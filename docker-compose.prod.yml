@@ -1,0 +1,47 @@
+services:
+  frontend:
+    container_name: tuyendung-studio-frontend-prod
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_NODE_ENV: production
+        REACT_APP_NODE_ENV: production
+        REACT_APP_API_JOB: http://your-domain.com/api/job/web
+        REACT_APP_API_COMPANY: http://your-domain.com/api/company/web
+        REACT_APP_API_INFO: http://your-domain.com/api/info/web
+        REACT_APP_API_AUTH: http://your-domain.com/api/auth/web
+    ports:
+      - "80:80"
+    restart: always
+    networks:
+      - myjob-network
+
+  backend:
+    container_name: tuyendung-studio-backend-prod
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
+    command: gunicorn --bind 0.0.0.0:8000 --workers 3 myjob_api.wsgi:application
+    ports:
+      - "8000:8000"
+    restart: always
+    depends_on:
+      - db
+      - redis
+    env_file:
+      - .env.prod
+    networks:
+      - myjob-network
+
+  # ... other services like db, redis would stay similar but with safer credentials ...
+
+networks:
+  myjob-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  huggingface-cache:
+  whisper-data:
+  minio-data:

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+        }
+
+        .header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            border-radius: 10px 10px 0 0;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .footer {
+            font-size: 12px;
+            color: #777;
+            margin-top: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Mời Phỏng vấn trực tuyến</h2>
+        </div>
+        <div class="content">
+            <p>Chào <strong>{{ candidate_name }}</strong>,</p>
+            <p>Bạn đã được mời tham gia buổi Phỏng vấn trực tuyến cho vị trí <strong>{{ job_title }}</strong>.</p>
+            <p>Đây là buổi phỏng vấn tự động với trợ lý ảo. Bạn có thể tham gia bất kỳ lúc nào thông qua liên kết dưới
+                đây:</p>
+
+            <div style="text-align: center;">
+                <a href="{{ interview_url }}" class="button">Tham gia Phỏng vấn ngay</a>
+            </div>
+
+            <p style="margin-top: 20px;">Thời gian dự kiến: 15-20 phút.</p>
+            <p>Mã buổi phỏng vấn của bạn: <strong>{{ invite_token }}</strong></p>
+
+            <p>Cảm ơn và chúc bạn có một buổi phỏng vấn tốt đẹp!</p>
+        </div>
+        <div class="footer">
+            <p>Đây là email tự động từ hệ thống TuyenDungSquare AI.</p>
+        </div>
+    </div>
+</body>
+
+</html>

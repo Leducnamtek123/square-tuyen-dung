@@ -1,0 +1,13 @@
+{
+  "myInterviewsTitle": "My interviews",
+  "noInterviewsTitle": "You have no interviews scheduled",
+  "nav": {
+    "dashboard": "My Dashboard",
+    "profile": "My Profile",
+    "myJobs": "My Jobs",
+    "myCompany": "My Company",
+    "myInterviews": "My Interviews",
+    "notifications": "Notifications",
+    "accountSettings": "Account & Settings"
+  }
+}

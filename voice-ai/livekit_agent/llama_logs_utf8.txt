@@ -1,0 +1,50 @@
+﻿slot get_availabl: id  2 | 
+task -1 | selected slot by 
+LCP similarity, sim_best = 
+0.902 (> 0.100 thold), f_keep 
+= 0.836
+slot launch_slot_: id  2 | 
+task -1 | sampler chain: 
+logits -> ?penalties -> ?dry 
+-> ?top-n-sigma -> top-k -> 
+?typical -> top-p -> min-p -> 
+?xtc -> temp-ext -> dist 
+slot launch_slot_: id  2 | 
+task 487 | processing task, 
+is_child = 0
+slot update_slots: id  2 | 
+task 487 | new prompt, 
+n_ctx_slot = 16384, n_keep = 
+0, task.n_tokens = 255
+slot update_slots: id  2 | 
+task 487 | n_tokens = 230, 
+memory_seq_rm [230, end)
+slot init_sampler: id  2 | 
+task 487 | init sampler, took 
+0.02 ms, tokens: text = 255, 
+total = 255
+slot update_slots: id  2 | 
+task 487 | prompt processing 
+done, n_tokens = 255, 
+batch.n_tokens = 25
+srv  log_server_r: done 
+request: POST 
+/v1/chat/completions 
+172.18.0.11 200
+slot print_timing: id  2 | 
+task 487 | 
+prompt eval time =     563.90 
+ms /    25 tokens (   22.56 
+ms per token,    44.33 tokens 
+per second)
+       eval time =    2939.26 
+ms /    33 tokens (   89.07 
+ms per token,    11.23 tokens 
+per second)
+      total time =    3503.16 
+ms /    58 tokens
+slot      release: id  2 | 
+task 487 | stop processing: 
+n_tokens = 287, truncated = 0
+srv  update_slots: all slots 
+are idle

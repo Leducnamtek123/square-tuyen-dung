@@ -1,0 +1,20 @@
+﻿{
+  "appName": "MyJob",
+  "actions": {
+    "start": "Start",
+    "close": "Close",
+    "backHome": "Back to home",
+    "joinNow": "Join now",
+    "cancel": "Cancel"
+  },
+  "status": {
+    "scheduled": "Scheduled",
+    "inProgress": "In progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "labels": {
+    "time": "Time",
+    "job": "Job"
+  }
+}

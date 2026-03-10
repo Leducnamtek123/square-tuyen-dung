@@ -1,0 +1,50 @@
+﻿- Chunk 1: raw_max=0.673931 
+-> boosted_max=0.95
+2026-03-08 09:53:38.082 | 
+INFO     | 
+__main__:write_to_ffmpeg:162 
+- Inference finished. Total 
+chunks: 1
+2026-03-08 09:53:41.130 | 
+INFO     | 
+__main__:write_to_ffmpeg:154 
+- Chunk 1: raw_max=0.855620 
+-> boosted_max=0.95
+2026-03-08 09:53:41.130 | 
+INFO     | 
+__main__:write_to_ffmpeg:162 
+- Inference finished. Total 
+chunks: 1
+2026-03-08 09:53:41.145 | 
+INFO     | 
+__main__:generator:185 - 
+FFmpeg stdout closed. Total 
+bytes output: 35373
+2026-03-08 09:53:41.164 | 
+INFO     | 
+__main__:tts_speech:84 - 
+Received TTS request: 
+{'input': 'Nß║┐u bß║ín cß║ºn 
+th├¬m sß╗▒ gi├║p ─æß╗í hoß║╖c 
+th├┤ng tin, ─æß╗½ng ngß║ºn 
+ngß║íi li├¬n hß╗ç.', 'model': 
+'tts-1', 'voice': 'Ly (nß╗» 
+miß╗ün Bß║»c)', 
+'response_format': 'mp3', 
+'speed': 1.0}
+2026-03-08 09:53:41.164 | 
+INFO     | 
+__main__:tts_speech:94 - 
+Matching voice found: Ly 
+(nß╗» miß╗ün Bß║»c) (Ly)
+2026-03-08 09:53:47.955 | 
+INFO     | 
+__main__:write_to_ffmpeg:154 
+- Chunk 1: raw_max=0.874851 
+-> boosted_max=0.95
+2026-03-08 09:53:47.967 | 
+INFO     | 
+__main__:write_to_ffmpeg:162 
+- Inference finished. Total 
+chunks: 1
+INFO:     172.18.0.11:60626 - "POST /v1/audio/speech HTTP/1.1" 200 OK

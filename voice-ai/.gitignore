@@ -1,0 +1,7 @@
+venv/
+inference/llama/models/
+
+# Python cache artifacts
+**/__pycache__/
+*.pyc
+.env

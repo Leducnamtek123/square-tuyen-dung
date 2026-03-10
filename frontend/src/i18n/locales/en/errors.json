@@ -1,0 +1,6 @@
+﻿{
+  "notFoundTitle": "Page not found",
+  "forbiddenTitle": "Access denied",
+  "systemErrorTitle": "Something went wrong",
+  "systemErrorBody": "Please try again later."
+}

@@ -1,0 +1,39 @@
+services:
+  vieneu-tts:
+    build:
+      context: ./inference/vieneu-tts
+      args:
+        MIRROR_PREFIX: ${DOCKER_MIRROR:-nvidia}
+    gpus: all
+
+  kokoro:
+    build:
+      context: ./inference/kokoro
+      args:
+        KOKORO_IMAGE: ${KOKORO_IMAGE:-ghcr.io/remsky/kokoro-fastapi-gpu:latest}
+
+  llama_cpp:
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    gpus: all
+    environment:
+      - LLAMA_ARG_N_GPU_LAYERS=${LLAMA_N_GPU_LAYERS:-35}
+
+  nemotron:
+    build:
+      context: ./inference/nemotron
+      args:
+        # Default to mirror prefix if provided
+        NEMOTRON_BASE: ${NEMOTRON_BASE:-${DOCKER_MIRROR:-nvidia}/cuda:12.4.1-cudnn-runtime-ubuntu22.04}
+        TORCH_INDEX_URL: ${NEMOTRON_TORCH_INDEX_URL:-https://download.pytorch.org/whl/cu124}
+        MIRROR_PREFIX: ${DOCKER_MIRROR:-nvidia}
+    gpus: all
+
+  whisper:
+    build:
+      context: ./inference/whisper
+      args:
+        WHISPER_BASE: ${WHISPER_BASE:-${DOCKER_MIRROR:-nvidia}/cuda:12.4.1-cudnn-runtime-ubuntu22.04}
+        MIRROR_PREFIX: ${DOCKER_MIRROR:-nvidia}
+    gpus: all
+    environment:
+      - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cuda:0}

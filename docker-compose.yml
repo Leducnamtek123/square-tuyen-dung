@@ -1,0 +1,371 @@
+
+services:
+  frontend:
+    container_name: tuyendung-studio-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+          REACT_APP_NODE_ENV: local
+          REACT_APP_API_JOB: http://localhost:8010/api/job/web
+          REACT_APP_API_COMPANY: http://localhost:8010/api/company/web
+          REACT_APP_API_INFO: http://localhost:8010/api/info/web
+          REACT_APP_API_AUTH: http://localhost:8010/api/auth/web
+
+           # GOONG - gợi ý địa điểm trong ô Địa điểm khi người dùng gõ vài từ
+          REACT_APP_GOONGAPI_KEY: ${REACT_APP_GOONGAPI_KEY}
+          REACT_APP_GOONGAPI_ACCESS_TOKEN: ${REACT_APP_GOONGAPI_ACCESS_TOKEN:-}
+
+          # FIREBASE
+          REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
+          REACT_APP_FIREBASE_AUTH_DOMAIN: ${REACT_APP_FIREBASE_AUTH_DOMAIN}
+          REACT_APP_FIREBASE_PROJECT_ID: ${REACT_APP_FIREBASE_PROJECT_ID}
+          REACT_APP_FIREBASE_STORAGE_BUCKET: ${REACT_APP_FIREBASE_STORAGE_BUCKET}
+          REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${REACT_APP_FIREBASE_MESSAGING_SENDER_ID}
+          REACT_APP_FIREBASE_APP_ID: ${REACT_APP_FIREBASE_APP_ID}
+    env_file:
+      - ./frontend/.env
+    ports:
+      - "3005:3000"
+    volumes:
+      - ./frontend:/myjob_web_app
+      - /myjob_web_app/node_modules
+    restart: unless-stopped
+    environment:
+      - VITE_NODE_ENV=local
+      - VITE_MYJOB_HOST_NAME=localhost
+      - VITE_ADMIN_MYJOB_HOST_NAME=admin.localhost
+      - VITE_EMPLOYER_MYJOB_HOST_NAME=employer.localhost
+      - VITE_MYJOB_SERVER_CLIENT_ID=${VITE_MYJOB_SERVER_CLIENT_ID}
+      - VITE_MYJOB_SERVER_CLIENT_SECRECT=${VITE_MYJOB_SERVER_CLIENT_SECRECT}
+      - VITE_GOOGLE_CLIENT_ID=${REACT_APP_GOOGLE_CLIENT_ID:-dummy-google-id}
+      - REACT_APP_NODE_ENV=local
+      # Nếu API KHÔNG có prefix /api thì để như dưới.
+      # Nếu dự án của bạn thực sự mount dưới /api, đổi lại thành http://localhost:8001/api
+      - REACT_APP_API_JOB=http://localhost:8010/api/job/web
+      - REACT_APP_API_COMPANY=http://localhost:8010/api/company/web
+      - REACT_APP_API_INFO=http://localhost:8010/api/info/web
+      - REACT_APP_API_AUTH=http://localhost:8010/api/auth/web
+      - REACT_APP_FACEBOOK_CLIENT_ID=${REACT_APP_FACEBOOK_CLIENT_ID}
+      - REACT_APP_FACEBOOK_CLIENT_SECRET=${REACT_APP_FACEBOOK_CLIENT_SECRET}
+      - REACT_APP_GOOGLE_CLIENT_ID=${REACT_APP_GOOGLE_CLIENT_ID}
+      - REACT_APP_GOOGLE_CLIENT_SECRET=${REACT_APP_GOOGLE_CLIENT_SECRET}
+
+    networks:
+      - myjob-network
+  backend:
+    container_name: tuyendung-studio-backend
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    # command: python  runserver 0.0.0.0:8001
+    command: python manage.py runserver 0.0.0.0:8001
+    volumes:
+      - ./api:/myjob_api
+    ports:
+      - "8010:8001"
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    environment:
+      # App config
+      - APP_ENV=local
+      - DEBUG=True
+      - APPEND_SLASH=True
+      - ALLOWED_HOSTS=*
+      - CSRF_TRUSTED_ORIGINS=https://tuyendung.sqstudio.vn,http://localhost:3002,http://127.0.0.1:3000,http://localhost:8001,http://localhost:8010,http://localhost:3005,http://admin.localhost:3005,http://employer.localhost:3005
+      - WEB_CLIENT_URL=http://localhost:3002
+      - WEB_JOB_SEEKER_CLIENT_URL=http://localhost:3002
+      - WEB_EMPLOYER_CLIENT_URL=http://localhost:3002
+
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      
+      - REQUIRE_CLIENT_SECRET=False
+
+      # Database config (CHUẨN CHO DJANGO + ĐÚNG DB VỪA IMPORT)
+      - DB_ENGINE=django.db.backends.mysql
+      - DB_HOST=tuyendung-studio-db
+      - DB_NAME=myjob_db
+      - DB_USER=root
+      - DB_PASSWORD=secret
+      - DB_PORT=3306
+
+      # Email
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_PORT=587
+      - EMAIL_HOST_USER=demow3907@gmail.com
+      - EMAIL_HOST_PASSWORD=enasoenfnxnxzzki
+
+      # Redis
+      - SERVICE_REDIS_HOST=redis
+      - SERVICE_REDIS_PORT=6379
+      - SERVICE_REDIS_USERNAME=
+      - SERVICE_REDIS_PASSWORD=
+      - SERVICE_REDIS_DB=0
+
+      # Twilio / Cloudinary / Social (tuỳ bạn)
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_PHONE=${TWILIO_PHONE}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - SOCIAL_AUTH_FACEBOOK_KEY=${SOCIAL_AUTH_FACEBOOK_KEY}
+      - SOCIAL_AUTH_FACEBOOK_SECRET=${SOCIAL_AUTH_FACEBOOK_SECRET}
+      - SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=${SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}
+      - SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=${SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET}
+      - SMS_API_KEY=${SMS_API_KEY}
+    networks:
+      - myjob-network
+  # ===== NEW: Celery worker =====
+  celery-worker:
+    container_name: tuyendung-studio-celery-worker
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    # nếu Dockerfile đã WORKDIR /app thì không cần; thêm cũng không hại
+    working_dir: /myjob_api
+    command: >
+      celery -A myjob_api.celery worker
+      --pool=prefork
+      --loglevel=info
+    volumes:
+      - ./api:/myjob_api
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    environment:
+      # giữ đồng bộ ENV với backend
+      - APP_ENV=local
+      - DEBUG=True
+      - APPEND_SLASH=True
+      - ALLOWED_HOSTS=*
+      - CSRF_TRUSTED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:8001,http://localhost:8010,http://tuyendung.sqstudio.vn,http://localhost:3005,http://admin.localhost:3005,http://employer.localhost:3005
+      - WEB_CLIENT_URL=http://localhost:3002
+      - WEB_JOB_SEEKER_CLIENT_URL=http://localhost:3002
+      - WEB_EMPLOYER_CLIENT_URL=http://localhost:3002
+
+      - DB_ENGINE=django.db.backends.mysql
+      - DB_HOST=tuyendung-studio-db
+      - DB_NAME=myjob_db
+      - DB_USER=root
+      - DB_PASSWORD=secret
+      - DB_PORT=3306
+
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_PORT=587
+      - EMAIL_HOST_USER=demow3907@gmail.com
+      - EMAIL_HOST_PASSWORD=enasoenfnxnxzzki
+
+      - SERVICE_REDIS_HOST=redis
+      - SERVICE_REDIS_PORT=6379
+      - SERVICE_REDIS_USERNAME=
+      - SERVICE_REDIS_PASSWORD=
+      - SERVICE_REDIS_DB=0
+    networks:
+      - myjob-network
+
+  # ===== NEW: Celery beat (lịch chạy định kỳ) =====
+  celery-beat:
+    container_name: tuyendung-studio-celery-beat
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    working_dir: /myjob_api
+    command: >
+      celery -A myjob_api beat -l info
+      --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    volumes:
+      - ./api:/myjob_api
+    depends_on:
+      - db
+      - redis
+    restart: unless-stopped
+    environment:
+      # giữ đồng bộ ENV với backend
+      - APP_ENV=local
+      - DEBUG=True
+      - APPEND_SLASH=True
+      - ALLOWED_HOSTS=*
+      - CSRF_TRUSTED_ORIGINS=https://tuyendung.sqstudio.vn,http://localhost:3000,http://127.0.0.1:3000,http://localhost:8001,http://localhost:8010,http://localhost:3005,http://admin.localhost:3005,http://employer.localhost:3005
+      - WEB_CLIENT_URL=http://localhost:3002
+      - WEB_EMPLOYER_CLIENT_URL=http://localhost:3002
+
+      - DB_ENGINE=django.db.backends.mysql
+      - DB_HOST=tuyendung-studio-db
+      - DB_NAME=myjob_db
+      - DB_USER=root
+      - DB_PASSWORD=secret
+      - DB_PORT=3306
+
+      - EMAIL_HOST=smtp.gmail.com
+      - EMAIL_PORT=587
+      - EMAIL_HOST_USER=demow3907@gmail.com
+      - EMAIL_HOST_PASSWORD=enasoenfnxnxzzki
+
+      - SERVICE_REDIS_HOST=redis
+      - SERVICE_REDIS_PORT=6379
+      - SERVICE_REDIS_USERNAME=
+      - SERVICE_REDIS_PASSWORD=
+      - SERVICE_REDIS_DB=0
+    networks:
+      - myjob-network
+
+  db:
+    image: mysql:8.0
+    container_name: tuyendung-studio-db
+    ports:
+      - "3310:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      # ĐÚNG với DB trong file SQL
+      MYSQL_DATABASE: myjob_db
+    volumes:
+      - db_data:/var/lib/mysql
+      # ĐÚNG đường dẫn file SQL của bạn
+      - ./tuyendungsqstudio.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - myjob-network
+
+  redis:
+    image: redis:7
+    container_name: tuyendung-studio-redis
+    ports:
+      - "6380:6379"
+    networks:
+      - myjob-network
+
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: tuyendung-studio-livekit
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+    environment:
+      LIVEKIT_KEYS: "${LIVEKIT_API_KEY:-devkey}: ${LIVEKIT_API_SECRET:-secret}"
+    volumes:
+      - ./voice-ai/livekit.yaml:/etc/livekit.yaml
+    command: --config /etc/livekit.yaml --dev --bind 0.0.0.0
+    networks:
+      - myjob-network
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  vieneu-tts:
+    build:
+      context: ./voice-ai/inference/vieneu-tts
+    container_name: tuyendung-studio-tts
+    environment:
+      - PORT=8298
+      - TTS_DEVICE=cuda
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    ports:
+      - "8298:8298"
+    volumes:
+      - huggingface-cache:/root/.cache/huggingface
+      - ./voice-ai/inference/vieneu-tts:/workspace
+    restart: unless-stopped
+    networks:
+      - myjob-network
+
+  whisper:
+    build:
+      context: ./voice-ai/inference/whisper
+    container_name: tuyendung-studio-whisper
+    volumes:
+      - whisper-data:/data
+    environment:
+      - VOXBOX_HF_REPO_ID=${VOXBOX_HF_REPO_ID:-Systran/faster-whisper-medium}
+      - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cpu}
+      - DATA_DIR=/data
+    ports:
+      - "11437:8080"
+    restart: unless-stopped
+    networks:
+      - myjob-network
+
+  llama-cpp:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    container_name: tuyendung-studio-llama-cpp
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - "11434"
+      - --hf-repo
+      - "${LLAMA_HF_REPO:-Qwen/Qwen2-7B-Instruct-GGUF}"
+      - --alias
+      - "${LLAMA_MODEL_ALIAS:-qwen2-7b}"
+    ports:
+      - "11436:11434"
+    volumes:
+      - ./voice-ai/inference/llama/models:/models
+    restart: unless-stopped
+    networks:
+      - myjob-network
+
+  livekit-agent:
+    build:
+      context: ./voice-ai/livekit_agent
+    container_name: tuyendung-studio-livekit-agent
+    environment:
+      - NUM_IDLE_PROCESSES=1
+      - BACKEND_API_URL=http://backend:8001/api/interview
+      - LIVEKIT_URL=http://livekit:7880
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}
+      - LLAMA_BASE_URL=http://llama-cpp:11434/v1
+      - STT_BASE_URL=http://whisper:8080/v1
+      - TTS_BASE_URL=http://vieneu-tts:8298/v1
+    depends_on:
+      - backend
+      - livekit
+      - vieneu-tts
+      - whisper
+      - llama-cpp
+    restart: unless-stopped
+    networks:
+      - myjob-network
+
+  minio:
+    image: quay.io/minio/minio:latest
+    container_name: tuyendung-studio-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-password}
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
+    networks:
+      - myjob-network
+
+networks:
+  myjob-network:
+    driver: bridge
+
+volumes:
+  db_data:
+  huggingface-cache:
+  whisper-data:
+  minio-data:

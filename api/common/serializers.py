@@ -1,0 +1,96 @@
+"""
+MyJob Recruitment System - Part of MyJob Platform
+
+Author: Bui Khanh Huy
+Email: khuy220@gmail.com
+Copyright (c) 2023 Bui Khanh Huy
+
+License: MIT License
+See the LICENSE file in the project root for full license information.
+"""
+
+from rest_framework import serializers
+from .models import (
+    District,
+    Location,
+    Career,
+    City
+)
+
+
+class CitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = City
+        fields = ('id', 'name', 'create_at', 'update_at')
+
+
+class DistrictSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = District
+        fields = ('id', 'name', 'city')
+
+
+class CareerSerializer(serializers.ModelSerializer):
+    name = serializers.CharField(max_length=150)
+    iconUrl = serializers.SerializerMethodField(method_name='get_icon_url', read_only=True)
+    appIconName = serializers.CharField(source='app_icon_name', read_only=True)
+    createAt = serializers.DateTimeField(source='create_at')
+    updateAt = serializers.DateTimeField(source='update_at')
+    jobPostTotal = serializers.SerializerMethodField(method_name='get_job_post_total')
+
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop('fields', None)
+
+        super().__init__(*args, **kwargs)
+
+        if fields is not None:
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+                
+    def get_icon_url(self, career):
+        return career.icon.get_full_url() if career.icon else None
+
+    def get_job_post_total(self, career):
+        return career.job_posts.count()
+
+
+    class Meta:
+        model = Career
+        fields = ('id', 'name', 'iconUrl', 'appIconName', 'createAt', 'updateAt', 'jobPostTotal')
+
+
+class ProfileDistrictSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = District
+        fields = ('id', 'name')
+
+
+class ProfileLocationSerializer(serializers.ModelSerializer):
+    districtDict = ProfileDistrictSerializers(source="district", read_only=True)
+
+    class Meta:
+        model = Location
+        fields = ('city', 'districtDict', 'address', 'district')
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    address = serializers.CharField(required=True, max_length=255)
+    lat = serializers.FloatField(required=False, allow_null=True)
+    lng = serializers.FloatField(required=False, allow_null=True)
+
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop('fields', None)
+
+        super().__init__(*args, **kwargs)
+
+        if fields is not None:
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
+    class Meta:
+        model = Location
+        fields = ('city', 'district', 'address', 'lat', 'lng')

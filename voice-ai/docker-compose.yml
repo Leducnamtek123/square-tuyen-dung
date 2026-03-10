@@ -1,0 +1,153 @@
+services:
+  vieneu-tts:
+    build:
+      context: ./inference/vieneu-tts
+    ports:
+      - "8298:8298"
+    environment:
+      - PORT=8298
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8298/health | grep -q '\"model_loaded\":true'"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 30s
+    networks:
+      - agent_network
+
+  nemotron:
+    build:
+      context: ./inference/nemotron
+    environment:
+      - NEMOTRON_MODEL_NAME=${NEMOTRON_MODEL_NAME:-nvidia/nemotron-speech-streaming-en-0.6b}
+      - NEMOTRON_MODEL_ID=${NEMOTRON_MODEL_ID:-nemotron-speech-streaming}
+      - PYTORCH_ENABLE_MPS_FALLBACK=1
+    ports:
+      - "11435:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8000/health | grep -q '\"model_loaded\":true'"]
+      interval: 10s
+      timeout: 5s
+      retries: 120
+      start_period: 20s
+    networks:
+      - agent_network
+
+  whisper:
+    build:
+      context: ./inference/whisper
+    volumes:
+      - whisper-data:/data
+    environment:
+      - VOXBOX_HF_REPO_ID=${VOXBOX_HF_REPO_ID:-Systran/faster-whisper-medium}
+      - VOXBOX_DEVICE=cuda
+      - DATA_DIR=/data
+    ports:
+      - "11437:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/v1/models > /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 150
+      start_period: 30s
+    networks:
+      - agent_network
+  
+  llama_cpp:
+    image: ghcr.io/ggml-org/llama.cpp:server
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - "11434"
+      - --hf-repo
+      - "${LLAMA_HF_REPO:-Qwen/Qwen2-7B-Instruct-GGUF}"
+      - --alias
+      - "${LLAMA_MODEL_ALIAS:-qwen2-7b}"
+      - --ctx-size
+      - "${LLAMA_CTX_SIZE:-16384}"
+    ports:
+      - "${LLAMA_HOST_PORT:-11436}:11434"
+    volumes:
+      - ./inference/llama/models:/models
+    environment:
+      - XDG_CACHE_HOME=/models
+      - HF_HOME=/models
+    networks:
+      - agent_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:11434/v1/models > /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 120
+      start_period: 30s
+
+  livekit:
+    image: livekit/livekit-server:latest
+    command: --dev --config /etc/livekit.yaml
+    volumes:
+      - ./livekit-configs/livekit.yaml:/etc/livekit.yaml
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+      - "50000-50010:50000-50010/udp"
+    networks:
+      - agent_network
+
+  livekit_agent:
+    build:
+      context: ./livekit_agent
+    env_file:
+      - .env
+    volumes:
+      - ./livekit_agent/src:/app/src
+    environment:
+      - LIVEKIT_URL=${LIVEKIT_URL:-ws://livekit:7880}
+      - LIVEKIT_HOST=${LIVEKIT_URL:-ws://livekit:7880}
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}
+      - LIVEKIT_AGENT_PORT=${LIVEKIT_AGENT_PORT:-7880}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-no-key-needed}
+      - GROQ_API_KEY=${GROQ_API_KEY:-no-key-needed}
+    depends_on:
+      livekit:
+        condition: service_started
+      vieneu-tts:
+        condition: service_healthy
+      whisper:
+        condition: service_healthy
+      llama_cpp:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8081/ > /dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    networks:
+      - agent_network
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3005:3000"
+    environment:
+      - NEXT_PUBLIC_LIVEKIT_URL=ws://localhost:7880
+      - LIVEKIT_URL=ws://livekit:7880
+      - LIVEKIT_API_KEY=devkey
+      - LIVEKIT_API_SECRET=secret
+    depends_on:
+      livekit:
+        condition: service_started
+    networks:
+      - agent_network
+
+volumes:
+  nemotron-cache:
+  whisper-data:
+
+networks:
+  agent_network:
+    driver: bridge

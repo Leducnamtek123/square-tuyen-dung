@@ -1,0 +1,24 @@
+﻿{
+  "redirectTitle": "Redirecting to interview room",
+  "redirectBody": "You will be moved into the interview room in this system.",
+  "redirectCta": "If you are not redirected, click here",
+  "readyTitle": "Ready to start the interview",
+  "readyBody": "Click start to connect. Camera and microphone will only turn on when you choose them in the toolbar.",
+  "startInterview": "Start interview",
+  "transcriptTitle": "Transcript",
+  "noMessages": "No messages yet.",
+  "chatPlaceholder": "Type a message...",
+  "controls": {
+    "mic": "Microphone",
+    "camera": "Camera",
+    "share": "Share",
+    "chat": "Chat",
+    "end": "End call"
+  },
+  "loading": "Connecting to interview room...",
+  "errors": {
+    "missingInvite": "Missing interview invite code.",
+    "tokenMissing": "Unable to fetch token to join the interview.",
+    "invalidSession": "Connection error or invalid interview session."
+  }
+}

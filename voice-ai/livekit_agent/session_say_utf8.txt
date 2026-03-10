@@ -1,0 +1,1 @@
+﻿(self, text: 'str | AsyncIterable[str]', *, audio: 'NotGivenOr[AsyncIterable[rtc.AudioFrame]]' = NOT_GIVEN, allow_interruptions: 'NotGivenOr[bool]' = NOT_GIVEN, add_to_chat_ctx: 'bool' = True) -> 'SpeechHandle'
