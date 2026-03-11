@@ -12,6 +12,7 @@ from livekit.agents import (
     cli,
 )
 from livekit.plugins import silero, openai
+from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 from .config import config
 from .prompts import INTERVIEWER_INSTRUCTIONS, DEFAULT_GREETING
@@ -74,7 +75,11 @@ async def entrypoint(ctx: JobContext):
             greeting = f"Xin chào {name}! Tôi là người phỏng vấn từ Hệ thống Phỏng vấn trực tuyến. Rất vui được gặp bạn trong buổi phỏng vấn cho vị trí {job_title} hôm nay. Bạn có thể bắt đầu bằng cách giới thiệu ngắn gọn về bản thân mình được không?"
 
         # Components
-        stt_model = openai.STT(base_url=config.stt_base_url, api_key="no-key-needed")
+        stt_model = openai.STT(
+            base_url=config.stt_base_url, 
+            api_key="no-key-needed",
+            language="vi"
+        )
         llm_model = openai.LLM(
             base_url=config.LLAMA_BASE_URL,
             api_key="no-key-needed",
@@ -83,7 +88,7 @@ async def entrypoint(ctx: JobContext):
         )
         tts_model = openai.TTS(base_url=config.TTS_BASE_URL, api_key=config.TTS_API_KEY)
 
-        # Agent with models
+        # Agent with models (compatible with 1.3.10)
         agent = Agent(
             instructions=instructions,
             vad=ctx.proc.userdata["vad"],
@@ -92,7 +97,9 @@ async def entrypoint(ctx: JobContext):
             tts=tts_model,
         )
 
-        session = AgentSession()
+        session = AgentSession(
+            turn_detection=MultilingualModel() # Better turn detection as in doc
+        )
         await session.start(agent, room=ctx.room)
         
         await _update_backend_status(ctx.room.name, "in_progress")

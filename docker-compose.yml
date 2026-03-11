@@ -228,7 +228,6 @@ services:
       - "8298:8298"
     volumes:
       - huggingface-cache:/root/.cache/huggingface
-      - ./voice-ai/inference/vieneu-tts:/workspace
     restart: unless-stopped
     networks:
       - myjob-network
