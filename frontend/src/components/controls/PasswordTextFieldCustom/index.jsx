@@ -11,12 +11,8 @@ See the LICENSE file in the project root for full license information.
 
 import React from 'react';
 import { Controller } from 'react-hook-form';
-import {
-  Box,
-  InputAdornment,
-  OutlinedInput,
-  Typography,
-} from '@mui/material';
+import { Box, InputAdornment, OutlinedInput, Typography } from "@mui/material";
+
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';

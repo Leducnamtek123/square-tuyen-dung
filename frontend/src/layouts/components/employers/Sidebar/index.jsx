@@ -11,20 +11,8 @@ See the LICENSE file in the project root for full license information.
 
 import React, { useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import {
-  Avatar,
-  Box,
-  Divider,
-  Drawer,
-  useTheme,
-  Toolbar,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  ListItemButton,
-  Collapse,
-} from '@mui/material';
+import { Avatar, Box, Divider, Drawer, useTheme, Toolbar, List, ListItem, ListItemIcon, ListItemText, ListItemButton, Collapse } from "@mui/material";
+
 import PropTypes from 'prop-types';
 import { styled } from '@mui/material/styles';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -38,6 +26,7 @@ import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNone
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import LanguageSwitcher from '../../commons/LanguageSwitcher';
 
 import { IMAGES, ROUTES, APP_NAME } from '../../../../configs/constants';
 
@@ -109,9 +98,11 @@ const MenuItem = ({ icon: Icon, text, to, onClick, isSelected, isExpanded, hasCh
       )}
       <ListItemText
         primary={text}
-        primaryTypographyProps={{
-          variant: 'body2',
-          fontSize: '0.9rem',
+        slotProps={{
+          primary: {
+            variant: 'body2',
+            fontSize: '0.9rem',
+          }
         }}
       />
       {hasChildren && (
@@ -181,17 +172,17 @@ const DrawerContent = ({ isAdmin }) => {
               <ListItem disablePadding>
                 <MenuItem
                   icon={GridViewIcon}
-                  text="Tổng quan hệ thống"
+                  text="System Overview"
                   to={`/${ROUTES.ADMIN.DASHBOARD}`}
                   isSelected={location.pathname === `/${ROUTES.ADMIN.DASHBOARD}`}
                 />
               </ListItem>
 
-              {/* Hệ thống & Người dùng */}
+              {/* System & Users */}
               <ListItem disablePadding>
                 <MenuItem
                   icon={AccountCircleOutlinedIcon}
-                  text="Hệ thống & Người dùng"
+                  text="System & Users"
                   hasChildren
                   isExpanded={expandedItems.system}
                   onClick={() => handleExpand('system')}
@@ -200,13 +191,13 @@ const DrawerContent = ({ isAdmin }) => {
               <Collapse in={expandedItems.system} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <MenuItem
-                    text="Người dùng & Phân quyền"
+                    text="Users & Permissions"
                     to={`/${ROUTES.ADMIN.USERS}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.USERS}`}
                     isChild
                   />
                   <MenuItem
-                    text="Cấu hình hệ thống"
+                    text="System Configuration"
                     to={`/${ROUTES.ADMIN.SETTINGS}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.SETTINGS}`}
                     isChild
@@ -214,11 +205,11 @@ const DrawerContent = ({ isAdmin }) => {
                 </List>
               </Collapse>
 
-              {/* Danh mục chung */}
+              {/* General Categories */}
               <ListItem disablePadding>
                 <MenuItem
                   icon={BusinessOutlinedIcon}
-                  text="Danh mục chung"
+                  text="General Categories"
                   hasChildren
                   isExpanded={expandedItems.categories}
                   onClick={() => handleExpand('categories')}
@@ -227,19 +218,19 @@ const DrawerContent = ({ isAdmin }) => {
               <Collapse in={expandedItems.categories} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <MenuItem
-                    text="Quản lý ngành nghề"
+                    text="Careers Management"
                     to={`/${ROUTES.ADMIN.CAREERS}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.CAREERS}`}
                     isChild
                   />
                   <MenuItem
-                    text="Quản lý tỉnh thành"
+                    text="Cities Management"
                     to={`/${ROUTES.ADMIN.CITIES}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.CITIES}`}
                     isChild
                   />
                   <MenuItem
-                    text="Quản lý quận huyện"
+                    text="Districts Management"
                     to={`/${ROUTES.ADMIN.DISTRICTS}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.DISTRICTS}`}
                     isChild
@@ -247,11 +238,11 @@ const DrawerContent = ({ isAdmin }) => {
                 </List>
               </Collapse>
 
-              {/* Thông tin & Hồ sơ */}
+              {/* Info & Profiles */}
               <ListItem disablePadding>
                 <MenuItem
                   icon={BusinessOutlinedIcon}
-                  text="Thông tin & Hồ sơ"
+                  text="Info & Profiles"
                   hasChildren
                   isExpanded={expandedItems.profiles}
                   onClick={() => handleExpand('profiles')}
@@ -260,19 +251,19 @@ const DrawerContent = ({ isAdmin }) => {
               <Collapse in={expandedItems.profiles} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <MenuItem
-                    text="Quản lý công ty"
+                    text="Company Management"
                     to={`/${ROUTES.ADMIN.COMPANIES}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.COMPANIES}`}
                     isChild
                   />
                   <MenuItem
-                    text="Hồ sơ ứng viên"
+                    text="Candidate Profiles"
                     to={`/${ROUTES.ADMIN.PROFILES}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.PROFILES}`}
                     isChild
                   />
                   <MenuItem
-                    text="Quản lý CV/Resume"
+                    text="CV/Resume Management"
                     to={`/${ROUTES.ADMIN.RESUMES}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.RESUMES}`}
                     isChild
@@ -280,11 +271,11 @@ const DrawerContent = ({ isAdmin }) => {
                 </List>
               </Collapse>
 
-              {/* Tuyển dụng & Phỏng vấn */}
+              {/* Recruitment & Interviews */}
               <ListItem disablePadding>
                 <MenuItem
                   icon={FactCheckOutlinedIcon}
-                  text="Tuyển dụng & Phỏng vấn"
+                  text="Recruitment & Interviews"
                   hasChildren
                   isExpanded={expandedItems.recruitment}
                   onClick={() => handleExpand('recruitment')}
@@ -293,43 +284,43 @@ const DrawerContent = ({ isAdmin }) => {
               <Collapse in={expandedItems.recruitment} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <MenuItem
-                    text="Tin tuyển dụng"
+                    text="Job Posts"
                     to={`/${ROUTES.ADMIN.JOBS}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.JOBS}`}
                     isChild
                   />
                   <MenuItem
-                    text="Nhật ký hoạt động"
+                    text="Activity Logs"
                     to={`/${ROUTES.ADMIN.JOB_ACTIVITY}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.JOB_ACTIVITY}`}
                     isChild
                   />
                   <MenuItem
-                    text="Ngân hàng câu hỏi"
+                    text="Question Bank"
                     to={`/${ROUTES.ADMIN.QUESTIONS}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.QUESTIONS}`}
                     isChild
                   />
                   <MenuItem
-                    text="Bộ đề phỏng vấn"
+                    text="Interview Question Sets"
                     to={`/${ROUTES.ADMIN.QUESTION_GROUPS}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.QUESTION_GROUPS}`}
                     isChild
                   />
                   <MenuItem
-                    text="Lịch trình phỏng vấn"
+                    text="Interview Schedule"
                     to={`/${ROUTES.ADMIN.INTERVIEWS}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.INTERVIEWS}`}
                     isChild
                   />
                   <MenuItem
-                    text="Phỏng vấn công ty trực tiếp"
+                    text="Direct Company Interviews"
                     to={`/${ROUTES.ADMIN.INTERVIEW_LIVE}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.INTERVIEW_LIVE}`}
                     isChild
                   />
                   <MenuItem
-                    text="Thông báo việc làm"
+                    text="Job Notifications"
                     to={`/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`}
                     isChild
@@ -339,31 +330,31 @@ const DrawerContent = ({ isAdmin }) => {
             </>
           ) : (
             <>
-              {/* Tổng quan */}
+              {/* Overview */}
               <ListItem disablePadding>
                 <MenuItem
                   icon={GridViewIcon}
-                  text="Bảng điều khiển"
+                  text="Dashboard"
                   to={`/${ROUTES.EMPLOYER.DASHBOARD}`}
                   isSelected={location.pathname === `/${ROUTES.EMPLOYER.DASHBOARD}`}
                 />
               </ListItem>
 
-              {/* Quản lý đăng tuyển */}
+              {/* Recruitment Management */}
               <ListItem disablePadding>
                 <MenuItem
                   icon={ListAltOutlinedIcon}
-                  text="Danh sách tin đăng"
+                  text="Job Post List"
                   to={`/${ROUTES.EMPLOYER.JOB_POST}`}
                   isSelected={location.pathname === `/${ROUTES.EMPLOYER.JOB_POST}`}
                 />
               </ListItem>
 
-              {/* Quản lý ứng viên */}
+              {/* Candidate Management */}
               <ListItem disablePadding>
                 <MenuItem
                   icon={FactCheckOutlinedIcon}
-                  text="Quản lý ứng viên"
+                  text="Candidate Management"
                   hasChildren
                   isExpanded={expandedItems.candidates}
                   onClick={() => handleExpand('candidates')}
@@ -372,19 +363,19 @@ const DrawerContent = ({ isAdmin }) => {
               <Collapse in={expandedItems.candidates} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <MenuItem
-                    text="Hồ sơ ứng tuyển"
+                    text="Applied Applications"
                     to={`/${ROUTES.EMPLOYER.APPLIED_PROFILE}`}
                     isSelected={location.pathname === `/${ROUTES.EMPLOYER.APPLIED_PROFILE}`}
                     isChild
                   />
                   <MenuItem
-                    text="Hồ sơ đã lưu"
+                    text="Saved Profiles"
                     to={`/${ROUTES.EMPLOYER.SAVED_PROFILE}`}
                     isSelected={location.pathname === `/${ROUTES.EMPLOYER.SAVED_PROFILE}`}
                     isChild
                   />
                   <MenuItem
-                    text="Tìm ứng viên mới"
+                    text="Find Candidates"
                     to={`/${ROUTES.EMPLOYER.PROFILE}`}
                     isSelected={location.pathname === `/${ROUTES.EMPLOYER.PROFILE}`}
                     isChild
@@ -392,11 +383,11 @@ const DrawerContent = ({ isAdmin }) => {
                 </List>
               </Collapse>
 
-              {/* Phỏng vấn trực tuyến */}
+              {/* Online Interviews */}
               <ListItem disablePadding>
                 <MenuItem
                   icon={FactCheckOutlinedIcon}
-                  text="Phỏng vấn Trực tuyến"
+                  text="Online Interviews"
                   hasChildren
                   isExpanded={expandedItems.interviews}
                   onClick={() => handleExpand('interviews')}
@@ -405,25 +396,25 @@ const DrawerContent = ({ isAdmin }) => {
               <Collapse in={expandedItems.interviews} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <MenuItem
-                    text="Danh sách phỏng vấn"
+                    text="Interview List"
                     to={`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`}
                     isSelected={location.pathname === `/${ROUTES.EMPLOYER.INTERVIEW_LIST}`}
                     isChild
                   />
                   <MenuItem
-                    text="Phỏng vấn ứng viên trực tiếp"
+                    text="Live Interview Room"
                     to={`/${ROUTES.EMPLOYER.INTERVIEW_LIVE}`}
                     isSelected={location.pathname === `/${ROUTES.EMPLOYER.INTERVIEW_LIVE}`}
                     isChild
                   />
                   <MenuItem
-                    text="Ngân hàng câu hỏi"
+                    text="Question Bank"
                     to={`/${ROUTES.EMPLOYER.QUESTION_BANK}`}
                     isSelected={location.pathname === `/${ROUTES.EMPLOYER.QUESTION_BANK}`}
                     isChild
                   />
                   <MenuItem
-                    text="Bộ câu hỏi"
+                    text="Question Sets"
                     to={`/${ROUTES.EMPLOYER.QUESTION_GROUPS}`}
                     isSelected={location.pathname === `/${ROUTES.EMPLOYER.QUESTION_GROUPS}`}
                     isChild
@@ -431,21 +422,21 @@ const DrawerContent = ({ isAdmin }) => {
                 </List>
               </Collapse>
 
-              {/* Quản lý thông báo */}
+              {/* Notifications */}
               <ListItem disablePadding>
                 <MenuItem
                   icon={NotificationsNoneOutlinedIcon}
-                  text={`${APP_NAME} thông báo`}
+                  text={`${APP_NAME} Notifications`}
                   to={`/${ROUTES.EMPLOYER.NOTIFICATION}`}
                   isSelected={location.pathname === `/${ROUTES.EMPLOYER.NOTIFICATION}`}
                 />
               </ListItem>
 
-              {/* Quản lý tài khoản */}
+              {/* Account Management */}
               <ListItem disablePadding>
                 <MenuItem
                   icon={BusinessOutlinedIcon}
-                  text="Quản lý tài khoản"
+                  text="Account Management"
                   hasChildren
                   isExpanded={expandedItems.account}
                   onClick={() => handleExpand('account')}
@@ -454,26 +445,26 @@ const DrawerContent = ({ isAdmin }) => {
               <Collapse in={expandedItems.account} timeout="auto" unmountOnExit>
                 <List component="div" disablePadding>
                   <MenuItem
-                    text="Thông tin công ty"
+                    text="Company Info"
                     to={`/${ROUTES.EMPLOYER.COMPANY}`}
                     isSelected={location.pathname === `/${ROUTES.EMPLOYER.COMPANY}`}
                     isChild
                   />
                   <MenuItem
-                    text="Xac thuc nha tuyen dung"
+                    text="Employer Verification"
                     to={`/${ROUTES.EMPLOYER.VERIFICATION}`}
                     isSelected={location.pathname === `/${ROUTES.EMPLOYER.VERIFICATION}`}
                     isChild
                   />
 
                   <MenuItem
-                    text="Tài khoản"
+                    text="Account"
                     to={`/${ROUTES.EMPLOYER.ACCOUNT}`}
                     isSelected={location.pathname === `/${ROUTES.EMPLOYER.ACCOUNT}`}
                     isChild
                   />
                   <MenuItem
-                    text="Cài đặt"
+                    text="Settings"
                     to={`/${ROUTES.EMPLOYER.SETTING}`}
                     isSelected={location.pathname === `/${ROUTES.EMPLOYER.SETTING}`}
                     isChild
@@ -482,6 +473,10 @@ const DrawerContent = ({ isAdmin }) => {
               </Collapse>
             </>
           )}
+          <Divider sx={{ my: 2, borderColor: 'grey.300' }} />
+          <ListItem disablePadding sx={{ px: 2, pb: 2 }}>
+            <LanguageSwitcher color="text.primary" />
+          </ListItem>
         </List>
       </Box>
     </div>

@@ -399,6 +399,25 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
     maritalStatus = serializers.CharField(source='marital_status',
                                           required=True,
                                           max_length=1)
+    idCardNumber = serializers.CharField(source='id_card_number', required=False,
+                                         allow_blank=True, allow_null=True, max_length=30)
+    idCardIssueDate = serializers.DateField(source='id_card_issue_date', required=False, allow_null=True,
+                                            input_formats=[var_sys.DATE_TIME_FORMAT["ISO8601"],
+                                                           var_sys.DATE_TIME_FORMAT["Ymd"]])
+    idCardIssuePlace = serializers.CharField(source='id_card_issue_place', required=False,
+                                             allow_blank=True, allow_null=True, max_length=255)
+    taxCode = serializers.CharField(source='tax_code', required=False,
+                                    allow_blank=True, allow_null=True, max_length=30)
+    socialInsuranceNo = serializers.CharField(source='social_insurance_no', required=False,
+                                              allow_blank=True, allow_null=True, max_length=30)
+    permanentAddress = serializers.CharField(source='permanent_address', required=False,
+                                             allow_blank=True, allow_null=True, max_length=255)
+    contactAddress = serializers.CharField(source='contact_address', required=False,
+                                           allow_blank=True, allow_null=True, max_length=255)
+    emergencyContactName = serializers.CharField(source='emergency_contact_name', required=False,
+                                                 allow_blank=True, allow_null=True, max_length=100)
+    emergencyContactPhone = serializers.CharField(source='emergency_contact_phone', required=False,
+                                                  allow_blank=True, allow_null=True, max_length=20)
     location = common_serializers.ProfileLocationSerializer()
     user = auth_serializers.UserSerializer(fields=["fullName"])
     old = serializers.SerializerMethodField(
@@ -428,6 +447,10 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
         model = JobSeekerProfile
         fields = ('id', 'phone', 'birthday',
                   'gender', 'maritalStatus',
+                  'idCardNumber', 'idCardIssueDate', 'idCardIssuePlace',
+                  'taxCode', 'socialInsuranceNo',
+                  'permanentAddress', 'contactAddress',
+                  'emergencyContactName', 'emergencyContactPhone',
                   'location', 'user', 'old')
 
     def update(self, instance, validated_data):
@@ -436,6 +459,15 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
         instance.gender = validated_data.get('gender', instance.gender)
         instance.marital_status = validated_data.get(
             'marital_status', instance.marital_status)
+        instance.id_card_number = validated_data.get('id_card_number', instance.id_card_number)
+        instance.id_card_issue_date = validated_data.get('id_card_issue_date', instance.id_card_issue_date)
+        instance.id_card_issue_place = validated_data.get('id_card_issue_place', instance.id_card_issue_place)
+        instance.tax_code = validated_data.get('tax_code', instance.tax_code)
+        instance.social_insurance_no = validated_data.get('social_insurance_no', instance.social_insurance_no)
+        instance.permanent_address = validated_data.get('permanent_address', instance.permanent_address)
+        instance.contact_address = validated_data.get('contact_address', instance.contact_address)
+        instance.emergency_contact_name = validated_data.get('emergency_contact_name', instance.emergency_contact_name)
+        instance.emergency_contact_phone = validated_data.get('emergency_contact_phone', instance.emergency_contact_phone)
         location_obj = instance.location
         user_obj = instance.user
 
@@ -524,6 +556,8 @@ class ResumeSerializer(serializers.ModelSerializer):
         required=False, allow_null=True, allow_blank=True)
     salaryMin = serializers.IntegerField(source="salary_min", required=True)
     salaryMax = serializers.IntegerField(source="salary_max", required=True)
+    expectedSalary = serializers.IntegerField(source="expected_salary", required=False, allow_null=True)
+    skillsSummary = serializers.CharField(source="skills_summary", required=False, allow_null=True, allow_blank=True)
     position = serializers.IntegerField(required=True)
     positionChooseData = serializers.SerializerMethodField(
         method_name="get_position_data", read_only=True)
@@ -679,7 +713,9 @@ class ResumeSerializer(serializers.ModelSerializer):
                 'companyName': exp.company_name,
                 'startDate': exp.start_date.isoformat() if exp.start_date else None,
                 'endDate': exp.end_date.isoformat() if exp.end_date else None,
-                'description': exp.description
+                'description': exp.description,
+                'lastSalary': exp.last_salary,
+                'leaveReason': exp.leave_reason
             })
         return experiences
 
@@ -693,7 +729,8 @@ class ResumeSerializer(serializers.ModelSerializer):
                 'trainingPlaceName': edu.training_place_name,
                 'startDate': edu.start_date.isoformat() if edu.start_date else None,
                 'completedDate': edu.completed_date.isoformat() if edu.completed_date else None,
-                'description': edu.description
+                'description': edu.description,
+                'gradeOrRank': edu.grade_or_rank
             })
         return educations
 
@@ -732,7 +769,7 @@ class ResumeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resume
         fields = ("id", "slug", "title", "description",
-                  "salaryMin", "salaryMax",
+                  "salaryMin", "salaryMax", "expectedSalary", "skillsSummary",
                   "position", "experience", "academicLevel",
                   "typeOfWorkplace", "jobType", "isActive",
                   "career", "updateAt", "file",
@@ -783,12 +820,14 @@ class ExperiencePdfSerializer(serializers.ModelSerializer):
     startDate = serializers.DateField(source='start_date', read_only=True)
     endDate = serializers.DateField(source='end_date', read_only=True)
     description = serializers.CharField(read_only=True)
+    lastSalary = serializers.IntegerField(source='last_salary', read_only=True)
+    leaveReason = serializers.CharField(source='leave_reason', read_only=True)
 
     class Meta:
         model = ExperienceDetail
         fields = ('id', 'jobName', 'companyName',
                   'startDate', 'endDate',
-                  'description')
+                  'description', 'lastSalary', 'leaveReason')
 
 
 class EducationPdfSerializer(serializers.ModelSerializer):
@@ -800,11 +839,12 @@ class EducationPdfSerializer(serializers.ModelSerializer):
     completedDate = serializers.DateField(
         source='completed_date', read_only=True)
     description = serializers.CharField(read_only=True)
+    gradeOrRank = serializers.CharField(source='grade_or_rank', read_only=True)
 
     class Meta:
         model = EducationDetail
         fields = ('id', 'degreeName', 'major', 'trainingPlaceName',
-                  'startDate', 'completedDate', 'description')
+                  'startDate', 'completedDate', 'description', 'gradeOrRank')
 
 
 class CertificatePdfSerializer(serializers.ModelSerializer):
@@ -844,6 +884,8 @@ class ResumePdfViewSerializer(serializers.ModelSerializer):
     description = serializers.CharField(read_only=True, )
     salaryMin = serializers.IntegerField(source="salary_min", read_only=True, )
     salaryMax = serializers.IntegerField(source="salary_max", read_only=True, )
+    expectedSalary = serializers.IntegerField(source="expected_salary", read_only=True, )
+    skillsSummary = serializers.CharField(source="skills_summary", read_only=True, )
     experience = serializers.IntegerField(read_only=True, )
     academicLevel = serializers.IntegerField(
         source="academic_level", read_only=True, )
@@ -872,7 +914,7 @@ class ResumePdfViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resume
         fields = ("title", "description",
-                  "salaryMin", "salaryMax",
+                  "salaryMin", "salaryMax", "expectedSalary", "skillsSummary",
                   "position", "experience",
                   "academicLevel",
                   "typeOfWorkplace", "jobType",
@@ -987,6 +1029,8 @@ class EducationSerializer(serializers.ModelSerializer):
                                                          var_sys.DATE_TIME_FORMAT["Ymd"]])
     description = serializers.CharField(
         required=False, allow_null=True, allow_blank=True)
+    gradeOrRank = serializers.CharField(
+        source='grade_or_rank', required=False, allow_blank=True, allow_null=True, max_length=100)
 
     # slug field for web
     resume = serializers.SlugRelatedField(
@@ -1018,7 +1062,7 @@ class EducationSerializer(serializers.ModelSerializer):
     class Meta:
         model = EducationDetail
         fields = ('id', 'degreeName', 'major', 'trainingPlaceName',
-                  'startDate', 'completedDate', 'description', 'resume', 'resumeId')
+                  'startDate', 'completedDate', 'description', 'gradeOrRank', 'resume', 'resumeId')
 
 
 class ExperienceSerializer(serializers.ModelSerializer):
@@ -1034,6 +1078,9 @@ class ExperienceSerializer(serializers.ModelSerializer):
                                                    var_sys.DATE_TIME_FORMAT["Ymd"]])
     description = serializers.CharField(
         required=False, allow_null=True, allow_blank=True)
+    lastSalary = serializers.IntegerField(source='last_salary', required=False, allow_null=True)
+    leaveReason = serializers.CharField(source='leave_reason', required=False,
+                                        allow_blank=True, allow_null=True, max_length=255)
 
     # slug field for web
     resume = serializers.SlugRelatedField(
@@ -1066,7 +1113,7 @@ class ExperienceSerializer(serializers.ModelSerializer):
         model = ExperienceDetail
         fields = ('id', 'jobName', 'companyName',
                   'startDate', 'endDate',
-                  'description', 'resume', 'resumeId')
+                  'description', 'lastSalary', 'leaveReason', 'resume', 'resumeId')
 
 
 class CertificateSerializer(serializers.ModelSerializer):
@@ -1205,6 +1252,8 @@ class ResumeDetailSerializer(serializers.ModelSerializer):
         required=False, allow_null=True, allow_blank=True)
     salaryMin = serializers.IntegerField(source="salary_min", required=True)
     salaryMax = serializers.IntegerField(source="salary_max", required=True)
+    expectedSalary = serializers.IntegerField(source="expected_salary", required=False, allow_null=True)
+    skillsSummary = serializers.CharField(source="skills_summary", required=False, allow_null=True, allow_blank=True)
     position = serializers.IntegerField(required=True)
     experience = serializers.IntegerField(required=True)
     academicLevel = serializers.IntegerField(
@@ -1227,20 +1276,24 @@ class ResumeDetailSerializer(serializers.ModelSerializer):
     jobSeekerProfile = JobSeekerProfileSerializer(source="job_seeker_profile",
                                                   fields=[
                                                       "id", "phone", "birthday",
-                                                      "gender", "maritalStatus", "location"
+                                                      "gender", "maritalStatus", "location",
+                                                      "idCardNumber", "idCardIssueDate", "idCardIssuePlace",
+                                                      "taxCode", "socialInsuranceNo",
+                                                      "permanentAddress", "contactAddress",
+                                                      "emergencyContactName", "emergencyContactPhone"
                                                   ],
                                                   read_only=True)
     experiencesDetails = ExperienceSerializer(source="experience_details",
                                               fields=[
                                                   'id', 'jobName', 'companyName',
                                                   'startDate', 'endDate',
-                                                  'description',
+                                                  'description', 'lastSalary', 'leaveReason',
                                               ],
                                               read_only=True, many=True)
     educationDetails = EducationSerializer(source="education_details",
                                            fields=[
                                                'id', 'degreeName', 'major', 'trainingPlaceName',
-                                               'startDate', 'completedDate', 'description'
+                                               'startDate', 'completedDate', 'description', 'gradeOrRank'
                                            ], read_only=True, many=True)
     certificates = CertificateSerializer(fields=[
         'id', 'name', 'trainingPlace', 'startDate',
@@ -1310,7 +1363,7 @@ class ResumeDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resume
         fields = ("id", "slug", "title", "description",
-                  "salaryMin", "salaryMax",
+                  "salaryMin", "salaryMax", "expectedSalary", "skillsSummary",
                   "position", "experience", "academicLevel",
                   "typeOfWorkplace", "jobType", "isActive",
                   "city", "career", "updateAt", "fileUrl",

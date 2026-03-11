@@ -138,7 +138,6 @@ application = JobPostActivity.objects.create(
 print("Creating Question Bank and Interview...")
 q1 = Question.objects.create(
     text="Trình bày vòng đời của một component trong React từ khi mount đến unmount.",
-    category='technical',
     difficulty=2,
     career=career,
     author=emp_user,
@@ -146,7 +145,6 @@ q1 = Question.objects.create(
 )
 q2 = Question.objects.create(
     text="Bạn giải quyết conflict nội bộ với đồng nghiệp như thế nào khi deadline đang cận kề?",
-    category='behavioral',
     difficulty=2,
     career=career,
     author=emp_user,

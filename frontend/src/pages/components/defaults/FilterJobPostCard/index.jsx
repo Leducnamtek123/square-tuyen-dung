@@ -10,7 +10,8 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
-import { Grid, Pagination, Stack } from '@mui/material';
+import { Pagination, Stack } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 
 import jobService from '../../../../services/jobService';
 import JobPost from '../../../../components/JobPost';
@@ -85,7 +86,7 @@ const FilterJobPostCard = ({ params = {}}) => {
         {isLoading ? (
           <Grid container spacing={2}>
             {Array.from(Array(pageSize).keys()).map((item) => (
-              <Grid key={item} item xs={col}>
+              <Grid key={item} size={col}>
                 <JobPost.Loading></JobPost.Loading>
               </Grid>
             ))}
@@ -96,7 +97,7 @@ const FilterJobPostCard = ({ params = {}}) => {
           <>
             <Grid container spacing={2}>
               {jobPosts.map((value) => (
-                <Grid item xs={col} key={value.id}>
+                <Grid key={value.id} size={col}>
                   {/* Start: Job post */}
                   <JobPost
                     id={value.id}

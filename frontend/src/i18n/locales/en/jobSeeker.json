@@ -9,5 +9,65 @@
     "myInterviews": "My Interviews",
     "notifications": "Notifications",
     "accountSettings": "Account & Settings"
+  },
+  "profile": {
+    "fields": {
+      "idCardNumber": "ID card number",
+      "idCardIssueDate": "ID card issue date",
+      "idCardIssuePlace": "ID card issue place",
+      "taxCode": "Tax code",
+      "socialInsuranceNo": "Social insurance number",
+      "permanentAddress": "Permanent address",
+      "contactAddress": "Contact address",
+      "emergencyContactName": "Emergency contact name",
+      "emergencyContactPhone": "Emergency contact phone",
+      "expectedSalary": "Expected salary",
+      "skillsSummary": "Skills summary",
+      "gradeOrRank": "Grade/Rank",
+      "lastSalary": "Last salary",
+      "leaveReason": "Reason for leaving"
+    },
+    "placeholders": {
+      "idCardNumber": "Enter ID card number",
+      "idCardIssueDate": "Select issue date",
+      "idCardIssuePlace": "Enter issue place",
+      "taxCode": "Enter tax code",
+      "socialInsuranceNo": "Enter social insurance number",
+      "permanentAddress": "Enter permanent address",
+      "contactAddress": "Enter contact address",
+      "emergencyContactName": "Enter contact name",
+      "emergencyContactPhone": "Enter contact phone",
+      "expectedSalary": "Enter expected salary",
+      "skillsSummary": "Summarize strengths, achievements, and special skills",
+      "gradeOrRank": "Enter grade or rank",
+      "lastSalary": "Enter last salary",
+      "leaveReason": "Enter reason for leaving"
+    }
+  },
+  "noDataForStatistics": "No data available for statistics",
+  "educationAddedSuccess": "Education information added successfully.",
+  "educationUpdatedSuccess": "Education information updated successfully.",
+  "educationDeletedSuccess": "Education information deleted successfully.",
+  "deleteEducationTitle": "Delete Education Information",
+  "deleteEducationWarning": "This education information will be permanently deleted and cannot be restored. Are you sure?",
+  "pleaseAddEducationInfo": "Please add your education information for employers to reference",
+  "present": "Present",
+  "detailedDescription": "Detailed Description",
+  "notUpdated": "Not updated",
+  "education": "Education",
+  "appliedJobs": "Applied Jobs",
+  "savedJobs": "Saved Jobs",
+  "employersViewedProfile": "Employers Viewed Profile",
+  "followedCompanies": "Followed Companies",
+  "dashboard": {
+    "pageTitle": "Job Seeker Dashboard",
+    "yourActivity": "Your Activity",
+    "suggestedJobs": "Suggested Jobs"
+  },
+  "sidebarViewTotal": {
+    "title": "Is your CV good enough?",
+    "subtitle": "How many employers are interested in your profile?",
+    "description": "Each employer view of your CV brings an opportunity for you to get closer to the right job.",
+    "button": "Explore Now"
   }
 }

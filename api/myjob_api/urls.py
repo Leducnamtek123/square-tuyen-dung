@@ -4,7 +4,7 @@ from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from myjob_api.admin import custom_admin_site
 from . import views
-from . import ai_views, interviews_compat_views
+from . import ai_views, interviews_compat_views, livekit_webhook
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -35,7 +35,9 @@ urlpatterns = [
             path('admin/web/system-settings/', views.SystemSettingsAPIView.as_view()),
             path('ai/tts/', ai_views.tts),
             path('ai/transcribe/', ai_views.transcribe),
+            path('livekit/webhook', livekit_webhook.livekit_webhook),
             path('interviews/<str:room_name>/context', interviews_compat_views.interview_context),
+            path('interviews/<str:room_name>/next-question', interviews_compat_views.interview_next_question),
             path('interviews/<str:room_name>/status', interviews_compat_views.interview_status),
         ]
     )),

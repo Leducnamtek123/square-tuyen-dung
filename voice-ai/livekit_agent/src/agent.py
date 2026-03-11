@@ -4,7 +4,6 @@ import httpx
 
 from livekit import rtc
 from livekit.agents import (
-    Agent,
     AgentSession,
     JobContext,
     JobProcess,
@@ -15,7 +14,8 @@ from livekit.plugins import silero, openai
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 from .config import config
-from .prompts import INTERVIEWER_INSTRUCTIONS, DEFAULT_GREETING
+from .prompts import DEFAULT_GREETING
+from .interviewer import Interviewer
 
 logger = logging.getLogger("agent")
 
@@ -43,12 +43,6 @@ def prewarm(proc: JobProcess):
     # Loading models in prewarm can sometimes cause IPC crashes (DuplexClosed).
     pass
 
-class Interviewer(Agent):
-    def __init__(self, instructions: str):
-        super().__init__(
-            instructions=instructions,
-        )
-
 async def entrypoint(ctx: JobContext):
     ctx.log_context_fields = {"room": ctx.room.name}
     logger.info("Starting square-ai-interviewer for room: %s", ctx.room.name)
@@ -71,24 +65,28 @@ async def entrypoint(ctx: JobContext):
         except Exception as e:
             logger.warning("Could not fetch interview context: %s", e)
 
-        # 3. Build Instructions & Greeting
-        instructions = INTERVIEWER_INSTRUCTIONS
+        # 3. Build Greeting + Agent Context
         greeting = DEFAULT_GREETING
+        agent_context = {
+            "backendApiUrl": config.BACKEND_API_URL,
+            "roomName": ctx.room.name,
+        }
         if interview_context:
             name = interview_context.get("candidateName") or "Ứng viên"
             job_title = interview_context.get("jobTitle") or "vị trí phỏng vấn"
-            instructions += f"\n\nTHÔNG TIN BUỔI PHỎNG VẤN:\n- Ứng viên: {name}\n- Vị trí: {job_title}\n"
-            questions = interview_context.get("questions", [])
-            if questions:
-                questions_text = "\n".join(f"- {str(q.get('text') if isinstance(q, dict) else q)}" for q in questions)
-                instructions += f"\nDANH SÁCH CÂU HỎI:\n{questions_text}\n"
-            greeting = f"Xin chào {name}! Tôi là người phỏng vấn từ Hệ thống Phỏng vấn trực tuyến. Rất vui được gặp bạn trong buổi phỏng vấn cho vị trí {job_title} hôm nay. Bạn có thể bắt đầu bằng cách giới thiệu ngắn gọn về bản thân mình được không?"
-
+            agent_context.update(interview_context)
+            greeting = (
+                f"Xin chào {name}! Tôi là người phỏng vấn từ Hệ thống Phỏng vấn trực "
+                f"tuyến. Rất vui được gặp bạn trong buổi phỏng vấn cho vị trí "
+                f"{job_title} hôm nay. Bạn có thể bắt đầu bằng cách giới thiệu "
+                f"ngắn gọn về bản thân mình được không?"
+            )
         # 4. Initialize Models
         stt_model = openai.STT(
             base_url=config.stt_base_url, 
             api_key=config.STT_API_KEY,
-            language="vi"
+            model=config.stt_model,
+            language=config.STT_LANGUAGE
         )
         llm_model = openai.LLM(
             base_url=config.LLAMA_BASE_URL,
@@ -98,7 +96,9 @@ async def entrypoint(ctx: JobContext):
         tts_model = openai.TTS(
             base_url=config.TTS_BASE_URL, 
             api_key=config.TTS_API_KEY,
-            model=config.TTS_MODEL
+            model=config.TTS_MODEL,
+            voice=config.TTS_VOICE,
+            instructions="Nói tiếng Việt, giọng rõ ràng, thân thiện."
         )
 
         # 5. Create AgentSession following 1.4.x / LIVIKIT_AGENTS_DOCS.md style
@@ -122,7 +122,7 @@ async def entrypoint(ctx: JobContext):
         # 6. Start session with the Interviewer agent
         await session.start(
             room=ctx.room,
-            agent=Interviewer(instructions=instructions)
+            agent=Interviewer(context=agent_context)
         )
         
         # 7. Post-start actions

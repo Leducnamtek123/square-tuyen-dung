@@ -12,7 +12,7 @@ See the LICENSE file in the project root for full license information.
 import * as React from 'react';
 import { Outlet } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Box } from '@mui/material';
+import { Box } from "@mui/material";
 
 import Header from '../components/employers/Header';
 import Sidebar from '../components/employers/Sidebar';

@@ -1,4 +1,5 @@
 import random
+import os
 from datetime import date, timedelta
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -38,24 +39,31 @@ class Command(BaseCommand):
             Career.objects.get_or_create(name='Marketing')
 
             # 2.5. OAuth Application
-            if not Application.objects.filter(client_id='qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS').exists():
-                admin_user = User.objects.filter(is_superuser=True).first()
-                if not admin_user:
-                    # Create a temporary admin if none exists yet, will be fixed by step 3
-                    admin_user = User.objects.create_superuser(
-                        email='admin_temp@myjob.com',
-                        password='Abc@1234'
-                    )
-                
-                Application.objects.create(
-                    client_id='qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS',
-                    client_secret='pbkdf2_sha256$600000$akJy2vMrXLxvnrHPHgIZIp$+EKUGekpEdO0zcDQlQ0szES1dJtPGZQh+WDGwKuqHt8=',
-                    client_type=Application.CLIENT_CONFIDENTIAL,
-                    authorization_grant_type=Application.GRANT_PASSWORD,
-                    name='MyJob Web App',
-                    user=admin_user
+            client_id = os.getenv('CLIENT_ID', 'qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS')
+            client_secret = os.getenv('CLIENT_SECRET', 'myjob_secret_client_key_2024')
+
+            admin_user = User.objects.filter(is_superuser=True).first()
+            if not admin_user:
+                # Create a temporary admin if none exists yet, will be fixed by step 3
+                admin_user = User.objects.create_superuser(
+                    email='admin_temp@myjob.com',
+                    full_name='System Admin',
+                    password='Abc@1234'
                 )
-                self.stdout.write(self.style.SUCCESS('Created OAuth Application'))
+
+            app, created = Application.objects.get_or_create(
+                client_id=client_id,
+                defaults={
+                    'client_type': Application.CLIENT_CONFIDENTIAL,
+                    'authorization_grant_type': Application.GRANT_PASSWORD,
+                    'name': 'MyJob Web App',
+                    'user': admin_user
+                }
+            )
+            app.client_secret = client_secret
+            app.user = admin_user
+            app.save()
+            self.stdout.write(self.style.SUCCESS('Seeded OAuth Application'))
 
             # 3. Admin User
             admin_user = User.objects.filter(email='admin@myjob.com').first()
@@ -186,17 +194,14 @@ class Command(BaseCommand):
             # 8. Interview Questions & Session
             q1, _ = Question.objects.get_or_create(
                 text='Explain the difference between a list and a tuple in Python.',
-                category='technical',
                 author=employer_user
             )
             q2, _ = Question.objects.get_or_create(
                 text='What are decorators in Python and how do they work?',
-                category='technical',
                 author=employer_user
             )
             q3, _ = Question.objects.get_or_create(
                 text='Describe a difficult situation you faced at work and how you handled it.',
-                category='behavioral',
                 author=employer_user
             )
 

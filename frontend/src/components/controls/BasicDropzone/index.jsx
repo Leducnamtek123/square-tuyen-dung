@@ -2,15 +2,11 @@
 
 MyJob Recruitment System - Part of MyJob Platform
 
-
-
 Author: Bui Khanh Huy
 
 Email: khuy220@gmail.com
 
 Copyright (c) 2023 Bui Khanh Huy
-
-
 
 License: MIT License
 
@@ -18,18 +14,16 @@ See the LICENSE file in the project root for full license information.
 
 */
 
-
-
 import React from 'react';
 
 import { useDropzone } from 'react-dropzone';
 
 import { Controller } from 'react-hook-form';
 
-import { Stack, Box, Typography, Button } from '@mui/material';
+import { Stack, Box, Typography, Button } from "@mui/material";
+
 import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-
 
 const FileDropzone = ({ accept, onDrop, values }) => {
 
@@ -40,8 +34,6 @@ const FileDropzone = ({ accept, onDrop, values }) => {
     onDrop,
 
   });
-
-
 
   return (
 
@@ -255,8 +247,6 @@ const FileDropzone = ({ accept, onDrop, values }) => {
 
 };
 
-
-
 const BasicDropzone = ({ control, name, title = '', showRequired = false }) => {
 
   return (
@@ -357,9 +347,5 @@ const BasicDropzone = ({ control, name, title = '', showRequired = false }) => {
 
 };
 
-
-
 export default BasicDropzone;
-
-
 

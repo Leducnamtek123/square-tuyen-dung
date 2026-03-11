@@ -12,21 +12,10 @@ See the LICENSE file in the project root for full license information.
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { MenuItem, TableBody, TableCell, TableRow, TextField, Tooltip, Typography, Button, IconButton, Stack, CircularProgress, Chip, Box } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import {
-  MenuItem,
-  TableBody,
-  TableCell,
-  TextField,
-  Tooltip,
-  Typography,
-  Button,
-  IconButton,
-  Stack,
-  CircularProgress,
-  Chip,
-  Box,
-} from '@mui/material';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
 import MarkEmailReadRoundedIcon from '@mui/icons-material/MarkEmailReadRounded';
@@ -54,6 +43,7 @@ const SendEmailComponent = ({
   email,
   fullName,
 }) => {
+  const { t } = useTranslation('employer');
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const [openSendMailPopup, setOpenSendMailPopup] = React.useState(false);
   const [sendMailData, setSendMailData] = React.useState(null);
@@ -77,7 +67,7 @@ const SendEmailComponent = ({
           setSentEmail(true);
         }
         setOpenSendMailPopup(false);
-        toastMessages.success('Gửi email thành công.');
+        toastMessages.success(t('appliedResume.email.sentSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -105,7 +95,7 @@ const SendEmailComponent = ({
         }
         onClick={() => handleOpenSendMail(email, fullName)}
       >
-        {sentEmail ? 'Gửi lại' : 'Gửi email'}
+        {sentEmail ? t('appliedResume.email.resend') : t('appliedResume.email.send')}
       </Button>
       {/* Start: send mail */}
       <SendMailCard
@@ -118,7 +108,7 @@ const SendEmailComponent = ({
       {/* Start: full screen loading */}
       {isFullScreenLoading && <BackdropLoading />}
       {/* End: full screen loading */}
-    </>
+      </>
   );
 };
 
@@ -128,6 +118,7 @@ const AppliedStatusComponent = ({
   id,
   handleChangeApplicationStatus,
 }) => {
+  const { t } = useTranslation('employer');
   const { allConfig } = useSelector((state) => state.config);
   const [applyStatus, setApplyStatus] = React.useState(defaultStatus);
 
@@ -136,10 +127,10 @@ const AppliedStatusComponent = ({
 
     if (chooseValue < applyStatus) {
       errorModal(
-        'Đã có lỗi',
-        `Bạn không được phép chuyển trạng thái hồ sơ từ <strong style="color:red;">"${
+        'Error occurred',
+        `You are not allowed to change the application status from <strong style="color:red;">"${
           allConfig?.applicationStatusDict[applyStatus] || '---'
-        }"</strong> sang <strong style="color:red;">"${
+        }"</strong> to <strong style="color:red;">"${
           allConfig?.applicationStatusDict[e.target.value] || '---'
         }"</strong>`
       );
@@ -151,10 +142,8 @@ const AppliedStatusComponent = ({
               setApplyStatus(chooseValue);
             }
           }),
-        'Cập nhật trạng thái hồ sơ',
-        `Hồ sơ sẽ được cập nhật sang trạng thái <strong style="color:red;">"${
-          allConfig?.applicationStatusDict[e.target.value] || '---'
-        }"</strong>. Bạn có chắc chắn?`,
+        t('appliedResume.status.updateTitle'),
+        t('appliedResume.status.updateConfirm', { statusName: allConfig?.applicationStatusDict[e.target.value] || '---' }),
         'question'
       );
     }
@@ -179,6 +168,7 @@ const AppliedStatusComponent = ({
 };
 
 const AIAnalysisComponent = ({ row }) => {
+  const { t } = useTranslation('employer');
   const [status, setStatus] = React.useState(row.aiAnalysisStatus);
   const [score, setScore] = React.useState(row.aiAnalysisScore);
 
@@ -186,7 +176,7 @@ const AIAnalysisComponent = ({ row }) => {
     try {
       setStatus('processing');
       await jobPostActivityService.analyzeResume(row.id);
-      toastMessages.success('Đã bắt đầu phân tích AI. Vui lòng chờ vài giây.');
+      toastMessages.success(t('appliedResume.ai.analysisStarted'));
     } catch (error) {
       errorHandling(error);
       setStatus('failed');
@@ -199,14 +189,14 @@ const AIAnalysisComponent = ({ row }) => {
         title={
           <Box sx={{ p: 1 }}>
             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-              Tóm tắt AI:
+              {t('appliedResume.ai.summary')}
             </Typography>
             <Typography variant="body2">{row.aiAnalysisSummary}</Typography>
             <Typography
               variant="subtitle2"
               sx={{ fontWeight: 'bold', mt: 1, mb: 0.5 }}
             >
-              Kỹ năng:
+              {t('appliedResume.ai.skills')}
             </Typography>
             <Typography variant="body2">{row.aiAnalysisSkills || 'N/A'}</Typography>
           </Box>
@@ -229,7 +219,7 @@ const AIAnalysisComponent = ({ row }) => {
     return (
       <Stack direction="row" spacing={1} alignItems="center">
         <CircularProgress size={16} />
-        <Typography variant="caption">Đang xử lý...</Typography>
+        <Typography variant="caption">{t('appliedResume.ai.processing')}</Typography>
       </Stack>
     );
   }
@@ -242,38 +232,40 @@ const AIAnalysisComponent = ({ row }) => {
       onClick={handleAnalyze}
       sx={{ textTransform: 'none', borderRadius: 1.5, fontSize: '0.75rem', py: 0.25 }}
     >
-      Phân tích
+      {t('appliedResume.ai.analyze')}
     </Button>
   );
 };
 
 const AppliedResumeTable = (props) => {
+  const { t } = useTranslation(['employer', 'common']);
   const nav = useNavigate();
   const { rows, isLoading, handleChangeApplicationStatus, handleDelete } =
     props;
+  const rowsSafe = Array.isArray(rows) ? rows : [];
   const { allConfig } = useSelector((state) => state.config);
 
   return (
     <DataTableCustom {...props}>
-      {!isLoading && rows.length === 0 ? (
-        <TableBody>
-          <TableCell colSpan={8}>
-            <NoDataCard
-              title="Chưa có ứng viên ứng tuyển"
-              imgComponentSgv={<SVG_IMAGES.ImageSvg13 />}
-            />
-          </TableCell>
-        </TableBody>
-      ) : (
-        rows.map((row, index) => {
-          return (
-            <TableBody key={row.id}>
+      <TableBody>
+        {!isLoading && rowsSafe.length === 0 ? (
+          <TableRow>
+            <TableCell colSpan={8}>
+              <NoDataCard
+                title={t('appliedResume.table.noCandidates')}
+                imgComponentSgv={<SVG_IMAGES.ImageSvg13 />}
+              />
+            </TableCell>
+          </TableRow>
+        ) : (
+          rowsSafe.map((row) => (
+            <TableRow key={row.id}>
               <TableCell component="th" scope="row" padding="none">
                 <Typography sx={{ fontWeight: 'bold' }}>
                   {row?.fullName}
                 </Typography>
                 {row?.type === CV_TYPES.cvWebsite ? (
-                  <Tooltip title="Hồ sơ Online" arrow>
+                  <Tooltip title={t('appliedResume.table.onlineResume')} arrow>
                     <FontAwesomeIcon
                       icon={faFile}
                       style={{ marginRight: 1 }}
@@ -281,7 +273,7 @@ const AppliedResumeTable = (props) => {
                     />
                   </Tooltip>
                 ) : (
-                  <Tooltip title="Hồ sơ Đính kèm" arrow>
+                  <Tooltip title={t('appliedResume.table.attachedResume')} arrow>
                     <FontAwesomeIcon
                       icon={faFilePdf}
                       style={{ marginRight: 1 }}
@@ -289,7 +281,7 @@ const AppliedResumeTable = (props) => {
                     />
                   </Tooltip>
                 )}{' '}
-                {row?.title || (
+                    {row?.title || (
                   <span
                     style={{
                       color: '#e0e0e0',
@@ -297,7 +289,7 @@ const AppliedResumeTable = (props) => {
                       fontSize: 13,
                     }}
                   >
-                    Chưa cập nhật
+                    {t('appliedResume.table.notUpdated')}
                   </span>
                 )}{' '}
               </TableCell>
@@ -307,8 +299,8 @@ const AppliedResumeTable = (props) => {
               </TableCell>
               <TableCell align="left">
                 {row?.type === CV_TYPES.cvWebsite
-                  ? 'Hồ sơ Online'
-                  : 'Hồ sơ đính kèm'}
+                  ? t('appliedResume.table.onlineResume')
+                  : t('appliedResume.table.attachedResume')}
               </TableCell>
               <TableCell align="center">
                 <AIAnalysisComponent row={row} />
@@ -323,21 +315,24 @@ const AppliedResumeTable = (props) => {
               </TableCell>
               <TableCell align="right">
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
-                  <Tooltip title="Xem hồ sơ" arrow>
+                  <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
                     <IconButton
                       color="primary"
                       aria-label="view"
                       size="small"
                       onClick={() =>
                         nav(
-                          `/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, row?.resumeSlug)}`
+                          `/${formatRoute(
+                            ROUTES.EMPLOYER.PROFILE_DETAIL,
+                            row?.resumeSlug
+                          )}`
                         )
                       }
                     >
                       <RemoveRedEyeOutlinedIcon fontSize="small" />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Xóa hồ sơ" arrow>
+                  <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
                     <IconButton
                       size="small"
                       color="error"
@@ -355,10 +350,10 @@ const AppliedResumeTable = (props) => {
                   />
                 </Stack>
               </TableCell>
-            </TableBody>
-          );
-        })
-      )}
+            </TableRow>
+          ))
+        )}
+      </TableBody>
     </DataTableCustom>
   );
 };

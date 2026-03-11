@@ -1,0 +1,98 @@
+{
+  "appliedResume": {
+    "title": "Applied Resume Management",
+    "downloadList": "Download List",
+    "filters": "Filters:",
+    "allJobPosts": "All job posts",
+    "allStatuses": "All recruitment statuses",
+    "advancedFilter": "Advanced Filter",
+    "table": {
+      "noCandidates": "No candidates have applied yet",
+      "onlineResume": "Online Resume",
+      "attachedResume": "Attached Resume",
+      "notUpdated": "Not updated",
+      "profileName": "Profile Name",
+      "appliedPosition": "Applied Position",
+      "appliedDate": "Applied Date",
+      "profileType": "Profile Type",
+      "aiAnalysis": "AI Analysis",
+      "status": "Recruitment Status",
+      "actions": "Actions",
+      "tooltips": {
+        "view": "View profile",
+        "delete": "Delete profile"
+      }
+    },
+    "ai": {
+       "analysisStarted": "AI analysis started. Please wait a few seconds.",
+       "processing": "Processing...",
+       "analyze": "Analyze",
+       "summary": "AI Summary:",
+       "skills": "Skills:"
+    },
+    "email": {
+       "sentSuccess": "Email sent successfully.",
+       "resend": "Resend",
+       "send": "Send email"
+    },
+    "status": {
+       "updateTitle": "Update application status",
+       "updateConfirm": "The profile will be updated to status <strong style=\"color:red;\">\"{{statusName}}\"</strong>. Are you sure?",
+       "errorTitle": "Error occurred",
+       "errorMsg": "You are not allowed to change the application status from <strong style=\"color:red;\">\"{{fromStatus}}\"</strong> to <strong style=\"color:red;\">\"{{toStatus}}\"</strong>",
+       "updateSuccess": "Update successful."
+    },
+    "delete": {
+       "title": "Delete Applied Profile",
+       "confirm": "This applied profile will be permanently deleted and cannot be recovered. Are you sure?",
+       "success": "Applied profile deleted successfully."
+    }
+  },
+  "dashboard": {
+    "pageTitle": "Employer Administration",
+    "recruitmentChart": "RECRUITMENT CHART",
+    "candidateChart": "CANDIDATE CHART",
+    "applicationChart": "RECRUITMENT & APPLICATION CHART",
+    "academicChart": "RECRUITMENT BY ACADEMIC LEVEL"
+  },
+  "jobPost": {
+    "title": "Job Post Management",
+    "createNew": "Create New Post",
+    "exportList": "Export List",
+    "filter": "Filter:",
+    "table": {
+      "jobTitle": "Job Title",
+      "postDate": "Post Date",
+      "deadline": "Deadline",
+      "applications": "Applications",
+      "views": "Views",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "urgent": "Urgent",
+    "noData": "You have no job posts yet",
+    "tooltips": {
+      "update": "Update",
+      "delete": "Delete"
+    },
+    "filters": {
+      "keywordsPlaceholder": "Enter job title",
+      "urgent": "Urgent",
+      "notUrgent": "Not urgent",
+      "urgentPlaceholder": "Recruitment status (urgent)",
+      "statusPlaceholder": "Approval status",
+      "reset": "Reset",
+      "search": "Search"
+    },
+    "delete": {
+      "title": "Delete Job Post",
+      "confirm": "This job post will be permanently deleted and cannot be recovered. Are you sure?",
+      "success": "Job post deleted successfully."
+    },
+    "messages": {
+      "addSuccess": "Job post added successfully.",
+      "updateSuccess": "Job post updated successfully."
+    },
+    "popupTitle": "Job Post"
+  }
+}

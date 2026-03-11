@@ -14,7 +14,8 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Grid } from '@mui/material';
+import Grid from "@mui/material/Grid2";
+
 import { useTranslation } from 'react-i18next';
 
 import PasswordTextFieldCustom from '../../../../components/controls/PasswordTextFieldCustom';
@@ -59,7 +60,7 @@ const UpdatePasswordForm = ({ handleUpdatePassword, serverErrors = {} }) => {
   return (
     <form id="modal-form" onSubmit={handleSubmit(handleUpdatePassword)}>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <PasswordTextFieldCustom
             name="oldPassword"
             control={control}
@@ -68,7 +69,7 @@ const UpdatePasswordForm = ({ handleUpdatePassword, serverErrors = {} }) => {
             placeholder={t('form.oldPasswordPlaceholder')}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <PasswordTextFieldCustom
             name="newPassword"
             control={control}
@@ -77,7 +78,7 @@ const UpdatePasswordForm = ({ handleUpdatePassword, serverErrors = {} }) => {
             placeholder={t('form.newPasswordPlaceholder')}
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid size={12}>
           <PasswordTextFieldCustom
             name="confirmPassword"
             control={control}

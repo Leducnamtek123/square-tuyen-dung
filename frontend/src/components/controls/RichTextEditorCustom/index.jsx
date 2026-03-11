@@ -15,7 +15,8 @@ import { Controller } from 'react-hook-form';
 import { EditorState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 
-import { Typography } from '@mui/material';
+import { Typography } from "@mui/material";
+
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const RichTextEditorCustom = ({
   control,

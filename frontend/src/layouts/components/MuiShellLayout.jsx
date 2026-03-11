@@ -7,24 +7,8 @@ Author: OpenAI Codex
 import * as React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import {
-  AppBar,
-  Avatar,
-  Box,
-  Collapse,
-  CssBaseline,
-  Divider,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Stack,
-  Toolbar,
-  Typography,
-} from '@mui/material';
+import { AppBar, Avatar, Box, Collapse, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from "@mui/material";
+
 import MenuIcon from '@mui/icons-material/Menu';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -33,6 +17,7 @@ import AccountSwitchMenu from './commons/AccountSwitchMenu';
 import UserMenu from './commons/UserMenu';
 import NotificationCard from '../../components/NotificationCard';
 import ChatCard from '../../components/ChatCard';
+import LanguageSwitcher from './commons/LanguageSwitcher';
 import { IMAGES } from '../../configs/constants';
 
 const drawerWidth = 240;
@@ -83,7 +68,9 @@ const MuiShellLayout = ({ title, navItems, children }) => {
               ) : null}
               <ListItemText
                 primary={item.label}
-                primaryTypographyProps={{ variant: 'body2', fontWeight: 600 }}
+                slotProps={{
+                  primary: { variant: 'body2', fontWeight: 600 }
+                }}
               />
               {expandedItems[item.id] ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
             </ListItemButton>
@@ -101,7 +88,9 @@ const MuiShellLayout = ({ title, navItems, children }) => {
                     <item.icon fontSize="small" />
                   </ListItemIcon>
                 ) : null}
-                <ListItemText primary={item.label} primaryTypographyProps={{ variant: 'body2' }} />
+                <ListItemText primary={item.label} slotProps={{
+                  primary: { variant: 'body2' }
+                }} />
                 {expandedItems[item.id] ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
               </ListItemButton>
             </ListItem>
@@ -127,7 +116,9 @@ const MuiShellLayout = ({ title, navItems, children }) => {
                 <item.icon fontSize="small" />
               </ListItemIcon>
             ) : null}
-            <ListItemText primary={item.label} primaryTypographyProps={{ variant: 'body2' }} />
+            <ListItemText primary={item.label} slotProps={{
+              primary: { variant: 'body2' }
+            }} />
           </ListItemButton>
         </ListItem>
       );
@@ -165,6 +156,7 @@ const MuiShellLayout = ({ title, navItems, children }) => {
           </Stack>
 
           <Stack direction="row" alignItems="center" spacing={1}>
+            <LanguageSwitcher />
             {isAuthenticated && <NotificationCard />}
             {isAuthenticated && <ChatCard />}
             <Stack

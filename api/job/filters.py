@@ -88,7 +88,7 @@ class EmployerJobPostActivityFilter(django_filters.FilterSet):
                                                field_name='resume__experience')
     positionId = django_filters.ChoiceFilter(choices=var_sys.POSITION_CHOICES,
                                              field_name='resume__position')
-    academicLevelId = django_filters.ChoiceFilter(choices=var_sys.POSITION_CHOICES,
+    academicLevelId = django_filters.ChoiceFilter(choices=var_sys.ACADEMIC_LEVEL,
                                                   field_name='resume__academic_level')
     typeOfWorkplaceId = django_filters.ChoiceFilter(choices=var_sys.TYPE_OF_WORKPLACE_CHOICES,
                                                     field_name='resume__type_of_workplace')

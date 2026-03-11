@@ -71,7 +71,7 @@ class Question(InterviewBaseModel):
         verbose_name_plural = "Questions"
 
     def __str__(self):
-        return f"[{self.get_category_display()}] {self.text[:80]}"
+        return self.text[:80]
 
 
 class QuestionGroup(InterviewBaseModel):
@@ -243,6 +243,10 @@ class InterviewSession(InterviewBaseModel):
         null=True, blank=True,
         related_name='interview_sessions',
         verbose_name="Nhóm câu hỏi"
+    )
+    question_cursor = models.IntegerField(
+        default=0,
+        verbose_name="Ch??? s??? c??u h???i hi???n t???i"
     )
 
     class Meta:

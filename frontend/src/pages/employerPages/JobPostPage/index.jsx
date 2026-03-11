@@ -10,13 +10,13 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
-import { Card } from '@mui/material';
+import { Card } from "@mui/material";
 
 import { TabTitle } from '../../../utils/generalFunction';
 import JobPostCard from '../../components/employers/JobPostCard';
 
 const JobPostPage = () => {
-  TabTitle("Quản lý tin tuyển dụng")
+  TabTitle("Job Post Management")
 
   return (
     <Card sx={{ p: 3 }}>

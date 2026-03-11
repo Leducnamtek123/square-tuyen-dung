@@ -1,17 +1,6 @@
 import React from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-    IconButton,
-    Tooltip,
-    Chip,
-    Typography,
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip, Chip, Typography } from "@mui/material";
+
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from '../../../../configs/dayjs-config';
@@ -22,13 +11,13 @@ const ResumeTable = ({ data, onView, onDelete }) => {
             <Table sx={{ minWidth: 800 }}>
                 <TableHead sx={{ bgcolor: 'grey.50' }}>
                     <TableRow>
-                        <TableCell>Tiêu đề CV</TableCell>
-                        <TableCell>Ứng viên</TableCell>
-                        <TableCell>Loại CV</TableCell>
-                        <TableCell>Kinh nghiệm</TableCell>
-                        <TableCell>Cập nhật lần cuối</TableCell>
-                        <TableCell align="center">Trạng thái</TableCell>
-                        <TableCell align="right">Thao tác</TableCell>
+                        <TableCell>Resume Title</TableCell>
+                        <TableCell>Candidate</TableCell>
+                        <TableCell>Resume Type</TableCell>
+                        <TableCell>Experience</TableCell>
+                        <TableCell>Last Update</TableCell>
+                        <TableCell align="center">Status</TableCell>
+                        <TableCell align="right">Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -45,7 +34,7 @@ const ResumeTable = ({ data, onView, onDelete }) => {
                             <TableCell>{row.userDict?.fullName || '---'}</TableCell>
                             <TableCell>
                                 <Chip
-                                    label={row.type === 'UPLOAD' ? 'File tải lên' : 'Hồ sơ online'}
+                                    label={row.type === 'UPLOAD' ? 'Uploaded File' : 'Online Profile'}
                                     size="small"
                                     variant="outlined"
                                     color={row.type === 'UPLOAD' ? 'primary' : 'secondary'}
@@ -55,18 +44,18 @@ const ResumeTable = ({ data, onView, onDelete }) => {
                             <TableCell>{dayjs(row.updateAt).format('DD/MM/YYYY HH:mm')}</TableCell>
                             <TableCell align="center">
                                 <Chip
-                                    label={row.isActive ? 'Đang bật' : 'Đang tắt'}
+                                    label={row.isActive ? 'Active' : 'Inactive'}
                                     size="small"
                                     color={row.isActive ? 'success' : 'default'}
                                 />
                             </TableCell>
                             <TableCell align="right">
-                                <Tooltip title="Xem chi tiết">
+                                <Tooltip title="View details">
                                     <IconButton size="small" onClick={() => onView?.(row)}>
                                         <VisibilityIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Xóa">
+                                <Tooltip title="Delete">
                                     <IconButton size="small" onClick={() => onDelete?.(row)} color="error">
                                         <DeleteIcon fontSize="small" />
                                     </IconButton>
@@ -77,7 +66,7 @@ const ResumeTable = ({ data, onView, onDelete }) => {
                     {(!data || data.length === 0) && (
                         <TableRow>
                             <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
-                                Không tìm thấy dữ liệu
+                                No data found
                             </TableCell>
                         </TableRow>
                     )}

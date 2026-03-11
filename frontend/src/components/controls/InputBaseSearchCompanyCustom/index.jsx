@@ -2,15 +2,11 @@
 
 MyJob Recruitment System - Part of MyJob Platform
 
-
-
 Author: Bui Khanh Huy
 
 Email: khuy220@gmail.com
 
 Copyright (c) 2023 Bui Khanh Huy
-
-
 
 License: MIT License
 
@@ -18,11 +14,7 @@ See the LICENSE file in the project root for full license information.
 
 */
 
-
-
 import * as React from 'react';
-
-
 
 import { useTheme } from '@mui/material/styles';
 
@@ -36,11 +28,9 @@ import ClearIcon from '@mui/icons-material/Clear';
 
 import { Controller } from 'react-hook-form';
 
-import { Box } from '@mui/material';
+import { Box } from "@mui/material";
 
-import { IconButton, InputAdornment } from '@mui/material';
-
-
+import { IconButton, InputAdornment } from "@mui/material";
 
 const InputBaseSearchCompanyCustom = ({
 
@@ -55,8 +45,6 @@ const InputBaseSearchCompanyCustom = ({
 }) => {
 
   const theme = useTheme();
-
-
 
   return (
 
@@ -105,8 +93,6 @@ const InputBaseSearchCompanyCustom = ({
               inputProps={{ 'aria-label': 'search' }}
 
               value={field.value ?? ''}
-
-
 
               onChange={(e) => {
 
@@ -181,8 +167,6 @@ const InputBaseSearchCompanyCustom = ({
   );
 
 };
-
-
 
 export default InputBaseSearchCompanyCustom;
 

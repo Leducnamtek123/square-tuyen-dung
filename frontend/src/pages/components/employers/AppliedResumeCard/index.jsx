@@ -11,19 +11,10 @@ See the LICENSE file in the project root for full license information.
 
 import React from 'react';
 import { useSelector } from 'react-redux';
-import {
-  Autocomplete,
-  Box,
-  Button,
-  Divider,
-  Grid,
-  IconButton,
-  LinearProgress,
-  Stack,
-  TextField,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Autocomplete, Box, Button, Divider, IconButton, LinearProgress, Stack, TextField, Tooltip, Typography } from "@mui/material";
+import { useTranslation } from 'react-i18next';
+import Grid from "@mui/material/Grid2";
+
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -41,75 +32,61 @@ import AppliedResumeTable from '../AppliedResumeTable';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 import jobService from '../../../../services/jobService';
 
-const headCells = [
-  {
-    id: 'title',
-    showOrder: false,
-    numeric: false,
-    disablePadding: true,
-    label: 'Tên hồ sơ',
-  },
-  {
-    id: 'jobName',
-    showOrder: false,
-    numeric: false,
-    disablePadding: false,
-    label: 'Vị trí ứng tuyển',
-  },
-  {
-    id: 'appliedDate',
-    showOrder: false,
-    numeric: false,
-    disablePadding: false,
-    label: 'Thời gian nộp',
-  },
-  {
-    id: 'type',
-    showOrder: false,
-    numeric: false,
-    disablePadding: false,
-    label: 'Loại hồ sơ',
-  },
-  {
-    id: 'aiAnalysis',
-    showOrder: false,
-    numeric: false,
-    disablePadding: false,
-    label: 'AI Phân tích',
-  },
-  {
-    id: 'city',
-    showOrder: false,
-    numeric: true,
-    disablePadding: false,
-    label: 'Trạng thái tuyển dụng',
-  },
-  {
-    id: 'action',
-    showOrder: false,
-    numeric: true,
-    disablePadding: false,
-    label: 'Hành động',
-  },
-];
-
-const pageSize = 5;
-
-const defaultFilterData = {
-  cityId: '',
-  careerId: '',
-  experienceId: '',
-  positionId: '',
-  academicLevelId: '',
-  typeOfWorkplaceId: '',
-  jobTypeId: '',
-  genderId: '',
-  maritalStatusId: '',
-  jobPostId: '',
-};
-
-const AppliedResumeCard = ({ title }) => {
+const AppliedResumeCard = ({ title: cardTitle }) => {
+  const { t } = useTranslation('employer');
   const { allConfig } = useSelector((state) => state.config);
+
+  const headCells = [
+    {
+      id: 'title',
+      showOrder: false,
+      numeric: false,
+      disablePadding: true,
+      label: t('appliedResume.table.profileName'),
+    },
+    {
+      id: 'jobName',
+      showOrder: false,
+      numeric: false,
+      disablePadding: false,
+      label: t('appliedResume.table.appliedPosition'),
+    },
+    {
+      id: 'appliedDate',
+      showOrder: false,
+      numeric: false,
+      disablePadding: false,
+      label: t('appliedResume.table.appliedDate'),
+    },
+    {
+      id: 'type',
+      showOrder: false,
+      numeric: false,
+      disablePadding: false,
+      label: t('appliedResume.table.profileType'),
+    },
+    {
+      id: 'aiAnalysis',
+      showOrder: false,
+      numeric: false,
+      disablePadding: false,
+      label: t('appliedResume.table.aiAnalysis'),
+    },
+    {
+      id: 'city',
+      showOrder: false,
+      numeric: true,
+      disablePadding: false,
+      label: t('appliedResume.table.status'),
+    },
+    {
+      id: 'action',
+      showOrder: false,
+      numeric: true,
+      disablePadding: false,
+      label: t('appliedResume.table.actions'),
+    },
+  ];
   const [openPopup, setOpenPopup] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [page, setPage] = React.useState(0);
@@ -146,7 +123,7 @@ const AppliedResumeCard = ({ title }) => {
       try {
         const resData = await jobService.getJobPostOptions(params);
 
-        setJobPostOptions(resData.data);
+        setJobPostOptions(Array.isArray(resData?.data) ? resData.data : []);
       } catch (error) {
         console.error(error);
       }
@@ -162,10 +139,15 @@ const AppliedResumeCard = ({ title }) => {
       try {
         const resData = await jobPostActivityService.getAppliedResume(params);
 
-        const data = resData.data;
+        const data = resData?.data;
+        const rawResumes = Array.isArray(data?.results)
+          ? data.results
+          : Array.isArray(data)
+          ? data
+          : [];
 
-        setCount(data.count);
-        retResumes(data.results);
+        setCount(typeof data?.count === 'number' ? data.count : rawResumes.length);
+        retResumes(rawResumes);
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -209,7 +191,7 @@ const AppliedResumeCard = ({ title }) => {
         const data = resData.data;
 
         // export
-        xlsxUtils.exportToXLSX(data, 'DanhSachHoSoUngTuyen');
+        xlsxUtils.exportToXLSX(data, 'AppliedProfilesList');
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -232,7 +214,7 @@ const AppliedResumeCard = ({ title }) => {
       try {
         await jobPostActivityService.changeApplicationStatus(id, data);
 
-        toastMessages.success('Cập nhật thành công.');
+        toastMessages.success(t('appliedResume.status.updateSuccess'));
 
         // success
         callback(true);
@@ -252,7 +234,7 @@ const AppliedResumeCard = ({ title }) => {
       try {
         await jobPostActivityService.deleteJobPostActivity(id);
         setIsSuccess(!isSuccess);
-        toastMessages.success('Xóa hồ sơ ứng tuyển thành công.');
+        toastMessages.success(t('appliedResume.delete.success'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -262,8 +244,8 @@ const AppliedResumeCard = ({ title }) => {
 
     confirmModal(
       () => del(id),
-      'Xóa hồ sơ ứng tuyển',
-      'Hồ sơ ứng tuyển này sẽ được xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?',
+      t('appliedResume.delete.title'),
+      t('appliedResume.delete.confirm'),
       'warning'
     );
   };
@@ -307,7 +289,7 @@ const AppliedResumeCard = ({ title }) => {
             fontSize: { xs: '1.25rem', sm: '1.5rem' }
           }}
         >
-          {title}
+          {cardTitle}
         </Typography>
         <Button
           variant="outlined"
@@ -323,10 +305,9 @@ const AppliedResumeCard = ({ title }) => {
             }
           }}
         >
-          Tải danh sách
+          {t('appliedResume.downloadList')}
         </Button>
       </Stack>
-
       {/* Filter Section */}
       <Box sx={{ mb: 3 }}>
         <Typography 
@@ -337,11 +318,17 @@ const AppliedResumeCard = ({ title }) => {
             mb: 2
           }}
         >
-          Bộ lọc:
+          {t('appliedResume.filters')}
         </Typography>
 
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6} md={4} xl={5}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
+              xl: 5
+            }}>
             <Autocomplete
               getOptionLabel={(option) => option.jobName}
               value={jobPostOptions.find((o) => o.id === jobPostIdSelect) || null}
@@ -352,7 +339,7 @@ const AppliedResumeCard = ({ title }) => {
               renderInput={(params) => (
                 <TextField 
                   {...params} 
-                  placeholder="Tất cả tin đăng"
+                  placeholder={t('appliedResume.allJobPosts')}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
@@ -363,7 +350,13 @@ const AppliedResumeCard = ({ title }) => {
               )}
             />
           </Grid>
-          <Grid item xs={12} sm={6} md={4} xl={3}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
+              xl: 3
+            }}>
             <Autocomplete
               getOptionLabel={(option) => option.name}
               value={
@@ -378,7 +371,7 @@ const AppliedResumeCard = ({ title }) => {
               renderInput={(params) => (
                 <TextField
                   {...params}
-                  placeholder="Tất cả trạng thái tuyển dụng"
+                  placeholder={t('appliedResume.allStatuses')}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       borderRadius: 2,
@@ -389,13 +382,18 @@ const AppliedResumeCard = ({ title }) => {
               )}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 4
+            }}>
             <Stack
               direction="row"
               justifyContent={{ xs: 'flex-start', md: 'flex-start' }}
               spacing={1}
             >
-              <Tooltip title="Đặt lại" arrow>
+              <Tooltip title={t('common:reset')} arrow>
                 <IconButton 
                   onClick={handleResetFilterData}
                   sx={{
@@ -424,13 +422,12 @@ const AppliedResumeCard = ({ title }) => {
                   }
                 }}
               >
-                Lọc nâng cao ({numbersFilter})
+                {t('appliedResume.advancedFilter')} ({numbersFilter})
               </Button>
             </Stack>
           </Grid>
         </Grid>
       </Box>
-
       {/* Loading Progress */}
       {isLoading ? (
         <Box sx={{ width: '100%', mb: 2 }}>
@@ -446,7 +443,6 @@ const AppliedResumeCard = ({ title }) => {
       ) : (
         <Divider sx={{ mb: 2 }} />
       )}
-
       {/* Table Section */}
       <Box sx={{
         backgroundColor: 'background.paper',
@@ -471,11 +467,10 @@ const AppliedResumeCard = ({ title }) => {
           handleDelete={handleDelete}
         />
       </Box>
-
       {/* Popup and Loading remain unchanged */}
       <FormPopup
-        title="Lọc nâng cao"
-        buttonText="Lọc"
+        title={t('appliedResume.advancedFilter')}
+        buttonText={t('common:search')}
         buttonIcon={<FilterListIcon />}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
@@ -485,7 +480,6 @@ const AppliedResumeCard = ({ title }) => {
           filterData={filterData}
         />
       </FormPopup>
-
       {isFullScreenLoading && <BackdropLoading />}
     </Box>
   );

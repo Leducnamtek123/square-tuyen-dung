@@ -33,7 +33,7 @@ export function TrackSelector({
           <BarVisualizer
             barCount={4}
             state={isEnabled ? 'speaking' : 'silent'}
-            trackRef={audioTrackRef}
+            track={audioTrackRef}
             className="flex h-full items-center justify-center gap-1"
           >
             <span className="bg-muted min-h-2.5 w-2.5 rounded-full" />

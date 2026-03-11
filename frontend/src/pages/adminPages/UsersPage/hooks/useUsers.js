@@ -20,11 +20,11 @@ export const useToggleUserStatus = () => {
     return useMutation({
         mutationFn: (user) => userService.toggleUserStatus(user.id),
         onSuccess: (data, user) => {
-            toastMessages.success(`${user.isActive ? 'Khoa' : 'Mo khoa'} nguoi dung thanh cong`);
+            toastMessages.success(`User ${user.isActive ? 'blocked' : 'unblocked'} successfully`);
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
         onError: (error) => {
-            toastMessages.error(error.response?.data?.errors?.detail || 'Thao tac that bai');
+            toastMessages.error(error.response?.data?.errors?.detail || 'Operation failed');
         }
     });
 };

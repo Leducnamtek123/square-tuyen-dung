@@ -36,6 +36,15 @@ class JobSeekerProfile(InfoBaseModel):
                                       choices=var_sys.MARITAL_STATUS_CHOICES,
                                       default=var_sys.MARITAL_STATUS_CHOICES[0][0],
                                       null=True)
+    id_card_number = models.CharField(max_length=30, blank=True, null=True)
+    id_card_issue_date = models.DateField(blank=True, null=True)
+    id_card_issue_place = models.CharField(max_length=255, blank=True, null=True)
+    tax_code = models.CharField(max_length=30, blank=True, null=True)
+    social_insurance_no = models.CharField(max_length=30, blank=True, null=True)
+    permanent_address = models.CharField(max_length=255, blank=True, null=True)
+    contact_address = models.CharField(max_length=255, blank=True, null=True)
+    emergency_contact_name = models.CharField(max_length=100, blank=True, null=True)
+    emergency_contact_phone = models.CharField(max_length=20, blank=True, null=True)
     # OneToOneField
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="job_seeker_profile")
     # ForeignKey
@@ -59,6 +68,8 @@ class Resume(InfoBaseModel):
     description = models.TextField(null=True)
     salary_min = models.DecimalField(default=0, max_digits=12, decimal_places=0)
     salary_max = models.DecimalField(default=0, max_digits=12, decimal_places=0)
+    expected_salary = models.DecimalField(max_digits=12, decimal_places=0, blank=True, null=True)
+    skills_summary = models.TextField(blank=True, null=True)
     position = models.SmallIntegerField(choices=var_sys.POSITION_CHOICES, null=True)
     experience = models.SmallIntegerField(choices=var_sys.EXPERIENCE_CHOICES, null=True)
     academic_level = models.SmallIntegerField(choices=var_sys.ACADEMIC_LEVEL, null=True)
@@ -92,6 +103,7 @@ class EducationDetail(InfoBaseModel):
     start_date = models.DateField()
     completed_date = models.DateField(null=True)
     description = models.CharField(max_length=500, blank=True, null=True)
+    grade_or_rank = models.CharField(max_length=100, blank=True, null=True)
 
     # ForeignKey
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, related_name="education_details")
@@ -106,6 +118,8 @@ class ExperienceDetail(InfoBaseModel):
     start_date = models.DateField()
     end_date = models.DateField()
     description = models.CharField(max_length=500, null=True, blank=True)
+    last_salary = models.DecimalField(max_digits=12, decimal_places=0, blank=True, null=True)
+    leave_reason = models.CharField(max_length=255, blank=True, null=True)
 
     # ForeignKey
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE,

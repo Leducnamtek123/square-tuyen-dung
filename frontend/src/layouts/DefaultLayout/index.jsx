@@ -11,7 +11,7 @@ See the LICENSE file in the project root for full license information.
 
 import * as React from 'react';
 import { Outlet } from 'react-router-dom';
-import { Box, Container } from '@mui/material';
+import { Box, Container } from "@mui/material";
 
 import Header from '../components/commons/Header';
 import Footer from '../components/commons/Footer';

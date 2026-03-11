@@ -9,22 +9,12 @@ License: MIT License
 See the LICENSE file in the project root for full license information.
 */
 
-import {
-  Avatar,
-  Box,
-  Divider,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  Stack,
-  useTheme,
-  Button,
-} from '@mui/material';
+import { Avatar, Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Stack, useTheme, Button } from "@mui/material";
+
 import React from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
 import errorHandling from '../../../../utils/errorHandling';
@@ -33,6 +23,7 @@ import { IMAGES, ROUTES } from '../../../../configs/constants';
 import { removeUserInfo } from '../../../../redux/userSlice';
 import tokenService from '../../../../services/tokenService';
 import AccountSwitchMenu from '../AccountSwitchMenu';
+import LanguageSwitcher from '../LanguageSwitcher';
 import {
   resetSearchCompany,
   resetSearchJobPostFilter,
@@ -42,6 +33,7 @@ import {
 const drawerWidth = 240;
 
 const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle }) => {
+  const { t } = useTranslation('common');
   const dispatch = useDispatch();
   const nav = useNavigate();
   const theme = useTheme();
@@ -126,8 +118,10 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle }) => {
             >
               <ListItemText
                 primary={page.label}
-                primaryTypographyProps={{
-                  fontSize: '0.95rem',
+                slotProps={{
+                  primary: {
+                    fontSize: '0.95rem',
+                  }
                 }}
               />
             </ListItemButton>
@@ -135,8 +129,12 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle }) => {
         ))}
       </List>
 
-      {/* Start: Account switch menu */}
       <AccountSwitchMenu isShowButton={true} />
+
+      <Divider sx={{ my: 1, borderColor: 'grey.100' }} />
+      <Box sx={{ px: 2, display: 'flex', justifyContent: 'center' }}>
+        <LanguageSwitcher color={theme.palette.text.primary} />
+      </Box>
 
       <Divider
         variant="middle"
@@ -175,13 +173,13 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle }) => {
             onClick={() =>
               confirmModal(
                 handleLogout,
-                'Đăng xuất tài khoản',
-                'Bạn có chắc chắn muốn đăng xuất?',
+                t('nav.logoutTitle'),
+                t('nav.logoutConfirm'),
                 'question'
               )
             }
           >
-            Đăng xuất
+            {t('nav.logout')}
           </Button>
         ) : (
           <>
@@ -206,7 +204,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle }) => {
               }}
               onClick={() => nav(`/${ROUTES.AUTH.REGISTER}`)}
             >
-              Đăng ký
+              {t('nav.register')}
             </Button>
           </>
         )}

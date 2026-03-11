@@ -12,16 +12,8 @@ See the LICENSE file in the project root for full license information.
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import {
-  Alert,
-  AlertTitle,
-  Avatar,
-  Box,
-  Card,
-  Container,
-  Typography,
-  styled,
-} from '@mui/material';
+import { Alert, AlertTitle, Avatar, Box, Card, Container, Typography, styled } from "@mui/material";
+
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from 'react-i18next';
 

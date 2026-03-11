@@ -1,4 +1,5 @@
 import logging
+import httpx
 from enum import Enum, auto
 from typing import Any
 
@@ -32,6 +33,11 @@ class Interviewer(Agent):
             instructions=instructions,
         )
         self._context = context
+        self._backend_api_url = None
+        self._room_name = None
+        if context:
+            self._backend_api_url = context.get("backendApiUrl")
+            self._room_name = context.get("roomName")
         self._current_stage = InterviewStage.INTRODUCTION
         self._history: list[dict[str, str]] = []
 
@@ -71,6 +77,27 @@ class Interviewer(Agent):
     ) -> str:
         """Get the current progress of the interview."""
         return f"Currently in the {self._current_stage.name} stage."
+
+    @function_tool()
+    async def get_next_question(
+        self,
+        context: RunContext,
+        advance: bool = True,
+    ) -> dict:
+        """Fetch the next primary interview question from the backend."""
+        if not self._backend_api_url or not self._room_name:
+            return {"error": "missing_backend_context"}
+
+        url = f"{self._backend_api_url}/interviews/{self._room_name}/next-question"
+        try:
+            async with httpx.AsyncClient() as client:
+                resp = await client.post(url, json={"advance": advance}, timeout=5.0)
+            if resp.status_code != 200:
+                return {"error": "backend_error", "status": resp.status_code}
+            return resp.json()
+        except Exception as exc:
+            logger.warning("get_next_question failed: %s", exc)
+            return {"error": "request_failed", "detail": str(exc)}
 
     async def get_initial_greeting(self) -> str:
         if self._context:

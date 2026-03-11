@@ -11,17 +11,8 @@ See the LICENSE file in the project root for full license information.
 
 import React from 'react';
 import { useTheme } from '@mui/material/styles';
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  IconButton,
-  Stack,
-  Typography,
-  useMediaQuery,
-} from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Stack, Typography, useMediaQuery } from "@mui/material";
+
 import CloseIcon from '@mui/icons-material/Close';
 import SaveIcon from '@mui/icons-material/Save';
 import { LoadingButton } from '@mui/lab';
@@ -47,13 +38,15 @@ const Popup = ({
         aria-labelledby="responsive-dialog-title"
         maxWidth="md"
         fullWidth
-        PaperProps={{
-          elevation: 0,
-          sx: {
-            borderRadius: '16px',
-            boxShadow: theme.customShadows.card,
-            border: `1px solid ${theme.palette.grey[100]}`,
-            overflow: 'hidden'
+        slotProps={{
+          paper: {
+            elevation: 0,
+            sx: {
+              borderRadius: '16px',
+              boxShadow: theme.customShadows.card,
+              border: `1px solid ${theme.palette.grey[100]}`,
+              overflow: 'hidden'
+            }
           }
         }}
       >

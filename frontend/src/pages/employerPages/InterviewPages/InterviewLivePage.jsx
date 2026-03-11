@@ -9,17 +9,9 @@ License: MIT License
 See the LICENSE file in the project root for full license information.
 */
 
-import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Typography,
-  Chip,
-  Stack,
-  Divider,
-  LinearProgress,
-  Button,
-  IconButton,
-} from '@mui/material';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Box, Typography, Chip, Stack, Divider, LinearProgress, Button, IconButton } from "@mui/material";
+
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Link } from 'react-router-dom';
@@ -57,7 +49,7 @@ const InterviewLivePage = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
 
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
     setLoading(true);
     try {
       const res = await interviewService.getSessions({
@@ -65,27 +57,31 @@ const InterviewLivePage = () => {
         pageSize: rowsPerPage,
       });
       const data = res;
-      const rawSessions = data.results || data || [];
-      const mapped = rawSessions.map(transformInterviewSession);
+      const rawSessions = Array.isArray(data?.results)
+        ? data.results
+        : Array.isArray(data)
+        ? data
+        : [];
+      const mapped = rawSessions.map(transformInterviewSession).filter(Boolean);
       setSessions(mapped);
-      setCount(data.count || rawSessions.length);
+      setCount(typeof data?.count === 'number' ? data.count : rawSessions.length);
     } catch (error) {
       console.error('Error fetching realtime sessions', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, rowsPerPage]);
 
   useEffect(() => {
     fetchSessions();
-  }, [page, rowsPerPage]);
+  }, [fetchSessions]);
 
   useEffect(() => {
     const hasActiveSession = sessions.some((session) => ACTIVE_STATUSES.includes(session.status));
     if (!hasActiveSession) return undefined;
     const interval = setInterval(fetchSessions, 5000);
     return () => clearInterval(interval);
-  }, [sessions]);
+  }, [sessions, fetchSessions]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -111,7 +107,7 @@ const InterviewLivePage = () => {
   const columns = useMemo(
     () => [
       {
-        header: 'Ứng viên',
+        header: 'Candidate',
         accessorKey: 'candidateName',
         cell: ({ row }) => (
           <Box>
@@ -125,12 +121,12 @@ const InterviewLivePage = () => {
         ),
       },
       {
-        header: 'Vị trí',
+        header: 'Position',
         accessorKey: 'jobName',
         cell: ({ getValue }) => <Typography variant="body2">{getValue() || 'N/A'}</Typography>,
       },
       {
-        header: 'Phòng',
+        header: 'Room',
         accessorKey: 'room_name',
         cell: ({ row }) => (
           <Typography variant="body2">
@@ -139,7 +135,7 @@ const InterviewLivePage = () => {
         ),
       },
       {
-        header: 'Thời gian',
+        header: 'Time',
         accessorKey: 'scheduledAt',
         cell: ({ getValue }) => (
           <Typography variant="body2">
@@ -148,7 +144,7 @@ const InterviewLivePage = () => {
         ),
       },
       {
-        header: 'Trạng thái',
+        header: 'Status',
         accessorKey: 'status',
         cell: ({ getValue }) => (
           <Chip
@@ -209,7 +205,7 @@ const InterviewLivePage = () => {
             fontSize: { xs: '1.25rem', sm: '1.5rem' },
           }}
         >
-          Phỏng vấn ứng viên trực tiếp
+          Live Interviews
         </Typography>
         <Button
           variant="contained"
@@ -227,14 +223,14 @@ const InterviewLivePage = () => {
             },
           }}
         >
-          Lên lịch phỏng vấn
+          Schedule Interview
         </Button>
       </Stack>
 
       <Stack direction="row" spacing={1.5} mb={3} flexWrap="wrap">
-        <Chip label={`Đang diễn ra: ${stats.active}`} color="primary" variant="outlined" />
-        <Chip label={`Đã lên lịch: ${stats.scheduled}`} color="info" variant="outlined" />
-        <Chip label={`Hoàn tất: ${stats.completed}`} color="success" variant="outlined" />
+        <Chip label={`In Progress: ${stats.active}`} color="primary" variant="outlined" />
+        <Chip label={`Scheduled: ${stats.scheduled}`} color="info" variant="outlined" />
+        <Chip label={`Completed: ${stats.completed}`} color="success" variant="outlined" />
       </Stack>
 
       {loading ? (
@@ -273,7 +269,7 @@ const InterviewLivePage = () => {
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          emptyMessage="Chưa có phiên phỏng vấn nào đang hoạt động."
+          emptyMessage="No active interview sessions found."
         />
       </Box>
     </Box>

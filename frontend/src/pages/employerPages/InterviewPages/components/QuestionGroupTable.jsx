@@ -1,9 +1,6 @@
 import React from 'react';
-import {
-    Table, TableBody, TableCell, TableContainer,
-    TableHead, TableRow, Typography, Tooltip,
-    IconButton, Box, CircularProgress
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Tooltip, IconButton, Box, CircularProgress } from "@mui/material";
+
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 

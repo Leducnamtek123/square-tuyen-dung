@@ -2,8 +2,6 @@
 
 MyJob Recruitment System - Part of MyJob Platform
 
-
-
 Author: Bui Khanh Huy
 
 Email: khuy220@gmail.com

@@ -1,0 +1,28 @@
+{
+  "noDataForStatistics": "Không có dữ liệu thống kê",
+  "educationAddedSuccess": "Thêm thông tin học vấn thành công.",
+  "educationUpdatedSuccess": "Cập nhật thông tin học vấn thành công.",
+  "educationDeletedSuccess": "Xóa thông tin học vấn thành công.",
+  "deleteEducationTitle": "Xóa thông tin học vấn",
+  "deleteEducationWarning": "Thông tin học vấn này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn không?",
+  "pleaseAddEducationInfo": "Vui lòng thêm thông tin học vấn để nhà tuyển dụng tham khảo",
+  "present": "Hiện tại",
+  "detailedDescription": "Mô tả chi tiết",
+  "notUpdated": "Chưa cập nhật",
+  "education": "Học vấn",
+  "appliedJobs": "Việc làm đã ứng tuyển",
+  "savedJobs": "Việc làm đã lưu",
+  "employersViewedProfile": "Nhà tuyển dụng đã xem hồ sơ",
+  "followedCompanies": "Công ty đang theo dõi",
+  "dashboard": {
+    "pageTitle": "Bảng điều khiển Người tìm việc",
+    "yourActivity": "Hoạt động của bạn",
+    "suggestedJobs": "Việc làm gợi ý"
+  },
+  "sidebarViewTotal": {
+    "title": "Hồ sơ của bạn có đủ tốt?",
+    "subtitle": "Có bao nhiêu nhà tuyển dụng quan tâm đến hồ sơ của bạn?",
+    "description": "Mỗi lượt xem hồ sơ từ nhà tuyển dụng mang lại cơ hội giúp bạn đến gần hơn với công việc phù hợp.",
+    "button": "Khám phá ngay"
+  }
+}

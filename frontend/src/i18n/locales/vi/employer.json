@@ -1,0 +1,98 @@
+{
+  "appliedResume": {
+    "title": "Quản lý hồ sơ ứng tuyển",
+    "downloadList": "Tải danh sách",
+    "filters": "Bộ lọc:",
+    "allJobPosts": "Tất cả tin tuyển dụng",
+    "allStatuses": "Tất cả trạng thái tuyển dụng",
+    "advancedFilter": "Bộ lọc nâng cao",
+    "table": {
+      "noCandidates": "Chưa có ứng viên nào ứng tuyển",
+      "onlineResume": "Hồ sơ Trực tuyến",
+      "attachedResume": "Hồ sơ Đính kèm",
+      "notUpdated": "Chưa cập nhật",
+      "profileName": "Tên ứng viên",
+      "appliedPosition": "Vị trí ứng tuyển",
+      "appliedDate": "Ngày ứng tuyển",
+      "profileType": "Loại hồ sơ",
+      "aiAnalysis": "Phân tích AI",
+      "status": "Trạng thái tuyển dụng",
+      "actions": "Thao tác",
+      "tooltips": {
+        "view": "Xem hồ sơ",
+        "delete": "Xóa hồ sơ"
+      }
+    },
+    "ai": {
+       "analysisStarted": "Đã bắt đầu phân tích AI. Vui lòng đợi trong giây lát.",
+       "processing": "Đang xử lý...",
+       "analyze": "Phân tích",
+       "summary": "Tóm tắt AI:",
+       "skills": "Kỹ năng:"
+    },
+    "email": {
+       "sentSuccess": "Gửi email thành công.",
+       "resend": "Gửi lại",
+       "send": "Gửi email"
+    },
+    "status": {
+       "updateTitle": "Cập nhật trạng thái ứng tuyển",
+       "updateConfirm": "Hồ sơ sẽ được cập nhật sang trạng thái <strong style=\"color:red;\">\"{{statusName}}\"</strong>. Bạn có chắc chắn không?",
+       "errorTitle": "Đã xảy ra lỗi",
+       "errorMsg": "Bạn không được phép thay đổi trạng thái ứng tuyển từ <strong style=\"color:red;\">\"{{fromStatus}}\"</strong> sang <strong style=\"color:red;\">\"{{toStatus}}\"</strong>",
+       "updateSuccess": "Cập nhật thành công."
+    },
+    "delete": {
+       "title": "Xóa hồ sơ ứng tuyển",
+       "confirm": "Hồ sơ ứng tuyển này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn không?",
+       "success": "Xóa hồ sơ ứng tuyển thành công."
+    }
+  },
+  "dashboard": {
+    "pageTitle": "Quản trị Nhà tuyển dụng",
+    "recruitmentChart": "BIỂU ĐỒ TUYỂN DỤNG",
+    "candidateChart": "BIỂU ĐỒ ỨNG VIÊN",
+    "applicationChart": "BIỂU ĐỒ TUYỂN DỤNG & ỨNG TUYỂN",
+    "academicChart": "BIỂU ĐỒ TUYỂN DỤNG THEO TRÌNH ĐỘ"
+  },
+  "jobPost": {
+    "title": "Quản lý tin tuyển dụng",
+    "createNew": "Tạo tin mới",
+    "exportList": "Xuất danh sách",
+    "filter": "Bộ lọc:",
+    "table": {
+      "jobTitle": "Tiêu đề công việc",
+      "postDate": "Ngày đăng",
+      "deadline": "Hạn chót",
+      "applications": "Lượt ứng tuyển",
+      "views": "Lượt xem",
+      "status": "Trạng thái",
+      "actions": "Thao tác"
+    },
+    "urgent": "Gấp",
+    "noData": "Bạn chưa có tin tuyển dụng nào",
+    "tooltips": {
+      "update": "Cập nhật",
+      "delete": "Xóa"
+    },
+    "filters": {
+      "keywordsPlaceholder": "Nhập tiêu đề công việc",
+      "urgent": "Gấp",
+      "notUrgent": "Không gấp",
+      "urgentPlaceholder": "Trạng thái tuyển dụng (gấp)",
+      "statusPlaceholder": "Trạng thái phê duyệt",
+      "reset": "Làm mới",
+      "search": "Tìm kiếm"
+    },
+    "delete": {
+      "title": "Xóa tin tuyển dụng",
+      "confirm": "Tin tuyển dụng này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn không?",
+      "success": "Xóa tin tuyển dụng thành công."
+    },
+    "messages": {
+      "addSuccess": "Thêm tin tuyển dụng thành công.",
+      "updateSuccess": "Cập nhật tin tuyển dụng thành công."
+    },
+    "popupTitle": "Tin tuyển dụng"
+  }
+}

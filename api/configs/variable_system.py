@@ -51,8 +51,8 @@ COMPANY_INFO = {
     "LIGHT_LOGO_LINK": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['system']}myjob_light_logo.png",
     "EMAIL": "myjob.support@gmail.com",
     "PHONE": "0888-425-094",
-    "ADDRESS": "1242 QL1A, Tân Tạo A, Bình Tân, TP. Hồ Chí Minh",
-    "WORK_TIME": "8:00 - 17:30 (Thứ 2 - Thứ 6)",
+    "ADDRESS": "1242 QL1A, Tan Tao A, Binh Tan, Ho Chi Minh City",
+    "WORK_TIME": "8:00 - 17:30 (Monday - Friday)",
     "MY_COMPANY_NAME": settings.COMPANY_NAME
 }
 
@@ -115,47 +115,47 @@ SOCIAL_MEDIA_LINKS = {
 
 PLATFORM_CHOICES = (
     ('WEB', 'Website'),
-    ('APP', 'Ứng dụng')
+    ('APP', 'Application')
 )
 
 LINK_GOOGLE_PLAY = "https://play.google.com/store/apps?hl=en"
 LINK_APPSTORE = "https://www.apple.com/vn/app-store/"
 
 ROLE_CHOICES = (
-    (ADMIN, 'Quản trị viên'),
-    (EMPLOYER, 'Nhà tuyển dụng'),
-    (JOB_SEEKER, 'Người tìm việc')
+    (ADMIN, 'Administrator'),
+    (EMPLOYER, 'Employer'),
+    (JOB_SEEKER, 'Job Seeker')
 )
 
 JOB_POST_STATUS = (
-    (1, 'Chờ duyệt'),
-    (2, 'Không duyệt'),
-    (3, 'Đã duyệt')
+    (1, 'Pending'),
+    (2, 'Rejected'),
+    (3, 'Approved')
 )
 
 GENDER_CHOICES = (
-    ('M', 'Nam'),
-    ('F', 'Nữ'),
-    ('O', 'Khác')
+    ('M', 'Male'),
+    ('F', 'Female'),
+    ('O', 'Other')
 )
 
 MARITAL_STATUS_CHOICES = (
-    ('S', 'Độc thân'),
-    ('M', 'Đã kết hôn')
+    ('S', 'Single'),
+    ('M', 'Married')
 )
 
 LANGUAGE_CHOICES = (
-    (1, 'Việt Nam'),
-    (2, 'Anh'),
-    (3, 'Nhật Bản'),
-    (4, 'Pháp'),
-    (5, 'Trung Quốc'),
-    (6, 'Nga'),
-    (7, 'Hàn Quốc'),
-    (8, 'Đức'),
-    (9, 'Ý'),
-    (10, 'Ả Rập'),
-    (11, 'Khác'),
+    (1, 'Vietnamese'),
+    (2, 'English'),
+    (3, 'Japanese'),
+    (4, 'French'),
+    (5, 'Chinese'),
+    (6, 'Russian'),
+    (7, 'Korean'),
+    (8, 'German'),
+    (9, 'Italian'),
+    (10, 'Arabic'),
+    (11, 'Other'),
 )
 
 LANGUAGE_LEVEL_CHOICES = (
@@ -167,71 +167,71 @@ LANGUAGE_LEVEL_CHOICES = (
 )
 
 POSITION_CHOICES = (
-    (1, 'Quản lý cấp cao'),
-    (2, 'Quản lý cấp trung'),
-    (3, 'Quản lý nhóm- giám sát'),
-    (4, 'Chuyên gia'),
-    (5, 'Chuyên viên- nhân viên'),
-    (6, 'Cộng tác viên'),
+    (1, 'Senior Management'),
+    (2, 'Middle Management'),
+    (3, 'Team Leader - Supervisor'),
+    (4, 'Specialist'),
+    (5, 'Staff / Employee'),
+    (6, 'Collaborator'),
 )
 
 TYPE_OF_WORKPLACE_CHOICES = (
-    (1, 'Làm việc tại văn phòng'),
-    (2, 'Làm việc kết hợp'),
-    (3, 'Làm việc tại nhà')
+    (1, 'Office-based'),
+    (2, 'Hybrid'),
+    (3, 'Remote / Work from home')
 )
 
 # OK
 JOB_TYPE_CHOICES = (
-    (1, 'Toàn thời gian cố định'),
-    (2, 'Toàn thời gian tạm thời'),
-    (3, 'Bán thời gian cố định'),
-    (4, 'Bán thời gian tạm thời'),
-    (5, 'Theo hợp đồng tư vấn'),
-    (6, 'Thực tập'),
-    (7, 'Khác'),
+    (1, 'Full-time Permanent'),
+    (2, 'Full-time Temporary'),
+    (3, 'Part-time Permanent'),
+    (4, 'Part-time Temporary'),
+    (5, 'Consultancy Contract'),
+    (6, 'Internship'),
+    (7, 'Other'),
 )
 
 EXPERIENCE_CHOICES = (
-    (1, 'Chưa có kinh nghiệm'),
-    (2, 'Dưới 1 năm kinh nghiệm '),
-    (3, '1 năm kinh nghiệm'),
-    (4, '2 năm kinh nghiệm'),
-    (5, '3 năm kinh nghiệm'),
-    (6, '4 năm kinh nghiệm'),
-    (7, '5 năm kinh nghiệm'),
-    (8, 'Trên 5 năm kinh nghiệm')
+    (1, 'No experience'),
+    (2, 'Under 1 year'),
+    (3, '1 year'),
+    (4, '2 years'),
+    (5, '3 years'),
+    (6, '4 years'),
+    (7, '5 years'),
+    (8, 'Over 5 years')
 )
 
 ACADEMIC_LEVEL = (
-    (1, 'Trên Đại học'),
-    (2, 'Đại học'),
-    (3, 'Cao đẳng'),
-    (4, 'Trung cấp'),
-    (5, 'Trung học'),
-    (6, 'Chứng chỉ')
+    (1, 'Postgraduate'),
+    (2, 'University'),
+    (3, 'College'),
+    (4, 'Vocational / Intermediate'),
+    (5, 'High School'),
+    (6, 'Certificate')
 )
 
 EMPLOYEE_SIZE_CHOICES = (
-    (1, 'Dưới 10 nhân viên'),
-    (2, '10 - 150 nhân viên'),
-    (3, '150 - 300 nhân viên'),
-    (4, 'Trên 300 nhân viên'),
+    (1, 'Under 10 employees'),
+    (2, '10 - 150 employees'),
+    (3, '150 - 300 employees'),
+    (4, 'Over 300 employees'),
 )
 
 APPLICATION_STATUS = (
-    (1, 'Chờ xác nhận'),
-    (2, 'Đã liên hệ'),
-    (3, 'Đã test'),
-    (4, 'Đã phỏng vấn'),
-    (5, 'Trúng tuyển'),
-    (6, 'Không trúng tuyển')
+    (1, 'Pending Confirmation'),
+    (2, 'Contacted'),
+    (3, 'Tested'),
+    (4, 'Interviewed'),
+    (5, 'Hired'),
+    (6, 'Not Selected')
 )
 
 FREQUENCY_NOTIFICATION = (
-    (1, 'Mỗi ngày'),
-    (2, '3 Ngày / lần'),
-    (3, '1 Tuần / 1 lần'),
+    (1, 'Daily'),
+    (2, 'Every 3 Days'),
+    (3, 'Weekly'),
 )
 
 DESCRIPTION_LOCATION = (

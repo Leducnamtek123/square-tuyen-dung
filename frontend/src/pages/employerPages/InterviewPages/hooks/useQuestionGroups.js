@@ -15,7 +15,7 @@ export const useQuestionGroups = (params) => {
         mutationFn: (data) => questionGroupService.createQuestionGroup(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
-            toast.success('Thêm bộ câu hỏi thành công');
+            toast.success('Added question group successfully');
         },
         onError: (err) => {
             toast.error('Có lỗi xảy ra khi thêm bộ câu hỏi');
@@ -27,7 +27,7 @@ export const useQuestionGroups = (params) => {
         mutationFn: ({ id, data }) => questionGroupService.updateQuestionGroup(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
-            toast.success('Cập nhật bộ câu hỏi thành công');
+            toast.success('Updated question group successfully');
         },
         onError: (err) => {
             toast.error('Có lỗi xảy ra khi cập nhật bộ câu hỏi');
@@ -39,7 +39,7 @@ export const useQuestionGroups = (params) => {
         mutationFn: (id) => questionGroupService.deleteQuestionGroup(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
-            toast.success('Xóa bộ câu hỏi thành công');
+            toast.success('Deleted question group successfully');
         },
         onError: (err) => {
             toast.error('Có lỗi xảy ra khi xóa bộ câu hỏi');

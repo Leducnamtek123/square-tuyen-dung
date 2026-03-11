@@ -12,23 +12,15 @@ See the LICENSE file in the project root for full license information.
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Link from '@mui/material/Link';
-import {
-  Box,
-  Grid,
-  List,
-  ListItem,
-  ListItemText,
-  Stack,
-  Typography,
-  Container,
-  Divider,
-  useTheme,
-} from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import { Box, List, ListItem, ListItemText, Stack, Typography, Container, Divider, useTheme } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 
 import { ICONS, IMAGES, LINKS, ROUTES, APP_NAME } from '../../../../configs/constants';
 import MuiImageCustom from '../../../../components/MuiImageCustom';
 
 const Footer = () => {
+  const { t } = useTranslation('common');
   const nav = useNavigate();
   const theme = useTheme();
 
@@ -36,7 +28,12 @@ const Footer = () => {
     <Box>
       <Container maxWidth="lg">
         <Grid container spacing={4}>
-          <Grid xs={12} sm={6} md={3} item>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 3
+            }}>
             <List disablePadding>
               <ListItem sx={{ pb: 2 }}>
                 <MuiImageCustom
@@ -49,40 +46,45 @@ const Footer = () => {
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
                   onClick={() => nav(`/${ROUTES.JOB_SEEKER.ABOUT_US}`)}
-                  primary={`Về ${APP_NAME}`}
+                  primary={t('footer.aboutApp', { appName: APP_NAME })}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
-                  onClick={() => nav('/lien-he')}
-                  primary="Liên Hệ"
+                  onClick={() => nav('/contact')}
+                  primary={t('footer.contact')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
-                  onClick={() => nav('/hoi-dap')}
-                  primary="Hỏi Đáp"
+                  onClick={() => nav('/faq')}
+                  primary={t('footer.faq')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
-                  onClick={() => nav('/thoa-thuan-su-dung')}
-                  primary="Thỏa thuận sử dụng"
+                  onClick={() => nav('/terms-of-service')}
+                  primary={t('footer.tos')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
-                  onClick={() => nav('/quy-dinh-bao-mat')}
-                  primary="Quy định bảo mật"
+                  onClick={() => nav('/privacy-policy')}
+                  primary={t('footer.privacy')}
                 />
               </ListItem>
             </List>
           </Grid>
-          <Grid xs={12} sm={6} md={3} item>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 3
+            }}>
             <List disablePadding>
               <ListItem>
                 <Typography
@@ -92,47 +94,52 @@ const Footer = () => {
                     mb: 1,
                   }}
                 >
-                  Dành cho nhà tuyển dụng
+                  {t('footer.forEmployers')}
                 </Typography>
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
                   onClick={() => nav(`/${ROUTES.EMPLOYER.JOB_POST}`)}
-                  primary="Đăng Tin Tuyển Dụng"
+                  primary={t('footer.postJob')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
                   onClick={() => nav(`/${ROUTES.EMPLOYER.PROFILE}`)}
-                  primary="Tìm Kiếm Hồ Sơ"
+                  primary={t('footer.searchResumes')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
                   onClick={() => nav(`/${ROUTES.EMPLOYER.DASHBOARD}`)}
-                  primary="Quản Lý Nhà Tuyển Dụng"
+                  primary={t('footer.employerDashboard')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
                   onClick={() => nav(`/${ROUTES.EMPLOYER.CHAT}`)}
-                  primary="Tin Nhắn"
+                  primary={t('footer.messages')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
                   onClick={() => nav(`/${ROUTES.EMPLOYER.NOTIFICATION}`)}
-                  primary="Thông Báo"
+                  primary={t('footer.notifications')}
                 />
               </ListItem>
             </List>
           </Grid>
-          <Grid xs={12} sm={6} md={3} item>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 3
+            }}>
             <List disablePadding>
               <ListItem>
                 <Typography
@@ -142,47 +149,52 @@ const Footer = () => {
                     mb: 1,
                   }}
                 >
-                  Dành cho ứng viên
+                  {t('footer.forCandidates')}
                 </Typography>
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
                   onClick={() => nav(`/${ROUTES.JOB_SEEKER.JOBS}`)}
-                  primary="Việc Làm"
+                  primary={t('nav.jobs')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
                   onClick={() => nav(`/${ROUTES.JOB_SEEKER.COMPANY}`)}
-                  primary="Công ty"
+                  primary={t('nav.companies')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
                   onClick={() => nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}`)}
-                  primary="Quản Lý Ứng Viên"
+                  primary={t('footer.candidateDashboard')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
                   onClick={() => nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.CHAT}`)}
-                  primary="Tin Nhắn"
+                  primary={t('footer.messages')}
                 />
               </ListItem>
               <ListItem>
                 <ListItemText
                   sx={{ cursor: 'pointer' }}
                   onClick={() => nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.NOTIFICATION}`)}
-                  primary="Thông Báo"
+                  primary={t('footer.notifications')}
                 />
               </ListItem>
             </List>
           </Grid>
-          <Grid xs={12} sm={6} md={3} item>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 3
+            }}>
             <List disablePadding>
               <ListItem>
                 <Typography
@@ -192,7 +204,7 @@ const Footer = () => {
                     mb: 1,
                   }}
                 >
-                  Ứng dụng di động
+                  {t('footer.mobileApps')}
                 </Typography>
               </ListItem>
               <ListItem>
@@ -227,7 +239,7 @@ const Footer = () => {
                     mb: 1,
                   }}
                 >
-                  Kết nối với {APP_NAME}
+                  {t('footer.connectWith', { appName: APP_NAME })}
                 </Typography>
               </ListItem>
               <ListItem>
@@ -264,7 +276,7 @@ const Footer = () => {
           align="center"
           sx={{ pt: 2 }}
         >
-          © {new Date().getFullYear()} {APP_NAME}. Tất cả quyền được bảo lưu.
+          {t('footer.rightsReserved', { year: new Date().getFullYear(), appName: APP_NAME })}
         </Typography>
       </Container>
     </Box>

@@ -11,7 +11,8 @@ See the LICENSE file in the project root for full license information.
 
 import * as React from 'react';
 import { Outlet } from 'react-router-dom';
-import { Box } from '@mui/material';
+import { Box } from "@mui/material";
+
 import ChatProvider from '../../context/ChatProvider';
 
 const ChatLayout = () => {

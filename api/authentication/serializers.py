@@ -13,6 +13,7 @@ from configs import variable_system as var_sys
 from configs.messages import ERROR_MESSAGES
 from helpers import helper
 from rest_framework import serializers
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.validators import UniqueValidator
 from django.conf import settings
 from django.db import transaction
@@ -224,10 +225,9 @@ class UserSerializer(serializers.ModelSerializer):
     isActive = serializers.BooleanField(source='is_active')
     isVerifyEmail = serializers.BooleanField(source='is_verify_email')
     roleName = serializers.CharField(source="role_name")
-    jobSeekerProfileId = serializers.PrimaryKeyRelatedField(source='job_seeker_profile',
-                                                            read_only=True)
+    jobSeekerProfileId = serializers.SerializerMethodField(method_name="get_job_seeker_profile_id", read_only=True)
     jobSeekerProfile = serializers.SerializerMethodField(method_name="get_job_seeker_profile", read_only=True)
-    companyId = serializers.PrimaryKeyRelatedField(source='company', read_only=True)
+    companyId = serializers.SerializerMethodField(method_name='get_company_id', read_only=True)
     company = serializers.SerializerMethodField(method_name='get_company')
     
     def get_avatar_url(self, user):
@@ -237,7 +237,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_job_seeker_profile(self, user):
         if user.role_name == var_sys.JOB_SEEKER:
-            job_seeker_profile = getattr(user, 'job_seeker_profile', None)
+            try:
+                job_seeker_profile = user.job_seeker_profile
+            except ObjectDoesNotExist:
+                job_seeker_profile = None
             if not job_seeker_profile:
                 return None
             return {
@@ -246,9 +249,21 @@ class UserSerializer(serializers.ModelSerializer):
             }
         return None
 
+    def get_job_seeker_profile_id(self, user):
+        if user.role_name != var_sys.JOB_SEEKER:
+            return None
+        try:
+            job_seeker_profile = user.job_seeker_profile
+        except ObjectDoesNotExist:
+            return None
+        return job_seeker_profile.id
+
     def get_company(self, user):
         if user.role_name == var_sys.EMPLOYER:
-            company = getattr(user, 'company', None)
+            try:
+                company = user.company
+            except ObjectDoesNotExist:
+                company = None
             if not company:
                 return None
             company_logo = getattr(company, 'logo', None)
@@ -261,6 +276,15 @@ class UserSerializer(serializers.ModelSerializer):
                 "imageUrl": company_logo_url
             }
         return None
+
+    def get_company_id(self, user):
+        if user.role_name != var_sys.EMPLOYER:
+            return None
+        try:
+            company = user.company
+        except ObjectDoesNotExist:
+            return None
+        return company.id
 
     def __init__(self, *args, **kwargs):
         fields = kwargs.pop('fields', None)

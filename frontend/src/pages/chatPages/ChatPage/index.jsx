@@ -11,16 +11,9 @@ See the LICENSE file in the project root for full license information.
 
 import React from 'react';
 import { useSelector } from 'react-redux';
-import { 
-  Box, 
-  Grid, 
-  Stack, 
-  Typography,
-  Drawer,
-  IconButton,
-  useTheme,
-  useMediaQuery 
-} from '@mui/material';
+import { Box, Stack, Typography, Drawer, IconButton, useTheme, useMediaQuery } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+
 import MenuIcon from '@mui/icons-material/Menu';
 import GroupIcon from '@mui/icons-material/Group';
 
@@ -50,12 +43,14 @@ const ChatPage = () => {
           anchor="left"
           open={openLeftDrawer}
           onClose={() => setOpenLeftDrawer(false)}
-          PaperProps={{
-            sx: {
-              width: '80%',
-              maxWidth: 360,
-              bgcolor: 'background.paper',
-            }
+          slotProps={{
+            paper: {
+              sx: {
+                width: '80%',
+                maxWidth: 360,
+                bgcolor: 'background.paper',
+              },
+            },
           }}
         >
           <Box px={2} py={2} sx={{ height: '100%' }}>
@@ -75,17 +70,17 @@ const ChatPage = () => {
         </Drawer>
       ) : (
         <Grid
-          item
-          xs={12}
-          sm={4}
-          md={3}
           sx={{
             height: '100vh',
             borderRight: 1,
             borderColor: 'divider',
             display: { xs: 'none', sm: 'block' }
           }}
-        >
+          size={{
+            xs: 12,
+            sm: 4,
+            md: 3
+          }}>
           <Box px={2} py={2} sx={{ height: '100%', bgcolor: 'background.paper' }}>
             <Stack spacing={2}>
               <Box>
@@ -102,18 +97,17 @@ const ChatPage = () => {
           </Box>
         </Grid>
       )}
-
       {/* Main Chat Window */}
-      <Grid 
-        item 
-        xs={12} 
-        sm={8} 
-        md={6}
+      <Grid
         sx={{ 
           height: '100vh',
           bgcolor: 'background.paper',
         }}
-      >
+        size={{
+          xs: 12,
+          sm: 8,
+          md: 6
+        }}>
         <Box sx={{ height: '100%' }}>
           <Stack direction="column" sx={{ height: '100%' }}>
             <Box 
@@ -179,19 +173,20 @@ const ChatPage = () => {
           </Stack>
         </Box>
       </Grid>
-
       {/* Right Sidebar */}
       {isMedium ? (
         <Drawer
           anchor="right"
           open={openRightDrawer}
           onClose={() => setOpenRightDrawer(false)}
-          PaperProps={{
-            sx: {
-              width: '80%',
-              maxWidth: 360,
-              bgcolor: 'background.paper',
-            }
+          slotProps={{
+            paper: {
+              sx: {
+                width: '80%',
+                maxWidth: 360,
+                bgcolor: 'background.paper',
+              },
+            },
           }}
         >
           <Box px={2} py={2}>
@@ -204,8 +199,6 @@ const ChatPage = () => {
         </Drawer>
       ) : (
         <Grid
-          item
-          md={3}
           sx={{
             height: '100vh',
             borderLeft: 1,
@@ -213,7 +206,9 @@ const ChatPage = () => {
             display: { xs: 'none', md: 'block' },
             bgcolor: 'background.paper'
           }}
-        >
+          size={{
+            md: 3
+          }}>
           <Box px={2} py={2}>
             {currentUser?.roleName === ROLES_NAME.JOB_SEEKER ? (
               <RightSidebar />

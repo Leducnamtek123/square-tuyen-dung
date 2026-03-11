@@ -85,14 +85,9 @@
   "scripts": {
     "start": "vite --host 0.0.0.0 --port 3000",
     "build": "vite build",
+    "lint": "eslint \"src/**/*.{js,jsx}\"",
     "preview": "vite preview",
     "test": "vitest"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [
@@ -107,9 +102,14 @@
     ]
   },
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.43.0",
+    "@typescript-eslint/parser": "^8.43.0",
     "@tailwindcss/postcss": "^4.2.1",
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.27",
+    "@mui/codemod": "^7.3.9",
+    "eslint": "^9.31.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
     "postcss": "^8.5.8",
     "sharp": "^0.34.2",
     "tailwindcss": "^4.2.1",

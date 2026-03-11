@@ -10,7 +10,7 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
-import { Box, Card, Tab } from '@mui/material';
+import { Box, Card, Tab } from "@mui/material";
 
 import { TabTitle } from '../../../utils/generalFunction';
 import CompanyCard from '../../components/employers/CompanyCard';
@@ -18,7 +18,7 @@ import CompanyImageCard from '../../components/employers/CompanyImageCard';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 
 const CompanyPage = () => {
-  TabTitle("Quản lý thông tin công ty")
+  TabTitle("Company Information Management")
 
   const [value, setValue] = React.useState(0);
 
@@ -31,8 +31,8 @@ const CompanyPage = () => {
       <TabContext value={value}>
         <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
           <TabList onChange={handleChange} aria-label="company tabs">
-            <Tab label="Thông tin công ty" />
-            <Tab label="Đa phương tiện" />
+            <Tab label="Company Information" />
+            <Tab label="Multimedia" />
           </TabList>
         </Box>
         <TabPanel value={0} sx={{ px: 1 }}>

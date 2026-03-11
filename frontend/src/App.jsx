@@ -21,6 +21,7 @@ import { getAllConfig } from "./redux/configSlice";
 
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
+
 import { viVN } from "@mui/material/locale";
 
 import { toast, ToastContainer } from "react-toastify";

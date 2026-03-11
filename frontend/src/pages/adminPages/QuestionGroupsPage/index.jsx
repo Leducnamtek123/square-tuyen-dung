@@ -1,26 +1,6 @@
 import React, { useState } from 'react';
-import {
-    Box,
-    Typography,
-    Breadcrumbs,
-    Link,
-    Button,
-    Paper,
-    TextField,
-    InputAdornment,
-    Pagination,
-    CircularProgress,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    OutlinedInput,
-    Chip,
-} from '@mui/material';
+import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Pagination, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip } from "@mui/material";
+
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useQuestionGroups } from './hooks/useQuestionGroups';
@@ -169,14 +149,14 @@ const QuestionGroupsPage = () => {
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-                        Quản lý bộ câu hỏi
+                        Question Group Management
                     </Typography>
                     <Breadcrumbs aria-label="breadcrumb">
                         <Link underline="hover" color="inherit" href="/admin">
                             Admin
                         </Link>
-                        <Typography color="text.primary">Ngân hàng câu hỏi</Typography>
-                        <Typography color="text.primary">Bộ câu hỏi</Typography>
+                        <Typography color="text.primary">Question Bank</Typography>
+                        <Typography color="text.primary">Question Groups</Typography>
                     </Breadcrumbs>
                 </Box>
                 <Button
@@ -185,24 +165,25 @@ const QuestionGroupsPage = () => {
                     onClick={handleOpenAdd}
                     sx={{ borderRadius: '8px', textTransform: 'none' }}
                 >
-                    Thêm bộ câu hỏi
+                    Add Question Group
                 </Button>
             </Box>
-
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
                         size="small"
-                        placeholder="Tìm kiếm bộ câu hỏi..."
+                        placeholder="Search question groups..."
                         value={searchTerm}
                         onChange={handleSearch}
                         sx={{ width: 300 }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon fontSize="small" color="action" />
-                                </InputAdornment>
-                            ),
+                        slotProps={{
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon fontSize="small" color="action" />
+                                    </InputAdornment>
+                                ),
+                            }
                         }}
                     />
                 </Box>
@@ -231,23 +212,22 @@ const QuestionGroupsPage = () => {
                     </>
                 )}
             </Paper>
-
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="xs">
                 <DialogTitle>
-                    {dialogMode === 'add' ? 'Thêm bộ câu hỏi mới' : 'Chỉnh sửa bộ câu hỏi'}
+                    {dialogMode === 'add' ? 'Add New Question Group' : 'Edit Question Group'}
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <TextField
-                            label="Tên bộ câu hỏi"
+                            label="Question Group Name"
                             fullWidth
                             value={groupName}
                             onChange={(e) => setGroupName(e.target.value)}
                             required
                         />
                         <TextField
-                            label="Mô tả"
+                            label="Description"
                             fullWidth
                             multiline
                             rows={3}
@@ -255,17 +235,17 @@ const QuestionGroupsPage = () => {
                             onChange={(e) => setGroupDescription(e.target.value)}
                         />
                         <FormControl fullWidth>
-                            <InputLabel>Chọn câu hỏi</InputLabel>
+                            <InputLabel>Select Questions</InputLabel>
                             <Select
                                 multiple
                                 value={selectedQuestions}
                                 onChange={(e) => setSelectedQuestions(e.target.value)}
-                                input={<OutlinedInput label="Chọn câu hỏi" />}
+                                input={<OutlinedInput label="Select Questions" />}
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                         {selected.map((value) => {
                                             const q = allQuestions.find((item) => item.id === value);
-                                            return <Chip key={value} label={q?.text?.substring(0, 30) || 'Câu hỏi'} />;
+                                            return <Chip key={value} label={q?.text?.substring(0, 30) || 'Question'} />;
                                         })}
                                     </Box>
                                 )}
@@ -283,29 +263,28 @@ const QuestionGroupsPage = () => {
                             onClick={() => setOpenCreateQuestion(true)}
                             sx={{ alignSelf: 'flex-start' }}
                         >
-                            Tạo câu hỏi mới
+                            Create New Question
                         </Button>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">Hủy</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">Cancel</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={isMutating || !groupName.trim()}
                     >
-                        {isMutating ? 'Đang lưu...' : 'Lưu lại'}
+                        {isMutating ? 'Saving...' : 'Save'}
                     </Button>
                 </DialogActions>
             </Dialog>
-
             {/* Create Question Dialog */}
             <Dialog open={openCreateQuestion} onClose={() => setOpenCreateQuestion(false)} fullWidth maxWidth="xs">
-                <DialogTitle>Tạo câu hỏi mới</DialogTitle>
+                <DialogTitle>Create New Question</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1 }}>
                         <TextField
-                            label="Nội dung câu hỏi"
+                            label="Question Content"
                             fullWidth
                             multiline
                             rows={3}
@@ -316,35 +295,34 @@ const QuestionGroupsPage = () => {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenCreateQuestion(false)} color="inherit">Hủy</Button>
+                    <Button onClick={() => setOpenCreateQuestion(false)} color="inherit">Cancel</Button>
                     <Button
                         onClick={handleCreateQuestion}
                         variant="contained"
                         disabled={isCreatingQuestion || !newQuestionContent.trim()}
                     >
-                        {isCreatingQuestion ? 'Đang tạo...' : 'Tạo mới'}
+                        {isCreatingQuestion ? 'Creating...' : 'Create'}
                     </Button>
                 </DialogActions>
             </Dialog>
-
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-                <DialogTitle>Xác nhận xóa</DialogTitle>
+                <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        Bạn có chắc chắn muốn xóa bộ câu hỏi <strong>{currentGroup?.name}</strong>?
-                        Dữ liệu các câu hỏi bên trong sẽ không bị xóa, nhưng liên kết với bộ câu hỏi này sẽ mất.
+                        Are you sure you want to delete question group <strong>{currentGroup?.name}</strong>?
+                        The questions inside will not be deleted, but the links to this group will be lost.
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Hủy</Button>
+                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Cancel</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Đang xóa...' : 'Xác nhận xóa'}
+                        {isMutating ? 'Deleting...' : 'Confirm Delete'}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -43,8 +43,6 @@ import letterSvg from "../assets/images/svg-images/letter.svg";
 
 import sadSvg from "../assets/images/svg-images/sad.svg";
 
-
-
 // Import các assets
 
 import jobSeekerChatbotIcon from "../assets/icons/job_seeker_chatbot_icon.gif";
@@ -93,21 +91,11 @@ import star4 from "../assets/images/feedbacks/4star.gif";
 
 import star5 from "../assets/images/feedbacks/5star.gif";
 
-
-
-
-
 const ENV = import.meta.env.VITE_NODE_ENV || "development";
-
-
 
 const PLATFORM = "WEB";
 
-
-
 const APP_NAME = "Square";
-
-
 
 const HOST_NAME = {
 
@@ -119,8 +107,6 @@ const HOST_NAME = {
 
 };
 
-
-
 const AUTH_PROVIDER = {
 
   FACEBOOK: "facebook",
@@ -128,8 +114,6 @@ const AUTH_PROVIDER = {
   GOOGLE: "google-oauth2",
 
 };
-
-
 
 const AUTH_CONFIG = {
 
@@ -149,15 +133,11 @@ const AUTH_CONFIG = {
 
   CONVERT_TOKEN_KEY: "convert_token",
 
-
-
   // FACEBOOK AUTH
 
   FACEBOOK_CLIENT_ID: import.meta.env.VITE_FACEBOOK_CLIENT_ID,
 
   FACEBOOK_CLIENT_SECRET: import.meta.env.VITE_FACEBOOK_CLIENT_SECRET,
-
-
 
   // GOOGLE AUTH
 
@@ -165,13 +145,9 @@ const AUTH_CONFIG = {
 
   GOOGLE_CLIENT_SECRET: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
 
-
-
   // GOONG
 
   GOONGAPI_KEY: import.meta.env.VITE_GOONGAPI_KEY,
-
-
 
   // Dialogflow chatbot
 
@@ -197,8 +173,6 @@ const AUTH_CONFIG = {
 
 };
 
-
-
 const ROLES_NAME = {
 
   ADMIN: "ADMIN",
@@ -209,33 +183,18 @@ const ROLES_NAME = {
 
 };
 
-
-
 const HOME_FILTER_CAREER = [
-
   {
-
     id: 34,
-
-    name: "IT - Phần mềm",
-
+    name: "IT - Software",
     titleIcon: DevicesIcon
-
   },
-
   {
-
     id: 33,
-
-    name: "IT - Phần cứng/Mạng",
-
+    name: "IT - Hardware/Networking",
     titleIcon: DeveloperBoardIcon
-
   },
-
 ];
-
-
 
 const REGEX_VATIDATE = {
 
@@ -244,14 +203,9 @@ const REGEX_VATIDATE = {
     /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/,
 
   urlRegExp:
-
-    // eslint-disable-next-line no-useless-escape
-
     /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/,
 
 };
-
-
 
 const CV_TYPES = {
 
@@ -260,8 +214,6 @@ const CV_TYPES = {
   cvUpload: "UPLOAD",
 
 };
-
-
 
 const DATE_OPTIONS = {
 
@@ -275,8 +227,6 @@ const DATE_OPTIONS = {
 
 };
 
-
-
 const IMAGES = {
   getLogo: (mode = 'dark') => {
     return mode === 'light'
@@ -289,7 +239,6 @@ const IMAGES = {
       : '/square-icons/logo square svg-black.svg';
   },
 
-
   coverImageDefault,
 
   chPlayDownload,
@@ -299,8 +248,6 @@ const IMAGES = {
   notificationImageDefault,
 
 };
-
-
 
 const ABOUT_IMAGES = {
 
@@ -313,8 +260,6 @@ const ABOUT_IMAGES = {
   PROFILE: profileImg,
 
 };
-
-
 
 const ICONS = {
 
@@ -338,8 +283,6 @@ const ICONS = {
 
 };
 
-
-
 const LINKS = {
 
   CHPLAY_LINK: "https://play.google.com/store/",
@@ -362,15 +305,11 @@ const LINKS = {
 
 };
 
-
-
 const LOADING_IMAGES = {
 
   LOADING_SPINNER: loadingSpinner,
 
 };
-
-
 
 const FEEDBACK_IMAGES = {
 
@@ -386,15 +325,11 @@ const FEEDBACK_IMAGES = {
 
 };
 
-
-
 const LOGO_IMAGES = {
 
   LOGO_WITH_BG: "/square-icons/logo.svg",
 
 };
-
-
 
 const BANNER_TYPES = {
 
@@ -403,8 +338,6 @@ const BANNER_TYPES = {
   MAIN_JOB_RIGHT: "MAIN_JOB_RIGHT",
 
 };
-
-
 
 const JOB_POST_STATUS_BG_COLOR = {
 
@@ -415,8 +348,6 @@ const JOB_POST_STATUS_BG_COLOR = {
   3: "success",
 
 };
-
-
 
 const ROUTES = {
 
@@ -565,8 +496,6 @@ const ROUTES = {
 
 };
 
-
-
 // SVG components
 
 const SVG_IMAGES = {
@@ -602,8 +531,6 @@ const SVG_IMAGES = {
   ImageSvg15: sadSvg,
 
 };
-
-
 
 export {
 
@@ -652,5 +579,4 @@ export {
   SVG_IMAGES,
 
 };
-
 

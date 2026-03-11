@@ -2,23 +2,17 @@
 
 MyJob Recruitment System - Part of MyJob Platform
 
-
-
 Author: Bui Khanh Huy
 
 Email: khuy220@gmail.com
 
 Copyright (c) 2023 Bui Khanh Huy
 
-
-
 License: MIT License
 
 See the LICENSE file in the project root for full license information.
 
 */
-
-
 
 import React from "react";
 
@@ -28,27 +22,8 @@ import { useSelector } from "react-redux";
 
 import dayjs from "dayjs";
 
-import {
-
-  Box,
-
-  Card,
-
-  Grid,
-
-  IconButton,
-
-  Link,
-
-  Stack,
-
-  Typography,
-
-  Button,
-
-  Skeleton,
-
-} from "@mui/material";
+import { Box, Card, IconButton, Link, Stack, Typography, Button, Skeleton } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 
 import { LoadingButton } from "@mui/lab";
 
@@ -73,11 +48,6 @@ import {
   faLocationDot,
 
 } from "@fortawesome/free-solid-svg-icons";
-
-
-
-
-
 
 import { TabTitle } from "../../../utils/generalFunction";
 
@@ -106,12 +76,9 @@ import ImageGalleryCustom from "../../../components/ImageGalleryCustom";
 
 import companyService from "../../../services/companyService";
 
-
-
 import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
 
 import CompanyDetailLoading from "./components/CompanyDetailLoading";
-
 
 const CompanyDetailPage = () => {
 
@@ -131,8 +98,6 @@ const CompanyDetailPage = () => {
 
   const [imageList, setImageList] = React.useState([]);
 
-
-
   React.useEffect(() => {
 
     const getCompanyDetail = async (companySlug) => {
@@ -145,13 +110,9 @@ const CompanyDetailPage = () => {
 
         const companyImages = data?.companyImages || [];
 
-
-
         setCompanyDetail(data);
 
         TabTitle(data?.companyName);
-
-
 
         var imagelistNew = [];
 
@@ -179,13 +140,9 @@ const CompanyDetailPage = () => {
 
     };
 
-
-
     getCompanyDetail(slug);
 
   }, [slug]);
-
-
 
   const handleFollow = () => {
 
@@ -215,7 +172,7 @@ const CompanyDetailPage = () => {
 
         toastMessages.success(
 
-          isFollowed ? "Theo dõi thành công." : "Hủy theo dõi thành công."
+          isFollowed ? "Followed successfully." : "Unfollowed successfully."
 
         );
 
@@ -231,13 +188,9 @@ const CompanyDetailPage = () => {
 
     };
 
-
-
     follow();
 
   };
-
-
 
   return isLoading ? (
 
@@ -583,13 +536,15 @@ const CompanyDetailPage = () => {
 
           </Card>
 
-
-
           <Box>
 
             <Grid container spacing={3}>
 
-              <Grid item xs={12} md={8}>
+              <Grid
+                size={{
+                  xs: 12,
+                  md: 8
+                }}>
 
                 <Card
 
@@ -697,8 +652,6 @@ const CompanyDetailPage = () => {
 
                     </Box>
 
-
-
                     <Box>
 
                       <Typography
@@ -740,9 +693,11 @@ const CompanyDetailPage = () => {
 
               </Grid>
 
-
-
-              <Grid item xs={12} md={4}>
+              <Grid
+                size={{
+                  xs: 12,
+                  md: 4
+                }}>
 
                 <Card
 
@@ -856,8 +811,6 @@ const CompanyDetailPage = () => {
 
                     </Box>
 
-
-
                     {/* Social Media Links */}
 
                     <Box>
@@ -939,8 +892,6 @@ const CompanyDetailPage = () => {
                       </Stack>
 
                     </Box>
-
-
 
                     {/* Company Info */}
 
@@ -1072,8 +1023,6 @@ const CompanyDetailPage = () => {
 
                     </Box>
 
-
-
                     {/* Map */}
 
                     <Box>
@@ -1126,8 +1075,6 @@ const CompanyDetailPage = () => {
                       </Box>
 
                     </Box>
-
-
 
                     {/* Image Gallery */}
 
@@ -1190,8 +1137,6 @@ const CompanyDetailPage = () => {
         </Stack>
 
       </Box>
-
-
 
       {/* Start: SocialNetworkSharingPopup */}
 
@@ -1259,9 +1204,5 @@ const CompanyDetailPage = () => {
 
 };
 
-
-
 export default CompanyDetailPage;
-
-
 

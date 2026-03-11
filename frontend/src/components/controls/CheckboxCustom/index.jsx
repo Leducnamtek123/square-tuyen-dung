@@ -11,7 +11,7 @@ See the LICENSE file in the project root for full license information.
 
 import React from 'react';
 import { Controller } from 'react-hook-form';
-import { Checkbox, FormControlLabel } from '@mui/material';
+import { Checkbox, FormControlLabel } from "@mui/material";
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const CheckboxCustom = ({ name, control, title = '', disabled = false }) => {

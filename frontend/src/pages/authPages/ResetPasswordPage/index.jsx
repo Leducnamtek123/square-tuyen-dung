@@ -11,7 +11,8 @@ See the LICENSE file in the project root for full license information.
 
 import * as React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Alert, AlertTitle, Card, Container, Typography } from '@mui/material';
+import { Alert, AlertTitle, Card, Container, Typography } from "@mui/material";
+
 import { useTranslation } from 'react-i18next';
 
 import { TabTitle } from '../../../utils/generalFunction';

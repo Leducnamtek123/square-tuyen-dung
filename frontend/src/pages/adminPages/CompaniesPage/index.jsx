@@ -1,19 +1,7 @@
 import React, { useState } from 'react';
-import {
-    Box,
-    Paper,
-    TextField,
-    InputAdornment,
-    Pagination,
-    CircularProgress,
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Grid,
-    Typography,
-} from '@mui/material';
+import { Box, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useCompanies } from './hooks/useCompanies';
@@ -144,24 +132,25 @@ const CompaniesPage = () => {
                     onClick={handleOpenAdd}
                     sx={{ borderRadius: '8px', textTransform: 'none' }}
                 >
-                    Thêm công ty
+                    Add Company
                 </Button>
             </Box>
-
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
                         size="small"
-                        placeholder="Tìm kiếm công ty..."
+                        placeholder="Search companies..."
                         value={searchTerm}
                         onChange={handleSearch}
                         sx={{ width: 400 }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon fontSize="small" color="action" />
-                                </InputAdornment>
-                            ),
+                        slotProps={{
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon fontSize="small" color="action" />
+                                    </InputAdornment>
+                                ),
+                            }
                         }}
                     />
                 </Box>
@@ -190,17 +179,16 @@ const CompaniesPage = () => {
                     </>
                 )}
             </Paper>
-
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
                 <DialogTitle>
-                    {dialogMode === 'add' ? 'Thêm công ty mới' : 'Chỉnh sửa thông tin công ty'}
+                    {dialogMode === 'add' ? 'Add New Company' : 'Edit Company Information'}
                 </DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2} sx={{ pt: 1 }}>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <TextField
-                                label="Tên công ty"
+                                label="Company Name"
                                 fullWidth
                                 name="companyName"
                                 value={formData.companyName}
@@ -208,9 +196,9 @@ const CompaniesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
-                                label="Mã số thuế"
+                                label="Tax Code"
                                 fullWidth
                                 name="taxCode"
                                 value={formData.taxCode}
@@ -218,9 +206,9 @@ const CompaniesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
-                                label="Quy mô nhân sự"
+                                label="Employee Size"
                                 fullWidth
                                 type="number"
                                 name="employeeSize"
@@ -229,9 +217,9 @@ const CompaniesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
-                                label="Email công ty"
+                                label="Company Email"
                                 fullWidth
                                 name="companyEmail"
                                 value={formData.companyEmail}
@@ -239,9 +227,9 @@ const CompaniesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
-                                label="Số điện thoại"
+                                label="Phone Number"
                                 fullWidth
                                 name="companyPhone"
                                 value={formData.companyPhone}
@@ -249,9 +237,9 @@ const CompaniesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <TextField
-                                label="Lĩnh vực hoạt động"
+                                label="Field of Operation"
                                 fullWidth
                                 name="fieldOperation"
                                 value={formData.fieldOperation}
@@ -259,7 +247,7 @@ const CompaniesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <TextField
                                 label="Website"
                                 fullWidth
@@ -271,35 +259,34 @@ const CompaniesPage = () => {
                     </Grid>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">Hủy</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">Cancel</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={isMutating || !formData.companyName || !formData.taxCode}
                     >
-                        {isMutating ? 'Đang lưu...' : 'Lưu lại'}
+                        {isMutating ? 'Saving...' : 'Save'}
                     </Button>
                 </DialogActions>
             </Dialog>
-
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-                <DialogTitle>Xác nhận xóa</DialogTitle>
+                <DialogTitle>Confirm Delete</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        Bạn có chắc chắn muốn xóa công ty <strong>{currentCompany?.companyName}</strong>?
-                        Hành động này không thể hoàn tác và có thể ảnh hưởng đến các tin đăng liên quan.
+                        Are you sure you want to delete company <strong>{currentCompany?.companyName}</strong>?
+                        This action cannot be undone and may affect associated job posts.
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Hủy</Button>
+                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Cancel</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Đang xóa...' : 'Xác nhận xóa'}
+                        {isMutating ? 'Deleting...' : 'Confirm Delete'}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -1,0 +1,12 @@
+{
+  "searchPlaceholderCompany": "Tên công ty, tên nhà tuyển dụng, ...",
+  "searchPlaceholderCandidate": "Họ tên ứng viên ...",
+  "noConversationsFound": "Chưa có cuộc hội thoại nào...",
+  "companyHasConnected": "{{companyName}} đã kết nối với bạn.",
+  "youConnectedToCompany": "Bạn đã kết nối với {{companyName}}",
+  "userHasConnected": "{{userName}} đã kết nối với bạn.",
+  "youConnectedToUser": "Bạn đã kết nối với {{userName}}",
+  "noConversationSelected": "Bạn chưa chọn cuộc hội thoại nào...",
+  "typeYourMessage": "Nhập tin nhắn của bạn ở đây...",
+  "send": "Gửi"
+}

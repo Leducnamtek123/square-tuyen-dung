@@ -274,10 +274,10 @@ class EmployerJobPostActivitySerializer(serializers.ModelSerializer):
     fullName = serializers.CharField(source="full_name", required=True, max_length=100)
     email = serializers.EmailField(required=True, max_length=100)
     phone = serializers.CharField(required=True, max_length=15)
-    title = serializers.PrimaryKeyRelatedField(source="resume.title", read_only=True)
-    type = serializers.PrimaryKeyRelatedField(source="resume.type", read_only=True)
-    resumeSlug = serializers.PrimaryKeyRelatedField(source="resume.slug", read_only=True)
-    jobName = serializers.PrimaryKeyRelatedField(source="job_post.job_name", read_only=True)
+    title = serializers.ReadOnlyField(source="resume.title")
+    type = serializers.ReadOnlyField(source="resume.type")
+    resumeSlug = serializers.ReadOnlyField(source="resume.slug")
+    jobName = serializers.ReadOnlyField(source="job_post.job_name")
     createAt = serializers.DateTimeField(source='create_at', read_only=True)
     isSentEmail = serializers.BooleanField(source='is_sent_email', required=False)
     aiAnalysisScore = serializers.IntegerField(source='ai_analysis_score', read_only=True)
@@ -304,15 +304,15 @@ class EmployerJobPostActivitySerializer(serializers.ModelSerializer):
 
 
 class EmployerJobPostActivityExportSerializer(serializers.ModelSerializer):
-    title = serializers.PrimaryKeyRelatedField(source="resume.title", read_only=True)
-    fullName = serializers.PrimaryKeyRelatedField(source="full_name", read_only=True)
-    email = serializers.PrimaryKeyRelatedField(read_only=True)
-    phone = serializers.PrimaryKeyRelatedField(read_only=True)
-    gender = serializers.PrimaryKeyRelatedField(source="resume.job_seeker_profile.gender", read_only=True)
+    title = serializers.ReadOnlyField(source="resume.title")
+    fullName = serializers.ReadOnlyField(source="full_name")
+    email = serializers.ReadOnlyField()
+    phone = serializers.ReadOnlyField()
+    gender = serializers.ReadOnlyField(source="resume.job_seeker_profile.gender")
 
-    birthday = serializers.PrimaryKeyRelatedField(source="resume.job_seeker_profile.birthday", read_only=True)
-    address = serializers.PrimaryKeyRelatedField(source="resume.job_seeker_profile.location.city.name", read_only=True)
-    jobName = serializers.PrimaryKeyRelatedField(source="job_post.job_name", read_only=True)
+    birthday = serializers.ReadOnlyField(source="resume.job_seeker_profile.birthday")
+    address = serializers.ReadOnlyField(source="resume.job_seeker_profile.location.city.name")
+    jobName = serializers.ReadOnlyField(source="job_post.job_name")
     createAt = serializers.DateTimeField(source='create_at', read_only=True)
     statusApply = serializers.SerializerMethodField(method_name="get_status_apply")
 

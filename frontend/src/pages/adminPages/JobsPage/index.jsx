@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import { Box, Card, CardHeader, CardContent, Typography, TablePagination, Dialog, DialogTitle, DialogContent, DialogActions, Button, Divider, TextField } from '@mui/material';
+import { Box, Card, CardHeader, CardContent, Typography, TablePagination, Dialog, DialogTitle, DialogContent, DialogActions, Button, Divider, TextField } from "@mui/material";
 
 import { useJobs, useApproveJob, useRejectJob, useUpdateJob, useDeleteJob } from './hooks/useJobs';
 
@@ -9,8 +9,6 @@ import JobTable from './components/JobTable';
 import JobFilters from './components/JobFilters';
 
 import dayjs from '../../../configs/moment-config';
-
-
 
 const JobsPage = () => {
 
@@ -28,8 +26,6 @@ const JobsPage = () => {
 
     const [editJob, setEditJob] = useState({ jobName: '', deadline: '' });
 
-
-
     const { data: jobsData, isLoading } = useJobs({
 
         page: page + 1,
@@ -40,8 +36,6 @@ const JobsPage = () => {
 
     });
 
-
-
     const approveMutation = useApproveJob();
 
     const rejectMutation = useRejectJob();
@@ -50,15 +44,11 @@ const JobsPage = () => {
 
     const deleteMutation = useDeleteJob();
 
-
-
     const handleChangePage = (event, newPage) => {
 
         setPage(newPage);
 
     };
-
-
 
     const handleChangeRowsPerPage = (event) => {
 
@@ -68,8 +58,6 @@ const JobsPage = () => {
 
     };
 
-
-
     const handleSearchChange = (value) => {
 
         setSearchTerm(value);
@@ -78,8 +66,6 @@ const JobsPage = () => {
 
     };
 
-
-
     const handleViewDetail = (job) => {
 
         setSelectedJob(job);
@@ -87,8 +73,6 @@ const JobsPage = () => {
         setOpenDetail(true);
 
     };
-
-
 
     const handleEdit = (job) => {
 
@@ -100,8 +84,6 @@ const JobsPage = () => {
 
     };
 
-
-
     const handleSaveEdit = () => {
 
         updateMutation.mutate({ id: selectedJob.id, data: editJob }, {
@@ -112,11 +94,9 @@ const JobsPage = () => {
 
     };
 
-
-
     const handleDelete = (id) => {
 
-        if (window.confirm('Bạn có chắc chắn muốn xóa tin đăng này?')) {
+        if (window.confirm('Are you sure you want to delete this job post?')) {
 
             deleteMutation.mutate(id);
 
@@ -124,21 +104,16 @@ const JobsPage = () => {
 
     };
 
-
-
     return (
         <>
             <JobFilters searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-
-
-
             <Card>
 
                 <CardHeader
 
-                    title={`Danh sách Tin Tuyển dụng (${jobsData?.count || 0} tổng cộng)`}
+                    title={`Job Post List (${jobsData?.count || 0} total)`}
 
-                    subheader={jobsData ? `Hiển thị ${page * rowsPerPage + 1} đến ${Math.min(page * rowsPerPage + rowsPerPage, jobsData.count)}` : ''}
+                    subheader={jobsData ? `Showing ${page * rowsPerPage + 1} to ${Math.min(page * rowsPerPage + rowsPerPage, jobsData.count)}` : ''}
 
                 />
 
@@ -162,8 +137,6 @@ const JobsPage = () => {
 
                     />
 
-
-
                     <TablePagination
 
                         rowsPerPageOptions={[5, 10, 25]}
@@ -180,23 +153,19 @@ const JobsPage = () => {
 
                         onRowsPerPageChange={handleChangeRowsPerPage}
 
-                        labelRowsPerPage="Số dòng mỗi trang:"
+                        labelRowsPerPage="Rows per page:"
 
-                        labelDisplayedRows={({ from, to, count }) => `${from}-${to} trong ${count}`}
+                        labelDisplayedRows={({ from, to, count }) => `${from}-${to} of ${count}`}
 
                     />
 
                 </CardContent>
 
             </Card>
-
-
-
             {/* Job Detail Dialog */}
-
             <Dialog open={openDetail} onClose={() => setOpenDetail(false)} maxWidth="md" fullWidth>
 
-                <DialogTitle sx={{ fontWeight: 'bold' }}>Chi tiết tin tuyển dụng</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>Job Post Details</DialogTitle>
 
                 <DialogContent dividers>
 
@@ -212,7 +181,7 @@ const JobsPage = () => {
 
                             <Typography variant="subtitle1" gutterBottom>
 
-                                Công ty: {selectedJob.companyDict?.companyName}
+                                Company: {selectedJob.companyDict?.companyName}
 
                             </Typography>
 
@@ -222,11 +191,11 @@ const JobsPage = () => {
 
                                 <Box>
 
-                                    <Typography variant="caption" color="textSecondary">Mức lương</Typography>
+                                    <Typography variant="caption" color="textSecondary">Salary</Typography>
 
                                     <Typography variant="body2">
 
-                                        {selectedJob.salaryMin?.toLocaleString()} - {selectedJob.salaryMax?.toLocaleString()} VNĐ
+                                        {selectedJob.salaryMin?.toLocaleString()} - {selectedJob.salaryMax?.toLocaleString()} VND
 
                                     </Typography>
 
@@ -234,23 +203,23 @@ const JobsPage = () => {
 
                                 <Box>
 
-                                    <Typography variant="caption" color="textSecondary">Số lượng</Typography>
+                                    <Typography variant="caption" color="textSecondary">Quantity</Typography>
 
-                                    <Typography variant="body2">{selectedJob.quantity} người</Typography>
-
-                                </Box>
-
-                                <Box>
-
-                                    <Typography variant="caption" color="textSecondary">Kinh nghiệm</Typography>
-
-                                    <Typography variant="body2">{selectedJob.experience} năm</Typography>
+                                    <Typography variant="body2">{selectedJob.quantity} people</Typography>
 
                                 </Box>
 
                                 <Box>
 
-                                    <Typography variant="caption" color="textSecondary">Trình độ</Typography>
+                                    <Typography variant="caption" color="textSecondary">Experience</Typography>
+
+                                    <Typography variant="body2">{selectedJob.experience} years</Typography>
+
+                                </Box>
+
+                                <Box>
+
+                                    <Typography variant="caption" color="textSecondary">Academic Level</Typography>
 
                                     <Typography variant="body2">{selectedJob.academicLevel}</Typography>
 
@@ -260,13 +229,11 @@ const JobsPage = () => {
 
                             <Divider sx={{ my: 2 }} />
 
-                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>Mô tả công việc</Typography>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>Job Description</Typography>
 
                             <Box dangerouslySetInnerHTML={{ __html: selectedJob.jobDescription }} sx={{ fontSize: '0.875rem' }} />
 
-
-
-                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mt: 2, mb: 1 }}>Yêu cầu công việc</Typography>
+                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mt: 2, mb: 1 }}>Job Requirements</Typography>
 
                             <Box dangerouslySetInnerHTML={{ __html: selectedJob.jobRequirement }} sx={{ fontSize: '0.875rem' }} />
 
@@ -278,15 +245,15 @@ const JobsPage = () => {
 
                 <DialogActions>
 
-                    <Button onClick={() => setOpenDetail(false)}>Đóng</Button>
+                    <Button onClick={() => setOpenDetail(false)}>Close</Button>
 
                     {selectedJob?.status === 1 && (
 
                         <>
 
-                            <Button onClick={() => { rejectMutation.mutate(selectedJob.id); setOpenDetail(false); }} color="error">Từ chối</Button>
+                            <Button onClick={() => { rejectMutation.mutate(selectedJob.id); setOpenDetail(false); }} color="error">Reject</Button>
 
-                            <Button onClick={() => { approveMutation.mutate(selectedJob.id); setOpenDetail(false); }} variant="contained" color="success">Duyệt tin</Button>
+                            <Button onClick={() => { approveMutation.mutate(selectedJob.id); setOpenDetail(false); }} variant="contained" color="success">Approve Post</Button>
 
                         </>
 
@@ -295,14 +262,10 @@ const JobsPage = () => {
                 </DialogActions>
 
             </Dialog>
-
-
-
             {/* Edit Job Dialog */}
-
             <Dialog open={openEdit} onClose={() => setOpenEdit(false)} maxWidth="sm" fullWidth>
 
-                <DialogTitle sx={{ fontWeight: 'bold' }}>Chỉnh sửa tin tuyển dụng</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 'bold' }}>Edit Job Post</DialogTitle>
 
                 <DialogContent dividers>
 
@@ -310,7 +273,7 @@ const JobsPage = () => {
 
                         fullWidth
 
-                        label="Tên công việc"
+                        label="Job Title"
 
                         value={editJob.jobName}
 
@@ -324,7 +287,7 @@ const JobsPage = () => {
 
                         fullWidth
 
-                        label="Hạn cuối"
+                        label="Deadline"
 
                         type="date"
 
@@ -332,7 +295,9 @@ const JobsPage = () => {
 
                         onChange={(e) => setEditJob({ ...editJob, deadline: e.target.value })}
 
-                        InputLabelProps={{ shrink: true }}
+                        slotProps={{
+                            inputLabel: { shrink: true }
+                        }}
 
                     />
 
@@ -340,18 +305,16 @@ const JobsPage = () => {
 
                 <DialogActions>
 
-                    <Button onClick={() => setOpenEdit(false)}>Hủy</Button>
+                    <Button onClick={() => setOpenEdit(false)}>Cancel</Button>
 
-                    <Button onClick={handleSaveEdit} variant="contained">Lưu</Button>
+                    <Button onClick={handleSaveEdit} variant="contained">Save</Button>
 
                 </DialogActions>
 
             </Dialog>
-
         </>
     );
+
 };
 
-
 export default JobsPage;
-

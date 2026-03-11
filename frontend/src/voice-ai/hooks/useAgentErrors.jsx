@@ -46,5 +46,5 @@ export function useAgentErrors() {
 
       end();
     }
-  }, [agent, isConnected, end]);
+  }, [agent, isConnected, end, t]);
 }

@@ -10,7 +10,9 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from "react";
-import { Box, Card, Grid, Stack, Typography } from "@mui/material";
+import { Box, Card, Stack, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
@@ -83,11 +85,16 @@ const AboutUsPage = () => {
           nhân tài và giúp doanh nghiệp xây dựng đội ngũ nhân sự vững mạnh.
         </Typography>
       </Box>
-
       <Box sx={{ mb: 8 }}>
         <Grid container spacing={4}>
           {features.map((feature, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
+            <Grid
+              key={index}
+              size={{
+                xs: 12,
+                sm: 6,
+                md: 3
+              }}>
               <Card
                 sx={{
                   height: "100%",
@@ -156,7 +163,6 @@ const AboutUsPage = () => {
           ))}
         </Grid>
       </Box>
-
       <Typography
         variant="h4"
         sx={{
@@ -170,7 +176,6 @@ const AboutUsPage = () => {
       >
         Mobile App {APP_NAME}
       </Typography>
-
       <Box sx={{ mt: 5 }}>
         <Card sx={{ p: 5 }}>
           <Stack
@@ -212,7 +217,6 @@ const AboutUsPage = () => {
           </Stack>
         </Card>
       </Box>
-
       <Box sx={{ mt: 5 }}>
         <Card sx={{ p: 5 }}>
           <Stack
@@ -255,7 +259,6 @@ const AboutUsPage = () => {
           </Stack>
         </Card>
       </Box>
-
       <Box sx={{ mt: 5 }}>
         <Card sx={{ p: 5 }}>
           <Stack
@@ -298,7 +301,6 @@ const AboutUsPage = () => {
           </Stack>
         </Card>
       </Box>
-
       <Box sx={{ mt: 5 }}>
         <Card sx={{ p: 5 }}>
           <Stack
@@ -342,7 +344,6 @@ const AboutUsPage = () => {
           </Stack>
         </Card>
       </Box>
-
       <Box sx={{ mt: 5 }}>
         <AppIntroductionCard />
       </Box>

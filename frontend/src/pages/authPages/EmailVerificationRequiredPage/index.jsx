@@ -11,7 +11,8 @@ See the LICENSE file in the project root for full license information.
 
 import * as React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Button, Card, Container, Typography } from '@mui/material';
+import { Box, Button, Card, Container, Typography } from "@mui/material";
+
 import { useTranslation } from 'react-i18next';
 
 import { TabTitle } from '../../../utils/generalFunction';

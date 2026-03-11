@@ -10,7 +10,8 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
-import { Box, Card, Skeleton, Stack, Typography } from '@mui/material';
+import { Box, Card, Skeleton, Stack, Typography } from "@mui/material";
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuoteLeft } from '@fortawesome/free-solid-svg-icons';
 import MuiImageCustom from '../MuiImageCustom';

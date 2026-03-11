@@ -1,119 +1,139 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { Grid } from '@mui/material';
-
-import { DATE_OPTIONS } from '../../../../configs/constants';
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
-import MultilineTextFieldCustom from '../../../../components/controls/MultilineTextFieldCustom';
-import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
-
-const EducationDetaiForm = ({ handleAddOrUpdate, editData }) => {
-  const schema = yup.object().shape({
-    degreeName: yup
-      .string()
-      .required('Tên bằng cấp/Chứng chỉ là bắt buộc.')
-      .max(200, 'Tên bằng cấp/Chứng chỉ vượt quá độ dài cho phép.'),
-    major: yup
-      .string()
-      .required('Chuyên ngành đào tạo là bắt buộc.')
-      .max(255, 'Chuyên ngành đào tạo vượt quá độ dài cho phép.'),
-    trainingPlaceName: yup
-      .string()
-      .required('Trường/Trung tâm đào tạo là bắt buộc.')
-      .max(255, 'Trường/Trung tâm đào tạo vượt quá độ dài cho phép.'),
-    startDate: yup
-      .date()
-      .required('Ngày bắt đầu là bắt buộc.')
-      .typeError('Ngày bắt đầu là bắt buộc.'),
-    completedDate: yup.date().nullable(),
-  });
-
-  const { control, reset, handleSubmit } = useForm({
-    resolver: yupResolver(schema),
-  });
-
-  React.useEffect(() => {
-    if (editData) {
-      reset((formValues) => ({
-        ...formValues,
-        ...editData,
-      }));
-    } else {
-      reset();
-    }
-  }, [editData, reset]);
-
-  return (
-    <form id="modal-form" onSubmit={handleSubmit(handleAddOrUpdate)}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <TextFieldCustom
-            name="degreeName"
-            title="Tên bằng cấp/Chứng chỉ"
-            showRequired={true}
-            placeholder="VD: Bằng Cao Đẳng CNTT, Chứng chỉ nghề điện công nghiệp"
-            control={control}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextFieldCustom
-            name="major"
-            title="Chuyên ngành đào tạo"
-            showRequired={true}
-            placeholder="Nhập chuyên ngành đào tạo"
-            control={control}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextFieldCustom
-            name="trainingPlaceName"
-            title="Trường/Trung tâm đào tạo"
-            showRequired={true}
-            placeholder="Nhập tên trường/Trung tâm đào tạo"
-            control={control}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <DatePickerCustom
-            name="startDate"
-            control={control}
-            title="Ngày bắt đầu"
-            showRequired={true}
-            maxDate={DATE_OPTIONS.yesterday}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <DatePickerCustom
-            name="completedDate"
-            control={control}
-            title="Ngày hoàn thành (Để trống nếu đang học tại đây)"
-            maxDate={DATE_OPTIONS.today}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <MultilineTextFieldCustom
-            name="description"
-            title="Mô tả thêm"
-            placeholder="Nhập nội dung mô tả tại đây"
-            control={control}
-          />
-        </Grid>
-      </Grid>
-    </form>
-  );
-};
-
-export default EducationDetaiForm;
+/*
+MyJob Recruitment System - Part of MyJob Platform
+
+Author: Bui Khanh Huy
+Email: khuy220@gmail.com
+Copyright (c) 2023 Bui Khanh Huy
+
+License: MIT License
+See the LICENSE file in the project root for full license information.
+*/
+
+import React from 'react';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import Grid from "@mui/material/Grid2";
+
+import { useTranslation } from 'react-i18next';
+
+import { DATE_OPTIONS } from '../../../../configs/constants';
+import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
+import MultilineTextFieldCustom from '../../../../components/controls/MultilineTextFieldCustom';
+import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
+
+const EducationDetaiForm = ({ handleAddOrUpdate, editData }) => {
+  const { t } = useTranslation(['jobSeeker']);
+  const schema = yup.object().shape({
+    degreeName: yup
+      .string()
+      .required('Degree/Certificate name is required.')
+      .max(200, 'Degree/Certificate name exceeds allowed length.'),
+    major: yup
+      .string()
+      .required('Major is required.')
+      .max(255, 'Major exceeds allowed length.'),
+    trainingPlaceName: yup
+      .string()
+      .required('School/Training center is required.')
+      .max(255, 'School/Training center exceeds allowed length.'),
+    startDate: yup
+      .date()
+      .required('Start date is required.')
+      .typeError('Start date is required.'),
+    completedDate: yup.date().nullable(),
+    gradeOrRank: yup.string().max(100, 'Grade/Rank exceeds allowed length.'),
+  });
+
+  const { control, reset, handleSubmit } = useForm({
+    resolver: yupResolver(schema),
+  });
+
+  React.useEffect(() => {
+    if (editData) {
+      reset((formValues) => ({
+        ...formValues,
+        ...editData,
+      }));
+    } else {
+      reset();
+    }
+  }, [editData, reset]);
+
+  return (
+    <form id="modal-form" onSubmit={handleSubmit(handleAddOrUpdate)}>
+      <Grid container spacing={2}>
+        <Grid size={12}>
+          <TextFieldCustom
+            name="degreeName"
+            title="Degree/Certificate Name"
+            showRequired={true}
+            placeholder="E.g.: Bachelor of IT, Industrial Electrical Certificate"
+            control={control}
+          />
+        </Grid>
+        <Grid size={12}>
+          <TextFieldCustom
+            name="major"
+            title="Major"
+            showRequired={true}
+            placeholder="Enter major"
+            control={control}
+          />
+        </Grid>
+        <Grid size={12}>
+          <TextFieldCustom
+            name="trainingPlaceName"
+            title="School/Training Center"
+            showRequired={true}
+            placeholder="Enter school/Training center name"
+            control={control}
+          />
+        </Grid>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
+          <DatePickerCustom
+            name="startDate"
+            control={control}
+            title="Start Date"
+            showRequired={true}
+            maxDate={DATE_OPTIONS.yesterday}
+          />
+        </Grid>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6
+          }}>
+          <DatePickerCustom
+            name="completedDate"
+            control={control}
+            title="Completion Date (Leave blank if currently studying here)"
+            maxDate={DATE_OPTIONS.today}
+          />
+        </Grid>
+        <Grid size={12}>
+          <TextFieldCustom
+            name="gradeOrRank"
+            title={t('jobSeeker:profile.fields.gradeOrRank')}
+            placeholder={t('jobSeeker:profile.placeholders.gradeOrRank')}
+            control={control}
+          />
+        </Grid>
+        <Grid size={12}>
+          <MultilineTextFieldCustom
+            name="description"
+            title="Additional Description"
+            placeholder="Enter description here"
+            control={control}
+          />
+        </Grid>
+      </Grid>
+    </form>
+  );
+};
+
+export default EducationDetaiForm;

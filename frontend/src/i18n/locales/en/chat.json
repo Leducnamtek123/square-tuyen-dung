@@ -1,0 +1,12 @@
+{
+  "searchPlaceholderCompany": "Company name, employer name, ...",
+  "searchPlaceholderCandidate": "Candidate name ...",
+  "noConversationsFound": "No conversations found...",
+  "companyHasConnected": "{{companyName}} has connected with you.",
+  "youConnectedToCompany": "You have connected to {{companyName}}",
+  "userHasConnected": "{{userName}} has connected with you.",
+  "youConnectedToUser": "You have connected to {{userName}}",
+  "noConversationSelected": "You haven't selected any conversation...",
+  "typeYourMessage": "Type your message here...",
+  "send": "Send"
+}

@@ -11,7 +11,7 @@ See the LICENSE file in the project root for full license information.
 
 import React from 'react';
 import { Controller } from 'react-hook-form';
-import { Autocomplete, TextField, Typography } from '@mui/material';
+import { Autocomplete, TextField, Typography } from "@mui/material";
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const TextFieldAutoCompleteCustom = ({
@@ -66,10 +66,12 @@ const TextFieldAutoCompleteCustom = ({
                   {...params}
                   size="small"
                   placeholder={placeholder}
-                  InputProps={{
-                    ...params.InputProps,
-                  }}
                   helperText={!fieldState.invalid ? helperText : ''}
+                  slotProps={{
+                    input: {
+                      ...params.InputProps,
+                    }
+                  }}
                 />
               )}
             />

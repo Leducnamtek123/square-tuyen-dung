@@ -12,19 +12,8 @@ See the LICENSE file in the project root for full license information.
 import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import {
-  Avatar,
-  Box,
-  IconButton,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Skeleton,
-  Stack,
-  Tooltip,
-  Typography,
-} from "@mui/material";
+import { Avatar, Box, IconButton, List, ListItem, ListItemAvatar, ListItemText, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
+
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
@@ -72,7 +61,7 @@ const JobApplicationCard = () => {
         mb={2}
       >
         <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          Ho so xin viec
+          Application Resumes
         </Typography>
         <IconButton
           aria-label="ArrowForward"
@@ -118,7 +107,7 @@ const JobApplicationCard = () => {
               >
                 <ListItemAvatar>
                   {item?.type === CV_TYPES.cvWebsite ? (
-                    <Tooltip title="Ho so Online">
+                    <Tooltip title="Online Profile">
                       <Avatar
                         sx={{
                           bgcolor: (theme) => theme.palette.primary.main,
@@ -130,7 +119,7 @@ const JobApplicationCard = () => {
                       </Avatar>
                     </Tooltip>
                   ) : item?.type === CV_TYPES.cvUpload ? (
-                    <Tooltip title="Ho so dinh kem">
+                    <Tooltip title="Attached Resume">
                       <Avatar
                         sx={{
                           bgcolor: (theme) => theme.palette.hot.main,
@@ -154,7 +143,7 @@ const JobApplicationCard = () => {
                   secondary={
                     <Stack spacing={0.5}>
                       <Typography variant="caption" color="text.secondary">
-                        Sua lan cuoi {dayjs(item?.updateAt).format("DD/MM/YYYY")}
+                        Last modified {dayjs(item?.updateAt).format("DD/MM/YYYY")}
                       </Typography>
                       <Typography
                         variant="body2"
@@ -166,8 +155,8 @@ const JobApplicationCard = () => {
                         }}
                       >
                         {item?.isActive
-                          ? "Dang cho phep tim kiem"
-                          : "Khong cho phep tim kiem"}
+                          ? "Searchable"
+                          : "Not Searchable"}
                       </Typography>
                     </Stack>
                   }

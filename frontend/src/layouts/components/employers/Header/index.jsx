@@ -11,16 +11,7 @@ See the LICENSE file in the project root for full license information.
 
 import React from 'react';
 import { useSelector } from 'react-redux';
-import {
-  AppBar,
-  Avatar,
-  Box,
-  Card,
-  IconButton,
-  Stack,
-  Toolbar,
-  Typography,
-} from '@mui/material';
+import { AppBar, Avatar, Box, Card, IconButton, Stack, Toolbar, Typography } from "@mui/material";
 
 import MenuIcon from '@mui/icons-material/Menu';
 
@@ -28,6 +19,7 @@ import UserMenu from '../../commons/UserMenu';
 import AccountSwitchMenu from '../../commons/AccountSwitchMenu';
 import NotificationCard from '../../../../components/NotificationCard';
 import ChatCard from '../../../../components/ChatCard';
+import LanguageSwitcher from '../../commons/LanguageSwitcher';
 
 const Header = ({ drawerWidth, handleDrawerToggle }) => {
   const { currentUser, isAuthenticated } = useSelector((state) => state.user);
@@ -111,6 +103,8 @@ const Header = ({ drawerWidth, handleDrawerToggle }) => {
         </Toolbar>
 
         <Toolbar>
+          <LanguageSwitcher />
+
           {/* start: NotificationCard */}
           {isAuthenticated && <NotificationCard />}
           {/* End: NotificationCard */}

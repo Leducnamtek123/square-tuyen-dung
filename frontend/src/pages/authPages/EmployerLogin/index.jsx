@@ -13,17 +13,9 @@ See the LICENSE file in the project root for full license information.
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  Alert,
-  AlertTitle,
-  Avatar,
-  Box,
-  Card,
-  Container,
-  Grid,
-  Typography,
-  styled,
-} from '@mui/material';
+import { Alert, AlertTitle, Avatar, Box, Card, Container, Typography, styled } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from 'react-i18next';
 
@@ -348,19 +340,23 @@ const EmployerLogin = () => {
               alignItems: 'center'
             }}
           >
-            <Grid item xs={12} sm={6}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <StyledLink to={`/${ROUTES.AUTH.FORGOT_PASSWORD}`}>
                 {t('login.forgotPassword')}
               </StyledLink>
             </Grid>
             <Grid
-              item
-              xs={12}
-              sm={6}
               sx={{
                 textAlign: { xs: 'left', sm: 'right' }
               }}
-            >
+              size={{
+                xs: 12,
+                sm: 6
+              }}>
               <StyledLink to={`/${ROUTES.AUTH.REGISTER}`}>
                 {t('login.noAccount')} {t('login.signUp')}
               </StyledLink>

@@ -2,23 +2,17 @@
 
 MyJob Recruitment System - Part of MyJob Platform
 
-
-
 Author: Bui Khanh Huy
 
 Email: khuy220@gmail.com
 
 Copyright (c) 2023 Bui Khanh Huy
 
-
-
 License: MIT License
 
 See the LICENSE file in the project root for full license information.
 
 */
-
-
 
 import React from 'react';
 
@@ -30,13 +24,9 @@ import './index.css';
 
 import App from './App';
 
-
-
 import { Provider } from 'react-redux';
 
 import store from './redux/store';
-
-
 
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
@@ -44,18 +34,12 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import 'dayjs/locale/en';
 
-
-
 // Import dayjs configuration
 
 import './configs/dayjs-config';
 import './i18n';
 
-
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-
-
 
 const queryClient = new QueryClient({
 
@@ -72,8 +56,6 @@ const queryClient = new QueryClient({
   },
 
 });
-
-
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 

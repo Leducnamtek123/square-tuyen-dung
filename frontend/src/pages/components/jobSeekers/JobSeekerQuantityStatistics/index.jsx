@@ -10,7 +10,9 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
-import { Card, CardContent, Grid, Stack, Typography, Skeleton } from '@mui/material';
+import { Card, CardContent, Stack, Typography, Skeleton } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import BookmarkOutlinedIcon from '@mui/icons-material/BookmarkOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
@@ -18,6 +20,7 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 
 import defaultTheme from '../../../../themeConfigs/defaultTheme';
 import statisticService from '../../../../services/statisticService';
+import { useTranslation } from 'react-i18next';
 
 const StatItem = ({ title, value, color, background, Icon, loading }) => (
   <Card
@@ -47,6 +50,7 @@ const StatItem = ({ title, value, color, background, Icon, loading }) => (
 );
 
 const JobSeekerQuantityStatistics = () => {
+  const { t } = useTranslation('jobSeeker');
   const [isLoading, setIsLoading] = React.useState(true);
   const [data, setData] = React.useState(null);
 
@@ -68,9 +72,15 @@ const JobSeekerQuantityStatistics = () => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} sm={12} md={6} lg={3}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12,
+          md: 6,
+          lg: 3
+        }}>
         <StatItem
-          title="Viec lam da ung tuyen"
+          title={t('appliedJobs')}
           value={data?.totalApply}
           color={defaultTheme.palette.success.main}
           background={`linear-gradient(135deg, ${defaultTheme.palette.success.background} 0%, rgba(46, 125, 50, 0.1) 100%)`}
@@ -78,10 +88,15 @@ const JobSeekerQuantityStatistics = () => {
           loading={isLoading}
         />
       </Grid>
-
-      <Grid item xs={12} sm={12} md={6} lg={3}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12,
+          md: 6,
+          lg: 3
+        }}>
         <StatItem
-          title="Viec lam da luu"
+          title={t('savedJobs')}
           value={data?.totalSave}
           color={defaultTheme.palette.primary.main}
           background={`linear-gradient(135deg, ${defaultTheme.palette.primary.background} 0%, ${defaultTheme.palette.primary.background} 100%)`}
@@ -89,10 +104,15 @@ const JobSeekerQuantityStatistics = () => {
           loading={isLoading}
         />
       </Grid>
-
-      <Grid item xs={12} sm={12} md={6} lg={3}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12,
+          md: 6,
+          lg: 3
+        }}>
         <StatItem
-          title="NTD da xem ho so"
+          title={t('employersViewedProfile')}
           value={data?.totalView}
           color={defaultTheme.palette.info.main}
           background={`linear-gradient(135deg, ${defaultTheme.palette.info.background} 0%, ${defaultTheme.palette.info.background} 100%)`}
@@ -100,10 +120,15 @@ const JobSeekerQuantityStatistics = () => {
           loading={isLoading}
         />
       </Grid>
-
-      <Grid item xs={12} sm={12} md={6} lg={3}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12,
+          md: 6,
+          lg: 3
+        }}>
         <StatItem
-          title="NTD dang theo doi"
+          title={t('followedCompanies')}
           value={data?.totalFollow}
           color={defaultTheme.palette.hot.main}
           background={`linear-gradient(135deg, ${defaultTheme.palette.hot.background} 0%, ${defaultTheme.palette.hot.background} 100%)`}

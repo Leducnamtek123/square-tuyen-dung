@@ -2,15 +2,11 @@
 
 MyJob Recruitment System - Part of MyJob Platform
 
-
-
 Author: Bui Khanh Huy
 
 Email: khuy220@gmail.com
 
 Copyright (c) 2023 Bui Khanh Huy
-
-
 
 License: MIT License
 
@@ -18,15 +14,12 @@ See the LICENSE file in the project root for full license information.
 
 */
 
-
-
 import React from "react";
 
 import { useSelector } from "react-redux";
 
-import { Box, Grid, Pagination, Stack, Typography } from "@mui/material";
-
-
+import { Box, Pagination, Stack, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 
 import { SVG_IMAGES } from "../../configs/constants";
 
@@ -35,8 +28,6 @@ import NoDataCard from "../NoDataCard";
 import Company from "../Company";
 
 import companyService from "../../services/companyService";
-
-
 
 const Companies = () => {
 
@@ -51,8 +42,6 @@ const Companies = () => {
   const [page, setPage] = React.useState(1);
 
   const [count, setCount] = React.useState(0);
-
-
 
   React.useEffect(() => {
 
@@ -70,11 +59,7 @@ const Companies = () => {
 
         });
 
-
-
         const data = resData.data;
-
-
 
         setCount(data.count);
 
@@ -92,13 +77,9 @@ const Companies = () => {
 
     };
 
-
-
     getCompanies();
 
   }, [companyFilter, page]);
-
-
 
   const handleChangePage = (event, newPage) => {
 
@@ -106,12 +87,8 @@ const Companies = () => {
 
   };
 
-
-
   return (
-
     <>
-
       <Stack
 
         direction={{
@@ -201,9 +178,6 @@ const Companies = () => {
         </Box>
 
       </Stack>
-
-
-
       <Stack spacing={2}>
 
         {isLoading ? (
@@ -212,7 +186,15 @@ const Companies = () => {
 
             {Array.from(Array(12).keys()).map((value) => (
 
-              <Grid item xs={12} sm={12} md={6} lg={4} xl={4} key={value}>
+              <Grid
+                key={value}
+                size={{
+                  xs: 12,
+                  sm: 12,
+                  md: 6,
+                  lg: 4,
+                  xl: 4
+                }}>
 
                 <Company.Loading />
 
@@ -240,7 +222,15 @@ const Companies = () => {
 
               {companies.map((value) => (
 
-                <Grid item xs={12} sm={12} md={6} lg={4} xl={4} key={value.id}>
+                <Grid
+                  key={value.id}
+                  size={{
+                    xs: 12,
+                    sm: 12,
+                    md: 6,
+                    lg: 4,
+                    xl: 4
+                  }}>
 
                   <Company
 
@@ -305,14 +295,10 @@ const Companies = () => {
         )}
 
       </Stack>
-
     </>
-
   );
 
 };
-
-
 
 export default Companies;
 

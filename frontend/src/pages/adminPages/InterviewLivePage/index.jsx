@@ -1,12 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import {
-  Box,
-  Typography,
-  Chip,
-  Stack,
-  Divider,
-  LinearProgress,
-} from '@mui/material';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Box, Typography, Chip, Stack, Divider, LinearProgress } from "@mui/material";
 
 import interviewService from '../../../services/interviewService';
 import { transformInterviewSession } from '../../../utils/transformers';
@@ -40,7 +33,7 @@ const InterviewLivePage = () => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
 
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
     setLoading(true);
     try {
       const res = await interviewService.getSessions({
@@ -57,18 +50,18 @@ const InterviewLivePage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, rowsPerPage]);
 
   useEffect(() => {
     fetchSessions();
-  }, [page, rowsPerPage]);
+  }, [fetchSessions]);
 
   useEffect(() => {
     const hasActiveSession = sessions.some((session) => ACTIVE_STATUSES.includes(session.status));
     if (!hasActiveSession) return undefined;
     const interval = setInterval(fetchSessions, 5000);
     return () => clearInterval(interval);
-  }, [sessions]);
+  }, [sessions, fetchSessions]);
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -89,7 +82,7 @@ const InterviewLivePage = () => {
   const columns = useMemo(
     () => [
       {
-        header: 'Công ty',
+        header: 'Company',
         accessorKey: 'companyName',
         cell: ({ row }) => (
           <Typography variant="body2">
@@ -102,7 +95,7 @@ const InterviewLivePage = () => {
         ),
       },
       {
-        header: 'Ứng viên',
+        header: 'Candidate',
         accessorKey: 'candidateName',
         cell: ({ row }) => (
           <Box>
@@ -116,12 +109,12 @@ const InterviewLivePage = () => {
         ),
       },
       {
-        header: 'Vị trí',
+        header: 'Position',
         accessorKey: 'jobName',
         cell: ({ getValue }) => <Typography variant="body2">{getValue() || 'N/A'}</Typography>,
       },
       {
-        header: 'Phòng',
+        header: 'Room',
         accessorKey: 'room_name',
         cell: ({ row }) => (
           <Typography variant="body2">
@@ -130,16 +123,16 @@ const InterviewLivePage = () => {
         ),
       },
       {
-        header: 'Thời gian',
+        header: 'Time',
         accessorKey: 'scheduledAt',
         cell: ({ getValue }) => (
           <Typography variant="body2">
-            {getValue() ? new Date(getValue()).toLocaleString('vi-VN') : 'N/A'}
+            {getValue() ? new Date(getValue()).toLocaleString('en-US') : 'N/A'}
           </Typography>
         ),
       },
       {
-        header: 'Trạng thái',
+        header: 'Status',
         accessorKey: 'status',
         cell: ({ getValue }) => (
           <Chip
@@ -171,14 +164,14 @@ const InterviewLivePage = () => {
         mb={2}
       >
         <Typography variant="h5" sx={{ fontWeight: 600 }}>
-          Phỏng vấn công ty trực tiếp
+          Live Company Interviews
         </Typography>
       </Stack>
 
       <Stack direction="row" spacing={1.5} mb={3} flexWrap="wrap">
-        <Chip label={`Đang diễn ra: ${stats.active}`} color="primary" variant="outlined" />
-        <Chip label={`Đã lên lịch: ${stats.scheduled}`} color="info" variant="outlined" />
-        <Chip label={`Hoàn tất: ${stats.completed}`} color="success" variant="outlined" />
+        <Chip label={`In Progress: ${stats.active}`} color="primary" variant="outlined" />
+        <Chip label={`Scheduled: ${stats.scheduled}`} color="info" variant="outlined" />
+        <Chip label={`Completed: ${stats.completed}`} color="success" variant="outlined" />
       </Stack>
 
       {loading ? (
@@ -217,7 +210,7 @@ const InterviewLivePage = () => {
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          emptyMessage="Chưa có phiên phỏng vấn nào đang hoạt động."
+          emptyMessage="No active interview sessions."
         />
       </Box>
     </Box>

@@ -16,7 +16,7 @@ import 'swiper/css/pagination';
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper';
-import { Box, Link } from '@mui/material';
+import { Box, Link } from "@mui/material";
 
 import HomeSearch from '../../../../pages/components/defaults/HomeSearch';
 import MuiImageCustom from '../../../../components/MuiImageCustom';

@@ -11,7 +11,7 @@ See the LICENSE file in the project root for full license information.
 
 import React from 'react';
 import { Controller } from 'react-hook-form';
-import { InputAdornment, TextField, Typography } from '@mui/material';
+import { InputAdornment, TextField, Typography } from "@mui/material";
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const TextFieldCustom = ({
@@ -60,13 +60,15 @@ const TextFieldCustom = ({
               error={fieldState.invalid}
               disabled={disabled}
               helperText={!fieldState.invalid ? helperText : ''}
-              InputProps={{
-                inputProps: {
-                  inputMode: type === 'number' ? 'numeric' : 'text',
-                },
-                startAdornment: icon && (
-                  <InputAdornment position="start">{icon}</InputAdornment>
-                ),
+              slotProps={{
+                input: {
+                  inputProps: {
+                    inputMode: type === 'number' ? 'numeric' : 'text',
+                  },
+                  startAdornment: icon && (
+                    <InputAdornment position="start">{icon}</InputAdornment>
+                  ),
+                }
               }}
             />
             {fieldState.invalid && (

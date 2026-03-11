@@ -15,16 +15,9 @@ import { useSelector } from 'react-redux';
 import { useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import {
-  Box,
-  Button,
-  Grid,
-  Stack,
-  Step,
-  StepLabel,
-  Stepper,
-  styled,
-} from '@mui/material';
+import { Box, Button, Stack, Step, StepLabel, Stepper, styled } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import HowToRegIcon from '@mui/icons-material/HowToReg';
@@ -351,7 +344,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
 
       <Box sx={{ mb: 2, display: actStep !== 0 ? 'block' : 'none' }}>
         <Grid container spacing={2.5}>
-          <Grid item xs={12}>
+          <Grid size={12}>
             <TextFieldCustom
               name="company.companyName"
               control={control}
@@ -366,7 +359,14 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 12,
+              lg: 12,
+              xl: 12
+            }}>
             <TextFieldCustom
               name="company.companyEmail"
               control={control}
@@ -381,7 +381,14 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 6,
+              lg: 6,
+              xl: 6
+            }}>
             <TextFieldCustom
               name="company.companyPhone"
               control={control}
@@ -396,7 +403,14 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 6,
+              lg: 6,
+              xl: 6
+            }}>
             <TextFieldCustom
               name="company.taxCode"
               control={control}
@@ -411,7 +425,14 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 4,
+              lg: 4,
+              xl: 4
+            }}>
             <DatePickerCustom
               name="company.since"
               control={control}
@@ -424,7 +445,14 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={8} lg={8} xl={8}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 8,
+              lg: 8,
+              xl: 8
+            }}>
             <TextFieldCustom
               name="company.fieldOperation"
               control={control}
@@ -438,7 +466,14 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 4,
+              lg: 4,
+              xl: 4
+            }}>
             <SingleSelectCustom
               options={allConfig?.employeeSizeOptions || []}
               name="company.employeeSize"
@@ -454,7 +489,14 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={8} lg={8} xl={8}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 8,
+              lg: 8,
+              xl: 8
+            }}>
             <TextFieldCustom
               name="company.websiteUrl"
               control={control}
@@ -468,7 +510,14 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={8} lg={8} xl={8}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 8,
+              lg: 8,
+              xl: 8
+            }}>
             <SingleSelectCustom
               options={allConfig?.cityOptions || []}
               name="company.location.city"
@@ -484,7 +533,14 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={4} lg={4} xl={4}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 4,
+              lg: 4,
+              xl: 4
+            }}>
             <SingleSelectCustom
               options={districtOptions}
               name="company.location.district"
@@ -500,7 +556,14 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
               }}
             />
           </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 12,
+              md: 12,
+              lg: 12,
+              xl: 12
+            }}>
             <TextFieldAutoCompleteCustom
               name="company.location.address"
               title={t('form.address')}

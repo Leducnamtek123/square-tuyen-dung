@@ -11,18 +11,9 @@ See the LICENSE file in the project root for full license information.
 
 import React from "react";
 
-import {
-  Box,
-  Card,
-  Grid,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Card, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+
 import PersonPinOutlinedIcon from "@mui/icons-material/PersonPinOutlined";
 import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
@@ -33,13 +24,13 @@ import GeneralInfoCard from "../../components/jobSeekers/GeneralInfoCard";
 import CVCard from "../../components/jobSeekers/CVCard";
 
 const items = [
-  { id: 0, value: "Thông tin cá nhân", icon: <PersonPinOutlinedIcon /> },
-  { id: 1, value: "Thông tin chung", icon: <WorkOutlineOutlinedIcon /> },
-  { id: 2, value: "Tải CV đính kèm", icon: <UploadFileOutlinedIcon /> },
+  { id: 0, value: "Personal Information", icon: <PersonPinOutlinedIcon /> },
+  { id: 1, value: "General Information", icon: <WorkOutlineOutlinedIcon /> },
+  { id: 2, value: "Upload Attached CV", icon: <UploadFileOutlinedIcon /> },
 ];
 
 const AttachedProfilePage = () => {
-  TabTitle("Cập nhật hồ sơ đính kèm");
+  TabTitle("Update Attached Resumes");
   const refs = React.useRef([]);
 
   const handleClickScroll = (index) => {
@@ -49,7 +40,14 @@ const AttachedProfilePage = () => {
   return (
     <Box sx={{ py: 2, px: { xs: 2, sm: 3 } }}>
       <Grid container spacing={3}>
-        <Grid xs={12} sm={12} md={7} lg={9} xl={9} item>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 12,
+            md: 7,
+            lg: 9,
+            xl: 9
+          }}>
           <Stack spacing={3}>
             <Card
               ref={(el) => (refs.current[0] = el)}
@@ -62,27 +60,22 @@ const AttachedProfilePage = () => {
               }}
             >
               {/* Start: Personal info */}
-              <PersonalInfoCard title="Thông tin cá nhân" />
+              <PersonalInfoCard title="Personal Information" />
               {/* End: Personal info  */}
             </Card>
             <Card ref={(el) => (refs.current[1] = el)}>
               {/* Start: General info */}
-              <GeneralInfoCard title="Thông tin chung" />
+              <GeneralInfoCard title="General Information" />
               {/* End: General info */}
             </Card>
             <Card ref={(el) => (refs.current[2] = el)}>
               {/* Start: Cv card */}
-              <CVCard title="Tải CV đính kèm" />
+              <CVCard title="Upload Attached CV" />
               {/* End: Cv card */}
             </Card>
           </Stack>
         </Grid>
         <Grid
-          xs={12}
-          sm={12}
-          md={5}
-          lg={3}
-          xl={3}
           sx={{
             display: {
               xs: 'none',
@@ -90,8 +83,13 @@ const AttachedProfilePage = () => {
               md: 'block'
             }
           }}
-          item
-        >
+          size={{
+            xs: 12,
+            sm: 12,
+            md: 5,
+            lg: 3,
+            xl: 3
+          }}>
           <Stack
             spacing={2}
             sx={{
@@ -115,7 +113,7 @@ const AttachedProfilePage = () => {
                     color: 'inherit'
                   }}
                 >
-                  Hồ sơ đính kèm của bạn
+                  Your Attached Resumes
                 </Typography>
 
                 <List sx={{ width: '100%' }}>
@@ -139,9 +137,11 @@ const AttachedProfilePage = () => {
                         </ListItemIcon>
                         <ListItemText
                           primary={item.value}
-                          primaryTypographyProps={{
-                            fontSize: '0.9rem',
-                            fontWeight: 500
+                          slotProps={{
+                            primary: {
+                              fontSize: '0.9rem',
+                              fontWeight: 500
+                            }
                           }}
                         />
                       </ListItemButton>

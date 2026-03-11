@@ -10,7 +10,9 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
-import { Card, CardContent, Grid, Stack, Typography, Skeleton } from '@mui/material';
+import { Card, CardContent, Stack, Typography, Skeleton } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
@@ -66,36 +68,60 @@ const EmployerQuantityStatistics = () => {
 
   return (
     <Grid container spacing={3}>
-      <Grid item xs={12} sm={12} md={6} lg={3}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12,
+          md: 6,
+          lg: 3
+        }}>
         <StatItem
-          title="Tat ca tin tuyen dung"
+          title="Total Job Posts"
           value={data?.totalJobPost}
           color="#3f8600"
           Icon={DescriptionOutlinedIcon}
           loading={isLoading}
         />
       </Grid>
-      <Grid item xs={12} sm={12} md={6} lg={3}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12,
+          md: 6,
+          lg: 3
+        }}>
         <StatItem
-          title="Tin tuyen dung cho duyet"
+          title="Pending Job Posts"
           value={data?.totalJobPostingPendingApproval}
           color="#ff9800"
           Icon={AccessTimeOutlinedIcon}
           loading={isLoading}
         />
       </Grid>
-      <Grid item xs={12} sm={12} md={6} lg={3}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12,
+          md: 6,
+          lg: 3
+        }}>
         <StatItem
-          title="Tin tuyen dung het han"
+          title="Expired Job Posts"
           value={data?.totalJobPostExpired}
           color="#cf1322"
           Icon={HighlightOffOutlinedIcon}
           loading={isLoading}
         />
       </Grid>
-      <Grid item xs={12} sm={12} md={6} lg={3}>
+      <Grid
+        size={{
+          xs: 12,
+          sm: 12,
+          md: 6,
+          lg: 3
+        }}>
         <StatItem
-          title="Ung vien ung tuyen"
+          title="Total Applications"
           value={data?.totalApply}
           color="#00b0ff"
           Icon={GroupsOutlinedIcon}

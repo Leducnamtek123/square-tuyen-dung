@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
 import adminInterviewService from '../../../../services/adminInterviewService';
 import toastMessages from '../../../../utils/toastMessages';
 
@@ -25,11 +24,11 @@ export const useScheduleInterview = () => {
     return useMutation({
         mutationFn: (data) => adminInterviewService.scheduleInterview(data),
         onSuccess: () => {
-            toastMessages.success('Len lich phong van thanh cong');
+            toastMessages.success('Interview scheduled successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
         },
         onError: (error) => {
-            toastMessages.error(error.response?.data?.errors?.detail || 'Len lich phong van that bai');
+            toastMessages.error(error.response?.data?.errors?.detail || 'Failed to schedule interview');
         },
     });
 };
@@ -40,11 +39,11 @@ export const useUpdateInterviewStatus = () => {
     return useMutation({
         mutationFn: ({ id, status }) => adminInterviewService.updateInterviewStatus(id, status),
         onSuccess: () => {
-            toastMessages.success('Cap nhat trang thai thanh cong');
+            toastMessages.success('Status updated successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
         },
         onError: (error) => {
-            toastMessages.error(error.response?.data?.errors?.detail || 'Cap nhat that bai');
+            toastMessages.error(error.response?.data?.errors?.detail || 'Update failed');
         },
     });
 };
@@ -55,11 +54,11 @@ export const useDeleteInterview = () => {
     return useMutation({
         mutationFn: (id) => adminInterviewService.deleteInterview(id),
         onSuccess: () => {
-            toastMessages.success('Xoa phong van thanh cong');
+            toastMessages.success('Interview deleted successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
         },
         onError: (error) => {
-            toastMessages.error(error.response?.data?.errors?.detail || 'Xoa that bai');
+            toastMessages.error(error.response?.data?.errors?.detail || 'Delete failed');
         },
     });
 };

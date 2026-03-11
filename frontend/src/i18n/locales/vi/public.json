@@ -1,0 +1,13 @@
+{
+  "home": {
+    "tabTitle": "Tìm việc nhanh, tuyển dụng hiệu quả tại {{appName}}",
+    "topCompanies": "Công ty nổi bật",
+    "urgentJobs": "Việc làm tuyển gấp",
+    "keyCareers": "Ngành nghề trọng điểm",
+    "suggestedJobs": "Việc làm gợi ý",
+    "exploreHeading": "Bạn cần tìm công việc phù hợp với mình?",
+    "startExploring": "Bắt đầu khám phá",
+    "userFeedback": "Đánh giá từ người dùng",
+    "jobsIn": "Việc làm {{careerName}}"
+  }
+}

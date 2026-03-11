@@ -10,7 +10,8 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
-import { Grid } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+import Grid from "@mui/material/Grid2";
 
 import { TabTitle } from '../../../utils/generalFunction';
 import EmployerQuantityStatistics from '../../components/employers/EmployerQuantityStatistics';
@@ -20,34 +21,59 @@ import ApplicationChart from '../../components/employers/charts/ApplicationChart
 import HiringAcademicChart from '../../components/employers/charts/HiringAcademicChart';
 
 const DashboardPage = () => {
-  TabTitle("Trang quản trị Nhà tuyển dụng")
+  const { t } = useTranslation('employer');
+  TabTitle(t('dashboard.pageTitle'))
 
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
+        <Grid size={12}>
           {/* Start: EmployerQuantityStatistics */}
           <EmployerQuantityStatistics />
           {/* End: EmployerQuantityStatistics */}
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 12,
+            md: 12,
+            lg: 6
+          }}>
           {/* Start: RecruitmentChart */}
-          <RecruitmentChart title="BIỂU ĐỒ TUYỂN DỤNG" />
+          <RecruitmentChart title={t('dashboard.recruitmentChart')} />
           {/* End: RecruitmentChart */}
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 12,
+            md: 12,
+            lg: 6
+          }}>
           {/* Start: CandidateChart */}
-          <CandidateChart title="BIỂU ĐỒ ỨNG VIÊN" />
+          <CandidateChart title={t('dashboard.candidateChart')} />
           {/* End: CandidateChart */}
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 12,
+            md: 12,
+            lg: 6
+          }}>
           {/* Start: ApplicationChart */}
-          <ApplicationChart title="BIỂU ĐỒ TUYỂN DỤNG & ỨNG TUYỂN" />
+          <ApplicationChart title={t('dashboard.applicationChart')} />
           {/* End: ApplicationChart */}
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={6}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 12,
+            md: 12,
+            lg: 6
+          }}>
           {/* Start: HiringAcademicChart */}
-          <HiringAcademicChart title="BIỂU ĐỒ TUYỂN DỤNG THEO CẤP BẬC" />
+          <HiringAcademicChart title={t('dashboard.academicChart')} />
           {/* End: HiringAcademicChart */}
         </Grid>
       </Grid>

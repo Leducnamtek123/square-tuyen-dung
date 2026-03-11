@@ -1,0 +1,851 @@
+# Số lượng ứng tuyển
+) ??
+, alignItems: isMe ?
+, resData?.result?.geometry.location.lat ||
+, resData?.result?.geometry.location.lng ||
+- Không thời hạn
+-- Chọn ngành nghề --
+/dang-nhap?successMessage=Password updated successfully
+: q.difficulty === 2 ?
+: score >= 40 ?
+==> Bắn API Search:
+>{row.userDict?.fullName ||
+?
+?? c? k?t qu? đánh giá tổng quát t? hệ thống AI
+AI Phân tích
+Ai đã xem hồ sơ của bạn
+Anh dai dien nay se bi xoa va khong the khoi phuc. Ban co chac chan?
+B?n ch?a l?u ?ng vi?n n?o
+Biểu tượng
+Blog tuyển dụng
+Báo giá
+Bây giờ
+Bạn chưa có thông báo việc làm nào
+Bạn chưa có tin tuyển dụng nào
+Bạn chưa lưu công việc nào
+Bạn chưa theo dõi bất kỳ nhà tuyển dụng nào
+Bạn chưa tải lên CV nào
+Bạn chưa ứng tuyển công việc nào
+Bạn có chắc chắn muốn xóa buổi phỏng vấn này?
+Bạn có chắc chắn muốn xóa câu hỏi này?
+Bạn có chắc chắn muốn xóa tin đăng này?
+Bạn có chắc chắn muốn đăng xuất?
+Bạn hãy thêm chứng chỉ của mình để nhà tuyển dụng tham khảo
+Bạn hãy thêm kinh nghiệm làm việc của mình để nhà tuyển dụng tham khảo
+Bạn hãy thêm kỹ năng chuyên môn của mình để nhà tuyển dụng tham khảo
+Bạn hãy thêm kỹ năng ngôn ngữ của mình để nhà tuyển dụng tham khảo
+Bạn hãy thêm thông tin học vấn của mình để nhà tuyển dụng tham khảo
+Bạn không có quyền, vui lòng quay lại!
+Bảng điều khiển
+Bảo trì hệ thống
+Bằng cấp
+Bằng cấp là bắt buộc.
+Bộ câu hỏi
+Bộ lọc nâng cao
+Bộ đề phỏng vấn
+CV này sẽ được xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?
+Ch?a c? ?ng vi?n ?ng tuy?n
+Chi tiết hồ sơ ứng viên
+Chi tiết tin tuyển dụng
+Chia sẻ qua
+Chia sẻ trải nghiệm của bạn...
+Cho phép các tin tuyển dụng được duyệt tự động
+Cho phép gửi email
+Cho phép gửi tin nhắn SMS
+Cho phép tìm kiếm
+Chuyên ngành đào tạo
+Chuyên ngành đào tạo là bắt buộc.
+Chuyên ngành đào tạo vượt quá độ dài cho phép.
+Chào mừng trở lại,
+Chân dung việc - Đi đúng hướng
+Chưa có buổi phỏng vấn nào được lên lịch
+Chưa có bộ câu hỏi nào
+Chưa có dữ liệu hội thoại
+Chưa có người dùng nào đánh giá
+Chưa có nhà tuyển dụng nào xem hồ sơ của bạn
+Chưa có phiên phỏng vấn nào đang hoạt động.
+Chưa có thông báo nào.
+Chưa cập nhật
+Chưa phân loại
+Chưa xác thực
+Chỉnh sửa
+Chỉnh sửa Resume
+Chỉnh sửa bộ câu hỏi
+Chỉnh sửa hồ sơ ứng viên
+Chỉnh sửa ngành nghề
+Chỉnh sửa quận huyện
+Chỉnh sửa thông báo
+Chỉnh sửa thông tin công ty
+Chỉnh sửa tin tuyển dụng
+Chỉnh sửa tỉnh thành
+Chọn Quận/Huyện
+Chọn Tỉnh/Thành phố
+Chọn bằng cấp
+Chọn bộ câu hỏi (Tùy chọn)
+Chọn bộ câu hỏi để tự động điền các câu hỏi bên dưới
+Chọn câu hỏi
+Chọn câu hỏi phỏng vấn
+Chọn cấp bậc
+Chọn giới tính
+Chọn giới tính yêu cầu
+Chọn giờ
+Chọn hình thức làm việc
+Chọn kinh nghiệm
+Chọn kinh nghiệm làm việc
+Chọn kinh nghiệm yêu cầu
+Chọn nghề nghiệp
+Chọn ngành nghề cần tuyển
+Chọn ngày
+Chọn ngôn ngữ
+Chọn năm
+Chọn nơi làm việc
+Chọn quy mô công ty
+Chọn tháng
+Chọn thập kỷ
+Chọn tin tuyển dụng
+Chọn trình độ học vấn
+Chọn tình trạng hôn nhân
+Chọn tệp CV của bạn
+Chọn tỉnh thành phố
+Chọn tỉnh thành để lọc
+Chọn vị nơi làm việc
+Chọn vị trí/chức vụ
+Chọn địa điểm
+Chọn ứng viên
+Chờ duyệt
+Chờ phỏng vấn
+Chờ xử lý
+Chủ nhật
+Chức danh/vị trí công việc
+Chứng chỉ
+Cài đặt
+Cài đặt chung
+Có lỗi xảy ra khi cập nhật bộ câu hỏi
+Có lỗi xảy ra khi cập nhật công ty
+Có lỗi xảy ra khi cập nhật hoạt động
+Có lỗi xảy ra khi cập nhật hồ sơ ứng viên
+Có lỗi xảy ra khi cập nhật ngành nghề
+Có lỗi xảy ra khi cập nhật quận huyện
+Có lỗi xảy ra khi cập nhật resume
+Có lỗi xảy ra khi cập nhật thông báo
+Có lỗi xảy ra khi cập nhật tỉnh thành
+Có lỗi xảy ra khi thêm bộ câu hỏi
+Có lỗi xảy ra khi thêm công ty
+Có lỗi xảy ra khi thêm hoạt động
+Có lỗi xảy ra khi thêm hồ sơ ứng viên
+Có lỗi xảy ra khi thêm ngành nghề
+Có lỗi xảy ra khi thêm quận huyện
+Có lỗi xảy ra khi thêm resume
+Có lỗi xảy ra khi thêm thông báo
+Có lỗi xảy ra khi thêm tỉnh thành
+Có lỗi xảy ra khi xóa bộ câu hỏi
+Có lỗi xảy ra khi xóa công ty
+Có lỗi xảy ra khi xóa hoạt động
+Có lỗi xảy ra khi xóa hồ sơ ứng viên
+Có lỗi xảy ra khi xóa ngành nghề
+Có lỗi xảy ra khi xóa quận huyện
+Có lỗi xảy ra khi xóa resume
+Có lỗi xảy ra khi xóa thông báo
+Có lỗi xảy ra khi xóa tỉnh thành
+Công ty
+Công việc & Phỏng vấn
+Cấp bậc
+Cấp bậc mong muốn
+Cấp bậc mong muốn là bắt buộc.
+Cấu hình chung
+Cấu hình hệ thống
+Cập nhật
+Cập nhật CV
+Cập nhật bộ câu hỏi thành công
+Cập nhật c?u h?i thành công
+Cập nhật công ty thành công
+Cập nhật hoạt động thành công
+Cập nhật hồ sơ Online
+Cập nhật hồ sơ đính kèm
+Cập nhật hồ sơ ứng viên thành công
+Cập nhật kinh nghiệm làm việc thành công.
+Cập nhật kỹ năng chuyên môn thành công.
+Cập nhật kỹ năng ngôn ngữ thành công.
+Cập nhật logo công ty thành công.
+Cập nhật lần cuối
+Cập nhật mật khẩu
+Cập nhật ngành nghề thành công
+Cập nhật quận huyện thành công
+Cập nhật resume thành công
+Cập nhật setting thành công.
+Cập nhật setting thất bại.
+Cập nhật thành công.
+Cập nhật thông báo thành công
+Cập nhật thông báo việc làm thành công.
+Cập nhật thông tin chứng chỉ thành công.
+Cập nhật thông tin cá nhân thành công.
+Cập nhật thông tin công ty thành công.
+Cập nhật thông tin học vấn thành công.
+Cập nhật thông tin hồ sơ thành công.
+Cập nhật thông tin tài khoản thành công.
+Cập nhật tin tuyển dụng thành công.
+Cập nhật tin đăng thành công
+Cập nhật trạng thái
+Cập nhật trạng thái hồ sơ
+Cập nhật trạng thái ứng tuyển
+Cập nhật tỉnh thành thành công
+Cập nhật ảnh bìa công ty thành công.
+Danh mục chung
+Danh sách Phỏng vấn trực tuyến
+Danh sách các buổi phỏng vấn
+Danh sách câu hỏi
+Danh sách phỏng vấn
+Danh sách tin đăng
+Duyệt
+Duyệt bài đăng tự động
+Dòng mỗi trang:
+Dễ
+Dịch vụ
+Dừng tất cả các hoạt động của người dùng để bảo trì
+Email công ty
+Email công ty là bắt buộc.
+Email công ty vượt quá độ dài cho phép.
+Email không hợp lệ.
+Email là bắt buộc.
+Email người liên hệ
+Email người liên hệ là bắt buộc.
+Email người liên hệ vượt quá độ dài cho phép.
+Email người nhận
+Email người nhận không hợp lệ.
+Email người nhận là bắt buộc.
+Email người nhận vượt quá độ dài cho phép.
+Email vượt quá độ dài cho phép.
+Ghi chú
+Ghi chú thêm về buổi phỏng vấn...
+Giới thiệu
+Giới tính
+Giới tính là bắt buộc.
+Giới tính vượt quá độ dài cho phép.
+Gửi
+Gửi email thành công.
+Gửi mail
+Gửi một bản sao đến địa chỉ email nhà tuyển dụng của tôi.
+Gửi phản hồi thành công.
+Gửi thành công. Vui lòng kiểm tra tin nhắn
+Gửi thông báo hệ thống qua email cho người quản trị
+H? s? ??nh k?m
+H? s? Online
+Hinh anh nay se bi xoa vinh vien va khong the khoi phuc. Ban co chac chan?
+Hiện chưa tìm công ty phù hợp với tiêu chí của bạn
+Hiện chưa tìm thấy việc làm phù hợp với tiêu chí của bạn
+Hiện tại
+Hoàn thành
+Hoạt động của bạn
+Hoạt động tin đăng
+Hành động
+Hãy
+Hình thức
+Hình thức làm việc
+Hình thức làm việc là bắt buộc.
+Hình thức:
+Hôm nay
+Hạn cuối
+Hạn nộp hồ sơ
+Hạn nộp hồ sơ không hợp lệ.
+Hạn nộp hồ sơ là bắt buộc.
+Hạn nộp hồ sơ phải lớn hơn ngày hôm nay.
+Hệ thống & Người dùng
+Họ tên
+Họ tên ứng viên ...
+Họ và tên
+Họ và tên là bắt buộc.
+Họ và tên vượt quá độ dài cho phép.
+Học vấn
+Học vấn:
+Hỏi Đáp
+Hồ sơ online
+Hồ sơ đã lưu
+Hồ sơ đã ứng tuyển
+Hồ sơ đính kèm
+Hồ sơ ứng tuyển
+Hồ sơ ứng tuyển này sẽ được xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?
+Hồ sơ ứng viên
+Hỗ trợ
+Hủy
+Hủy lưu thành công.
+Hủy phỏng vấn
+Hủy theo dõi thành công.
+ID người nhận (Để trống nếu gửi hệ thống)
+IT - Phần cứng/Mạng
+IT - Phần mềm
+Khu vực tuyển
+Khác
+Khám phá công việc phù hợp với định hướng nghề nghiệp. Thông tin chi tiết về yêu cầu công việc, môi trường và cơ hội phát triển tại mỗi công ty.
+Khó
+Không bỏ lỡ cơ hội với hệ thống thông báo thông minh. Nhận thông tin tức thì về các vị trí việc làm mới phù hợp với kỹ năng.
+Không chọn
+Không có câu hỏi nào. Hãy tạo câu hỏi trong Ngân hàng câu hỏi.
+Không có dữ liệu
+Không có dữ liệu để thống kê
+Không thể kết nối đến máy chủ, vui lòng kiểm tra mạng.
+Không thời hạn
+Không tuyển gấp
+Không tìm thấy cuộc trò chuyện nào...
+Không tìm thấy kết quả.
+Không tìm thấy người dùng nào
+Không tìm thấy thông tin buổi phỏng vấn
+Không xác định
+Kinh nghiệm
+Kinh nghiệm làm việc
+Kinh nghiệm làm việc là bắt buộc.
+Kinh nghiệm làm việc này sẽ được xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?
+Kinh nghiệm:
+Kinh độ
+Kinh độ trên bản đồ của công ty không hợp lệ.
+Kinh độ trên bản đồ của công ty là bắt buộc.
+Kinh độ trên bản đồ không hợp lệ.
+Kinh độ trên bản đồ là bắt buộc.
+Kéo và thả tệp vào đây hoặc nhấp vào
+Kích thước chuẩn của tệp
+Kết quả tìm kiếm nhà tuyển dụng
+Kết quả tìm kiếm tin tuyển dụng
+Kết quả đánh giá AI
+Kỹ năng chuyên môn
+Kỹ năng chuyên môn này sẽ được xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?
+Kỹ năng ngôn ngữ
+Kỹ năng ngôn ngữ này sẽ được xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?
+Liên Hệ
+Loại
+Loại CV
+Loại hồ sơ
+Lên lịch Phỏng vấn trực tuyến
+Lên lịch phỏng vấn
+Lĩnh vực
+Lĩnh vực / Ngành nghề
+Lĩnh vực hoạt động
+Lĩnh vực hoạt động là bắt buộc.
+Lưu
+Lưu hồ sơ
+Lương tối thiểu
+Lương tối thiểu không hợp lệ.
+Lương tối thiểu là bắt buộc.
+Lương tối thiểu phải nhỏ hơn lương tối đa.
+Lương tối đa
+Lương tối đa không hợp lệ.
+Lương tối đa là bắt buộc.
+Lương tối đa phải lớn hơn lương tối thiểu.
+Lượt nộp
+Lượt xem
+Lịch sử hội thoại
+Lịch trình phỏng vấn
+Lọc
+Lọc nâng cao
+Lỗi khi c?p nh?t c?u h?i
+Lỗi khi cập nhật tin đăng
+Lỗi khi duyệt tin đăng
+Lỗi khi lên lịch phỏng vấn
+Lỗi khi th?m c?u h?i
+Lỗi khi tải danh sách ứng viên
+Lỗi khi tải dữ liệu ban đầu
+Lỗi khi từ chối tin đăng
+Lỗi khi x?a c?u h?i
+Lỗi khi xem CV!
+Lỗi khi xóa tin đăng
+Mã số thuế
+Mã số thuế là bắt buộc.
+Mã số thuế vượt quá độ dài cho phép.
+Mô tả
+Mô tả công việc
+Mô tả công việc là bắt buộc.
+Mô tả thêm
+Mô tả thêm (thêm <br/> để xuống dòng)
+Mật khẩu
+Mục tiêu nghề nghiệp
+Mục tiêu nghề nghiệp là bắt buộc.
+Mục tiêu nghề nghiệp vượt quá độ dài cho phép.
+Mức lương
+Mức lương mong muốn
+Mức lương mong muốn không hợp lệ.
+Mức lương mong muốn tối thiểu
+Mức lương mong muốn tối thiểu là bắt buộc.
+Mức lương mong muốn tối đa
+Mức lương mong muốn tối đa là bắt buộc.
+Mức lương tối thiểu
+Mức lương tối đa
+Mức lương:
+Mức độ
+Nghề nghiệp
+Ngành nghề
+Ngành nghề khác
+Ngành nghề là bắt buộc.
+Ngành/nghề là bắt buộc.
+Ngày bắt đầu
+Ngày bắt đầu là bắt buộc.
+Ngày bắt đầu phải nhỏ hơn ngày hôm nay.
+Ngày bắt đầu phải nhỏ hơn ngày kết thúc.
+Ngày cập nhật
+Ngày gửi
+Ngày hoàn thành (Để trống nếu đang học tại đây)
+Ngày hết hạn (Để trống nếu chứng chỉ vô thời hạn)
+Ngày kết thúc
+Ngày kết thúc là bắt buộc.
+Ngày kết thúc phải lớn hơn ngày bắt đầu.
+Ngày kết thúc phải nhỏ hơn hoặc bằng ngày hôm nay.
+Ngày lưu
+Ngày sinh
+Ngày sinh không hợp lệ.
+Ngày sinh là bắt buộc.
+Ngày thành lập công ty
+Ngày đăng
+Ngân hàng câu hỏi
+Ngân hàng câu hỏi AI
+Ngôn ngữ
+Ngôn ngữ là bắt buộc.
+Người dùng & Phân quyền
+Người tìm việc
+Nhà tuyển dụng
+Nhà tuyển dụng xem hồ sơ
+Nhập URL Facebook
+Nhập URL Linkedin
+Nhập URL Youtube
+Nhập URL website của công ty
+Nhập chuyên ngành đào tạo
+Nhập email
+Nhập email của công ty
+Nhập email người liên hệ
+Nhập email người nhận
+Nhập họ và tên
+Nhập họ và tên của bạn
+Nhập kinh độ tọa độ trên bản đồ của công ty.
+Nhập lĩnh vực hoạt động của công ty
+Nhập mã số thuế công ty
+Nhập mật khẩu
+Nhập mức lương mong muốn của bạn
+Nhập mức lương mong muốn tối thiểu
+Nhập mức lương mong muốn tối đa
+Nhập mức lương tối thiểu
+Nhập mức lương tối đa
+Nhập nội dung mô tả tại đây
+Nhập nội dung tại đây
+Nhập nội dung tại đây ...
+Nhập số lượng nhân sự cần tuyển
+Nhập số điện thoại
+Nhập số điện thoại của công ty
+Nhập số điện thoại người liên hệ
+Nhập tiêu đề email
+Nhập tên chứng chỉ
+Nhập tên công ty
+Nhập tên công ty hoặc lĩnh vực cần tìm kiếm
+Nhập tên công việc
+Nhập tên kỹ năng
+Nhập tên người liên hệ
+Nhập tên người nhận
+Nhập tên tin đăng
+Nhập tên tin đăng hoặc tên ứng viên
+Nhập tên trường/Trung tâm đào tạo
+Nhập từ khoá là tên công việc hoặc liên quan đến tên công việc mà bạn đang tìm.
+Nhập từ khóa tìm kiếm...
+Nhập vĩ độ tọa độ trên bản đồ của công ty.
+Nhập địa chỉ
+Nhật ký hoạt động
+Nhắn tin
+Năm
+Năm sau
+Năm trước
+Nơi làm việc
+Nơi làm việc là bắt buộc.
+Nơi làm việc:
+Nội dung
+Nội dung câu hỏi
+Nội dung email
+Nội dung email là bắt buộc.
+Nội dung đánh giá là bắt buộc.
+Nội dung đánh giá vượt quá độ dài cho phép.
+Nữ
+Phòng
+Phỏng vấn Trực tuyến
+Phỏng vấn chưa kết thúc
+Phỏng vấn công ty trực tiếp
+Phỏng vấn trực tuyến
+Phỏng vấn ứng viên trực tiếp
+Quay lại
+Quy mô
+Quy mô công ty
+Quy mô nhân sự
+Quy mô nhân sự là bắt buộc.
+Quy định bảo mật
+Quyền lợi
+Quyền lợi là bắt buộc.
+Quản Lý Nhà Tuyển Dụng
+Quản Lý Ứng Viên
+Quản lý CV/Resume
+Quản lý bộ câu hỏi
+Quản lý công ty
+Quản lý hồ sơ tìm việc
+Quản lý hồ sơ đã lưu
+Quản lý hồ sơ đã ứng tuyển
+Quản lý ngành nghề
+Quản lý quận huyện
+Quản lý thông tin công ty
+Quản lý tin tuyển dụng
+Quản lý tài khoản
+Quản lý tài khoản Người tìm việc
+Quản lý tài khoản Nhà tuyển dụng
+Quản lý tỉnh thành
+Quản lý ứng viên
+Quận huyện
+Quận/Huyện
+Quận/Huyện là bắt buộc.
+Số câu hỏi
+Số dòng mỗi trang
+Số dòng mỗi trang:
+Số lượng
+Số lượng câu hỏi
+Số lượng tuyển
+Số lượng tuyển không hợp lệ.
+Số lượng tuyển là bắt buộc.
+Số lượng tuyển ít nhất là một ứng viên.
+Số điện thoại
+Số điện thoại công ty là bắt buộc.
+Số điện thoại công ty vượt quá độ dài cho phép.
+Số điện thoại không hợp lệ!
+Số điện thoại không hợp lệ.
+Số điện thoại là bắt buộc.
+Số điện thoại người liên hệ
+Số điện thoại người liên hệ là bắt buộc.
+Số điện thoại người liên hệ vượt quá độ dài cho phép.
+Số điện thoại vượt quá độ dài cho phép.
+Thao tác
+Thay đổi trạng thái hồ sơ thành công.
+Theo dõi
+Theo dõi công ty
+Tháng
+Tháng 1
+Tháng 10
+Tháng 11
+Tháng 12
+Tháng 2
+Tháng 3
+Tháng 4
+Tháng 5
+Tháng 6
+Tháng 7
+Tháng 8
+Tháng 9
+Tháng sau
+Tháng trước
+Thêm bộ câu hỏi thành công
+Thêm câu hỏi thành công
+Thêm công ty thành công
+Thêm hoạt động thành công
+Thêm hồ sơ ứng viên thành công
+Thêm kinh nghiệm làm việc thành công.
+Thêm kỹ năng chuyên môn thành công.
+Thêm kỹ năng ngôn ngữ thành công.
+Thêm mới
+Thêm mới tin tuyển dụng thành công.
+Thêm ngành nghề thành công
+Thêm quận huyện thành công
+Thêm resume thành công
+Thêm thông báo thành công
+Thêm thông báo việc làm thành công.
+Thêm thông tin chứng chỉ thành công.
+Thêm thông tin học vấn thành công.
+Thêm tỉnh thành thành công
+Thông Báo
+Thông báo Email
+Thông báo việc làm
+Thông báo việc làm mọi lúc
+Thông báo việc làm này sẽ được xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?
+Thông tin & Hồ sơ
+Thông tin buổi phỏng vấn
+Thông tin chung
+Thông tin chứng chỉ này sẽ được xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?
+Thông tin cá nhân
+Thông tin công ty
+Thông tin học vấn
+Thông tin học vấn này sẽ được xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?
+Thông tin hồ sơ
+Thông tin tài khoản
+Thập kỷ sau
+Thập kỷ trước
+Thế kỷ sau
+Thế kỷ trước
+Thỏa thuận sử dụng
+Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất
+Thống kê chỉ số ứng tuyển theo trình độ học vấn
+Thống kê số hồ sơ ứng tuyển nhận được theo ngày
+Thời gian
+Thời gian dự kiến
+Thời gian nộp
+Thời gian phỏng vấn
+Thời hạn nộp
+Thứ ba
+Thứ bảy
+Thứ hai
+Thứ năm
+Thứ sáu
+Thứ tư
+Tin Nhắn
+Tin tuyển dụng
+Tin tuyển dụng / Công ty
+Tin tuyển dụng này sẽ được xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?
+Tin đăng
+Tiêu đề
+Tiêu đề CV
+Tiêu đề email là bắt buộc.
+Tiêu đề email vượt quá độ dài cho phép.
+Top 10 nghề nghiệp
+Trang quản lý NTD
+Trang quản trị Công ty của tôi
+Trang quản trị Người tìm việc
+Trang quản trị Nhà tuyển dụng
+Trang quản trị Việc làm của tôi
+Trung bình
+Trình độ
+Trình độ học vấn
+Trình độ học vấn là bắt buộc.
+Trình độ là bắt buộc.
+Trường/Trung tâm đào tạo
+Trường/Trung tâm đào tạo là bắt buộc.
+Trường/Trung tâm đào tạo vượt quá độ dài cho phép.
+Trạng thái
+Trạng thái duyệt
+Trạng thái tuyển dụng
+Tuyển dụng
+Tuyển dụng & Phỏng vấn
+Tuyển gấp
+Tài khoản
+Tài khoản chưa xác thực
+Tài khoản đã xác thực
+Tên Công ty
+Tên bằng cấp/Chứng chỉ
+Tên bằng cấp/Chứng chỉ là bắt buộc.
+Tên bằng cấp/Chứng chỉ vượt quá độ dài cho phép.
+Tên bộ câu hỏi
+Tên chứng chỉ
+Tên chứng chỉ là bắt buộc.
+Tên chứng chỉ vượt quá độ dài cho phép.
+Tên công ty
+Tên công ty là bắt buộc.
+Tên công ty vượt quá độ dài cho phép.
+Tên công ty, tên nhà tuyển dụng, ...
+Tên công việc
+Tên công việc là bắt buộc.
+Tên công việc vượt quá độ dài cho phép.
+Tên hồ sơ
+Tên kỹ năng
+Tên kỹ năng là bắt buộc.
+Tên kỹ năng vượt quá độ dài cho phép.
+Tên ngành nghề
+Tên người liên hệ
+Tên người liên hệ là bắt buộc.
+Tên người liên hệ vượt quá độ dài cho phép.
+Tên người nhận
+Tên người nhận vượt quá độ dài cho phép.
+Tên người nhận.
+Tên quận huyện
+Tên tin đăng
+Tên trường/Trung tâm đào tạo là bắt buộc.
+Tên trường/Trung tâm đào tạo vượt quá độ dài cho phép.
+Tên tỉnh thành
+Tên ứng viên
+Tìm Kiếm Hồ Sơ
+Tìm câu hỏi...
+Tìm kiếm CV...
+Tìm kiếm bộ câu hỏi...
+Tìm kiếm công ty...
+Tìm kiếm cơ hội việc làm
+Tìm kiếm cơ hội việc làm lý tưởng trong khu vực. Với tính năng định vị thông minh, gợi ý công việc phù hợp gần nơi bạn sinh sống.
+Tìm kiếm hoạt động...
+Tìm kiếm ngành nghề...
+Tìm kiếm nhanh
+Tìm kiếm theo tên công việc hoặc công ty...
+Tìm kiếm theo tên hoặc email...
+Tìm kiếm thông báo...
+Tìm kiếm ứng viên
+Tìm kiếm ứng viên...
+Tìm ứng viên mới
+Tình trạng hôn nhân
+Tình trạng hôn nhân là bắt buộc.
+Tình trạng hôn nhân vượt quá độ dài cho phép.
+Tạo CV & Profile
+Tạo câu hỏi mới
+Tạo thông báo việc làm
+Tải CV thành công.
+Tải CV đính kèm
+Tải lên
+Tải xuống
+Tải ứng dụng miễn phí
+Tất cả cấp bậc
+Tất cả giới tính
+Tất cả hình thức làm việc
+Tất cả học vấn
+Tất cả kinh nghiệm
+Tất cả loại hình làm việc
+Tất cả ngành nghề
+Tất cả nơi làm việc
+Tất cả tin đăng
+Tất cả trạng thái tuyển dụng
+Tất cả tình trạng hôn nhân
+Tất cả tỉnh thành
+Tất cả vị trí
+Tần suất thông báo
+Tập tin là bắt buộc.
+Tỉnh thành
+Tỉnh/Thành phố
+Tỉnh/Thành phố là bắt buộc.
+Tổng quan hệ thống
+Tổng tin đăng
+Từ chối
+Từ khóa
+Từ khóa là bắt buộc.
+Tự động điền nếu bạn chọn địa chỉ được gợi ý.
+Upload File thành công.
+VD: Bằng Cao Đẳng CNTT, Chứng chỉ nghề điện công nghiệp
+VD: Kỹ sư phần mềm
+VD: Lập trình viên Backend
+Vai trò
+Việc Làm
+Việc làm
+Việc làm gợi ý
+Việc làm phù hợp
+Việc làm theo Hình thức là việc
+Việc làm theo Ngành nghề
+Việc làm theo Tỉnh thành
+Việc làm theo hình thức làm việc
+Việc làm theo ngành nghề
+Việc làm theo tỉnh thành
+Việc làm tương tự
+Việc làm xung quanh bạn
+Việc làm đã lưu
+Việc làm đã ứng tuyển
+Việc làm đề xuất
+Vui lòng chọn tin tuyển dụng
+Vui lòng chọn ứng viên
+Vĩ độ
+Vĩ độ trên bản đồ của công ty không hợp lệ.
+Vĩ độ trên bản đồ của công ty là bắt buộc.
+Vĩ độ trên bản đồ không hợp lệ.
+Vĩ độ trên bản đồ là bắt buộc.
+Về chúng tôi
+Vị trí
+Vị trí công việc là bắt buộc.
+Vị trí mong muốn
+Vị trí mong muốn là bắt buộc.
+Vị trí mong muốn vượt quá độ dài cho phép.
+Vị trí ứng tuyển
+Vị trí/chức vụ
+Vị trí:
+X?a h? s?
+Xem CV đính kèm
+Xem chi tiết
+Xem h? s?
+Xem hồ sơ
+Xem thêm
+Xem trước
+Xác nhận xóa
+Xác thực
+Xây dựng hồ sơ ứng tuyển chuyên nghiệp với công cụ tạo CV thông minh. Tối ưu profile với các mẫu CV đẹp mắt theo từng ngành nghề.
+Xóa
+Xóa CV đính kém
+Xóa bộ câu hỏi thành công
+Xóa c?u h?i thành công
+Xóa công ty thành công
+Xóa hoạt động thành công
+Xóa hồ sơ ứng tuyển
+Xóa hồ sơ ứng tuyển thành công.
+Xóa hồ sơ ứng viên thành công
+Xóa kinh nghiệm làm việc
+Xóa kinh nghiệm làm việc thành công.
+Xóa kỹ năng chuyên môn
+Xóa kỹ năng chuyên môn thành công.
+Xóa kỹ năng ngôn ngữ
+Xóa kỹ năng ngôn ngữ thành công.
+Xóa ngành nghề thành công
+Xóa quận huyện thành công
+Xóa resume thành công
+Xóa thành công.
+Xóa thông báo thành công
+Xóa thông báo việc làm
+Xóa thông báo việc làm thành công.
+Xóa thông tin chứng chỉ
+Xóa thông tin chứng chỉ thành công.
+Xóa thông tin học vấn
+Xóa thông tin học vấn thành công.
+Xóa tin tuyển dụng
+Xóa tin tuyển dụng thành công.
+Xóa tỉnh thành thành công
+Yêu cầu công việc
+Yêu cầu công việc là bắt buộc.
+Yêu cầu giới tính
+Yêu cầu giới tính là bắt buộc.
+[Hôm nay lúc] HH:mm
+[Hôm qua lúc] HH:mm
+][locationErr]?.join(
+cho phép tìm kiếm
+navigate(-1)} sx={{ mt: 2 }}>Quay lại
+onClick={() => onDelete?.(row)} color=
+onClick={() => onEdit?.(row)} color=
+setOpenCreateQuestion(false)} color="inherit">Hãy
+setOpenCreateQuestion(false)} color="inherit">Hủy
+setOpenDeleteDialog(false)} color="inherit">Hãy
+setOpenDeleteDialog(false)} color="inherit">Hủy
+setOpenDetail(false)}>Đóng
+setOpenDialog(false)} color="inherit">Hủy
+setOpenEdit(false)}>Hủy
+{ approveMutation.mutate(selectedJob.id); setOpenDetail(false); }} variant="contained" color="success">Duyệt tin
+{ rejectMutation.mutate(selectedJob.id); setOpenDetail(false); }} color="error">Từ chối
+{count} hồ sơ
+{row.userDict?.fullName || 'Hệ thống'}
+{selectedJob.experience} năm
+{selectedJob.quantity} người
+Đa phương tiện
+Đang gửi ...
+Đang theo dõi
+Đang thực hiện
+Đang tạo PDF...
+Đang tải...
+Đang xử lý...
+Điểm AI
+Đánh dấu hoàn thành
+Đánh giá là bắt buộc.
+Đã bắt đầu phân tích AI. Vui lòng chờ vài giây.
+Đã chấp nhận
+Đã có lỗi
+Đã duyệt
+Đã duyệt tin đăng
+Đã hủy
+Đã kết hôn
+Đã lên lịch
+Đã lên lịch phỏng vấn thành công
+Đã lưu hồ sơ của bạn
+Đã từ chối
+Đã từ chối tin đăng
+Đã xác thực
+Đã xóa tin đăng
+Đã xảy ra lỗi!
+Đã xảy ra lỗi, vui lòng thử lại!
+Đã ứng tuyển
+Đăng Tin Tuyển Dụng
+Đăng ký NTD
+Đăng nhập NTD
+Đăng xuất
+Đăng xuất tài khoản
+Đường dẫn Facebook
+Đường dẫn Linkedin
+Đường dẫn Youtube
+Đường dẫn website
+Đặt lại
+Địa chỉ
+Địa chỉ cụ thể
+Địa chỉ là bắt buộc.
+Địa chỉ vượt quá độ dài cho phép.
+Địa điểm
+Địa điểm làm việc
+Đối tượng nhận
+Đồng ý
+Đổi mật khẩu thành công.
+Độc thân
+Ảnh đại diện
+Ứng tuyển
+Ứng tuyển thành công.
+Ứng tuyển vị trí
+Ứng viên
+Ứng viên / Nhà tuyển dụng
+ứng viên

@@ -10,7 +10,8 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
-import { Box, Grid, Pagination, Stack } from '@mui/material';
+import { Box, Pagination, Stack } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 
 import JobPost from '../JobPost';
 
@@ -20,7 +21,14 @@ const JobPosts = () => {
       <Stack spacing={4}>
         <Grid container spacing={2}>
           {[1, 2, 3, 4, 5, 6, 7, 7, 1, 2, 3, 4].map((value) => (
-            <Grid item xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: 12,
+                md: 12,
+                lg: 12,
+                xl: 12
+              }}>
               <JobPost />
             </Grid>
           ))}

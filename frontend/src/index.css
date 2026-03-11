@@ -144,3 +144,8 @@ code {
     @apply font-sans;
   }
 }
+/* Reduce excessive toolbar padding for company icon container */
+.css-k9jzsh-MuiToolbar-root {
+  padding-top: 7px;
+  padding-bottom: 7px;
+}

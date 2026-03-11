@@ -1,4 +1,4 @@
-﻿{
+{
   "redirectTitle": "Redirecting to interview room",
   "redirectBody": "You will be moved into the interview room in this system.",
   "redirectCta": "If you are not redirected, click here",
@@ -71,5 +71,39 @@
     "missingInvite": "Missing interview invite code.",
     "tokenMissing": "Unable to fetch token to join the interview.",
     "invalidSession": "Connection error or invalid interview session."
+  },
+  "employer": {
+    "questions": {
+      "add": "Add Question",
+      "edit": "Edit Selected",
+      "createTitle": "Create Interview Question",
+      "editTitle": "Update Interview Question",
+      "textLabel": "Question Content",
+      "textPlaceholder": "Enter question for candidate",
+      "saveCreate": "Create Question",
+      "saveEdit": "Save Changes",
+      "textRequired": "Please enter question content.",
+      "createSuccess": "Question created.",
+      "updateSuccess": "Question updated.",
+      "saveError": "Failed to save question.",
+      "editSelectionError": "Please select exactly 1 question to edit."
+    },
+    "questionBank": {
+      "title": "AI Question Bank",
+      "add": "Add Question",
+      "createTitle": "Add New Question",
+      "editTitle": "Edit Question",
+      "textLabel": "Question Content",
+      "textRequired": "Please enter question content.",
+      "createSuccess": "New question added successfully.",
+      "updateSuccess": "Question updated successfully.",
+      "saveError": "An error occurred.",
+      "deleteConfirm": "Are you sure you want to delete this question?",
+      "deleteSuccess": "Deleted successfully.",
+      "deleteError": "Could not delete this question.",
+      "columns": {
+        "text": "Question Content"
+      }
+    }
   }
 }

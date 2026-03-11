@@ -1,0 +1,1566 @@
+{
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\App.jsx": [
+    "Loi Runtime:",
+    "Loi Promise (Async):"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\agent-audio-visualizer-bar.jsx": [
+    "*\n * @example\n * ```tsx\n *",
+    "children ? (",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\agent-chat-transcript.jsx": [
+    "*\n * @example\n * ```tsx\n *"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\agent-control-bar.jsx": [
+    "Voice assistant controls",
+    "Toggle microphone",
+    "Toggle camera",
+    "Toggle screen share",
+    "Toggle transcript",
+    "Type something...",
+    ";\n * ```\n *\n * @extends ComponentProps",
+    "END CALL",
+    "END"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\agent-disconnect-button.jsx": [
+    "*\n * @example\n * ```tsx\n *",
+    "END CALL"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\agent-track-control.jsx": [
+    "*\n * @example\n * ```tsx\n *",
+    "devices.filter((d) => d.deviceId !== ''), [devices]);\n\n  if (filteredDevices.length"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\agent-track-toggle.jsx": [
+    "*\n * @example\n * ```tsx\n *"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\start-audio-button.jsx": [
+    "Click to allow audio playback",
+    "*\n * @example\n * ```tsx\n *"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\ai-elements\\message.jsx": [
+    "Previous branch",
+    "Next branch"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\AppIntroductionCard\\index.jsx": [
+    "Nhập số điện thoại",
+    "Sent successfully. Please check your messages",
+    "Invalid phone number!",
+    "Tải ứng dụng miễn phí",
+    "Tìm việc hiệu quả bằng cách tải MyJob về di động của bạn và sẵn\n\n              sàng nhận việc làm ngay hôm nay!",
+    "gửi đi"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\ApplyCard\\index.jsx": [
+    "Applied successfully.",
+    "Ứng tuyển vị trí"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\ApplyForm\\index.jsx": [
+    "Nhập họ và tên",
+    "Nhập email",
+    "Nhập số điện thoại",
+    "Họ và tên",
+    "Email",
+    "Số điện thoại",
+    ") : (",
+    ") : value.type === CV_TYPES.cvUpload ? (",
+    "Xem hồ sơ",
+    "Lưu ý: Họ tên, email, số điện thoại cần chính xác để nhà tuyển\n\n              dụng liên hệ với bạn."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\CareerCarousel\\index.jsx": [
+    "))\n\n            : topCareers.map((value) => ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\ChatCard\\index.jsx": [
+    "show new notifications"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\chats\\ChatInfo\\index.jsx": [
+    "Hãy bắt đầu cuộc trò chuyện bằng một lời chào 😍"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\ColorPickerDialog\\index.jsx": [
+    "Chọn màu sắc cho CV của bạn",
+    "Màu sắc gợi ý",
+    "Xem trước màu đã chọn",
+    "Hủy",
+    "Xác nhận"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\Companies\\index.jsx": [
+    "Hiện chưa tìm công ty phù hợp với tiêu chí của bạn",
+    "Công ty nổi bật",
+    ") : companies.length === 0 ? (",
+    ") : (",
+    "1 && ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\Company\\index.jsx": [
+    ") : (",
+    "Đang theo dõi",
+    "state.user);\n\n  return (",
+    "Chưa cập nhật"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\CompanyAction\\index.jsx": [
+    "Chưa cập nhật"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\controls\\BasicDropzone\\index.jsx": [
+    "Kéo hồ sơ của bạn vào đây",
+    "Hoặc bạn có thể",
+    "Chọn hồ sơ từ máy bạn",
+    "Hỗ trợ định dạng .pdf",
+    ") : (",
+    "Đổi tập tin"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\controls\\FileUploadCustom\\index.jsx": [
+    "Kéo thả file vào đây hoặc",
+    "Chọn file",
+    "Chỉ chấp nhận file PDF",
+    ") : (",
+    "Xóa"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\controls\\InputBaseSearchCompanyCustom\\index.jsx": [
+    "Tìm kiếm"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\controls\\InputBaseSearchHomeCustom\\index.jsx": [
+    "Gợi ý tìm kiếm",
+    ") : searchResult.length === 0 ? (",
+    "Không có dữ liệu",
+    ") : (",
+    "0 && (",
+    "Tìm kiếm gần đây",
+    "Tìm kiếm"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\controls\\MultiSelectCustom\\index.jsx": [
+    ";\nconst checkedIcon ="
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\controls\\MultiSelectSearchCustom\\index.jsx": [
+    ";\nconst checkedIcon ="
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\controls\\RangePickerCustom\\index.jsx": [
+    "refresh",
+    "Ap dung"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\CVDoc\\index.jsx": [
+    "THÔNG TIN CHUNG",
+    "Vị trí:",
+    "Kinh nghiệm:",
+    "Học vấn:",
+    "Mức lương:",
+    "Nơi làm việc:",
+    "Hình thức:",
+    "KINH NGHIỆM LÀM VIỆC",
+    "HỌC VẤN",
+    "KỸ NĂNG CHUYÊN MÔN",
+    "0 && (",
+    "NGOẠI NGỮ",
+    "CHỨNG CHỈ"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\DataTable\\index.jsx": [
+    ") : data.length > 0 ? (\n\n                            table.getRowModel().rows.map((row) => (",
+    "))\n\n                        ) : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\DropzoneDialogCustom\\index.jsx": [
+    ");\n\n  return ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\Feedback\\index.jsx": [
+    "Chia sẻ trải nghiệm của bạn...",
+    "Feedback sent successfully.",
+    "Phản hồi",
+    "Phản hồi của bạn",
+    "Gửi phản hồi"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\FeedbackCarousel\\index.jsx": [
+    "Chưa có người dùng nào đánh giá",
+    ") : feedbacks.length === 0 ? (",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\JobPost\\index.jsx": [
+    "Hot",
+    "Tuyển gấp",
+    "HOT",
+    "Chưa cập nhật",
+    "Còn"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\JobPostAction\\index.jsx": [
+    "Chưa cập nhật"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\JobPostLarge\\index.jsx": [
+    "Tuyển gấp",
+    "state.config);\n\n  return (",
+    "Hot",
+    "Chưa cập nhật"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\JobSeekerProfile\\index.jsx": [
+    "save",
+    "view",
+    "Lưu hồ sơ",
+    "Xem hồ sơ",
+    "state.config);\n\n  return (",
+    "Chưa cập nhật",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\Map\\index.jsx": [
+    "Chưa thể xác định vị trí trên bản đồ"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\NotificationCard\\index.jsx": [
+    "show new notifications",
+    "delete",
+    "Chưa có thông báo nào",
+    ") : (\n\n                notifications.map((value, idx) => (",
+    "1 && (",
+    "Xem thêm",
+    "0 && (",
+    "Xóa tất cả"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\NumberCard\\index.jsx": [
+    "Nhà tuyển dụng xem hồ sơ"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\Pdf\\index.jsx": [
+    "zoom-out",
+    "Kích thước chuẩn của tệp",
+    "zoom-in",
+    "Tải xuống"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\ProfileUploadCard\\index.jsx": [
+    "Cho phép tìm kiếm",
+    "Tải xuống",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\SocialNetworkSharingPopup\\SocialNetworkSharingPopup.jsx": [
+    "Chia sẻ qua"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\components\\TopCompanyCarousel\\index.jsx": [
+    "))\n            : companies.map((value) => ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\layouts\\AdminLayout\\index.jsx": [
+    "window().document.body : undefined;\n\n  return ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\layouts\\components\\MuiShellLayout.jsx": [
+    "open drawer",
+    ");\n\n  return ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\layouts\\components\\commons\\AccountSwitchMenu\\index.jsx": [
+    "For Employers",
+    "Post a free job",
+    ") : hostName === HOST_NAME.EMPLOYER_MYJOB ? (",
+    "For Job Seekers",
+    "Switch",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\layouts\\components\\commons\\Footer\\index.jsx": [
+    "For Employers",
+    "For Candidates",
+    "Mobile Apps"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\layouts\\components\\commons\\Header\\index.jsx": [
+    "open drawer",
+    ") : (",
+    "Login",
+    "Register",
+    ");\n\n  return ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\layouts\\components\\commons\\LeftDrawer\\index.jsx": [
+    "Logout",
+    ") : (",
+    "Register",
+    ");\n\n  return ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\layouts\\components\\commons\\SubHeaderDialog\\index.jsx": [
+    "close",
+    "Hot",
+    "Danh sách tất cả nghề nghiệp",
+    "Top 10 nghề nghiệp",
+    "value.isHot === true)\n\n                    .map((career) => (",
+    "Ngành nghề khác",
+    "value.isHot !== true)\n\n                  .map((career) => (",
+    "value.id);\n    var careerResult = [];\n\n    for (let i = 0; i",
+    "customCareers(allConfig?.careerOptions || [], topCareers),\n    [allConfig?.careerOptions, topCareers, customCareers]\n  );\n\n  return ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\layouts\\components\\commons\\UserMenu\\index.jsx": [
+    "Logout"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\layouts\\components\\employers\\Header\\index.jsx": [
+    "open drawer",
+    ");\n\n  return ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\layouts\\components\\employers\\Sidebar\\index.jsx": [
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\layouts\\EmployerLayout\\index.jsx": [
+    "window().document.body : undefined;\n\n  return ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\CareersPage\\index.jsx": [
+    "breadcrumb",
+    "Career Name",
+    "Icon (App)",
+    "Search careers...",
+    "Career Management",
+    "Admin",
+    "General Config",
+    "Careers",
+    "Add Career",
+    ") : (",
+    "0 && (",
+    "Cancel",
+    "Confirm Delete",
+    "Are you sure you want to delete career",
+    "?\n                        This action cannot be undone."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\CareersPage\\components\\CareerTable.jsx": [
+    "Edit",
+    "Delete",
+    "Symbol",
+    "Career Name",
+    "Icon (App)",
+    "Total Posts",
+    "Actions",
+    "No data found"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\CitiesPage\\index.jsx": [
+    "breadcrumb",
+    "City Name",
+    "Edit",
+    "Delete",
+    "City Management",
+    "Admin",
+    "General Config",
+    "Cities",
+    "Add City",
+    ") : (",
+    "Actions",
+    "No data found",
+    "10 && (",
+    "Cancel",
+    "Confirm Delete",
+    "Are you sure you want to delete city",
+    "?\n                        This action cannot be undone."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\CompaniesPage\\index.jsx": [
+    "Company Name",
+    "Tax Code",
+    "Employee Size",
+    "Company Email",
+    "Phone Number",
+    "Field of Operation",
+    "Website",
+    "Search companies...",
+    "Add Company",
+    ") : (",
+    "0 && (",
+    "Cancel",
+    "Confirm Delete",
+    "Are you sure you want to delete company",
+    "?\n                        This action cannot be undone and may affect associated job posts."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\CompaniesPage\\components\\CompanyTable.jsx": [
+    "View details",
+    "Edit",
+    "Delete",
+    "Logo",
+    "Company Name",
+    "Scale",
+    "Field",
+    "Location",
+    "Job Posts",
+    "Followers",
+    "Actions"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\DashboardPage\\index.jsx": [
+    "Total Users",
+    "Job Posts",
+    "Pending Approval",
+    "Applications",
+    "User Distribution by Role",
+    ") : (",
+    "General Statistics",
+    "System",
+    "Status: Active"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\DashboardPage\\components\\StatCard.jsx": [
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\DistrictsPage\\index.jsx": [
+    "breadcrumb",
+    "Select city to filter",
+    "City",
+    "District Name",
+    "Edit",
+    "Delete",
+    "District Management",
+    "Admin",
+    "General Config",
+    "Districts",
+    "Add District",
+    ") : (",
+    "Actions",
+    "No data found for this city",
+    "Please select a city to see the district list",
+    "10 && (",
+    "Cancel",
+    "Confirm Delete",
+    "Are you sure you want to delete district",
+    "?\n                        This action cannot be undone."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\InterviewLivePage\\index.jsx": [
+    "Live Company Interviews",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\InterviewsPage\\index.jsx": [
+    "Interview List",
+    "Interview Management"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\InterviewsPage\\components\\InterviewTable.jsx": [
+    "Completed",
+    "Pending",
+    "In Progress",
+    "Scheduled",
+    "Cancelled",
+    "Vetting",
+    "Recruitment",
+    "View details",
+    "Mark as completed",
+    "Cancel interview",
+    "Delete",
+    ";\n            case 'PENDING':\n            case 'pending':\n            case 'draft':\n                return",
+    ";\n            case 'PROCESSING':\n            case 'in_progress':\n                return",
+    ";\n            case 'scheduled':\n                return",
+    ";\n            case 'cancelled':\n            case 'CANCELLED':\n                return",
+    ";\n            default:\n                return",
+    "Candidate / Employer",
+    "Job Post",
+    "Type",
+    "Time",
+    "Status",
+    "Actions",
+    "N/A"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\InterviewsPage\\hooks\\useInterviews.js": [
+    "Interview scheduled successfully",
+    "Status updated successfully",
+    "Interview deleted successfully"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\JobActivityPage\\index.jsx": [
+    "breadcrumb",
+    "Status",
+    "Search activities...",
+    "Job Post Activity Log",
+    "Admin",
+    "Jobs & Interviews",
+    "Job Post Activities",
+    ") : (",
+    "0 && (",
+    "Update Application Status",
+    "Applied",
+    "Pending",
+    "Accepted",
+    "Rejected",
+    "Cancel",
+    "Confirm Delete",
+    "Are you sure you want to delete this activity log of",
+    "?\n                        This action cannot be undone."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\JobActivityPage\\components\\JobActivityTable.jsx": [
+    "Update Status",
+    "Delete",
+    "Candidate",
+    "Job Post",
+    "Company",
+    "Status",
+    "Updated At",
+    "Actions",
+    "No data found"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\JobNotificationsPage\\index.jsx": [
+    "breadcrumb",
+    "Title",
+    "Content",
+    "Recipient ID (Leave blank for system-wide)",
+    "Search notifications...",
+    "Job Notifications",
+    "Admin",
+    "Jobs & Interviews",
+    "Create Notification",
+    ") : (",
+    "0 && (",
+    "Cancel",
+    "Confirm Delete",
+    "Are you sure you want to delete notification",
+    "?\n                        This action cannot be undone."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\JobNotificationsPage\\components\\JobNotificationTable.jsx": [
+    "Edit",
+    "Delete",
+    "Title",
+    "Content",
+    "Recipient",
+    "Sent At",
+    "Actions",
+    "No data found"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\JobsPage\\index.jsx": [
+    "Job Title",
+    "Deadline",
+    "Job Post Details",
+    "Salary",
+    "Quantity",
+    "Experience",
+    "Academic Level",
+    "Job Description",
+    "Job Requirements",
+    "Close",
+    "Reject",
+    "Approve Post",
+    "Edit Job Post",
+    "Cancel",
+    "Save"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\JobsPage\\components\\JobFilters.jsx": [
+    "Search by job title or company..."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\JobsPage\\components\\JobTable.jsx": [
+    "Pending",
+    "Rejected",
+    "Approved",
+    "Unknown",
+    "View details",
+    "Edit",
+    "Approve",
+    "Reject",
+    "Delete",
+    ";\n            case 2:\n                return",
+    ";\n            case 3:\n                return",
+    ";\n            default:\n                return",
+    "Job Post / Company",
+    "Post Date",
+    "Deadline",
+    "Status",
+    "Actions"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\ProfilesPage\\index.jsx": [
+    "Full Name",
+    "Phone Number",
+    "Date of Birth",
+    "Gender",
+    "Marital Status",
+    "City",
+    "District",
+    "Address",
+    "Search candidates...",
+    "Add Candidate",
+    ") : (",
+    "0 && (",
+    "Male",
+    "Female",
+    "Other",
+    "Single",
+    "Married",
+    "Cancel",
+    "Confirm Delete",
+    "Are you sure you want to delete profile of",
+    "?\n                        This action cannot be undone."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\ProfilesPage\\components\\ProfileTable.jsx": [
+    "View details",
+    "Edit",
+    "Delete",
+    "Avatar",
+    "Full Name",
+    "Email",
+    "Phone Number",
+    "Gender",
+    "Date of Birth",
+    "Actions",
+    "No data found"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\QuestionGroupsPage\\index.jsx": [
+    "breadcrumb",
+    "Question Group Name",
+    "Description",
+    "Select Questions",
+    "Question Content",
+    "Search question groups...",
+    "Question Group Management",
+    "Admin",
+    "Question Bank",
+    "Question Groups",
+    "Add Question Group",
+    ") : (",
+    "0 && (",
+    "item.id === value);\n                                            return",
+    "Create New Question",
+    "Cancel",
+    "Confirm Delete",
+    "Are you sure you want to delete question group",
+    "?\n                        The questions inside will not be deleted, but the links to this group will be lost."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\QuestionGroupsPage\\components\\QuestionGroupTable.jsx": [
+    "Edit",
+    "Delete",
+    "No question groups available",
+    "Question Group Name",
+    "Description",
+    "Question Count",
+    "Actions"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\QuestionsPage\\index.jsx": [
+    "Question Content",
+    "Difficulty",
+    "Field / Career",
+    "Question List",
+    "Interview Question Bank",
+    "Add Question",
+    "Easy",
+    "Medium",
+    "Hard",
+    "-- Select Career --",
+    "Cancel"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\QuestionsPage\\components\\QuestionTable.jsx": [
+    "Edit",
+    "Delete",
+    "Question Content",
+    "Field",
+    "Difficulty",
+    "Actions"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\ResumesPage\\index.jsx": [
+    "Resume Title",
+    "Min Salary",
+    "Max Salary",
+    "Search resumes...",
+    ") : (",
+    "0 && (",
+    "Edit Resume",
+    "Cancel",
+    "Confirm Delete",
+    "Are you sure you want to delete resume",
+    "?\n                        This action cannot be undone."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\ResumesPage\\components\\ResumeTable.jsx": [
+    "View details",
+    "Delete",
+    "Resume Title",
+    "Candidate",
+    "Resume Type",
+    "Experience",
+    "Last Update",
+    "Status",
+    "Actions",
+    "No data found"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\SettingsPage\\index.jsx": [
+    "System Settings",
+    "General Settings"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\SettingsPage\\hooks\\useSystemSettings.js": [
+    "Cai dat da duoc luu",
+    "Loi khi luu cai dat"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\UsersPage\\components\\ScheduleInterviewDialog.jsx": [
+    "Interview Time",
+    "Select questions",
+    "Notes",
+    "Search questions...",
+    "Additional notes about the interview...",
+    "Schedule Interview",
+    "Vetting interview for:",
+    "value.map((opt, idx) => (",
+    "Cancel"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\UsersPage\\components\\UserFilters.jsx": [
+    "Search by name or email..."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\adminPages\\UsersPage\\components\\UserTable.jsx": [
+    "Verified",
+    "Schedule Interview",
+    "No users found",
+    "Full Name",
+    "Email",
+    "Role",
+    "Verification",
+    "Status",
+    "Actions",
+    ") : (",
+    "Unverified"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\chatPages\\ChatPage\\index.jsx": [
+    "state.user);\n  \n  const [openLeftDrawer, setOpenLeftDrawer] = React.useState(false);\n  const [openRightDrawer, setOpenRightDrawer] = React.useState(false);\n\n  return (",
+    ") : (",
+    "More engage, more success"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\auths\\AccountCard\\index.jsx": [
+    "Cập nhật mật khẩu",
+    "Account updated successfully.",
+    "Password changed successfully.",
+    "Đã xảy ra lỗi!",
+    "Thay đổi mật khẩu",
+    "Cập nhật"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\auths\\AccountForm\\index.jsx": [
+    "Nhập họ và tên của bạn",
+    "Nhập email",
+    "Nhập mật khẩu",
+    "Full Name",
+    "Email",
+    "Mật khẩu"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\auths\\AvatarCard\\index.jsx": [
+    "Cap nhat anh dai dien thanh cong.",
+    "Da xay ra loi, vui long thu lai.",
+    "Xoa anh dai dien thanh cong.",
+    "Xoa that bai.",
+    "Anh dai dien"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\chats\\RightSidebar\\index.jsx": [
+    "Nhắn tin",
+    "TIN TUYỂN DỤNG ĐÃ ỨNG TUYỂN",
+    ") : jobPostsApplied.length === 0 ? (",
+    "You haven't applied for any position",
+    ") : (",
+    "1 && (",
+    "ỨNG VIÊN ỨNG TUYỂN",
+    "Chưa có ứng viên nào ứng tuyển"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\defaults\\CategoryCard\\index.jsx": [
+    "Tìm kiếm nhanh"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\defaults\\CompanySearch\\index.jsx": [
+    "delete",
+    "Nhập tên công ty hoặc lĩnh vực cần tìm kiếm",
+    "Tất cả tỉnh thành",
+    "Tìm kiếm"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\defaults\\FilterJobPostCard\\index.jsx": [
+    ") : jobPosts.length === 0 ? (",
+    ") : (",
+    "1 && ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\defaults\\HomeSearch\\index.jsx": [
+    "Tìm kiếm cơ hội việc làm",
+    "Tất cả ngành nghề",
+    "Tất cả tỉnh thành"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\defaults\\JobByCategory\\index.jsx": [
+    "Jobs by Career",
+    "maxItem && (",
+    "View all careers",
+    "Jobs by City",
+    "View all cities",
+    "Jobs by Job Type"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\defaults\\JobPostSearch\\index.jsx": [
+    "reset",
+    "clear",
+    "Search for job opportunities",
+    "All careers",
+    "All cities",
+    "All positions",
+    "All experience",
+    "All job types",
+    "All workplaces",
+    "All genders",
+    "Search",
+    "Advanced Filter"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\defaults\\MainJobPostCard\\index.jsx": [
+    "No jobs found matching your criteria",
+    "Search Results",
+    "))\n        ) : jobPosts.length === 0 ? (",
+    ") : (",
+    "1 && ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\defaults\\NotificationCard\\index.jsx": [
+    "No notifications yet.",
+    "0 && (",
+    "Mark all as read",
+    "Delete all",
+    ") : notifications.length === 0 ? (",
+    ") : (",
+    "1 && (",
+    "Load more"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\defaults\\SuggestedJobPostCard\\index.jsx": [
+    ") : jobPosts.length === 0 ? (",
+    ") : (",
+    "1 && ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\AppliedResumeCard\\index.jsx": [
+    "All job posts",
+    "All recruitment statuses",
+    "Reset",
+    "Advanced Filter",
+    "Update successful.",
+    "Applied profile deleted successfully.",
+    "Download List",
+    "Filters:",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\AppliedResumeFilterForm\\index.jsx": [
+    "Chọn Tỉnh/Thành phố",
+    "Tất cả ngành nghề",
+    "Tất cả kinh nghiệm",
+    "Tất cả cấp bậc",
+    "Tất cả học vấn",
+    "Tất cả nơi làm việc",
+    "Tất cả hình thức làm việc",
+    "Tất cả giới tính",
+    "Tất cả tình trạng hôn nhân"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\AppliedResumeTable\\index.jsx": [
+    "view",
+    "delete",
+    "No candidates have applied yet",
+    "Online Resume",
+    "Attached Resume",
+    "View profile",
+    "Delete profile",
+    "Email sent successfully.",
+    "AI analysis started. Please wait a few seconds.",
+    "AI Summary:",
+    "Skills:",
+    "Processing...",
+    "Analyze",
+    "state.config);\n\n  return (",
+    ") : (\n          rowsSafe.map((row) => (",
+    ") : (",
+    "Not updated"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\charts\\ApplicationChart\\index.jsx": [
+    "Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất",
+    ") : data.length === 0 ? (",
+    "Không có dữ liệu để thống kê",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\charts\\CandidateChart\\index.jsx": [
+    "Thống kê số hồ sơ ứng tuyển nhận được theo ngày",
+    ") : data.length === 0 ? (",
+    "Không có dữ liệu để thống kê",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\charts\\HiringAcademicChart\\index.jsx": [
+    "Thống kê chỉ số ứng tuyển theo trình độ học vấn",
+    ") : data.length === 0 ? (",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\charts\\RecruitmentChart\\index.jsx": [
+    "Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất",
+    ") : data.length === 0 ? (",
+    "Khong co du lieu de thong ke",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\CompanyCard\\index.jsx": [
+    "Company information updated successfully.",
+    "Company logo updated successfully.",
+    "Company cover image updated successfully.",
+    "Company Logo",
+    "Change Logo",
+    "Company Cover Image",
+    "Change Cover",
+    ") : (",
+    "Update"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\CompanyForm\\index.jsx": [
+    "Enter company name",
+    "Enter company tax code",
+    "Select company size",
+    "Enter company field of operation",
+    "Enter company website URL",
+    "Enter Facebook URL",
+    "Enter Youtube URL",
+    "Enter Linkedin URL",
+    "Enter company email",
+    "Enter company phone number",
+    "Select city/province",
+    "Select district",
+    "Enter address",
+    "Enter latitude coordinate on the map.",
+    "Enter longitude coordinate on the map.",
+    "Company Name",
+    "Tax Code",
+    "Company Size",
+    "Field of Operation",
+    "Founded Date",
+    "Website URL",
+    "Facebook URL",
+    "Youtube URL",
+    "Linkedin URL",
+    "Company Email",
+    "Phone Number",
+    "City/Province",
+    "District",
+    "Address",
+    "Latitude",
+    "Longitude",
+    "Additional Description",
+    "Automatically filled if you choose a suggested address."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\CompanyImageCard\\index.jsx": [
+    "Tai anh len thanh cong.",
+    "Xoa hinh anh thanh cong.",
+    "Thu vien anh cong ty",
+    "Tai len",
+    "Preview"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\EmployerQuantityStatistics\\index.jsx": [
+    "Total Job Posts",
+    "Pending Job Posts",
+    "Expired Job Posts",
+    "Total Applications",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\InterviewDetailCard\\index.jsx": [
+    ";\n\n    if (!session) return (",
+    "Interview session information not found",
+    "Back",
+    "Back to list",
+    "Online Interview Details",
+    "Room Code:",
+    "Interview Information",
+    "CANDIDATE",
+    "POSITION",
+    "INTERVIEW TYPE",
+    "SCHEDULE",
+    "AI Evaluation Result",
+    "View detailed report",
+    ") : (",
+    "Conversation History",
+    "LIVE MONITORING",
+    "0 ? session.transcripts.map((t, index) => (",
+    ")) : (",
+    "No conversation data available"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\InterviewListCard\\index.jsx": [
+    "(\n                row.original.ai_overall_score ? (",
+    ") : (",
+    "Schedule Interview"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\JobPostCard\\index.jsx": [
+    "Job Post",
+    "Job post added successfully.",
+    "Job post updated successfully.",
+    "Job post deleted successfully.",
+    "Job Post Management",
+    "Export List",
+    "Create New Post",
+    "Filter:",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\JobPostFilterForm\\index.jsx": [
+    "refresh",
+    "Enter job title",
+    "Recruitment status",
+    "Approval status",
+    "Reset",
+    "Search"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\JobPostForm\\index.jsx": [
+    "Enter job title",
+    "Select career",
+    "Select position",
+    "Select required experience",
+    "Select workplace",
+    "Select job type",
+    "Enter number of vacancies",
+    "Select gender requirement",
+    "Enter minimum salary",
+    "Enter maximum salary",
+    "Select academic level",
+    "Select city/province",
+    "Select district",
+    "Enter address",
+    "Enter latitude coordinate of the company on the map.",
+    "Enter longitude coordinate of the company on the map.",
+    "Enter contact person name",
+    "Enter contact person phone",
+    "Enter contact person email",
+    "Job Title",
+    "Career",
+    "Position",
+    "Experience",
+    "Workplace",
+    "Job Type",
+    "Number of Vacancies",
+    "Gender Requirement",
+    "Minimum Salary",
+    "Maximum Salary",
+    "Academic Level",
+    "Application Deadline",
+    "Job Description",
+    "Job Requirement",
+    "Benefits",
+    "City/Province",
+    "District",
+    "Address",
+    "Latitude",
+    "Longitude",
+    "Contact Person Name",
+    "Contact Person Phone",
+    "Contact Person Email",
+    "Urgent",
+    "Automatically filled if you choose a suggested address.",
+    "When you update the post, it will be pending approval!"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\JobPostsTable\\index.jsx": [
+    "Urgent",
+    "Update",
+    "Delete"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\ProfileCard\\index.jsx": [
+    "No results found.",
+    "value.slug === slugResume\n        );\n\n        for (let i = 0; i",
+    ") : resumes.length === 0 ? (",
+    ") : (",
+    "1 && ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\ProfileDetailCard\\index.jsx": [
+    "View Attached Resume",
+    "Email sent successfully.",
+    ") : (",
+    "Profile information not found.",
+    "This profile may be set to private.",
+    "In hồ sơ",
+    "Tải xuống",
+    "Xem",
+    "Thông tin cá nhân",
+    "Thông tin chung",
+    "Mục tiêu nghề nghiệp",
+    "0 && (",
+    "Kinh nghiệm làm việc",
+    "Chưa cập nhật",
+    "Học vấn",
+    "Chứng chỉ",
+    "Ngôn ngữ",
+    "Mức độ thành thạo",
+    "Kỹ năng chuyên môn"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\ProfileSearch\\index.jsx": [
+    "Enter keywords...",
+    "Select City/Province",
+    "All Careers",
+    "All Experience",
+    "All Positions",
+    "All Academic Levels",
+    "All Workplaces",
+    "All Employment Types",
+    "All Genders",
+    "All Marital Statuses",
+    "Search",
+    "Advanced Filters",
+    "Clear Filters",
+    "Careers",
+    "Experience",
+    "Position",
+    "Academic Level",
+    "Workplace",
+    "Employment Type",
+    "Gender",
+    "Marital Status"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\QuestionGroupsCard\\index.jsx": [
+    "breadcrumb",
+    "Question Group Name",
+    "Description",
+    "Select Questions",
+    "Question Content",
+    "Search question groups...",
+    "Employer",
+    "Online Interview",
+    "Question Groups",
+    "Add Question Group",
+    ") : (",
+    "item.id === value);\n                                            return",
+    "Create New Question",
+    "Cancel",
+    "Confirm Delete",
+    "Are you sure you want to delete the question group",
+    "The questions inside will not be deleted, but their association with this group will be lost."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\SavedResumeCard\\index.jsx": [
+    "Unsaved successfully.",
+    "Download List",
+    "Filters:",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\SavedResumeFilterForm\\index.jsx": [
+    "refresh",
+    "Enter job post or candidate name",
+    "Enter maximum salary",
+    "Select experience",
+    "Select location",
+    "Reset",
+    "Search"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\SavedResumeTable\\index.jsx": [
+    "view",
+    "You haven",
+    "Online Resume",
+    "Attached Resume",
+    "View profile",
+    "state.config);\n\n  return (",
+    ") : (\n          rowsSafe.map((row) => (",
+    ") : (",
+    "Not updated",
+    "Unsave"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\employers\\SendMailCard\\index.jsx": [
+    "Enter recipient name",
+    "Enter recipient email",
+    "Enter email subject",
+    "Send Mail",
+    "Recipient name",
+    "Recipient email",
+    "Subject",
+    "Email content",
+    "Send a copy to my employer email address."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\AdvancedSkillCard\\index.jsx": [
+    "add",
+    "advanced skills table",
+    "Professional Skills",
+    "Professional skill added successfully.",
+    "Professional skill updated successfully.",
+    "Professional skill deleted successfully.",
+    ") : (",
+    "Skill",
+    "Level",
+    "Actions"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\AdvancedSkillForm\\index.jsx": [
+    "Enter skill name",
+    "Skill Name",
+    "Level"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\AppliedJobCard\\index.jsx": [
+    "You haven",
+    ") : jobPostsApplied.length === 0 ? (",
+    "Search Jobs",
+    ") : (",
+    ") : value?.resumeDict?.type === CV_TYPES.cvUpload ? (",
+    "1 && ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\BoxProfile\\index.jsx": [
+    "Searchable",
+    "Loading...",
+    "Download",
+    "Generating PDF...",
+    "Profile status updated successfully.",
+    ") : (",
+    ") : resume === null ? (",
+    "Not updated",
+    "Please add all necessary information to complete your profile.",
+    "Edit Profile"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\CertificateCard\\index.jsx": [
+    "add",
+    "Certificate",
+    "Certificate added successfully.",
+    "Certificate updated successfully.",
+    "Certificate deleted successfully.",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\CertificateForm\\index.jsx": [
+    "Enter certificate name",
+    "Enter school/Training center name",
+    "Certificate Name",
+    "School/Training Center",
+    "Start Date",
+    "Expiration Date (Leave blank if no expiration)"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\charts\\index.jsx": [
+    ") : data.length === 0 ? (",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\CompanyFollowedCard\\index.jsx": [
+    "You haven",
+    "Unfollowed successfully.",
+    ") : resumesViewed.length === 0 ? (",
+    "Find companies",
+    ") : (",
+    "Unfollow",
+    "1 && ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\CompanyViewedCard\\index.jsx": [
+    "Saved your profile",
+    "No employers have viewed your profile yet",
+    ") : resumesViewed.length === 0 ? (",
+    ") : (",
+    "1 && ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\CVCard\\index.jsx": [
+    "edit",
+    "Update CV",
+    "File uploaded successfully.",
+    "Loading CV...",
+    ") : cv === null ? (",
+    "No CV has been uploaded yet",
+    "Click the upload button to add your CV",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\CVForm\\index.jsx": [
+    "Choose your CV file"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\ExperienceDetailCard\\index.jsx": [
+    "add",
+    "Work Experience",
+    "Experience added successfully.",
+    "Experience updated successfully.",
+    "Experience deleted successfully.",
+    ") : (",
+    "Detailed Description"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\GeneralInfoCard\\index.jsx": [
+    "edit",
+    "Resume Information",
+    "Profile information updated successfully.",
+    "Profile information not found",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\JobApplicationCard\\index.jsx": [
+    "ArrowForward",
+    "Online Profile",
+    "Attached Resume",
+    "Application Resumes",
+    ") : (",
+    ") : item?.type === CV_TYPES.cvUpload ? ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\JobPostNotificationCard\\index.jsx": [
+    "edit",
+    "delete",
+    "You don",
+    "Job notification added successfully.",
+    "Job notification updated successfully.",
+    "Job notification deleted successfully.",
+    ") : (",
+    "Not updated",
+    "Job Notifications",
+    "Maximum 3 job notifications can be enabled",
+    "Create Notification",
+    ") : jobPostNotifications.length === 0 ? (",
+    "Create Notification Now",
+    "1 && (",
+    "Create Job Notification"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\JobPostNotificationForm\\index.jsx": [
+    "Enter job name or related keywords you are searching for.",
+    "Select career",
+    "Select city/province",
+    "Select position/level",
+    "Select required experience",
+    "Enter your desired salary",
+    "Keyword",
+    "Career",
+    "City/Province",
+    "Position/Level",
+    "Experience",
+    "Desired Salary",
+    "Notification Frequency"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\LanguageSkillCard\\index.jsx": [
+    "add",
+    "language skills table",
+    "Language Skills",
+    "Language skill added successfully.",
+    "Language skill updated successfully.",
+    "Language skill deleted successfully.",
+    ") : (",
+    "Language",
+    "Level",
+    "Actions"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\LanguageSkillForm\\index.jsx": [
+    "Select language",
+    "Language",
+    "Level"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\PersonalInfoCard\\index.jsx": [
+    "edit",
+    "Personal Information",
+    "Personal information updated successfully.",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\ProfileUpload\\index.jsx": [
+    "No resumes uploaded yet",
+    "Resume Information",
+    "Resume uploaded successfully.",
+    "Resume deleted successfully.",
+    "Profile status updated successfully.",
+    ") : resumes.length === 0 ? (",
+    ") : (",
+    "Upload Resume"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\SavedJobCard\\index.jsx": [
+    "You haven",
+    ") : jobPosts.length === 0 ? (",
+    "Search Jobs",
+    ") : (",
+    "Unsave",
+    "1 && ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\SidebarProfile\\index.jsx": [
+    "Verified Account",
+    "Unverified Account",
+    "state.user);\n\n  return (",
+    "Welcome back,",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\jobSeekers\\SidebarViewTotal\\index.jsx": [
+    "Is your CV good enough?",
+    "How many employers are interested in your profile?",
+    "Each employer view of your CV brings an opportunity for you to get closer to the right job.",
+    "Explore Now"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\settings\\SettingCard\\index.jsx": [
+    "Settings updated successfully.",
+    "Failed to update settings.",
+    "Update"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\components\\settings\\SettingForm\\index.jsx": [
+    "Enable email notifications",
+    "Enable SMS notifications"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\AboutUsPage\\index.jsx": [
+    "Về chúng tôi",
+    "Chân dung việc - Đi đúng hướng",
+    "Khám phá công việc phù hợp với định hướng nghề nghiệp của bạn.",
+    "Chúng tôi cung cấp thông tin chi tiết về yêu cầu công việc,\n                  môi trường làm việc và cơ hội phát triển tại mỗi công ty.",
+    "Đánh giá chân thực từ nhân viên sẽ giúp bạn có cái nhìn thực\n                  tế nhất trước khi đưa ra quyết định quan trọng cho sự nghiệp.",
+    "Tạo CV & Profile",
+    "Xây dựng hồ sơ ứng tuyển chuyên nghiệp với công cụ tạo CV\n                  thông minh.",
+    "Tối ưu hóa profile của bạn với các mẫu CV đẹp mắt, phù hợp với\n                  từng ngành nghề.",
+    "Dễ dàng cập nhật và điều chỉnh CV theo yêu cầu của nhà tuyển\n                  dụng, tăng cơ hội được chú ý và lựa chọn cho vị trí mong muốn.",
+    "Việc làm xung quanh bạn",
+    "Tìm kiếm cơ hội việc làm lý tưởng trong khu vực của bạn.",
+    "Với tính năng định vị thông minh, chúng tôi gợi ý những công\n                  việc phù hợp gần nơi bạn sinh sống.",
+    "Tiết kiệm thời gian di chuyển và tận hưởng sự cân bằng giữa\n                  công việc và cuộc sống với các cơ hội việc làm trong bán kính\n                  mong muốn.",
+    "Thông báo việc làm mọi lúc",
+    "Không bỏ lỡ bất kỳ cơ hội nào với hệ thống thông báo thông\n                  minh.",
+    "Nhận thông tin tức thì về các vị trí việc làm mới phù hợp với\n                  kỹ năng và mong muốn của bạn.",
+    "Tùy chỉnh các tiêu chí thông báo như mức lương, địa điểm,\n                  ngành nghề để đảm bảo bạn luôn cập nhật những cơ hội tốt nhất\n                  trên thị trường."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\CompanyDetailPage\\index.jsx": [
+    "Chia se bang QR",
+    "facebook",
+    "youtube",
+    "linked",
+    ") : companyDetail === null ? (",
+    ") : (",
+    "Chưa cập nhật",
+    "Chia sẻ",
+    "Về công ty",
+    "Việc làm đang tuyển",
+    "Website",
+    "Theo dõi tại",
+    "Thông tin chung",
+    "Bản đồ",
+    "0 && (",
+    "Hình ảnh"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\CompanyPage\\index.jsx": [
+    "Khám Phá Văn Hóa Công ty",
+    "Tìm hiểu văn hóa công ty và chọn cho bạn nơi làm việc phù hợp nhất"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\HomePage\\index.jsx": [
+    "recipe",
+    "Top Companies",
+    "Urgent Jobs",
+    "Key Careers",
+    "Suggested Jobs",
+    "Need to find the right job for you?",
+    "Start exploring",
+    "User Feedback"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\JobDetailPage\\index.jsx": [
+    ") : jobPostDetail === null ? (",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\JobDetailPage\\components\\JobDetailActions.jsx": [
+    "Chia se"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\JobDetailPage\\components\\JobDetailContactCard.jsx": [
+    "ThÃ´ng tin liÃªn há»‡",
+    "NgÆ°á»i liÃªn há»‡",
+    "Email liÃªn há»‡",
+    "Sá»‘ Ä‘iá»‡n thoáº¡i",
+    "Äá»‹a chá»‰",
+    "Báº£n Ä‘á»“"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\JobDetailPage\\components\\JobDetailDescriptionCard.jsx": [
+    "Nghá» nghiá»‡p",
+    "NÆ¡i lÃ m viá»‡c",
+    "Há»c váº¥n",
+    "Sá»‘ lÆ°á»£ng tuyá»ƒn",
+    "Khu vá»±c tuyá»ƒn",
+    "YÃªu cáº§u giá»›i tÃ­nh",
+    "MÃ´ táº£ cÃ´ng viá»‡c",
+    "YÃªu cáº§u cÃ´ng viá»‡c",
+    "Quyá»n lá»£i"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\JobDetailPage\\components\\JobDetailHeaderCard.jsx": [
+    "Má»©c lÆ°Æ¡ng",
+    "Kinh nghiá»‡m",
+    "Cáº¥p báº­c",
+    "HÃ¬nh thá»©c",
+    "ChÆ°a cáº­p nháº­t"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\JobDetailPage\\components\\JobDetailInfoItem.jsx": [
+    ") : (",
+    "ChÆ°a cáº­p nháº­t"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\JobDetailPage\\components\\JobDetailSidebar.jsx": [
+    "Viá»‡c lÃ m tÆ°Æ¡ng tá»±"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\JobPage\\index.jsx": [
+    "Recommended Jobs"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\JobsByCareerPage\\index.jsx": [
+    "state.config);\n\n  return (",
+    "Việc làm theo Ngành nghề"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\JobsByCityPage\\index.jsx": [
+    "state.config);\n\n  return (",
+    "Việc làm theo Tỉnh thành"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\defaultPages\\JobsByJobTypePage\\index.jsx": [
+    "state.config);\n\n  return (",
+    "Việc làm theo Hình thức là việc"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\AccountPage\\index.jsx": [
+    "Account Information"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\CompanyPage\\index.jsx": [
+    "company tabs",
+    "Company Information",
+    "Multimedia"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\DashboardPage\\index.jsx": [
+    "RECRUITMENT CHART",
+    "CANDIDATE CHART",
+    "RECRUITMENT & APPLICATION CHART",
+    "RECRUITMENT BY ACADEMIC LEVEL"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\InterviewPages\\InterviewCreatePage.jsx": [
+    "Lên lịch Phỏng vấn trực tuyến"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\InterviewPages\\InterviewListPage.jsx": [
+    "Online Interview List"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\InterviewPages\\InterviewLivePage.jsx": [
+    "Live Interviews",
+    "Schedule Interview",
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\InterviewPages\\QuestionBankPage.jsx": [
+    "Ngân hàng câu hỏi AI"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\InterviewPages\\QuestionGroupsPage.jsx": [
+    "Quản lý bộ câu hỏi"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\InterviewPages\\components\\QuestionGroupTable.jsx": [
+    "Chỉnh sửa",
+    "Xóa",
+    "Chưa có bộ câu hỏi nào",
+    "Tên bộ câu hỏi",
+    "Mô tả",
+    "Số câu hỏi",
+    "Thao tác"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\ProfileAppliedPage\\index.jsx": [
+    "Applied Resumes"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\ProfilePage\\index.jsx": [
+    "Search Candidates"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\SavedProfilePage\\index.jsx": [
+    "Saved Resumes"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\SettingPage\\index.jsx": [
+    "Settings"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\employerPages\\VerificationPage\\index.jsx": [
+    "Status: Update Required",
+    "Enterprise Name",
+    "Tax Code",
+    "Business License Number",
+    "Representative",
+    "Phone Number",
+    "Contact Email",
+    "Website",
+    "Status: Pending Approval",
+    "Desired Time",
+    "Contact Person",
+    "Contact Phone Number",
+    "Notes",
+    "Employer Verification",
+    "Step 1: Update Company Profile",
+    "Complete company information before submitting verification documents. Admin will review this content before granting posting rights.",
+    "Open Company Information Page",
+    "Step 2: Enterprise Legal Documents",
+    "Provide legal document information for admin to verify the enterprise.",
+    "Save Legal Documents",
+    "Step 3: Register for Online Interview",
+    "Admin will confirm the interview schedule and send room participation information.",
+    "Send Interview Request",
+    "Submitted Interview Schedules",
+    "No interview requests yet.",
+    ") : (",
+    "Information recorded."
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\jobSeekerPages\\AccountPage\\index.jsx": [
+    "Account Information",
+    "Personal Information",
+    "Settings"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\jobSeekerPages\\AttachedProfilePage\\index.jsx": [
+    "Personal Information",
+    "General Information",
+    "Upload Attached CV",
+    "Your Attached Resumes"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\jobSeekerPages\\DashboardPage\\index.jsx": [
+    "Your Activity",
+    "Suggested Jobs"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\jobSeekerPages\\MyCompanyPage\\index.jsx": [
+    "my job",
+    "Nhà tuyển dụng xem hồ sơ",
+    "Theo dõi công ty",
+    "Việc làm phù hợp"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\jobSeekerPages\\MyJobPage\\index.jsx": [
+    "my job",
+    "Saved Jobs",
+    "Applied Jobs",
+    "Job Notifications",
+    "Note: You cannot view jobs that have expired or are temporarily suspended from receiving applications.",
+    "Suitable Jobs"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\jobSeekerPages\\OnlineProfilePage\\index.jsx": [
+    "Personal Information",
+    "General Information",
+    "Work Experience",
+    "Education Information",
+    "Certificates",
+    "Language Skills",
+    "Professional Skills",
+    "Your Online Profile"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\pages\\jobSeekerPages\\ProfilePage\\index.jsx": [
+    "Attached Resumes",
+    "Who viewed your profile",
+    "View Details"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\routes\\AppRouter.jsx": [
+    ") : ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\services\\firebaseService.js": [
+    "[\"David\", \"Van\", \"Teo\"], [\"David\", \"Teo\", \"Van\"], [\"Teo\", \"David\", \"Van\"],...\n  const name = displayName.split(' ').filter((word) => word);\n\n  const length = name.length;\n  let flagArray = [];\n  let result = [];\n  let stringArray = [];\n\n  /**\n   * khoi tao mang flag false\n   * dung de danh dau xem gia tri\n   * tai vi tri nay da duoc su dung\n   * hay chua\n   **/\n  for (let i = 0; i"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\utils\\errorHandling.js": [
+    "Unable to connect to server, please check your network.",
+    "You do not have permission, please go back!",
+    "An error occurred, please try again!"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\voice-ai\\components\\app\\chat-transcript.jsx": [
+    "0 && ("
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\voice-ai\\components\\livekit\\chat-entry.jsx": [
+    "(edited)"
+  ],
+  "c:\\Users\\leduc\\Documents\\square-tuyen-dung\\frontend\\src\\voice-ai\\components\\livekit\\agent-control-bar\\track-toggle.jsx": [
+    "getSourceIcon(source, isEnabled, isPending), [\n    source,\n    isEnabled,\n    isPending,\n  ]);\n\n  const sourceLabel =\n    source === Track.Source.Microphone\n      ? t('voiceAi.aria.microphone')\n      : source === Track.Source.Camera\n        ? t('voiceAi.aria.camera')\n        : t('voiceAi.aria.screenShare');\n\n  return ("
+  ]
+}

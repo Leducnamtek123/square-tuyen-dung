@@ -12,7 +12,8 @@ See the LICENSE file in the project root for full license information.
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { Badge, IconButton } from '@mui/material';
+import { Badge, IconButton } from "@mui/material";
+
 import ForumIcon from '@mui/icons-material/Forum';
 import {
   collection,

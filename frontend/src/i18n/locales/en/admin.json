@@ -1,0 +1,23 @@
+{
+  "dashboard": {
+    "totalUsers": "Total Users",
+    "jobPosts": "Job Posts",
+    "pendingApproval": "Pending Approval",
+    "applications": "Applications",
+    "userDistribution": "User Distribution by Role",
+    "generalStats": "General Statistics",
+    "systemInfo": "System Info",
+    "total": "Total:",
+    "employers": "Employers:",
+    "jobSeekers": "Job Seekers:",
+    "status": "Status:",
+    "statusActive": "Active",
+    "pendingPosts": "Pending Posts:",
+    "users": "users",
+    "roles": {
+      "employer": "Employer",
+      "jobSeeker": "Job Seeker",
+      "admin": "Admin"
+    }
+  }
+}

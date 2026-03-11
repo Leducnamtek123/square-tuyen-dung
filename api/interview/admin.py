@@ -11,8 +11,7 @@ from .models import (
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ['id', 'text_short', 'category', 'sort_order', 'author', 'create_at']
-    list_filter = ['category']
+    list_display = ['id', 'text_short', 'sort_order', 'author', 'create_at']
     search_fields = ['text']
     ordering = ['sort_order', '-create_at']
 

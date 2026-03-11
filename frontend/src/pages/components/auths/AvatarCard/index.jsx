@@ -11,7 +11,9 @@ See the LICENSE file in the project root for full license information.
 
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Stack, IconButton, Typography } from '@mui/material';
+import { Box, Stack, IconButton, Typography } from "@mui/material";
+import { useTranslation } from 'react-i18next';
+
 import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
@@ -22,6 +24,7 @@ import MuiImageCustom from '../../../../components/MuiImageCustom';
 import { deleteAvatar, updateAvatar } from '../../../../redux/userSlice';
 
 const AvatarCard = () => {
+  const { t } = useTranslation('auth');
   const dispatch = useDispatch();
   const { currentUser } = useSelector((state) => state.user);
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
@@ -36,10 +39,10 @@ const AvatarCard = () => {
     dispatch(updateAvatar(formData))
       .unwrap()
       .then(() => {
-        toastMessages.success('Cap nhat anh dai dien thanh cong.');
+        toastMessages.success(t('account.avatarUpdateSuccess'));
       })
       .catch(() => {
-        toastMessages.error('Da xay ra loi, vui long thu lai.');
+        toastMessages.error(t('messages.tryAgain'));
       })
       .finally(() => setIsFullScreenLoading(false));
   };
@@ -51,18 +54,18 @@ const AvatarCard = () => {
       dispatch(deleteAvatar())
         .unwrap()
         .then(() => {
-          toastMessages.success('Xoa anh dai dien thanh cong.');
+          toastMessages.success(t('account.avatarDeleteSuccess'));
         })
         .catch(() => {
-          toastMessages.error('Xoa that bai.');
+          toastMessages.error(t('messages.genericError'));
         })
         .finally(() => setIsFullScreenLoading(false));
     };
 
     confirmModal(
       () => del(),
-      'Xoa anh dai dien',
-      'Anh dai dien nay se bi xoa va khong the khoi phuc. Ban co chac chan?',
+      t('account.avatar'),
+      t('account.avatarDeleteConfirm'),
       'warning'
     );
   };
@@ -150,9 +153,8 @@ const AvatarCard = () => {
             </Stack>
           </Box>
         </Box>
-
         <Typography variant="subtitle2" gutterBottom sx={{ mt: 1 }}>
-          Anh dai dien
+          {t('account.avatar')}
         </Typography>
       </Stack>
 

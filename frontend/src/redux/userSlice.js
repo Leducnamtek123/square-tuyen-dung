@@ -1,143 +1,240 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
-
-import authService from '../services/authService';
-import tokenService from '../services/tokenService';
-
-const getUserInfo = createAsyncThunk(
-  'user/getUserInfo',
-  async (_, thunkAPI) => {
-    try {
-      const resData = await authService.getUserInfo();
-
-      return resData;
-    } catch (error) {
-      throw error;
-    }
-  }
-);
-
-const updateUserInfo = createAsyncThunk(
-  'user/updateUser',
-  async (data, thunkAPI) => {
-    try {
-      const resData = await authService.updateUser(data);
-
-      return resData;
-    } catch (error) {
-      throw error;
-    }
-  }
-);
-
-const removeUserInfo = createAsyncThunk(
-  'user/removeUserInfo',
-  async (data, thunkAPI) => {
-    try {
-      /**
-       * Khong revoktoken
-       * RevokToken -> token app -> chet theo
-       */
-      await authService.revokToken(data.accessToken, data.backend);
-
-      const removeResult =
-        tokenService.removeAccessTokenAndRefreshTokenFromCookie();
-
-      if (!removeResult) {
-        return Promise.reject("Can't remove token in Cookie");
-      }
-    } catch (error) {
-      throw error;
-    }
-  }
-);
-
-const updateAvatar = createAsyncThunk(
-  'user/updateAvatar',
-  async (formData, thunkAPI) => {
-    try {
-      const resData = await authService.updateAvatar(formData);
-
-      return resData;
-    } catch (error) {
-      throw error;
-    }
-  }
-);
-
-const deleteAvatar = createAsyncThunk(
-  'user/deleteAvatar',
-  async (_, thunkAPI) => {
-    try {
-      const resData = await authService.deleteAvatar();
-
-      return resData;
-    } catch (error) {
-      throw error;
-    }
-  }
-);
-
-export const userSlice = createSlice({
-  name: 'user',
-  initialState: {
-    isAuthenticated: false,
-    currentUser: null,
-  },
-  reducers: {},
-  extraReducers: (builder) => {
-    builder.addCase(getUserInfo.fulfilled, (state, action) => {
-      state.isAuthenticated = true;
-      state.currentUser = action.payload;
-    });
-
-    builder.addCase(updateUserInfo.fulfilled, (state, action) => {
-      state.isAuthenticated = true;
-      state.currentUser = action.payload;
-    });
-
-    builder.addCase(removeUserInfo.fulfilled, (state) => {
-      state.isAuthenticated = false;
-      state.currentUser = null;
-    });
-
-    builder.addCase(updateAvatar.fulfilled, (state, action) => {
-      return {
-        ...state,
-        currentUser: {
-          ...state.currentUser,
-          avatarUrl: action.payload?.avatarUrl || null,
-        },
-      };
-    });
-
-    builder.addCase(deleteAvatar.fulfilled, (state, action) => {
-      state.currentUser = {
-        ...state.currentUser,
-        avatarUrl: action.payload?.avatarUrl || null,
-      };
-    });
-  },
-});
-
-const { reducer } = userSlice;
-
-export default reducer;
-export {
-  getUserInfo,
-  updateUserInfo,
-  removeUserInfo,
-  updateAvatar,
-  deleteAvatar,
-};
-
+/*
+
+MyJob Recruitment System - Part of MyJob Platform
+
+Author: Bui Khanh Huy
+
+Email: khuy220@gmail.com
+
+Copyright (c) 2023 Bui Khanh Huy
+
+License: MIT License
+
+See the LICENSE file in the project root for full license information.
+
+*/
+
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
+import authService from '../services/authService';
+
+import tokenService from '../services/tokenService';
+
+const getUserInfo = createAsyncThunk(
+
+  'user/getUserInfo',
+
+  async (_, thunkAPI) => {
+
+    try {
+
+      const resData = await authService.getUserInfo();
+
+      return resData;
+
+    } catch (error) {
+
+      throw error;
+
+    }
+
+  }
+
+);
+
+const updateUserInfo = createAsyncThunk(
+
+  'user/updateUser',
+
+  async (data, thunkAPI) => {
+
+    try {
+
+      const resData = await authService.updateUser(data);
+
+      return resData;
+
+    } catch (error) {
+
+      throw error;
+
+    }
+
+  }
+
+);
+
+const removeUserInfo = createAsyncThunk(
+
+  'user/removeUserInfo',
+
+  async (data, thunkAPI) => {
+
+    try {
+
+      /**
+
+       * Khong revoktoken
+
+       * RevokToken -> token app -> chet theo
+
+       */
+
+      await authService.revokToken(data.accessToken, data.backend);
+
+      const removeResult =
+
+        tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+
+      if (!removeResult) {
+
+        return Promise.reject("Can't remove token in Cookie");
+
+      }
+
+    } catch (error) {
+
+      throw error;
+
+    }
+
+  }
+
+);
+
+const updateAvatar = createAsyncThunk(
+
+  'user/updateAvatar',
+
+  async (formData, thunkAPI) => {
+
+    try {
+
+      const resData = await authService.updateAvatar(formData);
+
+      return resData;
+
+    } catch (error) {
+
+      throw error;
+
+    }
+
+  }
+
+);
+
+const deleteAvatar = createAsyncThunk(
+
+  'user/deleteAvatar',
+
+  async (_, thunkAPI) => {
+
+    try {
+
+      const resData = await authService.deleteAvatar();
+
+      return resData;
+
+    } catch (error) {
+
+      throw error;
+
+    }
+
+  }
+
+);
+
+export const userSlice = createSlice({
+
+  name: 'user',
+
+  initialState: {
+
+    isAuthenticated: false,
+
+    currentUser: null,
+
+  },
+
+  reducers: {},
+
+  extraReducers: (builder) => {
+
+    builder.addCase(getUserInfo.fulfilled, (state, action) => {
+
+      state.isAuthenticated = true;
+
+      state.currentUser = action.payload;
+
+    });
+
+    builder.addCase(updateUserInfo.fulfilled, (state, action) => {
+
+      state.isAuthenticated = true;
+
+      state.currentUser = action.payload;
+
+    });
+
+    builder.addCase(removeUserInfo.fulfilled, (state) => {
+
+      state.isAuthenticated = false;
+
+      state.currentUser = null;
+
+    });
+
+    builder.addCase(updateAvatar.fulfilled, (state, action) => {
+
+      return {
+
+        ...state,
+
+        currentUser: {
+
+          ...state.currentUser,
+
+          avatarUrl: action.payload?.avatarUrl || null,
+
+        },
+
+      };
+
+    });
+
+    builder.addCase(deleteAvatar.fulfilled, (state, action) => {
+
+      state.currentUser = {
+
+        ...state.currentUser,
+
+        avatarUrl: action.payload?.avatarUrl || null,
+
+      };
+
+    });
+
+  },
+
+});
+
+const { reducer } = userSlice;
+
+export default reducer;
+
+export {
+
+  getUserInfo,
+
+  updateUserInfo,
+
+  removeUserInfo,
+
+  updateAvatar,
+
+  deleteAvatar,
+
+};
+

@@ -1,11 +1,80 @@
-﻿{
+{
   "appName": "MyJob",
+  "city": "City/Province",
+  "career": "Industry",
+  "experience": "Experience",
+  "position": "Level",
+  "academicLevel": "Education",
+  "typeOfWorkplace": "Workplace",
+  "jobType": "Job Type",
+  "gender": "Gender",
+  "maritalStatus": "Marital Status",
+  "all": "All",
+  "select": "Select",
+  "search": "Search",
+  "reset": "Reset",
+  "loading": "Loading...",
+  "noData": "No data",
+  "nav": {
+    "jobs": "Jobs",
+    "companies": "Companies",
+    "aboutUs": "About Us",
+    "introduction": "Introduction",
+    "services": "Services",
+    "pricing": "Pricing",
+    "support": "Support",
+    "blog": "Recruitment Blog",
+    "login": "Login",
+    "register": "Register",
+    "accountManagement": "Account Management",
+    "logout": "Logout",
+    "logoutConfirm": "Are you sure you want to logout?",
+    "logoutTitle": "Logout Account",
+    "switch": {
+      "forEmployers": "For Employers",
+      "postFreeJob": "Post a free job",
+      "forJobSeekers": "For Job Seekers",
+      "switch": "Switch",
+      "candidateLogin": "Candidate Login",
+      "employerLogin": "Employer Login",
+      "candidateRegister": "Candidate Register",
+      "employerRegister": "Employer Register"
+    },
+    "careers": {
+      "allCareersList": "List of all careers",
+      "topCareers": "Top 10 Careers",
+      "otherCareers": "Other Careers"
+    }
+  },
+  "footer": {
+    "aboutApp": "About {{appName}}",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "tos": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "forEmployers": "For Employers",
+    "postJob": "Post a Job",
+    "searchResumes": "Search Resumes",
+    "dashboard": "Dashboard",
+    "messages": "Messages",
+    "notifications": "Notifications",
+    "forCandidates": "For Candidates",
+    "candidateDashboard": "Candidate Dashboard",
+    "employerDashboard": "Employer Dashboard",
+    "mobileApps": "Mobile Apps",
+    "connectWith": "Connect with {{appName}}",
+    "rightsReserved": "© {{year}} {{appName}}. All rights reserved."
+  },
   "actions": {
     "start": "Start",
     "close": "Close",
     "backHome": "Back to home",
     "joinNow": "Join now",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "confirm": "Confirm"
   },
   "status": {
     "scheduled": "Scheduled",
@@ -16,5 +85,16 @@
   "labels": {
     "time": "Time",
     "job": "Job"
+  },
+  "placeholders": {
+    "selectCity": "Select City/Province",
+    "allCareers": "All industries",
+    "allExperiences": "All experience",
+    "allPositions": "All levels",
+    "allAcademicLevels": "All education",
+    "allWorkplaces": "All workplaces",
+    "allJobTypes": "All job types",
+    "allGenders": "All genders",
+    "allMaritalStatuses": "All marital statuses"
   }
 }

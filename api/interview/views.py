@@ -23,6 +23,15 @@ from .serializers import (
 from .livekit_service import LiveKitService
 
 
+def _get_session_questions(session: InterviewSession):
+    questions = session.questions.all()
+    if questions.exists():
+        return questions
+    if session.question_group_id:
+        return session.question_group.questions.all()
+    return questions
+
+
 # ============================================================
 # Question ViewSet
 # ============================================================
@@ -31,7 +40,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['category', 'career', 'difficulty']
+    filterset_fields = ['career', 'difficulty']
     search_fields = ['text']
     ordering_fields = ['sort_order', 'create_at']
 
@@ -182,11 +191,12 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+        questions = _get_session_questions(session)
         context_data = {
             "candidateName": session.candidate.full_name,
             "candidateEmail": session.candidate.email,
             "jobTitle": session.job_post.job_name if session.job_post else None,
-            "questions": [{"text": q.text, "category": q.category} for q in session.questions.all()],
+            "questions": [{"text": q.text} for q in questions],
             "interviewType": session.type,
         }
         return Response(context_data)

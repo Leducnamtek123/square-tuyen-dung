@@ -12,15 +12,9 @@ See the LICENSE file in the project root for full license information.
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  Avatar,
-  Box,
-  Card,
-  Container,
-  Grid,
-  Typography,
-  styled
-} from '@mui/material';
+import { Avatar, Box, Card, Container, Typography, styled } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from 'react-i18next';
 
@@ -191,7 +185,7 @@ const EmployerSignUp = () => {
               alignItems: 'center'
             }}
           >
-            <Grid item>
+            <Grid>
               <StyledLink to={`/${ROUTES.AUTH.LOGIN}`}>
                 {t('signup.haveAccount')} {t('signup.signIn')}
               </StyledLink>
@@ -199,7 +193,6 @@ const EmployerSignUp = () => {
           </Grid>
         </StyledCard>
       </Container>
-
       {isFullScreenLoading && <BackdropLoading />}
     </>
   );

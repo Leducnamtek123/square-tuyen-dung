@@ -2,15 +2,11 @@
 
 MyJob Recruitment System - Part of MyJob Platform
 
-
-
 Author: Bui Khanh Huy
 
 Email: khuy220@gmail.com
 
 Copyright (c) 2023 Bui Khanh Huy
-
-
 
 License: MIT License
 
@@ -18,22 +14,17 @@ See the LICENSE file in the project root for full license information.
 
 */
 
-
-
 import React from 'react';
 
 import { Controller } from 'react-hook-form';
 
-import { Stack, Alert, Box, Button, Typography } from '@mui/material';
+import { Stack, Alert, Box, Button, Typography } from "@mui/material";
+
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-
-
 
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 import FilePresentIcon from '@mui/icons-material/FilePresent';
-
-
 
 const FileUploadCustom = ({
 
@@ -51,8 +42,6 @@ const FileUploadCustom = ({
 
   const inputRef = React.useRef(null);
 
-
-
   const handleInputClick = (e) => {
 
     e.preventDefault();
@@ -61,21 +50,15 @@ const FileUploadCustom = ({
 
   };
 
-
-
   const handleFileChange = (event, onChange) => {
 
     const file = event.target.files[0];
 
     setSelectedFile(file || null);
 
-
-
     onChange(file);
 
   };
-
-
 
   return (
 
@@ -331,9 +314,5 @@ const FileUploadCustom = ({
 
 };
 
-
-
 export default FileUploadCustom;
-
-
 

@@ -1,0 +1,23 @@
+{
+  "dashboard": {
+    "totalUsers": "Tổng người dùng",
+    "jobPosts": "Tin tuyển dụng",
+    "pendingApproval": "Chờ phê duyệt",
+    "applications": "Lượt ứng tuyển",
+    "userDistribution": "Phân bổ người dùng theo vai trò",
+    "generalStats": "Thống kê tổng quát",
+    "systemInfo": "Thông tin hệ thống",
+    "total": "Tổng:",
+    "employers": "Nhà tuyển dụng:",
+    "jobSeekers": "Người tìm việc:",
+    "status": "Trạng thái:",
+    "statusActive": "Đang hoạt động",
+    "pendingPosts": "Tin chờ duyệt:",
+    "users": "người dùng",
+    "roles": {
+      "employer": "Nhà tuyển dụng",
+      "jobSeeker": "Người tìm việc",
+      "admin": "Quản trị viên"
+    }
+  }
+}

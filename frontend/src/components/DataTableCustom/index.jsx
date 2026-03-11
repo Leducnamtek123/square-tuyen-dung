@@ -20,11 +20,11 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { visuallyHidden } from '@mui/utils';
-import { Skeleton, Stack } from '@mui/material';
+import { Skeleton, Stack } from "@mui/material";
 
-
-function EnhancedTableHead({ headCells, order, orderBy, onRequestSort }) {
+function EnhancedTableHead({ headCells = [], order, orderBy, onRequestSort }) {
   const createSortHandler = (property) => (event) => {
+    if (!onRequestSort) return;
     onRequestSort(event, property);
   };
 
@@ -38,9 +38,12 @@ function EnhancedTableHead({ headCells, order, orderBy, onRequestSort }) {
             padding={headCell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === headCell.id ? order : false}
           >
+            {(() => {
+              const sortable = Boolean(onRequestSort) && Boolean(headCell.showOrder);
+              return (
             <TableSortLabel
-              disabled={!headCell.showOrder || false}
-              active={orderBy === headCell.id}
+              disabled={!sortable}
+              active={sortable && orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
               onClick={createSortHandler(headCell.id)}
             >
@@ -51,6 +54,8 @@ function EnhancedTableHead({ headCells, order, orderBy, onRequestSort }) {
                 </Box>
               ) : null}
             </TableSortLabel>
+              );
+            })()}
           </TableCell>
         ))}
       </TableRow>
@@ -59,13 +64,13 @@ function EnhancedTableHead({ headCells, order, orderBy, onRequestSort }) {
 }
 
 EnhancedTableHead.propTypes = {
-  onRequestSort: PropTypes.func.isRequired,
-  order: PropTypes.oneOf(['asc', 'desc']).isRequired,
-  orderBy: PropTypes.string.isRequired,
+  onRequestSort: PropTypes.func,
+  order: PropTypes.oneOf(['asc', 'desc']),
+  orderBy: PropTypes.string,
 };
 
 const DataTableCustom = ({
-  headCells,
+  headCells = [],
   rows,
   order,
   orderBy,
@@ -79,6 +84,10 @@ const DataTableCustom = ({
   handleUpdate,
   children,
 }) => {
+  const resolvedOrder = order ?? 'asc';
+  const resolvedOrderBy = orderBy ?? (headCells?.[0]?.id || '');
+  const resolvedRequestSort = handleRequestSort || undefined;
+
   return (
     <Box sx={{ width: '100%' }}>
       <TableContainer>
@@ -89,9 +98,9 @@ const DataTableCustom = ({
         >
           <EnhancedTableHead
             headCells={headCells}
-            order={order}
-            orderBy={orderBy}
-            onRequestSort={handleRequestSort}
+            order={resolvedOrder}
+            orderBy={resolvedOrderBy}
+            onRequestSort={resolvedRequestSort}
           />
           {children}
         </Table>

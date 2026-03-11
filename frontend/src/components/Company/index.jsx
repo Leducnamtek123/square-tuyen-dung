@@ -2,15 +2,11 @@
 
 MyJob Recruitment System - Part of MyJob Platform
 
-
-
 Author: Bui Khanh Huy
 
 Email: khuy220@gmail.com
 
 Copyright (c) 2023 Bui Khanh Huy
-
-
 
 License: MIT License
 
@@ -18,15 +14,13 @@ See the LICENSE file in the project root for full license information.
 
 */
 
-
-
 import React from 'react';
 
 import { useSelector } from 'react-redux';
 
 import { Link } from 'react-router-dom';
 
-import { Avatar, Box, Card, Skeleton, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Card, Skeleton, Stack, Typography } from "@mui/material";
 
 import { LoadingButton } from '@mui/lab';
 
@@ -50,13 +44,9 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 
-
-
 import { IMAGES, ROLES_NAME, ROUTES } from '../../configs/constants';
 
 import MuiImageCustom from '../MuiImageCustom';
-
-
 
 import companyService from '../../services/companyService';
 
@@ -66,8 +56,6 @@ import errorHandling from '../../utils/errorHandling';
 
 import { formatRoute } from '../../utils/funcUtils';
 
-
-
 const FollowComponent = ({ slug, isFollowed }) => {
 
   const { isAuthenticated, currentUser } = useSelector((state) => state.user);
@@ -75,8 +63,6 @@ const FollowComponent = ({ slug, isFollowed }) => {
   const [isLoadingFollow, setIsLoadingFollow] = React.useState(false);
 
   const [followed, setFollowed] = React.useState(isFollowed);
-
-
 
   const handleFollow = (slug) => {
 
@@ -90,13 +76,11 @@ const FollowComponent = ({ slug, isFollowed }) => {
 
         const isFollowed = resData.data.isFollowed;
 
-
-
         setFollowed(isFollowed);
 
         toastMessages.success(
 
-          isFollowed ? 'Theo dõi thành công.' : 'Hủy theo dõi thành công.'
+          isFollowed ? 'Followed successfully.' : 'Unfollowed successfully.'
 
         );
 
@@ -112,13 +96,9 @@ const FollowComponent = ({ slug, isFollowed }) => {
 
     };
 
-
-
     follow(slug);
 
   };
-
-
 
   return (
 
@@ -186,8 +166,6 @@ const FollowComponent = ({ slug, isFollowed }) => {
 
 };
 
-
-
 const Company = ({
 
   id,
@@ -217,8 +195,6 @@ const Company = ({
   const { allConfig } = useSelector((state) => state.config);
 
   const { isAuthenticated, currentUser } = useSelector((state) => state.user);
-
-
 
   return (
 
@@ -388,8 +364,6 @@ const Company = ({
 
           </Box>
 
-
-
           <Box sx={{ p: 2, pt: 5, width: '100%' }}>
 
             <Box mb={2}>
@@ -430,8 +404,6 @@ const Company = ({
 
             </Box>
 
-
-
             <Stack spacing={1.5}>
 
               <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -458,8 +430,6 @@ const Company = ({
 
               </Typography>
 
-
-
               <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 
                 <FontAwesomeIcon
@@ -484,8 +454,6 @@ const Company = ({
 
               </Typography>
 
-
-
               <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 
                 <FontAwesomeIcon
@@ -509,8 +477,6 @@ const Company = ({
                 )}
 
               </Typography>
-
-
 
               <Typography
 
@@ -552,8 +518,6 @@ const Company = ({
 
         </Box>
 
-
-
         <FollowComponent slug={slug} isFollowed={isFollowed} />
 
       </Stack>
@@ -563,8 +527,6 @@ const Company = ({
   );
 
 };
-
-
 
 const Loading = () => (
 
@@ -678,11 +640,7 @@ const Loading = () => (
 
 );
 
-
-
 Company.Loading = Loading;
-
-
 
 export default Company;
 
