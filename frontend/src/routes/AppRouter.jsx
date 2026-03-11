@@ -85,8 +85,12 @@ const AppRoutes = ({ settings }) => {
   const hostName = window.location.hostname;
   const pathname = window.location.pathname || "/";
   const candidatePrefix = `/${ROUTES.CANDIDATE.INTERVIEW.replace('/:id', '')}`;
+  
+  // Debug info
+  console.log('[AppRouter] Host:', hostName, 'Path:', pathname, 'Candidate Prefix:', candidatePrefix);
+
   // Always route candidate interview URLs to MYJOB config, regardless of host
-  const isCandidateRoute = pathname.startsWith(candidatePrefix);
+  const isCandidateRoute = pathname === candidatePrefix || pathname.startsWith(`${candidatePrefix}/`);
   // Fallback to MYJOB host if hostname is not recognized
   const routes = isCandidateRoute
     ? routesConfig[HOST_NAME.MYJOB]

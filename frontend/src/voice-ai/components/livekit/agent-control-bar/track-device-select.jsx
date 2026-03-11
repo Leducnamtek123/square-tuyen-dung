@@ -56,11 +56,13 @@ export function TrackDeviceSelect({
         <SelectValue placeholder={t('voiceAi.devices.select', { kind: kindLabel })} />
       </SelectTrigger>
       <SelectContent>
-        {devices?.map((device) => (
-          <SelectItem key={device.deviceId} value={device.deviceId} className="font-mono text-xs">
-            {device.label || t('voiceAi.devices.unknown')}
-          </SelectItem>
-        ))}
+        {devices
+          ?.filter((device) => device.deviceId !== '')
+          .map((device) => (
+            <SelectItem key={device.deviceId} value={device.deviceId} className="font-mono text-xs">
+              {device.label || t('voiceAi.devices.unknown')}
+            </SelectItem>
+          ))}
       </SelectContent>
     </Select>
   );

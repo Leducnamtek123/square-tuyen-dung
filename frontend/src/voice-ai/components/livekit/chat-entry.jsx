@@ -9,10 +9,19 @@ export const ChatEntry = ({
   hasBeenEdited,
   ...props
 }) => {
-  const safeLocale =
-    typeof locale === 'string' && Intl?.DateTimeFormat?.supportedLocalesOf([locale]).length
-      ? locale
-      : undefined;
+  const safeLocale = (() => {
+    if (typeof locale !== 'string' || !locale) {
+      return undefined;
+    }
+    if (!Intl?.DateTimeFormat?.supportedLocalesOf) {
+      return undefined;
+    }
+    try {
+      return Intl.DateTimeFormat.supportedLocalesOf(locale).length ? locale : undefined;
+    } catch {
+      return undefined;
+    }
+  })();
   const safeTimestamp =
     typeof timestamp === 'number' || typeof timestamp === 'string' ? new Date(timestamp) : null;
 

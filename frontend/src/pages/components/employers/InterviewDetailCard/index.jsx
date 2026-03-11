@@ -282,7 +282,7 @@ const InterviewDetailCard = () => {
 
                                 <Box>
 
-                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>LOẠI PH?NG V?N</Typography>
+                                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>LOẠI PHỎNG VẤN</Typography>
 
                                     <Typography variant="body1" sx={{ mt: 0.5 }}>{session.type?.toUpperCase()}</Typography>
 
