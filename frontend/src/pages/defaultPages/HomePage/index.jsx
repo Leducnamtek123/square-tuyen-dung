@@ -42,8 +42,8 @@ import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
 import SuggestedJobPostCard from "../../components/defaults/SuggestedJobPostCard";
 
 // Import images
-import bannerExplore from '../../../assets/images/banner-explore.png';
-import bannerExplorePc from '../../../assets/images/banner-explore-pc.png';
+import bannerExplore from '../../../assets/images/banner-explore.webp';
+import bannerExplorePc from '../../../assets/images/banner-explore-pc.webp';
 
 export default function HomePage() {
   TabTitle(`Tìm việc nhanh, tuyển dụng hiệu quả tại ${APP_NAME}`);
@@ -269,3 +269,4 @@ export default function HomePage() {
     </>
   );
 }
+

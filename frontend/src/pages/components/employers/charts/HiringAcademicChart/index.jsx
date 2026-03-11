@@ -21,7 +21,7 @@ import {
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
 
-import { Empty } from 'antd';
+import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
@@ -174,3 +174,4 @@ const HiringAcademicChart = ({ title }) => {
 };
 
 export default HiringAcademicChart;
+

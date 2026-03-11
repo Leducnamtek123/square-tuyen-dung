@@ -596,6 +596,24 @@ class EmployerJobPostActivityViewSet(viewsets.ViewSet,
         else:
             return var_res.response_data()
 
+    @action(methods=["post"], detail=True,
+            url_path="analyze-resume", url_name="analyze-resume")
+    def analyze_resume(self, request, pk):
+        try:
+            job_post_activity = self.get_object()
+            
+            # Chỉ cho phép chủ sở hữu công ty phân tích
+            if job_post_activity.job_post.company != request.user.company:
+                return Response(status=status.HTTP_403_FORBIDDEN)
+            
+            from ..tasks import analyze_resume_ai
+            analyze_resume_ai.delay(job_post_activity.id)
+            
+            return Response({"detail": "AI analysis task has been queued."}, status=status.HTTP_202_ACCEPTED)
+        except Exception as ex:
+            helper.print_log_error("analyze_resume", ex)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class JobPostNotificationViewSet(viewsets.ViewSet,
                                  generics.CreateAPIView,

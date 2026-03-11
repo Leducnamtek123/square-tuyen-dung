@@ -13,9 +13,7 @@ import React from 'react';
 import { Controller } from 'react-hook-form';
 import { Checkbox, FormControlLabel } from '@mui/material';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const CheckboxCustom = ({ name, control, title = '', disabled = false }) => {
   return (
     <div>
@@ -39,7 +37,7 @@ const CheckboxCustom = ({ name, control, title = '', disabled = false }) => {
                   marginLeft: 1,
                 }}
               >
-                <FontAwesomeIcon icon={faCircleExclamation} />{' '}
+                <ErrorOutlineIcon fontSize="small" />{' '}
                 {fieldState.error?.message}
               </span>
             )}
@@ -51,3 +49,4 @@ const CheckboxCustom = ({ name, control, title = '', disabled = false }) => {
 };
 
 export default CheckboxCustom;
+

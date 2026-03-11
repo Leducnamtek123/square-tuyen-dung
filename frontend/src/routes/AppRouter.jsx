@@ -11,7 +11,7 @@ See the LICENSE file in the project root for full license information.
 
 import { Routes, Route, Navigate } from "react-router-dom";
 import routesConfig from "../configs/routesConfig";
-import { HOST_NAME } from "../configs/constants";
+import { HOST_NAME, ROUTES } from "../configs/constants";
 
 const PrivateRoute = ({
   element: Element,
@@ -83,8 +83,14 @@ const renderRoutes = (routes, settings) => {
 
 const AppRoutes = ({ settings }) => {
   const hostName = window.location.hostname;
+  const pathname = window.location.pathname || "/";
+  const candidatePrefix = `/${ROUTES.CANDIDATE.INTERVIEW.replace('/:id', '')}`;
+  // Always route candidate interview URLs to MYJOB config, regardless of host
+  const isCandidateRoute = pathname.startsWith(candidatePrefix);
   // Fallback to MYJOB host if hostname is not recognized
-  const routes = routesConfig[hostName] || routesConfig[HOST_NAME.MYJOB];
+  const routes = isCandidateRoute
+    ? routesConfig[HOST_NAME.MYJOB]
+    : routesConfig[hostName] || routesConfig[HOST_NAME.MYJOB];
 
   return <Routes>{renderRoutes(routes, settings)}</Routes>;
 };

@@ -7,7 +7,7 @@ import { ROUTES } from '../../../configs/constants';
 import { useNavigate } from 'react-router-dom';
 import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
-import moment from 'moment';
+import dayjs from '../../../configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
 
 const MyInterviewsPage = () => {
@@ -75,7 +75,7 @@ const MyInterviewsPage = () => {
                                                 {interview.room_name || interview.roomName || 'Interview room'}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                                {t('common:labels.time')}: {moment(interview.scheduledAt || interview.scheduled_at).format('HH:mm - DD/MM/YYYY')}
+                                                {t('common:labels.time')}: {dayjs(interview.scheduledAt || interview.scheduled_at).format('HH:mm - DD/MM/YYYY')}
                                             </Typography>
                                             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                                                 {getStatusChip(interview.status)}

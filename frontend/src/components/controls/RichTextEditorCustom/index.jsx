@@ -16,9 +16,7 @@ import { EditorState } from 'draft-js';
 import { Editor } from 'react-draft-wysiwyg';
 
 import { Typography } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const RichTextEditorCustom = ({
   control,
   name,
@@ -95,7 +93,7 @@ const RichTextEditorCustom = ({
                   marginLeft: 1,
                 }}
               >
-                <FontAwesomeIcon icon={faCircleExclamation} />{' '}
+                <ErrorOutlineIcon fontSize="small" />{' '}
                 {fieldState.error?.message}
               </span>
             )}
@@ -107,3 +105,4 @@ const RichTextEditorCustom = ({
 };
 
 export default RichTextEditorCustom;
+

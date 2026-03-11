@@ -153,6 +153,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
 
         participant_identity = f"candidate-{session.candidate_id}"
         participant_name = session.candidate.full_name or session.candidate.email or participant_identity
+        LiveKitService.ensure_room_with_agent(session.room_name)
         token = LiveKitService.create_token(
             room_name=session.room_name,
             participant_identity=participant_identity,

@@ -20,7 +20,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
-import { Empty } from 'antd';
+import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 
 import { ChatContext } from '../../../../context/ChatProvider';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
@@ -553,3 +553,4 @@ const EmployerSidebar = () => {
 RightSidebar.Employer = EmployerSidebar;
 
 export default RightSidebar;
+

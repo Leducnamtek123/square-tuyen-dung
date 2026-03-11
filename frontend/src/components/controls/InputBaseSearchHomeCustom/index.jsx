@@ -28,14 +28,13 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { IconButton, InputAdornment } from '@mui/material';
+import { CircularProgress, IconButton, InputAdornment } from '@mui/material';
 import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 
 import { useDebounce } from '../../../hooks';
 import { searchJobPostWithKeyword } from '../../../redux/filterSlice';
 import jobService from '../../../services/jobService';
-import { Spin } from 'antd';
 import { ROUTES } from '../../../configs/constants';
 
 const InputBaseSearchHomeCustom = ({
@@ -143,11 +142,11 @@ const InputBaseSearchHomeCustom = ({
                   Gợi ý tìm kiếm
                 </Typography>
                 <Stack>
-                  {isLoading ? (
-                    <Stack sx={{ py: 2 }} justifyContent="center">
-                      <Spin />
-                    </Stack>
-                  ) : searchResult.length === 0 ? (
+                  {isLoading ? (
+                    <Stack sx={{ py: 2 }} justifyContent="center" alignItems="center">
+                      <CircularProgress size={20} />
+                    </Stack>
+                  ) : searchResult.length === 0 ? (
                     <Typography
                       my={1}
                       textAlign="center"

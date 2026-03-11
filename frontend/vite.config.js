@@ -3,6 +3,11 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 import svgr from 'vite-plugin-svgr'
 
+const devServerPort = Number(process.env.VITE_DEV_SERVER_PORT || 3000);
+const devServerClientPort = Number(process.env.VITE_DEV_SERVER_CLIENT_PORT || devServerPort);
+const devServerHost = process.env.VITE_DEV_SERVER_HOST || '0.0.0.0';
+const devServerHmrHost = process.env.VITE_DEV_SERVER_HMR_HOST || 'localhost';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -20,6 +25,9 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@fortawesome/react-fontawesome': path.resolve(__dirname, './src/icon-shims/fontawesome-react.jsx'),
+      '@fortawesome/free-solid-svg-icons': path.resolve(__dirname, './src/icon-shims/fontawesome-solid.js'),
+      '@fortawesome/free-regular-svg-icons': path.resolve(__dirname, './src/icon-shims/fontawesome-regular.js'),
     },
   },
   define: {
@@ -27,13 +35,13 @@ export default defineConfig({
     'process.env': {},
   },
   server: {
-    port: 3000,
-    host: '0.0.0.0',
+    port: devServerPort,
+    host: devServerHost,
     strictPort: true,
     hmr: {
       protocol: 'ws',
-      host: 'localhost',
-      port: 3000
+      host: devServerHmrHost,
+      port: devServerClientPort
     },
     proxy: {
       '/api': {

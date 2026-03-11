@@ -204,7 +204,7 @@ const InterviewDetailCard = () => {
 
                     <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.8 }}>
 
-                        M? ph?ng: <Box component="span" sx={{ fontWeight: 600, color: 'primary.main' }}>{session.room_name}</Box> | ID: {session.id}
+                        Mã phòng: <Box component="span" sx={{ fontWeight: 600, color: 'primary.main' }}>{session.room_name}</Box> | ID: {session.id}
 
                     </Typography>
 

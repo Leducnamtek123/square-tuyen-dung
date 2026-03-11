@@ -1,174 +1,109 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
-import React from 'react';
-
-import {
-  CopyFilled,
-  ClockCircleFilled,
-  CloseCircleFilled,
-  ContactsFilled,
-} from '@ant-design/icons';
-import { Grid } from '@mui/material';
-import { Card, Statistic } from 'antd';
-
-import statisticService from '../../../../services/statisticService';
-
-const EmployerQuantityStatistics = () => {
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [data, setData] = React.useState(null);
-
-  React.useEffect(() => {
-    const statistics = async () => {
-      setIsLoading(true);
-      try {
-        const resData = await statisticService.employerGeneralStatistics();
-
-        setData(resData.data);
-      } catch (error) {
-        console.error('Error: ', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    statistics();
-  }, []);
-
-  const cardStyle = {
-    boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-    borderRadius: '10px',
-    transition: 'all 0.3s ease',
-  };
-
-  return (
-    <Grid container spacing={3}>
-      <Grid item xs={12} sm={12} md={6} lg={3}>
-        <Card 
-          bordered={false}
-          style={cardStyle}
-          className="statistic-card"
-        >
-          <Statistic
-            title={
-              <span style={{ 
-                fontWeight: '600',
-                fontSize: '16px',
-                color: '#333',
-                marginBottom: '10px'
-              }}>
-                Tất cả tin tuyển dụng
-              </span>
-            }
-            value={data?.totalJobPost}
-            precision={0}
-            valueStyle={{ 
-              color: '#3f8600', 
-              fontSize: '24px',
-              fontWeight: '700'
-            }}
-            prefix={<CopyFilled style={{ fontSize: '24px', marginRight: '10px' }} />}
-            loading={isLoading}
-          />
-        </Card>
-      </Grid>
-      <Grid item xs={12} sm={12} md={6} lg={3}>
-        <Card 
-          bordered={false}
-          style={cardStyle}
-          className="statistic-card"
-        >
-          <Statistic
-            title={
-              <span style={{ 
-                fontWeight: '600',
-                fontSize: '16px',
-                color: '#333',
-                marginBottom: '10px'
-              }}>
-                Tin tuyển dụng chờ duyệt
-              </span>
-            }
-            value={data?.totalJobPostingPendingApproval}
-            precision={0}
-            valueStyle={{ 
-              color: '#ff9800',
-              fontSize: '24px',
-              fontWeight: '700'
-            }}
-            prefix={<ClockCircleFilled style={{ fontSize: '24px', marginRight: '10px' }} />}
-            loading={isLoading}
-          />
-        </Card>
-      </Grid>
-      <Grid item xs={12} sm={12} md={6} lg={3}>
-        <Card 
-          bordered={false}
-          style={cardStyle}
-          className="statistic-card"
-        >
-          <Statistic
-            title={
-              <span style={{ 
-                fontWeight: '600',
-                fontSize: '16px',
-                color: '#333',
-                marginBottom: '10px'
-              }}>
-                Tin tuyển dụng hết hạn
-              </span>
-            }
-            value={data?.totalJobPostExpired}
-            precision={0}
-            valueStyle={{ 
-              color: '#cf1322',
-              fontSize: '24px',
-              fontWeight: '700'
-            }}
-            prefix={<CloseCircleFilled style={{ fontSize: '24px', marginRight: '10px' }} />}
-            loading={isLoading}
-          />
-        </Card>
-      </Grid>
-      <Grid item xs={12} sm={12} md={6} lg={3}>
-        <Card 
-          bordered={false}
-          style={cardStyle}
-          className="statistic-card"
-        >
-          <Statistic
-            title={
-              <span style={{ 
-                fontWeight: '600',
-                fontSize: '16px',
-                color: '#333',
-                marginBottom: '10px'
-              }}>
-                Ứng viên ứng tuyển
-              </span>
-            }
-            value={data?.totalApply}
-            precision={0}
-            valueStyle={{ 
-              color: '#00b0ff',
-              fontSize: '24px',
-              fontWeight: '700'
-            }}
-            prefix={<ContactsFilled style={{ fontSize: '24px', marginRight: '10px' }} />}
-            loading={isLoading}
-          />
-        </Card>
-      </Grid>
-    </Grid>
-  );
-};
-
-export default EmployerQuantityStatistics;
+/*
+MyJob Recruitment System - Part of MyJob Platform
+
+Author: Bui Khanh Huy
+Email: khuy220@gmail.com
+Copyright (c) 2023 Bui Khanh Huy
+
+License: MIT License
+See the LICENSE file in the project root for full license information.
+*/
+
+import React from 'react';
+import { Card, CardContent, Grid, Stack, Typography, Skeleton } from '@mui/material';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
+import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
+import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
+
+import statisticService from '../../../../services/statisticService';
+
+const StatItem = ({ title, value, color, Icon, loading }) => (
+  <Card
+    sx={{
+      borderRadius: 2,
+      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
+      height: '100%',
+    }}
+  >
+    <CardContent>
+      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+        <Icon sx={{ fontSize: 22, color }} />
+        <Typography sx={{ fontWeight: 600, fontSize: '0.95rem', color: '#333' }}>
+          {title}
+        </Typography>
+      </Stack>
+      {loading ? (
+        <Skeleton width={80} height={32} />
+      ) : (
+        <Typography sx={{ color, fontSize: '1.8rem', fontWeight: 700 }}>
+          {value ?? 0}
+        </Typography>
+      )}
+    </CardContent>
+  </Card>
+);
+
+const EmployerQuantityStatistics = () => {
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [data, setData] = React.useState(null);
+
+  React.useEffect(() => {
+    const statistics = async () => {
+      setIsLoading(true);
+      try {
+        const resData = await statisticService.employerGeneralStatistics();
+        setData(resData.data);
+      } catch (error) {
+        console.error('Error: ', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    statistics();
+  }, []);
+
+  return (
+    <Grid container spacing={3}>
+      <Grid item xs={12} sm={12} md={6} lg={3}>
+        <StatItem
+          title="Tat ca tin tuyen dung"
+          value={data?.totalJobPost}
+          color="#3f8600"
+          Icon={DescriptionOutlinedIcon}
+          loading={isLoading}
+        />
+      </Grid>
+      <Grid item xs={12} sm={12} md={6} lg={3}>
+        <StatItem
+          title="Tin tuyen dung cho duyet"
+          value={data?.totalJobPostingPendingApproval}
+          color="#ff9800"
+          Icon={AccessTimeOutlinedIcon}
+          loading={isLoading}
+        />
+      </Grid>
+      <Grid item xs={12} sm={12} md={6} lg={3}>
+        <StatItem
+          title="Tin tuyen dung het han"
+          value={data?.totalJobPostExpired}
+          color="#cf1322"
+          Icon={HighlightOffOutlinedIcon}
+          loading={isLoading}
+        />
+      </Grid>
+      <Grid item xs={12} sm={12} md={6} lg={3}>
+        <StatItem
+          title="Ung vien ung tuyen"
+          value={data?.totalApply}
+          color="#00b0ff"
+          Icon={GroupsOutlinedIcon}
+          loading={isLoading}
+        />
+      </Grid>
+    </Grid>
+  );
+};
+
+export default EmployerQuantityStatistics;

@@ -37,7 +37,7 @@ import dayjs from 'dayjs';
 
 import RangePickerCustom from '../../../../../components/controls/RangePickerCustom';
 import statisticService from '../../../../../services/statisticService';
-import { Empty } from 'antd';
+import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 
 ChartJS.register(
   CategoryScale,
@@ -261,3 +261,4 @@ const CandidateChart = ({ title }) => {
 };
 
 export default CandidateChart;
+

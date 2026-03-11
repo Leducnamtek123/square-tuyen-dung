@@ -67,6 +67,7 @@ import {
 } from "../pages/employerPages";
 import {
   InterviewListPage as EmployerInterviewListPage,
+  InterviewLivePage as EmployerInterviewLivePage,
   InterviewCreatePage as EmployerInterviewCreatePage,
   InterviewDetailPage as EmployerInterviewDetailPage,
   QuestionBankPage as EmployerQuestionBankPage,
@@ -83,6 +84,7 @@ import {
   QuestionsPage as AdminQuestionsPage,
   QuestionGroupsPage as AdminQuestionGroupsPage,
   InterviewsPage as AdminInterviewsPage,
+  InterviewLivePage as AdminInterviewLivePage,
   SettingsPage as AdminSettingsPage,
   CareersPage as AdminCareersPage,
   CitiesPage as AdminCitiesPage,
@@ -298,6 +300,10 @@ const routesConfig = {
           element: EmployerInterviewListPage,
         },
         {
+          path: ROUTES.EMPLOYER.INTERVIEW_LIVE,
+          element: EmployerInterviewLivePage,
+        },
+        {
           path: ROUTES.EMPLOYER.QUESTION_BANK,
           element: EmployerQuestionBankPage,
         },
@@ -421,6 +427,10 @@ const routesConfig = {
         {
           path: ROUTES.ADMIN.INTERVIEWS,
           element: AdminInterviewsPage,
+        },
+        {
+          path: ROUTES.ADMIN.INTERVIEW_LIVE,
+          element: AdminInterviewLivePage,
         },
         {
           path: ROUTES.ADMIN.JOB_NOTIFICATIONS,

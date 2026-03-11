@@ -13,9 +13,7 @@ import React from 'react';
 import { Controller } from 'react-hook-form';
 import { Autocomplete, TextField, Typography } from '@mui/material';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const TextFieldAutoCompleteCustom = ({
   name,
   control,
@@ -84,7 +82,7 @@ const TextFieldAutoCompleteCustom = ({
                   marginLeft: 1,
                 }}
               >
-                <FontAwesomeIcon icon={faCircleExclamation} />{' '}
+                <ErrorOutlineIcon fontSize="small" />{' '}
                 {fieldState.error?.message}
               </span>
             )}
@@ -96,3 +94,4 @@ const TextFieldAutoCompleteCustom = ({
 };
 
 export default TextFieldAutoCompleteCustom;
+

@@ -19,9 +19,7 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const PasswordTextFieldCustom = ({
   name,
   control,
@@ -79,7 +77,7 @@ const PasswordTextFieldCustom = ({
                   marginLeft: 1,
                 }}
               >
-                <FontAwesomeIcon icon={faCircleExclamation} />{' '}
+                <ErrorOutlineIcon fontSize="small" />{' '}
                 {fieldState.error?.message}
               </span>
             )}
@@ -91,3 +89,4 @@ const PasswordTextFieldCustom = ({
 };
 
 export default PasswordTextFieldCustom;
+

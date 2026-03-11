@@ -18,9 +18,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { Typography } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
@@ -83,7 +81,7 @@ const MultiSelectCustom = ({
                   marginLeft: 1,
                 }}
               >
-                <FontAwesomeIcon icon={faCircleExclamation} />{' '}
+                <ErrorOutlineIcon fontSize="small" />{' '}
                 {fieldState.error?.message}
               </span>
             )}
@@ -95,3 +93,4 @@ const MultiSelectCustom = ({
 };
 
 export default MultiSelectCustom;
+

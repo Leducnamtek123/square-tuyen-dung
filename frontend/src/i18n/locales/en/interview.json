@@ -8,12 +8,63 @@
   "transcriptTitle": "Transcript",
   "noMessages": "No messages yet.",
   "chatPlaceholder": "Type a message...",
+  "youLabel": "You",
+  "aiSpeaking": "AI is speaking",
+  "aiListening": "AI is listening",
+  "aiHint": "AI will respond here during the call.",
+  "cameraPreview": "Camera preview",
+  "cameraHint": "Turn on the camera to see your preview.",
   "controls": {
     "mic": "Microphone",
     "camera": "Camera",
     "share": "Share",
     "chat": "Chat",
     "end": "End call"
+  },
+  "voiceAi": {
+    "pageTitle": "LiveKit Voice Agent",
+    "pageDescription": "A voice agent built with LiveKit",
+    "companyName": "LiveKit",
+    "startCall": "Start call",
+    "startAudio": "Start audio",
+    "welcome": {
+      "subtitle": "Chat live with your voice AI agent",
+      "help": "Need help getting set up? Check out the",
+      "quickstart": "Voice AI quickstart"
+    },
+    "controls": {
+      "endCall": "End call",
+      "endShort": "End"
+    },
+    "chat": {
+      "placeholder": "Type something...",
+      "sending": "Sending...",
+      "send": "Send"
+    },
+    "devices": {
+      "select": "Select a {{kind}}",
+      "microphone": "microphone",
+      "camera": "camera",
+      "speaker": "speaker"
+    },
+    "theme": {
+      "toggle": "Color scheme toggle",
+      "dark": "Enable dark color scheme",
+      "light": "Enable light color scheme",
+      "system": "Enable system color scheme"
+    },
+    "agentErrors": {
+      "title": "Session ended",
+      "quickstart": "See quickstart guide"
+    },
+    "preconnect": "Agent is listening, ask it a question",
+    "aria": {
+      "toggleMicrophone": "Toggle microphone",
+      "toggleCamera": "Toggle camera",
+      "toggleScreenShare": "Toggle screen share",
+      "toggleTranscript": "Toggle transcript",
+      "toggleGeneric": "Toggle {{target}}"
+    }
   },
   "loading": "Connecting to interview room...",
   "errors": {

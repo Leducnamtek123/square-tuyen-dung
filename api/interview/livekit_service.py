@@ -4,19 +4,49 @@ Interview Module — LiveKit Service
 
 import os
 import uuid
+import asyncio
+import logging
 from decouple import config
 from livekit import api
 
 LIVEKIT_API_KEY = config('LIVEKIT_API_KEY', default='devkey')
 LIVEKIT_API_SECRET = config('LIVEKIT_API_SECRET', default='secret')
+LIVEKIT_URL = config('LIVEKIT_URL', default='http://livekit:7880')
+LIVEKIT_AGENT_NAME = config('LIVEKIT_AGENT_NAME', default='square-ai-interviewer')
+
+logger = logging.getLogger(__name__)
 
 class LiveKitService:
+    @staticmethod
+    def ensure_room_with_agent(room_name: str) -> None:
+        """
+        Ensure room exists and is configured to dispatch the interview agent.
+        If room already exists, ignore the error.
+        """
+        async def _create_room():
+            lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+            try:
+                req = api.CreateRoomRequest(name=room_name)
+                if LIVEKIT_AGENT_NAME:
+                    req.agents.append(api.RoomAgentDispatch(agent_name=LIVEKIT_AGENT_NAME))
+                await lkapi.room.create_room(req)
+            finally:
+                await lkapi.aclose()
+
+        try:
+            asyncio.run(_create_room())
+        except Exception as exc:
+            message = str(exc).lower()
+            if "already exists" in message or "already_exists" in message:
+                return
+            logger.warning("LiveKit create_room failed: %s", exc)
+
     @staticmethod
     def create_token(room_name: str, participant_identity: str, participant_name: str, is_agent: bool = False) -> str:
         """
         Tạo JWT token cho người dùng (hoặc agent) join room LiveKit.
         """
-        token = (api.AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+        token_builder = (api.AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
             .with_identity(participant_identity)
             .with_name(participant_name)
             .with_grants(api.VideoGrants(
@@ -29,4 +59,8 @@ class LiveKitService:
                 can_subscribe=True,
                 hidden=is_agent
             )))
-        return token.to_jwt()
+        if LIVEKIT_AGENT_NAME:
+            room_config = api.RoomConfiguration()
+            room_config.agents.append(api.RoomAgentDispatch(agent_name=LIVEKIT_AGENT_NAME))
+            token_builder = token_builder.with_room_config(room_config)
+        return token_builder.to_jwt()

@@ -43,3 +43,5 @@ livekit-api
 PyJWT
 django-celery-results
 django-timezone-field
+pymupdf
+python-docx

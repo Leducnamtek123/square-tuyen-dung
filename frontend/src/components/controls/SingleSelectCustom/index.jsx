@@ -12,9 +12,7 @@ See the LICENSE file in the project root for full license information.
 import React from 'react';
 import { Controller } from 'react-hook-form';
 import { Autocomplete, TextField, Typography } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const SingleSelectCustom = ({
   name,
   control,
@@ -57,7 +55,7 @@ const SingleSelectCustom = ({
                   marginLeft: 1,
                 }}
               >
-                <FontAwesomeIcon icon={faCircleExclamation} />{' '}
+                <ErrorOutlineIcon fontSize="small" />{' '}
                 {fieldState.error?.message}
               </span>
             )}
@@ -69,3 +67,4 @@ const SingleSelectCustom = ({
 };
 
 export default SingleSelectCustom;
+

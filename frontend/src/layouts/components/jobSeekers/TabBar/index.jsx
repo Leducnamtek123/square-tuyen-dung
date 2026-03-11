@@ -106,11 +106,17 @@ const TabBar = () => {
         sx={{
           minHeight: '60px',
           '& .MuiTabs-scroller': {
-            height: '100%'
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center'
+          },
+          '& .MuiTabs-flexContainer': {
+            alignItems: 'center'
           },
           '& .MuiTabScrollButton-root': {
             width: 48,
-            height: '100%'
+            height: '100%',
+            alignSelf: 'center'
           }
         }}
       >

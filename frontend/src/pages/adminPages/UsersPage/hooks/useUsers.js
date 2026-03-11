@@ -1,7 +1,8 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import userService from '../../../../services/userService';
-import { message } from 'antd';
-
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+
+import userService from '../../../../services/userService';
+import toastMessages from '../../../../utils/toastMessages';
+
 export const useUsers = (params) => {
     return useQuery({
         queryKey: ['users', params],
@@ -12,19 +13,18 @@ export const useUsers = (params) => {
         placeholderData: keepPreviousData,
     });
 };
-
-export const useToggleUserStatus = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (user) => userService.toggleUserStatus(user.id),
-        onSuccess: (data, user) => {
-            message.success(`${user.isActive ? 'Khóa' : 'Mở khóa'} người dùng thành công`);
-            queryClient.invalidateQueries({ queryKey: ['users'] });
-        },
-        onError: (error) => {
-            message.error(error.response?.data?.errors?.detail || "Thao tác thất bại");
-        }
-    });
-};
-
+
+export const useToggleUserStatus = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (user) => userService.toggleUserStatus(user.id),
+        onSuccess: (data, user) => {
+            toastMessages.success(`${user.isActive ? 'Khoa' : 'Mo khoa'} nguoi dung thanh cong`);
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+        },
+        onError: (error) => {
+            toastMessages.error(error.response?.data?.errors?.detail || 'Thao tac that bai');
+        }
+    });
+};

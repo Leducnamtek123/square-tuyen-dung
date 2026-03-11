@@ -1,7 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import adminSettingsService from '../../../../services/adminSettingsService';
-import { message } from 'antd';
-
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import adminSettingsService from '../../../../services/adminSettingsService';
+import toastMessages from '../../../../utils/toastMessages';
+
 export const useSystemSettings = () => {
     return useQuery({
         queryKey: ['system-settings'],
@@ -14,18 +15,18 @@ export const useSystemSettings = () => {
             autoApproveJobs: false,
             emailNotifications: true,
         },
-    });
-};
-
-export const useUpdateSystemSettings = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (data) => adminSettingsService.updateSystemSettings(data),
-        onSuccess: () => {
-            message.success('Cài đặt đã được lưu');
-            queryClient.invalidateQueries({ queryKey: ['system-settings'] });
-        },
-        onError: () => message.error('Lỗi khi lưu cài đặt'),
-    });
-};
-
+    });
+};
+
+export const useUpdateSystemSettings = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (data) => adminSettingsService.updateSystemSettings(data),
+        onSuccess: () => {
+            toastMessages.success('Cai dat da duoc luu');
+            queryClient.invalidateQueries({ queryKey: ['system-settings'] });
+        },
+        onError: () => toastMessages.error('Loi khi luu cai dat'),
+    });
+};

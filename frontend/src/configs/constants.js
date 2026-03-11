@@ -59,13 +59,13 @@ import appStoreDownload from "../assets/images/app-ios-download.png";
 
 import notificationImageDefault from "../assets/images/noti-img-default.png";
 
-import aroundJobPost from "../assets/images/about-images/around-job-post.png";
+import aroundJobPost from "../assets/images/about-images/around-job-post.webp";
 
-import jobPostNotification from "../assets/images/about-images/job-notification-img.png";
+import jobPostNotification from "../assets/images/about-images/job-notification-img.webp";
 
-import jobPostImg from "../assets/images/about-images/job-post-img.png";
+import jobPostImg from "../assets/images/about-images/job-post-img.webp";
 
-import profileImg from "../assets/images/about-images/profile-img.png";
+import profileImg from "../assets/images/about-images/profile-img.webp";
 
 import instagramIcon from "../assets/icons/instagram-icon.png";
 
@@ -105,7 +105,7 @@ const PLATFORM = "WEB";
 
 
 
-const APP_NAME = "MyJob";
+const APP_NAME = "Square";
 
 
 
@@ -179,7 +179,7 @@ const AUTH_CONFIG = {
 
     AGENT_ID: import.meta.env.VITE_JOB_SEEKER_BOT_AGENT_ID || "",
 
-    CHAT_TITLE: "MyJob AI",
+    CHAT_TITLE: "Square AI",
 
     CHAT_ICON: jobSeekerChatbotIcon,
 
@@ -189,7 +189,7 @@ const AUTH_CONFIG = {
 
     AGENT_ID: import.meta.env.VITE_EMPLOYER_BOT_AGENT_ID || "",
 
-    CHAT_TITLE: "MyJob AI",
+    CHAT_TITLE: "Square AI",
 
     CHAT_ICON: employerChatbotIcon,
 
@@ -278,18 +278,17 @@ const DATE_OPTIONS = {
 
 
 const IMAGES = {
-
-  getLogo: () => {
-
-    return "/square/logo.svg";
-
+  getLogo: (mode = 'dark') => {
+    return mode === 'light'
+      ? '/square-icons/logo square svg-white.svg'
+      : '/square-icons/logo square svg-black.svg';
+  },
+  getTextLogo: (mode = 'dark') => {
+    return mode === 'light'
+      ? '/square-icons/logo square svg-white.svg'
+      : '/square-icons/logo square svg-black.svg';
   },
 
-  getTextLogo: () => {
-
-    return "/square/logo.svg";
-
-  },
 
   coverImageDefault,
 
@@ -391,7 +390,7 @@ const FEEDBACK_IMAGES = {
 
 const LOGO_IMAGES = {
 
-  LOGO_WITH_BG: "/square/logo.svg",
+  LOGO_WITH_BG: "/square-icons/logo.svg",
 
 };
 
@@ -517,6 +516,7 @@ const ROUTES = {
     SETTING: "cai-dat",
     CHAT: "ket-noi-voi-ung-vien",
     INTERVIEW_LIST: "danh-sach-phong-van",
+    INTERVIEW_LIVE: "phong-van-ung-vien-truc-tiep",
     INTERVIEW_CREATE: "len-lich-phong-van",
     INTERVIEW_DETAIL: "chi-tiet-phong-van/:id",
     QUESTION_BANK: "ngan-hang-cau-hoi",
@@ -559,6 +559,7 @@ const ROUTES = {
     JOB_ACTIVITY: "nhat-ky-tin-tuyen-dung",
 
     JOB_NOTIFICATIONS: "thong-bao-viec-lam",
+    INTERVIEW_LIVE: "phong-van-cong-ty-truc-tiep",
 
   },
 
@@ -651,4 +652,5 @@ export {
   SVG_IMAGES,
 
 };
+
 

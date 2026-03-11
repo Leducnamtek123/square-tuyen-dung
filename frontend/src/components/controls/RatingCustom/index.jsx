@@ -13,9 +13,7 @@ import React from 'react';
 import { Controller } from 'react-hook-form';
 import Rating from '@mui/material/Rating';
 import Typography from '@mui/material/Typography';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const RatingCustom = ({ name, control, title = null, onChangeActive, ...props }) => {
   return (
     <div>
@@ -46,7 +44,7 @@ const RatingCustom = ({ name, control, title = null, onChangeActive, ...props })
                   marginLeft: 1,
                 }}
               >
-                <FontAwesomeIcon icon={faCircleExclamation} />{' '}
+                <ErrorOutlineIcon fontSize="small" />{' '}
                 {fieldState.error?.message}
               </span>
             )}
@@ -58,3 +56,4 @@ const RatingCustom = ({ name, control, title = null, onChangeActive, ...props })
 };
 
 export default RatingCustom;
+

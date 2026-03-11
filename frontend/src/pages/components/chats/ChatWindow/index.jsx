@@ -44,7 +44,7 @@ import {
   updateChatRoomByPartnerId,
 } from '../../../../services/firebaseService';
 import ChatInfo from '../../../../components/chats/ChatInfo';
-import { Empty } from 'antd';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 
 const LIMIT = 20;
 const messageCollectionRef = collection(db, 'messages');
@@ -458,3 +458,4 @@ const ChatWindow = () => {
 };
 
 export default ChatWindow;
+

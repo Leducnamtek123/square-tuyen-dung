@@ -11,7 +11,7 @@ class Config:
     LIVEKIT_API_SECRET: str = os.getenv("LIVEKIT_API_SECRET", "secret")
     
     # LLM
-    LLAMA_MODEL: str = os.getenv("LLAMA_MODEL", "qwen2")
+    LLAMA_MODEL: str = os.getenv("LLAMA_MODEL", "qwen2-7b")
     LLAMA_BASE_URL: str = os.getenv("LLAMA_BASE_URL", "http://llama-cpp:11434/v1")
     
     # STT
@@ -31,10 +31,10 @@ class Config:
     # TTS
     TTS_BASE_URL: str = os.getenv("TTS_BASE_URL", "http://vieneu-tts:8298/v1")
     TTS_MODEL: str = os.getenv("TTS_MODEL", "tts-1")
-    TTS_VOICE: str = os.getenv("TTS_VOICE", "thanh_tuan")
+    TTS_VOICE: str = os.getenv("TTS_VOICE", "Bình (nam miền Bắc)")
     TTS_API_KEY: str = os.getenv("TTS_API_KEY", "no-key-needed")
     
     # API
-    BACKEND_API_URL: str = os.getenv("BACKEND_API_URL", "http://backend:8001/api/interview")
+    BACKEND_API_URL: str = os.getenv("BACKEND_API_URL", "http://backend:8001/api")
 
 config = Config()

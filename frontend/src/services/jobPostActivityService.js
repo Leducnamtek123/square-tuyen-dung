@@ -60,6 +60,11 @@ const jobPostActivityService = {
 
     return httpRequest.delete(url);
   },
+  analyzeResume: (id) => {
+    const url = `job/web/employer-job-posts-activity/${id}/analyze-resume/`;
+
+    return httpRequest.post(url);
+  },
 };
 
 export default jobPostActivityService;

@@ -1,180 +1,184 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
-import React from "react";
-import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { Box, Stack, Tooltip, Typography } from "@mui/material";
-import IconButton from "@mui/material/IconButton";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import dayjs from "dayjs";
-import { List, Avatar as AntAvatar } from "antd";
-import { FileOutlined, FilePdfOutlined } from "@ant-design/icons";
-
-import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
-import { CV_TYPES, ROUTES } from "../../../../configs/constants";
-
-const JobApplicationCard = () => {
-  const nav = useNavigate();
-  const { currentUser } = useSelector((state) => state.user);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [data, setData] = React.useState([]);
-
-  React.useEffect(() => {
-    const getOnlineProfile = async (jobSeekerProfileId, params) => {
-      setIsLoading(true);
-      try {
-        const resData = await jobSeekerProfileService.getResumes(
-          jobSeekerProfileId,
-          params
-        );
-
-        setData(resData.data);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getOnlineProfile(currentUser?.jobSeekerProfileId);
-  }, [currentUser]);
-
-  return (
-    <Box
-      sx={{
-        background: "#fff",
-        borderRadius: 2,
-      }}
-    >
-      <Stack
-        direction="row"
-        justifyContent="space-between"
-        alignItems="center"
-        mb={2}
-      >
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          Hồ sơ xin việc
-        </Typography>
-        <IconButton
-          aria-label="ArrowForward"
-          size="medium"
-          onClick={() =>
-            nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.PROFILE}`)
-          }
-          sx={{
-            "&:hover": {
-              backgroundColor: (theme) => theme.palette.primary.background,
-              color: (theme) => theme.palette.primary.main,
-            },
-          }}
-        >
-          <ArrowForwardIcon />
-        </IconButton>
-      </Stack>
-
-      <Box>
-        <List
-          itemLayout="horizontal"
-          dataSource={data}
-          loading={isLoading}
-          renderItem={(item, index) => (
-            <List.Item
-              style={{
-                padding: "16px",
-                marginBottom: "8px",
-                background: (theme) => theme.palette.grey[50],
-                borderRadius: "12px",
-                cursor: "pointer",
-                transition: "all 0.2s ease-in-out",
-                "&:hover": {
-                  transform: "translateY(-2px)",
-                  boxShadow: (theme) => theme.customShadows.small,
-                },
-              }}
-            >
-              <List.Item.Meta
-                avatar={
-                  item?.type === CV_TYPES.cvWebsite ? (
-                    <Tooltip title="Hồ sơ Online">
-                      <AntAvatar
-                        style={{
-                          backgroundColor: (theme) =>
-                            theme.palette.primary.main,
-                          padding: "6px",
-                          width: "45px",
-                          height: "45px",
-                        }}
-                        icon={<FileOutlined />}
-                      />
-                    </Tooltip>
-                  ) : item?.type === CV_TYPES.cvUpload ? (
-                    <Tooltip title="Hồ sơ đính kèm">
-                      <AntAvatar
-                        style={{
-                          backgroundColor: (theme) => theme.palette.hot.main,
-                          padding: "6px",
-                          width: "45px",
-                          height: "45px",
-                        }}
-                        icon={<FilePdfOutlined />}
-                      />
-                    </Tooltip>
-                  ) : (
-                    "---"
-                  )
-                }
-                title={
-                  <Typography
-                    variant="subtitle1"
-                    sx={{
-                      fontWeight: 500,
-                      color: (theme) => theme.palette.text.primary,
-                    }}
-                  >
-                    {item?.title}
-                  </Typography>
-                }
-                description={
-                  <Stack spacing={0.5}>
-                    <Typography
-                      variant="caption"
-                      sx={{
-                        color: (theme) => theme.palette.text.secondary,
-                      }}
-                    >
-                      Sửa lần cuối {dayjs(item?.updateAt).format("DD/MM/YYYY")}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{
-                        color: item?.isActive
-                          ? (theme) => theme.palette.success.main
-                          : (theme) => theme.palette.hot.main,
-                        fontWeight: 500,
-                      }}
-                    >
-                      {item?.isActive
-                        ? "Đang cho phép tìm kiếm"
-                        : "Không cho phép tìm kiếm"}
-                    </Typography>
-                  </Stack>
-                }
-              />
-            </List.Item>
-          )}
-        />
-      </Box>
-    </Box>
-  );
-};
-
-export default JobApplicationCard;
+/*
+MyJob Recruitment System - Part of MyJob Platform
+
+Author: Bui Khanh Huy
+Email: khuy220@gmail.com
+Copyright (c) 2023 Bui Khanh Huy
+
+License: MIT License
+See the LICENSE file in the project root for full license information.
+*/
+
+import React from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import {
+  Avatar,
+  Box,
+  IconButton,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Skeleton,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
+import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
+import dayjs from "dayjs";
+
+import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
+import { CV_TYPES, ROUTES } from "../../../../configs/constants";
+
+const JobApplicationCard = () => {
+  const nav = useNavigate();
+  const { currentUser } = useSelector((state) => state.user);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [data, setData] = React.useState([]);
+
+  React.useEffect(() => {
+    const getOnlineProfile = async (jobSeekerProfileId, params) => {
+      setIsLoading(true);
+      try {
+        const resData = await jobSeekerProfileService.getResumes(
+          jobSeekerProfileId,
+          params
+        );
+        setData(resData.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    getOnlineProfile(currentUser?.jobSeekerProfileId);
+  }, [currentUser]);
+
+  return (
+    <Box
+      sx={{
+        background: "#fff",
+        borderRadius: 2,
+      }}
+    >
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
+        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          Ho so xin viec
+        </Typography>
+        <IconButton
+          aria-label="ArrowForward"
+          size="medium"
+          onClick={() =>
+            nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.PROFILE}`)
+          }
+          sx={{
+            "&:hover": {
+              backgroundColor: (theme) => theme.palette.primary.background,
+              color: (theme) => theme.palette.primary.main,
+            },
+          }}
+        >
+          <ArrowForwardIcon />
+        </IconButton>
+      </Stack>
+
+      <Box>
+        {isLoading ? (
+          <Stack spacing={1}>
+            {Array.from({ length: 3 }).map((_, idx) => (
+              <Skeleton key={idx} variant="rounded" height={72} />
+            ))}
+          </Stack>
+        ) : (
+          <List disablePadding>
+            {data.map((item) => (
+              <ListItem
+                key={item?.id || item?.title}
+                sx={{
+                  p: 2,
+                  mb: 1,
+                  background: (theme) => theme.palette.grey[50],
+                  borderRadius: 2,
+                  cursor: "pointer",
+                  transition: "all 0.2s ease-in-out",
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: (theme) => theme.customShadows.small,
+                  },
+                }}
+              >
+                <ListItemAvatar>
+                  {item?.type === CV_TYPES.cvWebsite ? (
+                    <Tooltip title="Ho so Online">
+                      <Avatar
+                        sx={{
+                          bgcolor: (theme) => theme.palette.primary.main,
+                          width: 45,
+                          height: 45,
+                        }}
+                      >
+                        <DescriptionOutlinedIcon />
+                      </Avatar>
+                    </Tooltip>
+                  ) : item?.type === CV_TYPES.cvUpload ? (
+                    <Tooltip title="Ho so dinh kem">
+                      <Avatar
+                        sx={{
+                          bgcolor: (theme) => theme.palette.hot.main,
+                          width: 45,
+                          height: 45,
+                        }}
+                      >
+                        <PictureAsPdfOutlinedIcon />
+                      </Avatar>
+                    </Tooltip>
+                  ) : (
+                    <Avatar sx={{ width: 45, height: 45 }}>-</Avatar>
+                  )}
+                </ListItemAvatar>
+                <ListItemText
+                  primary={
+                    <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
+                      {item?.title}
+                    </Typography>
+                  }
+                  secondary={
+                    <Stack spacing={0.5}>
+                      <Typography variant="caption" color="text.secondary">
+                        Sua lan cuoi {dayjs(item?.updateAt).format("DD/MM/YYYY")}
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: item?.isActive
+                            ? (theme) => theme.palette.success.main
+                            : (theme) => theme.palette.hot.main,
+                          fontWeight: 500,
+                        }}
+                      >
+                        {item?.isActive
+                          ? "Dang cho phep tim kiem"
+                          : "Khong cho phep tim kiem"}
+                      </Typography>
+                    </Stack>
+                  }
+                />
+              </ListItem>
+            ))}
+          </List>
+        )}
+      </Box>
+    </Box>
+  );
+};
+
+export default JobApplicationCard;

@@ -11,9 +11,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import dayjs from '../../../configs/moment-config';
 import { Typography, Box } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const DateTimePickerCustom = ({
     name,
     control,
@@ -78,7 +76,7 @@ const DateTimePickerCustom = ({
                                     color="error"
                                     sx={{ mt: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}
                                 >
-                                    <FontAwesomeIcon icon={faCircleExclamation} style={{ fontSize: '10px' }} />
+                                    <ErrorOutlineIcon sx={{ fontSize: 10 }} />
                                     {fieldState.error.message}
                                 </Typography>
                             )}
@@ -91,3 +89,4 @@ const DateTimePickerCustom = ({
 };
 
 export default DateTimePickerCustom;
+

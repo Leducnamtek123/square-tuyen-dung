@@ -323,6 +323,12 @@ const DrawerContent = ({ isAdmin }) => {
                     isChild
                   />
                   <MenuItem
+                    text="Phỏng vấn công ty trực tiếp"
+                    to={`/${ROUTES.ADMIN.INTERVIEW_LIVE}`}
+                    isSelected={location.pathname === `/${ROUTES.ADMIN.INTERVIEW_LIVE}`}
+                    isChild
+                  />
+                  <MenuItem
                     text="Thông báo việc làm"
                     to={`/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`}
                     isSelected={location.pathname === `/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`}
@@ -402,6 +408,12 @@ const DrawerContent = ({ isAdmin }) => {
                     text="Danh sách phỏng vấn"
                     to={`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`}
                     isSelected={location.pathname === `/${ROUTES.EMPLOYER.INTERVIEW_LIST}`}
+                    isChild
+                  />
+                  <MenuItem
+                    text="Phỏng vấn ứng viên trực tiếp"
+                    to={`/${ROUTES.EMPLOYER.INTERVIEW_LIVE}`}
+                    isSelected={location.pathname === `/${ROUTES.EMPLOYER.INTERVIEW_LIVE}`}
                     isChild
                   />
                   <MenuItem

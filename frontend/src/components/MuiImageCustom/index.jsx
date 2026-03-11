@@ -13,8 +13,10 @@ import React from 'react';
 import Image from 'mui-image';
 
 const MuiImageCustom = (props) => {
+  const { loading = 'lazy', ...rest } = props;
   return (
     <Image
+      loading={loading}
       fit="contain"
       duration={500}
       easing="ease-in"
@@ -23,7 +25,7 @@ const MuiImageCustom = (props) => {
       shift={null}
       distance="100px"
       shiftDuration={600}
-      {...props}
+      {...rest}
     />
   );
 };

@@ -13,9 +13,7 @@ import React from 'react';
 import { Controller } from 'react-hook-form';
 import { InputAdornment, TextField, Typography } from '@mui/material';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const TextFieldCustom = ({
   name,
   control,
@@ -80,7 +78,7 @@ const TextFieldCustom = ({
                   marginLeft: 1,
                 }}
               >
-                <FontAwesomeIcon icon={faCircleExclamation} />{' '}
+                <ErrorOutlineIcon fontSize="small" />{' '}
                 {fieldState.error?.message}
               </span>
             )}
@@ -92,3 +90,4 @@ const TextFieldCustom = ({
 };
 
 export default TextFieldCustom;
+

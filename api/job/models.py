@@ -111,6 +111,17 @@ class JobPostActivity(JobPostBaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE, null=True)
 
+    # AI Analysis Fields
+    ai_analysis_score = models.IntegerField(null=True, blank=True)
+    ai_analysis_summary = models.TextField(null=True, blank=True)
+    ai_analysis_skills = models.TextField(null=True, blank=True) # JSON or Comma separated
+    ai_analysis_status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('completed', 'Completed'),
+        ('failed', 'Failed')
+    ], default='pending')
+
     class Meta:
         db_table = "myjob_job_job_post_activity"
         verbose_name_plural = "Job posts activity"

@@ -17,9 +17,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import { FormLabel, Typography } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const RadioCustom = ({
   name,
   control,
@@ -66,7 +64,7 @@ const RadioCustom = ({
                     marginLeft: 1,
                   }}
                 >
-                  <FontAwesomeIcon icon={faCircleExclamation} />{' '}
+                  <ErrorOutlineIcon fontSize="small" />{' '}
                   {fieldState.error?.message}
                 </span>
               )}
@@ -79,3 +77,4 @@ const RadioCustom = ({
 };
 
 export default RadioCustom;
+

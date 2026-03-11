@@ -14,9 +14,7 @@ import { Controller } from 'react-hook-form';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from '../../../configs/moment-config';
 import { Typography } from '@mui/material';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const DatePickerCustom = ({
   name,
   control,
@@ -85,7 +83,7 @@ const DatePickerCustom = ({
                   marginLeft: 1,
                 }}
               >
-                <FontAwesomeIcon icon={faCircleExclamation} />{' '}
+                <ErrorOutlineIcon fontSize="small" />{' '}
                 {fieldState.error?.message}
               </span>
             )}
@@ -97,3 +95,4 @@ const DatePickerCustom = ({
 };
 
 export default DatePickerCustom;
+

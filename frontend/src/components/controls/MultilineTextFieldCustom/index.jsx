@@ -13,9 +13,7 @@ import React from 'react';
 import { Controller } from 'react-hook-form';
 import { TextField, Typography } from '@mui/material';
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleExclamation } from '@fortawesome/free-solid-svg-icons';
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 const MultilineTextFieldCustom = ({
   name,
   control,
@@ -63,7 +61,7 @@ const MultilineTextFieldCustom = ({
                   marginLeft: 1,
                 }}
               >
-                <FontAwesomeIcon icon={faCircleExclamation} />{' '}
+                <ErrorOutlineIcon fontSize="small" />{' '}
                 {fieldState.error?.message}
               </span>
             )}
@@ -75,3 +73,4 @@ const MultilineTextFieldCustom = ({
 };
 
 export default MultilineTextFieldCustom;
+

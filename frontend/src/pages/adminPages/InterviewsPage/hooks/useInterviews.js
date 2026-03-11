@@ -1,7 +1,8 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import adminInterviewService from '../../../../services/adminInterviewService';
-import { message } from 'antd';
-
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+
+import adminInterviewService from '../../../../services/adminInterviewService';
+import toastMessages from '../../../../utils/toastMessages';
+
 export const useInterviews = (params) => {
     return useQuery({
         queryKey: ['admin-interviews', params],
@@ -17,49 +18,48 @@ export const useInterviews = (params) => {
         },
     });
 };
-
-export const useScheduleInterview = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (data) => adminInterviewService.scheduleInterview(data),
-        onSuccess: () => {
-            message.success('Lên lịch phỏng vấn thành công');
-            queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
-        },
-        onError: (error) => {
-            message.error(error.response?.data?.errors?.detail || 'Lên lịch phỏng vấn thất bại');
-        },
-    });
-};
-
-export const useUpdateInterviewStatus = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: ({ id, status }) => adminInterviewService.updateInterviewStatus(id, status),
-        onSuccess: () => {
-            message.success('Cập nhật trạng thái thành công');
-            queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
-        },
-        onError: (error) => {
-            message.error(error.response?.data?.errors?.detail || 'Cập nhật thất bại');
-        },
-    });
-};
-
-export const useDeleteInterview = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (id) => adminInterviewService.deleteInterview(id),
-        onSuccess: () => {
-            message.success('Xóa phỏng vấn thành công');
-            queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
-        },
-        onError: (error) => {
-            message.error(error.response?.data?.errors?.detail || 'Xóa thất bại');
-        },
-    });
-};
-
+
+export const useScheduleInterview = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (data) => adminInterviewService.scheduleInterview(data),
+        onSuccess: () => {
+            toastMessages.success('Len lich phong van thanh cong');
+            queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
+        },
+        onError: (error) => {
+            toastMessages.error(error.response?.data?.errors?.detail || 'Len lich phong van that bai');
+        },
+    });
+};
+
+export const useUpdateInterviewStatus = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ id, status }) => adminInterviewService.updateInterviewStatus(id, status),
+        onSuccess: () => {
+            toastMessages.success('Cap nhat trang thai thanh cong');
+            queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
+        },
+        onError: (error) => {
+            toastMessages.error(error.response?.data?.errors?.detail || 'Cap nhat that bai');
+        },
+    });
+};
+
+export const useDeleteInterview = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id) => adminInterviewService.deleteInterview(id),
+        onSuccess: () => {
+            toastMessages.success('Xoa phong van thanh cong');
+            queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
+        },
+        onError: (error) => {
+            toastMessages.error(error.response?.data?.errors?.detail || 'Xoa that bai');
+        },
+    });
+};

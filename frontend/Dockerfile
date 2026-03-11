@@ -1,5 +1,5 @@
 # Frontend development environment
-FROM node:18.18
+FROM node:20
 
 WORKDIR /myjob_web_app
 
@@ -12,6 +12,7 @@ ARG NO_PROXY
 ENV HTTP_PROXY=${HTTP_PROXY}
 ENV HTTPS_PROXY=${HTTPS_PROXY}
 ENV NO_PROXY=${NO_PROXY}
+ENV NPM_CONFIG_INCLUDE_OPTIONAL=true
 
 # Copy package.json and package-lock.json
 COPY package*.json ./
@@ -23,7 +24,7 @@ RUN if [ -n "$HTTP_PROXY" ]; then npm config set proxy "$HTTP_PROXY"; fi \
   && npm config set fetch-retry-mintimeout 20000 \
   && npm config set fetch-retry-maxtimeout 120000 \
   && npm config set fetch-timeout 300000 \
-  && npm install --no-audit --no-fund
+  && npm ci --include=optional --no-audit --no-fund
 
 # Copy all remaining application files
 COPY . .

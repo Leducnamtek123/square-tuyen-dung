@@ -3,6 +3,7 @@ export { default as QuestionsPage } from './QuestionsPage';
 export { default as UsersPage } from './UsersPage';
 export { default as JobsPage } from './JobsPage';
 export { default as InterviewsPage } from './InterviewsPage';
+export { default as InterviewLivePage } from './InterviewLivePage';
 export { default as SettingsPage } from './SettingsPage';
 export { default as CareersPage } from './CareersPage';
 export { default as CitiesPage } from './CitiesPage';
