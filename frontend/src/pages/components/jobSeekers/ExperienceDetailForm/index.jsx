@@ -27,41 +27,41 @@ const ExperienceDetaiForm = ({ handleAddOrUpdate, editData }) => {
   const schema = yup.object().shape({
     jobName: yup
       .string()
-      .required('Job title is required.')
-      .max(200, 'Job title exceeds allowed length.'),
+      .required(t('jobSeeker:profile.validation.jobTitleRequired'))
+      .max(200, t('jobSeeker:profile.validation.jobTitleMax')),
     companyName: yup
       .string()
-      .required('Company name is required.')
-      .max(255, 'Company name exceeds allowed length.'),
+      .required(t('jobSeeker:profile.validation.companyNameRequired'))
+      .max(255, t('jobSeeker:profile.validation.companyNameMax')),
     startDate: yup
       .date()
-      .required('Start date is required.')
-      .typeError('Start date is required.')
-      .max(DATE_OPTIONS.yesterday, 'Start date must be before today.')
+      .required(t('jobSeeker:profile.validation.startDateRequired'))
+      .typeError(t('jobSeeker:profile.validation.startDateRequired'))
+      .max(DATE_OPTIONS.yesterday, t('jobSeeker:profile.validation.startDateYesterday'))
       .test(
         'start-date-comparison',
-        'Start date must be before end date.',
+        t('jobSeeker:profile.validation.startDateComparison'),
         function (value) {
           return !(value >= this.parent.endDate);
         }
       ),
     endDate: yup
       .date()
-      .required('End date is required.')
-      .typeError('End date is required.')
+      .required(t('jobSeeker:profile.validation.endDateRequired'))
+      .typeError(t('jobSeeker:profile.validation.endDateRequired'))
       .max(
         DATE_OPTIONS.today,
-        'End date must be before or on today.'
+        t('jobSeeker:profile.validation.endDateToday')
       )
       .test(
         'end-date-comparison',
-        'End date must be after start date.',
+        t('jobSeeker:profile.validation.endDateComparison'),
         function (value) {
           return !(value <= this.parent.startDate);
         }
       ),
-    lastSalary: yup.number().nullable().min(0, 'Last salary must be a positive number.'),
-    leaveReason: yup.string().max(255, 'Reason exceeds allowed length.'),
+    lastSalary: yup.number().nullable().min(0, t('jobSeeker:profile.validation.lastSalaryInvalid')),
+    leaveReason: yup.string().max(255, t('jobSeeker:profile.validation.leaveReasonMax')),
   });
 
   const { control, reset, handleSubmit } = useForm({
@@ -86,16 +86,16 @@ const ExperienceDetaiForm = ({ handleAddOrUpdate, editData }) => {
           <TextFieldCustom
             name="jobName"
             control={control}
-            placeholder="E.g.: Software Engineer"
-            title="Job Title/Position"
+            placeholder={t('jobSeeker:profile.placeholders.jobTitle')}
+            title={t('jobSeeker:profile.fields.jobTitle')}
             showRequired={true}
           />
         </Grid>
         <Grid size={12}>
           <TextFieldCustom
             name="companyName"
-            title="Company Name"
-            placeholder="Enter company name"
+            title={t('jobSeeker:profile.fields.companyName')}
+            placeholder={t('jobSeeker:profile.placeholders.companyName')}
             control={control}
             showRequired={true}
           />
@@ -108,7 +108,7 @@ const ExperienceDetaiForm = ({ handleAddOrUpdate, editData }) => {
           <DatePickerCustom
             name="startDate"
             control={control}
-            title="Start Date"
+            title={t('jobSeeker:profile.fields.startDate')}
             showRequired={true}
             maxDate={DATE_OPTIONS.yesterday}
           />
@@ -121,7 +121,7 @@ const ExperienceDetaiForm = ({ handleAddOrUpdate, editData }) => {
           <DatePickerCustom
             name="endDate"
             control={control}
-            title="End Date"
+            title={t('jobSeeker:profile.fields.endDate')}
             showRequired={true}
             maxDate={DATE_OPTIONS.today}
           />
@@ -129,8 +129,8 @@ const ExperienceDetaiForm = ({ handleAddOrUpdate, editData }) => {
         <Grid size={12}>
           <MultilineTextFieldCustom
             name="description"
-            title="Additional Description"
-            placeholder="Enter description here"
+            title={t('jobSeeker:profile.fields.additionalDescription')}
+            placeholder={t('jobSeeker:profile.placeholders.additionalDescription')}
             control={control}
           />
         </Grid>

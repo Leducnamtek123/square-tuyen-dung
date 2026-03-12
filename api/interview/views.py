@@ -203,7 +203,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
 
     # PATCH /sessions/{room_name}/status/ — cập nhật trạng thái
     @action(detail=False, methods=['patch'], url_path='(?P<room_name>[^/.]+)/status',
-            permission_classes=[permissions.AllowAny])
+            permission_classes=[permissions.IsAuthenticated])
     def update_status(self, request, room_name=None):
         """Cập nhật trạng thái (cho Agent hoặc Frontend)."""
         try:
@@ -239,7 +239,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
 
     # POST /sessions/{room_name}/append-transcription/
     @action(detail=False, methods=['post'], url_path='(?P<room_name>[^/.]+)/append-transcription',
-            permission_classes=[permissions.AllowAny])
+            permission_classes=[permissions.IsAuthenticated])
     def append_transcription(self, request, room_name=None):
         """Agent gửi transcript hội thoại."""
         try:

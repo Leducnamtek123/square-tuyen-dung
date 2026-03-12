@@ -3,8 +3,10 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typog
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { useTranslation } from 'react-i18next';
 
 const QuestionTable = ({ questions, loading, onEdit, onDelete }) => {
+    const { t } = useTranslation('admin');
     if (loading && questions.length === 0) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
@@ -18,10 +20,10 @@ const QuestionTable = ({ questions, loading, onEdit, onDelete }) => {
             <Table>
                 <TableHead sx={{ bgcolor: 'grey.100' }}>
                     <TableRow>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Question Content</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Field</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Difficulty</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }} align="right">Actions</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.questions.table.questionContent')}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.questions.table.field')}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.questions.table.difficulty')}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }} align="right">{t('pages.questions.table.actions')}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -33,22 +35,22 @@ const QuestionTable = ({ questions, loading, onEdit, onDelete }) => {
                                 </Typography>
                             </TableCell>
                             <TableCell>
-                                <Chip label={q.careerDict?.name || 'General'} size="small" variant="outlined" />
+                                <Chip label={q.careerDict?.name || t('pages.questions.table.general')} size="small" variant="outlined" />
                             </TableCell>
                             <TableCell>
                                 <Chip
-                                    label={q.difficulty === 1 ? 'Easy' : q.difficulty === 2 ? 'Medium' : 'Hard'}
+                                    label={q.difficulty === 1 ? t('pages.questions.difficulty.easy') : q.difficulty === 2 ? t('pages.questions.difficulty.medium') : t('pages.questions.difficulty.hard')}
                                     size="small"
                                     color={q.difficulty === 1 ? 'success' : q.difficulty === 2 ? 'warning' : 'error'}
                                 />
                             </TableCell>
                             <TableCell align="right">
-                                <Tooltip title="Edit">
+                                <Tooltip title={t('pages.questions.table.edit')}>
                                     <IconButton size="small" onClick={() => onEdit(q)} color="primary">
                                         <EditIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Delete">
+                                <Tooltip title={t('pages.questions.table.delete')}>
                                     <IconButton size="small" onClick={() => onDelete(q.id)} color="error">
                                         <DeleteOutlineIcon fontSize="small" />
                                     </IconButton>

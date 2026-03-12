@@ -11,21 +11,20 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { cjk } from "@streamdown/cjk";
-import { code } from "@streamdown/code";
-import { math } from "@streamdown/math";
-import { mermaid } from "@streamdown/mermaid";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import {
   createContext,
+  lazy,
   memo,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from "react";
-import { Streamdown } from "streamdown";
+
+const LazyMessageResponse = lazy(() => import("./message-response"));
 
 export const Message = ({
   className,
@@ -257,17 +256,41 @@ export const MessageBranchPage = ({
   );
 };
 
-const streamdownPlugins = { cjk, code, math, mermaid };
+/**
+ * @typedef {{
+ *  className?: string,
+ *  children?: any,
+ *  enableRich?: boolean
+ * }} MessageResponseProps
+ */
 
-export const MessageResponse = memo(({
-  className,
-  ...props
-}) => (
-  <Streamdown
-    className={cn("size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className)}
-    plugins={streamdownPlugins}
-    {...props} />
-), (prevProps, nextProps) => prevProps.children === nextProps.children);
+/** @type {import("react").NamedExoticComponent<MessageResponseProps>} */
+export const MessageResponse = memo((props) => {
+  const {
+    className,
+    children,
+    enableRich = false,
+    ...rest
+  } = /** @type {MessageResponseProps} */ (props);
+
+  return (
+    <Suspense
+      fallback={(
+        <div className={cn("size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className)} {...rest}>
+          {children}
+        </div>
+      )}
+    >
+      <LazyMessageResponse
+        className={className}
+        enableRich={enableRich}
+        {...rest}
+      >
+        {children}
+      </LazyMessageResponse>
+    </Suspense>
+  );
+}, (prevProps, nextProps) => prevProps.children === nextProps.children);
 
 MessageResponse.displayName = "MessageResponse";
 

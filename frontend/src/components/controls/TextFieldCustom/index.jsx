@@ -49,7 +49,6 @@ const TextFieldCustom = ({
               size="small"
               id={field.name}
               placeholder={placeholder}
-              defaultValue=""
               value={formatDisplay(field.value)}
               onChange={(e) => {
                 const value = e.target.value.replace(/,/g, '');

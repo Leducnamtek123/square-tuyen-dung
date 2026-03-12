@@ -14,7 +14,8 @@ See the LICENSE file in the project root for full license information.
 
 */
 
-import React from "react";
+import React, { Suspense, lazy } from "react";
+import { useTranslation } from 'react-i18next';
 
 import { useParams } from "react-router-dom";
 
@@ -24,7 +25,6 @@ import { Avatar, Box, Card, Divider, Rating, Stack, Typography, Button, Skeleton
 import Grid from "@mui/material/Grid2";
 
 import ReactToPrint from "react-to-print";
-
 import dayjs from "dayjs";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -75,7 +75,7 @@ import errorHandling from "../../../../utils/errorHandling";
 
 import resumeService from "../../../../services/resumeService";
 
-import Pdf from "../../../../components/Pdf";
+const LazyPdf = lazy(() => import("../../../../components/Pdf"));
 
 import SendMailCard from "../SendMailCard";
 
@@ -364,6 +364,7 @@ const Loading = (
 );
 
 const SendEmailComponent = ({ resumeSlug, email, fullName, isSentEmail }) => {
+  const { t } = useTranslation('employer');
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
@@ -407,7 +408,7 @@ const SendEmailComponent = ({ resumeSlug, email, fullName, isSentEmail }) => {
 
         setOpenSendMailPopup(false);
 
-        toastMessages.success("Email sent successfully.");
+        toastMessages.success(t('sendEmailComponent.messages.success', 'Email sent successfully.'));
 
       } catch (error) {
 
@@ -475,7 +476,7 @@ const SendEmailComponent = ({ resumeSlug, email, fullName, isSentEmail }) => {
 
       >
 
-        {sentEmail ? "Resend Email" : "Send Email"}
+        {sentEmail ? t('sendEmailComponent.label.resendEmail', 'Resend Email') : t('sendEmailComponent.label.sendEmail', 'Send Email')}
 
       </Button>
 
@@ -500,6 +501,7 @@ const SendEmailComponent = ({ resumeSlug, email, fullName, isSentEmail }) => {
 };
 
 const ProfileDetailCard = () => {
+  const { t } = useTranslation('employer');
 
   const { slug: resumeSlug } = useParams();
 
@@ -580,9 +582,7 @@ const ProfileDetailCard = () => {
         setProfileDetail({ ...profileDetail, isSaved: isSaved });
 
         toastMessages.success(
-
-          isSaved ? "Saved successfully." : "Unsaved successfully."
-
+          isSaved ? t('profileDetailCard.messages.saveSuccess') : t('profileDetailCard.messages.unsaveSuccess')
         );
 
       } catch (error) {
@@ -604,19 +604,12 @@ const ProfileDetailCard = () => {
   ) : profileDetail === null ? (
 
     <NoDataCard
-
       title={
-
         <p>
-
-          Profile information not found.
-
-          <br /> This profile may be set to private.
-
+          {t('profileDetailCard.title.profileNotFound')}
+          <br /> {t('profileDetailCard.title.privateProfile')}
         </p>
-
       }
-
     />
 
   ) : (
@@ -725,7 +718,7 @@ const ProfileDetailCard = () => {
 
                     >
 
-                      {profileDetail?.title || "Not updated"}
+                      {profileDetail?.title || t('common.notUpdated')}
 
                     </Typography>
 
@@ -743,7 +736,7 @@ const ProfileDetailCard = () => {
 
                     >
 
-                      Cập nhật:{" "}
+                      {t('profileDetailCard.label.lastUpdated')}{" "}
 
                       {dayjs(profileDetail?.updateAt).format("DD/MM/YYYY")}
 
@@ -773,10 +766,8 @@ const ProfileDetailCard = () => {
 
                         icon={<CheckCircleRoundedIcon />}
 
-                        label={`Xem lần cuối: ${dayjs(
-
+                        label={`${t('profileDetailCard.label.lastViewed')} ${dayjs(
                           profileDetail?.lastViewedDate
-
                         ).format("DD/MM/YYYY HH:mm")}`}
 
                         size="small"
@@ -1083,7 +1074,7 @@ const ProfileDetailCard = () => {
 
                     >
 
-                      Thông tin cá nhân
+                      {t('profileDetailCard.title.personalInfo')}
 
                     </Typography>
 
@@ -1108,11 +1099,8 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "Phone",
-
+                          t('profileDetailCard.label.phone'),
                           profileDetail?.jobSeekerProfile?.phone
-
                         )}
 
                       </Grid>
@@ -1125,15 +1113,10 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "Gender",
-
+                          t('profileDetailCard.label.gender'),
                           allConfig?.genderDict[
-
                             profileDetail?.jobSeekerProfile?.gender
-
                           ]
-
                         )}
 
                       </Grid>
@@ -1146,11 +1129,8 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "Date of Birth",
-
+                          t('profileDetailCard.label.dob'),
                           <TimeAgo date={profileDetail?.jobSeekerProfile?.birthday} type="format" />
-
                         )}
 
                       </Grid>
@@ -1163,15 +1143,10 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "Marital Status",
-
+                          t('profileDetailCard.label.maritalStatus'),
                           allConfig?.maritalStatusDict[
-
                             profileDetail?.jobSeekerProfile?.maritalStatus
-
                           ]
-
                         )}
 
                       </Grid>
@@ -1184,15 +1159,10 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "City/Province",
-
+                          t('profileDetailCard.label.cityProvince'),
                           allConfig?.cityDict[
-
                             profileDetail?.jobSeekerProfile?.location?.city
-
                           ]
-
                         )}
 
                       </Grid>
@@ -1205,13 +1175,9 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "District",
-
+                          t('profileDetailCard.label.district'),
                           profileDetail?.jobSeekerProfile?.location
-
                             ?.districtDict?.name
-
                         )}
 
                       </Grid>
@@ -1224,11 +1190,8 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "Address",
-
+                          t('profileDetailCard.label.address'),
                           profileDetail?.jobSeekerProfile?.location?.address
-
                         )}
 
                       </Grid>
@@ -1263,7 +1226,7 @@ const ProfileDetailCard = () => {
 
                     >
 
-                      Thông tin chung
+                      {t('profileDetailCard.title.generalInfo')}
 
                     </Typography>
 
@@ -1276,7 +1239,7 @@ const ProfileDetailCard = () => {
                           md: 4
                         }}>
 
-                        {item("Desired Position", profileDetail?.title)}
+                        {item(t('profileDetailCard.label.desiredPosition'), profileDetail?.title)}
 
                       </Grid>
 
@@ -1288,11 +1251,8 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "Desired Level",
-
+                          t('profileDetailCard.label.desiredLevel'),
                           allConfig?.positionDict[profileDetail?.position]
-
                         )}
 
                       </Grid>
@@ -1305,15 +1265,10 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "Education Level",
-
+                          t('profileDetailCard.label.educationLevel'),
                           allConfig?.academicLevelDict[
-
                             profileDetail?.academicLevel
-
                           ]
-
                         )}
 
                       </Grid>
@@ -1326,11 +1281,8 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "Experience",
-
+                          t('profileDetailCard.label.experience'),
                           allConfig?.experienceDict[profileDetail?.experience]
-
                         )}
 
                       </Grid>
@@ -1377,17 +1329,11 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "Desired Salary",
-
+                          t('profileDetailCard.label.desiredSalary'),
                           salaryString(
-
                             profileDetail?.salaryMin,
-
                             profileDetail?.salaryMax
-
                           )
-
                         )}
 
                       </Grid>
@@ -1400,15 +1346,10 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "Workplace Type",
-
+                          t('profileDetailCard.label.workplaceType'),
                           allConfig?.typeOfWorkplaceDict[
-
                             profileDetail?.typeOfWorkplace
-
                           ]
-
                         )}
 
                       </Grid>
@@ -1421,11 +1362,8 @@ const ProfileDetailCard = () => {
                         }}>
 
                         {item(
-
-                          "Job Type",
-
+                          t('profileDetailCard.label.jobType'),
                           allConfig?.jobTypeDict[profileDetail?.jobType]
-
                         )}
 
                       </Grid>
@@ -1460,7 +1398,7 @@ const ProfileDetailCard = () => {
 
                     >
 
-                      Mục tiêu nghề nghiệp
+                      {t('profileDetailCard.title.careerGoals')}
 
                     </Typography>
 
@@ -1512,7 +1450,7 @@ const ProfileDetailCard = () => {
 
                       >
 
-                        {profileDetail?.description || "Not updated"}
+                        {profileDetail?.description || t('common.notUpdated')}
 
                       </Typography>
 
@@ -1540,7 +1478,7 @@ const ProfileDetailCard = () => {
 
                   <Typography variant="h5" sx={{ mb: 1.5 }}>
 
-                    Kinh nghiệm làm việc
+                    {t('profileDetailCard.title.workExperience')}
 
                   </Typography>
 
@@ -1622,7 +1560,7 @@ const ProfileDetailCard = () => {
 
                                     >
 
-                                      Chưa cập nhật
+                                      {t('common.notUpdated')}
 
                                     </span>
 
@@ -1670,7 +1608,7 @@ const ProfileDetailCard = () => {
 
                   <Typography variant="h5" sx={{ mb: 1.5 }}>
 
-                    Học vấn
+                    {t('profileDetailCard.title.education')}
 
                   </Typography>
 
@@ -1706,7 +1644,7 @@ const ProfileDetailCard = () => {
 
                               >
 
-                                {value?.degreeName} - Chuyên ngành:{" "}
+                                {value?.degreeName} - {t('profileDetailCard.label.major')}:{" "}
 
                                 {value?.major}
 
@@ -1734,7 +1672,7 @@ const ProfileDetailCard = () => {
 
                                 ) : (
 
-                                  "Present"
+                                  t('common.present')
 
                                 )}
 
@@ -1778,7 +1716,7 @@ const ProfileDetailCard = () => {
 
                   <Typography variant="h5" sx={{ mb: 1.5 }}>
 
-                    Chứng chỉ
+                    {t('profileDetailCard.title.certificates')}
 
                   </Typography>
 
@@ -1844,7 +1782,7 @@ const ProfileDetailCard = () => {
 
                                 ) : (
 
-                                  "No Expiration"
+                                  t('profileDetailCard.label.noExpiration')
 
                                 )}
 
@@ -1886,7 +1824,7 @@ const ProfileDetailCard = () => {
 
                   <Typography variant="h5" sx={{ mb: 1.5 }}>
 
-                    Ngôn ngữ
+                    {t('profileDetailCard.title.languages')}
 
                   </Typography>
 
@@ -1940,7 +1878,7 @@ const ProfileDetailCard = () => {
 
                               >
 
-                                Mức độ thành thạo
+                                {t('profileDetailCard.label.proficiency')}
 
                               </Typography>
 
@@ -1992,7 +1930,7 @@ const ProfileDetailCard = () => {
 
                   <Typography variant="h5" sx={{ mb: 1.5 }}>
 
-                    Kỹ năng chuyên môn
+                    {t('profileDetailCard.title.advancedSkills')}
 
                   </Typography>
 
@@ -2046,7 +1984,7 @@ const ProfileDetailCard = () => {
 
                               >
 
-                                Mức độ thành thạo
+                                {t('profileDetailCard.label.proficiency')}
 
                               </Typography>
 
@@ -2099,25 +2037,25 @@ const ProfileDetailCard = () => {
               {/* Start: Popup  */}
 
               <FormPopup
-
-                title="View Attached Resume"
-
+                title={t('sendEmailComponent.title.viewattachedresume', 'View Attached Resume')}
                 openPopup={openPopup}
-
                 setOpenPopup={setOpenPopup}
-
                 showDialogAction={false}
-
               >
-
-                <Pdf
-
-                  fileUrl={profileDetail?.fileUrl}
-
-                  title={profileDetail?.title}
-
-                />
-
+                <Suspense
+                  fallback={(
+                    <Box sx={{ p: 3, textAlign: "center" }}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        {t('profileDetailCard.messages.loadingPdf', 'Loading PDF...')}
+                      </Typography>
+                    </Box>
+                  )}
+                >
+                  <LazyPdf
+                    fileUrl={profileDetail?.fileUrl}
+                    title={profileDetail?.title}
+                  />
+                </Suspense>
               </FormPopup>
 
               {/* End: Popup */}

@@ -170,6 +170,7 @@ const AUTH_CONFIG = {
     CHAT_ICON: employerChatbotIcon,
 
   },
+  BOT_RENDER_MODE: import.meta.env.VITE_BOT_RENDER_MODE || "chat",
 
 };
 
@@ -180,6 +181,12 @@ const ROLES_NAME = {
   EMPLOYER: "EMPLOYER",
 
   JOB_SEEKER: "JOB_SEEKER",
+
+};
+
+const PAGINATION = {
+
+  ADMIN_MAX_PAGE_SIZE: 10000,
 
 };
 
@@ -547,6 +554,8 @@ export {
   AUTH_CONFIG,
 
   ROLES_NAME,
+
+  PAGINATION,
 
   HOME_FILTER_CAREER,
 

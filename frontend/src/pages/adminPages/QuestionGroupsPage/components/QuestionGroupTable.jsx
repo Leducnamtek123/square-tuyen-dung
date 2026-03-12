@@ -3,8 +3,10 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typog
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import { useTranslation } from 'react-i18next';
 
 const QuestionGroupTable = ({ data, loading, onEdit, onDelete }) => {
+    const { t } = useTranslation('admin');
     if (loading && (!data || data.length === 0)) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
@@ -16,7 +18,7 @@ const QuestionGroupTable = ({ data, loading, onEdit, onDelete }) => {
     if (!data || data.length === 0) {
         return (
             <Box sx={{ p: 5, textAlign: 'center' }}>
-                <Typography color="text.secondary">No question groups available</Typography>
+                <Typography color="text.secondary">{t('pages.questionGroups.table.noData')}</Typography>
             </Box>
         );
     }
@@ -26,10 +28,10 @@ const QuestionGroupTable = ({ data, loading, onEdit, onDelete }) => {
             <Table>
                 <TableHead sx={{ bgcolor: 'grey.100' }}>
                     <TableRow>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Question Group Name</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Description</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Question Count</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }} align="right">Actions</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.questionGroups.table.groupName')}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.questionGroups.table.description')}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.questionGroups.table.questionCount')}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }} align="right">{t('pages.questionGroups.table.actions')}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -51,12 +53,12 @@ const QuestionGroupTable = ({ data, loading, onEdit, onDelete }) => {
                                 </Typography>
                             </TableCell>
                             <TableCell align="right">
-                                <Tooltip title="Edit">
+                                <Tooltip title={t('pages.questionGroups.table.edit')}>
                                     <IconButton size="small" onClick={() => onEdit(item)} color="primary">
                                         <EditIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Delete">
+                                <Tooltip title={t('pages.questionGroups.table.delete')}>
                                     <IconButton size="small" onClick={() => onDelete(item)} color="error">
                                         <DeleteOutlineIcon fontSize="small" />
                                     </IconButton>

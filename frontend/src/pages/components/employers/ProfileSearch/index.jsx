@@ -10,6 +10,7 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { Button, Stack, Typography } from "@mui/material";
@@ -34,6 +35,7 @@ import SingleSelectCustom from '../../../../components/controls/SingleSelectCust
 import { resetSearchResume, searchResume } from '../../../../redux/filterSlice';
 
 const ProfileSearch = () => {
+  const { t } = useTranslation('employer');
   const dispatch = useDispatch();
   const { allConfig } = useSelector((state) => state.config);
   const { resumeFilter } = useSelector((state) => state.filter);
@@ -70,7 +72,7 @@ const ProfileSearch = () => {
             <TextFieldCustom
               name="kw"
               showRequired={true}
-              placeholder="Enter keywords..."
+              placeholder={t('profileSearch.placeholder.enterkeywords', 'Enter keywords...')}
               control={control}
               icon={<SearchIcon sx={{ color: 'grey.500' }} />}
               sx={{
@@ -100,7 +102,7 @@ const ProfileSearch = () => {
               control={control}
               options={allConfig?.cityOptions || []}
               showRequired={true}
-              placeholder="Select City/Province"
+              placeholder={t('profileSearch.placeholder.selectcityprovince', 'Select City/Province')}
               sx={{
                 '& .MuiOutlinedInput-root': {
                   backgroundColor: 'background.paper',
@@ -198,7 +200,7 @@ const ProfileSearch = () => {
                 name="careerId"
                 control={control}
                 options={allConfig?.careerOptions || []}
-                placeholder="All Careers"
+                placeholder={t('profileSearch.placeholder.allcareers', 'All Careers')}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'background.paper',
@@ -222,7 +224,7 @@ const ProfileSearch = () => {
                 name="experienceId"
                 control={control}
                 options={allConfig?.experienceOptions || []}
-                placeholder="All Experience"
+                placeholder={t('profileSearch.placeholder.allexperience', 'All Experience')}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'background.paper',
@@ -246,7 +248,7 @@ const ProfileSearch = () => {
                 name="positionId"
                 control={control}
                 options={allConfig?.positionOptions || []}
-                placeholder="All Positions"
+                placeholder={t('profileSearch.placeholder.allpositions', 'All Positions')}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'background.paper',
@@ -270,7 +272,7 @@ const ProfileSearch = () => {
                 name="academicLevelId"
                 control={control}
                 options={allConfig?.academicLevelOptions || []}
-                placeholder="All Academic Levels"
+                placeholder={t('profileSearch.placeholder.allacademiclevels', 'All Academic Levels')}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'background.paper',
@@ -294,7 +296,7 @@ const ProfileSearch = () => {
                 name="typeOfWorkplaceId"
                 control={control}
                 options={allConfig?.typeOfWorkplaceOptions || []}
-                placeholder="All Workplaces"
+                placeholder={t('profileSearch.placeholder.allworkplaces', 'All Workplaces')}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'background.paper',
@@ -318,7 +320,7 @@ const ProfileSearch = () => {
                 name="jobTypeId"
                 control={control}
                 options={allConfig?.jobTypeOptions || []}
-                placeholder="All Employment Types"
+                placeholder={t('profileSearch.placeholder.allemploymenttypes', 'All Employment Types')}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'background.paper',
@@ -342,7 +344,7 @@ const ProfileSearch = () => {
                 name="genderId"
                 control={control}
                 options={allConfig?.genderOptions || []}
-                placeholder="All Genders"
+                placeholder={t('profileSearch.placeholder.allgenders', 'All Genders')}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'background.paper',
@@ -366,7 +368,7 @@ const ProfileSearch = () => {
                 name="maritalStatusId"
                 control={control}
                 options={allConfig?.maritalStatusOptions || []}
-                placeholder="All Marital Statuses"
+                placeholder={t('profileSearch.placeholder.allmaritalstatuses', 'All Marital Statuses')}
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     backgroundColor: 'background.paper',

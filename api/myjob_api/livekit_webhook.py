@@ -29,17 +29,22 @@ def livekit_webhook(request: HttpRequest):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
     raw_body = request.body or b""
-    secret = os.getenv("LIVEKIT_API_SECRET", "")
+    body_text = raw_body.decode("utf-8") if isinstance(raw_body, (bytes, bytearray)) else str(raw_body)
+    api_key = os.getenv("LIVEKIT_API_KEY", "")
+    api_secret = os.getenv("LIVEKIT_API_SECRET", "")
     auth_header = request.headers.get("Authorization") or request.META.get("HTTP_AUTHORIZATION", "")
+    auth_token = auth_header.strip()
+    if auth_token.lower().startswith("bearer "):
+        auth_token = auth_token[7:].strip()
 
     verified = False
-    if secret:
+    if api_key and api_secret:
         try:
             # Prefer LiveKit's verifier if the package is available.
             from livekit import api  # type: ignore
 
-            receiver = api.WebhookReceiver(secret)
-            event = receiver.receive(raw_body, auth_header)
+            receiver = api.WebhookReceiver(api.TokenVerifier(api_key, api_secret))
+            event = receiver.receive(body_text, auth_token)
             verified = True
             payload = event  # already parsed by receiver
         except Exception as exc:

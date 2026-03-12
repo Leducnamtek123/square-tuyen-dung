@@ -85,7 +85,6 @@ def send_sms_download_app(request):
         #     }
         # )
         sms_response = "Mocked Response"
-        print(">> SMS SEND: ", sms_response)
     except Exception as ex:
         helper.print_log_error("send_sms_download_app", ex)
         var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

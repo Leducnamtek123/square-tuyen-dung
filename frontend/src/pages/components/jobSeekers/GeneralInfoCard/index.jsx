@@ -72,43 +72,43 @@ const Loading = (
   </Box>
 );
 
-const item = (title, value) => {
-  return (
-    <Box sx={{
-      p: 1,
-      backgroundColor: 'background.paper',
-    }}>
-      <Typography 
-        sx={{ 
-          fontWeight: 600,
-          color: 'primary.main',
-          fontSize: '0.875rem',
-          mb: 1
-        }}
-      >
-        {title}
-      </Typography>
-      <Typography sx={{
-        color: value ? 'text.primary' : 'text.disabled',
-        fontStyle: value ? 'normal' : 'italic',
-        fontSize: value ? '1rem' : '0.875rem',
-      }}>
-        {value || 'Not updated'}
-      </Typography>
-    </Box>
-  );
-};
-
 const GeneralInfoCard = ({ title }) => {
-  const { t } = useTranslation(['jobSeeker']);
-  const { slug: resumeSlug } = useParams();
-  const { allConfig } = useSelector((state) => state.config);
-  const [openPopup, setOpenPopup] = React.useState(false);
-  const [isSuccess, setIsSuccess] = React.useState(false);
-  const [isLoadingResumeDetail, setIsLoadingResumeDetail] =
-    React.useState(true);
-  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-  const [resumeDetail, setResumeDetail] = React.useState({});
+    const { t } = useTranslation(['jobSeeker', 'common']);
+    const { slug: resumeSlug } = useParams();
+    const { allConfig } = useSelector((state) => state.config);
+    const [openPopup, setOpenPopup] = React.useState(false);
+    const [isSuccess, setIsSuccess] = React.useState(false);
+    const [isLoadingResumeDetail, setIsLoadingResumeDetail] =
+        React.useState(true);
+    const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
+    const [resumeDetail, setResumeDetail] = React.useState({});
+
+    const item = (title, value) => {
+        return (
+            <Box sx={{
+                p: 1,
+                backgroundColor: 'background.paper',
+            }}>
+                <Typography
+                    sx={{
+                        fontWeight: 600,
+                        color: 'primary.main',
+                        fontSize: '0.875rem',
+                        mb: 1
+                    }}
+                >
+                    {title}
+                </Typography>
+                <Typography sx={{
+                    color: value ? 'text.primary' : 'text.disabled',
+                    fontStyle: value ? 'normal' : 'italic',
+                    fontSize: value ? '1rem' : '0.875rem',
+                }}>
+                    {value || t('common:noData')}
+                </Typography>
+            </Box>
+        );
+    };
 
   React.useEffect(() => {
     const getResumeDetail = async (resumeSlug) => {
@@ -134,7 +134,7 @@ const GeneralInfoCard = ({ title }) => {
 
         setIsSuccess(!isSuccess);
         setOpenPopup(false);
-        toastMessages.success('Profile information updated successfully.');
+        toastMessages.success(t('jobSeeker:profile.messages.profileUpdateSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -157,7 +157,7 @@ const GeneralInfoCard = ({ title }) => {
           Loading
         ) : resumeDetail === null ? (
           <Typography variant="h6" color="error.main" textAlign="center">
-            Profile information not found
+            {t('jobSeeker:profile.messages.notFound')}
           </Typography>
         ) : (
           <>
@@ -198,7 +198,7 @@ const GeneralInfoCard = ({ title }) => {
             <Stack sx={{ px: 1 }}>
               <Grid container spacing={2}>
                 <Grid size={12}>
-                  {item('Career Objective', resumeDetail?.description)}
+                  {item(t('jobSeeker:profile.fields.objective'), resumeDetail?.description)}
                   <Divider sx={{ my: 1, borderColor: 'grey.300' }} />
                   {item(
                     t('jobSeeker:profile.fields.skillsSummary'),
@@ -213,21 +213,21 @@ const GeneralInfoCard = ({ title }) => {
                     sm: 6
                   }}>
                   <Stack spacing={1.5}>
-                    {item('Desired Position', resumeDetail?.title)}
+                    {item(t('jobSeeker:profile.fields.desiredPosition'), resumeDetail?.title)}
                     {item(
-                      'Desired Level',
+                      t('jobSeeker:profile.fields.desiredLevel'),
                       allConfig.positionDict[resumeDetail?.position]
                     )}
                     {item(
-                      'Academic Level',
+                      t('jobSeeker:profile.fields.academicLevel'),
                       allConfig.academicLevelDict[resumeDetail?.academicLevel]
                     )}
                     {item(
-                      'Experience',
+                      t('jobSeeker:profile.fields.experience'),
                       allConfig.experienceDict[resumeDetail?.experience]
                     )}
                     {item(
-                      'Career',
+                      t('jobSeeker:profile.fields.career'),
                       allConfig.careerDict[resumeDetail?.career]
                     )}
                   </Stack>
@@ -240,11 +240,11 @@ const GeneralInfoCard = ({ title }) => {
                   }}>
                   <Stack spacing={1.5}>
                     {item(
-                      'Work Location',
+                      t('jobSeeker:profile.fields.workLocation'),
                       allConfig.cityDict[resumeDetail?.city]
                     )}
                     {item(
-                      'Desired Salary',
+                      t('jobSeeker:profile.fields.desiredSalary'),
                       salaryString(
                         resumeDetail?.salaryMin,
                         resumeDetail?.salaryMax
@@ -257,13 +257,13 @@ const GeneralInfoCard = ({ title }) => {
                         : null
                     )}
                     {item(
-                      'Workplace Type',
+                      t('jobSeeker:profile.fields.workplaceType'),
                       allConfig.typeOfWorkplaceDict[
                         resumeDetail?.typeOfWorkplace
                       ]
                     )}
                     {item(
-                      'Job Type',
+                      t('jobSeeker:profile.fields.jobType'),
                       allConfig.jobTypeDict[resumeDetail?.jobType]
                     )}
                   </Stack>
@@ -275,7 +275,7 @@ const GeneralInfoCard = ({ title }) => {
       </Stack>
       {/* Start: form  */}
       <FormPopup
-        title="Resume Information"
+        title={t('jobSeeker:profile.sections.resume')}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >

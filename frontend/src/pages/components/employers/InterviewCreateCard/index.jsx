@@ -376,7 +376,7 @@ const onSubmit = async (data) => {
 
                                         fullWidth
 
-                                        label="Select job post"
+                                        label={t('interviewCreateCard.label.selectjobpost', 'Select job post')}
                                         error={!!errors.job_post}
 
                                         helperText={errors.job_post?.message}
@@ -426,7 +426,7 @@ const onSubmit = async (data) => {
 
                                         fullWidth
 
-                                        label="Select candidate"
+                                        label={t('interviewCreateCard.label.selectcandidate', 'Select candidate')}
                                         disabled={!selectedJobPostId || candidates.length === 0}
 
                                         error={!!errors.candidate}
@@ -466,7 +466,7 @@ const onSubmit = async (data) => {
 
                                 control={control}
 
-                                title="Scheduled Time"
+                                title={t('interviewCreateCard.title.scheduledtime', 'Scheduled Time')}
                                 showRequired
 
                                 minDateTime={new Date().toISOString()}
@@ -493,10 +493,10 @@ const onSubmit = async (data) => {
 
                                         fullWidth
 
-                                        label="Select Question Group (Optional)"
+                                        label={t('interviewCreateCard.label.selectquestiongroupoptional', 'Select Question Group (Optional)')}
                                         variant="outlined"
 
-                                        helperText="Select a question group to automatically fill the questions below"
+                                        helperText={t('interviewCreateCard.helperText.selectaquestiongrouptoautomaticallyfillthequestionsbelow', 'Select a question group to automatically fill the questions below')}
                                     >
 
                                         <MenuItem value="">
@@ -540,7 +540,7 @@ const onSubmit = async (data) => {
 
                                             multiple
 
-                                            input={<OutlinedInput label="Select Interview Questions" />}
+                                            input={<OutlinedInput label={t('interviewCreateCard.label.selectinterviewquestions', 'Select Interview Questions')} />}
                                             renderValue={(selected) => (
 
                                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>

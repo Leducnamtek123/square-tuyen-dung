@@ -41,9 +41,9 @@ AUTH_PROVIDERS = (('email', 'email'), ('facebook',
                   'facebook'), ('google', 'google'))
 
 AVATAR_DEFAULT = {
-    "AVATAR": "https://res.cloudinary.com/dpvyrlu0j/image/upload/v1745661102/myjob-bucket/system/avt_default.jpg",
-    "COMPANY_LOGO": "https://res.cloudinary.com/dpvyrlu0j/image/upload/v1745661103/myjob-bucket/system/company_logo_default.png",
-    "COMPANY_COVER_IMAGE": "https://res.cloudinary.com/dpvyrlu0j/image/upload/v1745661103/myjob-bucket/system/company_cover_image_default.jpg",
+    "AVATAR": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['system']}avt_default.jpg",
+    "COMPANY_LOGO": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['system']}company_logo_default.png",
+    "COMPANY_COVER_IMAGE": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['system']}company_cover_image_default.jpg",
 }
 
 COMPANY_INFO = {

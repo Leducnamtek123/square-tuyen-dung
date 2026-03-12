@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Pagination, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useQuestionGroups } from './hooks/useQuestionGroups';
 import QuestionGroupTable from './components/QuestionGroupTable';
-import adminManagementService from '../../../services/adminManagementService';
 import questionService from '../../../services/questionService';
 import { transformQuestion, transformQuestionGroup } from '../../../utils/transformers';
 
 const QuestionGroupsPage = () => {
+    const { t } = useTranslation('admin');
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -149,14 +150,14 @@ const QuestionGroupsPage = () => {
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-                        Question Group Management
+                        {t('pages.questionGroups.title')}
                     </Typography>
                     <Breadcrumbs aria-label="breadcrumb">
                         <Link underline="hover" color="inherit" href="/admin">
-                            Admin
+                            {t('pages.questionGroups.breadcrumbAdmin')}
                         </Link>
-                        <Typography color="text.primary">Question Bank</Typography>
-                        <Typography color="text.primary">Question Groups</Typography>
+                        <Typography color="text.primary">{t('pages.questionGroups.breadcrumbBank')}</Typography>
+                        <Typography color="text.primary">{t('pages.questionGroups.breadcrumbGroups')}</Typography>
                     </Breadcrumbs>
                 </Box>
                 <Button
@@ -165,14 +166,14 @@ const QuestionGroupsPage = () => {
                     onClick={handleOpenAdd}
                     sx={{ borderRadius: '8px', textTransform: 'none' }}
                 >
-                    Add Question Group
+                    {t('pages.questionGroups.addBtn')}
                 </Button>
             </Box>
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
                         size="small"
-                        placeholder="Search question groups..."
+                        placeholder={t('pages.questionGroups.searchPlaceholder')}
                         value={searchTerm}
                         onChange={handleSearch}
                         sx={{ width: 300 }}
@@ -215,19 +216,19 @@ const QuestionGroupsPage = () => {
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="xs">
                 <DialogTitle>
-                    {dialogMode === 'add' ? 'Add New Question Group' : 'Edit Question Group'}
+                    {dialogMode === 'add' ? t('pages.questionGroups.addTitle') : t('pages.questionGroups.editTitle')}
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <TextField
-                            label="Question Group Name"
+                            label={t('pages.questionGroups.groupNameLabel')}
                             fullWidth
                             value={groupName}
                             onChange={(e) => setGroupName(e.target.value)}
                             required
                         />
                         <TextField
-                            label="Description"
+                            label={t('pages.questionGroups.descriptionLabel')}
                             fullWidth
                             multiline
                             rows={3}
@@ -235,12 +236,12 @@ const QuestionGroupsPage = () => {
                             onChange={(e) => setGroupDescription(e.target.value)}
                         />
                         <FormControl fullWidth>
-                            <InputLabel>Select Questions</InputLabel>
+                            <InputLabel>{t('pages.questionGroups.selectQuestionsLabel')}</InputLabel>
                             <Select
                                 multiple
                                 value={selectedQuestions}
                                 onChange={(e) => setSelectedQuestions(e.target.value)}
-                                input={<OutlinedInput label="Select Questions" />}
+                                input={<OutlinedInput label={t('pages.questionGroups.selectQuestionsLabel')} />}
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                         {selected.map((value) => {
@@ -263,28 +264,28 @@ const QuestionGroupsPage = () => {
                             onClick={() => setOpenCreateQuestion(true)}
                             sx={{ alignSelf: 'flex-start' }}
                         >
-                            Create New Question
+                            {t('pages.questionGroups.createQuestionBtn')}
                         </Button>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">Cancel</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.questionGroups.cancelBtn')}</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={isMutating || !groupName.trim()}
                     >
-                        {isMutating ? 'Saving...' : 'Save'}
+                        {isMutating ? t('pages.questionGroups.savingBtn') : t('pages.questionGroups.saveBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
             {/* Create Question Dialog */}
             <Dialog open={openCreateQuestion} onClose={() => setOpenCreateQuestion(false)} fullWidth maxWidth="xs">
-                <DialogTitle>Create New Question</DialogTitle>
+                <DialogTitle>{t('pages.questionGroups.createQuestionTitle')}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1 }}>
                         <TextField
-                            label="Question Content"
+                            label={t('pages.questionGroups.questionContentLabel')}
                             fullWidth
                             multiline
                             rows={3}
@@ -295,34 +296,31 @@ const QuestionGroupsPage = () => {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenCreateQuestion(false)} color="inherit">Cancel</Button>
+                    <Button onClick={() => setOpenCreateQuestion(false)} color="inherit">{t('pages.questionGroups.cancelBtn')}</Button>
                     <Button
                         onClick={handleCreateQuestion}
                         variant="contained"
                         disabled={isCreatingQuestion || !newQuestionContent.trim()}
                     >
-                        {isCreatingQuestion ? 'Creating...' : 'Create'}
+                        {isCreatingQuestion ? t('pages.questionGroups.creatingBtn') : t('pages.questionGroups.createBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogTitle>{t('pages.questionGroups.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography>
-                        Are you sure you want to delete question group <strong>{currentGroup?.name}</strong>?
-                        The questions inside will not be deleted, but the links to this group will be lost.
-                    </Typography>
+                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.questionGroups.deleteText', { name: currentGroup?.name }) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Cancel</Button>
+                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.questionGroups.cancelBtn')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Deleting...' : 'Confirm Delete'}
+                        {isMutating ? t('pages.questionGroups.deletingBtn') : t('pages.questionGroups.deleteBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>

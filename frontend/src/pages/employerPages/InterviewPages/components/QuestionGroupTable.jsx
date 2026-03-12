@@ -1,10 +1,12 @@
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Tooltip, IconButton, Box, CircularProgress } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
 const QuestionGroupTable = ({ data, loading, onEdit, onDelete }) => {
+    const { t } = useTranslation('employer');
     if (loading && (!data || data.length === 0)) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
@@ -16,7 +18,7 @@ const QuestionGroupTable = ({ data, loading, onEdit, onDelete }) => {
     if (!data || data.length === 0) {
         return (
             <Box sx={{ p: 5, textAlign: 'center' }}>
-                <Typography color="text.secondary">Chưa có bộ câu hỏi nào</Typography>
+                <Typography color="text.secondary">{t('questionGroupsCard.table.noData')}</Typography>
             </Box>
         );
     }
@@ -26,10 +28,10 @@ const QuestionGroupTable = ({ data, loading, onEdit, onDelete }) => {
             <Table>
                 <TableHead sx={{ bgcolor: 'grey.100' }}>
                     <TableRow>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Tên bộ câu hỏi</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Mô tả</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Số câu hỏi</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }} align="right">Thao tác</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('questionGroupsCard.label.questiongroupname')}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('questionGroupsCard.label.description')}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('questionGroupsCard.label.questionCount')}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }} align="right">{t('jobPost.table.actions')}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -51,12 +53,12 @@ const QuestionGroupTable = ({ data, loading, onEdit, onDelete }) => {
                                 </Typography>
                             </TableCell>
                             <TableCell align="right">
-                                <Tooltip title="Chỉnh sửa">
+                                <Tooltip title={t('jobPost.tooltips.update')}>
                                     <IconButton size="small" onClick={() => onEdit(item)} color="primary">
                                         <EditIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Xóa">
+                                <Tooltip title={t('jobPost.tooltips.delete')}>
                                     <IconButton size="small" onClick={() => onDelete(item)} color="error">
                                         <DeleteOutlineIcon fontSize="small" />
                                     </IconButton>

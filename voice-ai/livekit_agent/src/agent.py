@@ -16,6 +16,8 @@ from livekit.plugins.turn_detector.multilingual import MultilingualModel
 from .config import config
 from .prompts import DEFAULT_GREETING
 from .interviewer import Interviewer
+from .session_settings import build_session_kwargs
+from .preemptive_policy import should_enable_preemptive
 
 logger = logging.getLogger("agent")
 
@@ -117,6 +119,7 @@ async def entrypoint(ctx: JobContext):
             tts=tts_model,
             vad=vad_model,
             turn_detection=device_turn_detector,
+            **build_session_kwargs(),
         )
         
         # 6. Start session with the Interviewer agent
@@ -124,6 +127,20 @@ async def entrypoint(ctx: JobContext):
             room=ctx.room,
             agent=Interviewer(context=agent_context)
         )
+        if config.PREEMPTIVE_GATING and config.PREEMPTIVE_GENERATION:
+            session.options.preemptive_generation = False
+
+            def _handle_transcript(ev):
+                if ev.is_final:
+                    session.options.preemptive_generation = False
+                    return
+                session.options.preemptive_generation = should_enable_preemptive(
+                    ev.transcript,
+                    min_words=config.PREEMPTIVE_MIN_WORDS,
+                    min_chars=config.PREEMPTIVE_MIN_CHARS,
+                )
+
+            session.on("user_input_transcribed", _handle_transcript)
         
         # 7. Post-start actions
         await _update_backend_status(ctx.room.name, "in_progress")
@@ -131,7 +148,7 @@ async def entrypoint(ctx: JobContext):
         
         logger.info("Greeting user: %s", greeting)
         # Generate initial response
-        await session.say(greeting, allow_interruptions=False)
+        await session.say(greeting, allow_interruptions=True)
 
         # 8. Keep alive while room is connected
         while ctx.room.isconnected:

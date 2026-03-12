@@ -10,6 +10,7 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent, Stack, Typography, Skeleton } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 
@@ -47,6 +48,7 @@ const StatItem = ({ title, value, color, Icon, loading }) => (
 );
 
 const EmployerQuantityStatistics = () => {
+  const { t } = useTranslation('employer');
   const [isLoading, setIsLoading] = React.useState(true);
   const [data, setData] = React.useState(null);
 
@@ -76,7 +78,7 @@ const EmployerQuantityStatistics = () => {
           lg: 3
         }}>
         <StatItem
-          title="Total Job Posts"
+          title={t('statItem.title.totaljobposts', 'Total Job Posts')}
           value={data?.totalJobPost}
           color="#3f8600"
           Icon={DescriptionOutlinedIcon}
@@ -91,7 +93,7 @@ const EmployerQuantityStatistics = () => {
           lg: 3
         }}>
         <StatItem
-          title="Pending Job Posts"
+          title={t('statItem.title.pendingjobposts', 'Pending Job Posts')}
           value={data?.totalJobPostingPendingApproval}
           color="#ff9800"
           Icon={AccessTimeOutlinedIcon}
@@ -106,7 +108,7 @@ const EmployerQuantityStatistics = () => {
           lg: 3
         }}>
         <StatItem
-          title="Expired Job Posts"
+          title={t('statItem.title.expiredjobposts', 'Expired Job Posts')}
           value={data?.totalJobPostExpired}
           color="#cf1322"
           Icon={HighlightOffOutlinedIcon}
@@ -121,7 +123,7 @@ const EmployerQuantityStatistics = () => {
           lg: 3
         }}>
         <StatItem
-          title="Total Applications"
+          title={t('statItem.title.totalapplications', 'Total Applications')}
           value={data?.totalApply}
           color="#00b0ff"
           Icon={GroupsOutlinedIcon}

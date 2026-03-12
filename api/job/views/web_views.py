@@ -484,8 +484,11 @@ class EmployerJobPostActivityViewSet(viewsets.ViewSet,
         if page is not None:
             for item in res_data:
                 if item['avatarUrl']:
-                    avatar = File.objects.get(id=item['avatarUrl'])
-                    item['avatarUrl'] = avatar.get_full_url() if avatar else var_sys.AVATAR_DEFAULT["AVATAR"]
+                    try:
+                        avatar = File.objects.get(id=item['avatarUrl'])
+                        item['avatarUrl'] = avatar.get_full_url() if avatar else var_sys.AVATAR_DEFAULT["AVATAR"]
+                    except File.DoesNotExist:
+                        item['avatarUrl'] = var_sys.AVATAR_DEFAULT["AVATAR"]
                 else:
                     item['avatarUrl'] = var_sys.AVATAR_DEFAULT["AVATAR"]
             return self.get_paginated_response(res_data)

@@ -1,6 +1,6 @@
 aiohttp-retry==2.8.3
 asyncio==3.4.3
-cloudinary==1.32.0
+minio==7.2.7
 colorama==0.4.6
 django-admin-list-filter-dropdown==1.0.3
 django-autoslug==1.9.9

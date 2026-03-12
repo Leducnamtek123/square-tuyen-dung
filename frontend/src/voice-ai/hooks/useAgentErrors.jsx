@@ -6,7 +6,7 @@ import { toastAlert } from '@/voice-ai/components/livekit/alert-toast';
 export function useAgentErrors() {
   const { t } = useTranslation('interview');
   const agent = useAgent();
-  const { isConnected, end } = useSessionContext();
+  const { isConnected } = useSessionContext();
 
   useEffect(() => {
     if (isConnected && agent.state === 'failed') {
@@ -40,11 +40,12 @@ export function useAgentErrors() {
               </a>
               .
             </p>
+            <p className="w-full">
+              {t('voiceAi.agentErrors.sessionRetained')}
+            </p>
           </>
         ),
       });
-
-      end();
     }
-  }, [agent, isConnected, end, t]);
+  }, [agent, isConnected, t]);
 }

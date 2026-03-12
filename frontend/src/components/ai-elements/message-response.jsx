@@ -1,0 +1,101 @@
+import { memo, useEffect, useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
+
+const hasMermaid = (content) => /```mermaid[\s\S]*?```/i.test(content);
+const hasCode = (content) => /```[\s\S]*?```/.test(content) || /`[^`]+`/.test(content);
+const hasMath = (content) => /\$\$[\s\S]*?\$\$/.test(content) || /(^|[^\\])\$(.+?)([^\\])\$/s.test(content);
+const STREAMDOWN_CODE_CDN =
+  import.meta.env.VITE_STREAMDOWN_CODE_CDN ||
+  "https://esm.sh/@streamdown/code@1.1.0";
+const STREAMDOWN_MERMAID_CDN =
+  import.meta.env.VITE_STREAMDOWN_MERMAID_CDN ||
+  "https://esm.sh/@streamdown/mermaid@1.0.2";
+
+const MessageResponseInner = memo(({
+  className,
+  children,
+  enableRich = false,
+  ...props
+}) => {
+  const content = typeof children === "string" ? children : "";
+  if (!enableRich) {
+    return (
+      <div
+        className={cn("size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className)}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+  const needsMermaid = useMemo(() => hasMermaid(content), [content]);
+  const needsCode = useMemo(() => hasCode(content), [content]);
+  const needsMath = useMemo(() => hasMath(content), [content]);
+  const [streamdownState, setStreamdownState] = useState({
+    Streamdown: null,
+    plugins: null,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadStreamdown = async () => {
+      const [{ Streamdown }, { cjk }] = await Promise.all([
+        import("streamdown"),
+        import("@streamdown/cjk"),
+      ]);
+
+      const plugins = { cjk };
+
+      if (needsCode) {
+        const { code } = await import(/* @vite-ignore */ STREAMDOWN_CODE_CDN);
+        plugins.code = code;
+      }
+
+      if (needsMath) {
+        const { math } = await import("@streamdown/math");
+        plugins.math = math;
+      }
+
+      if (needsMermaid) {
+        const { mermaid } = await import(/* @vite-ignore */ STREAMDOWN_MERMAID_CDN);
+        plugins.mermaid = mermaid;
+      }
+
+      if (!cancelled) {
+        setStreamdownState({ Streamdown, plugins });
+      }
+    };
+
+    loadStreamdown();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [needsCode, needsMath, needsMermaid]);
+
+  if (!streamdownState.Streamdown) {
+    return (
+      <div
+        className={cn("size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className)}
+        {...props}
+      >
+        {children}
+      </div>
+    );
+  }
+
+  const Streamdown = streamdownState.Streamdown;
+
+  return (
+    <Streamdown
+      className={cn("size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className)}
+      plugins={streamdownState.plugins}
+      {...props}
+    />
+  );
+}, (prevProps, nextProps) => prevProps.children === nextProps.children);
+
+MessageResponseInner.displayName = "MessageResponseInner";
+
+export default MessageResponseInner;

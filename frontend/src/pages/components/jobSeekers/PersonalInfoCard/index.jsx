@@ -12,6 +12,7 @@ See the LICENSE file in the project root for full license information.
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 import { Box, Divider, Fab, Skeleton, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 
@@ -72,45 +73,46 @@ const Loading = (
   </>
 );
 
-const item = (title, value) => {
-  return (
-    <Box
-      sx={{
-        p: 1,
-        backgroundColor: "background.paper",
-      }}
-    >
-      <Typography
-        sx={{
-          fontWeight: 600,
-          color: "primary.main",
-          fontSize: "0.875rem",
-          mb: 1,
-        }}
-      >
-        {title}
-      </Typography>
-      <Typography
-        sx={{
-          color: value ? "text.primary" : "text.disabled",
-          fontStyle: value ? "normal" : "italic",
-          fontSize: value ? "1rem" : "0.875rem",
-        }}
-      >
-        {value || "Not updated"}
-      </Typography>
-    </Box>
-  );
-};
-
 const PersonalInfoCard = ({ title }) => {
-  const dispatch = useDispatch();
-  const { allConfig } = useSelector((state) => state.config);
-  const [openPopup, setOpenPopup] = React.useState(false);
-  const [isSuccess, setIsSuccess] = React.useState(false);
-  const [isLoadingProfile, setIsLoadingProfile] = React.useState(true);
-  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-  const [profile, setProfile] = React.useState(null);
+    const { t } = useTranslation(['jobSeeker', 'common']);
+    const dispatch = useDispatch();
+    const { allConfig } = useSelector((state) => state.config);
+    const [openPopup, setOpenPopup] = React.useState(false);
+    const [isSuccess, setIsSuccess] = React.useState(false);
+    const [isLoadingProfile, setIsLoadingProfile] = React.useState(true);
+    const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
+    const [profile, setProfile] = React.useState(null);
+
+    const item = (title, value) => {
+        return (
+            <Box
+                sx={{
+                    p: 1,
+                    backgroundColor: "background.paper",
+                }}
+            >
+                <Typography
+                    sx={{
+                        fontWeight: 600,
+                        color: "primary.main",
+                        fontSize: "0.875rem",
+                        mb: 1,
+                    }}
+                >
+                    {title}
+                </Typography>
+                <Typography
+                    sx={{
+                        color: value ? "text.primary" : "text.disabled",
+                        fontStyle: value ? "normal" : "italic",
+                        fontSize: value ? "1rem" : "0.875rem",
+                    }}
+                >
+                    {value || t('common:noData')}
+                </Typography>
+            </Box>
+        );
+    };
 
   React.useEffect(() => {
     const getProfile = async () => {
@@ -139,7 +141,7 @@ const updateProfile = async (data) => {
     dispatch(getUserInfo());
     setIsSuccess(!isSuccess);
     setOpenPopup(false);
-    toastMessages.success("Personal information updated successfully.");
+    toastMessages.success(t('jobSeeker:profile.messages.personalUpdateSuccess'));
   } catch (error) {
     errorHandling(error);
   } finally {
@@ -211,17 +213,17 @@ return (
                   xl: 4
                 }}>
                 <Stack spacing={1.5}>
-                  {item("Full Name", profile?.user?.fullName)}
-                  {item("Phone Number", profile?.phone)}
-                  {item("Gender", allConfig.genderDict[profile?.gender])}
+                  {item(t('jobSeeker:profile.fields.fullName'), profile?.user?.fullName)}
+                  {item(t('jobSeeker:profile.fields.phone'), profile?.phone)}
+                  {item(t('jobSeeker:profile.fields.gender'), allConfig.genderDict[profile?.gender])}
                   {item(
-                    "Date of Birth",
+                    t('jobSeeker:profile.fields.birthday'),
                     profile?.birthday
                       ? dayjs(profile.birthday).format("DD/MM/YYYY")
                       : profile?.birthday
                   )}
                   {item(
-                    "Marital Status",
+                    t('jobSeeker:profile.fields.maritalStatus'),
                     allConfig.maritalStatusDict[profile?.maritalStatus]
                   )}
                 </Stack>
@@ -236,11 +238,11 @@ return (
                 }}>
                 <Stack spacing={1.5}>
                   {item(
-                    "City/Province",
+                    t('common:city'),
                     allConfig.cityDict[profile?.location?.city]
                   )}
-                  {item("District", profile?.location?.districtDict?.name)}
-                  {item("Address", profile?.location?.address)}
+                  {item(t('jobSeeker:profile.fields.district'), profile?.location?.districtDict?.name)}
+                  {item(t('jobSeeker:profile.fields.address'), profile?.location?.address)}
                 </Stack>
               </Grid>
             </Grid>
@@ -250,7 +252,7 @@ return (
     </Box>
     {/* Start: form  */}
     <FormPopup
-      title="Personal Information"
+      title={t('jobSeeker:profile.sections.personal')}
       openPopup={openPopup}
       setOpenPopup={setOpenPopup}
     >

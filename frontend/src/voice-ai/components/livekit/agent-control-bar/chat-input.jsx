@@ -52,8 +52,8 @@ export function ChatInput({ chatOpen, isAgentAvailable = true, onSend }) {
         <input
           ref={inputRef}
           className={cn(
-            'border-input bg-background text-foreground flex h-10 w-full rounded-full border px-4 text-xs',
-            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+            'flex h-10 w-full rounded-full border border-white/10 bg-white/5 px-4 text-xs text-white/90',
+            'focus-visible:border-white/30 focus-visible:ring-white/20 focus-visible:ring-[3px]',
             'disabled:cursor-not-allowed disabled:opacity-50'
           )}
           type="text"

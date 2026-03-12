@@ -11,6 +11,7 @@ See the LICENSE file in the project root for full license information.
 
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -33,6 +34,7 @@ import NoDataCard from "../../../../components/NoDataCard";
 import { reloadResume } from "../../../../redux/profileSlice";
 
 const ProfileUpload = ({ title }) => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
   const dispatch = useDispatch();
   const {
     resume: { isReloadResume },
@@ -75,7 +77,7 @@ const ProfileUpload = ({ title }) => {
 
         setOpenPopup(false);
         setIsSuccess(!isSuccess);
-        toastMessages.success("Resume uploaded successfully.");
+        toastMessages.success(t('jobSeeker:profile.messages.resumeUploadSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -96,7 +98,7 @@ const ProfileUpload = ({ title }) => {
         await resumeService.deleteResume(slug);
 
         setIsSuccess(!isSuccess);
-        toastMessages.success("Resume deleted successfully.");
+        toastMessages.success(t('jobSeeker:profile.messages.resumeDeleteSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -106,8 +108,8 @@ const ProfileUpload = ({ title }) => {
 
     confirmModal(
       () => del(slug),
-      "Delete Attached Resume",
-      "This resume will be permanently deleted and cannot be restored. Are you sure?",
+      t('jobSeeker:profile.messages.deleteConfirmTitle', { item: t('jobSeeker:attachedProfile.sections.cv') }),
+      t('jobSeeker:profile.messages.deleteConfirmWarning'),
       "warning"
     );
   };
@@ -119,7 +121,7 @@ const ProfileUpload = ({ title }) => {
         await resumeService.activeResume(resumeSlug);
 
         dispatch(reloadResume());
-        toastMessages.success("Profile status updated successfully.");
+        toastMessages.success(t('jobSeeker:profile.messages.profileStatusUpdateSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -160,7 +162,7 @@ const ProfileUpload = ({ title }) => {
                 </Grid>
               ) : resumes.length === 0 ? (
                 <NoDataCard
-                  title="No resumes uploaded yet"
+                  title={t('jobSeeker:profile.messages.noResumeData')}
                   imgComponentSgv={<SVG_IMAGES.ImageSvg2 />}
                 />
               ) : (
@@ -206,7 +208,7 @@ const ProfileUpload = ({ title }) => {
                   },
                 }}
               >
-                Upload Resume
+                {t('jobSeeker:attachedProfile.sidebar.cv')}
               </Button>
             </Stack>
           </Box>
@@ -214,7 +216,7 @@ const ProfileUpload = ({ title }) => {
       </Stack>
       {/* Start: form  */}
       <FormPopup
-        title="Resume Information"
+        title={t('jobSeeker:profile.sections.resume')}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >

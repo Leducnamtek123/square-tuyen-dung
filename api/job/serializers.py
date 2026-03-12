@@ -147,7 +147,7 @@ class JobPostSerializer(serializers.ModelSerializer):
                 job_post.save()
         except Exception as ex:
             helper.print_log_error("create job post", error=ex)
-            return None
+            raise
         else:
             return job_post
 
@@ -173,20 +173,21 @@ class JobPostSerializer(serializers.ModelSerializer):
             instance.contact_person_email = validated_data.get('contact_person_email', instance.contact_person_email)
             instance.status = var_sys.JOB_POST_STATUS[0][0]
             location_obj = instance.location
+            location_data = validated_data.get("location")
 
             with transaction.atomic():
-                if location_obj:
-                    location_obj.city = validated_data["location"].get("city", location_obj.city)
-                    location_obj.district = validated_data["location"].get("district", location_obj.district)
-                    location_obj.address = validated_data["location"].get("address", location_obj.address)
-                    location_obj.lat = validated_data["location"].get("lat", location_obj.lat)
-                    location_obj.lng = validated_data["location"].get("lng", location_obj.lng)
+                if location_data and location_obj:
+                    location_obj.city = location_data.get("city", location_obj.city)
+                    location_obj.district = location_data.get("district", location_obj.district)
+                    location_obj.address = location_data.get("address", location_obj.address)
+                    location_obj.lat = location_data.get("lat", location_obj.lat)
+                    location_obj.lng = location_data.get("lng", location_obj.lng)
                     location_obj.save()
                 instance.save()
                 return instance
         except Exception as ex:
             helper.print_log_error("update job post", ex)
-            return None
+            raise
 
 
 class JobPostAroundFilterSerializer(serializers.Serializer):
@@ -266,7 +267,7 @@ class JobSeekerJobPostActivitySerializer(serializers.ModelSerializer):
             return job_post_activity
         except Exception as ex:
             helper.print_log_error("create job post activity", ex)
-            return None
+            raise
 
 
 class EmployerJobPostActivitySerializer(serializers.ModelSerializer):
@@ -380,7 +381,7 @@ class JobPostNotificationSerializer(serializers.ModelSerializer):
                 job_post_notification.save()
         except Exception as ex:
             helper.print_log_error("create job post notification", error=ex)
-            return None
+            raise
         else:
             return job_post_notification
 

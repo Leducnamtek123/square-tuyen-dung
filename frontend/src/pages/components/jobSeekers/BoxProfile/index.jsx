@@ -12,8 +12,6 @@ See the LICENSE file in the project root for full license information.
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { PDFDownloadLink } from "@react-pdf/renderer";
-
 import { Box, Chip, Stack, Typography, Button, Divider, Tooltip, Skeleton, CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 
@@ -40,7 +38,10 @@ import errorHandling from "../../../../utils/errorHandling";
 import MuiImageCustom from "../../../../components/MuiImageCustom";
 import toSlug, { salaryString } from "../../../../utils/customData";
 import NoDataCard from "../../../../components/NoDataCard";
-import CVDoc from "../../../../components/CVDoc";
+const LazyPDFDownloadLink = React.lazy(() =>
+  import("@react-pdf/renderer").then((module) => ({ default: module.PDFDownloadLink }))
+);
+const LazyCVDoc = React.lazy(() => import("../../../../components/CVDoc"));
 import { reloadResume } from "../../../../redux/profileSlice";
 import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
 import resumeService from "../../../../services/resumeService";
@@ -247,44 +248,58 @@ const BoxProfile = ({ title }) => {
                 </Stack>
 
                 {!isGeneratingPDF && (
-                  <PDFDownloadLink
-                    document={<CVDoc resume={resume} user={currentUser} themeColor={selectedColor} />}
-                    fileName={`${APP_NAME}_CV_${currentUser?.fullName}-${toSlug(resume?.title || "title")}.pdf`}
-                    style={{ textDecoration: "none" }}
+                  <React.Suspense
+                    fallback={(
+                      <Chip
+                        size="small"
+                        icon={<CircularProgress size={16} />}
+                        color="secondary"
+                        label="Loading..."
+                        sx={{
+                          boxShadow: (theme) => theme.customShadows.medium,
+                        }}
+                      />
+                    )}
                   >
-                    {({ loading, blob }) => {
-                      if (blob) {
-                        blobRef.current = blob;
-                      }
-                      
-                      return loading || isGeneratingPDF ? (
-                        <Chip
-                          size="small"
-                          icon={<CircularProgress size={16} />}
-                          color="secondary"
-                          label="Loading..."
-                          sx={{
-                            boxShadow: (theme) => theme.customShadows.medium,
-                          }}
-                        />
-                      ) : (
-                        <Chip
-                          size="small"
-                          icon={<DownloadIcon />}
-                          color="secondary"
-                          label="Download"
-                          onClick={handleDownloadClick}
-                          sx={{
-                            boxShadow: (theme) => theme.customShadows.medium,
-                            "&:hover": {
-                              transform: "scale(1.03)",
-                            },
-                            transition: "all 0.2s ease-in-out",
-                          }}
-                        />
-                      );
-                    }}
-                  </PDFDownloadLink>
+                    <LazyPDFDownloadLink
+                      document={<LazyCVDoc resume={resume} user={currentUser} themeColor={selectedColor} />}
+                      fileName={`${APP_NAME}_CV_${currentUser?.fullName}-${toSlug(resume?.title || "title")}.pdf`}
+                      style={{ textDecoration: "none" }}
+                    >
+                      {({ loading, blob }) => {
+                        if (blob) {
+                          blobRef.current = blob;
+                        }
+                        
+                        return loading || isGeneratingPDF ? (
+                          <Chip
+                            size="small"
+                            icon={<CircularProgress size={16} />}
+                            color="secondary"
+                            label="Loading..."
+                            sx={{
+                              boxShadow: (theme) => theme.customShadows.medium,
+                            }}
+                          />
+                        ) : (
+                          <Chip
+                            size="small"
+                            icon={<DownloadIcon />}
+                            color="secondary"
+                            label="Download"
+                            onClick={handleDownloadClick}
+                            sx={{
+                              boxShadow: (theme) => theme.customShadows.medium,
+                              "&:hover": {
+                                transform: "scale(1.03)",
+                              },
+                              transition: "all 0.2s ease-in-out",
+                            }}
+                          />
+                        );
+                      }}
+                    </LazyPDFDownloadLink>
+                  </React.Suspense>
                 )}
 
                 {isGeneratingPDF && (

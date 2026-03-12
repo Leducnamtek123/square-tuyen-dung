@@ -14,6 +14,7 @@ import { useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { useTranslation } from 'react-i18next';
 import Grid from "@mui/material/Grid2";
 
 import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
@@ -24,13 +25,14 @@ const LanguageSkillForm = ({
   editData,
   serverErrors = null,
 }) => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
   const { allConfig } = useSelector((state) => state.config);
   const schema = yup.object().shape({
     language: yup
       .number()
-      .required('Language is required.')
-      .typeError('Language is required.'),
-    level: yup.number().required('Level is required.'),
+      .required(t('jobSeeker:profile.validation.languageRequired'))
+      .typeError(t('jobSeeker:profile.validation.languageRequired')),
+    level: yup.number().required(t('jobSeeker:profile.validation.levelRequired')),
   });
 
   const { control, reset, setError, handleSubmit } = useForm({
@@ -75,13 +77,13 @@ const LanguageSkillForm = ({
             name="language"
             control={control}
             options={allConfig?.languageOptions || []}
-            title="Language"
+            title={t('jobSeeker:profile.fields.language')}
             showRequired={true}
-            placeholder="Select language"
+            placeholder={t('jobSeeker:profile.placeholders.selectLanguage')}
           />
         </Grid>
         <Grid size={12}>
-          <RatingCustom name="level" control={control} title="Level" />
+          <RatingCustom name="level" control={control} title={t('jobSeeker:profile.fields.level')} />
         </Grid>
       </Grid>
     </form>

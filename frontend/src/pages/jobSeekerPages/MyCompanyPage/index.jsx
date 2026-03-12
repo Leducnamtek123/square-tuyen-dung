@@ -19,6 +19,7 @@ import * as React from 'react';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 
 import { Box, Card, Stack, Tab, Typography } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 import Grid from "@mui/material/Grid2";
 
 import { TabTitle } from '../../../utils/generalFunction';
@@ -30,143 +31,141 @@ import CompanyFollowedCard from '../../components/jobSeekers/CompanyFollowedCard
 import SuggestedJobPostCard from '../../components/defaults/SuggestedJobPostCard';
 
 const MyCompanyPage = () => {
+    const { t } = useTranslation('jobSeeker');
+    TabTitle(t("myCompany.title"))
 
-  TabTitle("Trang quản trị Công ty của tôi")
+    const [value, setValue] = React.useState('1');
 
-  const [value, setValue] = React.useState('1');
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
 
-  const handleChange = (event, newValue) => {
+    return (
+        <Grid container spacing={2}>
+            <Grid
+                size={{
+                    xs: 12,
+                    sm: 12,
+                    md: 7,
+                    lg: 8,
+                    xl: 8
+                }}>
 
-    setValue(newValue);
+                <Stack spacing={2}>
 
-  };
+                    <Card sx={{ p: 1 }}>
 
-  return (
-    <Grid container spacing={2}>
-      <Grid
-        size={{
-          xs: 12,
-          sm: 12,
-          md: 7,
-          lg: 8,
-          xl: 8
-        }}>
+                        <Box sx={{ width: '100%', typography: 'body1' }}>
 
-        <Stack spacing={2}>
+                            <TabContext value={value}>
 
-          <Card sx={{ p: 1 }}>
+                                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
 
-            <Box sx={{ width: '100%', typography: 'body1' }}>
+                                    <TabList
 
-              <TabContext value={value}>
+                                        onChange={handleChange}
 
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                        aria-label="my job"
 
-                  <TabList
+                                        variant="scrollable"
 
-                    onChange={handleChange}
+                                        allowScrollButtonsMobile
 
-                    aria-label="my job"
+                                    >
 
-                    variant="scrollable"
+                                        <Tab
 
-                    allowScrollButtonsMobile
+                                            label={t("myCompany.tabs.viewed")}
 
-                  >
+                                            sx={{ textTransform: 'capitalize' }}
 
-                    <Tab
+                                            value="1"
 
-                      label="Nhà tuyển dụng xem hồ sơ"
+                                        />
 
-                      sx={{ textTransform: 'capitalize'}}
+                                        <Tab
 
-                      value="1"
+                                            label={t("myCompany.tabs.followed")}
 
-                    />
+                                            sx={{ textTransform: 'capitalize' }}
 
-                    <Tab
+                                            value="2"
 
-                      label="Theo dõi công ty"
+                                        />
 
-                      sx={{ textTransform: 'capitalize' }}
+                                    </TabList>
 
-                      value="2"
+                                </Box>
 
-                    />
+                                <TabPanel value="1" sx={{ px: { xs: 0, sm: 1, md: 2, lg: 2, xl: 2 } }}>
 
-                  </TabList>
+                                    {/* Start: CompanyViewedCard */}
 
-                </Box>
+                                    <CompanyViewedCard />
 
-                <TabPanel value="1" sx={{px: {xs: 0, sm: 1, md: 2, lg: 2, xl: 2} }}>
+                                    {/* End: CompanyViewedCard */}
 
-                  {/* Start: CompanyViewedCard */}
+                                </TabPanel>
 
-                  <CompanyViewedCard />
+                                <TabPanel value="2" sx={{ px: { xs: 0, sm: 1, md: 2, lg: 2, xl: 2 } }}>
 
-                  {/* End: CompanyViewedCard */}
+                                    {/* Start: CompanyFollowedCard */}
 
-                </TabPanel>
+                                    <CompanyFollowedCard />
 
-                <TabPanel value="2" sx={{px: {xs: 0, sm: 1, md: 2, lg: 2, xl: 2} }}>
+                                    {/* End: CompanyFollowedCard */}
 
-                  {/* Start: CompanyFollowedCard */}
+                                </TabPanel>
 
-                  <CompanyFollowedCard />
+                            </TabContext>
 
-                  {/* End: CompanyFollowedCard */}
+                        </Box>
 
-                </TabPanel>
+                    </Card>
 
-              </TabContext>
+                </Stack>
 
-            </Box>
+            </Grid>
+            <Grid
+                size={{
+                    xs: 12,
+                    sm: 12,
+                    md: 5,
+                    lg: 4,
+                    xl: 4
+                }}>
 
-          </Card>
+                <Stack spacing={2}>
 
-        </Stack>
+                    <Card sx={{ p: { xs: 1, sm: 1, md: 2, lg: 2, xl: 2 } }}>
 
-      </Grid>
-      <Grid
-        size={{
-          xs: 12,
-          sm: 12,
-          md: 5,
-          lg: 4,
-          xl: 4
-        }}>
+                        <Stack>
 
-        <Stack spacing={2}>
+                            <Box sx={{ mb: 2 }}>
 
-          <Card  sx={{p: {xs: 1, sm: 1, md: 2, lg: 2, xl: 2} }}> 
+                                <Typography variant="h6">{t("jobManagement.suitableJobs")}</Typography>
 
-            <Stack>
+                            </Box>
 
-              <Box sx={{ mb: 2 }}>
+                            <Box>
 
-                <Typography variant="h6">Việc làm phù hợp</Typography>
+                                {/* Start: SuggestedJobPostCard */}
 
-              </Box>
+                                <SuggestedJobPostCard fullWidth={true} />
 
-              <Box>
+                                {/* End: SuggestedJobPostCardf */}
 
-                {/* Start: SuggestedJobPostCard */}
+                            </Box>
 
-                <SuggestedJobPostCard fullWidth={true} />
+                        </Stack>
 
-                {/* End: SuggestedJobPostCardf */}
+                    </Card>
 
-              </Box>
+                </Stack>
 
-            </Stack>
-
-          </Card>
-
-        </Stack>
-
-      </Grid>
-    </Grid>
-  );
+            </Grid>
+        </Grid>
+    );
 
 };
 

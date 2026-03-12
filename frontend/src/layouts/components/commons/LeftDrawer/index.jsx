@@ -23,7 +23,6 @@ import { IMAGES, ROUTES } from '../../../../configs/constants';
 import { removeUserInfo } from '../../../../redux/userSlice';
 import tokenService from '../../../../services/tokenService';
 import AccountSwitchMenu from '../AccountSwitchMenu';
-import LanguageSwitcher from '../LanguageSwitcher';
 import {
   resetSearchCompany,
   resetSearchJobPostFilter,
@@ -132,9 +131,6 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle }) => {
       <AccountSwitchMenu isShowButton={true} />
 
       <Divider sx={{ my: 1, borderColor: 'grey.100' }} />
-      <Box sx={{ px: 2, display: 'flex', justifyContent: 'center' }}>
-        <LanguageSwitcher color={theme.palette.text.primary} />
-      </Box>
 
       <Divider
         variant="middle"

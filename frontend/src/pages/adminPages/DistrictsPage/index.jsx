@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, IconButton, Tooltip, MenuItem, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Pagination } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, IconButton, Tooltip, MenuItem, TextField, Dialog, DialogTitle, DialogContent, DialogActions, TablePagination } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -8,11 +9,13 @@ import { useDistricts } from './hooks/useDistricts';
 import { useCities } from '../CitiesPage/hooks/useCities';
 
 const DistrictsPage = () => {
+    const { t } = useTranslation('admin');
     const { data: citiesData, isLoading: isLoadingCities } = useCities();
     const cities = citiesData?.results || citiesData;
 
     const [selectedCity, setSelectedCity] = useState('');
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     useEffect(() => {
         if (cities && cities.length > 0 && !selectedCity) {
@@ -27,7 +30,7 @@ const DistrictsPage = () => {
         updateDistrict,
         deleteDistrict,
         isMutating
-    } = useDistricts({ city: selectedCity, page });
+    } = useDistricts({ city: selectedCity, page: page + 1, pageSize: rowsPerPage });
 
     const districts = districtsData?.results || districtsData;
 
@@ -98,14 +101,14 @@ const DistrictsPage = () => {
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-                        District Management
+                        {t('pages.districts.title')}
                     </Typography>
-                    <Breadcrumbs aria-label="breadcrumb">
+                    <Breadcrumbs aria-label={t('common.breadcrumb')}>
                         <Link underline="hover" color="inherit" href="/admin">
-                            Admin
+                            {t('pages.districts.breadcrumbAdmin')}
                         </Link>
-                        <Typography color="text.primary">General Config</Typography>
-                        <Typography color="text.primary">Districts</Typography>
+                        <Typography color="text.primary">{t('pages.districts.breadcrumbGeneral')}</Typography>
+                        <Typography color="text.primary">{t('pages.districts.breadcrumbDistricts')}</Typography>
                     </Breadcrumbs>
                 </Box>
                 <Button
@@ -114,7 +117,7 @@ const DistrictsPage = () => {
                     onClick={handleOpenAdd}
                     sx={{ borderRadius: '8px', textTransform: 'none' }}
                 >
-                    Add District
+                    {t('pages.districts.addDistrict')}
                 </Button>
             </Box>
 
@@ -124,11 +127,11 @@ const DistrictsPage = () => {
                         select
                         fullWidth
                         size="small"
-                        label="Select city to filter"
+                        label={t('pages.districts.filterCityPlaceholder')}
                         value={selectedCity}
                         onChange={(e) => {
                             setSelectedCity(e.target.value);
-                            setPage(1);
+                            setPage(0);
                         }}
                         disabled={isLoadingCities}
                     >
@@ -150,9 +153,9 @@ const DistrictsPage = () => {
                             <Table sx={{ minWidth: 650 }}>
                                 <TableHead sx={{ bgcolor: 'grey.50' }}>
                                     <TableRow>
-                                        <TableCell width={80}>ID</TableCell>
-                                        <TableCell>District Name</TableCell>
-                                        <TableCell align="right">Actions</TableCell>
+                                        <TableCell width={80}>{t('pages.districts.table.id')}</TableCell>
+                                        <TableCell>{t('pages.districts.table.districtName')}</TableCell>
+                                        <TableCell align="right">{t('pages.districts.table.actions')}</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -161,12 +164,12 @@ const DistrictsPage = () => {
                                             <TableCell>{row.id}</TableCell>
                                             <TableCell sx={{ fontWeight: 500 }}>{row.name}</TableCell>
                                             <TableCell align="right">
-                                                <Tooltip title="Edit">
+                                                <Tooltip title={t('pages.districts.table.edit')}>
                                                     <IconButton size="small" color="primary" onClick={() => handleOpenEdit(row)}>
                                                         <EditIcon fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
-                                                <Tooltip title="Delete">
+                                                <Tooltip title={t('pages.districts.table.delete')}>
                                                     <IconButton size="small" color="error" onClick={() => handleOpenDelete(row)}>
                                                         <DeleteIcon fontSize="small" />
                                                     </IconButton>
@@ -177,30 +180,36 @@ const DistrictsPage = () => {
                                     {(!districts || districts.length === 0) && selectedCity && (
                                         <TableRow>
                                             <TableCell colSpan={3} align="center" sx={{ py: 3 }}>
-                                                No data found for this city
+                                                {t('pages.districts.table.noData')}
                                             </TableCell>
                                         </TableRow>
                                     )}
                                     {!selectedCity && (
                                         <TableRow>
                                             <TableCell colSpan={3} align="center" sx={{ py: 3 }}>
-                                                Please select a city to see the district list
+                                                {t('pages.districts.table.noCitySelected')}
                                             </TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        {districtsData?.count > 10 && (
-                            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-                                <Pagination
-                                    count={Math.ceil(districtsData.count / 10)}
-                                    page={page}
-                                    onChange={(e, v) => setPage(v)}
-                                    color="primary"
-                                />
-                            </Box>
-                        )}
+                        <TablePagination
+                            rowsPerPageOptions={[5, 10, 25]}
+                            component="div"
+                            count={districtsData?.count || 0}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={(e, v) => setPage(v)}
+                            onRowsPerPageChange={(e) => {
+                                setRowsPerPage(parseInt(e.target.value, 10));
+                                setPage(0);
+                            }}
+                            labelRowsPerPage={t('common.pagination.rowsPerPage')}
+                            labelDisplayedRows={({ from, to, count }) =>
+                                t('common.pagination.displayedRows', { from, to, count })
+                            }
+                        />
                     </>
                 )}
             </Paper>
@@ -208,13 +217,13 @@ const DistrictsPage = () => {
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="xs">
                 <DialogTitle>
-                    {dialogMode === 'add' ? 'Add New District' : 'Edit District'}
+                    {dialogMode === 'add' ? t('pages.districts.addConfirmTitle') : t('pages.districts.editConfirmTitle')}
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <TextField
                             select
-                            label="City"
+                            label={t('pages.districts.cityLabel')}
                             fullWidth
                             value={targetCityId}
                             onChange={(e) => setTargetCityId(e.target.value)}
@@ -227,7 +236,7 @@ const DistrictsPage = () => {
                             ))}
                         </TextField>
                         <TextField
-                            label="District Name"
+                            label={t('pages.districts.districtNameLabel')}
                             fullWidth
                             value={districtName}
                             onChange={(e) => setDistrictName(e.target.value)}
@@ -236,35 +245,32 @@ const DistrictsPage = () => {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">Cancel</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.districts.cancelBtn')}</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={isMutating || !districtName.trim() || !targetCityId}
                     >
-                        {isMutating ? 'Saving...' : 'Save'}
+                        {isMutating ? t('pages.districts.savingBtn') : t('pages.districts.saveBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
 
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogTitle>{t('pages.districts.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography>
-                        Are you sure you want to delete district <strong>{currentDistrict?.name}</strong>?
-                        This action cannot be undone.
-                    </Typography>
+                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.districts.deleteText', { name: currentDistrict?.name }) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Cancel</Button>
+                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.districts.cancelBtn')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Deleting...' : 'Confirm Delete'}
+                        {isMutating ? t('pages.districts.deletingBtn') : t('pages.districts.deleteBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>

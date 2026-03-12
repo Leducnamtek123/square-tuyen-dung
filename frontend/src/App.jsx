@@ -9,7 +9,7 @@ License: MIT License
 See the LICENSE file in the project root for full license information.
 */
 
-import "sweetalert2/src/sweetalert2.scss";
+import "sweetalert2/dist/sweetalert2.min.css";
 
 import "./App.css";
 
@@ -30,6 +30,7 @@ import "react-toastify/dist/ReactToastify.css";
 import defaultTheme from "./themeConfigs/defaultTheme";
 import AppRoutes from "./routes/AppRouter";
 import Feedback from "./components/Feedback";
+import ChatBot from "./components/ChatBot";
 import ScrollToTop from "./components/ScrollToTop";
 import { ROLES_NAME, ROUTES, AUTH_CONFIG } from "./configs/constants";
 import { GoogleOAuthProvider } from "@react-oauth/google";
@@ -47,8 +48,36 @@ function App() {
     isAllowVerifyEmail: isAllowVerifyEmail,
   };
   const location = useLocation();
+  const isChatPage =
+    location.pathname.startsWith(`/${ROUTES.JOB_SEEKER.CHAT}`) ||
+    location.pathname.startsWith(`/${ROUTES.EMPLOYER.CHAT}`);
+  const isInterviewPage =
+    location.pathname.startsWith(`/${ROUTES.CANDIDATE.INTERVIEW}`) ||
+    location.pathname.startsWith(`/${ROUTES.CANDIDATE.INTERVIEW_ROOM}`) ||
+    location.pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_LIVE}`) ||
+    location.pathname.startsWith(`/${ROUTES.ADMIN.INTERVIEW_LIVE}`);
+  const canShowChatBot =
+    settings.isAuthenticated &&
+    (settings.isJobSeekerRole || settings.isEmployerRole || settings.isAdminRole) &&
+    !isChatPage &&
+    !isInterviewPage;
 
   const theme = React.useMemo(() => createTheme(defaultTheme, viVN), []);
+  const routeFallback = (
+    <div
+      style={{
+        minHeight: "40vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: "#6b7280",
+        fontSize: "0.95rem",
+      }}
+      aria-busy="true"
+    >
+      Loading...
+    </div>
+  );
 
   React.useEffect(() => {
     const initializeApp = async () => {
@@ -131,20 +160,25 @@ function App() {
       <ThemeProvider theme={theme}>
         <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
           <CssBaseline enableColorScheme />
-          <AppRoutes settings={settings} />
+          <React.Suspense fallback={routeFallback}>
+            <AppRoutes settings={settings} />
+          </React.Suspense>
           {/* Start: toast */}
           <ToastContainer autoClose={1300} />
           {/* End: toast */}
 
-          {/* Do not show feedback and chatbot in chat pages */}
-          {!location.pathname.startsWith(`/${ROUTES.JOB_SEEKER.CHAT}`) &&
-            !location.pathname.startsWith(`/${ROUTES.EMPLOYER.CHAT}`) && (
-              <>
-                {/* Start: Feedback */}
-                {isAuthenticated && <Feedback />}
-                {/* End: Feedback */}
-              </>
-            )}
+          {/* Do not show feedback in chat or interview pages */}
+          {!isChatPage && !isInterviewPage && (
+            <>
+              {/* Start: Feedback */}
+              {isAuthenticated && <Feedback />}
+              {/* End: Feedback */}
+            </>
+          )}
+
+          {/* Start: ChatBot */}
+          {canShowChatBot && <ChatBot />}
+          {/* End: ChatBot */}
         </GoogleOAuthProvider>
       </ThemeProvider>
       <ScrollToTop />

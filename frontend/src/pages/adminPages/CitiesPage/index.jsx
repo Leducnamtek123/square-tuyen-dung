@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Pagination } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, TextField, TablePagination } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -7,7 +8,9 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useCities } from './hooks/useCities';
 
 const CitiesPage = () => {
-    const [page, setPage] = useState(1);
+    const { t } = useTranslation('admin');
+    const [page, setPage] = useState(0);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
@@ -25,7 +28,7 @@ const CitiesPage = () => {
         updateCity,
         deleteCity,
         isMutating
-    } = useCities({ page });
+    } = useCities({ page: page + 1, pageSize: rowsPerPage });
 
     const handleOpenAdd = () => {
         setDialogMode('add');
@@ -79,14 +82,14 @@ const CitiesPage = () => {
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-                        City Management
+                        {t('pages.cities.title')}
                     </Typography>
-                    <Breadcrumbs aria-label="breadcrumb">
+                    <Breadcrumbs aria-label={t('common.breadcrumb')}>
                         <Link underline="hover" color="inherit" href="/admin">
-                            Admin
+                            {t('pages.cities.breadcrumbAdmin')}
                         </Link>
-                        <Typography color="text.primary">General Config</Typography>
-                        <Typography color="text.primary">Cities</Typography>
+                        <Typography color="text.primary">{t('pages.cities.breadcrumbGeneral')}</Typography>
+                        <Typography color="text.primary">{t('pages.cities.breadcrumbCities')}</Typography>
                     </Breadcrumbs>
                 </Box>
                 <Button
@@ -95,7 +98,7 @@ const CitiesPage = () => {
                     onClick={handleOpenAdd}
                     sx={{ borderRadius: '8px', textTransform: 'none' }}
                 >
-                    Add City
+                    {t('pages.cities.addCity')}
                 </Button>
             </Box>
 
@@ -110,9 +113,9 @@ const CitiesPage = () => {
                             <Table sx={{ minWidth: 650 }}>
                                 <TableHead sx={{ bgcolor: 'grey.50' }}>
                                     <TableRow>
-                                        <TableCell width={80}>ID</TableCell>
-                                        <TableCell>City Name</TableCell>
-                                        <TableCell align="right">Actions</TableCell>
+                                        <TableCell width={80}>{t('pages.cities.table.id')}</TableCell>
+                                        <TableCell>{t('pages.cities.table.cityName')}</TableCell>
+                                        <TableCell align="right">{t('pages.cities.table.actions')}</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -121,12 +124,12 @@ const CitiesPage = () => {
                                             <TableCell>{row.id}</TableCell>
                                             <TableCell sx={{ fontWeight: 500 }}>{row.name}</TableCell>
                                             <TableCell align="right">
-                                                <Tooltip title="Edit">
+                                                <Tooltip title={t('pages.cities.table.edit')}>
                                                     <IconButton size="small" color="primary" onClick={() => handleOpenEdit(row)}>
                                                         <EditIcon fontSize="small" />
                                                     </IconButton>
                                                 </Tooltip>
-                                                <Tooltip title="Delete">
+                                                <Tooltip title={t('pages.cities.table.delete')}>
                                                     <IconButton size="small" color="error" onClick={() => handleOpenDelete(row)}>
                                                         <DeleteIcon fontSize="small" />
                                                     </IconButton>
@@ -137,23 +140,29 @@ const CitiesPage = () => {
                                     {(!data || (data.results || data).length === 0) && (
                                         <TableRow>
                                             <TableCell colSpan={3} align="center" sx={{ py: 3 }}>
-                                                No data found
+                                                {t('pages.cities.table.noData')}
                                             </TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
                             </Table>
                         </TableContainer>
-                        {data?.count > 10 && (
-                            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-                                <Pagination
-                                    count={Math.ceil(data.count / 10)}
-                                    page={page}
-                                    onChange={(e, v) => setPage(v)}
-                                    color="primary"
-                                />
-                            </Box>
-                        )}
+                        <TablePagination
+                            rowsPerPageOptions={[5, 10, 25]}
+                            component="div"
+                            count={data?.count || 0}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={(e, v) => setPage(v)}
+                            onRowsPerPageChange={(e) => {
+                                setRowsPerPage(parseInt(e.target.value, 10));
+                                setPage(0);
+                            }}
+                            labelRowsPerPage={t('common.pagination.rowsPerPage')}
+                            labelDisplayedRows={({ from, to, count }) =>
+                                t('common.pagination.displayedRows', { from, to, count })
+                            }
+                        />
                     </>
                 )}
             </Paper>
@@ -161,12 +170,12 @@ const CitiesPage = () => {
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="xs">
                 <DialogTitle>
-                    {dialogMode === 'add' ? 'Add New City' : 'Edit City'}
+                    {dialogMode === 'add' ? t('pages.cities.addConfirmTitle') : t('pages.cities.editConfirmTitle')}
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1 }}>
                         <TextField
-                            label="City Name"
+                            label={t('pages.cities.cityNameLabel')}
                             fullWidth
                             value={cityName}
                             onChange={(e) => setCityName(e.target.value)}
@@ -175,35 +184,32 @@ const CitiesPage = () => {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">Cancel</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.cities.cancelBtn')}</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={isMutating || !cityName.trim()}
                     >
-                        {isMutating ? 'Saving...' : 'Save'}
+                        {isMutating ? t('pages.cities.savingBtn') : t('pages.cities.saveBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
 
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogTitle>{t('pages.cities.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography>
-                        Are you sure you want to delete city <strong>{currentCity?.name}</strong>?
-                        This action cannot be undone.
-                    </Typography>
+                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.cities.deleteText', { name: currentCity?.name }) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Cancel</Button>
+                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.cities.cancelBtn')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Deleting...' : 'Confirm Delete'}
+                        {isMutating ? t('pages.cities.deletingBtn') : t('pages.cities.deleteBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -10,6 +10,7 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -30,6 +31,7 @@ import goongService from '../../../../services/goongService';
 import RichTextEditorCustom from '../../../../components/controls/RichTextEditorCustom';
 
 const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
+  const { t } = useTranslation('employer');
   const { allConfig } = useSelector((state) => state.config);
   const [districtOptions, setDistrictOptions] = React.useState([]);
   const [locationOptions, setLocationOptions] = React.useState([]);
@@ -192,9 +194,9 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               }}>
               <TextFieldCustom
                 name="companyName"
-                title="Company Name"
+                title={t('companyForm.title.companyname', 'Company Name')}
                 showRequired={true}
-                placeholder="Enter company name"
+                placeholder={t('companyForm.placeholder.entercompanyname', 'Enter company name')}
                 control={control}
               />
             </Grid>
@@ -208,9 +210,9 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               }}>
               <TextFieldCustom
                 name="taxCode"
-                title="Tax Code"
+                title={t('companyForm.title.taxcode', 'Tax Code')}
                 showRequired={true}
-                placeholder="Enter company tax code"
+                placeholder={t('companyForm.placeholder.entercompanytaxcode', 'Enter company tax code')}
                 control={control}
               />
             </Grid>
@@ -226,9 +228,9 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
                 name="employeeSize"
                 control={control}
                 options={allConfig?.employeeSizeOptions || []}
-                title="Company Size"
+                title={t('companyForm.title.companysize', 'Company Size')}
                 showRequired={true}
-                placeholder="Select company size"
+                placeholder={t('companyForm.placeholder.selectcompanysize', 'Select company size')}
               />
             </Grid>
             <Grid
@@ -241,9 +243,9 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               }}>
               <TextFieldCustom
                 name="fieldOperation"
-                title="Field of Operation"
+                title={t('companyForm.title.fieldofoperation', 'Field of Operation')}
                 showRequired={true}
-                placeholder="Enter company field of operation"
+                placeholder={t('companyForm.placeholder.entercompanyfieldofoperation', 'Enter company field of operation')}
                 control={control}
               />
             </Grid>
@@ -258,7 +260,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               <DatePickerCustom
                 name="since"
                 control={control}
-                title="Founded Date"
+                title={t('companyForm.title.foundeddate', 'Founded Date')}
               />
             </Grid>
             <Grid
@@ -271,8 +273,8 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               }}>
               <TextFieldCustom
                 name="websiteUrl"
-                title="Website URL"
-                placeholder="Enter company website URL"
+                title={t('companyForm.title.websiteurl', 'Website URL')}
+                placeholder={t('companyForm.placeholder.entercompanywebsiteurl', 'Enter company website URL')}
                 control={control}
               />
             </Grid>
@@ -286,8 +288,8 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               }}>
               <TextFieldCustom
                 name="facebookUrl"
-                title="Facebook URL"
-                placeholder="Enter Facebook URL"
+                title={t('companyForm.title.facebookurl', 'Facebook URL')}
+                placeholder={t('companyForm.placeholder.enterfacebookurl', 'Enter Facebook URL')}
                 control={control}
               />
             </Grid>
@@ -301,8 +303,8 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               }}>
               <TextFieldCustom
                 name="youtubeUrl"
-                title="Youtube URL"
-                placeholder="Enter Youtube URL"
+                title={t('companyForm.title.youtubeurl', 'Youtube URL')}
+                placeholder={t('companyForm.placeholder.enteryoutubeurl', 'Enter Youtube URL')}
                 control={control}
               />
             </Grid>
@@ -316,8 +318,8 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               }}>
               <TextFieldCustom
                 name="linkedinUrl"
-                title="Linkedin URL"
-                placeholder="Enter Linkedin URL"
+                title={t('companyForm.title.linkedinurl', 'Linkedin URL')}
+                placeholder={t('companyForm.placeholder.enterlinkedinurl', 'Enter Linkedin URL')}
                 control={control}
               />
             </Grid>
@@ -331,9 +333,9 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               }}>
               <TextFieldCustom
                 name="companyEmail"
-                title="Company Email"
+                title={t('companyForm.title.companyemail', 'Company Email')}
                 showRequired={true}
-                placeholder="Enter company email"
+                placeholder={t('companyForm.placeholder.entercompanyemail', 'Enter company email')}
                 control={control}
               />
             </Grid>
@@ -347,9 +349,9 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               }}>
               <TextFieldCustom
                 name="companyPhone"
-                title="Phone Number"
+                title={t('companyForm.title.phonenumber', 'Phone Number')}
                 showRequired={true}
-                placeholder="Enter company phone number"
+                placeholder={t('companyForm.placeholder.entercompanyphonenumber', 'Enter company phone number')}
                 control={control}
               />
             </Grid>
@@ -365,9 +367,9 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
                 name="location.city"
                 control={control}
                 options={allConfig?.cityOptions || []}
-                title="City/Province"
+                title={t('companyForm.title.cityprovince', 'City/Province')}
                 showRequired={true}
-                placeholder="Select city/province"
+                placeholder={t('companyForm.placeholder.selectcityprovince', 'Select city/province')}
               />
             </Grid>
             <Grid
@@ -382,17 +384,17 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
                 options={districtOptions}
                 name="location.district"
                 control={control}
-                title="District"
+                title={t('companyForm.title.district', 'District')}
                 showRequired={true}
-                placeholder="Select district"
+                placeholder={t('companyForm.placeholder.selectdistrict', 'Select district')}
               />
             </Grid>
             <Grid size={12}>
               <TextFieldAutoCompleteCustom
                 name="location.address"
-                title="Address"
+                title={t('companyForm.title.address', 'Address')}
                 showRequired={true}
-                placeholder="Enter address"
+                placeholder={t('companyForm.placeholder.enteraddress', 'Enter address')}
                 control={control}
                 options={locationOptions}
                 handleSelect={handleSelectLocation}
@@ -408,10 +410,10 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               }}>
               <TextFieldCustom
                 name="location.lat"
-                title="Latitude"
+                title={t('companyForm.title.latitude', 'Latitude')}
                 showRequired={true}
-                placeholder="Enter latitude coordinate on the map."
-                helperText="Automatically filled if you choose a suggested address."
+                placeholder={t('companyForm.placeholder.enterlatitudecoordinateonthemap', 'Enter latitude coordinate on the map.')}
+                helperText={t('companyForm.helperText.automaticallyfilledifyouchooseasuggestedaddress', 'Automatically filled if you choose a suggested address.')}
                 control={control}
               />
             </Grid>
@@ -425,10 +427,10 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               }}>
               <TextFieldCustom
                 name="location.lng"
-                title="Longitude"
+                title={t('companyForm.title.longitude', 'Longitude')}
                 showRequired={true}
-                placeholder="Enter longitude coordinate on the map."
-                helperText="Automatically filled if you choose a suggested address."
+                placeholder={t('companyForm.placeholder.enterlongitudecoordinateonthemap', 'Enter longitude coordinate on the map.')}
+                helperText={t('companyForm.helperText.automaticallyfilledifyouchooseasuggestedaddress', 'Automatically filled if you choose a suggested address.')}
                 control={control}
               />
             </Grid>
@@ -436,7 +438,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
               <RichTextEditorCustom
                 name="description"
                 control={control}
-                title="Additional Description"
+                title={t('companyForm.title.additionaldescription', 'Additional Description')}
               />
             </Grid>
           </Grid>
@@ -447,6 +449,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
 };
 
 const Loading = () => {
+  const { t } = useTranslation('employer');
   return (
     <Grid container>
       <Grid

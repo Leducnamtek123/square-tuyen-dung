@@ -20,8 +20,11 @@ import interviewService from '../../../../services/interviewService';
 import { transformInterviewSession } from '../../../../utils/transformers';
 import { ROUTES } from '../../../../configs/constants';
 import DataTable from '../../../../components/DataTable';
+import { useTranslation } from 'react-i18next';
 
-const InterviewListCard = ({ title = "Online Interview List" }) => {
+const InterviewListCard = ({ title }) => {
+    const { t } = useTranslation('interview');
+    const displayTitle = title || t('interviewListCard.title');
     const [sessions, setSessions] = useState([]);
     const [count, setCount] = useState(0);
     const [page, setPage] = useState(0);
@@ -90,7 +93,7 @@ const InterviewListCard = ({ title = "Online Interview List" }) => {
 
     const columns = useMemo(() => [
         {
-            header: 'Candidate',
+            header: t('interviewListCard.candidate'),
             accessorKey: 'candidateName',
             cell: ({ row }) => (
                 <Box>
@@ -100,12 +103,12 @@ const InterviewListCard = ({ title = "Online Interview List" }) => {
             ),
         },
         {
-            header: 'Position',
+            header: t('interviewListCard.position'),
             accessorKey: 'jobName',
             cell: ({ getValue }) => <Typography variant="body2">{getValue() || 'N/A'}</Typography>,
         },
         {
-            header: 'Time',
+            header: t('interviewListCard.time'),
             accessorKey: 'scheduledAt',
             cell: ({ getValue }) => (
                 <Typography variant="body2">
@@ -114,7 +117,7 @@ const InterviewListCard = ({ title = "Online Interview List" }) => {
             ),
         },
         {
-            header: 'Status',
+            header: t('interviewListCard.status'),
             accessorKey: 'status',
             cell: ({ getValue }) => (
                 <Chip
@@ -126,14 +129,14 @@ const InterviewListCard = ({ title = "Online Interview List" }) => {
             ),
         },
         {
-            header: 'AI Score',
+            header: t('interviewListCard.aiScore'),
             accessorKey: 'ai_overall_score',
             cell: ({ row }) => (
                 row.original.ai_overall_score ? (
                     <Typography color="primary" sx={{ fontWeight: 'bold' }}>{row.original.ai_overall_score}/10</Typography>
                 ) : (
                     <Typography variant="caption" color="text.secondary">
-                        {row.original.status === 'completed' ? 'Grading...' : '-'}
+                        {row.original.status === 'completed' ? t('interviewListCard.grading') : '-'}
                     </Typography>
                 )
             ),
@@ -158,7 +161,7 @@ const InterviewListCard = ({ title = "Online Interview List" }) => {
                 </Box>
             ),
         },
-    ], []);
+    ], [t]);
 
     return (
         <Box sx={{
@@ -185,7 +188,7 @@ const InterviewListCard = ({ title = "Online Interview List" }) => {
                         fontSize: { xs: '1.25rem', sm: '1.5rem' }
                     }}
                 >
-                    {title}
+                    {displayTitle}
                 </Typography>
                 <Button
                     variant="contained"
@@ -203,7 +206,7 @@ const InterviewListCard = ({ title = "Online Interview List" }) => {
                         }
                     }}
                 >
-                    Schedule Interview
+                    {t('interviewListCard.scheduleInterview')}
                 </Button>
             </Stack>
 
@@ -243,7 +246,7 @@ const InterviewListCard = ({ title = "Online Interview List" }) => {
                     rowsPerPage={rowsPerPage}
                     onPageChange={handleChangePage}
                     onRowsPerPageChange={handleChangeRowsPerPage}
-                    emptyMessage="No interviews scheduled yet"
+                    emptyMessage={t('interviewListCard.noInterviews')}
                 />
             </Box>
         </Box>

@@ -10,6 +10,7 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { Box, Card, Pagination, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -24,6 +25,7 @@ import JobSeekerProfile from '../../../../components/JobSeekerProfile';
 import resumeService from '../../../../services/resumeService';
 
 const ProfileCard = () => {
+  const { t } = useTranslation('employer');
   const { resumeFilter } = useSelector((state) => state.filter);
   const { pageSize } = resumeFilter;
   const [page, setPage] = React.useState(1);
@@ -138,7 +140,7 @@ const ProfileCard = () => {
                 </Box>
               ) : resumes.length === 0 ? (
                 <NoDataCard
-                  title="No results found."
+                  title={t('profileCard.title.noresultsfound', 'No results found.')}
                   imgComponentSgv={<SVG_IMAGES.ImageSvg11 />}
                 />
               ) : (

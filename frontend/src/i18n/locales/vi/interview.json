@@ -1,1 +1,102 @@
-{}
+{
+  "redirectTitle": "Đang chuyển hướng đến phòng phỏng vấn",
+  "redirectBody": "Bạn sẽ được chuyển đến phòng phỏng vấn trong hệ thống.",
+  "redirectCta": "Nếu bạn không được tự động chuyển hướng, hãy nhấn vào đây",
+  "readyTitle": "Sẵn sàng bắt đầu phỏng vấn",
+  "readyBody": "Nhấn bắt đầu để kết nối. Camera và microphone sẽ chỉ bật lên khi bạn chọn chúng trên thanh công cụ.",
+  "startInterview": "Bắt đầu phỏng vấn",
+  "transcriptTitle": "Bản ghi âm",
+  "noMessages": "Chưa có tin nhắn nào.",
+  "chatPlaceholder": "Nhập tin nhắn...",
+  "youLabel": "Bạn",
+  "aiSpeaking": "AI đang nói",
+  "aiListening": "AI đang lắng nghe",
+  "aiHint": "AI sẽ phản hồi tại đây trong cuộc gọi.",
+  "cameraPreview": "Xem trước Camera",
+  "cameraHint": "Bật camera để xem trước hình ảnh của bạn.",
+  "controls": {
+    "mic": "Microphone",
+    "camera": "Camera",
+    "share": "Chia sẻ",
+    "chat": "Chat",
+    "end": "Kết thúc"
+  },
+  "voiceAi": {
+    "pageTitle": "Trợ lý Phỏng vấn Voice AI",
+    "pageDescription": "Trợ lý phỏng vấn ảo được xây dựng bởi LiveKit",
+    "companyName": "Square AI",
+    "startCall": "Bắt đầu cuộc gọi",
+    "startAudio": "Bật âm thanh",
+    "welcome": {
+      "subtitle": "Trò chuyện trực tiếp với trợ lý AI của bạn",
+      "help": "Cần hỗ trợ thiết lập? Xem ngay",
+      "quickstart": "Hướng dẫn sử dụng Voice AI"
+    },
+    "controls": {
+      "endCall": "Kết thúc cuộc gọi",
+      "endShort": "Kết thúc"
+    },
+    "chat": {
+      "placeholder": "Nhập nội dung...",
+      "sending": "Đang gửi...",
+      "send": "Gửi"
+    },
+    "devices": {
+      "select": "Chọn một {{kind}}",
+      "microphone": "microphone",
+      "camera": "camera",
+      "speaker": "loa"
+    },
+    "theme": {
+      "toggle": "Thay đổi giao diện",
+      "dark": "Giao diện tối",
+      "light": "Giao diện sáng",
+      "system": "Giao diện hệ thống"
+    },
+    "agentErrors": {
+      "title": "Cuộc gọi đã kết thúc",
+      "quickstart": "Xem hướng dẫn sử dụng",
+      "sessionRetained": "Phiên kết nối vẫn đang được giữ. Bạn có thể thử lại hoặc tiếp tục khi trợ lý quay lại."
+    },
+    "preconnect": "Trợ lý đang lắng nghe, hãy đặt câu hỏi",
+    "aria": {
+      "toggleMicrophone": "Bật/Tắt microphone",
+      "toggleCamera": "Bật/Tắt camera",
+      "toggleScreenShare": "Bật/Tắt chia sẻ màn hình",
+      "toggleTranscript": "Bật/Tắt bản ghi",
+      "toggleGeneric": "Bật/Tắt {{target}}"
+    }
+  },
+  "loading": "Đang kết nối đến phòng phỏng vấn...",
+  "errors": {
+    "missingInvite": "Thiếu mã mời phỏng vấn.",
+    "tokenMissing": "Không thể lấy token để tham gia phỏng vấn.",
+    "invalidSession": "Lỗi kết nối hoặc phiên phỏng vấn không hợp lệ."
+  },
+  "interviewListCard": {
+    "title": "Danh sách Phỏng vấn Online",
+    "scheduleInterview": "Lên lịch Phỏng vấn",
+    "candidate": "Ứng viên",
+    "position": "Vị trí",
+    "time": "Thời gian",
+    "status": "Trạng thái",
+    "aiScore": "Điểm AI",
+    "grading": "Đang chấm...",
+    "noInterviews": "Chưa có lịch phỏng vấn nào"
+  },
+  "interviewAdminPage": {
+    "title": "Quản lý Phỏng vấn",
+    "cardTitle": "Danh sách Phỏng vấn",
+    "candidateEmployer": "Ứng viên / Nhà tuyển dụng",
+    "jobPost": "Tin tuyển dụng",
+    "type": "Loại hình",
+    "time": "Thời gian",
+    "status": "Trạng thái",
+    "actions": "Thao tác",
+    "viewDetails": "Xem chi tiết",
+    "markCompleted": "Đánh dấu hoàn thành",
+    "cancelInterview": "Hủy phỏng vấn",
+    "delete": "Xóa",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa phỏng vấn này?"
+  }
+}

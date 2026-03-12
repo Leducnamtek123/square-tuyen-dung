@@ -11,6 +11,7 @@ See the LICENSE file in the project root for full license information.
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box, Typography, Chip, Stack, Divider, LinearProgress, Button, IconButton } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -43,6 +44,7 @@ const getStatusColor = (status) => {
 };
 
 const InterviewLivePage = () => {
+  const { t } = useTranslation('employer');
   const [sessions, setSessions] = useState([]);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
@@ -107,7 +109,7 @@ const InterviewLivePage = () => {
   const columns = useMemo(
     () => [
       {
-        header: 'Candidate',
+        header: t('interviewLive.table.candidate'),
         accessorKey: 'candidateName',
         cell: ({ row }) => (
           <Box>
@@ -121,12 +123,12 @@ const InterviewLivePage = () => {
         ),
       },
       {
-        header: 'Position',
+        header: t('interviewLive.table.position'),
         accessorKey: 'jobName',
         cell: ({ getValue }) => <Typography variant="body2">{getValue() || 'N/A'}</Typography>,
       },
       {
-        header: 'Room',
+        header: t('interviewLive.table.room'),
         accessorKey: 'room_name',
         cell: ({ row }) => (
           <Typography variant="body2">
@@ -135,7 +137,7 @@ const InterviewLivePage = () => {
         ),
       },
       {
-        header: 'Time',
+        header: t('interviewLive.table.time'),
         accessorKey: 'scheduledAt',
         cell: ({ getValue }) => (
           <Typography variant="body2">
@@ -144,7 +146,7 @@ const InterviewLivePage = () => {
         ),
       },
       {
-        header: 'Status',
+        header: t('interviewLive.table.status'),
         accessorKey: 'status',
         cell: ({ getValue }) => (
           <Chip
@@ -176,7 +178,7 @@ const InterviewLivePage = () => {
         ),
       },
     ],
-    []
+    [t, getLink]
   );
 
   return (
@@ -205,7 +207,7 @@ const InterviewLivePage = () => {
             fontSize: { xs: '1.25rem', sm: '1.5rem' },
           }}
         >
-          Live Interviews
+          {t('interviewLive.title')}
         </Typography>
         <Button
           variant="contained"
@@ -223,14 +225,14 @@ const InterviewLivePage = () => {
             },
           }}
         >
-          Schedule Interview
+          {t('interviewLive.scheduleBtn')}
         </Button>
       </Stack>
 
       <Stack direction="row" spacing={1.5} mb={3} flexWrap="wrap">
-        <Chip label={`In Progress: ${stats.active}`} color="primary" variant="outlined" />
-        <Chip label={`Scheduled: ${stats.scheduled}`} color="info" variant="outlined" />
-        <Chip label={`Completed: ${stats.completed}`} color="success" variant="outlined" />
+        <Chip label={t('interviewLive.stats.inProgress', { count: stats.active })} color="primary" variant="outlined" />
+        <Chip label={t('interviewLive.stats.scheduled', { count: stats.scheduled })} color="info" variant="outlined" />
+        <Chip label={t('interviewLive.stats.completed', { count: stats.completed })} color="success" variant="outlined" />
       </Stack>
 
       {loading ? (
@@ -269,7 +271,7 @@ const InterviewLivePage = () => {
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          emptyMessage="No active interview sessions found."
+          emptyMessage={t('interviewLive.table.emptyMessage')}
         />
       </Box>
     </Box>

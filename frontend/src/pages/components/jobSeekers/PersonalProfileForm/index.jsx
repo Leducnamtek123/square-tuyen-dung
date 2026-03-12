@@ -33,14 +33,14 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }) => {
     user: yup.object().shape({
       fullName: yup
         .string()
-        .required('Full name is required.')
-        .max(100, 'Full name exceeds allowed length.'),
+        .required(t('jobSeeker:profile.validation.fullNameRequired'))
+        .max(100, t('jobSeeker:profile.validation.fullNameMax')),
     }),
     phone: yup
       .string()
-      .required('Phone number is required.')
-      .matches(REGEX_VATIDATE.phoneRegExp, 'Invalid phone number.')
-      .max(15, 'Phone number exceeds allowed length.'),
+      .required(t('jobSeeker:profile.validation.phoneRequired'))
+      .matches(REGEX_VATIDATE.phoneRegExp, t('jobSeeker:profile.validation.phoneInvalid'))
+      .max(15, t('jobSeeker:profile.validation.phoneMax')),
     birthday: yup
       .date()
       .transform((value, originalValue) => {
@@ -49,40 +49,40 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }) => {
         }
         return value;
       })
-      .required('Date of birth is required.')
-      .typeError('Invalid date of birth.')
-      .max(DATE_OPTIONS.yesterday, 'Invalid date of birth.'),
+      .required(t('jobSeeker:profile.validation.birthdayRequired'))
+      .typeError(t('jobSeeker:profile.validation.birthdayInvalid'))
+      .max(DATE_OPTIONS.yesterday, t('jobSeeker:profile.validation.birthdayInvalid')),
     gender: yup
       .string()
-      .required('Gender is required.')
-      .max(1, 'Gender exceeds allowed length.'),
+      .required(t('jobSeeker:profile.validation.genderRequired'))
+      .max(1, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.gender') })),
     maritalStatus: yup
       .string()
-      .required('Marital status is required.')
-      .max(1, 'Marital status exceeds allowed length.'),
+      .required(t('jobSeeker:profile.validation.maritalStatusRequired'))
+      .max(1, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.maritalStatus') })),
     location: yup.object().shape({
       city: yup
         .number()
-        .required('City/Province is required.')
-        .typeError('City/Province is required.'),
+        .required(t('jobSeeker:profile.validation.cityRequired'))
+        .typeError(t('jobSeeker:profile.validation.cityRequired')),
       district: yup
         .number()
-        .required('District is required.')
-        .typeError('District is required.'),
+        .required(t('jobSeeker:profile.validation.districtRequired'))
+        .typeError(t('jobSeeker:profile.validation.districtRequired')),
       address: yup
         .string()
-        .required('Address is required.')
-        .max(255, 'Address exceeds allowed length.'),
+        .required(t('jobSeeker:profile.validation.addressRequired'))
+        .max(255, t('jobSeeker:profile.validation.addressMax')),
     }),
-    idCardNumber: yup.string().max(30, 'ID card number exceeds allowed length.'),
+    idCardNumber: yup.string().max(30, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.idCardNumber') })),
     idCardIssueDate: yup.date().nullable(),
-    idCardIssuePlace: yup.string().max(255, 'ID card issue place exceeds allowed length.'),
-    taxCode: yup.string().max(30, 'Tax code exceeds allowed length.'),
-    socialInsuranceNo: yup.string().max(30, 'Social insurance number exceeds allowed length.'),
-    permanentAddress: yup.string().max(255, 'Permanent address exceeds allowed length.'),
-    contactAddress: yup.string().max(255, 'Contact address exceeds allowed length.'),
-    emergencyContactName: yup.string().max(100, 'Emergency contact name exceeds allowed length.'),
-    emergencyContactPhone: yup.string().max(20, 'Emergency contact phone exceeds allowed length.'),
+    idCardIssuePlace: yup.string().max(255, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.idCardIssuePlace') })),
+    taxCode: yup.string().max(30, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.taxCode') })),
+    socialInsuranceNo: yup.string().max(30, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.socialInsuranceNo') })),
+    permanentAddress: yup.string().max(255, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.permanentAddress') })),
+    contactAddress: yup.string().max(255, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.contactAddress') })),
+    emergencyContactName: yup.string().max(100, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.emergencyContactName') })),
+    emergencyContactPhone: yup.string().max(20, t('jobSeeker:profile.validation.fieldMax', { field: t('jobSeeker:profile.fields.emergencyContactPhone') })),
   });
   const [districtOptions, setDistrictOptions] = React.useState([]);
 
@@ -147,9 +147,9 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }) => {
         <Grid size={12}>
           <TextFieldCustom
             name="user.fullName"
-            title="Full Name"
+            title={t('jobSeeker:profile.fields.fullName')}
             showRequired={true}
-            placeholder="Enter full name"
+            placeholder={t('jobSeeker:profile.placeholders.fullName')}
             control={control}
           />
         </Grid>

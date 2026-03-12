@@ -13,6 +13,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { useTranslation } from 'react-i18next';
 import Grid from "@mui/material/Grid2";
 
 import { DATE_OPTIONS } from '../../../../configs/constants';
@@ -24,19 +25,20 @@ const CertificateForm = ({
   editData,
   serverErrors = null,
 }) => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
   const schema = yup.object().shape({
     name: yup
       .string()
-      .required('Certificate name is required.')
-      .max(200, 'Certificate name exceeds allowed length.'),
+      .required(t('jobSeeker:profile.validation.certificateNameRequired'))
+      .max(200, t('jobSeeker:profile.validation.certificateNameMax')),
     trainingPlace: yup
       .string()
-      .required('School/Training center name is required.')
-      .max(255, 'School/Training center name exceeds allowed length.'),
+      .required(t('jobSeeker:profile.validation.trainingPlaceRequired'))
+      .max(255, t('jobSeeker:profile.validation.trainingPlaceMax')),
     startDate: yup
       .date()
-      .required('Start date is required.')
-      .typeError('Start date is required.'),
+      .required(t('jobSeeker:profile.validation.startDateRequired'))
+      .typeError(t('jobSeeker:profile.validation.startDateRequired')),
     expirationDate: yup.date().nullable(),
   });
 
@@ -78,18 +80,18 @@ const CertificateForm = ({
         <Grid size={12}>
           <TextFieldCustom
             name="name"
-            title="Certificate Name"
+            title={t('jobSeeker:profile.fields.certificateName')}
             showRequired={true}
-            placeholder="Enter certificate name"
+            placeholder={t('jobSeeker:profile.placeholders.certificateName')}
             control={control}
           />
         </Grid>
         <Grid size={12}>
           <TextFieldCustom
             name="trainingPlace"
-            title="School/Training Center"
+            title={t('jobSeeker:profile.fields.trainingPlace')}
             showRequired={true}
-            placeholder="Enter school/Training center name"
+            placeholder={t('jobSeeker:profile.placeholders.trainingPlace')}
             control={control}
           />
         </Grid>
@@ -101,7 +103,7 @@ const CertificateForm = ({
           <DatePickerCustom
             name="startDate"
             control={control}
-            title="Start Date"
+            title={t('jobSeeker:profile.fields.startDate')}
             showRequired={true}
             maxDate={DATE_OPTIONS.yesterday}
           />
@@ -114,7 +116,7 @@ const CertificateForm = ({
           <DatePickerCustom
             name="expirationDate"
             control={control}
-            title="Expiration Date (Leave blank if no expiration)"
+            title={t('jobSeeker:profile.fields.expirationDate')}
             maxDate={DATE_OPTIONS.today}
           />
         </Grid>

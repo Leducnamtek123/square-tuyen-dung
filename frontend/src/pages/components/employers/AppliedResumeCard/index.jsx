@@ -32,6 +32,20 @@ import AppliedResumeTable from '../AppliedResumeTable';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 import jobService from '../../../../services/jobService';
 
+const pageSize = 10;
+
+const defaultFilterData = {
+  cityId: '',
+  careerId: '',
+  experienceId: '',
+  positionId: '',
+  academicLevelId: '',
+  typeOfWorkplaceId: '',
+  jobTypeId: '',
+  genderId: '',
+  maritalStatusId: '',
+};
+
 const AppliedResumeCard = ({ title: cardTitle }) => {
   const { t } = useTranslation('employer');
   const { allConfig } = useSelector((state) => state.config);

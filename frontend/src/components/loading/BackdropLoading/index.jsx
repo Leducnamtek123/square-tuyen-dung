@@ -26,12 +26,8 @@ const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }) => {
         zIndex: 9999,
       }}
       open={open}
-      TransitionProps={{
-        timeout: 100
-      }}
-      slots={{
-        transition: Fade
-      }}
+      TransitionComponent={Fade}
+      transitionDuration={100}
     >
       <img 
         src={LOADING_IMAGES.LOADING_SPINNER}

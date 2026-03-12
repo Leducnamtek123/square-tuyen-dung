@@ -1,27 +1,47 @@
 import React from 'react';
-import { TextField, InputAdornment } from "@mui/material";
+import { TextField, InputAdornment, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 import SearchIcon from '@mui/icons-material/Search';
+import { ROLES_NAME } from '../../../../configs/constants';
 
-const UserFilters = ({ search, onSearchChange }) => {
+const UserFilters = ({ search, role, onSearchChange, onRoleChange }) => {
+    const { t } = useTranslation('admin');
     return (
-        <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Search by name or email..."
-            value={search}
-            onChange={(e) => onSearchChange(e.target.value)}
-            sx={{ mb: 2 }}
-            slotProps={{
-                input: {
-                    startAdornment: (
-                        <InputAdornment position="start">
-                            <SearchIcon />
-                        </InputAdornment>
-                    ),
-                }
-            }}
-        />
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 2 }}>
+            <TextField
+                fullWidth
+                variant="outlined"
+                placeholder={t('pages.users.filter.searchPlaceholder')}
+                value={search}
+                onChange={(e) => onSearchChange(e.target.value)}
+                slotProps={{
+                    input: {
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon />
+                            </InputAdornment>
+                        ),
+                    }
+                }}
+            />
+            <FormControl sx={{ minWidth: 220 }} size="small">
+                <InputLabel id="user-role-filter-label">
+                    {t('pages.users.filter.roleLabel')}
+                </InputLabel>
+                <Select
+                    labelId="user-role-filter-label"
+                    value={role}
+                    label={t('pages.users.filter.roleLabel')}
+                    onChange={(e) => onRoleChange(e.target.value)}
+                >
+                    <MenuItem value="">{t('pages.users.filter.roleAll')}</MenuItem>
+                    <MenuItem value={ROLES_NAME.ADMIN}>{t('pages.users.roles.admin')}</MenuItem>
+                    <MenuItem value={ROLES_NAME.EMPLOYER}>{t('pages.users.roles.employer')}</MenuItem>
+                    <MenuItem value={ROLES_NAME.JOB_SEEKER}>{t('pages.users.roles.jobSeeker')}</MenuItem>
+                </Select>
+            </FormControl>
+        </Stack>
     );
 };
 

@@ -24,28 +24,28 @@
       }
     },
     "ai": {
-       "analysisStarted": "Đã bắt đầu phân tích AI. Vui lòng đợi trong giây lát.",
-       "processing": "Đang xử lý...",
-       "analyze": "Phân tích",
-       "summary": "Tóm tắt AI:",
-       "skills": "Kỹ năng:"
+      "analysisStarted": "Đã bắt đầu phân tích AI. Vui lòng đợi trong giây lát.",
+      "processing": "Đang xử lý...",
+      "analyze": "Phân tích",
+      "summary": "Tóm tắt AI:",
+      "skills": "Kỹ năng:"
     },
     "email": {
-       "sentSuccess": "Gửi email thành công.",
-       "resend": "Gửi lại",
-       "send": "Gửi email"
+      "sentSuccess": "Gửi email thành công.",
+      "resend": "Gửi lại",
+      "send": "Gửi email"
     },
     "status": {
-       "updateTitle": "Cập nhật trạng thái ứng tuyển",
-       "updateConfirm": "Hồ sơ sẽ được cập nhật sang trạng thái <strong style=\"color:red;\">\"{{statusName}}\"</strong>. Bạn có chắc chắn không?",
-       "errorTitle": "Đã xảy ra lỗi",
-       "errorMsg": "Bạn không được phép thay đổi trạng thái ứng tuyển từ <strong style=\"color:red;\">\"{{fromStatus}}\"</strong> sang <strong style=\"color:red;\">\"{{toStatus}}\"</strong>",
-       "updateSuccess": "Cập nhật thành công."
+      "updateTitle": "Cập nhật trạng thái ứng tuyển",
+      "updateConfirm": "Hồ sơ sẽ được cập nhật sang trạng thái <strong style=\"color:red;\">\"{{statusName}}\"</strong>. Bạn có chắc chắn không?",
+      "errorTitle": "Đã xảy ra lỗi",
+      "errorMsg": "Bạn không được phép thay đổi trạng thái ứng tuyển từ <strong style=\"color:red;\">\"{{fromStatus}}\"</strong> sang <strong style=\"color:red;\">\"{{toStatus}}\"</strong>",
+      "updateSuccess": "Cập nhật thành công."
     },
     "delete": {
-       "title": "Xóa hồ sơ ứng tuyển",
-       "confirm": "Hồ sơ ứng tuyển này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn không?",
-       "success": "Xóa hồ sơ ứng tuyển thành công."
+      "title": "Xóa hồ sơ ứng tuyển",
+      "confirm": "Hồ sơ ứng tuyển này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn không?",
+      "success": "Xóa hồ sơ ứng tuyển thành công."
     }
   },
   "dashboard": {
@@ -94,5 +94,411 @@
       "updateSuccess": "Cập nhật tin tuyển dụng thành công."
     },
     "popupTitle": "Tin tuyển dụng"
+  },
+  "sendEmailComponent": {
+    "label": {
+      "view": "xem",
+      "delete": "xóa"
+    },
+    "title": {
+      "viewattachedresume": "Xem hồ sơ đính kèm"
+    }
+  },
+  "applicationChart": {
+    "title": {
+      "thngkchstuyndngtrongvng1thnggnnht": "Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất"
+    }
+  },
+  "candidateChart": {
+    "title": {
+      "thngkshsngtuynnhnctheongy": "Thống kê số hồ sơ ứng tuyển nhận được theo ngày"
+    }
+  },
+  "hiringAcademicChart": {
+    "title": {
+      "thngkchsngtuyntheotrnhhcvn": "Thống kê chỉ số ứng tuyển theo trình độ học vấn"
+    }
+  },
+  "recruitmentChart": {
+    "title": {
+      "thngkchstuyndngtrongvng1thnggnnht": "Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất"
+    }
+  },
+  "companyForm": {
+    "title": {
+      "companyname": "Tên công ty",
+      "taxcode": "Mã số thuế",
+      "companysize": "Quy mô công ty",
+      "fieldofoperation": "Lĩnh vực hoạt động",
+      "foundeddate": "Ngày thành lập",
+      "websiteurl": "Địa chỉ Website",
+      "facebookurl": "Địa chỉ Facebook",
+      "youtubeurl": "Địa chỉ Youtube",
+      "linkedinurl": "Địa chỉ Linkedin",
+      "companyemail": "Email công ty",
+      "phonenumber": "Số điện thoại",
+      "cityprovince": "Tỉnh/Thành phố",
+      "district": "Quận/Huyện",
+      "address": "Địa chỉ",
+      "latitude": "Vĩ độ",
+      "longitude": "Kinh độ",
+      "additionaldescription": "Mô tả bổ sung"
+    },
+    "placeholder": {
+      "entercompanyname": "Nhập tên công ty",
+      "entercompanytaxcode": "Nhập mã số thuế",
+      "selectcompanysize": "Chọn quy mô công ty",
+      "entercompanyfieldofoperation": "Nhập lĩnh vực hoạt động của công ty",
+      "entercompanywebsiteurl": "Nhập địa chỉ website",
+      "enterfacebookurl": "Nhập địa chỉ Facebook",
+      "enteryoutubeurl": "Nhập địa chỉ Youtube",
+      "enterlinkedinurl": "Nhập địa chỉ Linkedin",
+      "entercompanyemail": "Nhập email công ty",
+      "entercompanyphonenumber": "Nhập số điện thoại công ty",
+      "selectcityprovince": "Chọn Tỉnh/Thành phố",
+      "selectdistrict": "Chọn Quận/Huyện",
+      "enteraddress": "Nhập địa chỉ",
+      "enterlatitudecoordinateonthemap": "Nhập vĩ độ trên bản đồ",
+      "enterlongitudecoordinateonthemap": "Nhập kinh độ trên bản đồ"
+    },
+    "helperText": {
+      "automaticallyfilledifyouchooseasuggestedaddress": "Tự động điền nếu bạn chọn một địa chỉ gợi ý"
+    }
+  },
+  "statItem": {
+    "title": {
+      "totaljobposts": "Tổng tin tuyển dụng",
+      "pendingjobposts": "Tin chờ duyệt",
+      "expiredjobposts": "Tin hết hạn",
+      "totalapplications": "Tổng lượt ứng tuyển"
+    }
+  },
+  "interviewCreateCard": {
+    "label": {
+      "selectjobpost": "Chọn tin tuyển dụng",
+      "selectcandidate": "Chọn ứng viên",
+      "selectquestiongroupoptional": "Chọn bộ câu hỏi (Không bắt buộc)",
+      "selectinterviewquestions": "Chọn câu hỏi phỏng vấn"
+    },
+    "title": {
+      "scheduledtime": "Thời gian dự kiến"
+    },
+    "helperText": {
+      "selectaquestiongrouptoautomaticallyfillthequestionsbelow": "Chọn bộ câu hỏi để xem trước"
+    }
+  },
+  "jobPostFilterForm": {
+    "label": {
+      "refresh": "Làm mới"
+    }
+  },
+  "jobPostForm": {
+    "validation": {
+      "jobnameisrequired": "Yêu cầu nhập tên công việc",
+      "jobnameexceededallowedlength": "Tên công việc vượt quá độ dài",
+      "careerisrequired": "Yêu cầu chọn ngành nghề",
+      "positionisrequired": "Yêu cầu chọn cấp bậc",
+      "experienceisrequired": "Yêu cầu kinh nghiệm",
+      "workplaceisrequired": "Yêu cầu nơi làm việc",
+      "jobtypeisrequired": "Yêu cầu hình thức làm việc",
+      "numberofvacanciesisrequired": "Yêu cầu nhập lượng tuyển",
+      "invalidnumberofvacancies": "Số lượng tuyển không hợp lệ",
+      "atleastonevacancyisrequired": "Tối thiểu 1 vị trí",
+      "genderrequirementisrequired": "Yêu cầu chọn giới tính",
+      "minimumsalaryisrequired": "Yêu cầu mức lương tối thiểu",
+      "invalidminimumsalary": "Mức lương tối thiểu không hợp lệ",
+      "minSalaryLess": "Lương tối thiểu phải nhỏ hơn lương tối đa",
+      "maximumsalaryisrequired": "Yêu cầu mức lương tối đa",
+      "invalidmaximumsalary": "Mức lương tối đa không hợp lệ",
+      "maxSalaryGreater": "Lương tối đa phải lớn hơn lương tối thiểu",
+      "academiclevelisrequired": "Yêu cầu trình độ học vấn",
+      "applicationdeadlineisrequired": "Yêu cầu thời hạn ứng tuyển",
+      "invalidapplicationdeadline": "Thời hạn không hợp lệ",
+      "deadlinemustbeaftertoday": "Thời hạn phải sau hôm nay",
+      "jobDescRequired": "Yêu cầu mô tả công việc",
+      "jobReqRequired": "Yêu cầu yêu cầu công việc",
+      "benefitsRequired": "Yêu cầu quyền lợi",
+      "cityprovinceisrequired": "Yêu cầu Tỉnh/Thành phố",
+      "districtisrequired": "Yêu cầu Quận/Huyện",
+      "addressisrequired": "Yêu cầu địa chỉ",
+      "addressexceededallowedlength": "Địa chỉ quá dài",
+      "latitudeisrequired": "Yêu cầu vĩ độ",
+      "invalidlatitude": "Vĩ độ không hợp lệ",
+      "longitudeisrequired": "Yêu cầu kinh độ",
+      "invalidlongitude": "Kinh độ không hợp lệ",
+      "contactpersonnameisrequired": "Yêu cầu liên hệ",
+      "contactpersonnameexceededallowedlength": "Liên hệ quá dài",
+      "contactpersonphoneisrequired": "Yêu cầu SĐT",
+      "invalidphonenumber": "SĐT không hợp lệ",
+      "contactpersonphoneexceededallowedlength": "SĐT quá dài",
+      "contactpersonemailisrequired": "Yêu cầu email",
+      "invalidemail": "Email không hợp lệ",
+      "contactpersonemailexceededallowedlength": "Email quá dài"
+    },
+    "warning": "Khi cập nhật, bài viết sẽ ở trạng thái chờ duyệt!",
+    "title": {
+      "jobtitle": "Tiêu đề công việc",
+      "career": "Ngành nghề",
+      "position": "Cấp bậc",
+      "experience": "Kinh nghiệm",
+      "workplace": "Nơi làm việc",
+      "jobtype": "Hình thức làm việc",
+      "numberofvacancies": "Số lượng cần tuyển",
+      "genderrequirement": "Yêu cầu giới tính",
+      "minimumsalary": "Lương tối thiểu",
+      "maximumsalary": "Lương tối đa",
+      "academiclevel": "Trình độ học vấn",
+      "applicationdeadline": "Hạn chót ứng tuyển",
+      "jobdescription": "Mô tả công việc",
+      "jobrequirement": "Yêu cầu công việc",
+      "benefits": "Quyền lợi",
+      "cityprovince": "Tỉnh/Thành phố",
+      "district": "Quận/Huyện",
+      "address": "Địa chỉ",
+      "latitude": "Vĩ độ",
+      "longitude": "Kinh độ",
+      "contactpersonname": "Tên người liên hệ",
+      "contactpersonphone": "SĐT liên hệ",
+      "contactpersonemail": "Email liên hệ",
+      "urgent": "Gấp"
+    },
+    "placeholder": {
+      "enterjobtitle": "Nhập tiêu đề C.V",
+      "selectcareer": "Chọn ngành nghề",
+      "selectposition": "Chọn cấp bậc",
+      "selectrequiredexperience": "Chọn kinh nghiệm",
+      "selectworkplace": "Chọn nơi làm việc",
+      "selectjobtype": "Chọn hình thức LV",
+      "enternumberofvacancies": "Nhập số lượng",
+      "selectgenderrequirement": "Chọn yêu cầu GT",
+      "enterminimumsalary": "Nhập lương tối thiểu",
+      "entermaximumsalary": "Nhập lương tối đa",
+      "selectacademiclevel": "Chọn trình độ HV",
+      "selectcityprovince": "Chọn Tỉnh/Thành phố",
+      "selectdistrict": "Chọn Quận/Huyện",
+      "enteraddress": "Nhập địa chỉ",
+      "enterlatitudecoordinateofthecompanyonthemap": "Nhập vĩ độ trên bản đồ",
+      "enterlongitudecoordinateofthecompanyonthemap": "Nhập kinh độ trên bản đồ",
+      "entercontactpersonname": "Nhập người liên hệ",
+      "entercontactpersonphone": "Nhập SĐT liên hệ",
+      "entercontactpersonemail": "Nhập email liên hệ"
+    },
+    "helperText": {
+      "automaticallyfilledifyouchooseasuggestedaddress": "Tự động điền nếu bạn chọn một địa chỉ gợi ý"
+    }
+  },
+  "profileCard": {
+    "title": {
+      "noresultsfound": "Không tìm thấy kết quả."
+    }
+  },
+  "profileSearch": {
+    "placeholder": {
+      "enterkeywords": "Nhập từ khóa...",
+      "selectcityprovince": "Chọn tỉnh thành",
+      "allcareers": "Tất cả ngành nghề",
+      "allexperience": "Thời gian kinh nghiệm",
+      "allpositions": "Cấp bậc",
+      "allacademiclevels": "Trình độ HV",
+      "allworkplaces": "Hình thức LV",
+      "allemploymenttypes": "Loại hình LV",
+      "allgenders": "Giới tính",
+      "allmaritalstatuses": "TT hôn nhân"
+    }
+  },
+  "questionGroupsCard": {
+    "label": {
+      "breadcrumb": "đường dẫn",
+      "questiongroupname": "Tên nhóm câu hỏi",
+      "description": "Mô tả",
+      "selectquestions": "Chọn câu hỏi",
+      "questioncontent": "Nội dung câu hỏi"
+    },
+    "placeholder": {
+      "searchquestiongroups": "Tìm kiếm nhóm câu hỏi..."
+    }
+  },
+  "savedResumeFilterForm": {
+    "placeholder": {
+      "enterjobpostorcandidatename": "Nhập tin tuyển dụng hoặc ứng viên",
+      "entermaximumsalary": "Nhập lương tối đa",
+      "selectexperience": "Chọn kinh nghiệm",
+      "selectlocation": "Chọn địa điểm"
+    },
+    "title": {
+      "reset": "Làm mới"
+    },
+    "label": {
+      "refresh": "Làm mới"
+    }
+  },
+  "savedResumeTable": {
+    "title": {
+      "onlineresume": "Hồ sơ Trực tuyến",
+      "attachedresume": "Hồ sơ Đính kèm",
+      "viewprofile": "Xem hồ sơ",
+      "youhaventsavedanycandidatesyet": "Bạn chưa lưu ứng viên nào"
+    },
+    "label": {
+      "view": "xem",
+      "unsave": "Bỏ lưu"
+    }
+  },
+  "sendMailCard": {
+    "title": {
+      "sendmail": "Gửi E-mail",
+      "recipientname": "Tên người nhận",
+      "recipientemail": "Email người nhận",
+      "subject": "Tiêu đề",
+      "emailcontent": "Nội dung email",
+      "sendacopytomyemployeremailaddress": "Gửi bản sao tới email của bạn."
+    },
+    "placeholder": {
+      "enterrecipientname": "Nhập tên người nhận",
+      "enterrecipientemail": "Nhập email người nhận",
+      "enteremailsubject": "Nhập tiêu đề email"
+    }
+  },
+  "sidebar": {
+    "dashboard": "Bảng điều khiển",
+    "jobPostList": "Danh sách tin TD",
+    "candidateManagement": "Quản lý ứng viên",
+    "appliedApplications": "Hồ sơ ứng tuyển",
+    "savedProfiles": "Hồ sơ đã lưu",
+    "findCandidates": "Tìm kiếm ứng viên",
+    "onlineInterviews": "Phỏng vấn Online",
+    "interviewList": "Danh sách PV",
+    "interviewLive": "Phỏng vấn Live",
+    "questionBank": "Ngân hàng QA",
+    "questionSets": "Bộ câu hỏi",
+    "notifications": "Thông báo",
+    "accountManagement": "Quản lý tài khoản",
+    "companyInfo": "Thông tin công ty",
+    "employerVerification": "Xác thực danh tính",
+    "account": "Tài khoản",
+    "settings": "Cài đặt"
+  },
+  "interviewLive": {
+    "title": "Phỏng vấn Trực tiếp",
+    "scheduleBtn": "Lên lịch Phỏng vấn",
+    "stats": {
+      "inProgress": "Đang diễn ra: {{count}}",
+      "scheduled": "Đã lên lịch: {{count}}",
+      "completed": "Đã hoàn thành: {{count}}"
+    },
+    "table": {
+      "candidate": "Ứng viên",
+      "position": "Vị trí",
+      "room": "Phòng",
+      "time": "Thời gian",
+      "status": "Trạng thái",
+      "emptyMessage": "Không tìm thấy phiên phỏng vấn nào đang hoạt động."
+    }
+  },
+  "verification": {
+    "title": "Xác thực Nhà tuyển dụng",
+    "step1": {
+      "title": "Bước 1: Cập nhật Hồ sơ công ty",
+      "description": "Hoàn thiện thông tin công ty trước khi gửi tài liệu xác thực. Admin sẽ xem xét nội dung này trước khi cấp quyền đăng tin.",
+      "openBtn": "Mở trang thông tin công ty",
+      "statusRequired": "Trạng thái: Yêu cầu cập nhật"
+    },
+    "step2": {
+      "title": "Bước 2: Tài liệu pháp lý doanh nghiệp",
+      "description": "Cung cấp thông tin tài liệu pháp lý để admin xác minh doanh nghiệp.",
+      "enterpriseName": "Tên doanh nghiệp",
+      "taxCode": "Mã số thuế",
+      "licenseNumber": "Số giấy phép kinh doanh",
+      "representative": "Người đại diện",
+      "phone": "Số điện thoại",
+      "email": "Email liên hệ",
+      "website": "Website",
+      "saveBtn": "Lưu tài liệu pháp lý",
+      "statusPending": "Trạng thái: Chờ phê duyệt"
+    },
+    "step3": {
+      "title": "Bước 3: Đăng ký Phỏng vấn trực tuyến",
+      "description": "Admin sẽ xác nhận lịch phỏng vấn và gửi thông tin tham gia phòng.",
+      "timeLabel": "Thời gian mong muốn",
+      "contactPerson": "Người liên hệ",
+      "contactPhone": "Số điện thoại liên hệ",
+      "notes": "Ghi chú",
+      "sendRequestBtn": "Gửi yêu cầu phỏng vấn",
+      "statusLabel": "Trạng thái: {{status}}"
+    },
+    "submittedSchedules": {
+      "title": "Lịch phỏng vấn đã gửi",
+      "noRequests": "Chưa có yêu cầu phỏng vấn nào.",
+      "proposedTime": "Thời gian đề xuất: {{time}}",
+      "contact": "Liên hệ: {{phone}}",
+      "notes": "Ghi chú: {{notes}}"
+    },
+    "messages": {
+      "infoRecorded": "Thông tin đã được ghi lại.",
+      "noScheduleYet": "Chưa có lịch",
+      "waitingConfirmation": "Chờ xác nhận"
+    }
+  },
+  "profileDetailCard": {
+    "title": {
+      "personalInfo": "Thông tin cá nhân",
+      "generalInfo": "Thông tin chung",
+      "careerGoals": "Mục tiêu nghề nghiệp",
+      "workExperience": "Kinh nghiệm làm việc",
+      "education": "Học vấn",
+      "certificates": "Chứng chỉ",
+      "languages": "Ngôn ngữ",
+      "advancedSkills": "Kỹ năng chuyên môn",
+      "profileNotFound": "Thông tin hồ sơ không tìm thấy.",
+      "privateProfile": "Hồ sơ này có thể đang ở chế độ riêng tư."
+    },
+    "label": {
+      "lastUpdated": "Cập nhật:",
+      "lastViewed": "Xem lần cuối:",
+      "printProfile": "In hồ sơ",
+      "saveProfile": "Lưu hồ sơ",
+      "saved": "Đã lưu",
+      "unsave": "Bỏ lưu",
+      "download": "Tải xuống",
+      "view": "Xem",
+      "notUpdated": "Chưa cập nhật",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "gender": "Giới tính",
+      "dob": "Ngày sinh",
+      "maritalStatus": "Tình trạng hôn nhân",
+      "cityProvince": "Tỉnh/Thành phố",
+      "district": "Quận/Huyện",
+      "address": "Địa chỉ",
+      "desiredPosition": "Vị trí mong muốn",
+      "desiredLevel": "Cấp bậc mong muốn",
+      "educationLevel": "Trình độ học vấn",
+      "experience": "Kinh nghiệm",
+      "career": "Ngành nghề",
+      "workLocation": "Địa điểm làm việc",
+      "desiredSalary": "Mức lương mong muốn",
+      "workplaceType": "Loại hình làm việc",
+      "jobType": "Hình thức làm việc",
+      "major": "Chuyên ngành",
+      "school": "Trường",
+      "proficiency": "Mức độ thành thạo",
+      "noExpiration": "Không thời hạn"
+    },
+    "messages": {
+      "saveSuccess": "Đã lưu thành công.",
+      "unsaveSuccess": "Đã bỏ lưu thành công.",
+      "emailSentSuccess": "Gửi email thành công."
+    }
+  },
+  "common": {
+    "notUpdated": "Chưa cập nhật",
+    "present": "Hiện tại"
+  },
+  "company": {
+    "tabs": {
+      "info": "Thông tin công ty",
+      "multimedia": "Đa phương tiện"
+    },
+    "title": "Thông tin công ty"
   }
 }

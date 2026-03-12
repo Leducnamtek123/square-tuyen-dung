@@ -12,6 +12,7 @@ See the LICENSE file in the project root for full license information.
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from "react-i18next";
 import { Box, Divider, Fab, IconButton, Rating, Skeleton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 
 import AddIcon from '@mui/icons-material/Add';
@@ -61,6 +62,7 @@ const Loading = (
 );
 
 const LanguageSkillCard = ({ title }) => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
   const { slug: resumeSlug } = useParams();
   const { allConfig } = useSelector((state) => state.config);
   const [openPopup, setOpenPopup] = React.useState(false);
@@ -124,7 +126,7 @@ const LanguageSkillCard = ({ title }) => {
 
         setOpenPopup(false);
         setIsSuccess(!isSuccess);
-        toastMessages.success('Language skill added successfully.');
+        toastMessages.success(t('jobSeeker:profile.messages.languageAddSuccess'));
       } catch (error) {
         errorHandling(error, setServerErrors);
       } finally {
@@ -139,7 +141,7 @@ const LanguageSkillCard = ({ title }) => {
 
         setOpenPopup(false);
         setIsSuccess(!isSuccess);
-        toastMessages.success('Language skill updated successfully.');
+        toastMessages.success(t('jobSeeker:profile.messages.languageUpdateSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -166,7 +168,7 @@ const LanguageSkillCard = ({ title }) => {
         await languageSkillService.deleteLanguageSkillById(id);
 
         setIsSuccess(!isSuccess);
-        toastMessages.success('Language skill deleted successfully.');
+        toastMessages.success(t('jobSeeker:profile.messages.languageDeleteSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -176,8 +178,8 @@ const LanguageSkillCard = ({ title }) => {
 
     confirmModal(
       () => del(id),
-      'Delete Language Skill',
-      'This language skill will be permanently deleted and cannot be restored. Are you sure?',
+      t('jobSeeker:profile.messages.deleteConfirmTitle', { item: t('jobSeeker:profile.sections.language') }),
+      t('jobSeeker:profile.messages.deleteConfirmWarning'),
       'warning'
     );
   };
@@ -222,7 +224,7 @@ const LanguageSkillCard = ({ title }) => {
             <Box>
               {languageSkills.length === 0 ? (
                 <EmptyCard
-                  content="Please add your language skills for employers to reference"
+                  content={t('jobSeeker:profile.messages.noLanguageData')}
                   onClick={handleShowAdd}
                 />
               ) : (
@@ -245,7 +247,7 @@ const LanguageSkillCard = ({ title }) => {
                             borderColor: 'primary.light',
                           }}
                         >
-                          Language
+                          {t('jobSeeker:profile.fields.language')}
                         </TableCell>
                         <TableCell 
                           align="left"
@@ -257,7 +259,7 @@ const LanguageSkillCard = ({ title }) => {
                             borderColor: 'primary.light',
                           }}
                         >
-                          Level
+                          {t('jobSeeker:profile.fields.level')}
                         </TableCell>
                         <TableCell 
                           align="right"
@@ -269,7 +271,7 @@ const LanguageSkillCard = ({ title }) => {
                             borderColor: 'primary.light',
                           }}
                         >
-                          Actions
+                          {t('jobSeeker:profile.fields.actions')}
                         </TableCell>
                       </TableRow>
                     </TableHead>
@@ -342,7 +344,7 @@ const LanguageSkillCard = ({ title }) => {
       </Box>
 
       {/* Start: form  */}
-      <FormPopup title="Language Skills" openPopup={openPopup} setOpenPopup={setOpenPopup}>
+      <FormPopup title={t('jobSeeker:profile.sections.language')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
         <LanguageSkillForm handleAddOrUpdate={handleAddOrUpdate} editData={editData} serverErrors={serverErrors} />
       </FormPopup>
       {/* End: form */}

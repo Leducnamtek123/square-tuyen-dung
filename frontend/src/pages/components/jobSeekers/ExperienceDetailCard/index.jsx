@@ -11,6 +11,7 @@ See the LICENSE file in the project root for full license information.
 
 import React from "react";
 import { useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Fab, IconButton, Skeleton, Stack, Typography } from "@mui/material";
 
 import {
@@ -75,7 +76,8 @@ const Loading = (
 );
 
 const ExperienceDetailCard = ({ title }) => {
-  const { slug: resumeSlug } = useParams();
+    const { t } = useTranslation(['jobSeeker', 'common']);
+    const { slug: resumeSlug } = useParams();
   const [openPopup, setOpenPopup] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
   const [isLoadingExperiencesDetail, setIsLoadingExperiencesDetail] =
@@ -134,7 +136,7 @@ const ExperienceDetailCard = ({ title }) => {
 
         setOpenPopup(false);
         setIsSuccess(!isSuccess);
-        toastMessages.success("Experience added successfully.");
+        toastMessages.success(t('jobSeeker:profile.messages.experienceAddSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -149,7 +151,7 @@ const ExperienceDetailCard = ({ title }) => {
 
         setOpenPopup(false);
         setIsSuccess(!isSuccess);
-        toastMessages.success("Experience updated successfully.");
+        toastMessages.success(t('jobSeeker:profile.messages.experienceUpdateSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -176,7 +178,7 @@ const ExperienceDetailCard = ({ title }) => {
         await expericenDetailService.deleteExperienceDetailById(id);
 
         setIsSuccess(!isSuccess);
-        toastMessages.success("Experience deleted successfully.");
+        toastMessages.success(t('jobSeeker:profile.messages.experienceDeleteSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -186,8 +188,8 @@ const ExperienceDetailCard = ({ title }) => {
 
     confirmModal(
       () => del(id),
-      "Delete Experience",
-      "This experience will be permanently deleted and cannot be restored. Are you sure?",
+      t('jobSeeker:profile.messages.deleteConfirmTitle', { item: t('jobSeeker:profile.sections.experience') }),
+      t('jobSeeker:profile.messages.deleteConfirmWarning'),
       "warning"
     );
   };
@@ -241,7 +243,7 @@ const ExperienceDetailCard = ({ title }) => {
             <Box>
               {experiencesDetail.length === 0 ? (
                 <EmptyCard
-                  content="Please add your work experience for employers to reference"
+                  content={t('jobSeeker:profile.messages.noExperienceData')}
                   onClick={handleShowAdd}
                 />
               ) : (
@@ -282,7 +284,7 @@ const ExperienceDetailCard = ({ title }) => {
                             {value.endDate ? (
                               <TimeAgo date={value.endDate} type="format" format="DD/MM/YYYY"/>
                             ) : (
-                              "Present"
+                              t('jobSeeker:profile.fields.present')
                             )}
                           </Typography>
                           <Typography
@@ -364,7 +366,7 @@ const ExperienceDetailCard = ({ title }) => {
                                   fontWeight: 500,
                                 }}
                               >
-                                Detailed Description
+                                {t('jobSeeker:profile.fields.description')}
                               </Typography>
                             </AccordionSummary>
                             <AccordionDetails>
@@ -379,7 +381,7 @@ const ExperienceDetailCard = ({ title }) => {
                                     : "italic",
                                 }}
                               >
-                                {value.description || "Not updated"}
+                                {value.description || t('common:noData')}
                               </Typography>
                             </AccordionDetails>
                           </Accordion>
@@ -396,7 +398,7 @@ const ExperienceDetailCard = ({ title }) => {
 
       {/* Start: form  */}
       <FormPopup
-        title="Work Experience"
+        title={t('jobSeeker:profile.sections.experience')}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >

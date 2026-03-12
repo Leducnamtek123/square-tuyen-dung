@@ -33,23 +33,15 @@ export const addDocument = async (collectionName, data) => {
     updatedAt: serverTimestamp(),
   });
 
-  console.log('Document written with ID: ', docRef.id);
   return docRef.id;
 };
 
 export const updateChatRoomByPartnerId = (partnerId, chatRoomId) => {
   const chatRoomDocRef = doc(db, 'chatRooms', `${chatRoomId}`);
   updateDoc(chatRoomDocRef, {
-    recipientId: `${partnerId}`,
     unreadCount: increment(1),
     updatedAt: serverTimestamp(),
-  })
-    .then(() => {
-      console.log('update chatRoom success');
-    })
-    .catch((error) => {
-      console.log('update chatRoom failed: ', error);
-    });
+  });
 };
 
 export const checkExists = async (collectionName, docId) => {
@@ -89,7 +81,6 @@ export const checkChatRoomExists = async (collectionName, member1, member2) => {
     const roomId = querySnapshot.docs[0].id;
     return roomId;
   } else {
-    console.log('Room does not exist');
     return null;
   }
 };

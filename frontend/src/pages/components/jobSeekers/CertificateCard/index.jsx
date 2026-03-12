@@ -11,6 +11,7 @@ See the LICENSE file in the project root for full license information.
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from "react-i18next";
 import { Box, Divider, Fab, IconButton, Skeleton, Stack, Typography } from "@mui/material";
 
 import {
@@ -74,6 +75,7 @@ const Loading = (
 );
 
 const CertificateCard = ({ title }) => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
   const { slug: resumeSlug } = useParams();
   const [openPopup, setOpenPopup] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
@@ -136,7 +138,7 @@ const CertificateCard = ({ title }) => {
 
         setOpenPopup(false);
         setIsSuccess(!isSuccess);
-        toastMessages.success('Certificate added successfully.');
+        toastMessages.success(t('jobSeeker:profile.messages.certificateAddSuccess'));
       } catch (error) {
         errorHandling(error, setServerErrors);
       } finally {
@@ -151,7 +153,7 @@ const CertificateCard = ({ title }) => {
 
         setOpenPopup(false);
         setIsSuccess(!isSuccess);
-        toastMessages.success('Certificate updated successfully.');
+        toastMessages.success(t('jobSeeker:profile.messages.certificateUpdateSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -178,7 +180,7 @@ const CertificateCard = ({ title }) => {
         await certificateService.deleteCertificateById(id);
 
         setIsSuccess(!isSuccess);
-        toastMessages.success('Certificate deleted successfully.');
+        toastMessages.success(t('jobSeeker:profile.messages.certificateDeleteSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -188,8 +190,8 @@ const CertificateCard = ({ title }) => {
 
     confirmModal(
       () => del(id),
-      'Delete Certificate',
-      'This certificate will be permanently deleted and cannot be restored. Are you sure?',
+      t('jobSeeker:profile.messages.deleteConfirmTitle', { item: t('jobSeeker:profile.sections.certificates') }),
+      t('jobSeeker:profile.messages.deleteConfirmWarning'),
       'warning'
     );
   };
@@ -243,7 +245,7 @@ const CertificateCard = ({ title }) => {
             <Box>
               {certificates.length === 0 ? (
                 <EmptyCard
-                  content="Please add your certificates for employers to reference"
+                  content={t('jobSeeker:profile.messages.noCertificateData')}
                   onClick={handleShowAdd}
                 />
               ) : (
@@ -279,7 +281,7 @@ const CertificateCard = ({ title }) => {
                             {value.expirationDate ? (
                               <TimeAgo date={value.expirationDate} type="format" format="DD/MM/YYYY"/>
                             ) : (
-                              'No Expiration'
+                              t('jobSeeker:profile.fields.noExpiration')
                             )}
                           </Typography>
                           <Typography
@@ -345,7 +347,7 @@ const CertificateCard = ({ title }) => {
 
       {/* Start: form  */}
       <FormPopup
-        title="Certificate"
+        title={t('jobSeeker:profile.sections.certificates')}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >

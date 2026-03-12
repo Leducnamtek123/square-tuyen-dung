@@ -3,7 +3,6 @@ import json
 from datetime import datetime
 from pathlib import Path
 from decouple import config
-import cloudinary
 import firebase_admin
 from firebase_admin import credentials
 
@@ -29,6 +28,11 @@ AI_TTS_DEFAULT_VOICE = config("AI_TTS_DEFAULT_VOICE", default="Ly (nữ miền B
 AI_STT_BASE_URL = config("AI_STT_BASE_URL", default="http://localhost:11437/v1")
 AI_STT_MODEL = config("AI_STT_MODEL", default="openai/whisper-large-v3")
 AI_STT_LANGUAGE = config("AI_STT_LANGUAGE", default="vi")
+AI_LLM_BASE_URL = config(
+    "AI_LLM_BASE_URL",
+    default=config("LLAMA_BASE_URL", default="http://llama-cpp:11434/v1"),
+)
+AI_LLM_MODEL = config("AI_LLM_MODEL", default=config("LLAMA_MODEL", default="qwen2-7b"))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
@@ -52,7 +56,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary',
     'django_admin_listfilter_dropdown',
     'ckeditor',
     'django_otp',
@@ -304,31 +307,28 @@ DJANGO_CELERY_BEAT_TZ_AWARE = True
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME')
+MINIO_ENDPOINT = config('MINIO_ENDPOINT', default='minio:9000')
+MINIO_ACCESS_KEY = config('MINIO_ACCESS_KEY', default='admin')
+MINIO_SECRET_KEY = config('MINIO_SECRET_KEY', default='password')
+MINIO_BUCKET = config('MINIO_BUCKET', default='myjob-bucket')
+MINIO_SECURE = config('MINIO_SECURE', default=False, cast=bool)
+MINIO_PUBLIC_URL = config('MINIO_PUBLIC_URL', default='http://localhost:9000')
 
-CLOUDINARY_BUCKET_NAME = 'myjob-bucket'
-
-# Set the Cloudinary configuration
-cloudinary.config(
-    cloud_name=CLOUDINARY_CLOUD_NAME,
-    api_key=config('CLOUDINARY_API_KEY'),
-    api_secret=config('CLOUDINARY_API_SECRET'),
-)
-
-CLOUDINARY_PATH = "https://res.cloudinary.com/" + CLOUDINARY_CLOUD_NAME + "/image/upload/v{0}/"
+# Reuse existing setting names for compatibility across the codebase.
+CLOUDINARY_PATH = f"{MINIO_PUBLIC_URL.rstrip('/')}/{MINIO_BUCKET}/"
 
 CLOUDINARY_DIRECTORY = {
-    "avatar": f"{CLOUDINARY_BUCKET_NAME}/avatar/",
-    "cv": f"{CLOUDINARY_BUCKET_NAME}/cv/",
-    "logo": f"{CLOUDINARY_BUCKET_NAME}/logo/",
-    "cover_image": f"{CLOUDINARY_BUCKET_NAME}/cover_image/",
-    "company_image": f"{CLOUDINARY_BUCKET_NAME}/company_image/",
-    "career_image": f"{CLOUDINARY_BUCKET_NAME}/career_image/",
-    "web_banner": f"{CLOUDINARY_BUCKET_NAME}/banners/web_banners/",
-    "mobile_banner": f"{CLOUDINARY_BUCKET_NAME}/banners/mobile_banners/",
-    "system": f"{CLOUDINARY_BUCKET_NAME}/system/",
-    "icons": f"{CLOUDINARY_BUCKET_NAME}/icons/",
-    "about_us": f"{CLOUDINARY_BUCKET_NAME}/about_us/"
+    "avatar": "avatar/",
+    "cv": "cv/",
+    "logo": "logo/",
+    "cover_image": "cover_image/",
+    "company_image": "company_image/",
+    "career_image": "career_image/",
+    "web_banner": "banners/web_banners/",
+    "mobile_banner": "banners/mobile_banners/",
+    "system": "system/",
+    "icons": "icons/",
+    "about_us": "about_us/"
 }
 
 REDIRECT_LOGIN_CLIENT = "dang-nhap"

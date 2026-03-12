@@ -134,7 +134,7 @@ class JobSeekerRegisterSerializer(serializers.Serializer):
                 return user
         except Exception as ex:
             helper.print_log_error("create user in JobSeekerRegisterSerializer", ex)
-            return None
+            raise
 
     class Meta:
         model = User
@@ -210,7 +210,7 @@ class EmployerRegisterSerializer(serializers.Serializer):
                 return user
         except Exception as ex:
             helper.print_log_error("create user in JobSeekerRegisterSerializer", ex)
-            return None
+            raise
 
     class Meta:
         model = User
@@ -218,73 +218,68 @@ class EmployerRegisterSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
-    fullName = serializers.CharField(source="full_name")
-    email = serializers.CharField()
+    fullName = serializers.CharField(source="full_name", required=False, allow_blank=True)
+    email = serializers.EmailField(read_only=True)
     avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
-    isActive = serializers.BooleanField(source='is_active')
-    isVerifyEmail = serializers.BooleanField(source='is_verify_email')
-    roleName = serializers.CharField(source="role_name")
+    isActive = serializers.BooleanField(source='is_active', read_only=True)
+    isVerifyEmail = serializers.BooleanField(source='is_verify_email', read_only=True)
+    roleName = serializers.ChoiceField(source="role_name", choices=var_sys.ROLE_CHOICES, required=False)
     jobSeekerProfileId = serializers.SerializerMethodField(method_name="get_job_seeker_profile_id", read_only=True)
     jobSeekerProfile = serializers.SerializerMethodField(method_name="get_job_seeker_profile", read_only=True)
-    companyId = serializers.SerializerMethodField(method_name='get_company_id', read_only=True)
-    company = serializers.SerializerMethodField(method_name='get_company')
+    companyId = serializers.SerializerMethodField(method_name="get_company_id", read_only=True)
+    company = serializers.SerializerMethodField(method_name="get_company", read_only=True)
     
     def get_avatar_url(self, user):
-        if user.avatar:
-            return user.avatar.get_full_url()
+        try:
+            avatar = getattr(user, 'avatar', None)
+            if avatar:
+                return avatar.get_full_url()
+        except Exception as ex:
+            helper.print_log_error("UserSerializer.get_avatar_url", ex)
         return var_sys.AVATAR_DEFAULT["AVATAR"]
 
+    def _get_job_seeker_profile_safe(self, user):
+        if getattr(user, 'role_name', None) != var_sys.JOB_SEEKER:
+            return None
+        try:
+            return JobSeekerProfile.objects.only("id", "phone").filter(user=user).first()
+        except Exception as ex:
+            helper.print_log_error("UserSerializer._get_job_seeker_profile_safe", ex)
+            return None
+
     def get_job_seeker_profile(self, user):
-        if user.role_name == var_sys.JOB_SEEKER:
-            try:
-                job_seeker_profile = user.job_seeker_profile
-            except ObjectDoesNotExist:
-                job_seeker_profile = None
-            if not job_seeker_profile:
-                return None
+        profile = self._get_job_seeker_profile_safe(user)
+        if profile:
             return {
-                "id": job_seeker_profile.id,
-                "phone": job_seeker_profile.phone
+                "id": profile.id,
+                "phone": profile.phone
             }
         return None
 
     def get_job_seeker_profile_id(self, user):
-        if user.role_name != var_sys.JOB_SEEKER:
-            return None
-        try:
-            job_seeker_profile = user.job_seeker_profile
-        except ObjectDoesNotExist:
-            return None
-        return job_seeker_profile.id
+        profile = self._get_job_seeker_profile_safe(user)
+        return profile.id if profile else None
 
     def get_company(self, user):
-        if user.role_name == var_sys.EMPLOYER:
-            try:
-                company = user.company
-            except ObjectDoesNotExist:
-                company = None
-            if not company:
-                return None
-            company_logo = getattr(company, 'logo', None)
-            company_logo_url = company_logo.get_full_url() if company_logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+        if getattr(user, 'role_name', None) == var_sys.EMPLOYER:
+            company = getattr(user, 'company', None)
+            if company:
+                company_logo = getattr(company, 'logo', None)
+                company_logo_url = company_logo.get_full_url() if company_logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
 
-            return {
-                "id": company.id,
-                "slug": company.slug,
-                "companyName": company.company_name,
-                "imageUrl": company_logo_url
-            }
+                return {
+                    "id": company.id,
+                    "slug": company.slug,
+                    "companyName": company.company_name,
+                    "imageUrl": company_logo_url
+                }
         return None
 
     def get_company_id(self, user):
-        if user.role_name != var_sys.EMPLOYER:
+        if getattr(user, 'role_name', None) != var_sys.EMPLOYER:
             return None
-        try:
-            company = user.company
-        except ObjectDoesNotExist:
-            return None
-        return company.id
+        company = getattr(user, 'company', None)
+        return company.id if company else None
 
     def __init__(self, *args, **kwargs):
         fields = kwargs.pop('fields', None)
@@ -298,11 +293,15 @@ class UserSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
     def update(self, user, validated_data):
-        full_name = validated_data.get("full_name", "Full name")
+        if "full_name" in validated_data:
+            full_name = validated_data.get("full_name")
+            if full_name is not None:
+                user.full_name = full_name
+            if not user.has_company:
+                queue_auth.update_info.delay(user.id, full_name)
 
-        user.full_name = full_name
-        if not user.has_company:
-            queue_auth.update_info.delay(user.id, full_name)
+        if "role_name" in validated_data:
+            user.role_name = validated_data.get("role_name")
 
         user.save()
         return user
@@ -321,8 +320,12 @@ class AvatarSerializer(serializers.ModelSerializer):
     avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
     
     def get_avatar_url(self, user):
-        if user.avatar:
-            return user.avatar.get_full_url()
+        try:
+            avatar = getattr(user, 'avatar', None)
+            if avatar:
+                return avatar.get_full_url()
+        except Exception as ex:
+            helper.print_log_error("AvatarSerializer.get_avatar_url", ex)
         return var_sys.AVATAR_DEFAULT["AVATAR"]
 
     def update(self, user, validated_data):
@@ -354,8 +357,9 @@ class AvatarSerializer(serializers.ModelSerializer):
                     queue_auth.update_avatar.delay(user.id, user.avatar.get_full_url())
             
             return user
-        except:
-            return None
+        except Exception as ex:
+            helper.print_log_error("AvatarSerializer.update", ex)
+            raise
 
     class Meta:
         model = User

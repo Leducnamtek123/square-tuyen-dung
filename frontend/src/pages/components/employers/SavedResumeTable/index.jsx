@@ -15,6 +15,7 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useSelector } from 'react-redux';
 
@@ -43,6 +44,7 @@ import { faFile, faFilePdf } from '@fortawesome/free-regular-svg-icons';
 import { formatRoute } from '../../../../utils/funcUtils';
 
 const SavedResumeTable = (props) => {
+  const { t } = useTranslation('employer');
 
   const nav = useNavigate();
 
@@ -59,7 +61,7 @@ const SavedResumeTable = (props) => {
           <TableRow>
             <TableCell colSpan={7}>
               <NoDataCard
-                title="You haven't saved any candidates yet"
+                title={t('savedResumeTable.title.youhaventsavedanycandidatesyet')}
                 imgComponentSgv={<SVG_IMAGES.ImageSvg12 />}
               />
             </TableCell>
@@ -69,7 +71,7 @@ const SavedResumeTable = (props) => {
             <TableRow key={row.id}>
               <TableCell component="th" scope="row" padding="none">
                 {row?.resume?.type === CV_TYPES.cvWebsite ? (
-                  <Tooltip title="Online Resume" arrow>
+                  <Tooltip title={t('savedResumeTable.title.onlineresume')} arrow>
                     <FontAwesomeIcon
                       icon={faFile}
                       style={{ marginRight: 1 }}
@@ -77,7 +79,7 @@ const SavedResumeTable = (props) => {
                     />
                   </Tooltip>
                 ) : (
-                  <Tooltip title="Attached Resume" arrow>
+                  <Tooltip title={t('savedResumeTable.title.attachedresume')} arrow>
                     <FontAwesomeIcon
                       icon={faFilePdf}
                       style={{ marginRight: 1 }}
@@ -93,7 +95,7 @@ const SavedResumeTable = (props) => {
                       fontSize: 13,
                     }}
                   >
-                    Not updated
+                    {t('common.notUpdated')}
                   </span>
                 )}{' '}
               </TableCell>
@@ -112,7 +114,7 @@ const SavedResumeTable = (props) => {
                       fontSize: 13,
                     }}
                   >
-                    Not updated
+                    {t('common.notUpdated')}
                   </span>
                 )}
               </TableCell>
@@ -125,7 +127,7 @@ const SavedResumeTable = (props) => {
                       fontSize: 13,
                     }}
                   >
-                    Not updated
+                    {t('common.notUpdated')}
                   </span>
                 )}
               </TableCell>
@@ -138,7 +140,7 @@ const SavedResumeTable = (props) => {
                       fontSize: 13,
                     }}
                   >
-                    Not updated
+                    {t('common.notUpdated')}
                   </span>
                 )}
               </TableCell>
@@ -147,9 +149,9 @@ const SavedResumeTable = (props) => {
               </TableCell>
               <TableCell align="right">
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
-                  <Tooltip title="View profile" arrow>
+                  <Tooltip title={t('savedResumeTable.title.viewprofile')} arrow>
                     <IconButton
-                      aria-label="view"
+                      aria-label={t('savedResumeTable.label.view')}
                       size="small"
                       onClick={() =>
                         nav(
@@ -171,7 +173,7 @@ const SavedResumeTable = (props) => {
                     startIcon={<FavoriteIcon />}
                     onClick={() => handleUnsave(row?.resume?.slug)}
                   >
-                    Unsave
+                    {t('savedResumeTable.label.unsave')}
                   </Button>
                 </Stack>
               </TableCell>

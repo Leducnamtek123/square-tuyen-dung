@@ -9,12 +9,15 @@
   "jobType": "Job Type",
   "gender": "Gender",
   "maritalStatus": "Marital Status",
+  "fullName": "Full name",
+  "lastModified": "Last modified",
   "all": "All",
   "select": "Select",
   "search": "Search",
   "reset": "Reset",
   "loading": "Loading...",
   "noData": "No data",
+  "viewDetails": "View details",
   "nav": {
     "jobs": "Jobs",
     "companies": "Companies",
@@ -77,14 +80,20 @@
     "confirm": "Confirm"
   },
   "status": {
+    "pending": "Pending",
+    "active": "Active",
+    "inactive": "Inactive",
     "scheduled": "Scheduled",
-    "inProgress": "In progress",
+    "inProgress": "In Progress",
     "completed": "Completed",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "searchable": "Searchable",
+    "notSearchable": "Not Searchable"
   },
   "labels": {
     "time": "Time",
-    "job": "Job"
+    "job": "Job",
+    "uncategorized": "Uncategorized"
   },
   "placeholders": {
     "selectCity": "Select City/Province",

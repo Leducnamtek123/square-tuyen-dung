@@ -31,7 +31,7 @@ const ProfileUploadForm = ({ handleAdd }) => {
       .mixed()
       .test(
         'files empty',
-        'File is required.',
+        t('jobSeeker:profile.validation.fileRequired'),
         (value) =>
           !(
             value === undefined ||
@@ -42,68 +42,68 @@ const ProfileUploadForm = ({ handleAdd }) => {
       ),
     title: yup
       .string()
-      .required('Desired position is required.')
-      .max(200, 'Desired position exceeds allowed length.'),
+      .required(t('jobSeeker:profile.validation.desiredPositionRequired'))
+      .max(200, t('jobSeeker:profile.validation.desiredPositionMax')),
     position: yup
       .number()
-      .required('Desired level is required.')
-      .typeError('Desired level is required.'),
+      .required(t('jobSeeker:profile.validation.desiredLevelRequired'))
+      .typeError(t('jobSeeker:profile.validation.desiredLevelRequired')),
     academicLevel: yup
       .number()
-      .required('Academic level is required.')
-      .typeError('Academic level is required.'),
+      .required(t('jobSeeker:profile.validation.academicLevelRequired'))
+      .typeError(t('jobSeeker:profile.validation.academicLevelRequired')),
     experience: yup
       .number()
-      .required('Work experience is required.')
-      .typeError('Work experience is required.'),
+      .required(t('jobSeeker:profile.validation.experienceRequired'))
+      .typeError(t('jobSeeker:profile.validation.experienceRequired')),
     career: yup
       .number()
-      .required('Career is required.')
-      .typeError('Career is required.'),
+      .required(t('jobSeeker:profile.validation.careerRequired'))
+      .typeError(t('jobSeeker:profile.validation.careerRequired')),
     city: yup
       .number()
-      .required('City/Province is required.')
-      .typeError('City/Province is required.'),
+      .required(t('jobSeeker:profile.validation.cityRequired'))
+      .typeError(t('jobSeeker:profile.validation.cityRequired')),
     salaryMin: yup
       .number()
-      .required('Minimum desired salary is required.')
-      .typeError('Invalid minimum salary.')
-      .min(0, 'Invalid minimum salary.')
+      .required(t('jobSeeker:profile.validation.salaryMinRequired'))
+      .typeError(t('jobSeeker:profile.validation.salaryMinInvalid'))
+      .min(0, t('jobSeeker:profile.validation.salaryMinInvalid'))
       .test(
         'minimum-wage-comparison',
-        'Minimum salary must be less than maximum salary.',
+        t('jobSeeker:profile.validation.salaryMinComparison'),
         function (value) {
           return !(value >= this.parent.salaryMax);
         }
       ),
     salaryMax: yup
       .number()
-      .required('Maximum desired salary is required.')
-      .typeError('Invalid maximum salary.')
-      .min(0, 'Invalid maximum salary.')
+      .required(t('jobSeeker:profile.validation.salaryMaxRequired'))
+      .typeError(t('jobSeeker:profile.validation.salaryMaxInvalid'))
+      .min(0, t('jobSeeker:profile.validation.salaryMaxInvalid'))
       .test(
         'maximum-wage-comparison',
-        'Maximum salary must be greater than minimum salary.',
+        t('jobSeeker:profile.validation.salaryMaxComparison'),
         function (value) {
           return !(value <= this.parent.salaryMin);
         }
       ),
-    expectedSalary: yup.number().nullable().min(0, 'Expected salary must be a positive number.'),
+    expectedSalary: yup.number().nullable().min(0, t('jobSeeker:profile.validation.expectedSalaryInvalid')),
     typeOfWorkplace: yup
       .number()
-      .required('Workplace type is required.')
-      .typeError('Workplace type is required.'),
+      .required(t('jobSeeker:profile.validation.workplaceTypeRequired'))
+      .typeError(t('jobSeeker:profile.validation.workplaceTypeRequired')),
     jobType: yup
       .number()
-      .required('Job type is required.')
-      .typeError('Job type is required.'),
+      .required(t('jobSeeker:profile.validation.jobTypeRequired'))
+      .typeError(t('jobSeeker:profile.validation.jobTypeRequired')),
     description: yup
       .string()
-      .required('Career objective is required.')
-      .max(800, 'Career objective exceeds allowed length.'),
+      .required(t('jobSeeker:profile.validation.objectiveRequired'))
+      .max(800, t('jobSeeker:profile.validation.objectiveMax')),
     skillsSummary: yup
       .string()
-      .max(2000, 'Skills summary exceeds allowed length.'),
+      .max(2000, t('jobSeeker:profile.validation.skillsSummaryMax')),
   });
 
   const { control, handleSubmit } = useForm({
@@ -117,7 +117,7 @@ const ProfileUploadForm = ({ handleAdd }) => {
           <FileUploadCustom
             control={control}
             name="file"
-            title="Choose your CV file"
+            title={t('jobSeeker:profile.fields.cvFile')}
             showRequired={true}
           />
         </Grid>
@@ -129,8 +129,8 @@ const ProfileUploadForm = ({ handleAdd }) => {
           <TextFieldCustom
             name="title"
             showRequired={true}
-            title="Desired Position"
-            placeholder="E.g.: Backend Developer"
+            title={t('jobSeeker:profile.fields.desiredPosition')}
+            placeholder={t('jobSeeker:profile.placeholders.desiredPosition')}
             control={control}
           />
         </Grid>
@@ -143,9 +143,9 @@ const ProfileUploadForm = ({ handleAdd }) => {
             name="position"
             control={control}
             options={allConfig?.positionOptions || []}
-            title="Desired Level"
+            title={t('jobSeeker:profile.fields.desiredLevel')}
             showRequired={true}
-            placeholder="Select level"
+            placeholder={t('jobSeeker:profile.placeholders.selectLevel')}
           />
         </Grid>
         <Grid
@@ -157,9 +157,9 @@ const ProfileUploadForm = ({ handleAdd }) => {
             name="academicLevel"
             control={control}
             options={allConfig?.academicLevelOptions || []}
-            title="Academic Level"
+            title={t('jobSeeker:profile.fields.academicLevel')}
             showRequired={true}
-            placeholder="Select academic level"
+            placeholder={t('jobSeeker:profile.placeholders.selectAcademicLevel')}
           />
         </Grid>
         <Grid
@@ -171,9 +171,9 @@ const ProfileUploadForm = ({ handleAdd }) => {
             name="experience"
             control={control}
             options={allConfig?.experienceOptions || []}
-            title="Work Experience"
+            title={t('jobSeeker:profile.fields.experience')}
             showRequired={true}
-            placeholder="Select work experience"
+            placeholder={t('jobSeeker:profile.placeholders.selectExperience')}
           />
         </Grid>
         <Grid
@@ -185,9 +185,9 @@ const ProfileUploadForm = ({ handleAdd }) => {
             name="career"
             control={control}
             options={allConfig?.careerOptions || []}
-            title="Career"
+            title={t('jobSeeker:profile.fields.career')}
             showRequired={true}
-            placeholder="Select career"
+            placeholder={t('jobSeeker:profile.placeholders.selectCareer')}
           />
         </Grid>
         <Grid
@@ -199,9 +199,9 @@ const ProfileUploadForm = ({ handleAdd }) => {
             name="city"
             control={control}
             options={allConfig?.cityOptions || []}
-            title="City/Province"
+            title={t('jobSeeker:profile.fields.city')}
             showRequired={true}
-            placeholder="Select city/province"
+            placeholder={t('jobSeeker:profile.placeholders.selectCity')}
           />
         </Grid>
         <Grid
@@ -211,9 +211,9 @@ const ProfileUploadForm = ({ handleAdd }) => {
           }}>
           <TextFieldCustom
             name="salaryMin"
-            title="Minimum Desired Salary"
+            title={t('jobSeeker:profile.fields.desiredSalary')}
             showRequired={true}
-            placeholder="Enter minimum desired salary"
+            placeholder={t('jobSeeker:profile.placeholders.salaryMin')}
             control={control}
             icon={'VND'}
             type='number'
@@ -226,9 +226,9 @@ const ProfileUploadForm = ({ handleAdd }) => {
           }}>
           <TextFieldCustom
             name="salaryMax"
-            title="Maximum Desired Salary"
+            title={t('jobSeeker:profile.fields.desiredSalary')}
             showRequired={true}
-            placeholder="Enter maximum desired salary"
+            placeholder={t('jobSeeker:profile.placeholders.salaryMax')}
             control={control}
             icon={'VND'}
             type='number'
@@ -257,9 +257,9 @@ const ProfileUploadForm = ({ handleAdd }) => {
             name="typeOfWorkplace"
             control={control}
             options={allConfig?.typeOfWorkplaceOptions || []}
-            title="Workplace Type"
+            title={t('jobSeeker:profile.fields.workplaceType')}
             showRequired={true}
-            placeholder="Select workplace type"
+            placeholder={t('jobSeeker:profile.placeholders.selectWorkplaceType')}
           />
         </Grid>
         <Grid
@@ -271,17 +271,17 @@ const ProfileUploadForm = ({ handleAdd }) => {
             name="jobType"
             control={control}
             options={allConfig?.jobTypeOptions || []}
-            title="Job Type"
+            title={t('jobSeeker:profile.fields.jobType')}
             showRequired={true}
-            placeholder="Select job type"
+            placeholder={t('jobSeeker:profile.placeholders.selectJobType')}
           />
         </Grid>
         <Grid size={12}>
           <MultilineTextFieldCustom
             name="description"
-            title="Career Objective"
+            title={t('jobSeeker:profile.fields.objective')}
             showRequired={true}
-            placeholder="Enter content here"
+            placeholder={t('jobSeeker:profile.placeholders.objective')}
             control={control}
           />
         </Grid>

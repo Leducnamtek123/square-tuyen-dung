@@ -9,6 +9,7 @@ License: MIT License
 See the LICENSE file in the project root for full license information.
 */
 
+import { lazy } from "react";
 import { Outlet } from "react-router-dom";
 import { HOST_NAME, ROUTES } from "./constants";
 import {
@@ -20,86 +21,84 @@ import {
   AdminLayout,
   FullscreenLayout,
 } from "../layouts";
-import {
-  EmailVerificationRequiredPage,
-  EmployerLogin,
-  EmployerSignUp,
-  ForgotPasswordPage,
-  JobSeekerLogin,
-  JobSeekerSignUp,
-  ResetPasswordPage,
-  AdminLogin,
-} from "../pages/authPages";
-import { ChatPage } from "../pages/chatPages";
-import {
-  AboutUsPage,
-  CompanyDetailPage,
-  CompanyPage,
-  HomePage,
-  JobDetailPage,
-  JobPage,
-  JobsByCareerPage,
-  JobsByCityPage,
-  JobsByJobTypePage,
-  NotificationPage,
-} from "../pages/defaultPages";
-import {
-  AccountPage,
-  AttachedProfilePage,
-  DashboardPage,
-  MyCompanyPage,
-  MyJobPage,
-  OnlineProfilePage,
-  ProfilePage,
-  MyInterviewsPage,
-} from "../pages/jobSeekerPages";
-import {
-  AccountPage as EmployerAccountPage,
-  CompanyPage as EmployerCompanyPage,
-  DashboardPage as EmployerDashboardPage,
-  JobPostPage as EmployerJobPostPage,
-  ProfileAppliedPage as EmployerProfileAppliedPage,
-  ProfileDetailPage as EmployerProfileDetailPage,
-  ProfilePage as EmployerProfilePage,
-  SavedProfilePage as EmployerSavedProfilePage,
-  SettingPage as EmployerSettingPage,
-  VerificationPage as EmployerVerificationPage,
-} from "../pages/employerPages";
-import {
-  InterviewListPage as EmployerInterviewListPage,
-  InterviewLivePage as EmployerInterviewLivePage,
-  InterviewCreatePage as EmployerInterviewCreatePage,
-  InterviewDetailPage as EmployerInterviewDetailPage,
-  QuestionBankPage as EmployerQuestionBankPage,
-  QuestionGroupsPage as EmployerQuestionGroupsPage,
-} from "../pages/employerPages/InterviewPages";
-import {
-  ForbiddenPage,
-  NotFoundPage,
-} from "../pages/errorsPage";
-import {
-  DashboardPage as AdminDashboardPage,
-  UsersPage as AdminUsersPage,
-  JobsPage as AdminJobsPage,
-  QuestionsPage as AdminQuestionsPage,
-  QuestionGroupsPage as AdminQuestionGroupsPage,
-  InterviewsPage as AdminInterviewsPage,
-  InterviewLivePage as AdminInterviewLivePage,
-  SettingsPage as AdminSettingsPage,
-  CareersPage as AdminCareersPage,
-  CitiesPage as AdminCitiesPage,
-  DistrictsPage as AdminDistrictsPage,
-  CompaniesPage as AdminCompaniesPage,
-  ProfilesPage as AdminProfilesPage,
-  ResumesPage as AdminResumesPage,
-  JobActivityPage as AdminJobActivityPage,
-  JobNotificationsPage as AdminJobNotificationsPage,
-} from "../pages/adminPages";
-import {
-  CandidateLoginPage,
-  InterviewRoomPage,
-  VoiceAiInterviewRedirectPage,
-} from "../pages/candidatePages";
+
+const EmailVerificationRequiredPage = lazy(() => import("../pages/authPages/EmailVerificationRequiredPage"));
+const EmployerLogin = lazy(() => import("../pages/authPages/EmployerLogin"));
+const EmployerSignUp = lazy(() => import("../pages/authPages/EmployerSignUp"));
+const ForgotPasswordPage = lazy(() => import("../pages/authPages/ForgotPasswordPage"));
+const JobSeekerLogin = lazy(() => import("../pages/authPages/JobSeekerLogin"));
+const JobSeekerSignUp = lazy(() => import("../pages/authPages/JobSeekerSignUp"));
+const ResetPasswordPage = lazy(() => import("../pages/authPages/ResetPasswordPage"));
+const AdminLogin = lazy(() => import("../pages/authPages/AdminLogin"));
+
+const ChatPage = lazy(() => import("../pages/chatPages/ChatPage"));
+
+const AboutUsPage = lazy(() => import("../pages/defaultPages/AboutUsPage"));
+const CompanyDetailPage = lazy(() => import("../pages/defaultPages/CompanyDetailPage"));
+const CompanyPage = lazy(() => import("../pages/defaultPages/CompanyPage"));
+const HomePage = lazy(() => import("../pages/defaultPages/HomePage"));
+const JobDetailPage = lazy(() => import("../pages/defaultPages/JobDetailPage"));
+const JobPage = lazy(() => import("../pages/defaultPages/JobPage"));
+const JobsByCareerPage = lazy(() => import("../pages/defaultPages/JobsByCareerPage"));
+const JobsByCityPage = lazy(() => import("../pages/defaultPages/JobsByCityPage"));
+const JobsByJobTypePage = lazy(() => import("../pages/defaultPages/JobsByJobTypePage"));
+const NotificationPage = lazy(() => import("../pages/defaultPages/NotificationPage"));
+
+const AccountPage = lazy(() => import("../pages/jobSeekerPages/AccountPage"));
+const AttachedProfilePage = lazy(() => import("../pages/jobSeekerPages/AttachedProfilePage"));
+const DashboardPage = lazy(() => import("../pages/jobSeekerPages/DashboardPage"));
+const MyCompanyPage = lazy(() => import("../pages/jobSeekerPages/MyCompanyPage"));
+const MyJobPage = lazy(() => import("../pages/jobSeekerPages/MyJobPage"));
+const OnlineProfilePage = lazy(() => import("../pages/jobSeekerPages/OnlineProfilePage"));
+const ProfilePage = lazy(() => import("../pages/jobSeekerPages/ProfilePage"));
+const MyInterviewsPage = lazy(() => import("../pages/jobSeekerPages/MyInterviewsPage"));
+
+const EmployerAccountPage = lazy(() => import("../pages/employerPages/AccountPage"));
+const EmployerBlogPage = lazy(() => import("../pages/employerPages/BlogPage"));
+const EmployerCompanyPage = lazy(() => import("../pages/employerPages/CompanyPage"));
+const EmployerDashboardPage = lazy(() => import("../pages/employerPages/DashboardPage"));
+const EmployerIntroducePage = lazy(() => import("../pages/employerPages/IntroducePage"));
+const EmployerJobPostPage = lazy(() => import("../pages/employerPages/JobPostPage"));
+const EmployerPricingPage = lazy(() => import("../pages/employerPages/PricingPage"));
+const EmployerProfileAppliedPage = lazy(() => import("../pages/employerPages/ProfileAppliedPage"));
+const EmployerProfileDetailPage = lazy(() => import("../pages/employerPages/ProfileDetailPage"));
+const EmployerProfilePage = lazy(() => import("../pages/employerPages/ProfilePage"));
+const EmployerSavedProfilePage = lazy(() => import("../pages/employerPages/SavedProfilePage"));
+const EmployerServicePage = lazy(() => import("../pages/employerPages/ServicePage"));
+const EmployerSettingPage = lazy(() => import("../pages/employerPages/SettingPage"));
+const EmployerSupportPage = lazy(() => import("../pages/employerPages/SupportPage"));
+const EmployerVerificationPage = lazy(() => import("../pages/employerPages/VerificationPage"));
+
+const EmployerInterviewListPage = lazy(() => import("../pages/employerPages/InterviewPages/InterviewListPage"));
+const EmployerInterviewLivePage = lazy(() => import("../pages/employerPages/InterviewPages/InterviewLivePage"));
+const EmployerInterviewCreatePage = lazy(() => import("../pages/employerPages/InterviewPages/InterviewCreatePage"));
+const EmployerInterviewDetailPage = lazy(() => import("../pages/employerPages/InterviewPages/InterviewDetailPage"));
+const EmployerQuestionBankPage = lazy(() => import("../pages/employerPages/InterviewPages/QuestionBankPage"));
+const EmployerQuestionGroupsPage = lazy(() => import("../pages/employerPages/InterviewPages/QuestionGroupsPage"));
+
+const ForbiddenPage = lazy(() => import("../pages/errorsPage/ForbiddenPage"));
+const NotFoundPage = lazy(() => import("../pages/errorsPage/NotFoundPage"));
+
+const AdminDashboardPage = lazy(() => import("../pages/adminPages/DashboardPage"));
+const AdminUsersPage = lazy(() => import("../pages/adminPages/UsersPage"));
+const AdminJobsPage = lazy(() => import("../pages/adminPages/JobsPage"));
+const AdminQuestionsPage = lazy(() => import("../pages/adminPages/QuestionsPage"));
+const AdminQuestionGroupsPage = lazy(() => import("../pages/adminPages/QuestionGroupsPage"));
+const AdminInterviewsPage = lazy(() => import("../pages/adminPages/InterviewsPage"));
+const AdminInterviewLivePage = lazy(() => import("../pages/adminPages/InterviewLivePage"));
+const AdminSettingsPage = lazy(() => import("../pages/adminPages/SettingsPage"));
+const AdminCareersPage = lazy(() => import("../pages/adminPages/CareersPage"));
+const AdminCitiesPage = lazy(() => import("../pages/adminPages/CitiesPage"));
+const AdminDistrictsPage = lazy(() => import("../pages/adminPages/DistrictsPage"));
+const AdminCompaniesPage = lazy(() => import("../pages/adminPages/CompaniesPage"));
+const AdminProfilesPage = lazy(() => import("../pages/adminPages/ProfilesPage"));
+const AdminResumesPage = lazy(() => import("../pages/adminPages/ResumesPage"));
+const AdminJobActivityPage = lazy(() => import("../pages/adminPages/JobActivityPage"));
+const AdminJobNotificationsPage = lazy(() => import("../pages/adminPages/JobNotificationsPage"));
+
+const CandidateLoginPage = lazy(() => import("../pages/candidatePages/CandidateLoginPage"));
+const InterviewRoomPage = lazy(() => import("../pages/candidatePages/InterviewRoomPage"));
+const VoiceAiInterviewRedirectPage = lazy(() => import("../pages/candidatePages/VoiceAiInterviewRedirectPage"));
 
 const routesConfig = {
   [HOST_NAME.MYJOB]: [
@@ -270,6 +269,31 @@ const routesConfig = {
   ],
   [HOST_NAME.EMPLOYER_MYJOB]: [
     {
+      layouts: DefaultLayout,
+      children: [
+        {
+          path: ROUTES.EMPLOYER.INTRODUCE,
+          element: EmployerIntroducePage,
+        },
+        {
+          path: ROUTES.EMPLOYER.SERVICE,
+          element: EmployerServicePage,
+        },
+        {
+          path: ROUTES.EMPLOYER.PRICING,
+          element: EmployerPricingPage,
+        },
+        {
+          path: ROUTES.EMPLOYER.SUPPORT,
+          element: EmployerSupportPage,
+        },
+        {
+          path: ROUTES.EMPLOYER.BLOG,
+          element: EmployerBlogPage,
+        },
+      ],
+    },
+    {
       layouts: EmployerLayout,
       checkCondition: (settings) =>
         settings.isAuthenticated && settings.isEmployerRole,
@@ -298,6 +322,10 @@ const routesConfig = {
         {
           path: ROUTES.EMPLOYER.INTERVIEW_LIST,
           element: EmployerInterviewListPage,
+        },
+        {
+          path: ROUTES.EMPLOYER.INTERVIEW_CREATE,
+          element: EmployerInterviewCreatePage,
         },
         {
           path: ROUTES.EMPLOYER.INTERVIEW_LIVE,

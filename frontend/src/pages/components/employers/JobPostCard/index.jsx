@@ -32,6 +32,8 @@ import JobPostForm from '../JobPostForm';
 import jobService from '../../../../services/jobService';
 import JobPostsTable from '../JobPostsTable';
 
+const pageSize = 10;
+
 const JobPostCard = () => {
   const { t } = useTranslation('employer');
   
@@ -259,7 +261,7 @@ const JobPostCard = () => {
     setFilterData({
       ...data,
       isUrgent: data.isUrgent === 1 ? true : data.isUrgent === 2 ? false : '',
-      pageSize: pageSize,
+      pageSize: rowsPerPage,
     });
     setPage(0);
   };

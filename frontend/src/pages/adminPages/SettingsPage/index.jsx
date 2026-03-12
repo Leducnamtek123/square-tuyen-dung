@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Divider, Switch, List, ListItem, ListItemText, Button, CircularProgress } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 import { useSystemSettings, useUpdateSystemSettings } from './hooks/useSystemSettings';
 
 const SettingsPage = () => {
+    const { t } = useTranslation('admin');
     const { data: settings, isLoading } = useSystemSettings();
     const updateMutation = useUpdateSystemSettings();
     const [localSettings, setLocalSettings] = useState(settings || {});
@@ -33,11 +35,11 @@ const SettingsPage = () => {
     return (
         <Box sx={{ p: 3 }}>
             <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
-                System Settings
+                {t('pages.settings.title')}
             </Typography>
 
             <Paper sx={{ p: 3, boxShadow: 2 }}>
-                <Typography variant="h6" gutterBottom>General Settings</Typography>
+                <Typography variant="h6" gutterBottom>{t('pages.settings.generalTitle')}</Typography>
                 <List>
                     <ListItem
                         secondaryAction={
@@ -48,7 +50,10 @@ const SettingsPage = () => {
                             />
                         }
                     >
-                        <ListItemText primary="System Maintenance" secondary="Stop all user activities for maintenance" />
+                        <ListItemText 
+                            primary={t('pages.settings.maintenanceMode.label')} 
+                            secondary={t('pages.settings.maintenanceMode.description')} 
+                        />
                     </ListItem>
                     <Divider />
                     <ListItem
@@ -60,7 +65,10 @@ const SettingsPage = () => {
                             />
                         }
                     >
-                        <ListItemText primary="Auto-approve Job Posts" secondary="Allow job posts to be approved automatically" />
+                        <ListItemText 
+                            primary={t('pages.settings.autoApproveJobs.label')} 
+                            secondary={t('pages.settings.autoApproveJobs.description')} 
+                        />
                     </ListItem>
                     <Divider />
                     <ListItem
@@ -72,7 +80,10 @@ const SettingsPage = () => {
                             />
                         }
                     >
-                        <ListItemText primary="Email Notifications" secondary="Send system notifications via email to administrators" />
+                        <ListItemText 
+                            primary={t('pages.settings.emailNotifications.label')} 
+                            secondary={t('pages.settings.emailNotifications.description')} 
+                        />
                     </ListItem>
                 </List>
                 <Box sx={{ mt: 3, display: 'flex', justifyContent: 'flex-end' }}>
@@ -81,7 +92,7 @@ const SettingsPage = () => {
                         onClick={handleSave}
                         disabled={updateMutation.isPending}
                     >
-                        {updateMutation.isPending ? <CircularProgress size={20} /> : 'Save Changes'}
+                        {updateMutation.isPending ? <CircularProgress size={20} /> : t('pages.settings.saveBtn')}
                     </Button>
                 </Box>
             </Paper>

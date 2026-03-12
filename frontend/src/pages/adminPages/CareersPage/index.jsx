@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Pagination, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
@@ -7,6 +8,7 @@ import { useCareers } from './hooks/useCareers';
 import CareerTable from './components/CareerTable';
 
 const CareersPage = () => {
+    const { t } = useTranslation('admin');
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -91,14 +93,14 @@ const CareersPage = () => {
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-                        Career Management
+                        {t('pages.careers.title')}
                     </Typography>
-                    <Breadcrumbs aria-label="breadcrumb">
+                    <Breadcrumbs aria-label={t('common.breadcrumb')}>
                         <Link underline="hover" color="inherit" href="/admin">
-                            Admin
+                            {t('pages.careers.breadcrumbAdmin')}
                         </Link>
-                        <Typography color="text.primary">General Config</Typography>
-                        <Typography color="text.primary">Careers</Typography>
+                        <Typography color="text.primary">{t('pages.careers.breadcrumbGeneral')}</Typography>
+                        <Typography color="text.primary">{t('pages.careers.breadcrumbCareers')}</Typography>
                     </Breadcrumbs>
                 </Box>
                 <Button
@@ -107,14 +109,14 @@ const CareersPage = () => {
                     onClick={handleOpenAdd}
                     sx={{ borderRadius: '8px', textTransform: 'none' }}
                 >
-                    Add Career
+                    {t('pages.careers.addCareer')}
                 </Button>
             </Box>
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
                         size="small"
-                        placeholder="Search careers..."
+                        placeholder={t('pages.careers.searchPlaceholder')}
                         value={searchTerm}
                         onChange={handleSearch}
                         sx={{ width: 300 }}
@@ -157,19 +159,19 @@ const CareersPage = () => {
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="xs">
                 <DialogTitle>
-                    {dialogMode === 'add' ? 'Add New Career' : 'Edit Career'}
+                    {dialogMode === 'add' ? t('pages.careers.addConfirmTitle') : t('pages.careers.editConfirmTitle')}
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <TextField
-                            label="Career Name"
+                            label={t('pages.careers.careerNameLabel')}
                             fullWidth
                             value={careerName}
                             onChange={(e) => setCareerName(e.target.value)}
                             required
                         />
                         <TextField
-                            label="Icon (App)"
+                            label={t('pages.careers.iconLabel')}
                             fullWidth
                             value={appIconName}
                             onChange={(e) => setAppIconName(e.target.value)}
@@ -177,34 +179,31 @@ const CareersPage = () => {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">Cancel</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.careers.cancelBtn')}</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={isMutating || !careerName.trim()}
                     >
-                        {isMutating ? 'Saving...' : 'Save'}
+                        {isMutating ? t('pages.careers.savingBtn') : t('pages.careers.saveBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogTitle>{t('pages.careers.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography>
-                        Are you sure you want to delete career <strong>{currentCareer?.name}</strong>?
-                        This action cannot be undone.
-                    </Typography>
+                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.careers.deleteText', { name: currentCareer?.name }) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Cancel</Button>
+                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.careers.cancelBtn')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Deleting...' : 'Confirm Delete'}
+                        {isMutating ? t('pages.careers.deletingBtn') : t('pages.careers.deleteBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>

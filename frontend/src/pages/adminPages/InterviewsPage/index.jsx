@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Box, Card, CardHeader, CardContent, Typography, TablePagination } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import { transformInterviewSession } from '../../../utils/transformers';
 import InterviewTable from './components/InterviewTable';
-import { useInterviews, useDeleteInterview, useUpdateInterviewStatus } from './hooks/useInterviews';
+import { useDeleteInterview, useUpdateInterviewStatus, useInterviews } from './hooks/useInterviews';
 
 const InterviewsPage = () => {
+    const { t } = useTranslation(['interview', 'admin']);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -33,7 +35,7 @@ const InterviewsPage = () => {
     };
 
     const handleDelete = (id) => {
-        if (window.confirm('Are you sure you want to delete this interview?')) {
+        if (window.confirm(t('interviewAdminPage.confirmDelete', { ns: 'interview' }))) {
             deleteMutation.mutate(id);
         }
     };
@@ -45,11 +47,11 @@ const InterviewsPage = () => {
     return (
         <Box>
             <Typography variant="h4" sx={{ mb: 4, fontWeight: 'bold' }}>
-                <VideocamOutlinedIcon sx={{ mr: 1, verticalAlign: 'middle' }} /> Interview Management
+                <VideocamOutlinedIcon sx={{ mr: 1, verticalAlign: 'middle' }} /> {t('interviewAdminPage.title', { ns: 'interview' })}
             </Typography>
 
             <Card>
-                <CardHeader title="Interview List" />
+                <CardHeader title={t('interviewAdminPage.cardTitle', { ns: 'interview' })} />
                 <CardContent>
                     <InterviewTable
                         interviews={interviews}
@@ -66,7 +68,10 @@ const InterviewsPage = () => {
                         page={page}
                         onPageChange={handleChangePage}
                         onRowsPerPageChange={handleChangeRowsPerPage}
-                        labelRowsPerPage="Rows per page:"
+                        labelRowsPerPage={t('common.pagination.rowsPerPage', { ns: 'admin' })}
+                        labelDisplayedRows={({ from, to, count }) => 
+                            t('common.pagination.displayedRows', { ns: 'admin', from, to, count })
+                        }
                     />
                 </CardContent>
             </Card>

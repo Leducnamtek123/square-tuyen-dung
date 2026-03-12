@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, Chip, Stack, Divider, LinearProgress } from "@mui/material";
 
 import interviewService from '../../../services/interviewService';
@@ -27,6 +28,7 @@ const getStatusColor = (status) => {
 };
 
 const InterviewLivePage = () => {
+  const { t } = useTranslation('admin');
   const [sessions, setSessions] = useState([]);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
@@ -82,7 +84,7 @@ const InterviewLivePage = () => {
   const columns = useMemo(
     () => [
       {
-        header: 'Company',
+        header: t('pages.interviewLive.table.company'),
         accessorKey: 'companyName',
         cell: ({ row }) => (
           <Typography variant="body2">
@@ -90,61 +92,70 @@ const InterviewLivePage = () => {
               row.original.company_name ||
               row.original.companyDict?.companyName ||
               row.original.job_post_dict?.companyName ||
-              'N/A'}
+              t('common.na')}
           </Typography>
         ),
       },
       {
-        header: 'Candidate',
+        header: t('pages.interviewLive.table.candidate'),
         accessorKey: 'candidateName',
         cell: ({ row }) => (
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {row.original.candidateName || 'N/A'}
+              {row.original.candidateName || t('common.na')}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {row.original.candidateEmail || 'N/A'}
+              {row.original.candidateEmail || t('common.na')}
             </Typography>
           </Box>
         ),
       },
       {
-        header: 'Position',
+        header: t('pages.interviewLive.table.position'),
         accessorKey: 'jobName',
-        cell: ({ getValue }) => <Typography variant="body2">{getValue() || 'N/A'}</Typography>,
+        cell: ({ getValue }) => <Typography variant="body2">{getValue() || t('common.na')}</Typography>,
       },
       {
-        header: 'Room',
+        header: t('pages.interviewLive.table.room'),
         accessorKey: 'room_name',
         cell: ({ row }) => (
           <Typography variant="body2">
-            {row.original.room_name || row.original.roomName || row.original.room || 'N/A'}
+            {row.original.room_name || row.original.roomName || row.original.room || t('common.na')}
           </Typography>
         ),
       },
       {
-        header: 'Time',
+        header: t('pages.interviewLive.table.time'),
         accessorKey: 'scheduledAt',
         cell: ({ getValue }) => (
           <Typography variant="body2">
-            {getValue() ? new Date(getValue()).toLocaleString('en-US') : 'N/A'}
+            {getValue() ? new Date(getValue()).toLocaleString() : t('common.na')}
           </Typography>
         ),
       },
       {
-        header: 'Status',
+        header: t('pages.interviewLive.table.status'),
         accessorKey: 'status',
-        cell: ({ getValue }) => (
-          <Chip
-            label={getValue()?.replaceAll('_', ' ')?.toUpperCase()}
-            color={getStatusColor(getValue())}
-            size="small"
-            sx={{ fontWeight: 'bold' }}
-          />
-        ),
+        cell: ({ getValue }) => {
+          const status = getValue()?.toLowerCase() || '';
+          let label = getValue();
+          if (status === 'completed') label = t('common.status.completed');
+          else if (['in_progress', 'calibration', 'processing', 'connecting', 'active'].includes(status)) label = t('common.status.inProgress');
+          else if (status === 'scheduled') label = t('common.status.scheduled');
+          else if (status === 'cancelled') label = t('common.status.cancelled');
+          
+          return (
+            <Chip
+              label={label}
+              color={getStatusColor(status)}
+              size="small"
+              sx={{ fontWeight: 'bold' }}
+            />
+          );
+        },
       },
     ],
-    []
+    [t]
   );
 
   return (
@@ -164,14 +175,14 @@ const InterviewLivePage = () => {
         mb={2}
       >
         <Typography variant="h5" sx={{ fontWeight: 600 }}>
-          Live Company Interviews
+          {t('pages.interviewLive.title')}
         </Typography>
       </Stack>
 
       <Stack direction="row" spacing={1.5} mb={3} flexWrap="wrap">
-        <Chip label={`In Progress: ${stats.active}`} color="primary" variant="outlined" />
-        <Chip label={`Scheduled: ${stats.scheduled}`} color="info" variant="outlined" />
-        <Chip label={`Completed: ${stats.completed}`} color="success" variant="outlined" />
+        <Chip label={t('pages.interviewLive.stats.inProgress', { count: stats.active })} color="primary" variant="outlined" />
+        <Chip label={t('pages.interviewLive.stats.scheduled', { count: stats.scheduled })} color="info" variant="outlined" />
+        <Chip label={t('pages.interviewLive.stats.completed', { count: stats.completed })} color="success" variant="outlined" />
       </Stack>
 
       {loading ? (
@@ -210,7 +221,7 @@ const InterviewLivePage = () => {
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           onRowsPerPageChange={handleChangeRowsPerPage}
-          emptyMessage="No active interview sessions."
+          emptyMessage={t('pages.interviewLive.table.emptyMessage')}
         />
       </Box>
     </Box>

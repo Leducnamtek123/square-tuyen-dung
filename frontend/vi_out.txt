@@ -1,0 +1,368 @@
+Found 70 files containing Vietnamese characters.
+
+File: components\AppIntroductionCard\index.jsx
+  L99: <Typography variant="h5">Tải ứng dụng miễn phí</Typography>
+  L107: Tìm việc hiệu quả bằng cách tải MyJob về di động của bạn và sẵn
+  L109: sàng nhận việc làm ngay hôm nay!
+  L151: placeholder="Nhập số điện thoại"
+  L167: gửi đi
+
+File: components\ApplyCard\index.jsx
+  L93: <Typography color="gray">Ứng tuyển vị trí </Typography>
+  L101: buttonText="Ứng tuyển"
+
+File: components\ApplyForm\index.jsx
+  10 matches, examples:
+  L238: Hồ sơ trực tuyến
+  L256: Hồ sơ đính kèm
+  L302: <FontAwesomeIcon icon={faEye} /> Xem hồ sơ
+  L332: title="Họ và tên"
+  L336: placeholder="Nhập họ và tên"
+
+File: components\CareerCarousel\index.jsx
+  L425: {value.jobPostTotal} Việc Làm
+
+File: components\ChatBot\index.jsx
+  12 matches, examples:
+  L27: return "Chào anh/chị! Square AI có thể hỗ trợ đăng tin, tìm ứng viên và quản lý phỏng vấn. Anh/chị cần giúp gì?";
+  L29: return "Chào bạn! Square AI sẵn sàng hỗ trợ tìm việc, hồ sơ và phỏng vấn. Bạn cần giúp gì?";
+  L34: return "Bạn là trợ lý tuyển dụng Square AI dành cho nhà tuyển dụng. Trả lời ngắn gọn, rõ ràng, ưu tiên tiếng Việt.";
+  L36: return "Bạn là trợ lý tuyển dụng Square AI dành cho người tìm việc. Trả lời ngắn gọn, rõ ràng, ưu tiên tiếng Việt.";
+  L91: "Xin lỗi, tôi chưa có câu trả lời phù hợp.";
+
+File: components\chats\ChatInfo\index.jsx
+  L85: Hãy bắt đầu cuộc trò chuyện bằng một lời chào 😍
+
+File: components\chats\SidebarHeader\index.jsx
+  L84: label={!isEmployer ? 'Về trang chủ' : 'Về trang quản trị'}
+
+File: components\ColorPickerDialog\index.jsx
+  L83: Chọn màu sắc cho CV của bạn
+  L95: Màu sắc gợi ý
+  L205: Xem trước màu đã chọn
+  L231: <Button onClick={onClose}>Hủy</Button>
+  L255: Xác nhận
+
+File: components\Companies\index.jsx
+  L148: Công ty nổi bật
+  L172: {count} công ty
+  L211: title="Hiện chưa tìm công ty phù hợp với tiêu chí của bạn"
+
+File: components\Company\index.jsx
+  7 matches, examples:
+  L147: <span style={{ color: 'white' }}>Đang theo dõi</span>
+  L151: 'Theo dõi'
+  L359: {followNumber} lượt theo dõi
+  L425: Chưa cập nhật
+  L449: Chưa cập nhật
+
+File: components\CompanyAction\index.jsx
+  L219: Đã xem hồ sơ {resume?.title} {views} lần
+  L241: Lần xem cuối {dayjs(createAt).format('DD/MM/YYYY HH:mm')}
+  L469: Chưa cập nhật
+  L513: {company?.followNumber} theo dõi
+  L529: {company?.jobPostNumber} việc làm
+
+File: components\controls\BasicDropzone\index.jsx
+  L132: Kéo hồ sơ của bạn vào đây
+  L138: Hoặc bạn có thể
+  L170: Chọn hồ sơ từ máy bạn
+  L188: Hỗ trợ định dạng .pdf
+  L234: Đổi tập tin
+
+File: components\controls\FileUploadCustom\index.jsx
+  L149: Kéo thả file vào đây hoặc
+  L175: Chọn file
+  L181: Chỉ chấp nhận file PDF
+  L237: Xóa
+
+File: components\controls\FormPopup\index.jsx
+  L25: buttonText = 'Lưu',
+
+File: components\controls\InputBaseSearchCompanyCustom\index.jsx
+  L157: Tìm kiếm
+
+File: components\controls\InputBaseSearchHomeCustom\index.jsx
+  L237: Gợi ý tìm kiếm
+  L260: Không có dữ liệu
+  L328: Tìm kiếm gần đây
+  L528: Tìm kiếm
+
+File: components\CVDoc\index.jsx
+  19 matches, examples:
+  L537: <Text style={styles.contactItem}>SĐT: {user?.phone}</Text>
+  L541: Cập nhật: {formatDate(resume?.updateAt)}
+  L561: <Text style={styles.sectionTitle}>THÔNG TIN CHUNG</Text>
+  L569: <Text style={styles.infoLabel}>Vị trí:</Text>
+  L581: <Text style={styles.infoLabel}>Kinh nghiệm:</Text>
+
+File: components\DataTable\index.jsx
+  L33: emptyMessage = "Không có dữ liệu",
+  L165: labelRowsPerPage="Dòng mỗi trang:"
+
+File: components\DropzoneDialogCustom\index.jsx
+  7 matches, examples:
+  L27: const { open, setOpen, handleUpload, title = 'Tiêu đề' } = props;
+  L57: submitButtonText="Tải lên"
+  L59: cancelButtonText="Hủy"
+  L79: dropzoneText="Kéo và thả tệp vào đây hoặc nhấp vào"
+  L81: previewText="Xem trước"
+
+File: components\EmptyCard\index.jsx
+  L25: const EmptyCard = ({ content, labelButton="Thêm mới", onClick }) => {
+
+File: components\Feedback\index.jsx
+  L258: Phản hồi
+  L325: Phản hồi của bạn
+  L459: placeholder="Chia sẻ trải nghiệm của bạn..."
+  L531: Gửi phản hồi
+
+File: components\FeedbackCarousel\index.jsx
+  L197: <NoDataCard title="Chưa có người dùng nào đánh giá" />
+
+File: components\JobPost\index.jsx
+  L299: <Tooltip title="Tuyển gấp" placement="top">
+  L511: Chưa cập nhật
+  L597: Còn <TimeAgo date={deadline} type="fromNow" />
+
+File: components\JobPostAction\index.jsx
+  L317: Chưa cập nhật
+
+File: components\JobPostLarge\index.jsx
+  L221: <Tooltip title="Tuyển gấp" placement="top">
+  L573: Chưa cập nhật
+  L693: Còn{" "}
+
+File: components\JobSeekerProfile\index.jsx
+  12 matches, examples:
+  L197: Chưa cập nhật
+  L225: Chưa cập nhật
+  L231: tuổi)
+  L245: label={`Xem lần cuối: ${dayjs(lastViewedDate).format(
+  L327: Chưa cập nhật
+
+File: components\MainJobRightBanner\index.jsx
+  L203: {banner.buttonText || 'Xem thêm'}
+
+File: components\Map\index.jsx
+  L105: Chưa thể xác định vị trí trên bản đồ
+
+File: components\NotificationCard\index.jsx
+  L558: Chưa có thông báo nào
+  L720: {value?.is_read === true ? 'Đã đọc' : 'Mới'}
+  L792: Xem thêm
+  L828: Xóa tất cả
+
+File: components\NumberCard\index.jsx
+  L45: <Typography variant="button">Nhà tuyển dụng xem hồ sơ</Typography>
+
+File: components\Pdf\index.jsx
+  L144: label="Kích thước chuẩn của tệp"
+  L218: Tải xuống
+
+File: components\ProfileUploadCard\index.jsx
+  L171: label="Cho phép tìm kiếm"
+  L199: label="Cho phép tìm kiếm"
+  L209: title={`Bật "Cho phép tìm kiếm" sẽ giúp nhà tuyển dụng tìm thấy hồ sơ của bạn và họ có thể liên hệ với bạn về công việc mới. Chỉ có duy nhất một hồ được bật trạng thái "cho phép tìm kiếm" trong tất cả hồ sơ của bạn.`}
+  L287: Cập nhật lần cuối: {dayjs(updateAt).format('DD/MM/YYYY HH:mm:ss')}
+  L313: label="Tải xuống"
+
+File: components\SocialNetworkSharingPopup\SocialNetworkSharingPopup.jsx
+  L115: <Typography variant="h5" sx={{ fontWeight: 600 }}>Chia sẻ qua</Typography>
+
+File: layouts\components\commons\LanguageSwitcher\index.jsx
+  L27: label: 'Tiếng Việt',
+
+File: pages\components\chats\ChatWindow\index.jsx
+  L473: mt: selectedRoomId ? '72px' : 0, // Chiều cao của header chat
+  L475: mb: '80px' // Chiều cao của khung nhập tin nhắn
+
+File: pages\components\chats\Message\index.jsx
+  L72: : "Đang gửi ..."}
+
+File: pages\components\chats\RightSidebar\index.jsx
+  L228: TIN TUYỂN DỤNG ĐÃ ỨNG TUYỂN
+  L426: label="Nhắn tin"
+  L710: ỨNG VIÊN ỨNG TUYỂN
+  L774: Chưa có ứng viên nào ứng tuyển
+  L908: label="Nhắn tin"
+
+File: pages\components\defaults\CategoryCard\index.jsx
+  L142: placeholder="Tìm kiếm nhanh"
+
+File: pages\components\defaults\CompanySearch\index.jsx
+  L107: placeholder="Nhập tên công ty hoặc lĩnh vực cần tìm kiếm"
+  L128: placeholder="Tất cả tỉnh thành"
+  L161: Tìm kiếm
+
+File: pages\components\defaults\HomeSearch\index.jsx
+  L181: placeholder="Tìm kiếm cơ hội việc làm"
+  L204: placeholder="Tất cả ngành nghề"
+  L227: placeholder="Tất cả tỉnh thành"
+
+File: pages\components\employers\charts\ApplicationChart\index.jsx
+  L320: title={t('applicationChart.title.thngkchstuyndngtrongvng1thnggnnht', 'Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất')}
+  L430: Không có dữ liệu để thống kê
+
+File: pages\components\employers\charts\CandidateChart\index.jsx
+  L332: title={t('candidateChart.title.thngkshsngtuynnhnctheongy', 'Thống kê số hồ sơ ứng tuyển nhận được theo ngày')}
+  L442: Không có dữ liệu để thống kê
+
+File: pages\components\employers\charts\HiringAcademicChart\index.jsx
+  L154: label: '# Số lượng ứng tuyển',
+  L222: title={t('hiringAcademicChart.title.thngkchsngtuyntheotrnhhcvn', 'Thống kê chỉ số ứng tuyển theo trình độ học vấn')}
+
+File: pages\components\employers\charts\RecruitmentChart\index.jsx
+  L332: title={t('recruitmentChart.title.thngkchstuyndngtrongvng1thnggnnht', 'Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất')}
+
+File: pages\components\employers\InterviewCreateCard\index.jsx
+  L528: <InputLabel>Chọn câu hỏi phỏng vấn</InputLabel>
+  L648: Hủy bỏ
+  L669: Lên lịch ngay
+
+File: pages\components\employers\ProfileDetailCard\index.jsx
+  17 matches, examples:
+  L748: Cập nhật:{" "}
+  L778: label={`Xem lần cuối: ${dayjs(
+  L840: In hồ sơ
+  L924: {/* CV đính kèm section */}
+  L1024: Tải xuống
+
+File: pages\defaultPages\AboutUsPage\index.jsx
+  44 matches, examples:
+  L27: TabTitle(`Về chúng tôi - Hệ thống giới thiệu việc làm ${APP_NAME}`);
+  L31: title: "Chân dung việc - Đi đúng hướng",
+  L33: description: "Khám phá công việc phù hợp với định hướng nghề nghiệp. Thông tin chi tiết về yêu cầu công việc, môi trường và cơ hội phát triển tại mỗi công ty.",
+  L37: title: "Tạo CV & Profile",
+  L39: description: "Xây dựng hồ sơ ứng tuyển chuyên nghiệp với công cụ tạo CV thông minh. Tối ưu profile với các mẫu CV đẹp mắt theo từng ngành nghề.",
+
+File: pages\defaultPages\CompanyDetailPage\index.jsx
+  13 matches, examples:
+  L415: Chưa cập nhật
+  L493: ? "Đang theo dõi"
+  L495: : "Theo dõi"}{" "}
+  L527: Chia sẻ
+  L583: Về công ty
+
+File: pages\defaultPages\CompanyPage\index.jsx
+  L29: TabTitle('Kết quả tìm kiếm nhà tuyển dụng')
+  L71: Khám Phá Văn Hóa Công ty
+  L91: Tìm hiểu văn hóa công ty và chọn cho bạn nơi làm việc phù hợp nhất
+
+File: pages\defaultPages\JobDetailPage\components\JobDetailContactCard.jsx
+  10 matches, examples:
+  L49: ThÃ´ng tin liÃªn há»‡
+  L71: NgÆ°á»i liÃªn há»‡
+  L74: {jobPostDetail?.contactPersonName || "ChÆ°a cáº­p nháº­t"}
+  L97: Email liÃªn há»‡
+  L100: {jobPostDetail?.contactPersonEmail || "ChÆ°a cáº­p nháº­t"}
+
+File: pages\defaultPages\JobDetailPage\components\JobDetailDescriptionCard.jsx
+  13 matches, examples:
+  L18: {/* MÃ´ táº£ cÃ´ng viá»‡c */}
+  L37: MÃ´ táº£ cÃ´ng viá»‡c
+  L46: {/* YÃªu cáº§u cÃ´ng viá»‡c */}
+  L65: YÃªu cáº§u cÃ´ng viá»‡c
+  L74: {/* Quyá»n lá»£i */}
+
+File: pages\defaultPages\JobDetailPage\components\JobDetailHeaderCard.jsx
+  8 matches, examples:
+  L79: ChÆ°a cáº­p nháº­t
+  L112: Háº¡n ná»™p: {dayjs(jobPostDetail?.deadline).format("DD/MM/YYYY")}
+  L130: {jobPostDetail?.views} lÆ°á»£t xem
+  L148: ÄÄƒng ngÃ y:{" "}
+  L175: title="Má»©c lÆ°Æ¡ng"
+
+File: pages\defaultPages\JobDetailPage\components\JobDetailInfoItem.jsx
+  L19: ChÆ°a cáº­p nháº­t
+
+File: pages\defaultPages\JobDetailPage\components\JobDetailSidebar.jsx
+  L10: <Typography variant="h5">Viá»‡c lÃ m tÆ°Æ¡ng tá»±</Typography>
+
+File: pages\defaultPages\JobsByCareerPage\index.jsx
+  L29: TabTitle('Việc làm theo ngành nghề');
+  L37: <Typography variant="h4">Việc làm theo Ngành nghề</Typography>
+
+File: pages\defaultPages\JobsByCityPage\index.jsx
+  L29: TabTitle("Việc làm theo tỉnh thành")
+  L37: <Typography variant="h4">Việc làm theo Tỉnh thành</Typography>
+
+File: pages\defaultPages\JobsByJobTypePage\index.jsx
+  L29: TabTitle("Việc làm theo hình thức làm việc")
+  L37: <Typography variant="h4">Việc làm theo Hình thức là việc</Typography>
+
+File: pages\defaultPages\NotificationPage\index.jsx
+  L29: TabTitle(`${APP_NAME} thông báo`);
+  L59: {`${APP_NAME} thông báo`}
+
+File: pages\employerPages\BlogPage\index.jsx
+  10 matches, examples:
+  L22: TabTitle(`Blog tuyển dụng - ${APP_NAME}`);
+  L26: title: "Chia sẻ kinh nghiệm tuyển dụng",
+  L27: description: "Nội dung đang được cập nhật để mang lại thông tin hữu ích.",
+  L30: title: "Mẹo viết mô tả công việc",
+  L31: description: "Nội dung đang được cập nhật để mang lại thông tin hữu ích.",
+
+File: pages\employerPages\InterviewPages\InterviewCreatePage.jsx
+  L9: <InterviewCreateCard title="Lên lịch Phỏng vấn trực tuyến" />
+
+File: pages\employerPages\InterviewPages\QuestionBankPage.jsx
+  L6: <QuestionBankCard title="Ngân hàng câu hỏi AI" />
+
+File: pages\employerPages\InterviewPages\QuestionGroupsPage.jsx
+  L6: <QuestionGroupsCard title="Quản lý bộ câu hỏi" />
+
+File: pages\employerPages\InterviewPages\components\QuestionGroupTable.jsx
+  7 matches, examples:
+  L19: <Typography color="text.secondary">Chưa có bộ câu hỏi nào</Typography>
+  L29: <TableCell sx={{ fontWeight: 'bold' }}>Tên bộ câu hỏi</TableCell>
+  L30: <TableCell sx={{ fontWeight: 'bold' }}>Mô tả</TableCell>
+  L31: <TableCell sx={{ fontWeight: 'bold' }}>Số câu hỏi</TableCell>
+  L32: <TableCell sx={{ fontWeight: 'bold' }} align="right">Thao tác</TableCell>
+
+File: pages\employerPages\InterviewPages\hooks\useQuestionGroups.js
+  L21: toast.error('Có lỗi xảy ra khi thêm bộ câu hỏi');
+  L33: toast.error('Có lỗi xảy ra khi cập nhật bộ câu hỏi');
+  L45: toast.error('Có lỗi xảy ra khi xóa bộ câu hỏi');
+
+File: pages\employerPages\IntroducePage\index.jsx
+  24 matches, examples:
+  L25: TabTitle(`Giới thiệu - Nền tảng tuyển dụng ${APP_NAME}`);
+  L29: title: "Đăng tin nhanh, tiếp cận đúng người",
+  L31: "Tạo tin tuyển dụng chuẩn, hiển thị rõ yêu cầu và quyền lợi để thu hút ứng viên phù hợp.",
+  L35: title: "Tìm kiếm hồ sơ theo kỹ năng",
+  L37: "Bộ lọc theo ngành nghề, kinh nghiệm, địa điểm giúp rút ngắn thời gian sàng lọc.",
+
+File: pages\employerPages\PricingPage\index.jsx
+  23 matches, examples:
+  L20: TabTitle(`Bảng giá - ${APP_NAME}`);
+  L24: title: "Cơ bản",
+  L25: price: "Liên hệ",
+  L26: description: "Phù hợp cho doanh nghiệp bắt đầu tuyển dụng.",
+  L28: "Đăng tin tuyển dụng cơ bản",
+
+File: pages\employerPages\ProfileDetailPage\index.jsx
+  L27: TabTitle("Chi tiết hồ sơ ứng viên")
+
+File: pages\employerPages\ServicePage\index.jsx
+  13 matches, examples:
+  L25: TabTitle(`Dịch vụ - ${APP_NAME}`);
+  L29: title: "Đăng tin tuyển dụng",
+  L31: "Hỗ trợ tạo tin tuyển dụng chuẩn, hiển thị rõ yêu cầu và quyền lợi để tiếp cận đúng ứng viên.",
+  L35: title: "Tìm kiếm và sàng lọc hồ sơ",
+  L37: "Bộ lọc theo kỹ năng, kinh nghiệm, địa điểm giúp doanh nghiệp tiết kiệm thời gian tuyển dụng.",
+
+File: pages\employerPages\SupportPage\index.jsx
+  20 matches, examples:
+  L24: TabTitle(`Hỗ trợ - ${APP_NAME}`);
+  L28: title: "Hỗ trợ trực tiếp",
+  L30: "Giải đáp các vấn đề kỹ thuật và nghiệp vụ tuyển dụng trong giờ hành chính.",
+  L31: note: "Thông tin liên hệ đang được cập nhật.",
+  L35: title: "Tài liệu hướng dẫn",
+
+File: pages\jobSeekerPages\MyCompanyPage\index.jsx
+  L34: TabTitle("Trang quản trị Công ty của tôi")
+  L79: label="Nhà tuyển dụng xem hồ sơ"
+  L89: label="Theo dõi công ty"
+  L147: <Typography variant="h6">Việc làm phù hợp</Typography>
+

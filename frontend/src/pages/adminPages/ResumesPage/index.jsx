@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 import Grid from "@mui/material/Grid2";
 
 import SearchIcon from '@mui/icons-material/Search';
@@ -7,6 +8,7 @@ import { useResumes } from './hooks/useResumes';
 import ResumeTable from './components/ResumeTable';
 
 const ResumesPage = () => {
+    const { t } = useTranslation('admin');
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -95,7 +97,7 @@ const ResumesPage = () => {
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
                         size="small"
-                        placeholder="Search resumes..."
+                        placeholder={t('pages.resumes.searchPlaceholder')}
                         value={searchTerm}
                         onChange={handleSearch}
                         sx={{ width: 400 }}
@@ -137,12 +139,12 @@ const ResumesPage = () => {
             </Paper>
             {/* Edit Dialog */}
             <Dialog open={openEditDialog} onClose={handleCloseDialogs} fullWidth maxWidth="xs">
-                <DialogTitle>Edit Resume</DialogTitle>
+                <DialogTitle>{t('pages.resumes.editTitle')}</DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2} sx={{ pt: 1 }}>
                         <Grid size={12}>
                             <TextField
-                                label="Resume Title"
+                                label={t('pages.resumes.resumeTitleLabel')}
                                 fullWidth
                                 name="title"
                                 value={formData.title}
@@ -152,7 +154,7 @@ const ResumesPage = () => {
                         </Grid>
                         <Grid size={6}>
                             <TextField
-                                label="Min Salary"
+                                label={t('pages.resumes.minSalaryLabel')}
                                 fullWidth
                                 type="number"
                                 name="salaryMin"
@@ -162,7 +164,7 @@ const ResumesPage = () => {
                         </Grid>
                         <Grid size={6}>
                             <TextField
-                                label="Max Salary"
+                                label={t('pages.resumes.maxSalaryLabel')}
                                 fullWidth
                                 type="number"
                                 name="salaryMax"
@@ -173,34 +175,31 @@ const ResumesPage = () => {
                     </Grid>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialogs} color="inherit">Cancel</Button>
+                    <Button onClick={handleCloseDialogs} color="inherit">{t('pages.resumes.cancelBtn')}</Button>
                     <Button
                         onClick={handleSaveEdit}
                         variant="contained"
                         disabled={isMutating || !formData.title}
                     >
-                        {isMutating ? 'Saving...' : 'Save'}
+                        {isMutating ? t('pages.resumes.savingBtn') : t('pages.resumes.saveBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={handleCloseDialogs}>
-                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogTitle>{t('pages.resumes.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography>
-                        Are you sure you want to delete resume <strong>{currentResume?.title}</strong>?
-                        This action cannot be undone.
-                    </Typography>
+                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.resumes.deleteText', { name: currentResume?.title }) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialogs} color="inherit">Cancel</Button>
+                    <Button onClick={handleCloseDialogs} color="inherit">{t('pages.resumes.cancelBtn')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Deleting...' : 'Confirm Delete'}
+                        {isMutating ? t('pages.resumes.deletingBtn') : t('pages.resumes.deleteBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>

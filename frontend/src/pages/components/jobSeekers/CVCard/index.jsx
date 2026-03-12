@@ -9,14 +9,14 @@ License: MIT License
 See the LICENSE file in the project root for full license information.
 */
 
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Divider, Stack, Typography, Fab } from "@mui/material";
 
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 import CVForm from "../CVForm";
-import Pdf from "../../../../components/Pdf";
+const LazyPdf = lazy(() => import("../../../../components/Pdf"));
 import BackdropLoading from "../../../../components/loading/BackdropLoading";
 import errorHandling from "../../../../utils/errorHandling";
 import FormPopup from "../../../../components/controls/FormPopup";
@@ -156,7 +156,17 @@ const CVCard = ({ title }) => {
                   boxShadow: (theme) => theme.customShadows.small,
                 }}
               >
-                <Pdf title={cv.title} fileUrl={cv.fileUrl} />
+                <Suspense
+                  fallback={(
+                    <Stack alignItems="center" justifyContent="center" sx={{ py: 6 }}>
+                      <Typography variant="subtitle2" color="text.secondary">
+                        Loading preview...
+                      </Typography>
+                    </Stack>
+                  )}
+                >
+                  <LazyPdf title={cv.title} fileUrl={cv.fileUrl} />
+                </Suspense>
               </Box>
             </Stack>
           )}

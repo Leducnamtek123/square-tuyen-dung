@@ -35,6 +35,7 @@ urlpatterns = [
             path('admin/web/system-settings/', views.SystemSettingsAPIView.as_view()),
             path('ai/tts/', ai_views.tts),
             path('ai/transcribe/', ai_views.transcribe),
+            path('ai/chat/', ai_views.chat),
             path('livekit/webhook', livekit_webhook.livekit_webhook),
             path('interviews/<str:room_name>/context', interviews_compat_views.interview_context),
             path('interviews/<str:room_name>/next-question', interviews_compat_views.interview_next_question),

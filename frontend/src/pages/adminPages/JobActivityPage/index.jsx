@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 import SearchIcon from '@mui/icons-material/Search';
 import { useJobActivities } from './hooks/useJobActivities';
 import JobActivityTable from './components/JobActivityTable';
 
 const JobActivityPage = () => {
+    const { t } = useTranslation('admin');
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -74,21 +76,21 @@ const JobActivityPage = () => {
         <Box>
             <Box sx={{ mb: 3 }}>
                 <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-                    Job Post Activity Log
+                    {t('pages.jobActivity.title')}
                 </Typography>
                 <Breadcrumbs aria-label="breadcrumb">
                     <Link underline="hover" color="inherit" href="/admin">
-                        Admin
+                        {t('pages.jobActivity.breadcrumbAdmin')}
                     </Link>
-                    <Typography color="text.primary">Jobs & Interviews</Typography>
-                    <Typography color="text.primary">Job Post Activities</Typography>
+                    <Typography color="text.primary">{t('pages.jobActivity.breadcrumbJobs')}</Typography>
+                    <Typography color="text.primary">{t('pages.jobActivity.breadcrumbActivity')}</Typography>
                 </Breadcrumbs>
             </Box>
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
                         size="small"
-                        placeholder="Search activities..."
+                        placeholder={t('pages.jobActivity.searchPlaceholder')}
                         value={searchTerm}
                         onChange={handleSearch}
                         sx={{ width: 400 }}
@@ -130,52 +132,49 @@ const JobActivityPage = () => {
             </Paper>
             {/* Edit Status Dialog */}
             <Dialog open={openEditDialog} onClose={handleCloseDialogs} fullWidth maxWidth="xs">
-                <DialogTitle>Update Application Status</DialogTitle>
+                <DialogTitle>{t('pages.jobActivity.editStatusTitle')}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1 }}>
                         <TextField
                             select
                             fullWidth
-                            label="Status"
+                            label={t('pages.jobActivity.statusLabel')}
                             value={statusValue}
                             onChange={(e) => setStatusValue(e.target.value)}
                         >
-                            <MenuItem value="APPLIED">Applied</MenuItem>
-                            <MenuItem value="PENDING">Pending</MenuItem>
-                            <MenuItem value="ACCEPTED">Accepted</MenuItem>
-                            <MenuItem value="REJECTED">Rejected</MenuItem>
+                            <MenuItem value="APPLIED">{t('pages.jobActivity.statusOptions.applied')}</MenuItem>
+                            <MenuItem value="PENDING">{t('pages.jobActivity.statusOptions.pending')}</MenuItem>
+                            <MenuItem value="ACCEPTED">{t('pages.jobActivity.statusOptions.accepted')}</MenuItem>
+                            <MenuItem value="REJECTED">{t('pages.jobActivity.statusOptions.rejected')}</MenuItem>
                         </TextField>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialogs} color="inherit">Cancel</Button>
+                    <Button onClick={handleCloseDialogs} color="inherit">{t('pages.jobActivity.cancelBtn')}</Button>
                     <Button
                         onClick={handleSaveStatus}
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Saving...' : 'Save'}
+                        {isMutating ? t('pages.jobActivity.savingBtn') : t('pages.jobActivity.saveBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={handleCloseDialogs}>
-                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogTitle>{t('pages.jobActivity.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography>
-                        Are you sure you want to delete this activity log of <strong>{currentActivity?.userDict?.fullName}</strong>?
-                        This action cannot be undone.
-                    </Typography>
+                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.jobActivity.deleteText', { name: currentActivity?.userDict?.fullName }) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialogs} color="inherit">Cancel</Button>
+                    <Button onClick={handleCloseDialogs} color="inherit">{t('pages.jobActivity.cancelBtn')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Deleting...' : 'Confirm Delete'}
+                        {isMutating ? t('pages.jobActivity.deletingBtn') : t('pages.jobActivity.deleteBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>

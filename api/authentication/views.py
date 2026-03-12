@@ -643,6 +643,14 @@ class UserViewSet(viewsets.ViewSet,
             
         return queryset
 
+    def update(self, request, *args, **kwargs):
+        if "roleName" in request.data and str(request.user.pk) == str(kwargs.get("pk")):
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": ERROR_MESSAGES.get("CANNOT_CHANGE_OWN_ROLE", "Cannot change your own role.")}
+            )
+        return super().update(request, *args, **kwargs)
+
     @action(methods=['post'], detail=True, url_path='toggle-active', url_name='toggle-active')
     def toggle_active(self, request, pk=None):
         try:

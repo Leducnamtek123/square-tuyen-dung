@@ -11,6 +11,7 @@ See the LICENSE file in the project root for full license information.
 
 import React from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from "react-i18next";
 import { Box, Divider, Fab, IconButton, Rating, Skeleton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 
 import AddIcon from '@mui/icons-material/Add';
@@ -60,6 +61,7 @@ const Loading = (
 );
 
 const AdvancedSkillCard = ({ title }) => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
   const { slug: resumeSlug } = useParams();
   const [openPopup, setOpenPopup] = React.useState(false);
   const [isSuccess, setIsSuccess] = React.useState(false);
@@ -122,7 +124,7 @@ const AdvancedSkillCard = ({ title }) => {
 
         setOpenPopup(false);
         setIsSuccess(!isSuccess);
-        toastMessages.success('Professional skill added successfully.');
+        toastMessages.success(t('jobSeeker:profile.messages.skillAddSuccess'));
       } catch (error) {
         errorHandling(error, setServerErrors);
       } finally {
@@ -137,7 +139,7 @@ const AdvancedSkillCard = ({ title }) => {
 
         setOpenPopup(false);
         setIsSuccess(!isSuccess);
-        toastMessages.success('Professional skill updated successfully.');
+        toastMessages.success(t('jobSeeker:profile.messages.skillUpdateSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -164,7 +166,7 @@ const AdvancedSkillCard = ({ title }) => {
         await advancedSkillService.deleteAdvancedSkillById(id);
 
         setIsSuccess(!isSuccess);
-        toastMessages.success('Professional skill deleted successfully.');
+        toastMessages.success(t('jobSeeker:profile.messages.skillDeleteSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -174,8 +176,8 @@ const AdvancedSkillCard = ({ title }) => {
 
     confirmModal(
       () => del(id),
-      'Delete Professional Skill',
-      'This professional skill will be permanently deleted and cannot be restored. Are you sure?',
+      t('jobSeeker:profile.messages.deleteConfirmTitle', { item: t('jobSeeker:profile.sections.skills') }),
+      t('jobSeeker:profile.messages.deleteConfirmWarning'),
       'warning'
     );
   };
@@ -220,7 +222,7 @@ const AdvancedSkillCard = ({ title }) => {
             <Box>
               {advancedSkills.length === 0 ? (
                 <EmptyCard
-                  content="Please add your professional skills for employers to reference"
+                  content={t('jobSeeker:profile.messages.noSkillData')}
                   onClick={handleShowAdd}
                 />
               ) : (
@@ -243,7 +245,7 @@ const AdvancedSkillCard = ({ title }) => {
                             borderColor: 'primary.light',
                           }}
                         >
-                          Skill
+                          {t('jobSeeker:profile.fields.skill')}
                         </TableCell>
                         <TableCell 
                           align="left"
@@ -255,7 +257,7 @@ const AdvancedSkillCard = ({ title }) => {
                             borderColor: 'primary.light',
                           }}
                         >
-                          Level
+                          {t('jobSeeker:profile.fields.level')}
                         </TableCell>
                         <TableCell 
                           align="right"
@@ -267,7 +269,7 @@ const AdvancedSkillCard = ({ title }) => {
                             borderColor: 'primary.light',
                           }}
                         >
-                          Actions
+                          {t('jobSeeker:profile.fields.actions')}
                         </TableCell>
                       </TableRow>
                     </TableHead>
@@ -340,7 +342,7 @@ const AdvancedSkillCard = ({ title }) => {
       </Box>
 
       {/* Start: form  */}
-      <FormPopup title="Professional Skills" openPopup={openPopup} setOpenPopup={setOpenPopup}>
+      <FormPopup title={t('jobSeeker:profile.sections.skills')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
         <AdvancedSkillForm handleAddOrUpdate={handleAddOrUpdate} editData={editData} serverErrors={serverErrors} />
       </FormPopup>
       {/* End: form */}

@@ -11,6 +11,7 @@ import interviewService from "../../../services/interviewService";
 import { App as VoiceAiApp } from "@/voice-ai/components/app/app";
 import { ThemeProvider } from "@/voice-ai/components/app/theme-provider";
 import { APP_CONFIG_DEFAULTS } from "@/voice-ai/app-config";
+import LanguageSwitcher from "../../../layouts/components/commons/LanguageSwitcher";
 
 const InterviewRoomPage = () => {
   const { id: inviteToken } = useParams();
@@ -132,7 +133,10 @@ const InterviewRoomPage = () => {
   }
 
   return (
-    <Box sx={{ height: "100vh", width: "100vw", bgcolor: "#0f172a" }}>
+    <Box sx={{ height: "100vh", width: "100vw", bgcolor: "#0f172a", position: 'relative' }}>
+      <Box sx={{ position: 'absolute', top: 16, right: 16, zIndex: 1100 }}>
+        <LanguageSwitcher />
+      </Box>
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
         <VoiceAiApp
           appConfig={appConfig}

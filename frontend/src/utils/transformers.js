@@ -3,8 +3,10 @@
 MyJob Recruitment System - Part of MyJob Platform
 
 Author: Antigravity (Google DeepMind)
-
 */
+
+import i18n from '../i18n';
+const t = (key, options) => i18n.t(key, options);
 
 /**
 
@@ -24,7 +26,7 @@ export const transformQuestion = (q) => {
 
         text: q.text || q.questionText || q.content || '',
 
-        category: q.category || 'Chưa phân loại',
+        category: q.category || t('common:labels.uncategorized'),
 
         question_type: q.question_type || q.type || 'TEXT',
 

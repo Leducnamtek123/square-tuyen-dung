@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 import Grid from "@mui/material/Grid2";
 
 import SearchIcon from '@mui/icons-material/Search';
@@ -8,6 +9,7 @@ import { useCompanies } from './hooks/useCompanies';
 import CompanyTable from './components/CompanyTable';
 
 const CompaniesPage = () => {
+    const { t } = useTranslation('admin');
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -132,14 +134,14 @@ const CompaniesPage = () => {
                     onClick={handleOpenAdd}
                     sx={{ borderRadius: '8px', textTransform: 'none' }}
                 >
-                    Add Company
+                    {t('pages.companies.addCompany')}
                 </Button>
             </Box>
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
                         size="small"
-                        placeholder="Search companies..."
+                        placeholder={t('pages.companies.searchPlaceholder')}
                         value={searchTerm}
                         onChange={handleSearch}
                         sx={{ width: 400 }}
@@ -182,13 +184,13 @@ const CompaniesPage = () => {
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
                 <DialogTitle>
-                    {dialogMode === 'add' ? 'Add New Company' : 'Edit Company Information'}
+                    {dialogMode === 'add' ? t('pages.companies.addConfirmTitle') : t('pages.companies.editConfirmTitle')}
                 </DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2} sx={{ pt: 1 }}>
                         <Grid size={12}>
                             <TextField
-                                label="Company Name"
+                                label={t('pages.companies.companyNameLabel')}
                                 fullWidth
                                 name="companyName"
                                 value={formData.companyName}
@@ -198,7 +200,7 @@ const CompaniesPage = () => {
                         </Grid>
                         <Grid size={6}>
                             <TextField
-                                label="Tax Code"
+                                label={t('pages.companies.taxCodeLabel')}
                                 fullWidth
                                 name="taxCode"
                                 value={formData.taxCode}
@@ -208,7 +210,7 @@ const CompaniesPage = () => {
                         </Grid>
                         <Grid size={6}>
                             <TextField
-                                label="Employee Size"
+                                label={t('pages.companies.employeeSizeLabel')}
                                 fullWidth
                                 type="number"
                                 name="employeeSize"
@@ -219,7 +221,7 @@ const CompaniesPage = () => {
                         </Grid>
                         <Grid size={6}>
                             <TextField
-                                label="Company Email"
+                                label={t('pages.companies.companyEmailLabel')}
                                 fullWidth
                                 name="companyEmail"
                                 value={formData.companyEmail}
@@ -229,7 +231,7 @@ const CompaniesPage = () => {
                         </Grid>
                         <Grid size={6}>
                             <TextField
-                                label="Phone Number"
+                                label={t('pages.companies.companyPhoneLabel')}
                                 fullWidth
                                 name="companyPhone"
                                 value={formData.companyPhone}
@@ -239,7 +241,7 @@ const CompaniesPage = () => {
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                label="Field of Operation"
+                                label={t('pages.companies.fieldOperationLabel')}
                                 fullWidth
                                 name="fieldOperation"
                                 value={formData.fieldOperation}
@@ -249,7 +251,7 @@ const CompaniesPage = () => {
                         </Grid>
                         <Grid size={12}>
                             <TextField
-                                label="Website"
+                                label={t('pages.companies.websiteLabel')}
                                 fullWidth
                                 name="websiteUrl"
                                 value={formData.websiteUrl}
@@ -259,34 +261,31 @@ const CompaniesPage = () => {
                     </Grid>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">Cancel</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.companies.cancelBtn')}</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={isMutating || !formData.companyName || !formData.taxCode}
                     >
-                        {isMutating ? 'Saving...' : 'Save'}
+                        {isMutating ? t('pages.companies.savingBtn') : t('pages.companies.saveBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-                <DialogTitle>Confirm Delete</DialogTitle>
+                <DialogTitle>{t('pages.companies.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography>
-                        Are you sure you want to delete company <strong>{currentCompany?.companyName}</strong>?
-                        This action cannot be undone and may affect associated job posts.
-                    </Typography>
+                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.companies.deleteText', { name: currentCompany?.companyName }) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Cancel</Button>
+                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.companies.cancelBtn')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Deleting...' : 'Confirm Delete'}
+                        {isMutating ? t('pages.companies.deletingBtn') : t('pages.companies.deleteBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>

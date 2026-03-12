@@ -27,22 +27,22 @@ const EducationDetaiForm = ({ handleAddOrUpdate, editData }) => {
   const schema = yup.object().shape({
     degreeName: yup
       .string()
-      .required('Degree/Certificate name is required.')
-      .max(200, 'Degree/Certificate name exceeds allowed length.'),
+      .required(t('jobSeeker:profile.validation.degreeNameRequired'))
+      .max(200, t('jobSeeker:profile.validation.degreeNameMax')),
     major: yup
       .string()
-      .required('Major is required.')
-      .max(255, 'Major exceeds allowed length.'),
+      .required(t('jobSeeker:profile.validation.majorRequired'))
+      .max(255, t('jobSeeker:profile.validation.majorMax')),
     trainingPlaceName: yup
       .string()
-      .required('School/Training center is required.')
-      .max(255, 'School/Training center exceeds allowed length.'),
+      .required(t('jobSeeker:profile.validation.trainingPlaceRequired'))
+      .max(255, t('jobSeeker:profile.validation.trainingPlaceMax')),
     startDate: yup
       .date()
-      .required('Start date is required.')
-      .typeError('Start date is required.'),
+      .required(t('jobSeeker:profile.validation.startDateRequired'))
+      .typeError(t('jobSeeker:profile.validation.startDateRequired')),
     completedDate: yup.date().nullable(),
-    gradeOrRank: yup.string().max(100, 'Grade/Rank exceeds allowed length.'),
+    gradeOrRank: yup.string().max(100, t('jobSeeker:profile.validation.gradeOrRankMax')),
   });
 
   const { control, reset, handleSubmit } = useForm({
@@ -66,27 +66,27 @@ const EducationDetaiForm = ({ handleAddOrUpdate, editData }) => {
         <Grid size={12}>
           <TextFieldCustom
             name="degreeName"
-            title="Degree/Certificate Name"
+            title={t('jobSeeker:profile.fields.degreeName')}
             showRequired={true}
-            placeholder="E.g.: Bachelor of IT, Industrial Electrical Certificate"
+            placeholder={t('jobSeeker:profile.placeholders.degreeName')}
             control={control}
           />
         </Grid>
         <Grid size={12}>
           <TextFieldCustom
             name="major"
-            title="Major"
+            title={t('jobSeeker:profile.fields.major')}
             showRequired={true}
-            placeholder="Enter major"
+            placeholder={t('jobSeeker:profile.placeholders.major')}
             control={control}
           />
         </Grid>
         <Grid size={12}>
           <TextFieldCustom
             name="trainingPlaceName"
-            title="School/Training Center"
+            title={t('jobSeeker:profile.fields.trainingPlace')}
             showRequired={true}
-            placeholder="Enter school/Training center name"
+            placeholder={t('jobSeeker:profile.placeholders.trainingPlace')}
             control={control}
           />
         </Grid>
@@ -98,7 +98,7 @@ const EducationDetaiForm = ({ handleAddOrUpdate, editData }) => {
           <DatePickerCustom
             name="startDate"
             control={control}
-            title="Start Date"
+            title={t('jobSeeker:profile.fields.startDate')}
             showRequired={true}
             maxDate={DATE_OPTIONS.yesterday}
           />
@@ -111,7 +111,7 @@ const EducationDetaiForm = ({ handleAddOrUpdate, editData }) => {
           <DatePickerCustom
             name="completedDate"
             control={control}
-            title="Completion Date (Leave blank if currently studying here)"
+            title={t('jobSeeker:profile.fields.completedDate')}
             maxDate={DATE_OPTIONS.today}
           />
         </Grid>
@@ -126,8 +126,8 @@ const EducationDetaiForm = ({ handleAddOrUpdate, editData }) => {
         <Grid size={12}>
           <MultilineTextFieldCustom
             name="description"
-            title="Additional Description"
-            placeholder="Enter description here"
+            title={t('jobSeeker:profile.fields.additionalDescription')}
+            placeholder={t('jobSeeker:profile.placeholders.additionalDescription')}
             control={control}
           />
         </Grid>

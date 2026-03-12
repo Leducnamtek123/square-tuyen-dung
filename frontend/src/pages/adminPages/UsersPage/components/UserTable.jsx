@@ -1,10 +1,35 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Tooltip, Switch, CircularProgress, Typography, IconButton, Stack } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Tooltip, Switch, CircularProgress, Typography, Stack, Select, MenuItem } from "@mui/material";
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
+import { useTranslation } from 'react-i18next';
+import { ROLES_NAME } from '../../../../configs/constants';
 
-const UserTable = ({ users, loading, onToggleStatus, onScheduleInterview }) => {
+const UserTable = ({ users, loading, onToggleStatus, onRoleChange, currentUserId, disableRoleActions }) => {
+    const { t } = useTranslation('admin');
+    const getRoleLabel = (roleName) => {
+        switch (roleName) {
+            case ROLES_NAME.ADMIN:
+                return t('pages.users.roles.admin');
+            case ROLES_NAME.EMPLOYER:
+                return t('pages.users.roles.employer');
+            case ROLES_NAME.JOB_SEEKER:
+                return t('pages.users.roles.jobSeeker');
+            default:
+                return t('common.na');
+        }
+    };
+
+    const getRoleColor = (roleName) => {
+        if (roleName === ROLES_NAME.ADMIN) {
+            return 'error';
+        }
+        if (roleName === ROLES_NAME.EMPLOYER) {
+            return 'primary';
+        }
+        return 'default';
+    };
+
     if (loading && users.length === 0) {
         return (
             <TableContainer sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
@@ -16,7 +41,7 @@ const UserTable = ({ users, loading, onToggleStatus, onScheduleInterview }) => {
     if (users.length === 0) {
         return (
             <TableContainer sx={{ py: 5, textAlign: 'center' }}>
-                <Typography color="textSecondary">No users found</Typography>
+                <Typography color="textSecondary">{t('pages.users.table.noUsers')}</Typography>
             </TableContainer>
         );
     }
@@ -26,13 +51,13 @@ const UserTable = ({ users, loading, onToggleStatus, onScheduleInterview }) => {
             <Table size="medium">
                 <TableHead>
                     <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                        <TableCell>ID</TableCell>
-                        <TableCell>Full Name</TableCell>
-                        <TableCell>Email</TableCell>
-                        <TableCell>Role</TableCell>
-                        <TableCell>Verification</TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell align="right">Actions</TableCell>
+                        <TableCell>{t('pages.users.table.id')}</TableCell>
+                        <TableCell>{t('pages.users.table.fullName')}</TableCell>
+                        <TableCell>{t('pages.users.table.email')}</TableCell>
+                        <TableCell>{t('pages.users.table.role')}</TableCell>
+                        <TableCell>{t('pages.users.table.verification')}</TableCell>
+                        <TableCell>{t('pages.users.table.status')}</TableCell>
+                        <TableCell align="right">{t('pages.users.table.actions')}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -42,24 +67,37 @@ const UserTable = ({ users, loading, onToggleStatus, onScheduleInterview }) => {
                             <TableCell>{user.fullName}</TableCell>
                             <TableCell>{user.email}</TableCell>
                             <TableCell>
-                                <Chip
-                                    label={user.roleName}
+                                <Select
+                                    value={user.roleName || ''}
                                     size="small"
-                                    color={user.roleName === 'ADMIN' ? 'error' : user.roleName === 'EMPLOYER' ? 'primary' : 'default'}
-                                />
+                                    onChange={(event) => onRoleChange(user, event.target.value)}
+                                    disabled={disableRoleActions || user.id === currentUserId}
+                                    renderValue={(value) => (
+                                        <Chip
+                                            label={getRoleLabel(value)}
+                                            size="small"
+                                            color={getRoleColor(value)}
+                                        />
+                                    )}
+                                    sx={{ minWidth: 160 }}
+                                >
+                                    <MenuItem value={ROLES_NAME.ADMIN}>{getRoleLabel(ROLES_NAME.ADMIN)}</MenuItem>
+                                    <MenuItem value={ROLES_NAME.EMPLOYER}>{getRoleLabel(ROLES_NAME.EMPLOYER)}</MenuItem>
+                                    <MenuItem value={ROLES_NAME.JOB_SEEKER}>{getRoleLabel(ROLES_NAME.JOB_SEEKER)}</MenuItem>
+                                </Select>
                             </TableCell>
                             <TableCell>
                                 {user.isVerifyEmail ? (
-                                    <Tooltip title="Verified">
+                                    <Tooltip title={t('pages.users.table.verified')}>
                                         <CheckCircleIcon color="success" size="small" />
                                     </Tooltip>
                                 ) : (
-                                    <Typography variant="caption" color="error">Unverified</Typography>
+                                    <Typography variant="caption" color="error">{t('pages.users.table.unverified')}</Typography>
                                 )}
                             </TableCell>
                             <TableCell>
                                 <Chip
-                                    label={user.isActive ? 'Active' : 'Blocked'}
+                                    label={user.isActive ? t('pages.users.table.active') : t('pages.users.table.blocked')}
                                     size="small"
                                     color={user.isActive ? 'success' : 'error'}
                                     variant="outlined"
@@ -67,18 +105,7 @@ const UserTable = ({ users, loading, onToggleStatus, onScheduleInterview }) => {
                             </TableCell>
                             <TableCell align="right">
                                 <Stack direction="row" spacing={0.5} justifyContent="flex-end" alignItems="center">
-                                    {user.roleName !== 'ADMIN' && (
-                                        <Tooltip title="Schedule Interview">
-                                            <IconButton
-                                                size="small"
-                                                color="info"
-                                                onClick={() => onScheduleInterview(user)}
-                                            >
-                                                <VideocamOutlinedIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                    )}
-                                    <Tooltip title={user.isActive ? 'Block account' : 'Unblock account'}>
+                                    <Tooltip title={user.isActive ? t('pages.users.table.blockAccount') : t('pages.users.table.unblockAccount')}>
                                         <Switch
                                             checked={user.isActive}
                                             onChange={() => onToggleStatus(user)}

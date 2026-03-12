@@ -10,6 +10,7 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { Button, Stack, IconButton, Tooltip } from "@mui/material";
@@ -22,6 +23,7 @@ import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
 import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
 
 const SavedResumeFilterForm = ({ handleFilter }) => {
+  const { t } = useTranslation('employer');
   const { allConfig } = useSelector((state) => state.config);
 
   const {
@@ -51,7 +53,7 @@ const SavedResumeFilterForm = ({ handleFilter }) => {
           }}>
           <TextFieldCustom
             name="kw"
-            placeholder="Enter job post or candidate name"
+            placeholder={t('savedResumeFilterForm.placeholder.enterjobpostorcandidatename', 'Enter job post or candidate name')}
             control={control}
           />
         </Grid>
@@ -65,7 +67,7 @@ const SavedResumeFilterForm = ({ handleFilter }) => {
           }}>
           <TextFieldCustom
             name="salaryMax"
-            placeholder="Enter maximum salary"
+            placeholder={t('savedResumeFilterForm.placeholder.entermaximumsalary', 'Enter maximum salary')}
             control={control}
             type="number"
           />
@@ -82,7 +84,7 @@ const SavedResumeFilterForm = ({ handleFilter }) => {
             name="experienceId"
             control={control}
             options={allConfig?.experienceOptions || []}
-            placeholder="Select experience"
+            placeholder={t('savedResumeFilterForm.placeholder.selectexperience', 'Select experience')}
           />
         </Grid>
         <Grid
@@ -97,7 +99,7 @@ const SavedResumeFilterForm = ({ handleFilter }) => {
             name="cityId"
             control={control}
             options={allConfig?.cityOptions || []}
-            placeholder="Select location"
+            placeholder={t('savedResumeFilterForm.placeholder.selectlocation', 'Select location')}
           />
         </Grid>
         <Grid
@@ -109,9 +111,9 @@ const SavedResumeFilterForm = ({ handleFilter }) => {
             xl: 3
           }}>
           <Stack direction="row" spacing={2}>
-            <Tooltip title="Reset" arrow>
+            <Tooltip title={t('savedResumeFilterForm.title.reset', 'Reset')} arrow>
               <IconButton
-                aria-label="refresh"
+                aria-label={t('savedResumeFilterForm.label.refresh', 'refresh')}
                 onClick={() => {
                   reset();
                   handleSubmit(handleFilter(defaultValues));

@@ -60,8 +60,11 @@ const AccountCard = ({ title, sx }) => {
   const [serverErrors, setServerErrors] = React.useState(null);
 
   const handleUpdateAccount = (data) => {
+    const payload = {
+      fullName: data.fullName,
+    };
 
-    dispatch(updateUserInfo(data))
+    dispatch(updateUserInfo(payload))
 
       .unwrap()
 

@@ -13,6 +13,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { useTranslation } from 'react-i18next';
 import Grid from "@mui/material/Grid2";
 
 import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
@@ -23,12 +24,13 @@ const AdvancedSkillForm = ({
   editData,
   serverErrors = null,
 }) => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
   const schema = yup.object().shape({
     name: yup
       .string()
-      .required('Skill name is required.')
-      .max(200, 'Skill name exceeds allowed length.'),
-    level: yup.number().required('Level is required.'),
+      .required(t('jobSeeker:profile.validation.skillNameRequired'))
+      .max(200, t('jobSeeker:profile.validation.skillNameMax')),
+    level: yup.number().required(t('jobSeeker:profile.validation.levelRequired')),
   });
 
   const { control, reset, setError, handleSubmit } = useForm({
@@ -71,14 +73,14 @@ const AdvancedSkillForm = ({
           }}>
           <TextFieldCustom
             name="name"
-            title="Skill Name"
+            title={t('jobSeeker:profile.fields.skillName')}
             showRequired={true}
-            placeholder="Enter skill name"
+            placeholder={t('jobSeeker:profile.placeholders.skillName')}
             control={control}
           />
         </Grid>
         <Grid size={12}>
-          <RatingCustom name="level" control={control} title="Level" />
+          <RatingCustom name="level" control={control} title={t('jobSeeker:profile.fields.level')} />
         </Grid>
       </Grid>
     </form>

@@ -37,6 +37,7 @@ ERROR_MESSAGES = {
     'INVALID_PASSWORD_RESET_CODE': 'Mã xác nhận quên mật khẩu không hợp lệ',
     'PASSWORD_RESET_CODE_EXPIRED': 'Mã xác nhận quên mật khẩu đã hết hạn',
     'CLOUDINARY_UPLOAD_ERROR': 'Something went wrong when upload image to cloudinary',
+    'CANNOT_CHANGE_OWN_ROLE': 'Báº¡n khÃ´ng thá»ƒ thay Ä‘á»•i vai trÃ² cá»§a chÃ­nh mÃ¬nh.',
     'MAXIMUM_IMAGES':'Tối đa 15 ảnh',
     'MAXIMUM_CERTIFICATE': 'Tối đa 10 thông tin chứng chỉ',
     'MAXIMUM_EXPERIENCE': 'Tối đa 10 thông tin kinh nghiệm',

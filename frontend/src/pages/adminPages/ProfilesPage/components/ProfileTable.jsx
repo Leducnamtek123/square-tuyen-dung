@@ -4,20 +4,22 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useTranslation } from 'react-i18next';
 
 const ProfileTable = ({ data, onView, onEdit, onDelete }) => {
+    const { t } = useTranslation('admin');
     return (
         <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
             <Table sx={{ minWidth: 800 }}>
                 <TableHead sx={{ bgcolor: 'grey.50' }}>
                     <TableRow>
-                        <TableCell width={80}>Avatar</TableCell>
-                        <TableCell>Full Name</TableCell>
-                        <TableCell>Email</TableCell>
-                        <TableCell>Phone Number</TableCell>
-                        <TableCell>Gender</TableCell>
-                        <TableCell>Date of Birth</TableCell>
-                        <TableCell align="right">Actions</TableCell>
+                        <TableCell width={80}>{t('pages.profiles.table.avatar')}</TableCell>
+                        <TableCell>{t('pages.profiles.table.fullName')}</TableCell>
+                        <TableCell>{t('pages.profiles.table.email')}</TableCell>
+                        <TableCell>{t('pages.profiles.table.phone')}</TableCell>
+                        <TableCell>{t('pages.profiles.table.gender')}</TableCell>
+                        <TableCell>{t('pages.profiles.table.dob')}</TableCell>
+                        <TableCell align="right">{t('pages.profiles.table.actions')}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -39,17 +41,17 @@ const ProfileTable = ({ data, onView, onEdit, onDelete }) => {
                             <TableCell>{row.userDict?.gender || '---'}</TableCell>
                             <TableCell>{row.userDict?.birthday || '---'}</TableCell>
                             <TableCell align="right">
-                                <Tooltip title="View details">
+                                <Tooltip title={t('pages.profiles.table.viewDetails')}>
                                     <IconButton size="small" onClick={() => onView?.(row)}>
                                         <VisibilityIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Edit">
+                                <Tooltip title={t('pages.profiles.table.edit')}>
                                     <IconButton size="small" onClick={() => onEdit?.(row)} color="primary">
                                         <EditIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Delete">
+                                <Tooltip title={t('pages.profiles.table.delete')}>
                                     <IconButton size="small" onClick={() => onDelete?.(row)} color="error">
                                         <DeleteIcon fontSize="small" />
                                     </IconButton>
@@ -60,7 +62,7 @@ const ProfileTable = ({ data, onView, onEdit, onDelete }) => {
                     {(!data || data.length === 0) && (
                         <TableRow>
                             <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
-                                No data found
+                                {t('pages.profiles.table.noData')}
                             </TableCell>
                         </TableRow>
                     )}

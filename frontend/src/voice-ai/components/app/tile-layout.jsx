@@ -42,7 +42,7 @@ export function useLocalTrackRef(source) {
   return trackRef;
 }
 
-export function TileLayout({ chatOpen }) {
+export const TileLayout = React.memo(function TileLayout({ chatOpen }) {
   const {
     state: agentState,
     audioTrack: agentAudioTrack,
@@ -61,8 +61,8 @@ export function TileLayout({ chatOpen }) {
   const videoHeight = agentVideoTrack?.publication.dimensions?.height ?? 0;
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-8 bottom-32 z-50 md:top-12 md:bottom-40">
-      <div className="relative mx-auto h-full max-w-2xl px-4 md:px-0">
+    <div className="pointer-events-none fixed inset-x-0 top-10 bottom-[170px] z-30 md:top-12 md:bottom-[220px]">
+      <div className="relative mx-auto h-full max-w-3xl px-4 md:px-0">
         <div className={cn(classNames.grid)}>
           <div
             className={cn([
@@ -90,8 +90,8 @@ export function TileLayout({ chatOpen }) {
                     delay: animationDelay,
                   }}
                   className={cn(
-                    'bg-background aspect-square h-[90px] rounded-md border border-transparent transition-[border,drop-shadow]',
-                    chatOpen && 'border-input/50 drop-shadow-lg/10 delay-200'
+                    'bg-white/5 text-white/80 aspect-square h-[90px] rounded-md border border-white/10 transition-[border,shadow]',
+                    chatOpen && 'border-white/20 shadow-[0_10px_28px_rgba(2,6,23,0.35)] delay-200'
                   )}
                 >
                   <BarVisualizer
@@ -140,7 +140,7 @@ export function TileLayout({ chatOpen }) {
                     },
                   }}
                   className={cn(
-                    'overflow-hidden bg-black drop-shadow-xl/80',
+                    'overflow-hidden bg-black shadow-[0_24px_60px_rgba(2,6,23,0.45)]',
                     chatOpen ? 'h-[90px]' : 'h-auto w-full'
                   )}
                 >
@@ -184,13 +184,13 @@ export function TileLayout({ chatOpen }) {
                     ...ANIMATION_TRANSITION,
                     delay: animationDelay,
                   }}
-                  className="drop-shadow-lg/20"
+                  className="shadow-[0_14px_30px_rgba(2,6,23,0.35)]"
                 >
                   <VideoTrack
                     trackRef={cameraTrack || screenShareTrack}
                     width={(cameraTrack || screenShareTrack)?.publication.dimensions?.width ?? 0}
                     height={(cameraTrack || screenShareTrack)?.publication.dimensions?.height ?? 0}
-                    className="bg-muted aspect-square w-[90px] rounded-md object-cover"
+                    className="bg-white/5 aspect-square w-[90px] rounded-md border border-white/10 object-cover"
                   />
                 </MotionContainer>
               )}
@@ -200,4 +200,4 @@ export function TileLayout({ chatOpen }) {
       </div>
     </div>
   );
-}
+});

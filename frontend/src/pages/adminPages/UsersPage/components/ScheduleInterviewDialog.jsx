@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Chip, Autocomplete, CircularProgress, Alert } from "@mui/material";
+import { useTranslation, Trans } from 'react-i18next';
 
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -10,6 +11,7 @@ import questionService from '../../../../services/questionService';
 import { useScheduleInterview } from '../../InterviewsPage/hooks/useInterviews';
 
 const ScheduleInterviewDialog = ({ open, onClose, user }) => {
+    const { t } = useTranslation('admin');
     const [scheduledAt, setScheduledAt] = useState(dayjs().add(1, 'day'));
     const [notes, setNotes] = useState('');
     const [selectedQuestions, setSelectedQuestions] = useState([]);
@@ -63,11 +65,16 @@ const ScheduleInterviewDialog = ({ open, onClose, user }) => {
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
             <DialogTitle sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <VideocamOutlinedIcon color="primary" /> Schedule Interview
+                <VideocamOutlinedIcon color="primary" /> {t('pages.users.scheduleInterviewDialog.title')}
             </DialogTitle>
             <DialogContent>
                 <Alert severity="info" sx={{ mb: 2, mt: 1 }}>
-                    Vetting interview for: <strong>{user.fullName || user.email}</strong>
+                    <Trans
+                        i18nKey="pages.users.scheduleInterviewDialog.vettingFor"
+                        t={t}
+                        values={{ name: user.fullName || user.email }}
+                        components={{ strong: <strong /> }}
+                    />
                     {user.roleName && (
                         <Chip label={user.roleName} size="small" sx={{ ml: 1 }}
                             color={user.roleName === 'EMPLOYER' ? 'primary' : 'default'}
@@ -78,7 +85,7 @@ const ScheduleInterviewDialog = ({ open, onClose, user }) => {
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateTimePicker
-                            label="Interview Time"
+                            label={t('pages.users.scheduleInterviewDialog.timeLabel')}
                             value={scheduledAt}
                             onChange={(v) => setScheduledAt(v)}
                             minDateTime={dayjs()}
@@ -98,8 +105,8 @@ const ScheduleInterviewDialog = ({ open, onClose, user }) => {
                         renderInput={(params) => (
                             <TextField
                                 {...params}
-                                label="Select questions"
-                                placeholder="Search questions..."
+                                label={t('pages.users.scheduleInterviewDialog.questionsLabel')}
+                                placeholder={t('pages.users.scheduleInterviewDialog.questionsPlaceholder')}
                                 slotProps={{
                                     input: {
                                         ...params.InputProps,
@@ -128,26 +135,28 @@ const ScheduleInterviewDialog = ({ open, onClose, user }) => {
                     />
 
                     <TextField
-                        label="Notes"
+                        label={t('pages.users.scheduleInterviewDialog.notesLabel')}
                         multiline
                         rows={3}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        placeholder="Additional notes about the interview..."
+                        placeholder={t('pages.users.scheduleInterviewDialog.notesPlaceholder')}
                         fullWidth
                     />
                 </Box>
             </DialogContent>
             <DialogActions sx={{ px: 3, pb: 2 }}>
                 <Button onClick={onClose} color="inherit">
-                    Cancel
+                    {t('pages.users.scheduleInterviewDialog.cancelBtn')}
                 </Button>
                 <Button
                     onClick={handleSubmit}
                     variant="contained"
                     disabled={scheduleInterviewMutation.isPending || !scheduledAt}
                 >
-                    {scheduleInterviewMutation.isPending ? 'Scheduling...' : 'Schedule Interview'}
+                    {scheduleInterviewMutation.isPending 
+                        ? t('pages.users.scheduleInterviewDialog.schedulingBtn') 
+                        : t('pages.users.scheduleInterviewDialog.submitBtn')}
                 </Button>
             </DialogActions>
         </Dialog>

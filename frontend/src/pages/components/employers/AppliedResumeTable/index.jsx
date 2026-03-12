@@ -318,7 +318,7 @@ const AppliedResumeTable = (props) => {
                   <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
                     <IconButton
                       color="primary"
-                      aria-label="view"
+                      aria-label={t('sendEmailComponent.label.view', 'view')}
                       size="small"
                       onClick={() =>
                         nav(
@@ -336,7 +336,7 @@ const AppliedResumeTable = (props) => {
                     <IconButton
                       size="small"
                       color="error"
-                      aria-label="delete"
+                      aria-label={t('sendEmailComponent.label.delete', 'delete')}
                       onClick={() => handleDelete(row?.id)}
                     >
                       <DeleteOutlineOutlinedIcon fontSize="small" />

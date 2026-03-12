@@ -4,19 +4,21 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from '../../../../configs/dayjs-config';
+import { useTranslation } from 'react-i18next';
 
 const JobActivityTable = ({ data, onEdit, onDelete }) => {
+    const { t } = useTranslation('admin');
     return (
         <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
             <Table sx={{ minWidth: 800 }}>
                 <TableHead sx={{ bgcolor: 'grey.50' }}>
                     <TableRow>
-                        <TableCell>Candidate</TableCell>
-                        <TableCell>Job Post</TableCell>
-                        <TableCell>Company</TableCell>
-                        <TableCell>Status</TableCell>
-                        <TableCell>Updated At</TableCell>
-                        <TableCell align="right">Actions</TableCell>
+                        <TableCell>{t('pages.jobActivity.table.candidate')}</TableCell>
+                        <TableCell>{t('pages.jobActivity.table.jobPost')}</TableCell>
+                        <TableCell>{t('pages.jobActivity.table.company')}</TableCell>
+                        <TableCell>{t('pages.jobActivity.table.status')}</TableCell>
+                        <TableCell>{t('pages.jobActivity.table.updatedAt')}</TableCell>
+                        <TableCell align="right">{t('pages.jobActivity.table.actions')}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -42,12 +44,12 @@ const JobActivityTable = ({ data, onEdit, onDelete }) => {
                             </TableCell>
                             <TableCell>{dayjs(row.updateAt).format('DD/MM/YYYY HH:mm')}</TableCell>
                             <TableCell align="right">
-                                <Tooltip title="Update Status">
+                                <Tooltip title={t('pages.jobActivity.table.updateStatus')}>
                                     <IconButton size="small" onClick={() => onEdit?.(row)} color="primary">
                                         <EditIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Delete">
+                                <Tooltip title={t('pages.jobActivity.table.delete')}>
                                     <IconButton size="small" onClick={() => onDelete?.(row)} color="error">
                                         <DeleteIcon fontSize="small" />
                                     </IconButton>
@@ -58,7 +60,7 @@ const JobActivityTable = ({ data, onEdit, onDelete }) => {
                     {(!data || data.length === 0) && (
                         <TableRow>
                             <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                                No data found
+                                {t('pages.jobActivity.table.noData')}
                             </TableCell>
                         </TableRow>
                     )}

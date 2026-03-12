@@ -14,15 +14,17 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Avatar, Box, IconButton, List, ListItem, ListItemAvatar, ListItemText, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
 
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined";
 import PictureAsPdfOutlinedIcon from "@mui/icons-material/PictureAsPdfOutlined";
+import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 
 import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
 import { CV_TYPES, ROUTES } from "../../../../configs/constants";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 const JobApplicationCard = () => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
   const nav = useNavigate();
   const { currentUser } = useSelector((state) => state.user);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -61,7 +63,7 @@ const JobApplicationCard = () => {
         mb={2}
       >
         <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          Application Resumes
+          {t('jobSeeker:jobApplication.title')}
         </Typography>
         <IconButton
           aria-label="ArrowForward"
@@ -107,7 +109,7 @@ const JobApplicationCard = () => {
               >
                 <ListItemAvatar>
                   {item?.type === CV_TYPES.cvWebsite ? (
-                    <Tooltip title="Online Profile">
+                    <Tooltip title={t('jobSeeker:jobApplication.onlineProfile')}>
                       <Avatar
                         sx={{
                           bgcolor: (theme) => theme.palette.primary.main,
@@ -119,7 +121,7 @@ const JobApplicationCard = () => {
                       </Avatar>
                     </Tooltip>
                   ) : item?.type === CV_TYPES.cvUpload ? (
-                    <Tooltip title="Attached Resume">
+                    <Tooltip title={t('jobSeeker:jobApplication.attachedResume')}>
                       <Avatar
                         sx={{
                           bgcolor: (theme) => theme.palette.hot.main,
@@ -143,7 +145,7 @@ const JobApplicationCard = () => {
                   secondary={
                     <Stack spacing={0.5}>
                       <Typography variant="caption" color="text.secondary">
-                        Last modified {dayjs(item?.updateAt).format("DD/MM/YYYY")}
+                        {t('common:labels.lastModified')} {dayjs(item?.updateAt).format("DD/MM/YYYY")}
                       </Typography>
                       <Typography
                         variant="body2"
@@ -155,8 +157,8 @@ const JobApplicationCard = () => {
                         }}
                       >
                         {item?.isActive
-                          ? "Searchable"
-                          : "Not Searchable"}
+                          ? t('common:status.searchable')
+                          : t('common:status.notSearchable')}
                       </Typography>
                     </Stack>
                   }

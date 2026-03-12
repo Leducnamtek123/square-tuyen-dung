@@ -19,5 +19,499 @@
       "jobSeeker": "Job Seeker",
       "admin": "Admin"
     }
+  },
+  "sidebar": {
+    "systemOverview": "System Overview",
+    "systemAndUsers": "System & Users",
+    "usersAndPermissions": "Users & Permissions",
+    "systemConfiguration": "System Configuration",
+    "generalCategories": "General Categories",
+    "careersManagement": "Careers Management",
+    "citiesManagement": "Cities Management",
+    "districtsManagement": "Districts Management",
+    "infoAndProfiles": "Info & Profiles",
+    "companyManagement": "Company Management",
+    "candidateProfiles": "Candidate Profiles",
+    "resumeManagement": "CV/Resume Management",
+    "recruitmentAndInterviews": "Recruitment & Interviews",
+    "jobPosts": "Job Posts",
+    "activityLogs": "Activity Logs",
+    "questionBank": "Question Bank",
+    "interviewQuestionSets": "Interview Question Sets",
+    "interviewSchedule": "Interview Schedule",
+    "interviewLive": "Direct Company Interviews",
+    "jobNotifications": "Job Notifications"
+  },
+  "pages": {
+    "careers": {
+      "title": "Career Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbGeneral": "General Config",
+      "breadcrumbCareers": "Careers",
+      "addCareer": "Add Career",
+      "searchPlaceholder": "Search careers...",
+      "addConfirmTitle": "Add New Career",
+      "editConfirmTitle": "Edit Career",
+      "careerNameLabel": "Career Name",
+      "iconLabel": "Icon (App)",
+      "cancelBtn": "Cancel",
+      "saveBtn": "Save",
+      "savingBtn": "Saving...",
+      "deleteTitle": "Confirm Delete",
+      "deleteText": "Are you sure you want to delete career <strong>{{name}}</strong>? This action cannot be undone.",
+      "deleteBtn": "Confirm Delete",
+      "deletingBtn": "Deleting...",
+      "table": {
+        "id": "ID",
+        "careerName": "Career Name",
+        "symbol": "Symbol",
+        "totalPosts": "Total Posts",
+        "actions": "Actions",
+        "edit": "Edit",
+        "delete": "Delete",
+        "noData": "No data found"
+      }
+    },
+    "cities": {
+      "title": "City Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbGeneral": "General Config",
+      "breadcrumbCities": "Cities",
+      "addCity": "Add City",
+      "addConfirmTitle": "Add New City",
+      "editConfirmTitle": "Edit City",
+      "cityNameLabel": "City Name",
+      "cancelBtn": "Cancel",
+      "saveBtn": "Save",
+      "savingBtn": "Saving...",
+      "deleteTitle": "Confirm Delete",
+      "deleteText": "Are you sure you want to delete city <strong>{{name}}</strong>? This action cannot be undone.",
+      "deleteBtn": "Confirm Delete",
+      "deletingBtn": "Deleting...",
+      "table": {
+        "id": "ID",
+        "cityName": "City Name",
+        "actions": "Actions",
+        "edit": "Edit",
+        "delete": "Delete",
+        "noData": "No data found"
+      }
+    },
+    "districts": {
+      "title": "District Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbGeneral": "General Config",
+      "breadcrumbDistricts": "Districts",
+      "addDistrict": "Add District",
+      "filterCityPlaceholder": "Select city to filter",
+      "addConfirmTitle": "Add New District",
+      "editConfirmTitle": "Edit District",
+      "cityLabel": "City",
+      "districtNameLabel": "District Name",
+      "cancelBtn": "Cancel",
+      "saveBtn": "Save",
+      "savingBtn": "Saving...",
+      "deleteTitle": "Confirm Delete",
+      "deleteText": "Are you sure you want to delete district <strong>{{name}}</strong>? This action cannot be undone.",
+      "deleteBtn": "Confirm Delete",
+      "deletingBtn": "Deleting...",
+      "table": {
+        "id": "ID",
+        "districtName": "District Name",
+        "actions": "Actions",
+        "edit": "Edit",
+        "delete": "Delete",
+        "noData": "No data found for this city",
+        "noCitySelected": "Please select a city to see the district list"
+      }
+    },
+    "companies": {
+      "addCompany": "Add Company",
+      "searchPlaceholder": "Search companies...",
+      "addConfirmTitle": "Add New Company",
+      "editConfirmTitle": "Edit Company Information",
+      "companyNameLabel": "Company Name",
+      "taxCodeLabel": "Tax Code",
+      "employeeSizeLabel": "Employee Size",
+      "companyEmailLabel": "Company Email",
+      "companyPhoneLabel": "Phone Number",
+      "fieldOperationLabel": "Field of Operation",
+      "websiteLabel": "Website",
+      "cancelBtn": "Cancel",
+      "saveBtn": "Save",
+      "savingBtn": "Saving...",
+      "deleteTitle": "Confirm Delete",
+      "deleteText": "Are you sure you want to delete company <strong>{{name}}</strong>? This action cannot be undone and may affect associated job posts.",
+      "deleteBtn": "Confirm Delete",
+      "deletingBtn": "Deleting...",
+      "table": {
+        "logo": "Logo",
+        "companyName": "Company Name",
+        "scale": "Scale",
+        "field": "Field",
+        "location": "Location",
+        "jobPosts": "Job Posts",
+        "followers": "Followers",
+        "actions": "Actions",
+        "viewDetails": "View details",
+        "edit": "Edit",
+        "delete": "Delete"
+      }
+    },
+    "jobActivity": {
+      "title": "Job Post Activity Log",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbJobs": "Jobs & Interviews",
+      "breadcrumbActivity": "Job Post Activities",
+      "searchPlaceholder": "Search activities...",
+      "editStatusTitle": "Update Application Status",
+      "statusLabel": "Status",
+      "statusOptions": {
+        "applied": "Applied",
+        "pending": "Pending",
+        "accepted": "Accepted",
+        "rejected": "Rejected"
+      },
+      "cancelBtn": "Cancel",
+      "saveBtn": "Save",
+      "savingBtn": "Saving...",
+      "deleteTitle": "Confirm Delete",
+      "deleteText": "Are you sure you want to delete this activity log of <strong>{{name}}</strong>? This action cannot be undone.",
+      "deleteBtn": "Confirm Delete",
+      "deletingBtn": "Deleting...",
+      "table": {
+        "candidate": "Candidate",
+        "jobPost": "Job Post",
+        "company": "Company",
+        "status": "Status",
+        "updatedAt": "Updated At",
+        "actions": "Actions",
+        "updateStatus": "Update Status",
+        "delete": "Delete",
+        "noData": "No data found"
+      }
+    },
+    "jobs": {
+      "title": "Job Post List",
+      "total": "total",
+      "showing": "Showing",
+      "to": "to",
+      "of": "of",
+      "detailTitle": "Job Post Details",
+      "company": "Company",
+      "salary": "Salary",
+      "quantity": "Quantity",
+      "people": "people",
+      "experience": "Experience",
+      "years": "years",
+      "academicLevel": "Academic Level",
+      "jobDescription": "Job Description",
+      "jobRequirements": "Job Requirements",
+      "close": "Close",
+      "reject": "Reject",
+      "approve": "Approve Post",
+      "editTitle": "Edit Job Post",
+      "jobTitleLabel": "Job Title",
+      "deadlineLabel": "Deadline",
+      "cancel": "Cancel",
+      "save": "Save",
+      "deleteConfirm": "Are you sure you want to delete this job post?",
+      "table": {
+        "status": {
+          "pending": "Pending",
+          "rejected": "Rejected",
+          "approved": "Approved",
+          "unknown": "Unknown"
+        },
+        "jobPostCompany": "Job Post / Company",
+        "postDate": "Post Date",
+        "deadline": "Deadline",
+        "statusCol": "Status",
+        "actions": "Actions",
+        "viewDetails": "View details",
+        "edit": "Edit",
+        "approveAction": "Approve",
+        "rejectAction": "Reject",
+        "delete": "Delete"
+      },
+      "filter": {
+        "searchPlaceholder": "Search by job title or company..."
+      }
+    },
+    "profiles": {
+      "addCandidate": "Add Candidate",
+      "searchPlaceholder": "Search candidates...",
+      "addTitle": "Add New Candidate Profile",
+      "editTitle": "Edit Candidate Profile",
+      "fullNameLabel": "Full Name",
+      "phoneLabel": "Phone Number",
+      "dobLabel": "Date of Birth",
+      "genderLabel": "Gender",
+      "genderOptions": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other"
+      },
+      "maritalStatusLabel": "Marital Status",
+      "maritalOptions": {
+        "single": "Single",
+        "married": "Married"
+      },
+      "cityLabel": "City",
+      "districtLabel": "District",
+      "addressLabel": "Address",
+      "cancelBtn": "Cancel",
+      "saveBtn": "Save",
+      "savingBtn": "Saving...",
+      "deleteTitle": "Confirm Delete",
+      "deleteText": "Are you sure you want to delete profile of <strong>{{name}}</strong>? This action cannot be undone.",
+      "deleteBtn": "Confirm Delete",
+      "deletingBtn": "Deleting...",
+      "table": {
+        "avatar": "Avatar",
+        "fullName": "Full Name",
+        "email": "Email",
+        "phone": "Phone Number",
+        "gender": "Gender",
+        "dob": "Date of Birth",
+        "actions": "Actions",
+        "viewDetails": "View details",
+        "edit": "Edit",
+        "delete": "Delete",
+        "noData": "No data found"
+      }
+    },
+    "questionGroups": {
+      "title": "Question Group Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbBank": "Question Bank",
+      "breadcrumbGroups": "Question Groups",
+      "addBtn": "Add Question Group",
+      "searchPlaceholder": "Search question groups...",
+      "addTitle": "Add New Question Group",
+      "editTitle": "Edit Question Group",
+      "groupNameLabel": "Question Group Name",
+      "descriptionLabel": "Description",
+      "selectQuestionsLabel": "Select Questions",
+      "createQuestionBtn": "Create New Question",
+      "cancelBtn": "Cancel",
+      "saveBtn": "Save",
+      "savingBtn": "Saving...",
+      "createQuestionTitle": "Create New Question",
+      "questionContentLabel": "Question Content",
+      "createBtn": "Create",
+      "creatingBtn": "Creating...",
+      "deleteTitle": "Confirm Delete",
+      "deleteText": "Are you sure you want to delete question group <strong>{{name}}</strong>? The questions inside will not be deleted, but the links to this group will be lost.",
+      "deleteBtn": "Confirm Delete",
+      "deletingBtn": "Deleting...",
+      "table": {
+        "noData": "No question groups available",
+        "groupName": "Question Group Name",
+        "description": "Description",
+        "questionCount": "Question Count",
+        "actions": "Actions",
+        "edit": "Edit",
+        "delete": "Delete"
+      }
+    },
+    "resumes": {
+      "searchPlaceholder": "Search resumes...",
+      "editTitle": "Edit Resume",
+      "resumeTitleLabel": "Resume Title",
+      "minSalaryLabel": "Min Salary",
+      "maxSalaryLabel": "Max Salary",
+      "cancelBtn": "Cancel",
+      "saveBtn": "Save",
+      "savingBtn": "Saving...",
+      "deleteTitle": "Confirm Delete",
+      "deleteText": "Are you sure you want to delete resume <strong>{{name}}</strong>? This action cannot be undone.",
+      "deleteBtn": "Confirm Delete",
+      "deletingBtn": "Deleting...",
+      "table": {
+        "resumeTitle": "Resume Title",
+        "candidate": "Candidate",
+        "resumeType": "Resume Type",
+        "experience": "Experience",
+        "lastUpdate": "Last Update",
+        "status": "Status",
+        "actions": "Actions",
+        "uploadedFile": "Uploaded File",
+        "onlineProfile": "Online Profile",
+        "active": "Active",
+        "inactive": "Inactive",
+        "viewDetails": "View details",
+        "delete": "Delete",
+        "noData": "No data found"
+      }
+    },
+    "users": {
+      "table": {
+        "id": "ID",
+        "fullName": "Full Name",
+        "email": "Email",
+        "role": "Role",
+        "verification": "Verification",
+        "status": "Status",
+        "actions": "Actions",
+        "verified": "Verified",
+        "unverified": "Unverified",
+        "active": "Active",
+        "blocked": "Blocked",
+        "scheduleInterview": "Schedule Interview",
+        "blockAccount": "Block account",
+        "unblockAccount": "Unblock account",
+        "noUsers": "No users found"
+      },
+      "filter": {
+        "searchPlaceholder": "Search by name or email...",
+        "roleLabel": "Role",
+        "roleAll": "All roles"
+      },
+      "scheduleInterviewDialog": {
+        "title": "Schedule Interview",
+        "vettingFor": "Vetting interview for: <strong>{{name}}</strong>",
+        "timeLabel": "Interview Time",
+        "questionsLabel": "Select questions",
+        "questionsPlaceholder": "Search questions...",
+        "notesLabel": "Notes",
+        "notesPlaceholder": "Additional notes about the interview...",
+        "cancelBtn": "Cancel",
+        "submitBtn": "Schedule Interview",
+        "schedulingBtn": "Scheduling..."
+      },
+      "roles": {
+        "admin": "Administrator",
+        "employer": "Employer",
+        "jobSeeker": "Job Seeker"
+      },
+      "toast": {
+        "blockSuccess": "Account blocked.",
+        "unblockSuccess": "Account unblocked.",
+        "actionFailed": "Operation failed.",
+        "roleUpdated": "Role updated.",
+        "roleUpdateFailed": "Role update failed."
+      }
+    },
+    "questions": {
+      "title": "Interview Question Bank",
+      "addBtn": "Add Question",
+      "listTitle": "Question List",
+      "deleteConfirm": "Are you sure you want to delete this question?",
+      "addTitle": "Add New Question",
+      "editTitle": "Edit Question",
+      "questionContentLabel": "Question Content",
+      "difficultyLabel": "Difficulty",
+      "fieldCareerLabel": "Field / Career",
+      "selectCareer": "-- Select Career --",
+      "cancelBtn": "Cancel",
+      "saveBtn": "Save",
+      "savingBtn": "Saving...",
+      "difficulty": {
+        "easy": "Easy",
+        "medium": "Medium",
+        "hard": "Hard"
+      },
+      "table": {
+        "questionContent": "Question Content",
+        "field": "Field",
+        "difficulty": "Difficulty",
+        "actions": "Actions",
+        "general": "General",
+        "edit": "Edit",
+        "delete": "Delete"
+      }
+    },
+    "interviewLive": {
+      "title": "Live Company Interviews",
+      "stats": {
+        "inProgress": "In Progress: {{count}}",
+        "scheduled": "Scheduled: {{count}}",
+        "completed": "Completed: {{count}}"
+      },
+      "table": {
+        "company": "Company",
+        "candidate": "Candidate",
+        "position": "Position",
+        "room": "Room",
+        "time": "Time",
+        "status": "Status",
+        "emptyMessage": "No active interview sessions."
+      }
+    },
+    "jobNotifications": {
+      "title": "Job Notifications",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbJobsInterviews": "Jobs & Interviews",
+      "addBtn": "Create Notification",
+      "searchPlaceholder": "Search notifications...",
+      "addTitle": "Create New Notification",
+      "editTitle": "Edit Notification",
+      "labelTitle": "Title",
+      "labelContent": "Content",
+      "labelRecipient": "Recipient ID (Leave blank for system-wide)",
+      "cancelBtn": "Cancel",
+      "confirmBtn": "Confirm",
+      "sendingBtn": "Sending...",
+      "deleteConfirmTitle": "Confirm Delete",
+      "deleteConfirmText": "Are you sure you want to delete notification <strong>{{title}}</strong>? This action cannot be undone.",
+      "deletingBtn": "Deleting...",
+      "table": {
+        "title": "Title",
+        "content": "Content",
+        "recipient": "Recipient",
+        "sentAt": "Sent At",
+        "actions": "Actions",
+        "edit": "Edit",
+        "delete": "Delete",
+        "noData": "No data found"
+      }
+    },
+    "interviews": {
+      "type": {
+        "vetting": "Vetting",
+        "recruitment": "Recruitment"
+      }
+    },
+    "settings": {
+      "title": "System Settings",
+      "generalTitle": "General Settings",
+      "maintenanceMode": {
+        "label": "System Maintenance",
+        "description": "Stop all user activities for maintenance"
+      },
+      "autoApproveJobs": {
+        "label": "Auto-approve Job Posts",
+        "description": "Allow job posts to be approved automatically"
+      },
+      "emailNotifications": {
+        "label": "Email Notifications",
+        "description": "Send system notifications via email to administrators"
+      },
+      "saveBtn": "Save Changes"
+    }
+  },
+  "common": {
+    "pagination": {
+      "rowsPerPage": "Rows per page:",
+      "displayedRows": "{{from}}-{{to}} of {{count}}",
+      "all": "All"
+    },
+    "breadcrumb": "Breadcrumb",
+    "table": {
+      "noData": "No data available",
+      "loading": "Loading data..."
+    },
+    "status": {
+      "completed": "Completed",
+      "pending": "Pending",
+      "inProgress": "In progress",
+      "scheduled": "Scheduled",
+      "cancelled": "Cancelled",
+      "unknown": "Unknown"
+    },
+    "na": "N/A",
+    "system": "System",
+    "hot": "Hot"
   }
 }

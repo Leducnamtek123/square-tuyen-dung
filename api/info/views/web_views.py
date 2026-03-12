@@ -71,7 +71,7 @@ class JobSeekerProfileViewSet(viewsets.ViewSet,
                               generics.RetrieveAPIView):
     queryset = JobSeekerProfile.objects
     serializer_class = JobSeekerProfileSerializer
-    permission_classes = [perms_sys.AllowAny()]
+    permission_classes = [perms_sys.IsAuthenticated]
 
     def get_permissions(self):
         if self.action in ["get_resumes"]:

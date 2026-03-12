@@ -252,24 +252,26 @@ class CompanySerializer(serializers.ModelSerializer):
             instance.description = validated_data.get(
                 'description', instance.description)
             location_obj = instance.location
+            location_data = validated_data.get("location")
 
             with transaction.atomic():
-                if location_obj:
-                    location_obj.city = validated_data["location"].get(
-                        "city", location_obj.city)
-                    location_obj.district = validated_data["location"].get(
-                        "district", location_obj.district)
-                    location_obj.address = validated_data["location"].get(
-                        "address", location_obj.address)
-                    location_obj.lat = validated_data["location"].get(
-                        "lat", location_obj.lat)
-                    location_obj.lng = validated_data["location"].get(
-                        "lng", location_obj.lng)
-                    location_obj.save()
-                else:
-                    location_new = Location.objects.create(
-                        **validated_data["location"])
-                    instance.location = location_new
+                if location_data:
+                    if location_obj:
+                        location_obj.city = location_data.get(
+                            "city", location_obj.city)
+                        location_obj.district = location_data.get(
+                            "district", location_obj.district)
+                        location_obj.address = location_data.get(
+                            "address", location_obj.address)
+                        location_obj.lat = location_data.get(
+                            "lat", location_obj.lat)
+                        location_obj.lng = location_data.get(
+                            "lng", location_obj.lng)
+                        location_obj.save()
+                    else:
+                        location_new = Location.objects.create(
+                            **location_data)
+                        instance.location = location_new
                 instance.save()
 
                 # update in firebase
@@ -279,7 +281,7 @@ class CompanySerializer(serializers.ModelSerializer):
                 return instance
         except Exception as ex:
             helper.print_log_error("update company", ex)
-            return None
+            raise
 
 
 class CompanyFollowedSerializer(serializers.ModelSerializer):
@@ -343,7 +345,7 @@ class LogoCompanySerializer(serializers.ModelSerializer):
         except Exception as e:
             # Log the error if any occurs during the process
             helper.print_log_error("update company logo", e)
-            return None
+            raise
 
 
 class CompanyCoverImageSerializer(serializers.ModelSerializer):
@@ -387,7 +389,8 @@ class CompanyCoverImageSerializer(serializers.ModelSerializer):
                 company.save()
             return company
         except:
-            return None
+            helper.print_log_error("update company cover image", "unknown error")
+            raise
 
 
 class JobSeekerProfileSerializer(serializers.ModelSerializer):
@@ -470,25 +473,28 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
         instance.emergency_contact_phone = validated_data.get('emergency_contact_phone', instance.emergency_contact_phone)
         location_obj = instance.location
         user_obj = instance.user
+        location_data = validated_data.get("location")
+        user_data = validated_data.get("user")
 
-        if location_obj:
-            location_obj.city = validated_data["location"].get(
-                "city", location_obj.city)
-            location_obj.district = validated_data["location"].get(
-                "district", location_obj.district)
-            location_obj.address = validated_data["location"].get(
-                "address", location_obj.address)
-            location_obj.save()
-        else:
-            location_new = Location.objects.create(
-                **validated_data["location"])
-            instance.location = location_new
-        user_obj.full_name = validated_data["user"].get(
-            "full_name", user_obj.full_name)
-        user_obj.save()
-
-        # update in firebase
-        queue_auth.update_info.delay(user_obj.id, user_obj.full_name)
+        if location_data:
+            if location_obj:
+                location_obj.city = location_data.get(
+                    "city", location_obj.city)
+                location_obj.district = location_data.get(
+                    "district", location_obj.district)
+                location_obj.address = location_data.get(
+                    "address", location_obj.address)
+                location_obj.save()
+            else:
+                location_new = Location.objects.create(
+                    **location_data)
+                instance.location = location_new
+        if user_data:
+            user_obj.full_name = user_data.get(
+                "full_name", user_obj.full_name)
+            user_obj.save()
+            # update in firebase
+            queue_auth.update_info.delay(user_obj.id, user_obj.full_name)
 
         instance.save()
         return instance

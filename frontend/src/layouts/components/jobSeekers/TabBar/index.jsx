@@ -34,7 +34,7 @@ const TabBar = () => {
   const { t } = useTranslation(['jobSeeker', 'common']);
 
   const tabItems = [
-    { id: 1, label: `My ${APP_NAME}`, icon: <DashboardIcon />, path: `/${ROUTES.JOB_SEEKER.DASHBOARD}` },
+    { id: 1, label: t('jobSeeker:nav.myDashboard', { appName: APP_NAME }), icon: <DashboardIcon />, path: `/${ROUTES.JOB_SEEKER.DASHBOARD}` },
     {
       id: 2,
       label: t('jobSeeker:nav.profile'),

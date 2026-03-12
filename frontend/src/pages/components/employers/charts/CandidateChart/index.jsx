@@ -15,6 +15,7 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Box, Card, Divider, Stack, Tooltip as MuiTooltip, Typography, CircularProgress } from "@mui/material";
 
@@ -171,6 +172,7 @@ export const options = {
 };
 
 const CandidateChart = ({ title }) => {
+  const { t } = useTranslation('employer');
 
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -327,7 +329,7 @@ const CandidateChart = ({ title }) => {
 
             <MuiTooltip
 
-              title="Thống kê số hồ sơ ứng tuyển nhận được theo ngày"
+              title={t('candidateChart.title.thngkshsngtuynnhnctheongy', 'Thống kê số hồ sơ ứng tuyển nhận được theo ngày')}
 
               arrow
 

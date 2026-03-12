@@ -162,7 +162,7 @@ const MobileContent = (setOpen, careers, handleFilter, t) => {
               >
                 {career?.name}{' '}
                 {career.isHot && (
-                  <Chip label="Hot" size="small" color="error" />
+                  <Chip label={t('common.hot', { ns: 'admin' })} size="small" color="error" />
                 )}
               </Typography>
             </Grid>

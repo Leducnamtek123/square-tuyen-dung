@@ -41,7 +41,6 @@ const MultilineTextFieldCustom = ({
             //   size="small"
               id={field.name}
               placeholder={placeholder}
-              defaultValue=""
               value={field.value}
               onChange={field.onChange}
               onBlur={field.onBlur}

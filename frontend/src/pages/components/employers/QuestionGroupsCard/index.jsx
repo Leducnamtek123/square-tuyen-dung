@@ -10,6 +10,7 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React, { useState, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip, IconButton, Stack, Divider, LinearProgress } from "@mui/material";
 
 import SearchIcon from '@mui/icons-material/Search';
@@ -23,6 +24,7 @@ import questionService from '../../../../services/questionService';
 import { transformQuestion, transformQuestionGroup } from '../../../../utils/transformers';
 
 const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
+  const { t } = useTranslation('employer');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
@@ -228,7 +230,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
                     >
                         {title}
                     </Typography>
-                    <Breadcrumbs aria-label="breadcrumb">
+                    <Breadcrumbs aria-label={t('questionGroupsCard.label.breadcrumb', 'breadcrumb')}>
                         <Link underline="hover" color="inherit" href="/nha-tuyen-dung" sx={{ fontSize: '0.875rem' }}>
                             Employer
                         </Link>
@@ -258,7 +260,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
             <Box sx={{ mb: 3 }}>
                 <TextField
                     size="small"
-                    placeholder="Search question groups..."
+                    placeholder={t('questionGroupsCard.placeholder.searchquestiongroups', 'Search question groups...')}
                     value={searchTerm}
                     onChange={handleSearch}
                     sx={{
@@ -323,7 +325,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <TextField
-                            label="Question Group Name"
+                            label={t('questionGroupsCard.label.questiongroupname', 'Question Group Name')}
                             fullWidth
                             variant="outlined"
                             value={groupName}
@@ -331,7 +333,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
                             required
                         />
                         <TextField
-                            label="Description"
+                            label={t('questionGroupsCard.label.description', 'Description')}
                             fullWidth
                             multiline
                             rows={3}
@@ -345,7 +347,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
                                 multiple
                                 value={selectedQuestions}
                                 onChange={(e) => setSelectedQuestions(e.target.value)}
-                                input={<OutlinedInput label="Select Questions" />}
+                                input={<OutlinedInput label={t('questionGroupsCard.label.selectquestions', 'Select Questions')} />}
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                         {selected.map((value) => {
@@ -392,7 +394,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
                 <DialogContent>
                     <Box sx={{ pt: 1 }}>
                         <TextField
-                            label="Question Content"
+                            label={t('questionGroupsCard.label.questioncontent', 'Question Content')}
                             fullWidth
                             multiline
                             rows={3}

@@ -133,7 +133,7 @@ const EducationDetailCard = ({ title }) => {
 
         setOpenPopup(false);
         setIsSuccess(!isSuccess);
-        toastMessages.success(t('educationAddedSuccess'));
+        toastMessages.success(t('profile.messages.educationAddSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -148,7 +148,7 @@ const EducationDetailCard = ({ title }) => {
 
         setOpenPopup(false);
         setIsSuccess(!isSuccess);
-        toastMessages.success(t('educationUpdatedSuccess'));
+        toastMessages.success(t('profile.messages.educationUpdateSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -175,7 +175,7 @@ const EducationDetailCard = ({ title }) => {
         await educationDetailService.deleteEducationDetailById(id);
 
         setIsSuccess(!isSuccess);
-        toastMessages.success(t('educationDeletedSuccess'));
+        toastMessages.success(t('profile.messages.educationDeleteSuccess'));
       } catch (error) {
         errorHandling(error);
       } finally {
@@ -185,8 +185,8 @@ const EducationDetailCard = ({ title }) => {
 
     confirmModal(
       () => del(id),
-      t('deleteEducationTitle'),
-      t('deleteEducationWarning'),
+      t('profile.messages.deleteConfirmTitle', { item: t('profile.sections.education') }),
+      t('profile.messages.deleteConfirmWarning'),
       'warning'
     );
   };
@@ -240,7 +240,7 @@ const EducationDetailCard = ({ title }) => {
             <Box>
               {educationsDetail.length === 0 ? (
                 <EmptyCard
-                  content={t('pleaseAddEducationInfo')}
+                  content={t('profile.messages.noEducationData')}
                   onClick={handleShowAdd}
                 />
               ) : (
@@ -276,7 +276,7 @@ const EducationDetailCard = ({ title }) => {
                             {value.completedDate ? (
                               <TimeAgo date={value.completedDate} type="format" format="DD/MM/YYYY"/>
                             ) : (
-                              t('present')
+                              t('profile.fields.present')
                             )}
                           </Typography>
                           <Typography
@@ -366,7 +366,7 @@ const EducationDetailCard = ({ title }) => {
                                   fontWeight: 500
                                 }}
                               >
-                                {t('detailedDescription')}
+                                {t('profile.fields.description')}
                               </Typography>
                             </AccordionSummary>
                             <AccordionDetails>
@@ -377,7 +377,7 @@ const EducationDetailCard = ({ title }) => {
                                   fontStyle: value.description ? 'normal' : 'italic',
                                 }}
                               >
-                                {value.description || t('notUpdated')}
+                                {value.description || t('common:noData')}
                               </Typography>
                             </AccordionDetails>
                           </Accordion>
@@ -394,7 +394,7 @@ const EducationDetailCard = ({ title }) => {
 
       {/* Start: form  */}
       <FormPopup
-        title={t('education')}
+        title={t('profile.sections.education')}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >

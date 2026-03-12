@@ -73,7 +73,7 @@ const MyInterviewsPage = () => {
                                         </Grid>
                                         <Grid size="grow">
                                             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                                {interview.room_name || interview.roomName || 'Interview room'}
+                                                {interview.room_name || interview.roomName || t('jobSeeker:myInterviews.defaultRoomName')}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                                                 {t('common:labels.time')}: {dayjs(interview.scheduledAt || interview.scheduled_at).format('HH:mm - DD/MM/YYYY')}
@@ -81,7 +81,7 @@ const MyInterviewsPage = () => {
                                             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                                                 {getStatusChip(interview.status)}
                                                 <Chip
-                                                    label={interview.type === 'ai' ? 'AI Interview' : 'Live Interview'}
+                                                    label={interview.type === 'ai' ? t('jobSeeker:myInterviews.aiInterview') : t('jobSeeker:myInterviews.liveInterview')}
                                                     size="small"
                                                     variant="outlined"
                                                 />

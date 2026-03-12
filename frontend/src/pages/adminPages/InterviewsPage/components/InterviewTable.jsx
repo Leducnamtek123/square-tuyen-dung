@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Chip, Tooltip, IconButton, Box, CircularProgress, Stack } from "@mui/material";
 
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
@@ -7,8 +6,11 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import dayjs from '../../../../configs/dayjs-config';
+import { useTranslation } from 'react-i18next';
 
 const InterviewTable = ({ interviews, loading, onView, onDelete, onUpdateStatus }) => {
+    const { t } = useTranslation(['interview', 'admin']);
+    
     if (loading && interviews.length === 0) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
@@ -18,33 +20,31 @@ const InterviewTable = ({ interviews, loading, onView, onDelete, onUpdateStatus 
     }
 
     const getStatusChip = (status) => {
-        switch (status) {
-            case 'COMPLETED':
+        const lowerStatus = status?.toLowerCase();
+        switch (lowerStatus) {
             case 'completed':
-                return <Chip label="Completed" color="success" size="small" />;
-            case 'PENDING':
+                return <Chip label={t('common.status.completed', { ns: 'admin' })} color="success" size="small" />;
             case 'pending':
             case 'draft':
-                return <Chip label="Pending" color="warning" size="small" />;
-            case 'PROCESSING':
+                return <Chip label={t('common.status.pending', { ns: 'admin' })} color="warning" size="small" />;
+            case 'processing':
             case 'in_progress':
-                return <Chip label="In Progress" color="info" size="small" />;
+                return <Chip label={t('common.status.inProgress', { ns: 'admin' })} color="info" size="small" />;
             case 'scheduled':
-                return <Chip label="Scheduled" color="primary" size="small" />;
+                return <Chip label={t('common.status.scheduled', { ns: 'admin' })} color="primary" size="small" />;
             case 'cancelled':
-            case 'CANCELLED':
-                return <Chip label="Cancelled" color="error" size="small" />;
+                return <Chip label={t('common.status.cancelled', { ns: 'admin' })} color="error" size="small" />;
             default:
-                return <Chip label={status} size="small" />;
+                return <Chip label={status || t('common.status.unknown', { ns: 'admin' })} size="small" />;
         }
     };
 
     const getTypeChip = (type) => {
-        switch (type) {
+        switch (type?.toUpperCase()) {
             case 'VETTING':
-                return <Chip label="Vetting" color="warning" size="small" variant="outlined" />;
+                return <Chip label={t('pages.interviews.type.vetting', { ns: 'admin' })} color="warning" size="small" variant="outlined" />;
             default:
-                return <Chip label="Recruitment" color="primary" size="small" variant="outlined" />;
+                return <Chip label={t('pages.interviews.type.recruitment', { ns: 'admin' })} color="primary" size="small" variant="outlined" />;
         }
     };
 
@@ -53,12 +53,12 @@ const InterviewTable = ({ interviews, loading, onView, onDelete, onUpdateStatus 
             <Table>
                 <TableHead sx={{ bgcolor: 'grey.100' }}>
                     <TableRow>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Candidate / Employer</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Job Post</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Type</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Time</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }} align="right">Actions</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('interviewAdminPage.candidateEmployer', { ns: 'interview' })}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('interviewAdminPage.jobPost', { ns: 'interview' })}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('interviewAdminPage.type', { ns: 'interview' })}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('interviewAdminPage.time', { ns: 'interview' })}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }}>{t('interviewAdminPage.status', { ns: 'interview' })}</TableCell>
+                        <TableCell sx={{ fontWeight: 'bold' }} align="right">{t('interviewAdminPage.actions', { ns: 'interview' })}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -75,7 +75,7 @@ const InterviewTable = ({ interviews, loading, onView, onDelete, onUpdateStatus 
                             <TableCell>
                                 {i.jobName || (
                                     <Typography variant="caption" color="text.disabled" sx={{ fontStyle: 'italic' }}>
-                                        N/A
+                                    {t('common.na', { ns: 'admin' })}
                                     </Typography>
                                 )}
                             </TableCell>
@@ -84,26 +84,26 @@ const InterviewTable = ({ interviews, loading, onView, onDelete, onUpdateStatus 
                             <TableCell>{getStatusChip(i.status)}</TableCell>
                             <TableCell align="right">
                                 <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                                    <Tooltip title="View details">
+                                    <Tooltip title={t('interviewAdminPage.viewDetails', { ns: 'interview' })}>
                                         <IconButton size="small" onClick={() => onView(i)} color="primary">
                                             <VisibilityOutlinedIcon fontSize="small" />
                                         </IconButton>
                                     </Tooltip>
                                     {i.status !== 'completed' && i.status !== 'COMPLETED' && (
-                                        <Tooltip title="Mark as completed">
+                                        <Tooltip title={t('interviewAdminPage.markCompleted', { ns: 'interview' })}>
                                             <IconButton size="small" onClick={() => onUpdateStatus(i.id, 'completed')} color="success">
                                                 <CheckCircleOutlineIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
                                     )}
                                     {i.status !== 'cancelled' && i.status !== 'CANCELLED' && (
-                                        <Tooltip title="Cancel interview">
+                                        <Tooltip title={t('interviewAdminPage.cancelInterview', { ns: 'interview' })}>
                                             <IconButton size="small" onClick={() => onUpdateStatus(i.id, 'cancelled')} color="warning">
                                                 <CancelOutlinedIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
                                     )}
-                                    <Tooltip title="Delete">
+                                    <Tooltip title={t('interviewAdminPage.delete', { ns: 'interview' })}>
                                         <IconButton size="small" onClick={() => onDelete(i.id)} color="error">
                                             <DeleteOutlineIcon fontSize="small" />
                                         </IconButton>
@@ -112,6 +112,13 @@ const InterviewTable = ({ interviews, loading, onView, onDelete, onUpdateStatus 
                             </TableCell>
                         </TableRow>
                     ))}
+                    {interviews.length === 0 && (
+                        <TableRow>
+                            <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                                <Typography color="text.secondary">{t('common.table.noData', { ns: 'admin' })}</Typography>
+                            </TableCell>
+                        </TableRow>
+                    )}
                 </TableBody>
             </Table>
         </TableContainer>

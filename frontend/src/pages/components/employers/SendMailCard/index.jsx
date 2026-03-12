@@ -15,6 +15,7 @@ See the LICENSE file in the project root for full license information.
 */
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useForm } from 'react-hook-form';
 
@@ -45,6 +46,7 @@ const SendMailCard = ({
   handleSendEmail,
 
 }) => {
+  const { t } = useTranslation('employer');
 
   const schema = yup.object().shape({
 
@@ -124,7 +126,7 @@ const SendMailCard = ({
     <>
       <FormPopup
 
-        title="Send Mail"
+        title={t('sendMailCard.title.sendmail', 'Send Mail')}
 
         openPopup={openPopup}
 
@@ -146,11 +148,11 @@ const SendMailCard = ({
 
                 name="fullName"
 
-                title="Recipient name"
+                title={t('sendMailCard.title.recipientname', 'Recipient name')}
 
                 showRequired={true}
 
-                placeholder="Enter recipient name"
+                placeholder={t('sendMailCard.placeholder.enterrecipientname', 'Enter recipient name')}
 
                 control={control}
 
@@ -166,11 +168,11 @@ const SendMailCard = ({
 
                 name="email"
 
-                title="Recipient email"
+                title={t('sendMailCard.title.recipientemail', 'Recipient email')}
 
                 showRequired={true}
 
-                placeholder="Enter recipient email"
+                placeholder={t('sendMailCard.placeholder.enterrecipientemail', 'Enter recipient email')}
 
                 control={control}
 
@@ -186,11 +188,11 @@ const SendMailCard = ({
 
                 name="title"
 
-                title="Subject"
+                title={t('sendMailCard.title.subject', 'Subject')}
 
                 showRequired={true}
 
-                placeholder="Enter email subject"
+                placeholder={t('sendMailCard.placeholder.enteremailsubject', 'Enter email subject')}
 
                 control={control}
 
@@ -206,7 +208,7 @@ const SendMailCard = ({
 
                 control={control}
 
-                title="Email content"
+                title={t('sendMailCard.title.emailcontent', 'Email content')}
 
                 showRequired={true}
 
@@ -222,7 +224,7 @@ const SendMailCard = ({
 
                 control={control}
 
-                title="Send a copy to my employer email address."
+                title={t('sendMailCard.title.sendacopytomyemployeremailaddress', 'Send a copy to my employer email address.')}
 
               />
 

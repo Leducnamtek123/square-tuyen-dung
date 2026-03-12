@@ -1,1 +1,6 @@
-{}
+{
+  "notFoundTitle": "Không tìm thấy trang",
+  "forbiddenTitle": "Truy cập bị từ chối",
+  "systemErrorTitle": "Đã có lỗi xảy ra",
+  "systemErrorBody": "Vui lòng thử lại sau."
+}
