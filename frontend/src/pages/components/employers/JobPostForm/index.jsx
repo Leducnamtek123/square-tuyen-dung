@@ -1,485 +1,969 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { useForm, useWatch } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { Alert, Grid } from '@mui/material';
-
-import { DATE_OPTIONS, REGEX_VATIDATE } from '../../../../configs/constants';
-import useDebounce from '../../../../hooks/useDebounce';
-import errorHandling from '../../../../utils/errorHandling';
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
-import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
-import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
-import CheckboxCustom from '../../../../components/controls/CheckboxCustom';
-import commonService from '../../../../services/commonService';
-import RichTextEditorCustom from '../../../../components/controls/RichTextEditorCustom';
-import TextFieldAutoCompleteCustom from '../../../../components/controls/TextFieldAutoCompleteCustom';
-
-import goongService from '../../../../services/goongService';
-
-const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }) => {
-  const { allConfig } = useSelector((state) => state.config);
-  const [districtOptions, setDistrictOptions] = React.useState([]);
-  const [locationOptions, setLocationOptions] = React.useState([]);
-
-  const schema = yup.object().shape({
-    jobName: yup
-      .string()
-      .required('Tên công việc là bắt buộc.')
-      .max(200, 'Tên công việc vượt quá độ dài cho phép.'),
-    career: yup
-      .number()
-      .required('Ngành/nghề là bắt buộc.')
-      .typeError('Ngành/nghề là bắt buộc.'),
-    position: yup
-      .number()
-      .required('Vị trí công việc là bắt buộc.')
-      .typeError('Vị trí công việc là bắt buộc.'),
-    experience: yup
-      .number()
-      .required('Kinh nghiệm làm việc là bắt buộc.')
-      .typeError('Kinh nghiệm làm việc là bắt buộc.'),
-    typeOfWorkplace: yup
-      .number()
-      .required('Nơi làm việc là bắt buộc.')
-      .typeError('Nơi làm việc là bắt buộc.'),
-    jobType: yup
-      .number()
-      .required('Hình thức làm việc là bắt buộc.')
-      .typeError('Hình thức làm việc là bắt buộc.'),
-    quantity: yup
-      .number()
-      .required('Số lượng tuyển là bắt buộc.')
-      .typeError('Số lượng tuyển không hợp lệ.')
-      .min(1, 'Số lượng tuyển ít nhất là một ứng viên.'),
-    genderRequired: yup
-      .string()
-      .required('Yêu cầu giới tính là bắt buộc.')
-      .typeError('Yêu cầu giới tính là bắt buộc.'),
-    salaryMin: yup
-      .number()
-      .required('Lương tối thiểu là bắt buộc.')
-      .typeError('Lương tối thiểu không hợp lệ.')
-      .min(0, 'Lương tối thiểu không hợp lệ.')
-      .test(
-        'minimum-wage-comparison',
-        'Lương tối thiểu phải nhỏ hơn lương tối đa.',
-        function (value) {
-          return !(value >= this.parent.salaryMax);
-        }
-      ),
-    salaryMax: yup
-      .number()
-      .required('Lương tối đa là bắt buộc.')
-      .typeError('Lương tối đa không hợp lệ.')
-      .min(0, 'Lương tối đa không hợp lệ.')
-      .test(
-        'maximum-wage-comparison',
-        'Lương tối đa phải lớn hơn lương tối thiểu.',
-        function (value) {
-          return !(value <= this.parent.salaryMin);
-        }
-      ),
-    academicLevel: yup
-      .number()
-      .required('Bằng cấp là bắt buộc.')
-      .typeError('Bằng cấp là bắt buộc.'),
-    deadline: yup
-      .date()
-      .required('Hạn nộp hồ sơ là bắt buộc.')
-      .typeError('Hạn nộp hồ sơ không hợp lệ.')
-      .min(new Date() + 1, 'Hạn nộp hồ sơ phải lớn hơn ngày hôm nay.'),
+import React from 'react';
+
+import { useSelector } from 'react-redux';
+
+import { useForm, useWatch } from 'react-hook-form';
+
+import { yupResolver } from '@hookform/resolvers/yup';
+
+import * as yup from 'yup';
+
+import { useTranslation } from 'react-i18next';
+
+import { Alert } from "@mui/material";
+
+import Grid from "@mui/material/Grid2";
+
+import { DATE_OPTIONS, REGEX_VATIDATE } from '../../../../configs/constants';
+
+import useDebounce from '../../../../hooks/useDebounce';
+
+import errorHandling from '../../../../utils/errorHandling';
+
+import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
+
+import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
+
+import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
+
+import CheckboxCustom from '../../../../components/controls/CheckboxCustom';
+
+import commonService from '../../../../services/commonService';
+
+import RichTextEditorCustom from '../../../../components/controls/RichTextEditorCustom';
+
+import TextFieldAutoCompleteCustom from '../../../../components/controls/TextFieldAutoCompleteCustom';
+
+import goongService from '../../../../services/goongService';
+
+const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }) => {
+
+  const { t } = useTranslation('employer');
+
+  const { allConfig } = useSelector((state) => state.config);
+
+  const [districtOptions, setDistrictOptions] = React.useState([]);
+
+  const [locationOptions, setLocationOptions] = React.useState([]);
+
+  const schema = yup.object().shape({
+
+    jobName: yup
+
+      .string()
+
+      .required(t('jobPostForm.validation.jobnameisrequired', 'Job name is required.'))
+
+      .max(200, t('jobPostForm.validation.jobnameexceededallowedlength', 'Job name exceeded allowed length.')),
+
+    career: yup
+
+      .number()
+
+      .required(t('jobPostForm.validation.careerisrequired', 'Career is required.'))
+
+      .typeError(t('jobPostForm.validation.careerisrequired', 'Career is required.')),
+
+    position: yup
+
+      .number()
+
+      .required(t('jobPostForm.validation.positionisrequired', 'Position is required.'))
+
+      .typeError(t('jobPostForm.validation.positionisrequired', 'Position is required.')),
+
+    experience: yup
+
+      .number()
+
+      .required(t('jobPostForm.validation.experienceisrequired', 'Experience is required.'))
+
+      .typeError(t('jobPostForm.validation.experienceisrequired', 'Experience is required.')),
+
+    typeOfWorkplace: yup
+
+      .number()
+
+      .required(t('jobPostForm.validation.workplaceisrequired', 'Workplace is required.'))
+
+      .typeError(t('jobPostForm.validation.workplaceisrequired', 'Workplace is required.')),
+
+    jobType: yup
+
+      .number()
+
+      .required(t('jobPostForm.validation.jobtypeisrequired', 'Job type is required.'))
+
+      .typeError(t('jobPostForm.validation.jobtypeisrequired', 'Job type is required.')),
+
+    quantity: yup
+
+      .number()
+
+      .required(t('jobPostForm.validation.numberofvacanciesisrequired', 'Number of vacancies is required.'))
+
+      .typeError(t('jobPostForm.validation.invalidnumberofvacancies', 'Invalid number of vacancies.'))
+
+      .min(1, t('jobPostForm.validation.atleastonevacancyisrequired', 'At least one vacancy is required.')),
+
+    genderRequired: yup
+
+      .string()
+
+      .required(t('jobPostForm.validation.genderrequirementisrequired', 'Gender requirement is required.'))
+
+      .typeError(t('jobPostForm.validation.genderrequirementisrequired', 'Gender requirement is required.')),
+
+    salaryMin: yup
+
+      .number()
+
+      .required(t('jobPostForm.validation.minimumsalaryisrequired', 'Minimum salary is required.'))
+
+      .typeError(t('jobPostForm.validation.invalidminimumsalary', 'Invalid minimum salary.'))
+
+      .min(0, t('jobPostForm.validation.invalidminimumsalary', 'Invalid minimum salary.'))
+
+      .test(
+
+        'minimum-wage-comparison',
+
+        t('jobPostForm.validation.minSalaryLess', 'Minimum salary must be less than maximum salary.'),
+
+        function (value) {
+
+          return !(value >= this.parent.salaryMax);
+
+        }
+
+      ),
+
+    salaryMax: yup
+
+      .number()
+
+      .required(t('jobPostForm.validation.maximumsalaryisrequired', 'Maximum salary is required.'))
+
+      .typeError(t('jobPostForm.validation.invalidmaximumsalary', 'Invalid maximum salary.'))
+
+      .min(0, t('jobPostForm.validation.invalidmaximumsalary', 'Invalid maximum salary.'))
+
+      .test(
+
+        'maximum-wage-comparison',
+
+        t('jobPostForm.validation.maxSalaryGreater', 'Maximum salary must be greater than minimum salary.'),
+
+        function (value) {
+
+          return !(value <= this.parent.salaryMin);
+
+        }
+
+      ),
+
+    academicLevel: yup
+
+      .number()
+
+      .required(t('jobPostForm.validation.academiclevelisrequired', 'Academic level is required.'))
+
+      .typeError(t('jobPostForm.validation.academiclevelisrequired', 'Academic level is required.')),
+
+    deadline: yup
+
+      .date()
+
+      .required(t('jobPostForm.validation.applicationdeadlineisrequired', 'Application deadline is required.'))
+
+      .typeError(t('jobPostForm.validation.invalidapplicationdeadline', 'Invalid application deadline.'))
+
+      .min(new Date() + 1, t('jobPostForm.validation.deadlinemustbeaftertoday', 'Deadline must be after today.')),
+
     jobDescription: yup
+
       .mixed()
+
       .test(
+
         'editorContent',
-        'Mô tả công việc là bắt buộc.',
+
+        t('jobPostForm.validation.jobDescRequired', 'Job description is required.'),
+
         (value) => value?.getCurrentContent?.()?.hasText?.()
+
       ),
+
     jobRequirement: yup
+
       .mixed()
+
       .test(
+
         'editorContent',
-        'Yêu cầu công việc là bắt buộc.',
+
+        t('jobPostForm.validation.jobReqRequired', 'Job requirement is required.'),
+
         (value) => value?.getCurrentContent?.()?.hasText?.()
+
       ),
+
     benefitsEnjoyed: yup
+
       .mixed()
+
       .test(
+
         'editorContent',
-        'Quyền lợi là bắt buộc.',
+
+        t('jobPostForm.validation.benefitsRequired', 'Benefits are required.'),
+
         (value) => value?.getCurrentContent?.()?.hasText?.()
+
       ),
-    location: yup.object().shape({
-      city: yup
-        .number()
-        .required('Tỉnh/Thành phố là bắt buộc.')
-        .typeError('Tỉnh/Thành phố là bắt buộc.'),
-      district: yup
-        .number()
-        .required('Quận/Huyện là bắt buộc.')
-        .typeError('Quận/Huyện là bắt buộc.'),
-      address: yup
-        .string()
-        .required('Địa chỉ là bắt buộc.')
-        .max(255, 'Địa chỉ vượt quá độ dài cho phép.'),
-      lat: yup
-        .number()
-        .required('Vĩ độ trên bản đồ là bắt buộc.')
-        .typeError('Vĩ độ trên bản đồ không hợp lệ.'),
-      lng: yup
-        .number()
-        .required('Kinh độ trên bản đồ là bắt buộc.')
-        .typeError('Kinh độ trên bản đồ không hợp lệ.'),
-    }),
-    contactPersonName: yup
-      .string()
-      .required('Tên người liên hệ là bắt buộc.')
-      .max(100, 'Tên người liên hệ vượt quá độ dài cho phép.'),
-    contactPersonPhone: yup
-      .string()
-      .required('Số điện thoại người liên hệ là bắt buộc.')
-      .matches(REGEX_VATIDATE.phoneRegExp, 'Số điện thoại không hợp lệ.')
-      .max(15, 'Số điện thoại người liên hệ vượt quá độ dài cho phép.'),
-    contactPersonEmail: yup
-      .string()
-      .required('Email người liên hệ là bắt buộc.')
-      .email('Email không hợp lệ.')
-      .max(100, 'Email người liên hệ vượt quá độ dài cho phép.'),
-    isUrgent: yup.boolean().default(false),
-  });
-
-  const { control, reset, setValue, setError, handleSubmit } = useForm({
-    resolver: yupResolver(schema),
-  });
-
-  const cityId = useWatch({
-    control,
-    name: 'location.city',
-  });
-
-  const address = useWatch({
-    control,
-    name: 'location.address',
-  });
-
-  const addressDebounce = useDebounce(address, 500);
-
-  React.useEffect(() => {
-    const loadDistricts = async (cityId) => {
-      try {
-        const resData = await commonService.getDistrictsByCityId(cityId);
-
-        if (districtOptions.length > 0) setValue('location.district', '');
-        setDistrictOptions(resData.data);
-      } catch (error) {
-        errorHandling(error);
-      } finally {
-      }
-    };
-
-    if (cityId) {
-      loadDistricts(cityId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cityId, setValue]);
-
-  React.useEffect(() => {
-    const loadLocation = async (input) => {
-      try {
-        const resData = await goongService.getPlaces(input);
-
-        if (resData.predictions) setLocationOptions(resData.predictions);
-      } catch (error) {}
-    };
-
-    loadLocation(addressDebounce);
-  }, [addressDebounce]);
-
-  React.useEffect(() => {
-    if (editData) {
-      reset((formValues) => ({
-        ...formValues,
-        ...editData,
-      }));
-    } else {
-      reset();
-    }
-  }, [editData, reset]);
-
-  React.useEffect(() => {
-    if (serverErrors !== null)
-      for (let err in serverErrors) {
-        setError(err, {
-          type: 400,
-          message: serverErrors[err]?.join(' '),
-        });
-      }
-    else {
-      setError();
-    }
-  }, [serverErrors, setError]);
-
-  const handleSelectLocation = async (e, value) => {
-    try {
-      const resData = await goongService.getPlaceDetailByPlaceId(
-        value.place_id
-      );
-      setValue('location.lat', resData?.result?.geometry.location.lat || '');
-      setValue('location.lng', resData?.result?.geometry.location.lng || '');
-    } catch (error) {}
-  };
-
-  return (
-    <form id="modal-form" onSubmit={handleSubmit(handleAddOrUpdate)}>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Alert severity="warning">
-            Khi bạn cập nhật bài đăng, nó sẽ ở trạng thái chờ kiểm duyệt!
-          </Alert>
-        </Grid>
-
-        <Grid item xs={12}>
-          <TextFieldCustom
-            name="jobName"
-            title="Tên công việc"
-            showRequired={true}
-            placeholder="Nhập tên công việc"
-            control={control}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <SingleSelectCustom
-            name="career"
-            control={control}
-            options={allConfig?.careerOptions || []}
-            title="Ngành nghề"
-            showRequired={true}
-            placeholder="Chọn ngành nghề cần tuyển"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <SingleSelectCustom
-            name="position"
-            control={control}
-            options={allConfig?.positionOptions || []}
-            title="Vị trí/chức vụ"
-            showRequired={true}
-            placeholder="Chọn vị trí/chức vụ"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <SingleSelectCustom
-            name="experience"
-            control={control}
-            options={allConfig?.experienceOptions || []}
-            title="Kinh nghiệm"
-            showRequired={true}
-            placeholder="Chọn kinh nghiệm yêu cầu"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <SingleSelectCustom
-            name="typeOfWorkplace"
-            control={control}
-            options={allConfig?.typeOfWorkplaceOptions || []}
-            title="Nơi làm việc"
-            showRequired={true}
-            placeholder="Chọn vị nơi làm việc"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <SingleSelectCustom
-            name="jobType"
-            control={control}
-            options={allConfig?.jobTypeOptions || []}
-            title="Hình thức làm việc"
-            showRequired={true}
-            placeholder="Chọn hình thức làm việc"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextFieldCustom
-            name="quantity"
-            title="Số lượng tuyển"
-            showRequired={true}
-            placeholder="Nhập số lượng nhân sự cần tuyển"
-            control={control}
-            type="number"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <SingleSelectCustom
-            name="genderRequired"
-            control={control}
-            options={allConfig?.genderOptions || []}
-            title="Yêu cầu giới tính"
-            showRequired={true}
-            placeholder="Chọn giới tính yêu cầu"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextFieldCustom
-            name="salaryMin"
-            title="Mức lương tối thiểu"
-            showRequired={true}
-            placeholder="Nhập mức lương tối thiểu"
-            control={control}
-            type="number"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <TextFieldCustom
-            name="salaryMax"
-            title="Mức lương tối đa"
-            showRequired={true}
-            placeholder="Nhập mức lương tối đa"
-            control={control}
-            type="number"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <SingleSelectCustom
-            name="academicLevel"
-            control={control}
-            options={allConfig?.academicLevelOptions || []}
-            title="Bằng cấp"
-            showRequired={true}
-            placeholder="Chọn bằng cấp"
-          />
-        </Grid>
-        <Grid item xs={6}>
-          <DatePickerCustom
-            name="deadline"
-            control={control}
-            showRequired={true}
-            title="Hạn nộp hồ sơ"
-            minDate={DATE_OPTIONS.tomorrow}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <RichTextEditorCustom
-            name="jobDescription"
-            control={control}
-            title="Mô tả công việc"
-            showRequired={true}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <RichTextEditorCustom
-            name="jobRequirement"
-            control={control}
-            title="Yêu cầu công việc"
-            showRequired={true}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <RichTextEditorCustom
-            name="benefitsEnjoyed"
-            control={control}
-            title="Quyền lợi"
-            showRequired={true}
-          />
-        </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-          <SingleSelectCustom
-            name="location.city"
-            control={control}
-            options={allConfig?.cityOptions || []}
-            title="Tỉnh/Thành phố"
-            showRequired={true}
-            placeholder="Chọn tỉnh thành phố"
-          />
-        </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-          <SingleSelectCustom
-            name="location.district"
-            control={control}
-            options={districtOptions}
-            title="Quận/Huyện"
-            showRequired={true}
-            placeholder="Chọn Quận/Huyện"
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextFieldAutoCompleteCustom
-            name="location.address"
-            title="Địa chỉ"
-            showRequired={true}
-            placeholder="Nhập địa chỉ"
-            control={control}
-            options={locationOptions}
-            loading={true}
-            handleSelect={handleSelectLocation}
-          />
-        </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-          <TextFieldCustom
-            name="location.lat"
-            title="Vĩ độ"
-            showRequired={true}
-            placeholder="Nhập vĩ độ tọa độ trên bản đồ của công ty."
-            helperText="Tự động điền nếu bạn chọn địa chỉ được gợi ý."
-            control={control}
-            type="number"
-          />
-        </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={6} xl={6}>
-          <TextFieldCustom
-            name="location.lng"
-            title="Kinh độ"
-            showRequired={true}
-            placeholder="Nhập kinh độ tọa độ trên bản đồ của công ty."
-            helperText="Tự động điền nếu bạn chọn địa chỉ được gợi ý."
-            control={control}
-            type="number"
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextFieldCustom
-            name="contactPersonName"
-            title="Tên người liên hệ"
-            showRequired={true}
-            placeholder="Nhập tên người liên hệ"
-            control={control}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextFieldCustom
-            name="contactPersonPhone"
-            title="Số điện thoại người liên hệ"
-            showRequired={true}
-            placeholder="Nhập số điện thoại người liên hệ"
-            control={control}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <TextFieldCustom
-            name="contactPersonEmail"
-            title="Email người liên hệ"
-            showRequired={true}
-            placeholder="Nhập email người liên hệ"
-            control={control}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <CheckboxCustom name="isUrgent" control={control} title="Tuyển gấp" />
-        </Grid>
-      </Grid>
-    </form>
-  );
-};
-
-export default JobPostForm;
+
+    location: yup.object().shape({
+
+      city: yup
+
+        .number()
+
+        .required(t('jobPostForm.validation.cityprovinceisrequired', 'City/Province is required.'))
+
+        .typeError(t('jobPostForm.validation.cityprovinceisrequired', 'City/Province is required.')),
+
+      district: yup
+
+        .number()
+
+        .required(t('jobPostForm.validation.districtisrequired', 'District is required.'))
+
+        .typeError(t('jobPostForm.validation.districtisrequired', 'District is required.')),
+
+      address: yup
+
+        .string()
+
+        .required(t('jobPostForm.validation.addressisrequired', 'Address is required.'))
+
+        .max(255, t('jobPostForm.validation.addressexceededallowedlength', 'Address exceeded allowed length.')),
+
+      lat: yup
+
+        .number()
+
+        .required(t('jobPostForm.validation.latitudeisrequired', 'Latitude is required.'))
+
+        .typeError(t('jobPostForm.validation.invalidlatitude', 'Invalid latitude.')),
+
+      lng: yup
+
+        .number()
+
+        .required(t('jobPostForm.validation.longitudeisrequired', 'Longitude is required.'))
+
+        .typeError(t('jobPostForm.validation.invalidlongitude', 'Invalid longitude.')),
+
+    }),
+
+    contactPersonName: yup
+
+      .string()
+
+      .required(t('jobPostForm.validation.contactpersonnameisrequired', 'Contact person name is required.'))
+
+      .max(100, t('jobPostForm.validation.contactpersonnameexceededallowedlength', 'Contact person name exceeded allowed length.')),
+
+    contactPersonPhone: yup
+
+      .string()
+
+      .required(t('jobPostForm.validation.contactpersonphoneisrequired', 'Contact person phone is required.'))
+
+      .matches(REGEX_VATIDATE.phoneRegExp, t('jobPostForm.validation.invalidphonenumber', 'Invalid phone number.'))
+
+      .max(15, t('jobPostForm.validation.contactpersonphoneexceededallowedlength', 'Contact person phone exceeded allowed length.')),
+
+    contactPersonEmail: yup
+
+      .string()
+
+      .required(t('jobPostForm.validation.contactpersonemailisrequired', 'Contact person email is required.'))
+
+      .email(t('jobPostForm.validation.invalidemail', 'Invalid email.'))
+
+      .max(100, t('jobPostForm.validation.contactpersonemailexceededallowedlength', 'Contact person email exceeded allowed length.')),
+
+    isUrgent: yup.boolean().default(false),
+
+  });
+
+  const { control, reset, setValue, setError, handleSubmit } = useForm({
+
+    resolver: yupResolver(schema),
+
+  });
+
+  const cityId = useWatch({
+
+    control,
+
+    name: 'location.city',
+
+  });
+
+  const address = useWatch({
+
+    control,
+
+    name: 'location.address',
+
+  });
+
+  const addressDebounce = useDebounce(address, 500);
+
+  React.useEffect(() => {
+
+    const loadDistricts = async (cityId) => {
+
+      try {
+
+        const resData = await commonService.getDistrictsByCityId(cityId);
+
+        if (districtOptions.length > 0) setValue('location.district', '');
+
+        setDistrictOptions(resData.data);
+
+      } catch (error) {
+
+        errorHandling(error);
+
+      } finally {
+
+      }
+
+    };
+
+    if (cityId) {
+
+      loadDistricts(cityId);
+
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+
+  }, [cityId, setValue]);
+
+  React.useEffect(() => {
+
+    const loadLocation = async (input) => {
+
+      try {
+
+        const resData = await goongService.getPlaces(input);
+
+        if (resData.predictions) setLocationOptions(resData.predictions);
+
+      } catch (error) {}
+
+    };
+
+    loadLocation(addressDebounce);
+
+  }, [addressDebounce]);
+
+  React.useEffect(() => {
+
+    if (editData) {
+
+      reset((formValues) => ({
+
+        ...formValues,
+
+        ...editData,
+
+      }));
+
+    } else {
+
+      reset();
+
+    }
+
+  }, [editData, reset]);
+
+  React.useEffect(() => {
+
+    if (serverErrors !== null)
+
+      for (let err in serverErrors) {
+
+        setError(err, {
+
+          type: 400,
+
+          message: serverErrors[err]?.join(' '),
+
+        });
+
+      }
+
+    else {
+
+      setError();
+
+    }
+
+  }, [serverErrors, setError]);
+
+  const handleSelectLocation = async (e, value) => {
+
+    try {
+
+      const resData = await goongService.getPlaceDetailByPlaceId(
+
+        value.place_id
+
+      );
+
+      setValue('location.lat', resData?.result?.geometry.location.lat || '');
+
+      setValue('location.lng', resData?.result?.geometry.location.lng || '');
+
+    } catch (error) {}
+
+  };
+
+  return (
+
+    <form id="modal-form" onSubmit={handleSubmit(handleAddOrUpdate)}>
+
+      <Grid container spacing={2}>
+
+        <Grid size={12}>
+
+          <Alert severity="warning">
+
+            {t('jobPostForm.warning', 'When you update the post, it will be pending approval!')}
+
+          </Alert>
+
+        </Grid>
+
+        <Grid size={12}>
+
+          <TextFieldCustom
+
+            name="jobName"
+
+            title={t('jobPostForm.title.jobtitle', 'Job Title')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.enterjobtitle', 'Enter job title')}
+
+            control={control}
+
+          />
+
+        </Grid>
+
+        <Grid size={12}>
+
+          <SingleSelectCustom
+
+            name="career"
+
+            control={control}
+
+            options={allConfig?.careerOptions || []}
+
+            title={t('jobPostForm.title.career', 'Career')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.selectcareer', 'Select career')}
+
+          />
+
+        </Grid>
+
+        <Grid size={6}>
+
+          <SingleSelectCustom
+
+            name="position"
+
+            control={control}
+
+            options={allConfig?.positionOptions || []}
+
+            title={t('jobPostForm.title.position', 'Position')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.selectposition', 'Select position')}
+
+          />
+
+        </Grid>
+
+        <Grid size={6}>
+
+          <SingleSelectCustom
+
+            name="experience"
+
+            control={control}
+
+            options={allConfig?.experienceOptions || []}
+
+            title={t('jobPostForm.title.experience', 'Experience')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.selectrequiredexperience', 'Select required experience')}
+
+          />
+
+        </Grid>
+
+        <Grid size={6}>
+
+          <SingleSelectCustom
+
+            name="typeOfWorkplace"
+
+            control={control}
+
+            options={allConfig?.typeOfWorkplaceOptions || []}
+
+            title={t('jobPostForm.title.workplace', 'Workplace')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.selectworkplace', 'Select workplace')}
+
+          />
+
+        </Grid>
+
+        <Grid size={6}>
+
+          <SingleSelectCustom
+
+            name="jobType"
+
+            control={control}
+
+            options={allConfig?.jobTypeOptions || []}
+
+            title={t('jobPostForm.title.jobtype', 'Job Type')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.selectjobtype', 'Select job type')}
+
+          />
+
+        </Grid>
+
+        <Grid size={6}>
+
+          <TextFieldCustom
+
+            name="quantity"
+
+            title={t('jobPostForm.title.numberofvacancies', 'Number of Vacancies')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.enternumberofvacancies', 'Enter number of vacancies')}
+
+            control={control}
+
+            type="number"
+
+          />
+
+        </Grid>
+
+        <Grid size={6}>
+
+          <SingleSelectCustom
+
+            name="genderRequired"
+
+            control={control}
+
+            options={allConfig?.genderOptions || []}
+
+            title={t('jobPostForm.title.genderrequirement', 'Gender Requirement')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.selectgenderrequirement', 'Select gender requirement')}
+
+          />
+
+        </Grid>
+
+        <Grid size={6}>
+
+          <TextFieldCustom
+
+            name="salaryMin"
+
+            title={t('jobPostForm.title.minimumsalary', 'Minimum Salary')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.enterminimumsalary', 'Enter minimum salary')}
+
+            control={control}
+
+            type="number"
+
+          />
+
+        </Grid>
+
+        <Grid size={6}>
+
+          <TextFieldCustom
+
+            name="salaryMax"
+
+            title={t('jobPostForm.title.maximumsalary', 'Maximum Salary')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.entermaximumsalary', 'Enter maximum salary')}
+
+            control={control}
+
+            type="number"
+
+          />
+
+        </Grid>
+
+        <Grid size={6}>
+
+          <SingleSelectCustom
+
+            name="academicLevel"
+
+            control={control}
+
+            options={allConfig?.academicLevelOptions || []}
+
+            title={t('jobPostForm.title.academiclevel', 'Academic Level')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.selectacademiclevel', 'Select academic level')}
+
+          />
+
+        </Grid>
+
+        <Grid size={6}>
+
+          <DatePickerCustom
+
+            name="deadline"
+
+            control={control}
+
+            showRequired={true}
+
+            title={t('jobPostForm.title.applicationdeadline', 'Application Deadline')}
+
+            minDate={DATE_OPTIONS.tomorrow}
+
+          />
+
+        </Grid>
+
+        <Grid size={12}>
+
+          <RichTextEditorCustom
+
+            name="jobDescription"
+
+            control={control}
+
+            title={t('jobPostForm.title.jobdescription', 'Job Description')}
+
+            showRequired={true}
+
+          />
+
+        </Grid>
+
+        <Grid size={12}>
+
+          <RichTextEditorCustom
+
+            name="jobRequirement"
+
+            control={control}
+
+            title={t('jobPostForm.title.jobrequirement', 'Job Requirement')}
+
+            showRequired={true}
+
+          />
+
+        </Grid>
+
+        <Grid size={12}>
+
+          <RichTextEditorCustom
+
+            name="benefitsEnjoyed"
+
+            control={control}
+
+            title={t('jobPostForm.title.benefits', 'Benefits')}
+
+            showRequired={true}
+
+          />
+
+        </Grid>
+
+        <Grid
+
+          size={{
+
+            xs: 12,
+
+            sm: 12,
+
+            md: 6,
+
+            lg: 6,
+
+            xl: 6
+
+          }}>
+
+          <SingleSelectCustom
+
+            name="location.city"
+
+            control={control}
+
+            options={allConfig?.cityOptions || []}
+
+            title={t('jobPostForm.title.cityprovince', 'City/Province')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.selectcityprovince', 'Select city/province')}
+
+          />
+
+        </Grid>
+
+        <Grid
+
+          size={{
+
+            xs: 12,
+
+            sm: 12,
+
+            md: 6,
+
+            lg: 6,
+
+            xl: 6
+
+          }}>
+
+          <SingleSelectCustom
+
+            name="location.district"
+
+            control={control}
+
+            options={districtOptions}
+
+            title={t('jobPostForm.title.district', 'District')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.selectdistrict', 'Select district')}
+
+          />
+
+        </Grid>
+
+        <Grid size={12}>
+
+          <TextFieldAutoCompleteCustom
+
+            name="location.address"
+
+            title={t('jobPostForm.title.address', 'Address')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.enteraddress', 'Enter address')}
+
+            control={control}
+
+            options={locationOptions}
+
+            loading={true}
+
+            handleSelect={handleSelectLocation}
+
+          />
+
+        </Grid>
+
+        <Grid
+
+          size={{
+
+            xs: 12,
+
+            sm: 12,
+
+            md: 6,
+
+            lg: 6,
+
+            xl: 6
+
+          }}>
+
+          <TextFieldCustom
+
+            name="location.lat"
+
+            title={t('jobPostForm.title.latitude', 'Latitude')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.enterlatitudecoordinateofthecompanyonthemap', 'Enter latitude coordinate of the company on the map.')}
+
+            helperText={t('jobPostForm.helperText.automaticallyfilledifyouchooseasuggestedaddress', 'Automatically filled if you choose a suggested address.')}
+
+            control={control}
+
+            type="number"
+
+          />
+
+        </Grid>
+
+        <Grid
+
+          size={{
+
+            xs: 12,
+
+            sm: 12,
+
+            md: 6,
+
+            lg: 6,
+
+            xl: 6
+
+          }}>
+
+          <TextFieldCustom
+
+            name="location.lng"
+
+            title={t('jobPostForm.title.longitude', 'Longitude')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.enterlongitudecoordinateofthecompanyonthemap', 'Enter longitude coordinate of the company on the map.')}
+
+            helperText={t('jobPostForm.helperText.automaticallyfilledifyouchooseasuggestedaddress', 'Automatically filled if you choose a suggested address.')}
+
+            control={control}
+
+            type="number"
+
+          />
+
+        </Grid>
+
+        <Grid size={12}>
+
+          <TextFieldCustom
+
+            name="contactPersonName"
+
+            title={t('jobPostForm.title.contactpersonname', 'Contact Person Name')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.entercontactpersonname', 'Enter contact person name')}
+
+            control={control}
+
+          />
+
+        </Grid>
+
+        <Grid size={12}>
+
+          <TextFieldCustom
+
+            name="contactPersonPhone"
+
+            title={t('jobPostForm.title.contactpersonphone', 'Contact Person Phone')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.entercontactpersonphone', 'Enter contact person phone')}
+
+            control={control}
+
+          />
+
+        </Grid>
+
+        <Grid size={12}>
+
+          <TextFieldCustom
+
+            name="contactPersonEmail"
+
+            title={t('jobPostForm.title.contactpersonemail', 'Contact Person Email')}
+
+            showRequired={true}
+
+            placeholder={t('jobPostForm.placeholder.entercontactpersonemail', 'Enter contact person email')}
+
+            control={control}
+
+          />
+
+        </Grid>
+
+        <Grid size={12}>
+
+          <CheckboxCustom name="isUrgent" control={control} title={t('jobPostForm.title.urgent', 'Urgent')} />
+
+        </Grid>
+
+      </Grid>
+
+    </form>
+
+  );
+
+};
+
+export default JobPostForm;

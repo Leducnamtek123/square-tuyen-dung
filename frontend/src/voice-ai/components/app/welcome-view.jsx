@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/voice-ai/components/livekit/button';
+import LanguageSwitcher from '@/layouts/components/commons/LanguageSwitcher';
 
 function WelcomeImage() {
   return (
@@ -24,6 +25,9 @@ export function WelcomeView({ startButtonText, onStartCall }) {
   const ctaLabel = startButtonText || t('startInterview');
   return (
     <div className="relative min-h-svh overflow-hidden">
+      <div className="absolute top-4 right-4 z-50">
+        <LanguageSwitcher />
+      </div>
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute -top-32 left-1/2 h-80 w-[42rem] -translate-x-1/2 rounded-full bg-sky-500/20 blur-3xl" />
         <div className="absolute -bottom-40 right-[-10%] h-96 w-[36rem] rounded-full bg-indigo-500/20 blur-3xl" />

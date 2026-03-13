@@ -1,25 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
-
-
 import React from "react";
 
 import { Box, Button, Stack, Typography, Paper } from "@mui/material";
@@ -27,8 +5,6 @@ import { Box, Button, Stack, Typography, Paper } from "@mui/material";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
-
-
 
 import {
 
@@ -50,12 +26,6 @@ import companyService from "../../../../services/companyService";
 
 import MuiImageCustom from "../../../../components/MuiImageCustom";
 
-
-
-
-
-
-
 const CompanyCard = () => {
 
   const [isSuccess, setIsSuccess] = React.useState(false);
@@ -73,8 +43,8 @@ const CompanyCard = () => {
   const [serverErrors, setServerErrors] = React.useState(null);
 
   const logoInputRef = React.useRef(null);
-  const coverInputRef = React.useRef(null);
 
+  const coverInputRef = React.useRef(null);
 
   React.useEffect(() => {
 
@@ -88,8 +58,6 @@ const CompanyCard = () => {
 
         var data = resData.data;
 
-
-
         data = {
 
           ...data,
@@ -99,8 +67,6 @@ const CompanyCard = () => {
         };
 
         setEditData(data);
-
-
 
         if (companyImageUrl === null) {
 
@@ -126,15 +92,11 @@ const CompanyCard = () => {
 
     };
 
-
-
     loadCompany();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
 
   }, [isSuccess]);
-
-
 
   const handleUpdate = (data) => {
 
@@ -142,19 +104,15 @@ const CompanyCard = () => {
 
       setIsFullScreenLoading(true);
 
-
-
       try {
 
         await companyService.updateCompany(id, data);
-
-
 
         setIsSuccess(!isSuccess);
 
         if (serverErrors !== null) setServerErrors(null);
 
-        toastMessages.success("Cập nhật thông tin công ty thành công.");
+        toastMessages.success("Company information updated successfully.");
 
       } catch (error) {
 
@@ -168,8 +126,6 @@ const CompanyCard = () => {
 
     };
 
-
-
     const dataCustom = {
 
       ...data,
@@ -178,17 +134,13 @@ const CompanyCard = () => {
 
     };
 
-
-
     update(dataCustom?.id, dataCustom);
 
   };
 
-
-
   const handleUpdateCompanyImageUrl = (file) => {
 
-        const update = async (formData) => {
+    const update = async (formData) => {
 
       setIsFullScreenLoading(true);
 
@@ -198,9 +150,7 @@ const CompanyCard = () => {
 
         const data = resData.data;
 
-
-
-        toastMessages.success("Cập nhật logo công ty thành công.");
+        toastMessages.success("Company logo updated successfully.");
 
         setCompanyImageUrl(data?.companyImageUrl);
 
@@ -216,8 +166,6 @@ const CompanyCard = () => {
 
     };
 
-
-
     var formData = new FormData();
 
     formData.append("file", file);
@@ -226,11 +174,7 @@ const CompanyCard = () => {
 
   };
 
-
-
   const handleUpdateCompanyCoverImageUrl = (file) => {
-
-    
 
     const update = async (formData) => {
 
@@ -246,9 +190,7 @@ const CompanyCard = () => {
 
         const data = resData.data;
 
-
-
-        toastMessages.success("Cập nhật ảnh bìa công ty thành công.");
+        toastMessages.success("Company cover image updated successfully.");
 
         setCompanyCoverImageUrl(data?.companyCoverImageUrl);
 
@@ -264,8 +206,6 @@ const CompanyCard = () => {
 
     };
 
-
-
     var formData = new FormData();
 
     formData.append("file", file);
@@ -273,8 +213,6 @@ const CompanyCard = () => {
     update(formData);
 
   };
-
-
 
   return (
 
@@ -300,7 +238,7 @@ const CompanyCard = () => {
 
           >
 
-            Logo công ty
+            Company Logo
 
           </Typography>
 
@@ -329,25 +267,36 @@ const CompanyCard = () => {
             <Box sx={{ mt: 2 }}>
 
               <Button
+
                 variant="contained"
+
                 size="small"
+
                 startIcon={<CameraAltOutlinedIcon />}
+
                 onClick={() => logoInputRef.current?.click()}
+
                 sx={{
+
                   borderRadius: 2,
+
                   textTransform: "none",
+
                   boxShadow: "none",
+
                 }}
+
               >
-                Thay logo
+
+                Change Logo
+
               </Button>
+
             </Box>
 
           </Box>
 
         </Box>
-
-
 
         <Box>
 
@@ -367,7 +316,7 @@ const CompanyCard = () => {
 
           >
 
-            Ảnh bìa công ty
+            Company Cover Image
 
           </Typography>
 
@@ -398,25 +347,36 @@ const CompanyCard = () => {
             <Box sx={{ mt: 2 }}>
 
               <Button
+
                 variant="contained"
+
                 size="small"
+
                 startIcon={<CameraAltOutlinedIcon />}
+
                 onClick={() => coverInputRef.current?.click()}
+
                 sx={{
+
                   borderRadius: 2,
+
                   textTransform: "none",
+
                   boxShadow: "none",
+
                 }}
+
               >
-                Thay anh bia
+
+                Change Cover
+
               </Button>
+
             </Box>
 
           </Box>
 
         </Box>
-
-
 
         <Box>
 
@@ -476,7 +436,7 @@ const CompanyCard = () => {
 
                 >
 
-                  Cập nhật
+                  Update
 
                 </Button>
 
@@ -490,32 +450,54 @@ const CompanyCard = () => {
 
       </Stack>
 
-
-
       <input
+
         ref={logoInputRef}
+
         type="file"
+
         accept="image/*"
+
         style={{ display: "none" }}
+
         onChange={(event) => {
+
           const file = event.target.files?.[0];
+
           if (!file) return;
+
           handleUpdateCompanyImageUrl(file);
+
           event.target.value = "";
+
         }}
+
       />
+
       <input
+
         ref={coverInputRef}
+
         type="file"
+
         accept="image/*"
+
         style={{ display: "none" }}
+
         onChange={(event) => {
+
           const file = event.target.files?.[0];
+
           if (!file) return;
+
           handleUpdateCompanyCoverImageUrl(file);
+
           event.target.value = "";
+
         }}
+
       />
+
       {isFullScreenLoading && <BackdropLoading />}
 
     </Paper>
@@ -524,8 +506,4 @@ const CompanyCard = () => {
 
 };
 
-
-
 export default CompanyCard;
-
-

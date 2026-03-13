@@ -1,39 +1,19 @@
 import React, { useState } from 'react';
-import {
-    Box,
-    Typography,
-    Breadcrumbs,
-    Link,
-    Button,
-    Paper,
-    TextField,
-    InputAdornment,
-    Pagination,
-    CircularProgress,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    OutlinedInput,
-    Chip,
-} from '@mui/material';
+import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Pagination, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip } from "@mui/material";
+import { useTranslation } from 'react-i18next';
+
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useQuestionGroups } from './hooks/useQuestionGroups';
 import QuestionGroupTable from './components/QuestionGroupTable';
-import adminManagementService from '../../../services/adminManagementService';
 import questionService from '../../../services/questionService';
 import { transformQuestion, transformQuestionGroup } from '../../../utils/transformers';
 
 const QuestionGroupsPage = () => {
+    const { t } = useTranslation('admin');
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState('add'); // 'add' or 'edit'
     const [currentGroup, setCurrentGroup] = useState(null);
@@ -42,12 +22,10 @@ const QuestionGroupsPage = () => {
     const [selectedQuestions, setSelectedQuestions] = useState([]);
     const [allQuestions, setAllQuestions] = useState([]);
 
-    // Create Question state
     const [openCreateQuestion, setOpenCreateQuestion] = useState(false);
     const [newQuestionContent, setNewQuestionContent] = useState('');
     const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
 
-    // Delete dialog
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const {
@@ -169,14 +147,14 @@ const QuestionGroupsPage = () => {
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <Box>
                     <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
-                        Quản lý bộ câu hỏi
+                        {t('pages.questionGroups.title')}
                     </Typography>
                     <Breadcrumbs aria-label="breadcrumb">
                         <Link underline="hover" color="inherit" href="/admin">
-                            Admin
+                            {t('pages.questionGroups.breadcrumbAdmin')}
                         </Link>
-                        <Typography color="text.primary">Ngân hàng câu hỏi</Typography>
-                        <Typography color="text.primary">Bộ câu hỏi</Typography>
+                        <Typography color="text.primary">{t('pages.questionGroups.breadcrumbBank')}</Typography>
+                        <Typography color="text.primary">{t('pages.questionGroups.breadcrumbGroups')}</Typography>
                     </Breadcrumbs>
                 </Box>
                 <Button
@@ -185,24 +163,25 @@ const QuestionGroupsPage = () => {
                     onClick={handleOpenAdd}
                     sx={{ borderRadius: '8px', textTransform: 'none' }}
                 >
-                    Thêm bộ câu hỏi
+                    {t('pages.questionGroups.addBtn')}
                 </Button>
             </Box>
-
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
                         size="small"
-                        placeholder="Tìm kiếm bộ câu hỏi..."
+                        placeholder={t('pages.questionGroups.searchPlaceholder')}
                         value={searchTerm}
                         onChange={handleSearch}
                         sx={{ width: 300 }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon fontSize="small" color="action" />
-                                </InputAdornment>
-                            ),
+                        slotProps={{
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon fontSize="small" color="action" />
+                                    </InputAdornment>
+                                ),
+                            }
                         }}
                     />
                 </Box>
@@ -231,23 +210,22 @@ const QuestionGroupsPage = () => {
                     </>
                 )}
             </Paper>
-
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="xs">
                 <DialogTitle>
-                    {dialogMode === 'add' ? 'Thêm bộ câu hỏi mới' : 'Chỉnh sửa bộ câu hỏi'}
+                    {dialogMode === 'add' ? t('pages.questionGroups.addTitle') : t('pages.questionGroups.editTitle')}
                 </DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <TextField
-                            label="Tên bộ câu hỏi"
+                            label={t('pages.questionGroups.groupNameLabel')}
                             fullWidth
                             value={groupName}
                             onChange={(e) => setGroupName(e.target.value)}
                             required
                         />
                         <TextField
-                            label="Mô tả"
+                            label={t('pages.questionGroups.descriptionLabel')}
                             fullWidth
                             multiline
                             rows={3}
@@ -255,17 +233,17 @@ const QuestionGroupsPage = () => {
                             onChange={(e) => setGroupDescription(e.target.value)}
                         />
                         <FormControl fullWidth>
-                            <InputLabel>Chọn câu hỏi</InputLabel>
+                            <InputLabel>{t('pages.questionGroups.selectQuestionsLabel')}</InputLabel>
                             <Select
                                 multiple
                                 value={selectedQuestions}
                                 onChange={(e) => setSelectedQuestions(e.target.value)}
-                                input={<OutlinedInput label="Chọn câu hỏi" />}
+                                input={<OutlinedInput label={t('pages.questionGroups.selectQuestionsLabel')} />}
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                         {selected.map((value) => {
                                             const q = allQuestions.find((item) => item.id === value);
-                                            return <Chip key={value} label={q?.text?.substring(0, 30) || 'Câu hỏi'} />;
+                                            return <Chip key={value} label={q?.text?.substring(0, 30) || 'Question'} />;
                                         })}
                                     </Box>
                                 )}
@@ -283,29 +261,28 @@ const QuestionGroupsPage = () => {
                             onClick={() => setOpenCreateQuestion(true)}
                             sx={{ alignSelf: 'flex-start' }}
                         >
-                            Tạo câu hỏi mới
+                            {t('pages.questionGroups.createQuestionBtn')}
                         </Button>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">Hủy</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.questionGroups.cancelBtn')}</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={isMutating || !groupName.trim()}
                     >
-                        {isMutating ? 'Đang lưu...' : 'Lưu lại'}
+                        {isMutating ? t('pages.questionGroups.savingBtn') : t('pages.questionGroups.saveBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
-
             {/* Create Question Dialog */}
             <Dialog open={openCreateQuestion} onClose={() => setOpenCreateQuestion(false)} fullWidth maxWidth="xs">
-                <DialogTitle>Tạo câu hỏi mới</DialogTitle>
+                <DialogTitle>{t('pages.questionGroups.createQuestionTitle')}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1 }}>
                         <TextField
-                            label="Nội dung câu hỏi"
+                            label={t('pages.questionGroups.questionContentLabel')}
                             fullWidth
                             multiline
                             rows={3}
@@ -316,35 +293,31 @@ const QuestionGroupsPage = () => {
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenCreateQuestion(false)} color="inherit">Hủy</Button>
+                    <Button onClick={() => setOpenCreateQuestion(false)} color="inherit">{t('pages.questionGroups.cancelBtn')}</Button>
                     <Button
                         onClick={handleCreateQuestion}
                         variant="contained"
                         disabled={isCreatingQuestion || !newQuestionContent.trim()}
                     >
-                        {isCreatingQuestion ? 'Đang tạo...' : 'Tạo mới'}
+                        {isCreatingQuestion ? t('pages.questionGroups.creatingBtn') : t('pages.questionGroups.createBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
-
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-                <DialogTitle>Xác nhận xóa</DialogTitle>
+                <DialogTitle>{t('pages.questionGroups.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography>
-                        Bạn có chắc chắn muốn xóa bộ câu hỏi <strong>{currentGroup?.name}</strong>?
-                        Dữ liệu các câu hỏi bên trong sẽ không bị xóa, nhưng liên kết với bộ câu hỏi này sẽ mất.
-                    </Typography>
+                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.questionGroups.deleteText', { name: currentGroup?.name }) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Hủy</Button>
+                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.questionGroups.cancelBtn')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Đang xóa...' : 'Xác nhận xóa'}
+                        {isMutating ? t('pages.questionGroups.deletingBtn') : t('pages.questionGroups.deleteBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>

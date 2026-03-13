@@ -1,5 +1,7 @@
 import React from 'react';
-import { Box, Card, Typography, Grid, Button, Avatar, Chip, CircularProgress } from '@mui/material';
+import { Box, Card, Typography, Button, Avatar, Chip, CircularProgress } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+
 import { TabTitle } from '../../../utils/generalFunction';
 import { useMyInterviews } from './hooks/useMyInterviews';
 import { transformInterviewSession } from '../../../utils/transformers';
@@ -42,7 +44,6 @@ const MyInterviewsPage = () => {
             <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
                 {t('jobSeeker:myInterviewsTitle')}
             </Typography>
-
             <Card sx={{ p: 2, borderRadius: '12px', boxShadow: (theme) => theme.customShadows?.card }}>
                 {isLoading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
@@ -62,17 +63,17 @@ const MyInterviewsPage = () => {
                 ) : (
                     <Grid container spacing={2}>
                         {interviews.map((interview) => (
-                            <Grid item xs={12} key={interview.id}>
+                            <Grid key={interview.id} size={12}>
                                 <Card variant="outlined" sx={{ p: 2, borderRadius: '8px', '&:hover': { borderColor: 'primary.main' } }}>
                                     <Grid container spacing={2} alignItems="center">
-                                        <Grid item>
+                                        <Grid>
                                             <Avatar sx={{ bgcolor: 'primary.main', width: 56, height: 56 }}>
                                                 <VideoCameraFrontIcon fontSize="large" />
                                             </Avatar>
                                         </Grid>
-                                        <Grid item xs>
+                                        <Grid size="grow">
                                             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                                {interview.room_name || interview.roomName || 'Interview room'}
+                                                {interview.room_name || interview.roomName || t('jobSeeker:myInterviews.defaultRoomName')}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                                                 {t('common:labels.time')}: {dayjs(interview.scheduledAt || interview.scheduled_at).format('HH:mm - DD/MM/YYYY')}
@@ -80,7 +81,7 @@ const MyInterviewsPage = () => {
                                             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                                                 {getStatusChip(interview.status)}
                                                 <Chip
-                                                    label={interview.type === 'ai' ? 'AI Interview' : 'Live Interview'}
+                                                    label={interview.type === 'ai' ? t('jobSeeker:myInterviews.aiInterview') : t('jobSeeker:myInterviews.liveInterview')}
                                                     size="small"
                                                     variant="outlined"
                                                 />
@@ -91,7 +92,7 @@ const MyInterviewsPage = () => {
                                                 )}
                                             </Box>
                                         </Grid>
-                                        <Grid item>
+                                        <Grid>
                                             <Button
                                                 variant="contained"
                                                 color="primary"

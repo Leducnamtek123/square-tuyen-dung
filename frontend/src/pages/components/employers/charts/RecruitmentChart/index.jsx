@@ -2,15 +2,11 @@
 
 MyJob Recruitment System - Part of MyJob Platform
 
-
-
 Author: Bui Khanh Huy
 
 Email: khuy220@gmail.com
 
 Copyright (c) 2023 Bui Khanh Huy
-
-
 
 License: MIT License
 
@@ -18,32 +14,14 @@ See the LICENSE file in the project root for full license information.
 
 */
 
-
-
 import React from "react";
+import { useTranslation } from 'react-i18next';
 
-import {
-
-  Box,
-
-  Card,
-
-  Divider,
-
-  Stack,
-
-  Tooltip as MuiTooltip,
-
-  Typography,
-
-  CircularProgress,
-
-} from "@mui/material";
+import { Box, Card, Divider, Stack, Tooltip as MuiTooltip, Typography, CircularProgress } from "@mui/material";
 
 import InfoIcon from "@mui/icons-material/Info";
 
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
-
 
 import {
 
@@ -65,18 +43,11 @@ import {
 
 import { Bar } from "react-chartjs-2";
 
-
-
 import dayjs from "dayjs";
-
-
 
 import RangePickerCustom from "../../../../../components/controls/RangePickerCustom";
 
 import statisticService from "../../../../../services/statisticService";
-
-
-
 
 const colors = [
 
@@ -94,8 +65,6 @@ const colors = [
 
 ];
 
-
-
 ChartJS.register(
 
   CategoryScale,
@@ -111,8 +80,6 @@ ChartJS.register(
   Legend
 
 );
-
-
 
 export const options = {
 
@@ -228,9 +195,8 @@ export const options = {
 
 };
 
-
-
 const RecruitmentChart = ({ title }) => {
+  const { t } = useTranslation('employer');
 
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -246,8 +212,6 @@ const RecruitmentChart = ({ title }) => {
 
   const [data, setData] = React.useState([]);
 
-
-
   React.useEffect(() => {
 
     const statistics = async (data) => {
@@ -261,8 +225,6 @@ const RecruitmentChart = ({ title }) => {
           data
 
         );
-
-
 
         setData(resData.data);
 
@@ -278,8 +240,6 @@ const RecruitmentChart = ({ title }) => {
 
     };
 
-
-
     statistics({
 
       startDate: dayjs(selectedDateRange[0]).format("YYYY-MM-DD").toString(),
@@ -288,13 +248,7 @@ const RecruitmentChart = ({ title }) => {
 
     });
 
-
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-
-  }, [allowSubmit]);
-
-
+  }, [allowSubmit, selectedDateRange]);
 
   const dataOptions = React.useMemo(() => {
 
@@ -304,7 +258,7 @@ const RecruitmentChart = ({ title }) => {
 
       datasets.push({
 
-        label: data[i]?.label,
+        label: t(`recruitmentChart.labels.${data[i]?.label?.toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data[i]?.label }),
 
         data: data[i]?.data || [],
 
@@ -322,8 +276,6 @@ const RecruitmentChart = ({ title }) => {
 
     }
 
-
-
     const d = {
 
       labels: [""],
@@ -332,30 +284,19 @@ const RecruitmentChart = ({ title }) => {
 
     };
 
-
-
     return d;
 
-  }, [data]);
-
-
+  }, [data, t]);
 
   return (
 
     <Card 
-
       sx={{ 
-
         p: 3,
-
-        boxShadow: theme => theme.customShadows.card,
-
-        border: theme => `1px solid ${theme.palette.grey[100]}`,
-
+        boxShadow: (theme) => theme.customShadows?.card || theme.shadows[1],
+        border: (theme) => `1px solid ${theme.palette.divider}`,
         height: '100%'
-
       }}
-
     >
 
       <Stack spacing={3}>
@@ -379,13 +320,9 @@ const RecruitmentChart = ({ title }) => {
             </Typography>
 
             <MuiTooltip
-
-              title="Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất"
-
+              title={t('recruitmentChart.title')}
               arrow
-
               placement="left"
-
             >
 
               <InfoIcon
@@ -412,11 +349,7 @@ const RecruitmentChart = ({ title }) => {
 
         </Box>
 
-
-
         <Divider sx={{ borderStyle: 'dashed' }} />
-
-
 
         <Box>
 
@@ -435,8 +368,6 @@ const RecruitmentChart = ({ title }) => {
             />
 
           </Stack>
-
-
 
           <Box sx={{ position: 'relative', minHeight: 320 }}>
 
@@ -489,7 +420,7 @@ const RecruitmentChart = ({ title }) => {
               >
 
                 <InsertChartOutlinedIcon sx={{ fontSize: 42, color: "text.secondary" }} />
-                <Typography variant="body2" color="text.secondary">Khong co du lieu de thong ke</Typography>
+                <Typography variant="body2" color="text.secondary">{t('recruitmentChart.noData')}</Typography>
 
               </Stack>
 
@@ -515,7 +446,4 @@ const RecruitmentChart = ({ title }) => {
 
 };
 
-
-
 export default RecruitmentChart;
-

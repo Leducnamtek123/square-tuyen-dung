@@ -1,4 +1,5 @@
 import random
+import os
 from datetime import date, timedelta
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -12,214 +13,320 @@ from django.db import transaction
 from oauth2_provider.models import Application
 
 class Command(BaseCommand):
-    help = 'Seed initial data for development'
+    help = 'Seed initial data for development - Construction & Design Industry'
 
     @transaction.atomic
     def handle(self, *args, **options):
         try:
-            self.stdout.write('Seeding data...')
+            self.stdout.write('Starting Seeding Construction & Design Industry Data...')
             
             # 1. Cities & Districts
-            city, _ = City.objects.get_or_create(name='Hồ Chí Minh')
-            District.objects.get_or_create(name='Quận 1', city=city)
-            district_q7, _ = District.objects.get_or_create(name='Quận 7', city=city)
+            city_hcm, _ = City.objects.get_or_create(name='Hồ Chí Minh')
+            city_hn, _ = City.objects.get_or_create(name='Hà Nội')
+            District.objects.get_or_create(name='Quận 1', city=city_hcm)
+            district_q7, _ = District.objects.get_or_create(name='Quận 7', city=city_hcm)
+            District.objects.get_or_create(name='Cầu Giấy', city=city_hn)
             
-            location, _ = Location.objects.get_or_create(
-                city=city,
+            location_hcm, _ = Location.objects.get_or_create(
+                city=city_hcm,
                 district=district_q7,
-                address='Số 1 Võ Văn Ngân',
+                address='Số 1 Võ Văn Ngân, Thủ Đức, TP.HCM',
                 lat=10.8507,
                 lng=106.7719
             )
 
             # 2. Careers
-            it_career, _ = Career.objects.get_or_create(name='Công nghệ thông tin')
-            Career.objects.get_or_create(name='Kinh doanh / Bán hàng')
-            Career.objects.get_or_create(name='Marketing')
+            construction_career, _ = Career.objects.get_or_create(name='Xây dựng')
+            design_career, _ = Career.objects.get_or_create(name='Thiết kế / Kiến trúc')
+            Career.objects.get_or_create(name='Điện / Điện tử')
+            Career.objects.get_or_create(name='Cơ khí')
 
             # 2.5. OAuth Application
-            if not Application.objects.filter(client_id='qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS').exists():
-                admin_user = User.objects.filter(is_superuser=True).first()
-                if not admin_user:
-                    # Create a temporary admin if none exists yet, will be fixed by step 3
-                    admin_user = User.objects.create_superuser(
-                        email='admin_temp@myjob.com',
-                        password='Abc@1234'
-                    )
-                
-                Application.objects.create(
-                    client_id='qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS',
-                    client_secret='pbkdf2_sha256$600000$akJy2vMrXLxvnrHPHgIZIp$+EKUGekpEdO0zcDQlQ0szES1dJtPGZQh+WDGwKuqHt8=',
-                    client_type=Application.CLIENT_CONFIDENTIAL,
-                    authorization_grant_type=Application.GRANT_PASSWORD,
-                    name='MyJob Web App',
-                    user=admin_user
-                )
-                self.stdout.write(self.style.SUCCESS('Created OAuth Application'))
+            client_id = os.getenv('CLIENT_ID', 'qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS')
+            client_secret = os.getenv('CLIENT_SECRET', 'myjob_secret_client_key_2024')
 
-            # 3. Admin User
-            admin_user = User.objects.filter(email='admin@myjob.com').first()
+            admin_user = User.objects.filter(is_superuser=True).first()
             if not admin_user:
                 admin_user = User.objects.create_superuser(
                     email='admin@myjob.com',
                     full_name='System Admin',
                     password='Abc@1234'
                 )
-                self.stdout.write(self.style.SUCCESS('Created Admin: admin@myjob.com'))
-            else:
-                admin_user.set_password('Abc@1234')
-                admin_user.save()
-                self.stdout.write(self.style.SUCCESS('Updated Admin password: admin@myjob.com'))
 
-            # 4. Employer & Company
-            employer_user = User.objects.filter(email='employer@myjob.com').first()
-            if not employer_user:
-                employer_user = User.objects.create_user_with_role_name(
-                    email='employer@myjob.com',
-                    full_name='HR Manager',
-                    role_name=var_sys.EMPLOYER,
-                    password='Abc@1234',
-                    is_active=True,
-                    is_verify_email=True,
-                    has_company=True
-                )
-                self.stdout.write(self.style.SUCCESS('Created Employer: employer@myjob.com'))
-            else:
-                employer_user.set_password('Abc@1234')
-                employer_user.save()
-                self.stdout.write(self.style.SUCCESS('Updated Employer password: employer@myjob.com'))
+            app, created = Application.objects.get_or_create(
+                client_id=client_id,
+                defaults={
+                    'client_type': Application.CLIENT_CONFIDENTIAL,
+                    'authorization_grant_type': Application.GRANT_PASSWORD,
+                    'name': 'MyJob Web App',
+                    'user': admin_user
+                }
+            )
+            app.client_secret = client_secret
+            app.user = admin_user
+            app.save()
 
+            # Create Main Employer
+            employer_user, created = User.objects.get_or_create(
+                email='employer@square.com',
+                defaults={
+                    'full_name': 'Square Construction Group',
+                    'is_active': True,
+                    'is_verify_email': True,
+                    'role_name': var_sys.EMPLOYER
+                }
+            )
+            employer_user.role_name = var_sys.EMPLOYER
+            employer_user.set_password('Abc@1234')
+            employer_user.save()
+            
             company, _ = Company.objects.get_or_create(
                 user=employer_user,
                 defaults={
-                    'company_name': 'MyJob Technology Solutions',
-                    'company_email': 'hr@myjobtech.com',
-                    'company_phone': '0123456789',
-                    'tax_code': 'ABC123456',
-                    'location': location,
-                    'employee_size': 2, # 10-150
-                    'field_operation': 'Software Development'
+                    'company_name': 'Square Group Construction & Design',
+                    'company_email': 'hr@squaregroup.vn',
+                    'company_phone': '02812345678',
+                    'tax_code': '0312456789',
+                    'location': location_hcm,
+                    'employee_size': 4, # 500-1000
+                    'field_operation': 'Construction, Interior Design, Architecture'
                 }
             )
 
-            # 5. Job Seeker & Profile
-            seeker_user = User.objects.filter(email='jobseeker@myjob.com').first()
-            if not seeker_user:
-                seeker_user = User.objects.create_user_with_role_name(
-                    email='jobseeker@myjob.com',
-                    full_name='Nguyen Van Ung Vien',
-                    role_name=var_sys.JOB_SEEKER,
-                    password='Abc@1234',
-                    is_active=True,
-                    is_verify_email=True
+            # Data for 10 seeds with role-specific questions
+            seeds_data = [
+                {
+                    "role": "Kiến trúc sư", 
+                    "name": "Nguyên Văn An", 
+                    "email": "kts.an@gmail.com", 
+                    "career": design_career,
+                    "questions": [
+                        "Quy trình triển khai BIM trong thiết kế kiến trúc như thế nào?",
+                        "Bạn phối hợp với kỹ sư kết cấu và M&E như thế nào trong giai đoạn thiết kế cơ sở?",
+                        "Cách bạn xử lý mâu thuẫn giữa ý tưởng thẩm mĩ và công năng sử dụng?",
+                        "Nêu các tiêu chuẩn Việt Nam (TCVN) về thoát nạn và PCCC trong chung cư cao tầng?"
+                    ]
+                },
+                {
+                    "role": "Kỹ sư xây dựng", 
+                    "name": "Lê Quang Vinh", 
+                    "email": "vinh.le@gmail.com", 
+                    "career": construction_career,
+                    "questions": [
+                        "Quy trình kiểm soát chất lượng vật liệu đầu vào tại công trường?",
+                        "Cách xử lý khi kết quả thí nghiệm nén mẫu bê tông không đạt yêu cầu?",
+                        "Trình bày biện pháp thi công tầng hầm bằng phương pháp Semi Top-down?",
+                        "Sử dụng phần mềm nào để quản lý tiến độ và chi phí thi công?"
+                    ]
+                },
+                {
+                    "role": "Kỹ sư điện M&E", 
+                    "name": "Trần Thanh Sơn", 
+                    "email": "son.me@gmail.com", 
+                    "career": construction_career,
+                    "questions": [
+                        "Các bước nghiệm thu hệ thống tăng áp cầu thang và hút khói hành lang?",
+                        "Cách tính toán chọn tiết diện cáp và thiết bị bảo vệ cho hệ thống chiller?",
+                        "Sơ đồ nguyên lý hệ thống điện nhẹ (ELV) trong tòa nhà thông minh?",
+                        "Quy trình xử lý sự cố mất điện lưới và khởi động máy phát điện dự phòng?"
+                    ]
+                },
+                {
+                    "role": "Chỉ huy trưởng", 
+                    "name": "Phạm Minh Đức", 
+                    "email": "duc.site@gmail.com", 
+                    "career": construction_career,
+                    "questions": [
+                        "Kinh nghiệm điều phối nhiều nhà thầu phụ cùng thi công trên một mặt bằng hẹp?",
+                        "Cách quản lý và tối ưu hóa chi phí nhân công và máy thi công tại công trường?",
+                        "Kỹ năng xử lý các vấn đề pháp lý và thanh tra xây dựng tại địa phương?",
+                        "Làm thế nào để duy trì kỷ luật và ý thức an toàn của công nhân?"
+                    ]
+                },
+                {
+                    "role": "Kỹ sư dự toán (QS)", 
+                    "name": "Hoàng Thị Lan", 
+                    "email": "lan.qs@gmail.com", 
+                    "career": construction_career,
+                    "questions": [
+                        "Các bước lập hồ sơ thanh quyết toán với chủ đầu tư và nhà thầu phụ?",
+                        "Cách bóc tách khối lượng thép và bê tông từ bản vẽ shop-drawing?",
+                        "Xử lý các phát sinh ngoài hợp đồng (VO) như thế nào để đảm bảo quyền lợi công ty?",
+                        "Tìm hiểu và cập nhật đơn giá vật liệu thị trường bằng cách nào?"
+                    ]
+                },
+                {
+                    "role": "Thiết kế nội thất", 
+                    "name": "Vũ Hải Đăng", 
+                    "email": "dang.interior@gmail.com", 
+                    "career": design_career,
+                    "questions": [
+                        "Sự khác biệt trong việc chọn vật liệu hoàn thiện cho căn hộ cao cấp và văn phòng?",
+                        "Kỹ năng sử dụng phần mềm 3dsMax, Corona hoặc Enscape để diễn họa?",
+                        "Cách tối ưu hóa không gian cho các căn hộ diện tích nhỏ (Studio)?",
+                        "Nắm bắt các xu hướng nội thất bền vững (Sustainable Design) hiện nay?"
+                    ]
+                },
+                {
+                    "role": "Cán bộ an toàn", 
+                    "name": "Đặng Ngọc Thạch", 
+                    "email": "thach.safety@gmail.com", 
+                    "career": construction_career,
+                    "questions": [
+                        "Quy trình cấp phép và giám sát các công việc nguy hiểm (làm việc trên cao, hàn cắt)?",
+                        "Nội dung huấn luyện an toàn định kỳ cho công nhân mới vào công trường?",
+                        "Cách thiết lập hệ thống cảnh báo và lưới an toàn cho nhà cao tầng?",
+                        "Quy trình sơ cứu và báo cáo tai nạn lao động theo quy định?"
+                    ]
+                },
+                {
+                    "role": "Kỹ sư kết cấu", 
+                    "name": "Bùi Xuân Hòa", 
+                    "email": "hoa.structural@gmail.com", 
+                    "career": construction_career,
+                    "questions": [
+                        "Nguyên lý tính toán và kiểm tra độ võng, vết nứt cho dầm sàn nhịp lớn?",
+                        "Cách thiết lập mô hình tính toán tải trọng gió và động đất trong Etabs?",
+                        "Kỹ năng triển khai bản vẽ chi tiết thép (Shop-drawing) đạt độ chính xác cao?",
+                        "Sự khác biệt giữa thiết kế kết cấu bê tông cốt thép và kết cấu thép tiền chế?"
+                    ]
+                },
+                {
+                    "role": "Giám sát công trình", 
+                    "name": "Ngô Quốc Bảo", 
+                    "email": "bao.sup@gmail.com", 
+                    "career": construction_career,
+                    "questions": [
+                        "Các bước kiểm tra nghiệm thu cốt thép và ván khuôn trước khi đổ bê tông?",
+                        "Ghi nhật ký công trình như thế nào để làm bằng chứng pháp lý khi có tranh chấp?",
+                        "Cách kiểm soát việc sai lệch cao độ và vị trí trục tim trên mặt bằng thi công?",
+                        "Quy trình giám sát lắp đặt hệ thống thoát nước ngầm hố ga?"
+                    ]
+                },
+                {
+                    "role": "Quản lý dự án", 
+                    "name": "Đỗ Hoàng Long", 
+                    "email": "long.pm@gmail.com", 
+                    "career": construction_career,
+                    "questions": [
+                        "Các chỉ số KPI chính để đánh giá hiệu quả của một dự án xây dựng?",
+                        "Phương pháp quản lý rủi ro về tiến độ và dòng tiền của dự án?",
+                        "Cách báo cáo và thuyết phục chủ đầu tư về các thay đổi kỹ thuật làm tăng chi phí?",
+                        "Quy trình đóng dự án và bàn giao đưa vào sử dụng (Handover)?"
+                    ]
+                },
+            ]
+
+            self.stdout.write(f'Generated {len(seeds_data)} profiles...')
+
+            for i, seed in enumerate(seeds_data):
+                user, created = User.objects.get_or_create(
+                    email=seed['email'],
+                    defaults={
+                        'full_name': seed['name'],
+                        'is_active': True,
+                        'is_verify_email': True,
+                        'role_name': var_sys.JOB_SEEKER
+                    }
                 )
-                self.stdout.write(self.style.SUCCESS('Created Job Seeker: jobseeker@myjob.com'))
-            else:
-                seeker_user.set_password('Abc@1234')
-                seeker_user.save()
-                self.stdout.write(self.style.SUCCESS('Updated Job Seeker password: jobseeker@myjob.com'))
+                user.role_name = var_sys.JOB_SEEKER
+                user.set_password('Abc@1234')
+                user.save()
 
-            profile, _ = JobSeekerProfile.objects.get_or_create(
-                user=seeker_user,
-                defaults={
-                    'phone': '0987654321',
-                    'location': location,
-                    'gender': 'M'
-                }
-            )
+                profile, _ = JobSeekerProfile.objects.get_or_create(
+                    user=user,
+                    defaults={
+                        'phone': f'090{random.randint(1000000, 9999999)}',
+                        'location': location_hcm,
+                        'gender': random.choice(['M', 'F']),
+                        'birthday': date(1990 + random.randint(0, 10), random.randint(1, 12), random.randint(1, 28))
+                    }
+                )
 
-            # 6. Content: Job Post & Resume
-            job_post, _ = JobPost.objects.get_or_create(
-                job_name='Senior Python Developer (Django)',
-                company=company,
-                user=employer_user,
-                defaults={
-                    'deadline': date.today() + timedelta(days=30),
-                    'quantity': 5,
-                    'job_description': '<p>Tuyển gấp Backend Python Developer...</p>',
-                    'position': 5, # Chuyên viên
-                    'type_of_workplace': 1, # Văn phòng
-                    'experience': 4, # 2 năm
-                    'academic_level': 2, # Đại học
-                    'job_type': 1, # Toàn thời gian
-                    'salary_min': 20000000,
-                    'salary_max': 40000000,
-                    'career': it_career,
-                    'location': location,
-                    'contact_person_name': 'HR Manager',
-                    'contact_person_phone': '0123456789',
-                    'contact_person_email': 'hr@myjobtech.com',
-                    'status': 3 # Đã duyệt
-                }
-            )
+                # Job Post for each role
+                job_post, _ = JobPost.objects.get_or_create(
+                    job_name=f"Tuyển {seed['role']} chuyên nghiệp",
+                    company=company,
+                    user=employer_user,
+                    defaults={
+                        'deadline': date.today() + timedelta(days=30),
+                        'quantity': 2,
+                        'job_description': f'<p>Chúng tôi cần tuyển {seed["role"]} có kinh nghiệm...</p>',
+                        'position': 5, # Chuyên viên
+                        'type_of_workplace': 1,
+                        'experience': random.randint(3, 10),
+                        'academic_level': 2,
+                        'job_type': 1,
+                        'salary_min': 15000000 + (random.randint(0, 5) * 1000000),
+                        'salary_max': 25000000 + (random.randint(0, 5) * 1000000),
+                        'career': seed['career'],
+                        'location': location_hcm,
+                        'contact_person_name': 'HR Dept',
+                        'contact_person_email': 'hr@squaregroup.vn',
+                        'contact_person_phone': '02812345678',
+                        'status': 3
+                    }
+                )
 
-            resume, _ = Resume.objects.get_or_create(
-                user=seeker_user,
-                job_seeker_profile=profile,
-                defaults={
-                    'title': 'Senior Fullstack Developer CV',
-                    'salary_min': 25000000,
-                    'salary_max': 50000000,
-                    'position': 5,
-                    'experience': 5,
-                    'academic_level': 2,
-                    'type_of_workplace': 2,
-                    'city': city,
-                    'career': it_career,
-                    'is_active': True
-                }
-            )
+                resume, _ = Resume.objects.get_or_create(
+                    user=user,
+                    job_seeker_profile=profile,
+                    defaults={
+                        'title': f"CV {seed['role']} - {seed['name']}",
+                        'salary_min': 15000000,
+                        'salary_max': 30000000,
+                        'position': 5,
+                        'experience': 5,
+                        'academic_level': 2,
+                        'type_of_workplace': 1,
+                        'city': city_hcm,
+                        'career': seed['career'],
+                        'is_active': True
+                    }
+                )
 
-            # 7. Application (JobPostActivity)
-            activity, _ = JobPostActivity.objects.get_or_create(
-                job_post=job_post,
-                user=seeker_user,
-                defaults={
-                    'resume': resume,
-                    'full_name': seeker_user.full_name,
-                    'email': seeker_user.email,
-                    'phone': '0987654321',
-                    'status': 1 # Chờ xác nhận
-                }
-            )
+                # Job Application
+                JobPostActivity.objects.get_or_create(
+                    job_post=job_post,
+                    user=user,
+                    defaults={
+                        'resume': resume,
+                        'full_name': user.full_name,
+                        'email': user.email,
+                        'phone': profile.phone,
+                        'status': 1
+                    }
+                )
 
-            # 8. Interview Questions & Session
-            q1, _ = Question.objects.get_or_create(
-                text='Explain the difference between a list and a tuple in Python.',
-                category='technical',
-                author=employer_user
-            )
-            q2, _ = Question.objects.get_or_create(
-                text='What are decorators in Python and how do they work?',
-                category='technical',
-                author=employer_user
-            )
-            q3, _ = Question.objects.get_or_create(
-                text='Describe a difficult situation you faced at work and how you handled it.',
-                category='behavioral',
-                author=employer_user
-            )
+                # Questions for this interview (Role Specific)
+                q_list = []
+                for q_text in seed['questions']:
+                    q, _ = Question.objects.get_or_create(
+                        text=q_text,
+                        author=employer_user
+                    )
+                    q_list.append(q)
 
-            group, _ = QuestionGroup.objects.get_or_create(
-                name='Python Backend Interview Group',
-                author=employer_user
-            )
-            group.questions.add(q1, q2, q3)
+                group, _ = QuestionGroup.objects.get_or_create(
+                    name=f"Bộ đề phỏng vấn {seed['role']}",
+                    author=employer_user
+                )
+                group.questions.set(q_list)
 
-            interview, _ = InterviewSession.objects.get_or_create(
-                candidate=seeker_user,
-                job_post=job_post,
-                defaults={
-                    'status': 'scheduled',
-                    'type': 'technical',
-                    'scheduled_at': timezone.now() + timedelta(days=1),
-                    'created_by': employer_user,
-                    'question_group': group
-                }
-            )
-            interview.questions.add(q1, q2, q3)
+                interview, _ = InterviewSession.objects.get_or_create(
+                    candidate=user,
+                    job_post=job_post,
+                    defaults={
+                        'status': 'scheduled',
+                        'type': 'technical',
+                        'scheduled_at': timezone.now() + timedelta(days=random.randint(1, 7)),
+                        'created_by': employer_user,
+                        'question_group': group
+                    }
+                )
+                interview.questions.set(q_list)
 
-            self.stdout.write(self.style.SUCCESS('Successfully seeded all data!'))
+            self.stdout.write(self.style.SUCCESS('Successfully seeded 10 specialized construction & design profiles with dedicated question sets!'))
         except Exception as e:
             self.stderr.write(self.style.ERROR(f'Error seeding data: {str(e)}'))
             import traceback

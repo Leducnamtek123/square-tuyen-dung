@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Dialog, DialogTitle, DialogContent, DialogActions,
-    Button, TextField, Box, Chip,
-    Autocomplete, CircularProgress, Alert
-} from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Chip, Autocomplete, CircularProgress, Alert } from "@mui/material";
+import { useTranslation, Trans } from 'react-i18next';
+
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -13,6 +11,7 @@ import questionService from '../../../../services/questionService';
 import { useScheduleInterview } from '../../InterviewsPage/hooks/useInterviews';
 
 const ScheduleInterviewDialog = ({ open, onClose, user }) => {
+    const { t } = useTranslation('admin');
     const [scheduledAt, setScheduledAt] = useState(dayjs().add(1, 'day'));
     const [notes, setNotes] = useState('');
     const [selectedQuestions, setSelectedQuestions] = useState([]);
@@ -66,11 +65,16 @@ const ScheduleInterviewDialog = ({ open, onClose, user }) => {
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
             <DialogTitle sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 1 }}>
-                <VideocamOutlinedIcon color="primary" /> Lên lịch phỏng vấn
+                <VideocamOutlinedIcon color="primary" /> {t('pages.users.scheduleInterviewDialog.title')}
             </DialogTitle>
             <DialogContent>
                 <Alert severity="info" sx={{ mb: 2, mt: 1 }}>
-                    Phỏng vấn xác thực cho: <strong>{user.fullName || user.email}</strong>
+                    <Trans
+                        i18nKey="pages.users.scheduleInterviewDialog.vettingFor"
+                        t={t}
+                        values={{ name: user.fullName || user.email }}
+                        components={{ strong: <strong /> }}
+                    />
                     {user.roleName && (
                         <Chip label={user.roleName} size="small" sx={{ ml: 1 }}
                             color={user.roleName === 'EMPLOYER' ? 'primary' : 'default'}
@@ -81,7 +85,7 @@ const ScheduleInterviewDialog = ({ open, onClose, user }) => {
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateTimePicker
-                            label="Thời gian phỏng vấn"
+                            label={t('pages.users.scheduleInterviewDialog.timeLabel')}
                             value={scheduledAt}
                             onChange={(v) => setScheduledAt(v)}
                             minDateTime={dayjs()}
@@ -94,23 +98,25 @@ const ScheduleInterviewDialog = ({ open, onClose, user }) => {
                     <Autocomplete
                         multiple
                         options={questions}
-                        getOptionLabel={(opt) => opt.text || opt.content || `Câu hỏi #${opt.id}`}
+                        getOptionLabel={(opt) => opt.text || opt.content || `Question #${opt.id}`}
                         value={selectedQuestions}
                         onChange={(_, v) => setSelectedQuestions(v)}
                         loading={loadingQuestions}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
-                                label="Chọn câu hỏi"
-                                placeholder="Tìm câu hỏi..."
-                                InputProps={{
-                                    ...params.InputProps,
-                                    endAdornment: (
-                                        <>
-                                            {loadingQuestions && <CircularProgress size={20} />}
-                                            {params.InputProps.endAdornment}
-                                        </>
-                                    ),
+                                label={t('pages.users.scheduleInterviewDialog.questionsLabel')}
+                                placeholder={t('pages.users.scheduleInterviewDialog.questionsPlaceholder')}
+                                slotProps={{
+                                    input: {
+                                        ...params.InputProps,
+                                        endAdornment: (
+                                            <>
+                                                {loadingQuestions && <CircularProgress size={20} />}
+                                                {params.InputProps.endAdornment}
+                                            </>
+                                        ),
+                                    }
                                 }}
                             />
                         )}
@@ -129,26 +135,28 @@ const ScheduleInterviewDialog = ({ open, onClose, user }) => {
                     />
 
                     <TextField
-                        label="Ghi chú"
+                        label={t('pages.users.scheduleInterviewDialog.notesLabel')}
                         multiline
                         rows={3}
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        placeholder="Ghi chú thêm về buổi phỏng vấn..."
+                        placeholder={t('pages.users.scheduleInterviewDialog.notesPlaceholder')}
                         fullWidth
                     />
                 </Box>
             </DialogContent>
             <DialogActions sx={{ px: 3, pb: 2 }}>
                 <Button onClick={onClose} color="inherit">
-                    Hủy
+                    {t('pages.users.scheduleInterviewDialog.cancelBtn')}
                 </Button>
                 <Button
                     onClick={handleSubmit}
                     variant="contained"
                     disabled={scheduleInterviewMutation.isPending || !scheduledAt}
                 >
-                    {scheduleInterviewMutation.isPending ? 'Đang lên lịch...' : 'Lên lịch phỏng vấn'}
+                    {scheduleInterviewMutation.isPending 
+                        ? t('pages.users.scheduleInterviewDialog.schedulingBtn') 
+                        : t('pages.users.scheduleInterviewDialog.submitBtn')}
                 </Button>
             </DialogActions>
         </Dialog>

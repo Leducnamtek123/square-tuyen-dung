@@ -27,11 +27,22 @@ const normalizeProps = (props) => {
   return nextProps;
 };
 
-const FontAwesomeIcon = ({ icon: Icon, ...props }) => {
+const FontAwesomeIcon = React.forwardRef(({ icon: Icon, ...props }, ref) => {
   if (!Icon) return null;
-  const normalizedProps = normalizeProps(props);
-  return <Icon {...normalizedProps} />;
-};
+  const { fontSize, color, sx, style, className, ...rest } = props;
+  const normalizedProps = normalizeProps({ fontSize, color, sx });
+
+  return (
+    <span
+      ref={ref}
+      className={className}
+      style={{ display: 'inline-flex', alignItems: 'center', ...style }}
+      {...rest}
+    >
+      <Icon {...normalizedProps} />
+    </span>
+  );
+});
 
 export { FontAwesomeIcon };
 export default FontAwesomeIcon;

@@ -26,7 +26,6 @@ const updateStatusNotification = async (key) => {
     });
 }
 
-
 const showDetail = (item) => {
     const showPopup = (title, content, image, key, callBackFunc, bntTitle = "Ok", showCancelButton = false) => {
 

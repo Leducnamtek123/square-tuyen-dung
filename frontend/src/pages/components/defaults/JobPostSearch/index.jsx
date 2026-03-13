@@ -1,250 +1,589 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useForm } from 'react-hook-form';
-import {
-  Box,
-  Button,
-  Card,
-  Grid,
-  IconButton,
-  Stack,
-  Typography,
-} from '@mui/material';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
-import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import ClearIcon from '@mui/icons-material/Clear';
-
-import InputBaseSearchHomeCustom from '../../../../components/controls/InputBaseSearchHomeCustom';
-import SingleSelectSearchCustom from '../../../../components/controls/SingleSelectSearchCustom';
-
-import {
-  resetSearchJobPostFilter,
-  searchJobPost,
-} from '../../../../redux/filterSlice';
-
-const JobPostSearch = () => {
-  const dispatch = useDispatch();
-  const { allConfig } = useSelector((state) => state.config);
-  const { jobPostFilter } = useSelector((state) => state.filter);
-  const [showAdvanceFilter, setShowAdvanceFilter] = React.useState(false);
-
-  const { control, handleSubmit, reset } = useForm();
-
-  React.useEffect(() => {
-    reset((formValues) => ({
-      ...formValues,
-      ...jobPostFilter,
-    }));
-  }, [jobPostFilter, reset]);
-
-  const handleChangeShowFilter = () => {
-    setShowAdvanceFilter(!showAdvanceFilter);
-  };
-
-  const handleSaveKeyworLocalStorage = (kw) => {
-    try {
-      if (kw) {
-        const keywordListStr = localStorage.getItem('myjob_search_history');
-
-        if (
-          keywordListStr !== null &&
-          keywordListStr !== undefined &&
-          keywordListStr !== ''
-        ) {
-          const keywordList = JSON.parse(keywordListStr);
-
-          if (!keywordList.includes(kw)) {
-            if (keywordList.length >= 5) {
-              localStorage.setItem(
-                'myjob_search_history',
-                JSON.stringify([
-                  kw,
-                  ...keywordList.slice(0, keywordList.length - 1),
-                ])
-              );
-            } else {
-              localStorage.setItem(
-                'myjob_search_history',
-                JSON.stringify([kw, ...keywordList])
-              );
-            }
-          }
-        } else {
-          localStorage.setItem('myjob_search_history', JSON.stringify([kw]));
-        }
-      }
-    } catch (error) {
-      console.error('Loi khi set kw vao local storage: ', error);
-    }
-  };
-
-  const handleFilter = (data) => {
-    handleSaveKeyworLocalStorage(data?.kw);
-
-    dispatch(searchJobPost(data));
-  };
-
-  const handleReset = () => {
-    dispatch(resetSearchJobPostFilter());
-  };
-
-  return (
-    <Box component="form" onSubmit={handleSubmit(handleFilter)}>
-      <Card sx={{ p: 3, boxShadow: 0, backgroundColor: '#441da0' }}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={12} md={6} lg={4} xl={4}>
-            <InputBaseSearchHomeCustom
-              name="kw"
-              placeholder="Tìm kiếm cơ hội việc làm"
-              control={control}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3} lg={3} xl={3}>
-            <SingleSelectSearchCustom
-              name="careerId"
-              placeholder="Tất cả ngành nghề"
-              control={control}
-              options={allConfig?.careerOptions || []}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={3} lg={2} xl={2}>
-            <SingleSelectSearchCustom
-              name="cityId"
-              placeholder="Tất cả tỉnh thành"
-              control={control}
-              options={allConfig?.cityOptions || []}
-            />
-          </Grid>
-          <Grid item xs={12} sm={12} md={12} lg={3} xl={3}>
-            <Stack
-              spacing={2}
-              direction={{
-                xs: 'column',
-                sm: 'row',
-                md: 'row',
-                lg: 'row',
-                xl: 'row',
-              }}
-              justifyContent={{ sm: 'flex-end', lg: 'center' }}
-            >
-              <Button
-                variant="contained"
-                color="info"
-                sx={{ py: 1 }}
-                type="submit"
-              >
-                Tìm kiếm
-              </Button>
-              <Button
-                variant="contained"
-                sx={{ py: 1, color: 'white' }}
-                startIcon={
-                  showAdvanceFilter ? <FilterAltOffIcon /> : <FilterAltIcon />
-                }
-                color="secondary"
-                onClick={handleChangeShowFilter}
-              >
-                Lọc nâng cao
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Card>
-      <Card
-        sx={{
-          p: 2,
-          boxShadow: 3,
-          mt: -1,
-          display: showAdvanceFilter ? 'block' : 'none',
-        }}
-      >
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={12} md={12} lg={1} xl={1}>
-            <Typography
-              variant="subtitle2"
-              sx={{ pt: 1, fontSize: 14 }}
-              color="GrayText"
-            >
-              Lọc nâng cao
-            </Typography>
-          </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={2} xl={2}>
-            <SingleSelectSearchCustom
-              name="positionId"
-              placeholder="Tất cả vị trí"
-              control={control}
-              options={allConfig?.positionOptions || []}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={2} xl={2}>
-            <SingleSelectSearchCustom
-              name="experienceId"
-              placeholder="Tất cả kinh nghiệm"
-              control={control}
-              options={allConfig?.experienceOptions || []}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={2} xl={2}>
-            <SingleSelectSearchCustom
-              name="jobTypeId"
-              placeholder="Tất cả hình thức làm việc"
-              control={control}
-              options={allConfig?.jobTypeOptions || []}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={2} xl={2}>
-            <SingleSelectSearchCustom
-              name="typeOfWorkplaceId"
-              placeholder="Tất cả loại hình làm việc"
-              control={control}
-              options={allConfig?.typeOfWorkplaceOptions || []}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={2} xl={2}>
-            <SingleSelectSearchCustom
-              name="genderId"
-              placeholder="Tất cả giới tính"
-              control={control}
-              options={allConfig?.genderOptions || []}
-            />
-          </Grid>
-          <Grid item xs={12} sm={6} md={4} lg={1} xl={1}>
-            <Stack
-              direction="row"
-              justifyContent={{ xs: 'flex-end', lg: 'center', xl: 'center' }}
-            >
-              <IconButton
-                color="primary"
-                aria-label="add to shopping cart"
-                onClick={handleReset}
-              >
-                <DeleteForeverIcon color="secondary" />
-              </IconButton>
-              <IconButton
-                color="primary"
-                aria-label="add to shopping cart"
-                onClick={handleChangeShowFilter}
-              >
-                <ClearIcon color="error" />
-              </IconButton>
-            </Stack>
-          </Grid>
-        </Grid>
-      </Card>
-    </Box>
-  );
-};
-
-export default JobPostSearch;
+import React from 'react';
+
+import { useDispatch, useSelector } from 'react-redux';
+
+import { useForm } from 'react-hook-form';
+
+import { Box, Button, Card, IconButton, Stack, Typography } from "@mui/material";
+
+import Grid from "@mui/material/Grid2";
+
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+
+import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+
+import ClearIcon from '@mui/icons-material/Clear';
+
+import InputBaseSearchHomeCustom from '../../../../components/controls/InputBaseSearchHomeCustom';
+
+import SingleSelectSearchCustom from '../../../../components/controls/SingleSelectSearchCustom';
+
+import {
+
+  resetSearchJobPostFilter,
+
+  searchJobPost,
+
+} from '../../../../redux/filterSlice';
+
+const JobPostSearch = () => {
+
+  const dispatch = useDispatch();
+
+  const { allConfig } = useSelector((state) => state.config);
+
+  const { jobPostFilter } = useSelector((state) => state.filter);
+
+  const [showAdvanceFilter, setShowAdvanceFilter] = React.useState(false);
+
+  const { control, handleSubmit, reset } = useForm();
+
+  React.useEffect(() => {
+
+    reset((formValues) => ({
+
+      ...formValues,
+
+      ...jobPostFilter,
+
+    }));
+
+  }, [jobPostFilter, reset]);
+
+  const handleChangeShowFilter = () => {
+
+    setShowAdvanceFilter(!showAdvanceFilter);
+
+  };
+
+  const handleSaveKeyworLocalStorage = (kw) => {
+
+    try {
+
+      if (kw) {
+
+        const keywordListStr = localStorage.getItem('myjob_search_history');
+
+        if (
+
+          keywordListStr !== null &&
+
+          keywordListStr !== undefined &&
+
+          keywordListStr !== ''
+
+        ) {
+
+          const keywordList = JSON.parse(keywordListStr);
+
+          if (!keywordList.includes(kw)) {
+
+            if (keywordList.length >= 5) {
+
+              localStorage.setItem(
+
+                'myjob_search_history',
+
+                JSON.stringify([
+
+                  kw,
+
+                  ...keywordList.slice(0, keywordList.length - 1),
+
+                ])
+
+              );
+
+            } else {
+
+              localStorage.setItem(
+
+                'myjob_search_history',
+
+                JSON.stringify([kw, ...keywordList])
+
+              );
+
+            }
+
+          }
+
+        } else {
+
+          localStorage.setItem('myjob_search_history', JSON.stringify([kw]));
+
+        }
+
+      }
+
+    } catch (error) {
+
+      console.error('Loi khi set kw vao local storage: ', error);
+
+    }
+
+  };
+
+  const handleFilter = (data) => {
+
+    handleSaveKeyworLocalStorage(data?.kw);
+
+    dispatch(searchJobPost(data));
+
+  };
+
+  const handleReset = () => {
+
+    dispatch(resetSearchJobPostFilter());
+
+  };
+
+  return (
+
+    <Box component="form" onSubmit={handleSubmit(handleFilter)}>
+
+      <Card sx={{ p: 3, boxShadow: 0, backgroundColor: '#441da0' }}>
+
+        <Grid container spacing={2}>
+
+          <Grid
+
+            size={{
+
+              xs: 12,
+
+              sm: 12,
+
+              md: 6,
+
+              lg: 4,
+
+              xl: 4
+
+            }}>
+
+            <InputBaseSearchHomeCustom
+
+              name="kw"
+
+              placeholder="Search for job opportunities"
+
+              control={control}
+
+            />
+
+          </Grid>
+
+          <Grid
+
+            size={{
+
+              xs: 12,
+
+              sm: 6,
+
+              md: 3,
+
+              lg: 3,
+
+              xl: 3
+
+            }}>
+
+            <SingleSelectSearchCustom
+
+              name="careerId"
+
+              placeholder="All careers"
+
+              control={control}
+
+              options={allConfig?.careerOptions || []}
+
+            />
+
+          </Grid>
+
+          <Grid
+
+            size={{
+
+              xs: 12,
+
+              sm: 6,
+
+              md: 3,
+
+              lg: 2,
+
+              xl: 2
+
+            }}>
+
+            <SingleSelectSearchCustom
+
+              name="cityId"
+
+              placeholder="All cities"
+
+              control={control}
+
+              options={allConfig?.cityOptions || []}
+
+            />
+
+          </Grid>
+
+          <Grid
+
+            size={{
+
+              xs: 12,
+
+              sm: 12,
+
+              md: 12,
+
+              lg: 3,
+
+              xl: 3
+
+            }}>
+
+            <Stack
+
+              spacing={2}
+
+              direction={{
+
+                xs: 'column',
+
+                sm: 'row',
+
+                md: 'row',
+
+                lg: 'row',
+
+                xl: 'row',
+
+              }}
+
+              justifyContent={{ sm: 'flex-end', lg: 'center' }}
+
+            >
+
+              <Button
+
+                variant="contained"
+
+                color="info"
+
+                sx={{ py: 1 }}
+
+                type="submit"
+
+              >
+
+                Search
+
+              </Button>
+
+              <Button
+
+                variant="contained"
+
+                sx={{ py: 1, color: 'white' }}
+
+                startIcon={
+
+                  showAdvanceFilter ? <FilterAltOffIcon /> : <FilterAltIcon />
+
+                }
+
+                color="secondary"
+
+                onClick={handleChangeShowFilter}
+
+              >
+
+                Advanced Filter
+
+              </Button>
+
+            </Stack>
+
+          </Grid>
+
+        </Grid>
+
+      </Card>
+
+      <Card
+
+        sx={{
+
+          p: 2,
+
+          boxShadow: 3,
+
+          mt: -1,
+
+          display: showAdvanceFilter ? 'block' : 'none',
+
+        }}
+
+      >
+
+        <Grid container spacing={2}>
+
+          <Grid
+
+            size={{
+
+              xs: 12,
+
+              sm: 12,
+
+              md: 12,
+
+              lg: 1,
+
+              xl: 1
+
+            }}>
+
+            <Typography
+
+              variant="subtitle2"
+
+              sx={{ pt: 1, fontSize: 14 }}
+
+              color="GrayText"
+
+            >
+
+              Advanced Filter
+
+            </Typography>
+
+          </Grid>
+
+          <Grid
+
+            size={{
+
+              xs: 12,
+
+              sm: 6,
+
+              md: 4,
+
+              lg: 2,
+
+              xl: 2
+
+            }}>
+
+            <SingleSelectSearchCustom
+
+              name="positionId"
+
+              placeholder="All positions"
+
+              control={control}
+
+              options={allConfig?.positionOptions || []}
+
+            />
+
+          </Grid>
+
+          <Grid
+
+            size={{
+
+              xs: 12,
+
+              sm: 6,
+
+              md: 4,
+
+              lg: 2,
+
+              xl: 2
+
+            }}>
+
+            <SingleSelectSearchCustom
+
+              name="experienceId"
+
+              placeholder="All experience"
+
+              control={control}
+
+              options={allConfig?.experienceOptions || []}
+
+            />
+
+          </Grid>
+
+          <Grid
+
+            size={{
+
+              xs: 12,
+
+              sm: 6,
+
+              md: 4,
+
+              lg: 2,
+
+              xl: 2
+
+            }}>
+
+            <SingleSelectSearchCustom
+
+              name="jobTypeId"
+
+              placeholder="All job types"
+
+              control={control}
+
+              options={allConfig?.jobTypeOptions || []}
+
+            />
+
+          </Grid>
+
+          <Grid
+
+            size={{
+
+              xs: 12,
+
+              sm: 6,
+
+              md: 4,
+
+              lg: 2,
+
+              xl: 2
+
+            }}>
+
+            <SingleSelectSearchCustom
+
+              name="typeOfWorkplaceId"
+
+              placeholder="All workplaces"
+
+              control={control}
+
+              options={allConfig?.typeOfWorkplaceOptions || []}
+
+            />
+
+          </Grid>
+
+          <Grid
+
+            size={{
+
+              xs: 12,
+
+              sm: 6,
+
+              md: 4,
+
+              lg: 2,
+
+              xl: 2
+
+            }}>
+
+            <SingleSelectSearchCustom
+
+              name="genderId"
+
+              placeholder="All genders"
+
+              control={control}
+
+              options={allConfig?.genderOptions || []}
+
+            />
+
+          </Grid>
+
+          <Grid
+
+            size={{
+
+              xs: 12,
+
+              sm: 6,
+
+              md: 4,
+
+              lg: 1,
+
+              xl: 1
+
+            }}>
+
+            <Stack
+
+              direction="row"
+
+              justifyContent={{ xs: 'flex-end', lg: 'center', xl: 'center' }}
+
+            >
+
+              <IconButton
+
+                color="primary"
+
+                aria-label="reset"
+
+                onClick={handleReset}
+
+              >
+
+                <DeleteForeverIcon color="secondary" />
+
+              </IconButton>
+
+              <IconButton
+
+                color="primary"
+
+                aria-label="clear"
+
+                onClick={handleChangeShowFilter}
+
+              >
+
+                <ClearIcon color="error" />
+
+              </IconButton>
+
+            </Stack>
+
+          </Grid>
+
+        </Grid>
+
+      </Card>
+
+    </Box>
+
+  );
+
+};
+
+export default JobPostSearch;

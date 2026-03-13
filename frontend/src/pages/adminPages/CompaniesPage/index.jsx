@@ -1,25 +1,15 @@
 import React, { useState } from 'react';
-import {
-    Box,
-    Paper,
-    TextField,
-    InputAdornment,
-    Pagination,
-    CircularProgress,
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Grid,
-    Typography,
-} from '@mui/material';
+import { Box, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from "@mui/material";
+import { useTranslation } from 'react-i18next';
+import Grid from "@mui/material/Grid2";
+
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useCompanies } from './hooks/useCompanies';
 import CompanyTable from './components/CompanyTable';
 
 const CompaniesPage = () => {
+    const { t } = useTranslation('admin');
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -35,7 +25,6 @@ const CompaniesPage = () => {
         kw: searchTerm
     });
 
-    // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState('add');
     const [currentCompany, setCurrentCompany] = useState(null);
@@ -49,7 +38,6 @@ const CompaniesPage = () => {
         websiteUrl: '',
     });
 
-    // Delete dialog
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleSearch = (e) => {
@@ -144,24 +132,25 @@ const CompaniesPage = () => {
                     onClick={handleOpenAdd}
                     sx={{ borderRadius: '8px', textTransform: 'none' }}
                 >
-                    Thêm công ty
+                    {t('pages.companies.addCompany')}
                 </Button>
             </Box>
-
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
                         size="small"
-                        placeholder="Tìm kiếm công ty..."
+                        placeholder={t('pages.companies.searchPlaceholder')}
                         value={searchTerm}
                         onChange={handleSearch}
                         sx={{ width: 400 }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon fontSize="small" color="action" />
-                                </InputAdornment>
-                            ),
+                        slotProps={{
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon fontSize="small" color="action" />
+                                    </InputAdornment>
+                                ),
+                            }
                         }}
                     />
                 </Box>
@@ -190,17 +179,16 @@ const CompaniesPage = () => {
                     </>
                 )}
             </Paper>
-
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
                 <DialogTitle>
-                    {dialogMode === 'add' ? 'Thêm công ty mới' : 'Chỉnh sửa thông tin công ty'}
+                    {dialogMode === 'add' ? t('pages.companies.addConfirmTitle') : t('pages.companies.editConfirmTitle')}
                 </DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2} sx={{ pt: 1 }}>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <TextField
-                                label="Tên công ty"
+                                label={t('pages.companies.companyNameLabel')}
                                 fullWidth
                                 name="companyName"
                                 value={formData.companyName}
@@ -208,9 +196,9 @@ const CompaniesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
-                                label="Mã số thuế"
+                                label={t('pages.companies.taxCodeLabel')}
                                 fullWidth
                                 name="taxCode"
                                 value={formData.taxCode}
@@ -218,9 +206,9 @@ const CompaniesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
-                                label="Quy mô nhân sự"
+                                label={t('pages.companies.employeeSizeLabel')}
                                 fullWidth
                                 type="number"
                                 name="employeeSize"
@@ -229,9 +217,9 @@ const CompaniesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
-                                label="Email công ty"
+                                label={t('pages.companies.companyEmailLabel')}
                                 fullWidth
                                 name="companyEmail"
                                 value={formData.companyEmail}
@@ -239,9 +227,9 @@ const CompaniesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
-                                label="Số điện thoại"
+                                label={t('pages.companies.companyPhoneLabel')}
                                 fullWidth
                                 name="companyPhone"
                                 value={formData.companyPhone}
@@ -249,9 +237,9 @@ const CompaniesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <TextField
-                                label="Lĩnh vực hoạt động"
+                                label={t('pages.companies.fieldOperationLabel')}
                                 fullWidth
                                 name="fieldOperation"
                                 value={formData.fieldOperation}
@@ -259,9 +247,9 @@ const CompaniesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <TextField
-                                label="Website"
+                                label={t('pages.companies.websiteLabel')}
                                 fullWidth
                                 name="websiteUrl"
                                 value={formData.websiteUrl}
@@ -271,35 +259,31 @@ const CompaniesPage = () => {
                     </Grid>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">Hủy</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.companies.cancelBtn')}</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={isMutating || !formData.companyName || !formData.taxCode}
                     >
-                        {isMutating ? 'Đang lưu...' : 'Lưu lại'}
+                        {isMutating ? t('pages.companies.savingBtn') : t('pages.companies.saveBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
-
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-                <DialogTitle>Xác nhận xóa</DialogTitle>
+                <DialogTitle>{t('pages.companies.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography>
-                        Bạn có chắc chắn muốn xóa công ty <strong>{currentCompany?.companyName}</strong>?
-                        Hành động này không thể hoàn tác và có thể ảnh hưởng đến các tin đăng liên quan.
-                    </Typography>
+                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.companies.deleteText', { name: currentCompany?.companyName }) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Hủy</Button>
+                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.companies.cancelBtn')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Đang xóa...' : 'Xác nhận xóa'}
+                        {isMutating ? t('pages.companies.deletingBtn') : t('pages.companies.deleteBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>

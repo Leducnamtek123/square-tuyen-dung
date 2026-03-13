@@ -1,33 +1,24 @@
 import React from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-    Chip,
-    Typography,
-    IconButton,
-    Tooltip,
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip, Typography, IconButton, Tooltip } from "@mui/material";
+
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from '../../../../configs/dayjs-config';
+import { useTranslation } from 'react-i18next';
 
 const JobActivityTable = ({ data, onEdit, onDelete }) => {
+    const { t } = useTranslation('admin');
     return (
         <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
             <Table sx={{ minWidth: 800 }}>
                 <TableHead sx={{ bgcolor: 'grey.50' }}>
                     <TableRow>
-                        <TableCell>Ứng viên</TableCell>
-                        <TableCell>Tin tuyển dụng</TableCell>
-                        <TableCell>Công ty</TableCell>
-                        <TableCell>Trạng thái</TableCell>
-                        <TableCell>Ngày cập nhật</TableCell>
-                        <TableCell align="right">Thao tác</TableCell>
+                        <TableCell>{t('pages.jobActivity.table.candidate')}</TableCell>
+                        <TableCell>{t('pages.jobActivity.table.jobPost')}</TableCell>
+                        <TableCell>{t('pages.jobActivity.table.company')}</TableCell>
+                        <TableCell>{t('pages.jobActivity.table.status')}</TableCell>
+                        <TableCell>{t('pages.jobActivity.table.updatedAt')}</TableCell>
+                        <TableCell align="right">{t('pages.jobActivity.table.actions')}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -53,12 +44,12 @@ const JobActivityTable = ({ data, onEdit, onDelete }) => {
                             </TableCell>
                             <TableCell>{dayjs(row.updateAt).format('DD/MM/YYYY HH:mm')}</TableCell>
                             <TableCell align="right">
-                                <Tooltip title="Cập nhật trạng thái">
+                                <Tooltip title={t('pages.jobActivity.table.updateStatus')}>
                                     <IconButton size="small" onClick={() => onEdit?.(row)} color="primary">
                                         <EditIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Xóa">
+                                <Tooltip title={t('pages.jobActivity.table.delete')}>
                                     <IconButton size="small" onClick={() => onDelete?.(row)} color="error">
                                         <DeleteIcon fontSize="small" />
                                     </IconButton>
@@ -69,7 +60,7 @@ const JobActivityTable = ({ data, onEdit, onDelete }) => {
                     {(!data || data.length === 0) && (
                         <TableRow>
                             <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
-                                Không tìm thấy dữ liệu
+                                {t('pages.jobActivity.table.noData')}
                             </TableCell>
                         </TableRow>
                     )}

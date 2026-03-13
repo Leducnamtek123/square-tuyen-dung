@@ -1,91 +1,181 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
-import * as React from 'react';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Box, Card, Grid, Stack, Tab, Typography } from '@mui/material';
-
-import { TabTitle } from '../../../utils/generalFunction';
-import CompanyViewedCard from '../../components/jobSeekers/CompanyViewedCard';
-import CompanyFollowedCard from '../../components/jobSeekers/CompanyFollowedCard';
-import SuggestedJobPostCard from '../../components/defaults/SuggestedJobPostCard';
-
-const MyCompanyPage = () => {
-  TabTitle("Trang quản trị Công ty của tôi")
-
-  const [value, setValue] = React.useState('1');
-
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
-
-  return (
-    <Grid container spacing={2}>
-      <Grid xs={12} sm={12} md={7} lg={8} xl={8} item>
-        <Stack spacing={2}>
-          <Card sx={{ p: 1 }}>
-            <Box sx={{ width: '100%', typography: 'body1' }}>
-              <TabContext value={value}>
-                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                  <TabList
-                    onChange={handleChange}
-                    aria-label="my job"
-                    variant="scrollable"
-                    allowScrollButtonsMobile
-                  >
-                    <Tab
-                      label="Nhà tuyển dụng xem hồ sơ"
-                      sx={{ textTransform: 'capitalize'}}
-                      value="1"
-                    />
-                    <Tab
-                      label="Theo dõi công ty"
-                      sx={{ textTransform: 'capitalize' }}
-                      value="2"
-                    />
-                  </TabList>
-                </Box>
-                <TabPanel value="1" sx={{px: {xs: 0, sm: 1, md: 2, lg: 2, xl: 2} }}>
-                  {/* Start: CompanyViewedCard */}
-                  <CompanyViewedCard />
-                  {/* End: CompanyViewedCard */}
-                </TabPanel>
-                <TabPanel value="2" sx={{px: {xs: 0, sm: 1, md: 2, lg: 2, xl: 2} }}>
-                  {/* Start: CompanyFollowedCard */}
-                  <CompanyFollowedCard />
-                  {/* End: CompanyFollowedCard */}
-                </TabPanel>
-              </TabContext>
-            </Box>
-          </Card>
-        </Stack>
-      </Grid>
-      <Grid xs={12} sm={12} md={5} lg={4} xl={4} item>
-        <Stack spacing={2}>
-          <Card  sx={{p: {xs: 1, sm: 1, md: 2, lg: 2, xl: 2} }}> 
-            <Stack>
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="h6">Việc làm phù hợp</Typography>
-              </Box>
-              <Box>
-                {/* Start: SuggestedJobPostCard */}
-                <SuggestedJobPostCard fullWidth={true} />
-                {/* End: SuggestedJobPostCardf */}
-              </Box>
-            </Stack>
-          </Card>
-        </Stack>
-      </Grid>
-    </Grid>
-  );
-};
-
-export default MyCompanyPage;
+import * as React from 'react';
+
+import { TabContext, TabList, TabPanel } from '@mui/lab';
+
+import { Box, Card, Stack, Tab, Typography } from "@mui/material";
+
+import { useTranslation } from 'react-i18next';
+
+import Grid from "@mui/material/Grid2";
+
+import { TabTitle } from '../../../utils/generalFunction';
+
+import CompanyViewedCard from '../../components/jobSeekers/CompanyViewedCard';
+
+import CompanyFollowedCard from '../../components/jobSeekers/CompanyFollowedCard';
+
+import SuggestedJobPostCard from '../../components/defaults/SuggestedJobPostCard';
+
+const MyCompanyPage = () => {
+
+    const { t } = useTranslation('jobSeeker');
+
+    TabTitle(t("myCompany.title"))
+
+    const [value, setValue] = React.useState('1');
+
+    const handleChange = (event, newValue) => {
+
+        setValue(newValue);
+
+    };
+
+    return (
+
+        <Grid container spacing={2}>
+
+            <Grid
+
+                size={{
+
+                    xs: 12,
+
+                    sm: 12,
+
+                    md: 7,
+
+                    lg: 8,
+
+                    xl: 8
+
+                }}>
+
+                <Stack spacing={2}>
+
+                    <Card sx={{ p: 1 }}>
+
+                        <Box sx={{ width: '100%', typography: 'body1' }}>
+
+                            <TabContext value={value}>
+
+                                <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+
+                                    <TabList
+
+                                        onChange={handleChange}
+
+                                        aria-label="my job"
+
+                                        variant="scrollable"
+
+                                        allowScrollButtonsMobile
+
+                                    >
+
+                                        <Tab
+
+                                            label={t("myCompany.tabs.viewed")}
+
+                                            sx={{ textTransform: 'capitalize' }}
+
+                                            value="1"
+
+                                        />
+
+                                        <Tab
+
+                                            label={t("myCompany.tabs.followed")}
+
+                                            sx={{ textTransform: 'capitalize' }}
+
+                                            value="2"
+
+                                        />
+
+                                    </TabList>
+
+                                </Box>
+
+                                <TabPanel value="1" sx={{ px: { xs: 0, sm: 1, md: 2, lg: 2, xl: 2 } }}>
+
+                                    {/* Start: CompanyViewedCard */}
+
+                                    <CompanyViewedCard />
+
+                                    {/* End: CompanyViewedCard */}
+
+                                </TabPanel>
+
+                                <TabPanel value="2" sx={{ px: { xs: 0, sm: 1, md: 2, lg: 2, xl: 2 } }}>
+
+                                    {/* Start: CompanyFollowedCard */}
+
+                                    <CompanyFollowedCard />
+
+                                    {/* End: CompanyFollowedCard */}
+
+                                </TabPanel>
+
+                            </TabContext>
+
+                        </Box>
+
+                    </Card>
+
+                </Stack>
+
+            </Grid>
+
+            <Grid
+
+                size={{
+
+                    xs: 12,
+
+                    sm: 12,
+
+                    md: 5,
+
+                    lg: 4,
+
+                    xl: 4
+
+                }}>
+
+                <Stack spacing={2}>
+
+                    <Card sx={{ p: { xs: 1, sm: 1, md: 2, lg: 2, xl: 2 } }}>
+
+                        <Stack>
+
+                            <Box sx={{ mb: 2 }}>
+
+                                <Typography variant="h6">{t("jobManagement.suitableJobs")}</Typography>
+
+                            </Box>
+
+                            <Box>
+
+                                {/* Start: SuggestedJobPostCard */}
+
+                                <SuggestedJobPostCard fullWidth={true} />
+
+                                {/* End: SuggestedJobPostCardf */}
+
+                            </Box>
+
+                        </Stack>
+
+                    </Card>
+
+                </Stack>
+
+            </Grid>
+
+        </Grid>
+
+    );
+
+};
+
+export default MyCompanyPage;

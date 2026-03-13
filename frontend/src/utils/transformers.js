@@ -1,14 +1,6 @@
-/*
+import i18n from '../i18n';
 
-MyJob Recruitment System - Part of MyJob Platform
-
-
-
-Author: Antigravity (Google DeepMind)
-
-*/
-
-
+const t = (key, options) => i18n.t(key, options);
 
 /**
 
@@ -17,8 +9,6 @@ Author: Antigravity (Google DeepMind)
  * This ensures consistency and avoids "undefined" checks scattered across components.
 
  */
-
-
 
 export const transformQuestion = (q) => {
 
@@ -30,7 +20,7 @@ export const transformQuestion = (q) => {
 
         text: q.text || q.questionText || q.content || '',
 
-        category: q.category || 'Chưa phân loại',
+        category: q.category || t('common:labels.uncategorized'),
 
         question_type: q.question_type || q.type || 'TEXT',
 
@@ -45,8 +35,6 @@ export const transformQuestion = (q) => {
     };
 
 };
-
-
 
 export const transformQuestionGroup = (group) => {
 
@@ -70,8 +58,6 @@ export const transformQuestionGroup = (group) => {
 
 };
 
-
-
 export const transformInterviewSession = (session) => {
 
     if (!session) return null;
@@ -88,26 +74,41 @@ export const transformInterviewSession = (session) => {
 
         candidateEmail: session.candidate_email || session.candidate_dict?.email || session.jobSeekerDict?.email || '',
 
+        candidate_email: session.candidate_email || session.candidate_dict?.email || session.jobSeekerDict?.email || '',
+
         jobName: session.job_name || session.job_post_name || session.job_post_dict?.jobName || session.jobPostDict?.jobName || '',
 
         scheduledAt: session.scheduled_at || session.startTime || '',
+
         status: session.status || 'PENDING',
+
         interview_type: session.interview_type || session.interviewType || null,
+
+        type: session.type || session.interview_type || session.interviewType || null,
+
         inviteToken: session.invite_token || session.inviteToken || null,
+
         notes: session.notes || '',
+
         questions: (session.questions || []).map(transformQuestion),
 
         ...session,
 
         candidateName: session.candidate_name || session.candidate_dict?.fullName || session.jobSeekerDict?.fullName || '',
+
+        candidateEmail: session.candidate_email || session.candidate_dict?.email || session.jobSeekerDict?.email || '',
+
+        candidate_email: session.candidate_email || session.candidate_dict?.email || session.jobSeekerDict?.email || '',
+
         jobName: session.job_name || session.job_post_name || session.job_post_dict?.jobName || session.jobPostDict?.jobName || '',
+
         scheduledAt: session.scheduled_at || session.startTime || '',
+
         inviteToken: session.invite_token || session.inviteToken || null,
+
     };
+
 };
-
-
-
 
 export const transformJobPost = (job) => {
 
@@ -138,8 +139,6 @@ export const transformJobPost = (job) => {
     };
 
 };
-
-
 
 export const transformAppliedResume = (resume) => {
 
@@ -176,4 +175,3 @@ export const transformAppliedResume = (resume) => {
     };
 
 };
-

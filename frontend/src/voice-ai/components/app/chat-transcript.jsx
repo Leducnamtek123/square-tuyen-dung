@@ -1,4 +1,6 @@
-import { AnimatePresence, motion } from 'motion/react';
+import React from 'react';
+import { motion } from 'motion/react';
+import { Virtuoso } from 'react-virtuoso';
 import { ChatEntry } from '@/voice-ai/components/livekit/chat-entry';
 import { cn } from '@/voice-ai/lib/utils';
 
@@ -24,29 +26,55 @@ const CONTAINER_MOTION_PROPS = {
   },
 };
 
-export function ChatTranscript({ hidden = false, messages = [], className, ...props }) {
-  const entries = messages.map((message) => {
-    const locale = message?.from?.isLocal ? 'you' : 'assistant';
+const Scroller = React.forwardRef(function Scroller({ className, itemKey, ...props }, ref) {
+  return (
+    <div
+      ref={ref}
+      className={cn('overflow-y-auto px-4 pt-36 pb-[180px] md:px-6 md:pb-[220px]', className)}
+      {...props}
+    />
+  );
+});
 
-    return (
-      <ChatEntry
-        key={message?.id}
-        locale={locale}
-        message={message?.message ?? ''}
-        timestamp={message?.timestamp ?? Date.now()}
-        name={message?.from?.name ?? undefined}
-        className={cn(hidden && 'opacity-0 pointer-events-none')}
-      />
-    );
-  });
+const List = React.forwardRef(function List({ className, itemKey, ...props }, ref) {
+  return <ul ref={ref} className={cn('flex flex-col gap-4', className)} {...props} />;
+});
+
+export const ChatTranscript = React.memo(function ChatTranscript({
+  messages = [],
+  listClassName,
+  followOutput,
+  ...props
+}) {
+  if (messages.length === 0) {
+    return null;
+  }
 
   return (
-    <AnimatePresence>
-      {messages.length > 0 && (
-        <MotionContainer {...CONTAINER_MOTION_PROPS} {...props}>
-          <ul className={cn('flex flex-col gap-4', className)}>{entries}</ul>
-        </MotionContainer>
-      )}
-    </AnimatePresence>
+    <MotionContainer {...CONTAINER_MOTION_PROPS} {...props}>
+      <Virtuoso
+        data={messages}
+        itemContent={(index, message) => {
+          const locale = message?.from?.isLocal ? 'you' : 'assistant';
+          return (
+            <ChatEntry
+              key={message?.id}
+              locale={locale}
+              message={message?.message ?? ''}
+              timestamp={message?.timestamp ?? Date.now()}
+              name={message?.from?.name ?? undefined}
+            />
+          );
+        }}
+        itemKey={(index) => messages[index]?.id ?? index}
+        followOutput={followOutput}
+        components={{
+          Scroller,
+          List: React.forwardRef(function ChatList(listProps, ref) {
+            return <List ref={ref} {...listProps} className={cn(listProps.className, listClassName)} />;
+          }),
+        }}
+      />
+    </MotionContainer>
   );
-}
+});

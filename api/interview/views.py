@@ -22,16 +22,19 @@ from .serializers import (
 )
 from .livekit_service import LiveKitService
 
-
-# ============================================================
-# Question ViewSet
-# ============================================================
+def _get_session_questions(session: InterviewSession):
+    questions = session.questions.all()
+    if questions.exists():
+        return questions
+    if session.question_group_id:
+        return session.question_group.questions.all()
+    return questions
 
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_fields = ['category', 'career', 'difficulty']
+    filterset_fields = ['career', 'difficulty']
     search_fields = ['text']
     ordering_fields = ['sort_order', 'create_at']
 
@@ -39,7 +42,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
         user = self.request.user
         qs = super().get_queryset()
         role = getattr(user, 'role_name', None)
-        
+
         if role == 'EMPLOYER' and hasattr(user, 'company') and user.company:
             from django.db.models import Q
             return qs.filter(Q(company__isnull=True) | Q(company=user.company))
@@ -52,11 +55,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
             serializer.save(author=user, company=user.company)
         else:
             serializer.save(author=user)
-
-
-# ============================================================
-# QuestionGroup ViewSet
-# ============================================================
 
 class QuestionGroupViewSet(viewsets.ModelViewSet):
     queryset = QuestionGroup.objects.prefetch_related('questions').all()
@@ -69,7 +67,7 @@ class QuestionGroupViewSet(viewsets.ModelViewSet):
         user = self.request.user
         qs = super().get_queryset()
         role = getattr(user, 'role_name', None)
-        
+
         if role == 'EMPLOYER' and hasattr(user, 'company') and user.company:
             from django.db.models import Q
             return qs.filter(Q(company__isnull=True) | Q(company=user.company))
@@ -83,23 +81,18 @@ class QuestionGroupViewSet(viewsets.ModelViewSet):
         else:
             serializer.save(author=user)
 
-
-# ============================================================
-# InterviewSession ViewSet
-# ============================================================
-
 class InterviewSessionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         base_qs = InterviewSession.objects.select_related(
             'candidate', 'job_post', 'created_by', 'question_group'
         ).prefetch_related('questions', 'transcripts', 'evaluations')
-        
+
         if user.is_anonymous:
             return base_qs.none()
-            
+
         role = getattr(user, 'role_name', None)
-        
+
         if role == 'JOB_SEEKER':
             return base_qs.filter(candidate=user)
         elif role == 'EMPLOYER':
@@ -107,7 +100,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
             if hasattr(user, 'company') and user.company:
                  return base_qs.filter(Q(job_post__company=user.company) | Q(created_by=user)).distinct()
             return base_qs.filter(created_by=user)
-        
+
         # Admin or other roles can see all
         return base_qs.all()
 
@@ -182,18 +175,19 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+        questions = _get_session_questions(session)
         context_data = {
             "candidateName": session.candidate.full_name,
             "candidateEmail": session.candidate.email,
             "jobTitle": session.job_post.job_name if session.job_post else None,
-            "questions": [{"text": q.text, "category": q.category} for q in session.questions.all()],
+            "questions": [{"text": q.text} for q in questions],
             "interviewType": session.type,
         }
         return Response(context_data)
 
     # PATCH /sessions/{room_name}/status/ — cập nhật trạng thái
     @action(detail=False, methods=['patch'], url_path='(?P<room_name>[^/.]+)/status',
-            permission_classes=[permissions.AllowAny])
+            permission_classes=[permissions.IsAuthenticated])
     def update_status(self, request, room_name=None):
         """Cập nhật trạng thái (cho Agent hoặc Frontend)."""
         try:
@@ -209,6 +203,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
 
         new_status = serializer.validated_data['status']
         session.status = new_status
+        was_started = session.start_time is not None
 
         from django.utils import timezone as tz
         if new_status == 'in_progress' and not session.start_time:
@@ -224,12 +219,21 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         if new_status == 'completed':
             from .tasks import evaluate_interview_session
             evaluate_interview_session.delay(session.id)
-            
+
+        # Enforce maximum duration once per session start
+        if new_status == 'in_progress' and not was_started:
+            from .tasks import end_interview_session
+            from django.conf import settings as dj_settings
+            end_interview_session.apply_async(
+                args=[session.id, "max_duration"],
+                countdown=int(getattr(dj_settings, "INTERVIEW_MAX_DURATION_SECONDS", 1800)),
+            )
+
         return Response({"status": new_status})
 
     # POST /sessions/{room_name}/append-transcription/
     @action(detail=False, methods=['post'], url_path='(?P<room_name>[^/.]+)/append-transcription',
-            permission_classes=[permissions.AllowAny])
+            permission_classes=[permissions.IsAuthenticated])
     def append_transcription(self, request, room_name=None):
         """Agent gửi transcript hội thoại."""
         try:
@@ -251,11 +255,6 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
             InterviewTranscriptSerializer(transcript).data,
             status=status.HTTP_201_CREATED
         )
-
-
-# ============================================================
-# InterviewEvaluation ViewSet
-# ============================================================
 
 class InterviewEvaluationViewSet(viewsets.ModelViewSet):
     queryset = InterviewEvaluation.objects.select_related('interview', 'evaluator').all()

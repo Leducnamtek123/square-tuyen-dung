@@ -1,30 +1,10 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
-
-
 import React from 'react';
 
 import { useSelector } from 'react-redux';
 
-import { Box, Chip, IconButton, TableBody, TableCell, Tooltip } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+
+import { Box, Chip, IconButton, Tooltip } from "@mui/material";
 
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 
@@ -32,27 +12,23 @@ import dayjs from 'dayjs';
 
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 
-
-
 import DataTable from '../../../../components/DataTable';
 
 import { JOB_POST_STATUS_BG_COLOR } from '../../../../configs/constants';
 
-
-
 const JobPostsTable = (props) => {
 
-  const { rows, isLoading, count, page, rowsPerPage, order, orderBy, handleRequestSort, handleChangePage, handleChangeRowsPerPage, handleDelete, handleUpdate } = props;
+  const { t } = useTranslation('employer');
+
+  const { rows, isLoading, count, page, rowsPerPage, handleChangePage, handleChangeRowsPerPage, handleDelete, handleUpdate } = props;
 
   const { allConfig } = useSelector((state) => state.config);
-
-
 
   const columns = React.useMemo(() => [
 
     {
 
-      header: 'Tên tin đăng',
+      header: t('jobPost.table.jobTitle'),
 
       accessorKey: 'jobName',
 
@@ -66,7 +42,7 @@ const JobPostsTable = (props) => {
 
             <Chip
 
-              label="Tuyển gấp"
+              label={t('jobPost.urgent')}
 
               color="error"
 
@@ -88,7 +64,7 @@ const JobPostsTable = (props) => {
 
     {
 
-      header: 'Ngày đăng',
+      header: t('jobPost.table.postDate'),
 
       accessorKey: 'createAt',
 
@@ -98,7 +74,7 @@ const JobPostsTable = (props) => {
 
     {
 
-      header: 'Thời hạn nộp',
+      header: t('jobPost.table.deadline'),
 
       accessorKey: 'deadline',
 
@@ -116,7 +92,7 @@ const JobPostsTable = (props) => {
 
     {
 
-      header: 'Lượt nộp',
+      header: t('jobPost.table.applications'),
 
       accessorKey: 'appliedNumber',
 
@@ -124,7 +100,7 @@ const JobPostsTable = (props) => {
 
     {
 
-      header: 'Lượt xem',
+      header: t('jobPost.table.views'),
 
       accessorKey: 'views',
 
@@ -132,7 +108,7 @@ const JobPostsTable = (props) => {
 
     {
 
-      header: 'Trạng thái',
+      header: t('jobPost.table.status'),
 
       accessorKey: 'status',
 
@@ -162,13 +138,14 @@ const JobPostsTable = (props) => {
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
 
-          <Tooltip title="Cập nhật" arrow>
+          <Tooltip title={t('jobPost.tooltips.update')} arrow>
 
             <IconButton
 
               color="secondary"
 
               onClick={() => handleUpdate(row.original.slug || row.original.id)}
+
             >
 
               <EditOutlinedIcon />
@@ -177,13 +154,14 @@ const JobPostsTable = (props) => {
 
           </Tooltip>
 
-          <Tooltip title="Xóa" arrow>
+          <Tooltip title={t('jobPost.tooltips.delete')} arrow>
 
             <IconButton
 
               color="error"
 
               onClick={() => handleDelete(row.original.slug || row.original.id)}
+
             >
 
               <DeleteOutlineOutlinedIcon />
@@ -198,9 +176,7 @@ const JobPostsTable = (props) => {
 
     },
 
-  ], [allConfig, handleDelete, handleUpdate]);
-
-
+  ], [allConfig, handleDelete, handleUpdate, t]);
 
   return (
 
@@ -222,7 +198,7 @@ const JobPostsTable = (props) => {
 
       onRowsPerPageChange={handleChangeRowsPerPage}
 
-      emptyMessage="Bạn chưa có tin tuyển dụng nào"
+      emptyMessage={t('jobPost.noData')}
 
     />
 
@@ -230,7 +206,4 @@ const JobPostsTable = (props) => {
 
 };
 
-
-
 export default JobPostsTable;
-

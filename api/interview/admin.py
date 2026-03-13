@@ -8,18 +8,15 @@ from .models import (
     InterviewSession, InterviewTranscript, InterviewEvaluation
 )
 
-
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ['id', 'text_short', 'category', 'sort_order', 'author', 'create_at']
-    list_filter = ['category']
+    list_display = ['id', 'text_short', 'sort_order', 'author', 'create_at']
     search_fields = ['text']
     ordering = ['sort_order', '-create_at']
 
     def text_short(self, obj):
         return obj.text[:80] if obj.text else ''
     text_short.short_description = 'Nội dung'
-
 
 @admin.register(QuestionGroup)
 class QuestionGroupAdmin(admin.ModelAdmin):
@@ -31,17 +28,14 @@ class QuestionGroupAdmin(admin.ModelAdmin):
         return obj.questions.count()
     questions_count.short_description = 'Số câu hỏi'
 
-
 class TranscriptInline(admin.TabularInline):
     model = InterviewTranscript
     extra = 0
     readonly_fields = ['speaker_role', 'content', 'speech_duration_ms', 'create_at']
 
-
 class EvaluationInline(admin.StackedInline):
     model = InterviewEvaluation
     extra = 0
-
 
 @admin.register(InterviewSession)
 class InterviewSessionAdmin(admin.ModelAdmin):
@@ -54,7 +48,6 @@ class InterviewSessionAdmin(admin.ModelAdmin):
     readonly_fields = ['room_name', 'invite_token']
     inlines = [TranscriptInline, EvaluationInline]
 
-
 @admin.register(InterviewTranscript)
 class InterviewTranscriptAdmin(admin.ModelAdmin):
     list_display = ['id', 'interview', 'speaker_role', 'content_short', 'create_at']
@@ -63,7 +56,6 @@ class InterviewTranscriptAdmin(admin.ModelAdmin):
     def content_short(self, obj):
         return obj.content[:80] if obj.content else ''
     content_short.short_description = 'Nội dung'
-
 
 @admin.register(InterviewEvaluation)
 class InterviewEvaluationAdmin(admin.ModelAdmin):

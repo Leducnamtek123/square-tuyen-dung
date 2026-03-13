@@ -1,31 +1,8 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
-
-
 import React from "react";
 
 import { Box, Stack, CircularProgress, Typography } from "@mui/material";
 
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
-
 
 import {
 
@@ -49,14 +26,11 @@ import {
 
 import { Line } from "react-chartjs-2";
 
-
-
-
 import statisticService from "../../../../services/statisticService";
 
 import defaultTheme from "../../../../themeConfigs/defaultTheme";
 
-
+import { useTranslation } from "react-i18next";
 
 ChartJS.register(
 
@@ -148,15 +122,13 @@ export const options = {
 
 };
 
-
-
 const ActivityChart = () => {
+
+  const { t } = useTranslation("jobSeeker");
 
   const [isLoading, setIsLoading] = React.useState(true);
 
   const [data, setData] = React.useState([]);
-
-
 
   React.useEffect(() => {
 
@@ -185,8 +157,6 @@ const ActivityChart = () => {
     statistics();
 
   }, []);
-
-
 
   const dataOptions = React.useMemo(() => {
 
@@ -266,13 +236,9 @@ const ActivityChart = () => {
 
     };
 
-
-
     return d;
 
   }, [data]);
-
-
 
   return (
 
@@ -305,10 +271,15 @@ const ActivityChart = () => {
           ) : data.length === 0 ? (
 
             <Stack alignItems="center" spacing={1}>
+
               <InsertChartOutlinedIcon sx={{ fontSize: 42, color: "text.secondary" }} />
+
               <Typography variant="body2" color="text.secondary">
-                Khong co du lieu de thong ke
+
+                {t('noDataForStatistics')}
+
               </Typography>
+
             </Stack>
 
           ) : (
@@ -327,7 +298,4 @@ const ActivityChart = () => {
 
 };
 
-
-
 export default ActivityChart;
-

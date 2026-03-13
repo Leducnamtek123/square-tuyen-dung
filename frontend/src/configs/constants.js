@@ -1,20 +1,13 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
 import dayjs from './dayjs-config';
+
 import DeveloperBoardIcon from "@mui/icons-material/DeveloperBoard";
+
 import DevicesIcon from "@mui/icons-material/Devices";
 
 // Import SVG files
+
 import emptyDataSvg from "../assets/images/svg-images/empty-data.svg";
+
 import onlineGallerySvg from "../assets/images/svg-images/online-gallery.svg";
 
 import emptyStreetSvg from "../assets/images/svg-images/empty-street.svg";
@@ -42,8 +35,6 @@ import opinionSvg from "../assets/images/svg-images/opinion.svg";
 import letterSvg from "../assets/images/svg-images/letter.svg";
 
 import sadSvg from "../assets/images/svg-images/sad.svg";
-
-
 
 // Import các assets
 
@@ -93,21 +84,11 @@ import star4 from "../assets/images/feedbacks/4star.gif";
 
 import star5 from "../assets/images/feedbacks/5star.gif";
 
-
-
-
-
 const ENV = import.meta.env.VITE_NODE_ENV || "development";
-
-
 
 const PLATFORM = "WEB";
 
-
-
 const APP_NAME = "Square";
-
-
 
 const HOST_NAME = {
 
@@ -119,8 +100,6 @@ const HOST_NAME = {
 
 };
 
-
-
 const AUTH_PROVIDER = {
 
   FACEBOOK: "facebook",
@@ -128,8 +107,6 @@ const AUTH_PROVIDER = {
   GOOGLE: "google-oauth2",
 
 };
-
-
 
 const AUTH_CONFIG = {
 
@@ -144,12 +121,11 @@ const AUTH_CONFIG = {
   ACCESS_TOKEN_KEY: "access_token",
 
   REFRESH_TOKEN_KEY: "refresh_token",
+  REFRESH_TOKEN_GRANT: "refresh_token",
 
   PASSWORD_KEY: "password",
 
   CONVERT_TOKEN_KEY: "convert_token",
-
-
 
   // FACEBOOK AUTH
 
@@ -157,21 +133,13 @@ const AUTH_CONFIG = {
 
   FACEBOOK_CLIENT_SECRET: import.meta.env.VITE_FACEBOOK_CLIENT_SECRET,
 
-
-
   // GOOGLE AUTH
 
   GOOGLE_CLIENT_ID: import.meta.env.VITE_GOOGLE_CLIENT_ID || "dummy-google-client-id",
 
   GOOGLE_CLIENT_SECRET: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
 
-
-
-  // GOONG
-
   GOONGAPI_KEY: import.meta.env.VITE_GOONGAPI_KEY,
-
-
 
   // Dialogflow chatbot
 
@@ -194,10 +162,9 @@ const AUTH_CONFIG = {
     CHAT_ICON: employerChatbotIcon,
 
   },
+  BOT_RENDER_MODE: import.meta.env.VITE_BOT_RENDER_MODE || "chat",
 
 };
-
-
 
 const ROLES_NAME = {
 
@@ -209,7 +176,11 @@ const ROLES_NAME = {
 
 };
 
+const PAGINATION = {
 
+  ADMIN_MAX_PAGE_SIZE: 10000,
+
+};
 
 const HOME_FILTER_CAREER = [
 
@@ -217,7 +188,7 @@ const HOME_FILTER_CAREER = [
 
     id: 34,
 
-    name: "IT - Phần mềm",
+    name: "IT - Software",
 
     titleIcon: DevicesIcon
 
@@ -227,15 +198,13 @@ const HOME_FILTER_CAREER = [
 
     id: 33,
 
-    name: "IT - Phần cứng/Mạng",
+    name: "IT - Hardware/Networking",
 
     titleIcon: DeveloperBoardIcon
 
   },
 
 ];
-
-
 
 const REGEX_VATIDATE = {
 
@@ -244,14 +213,9 @@ const REGEX_VATIDATE = {
     /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/,
 
   urlRegExp:
-
-    // eslint-disable-next-line no-useless-escape
-
     /^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+$/,
 
 };
-
-
 
 const CV_TYPES = {
 
@@ -260,8 +224,6 @@ const CV_TYPES = {
   cvUpload: "UPLOAD",
 
 };
-
-
 
 const DATE_OPTIONS = {
 
@@ -275,20 +237,27 @@ const DATE_OPTIONS = {
 
 };
 
-
-
 const IMAGES = {
+
   getLogo: (mode = 'dark') => {
+
     return mode === 'light'
+
       ? '/square-icons/logo square svg-white.svg'
+
       : '/square-icons/logo square svg-black.svg';
-  },
-  getTextLogo: (mode = 'dark') => {
-    return mode === 'light'
-      ? '/square-icons/logo square svg-white.svg'
-      : '/square-icons/logo square svg-black.svg';
+
   },
 
+  getTextLogo: (mode = 'dark') => {
+
+    return mode === 'light'
+
+      ? '/square-icons/logo square svg-white.svg'
+
+      : '/square-icons/logo square svg-black.svg';
+
+  },
 
   coverImageDefault,
 
@@ -299,8 +268,6 @@ const IMAGES = {
   notificationImageDefault,
 
 };
-
-
 
 const ABOUT_IMAGES = {
 
@@ -313,8 +280,6 @@ const ABOUT_IMAGES = {
   PROFILE: profileImg,
 
 };
-
-
 
 const ICONS = {
 
@@ -338,8 +303,6 @@ const ICONS = {
 
 };
 
-
-
 const LINKS = {
 
   CHPLAY_LINK: "https://play.google.com/store/",
@@ -362,15 +325,11 @@ const LINKS = {
 
 };
 
-
-
 const LOADING_IMAGES = {
 
   LOADING_SPINNER: loadingSpinner,
 
 };
-
-
 
 const FEEDBACK_IMAGES = {
 
@@ -386,15 +345,11 @@ const FEEDBACK_IMAGES = {
 
 };
 
-
-
 const LOGO_IMAGES = {
 
   LOGO_WITH_BG: "/square-icons/logo.svg",
 
 };
-
-
 
 const BANNER_TYPES = {
 
@@ -403,8 +358,6 @@ const BANNER_TYPES = {
   MAIN_JOB_RIGHT: "MAIN_JOB_RIGHT",
 
 };
-
-
 
 const JOB_POST_STATUS_BG_COLOR = {
 
@@ -415,8 +368,6 @@ const JOB_POST_STATUS_BG_COLOR = {
   3: "success",
 
 };
-
-
 
 const ROUTES = {
 
@@ -513,21 +464,37 @@ const ROUTES = {
     NOTIFICATION: "thong-bao",
 
     ACCOUNT: "tai-khoan",
+
     SETTING: "cai-dat",
+
     CHAT: "ket-noi-voi-ung-vien",
+
     INTERVIEW_LIST: "danh-sach-phong-van",
+
     INTERVIEW_LIVE: "phong-van-ung-vien-truc-tiep",
+
     INTERVIEW_CREATE: "len-lich-phong-van",
+
     INTERVIEW_DETAIL: "chi-tiet-phong-van/:id",
+
     QUESTION_BANK: "ngan-hang-cau-hoi",
+
     QUESTION_GROUPS: "bo-cau-hoi",
+
     VERIFICATION: "xac-thuc-nha-tuyen-dung",
+
   },
+
   CANDIDATE: {
+
     LOGIN: "phong-van/dang-nhap",
+
     INTERVIEW: "phong-van/:id",
+
     INTERVIEW_ROOM: "phong-van/room/:id",
+
   },
+
   ADMIN: {
 
     DASHBOARD: "",
@@ -559,13 +526,12 @@ const ROUTES = {
     JOB_ACTIVITY: "nhat-ky-tin-tuyen-dung",
 
     JOB_NOTIFICATIONS: "thong-bao-viec-lam",
+
     INTERVIEW_LIVE: "phong-van-cong-ty-truc-tiep",
 
   },
 
 };
-
-
 
 // SVG components
 
@@ -603,8 +569,6 @@ const SVG_IMAGES = {
 
 };
 
-
-
 export {
 
   ENV,
@@ -620,6 +584,8 @@ export {
   AUTH_CONFIG,
 
   ROLES_NAME,
+
+  PAGINATION,
 
   HOME_FILTER_CAREER,
 
@@ -652,5 +618,3 @@ export {
   SVG_IMAGES,
 
 };
-
-

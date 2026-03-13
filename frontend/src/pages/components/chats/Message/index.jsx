@@ -1,88 +1,121 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
 import React from "react";
+
 import { Box, Typography, Avatar } from "@mui/material";
 
 import { ChatContext } from "../../../../context/ChatProvider";
+
 import { formatMessageDate } from "../../../../utils/dateHelper";
+
 import defaultTheme from "../../../../themeConfigs/defaultTheme";
 
 const Message = ({ userId, text, avatarUrl, createdAt }) => {
+
   const { currentUserChat } = React.useContext(ChatContext);
+
   const isMe = `${currentUserChat?.userId}` === `${userId}`;
 
   return (
+
     <Box
+
       sx={{
+
         display: "flex",
+
         flexDirection: "row",
+
         alignSelf: isMe ? "flex-end" : "flex-start",
+
         justifyContent: isMe ? "flex-end" : "flex-start",
+
         maxWidth: "80%",
+
         mb: 2,
+
       }}
+
     >
+
       {!isMe && (
+
         <Avatar
+
           src={avatarUrl}
+
           alt="avatar 1"
+
           sx={{ width: 50, height: 50, mr: 2 }}
+
         />
+
       )}
+
       <Box sx={{ display: "flex", flexDirection: "column", alignItems: isMe ? "flex-end" : "flex-start" }}>
+
         <Typography
+
           variant="body2"
+
           sx={{
+
             p: 1.5,
+
             mb: 0.5,
+
             color: isMe ? "white" : defaultTheme.palette.grey[800],
+
             backgroundColor: isMe ? "#441da0" : defaultTheme.palette.grey[300],
+
             borderTopLeftRadius: 6,
+
             borderTopRightRadius: 6,
+
             borderBottomLeftRadius: isMe ? 6 : 0,
+
             borderBottomRightRadius: isMe ? 0 : 6,
+
             whiteSpace: "pre-wrap",
+
             wordBreak: "break-word",
+
           }}
+
         >
+
           {text}
+
         </Typography>
+
         <Typography variant="caption" color="text.secondary">
+
           {createdAt?.seconds
+
             ? formatMessageDate(createdAt?.seconds * 1000)
+
             : "Đang gửi ..."}
+
         </Typography>
+
       </Box>
+
       {isMe && (
+
         <Avatar
+
           src={avatarUrl}
+
           alt="avatar 1"
+
           sx={{ width: 50, height: 50, ml: 2 }}
+
         />
+
       )}
+
     </Box>
+
   );
+
 };
 
 export default Message;

@@ -1,18 +1,9 @@
-"""
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-"""
 
 from configs import variable_system as var_sys
 from configs.messages import ERROR_MESSAGES
 from helpers import helper
 from rest_framework import serializers
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.validators import UniqueValidator
 from django.conf import settings
 from django.db import transaction
@@ -26,12 +17,10 @@ from common.models import Location, File
 from common.serializers import LocationSerializer
 from helpers.cloudinary_service import CloudinaryService
 
-
 class CheckCredsSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, max_length=100)
     roleName = serializers.CharField(required=False, max_length=10,
                                      allow_null=True, allow_blank=True)
-
 
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, max_length=100)
@@ -41,7 +30,6 @@ class ForgotPasswordSerializer(serializers.Serializer):
         if platform not in ["WEB", "APP"]:
             raise serializers.ValidationError(ERROR_MESSAGES['INVALID_PLATFORM'])
         return platform
-
 
 class UpdatePasswordSerializer(serializers.Serializer):
     oldPassword = serializers.CharField(required=True, max_length=128)
@@ -66,7 +54,6 @@ class UpdatePasswordSerializer(serializers.Serializer):
         instance.save()
 
         return instance
-
 
 class ResetPasswordSerializer(serializers.Serializer):
     newPassword = serializers.CharField(required=True, max_length=128)
@@ -103,7 +90,6 @@ class ResetPasswordSerializer(serializers.Serializer):
                 raise serializers.ValidationError({'token': ERROR_MESSAGES['TOKEN_REQUIRED']})
         return attrs
 
-
 class JobSeekerRegisterSerializer(serializers.Serializer):
     fullName = serializers.CharField(source="full_name", required=True, max_length=100)
     email = serializers.EmailField(required=True, max_length=100,
@@ -133,12 +119,11 @@ class JobSeekerRegisterSerializer(serializers.Serializer):
                 return user
         except Exception as ex:
             helper.print_log_error("create user in JobSeekerRegisterSerializer", ex)
-            return None
+            raise
 
     class Meta:
         model = User
         fields = ("fullName", "email", "password", "confirmPassword", "platform")
-
 
 class CompanyRegisterSerializer(serializers.ModelSerializer):
     companyName = serializers.CharField(source="company_name", required=True, max_length=255,
@@ -176,7 +161,6 @@ class CompanyRegisterSerializer(serializers.ModelSerializer):
                   "websiteUrl", "description",
                   "location")
 
-
 class EmployerRegisterSerializer(serializers.Serializer):
     company = CompanyRegisterSerializer()
     fullName = serializers.CharField(source="full_name", required=True, max_length=100)
@@ -209,58 +193,75 @@ class EmployerRegisterSerializer(serializers.Serializer):
                 return user
         except Exception as ex:
             helper.print_log_error("create user in JobSeekerRegisterSerializer", ex)
-            return None
+            raise
 
     class Meta:
         model = User
         fields = ("fullName", "email", "password", "confirmPassword", "company", "platform")
 
-
 class UserSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField()
-    fullName = serializers.CharField(source="full_name")
-    email = serializers.CharField()
+    fullName = serializers.CharField(source="full_name", required=False, allow_blank=True)
+    email = serializers.EmailField(read_only=True)
     avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
-    isActive = serializers.BooleanField(source='is_active')
-    isVerifyEmail = serializers.BooleanField(source='is_verify_email')
-    roleName = serializers.CharField(source="role_name")
-    jobSeekerProfileId = serializers.PrimaryKeyRelatedField(source='job_seeker_profile',
-                                                            read_only=True)
+    isActive = serializers.BooleanField(source='is_active', read_only=True)
+    isVerifyEmail = serializers.BooleanField(source='is_verify_email', read_only=True)
+    roleName = serializers.ChoiceField(source="role_name", choices=var_sys.ROLE_CHOICES, required=False)
+    jobSeekerProfileId = serializers.SerializerMethodField(method_name="get_job_seeker_profile_id", read_only=True)
     jobSeekerProfile = serializers.SerializerMethodField(method_name="get_job_seeker_profile", read_only=True)
-    companyId = serializers.PrimaryKeyRelatedField(source='company', read_only=True)
-    company = serializers.SerializerMethodField(method_name='get_company')
+    companyId = serializers.SerializerMethodField(method_name="get_company_id", read_only=True)
+    company = serializers.SerializerMethodField(method_name="get_company", read_only=True)
     
     def get_avatar_url(self, user):
-        if user.avatar:
-            return user.avatar.get_full_url()
+        try:
+            avatar = getattr(user, 'avatar', None)
+            if avatar:
+                return avatar.get_full_url()
+        except Exception as ex:
+            helper.print_log_error("UserSerializer.get_avatar_url", ex)
         return var_sys.AVATAR_DEFAULT["AVATAR"]
 
+    def _get_job_seeker_profile_safe(self, user):
+        if getattr(user, 'role_name', None) != var_sys.JOB_SEEKER:
+            return None
+        try:
+            return JobSeekerProfile.objects.only("id", "phone").filter(user=user).first()
+        except Exception as ex:
+            helper.print_log_error("UserSerializer._get_job_seeker_profile_safe", ex)
+            return None
+
     def get_job_seeker_profile(self, user):
-        if user.role_name == var_sys.JOB_SEEKER:
-            job_seeker_profile = getattr(user, 'job_seeker_profile', None)
-            if not job_seeker_profile:
-                return None
+        profile = self._get_job_seeker_profile_safe(user)
+        if profile:
             return {
-                "id": job_seeker_profile.id,
-                "phone": job_seeker_profile.phone
+                "id": profile.id,
+                "phone": profile.phone
             }
         return None
+
+    def get_job_seeker_profile_id(self, user):
+        profile = self._get_job_seeker_profile_safe(user)
+        return profile.id if profile else None
 
     def get_company(self, user):
-        if user.role_name == var_sys.EMPLOYER:
+        if getattr(user, 'role_name', None) == var_sys.EMPLOYER:
             company = getattr(user, 'company', None)
-            if not company:
-                return None
-            company_logo = getattr(company, 'logo', None)
-            company_logo_url = company_logo.get_full_url() if company_logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+            if company:
+                company_logo = getattr(company, 'logo', None)
+                company_logo_url = company_logo.get_full_url() if company_logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
 
-            return {
-                "id": company.id,
-                "slug": company.slug,
-                "companyName": company.company_name,
-                "imageUrl": company_logo_url
-            }
+                return {
+                    "id": company.id,
+                    "slug": company.slug,
+                    "companyName": company.company_name,
+                    "imageUrl": company_logo_url
+                }
         return None
+
+    def get_company_id(self, user):
+        if getattr(user, 'role_name', None) != var_sys.EMPLOYER:
+            return None
+        company = getattr(user, 'company', None)
+        return company.id if company else None
 
     def __init__(self, *args, **kwargs):
         fields = kwargs.pop('fields', None)
@@ -274,11 +275,15 @@ class UserSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
     def update(self, user, validated_data):
-        full_name = validated_data.get("full_name", "Full name")
+        if "full_name" in validated_data:
+            full_name = validated_data.get("full_name")
+            if full_name is not None:
+                user.full_name = full_name
+            if not user.has_company:
+                queue_auth.update_info.delay(user.id, full_name)
 
-        user.full_name = full_name
-        if not user.has_company:
-            queue_auth.update_info.delay(user.id, full_name)
+        if "role_name" in validated_data:
+            user.role_name = validated_data.get("role_name")
 
         user.save()
         return user
@@ -291,14 +296,17 @@ class UserSerializer(serializers.ModelSerializer):
                   "jobSeekerProfileId", "jobSeekerProfile",
                   "companyId", "company",)
 
-
 class AvatarSerializer(serializers.ModelSerializer):
     file = serializers.FileField(required=True, write_only=True)
     avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
     
     def get_avatar_url(self, user):
-        if user.avatar:
-            return user.avatar.get_full_url()
+        try:
+            avatar = getattr(user, 'avatar', None)
+            if avatar:
+                return avatar.get_full_url()
+        except Exception as ex:
+            helper.print_log_error("AvatarSerializer.get_avatar_url", ex)
         return var_sys.AVATAR_DEFAULT["AVATAR"]
 
     def update(self, user, validated_data):
@@ -311,13 +319,11 @@ class AvatarSerializer(serializers.ModelSerializer):
                 if user.avatar:
                     path_list = user.avatar.public_id.split('/')
                     public_id = path_list[-1] if path_list else None
-                # Upload to cloudinary
                 avatar_upload_result = CloudinaryService.upload_image(
                     file,
                     settings.CLOUDINARY_DIRECTORY["avatar"],
                     public_id=public_id
                 )
-                # Update or create file
                 user.avatar = File.update_or_create_file_with_cloudinary(
                     user.avatar,
                     avatar_upload_result,
@@ -330,13 +336,13 @@ class AvatarSerializer(serializers.ModelSerializer):
                     queue_auth.update_avatar.delay(user.id, user.avatar.get_full_url())
             
             return user
-        except:
-            return None
+        except Exception as ex:
+            helper.print_log_error("AvatarSerializer.update", ex)
+            raise
 
     class Meta:
         model = User
         fields = ('file', 'avatarUrl')
-
 
 class UserSettingSerializer(serializers.ModelSerializer):
     emailNotificationActive = serializers.BooleanField(required=True, source='email_notification_active')

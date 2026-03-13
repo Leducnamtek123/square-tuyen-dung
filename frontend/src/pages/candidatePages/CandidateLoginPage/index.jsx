@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Box, Paper, Typography, TextField, Button, Container } from '@mui/material';
+import { Box, Paper, Typography, TextField, Button, Container } from "@mui/material";
+
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../../configs/constants';
+import LanguageSwitcher from '../../../layouts/components/commons/LanguageSwitcher';
 
 const CandidateLoginPage = () => {
     const [sessionId, setSessionId] = useState('');
@@ -17,37 +19,42 @@ const CandidateLoginPage = () => {
     };
 
     return (
-        <Container maxWidth="sm">
-            <Box sx={{ mt: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <Paper sx={{ p: 4, width: '100%', textAlign: 'center' }}>
-                    <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
-                        {t('candidateLoginTitle')}
-                    </Typography>
-                    <Typography variant="body1" sx={{ mb: 4, color: 'text.secondary' }}>
-                        {t('candidateLoginBody')}
-                    </Typography>
-
-                    <TextField
-                        fullWidth
-                        label={t('candidateLoginLabel')}
-                        variant="outlined"
-                        value={sessionId}
-                        onChange={(e) => setSessionId(e.target.value)}
-                        sx={{ mb: 3 }}
-                    />
-
-                    <Button
-                        fullWidth
-                        variant="contained"
-                        size="large"
-                        onClick={handleJoin}
-                        disabled={!sessionId.trim()}
-                    >
-                        {t('common:actions.joinNow')}
-                    </Button>
-                </Paper>
+        <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#0f172a', position: 'relative' }}>
+            <Box sx={{ position: 'absolute', top: 16, right: 16, zIndex: 1100 }}>
+                <LanguageSwitcher />
             </Box>
-        </Container>
+            <Container maxWidth="sm">
+                <Box sx={{ mt: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <Paper sx={{ p: 4, width: '100%', textAlign: 'center' }}>
+                        <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
+                            {t('candidateLoginTitle')}
+                        </Typography>
+                        <Typography variant="body1" sx={{ mb: 4, color: 'text.secondary' }}>
+                            {t('candidateLoginBody')}
+                        </Typography>
+    
+                        <TextField
+                            fullWidth
+                            label={t('candidateLoginLabel')}
+                            variant="outlined"
+                            value={sessionId}
+                            onChange={(e) => setSessionId(e.target.value)}
+                            sx={{ mb: 3 }}
+                        />
+    
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            size="large"
+                            onClick={handleJoin}
+                            disabled={!sessionId.trim()}
+                        >
+                            {t('common:actions.joinNow')}
+                        </Button>
+                    </Paper>
+                </Box>
+            </Container>
+        </Box>
     );
 };
 

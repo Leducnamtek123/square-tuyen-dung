@@ -1,5 +1,8 @@
 import React from 'react';
-import { Box, Typography, Grid, Card, CardHeader, CardContent, Skeleton, Paper, Stack } from '@mui/material';
+import { Box, Typography, Card, CardHeader, CardContent, Skeleton, Paper, Stack } from "@mui/material";
+import { useTranslation } from 'react-i18next';
+import Grid from "@mui/material/Grid2";
+
 import PeopleIcon from '@mui/icons-material/People';
 import WorkIcon from '@mui/icons-material/Work';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
@@ -14,13 +17,14 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const COLORS = ['#3f51b5', '#ff9800', '#f44336', '#4caf50', '#00bcd4'];
 
 const DashboardPage = () => {
+  const { t } = useTranslation('admin');
   const { data: stats, isLoading } = useAdminStats();
 
   const userRoleData = stats
     ? [
-      { name: 'Nha tuyen dung', value: stats.totalEmployers || 0 },
-      { name: 'Nguoi tim viec', value: stats.totalJobSeekers || 0 },
-      { name: 'Quan tri vien', value: 5 },
+      { name: t('dashboard.roles.employer'), value: stats.totalEmployers || 0 },
+      { name: t('dashboard.roles.jobSeeker'), value: stats.totalJobSeekers || 0 },
+      { name: t('dashboard.roles.admin'), value: 5 },
     ]
     : [];
 
@@ -52,9 +56,14 @@ const DashboardPage = () => {
   return (
     <Box>
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 3
+          }}>
           <StatCard
-            title="Tong nguoi dung"
+            title={t('dashboard.totalUsers')}
             value={stats?.totalUsers}
             loading={isLoading}
             icon={<PeopleIcon sx={{ fontSize: 40 }} />}
@@ -62,9 +71,14 @@ const DashboardPage = () => {
             trend={12}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 3
+          }}>
           <StatCard
-            title="Tin tuyen dung"
+            title={t('dashboard.jobPosts')}
             value={stats?.totalJobPosts}
             loading={isLoading}
             icon={<WorkIcon sx={{ fontSize: 40 }} />}
@@ -72,9 +86,14 @@ const DashboardPage = () => {
             trend={8}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 3
+          }}>
           <StatCard
-            title="Cho duyet"
+            title={t('dashboard.pendingApproval')}
             value={stats?.totalJobPostsPending}
             loading={isLoading}
             icon={<QuestionAnswerIcon sx={{ fontSize: 40 }} />}
@@ -82,9 +101,14 @@ const DashboardPage = () => {
             trend={-5}
           />
         </Grid>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid
+          size={{
+            xs: 12,
+            sm: 6,
+            md: 3
+          }}>
           <StatCard
-            title="Luot ung tuyen"
+            title={t('dashboard.applications')}
             value={stats?.totalApplications}
             loading={isLoading}
             icon={<AssessmentIcon sx={{ fontSize: 40 }} />}
@@ -93,11 +117,14 @@ const DashboardPage = () => {
           />
         </Grid>
       </Grid>
-
       <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 8
+          }}>
           <Card sx={{ height: '100%' }}>
-            <CardHeader title="Phan bo nguoi dung theo loai" />
+            <CardHeader title={t('dashboard.userDistribution')} />
             <CardContent sx={{ height: 350 }}>
               {isLoading ? (
                 <Skeleton variant="rectangular" height="100%" />
@@ -110,21 +137,25 @@ const DashboardPage = () => {
           </Card>
         </Grid>
 
-        <Grid item xs={12} md={4}>
+        <Grid
+          size={{
+            xs: 12,
+            md: 4
+          }}>
           <Stack spacing={3}>
             <Paper sx={{ p: 3, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>Thong ke chung</Typography>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>{t('dashboard.generalStats')}</Typography>
               <Stack spacing={1}>
-                <Typography variant="body2">Tong: {stats?.totalUsers || 0} nguoi dung</Typography>
-                <Typography variant="body2">Nha tuyen dung: {stats?.totalEmployers || 0}</Typography>
-                <Typography variant="body2">Nguoi tim viec: {stats?.totalJobSeekers || 0}</Typography>
+                <Typography variant="body2">{t('dashboard.total')} {stats?.totalUsers || 0} {t('dashboard.users')}</Typography>
+                <Typography variant="body2">{t('dashboard.employers')} {stats?.totalEmployers || 0}</Typography>
+                <Typography variant="body2">{t('dashboard.jobSeekers')} {stats?.totalJobSeekers || 0}</Typography>
               </Stack>
             </Paper>
             <Paper sx={{ p: 3, background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>He thong</Typography>
+              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>{t('dashboard.systemInfo')}</Typography>
               <Stack spacing={1}>
-                <Typography variant="body2">Trang thai: Hoat dong</Typography>
-                <Typography variant="body2">Tin cho duyet: {stats?.totalJobPostsPending || 0}</Typography>
+                <Typography variant="body2">{t('dashboard.status')} {t('dashboard.statusActive')}</Typography>
+                <Typography variant="body2">{t('dashboard.pendingPosts')} {stats?.totalJobPostsPending || 0}</Typography>
               </Stack>
             </Paper>
           </Stack>

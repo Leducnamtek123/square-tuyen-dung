@@ -15,10 +15,13 @@ import { useAgentErrors } from '@/voice-ai/hooks/useAgentErrors';
 import { useDebugMode } from '@/voice-ai/hooks/useDebug';
 import { getSandboxTokenSource } from '@/voice-ai/lib/utils';
 
-const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
+const LIVEKIT_DEBUG_ENABLED = import.meta.env.VITE_LIVEKIT_DEBUG === '1';
 
 function AppSetup() {
-  useDebugMode({ enabled: IN_DEVELOPMENT });
+  useDebugMode({
+    enabled: LIVEKIT_DEBUG_ENABLED,
+    logLevel: 'warn',
+  });
   useAgentErrors();
 
   return null;

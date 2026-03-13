@@ -2,6 +2,9 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tansta
 
 import userService from '../../../../services/userService';
 import toastMessages from '../../../../utils/toastMessages';
+import i18n from '../../../../i18n';
+
+const t = (key, options) => i18n.t(key, { ns: 'admin', ...options });
 
 export const useUsers = (params) => {
     return useQuery({
@@ -20,11 +23,34 @@ export const useToggleUserStatus = () => {
     return useMutation({
         mutationFn: (user) => userService.toggleUserStatus(user.id),
         onSuccess: (data, user) => {
-            toastMessages.success(`${user.isActive ? 'Khoa' : 'Mo khoa'} nguoi dung thanh cong`);
+            toastMessages.success(
+                user.isActive
+                    ? t('pages.users.toast.blockSuccess')
+                    : t('pages.users.toast.unblockSuccess')
+            );
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
         onError: (error) => {
-            toastMessages.error(error.response?.data?.errors?.detail || 'Thao tac that bai');
+            toastMessages.error(
+                error.response?.data?.errors?.detail || t('pages.users.toast.actionFailed')
+            );
+        }
+    });
+};
+
+export const useUpdateUserRole = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: ({ userId, roleName }) => userService.updateUser(userId, { roleName }),
+        onSuccess: () => {
+            toastMessages.success(t('pages.users.toast.roleUpdated'));
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+        },
+        onError: (error) => {
+            toastMessages.error(
+                error.response?.data?.errors?.detail || t('pages.users.toast.roleUpdateFailed')
+            );
         }
     });
 };

@@ -1,20 +1,8 @@
 import React, { useState } from 'react';
-import {
-    Box,
-    Typography,
-    Paper,
-    TextField,
-    InputAdornment,
-    Pagination,
-    CircularProgress,
-    Button,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Grid,
-    MenuItem,
-} from '@mui/material';
+import { Box, Typography, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem } from "@mui/material";
+import { useTranslation } from 'react-i18next';
+import Grid from "@mui/material/Grid2";
+
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useProfiles } from './hooks/useProfiles';
@@ -23,6 +11,7 @@ import { useDistricts } from '../DistrictsPage/hooks/useDistricts';
 import ProfileTable from './components/ProfileTable';
 
 const ProfilesPage = () => {
+    const { t } = useTranslation('admin');
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -41,7 +30,6 @@ const ProfilesPage = () => {
     const { data: citiesData } = useCities();
     const cities = citiesData?.results || citiesData;
 
-    // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState('add');
     const [currentProfile, setCurrentProfile] = useState(null);
@@ -61,7 +49,6 @@ const ProfilesPage = () => {
     const { data: districtsData } = useDistricts({ city: formData.location.city });
     const districts = districtsData?.results || districtsData;
 
-    // Delete dialog
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleSearch = (e) => {
@@ -157,30 +144,31 @@ const ProfilesPage = () => {
     return (
         <>
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleOpenAdd}
-                    sx={{ borderRadius: '8px', textTransform: 'none' }}
-                >
-                    Thêm ứng viên
-                </Button>
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={handleOpenAdd}
+                        sx={{ borderRadius: '8px', textTransform: 'none' }}
+                    >
+                        {t('pages.profiles.addCandidate')}
+                    </Button>
             </Box>
-
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
-                    <TextField
-                        size="small"
-                        placeholder="Tìm kiếm ứng viên..."
-                        value={searchTerm}
+                        <TextField
+                            size="small"
+                            placeholder={t('pages.profiles.searchPlaceholder')}
+                            value={searchTerm}
                         onChange={handleSearch}
                         sx={{ width: 400 }}
-                        InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <SearchIcon fontSize="small" color="action" />
-                                </InputAdornment>
-                            ),
+                        slotProps={{
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon fontSize="small" color="action" />
+                                    </InputAdornment>
+                                ),
+                            }
                         }}
                     />
                 </Box>
@@ -209,17 +197,16 @@ const ProfilesPage = () => {
                     </>
                 )}
             </Paper>
-
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
                 <DialogTitle>
-                    {dialogMode === 'add' ? 'Thêm hồ sơ ứng viên mới' : 'Chỉnh sửa hồ sơ ứng viên'}
+                    {dialogMode === 'add' ? t('pages.profiles.addTitle') : t('pages.profiles.editTitle')}
                 </DialogTitle>
                 <DialogContent>
                     <Grid container spacing={2} sx={{ pt: 1 }}>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <TextField
-                                label="Họ và tên"
+                                label={t('pages.profiles.fullNameLabel')}
                                 fullWidth
                                 name="fullName"
                                 value={formData.user.fullName}
@@ -227,9 +214,9 @@ const ProfilesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
-                                label="Số điện thoại"
+                                label={t('pages.profiles.phoneLabel')}
                                 fullWidth
                                 name="phone"
                                 value={formData.phone}
@@ -237,49 +224,51 @@ const ProfilesPage = () => {
                                 required
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
-                                label="Ngày sinh"
+                                label={t('pages.profiles.dobLabel')}
                                 fullWidth
                                 type="date"
                                 name="birthday"
                                 value={formData.birthday}
                                 onChange={handleInputChange}
-                                InputLabelProps={{ shrink: true }}
                                 required
+                                slotProps={{
+                                    inputLabel: { shrink: true }
+                                }}
                             />
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
                                 select
-                                label="Giới tính"
+                                label={t('pages.profiles.genderLabel')}
                                 fullWidth
                                 name="gender"
                                 value={formData.gender}
                                 onChange={handleInputChange}
                             >
-                                <MenuItem value="M">Nam</MenuItem>
-                                <MenuItem value="F">Nữ</MenuItem>
-                                <MenuItem value="O">Khác</MenuItem>
+                                <MenuItem value="M">{t('pages.profiles.genderOptions.male')}</MenuItem>
+                                <MenuItem value="F">{t('pages.profiles.genderOptions.female')}</MenuItem>
+                                <MenuItem value="O">{t('pages.profiles.genderOptions.other')}</MenuItem>
                             </TextField>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
                                 select
-                                label="Tình trạng hôn nhân"
+                                label={t('pages.profiles.maritalStatusLabel')}
                                 fullWidth
                                 name="maritalStatus"
                                 value={formData.maritalStatus}
                                 onChange={handleInputChange}
                             >
-                                <MenuItem value="S">Độc thân</MenuItem>
-                                <MenuItem value="M">Đã kết hôn</MenuItem>
+                                <MenuItem value="S">{t('pages.profiles.maritalOptions.single')}</MenuItem>
+                                <MenuItem value="M">{t('pages.profiles.maritalOptions.married')}</MenuItem>
                             </TextField>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
                                 select
-                                label="Tỉnh thành"
+                                label={t('pages.profiles.cityLabel')}
                                 fullWidth
                                 name="loc_city"
                                 value={formData.location.city}
@@ -290,10 +279,10 @@ const ProfilesPage = () => {
                                 ))}
                             </TextField>
                         </Grid>
-                        <Grid item xs={6}>
+                        <Grid size={6}>
                             <TextField
                                 select
-                                label="Quận huyện"
+                                label={t('pages.profiles.districtLabel')}
                                 fullWidth
                                 name="loc_district"
                                 value={formData.location.district}
@@ -305,9 +294,9 @@ const ProfilesPage = () => {
                                 ))}
                             </TextField>
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                             <TextField
-                                label="Địa chỉ cụ thể"
+                                label={t('pages.profiles.addressLabel')}
                                 fullWidth
                                 name="loc_address"
                                 value={formData.location.address}
@@ -317,35 +306,31 @@ const ProfilesPage = () => {
                     </Grid>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">Hủy</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.profiles.cancelBtn')}</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={isMutating || !formData.user.fullName || !formData.phone}
                     >
-                        {isMutating ? 'Đang lưu...' : 'Lưu lại'}
+                        {isMutating ? t('pages.profiles.savingBtn') : t('pages.profiles.saveBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
-
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-                <DialogTitle>Xác nhận xóa</DialogTitle>
+                <DialogTitle>{t('pages.profiles.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography>
-                        Bạn có chắc chắn muốn xóa hồ sơ của <strong>{currentProfile?.userDict?.fullName}</strong>?
-                        Hành động này không thể hoàn tác.
-                    </Typography>
+                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.profiles.deleteText', { name: currentProfile?.userDict?.fullName }) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Hủy</Button>
+                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.profiles.cancelBtn')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? 'Đang xóa...' : 'Xác nhận xóa'}
+                        {isMutating ? t('pages.profiles.deletingBtn') : t('pages.profiles.deleteBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>

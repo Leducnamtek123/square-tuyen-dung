@@ -32,7 +32,6 @@ TARGET_SAMPLE_RATE = 16000
 
 asr_model = None
 
-
 def load_model():
     global asr_model
     logger.info("Loading model %s ...", MODEL_NAME)
@@ -55,15 +54,12 @@ def load_model():
 
     logger.info("Model loaded successfully")
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     load_model()
     yield
 
-
 app = FastAPI(title="Nemotron STT Server", lifespan=lifespan)
-
 
 def load_audio(audio_bytes: bytes, filename: str) -> np.ndarray:
     """Load audio bytes, resample to 16kHz mono, return float32 numpy array."""
@@ -101,7 +97,6 @@ def load_audio(audio_bytes: bytes, filename: str) -> np.ndarray:
 
     return data
 
-
 def direct_transcribe(audio: np.ndarray) -> str:
     """Run full-file transcription using direct model forward pass."""
     audio_tensor = torch.tensor(audio).unsqueeze(0).to(asr_model.device)
@@ -124,7 +119,6 @@ def direct_transcribe(audio: np.ndarray) -> str:
 
     first_hypothesis = hypotheses[0]
     return first_hypothesis.text if hasattr(first_hypothesis, "text") else str(first_hypothesis)
-
 
 def streaming_transcribe(audio: np.ndarray):
     """Yield incremental transcript deltas using conformer_stream_step."""
@@ -224,7 +218,6 @@ def streaming_transcribe(audio: np.ndarray):
 
             offset += shift_frames
 
-
 async def sse_generator(audio: np.ndarray):
     """Generate SSE events from streaming transcription."""
     full_text = ""
@@ -236,7 +229,6 @@ async def sse_generator(audio: np.ndarray):
     done_event = {"type": "transcript.text.done", "text": full_text.strip()}
     yield f"data: {json.dumps(done_event)}\n\n"
     yield "data: [DONE]\n\n"
-
 
 @app.post("/v1/audio/transcriptions")
 async def transcribe(
@@ -291,7 +283,6 @@ async def transcribe(
 
     return JSONResponse(content={"text": text})
 
-
 @app.get("/v1/models")
 async def list_models():
     return JSONResponse(
@@ -308,11 +299,9 @@ async def list_models():
         }
     )
 
-
 @app.get("/health")
 async def health():
     return {"status": "ok", "model_loaded": asr_model is not None}
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Nemotron STT Server")

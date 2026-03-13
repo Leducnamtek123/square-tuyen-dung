@@ -3,7 +3,6 @@ import json
 from datetime import datetime
 from pathlib import Path
 from decouple import config
-import cloudinary
 import firebase_admin
 from firebase_admin import credentials
 
@@ -12,7 +11,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 COMPANY_NAME = "MyJob"
 
-# Web client URL
 WEB_JOB_SEEKER_CLIENT_URL = config("WEB_JOB_SEEKER_CLIENT_URL", default="http://localhost:3000/")
 WEB_EMPLOYER_CLIENT_URL = config("WEB_EMPLOYER_CLIENT_URL", default="http://localhost:3000/")
 
@@ -21,14 +19,17 @@ DOMAIN_CLIENT = {
     "employer": WEB_EMPLOYER_CLIENT_URL if WEB_EMPLOYER_CLIENT_URL else "http://localhost:3000/",
 }
 
-# =====================
 # Local AI (Voice) services
-# =====================
 AI_TTS_BASE_URL = config("AI_TTS_BASE_URL", default="http://localhost:8298/v1")
 AI_TTS_DEFAULT_VOICE = config("AI_TTS_DEFAULT_VOICE", default="Ly (nữ miền Bắc)")
 AI_STT_BASE_URL = config("AI_STT_BASE_URL", default="http://localhost:11437/v1")
 AI_STT_MODEL = config("AI_STT_MODEL", default="openai/whisper-large-v3")
 AI_STT_LANGUAGE = config("AI_STT_LANGUAGE", default="vi")
+AI_LLM_BASE_URL = config(
+    "AI_LLM_BASE_URL",
+    default=config("LLAMA_BASE_URL", default="http://llama-cpp:11434/v1"),
+)
+AI_LLM_MODEL = config("AI_LLM_MODEL", default=config("LLAMA_MODEL", default="qwen2-7b"))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
@@ -52,7 +53,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary',
     'django_admin_listfilter_dropdown',
     'ckeditor',
     'django_otp',
@@ -138,7 +138,6 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-# Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 # Bo khi su dung sqlclient: mysqlclient==2.1.1
 
@@ -204,16 +203,12 @@ OAUTH2_PROVIDER = {
 }
 
 AUTHENTICATION_BACKENDS = (
-    # Facebook OAuth2
     'social_core.backends.facebook.FacebookAppOAuth2',
     'social_core.backends.facebook.FacebookOAuth2',
 
-    # Google OAuth2
     'social_core.backends.google.GoogleOAuth2',
 
-    # drf_social_oauth2
     'drf_social_oauth2.backends.DjangoOAuth2',
-    # Django
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -248,7 +243,6 @@ SERVICE_REDIS_USERNAME = config('SERVICE_REDIS_USERNAME', default='')
 SERVICE_REDIS_PASSWORD = config('SERVICE_REDIS_PASSWORD', default='')
 SERVICE_REDIS_DB = config('SERVICE_REDIS_DB', default=0, cast=int)
 
-# FACEBOOK
 # Facebook configuration
 SOCIAL_AUTH_FACEBOOK_DIALOG_URL = 'https://www.facebook.com/v15.0/dialog/oauth/'
 SOCIAL_AUTH_FACEBOOK_OAUTH2_REVOKE_TOKEN_URL = 'https://graph.facebook.com/v15.0/me/permissions'
@@ -261,7 +255,6 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
     'fields': 'id,name,email,first_name,last_name'
 }
 
-# GOOGLE
 # Google configuration
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = DOMAIN_CLIENT['job_seeker'].rstrip('/')
 SOCIAL_AUTH_GOOGLE_OAUTH2_TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
@@ -304,31 +297,28 @@ DJANGO_CELERY_BEAT_TZ_AWARE = True
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-CLOUDINARY_CLOUD_NAME = config('CLOUDINARY_CLOUD_NAME')
+MINIO_ENDPOINT = config('MINIO_ENDPOINT', default='minio:9000')
+MINIO_ACCESS_KEY = config('MINIO_ACCESS_KEY', default='admin')
+MINIO_SECRET_KEY = config('MINIO_SECRET_KEY', default='password')
+MINIO_BUCKET = config('MINIO_BUCKET', default='myjob-bucket')
+MINIO_SECURE = config('MINIO_SECURE', default=False, cast=bool)
+MINIO_PUBLIC_URL = config('MINIO_PUBLIC_URL', default='http://localhost:9000')
 
-CLOUDINARY_BUCKET_NAME = 'myjob-bucket'
-
-# Set the Cloudinary configuration
-cloudinary.config(
-    cloud_name=CLOUDINARY_CLOUD_NAME,
-    api_key=config('CLOUDINARY_API_KEY'),
-    api_secret=config('CLOUDINARY_API_SECRET'),
-)
-
-CLOUDINARY_PATH = "https://res.cloudinary.com/" + CLOUDINARY_CLOUD_NAME + "/image/upload/v{0}/"
+# Reuse existing setting names for compatibility across the codebase.
+CLOUDINARY_PATH = f"{MINIO_PUBLIC_URL.rstrip('/')}/{MINIO_BUCKET}/"
 
 CLOUDINARY_DIRECTORY = {
-    "avatar": f"{CLOUDINARY_BUCKET_NAME}/avatar/",
-    "cv": f"{CLOUDINARY_BUCKET_NAME}/cv/",
-    "logo": f"{CLOUDINARY_BUCKET_NAME}/logo/",
-    "cover_image": f"{CLOUDINARY_BUCKET_NAME}/cover_image/",
-    "company_image": f"{CLOUDINARY_BUCKET_NAME}/company_image/",
-    "career_image": f"{CLOUDINARY_BUCKET_NAME}/career_image/",
-    "web_banner": f"{CLOUDINARY_BUCKET_NAME}/banners/web_banners/",
-    "mobile_banner": f"{CLOUDINARY_BUCKET_NAME}/banners/mobile_banners/",
-    "system": f"{CLOUDINARY_BUCKET_NAME}/system/",
-    "icons": f"{CLOUDINARY_BUCKET_NAME}/icons/",
-    "about_us": f"{CLOUDINARY_BUCKET_NAME}/about_us/"
+    "avatar": "avatar/",
+    "cv": "cv/",
+    "logo": "logo/",
+    "cover_image": "cover_image/",
+    "company_image": "company_image/",
+    "career_image": "career_image/",
+    "web_banner": "banners/web_banners/",
+    "mobile_banner": "banners/mobile_banners/",
+    "system": "system/",
+    "icons": "icons/",
+    "about_us": "about_us/"
 }
 
 REDIRECT_LOGIN_CLIENT = "dang-nhap"
@@ -339,13 +329,14 @@ MYJOB_AUTH = {
     "TIME_REQUIRED_FORGOT_PASSWORD": 120
 }
 
+# Interview settings
+INTERVIEW_MAX_DURATION_SECONDS = int(os.getenv("INTERVIEW_MAX_DURATION_SECONDS", "1800"))
+
 REDIS_JOB_TITLE_EXPIRE_SECONDS = 14400
 
-# SMS
 SMS_BASE_URL = "https://qy1kdr.api.infobip.com"
 SMS_API_KEY = config('SMS_API_KEY', default='')
 
-# FIREBASE
 FIREBASE_CONFIG = {
     "apiKey": config('FIREBASE_API_KEY', default=''),
     "authDomain": config('FIREBASE_AUTH_DOMAIN', default=''),

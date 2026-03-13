@@ -1,34 +1,25 @@
 import React from 'react';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-    IconButton,
-    Tooltip,
-    Chip,
-    Typography,
-} from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip, Chip, Typography } from "@mui/material";
+
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from '../../../../configs/dayjs-config';
+import { useTranslation } from 'react-i18next';
 
 const ResumeTable = ({ data, onView, onDelete }) => {
+    const { t } = useTranslation('admin');
     return (
         <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
             <Table sx={{ minWidth: 800 }}>
                 <TableHead sx={{ bgcolor: 'grey.50' }}>
                     <TableRow>
-                        <TableCell>Tiêu đề CV</TableCell>
-                        <TableCell>Ứng viên</TableCell>
-                        <TableCell>Loại CV</TableCell>
-                        <TableCell>Kinh nghiệm</TableCell>
-                        <TableCell>Cập nhật lần cuối</TableCell>
-                        <TableCell align="center">Trạng thái</TableCell>
-                        <TableCell align="right">Thao tác</TableCell>
+                        <TableCell>{t('pages.resumes.table.resumeTitle')}</TableCell>
+                        <TableCell>{t('pages.resumes.table.candidate')}</TableCell>
+                        <TableCell>{t('pages.resumes.table.resumeType')}</TableCell>
+                        <TableCell>{t('pages.resumes.table.experience')}</TableCell>
+                        <TableCell>{t('pages.resumes.table.lastUpdate')}</TableCell>
+                        <TableCell align="center">{t('pages.resumes.table.status')}</TableCell>
+                        <TableCell align="right">{t('pages.resumes.table.actions')}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -45,7 +36,7 @@ const ResumeTable = ({ data, onView, onDelete }) => {
                             <TableCell>{row.userDict?.fullName || '---'}</TableCell>
                             <TableCell>
                                 <Chip
-                                    label={row.type === 'UPLOAD' ? 'File tải lên' : 'Hồ sơ online'}
+                                    label={row.type === 'UPLOAD' ? t('pages.resumes.table.uploadedFile') : t('pages.resumes.table.onlineProfile')}
                                     size="small"
                                     variant="outlined"
                                     color={row.type === 'UPLOAD' ? 'primary' : 'secondary'}
@@ -55,18 +46,18 @@ const ResumeTable = ({ data, onView, onDelete }) => {
                             <TableCell>{dayjs(row.updateAt).format('DD/MM/YYYY HH:mm')}</TableCell>
                             <TableCell align="center">
                                 <Chip
-                                    label={row.isActive ? 'Đang bật' : 'Đang tắt'}
+                                    label={row.isActive ? t('pages.resumes.table.active') : t('pages.resumes.table.inactive')}
                                     size="small"
                                     color={row.isActive ? 'success' : 'default'}
                                 />
                             </TableCell>
                             <TableCell align="right">
-                                <Tooltip title="Xem chi tiết">
+                                <Tooltip title={t('pages.resumes.table.viewDetails')}>
                                     <IconButton size="small" onClick={() => onView?.(row)}>
                                         <VisibilityIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>
-                                <Tooltip title="Xóa">
+                                <Tooltip title={t('pages.resumes.table.delete')}>
                                     <IconButton size="small" onClick={() => onDelete?.(row)} color="error">
                                         <DeleteIcon fontSize="small" />
                                     </IconButton>
@@ -77,7 +68,7 @@ const ResumeTable = ({ data, onView, onDelete }) => {
                     {(!data || data.length === 0) && (
                         <TableRow>
                             <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
-                                Không tìm thấy dữ liệu
+                                {t('pages.resumes.table.noData')}
                             </TableCell>
                         </TableRow>
                     )}

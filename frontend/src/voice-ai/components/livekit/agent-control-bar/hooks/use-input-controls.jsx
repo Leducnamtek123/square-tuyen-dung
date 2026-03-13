@@ -113,4 +113,3 @@ export function useInputControls({ saveUserChoices = true, onDeviceError } = {})
     handleCameraDeviceSelectError,
   };
 }
-

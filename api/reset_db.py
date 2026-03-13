@@ -25,9 +25,6 @@ City.objects.all().delete()
 District.objects.all().delete()
 Location.objects.all().delete()
 
-# -----------------
-# 1. COMMON DATA
-# -----------------
 print("Creating common data...")
 city = City.objects.create(name="Hồ Chí Minh")
 district = District.objects.create(name="Quận 1", city=city)
@@ -42,10 +39,7 @@ loc = Location.objects.create(
 
 career = Career.objects.create(name="Công nghệ thông tin (IT)")
 
-
-# -----------------
 # 2. USERS
-# -----------------
 print("Creating Administrative User...")
 admin_user = User.objects.create_superuser(
     email="admin@myjob.com",
@@ -91,10 +85,7 @@ js_user.save()
 profile = JobSeekerProfile.objects.create(user=js_user, phone="0123456789")
 resume = Resume.objects.create(job_seeker_profile=profile, user=js_user, type=var_sys.CV_WEBSITE, title="Frontend Developer")
 
-
-# -----------------
 # 3. JOB POST & ACTIVITY
-# -----------------
 print("Creating Job Post...")
 job_post = JobPost.objects.create(
     job_name="Senior Frontend Developer (React)",
@@ -131,14 +122,10 @@ application = JobPostActivity.objects.create(
     status=4, # Đã phỏng vấn
 )
 
-
-# -----------------
 # 4. INTERVIEW CONFIGS
-# -----------------
 print("Creating Question Bank and Interview...")
 q1 = Question.objects.create(
     text="Trình bày vòng đời của một component trong React từ khi mount đến unmount.",
-    category='technical',
     difficulty=2,
     career=career,
     author=emp_user,
@@ -146,7 +133,6 @@ q1 = Question.objects.create(
 )
 q2 = Question.objects.create(
     text="Bạn giải quyết conflict nội bộ với đồng nghiệp như thế nào khi deadline đang cận kề?",
-    category='behavioral',
     difficulty=2,
     career=career,
     author=emp_user,
@@ -173,10 +159,7 @@ interview = InterviewSession.objects.create(
 )
 interview.questions.add(q1, q2)
 
-
-# -----------------
 # 5. OAUTH2 APP
-# -----------------
 Application.objects.create(
     user=admin_user,
     client_type=Application.CLIENT_CONFIDENTIAL,

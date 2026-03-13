@@ -20,7 +20,7 @@ const TimeAgo = ({ date, type = 'fromNow', format = 'DD/MM/YYYY HH:mm' }) => {
     const timer = setInterval(updateTime, 60000);
 
     return () => clearInterval(timer);
-  }, [date, type]);
+  }, [date, type, format]);
 
   if (!date) return null;
 

@@ -1,105 +1,178 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
 import axios from 'axios';
 import queryString from 'query-string';
 import tokenService from '../services/tokenService';
+import { AUTH_CONFIG } from '../configs/constants';
 
 // API endpoints that do not require authentication
 const notAuthenticationURL = ['auth/token/', 'auth/convert-token/'];
+const publicEndpointPrefixes = ['interview/web/sessions/invite/'];
 // Prefix for API endpoints
 const prefix = 'api'
 
 // Use relative path to work with nginx proxy, allow override via env if needed
+
 const baseURL = import.meta.env.VITE_API_BASE || `/${prefix}/`;
 
 const httpRequest = axios.create({
   baseURL,
   headers: {
+
     'Content-Type': 'application/json',
+
   },
+
   paramsSerializer: {
+
     serialize: (params) => {
+
       return queryString.stringify(params, { arrayFormat: 'bracket' });
+
     },
+
+  },
+
+  withCredentials: true,
+
+  timeout: 30000,
+});
+
+const refreshClient = axios.create({
+  baseURL,
+  headers: {
+    'Content-Type': 'application/json',
   },
   withCredentials: true,
   timeout: 30000,
 });
 
+const isPublicEndpoint = (url) => {
+  const safeUrl = String(url || '');
+  if (!safeUrl) return false;
+  if (notAuthenticationURL.includes(safeUrl)) return true;
+  return publicEndpointPrefixes.some((prefix) => safeUrl.startsWith(prefix));
+};
+
+const isAuthTokenEndpoint = (url) => {
+  const safeUrl = String(url || '');
+  return safeUrl === 'auth/token/' || safeUrl === '/auth/token/';
+};
+
+const unwrapResponse = (response) => response?.data?.data ?? response?.data;
+
+let refreshPromise = null;
+
 httpRequest.interceptors.request.use(
   (config) => {
     const accessToken = tokenService.getAccessTokenFromCookie();
 
-    if (accessToken && !notAuthenticationURL.includes(config.url)) {
+    if (accessToken && !isPublicEndpoint(config.url)) {
       config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
     return config;
   },
   (error) => {
     return Promise.reject(error);
+
   }
+
 );
 
 httpRequest.interceptors.response.use(
+
   (response) => {
+
     // Backend wraps payload in { data, errors } via MyJSONRenderer.
+
     // Return payload directly; fall back to raw response for legacy endpoints.
+
     const payload = response.data?.data ?? response.data;
+
     if (payload && typeof payload === 'object' && !('data' in payload)) {
+
       try {
+
         Object.defineProperty(payload, 'data', {
+
           value: payload,
+
           enumerable: false,
+
         });
+
       } catch {
+
         // ignore if payload is non-extensible
+
       }
+
     }
+
     return payload;
+
   },
+
   async (error) => {
-    // const originalConfig = error.config;
+    const originalConfig = error.config;
+    const status = error.response?.status;
 
-    // Access Token was expired
-    if (error.response?.status === 401) {
-      tokenService.removeAccessTokenAndRefreshTokenFromCookie();
-      // const refreshTokenCookie = tokenService.getRefreshTokenFromCookie();
-
-      // if (!refreshTokenCookie) {
-      //   return Promise.reject(error);
-      // }
-
-      // try {
-      //   const resData = await httpRequest.post('api/auth/token/', {
-      //     grant_type: 'refresh_token',
-      //     client_id: 'VYqeXWvCcINnPhStYBKg3HJC5BeJqCZaohYlyROz',
-      //     client_secret:
-      //       'Buz6z6vwxy8W5QCVlxqCyfDnhFDDsGgf7N9B2lApShX1nj9hiFGyT8stTo6hSxn3ph2MttFPPfwWLUlwpaYaOjxvCjoYABdoq23EBoe5pMhF5zlUhUolwVdgQ7nuDtYG',
-      //     refresh_token: refreshTokenCookie,
-      //   });
-
-      //   const { access_token: accessToken, refresh_token: refreshToken } =
-      //     resData.data;
-
-      //   tokenService.saveAccessTokenAndRefreshTokenToCookie(accessToken, refreshToken);
-
-      //   return httpRequest(originalConfig);
-      // } catch (_error) {
-      //   tokenService.removeAccessTokenAndRefreshTokenFromCookie();
-      //   return Promise.reject(_error);
-      // }
+    if (status !== 401 || !originalConfig) {
+      return Promise.reject(error);
     }
 
-    return Promise.reject(error);
+    if (isPublicEndpoint(originalConfig.url)) {
+      return Promise.reject(error);
+    }
+
+    if (originalConfig._retry || isAuthTokenEndpoint(originalConfig.url)) {
+      tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+      return Promise.reject(error);
+    }
+
+    const refreshToken = tokenService.getRefreshTokenFromCookie();
+    if (!refreshToken) {
+      tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+      return Promise.reject(error);
+    }
+
+    if (!refreshPromise) {
+      refreshPromise = refreshClient.post('auth/token/', {
+        grant_type: AUTH_CONFIG.REFRESH_TOKEN_GRANT,
+        client_id: AUTH_CONFIG.CLIENT_ID,
+        client_secret: AUTH_CONFIG.CLIENT_SECRECT,
+        refresh_token: refreshToken,
+      });
+    }
+
+    try {
+      const refreshResponse = await refreshPromise;
+      refreshPromise = null;
+
+      const refreshData = unwrapResponse(refreshResponse);
+      const accessToken =
+        refreshData?.access_token || refreshData?.accessToken || null;
+      const newRefreshToken =
+        refreshData?.refresh_token || refreshData?.refreshToken || refreshToken;
+
+      if (!accessToken) {
+        tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+        return Promise.reject(error);
+      }
+
+      tokenService.saveAccessTokenAndRefreshTokenToCookie(
+        accessToken,
+        newRefreshToken,
+        tokenService.getProviderFromCookie()
+      );
+
+      originalConfig._retry = true;
+      originalConfig.headers = originalConfig.headers || {};
+      originalConfig.headers['Authorization'] = `Bearer ${accessToken}`;
+      return httpRequest(originalConfig);
+    } catch (refreshError) {
+      refreshPromise = null;
+      tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+      return Promise.reject(refreshError);
+    }
   }
 );
 

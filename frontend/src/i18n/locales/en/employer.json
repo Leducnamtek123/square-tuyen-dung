@@ -1,0 +1,762 @@
+{
+  "appliedResume": {
+    "title": "Applied Resume Management",
+    "downloadList": "Download List",
+    "filters": "Filters:",
+    "allJobPosts": "All job posts",
+    "allStatuses": "All recruitment statuses",
+    "advancedFilter": "Advanced Filter",
+    "table": {
+      "noCandidates": "No candidates have applied yet",
+      "onlineResume": "Online Resume",
+      "attachedResume": "Attached Resume",
+      "notUpdated": "Not updated",
+      "profileName": "Profile Name",
+      "appliedPosition": "Applied Position",
+      "appliedDate": "Applied Date",
+      "profileType": "Profile Type",
+      "aiAnalysis": "AI Analysis",
+      "status": "Recruitment Status",
+      "actions": "Actions",
+      "tooltips": {
+        "view": "View profile",
+        "delete": "Delete profile"
+      }
+    },
+    "ai": {
+      "analysisStarted": "AI analysis started. Please wait a few seconds.",
+      "processing": "Processing...",
+      "analyze": "Analyze",
+      "summary": "AI Summary:",
+      "skills": "Skills:"
+    },
+    "email": {
+      "sentSuccess": "Email sent successfully.",
+      "resend": "Resend",
+      "send": "Send email"
+    },
+    "status": {
+      "updateTitle": "Update application status",
+      "updateConfirm": "The profile will be updated to status <strong style=\"color:red;\">\"{{statusName}}\"</strong>. Are you sure?",
+      "errorTitle": "Error occurred",
+      "errorMsg": "You are not allowed to change the application status from <strong style=\"color:red;\">\"{{fromStatus}}\"</strong> to <strong style=\"color:red;\">\"{{toStatus}}\"</strong>",
+      "updateSuccess": "Update successful."
+    },
+    "delete": {
+      "title": "Delete Applied Profile",
+      "confirm": "This applied profile will be permanently deleted and cannot be recovered. Are you sure?",
+      "success": "Candidate application deleted successfully."
+    }
+  },
+  "savedResume": {
+    "title": "Saved Resume Management",
+    "downloadList": "Download List",
+    "filters": "Filters:",
+    "messages": {
+      "unsaveSuccess": "Unsaved successfully."
+    }
+  },
+  "savedResumeTable": {
+    "title": {
+      "youhaventsavedanycandidatesyet": "You haven't saved any candidates yet",
+      "onlineresume": "Online Resume",
+      "attachedresume": "Attached Resume",
+      "viewprofile": "View profile"
+    },
+    "label": {
+      "view": "view",
+      "unsave": "Unsave",
+      "resumeTitle": "Resume Title",
+      "candidateName": "Candidate Name",
+      "salary": "Salary",
+      "experience": "Experience",
+      "cityProvince": "City/Province",
+      "savedDate": "Saved Date",
+      "actions": "Actions"
+    }
+  },
+  "savedResumeFilterForm": {
+    "placeholder": {
+      "enterjobpostorcandidatename": "Enter resume title or candidate name",
+      "entermaximumsalary": "Enter maximum salary",
+      "selectexperience": "Select experience",
+      "selectlocation": "Select location"
+    },
+    "title": {
+      "reset": "Reset"
+    },
+    "label": {
+      "refresh": "refresh",
+      "search": "Search"
+    }
+  },
+  "dashboard": {
+    "pageTitle": "Employer Administration",
+    "recruitmentChart": "RECRUITMENT CHART",
+    "candidateChart": "CANDIDATE CHART",
+    "applicationChart": "RECRUITMENT & APPLICATION CHART",
+    "academicChart": "RECRUITMENT BY ACADEMIC LEVEL"
+  },
+  "jobPost": {
+    "title": "Job Post Management",
+    "createNew": "Create New Post",
+    "exportList": "Export List",
+    "filter": "Filter:",
+    "table": {
+      "jobTitle": "Job Title",
+      "postDate": "Post Date",
+      "deadline": "Deadline",
+      "applications": "Applications",
+      "views": "Views",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "urgent": "Urgent",
+    "noData": "You have no job posts yet",
+    "tooltips": {
+      "update": "Update",
+      "delete": "Delete"
+    },
+    "filters": {
+      "keywordsPlaceholder": "Enter job title",
+      "urgent": "Urgent",
+      "notUrgent": "Not urgent",
+      "urgentPlaceholder": "Recruitment status (urgent)",
+      "statusPlaceholder": "Approval status",
+      "reset": "Reset",
+      "search": "Search"
+    },
+    "delete": {
+      "title": "Delete Job Post",
+      "confirm": "This job post will be permanently deleted and cannot be recovered. Are you sure?",
+      "success": "Job post deleted successfully."
+    },
+    "messages": {
+      "addSuccess": "Job post added successfully.",
+      "updateSuccess": "Job post updated successfully."
+    },
+    "popupTitle": "Job Post"
+  },
+  "sendEmailComponent": {
+    "label": {
+      "view": "View",
+      "delete": "Delete",
+      "sendEmail": "Send Email",
+      "resendEmail": "Resend Email"
+    },
+    "title": {
+      "viewattachedresume": "View Attached Resume"
+    },
+    "messages": {
+      "success": "Email sent successfully."
+    }
+  },
+  "applicationChart": {
+    "title": "Statistics of recruitment index within the last 1 month",
+    "noData": "No data available for statistics",
+    "labels": {
+      "totalapplications": "Total Applications",
+      "averageapplications": "Average Applications",
+      "applications": "Applications"
+    }
+  },
+  "candidateChart": {
+    "title": "Statistics of total applications received by day",
+    "noData": "No data available for statistics",
+    "labels": {
+      "newcandidates": "New Candidates",
+      "totalcandidates": "Total Candidates",
+      "candidates": "Candidates"
+    }
+  },
+  "hiringAcademicChart": {
+    "title": "Recruitment statistics by academic level",
+    "applicationCount": "Application count",
+    "noData": "No data available for statistics",
+    "labels": {
+      "chuatotnghiep": "Not Graduated",
+      "trungcap": "Intermediate",
+      "caodang": "Associate",
+      "daihoc": "Bachelor",
+      "saudaihoc": "Postgraduate",
+      "khac": "Other"
+    }
+  },
+  "recruitmentChart": {
+    "title": "Recruitment process statistics over time",
+    "noData": "No recruitment data for this period",
+    "labels": {
+      "applied": "Applied",
+      "new": "New",
+      "interviewing": "Interviewing",
+      "offered": "Offered",
+      "hired": "Hired",
+      "rejected": "Rejected"
+    }
+  },
+  "companyForm": {
+    "title": {
+      "companyname": "Company Name",
+      "taxcode": "Tax Code",
+      "companysize": "Company Size",
+      "fieldofoperation": "Field of Operation",
+      "foundeddate": "Founded Date",
+      "websiteurl": "Website URL",
+      "facebookurl": "Facebook URL",
+      "youtubeurl": "Youtube URL",
+      "linkedinurl": "Linkedin URL",
+      "companyemail": "Company Email",
+      "phonenumber": "Phone Number",
+      "cityprovince": "City/Province",
+      "district": "District",
+      "address": "Address",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "additionaldescription": "Additional Description"
+    },
+    "placeholder": {
+      "entercompanyname": "Enter company name",
+      "entercompanytaxcode": "Enter company tax code",
+      "selectcompanysize": "Select company size",
+      "entercompanyfieldofoperation": "Enter company field of operation",
+      "entercompanywebsiteurl": "Enter company website URL",
+      "enterfacebookurl": "Enter Facebook URL",
+      "enteryoutubeurl": "Enter Youtube URL",
+      "enterlinkedinurl": "Enter Linkedin URL",
+      "entercompanyemail": "Enter company email",
+      "entercompanyphonenumber": "Enter company phone number",
+      "selectcityprovince": "Select city/province",
+      "selectdistrict": "Select district",
+      "enteraddress": "Enter address",
+      "enterlatitudecoordinateonthemap": "Enter latitude coordinate on the map.",
+      "enterlongitudecoordinateonthemap": "Enter longitude coordinate on the map."
+    },
+    "helperText": {
+      "automaticallyfilledifyouchooseasuggestedaddress": "Automatically filled if you choose a suggested address."
+    }
+  },
+  "statItem": {
+    "title": {
+      "totaljobposts": "Total Job Posts",
+      "pendingjobposts": "Pending Job Posts",
+      "expiredjobposts": "Expired Job Posts",
+      "totalapplications": "Total Applications"
+    }
+  },
+  "interviewCreateCard": {
+    "title": {
+      "scheduleOnlineInterview": "Schedule Online Interview",
+      "scheduledtime": "Scheduled Time"
+    },
+    "label": {
+      "selectjobpost": "Select job post",
+      "selectcandidate": "Select candidate",
+      "selectquestiongroupoptional": "Select Question Group (Optional)",
+      "selectinterviewquestions": "Select Interview Questions"
+    },
+    "helperText": {
+      "selectaquestiongrouptoautomaticallyfillthequestionsbelow": "Select a question group to automatically fill the questions below"
+    },
+    "validation": {
+      "selectJobPost": "Please select a job post",
+      "selectCandidate": "Please select a candidate"
+    },
+    "messages": {
+      "loadDataError": "Error loading initial data",
+      "loadCandidateError": "Error loading candidate list",
+      "scheduleSuccess": "Interview scheduled successfully",
+      "scheduleError": "Error scheduling interview"
+    },
+    "noCandidates": "No candidates have applied",
+    "none": "None",
+    "questions": "questions",
+    "noQuestions": "No questions available. Please create questions in the Question Bank.",
+    "cancel": "Cancel",
+    "scheduleNow": "Schedule Now"
+  },
+  "interviewDetail": {
+    "title": "Online Interview Details",
+    "subtitle": {
+      "info": "Interview Information",
+      "aiEvaluation": "AI Evaluation Result",
+      "history": "Conversation History"
+    },
+    "label": {
+      "roomCode": "Room Code",
+      "candidate": "CANDIDATE",
+      "position": "POSITION",
+      "type": "INTERVIEW TYPE",
+      "schedule": "SCHEDULE",
+      "liveMonitoring": "LIVE MONITORING",
+      "aiInterviewer": "AI Interviewer",
+      "candidateSmall": "Candidate"
+    },
+    "messages": {
+      "notFound": "Interview session information not found",
+      "aiGenerating": "AI evaluation results are being generated",
+      "aiAnalyzing": "AI is analyzing the conversation...",
+      "notEnded": "Interview has not ended",
+      "noHistory": "No conversation data available"
+    },
+    "actions": {
+      "backToList": "Back to list",
+      "viewReport": "View detailed report"
+    }
+  },
+  "jobPostFilterForm": {
+    "label": {
+      "refresh": "refresh"
+    }
+  },
+  "jobPostForm": {
+    "validation": {
+      "jobnameisrequired": "Job name is required.",
+      "jobnameexceededallowedlength": "Job name exceeded allowed length.",
+      "careerisrequired": "Career is required.",
+      "positionisrequired": "Position is required.",
+      "experienceisrequired": "Experience is required.",
+      "workplaceisrequired": "Workplace is required.",
+      "jobtypeisrequired": "Job type is required.",
+      "numberofvacanciesisrequired": "Number of vacancies is required.",
+      "invalidnumberofvacancies": "Invalid number of vacancies.",
+      "atleastonevacancyisrequired": "At least one vacancy is required.",
+      "genderrequirementisrequired": "Gender requirement is required.",
+      "minimumsalaryisrequired": "Minimum salary is required.",
+      "invalidminimumsalary": "Invalid minimum salary.",
+      "minSalaryLess": "Minimum salary must be less than maximum salary.",
+      "maximumsalaryisrequired": "Maximum salary is required.",
+      "invalidmaximumsalary": "Invalid maximum salary.",
+      "maxSalaryGreater": "Maximum salary must be greater than minimum salary.",
+      "academiclevelisrequired": "Academic level is required.",
+      "applicationdeadlineisrequired": "Application deadline is required.",
+      "invalidapplicationdeadline": "Invalid application deadline.",
+      "deadlinemustbeaftertoday": "Deadline must be after today.",
+      "jobDescRequired": "Job description is required.",
+      "jobReqRequired": "Job requirement is required.",
+      "benefitsRequired": "Benefits are required.",
+      "cityprovinceisrequired": "City/Province is required.",
+      "districtisrequired": "District is required.",
+      "addressisrequired": "Address is required.",
+      "addressexceededallowedlength": "Address exceeded allowed length.",
+      "latitudeisrequired": "Latitude is required.",
+      "invalidlatitude": "Invalid latitude.",
+      "longitudeisrequired": "Longitude is required.",
+      "invalidlongitude": "Invalid longitude.",
+      "contactpersonnameisrequired": "Contact person name is required.",
+      "contactpersonnameexceededallowedlength": "Contact person name exceeded allowed length.",
+      "contactpersonphoneisrequired": "Contact person phone is required.",
+      "invalidphonenumber": "Invalid phone number.",
+      "contactpersonphoneexceededallowedlength": "Contact person phone exceeded allowed length.",
+      "contactpersonemailisrequired": "Contact person email is required.",
+      "invalidemail": "Invalid email.",
+      "contactpersonemailexceededallowedlength": "Contact person email exceeded allowed length."
+    },
+    "warning": "When you update the post, it will be pending approval!",
+    "title": {
+      "jobtitle": "Job Title",
+      "career": "Career",
+      "position": "Position",
+      "experience": "Experience",
+      "workplace": "Workplace",
+      "jobtype": "Job Type",
+      "numberofvacancies": "Number of Vacancies",
+      "genderrequirement": "Gender Requirement",
+      "minimumsalary": "Minimum Salary",
+      "maximumsalary": "Maximum Salary",
+      "academiclevel": "Academic Level",
+      "applicationdeadline": "Application Deadline",
+      "jobdescription": "Job Description",
+      "jobrequirement": "Job Requirement",
+      "benefits": "Benefits",
+      "cityprovince": "City/Province",
+      "district": "District",
+      "address": "Address",
+      "latitude": "Latitude",
+      "longitude": "Longitude",
+      "contactpersonname": "Contact Person Name",
+      "contactpersonphone": "Contact Person Phone",
+      "contactpersonemail": "Contact Person Email",
+      "urgent": "Urgent"
+    },
+    "placeholder": {
+      "enterjobtitle": "Enter job title",
+      "selectcareer": "Select career",
+      "selectposition": "Select position",
+      "selectrequiredexperience": "Select required experience",
+      "selectworkplace": "Select workplace",
+      "selectjobtype": "Select job type",
+      "enternumberofvacancies": "Enter number of vacancies",
+      "selectgenderrequirement": "Select gender requirement",
+      "enterminimumsalary": "Enter minimum salary",
+      "entermaximumsalary": "Enter maximum salary",
+      "selectacademiclevel": "Select academic level",
+      "selectcityprovince": "Select city/province",
+      "selectdistrict": "Select district",
+      "enteraddress": "Enter address",
+      "enterlatitudecoordinateofthecompanyonthemap": "Enter latitude coordinate of the company on the map.",
+      "enterlongitudecoordinateofthecompanyonthemap": "Enter longitude coordinate of the company on the map.",
+      "entercontactpersonname": "Enter contact person name",
+      "entercontactpersonphone": "Enter contact person phone",
+      "entercontactpersonemail": "Enter contact person email"
+    },
+    "helperText": {
+      "automaticallyfilledifyouchooseasuggestedaddress": "Automatically filled if you choose a suggested address."
+    }
+  },
+  "profileCard": {
+    "title": {
+      "noresultsfound": "No results found."
+    },
+    "label": {
+      "resultsFound": "Results found:",
+      "profiles": "{{count}} profiles"
+    },
+    "messages": {
+      "saveSuccess": "Saved successfully.",
+      "unsaveSuccess": "Unsaved successfully."
+    }
+  },
+  "profileSearch": {
+    "title": {
+      "advancedFilters": "Advanced Filters"
+    },
+    "placeholder": {
+      "enterkeywords": "Enter keywords...",
+      "selectcityprovince": "Select City/Province",
+      "allcareers": "All Careers",
+      "allexperience": "All Experience",
+      "allpositions": "All Positions",
+      "allacademiclevels": "All Academic Levels",
+      "allworkplaces": "All Workplaces",
+      "allemploymenttypes": "All Employment Types",
+      "allgenders": "All Genders",
+      "allmaritalstatuses": "All Marital Statuses"
+    },
+    "label": {
+      "search": "Search",
+      "clearFilters": "Clear Filters",
+      "careers": "Careers",
+      "experience": "Experience",
+      "position": "Position",
+      "academicLevel": "Academic Level",
+      "workplace": "Workplace",
+      "employmentType": "Employment Type",
+      "gender": "Gender",
+      "maritalStatus": "Marital Status"
+    }
+  },
+  "questionGroupsCard": {
+    "label": {
+      "breadcrumb": "breadcrumb",
+      "questiongroupname": "Question Group Name",
+      "description": "Description",
+      "selectquestions": "Select Questions",
+      "questioncontent": "Question Content"
+    },
+    "placeholder": {
+      "searchquestiongroups": "Search question groups..."
+    }
+  },
+  "sendMailCard": {
+    "title": {
+      "sendmail": "Send Mail",
+      "recipientname": "Recipient name",
+      "recipientemail": "Recipient email",
+      "subject": "Subject",
+      "emailcontent": "Email content",
+      "sendacopytomyemployeremailaddress": "Send a copy to my employer email address."
+    },
+    "placeholder": {
+      "enterrecipientname": "Enter recipient name",
+      "enterrecipientemail": "Enter recipient email",
+      "enteremailsubject": "Enter email subject"
+    }
+  },
+
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "jobPostList": "Job Post List",
+    "candidateManagement": "Candidate Management",
+    "appliedApplications": "Applied Applications",
+    "savedProfiles": "Saved Profiles",
+    "findCandidates": "Find Candidates",
+    "onlineInterviews": "Online Interviews",
+    "interviewList": "Interview List",
+    "interviewLive": "Live Interview Room",
+    "questionBank": "Question Bank",
+    "questionSets": "Question Sets",
+    "notifications": "Notifications",
+    "accountManagement": "Account Management",
+    "companyInfo": "Company Info",
+    "employerVerification": "Employer Verification",
+    "account": "Account",
+    "settings": "Settings"
+  },
+  "interviewLive": {
+    "title": "Live Interviews",
+    "scheduleBtn": "Schedule Interview",
+    "stats": {
+      "inProgress": "In Progress: {{count}}",
+      "scheduled": "Scheduled: {{count}}",
+      "completed": "Completed: {{count}}"
+    },
+    "table": {
+      "candidate": "Candidate",
+      "position": "Position",
+      "room": "Room",
+      "time": "Time",
+      "status": "Status",
+      "emptyMessage": "No active interview sessions found."
+    },
+    "statuses": {
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "scheduled": "Scheduled",
+      "cancelled": "Cancelled",
+      "calibration": "Calibration",
+      "processing": "Processing",
+      "connecting": "Connecting",
+      "active": "Active"
+    }
+  },
+  "verification": {
+    "title": "Employer Verification",
+    "step1": {
+      "title": "Step 1: Update Company Profile",
+      "description": "Complete company information before submitting verification documents. Admin will review this content before granting posting rights.",
+      "openBtn": "Open Company Information Page",
+      "statusRequired": "Status: Update Required"
+    },
+    "step2": {
+      "title": "Step 2: Enterprise Legal Documents",
+      "description": "Provide legal document information for admin to verify the enterprise.",
+      "enterpriseName": "Enterprise Name",
+      "taxCode": "Tax Code",
+      "licenseNumber": "Business License Number",
+      "representative": "Representative",
+      "phone": "Phone Number",
+      "email": "Contact Email",
+      "website": "Website",
+      "saveBtn": "Save Legal Documents",
+      "statusPending": "Status: Pending Approval"
+    },
+    "step3": {
+      "title": "Step 3: Register for Online Interview",
+      "description": "Admin will confirm the interview schedule and send room participation information.",
+      "timeLabel": "Desired Time",
+      "contactPerson": "Contact Person",
+      "contactPhone": "Contact Phone Number",
+      "notes": "Notes",
+      "sendRequestBtn": "Send Interview Request",
+      "statusLabel": "Status: {{status}}"
+    },
+    "submittedSchedules": {
+      "title": "Submitted Interview Schedules",
+      "noRequests": "No interview requests yet.",
+      "proposedTime": "Proposed Time: {{time}}",
+      "contact": "Contact: {{phone}}",
+      "notes": "Notes: {{notes}}"
+    },
+    "messages": {
+      "infoRecorded": "Information recorded.",
+      "noScheduleYet": "No schedule yet",
+      "waitingConfirmation": "Waiting for confirmation"
+    }
+  },
+  "profileDetailCard": {
+    "title": {
+      "profileDetail": "Candidate Profile Details",
+      "personalInfo": "Personal Information",
+      "generalInfo": "General Information",
+      "careerGoals": "Career Goals",
+      "workExperience": "Work Experience",
+      "education": "Education",
+      "certificates": "Certificates",
+      "languages": "Languages",
+      "advancedSkills": "Advanced Skills",
+      "profileNotFound": "Profile information not found.",
+      "privateProfile": "This profile may be set to private."
+    },
+    "label": {
+      "lastUpdated": "Updated:",
+      "lastViewed": "Last viewed:",
+      "printProfile": "Print profile",
+      "saveProfile": "Save profile",
+      "saved": "Saved",
+      "unsave": "Unsave",
+      "download": "Download",
+      "view": "View",
+      "notUpdated": "Not updated",
+      "email": "Email",
+      "phone": "Phone",
+      "gender": "Gender",
+      "dob": "Date of Birth",
+      "maritalStatus": "Marital Status",
+      "cityProvince": "City/Province",
+      "district": "District",
+      "address": "Address",
+      "desiredPosition": "Desired Position",
+      "desiredLevel": "Desired Level",
+      "educationLevel": "Education Level",
+      "experience": "Experience",
+      "career": "Career",
+      "workLocation": "Work Location",
+      "desiredSalary": "Desired Salary",
+      "workplaceType": "Workplace Type",
+      "jobType": "Job Type",
+      "major": "Major",
+      "school": "School",
+      "proficiency": "Proficiency Level",
+      "noExpiration": "No expiration"
+    },
+    "messages": {
+      "saveSuccess": "Saved successfully.",
+      "unsaveSuccess": "Unsaved successfully.",
+      "emailSentSuccess": "Email sent successfully.",
+      "loadingPdf": "Loading PDF..."
+    }
+  },
+  "common": {
+    "notUpdated": "Not updated",
+    "present": "Present"
+  },
+  "company": {
+    "tabs": {
+      "info": "Company Information",
+      "multimedia": "Multimedia"
+    },
+    "title": "Company Information"
+  },
+  "pricing": {
+    "heroTitle": "Pricing",
+    "heroSubtitle": "We provide flexible, easy-to-choose service packages that can be adjusted to the scale of the enterprise's recruitment.",
+    "contactBtn": "Contact for consultation",
+    "plans": {
+      "basic": {
+        "title": "Basic",
+        "price": "Contact",
+        "desc": "Suitable for enterprises starting to recruit.",
+        "f1": "Basic job posting",
+        "f2": "Candidate management",
+        "f3": "Overview report"
+      },
+      "standard": {
+        "title": "Standard",
+        "price": "Contact",
+        "desc": "For recruitment teams expanding scale.",
+        "f1": "Advanced search and filtering",
+        "f2": "Interview scheduling",
+        "f3": "Priority support"
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "price": "On Demand",
+        "desc": "Custom solution for enterprises with large needs.",
+        "f1": "Custom recruitment package",
+        "f2": "Detailed reports",
+        "f3": "Process optimization consulting"
+      }
+    }
+  },
+  "introduce": {
+    "pageTitle": "Introduction",
+    "heroTitle": "Introduction",
+    "heroSubtitle": "{{appName}} supports employers in optimizing the entire recruitment process, from posting, reaching candidates to managing interviews and evaluations. Our goal is to help businesses recruit the right people faster, clearer, and more effectively.",
+    "processTitle": "Simple Recruitment Process",
+    "stepLabel": "Step {{index}}",
+    "highlights": {
+      "h1": {
+        "title": "Post quickly, reach the right people",
+        "desc": "Create standard job posts, clearly displaying requirements and benefits to attract suitable candidates."
+      },
+      "h2": {
+        "title": "Search profiles by skill",
+        "desc": "Filters by industry, experience, location help shorten screening time."
+      },
+      "h3": {
+        "title": "Track recruitment process",
+        "desc": "Manage candidate status, interview schedule, and feedback centrally on one screen."
+      },
+      "h4": {
+        "title": "Build recruitment brand",
+        "desc": "Clear, reliable company profile pages help increase candidate interest rates."
+      }
+    },
+    "steps": {
+      "s1": {
+        "title": "Post Job",
+        "desc": "Create job posts with complete and standardized information."
+      },
+      "s2": {
+        "title": "Receive Profiles",
+        "desc": "Candidates submit profiles online, concentrated in one place."
+      },
+      "s3": {
+        "title": "Evaluate",
+        "desc": "Screen according to criteria, note and share internally."
+      },
+      "s4": {
+        "title": "Interview",
+        "desc": "Schedule and respond quickly, ensuring candidate experience."
+      }
+    }
+  },
+  "support": {
+    "pageTitle": "Support Center",
+    "heroTitle": "How can we help you?",
+    "heroSubtitle": "{{appName}} is always ready to help you optimize your recruitment process. If you encounter any difficulties, please contact us through the channels below.",
+    "directSupport": {
+      "title": "Direct Support",
+      "desc": "Contact our technical support and recruitment consulting team.",
+      "note": "Time: 8:00 - 18:00 (Mon - Sat)"
+    },
+    "docs": {
+      "title": "User Documentation",
+      "desc": "Search for answers in our detailed user manual repository.",
+      "note": "Latest update: 2024"
+    },
+    "feedback": {
+      "title": "Feedback & Suggestions",
+      "desc": "We always listen to your comments to improve our service.",
+      "note": "Response within 24h"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "How to post a job quickly?",
+      "a1": "Just select 'Post New Job', fill in the required information and click 'Post'. Your post will be approved within 30 minutes.",
+      "q2": "How does AI technology help in screening profiles?",
+      "a2": "The AI system will automatically analyze candidate skills and experience against job requirements and provide a matching score, helping you save 70% of screening time.",
+      "q3": "How to ensure business information security?",
+      "a3": "We use international standard data encryption and multi-layer security to ensure your and candidate information is always safe."
+    }
+  },
+  "service": {
+    "pageTitle": "Our Services",
+    "heroTitle": "Comprehensive Recruitment Solutions",
+    "heroSubtitle": "{{appName}} provides powerful tools to help you find, connect, and manage talent most effectively.",
+    "jobPost": {
+      "title": "Job Posting",
+      "desc": "Reach thousands of potential candidates every day through our platform."
+    },
+    "search": {
+      "title": "Resume Search",
+      "desc": "Use smart filters to find exactly the right candidate for the skills you need."
+    },
+    "interview": {
+      "title": "Online Interview",
+      "desc": "Integrated high-quality Video Call interview tools, notes, and instant evaluation."
+    },
+    "report": {
+      "title": "Reporting & Analytics",
+      "desc": "Track recruitment effectiveness through detailed and transparent statistics."
+    }
+  },
+  "account": {
+    "pageTitle": "Account Management",
+    "info": "Account Information"
+  },
+  "setting": {
+    "pageTitle": "Settings",
+    "title": "System Settings"
+  }
+}

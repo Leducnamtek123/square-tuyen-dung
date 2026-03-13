@@ -1,0 +1,43 @@
+{
+  "home": {
+    "tabTitle": "Fast job search, effective recruitment at {{appName}}",
+    "topCompanies": "Top Companies",
+    "urgentJobs": "Urgent Jobs",
+    "keyCareers": "Key Careers",
+    "suggestedJobs": "Suggested Jobs",
+    "exploreHeading": "Need to find the right job for you?",
+    "startExploring": "Start exploring",
+    "userFeedback": "User Feedback",
+    "jobsIn": "{{careerName}} Jobs"
+  },
+  "jobDetail": {
+    "deadline": "Deadline",
+    "views": "views",
+    "postedDate": "Posted date",
+    "salary": "Salary",
+    "experience": "Experience",
+    "position": "Position",
+    "jobType": "Job Type",
+    "description": "Job Description",
+    "requirements": "Job Requirements",
+    "benefits": "Benefits",
+    "additionalInfo": "Additional Information",
+    "career": "Career",
+    "workplaceType": "Workplace Type",
+    "academicLevel": "Academic Level",
+    "quantity": "Quantity",
+    "location": "Location",
+    "genderRequired": "Gender requirement",
+    "contactInfo": "Contact Information",
+    "contactPerson": "Contact Person",
+    "contactEmail": "Contact Email",
+    "contactPhone": "Phone Number",
+    "address": "Address",
+    "map": "Map",
+    "similarJobs": "Similar Jobs",
+    "notUpdated": "Not updated",
+    "savedSuccess": "Saved successfully.",
+    "unsavedSuccess": "Unsaved successfully.",
+    "noData": "No data available."
+  }
+}

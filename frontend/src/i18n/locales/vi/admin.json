@@ -1,0 +1,517 @@
+{
+  "dashboard": {
+    "totalUsers": "Tổng người dùng",
+    "jobPosts": "Tin tuyển dụng",
+    "pendingApproval": "Chờ phê duyệt",
+    "applications": "Lượt ứng tuyển",
+    "userDistribution": "Phân bổ người dùng theo vai trò",
+    "generalStats": "Thống kê tổng quát",
+    "systemInfo": "Thông tin hệ thống",
+    "total": "Tổng:",
+    "employers": "Nhà tuyển dụng:",
+    "jobSeekers": "Người tìm việc:",
+    "status": "Trạng thái:",
+    "statusActive": "Đang hoạt động",
+    "pendingPosts": "Tin chờ duyệt:",
+    "users": "người dùng",
+    "roles": {
+      "employer": "Nhà tuyển dụng",
+      "jobSeeker": "Người tìm việc",
+      "admin": "Quản trị viên"
+    }
+  },
+  "sidebar": {
+    "systemOverview": "Tổng quan",
+    "systemAndUsers": "Người dùng & HT",
+    "usersAndPermissions": "Phân quyền",
+    "systemConfiguration": "Cấu hình hệ thống",
+    "generalCategories": "Danh mục chung",
+    "careersManagement": "Ngành nghề",
+    "citiesManagement": "Tỉnh/Thành phố",
+    "districtsManagement": "Quận/Huyện",
+    "infoAndProfiles": "Hồ sơ & Thông tin",
+    "companyManagement": "Công ty",
+    "candidateProfiles": "Hồ sơ ứng viên",
+    "resumeManagement": "Hồ sơ đính kèm",
+    "recruitmentAndInterviews": "Tuyển dụng",
+    "jobPosts": "Tin tuyển dụng",
+    "activityLogs": "Lịch sử hoạt động",
+    "questionBank": "Ngân hàng câu hỏi",
+    "interviewQuestionSets": "Bộ câu hỏi",
+    "interviewSchedule": "Lịch phỏng vấn",
+    "interviewLive": "Phỏng vấn Live",
+    "jobNotifications": "Thông báo việc làm"
+  },
+  "pages": {
+    "careers": {
+      "title": "Quản lý Ngành nghề",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbGeneral": "Cấu hình chung",
+      "breadcrumbCareers": "Ngành nghề",
+      "addCareer": "Thêm ngành nghề",
+      "searchPlaceholder": "Tìm kiếm ngành nghề...",
+      "addConfirmTitle": "Thêm ngành nghề mới",
+      "editConfirmTitle": "Sửa ngành nghề",
+      "careerNameLabel": "Tên ngành nghề",
+      "iconLabel": "Biểu tượng (App)",
+      "cancelBtn": "Hủy",
+      "saveBtn": "Lưu",
+      "savingBtn": "Đang lưu...",
+      "deleteTitle": "Xác nhận xóa",
+      "deleteText": "Bạn có chắc chắn muốn xóa ngành nghề <strong>{{name}}</strong> không? Hành động này không thể hoàn tác.",
+      "deleteBtn": "Xác nhận xóa",
+      "deletingBtn": "Đang xóa...",
+      "table": {
+        "id": "ID",
+        "careerName": "Tên ngành nghề",
+        "symbol": "Ký hiệu",
+        "totalPosts": "Tổng số bài viết",
+        "actions": "Thao tác",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "noData": "Không có dữ liệu"
+      }
+    },
+    "cities": {
+      "title": "Quản lý Tỉnh/Thành phố",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbGeneral": "Cấu hình chung",
+      "breadcrumbCities": "Tỉnh/Thành phố",
+      "addCity": "Thêm thành phố",
+      "addConfirmTitle": "Thêm thành phố mới",
+      "editConfirmTitle": "Sửa thành phố",
+      "cityNameLabel": "Tên thành phố",
+      "cancelBtn": "Hủy",
+      "saveBtn": "Lưu",
+      "savingBtn": "Đang lưu...",
+      "deleteTitle": "Xác nhận xóa",
+      "deleteText": "Bạn có chắc chắn muốn xóa thành phố <strong>{{name}}</strong> không? Hành động này không thể hoàn tác.",
+      "deleteBtn": "Xác nhận xóa",
+      "deletingBtn": "Đang xóa...",
+      "table": {
+        "id": "ID",
+        "cityName": "Tên thành phố",
+        "actions": "Thao tác",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "noData": "Không có dữ liệu"
+      }
+    },
+    "districts": {
+      "title": "Quản lý Quận/Huyện",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbGeneral": "Cấu hình chung",
+      "breadcrumbDistricts": "Quận/Huyện",
+      "addDistrict": "Thêm quận/huyện",
+      "filterCityPlaceholder": "Chọn thành phố để lọc",
+      "addConfirmTitle": "Thêm quận/huyện mới",
+      "editConfirmTitle": "Sửa quận/huyện",
+      "cityLabel": "Thành phố",
+      "districtNameLabel": "Tên quận/huyện",
+      "cancelBtn": "Hủy",
+      "saveBtn": "Lưu",
+      "savingBtn": "Đang lưu...",
+      "deleteTitle": "Xác nhận xóa",
+      "deleteText": "Bạn có chắc chắn muốn xóa quận/huyện <strong>{{name}}</strong> không? Hành động này không thể hoàn tác.",
+      "deleteBtn": "Xác nhận xóa",
+      "deletingBtn": "Đang xóa...",
+      "table": {
+        "id": "ID",
+        "districtName": "Tên quận/huyện",
+        "actions": "Thao tác",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "noData": "Không có dữ liệu cho thành phố này",
+        "noCitySelected": "Vui lòng chọn thành phố để xem danh sách quận/huyện"
+      }
+    },
+    "companies": {
+      "addCompany": "Thêm công ty",
+      "searchPlaceholder": "Tìm kiếm công ty...",
+      "addConfirmTitle": "Thêm công ty mới",
+      "editConfirmTitle": "Sửa thông tin công ty",
+      "companyNameLabel": "Tên công ty",
+      "taxCodeLabel": "Mã số thuế",
+      "employeeSizeLabel": "Quy mô nhân sự",
+      "companyEmailLabel": "Email công ty",
+      "companyPhoneLabel": "Số điện thoại",
+      "fieldOperationLabel": "Lĩnh vực hoạt động",
+      "websiteLabel": "Website",
+      "cancelBtn": "Hủy",
+      "saveBtn": "Lưu",
+      "savingBtn": "Đang lưu...",
+      "deleteTitle": "Xác nhận xóa",
+      "deleteText": "Bạn có chắc chắn muốn xóa công ty <strong>{{name}}</strong> không? Hành động này không thể hoàn tác và có thể ảnh hưởng đến các bài đăng tuyển dụng liên quan.",
+      "deleteBtn": "Xác nhận xóa",
+      "deletingBtn": "Đang xóa...",
+      "table": {
+        "logo": "Logo",
+        "companyName": "Tên công ty",
+        "scale": "Quy mô",
+        "field": "Lĩnh vực",
+        "location": "Địa điểm",
+        "jobPosts": "Bài tuyển dụng",
+        "followers": "Lượt theo dõi",
+        "actions": "Thao tác",
+        "viewDetails": "Xem chi tiết",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa"
+      }
+    },
+    "jobActivity": {
+      "title": "Lịch sử Ứng tuyển Tuyển dụng",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbJobs": "Việc làm & Phỏng vấn",
+      "breadcrumbActivity": "Hoạt động Ứng tuyển",
+      "searchPlaceholder": "Tìm kiếm hoạt động...",
+      "editStatusTitle": "Cập nhật Trạng thái Ứng tuyển",
+      "statusLabel": "Trạng thái",
+      "statusOptions": {
+        "applied": "Đã ứng tuyển",
+        "pending": "Đang chờ",
+        "accepted": "Tham gia",
+        "rejected": "Từ chối"
+      },
+      "cancelBtn": "Hủy",
+      "saveBtn": "Lưu",
+      "savingBtn": "Đang lưu...",
+      "deleteTitle": "Xác nhận xóa",
+      "deleteText": "Bạn có chắc chắn muốn xóa lịch sử ứng tuyển của <strong>{{name}}</strong> không? Hành động này không thể hoàn tác.",
+      "deleteBtn": "Xác nhận xóa",
+      "deletingBtn": "Đang xóa...",
+      "table": {
+        "candidate": "Ứng viên",
+        "jobPost": "Tin tuyển dụng",
+        "company": "Công ty",
+        "status": "Trạng thái",
+        "updatedAt": "Cập nhật lúc",
+        "actions": "Thao tác",
+        "updateStatus": "Cập nhật trạng thái",
+        "delete": "Xóa",
+        "noData": "Không có dữ liệu"
+      }
+    },
+    "jobs": {
+      "title": "Danh sách Tin tuyển dụng",
+      "total": "tổng số",
+      "showing": "Hiển thị",
+      "to": "đến",
+      "of": "của",
+      "detailTitle": "Chi tiết Tin tuyển dụng",
+      "company": "Công ty",
+      "salary": "Mức lương",
+      "quantity": "Số lượng",
+      "people": "người",
+      "experience": "Kinh nghiệm",
+      "years": "năm",
+      "academicLevel": "Trình độ học vấn",
+      "jobDescription": "Mô tả công việc",
+      "jobRequirements": "Yêu cầu công việc",
+      "close": "Đóng",
+      "reject": "Từ chối",
+      "approve": "Duyệt bài",
+      "editTitle": "Sửa Tin tuyển dụng",
+      "jobTitleLabel": "Tiêu đề công việc",
+      "deadlineLabel": "Hạn chót",
+      "cancel": "Hủy",
+      "save": "Lưu",
+      "deleteConfirm": "Bạn có chắc chắn muốn xóa tin tuyển dụng này không?",
+      "table": {
+        "status": {
+          "pending": "Đang chờ",
+          "rejected": "Đã từ chối",
+          "approved": "Đã duyệt",
+          "unknown": "Không rõ"
+        },
+        "jobPostCompany": "Tin tuyển dụng / Công ty",
+        "postDate": "Ngày đăng",
+        "deadline": "Hạn chót",
+        "statusCol": "Trạng thái",
+        "actions": "Thao tác",
+        "viewDetails": "Xem chi tiết",
+        "edit": "Chỉnh sửa",
+        "approveAction": "Duyệt",
+        "rejectAction": "Từ chối",
+        "delete": "Xóa"
+      },
+      "filter": {
+        "searchPlaceholder": "Tìm theo tiêu đề hoặc công ty..."
+      }
+    },
+    "profiles": {
+      "addCandidate": "Thêm ứng viên",
+      "searchPlaceholder": "Tìm kiếm ứng viên...",
+      "addTitle": "Thêm hồ sơ ứng viên mới",
+      "editTitle": "Sửa hồ sơ ứng viên",
+      "fullNameLabel": "Họ và tên",
+      "phoneLabel": "Số điện thoại",
+      "dobLabel": "Ngày sinh",
+      "genderLabel": "Giới tính",
+      "genderOptions": {
+        "male": "Nam",
+        "female": "Nữ",
+        "other": "Khác"
+      },
+      "maritalStatusLabel": "Tình trạng hôn nhân",
+      "maritalOptions": {
+        "single": "Độc thân",
+        "married": "Đã kết hôn"
+      },
+      "cityLabel": "Thành phố",
+      "districtLabel": "Quận/Huyện",
+      "addressLabel": "Địa chỉ",
+      "cancelBtn": "Hủy",
+      "saveBtn": "Lưu",
+      "savingBtn": "Đang lưu...",
+      "deleteTitle": "Xác nhận xóa",
+      "deleteText": "Bạn có chắc chắn muốn xóa hồ sơ của <strong>{{name}}</strong> không? Hành động này không thể hoàn tác.",
+      "deleteBtn": "Xác nhận xóa",
+      "deletingBtn": "Đang xóa...",
+      "table": {
+        "avatar": "Ảnh đại diện",
+        "fullName": "Họ và tên",
+        "email": "Email",
+        "phone": "Số điện thoại",
+        "gender": "Giới tính",
+        "dob": "Ngày sinh",
+        "actions": "Thao tác",
+        "viewDetails": "Xem chi tiết",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "noData": "Không có dữ liệu"
+      }
+    },
+    "questionGroups": {
+      "title": "Quản lý Nhóm câu hỏi",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbBank": "Ngân hàng câu hỏi",
+      "breadcrumbGroups": "Nhóm câu hỏi",
+      "addBtn": "Thêm Nhóm câu hỏi",
+      "searchPlaceholder": "Tìm kiếm nhóm câu hỏi...",
+      "addTitle": "Thêm Nhóm câu hỏi mới",
+      "editTitle": "Sửa Nhóm câu hỏi",
+      "groupNameLabel": "Tên nhóm câu hỏi",
+      "descriptionLabel": "Mô tả",
+      "selectQuestionsLabel": "Chọn câu hỏi",
+      "createQuestionBtn": "Tạo Câu hỏi mới",
+      "cancelBtn": "Hủy",
+      "saveBtn": "Lưu",
+      "savingBtn": "Đang lưu...",
+      "createQuestionTitle": "Tạo Câu hỏi mới",
+      "questionContentLabel": "Nội dung câu hỏi",
+      "createBtn": "Tạo",
+      "creatingBtn": "Đang tạo...",
+      "deleteTitle": "Xác nhận xóa",
+      "deleteText": "Bạn có chắc chắn muốn xóa nhóm câu hỏi <strong>{{name}}</strong> không? Các câu hỏi bên trong sẽ không bị xóa, nhưng liên kết với nhóm này sẽ bị mất.",
+      "deleteBtn": "Xác nhận xóa",
+      "deletingBtn": "Đang xóa...",
+      "table": {
+        "noData": "Không có nhóm câu hỏi nào",
+        "groupName": "Tên nhóm câu hỏi",
+        "description": "Mô tả",
+        "questionCount": "Số lượng câu hỏi",
+        "actions": "Thao tác",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa"
+      }
+    },
+    "resumes": {
+      "searchPlaceholder": "Tìm kiếm hồ sơ...",
+      "editTitle": "Sửa hồ sơ",
+      "resumeTitleLabel": "Tiêu đề hồ sơ",
+      "minSalaryLabel": "Lương tối thiểu",
+      "maxSalaryLabel": "Lương tối đa",
+      "cancelBtn": "Hủy",
+      "saveBtn": "Lưu",
+      "savingBtn": "Đang lưu...",
+      "deleteTitle": "Xác nhận xóa",
+      "deleteText": "Bạn có chắc chắn muốn xóa hồ sơ <strong>{{name}}</strong> không? Hành động này không thể hoàn tác.",
+      "deleteBtn": "Xác nhận xóa",
+      "deletingBtn": "Đang xóa...",
+      "table": {
+        "resumeTitle": "Tiêu đề hồ sơ",
+        "candidate": "Ứng viên",
+        "resumeType": "Loại hồ sơ",
+        "experience": "Kinh nghiệm",
+        "lastUpdate": "Cập nhật lần cuối",
+        "status": "Trạng thái",
+        "actions": "Thao tác",
+        "uploadedFile": "Tệp tải lên",
+        "onlineProfile": "Hồ sơ trực tuyến",
+        "active": "Đang hoạt động",
+        "inactive": "Không hoạt động",
+        "viewDetails": "Xem chi tiết",
+        "delete": "Xóa",
+        "noData": "Không có dữ liệu"
+      }
+    },
+    "users": {
+      "table": {
+        "id": "ID",
+        "fullName": "Họ và tên",
+        "email": "Email",
+        "role": "Vai trò",
+        "verification": "Xác thực",
+        "status": "Trạng thái",
+        "actions": "Thao tác",
+        "verified": "Đã xác thực",
+        "unverified": "Chưa xác thực",
+        "active": "Đang hoạt động",
+        "blocked": "Đã khóa",
+        "scheduleInterview": "Lên lịch phỏng vấn",
+        "blockAccount": "Khóa tài khoản",
+        "unblockAccount": "Mở khóa tài khoản",
+        "noUsers": "Không tìm thấy người dùng"
+      },
+      "filter": {
+        "searchPlaceholder": "Tìm kiếm theo tên hoặc email...",
+        "roleLabel": "Vai tr?",
+        "roleAll": "T?t c? vai tr?"
+      },
+      "scheduleInterviewDialog": {
+        "title": "Đặt lịch phỏng vấn",
+        "vettingFor": "Phỏng vấn vetting cho: <strong>{{name}}</strong>",
+        "timeLabel": "Thời gian phỏng vấn",
+        "questionsLabel": "Chọn câu hỏi",
+        "questionsPlaceholder": "Tìm kiếm câu hỏi...",
+        "notesLabel": "Ghi chú",
+        "notesPlaceholder": "Ghi chú thêm về cuộc phỏng vấn...",
+        "cancelBtn": "Hủy",
+        "submitBtn": "Đặt lịch phỏng vấn",
+        "schedulingBtn": "Đang đặt lịch..."
+      },
+      "roles": {
+        "admin": "Qu?n tr? vi?n",
+        "employer": "Nh? tuy?n d?ng",
+        "jobSeeker": "Ng??i t?m vi?c"
+      },
+      "toast": {
+        "blockSuccess": "?? kh?a t?i kho?n.",
+        "unblockSuccess": "?? m? kh?a t?i kho?n.",
+        "actionFailed": "Thao t?c th?t b?i.",
+        "roleUpdated": "?? c?p nh?t vai tr?.",
+        "roleUpdateFailed": "C?p nh?t vai tr? th?t b?i."
+      }
+    },
+    "questions": {
+      "title": "Ngân hàng Câu hỏi Phỏng vấn",
+      "addBtn": "Thêm Câu hỏi",
+      "listTitle": "Danh sách Câu hỏi",
+      "deleteConfirm": "Bạn có chắc chắn muốn xóa câu hỏi này không?",
+      "addTitle": "Thêm Câu hỏi mới",
+      "editTitle": "Sửa Câu hỏi",
+      "questionContentLabel": "Nội dung câu hỏi",
+      "difficultyLabel": "Độ khó",
+      "fieldCareerLabel": "Lĩnh vực / Ngành nghề",
+      "selectCareer": "-- Chọn Ngành nghề --",
+      "cancelBtn": "Hủy",
+      "saveBtn": "Lưu",
+      "savingBtn": "Đang lưu...",
+      "difficulty": {
+        "easy": "Dễ",
+        "medium": "Trung bình",
+        "hard": "Khó"
+      },
+      "table": {
+        "questionContent": "Nội dung câu hỏi",
+        "field": "Lĩnh vực",
+        "difficulty": "Độ khó",
+        "actions": "Thao tác",
+        "general": "Chung",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa"
+      }
+    },
+    "interviewLive": {
+      "title": "Phỏng vấn Trực tiếp Công ty",
+      "stats": {
+        "inProgress": "Đang thực hiện: {{count}}",
+        "scheduled": "Đã lên lịch: {{count}}",
+        "completed": "Đã hoàn thành: {{count}}"
+      },
+      "table": {
+        "company": "Công ty",
+        "candidate": "Ứng viên",
+        "position": "Vị trí",
+        "room": "Phòng",
+        "time": "Thời gian",
+        "status": "Trạng thái",
+        "emptyMessage": "Không có phiên phỏng vấn nào đang hoạt động."
+      }
+    },
+    "jobNotifications": {
+      "title": "Thông báo Việc làm",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbJobsInterviews": "Việc làm & Phỏng vấn",
+      "addBtn": "Tạo thông báo",
+      "searchPlaceholder": "Tìm kiếm thông báo...",
+      "addTitle": "Tạo thông báo mới",
+      "editTitle": "Chỉnh sửa thông báo",
+      "labelTitle": "Tiêu đề",
+      "labelContent": "Nội dung",
+      "labelRecipient": "ID người nhận (Để trống nếu gửi toàn hệ thống)",
+      "cancelBtn": "Hủy",
+      "confirmBtn": "Xác nhận",
+      "sendingBtn": "Đang gửi...",
+      "deleteConfirmTitle": "Xác nhận xóa",
+      "deleteConfirmText": "Bạn có chắc chắn muốn xóa thông báo <strong>{{title}}</strong> không? Hành động này không thể hoàn tác.",
+      "deletingBtn": "Đang xóa...",
+      "table": {
+        "title": "Tiêu đề",
+        "content": "Nội dung",
+        "recipient": "Người nhận",
+        "sentAt": "Gửi lúc",
+        "actions": "Thao tác",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "noData": "Không tìm thấy dữ liệu"
+      }
+    },
+    "interviews": {
+      "type": {
+        "vetting": "Vetting",
+        "recruitment": "Tuyển dụng"
+      }
+    },
+    "settings": {
+      "title": "Cài đặt Hệ thống",
+      "generalTitle": "Cài đặt Chung",
+      "maintenanceMode": {
+        "label": "Bảo trì Hệ thống",
+        "description": "Dừng tất cả hoạt động của người dùng để bảo trì"
+      },
+      "autoApproveJobs": {
+        "label": "Tự động duyệt tin tuyển dụng",
+        "description": "Cho phép các tin tuyển dụng được phê duyệt tự động"
+      },
+      "emailNotifications": {
+        "label": "Thông báo Email",
+        "description": "Gửi thông báo hệ thống qua email cho quản trị viên"
+      },
+      "saveBtn": "Lưu thay đổi"
+    }
+  },
+  "common": {
+    "pagination": {
+      "rowsPerPage": "Số hàng mỗi trang:",
+      "displayedRows": "{{from}}-{{to}} của {{count}}",
+      "all": "T?t c?"
+    },
+    "breadcrumb": "Đường dẫn",
+    "table": {
+      "noData": "Không có dữ liệu",
+      "loading": "Đang tải dữ liệu..."
+    },
+    "status": {
+      "completed": "Đã hoàn thành",
+      "pending": "Đang chờ",
+      "inProgress": "Đang thực hiện",
+      "scheduled": "Đã lên lịch",
+      "cancelled": "Đã hủy",
+      "unknown": "Không rõ"
+    },
+    "na": "N/A",
+    "system": "Hệ thống",
+    "hot": "Hot"
+  }
+}

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Button, Paper, Stack, Typography } from '@mui/material';
+import { Box, Button, Paper, Stack, Typography } from "@mui/material";
+
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../configs/constants';

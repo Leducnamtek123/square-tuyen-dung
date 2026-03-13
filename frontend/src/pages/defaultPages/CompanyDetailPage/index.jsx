@@ -1,25 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
-
-
 import React from "react";
 
 import { useParams } from "react-router-dom";
@@ -28,27 +6,9 @@ import { useSelector } from "react-redux";
 
 import dayjs from "dayjs";
 
-import {
+import { Box, Card, IconButton, Link, Stack, Typography, Button, Skeleton } from "@mui/material";
 
-  Box,
-
-  Card,
-
-  Grid,
-
-  IconButton,
-
-  Link,
-
-  Stack,
-
-  Typography,
-
-  Button,
-
-  Skeleton,
-
-} from "@mui/material";
+import Grid from "@mui/material/Grid2";
 
 import { LoadingButton } from "@mui/lab";
 
@@ -74,11 +34,6 @@ import {
 
 } from "@fortawesome/free-solid-svg-icons";
 
-
-
-
-
-
 import { TabTitle } from "../../../utils/generalFunction";
 
 import { ICONS, IMAGES, ROLES_NAME } from "../../../configs/constants";
@@ -90,6 +45,7 @@ import toastMessages from "../../../utils/toastMessages";
 import Map from "../../../components/Map";
 
 import QRCodeBox from "../../../components/QRCodeBox";
+
 import SocialNetworkSharingPopup from "../../../components/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
 
 import ShareIcon from "@mui/icons-material/Share";
@@ -106,12 +62,9 @@ import ImageGalleryCustom from "../../../components/ImageGalleryCustom";
 
 import companyService from "../../../services/companyService";
 
-
-
 import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
 
 import CompanyDetailLoading from "./components/CompanyDetailLoading";
-
 
 const CompanyDetailPage = () => {
 
@@ -131,8 +84,6 @@ const CompanyDetailPage = () => {
 
   const [imageList, setImageList] = React.useState([]);
 
-
-
   React.useEffect(() => {
 
     const getCompanyDetail = async (companySlug) => {
@@ -145,13 +96,9 @@ const CompanyDetailPage = () => {
 
         const companyImages = data?.companyImages || [];
 
-
-
         setCompanyDetail(data);
 
         TabTitle(data?.companyName);
-
-
 
         var imagelistNew = [];
 
@@ -179,13 +126,9 @@ const CompanyDetailPage = () => {
 
     };
 
-
-
     getCompanyDetail(slug);
 
   }, [slug]);
-
-
 
   const handleFollow = () => {
 
@@ -215,7 +158,7 @@ const CompanyDetailPage = () => {
 
         toastMessages.success(
 
-          isFollowed ? "Theo dõi thành công." : "Hủy theo dõi thành công."
+          isFollowed ? "Followed successfully." : "Unfollowed successfully."
 
         );
 
@@ -231,13 +174,9 @@ const CompanyDetailPage = () => {
 
     };
 
-
-
     follow();
 
   };
-
-
 
   return isLoading ? (
 
@@ -583,13 +522,19 @@ const CompanyDetailPage = () => {
 
           </Card>
 
-
-
           <Box>
 
             <Grid container spacing={3}>
 
-              <Grid item xs={12} md={8}>
+              <Grid
+
+                size={{
+
+                  xs: 12,
+
+                  md: 8
+
+                }}>
 
                 <Card
 
@@ -697,8 +642,6 @@ const CompanyDetailPage = () => {
 
                     </Box>
 
-
-
                     <Box>
 
                       <Typography
@@ -720,6 +663,7 @@ const CompanyDetailPage = () => {
                       >
 
                         Việc làm đang tuyển
+
                       </Typography>
 
                       <FilterJobPostCard
@@ -740,9 +684,15 @@ const CompanyDetailPage = () => {
 
               </Grid>
 
+              <Grid
 
+                size={{
 
-              <Grid item xs={12} md={4}>
+                  xs: 12,
+
+                  md: 4
+
+                }}>
 
                 <Card
 
@@ -856,8 +806,6 @@ const CompanyDetailPage = () => {
 
                     </Box>
 
-
-
                     {/* Social Media Links */}
 
                     <Box>
@@ -939,8 +887,6 @@ const CompanyDetailPage = () => {
                       </Stack>
 
                     </Box>
-
-
 
                     {/* Company Info */}
 
@@ -1072,8 +1018,6 @@ const CompanyDetailPage = () => {
 
                     </Box>
 
-
-
                     {/* Map */}
 
                     <Box>
@@ -1093,6 +1037,7 @@ const CompanyDetailPage = () => {
                       >
 
                         Bản đồ
+
                       </Typography>
 
                       <Box
@@ -1126,8 +1071,6 @@ const CompanyDetailPage = () => {
                       </Box>
 
                     </Box>
-
-
 
                     {/* Image Gallery */}
 
@@ -1190,8 +1133,6 @@ const CompanyDetailPage = () => {
         </Stack>
 
       </Box>
-
-
 
       {/* Start: SocialNetworkSharingPopup */}
 
@@ -1259,9 +1200,4 @@ const CompanyDetailPage = () => {
 
 };
 
-
-
 export default CompanyDetailPage;
-
-
-

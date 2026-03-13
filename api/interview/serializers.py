@@ -9,7 +9,6 @@ from .models import (
 )
 from common import serializers as common_serializers
 
-
 class QuestionSerializer(serializers.ModelSerializer):
     questionText = serializers.CharField(source="text", read_only=True)
     careerDict = common_serializers.CareerSerializer(source="career", read_only=True)
@@ -17,11 +16,10 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = [
-            'id', 'text', 'questionText', 'category', 'difficulty',
+            'id', 'text', 'questionText', 'difficulty',
             'career', 'careerDict', 'sort_order', 'author', 'company', 'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'author', 'company', 'create_at', 'update_at']
-
 
 class QuestionGroupSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
@@ -42,13 +40,11 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
     def get_questions_count(self, obj):
         return obj.questions.count()
 
-
 class InterviewTranscriptSerializer(serializers.ModelSerializer):
     class Meta:
         model = InterviewTranscript
         fields = ['id', 'interview', 'speaker_role', 'content', 'speech_duration_ms', 'create_at']
         read_only_fields = ['id', 'create_at']
-
 
 class InterviewEvaluationSerializer(serializers.ModelSerializer):
     evaluator_name = serializers.CharField(source='evaluator.full_name', read_only=True)
@@ -62,7 +58,6 @@ class InterviewEvaluationSerializer(serializers.ModelSerializer):
             'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'evaluator', 'create_at', 'update_at']
-
 
 class InterviewSessionListSerializer(serializers.ModelSerializer):
     """Serializer cho danh sách (nhẹ, không nested)."""
@@ -83,7 +78,6 @@ class InterviewSessionListSerializer(serializers.ModelSerializer):
 
     def get_evaluations_count(self, obj):
         return obj.evaluations.count()
-
 
 class InterviewSessionDetailSerializer(serializers.ModelSerializer):
     """Serializer chi tiết (có nested transcripts, evaluations, questions)."""
@@ -113,7 +107,6 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
             'created_by', 'create_at', 'update_at'
         ]
 
-
 class InterviewSessionCreateSerializer(serializers.ModelSerializer):
     """Serializer tạo mới interview."""
     question_ids = serializers.PrimaryKeyRelatedField(
@@ -138,7 +131,6 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
             session.questions.set(session.question_group.questions.all())
         return session
 
-
 class InterviewContextSerializer(serializers.Serializer):
     """Context cho AI Agent khi join room (follow SquareAI)."""
     candidateName = serializers.CharField()
@@ -147,13 +139,11 @@ class InterviewContextSerializer(serializers.Serializer):
     questions = serializers.ListField()
     interviewType = serializers.CharField()
 
-
 class AppendTranscriptSerializer(serializers.Serializer):
     """Serializer cho agent gửi transcript."""
     speaker_role = serializers.ChoiceField(choices=['ai_agent', 'candidate'])
     content = serializers.CharField()
     speech_duration_ms = serializers.IntegerField(required=False, allow_null=True)
-
 
 class UpdateStatusSerializer(serializers.Serializer):
     """Serializer cập nhật status."""
