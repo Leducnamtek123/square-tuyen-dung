@@ -1,7 +1,6 @@
 from livekit_agent.session_settings import build_session_kwargs
 from livekit_agent.config import config
 
-
 def test_build_session_kwargs() -> None:
     kwargs = build_session_kwargs()
     assert kwargs["preemptive_generation"] == config.PREEMPTIVE_GENERATION

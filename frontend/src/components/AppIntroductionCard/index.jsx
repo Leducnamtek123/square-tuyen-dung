@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { Link } from 'react-router-dom';
@@ -37,8 +21,6 @@ const AppIntroductionCard = () => {
   const handleSendSMS = (event) => {
 
     event.preventDefault();
-
-    
 
     const sendSMS = async (data) => {
 
@@ -233,4 +215,3 @@ const AppIntroductionCard = () => {
 };
 
 export default AppIntroductionCard;
-

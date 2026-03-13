@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-
 def should_enable_preemptive(transcript: str, *, min_words: int, min_chars: int) -> bool:
     text = transcript.strip()
     if len(text) < min_chars:

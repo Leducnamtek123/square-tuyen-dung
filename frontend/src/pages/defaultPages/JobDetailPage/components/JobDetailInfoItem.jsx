@@ -1,7 +1,9 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Typography } from "@mui/material";
 
 const JobDetailInfoItem = ({ title, value }) => {
+  const { t } = useTranslation(["public"]);
   return (
     <Box>
       <Typography
@@ -16,7 +18,7 @@ const JobDetailInfoItem = ({ title, value }) => {
           <span style={{ fontWeight: "bold" }}>{value}</span>
         ) : (
           <span style={{ color: "#e0e0e0", fontStyle: "italic", fontSize: 13 }}>
-            ChÆ°a cáº­p nháº­t
+            {t("jobDetail.notUpdated")}
           </span>
         )}
       </Typography>

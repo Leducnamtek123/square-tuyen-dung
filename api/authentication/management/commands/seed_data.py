@@ -220,7 +220,6 @@ class Command(BaseCommand):
             self.stdout.write(f'Generated {len(seeds_data)} profiles...')
 
             for i, seed in enumerate(seeds_data):
-                # User
                 user, created = User.objects.get_or_create(
                     email=seed['email'],
                     defaults={
@@ -234,7 +233,6 @@ class Command(BaseCommand):
                 user.set_password('Abc@1234')
                 user.save()
 
-                # Profile
                 profile, _ = JobSeekerProfile.objects.get_or_create(
                     user=user,
                     defaults={
@@ -270,7 +268,6 @@ class Command(BaseCommand):
                     }
                 )
 
-                # Resume
                 resume, _ = Resume.objects.get_or_create(
                     user=user,
                     job_seeker_profile=profile,
@@ -310,14 +307,12 @@ class Command(BaseCommand):
                     )
                     q_list.append(q)
 
-                # Question Group
                 group, _ = QuestionGroup.objects.get_or_create(
                     name=f"Bộ đề phỏng vấn {seed['role']}",
                     author=employer_user
                 )
                 group.questions.set(q_list)
 
-                # Interview Session
                 interview, _ = InterviewSession.objects.get_or_create(
                     candidate=user,
                     job_post=job_post,

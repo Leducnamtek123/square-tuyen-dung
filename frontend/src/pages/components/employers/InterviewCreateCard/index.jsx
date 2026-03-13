@@ -1,22 +1,7 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import { useState, useEffect } from 'react';
 
 import { Box, Typography, Button, Paper, TextField, MenuItem, FormControl, InputLabel, Select, OutlinedInput, Chip, CircularProgress, Stack, Divider, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+
 import Grid from "@mui/material/Grid2";
 
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 
 import { toast } from 'react-toastify';
+
 import { useTranslation } from 'react-i18next';
 
 import interviewService from '../../../../services/interviewService';
@@ -42,9 +28,11 @@ import { transformQuestion, transformJobPost, transformAppliedResume, transformQ
 
 import DateTimePickerCustom from '../../../../components/controls/DateTimePickerCustom';
 
-const InterviewCreateCard = ({ title = "Schedule Online Interview" }) => {
+const InterviewCreateCard = ({ title }) => {
+
     const navigate = useNavigate();
-    const { t } = useTranslation(['interview', 'common']);
+
+    const { t } = useTranslation(['employer', 'interview', 'common']);
 
     const [jobs, setJobs] = useState([]);
 
@@ -55,9 +43,13 @@ const InterviewCreateCard = ({ title = "Schedule Online Interview" }) => {
     const [candidates, setCandidates] = useState([]);
 
     const [isLoadingData, setIsLoadingData] = useState(true);
+
     const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
+
     const [isSavingQuestion, setIsSavingQuestion] = useState(false);
+
     const [questionDraft, setQuestionDraft] = useState('');
+
     const [editingQuestionId, setEditingQuestionId] = useState(null);
 
     const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm({
@@ -83,13 +75,21 @@ const InterviewCreateCard = ({ title = "Schedule Online Interview" }) => {
     const selectedGroupId = watch('selected_group');
 
     const fetchQuestions = async () => {
+
         const questionsRes = await questionService.getQuestions({ pageSize: 1000 });
+
         const rawQuestions = Array.isArray(questionsRes?.results)
+
             ? questionsRes.results
+
             : Array.isArray(questionsRes)
+
                 ? questionsRes
+
                 : [];
+
         setQuestions(rawQuestions.map(transformQuestion).filter(Boolean));
+
     };
 
     useEffect(() => {
@@ -111,29 +111,47 @@ const InterviewCreateCard = ({ title = "Schedule Online Interview" }) => {
                 ]);
 
                 const rawJobs = Array.isArray(jobsRes?.results)
+
                     ? jobsRes.results
+
                     : Array.isArray(jobsRes)
+
                         ? jobsRes
+
                         : [];
+
                 const rawQuestions = Array.isArray(questionsRes?.results)
+
                     ? questionsRes.results
+
                     : Array.isArray(questionsRes)
+
                         ? questionsRes
+
                         : [];
+
                 const rawGroups = Array.isArray(groupsRes?.results)
+
                     ? groupsRes.results
+
                     : Array.isArray(groupsRes)
+
                         ? groupsRes
+
                         : [];
 
                 setJobs(rawJobs.map(transformJobPost).filter(Boolean));
+
                 setQuestions(rawQuestions.map(transformQuestion).filter(Boolean));
+
                 setQuestionGroups(rawGroups.map(transformQuestionGroup).filter(Boolean));
+
             } catch (error) {
 
                 console.error('Error fetching initial data', error);
 
-                toast.error('Error loading initial data');
+                toast.error(t('interviewCreateCard.messages.loadDataError'));
+
             } finally {
 
                 setIsLoadingData(false);
@@ -153,13 +171,21 @@ const InterviewCreateCard = ({ title = "Schedule Online Interview" }) => {
         if (selectedGroupId) {
 
             const group = questionGroups.find((g) => String(g.id) === String(selectedGroupId));
+
             if (group && group.questions) {
+
                 const questionIds = group.questions.map(q => q.id);
+
                 setValue('selected_questions', questionIds);
+
             }
+
         } else {
+
             setValue('selected_questions', []);
+
         }
+
     }, [selectedGroupId, questionGroups, setValue]);
 
     useEffect(() => {
@@ -169,22 +195,39 @@ const InterviewCreateCard = ({ title = "Schedule Online Interview" }) => {
             jobPostActivityService.getAppliedResume({ jobPostId: selectedJobPostId, pageSize: 100 })
 
                 .then(res => {
+
                     const rawCandidates = Array.isArray(res?.results)
+
                         ? res.results
+
                         : Array.isArray(res)
+
                             ? res
+
                             : Array.isArray(res?.data?.results)
+
                                 ? res.data.results
+
                                 : Array.isArray(res?.data)
+
                                     ? res.data
+
                                     : [];
+
                     setCandidates(rawCandidates.map(transformAppliedResume).filter(Boolean));
+
                     setValue('candidate', '');
+
                 })
+
                 .catch(err => {
+
                     console.error('Error fetching candidates', err);
-                    toast.error('Error loading candidate list');
+
+                    toast.error(t('interviewCreateCard.messages.loadCandidateError'));
+
                 });
+
         } else {
 
             setCandidates([]);
@@ -196,58 +239,104 @@ const InterviewCreateCard = ({ title = "Schedule Online Interview" }) => {
     }, [selectedJobPostId, setValue]);
 
     const openCreateQuestionDialog = () => {
+
         setEditingQuestionId(null);
+
         setQuestionDraft('');
+
         setIsQuestionDialogOpen(true);
+
     };
 
     const openEditQuestionDialog = () => {
+
         const selected = watch('selected_questions') || [];
+
         if (selected.length !== 1) {
+
             toast.error(t('interview:employer.questions.editSelectionError'));
+
             return;
+
         }
+
         const q = questions.find((item) => item.id === selected[0]);
+
         if (!q) {
+
             toast.error(t('interview:employer.questions.editSelectionError'));
+
             return;
+
         }
+
         setEditingQuestionId(q.id);
+
         setQuestionDraft(q.text || q.questionText || q.content || '');
+
         setIsQuestionDialogOpen(true);
+
     };
 
     const handleSaveQuestion = async () => {
+
         const trimmed = questionDraft.trim();
+
         if (!trimmed) {
+
             toast.error(t('interview:employer.questions.textRequired'));
+
             return;
+
         }
+
         setIsSavingQuestion(true);
+
         try {
+
             if (editingQuestionId) {
+
                 await questionService.updateQuestion(editingQuestionId, { text: trimmed });
+
                 toast.success(t('interview:employer.questions.updateSuccess'));
+
             } else {
+
                 const newQuestion = await questionService.createQuestion({ text: trimmed });
+
                 toast.success(t('interview:employer.questions.createSuccess'));
+
                 const createdId = newQuestion?.id || newQuestion?.data?.id || newQuestion?.results?.id;
+
                 if (createdId) {
+
                     const current = watch('selected_questions') || [];
+
                     setValue('selected_questions', [...current, createdId]);
+
                 }
+
             }
+
             await fetchQuestions();
+
             setIsQuestionDialogOpen(false);
+
         } catch (error) {
+
             console.error('Question save error:', error);
+
             toast.error(t('interview:employer.questions.saveError'));
+
         } finally {
+
             setIsSavingQuestion(false);
+
         }
+
     };
 
-const onSubmit = async (data) => {
+    const onSubmit = async (data) => {
 
         try {
 
@@ -267,7 +356,8 @@ const onSubmit = async (data) => {
 
             await interviewService.scheduleSession(payload);
 
-            toast.success('Interview scheduled successfully');
+            toast.success(t('interviewCreateCard.messages.scheduleSuccess'));
+
             // Fix double slash and ensure correct route
 
             navigate(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`);
@@ -276,7 +366,8 @@ const onSubmit = async (data) => {
 
             console.error('Submit error:', error);
 
-            toast.error('Error scheduling interview');
+            toast.error(t('interviewCreateCard.messages.scheduleError'));
+
         }
 
     };
@@ -296,6 +387,7 @@ const onSubmit = async (data) => {
     }
 
     return (
+
         <Box sx={{
 
             px: { xs: 1, sm: 2 },
@@ -307,7 +399,9 @@ const onSubmit = async (data) => {
             borderRadius: 2
 
         }}>
+
             {/* Header Section */}
+
             <Stack
 
                 direction={{ xs: 'column', sm: 'row' }}
@@ -342,11 +436,12 @@ const onSubmit = async (data) => {
 
                 >
 
-                    {title}
+                    {title || t('interviewCreateCard.title.scheduleOnlineInterview')}
 
                 </Typography>
 
             </Stack>
+
             <Paper sx={{ p: { xs: 2, sm: 4 }, borderRadius: 3, boxShadow: (theme) => theme.customShadows?.card || 2 }}>
 
                 <form onSubmit={handleSubmit(onSubmit)}>
@@ -354,9 +449,13 @@ const onSubmit = async (data) => {
                     <Grid container spacing={3}>
 
                         <Grid
+
                             size={{
+
                                 xs: 12,
+
                                 md: 6
+
                             }}>
 
                             <Controller
@@ -365,7 +464,8 @@ const onSubmit = async (data) => {
 
                                 control={control}
 
-                                rules={{ required: 'Please select a job post' }}
+                                rules={{ required: t('interviewCreateCard.validation.selectJobPost') }}
+
                                 render={({ field }) => (
 
                                     <TextField
@@ -376,7 +476,8 @@ const onSubmit = async (data) => {
 
                                         fullWidth
 
-                                        label={t('interviewCreateCard.label.selectjobpost', 'Select job post')}
+                                        label={t('interviewCreateCard.label.selectjobpost')}
+
                                         error={!!errors.job_post}
 
                                         helperText={errors.job_post?.message}
@@ -404,9 +505,13 @@ const onSubmit = async (data) => {
                         </Grid>
 
                         <Grid
+
                             size={{
+
                                 xs: 12,
+
                                 md: 6
+
                             }}>
 
                             <Controller
@@ -415,7 +520,8 @@ const onSubmit = async (data) => {
 
                                 control={control}
 
-                                rules={{ required: 'Please select a candidate' }}
+                                rules={{ required: t('interviewCreateCard.validation.selectCandidate') }}
+
                                 render={({ field }) => (
 
                                     <TextField
@@ -426,12 +532,14 @@ const onSubmit = async (data) => {
 
                                         fullWidth
 
-                                        label={t('interviewCreateCard.label.selectcandidate', 'Select candidate')}
+                                        label={t('interviewCreateCard.label.selectcandidate')}
+
                                         disabled={!selectedJobPostId || candidates.length === 0}
 
                                         error={!!errors.candidate}
 
-                                        helperText={errors.candidate?.message || (selectedJobPostId && candidates.length === 0 ? 'No candidates have applied' : '')}
+                                        helperText={errors.candidate?.message || (selectedJobPostId && candidates.length === 0 ? t('interviewCreateCard.noCandidates') : '')}
+
                                         variant="outlined"
 
                                     >
@@ -455,9 +563,13 @@ const onSubmit = async (data) => {
                         </Grid>
 
                         <Grid
+
                             size={{
+
                                 xs: 12,
+
                                 md: 6
+
                             }}>
 
                             <DateTimePickerCustom
@@ -466,7 +578,8 @@ const onSubmit = async (data) => {
 
                                 control={control}
 
-                                title={t('interviewCreateCard.title.scheduledtime', 'Scheduled Time')}
+                                title={t('interviewCreateCard.title.scheduledtime')}
+
                                 showRequired
 
                                 minDateTime={new Date().toISOString()}
@@ -493,22 +606,26 @@ const onSubmit = async (data) => {
 
                                         fullWidth
 
-                                        label={t('interviewCreateCard.label.selectquestiongroupoptional', 'Select Question Group (Optional)')}
+                                        label={t('interviewCreateCard.label.selectquestiongroupoptional')}
+
                                         variant="outlined"
 
-                                        helperText={t('interviewCreateCard.helperText.selectaquestiongrouptoautomaticallyfillthequestionsbelow', 'Select a question group to automatically fill the questions below')}
+                                        helperText={t('interviewCreateCard.helperText.selectaquestiongrouptoautomaticallyfillthequestionsbelow')}
+
                                     >
 
                                         <MenuItem value="">
 
-                                            <em>None</em>
+                                            <em>{t('interviewCreateCard.none')}</em>
+
                                         </MenuItem>
 
                                         {questionGroups.map((group) => (
 
                                             <MenuItem key={group.id} value={group.id}>
 
-                                                {group.name} ({group.questions?.length || 0} questions)
+                                                {group.name} ({group.questions?.length || 0} {t('interviewCreateCard.questions')})
+
                                             </MenuItem>
 
                                         ))}
@@ -525,7 +642,8 @@ const onSubmit = async (data) => {
 
                             <FormControl fullWidth variant="outlined" error={!!errors.selected_questions}>
 
-                                <InputLabel>Chọn câu hỏi phỏng vấn</InputLabel>
+                                <InputLabel>{t('interviewCreateCard.label.selectinterviewquestions')}</InputLabel>
+
                                 <Controller
 
                                     name="selected_questions"
@@ -540,15 +658,18 @@ const onSubmit = async (data) => {
 
                                             multiple
 
-                                            input={<OutlinedInput label={t('interviewCreateCard.label.selectinterviewquestions', 'Select Interview Questions')} />}
+                                            input={<OutlinedInput label={t('interviewCreateCard.label.selectinterviewquestions')} />}
+
                                             renderValue={(selected) => (
 
                                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
 
                                                     {(Array.isArray(selected) ? selected : []).map((value) => {
+
                                                         const q = questions.find(item => item.id === value);
 
                                                         const label = q?.text || q?.questionText || q?.content || `Question #${value}`;
+
                                                         return <Chip key={value} label={label.substring(0, 30) + (label.length > 30 ? '...' : '')} size="small" />;
 
                                                     })}
@@ -563,7 +684,8 @@ const onSubmit = async (data) => {
 
                                                 <MenuItem disabled>
 
-                                                    <em>No questions available. Please create questions in the Question Bank.</em>
+                                                    <em>{t('interviewCreateCard.noQuestions')}</em>
+
                                                 </MenuItem>
 
                                             )}
@@ -575,6 +697,7 @@ const onSubmit = async (data) => {
                                                     <Typography variant="body2" sx={{ maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis' }}>
 
                                                         {q.text || q.questionText || q.content || `Question #${q.id}`}
+
                                                     </Typography>
 
                                                 </MenuItem>
@@ -645,7 +768,8 @@ const onSubmit = async (data) => {
 
                                 >
 
-                                    Hủy bỏ
+                                    {t('interviewCreateCard.cancel')}
+
                                 </Button>
 
                                 <Button
@@ -666,7 +790,8 @@ const onSubmit = async (data) => {
 
                                 >
 
-                                    Lên lịch ngay
+                                    {t('interviewCreateCard.scheduleNow')}
+
                                 </Button>
 
                             </Stack>
@@ -678,6 +803,7 @@ const onSubmit = async (data) => {
                 </form>
 
             </Paper>
+
             <Dialog
 
                 open={isQuestionDialogOpen}
@@ -757,10 +883,11 @@ const onSubmit = async (data) => {
                 </DialogActions>
 
             </Dialog>
+
         </Box>
+
     );
 
 };
 
 export default InterviewCreateCard;
-

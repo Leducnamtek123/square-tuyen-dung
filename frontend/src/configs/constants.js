@@ -1,20 +1,13 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
 import dayjs from './dayjs-config';
+
 import DeveloperBoardIcon from "@mui/icons-material/DeveloperBoard";
+
 import DevicesIcon from "@mui/icons-material/Devices";
 
 // Import SVG files
+
 import emptyDataSvg from "../assets/images/svg-images/empty-data.svg";
+
 import onlineGallerySvg from "../assets/images/svg-images/online-gallery.svg";
 
 import emptyStreetSvg from "../assets/images/svg-images/empty-street.svg";
@@ -128,6 +121,7 @@ const AUTH_CONFIG = {
   ACCESS_TOKEN_KEY: "access_token",
 
   REFRESH_TOKEN_KEY: "refresh_token",
+  REFRESH_TOKEN_GRANT: "refresh_token",
 
   PASSWORD_KEY: "password",
 
@@ -144,8 +138,6 @@ const AUTH_CONFIG = {
   GOOGLE_CLIENT_ID: import.meta.env.VITE_GOOGLE_CLIENT_ID || "dummy-google-client-id",
 
   GOOGLE_CLIENT_SECRET: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
-
-  // GOONG
 
   GOONGAPI_KEY: import.meta.env.VITE_GOONGAPI_KEY,
 
@@ -191,16 +183,27 @@ const PAGINATION = {
 };
 
 const HOME_FILTER_CAREER = [
+
   {
+
     id: 34,
+
     name: "IT - Software",
+
     titleIcon: DevicesIcon
+
   },
+
   {
+
     id: 33,
+
     name: "IT - Hardware/Networking",
+
     titleIcon: DeveloperBoardIcon
+
   },
+
 ];
 
 const REGEX_VATIDATE = {
@@ -235,15 +238,25 @@ const DATE_OPTIONS = {
 };
 
 const IMAGES = {
+
   getLogo: (mode = 'dark') => {
+
     return mode === 'light'
+
       ? '/square-icons/logo square svg-white.svg'
+
       : '/square-icons/logo square svg-black.svg';
+
   },
+
   getTextLogo: (mode = 'dark') => {
+
     return mode === 'light'
+
       ? '/square-icons/logo square svg-white.svg'
+
       : '/square-icons/logo square svg-black.svg';
+
   },
 
   coverImageDefault,
@@ -451,21 +464,37 @@ const ROUTES = {
     NOTIFICATION: "thong-bao",
 
     ACCOUNT: "tai-khoan",
+
     SETTING: "cai-dat",
+
     CHAT: "ket-noi-voi-ung-vien",
+
     INTERVIEW_LIST: "danh-sach-phong-van",
+
     INTERVIEW_LIVE: "phong-van-ung-vien-truc-tiep",
+
     INTERVIEW_CREATE: "len-lich-phong-van",
+
     INTERVIEW_DETAIL: "chi-tiet-phong-van/:id",
+
     QUESTION_BANK: "ngan-hang-cau-hoi",
+
     QUESTION_GROUPS: "bo-cau-hoi",
+
     VERIFICATION: "xac-thuc-nha-tuyen-dung",
+
   },
+
   CANDIDATE: {
+
     LOGIN: "phong-van/dang-nhap",
+
     INTERVIEW: "phong-van/:id",
+
     INTERVIEW_ROOM: "phong-van/room/:id",
+
   },
+
   ADMIN: {
 
     DASHBOARD: "",
@@ -497,6 +526,7 @@ const ROUTES = {
     JOB_ACTIVITY: "nhat-ky-tin-tuyen-dung",
 
     JOB_NOTIFICATIONS: "thong-bao-viec-lam",
+
     INTERVIEW_LIVE: "phong-van-cong-ty-truc-tiep",
 
   },
@@ -588,4 +618,3 @@ export {
   SVG_IMAGES,
 
 };
-

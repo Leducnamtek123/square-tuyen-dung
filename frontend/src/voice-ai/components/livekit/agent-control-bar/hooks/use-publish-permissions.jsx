@@ -33,4 +33,3 @@ export function usePublishPermissions() {
     data: localPermissions?.canPublishData ?? false,
   };
 }
-

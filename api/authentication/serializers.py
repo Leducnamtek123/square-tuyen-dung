@@ -1,13 +1,3 @@
-"""
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-"""
 
 from configs import variable_system as var_sys
 from configs.messages import ERROR_MESSAGES
@@ -27,12 +17,10 @@ from common.models import Location, File
 from common.serializers import LocationSerializer
 from helpers.cloudinary_service import CloudinaryService
 
-
 class CheckCredsSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, max_length=100)
     roleName = serializers.CharField(required=False, max_length=10,
                                      allow_null=True, allow_blank=True)
-
 
 class ForgotPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True, max_length=100)
@@ -42,7 +30,6 @@ class ForgotPasswordSerializer(serializers.Serializer):
         if platform not in ["WEB", "APP"]:
             raise serializers.ValidationError(ERROR_MESSAGES['INVALID_PLATFORM'])
         return platform
-
 
 class UpdatePasswordSerializer(serializers.Serializer):
     oldPassword = serializers.CharField(required=True, max_length=128)
@@ -67,7 +54,6 @@ class UpdatePasswordSerializer(serializers.Serializer):
         instance.save()
 
         return instance
-
 
 class ResetPasswordSerializer(serializers.Serializer):
     newPassword = serializers.CharField(required=True, max_length=128)
@@ -104,7 +90,6 @@ class ResetPasswordSerializer(serializers.Serializer):
                 raise serializers.ValidationError({'token': ERROR_MESSAGES['TOKEN_REQUIRED']})
         return attrs
 
-
 class JobSeekerRegisterSerializer(serializers.Serializer):
     fullName = serializers.CharField(source="full_name", required=True, max_length=100)
     email = serializers.EmailField(required=True, max_length=100,
@@ -139,7 +124,6 @@ class JobSeekerRegisterSerializer(serializers.Serializer):
     class Meta:
         model = User
         fields = ("fullName", "email", "password", "confirmPassword", "platform")
-
 
 class CompanyRegisterSerializer(serializers.ModelSerializer):
     companyName = serializers.CharField(source="company_name", required=True, max_length=255,
@@ -176,7 +160,6 @@ class CompanyRegisterSerializer(serializers.ModelSerializer):
                   "employeeSize",
                   "websiteUrl", "description",
                   "location")
-
 
 class EmployerRegisterSerializer(serializers.Serializer):
     company = CompanyRegisterSerializer()
@@ -215,7 +198,6 @@ class EmployerRegisterSerializer(serializers.Serializer):
     class Meta:
         model = User
         fields = ("fullName", "email", "password", "confirmPassword", "company", "platform")
-
 
 class UserSerializer(serializers.ModelSerializer):
     fullName = serializers.CharField(source="full_name", required=False, allow_blank=True)
@@ -314,7 +296,6 @@ class UserSerializer(serializers.ModelSerializer):
                   "jobSeekerProfileId", "jobSeekerProfile",
                   "companyId", "company",)
 
-
 class AvatarSerializer(serializers.ModelSerializer):
     file = serializers.FileField(required=True, write_only=True)
     avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
@@ -338,13 +319,11 @@ class AvatarSerializer(serializers.ModelSerializer):
                 if user.avatar:
                     path_list = user.avatar.public_id.split('/')
                     public_id = path_list[-1] if path_list else None
-                # Upload to cloudinary
                 avatar_upload_result = CloudinaryService.upload_image(
                     file,
                     settings.CLOUDINARY_DIRECTORY["avatar"],
                     public_id=public_id
                 )
-                # Update or create file
                 user.avatar = File.update_or_create_file_with_cloudinary(
                     user.avatar,
                     avatar_upload_result,
@@ -364,7 +343,6 @@ class AvatarSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('file', 'avatarUrl')
-
 
 class UserSettingSerializer(serializers.ModelSerializer):
     emailNotificationActive = serializers.BooleanField(required=True, source='email_notification_active')

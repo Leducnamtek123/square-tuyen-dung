@@ -40,6 +40,7 @@ urlpatterns = [
             path('interviews/<str:room_name>/context', interviews_compat_views.interview_context),
             path('interviews/<str:room_name>/next-question', interviews_compat_views.interview_next_question),
             path('interviews/<str:room_name>/status', interviews_compat_views.interview_status),
+            path('interviews/<str:room_name>/append-transcription', interviews_compat_views.interview_append_transcription),
         ]
     )),
     path('', custom_admin_site.urls),

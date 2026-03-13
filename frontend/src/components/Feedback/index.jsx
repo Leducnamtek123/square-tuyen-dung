@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
@@ -23,6 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography, Box } from "@mui/material";
+
 import Grid from "@mui/material/Grid2";
 
 import CloseIcon from '@mui/icons-material/Close';
@@ -126,7 +111,9 @@ const Feedback = () => {
   };
 
   return (
+
     <>
+
       <Button
 
         variant="contained"
@@ -162,8 +149,6 @@ const Feedback = () => {
           fontWeight: 600,
 
           letterSpacing: '0.2px',
-
-          
 
           '&:hover': {
 
@@ -258,6 +243,7 @@ const Feedback = () => {
         Phản hồi
 
       </Button>
+
       <Dialog 
 
         open={open} 
@@ -269,6 +255,7 @@ const Feedback = () => {
         fullWidth
 
         slotProps={{
+
           paper: {
 
             sx: {
@@ -282,6 +269,7 @@ const Feedback = () => {
             }
 
           }
+
         }}
 
       >
@@ -535,11 +523,13 @@ const Feedback = () => {
         </DialogActions>
 
       </Dialog>
+
       {isFullScreenLoading && <BackdropLoading />}
+
     </>
+
   );
 
 };
 
 export default Feedback;
-

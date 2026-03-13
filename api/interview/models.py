@@ -11,7 +11,6 @@ from job.models import JobPost
 from info.models import Resume
 import uuid
 
-
 class InterviewBaseModel(models.Model):
     class Meta:
         abstract = True
@@ -19,10 +18,7 @@ class InterviewBaseModel(models.Model):
     create_at = models.DateTimeField(auto_now_add=True)
     update_at = models.DateTimeField(auto_now=True)
 
-
-# ============================================================
 # Question Bank
-# ============================================================
 
 class Question(InterviewBaseModel):
     """Ngân hàng câu hỏi phỏng vấn — chỉ cần nội dung text."""
@@ -73,7 +69,6 @@ class Question(InterviewBaseModel):
     def __str__(self):
         return self.text[:80]
 
-
 class QuestionGroup(InterviewBaseModel):
     """Nhóm câu hỏi (cho một vị trí hoặc chủ đề cụ thể)."""
 
@@ -107,11 +102,6 @@ class QuestionGroup(InterviewBaseModel):
 
     def __str__(self):
         return self.name
-
-
-# ============================================================
-# Interview Session
-# ============================================================
 
 class InterviewSession(InterviewBaseModel):
     """Buổi Phỏng vấn trực tuyến."""
@@ -232,7 +222,6 @@ class InterviewSession(InterviewBaseModel):
         verbose_name="Người tạo (HR)"
     )
 
-    # Many to Many
     questions = models.ManyToManyField(
         Question, blank=True,
         related_name='interview_sessions',
@@ -264,11 +253,6 @@ class InterviewSession(InterviewBaseModel):
         if not self.invite_token:
             self.invite_token = uuid.uuid4().hex
         super().save(*args, **kwargs)
-
-
-# ============================================================
-# Interview Transcript
-# ============================================================
 
 class InterviewTranscript(models.Model):
     """Lịch sử hội thoại trong buổi phỏng vấn."""
@@ -304,10 +288,7 @@ class InterviewTranscript(models.Model):
     def __str__(self):
         return f"[{self.get_speaker_role_display()}] {self.content[:60]}"
 
-
-# ============================================================
 # Interview Evaluation (HR đánh giá)
-# ============================================================
 
 class InterviewEvaluation(InterviewBaseModel):
     """Đánh giá kết quả phỏng vấn bởi HR."""

@@ -18,4 +18,3 @@ export const APP_CONFIG_DEFAULTS = {
   sandboxId: undefined,
   agentName: undefined,
 };
-

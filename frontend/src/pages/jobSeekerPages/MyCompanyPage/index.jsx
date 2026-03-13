@@ -1,25 +1,11 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import * as React from 'react';
 
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 
 import { Box, Card, Stack, Tab, Typography } from "@mui/material";
+
 import { useTranslation } from 'react-i18next';
+
 import Grid from "@mui/material/Grid2";
 
 import { TabTitle } from '../../../utils/generalFunction';
@@ -31,24 +17,37 @@ import CompanyFollowedCard from '../../components/jobSeekers/CompanyFollowedCard
 import SuggestedJobPostCard from '../../components/defaults/SuggestedJobPostCard';
 
 const MyCompanyPage = () => {
+
     const { t } = useTranslation('jobSeeker');
+
     TabTitle(t("myCompany.title"))
 
     const [value, setValue] = React.useState('1');
 
     const handleChange = (event, newValue) => {
+
         setValue(newValue);
+
     };
 
     return (
+
         <Grid container spacing={2}>
+
             <Grid
+
                 size={{
+
                     xs: 12,
+
                     sm: 12,
+
                     md: 7,
+
                     lg: 8,
+
                     xl: 8
+
                 }}>
 
                 <Stack spacing={2}>
@@ -126,13 +125,21 @@ const MyCompanyPage = () => {
                 </Stack>
 
             </Grid>
+
             <Grid
+
                 size={{
+
                     xs: 12,
+
                     sm: 12,
+
                     md: 5,
+
                     lg: 4,
+
                     xl: 4
+
                 }}>
 
                 <Stack spacing={2}>
@@ -164,10 +171,11 @@ const MyCompanyPage = () => {
                 </Stack>
 
             </Grid>
+
         </Grid>
+
     );
 
 };
 
 export default MyCompanyPage;
-

@@ -19,7 +19,6 @@ def replace_in_file(filepath, replacements):
     else:
         print(f"No changes in: {filepath}")
 
-# ChatWindow replacements
 chatwindow_replacements = {
     'đã kết nối với bạn.': 'has connected with you.',
     'Bạn đã kết nối đến': 'You have connected to',
@@ -33,7 +32,6 @@ replace_in_file(
     chatwindow_replacements
 )
 
-# RightSidebar replacements
 rightsidebar_replacements = {
     'Chi tiết ứng viên': 'Candidate Details',
     'Chưa cập nhật': 'Not updated',
@@ -50,7 +48,6 @@ replace_in_file(
     rightsidebar_replacements
 )
 
-# QuestionGroupTable replacements
 questiongrouptable_replacements = {
     'Quản lý câu hỏi trong bộ:': 'Manage questions in group:',
     'Tìm kiếm câu hỏi...': 'Search questions...',

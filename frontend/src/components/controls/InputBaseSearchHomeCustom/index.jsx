@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import * as React from 'react';
 
 import { useDispatch } from 'react-redux';
@@ -154,8 +138,6 @@ const InputBaseSearchHomeCustom = ({
 
     getSuggestTitle(debounded);
 
-    
-
   }, [debounded, isLoading]);
 
   const handleHideResult = () => {
@@ -241,10 +223,15 @@ const InputBaseSearchHomeCustom = ({
                 <Stack>
 
                   {isLoading ? (
+
                     <Stack sx={{ py: 2 }} justifyContent="center" alignItems="center">
+
                       <CircularProgress size={20} />
+
                     </Stack>
+
                   ) : searchResult.length === 0 ? (
+
                     <Typography
 
                       my={1}
@@ -542,4 +529,3 @@ const InputBaseSearchHomeCustom = ({
 };
 
 export default InputBaseSearchHomeCustom;
-

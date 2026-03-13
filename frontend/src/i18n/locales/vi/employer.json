@@ -48,6 +48,48 @@
       "success": "Xóa hồ sơ ứng tuyển thành công."
     }
   },
+  "savedResume": {
+    "title": "Quản lý hồ sơ đã lưu",
+    "downloadList": "Tải danh sách",
+    "filters": "Bộ lọc:",
+    "messages": {
+      "unsaveSuccess": "Bỏ lưu hồ sơ thành công."
+    }
+  },
+  "savedResumeTable": {
+    "title": {
+      "youhaventsavedanycandidatesyet": "Bạn chưa lưu ứng viên nào",
+      "onlineresume": "Hồ sơ Trực tuyến",
+      "attachedresume": "Hồ sơ Đính kèm",
+      "viewprofile": "Xem hồ sơ"
+    },
+    "label": {
+      "view": "xem",
+      "unsave": "Bỏ lưu",
+      "resumeTitle": "Tiêu đề hồ sơ",
+      "candidateName": "Tên ứng viên",
+      "salary": "Mức lương",
+      "experience": "Kinh nghiệm",
+      "cityProvince": "Tỉnh/Thành phố",
+      "savedDate": "Ngày lưu",
+      "actions": "Thao tác"
+    }
+  },
+  "savedResumeFilterForm": {
+    "placeholder": {
+      "enterjobpostorcandidatename": "Nhập tiêu đề hồ sơ hoặc tên ứng viên",
+      "entermaximumsalary": "Nhập mức lương tối đa",
+      "selectexperience": "Chọn kinh nghiệm",
+      "selectlocation": "Chọn địa điểm"
+    },
+    "title": {
+      "reset": "Làm mới"
+    },
+    "label": {
+      "refresh": "Làm mới",
+      "search": "Tìm kiếm"
+    }
+  },
   "dashboard": {
     "pageTitle": "Quản trị Nhà tuyển dụng",
     "recruitmentChart": "BIỂU ĐỒ TUYỂN DỤNG",
@@ -97,31 +139,59 @@
   },
   "sendEmailComponent": {
     "label": {
-      "view": "xem",
-      "delete": "xóa"
+      "view": "Xem",
+      "delete": "Xóa",
+      "sendEmail": "Gửi Email",
+      "resendEmail": "Gửi lại Email"
     },
     "title": {
-      "viewattachedresume": "Xem hồ sơ đính kèm"
+      "viewattachedresume": "Xem CV đính kèm"
+    },
+    "messages": {
+      "success": "Gửi email thành công."
     }
   },
   "applicationChart": {
-    "title": {
-      "thngkchstuyndngtrongvng1thnggnnht": "Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất"
+    "title": "Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất",
+    "noData": "Không có dữ liệu để thống kê",
+    "labels": {
+      "totalapplications": "Tổng số lượng ứng tuyển",
+      "averageapplications": "Trung bình lượng ứng tuyển",
+      "applications": "Đơn ứng tuyển"
     }
   },
   "candidateChart": {
-    "title": {
-      "thngkshsngtuynnhnctheongy": "Thống kê số hồ sơ ứng tuyển nhận được theo ngày"
+    "title": "Thống kê số hồ sơ ứng tuyển nhận được theo ngày",
+    "noData": "Không có dữ liệu để thống kê",
+    "labels": {
+      "newcandidates": "Ứng viên mới",
+      "totalcandidates": "Tổng số ứng viên",
+      "candidates": "Ứng viên"
     }
   },
   "hiringAcademicChart": {
-    "title": {
-      "thngkchsngtuyntheotrnhhcvn": "Thống kê chỉ số ứng tuyển theo trình độ học vấn"
+    "title": "Thống kê chỉ số ứng tuyển theo trình độ học vấn",
+    "applicationCount": "Số lượng ứng tuyển",
+    "noData": "Không có dữ liệu để thống kê",
+    "labels": {
+      "chuatotnghiep": "Chưa tốt nghiệp",
+      "trungcap": "Trung cấp",
+      "caodang": "Cao đẳng",
+      "daihoc": "Đại học",
+      "saudaihoc": "Sau đại học",
+      "khac": "Khác"
     }
   },
   "recruitmentChart": {
-    "title": {
-      "thngkchstuyndngtrongvng1thnggnnht": "Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất"
+    "title": "Thống kê quy trình tuyển dụng theo thời gian",
+    "noData": "Không có dữ liệu tuyển dụng trong khoảng thời gian này",
+    "labels": {
+      "applied": "Hồ sơ ứng tuyển",
+      "new": "Hồ sơ mới",
+      "interviewing": "Đang phỏng vấn",
+      "offered": "Đã mời làm việc",
+      "hired": "Đã tuyển dụng",
+      "rejected": "Đã từ chối"
     }
   },
   "companyForm": {
@@ -174,17 +244,63 @@
     }
   },
   "interviewCreateCard": {
+    "title": {
+      "scheduleOnlineInterview": "Lên lịch Phỏng vấn trực tuyến",
+      "scheduledtime": "Thời gian phỏng vấn"
+    },
     "label": {
       "selectjobpost": "Chọn tin tuyển dụng",
       "selectcandidate": "Chọn ứng viên",
-      "selectquestiongroupoptional": "Chọn bộ câu hỏi (Không bắt buộc)",
+      "selectquestiongroupoptional": "Chọn nhóm câu hỏi (Không bắt buộc)",
       "selectinterviewquestions": "Chọn câu hỏi phỏng vấn"
     },
-    "title": {
-      "scheduledtime": "Thời gian dự kiến"
-    },
     "helperText": {
-      "selectaquestiongrouptoautomaticallyfillthequestionsbelow": "Chọn bộ câu hỏi để xem trước"
+      "selectaquestiongrouptoautomaticallyfillthequestionsbelow": "Chọn một nhóm câu hỏi để tự động điền các câu hỏi bên dưới"
+    },
+    "validation": {
+      "selectJobPost": "Vui lòng chọn tin tuyển dụng",
+      "selectCandidate": "Vui lòng chọn ứng viên"
+    },
+    "messages": {
+      "loadDataError": "Lỗi khi tải dữ liệu ban đầu",
+      "loadCandidateError": "Lỗi khi tải danh sách ứng viên",
+      "scheduleSuccess": "Lên lịch phỏng vấn thành công",
+      "scheduleError": "Lỗi khi lên lịch phỏng vấn"
+    },
+    "noCandidates": "Không tìm thấy ứng viên nào cho tin tuyển dụng này",
+    "none": "Không có",
+    "questions": "câu hỏi",
+    "noQuestions": "Không có câu hỏi nào",
+    "cancel": "Hủy bỏ",
+    "scheduleNow": "Lên lịch ngay"
+  },
+  "interviewDetail": {
+    "title": "Chi tiết Phỏng vấn Online",
+    "subtitle": {
+      "info": "Thông tin Phỏng vấn",
+      "aiEvaluation": "Kết quả đánh giá AI",
+      "history": "Lịch sử cuộc trò chuyện"
+    },
+    "label": {
+      "roomCode": "Mã phòng",
+      "candidate": "ỨNG VIÊN",
+      "position": "VỊ TRÍ",
+      "type": "LOẠI PHỎNG VẤN",
+      "schedule": "LỊCH TRÌNH",
+      "liveMonitoring": "THEO DÕI TRỰC TIẾP",
+      "aiInterviewer": "Người phỏng vấn AI",
+      "candidateSmall": "Ứng viên"
+    },
+    "messages": {
+      "notFound": "Không tìm thấy thông tin phiên phỏng vấn",
+      "aiGenerating": "Kết quả đánh giá AI đang được khởi tạo",
+      "aiAnalyzing": "AI đang phân tích cuộc trò chuyện...",
+      "notEnded": "Buổi phỏng vấn chưa kết thúc",
+      "noHistory": "Không có dữ liệu cuộc trò chuyện"
+    },
+    "actions": {
+      "backToList": "Quay lại danh sách",
+      "viewReport": "Xem báo cáo chi tiết"
     }
   },
   "jobPostFilterForm": {
@@ -290,9 +406,20 @@
   "profileCard": {
     "title": {
       "noresultsfound": "Không tìm thấy kết quả."
+    },
+    "label": {
+      "resultsFound": "Kết quả tìm thấy:",
+      "profiles": "{{count}} hồ sơ"
+    },
+    "messages": {
+      "saveSuccess": "Lưu hồ sơ thành công.",
+      "unsaveSuccess": "Bỏ lưu hồ sơ thành công."
     }
   },
   "profileSearch": {
+    "title": {
+      "advancedFilters": "Bộ lọc nâng cao"
+    },
     "placeholder": {
       "enterkeywords": "Nhập từ khóa...",
       "selectcityprovince": "Chọn tỉnh thành",
@@ -304,6 +431,18 @@
       "allemploymenttypes": "Loại hình LV",
       "allgenders": "Giới tính",
       "allmaritalstatuses": "TT hôn nhân"
+    },
+    "label": {
+      "search": "Tìm kiếm",
+      "clearFilters": "Xóa bộ lọc",
+      "careers": "Ngành nghề",
+      "experience": "Kinh nghiệm",
+      "position": "Cấp bậc",
+      "academicLevel": "Trình độ học vấn",
+      "workplace": "Nơi làm việc",
+      "employmentType": "Loại hình làm việc",
+      "gender": "Giới tính",
+      "maritalStatus": "Tình trạng hôn nhân"
     }
   },
   "questionGroupsCard": {
@@ -316,32 +455,6 @@
     },
     "placeholder": {
       "searchquestiongroups": "Tìm kiếm nhóm câu hỏi..."
-    }
-  },
-  "savedResumeFilterForm": {
-    "placeholder": {
-      "enterjobpostorcandidatename": "Nhập tin tuyển dụng hoặc ứng viên",
-      "entermaximumsalary": "Nhập lương tối đa",
-      "selectexperience": "Chọn kinh nghiệm",
-      "selectlocation": "Chọn địa điểm"
-    },
-    "title": {
-      "reset": "Làm mới"
-    },
-    "label": {
-      "refresh": "Làm mới"
-    }
-  },
-  "savedResumeTable": {
-    "title": {
-      "onlineresume": "Hồ sơ Trực tuyến",
-      "attachedresume": "Hồ sơ Đính kèm",
-      "viewprofile": "Xem hồ sơ",
-      "youhaventsavedanycandidatesyet": "Bạn chưa lưu ứng viên nào"
-    },
-    "label": {
-      "view": "xem",
-      "unsave": "Bỏ lưu"
     }
   },
   "sendMailCard": {
@@ -359,6 +472,7 @@
       "enteremailsubject": "Nhập tiêu đề email"
     }
   },
+
   "sidebar": {
     "dashboard": "Bảng điều khiển",
     "jobPostList": "Danh sách tin TD",
@@ -393,6 +507,16 @@
       "time": "Thời gian",
       "status": "Trạng thái",
       "emptyMessage": "Không tìm thấy phiên phỏng vấn nào đang hoạt động."
+    },
+    "statuses": {
+      "completed": "Hoàn thành",
+      "in_progress": "Đang diễn ra",
+      "scheduled": "Đã lên lịch",
+      "cancelled": "Đã hủy",
+      "calibration": "Đang hiệu chuẩn",
+      "processing": "Đang xử lý",
+      "connecting": "Đang kết nối",
+      "active": "Hoạt động"
     }
   },
   "verification": {
@@ -441,6 +565,7 @@
   },
   "profileDetailCard": {
     "title": {
+      "profileDetail": "Chi tiết hồ sơ ứng viên",
       "personalInfo": "Thông tin cá nhân",
       "generalInfo": "Thông tin chung",
       "careerGoals": "Mục tiêu nghề nghiệp",
@@ -485,8 +610,9 @@
       "noExpiration": "Không thời hạn"
     },
     "messages": {
-      "saveSuccess": "Đã lưu thành công.",
-      "unsaveSuccess": "Đã bỏ lưu thành công.",
+      "saveSuccess": "Lưu hồ sơ thành công.",
+      "unsaveSuccess": "Bỏ lưu hồ sơ thành công.",
+      "loadingPdf": "Đang tải PDF...",
       "emailSentSuccess": "Gửi email thành công."
     }
   },
@@ -500,5 +626,137 @@
       "multimedia": "Đa phương tiện"
     },
     "title": "Thông tin công ty"
+  },
+  "pricing": {
+    "heroTitle": "Bảng giá",
+    "heroSubtitle": "Chúng tôi cung cấp các gói dịch vụ linh hoạt, dễ lựa chọn và có thể điều chỉnh theo quy mô tuyển dụng của doanh nghiệp.",
+    "contactBtn": "Liên hệ tư vấn",
+    "plans": {
+      "basic": {
+        "title": "Cơ bản",
+        "price": "Liên hệ",
+        "desc": "Phù hợp cho doanh nghiệp bắt đầu tuyển dụng.",
+        "f1": "Đăng tin tuyển dụng cơ bản",
+        "f2": "Quản lý hồ sơ ứng viên",
+        "f3": "Báo cáo tổng quan"
+      },
+      "standard": {
+        "title": "Tiêu chuẩn",
+        "price": "Liên hệ",
+        "desc": "Dành cho đội ngũ tuyển dụng đang mở rộng quy mô.",
+        "f1": "Tìm kiếm và lọc hồ sơ nâng cao",
+        "f2": "Lên lịch phỏng vấn",
+        "f3": "Hỗ trợ ưu tiên"
+      },
+      "enterprise": {
+        "title": "Doanh nghiệp",
+        "price": "Theo nhu cầu",
+        "desc": "Giải pháp riêng cho doanh nghiệp có nhu cầu lớn.",
+        "f1": "Gói tuyển dụng tùy chỉnh",
+        "f2": "Báo cáo chi tiết",
+        "f3": "Tư vấn tối ưu quy trình"
+      }
+    }
+  },
+  "introduce": {
+    "pageTitle": "Giới thiệu",
+    "heroTitle": "Giới thiệu",
+    "heroSubtitle": "{{appName}} hỗ trợ nhà tuyển dụng tối ưu hóa toàn bộ quy trình tìm kiếm nhân sự, từ đăng tin, tiếp cận ứng viên đến quản lý phỏng vấn và đánh giá. Mục tiêu của chúng tôi là giúp doanh nghiệp tuyển được đúng người nhanh hơn, rõ ràng hơn và hiệu quả hơn.",
+    "processTitle": "Quy trình tuyển dụng đơn giản",
+    "stepLabel": "Bước {{index}}",
+    "highlights": {
+      "h1": {
+        "title": "Đăng tin nhanh, tiếp cận đúng người",
+        "desc": "Tạo tin tuyển dụng chuẩn, hiển thị rõ yêu cầu và quyền lợi để thu hút ứng viên phù hợp."
+      },
+      "h2": {
+        "title": "Tìm kiếm hồ sơ theo kỹ năng",
+        "desc": "Bộ lọc theo ngành nghề, kinh nghiệm, địa điểm giúp rút ngắn thời gian sàng lọc."
+      },
+      "h3": {
+        "title": "Theo dõi quy trình tuyển dụng",
+        "desc": "Quản lý trạng thái ứng viên, lịch phỏng vấn và phản hồi tập trung trên một màn hình."
+      },
+      "h4": {
+        "title": "Xây dựng thương hiệu tuyển dụng",
+        "desc": "Trang hồ sơ công ty rõ ràng, đáng tin cậy giúp tăng tỷ lệ ứng viên quan tâm."
+      }
+    },
+    "steps": {
+      "s1": {
+        "title": "Đăng tin",
+        "desc": "Tạo tin tuyển dụng với thông tin đầy đủ và chuẩn hóa."
+      },
+      "s2": {
+        "title": "Nhận hồ sơ",
+        "desc": "Ứng viên nộp hồ sơ trực tuyến, tập trung trong một nơi."
+      },
+      "s3": {
+        "title": "Đánh giá",
+        "desc": "Sàng lọc theo tiêu chí, ghi chú và chia sẻ trong nội bộ."
+      },
+      "s4": {
+        "title": "Phỏng vấn",
+        "desc": "Lên lịch và phản hồi nhanh, đảm bảo trải nghiệm ứng viên."
+      }
+    }
+  },
+  "support": {
+    "pageTitle": "Trung tâm hỗ trợ",
+    "heroTitle": "Chúng tôi có thể giúp gì cho bạn?",
+    "heroSubtitle": "{{appName}} luôn sẵn sàng hỗ trợ bạn tối ưu hóa quy trình tuyển dụng. Nếu bạn gặp bất kỳ khó khăn nào, hãy liên hệ với chúng tôi qua các kênh dưới đây.",
+    "directSupport": {
+      "title": "Hỗ trợ trực tiếp",
+      "desc": "Liên hệ với đội ngũ hỗ trợ kỹ thuật và tư vấn tuyển dụng.",
+      "note": "Thời gian: 8:00 - 18:00 (Thứ 2 - Thứ 7)"
+    },
+    "docs": {
+      "title": "Tài liệu hướng dẫn",
+      "desc": "Tìm kiếm câu trả lời trong kho tài liệu hướng dẫn sử dụng chi tiết.",
+      "note": "Cập nhật mới nhất: 2024"
+    },
+    "feedback": {
+      "title": "Phản hồi & Góp ý",
+      "desc": "Chúng tôi luôn lắng nghe ý kiến để cải thiện dịch vụ tốt hơn.",
+      "note": "Phản hồi trong vòng 24h"
+    },
+    "faq": {
+      "title": "Câu hỏi thường gặp",
+      "q1": "Làm thế nào để đăng tin tuyển dụng nhanh chóng?",
+      "a1": "Bạn chỉ cần chọn 'Đăng tin mới', điền các thông tin bắt buộc và nhấn 'Đăng tin'. Tin của bạn sẽ được duyệt trong vòng 30 phút.",
+      "q2": "Công nghệ AI giúp ích gì trong việc sàng lọc hồ sơ?",
+      "a2": "Hệ thống AI sẽ tự động phân tích kỹ năng, kinh nghiệm của ứng viên so với yêu cầu công việc và đưa ra điểm số phù hợp, giúp bạn tiết kiệm 70% thời gian sàng lọc.",
+      "q3": "Làm thế nào để bảo mật thông tin doanh nghiệp?",
+      "a3": "Chúng tôi sử dụng mã hóa dữ liệu chuẩn quốc tế và các lớp bảo mật đa tầng để đảm bảo thông tin của bạn và ứng viên luôn an toàn."
+    }
+  },
+  "service": {
+    "pageTitle": "Dịch vụ của chúng tôi",
+    "heroTitle": "Giải pháp tuyển dụng toàn diện",
+    "heroSubtitle": "{{appName}} cung cấp các công cụ mạnh mẽ giúp bạn tìm kiếm, kết nối và quản lý nhân tài một cách hiệu quả nhất.",
+    "jobPost": {
+      "title": "Đăng tin tuyển dụng",
+      "desc": "Tiếp cận hàng ngàn ứng viên tiềm năng mỗi ngày thông qua nền tảng của chúng tôi."
+    },
+    "search": {
+      "title": "Tìm kiếm hồ sơ",
+      "desc": "Sử dụng bộ lọc thông minh để tìm chính xác ứng viên phù hợp với kỹ năng bạn cần."
+    },
+    "interview": {
+      "title": "Phỏng vấn trực tuyến",
+      "desc": "Tích hợp công cụ phỏng vấn Video Call chất lượng cao, ghi chú và đánh giá tức thì."
+    },
+    "report": {
+      "title": "Báo cáo & Phân tích",
+      "desc": "Theo dõi hiệu quả tuyển dụng thông qua các số liệu thống kê chi tiết và minh bạch."
+    }
+  },
+  "account": {
+    "pageTitle": "Quản lý tài khoản",
+    "info": "Thông tin tài khoản"
+  },
+  "setting": {
+    "pageTitle": "Cài đặt",
+    "title": "Cài đặt hệ thống"
   }
 }

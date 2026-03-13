@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { Viewer, Worker } from '@react-pdf-viewer/core';
@@ -31,6 +15,7 @@ import { SpecialZoomLevel } from '@react-pdf-viewer/core';
 import Button from '@mui/material/Button';
 
 import { Box, Chip, IconButton, Stack } from "@mui/material";
+
 import Grid from "@mui/material/Grid2";
 
 import ZoomOutOutlinedIcon from '@mui/icons-material/ZoomOutOutlined';
@@ -60,7 +45,9 @@ const Pdf = ({ fileUrl, title = '' }) => {
   const { ZoomIn, ZoomOut, Zoom } = zoomPluginInstance;
 
   return (
+
     <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+
       <Stack
 
         spacing={2}
@@ -246,10 +233,11 @@ const Pdf = ({ fileUrl, title = '' }) => {
         </Box>
 
       </Stack>
+
     </Worker>
+
   );
 
 };
 
 export default Pdf;
-

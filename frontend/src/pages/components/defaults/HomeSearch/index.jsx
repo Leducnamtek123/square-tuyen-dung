@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,6 +7,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import { Card } from "@mui/material";
+
 import Grid from "@mui/material/Grid2";
 
 import InputBaseSearchHomeCustom from '../../../../components/controls/InputBaseSearchHomeCustom';
@@ -144,6 +129,7 @@ const HomeSearch = () => {
   };
 
   return (
+
     <Card
 
       sx={{
@@ -159,17 +145,25 @@ const HomeSearch = () => {
       }}
 
     >
+
       <form onSubmit={handleSubmit(handleFilter)}>
 
         <Grid container spacing={2}>
 
           <Grid
+
             size={{
+
               xs: 12,
+
               sm: 12,
+
               md: 12,
+
               lg: 12,
+
               xl: 12
+
             }}>
 
             <InputBaseSearchHomeCustom
@@ -189,12 +183,19 @@ const HomeSearch = () => {
           </Grid>
 
           <Grid
+
             size={{
+
               xs: 12,
+
               sm: 12,
+
               md: 6,
+
               lg: 6,
+
               xl: 6
+
             }}>
 
             <SingleSelectSearchCustom
@@ -212,12 +213,19 @@ const HomeSearch = () => {
           </Grid>
 
           <Grid
+
             size={{
+
               xs: 12,
+
               sm: 12,
+
               md: 6,
+
               lg: 6,
+
               xl: 6
+
             }}>
 
             <SingleSelectSearchCustom
@@ -237,10 +245,11 @@ const HomeSearch = () => {
         </Grid>
 
       </form>
+
     </Card>
+
   );
 
 };
 
 export default HomeSearch;
-

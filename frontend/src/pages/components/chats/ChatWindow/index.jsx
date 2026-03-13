@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -204,7 +188,6 @@ const ChatWindow = () => {
 
     }
 
-    
   }, [selectedRoomId]);
 
   // danh sach messages
@@ -253,7 +236,6 @@ const ChatWindow = () => {
 
     return () => unsubscribe();
 
-    
   }, [selectedRoomId]);
 
   // tai them du lieu
@@ -688,19 +670,13 @@ const ChatWindow = () => {
 
           >
 
-            <Empty
+            <ChatBubbleOutlineIcon sx={{ fontSize: 48, color: 'text.disabled' }} />
 
-              description={
+            <Typography color="text.secondary">
 
-                <Typography color="text.secondary">
+              {t('noConversationSelected')}
 
-                  {t('noConversationSelected')}
-
-                </Typography>
-
-              }
-
-            />
+            </Typography>
 
           </Stack>
 
@@ -825,4 +801,3 @@ const ChatWindow = () => {
 };
 
 export default ChatWindow;
-

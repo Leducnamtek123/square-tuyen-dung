@@ -30,7 +30,6 @@ const ProfilesPage = () => {
     const { data: citiesData } = useCities();
     const cities = citiesData?.results || citiesData;
 
-    // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState('add');
     const [currentProfile, setCurrentProfile] = useState(null);
@@ -50,7 +49,6 @@ const ProfilesPage = () => {
     const { data: districtsData } = useDistricts({ city: formData.location.city });
     const districts = districtsData?.results || districtsData;
 
-    // Delete dialog
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleSearch = (e) => {

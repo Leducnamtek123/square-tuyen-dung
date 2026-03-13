@@ -9,7 +9,6 @@ const ENDPOINTS = {
     "STATISTICAL_CAREER_CHART": "/admin/api/career-chart/",
     "STATISTICAL_JOB_POST_CHART": "/admin/api/job-post-chart/",
 }
-// Default page size
 const PAGE_SIZE_DEFAULT = 10;
 
 export { FIREBASE_CONFIG, ENDPOINTS, PAGE_SIZE_DEFAULT };

@@ -12,14 +12,12 @@ const CareersPage = () => {
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState('add'); // 'add' or 'edit'
     const [currentCareer, setCurrentCareer] = useState(null);
     const [careerName, setCareerName] = useState('');
     const [appIconName, setAppIconName] = useState('');
 
-    // Delete dialog
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const {

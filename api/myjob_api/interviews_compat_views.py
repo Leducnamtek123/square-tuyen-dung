@@ -4,8 +4,7 @@ from django.http import HttpRequest, JsonResponse
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from interview.models import InterviewSession
-
+from interview.models import InterviewSession, InterviewTranscript
 
 def _get_session_questions(session: InterviewSession):
     questions = session.questions.all()
@@ -14,7 +13,6 @@ def _get_session_questions(session: InterviewSession):
     if session.question_group_id:
         return session.question_group.questions.all()
     return questions
-
 
 def interview_context(request: HttpRequest, room_name: str):
     """
@@ -47,7 +45,6 @@ def interview_context(request: HttpRequest, room_name: str):
         "interviewType": session.type,
     }
     return JsonResponse(context_data, status=200)
-
 
 @csrf_exempt
 def interview_next_question(request: HttpRequest, room_name: str):
@@ -112,7 +109,6 @@ def interview_next_question(request: HttpRequest, room_name: str):
         status=200,
     )
 
-
 @csrf_exempt
 def interview_status(request: HttpRequest, room_name: str):
     """
@@ -151,3 +147,50 @@ def interview_status(request: HttpRequest, room_name: str):
     session.save(update_fields=["status", "start_time", "end_time", "duration", "update_at"])
     return JsonResponse({"status": new_status}, status=200)
 
+@csrf_exempt
+def interview_append_transcription(request: HttpRequest, room_name: str):
+    """
+    POST /api/interviews/{room_name}/append-transcription
+    Body: { "speaker_role": "ai_agent"|"candidate", "content": "...", "speech_duration_ms": 123 }
+
+    Compatibility endpoint for `squareai/apps/voice-ai/livekit_agent`.
+    Returns *raw* JSON (no {errors,data} envelope).
+    """
+    if request.method not in ("POST",):
+        return JsonResponse({"detail": "Method not allowed."}, status=405)
+
+    try:
+        session = InterviewSession.objects.get(room_name=room_name)
+    except InterviewSession.DoesNotExist:
+        return JsonResponse({"detail": "Interview session not found."}, status=404)
+
+    try:
+        payload = json.loads(request.body.decode("utf-8") or "{}")
+    except Exception:
+        payload = {}
+
+    speaker_role = payload.get("speaker_role")
+    content = payload.get("content") or ""
+    speech_duration_ms = payload.get("speech_duration_ms")
+
+    if speaker_role not in ("ai_agent", "candidate"):
+        return JsonResponse({"detail": "Invalid `speaker_role`."}, status=400)
+    if not isinstance(content, str) or not content.strip():
+        return JsonResponse({"detail": "Missing `content`."}, status=400)
+
+    transcript = InterviewTranscript.objects.create(
+        interview=session,
+        speaker_role=speaker_role,
+        content=content.strip(),
+        speech_duration_ms=speech_duration_ms if speech_duration_ms is not None else None,
+    )
+    return JsonResponse(
+        {
+            "id": transcript.id,
+            "speaker_role": transcript.speaker_role,
+            "content": transcript.content,
+            "speech_duration_ms": transcript.speech_duration_ms,
+            "create_at": transcript.create_at.isoformat() if transcript.create_at else None,
+        },
+        status=201,
+    )

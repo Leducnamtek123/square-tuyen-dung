@@ -34,14 +34,12 @@ const DistrictsPage = () => {
 
     const districts = districtsData?.results || districtsData;
 
-    // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState('add');
     const [currentDistrict, setCurrentDistrict] = useState(null);
     const [districtName, setDistrictName] = useState('');
     const [targetCityId, setTargetCityId] = useState('');
 
-    // Delete dialog
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleOpenAdd = () => {

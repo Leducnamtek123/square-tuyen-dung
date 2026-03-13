@@ -73,23 +73,42 @@
     "tokenMissing": "Không thể lấy token để tham gia phỏng vấn.",
     "invalidSession": "Lỗi kết nối hoặc phiên phỏng vấn không hợp lệ."
   },
+  "employer": {
+    "questions": {
+      "add": "Thêm câu hỏi",
+      "edit": "Sửa câu hỏi đã chọn",
+      "createTitle": "Tạo câu hỏi phỏng vấn",
+      "editTitle": "Cập nhật câu hỏi phỏng vấn",
+      "textLabel": "Nội dung câu hỏi",
+      "textPlaceholder": "Nhập câu hỏi cho ứng viên",
+      "saveCreate": "Tạo câu hỏi",
+      "saveEdit": "Lưu thay đổi",
+      "textRequired": "Vui lòng nhập nội dung câu hỏi.",
+      "createSuccess": "Đã tạo câu hỏi.",
+      "updateSuccess": "Đã cập nhật câu hỏi.",
+      "saveError": "Lỗi khi lưu câu hỏi.",
+      "editSelectionError": "Vui lòng chọn đúng 1 câu hỏi để sửa."
+    },
+    "questionBank": {
+      "title": "Ngân hàng câu hỏi AI",
+      "add": "Thêm câu hỏi",
+      "createTitle": "Thêm câu hỏi mới",
+      "editTitle": "Sửa câu hỏi",
+      "textLabel": "Nội dung câu hỏi",
+      "textRequired": "Vui lòng nhập nội dung câu hỏi.",
+      "createSuccess": "Đã thêm câu hỏi mới thành công.",
+      "updateSuccess": "Đã cập nhật câu hỏi thành công.",
+      "saveError": "Đã có lỗi xảy ra.",
+      "deleteConfirm": "Bạn có chắc chắn muốn xóa câu hỏi này?",
+      "deleteSuccess": "Đã xóa thành công.",
+      "deleteError": "Không thể xóa câu hỏi này.",
+      "columns": {
+        "text": "Nội dung câu hỏi"
+      }
+    }
+  },
   "interviewListCard": {
     "title": "Danh sách Phỏng vấn Online",
-    "scheduleInterview": "Lên lịch Phỏng vấn",
-    "candidate": "Ứng viên",
-    "position": "Vị trí",
-    "time": "Thời gian",
-    "status": "Trạng thái",
-    "aiScore": "Điểm AI",
-    "grading": "Đang chấm...",
-    "noInterviews": "Chưa có lịch phỏng vấn nào"
-  },
-  "interviewAdminPage": {
-    "title": "Quản lý Phỏng vấn",
-    "cardTitle": "Danh sách Phỏng vấn",
-    "candidateEmployer": "Ứng viên / Nhà tuyển dụng",
-    "jobPost": "Tin tuyển dụng",
-    "type": "Loại hình",
     "time": "Thời gian",
     "status": "Trạng thái",
     "actions": "Thao tác",

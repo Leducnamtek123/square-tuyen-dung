@@ -13,4 +13,3 @@ const InterviewCreatePage = () => {
 };
 
 export default InterviewCreatePage;
-

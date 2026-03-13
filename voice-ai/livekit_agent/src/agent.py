@@ -127,6 +127,12 @@ async def entrypoint(ctx: JobContext):
             room=ctx.room,
             agent=Interviewer(context=agent_context)
         )
+        try:
+            await ctx.room.local_participant.set_attributes({
+                "lk.agent.state": "listening",
+            })
+        except Exception as e:
+            logger.warning("Could not set agent state attribute: %s", e)
         if config.PREEMPTIVE_GATING and config.PREEMPTIVE_GENERATION:
             session.options.preemptive_generation = False
 
@@ -147,8 +153,20 @@ async def entrypoint(ctx: JobContext):
         await _set_stage(ctx.room, "INTRODUCTION")
         
         logger.info("Greeting user: %s", greeting)
+        try:
+            await ctx.room.local_participant.set_attributes({
+                "lk.agent.state": "speaking",
+            })
+        except Exception as e:
+            logger.warning("Could not set agent state to speaking: %s", e)
         # Generate initial response
         await session.say(greeting, allow_interruptions=True)
+        try:
+            await ctx.room.local_participant.set_attributes({
+                "lk.agent.state": "listening",
+            })
+        except Exception as e:
+            logger.warning("Could not set agent state to listening: %s", e)
 
         # 8. Keep alive while room is connected
         while ctx.room.isconnected:

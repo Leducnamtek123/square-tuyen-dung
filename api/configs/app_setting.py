@@ -1,35 +1,42 @@
-"""
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-"""
 
 # Environment: Development
+
 ENV_DEV = "development"
+
 ENV_PROD = "production"
 
 # Refix for all routes
+
 ROUTES_PREFIX = "api/"
+
 COMMON_PREFIX = "common/"
+
 AUTHENTICATION_PREFIX = "auth/"
+
 INFO_PREFIX = "info/"
+
 JOB_PREFIX = "job/"
+
 MYJOB_PREFIX = "myjob/"
 
 MIDDLEWARE_ALLOW_ANY_FOR_ROUTES = [
+
     "/" + ROUTES_PREFIX + COMMON_PREFIX + "configs/",
+
     "/" + ROUTES_PREFIX + COMMON_PREFIX + "districts/",
+
     "/" + ROUTES_PREFIX + COMMON_PREFIX + "top-careers/",
+
     "/" + ROUTES_PREFIX + COMMON_PREFIX + "all-careers/",
 
     "/" + ROUTES_PREFIX + AUTHENTICATION_PREFIX + "token/",
+
     "/" + ROUTES_PREFIX + AUTHENTICATION_PREFIX + "convert-token/",
+
     "/" + ROUTES_PREFIX + AUTHENTICATION_PREFIX + "revoke-token/",
+
     "/" + ROUTES_PREFIX + AUTHENTICATION_PREFIX + "email-exists/",
+
     "/" + ROUTES_PREFIX + AUTHENTICATION_PREFIX + "check-creds/",
+
 ]

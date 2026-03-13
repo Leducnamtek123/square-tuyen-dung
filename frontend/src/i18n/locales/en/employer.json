@@ -45,7 +45,49 @@
     "delete": {
       "title": "Delete Applied Profile",
       "confirm": "This applied profile will be permanently deleted and cannot be recovered. Are you sure?",
-      "success": "Applied profile deleted successfully."
+      "success": "Candidate application deleted successfully."
+    }
+  },
+  "savedResume": {
+    "title": "Saved Resume Management",
+    "downloadList": "Download List",
+    "filters": "Filters:",
+    "messages": {
+      "unsaveSuccess": "Unsaved successfully."
+    }
+  },
+  "savedResumeTable": {
+    "title": {
+      "youhaventsavedanycandidatesyet": "You haven't saved any candidates yet",
+      "onlineresume": "Online Resume",
+      "attachedresume": "Attached Resume",
+      "viewprofile": "View profile"
+    },
+    "label": {
+      "view": "view",
+      "unsave": "Unsave",
+      "resumeTitle": "Resume Title",
+      "candidateName": "Candidate Name",
+      "salary": "Salary",
+      "experience": "Experience",
+      "cityProvince": "City/Province",
+      "savedDate": "Saved Date",
+      "actions": "Actions"
+    }
+  },
+  "savedResumeFilterForm": {
+    "placeholder": {
+      "enterjobpostorcandidatename": "Enter resume title or candidate name",
+      "entermaximumsalary": "Enter maximum salary",
+      "selectexperience": "Select experience",
+      "selectlocation": "Select location"
+    },
+    "title": {
+      "reset": "Reset"
+    },
+    "label": {
+      "refresh": "refresh",
+      "search": "Search"
     }
   },
   "dashboard": {
@@ -97,31 +139,59 @@
   },
   "sendEmailComponent": {
     "label": {
-      "view": "view",
-      "delete": "delete"
+      "view": "View",
+      "delete": "Delete",
+      "sendEmail": "Send Email",
+      "resendEmail": "Resend Email"
     },
     "title": {
       "viewattachedresume": "View Attached Resume"
+    },
+    "messages": {
+      "success": "Email sent successfully."
     }
   },
   "applicationChart": {
-    "title": {
-      "thngkchstuyndngtrongvng1thnggnnht": "Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất"
+    "title": "Statistics of recruitment index within the last 1 month",
+    "noData": "No data available for statistics",
+    "labels": {
+      "totalapplications": "Total Applications",
+      "averageapplications": "Average Applications",
+      "applications": "Applications"
     }
   },
   "candidateChart": {
-    "title": {
-      "thngkshsngtuynnhnctheongy": "Thống kê số hồ sơ ứng tuyển nhận được theo ngày"
+    "title": "Statistics of total applications received by day",
+    "noData": "No data available for statistics",
+    "labels": {
+      "newcandidates": "New Candidates",
+      "totalcandidates": "Total Candidates",
+      "candidates": "Candidates"
     }
   },
   "hiringAcademicChart": {
-    "title": {
-      "thngkchsngtuyntheotrnhhcvn": "Thống kê chỉ số ứng tuyển theo trình độ học vấn"
+    "title": "Recruitment statistics by academic level",
+    "applicationCount": "Application count",
+    "noData": "No data available for statistics",
+    "labels": {
+      "chuatotnghiep": "Not Graduated",
+      "trungcap": "Intermediate",
+      "caodang": "Associate",
+      "daihoc": "Bachelor",
+      "saudaihoc": "Postgraduate",
+      "khac": "Other"
     }
   },
   "recruitmentChart": {
-    "title": {
-      "thngkchstuyndngtrongvng1thnggnnht": "Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất"
+    "title": "Recruitment process statistics over time",
+    "noData": "No recruitment data for this period",
+    "labels": {
+      "applied": "Applied",
+      "new": "New",
+      "interviewing": "Interviewing",
+      "offered": "Offered",
+      "hired": "Hired",
+      "rejected": "Rejected"
     }
   },
   "companyForm": {
@@ -174,17 +244,63 @@
     }
   },
   "interviewCreateCard": {
+    "title": {
+      "scheduleOnlineInterview": "Schedule Online Interview",
+      "scheduledtime": "Scheduled Time"
+    },
     "label": {
       "selectjobpost": "Select job post",
       "selectcandidate": "Select candidate",
       "selectquestiongroupoptional": "Select Question Group (Optional)",
       "selectinterviewquestions": "Select Interview Questions"
     },
-    "title": {
-      "scheduledtime": "Scheduled Time"
-    },
     "helperText": {
       "selectaquestiongrouptoautomaticallyfillthequestionsbelow": "Select a question group to automatically fill the questions below"
+    },
+    "validation": {
+      "selectJobPost": "Please select a job post",
+      "selectCandidate": "Please select a candidate"
+    },
+    "messages": {
+      "loadDataError": "Error loading initial data",
+      "loadCandidateError": "Error loading candidate list",
+      "scheduleSuccess": "Interview scheduled successfully",
+      "scheduleError": "Error scheduling interview"
+    },
+    "noCandidates": "No candidates have applied",
+    "none": "None",
+    "questions": "questions",
+    "noQuestions": "No questions available. Please create questions in the Question Bank.",
+    "cancel": "Cancel",
+    "scheduleNow": "Schedule Now"
+  },
+  "interviewDetail": {
+    "title": "Online Interview Details",
+    "subtitle": {
+      "info": "Interview Information",
+      "aiEvaluation": "AI Evaluation Result",
+      "history": "Conversation History"
+    },
+    "label": {
+      "roomCode": "Room Code",
+      "candidate": "CANDIDATE",
+      "position": "POSITION",
+      "type": "INTERVIEW TYPE",
+      "schedule": "SCHEDULE",
+      "liveMonitoring": "LIVE MONITORING",
+      "aiInterviewer": "AI Interviewer",
+      "candidateSmall": "Candidate"
+    },
+    "messages": {
+      "notFound": "Interview session information not found",
+      "aiGenerating": "AI evaluation results are being generated",
+      "aiAnalyzing": "AI is analyzing the conversation...",
+      "notEnded": "Interview has not ended",
+      "noHistory": "No conversation data available"
+    },
+    "actions": {
+      "backToList": "Back to list",
+      "viewReport": "View detailed report"
     }
   },
   "jobPostFilterForm": {
@@ -290,9 +406,20 @@
   "profileCard": {
     "title": {
       "noresultsfound": "No results found."
+    },
+    "label": {
+      "resultsFound": "Results found:",
+      "profiles": "{{count}} profiles"
+    },
+    "messages": {
+      "saveSuccess": "Saved successfully.",
+      "unsaveSuccess": "Unsaved successfully."
     }
   },
   "profileSearch": {
+    "title": {
+      "advancedFilters": "Advanced Filters"
+    },
     "placeholder": {
       "enterkeywords": "Enter keywords...",
       "selectcityprovince": "Select City/Province",
@@ -304,6 +431,18 @@
       "allemploymenttypes": "All Employment Types",
       "allgenders": "All Genders",
       "allmaritalstatuses": "All Marital Statuses"
+    },
+    "label": {
+      "search": "Search",
+      "clearFilters": "Clear Filters",
+      "careers": "Careers",
+      "experience": "Experience",
+      "position": "Position",
+      "academicLevel": "Academic Level",
+      "workplace": "Workplace",
+      "employmentType": "Employment Type",
+      "gender": "Gender",
+      "maritalStatus": "Marital Status"
     }
   },
   "questionGroupsCard": {
@@ -316,32 +455,6 @@
     },
     "placeholder": {
       "searchquestiongroups": "Search question groups..."
-    }
-  },
-  "savedResumeFilterForm": {
-    "placeholder": {
-      "enterjobpostorcandidatename": "Enter job post or candidate name",
-      "entermaximumsalary": "Enter maximum salary",
-      "selectexperience": "Select experience",
-      "selectlocation": "Select location"
-    },
-    "title": {
-      "reset": "Reset"
-    },
-    "label": {
-      "refresh": "refresh"
-    }
-  },
-  "savedResumeTable": {
-    "title": {
-      "onlineresume": "Online Resume",
-      "attachedresume": "Attached Resume",
-      "viewprofile": "View profile",
-      "youhaventsavedanycandidatesyet": "You haven't saved any candidates yet"
-    },
-    "label": {
-      "view": "view",
-      "unsave": "Unsave"
     }
   },
   "sendMailCard": {
@@ -359,6 +472,7 @@
       "enteremailsubject": "Enter email subject"
     }
   },
+
   "sidebar": {
     "dashboard": "Dashboard",
     "jobPostList": "Job Post List",
@@ -393,6 +507,16 @@
       "time": "Time",
       "status": "Status",
       "emptyMessage": "No active interview sessions found."
+    },
+    "statuses": {
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "scheduled": "Scheduled",
+      "cancelled": "Cancelled",
+      "calibration": "Calibration",
+      "processing": "Processing",
+      "connecting": "Connecting",
+      "active": "Active"
     }
   },
   "verification": {
@@ -441,6 +565,7 @@
   },
   "profileDetailCard": {
     "title": {
+      "profileDetail": "Candidate Profile Details",
       "personalInfo": "Personal Information",
       "generalInfo": "General Information",
       "careerGoals": "Career Goals",
@@ -482,12 +607,13 @@
       "major": "Major",
       "school": "School",
       "proficiency": "Proficiency Level",
-      "noExpiration": "No Expiration"
+      "noExpiration": "No expiration"
     },
     "messages": {
       "saveSuccess": "Saved successfully.",
       "unsaveSuccess": "Unsaved successfully.",
-      "emailSentSuccess": "Email sent successfully."
+      "emailSentSuccess": "Email sent successfully.",
+      "loadingPdf": "Loading PDF..."
     }
   },
   "common": {
@@ -500,5 +626,137 @@
       "multimedia": "Multimedia"
     },
     "title": "Company Information"
+  },
+  "pricing": {
+    "heroTitle": "Pricing",
+    "heroSubtitle": "We provide flexible, easy-to-choose service packages that can be adjusted to the scale of the enterprise's recruitment.",
+    "contactBtn": "Contact for consultation",
+    "plans": {
+      "basic": {
+        "title": "Basic",
+        "price": "Contact",
+        "desc": "Suitable for enterprises starting to recruit.",
+        "f1": "Basic job posting",
+        "f2": "Candidate management",
+        "f3": "Overview report"
+      },
+      "standard": {
+        "title": "Standard",
+        "price": "Contact",
+        "desc": "For recruitment teams expanding scale.",
+        "f1": "Advanced search and filtering",
+        "f2": "Interview scheduling",
+        "f3": "Priority support"
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "price": "On Demand",
+        "desc": "Custom solution for enterprises with large needs.",
+        "f1": "Custom recruitment package",
+        "f2": "Detailed reports",
+        "f3": "Process optimization consulting"
+      }
+    }
+  },
+  "introduce": {
+    "pageTitle": "Introduction",
+    "heroTitle": "Introduction",
+    "heroSubtitle": "{{appName}} supports employers in optimizing the entire recruitment process, from posting, reaching candidates to managing interviews and evaluations. Our goal is to help businesses recruit the right people faster, clearer, and more effectively.",
+    "processTitle": "Simple Recruitment Process",
+    "stepLabel": "Step {{index}}",
+    "highlights": {
+      "h1": {
+        "title": "Post quickly, reach the right people",
+        "desc": "Create standard job posts, clearly displaying requirements and benefits to attract suitable candidates."
+      },
+      "h2": {
+        "title": "Search profiles by skill",
+        "desc": "Filters by industry, experience, location help shorten screening time."
+      },
+      "h3": {
+        "title": "Track recruitment process",
+        "desc": "Manage candidate status, interview schedule, and feedback centrally on one screen."
+      },
+      "h4": {
+        "title": "Build recruitment brand",
+        "desc": "Clear, reliable company profile pages help increase candidate interest rates."
+      }
+    },
+    "steps": {
+      "s1": {
+        "title": "Post Job",
+        "desc": "Create job posts with complete and standardized information."
+      },
+      "s2": {
+        "title": "Receive Profiles",
+        "desc": "Candidates submit profiles online, concentrated in one place."
+      },
+      "s3": {
+        "title": "Evaluate",
+        "desc": "Screen according to criteria, note and share internally."
+      },
+      "s4": {
+        "title": "Interview",
+        "desc": "Schedule and respond quickly, ensuring candidate experience."
+      }
+    }
+  },
+  "support": {
+    "pageTitle": "Support Center",
+    "heroTitle": "How can we help you?",
+    "heroSubtitle": "{{appName}} is always ready to help you optimize your recruitment process. If you encounter any difficulties, please contact us through the channels below.",
+    "directSupport": {
+      "title": "Direct Support",
+      "desc": "Contact our technical support and recruitment consulting team.",
+      "note": "Time: 8:00 - 18:00 (Mon - Sat)"
+    },
+    "docs": {
+      "title": "User Documentation",
+      "desc": "Search for answers in our detailed user manual repository.",
+      "note": "Latest update: 2024"
+    },
+    "feedback": {
+      "title": "Feedback & Suggestions",
+      "desc": "We always listen to your comments to improve our service.",
+      "note": "Response within 24h"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "How to post a job quickly?",
+      "a1": "Just select 'Post New Job', fill in the required information and click 'Post'. Your post will be approved within 30 minutes.",
+      "q2": "How does AI technology help in screening profiles?",
+      "a2": "The AI system will automatically analyze candidate skills and experience against job requirements and provide a matching score, helping you save 70% of screening time.",
+      "q3": "How to ensure business information security?",
+      "a3": "We use international standard data encryption and multi-layer security to ensure your and candidate information is always safe."
+    }
+  },
+  "service": {
+    "pageTitle": "Our Services",
+    "heroTitle": "Comprehensive Recruitment Solutions",
+    "heroSubtitle": "{{appName}} provides powerful tools to help you find, connect, and manage talent most effectively.",
+    "jobPost": {
+      "title": "Job Posting",
+      "desc": "Reach thousands of potential candidates every day through our platform."
+    },
+    "search": {
+      "title": "Resume Search",
+      "desc": "Use smart filters to find exactly the right candidate for the skills you need."
+    },
+    "interview": {
+      "title": "Online Interview",
+      "desc": "Integrated high-quality Video Call interview tools, notes, and instant evaluation."
+    },
+    "report": {
+      "title": "Reporting & Analytics",
+      "desc": "Track recruitment effectiveness through detailed and transparent statistics."
+    }
+  },
+  "account": {
+    "pageTitle": "Account Management",
+    "info": "Account Information"
+  },
+  "setting": {
+    "pageTitle": "Settings",
+    "title": "System Settings"
   }
 }

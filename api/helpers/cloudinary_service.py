@@ -1,14 +1,3 @@
-"""
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-"""
-
 
 import io
 import mimetypes
@@ -102,15 +91,23 @@ class CloudinaryService:
         Upload image to MinIO
         
         Args:
+
             file: File object
+
             folder: Folder name
+
             public_id: Public ID
+
             options: Options
-            
+
         Returns:
+
             Upload result
+
         """
+
         try:
+
             client = CloudinaryService._get_client()
             bucket = settings.MINIO_BUCKET
             CloudinaryService._ensure_bucket(client, bucket)
@@ -151,12 +148,17 @@ class CloudinaryService:
         Delete image from MinIO
         
         Args:
+
             public_id: Public ID
-            
+
         Returns:
+
             Delete result (bool)
+
         """
+
         try:
+
             client = CloudinaryService._get_client()
             bucket = settings.MINIO_BUCKET
             client.remove_object(bucket, public_id)
@@ -171,11 +173,15 @@ class CloudinaryService:
         Get URL from public ID
         
         Args:
+
             public_id: Public ID
+
             options_config: Options config
-            
+
         Returns:
+
             URL and options
+
         """
         try:
             if not public_id:

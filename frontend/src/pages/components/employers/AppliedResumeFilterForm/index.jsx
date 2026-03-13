@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -21,7 +5,9 @@ import { useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 
 import { Box, Stack, Typography } from "@mui/material";
+
 import { useTranslation } from 'react-i18next';
+
 import Grid from "@mui/material/Grid2";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -51,7 +37,9 @@ import {
 import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
 
 const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
+
   const { t } = useTranslation('common');
+
   const { allConfig } = useSelector((state) => state.config);
 
   const { control, handleSubmit, reset } = useForm();
@@ -69,7 +57,9 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
   }, [filterData, reset]);
 
   return (
+
     <>
+
       <form id="modal-form" onSubmit={handleSubmit(handleFilter)}>
 
         <Grid size={12}>
@@ -91,6 +81,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                   />{' '}
 
                   {t('city')}
+
                 </Typography>
 
               </Box>
@@ -106,6 +97,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                 showRequired={true}
 
                 placeholder={t('placeholders.selectCity')}
+
               />
 
             </Stack>
@@ -125,6 +117,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                   />{' '}
 
                   {t('career')}
+
                 </Typography>
 
               </Box>
@@ -138,6 +131,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                 options={allConfig?.careerOptions || []}
 
                 placeholder={t('placeholders.allCareers')}
+
               />
 
             </Stack>
@@ -157,6 +151,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                   />{' '}
 
                   {t('experience')}
+
                 </Typography>
 
               </Box>
@@ -170,6 +165,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                 options={allConfig?.experienceOptions || []}
 
                 placeholder={t('placeholders.allExperiences')}
+
               />
 
             </Stack>
@@ -183,6 +179,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                   <FontAwesomeIcon icon={faUsers} style={{ marginRight: 3 }} />{' '}
 
                   {t('position')}
+
                 </Typography>
 
               </Box>
@@ -196,6 +193,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                 options={allConfig?.positionOptions || []}
 
                 placeholder={t('placeholders.allPositions')}
+
               />
 
             </Stack>
@@ -215,6 +213,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                   />{' '}
 
                   {t('academicLevel')}
+
                 </Typography>
 
               </Box>
@@ -228,6 +227,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                 options={allConfig?.academicLevelOptions || []}
 
                 placeholder={t('placeholders.allAcademicLevels')}
+
               />
 
             </Stack>
@@ -247,6 +247,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                   />{' '}
 
                   {t('typeOfWorkplace')}
+
                 </Typography>
 
               </Box>
@@ -260,6 +261,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                 options={allConfig?.typeOfWorkplaceOptions || []}
 
                 placeholder={t('placeholders.allWorkplaces')}
+
               />
 
             </Stack>
@@ -279,6 +281,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                   />{' '}
 
                   {t('jobType')}
+
                 </Typography>
 
               </Box>
@@ -292,6 +295,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                 options={allConfig?.jobTypeOptions || []}
 
                 placeholder={t('placeholders.allJobTypes')}
+
               />
 
             </Stack>
@@ -311,6 +315,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                   />{' '}
 
                   {t('gender')}
+
                 </Typography>
 
               </Box>
@@ -324,6 +329,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                 options={allConfig?.genderOptions || []}
 
                 placeholder={t('placeholders.allGenders')}
+
               />
 
             </Stack>
@@ -343,6 +349,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                   />{' '}
 
                   {t('maritalStatus')}
+
                 </Typography>
 
               </Box>
@@ -356,6 +363,7 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
                 options={allConfig?.maritalStatusOptions || []}
 
                 placeholder={t('placeholders.allMaritalStatuses')}
+
               />
 
             </Stack>
@@ -365,10 +373,11 @@ const AppliedResumeFilterForm = ({ handleFilter, filterData }) => {
         </Grid>
 
       </form>
+
     </>
+
   );
 
 };
 
 export default AppliedResumeFilterForm;
-

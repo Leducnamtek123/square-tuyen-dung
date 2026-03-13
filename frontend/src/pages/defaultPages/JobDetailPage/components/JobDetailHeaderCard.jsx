@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { Box, Card, Divider, Stack, Typography } from "@mui/material";
@@ -29,6 +30,7 @@ const JobDetailHeaderCard = ({
   onShowApplyForm,
   onOpenSharePopup,
 }) => {
+  const { t } = useTranslation(["public"]);
   return (
     <Card
       sx={{
@@ -76,7 +78,7 @@ const JobDetailHeaderCard = ({
                       fontSize: 13,
                     }}
                   >
-                    ChÆ°a cáº­p nháº­t
+                    {t("jobDetail.notUpdated")}
                   </span>
                 )}
               </Typography>
@@ -109,7 +111,7 @@ const JobDetailHeaderCard = ({
                   color: "#9c27b0",
                 }}
               />
-              Háº¡n ná»™p: {dayjs(jobPostDetail?.deadline).format("DD/MM/YYYY")}
+              {t("jobDetail.deadline")}: {dayjs(jobPostDetail?.deadline).format("DD/MM/YYYY")}
             </Typography>
             <Typography
               variant="subtitle2"
@@ -127,7 +129,7 @@ const JobDetailHeaderCard = ({
                   color: "#9c27b0",
                 }}
               />
-              {jobPostDetail?.views} lÆ°á»£t xem
+              {jobPostDetail?.views} {t("jobDetail.views")}
             </Typography>
             <Typography
               variant="subtitle2"
@@ -145,7 +147,7 @@ const JobDetailHeaderCard = ({
                   color: "#9c27b0",
                 }}
               />
-              ÄÄƒng ngÃ y:{" "}
+              {t("jobDetail.postedDate")}:{" "}
               {dayjs(jobPostDetail?.createAt).format("DD/MM/YYYY")}
             </Typography>
           </Stack>
@@ -172,7 +174,7 @@ const JobDetailHeaderCard = ({
               md: 3
             }}>
             <JobDetailInfoItem
-              title="Má»©c lÆ°Æ¡ng"
+              title={t("jobDetail.salary")}
               value={salaryString(
                 jobPostDetail?.salaryMin,
                 jobPostDetail?.salaryMax
@@ -186,7 +188,7 @@ const JobDetailHeaderCard = ({
               md: 3
             }}>
             <JobDetailInfoItem
-              title="Kinh nghiá»‡m"
+              title={t("jobDetail.experience")}
               value={allConfig?.experienceDict[jobPostDetail?.experience]}
             />
           </Grid>
@@ -197,7 +199,7 @@ const JobDetailHeaderCard = ({
               md: 3
             }}>
             <JobDetailInfoItem
-              title="Cáº¥p báº­c"
+              title={t("jobDetail.position")}
               value={allConfig?.positionDict[jobPostDetail?.position]}
             />
           </Grid>
@@ -208,7 +210,7 @@ const JobDetailHeaderCard = ({
               md: 3
             }}>
             <JobDetailInfoItem
-              title="HÃ¬nh thá»©c"
+              title={t("jobDetail.jobType")}
               value={allConfig?.jobTypeDict[jobPostDetail?.jobType]}
             />
           </Grid>

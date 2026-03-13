@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -29,6 +13,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import { IMAGES, ROLES_NAME, ROUTES } from '../../../configs/constants';
 
 import MuiImageCustom from '../../MuiImageCustom';
+
 import LanguageSwitcher from '../../../layouts/components/commons/LanguageSwitcher';
 
 const SidebarHeader = () => {
@@ -78,12 +63,19 @@ const SidebarHeader = () => {
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+
           <LanguageSwitcher />
+
           <Chip
+
             icon={!isEmployer ? <HomeIcon /> : <GridViewIcon />}
+
             label={!isEmployer ? 'Về trang chủ' : 'Về trang quản trị'}
+
             onClick={handleRedirect}
+
           />
+
         </Box>
 
       </Stack>
@@ -97,4 +89,3 @@ const SidebarHeader = () => {
 };
 
 export default SidebarHeader;
-

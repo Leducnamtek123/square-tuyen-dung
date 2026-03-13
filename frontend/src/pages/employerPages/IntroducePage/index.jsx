@@ -1,16 +1,6 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
 import React from "react";
 import { Box, Card, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import Grid from "@mui/material/Grid2";
 
 import CampaignOutlinedIcon from "@mui/icons-material/CampaignOutlined";
@@ -22,51 +12,48 @@ import { TabTitle } from "../../../utils/generalFunction";
 import { APP_NAME } from "../../../configs/constants";
 
 const IntroducePage = () => {
-  TabTitle(`Giới thiệu - Nền tảng tuyển dụng ${APP_NAME}`);
+  const { t } = useTranslation("employer");
+  TabTitle(`${t('introduce.pageTitle')} - ${t('common.appName', { defaultValue: APP_NAME })}`);
 
   const highlights = [
     {
-      title: "Đăng tin nhanh, tiếp cận đúng người",
-      description:
-        "Tạo tin tuyển dụng chuẩn, hiển thị rõ yêu cầu và quyền lợi để thu hút ứng viên phù hợp.",
+      title: t('introduce.highlights.h1.title'),
+      description: t('introduce.highlights.h1.desc'),
       icon: CampaignOutlinedIcon,
     },
     {
-      title: "Tìm kiếm hồ sơ theo kỹ năng",
-      description:
-        "Bộ lọc theo ngành nghề, kinh nghiệm, địa điểm giúp rút ngắn thời gian sàng lọc.",
+      title: t('introduce.highlights.h2.title'),
+      description: t('introduce.highlights.h2.desc'),
       icon: PeopleAltOutlinedIcon,
     },
     {
-      title: "Theo dõi quy trình tuyển dụng",
-      description:
-        "Quản lý trạng thái ứng viên, lịch phỏng vấn và phản hồi tập trung trên một màn hình.",
+      title: t('introduce.highlights.h3.title'),
+      description: t('introduce.highlights.h3.desc'),
       icon: TrackChangesOutlinedIcon,
     },
     {
-      title: "Xây dựng thương hiệu tuyển dụng",
-      description:
-        "Trang hồ sơ công ty rõ ràng, đáng tin cậy giúp tăng tỷ lệ ứng viên quan tâm.",
+      title: t('introduce.highlights.h4.title'),
+      description: t('introduce.highlights.h4.desc'),
       icon: VerifiedOutlinedIcon,
     },
   ];
 
   const steps = [
     {
-      title: "Đăng tin",
-      description: "Tạo tin tuyển dụng với thông tin đầy đủ và chuẩn hóa.",
+      title: t('introduce.steps.s1.title'),
+      description: t('introduce.steps.s1.desc'),
     },
     {
-      title: "Nhận hồ sơ",
-      description: "Ứng viên nộp hồ sơ trực tuyến, tập trung trong một nơi.",
+      title: t('introduce.steps.s2.title'),
+      description: t('introduce.steps.s2.desc'),
     },
     {
-      title: "Đánh giá",
-      description: "Sàng lọc theo tiêu chí, ghi chú và chia sẻ trong nội bộ.",
+      title: t('introduce.steps.s3.title'),
+      description: t('introduce.steps.s3.desc'),
     },
     {
-      title: "Phỏng vấn",
-      description: "Lên lịch và phản hồi nhanh, đảm bảo trải nghiệm ứng viên.",
+      title: t('introduce.steps.s4.title'),
+      description: t('introduce.steps.s4.desc'),
     },
   ];
 
@@ -83,7 +70,7 @@ const IntroducePage = () => {
             fontWeight: 700,
           }}
         >
-          Giới thiệu
+          {t('introduce.heroTitle')}
         </Typography>
         <Typography
           sx={{
@@ -93,10 +80,7 @@ const IntroducePage = () => {
             lineHeight: 1.8,
           }}
         >
-          {APP_NAME} hỗ trợ nhà tuyển dụng tối ưu hóa toàn bộ quy trình tìm kiếm nhân
-          sự, từ đăng tin, tiếp cận ứng viên đến quản lý phỏng vấn và đánh giá.
-          Mục tiêu của chúng tôi là giúp doanh nghiệp tuyển được đúng người nhanh
-          hơn, rõ ràng hơn và hiệu quả hơn.
+          {t('introduce.heroSubtitle', { appName: APP_NAME })}
         </Typography>
       </Box>
 
@@ -150,7 +134,7 @@ const IntroducePage = () => {
             fontWeight: 700,
           }}
         >
-          Quy trình tuyển dụng đơn giản
+          {t('introduce.processTitle')}
         </Typography>
         <Grid container spacing={3}>
           {steps.map((step, index) => (
@@ -174,7 +158,7 @@ const IntroducePage = () => {
                   variant="h6"
                   sx={{ fontWeight: 700, mb: 1, color: "primary.main" }}
                 >
-                  Bước {index + 1}
+                  {t('introduce.stepLabel', { index: index + 1 })}
                 </Typography>
                 <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>
                   {step.title}

@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -548,8 +532,6 @@ const JobPost = ({
 
       <Divider sx={{ mt: 1, mb: 0.75, borderColor: theme.palette.grey[400] }} />
 
-      
-
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
 
         <Box
@@ -679,4 +661,3 @@ const Loading = () => (
 JobPost.Loading = Loading;
 
 export default JobPost;
-

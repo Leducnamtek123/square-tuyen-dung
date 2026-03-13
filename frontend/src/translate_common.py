@@ -81,4 +81,3 @@ replace_in_file(
         "'Hủy theo dõi thành công.'": "'Unfollowed successfully.'"
     }
 )
-

@@ -50,11 +50,9 @@ def analyze_resume_ai(activity_id):
         activity.ai_analysis_status = 'processing'
         activity.save()
 
-        # 1. Lấy nội dung CV
         resume_url = activity.resume.file.get_full_url()
         file_format = activity.resume.file.format.lower()
         
-        # Tải file tạm để xử lý
         resume_text = ""
         with httpx.Client() as client:
             response = client.get(resume_url)

@@ -33,7 +33,36 @@ class LiveKitService:
             finally:
                 await lkapi.aclose()
 
+        async def _room_exists():
+            lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+            try:
+                resp = await lkapi.room.list_rooms(api.ListRoomsRequest(names=[room_name]))
+                return len(getattr(resp, "rooms", []) or []) > 0
+            finally:
+                await lkapi.aclose()
+
+        async def _has_participants():
+            lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+            try:
+                resp = await lkapi.room.list_participants(api.ListParticipantsRequest(room=room_name))
+                return len(getattr(resp, "participants", []) or []) > 0
+            finally:
+                await lkapi.aclose()
+
+        async def _delete_room():
+            lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+            try:
+                await lkapi.room.delete_room(api.DeleteRoomRequest(room=room_name))
+            finally:
+                await lkapi.aclose()
+
         try:
+            # If the room exists but is empty, delete it to ensure agent config is applied.
+            try:
+                if asyncio.run(_room_exists()) and not asyncio.run(_has_participants()):
+                    asyncio.run(_delete_room())
+            except Exception as cleanup_exc:
+                logger.warning("LiveKit pre-cleanup failed: %s", cleanup_exc)
             asyncio.run(_create_room())
         except Exception as exc:
             message = str(exc).lower()
@@ -59,8 +88,22 @@ class LiveKitService:
                 can_subscribe=True,
                 hidden=is_agent
             )))
-        if LIVEKIT_AGENT_NAME:
-            room_config = api.RoomConfiguration()
-            room_config.agents.append(api.RoomAgentDispatch(agent_name=LIVEKIT_AGENT_NAME))
-            token_builder = token_builder.with_room_config(room_config)
+        # Room agent is already attached when the room is created via ensure_room_with_agent().
+        # Avoid attaching room_config to participant tokens to prevent triggering participant-level
+        # agent jobs when workers only handle room-level jobs.
         return token_builder.to_jwt()
+
+    @staticmethod
+    def delete_room(room_name: str) -> None:
+        """Delete a LiveKit room by name."""
+        async def _delete_room():
+            lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+            try:
+                await lkapi.room.delete_room(api.DeleteRoomRequest(room=room_name))
+            finally:
+                await lkapi.aclose()
+
+        try:
+            asyncio.run(_delete_room())
+        except Exception as exc:
+            logger.warning("LiveKit delete_room failed: %s", exc)

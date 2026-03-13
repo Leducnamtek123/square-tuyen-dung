@@ -1,30 +1,33 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
 import React from 'react';
+
 import { Card } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
+
 import { TabTitle } from '../../../utils/generalFunction';
+
 import SavedResumeCard from '../../components/employers/SavedResumeCard';
 
 const SavedProfilePage = () => {
-  TabTitle("Saved Resume Management")
+
+  const { t } = useTranslation('employer');
+
+  TabTitle(t('savedResume.title'));
 
   return (
+
     <Card sx={{ p: 3 }}>
+
       {/* Start: Saved Resume Card */}
-      <SavedResumeCard title="Saved Resumes"/>
+
+      <SavedResumeCard title={t('savedResume.title')}/>
+
       {/* End: Saved Resume Card */}
+
     </Card>
+
   );
+
 };
 
 export default SavedProfilePage;

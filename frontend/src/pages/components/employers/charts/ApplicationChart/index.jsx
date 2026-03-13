@@ -35,6 +35,10 @@ import {
 
   BarElement,
 
+  PointElement,
+
+  LineElement,
+
   Title,
 
   Tooltip,
@@ -49,6 +53,8 @@ import RangePickerCustom from '../../../../../components/controls/RangePickerCus
 
 import statisticService from '../../../../../services/statisticService';
 
+import { useTheme } from '@mui/material/styles';
+
 ChartJS.register(
 
   CategoryScale,
@@ -56,6 +62,10 @@ ChartJS.register(
   LinearScale,
 
   BarElement,
+
+  PointElement,
+
+  LineElement,
 
   Title,
 
@@ -169,6 +179,7 @@ const options = {
 
 const ApplicationChart = ({ title }) => {
   const { t } = useTranslation('employer');
+  const theme = useTheme();
 
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -182,17 +193,17 @@ const ApplicationChart = ({ title }) => {
 
   ]);
 
-  const [data, setData] = React.useState([]);
+  const [data, setData] = React.useState(null);
 
   React.useEffect(() => {
 
-    const statistics = async (data) => {
+    const statistics = async (params) => {
 
       setIsLoading(true);
 
       try {
 
-        const resData = await statisticService.employerApplicationStatistics(data);
+        const resData = await statisticService.employerApplicationStatistics(params);
 
         setData(resData.data);
 
@@ -216,7 +227,6 @@ const ApplicationChart = ({ title }) => {
 
     });
 
-    
   }, [allowSubmit, selectedDateRange]);
 
   const dataOptions = React.useMemo(() => ({
@@ -229,11 +239,11 @@ const ApplicationChart = ({ title }) => {
 
         type: 'line',
 
-        label: data?.title2,
+        label: t(`applicationChart.labels.${data?.title2?.toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data?.title2 }),
 
-        borderColor: 'rgba(68, 29, 160, 1)', // primary.main
+        borderColor: theme.palette.primary.main,
 
-        backgroundColor: 'rgba(68, 29, 160, 0.1)',
+        backgroundColor: theme.palette.primary.light || 'rgba(25, 118, 210, 0.1)',
 
         data: data?.data2 || [],
 
@@ -259,9 +269,9 @@ const ApplicationChart = ({ title }) => {
 
         type: 'bar',
 
-        label: data?.title1,
+        label: t(`applicationChart.labels.${data?.title1?.toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data?.title1 }),
 
-        backgroundColor: 'rgba(255, 152, 0, 0.9)', // secondary.main
+        backgroundColor: theme.palette.secondary.main,
 
         data: data?.data1 || [],
 
@@ -275,7 +285,7 @@ const ApplicationChart = ({ title }) => {
 
     ],
 
-  }), [data]);
+  }), [data, t, theme]);
 
   return (
 
@@ -285,9 +295,9 @@ const ApplicationChart = ({ title }) => {
 
         p: 3,
 
-        boxShadow: theme => theme.customShadows.card,
+        boxShadow: theme['customShadows']?.card || theme.shadows[1],
 
-        border: theme => `1px solid ${theme.palette.grey[100]}`,
+        border: `1px solid ${theme.palette.divider}`,
 
         height: '100%'
 
@@ -317,7 +327,7 @@ const ApplicationChart = ({ title }) => {
 
             <MuiTooltip
 
-              title={t('applicationChart.title.thngkchstuyndngtrongvng1thnggnnht', 'Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất')}
+              title={t('applicationChart.title')}
 
               arrow
 
@@ -399,7 +409,7 @@ const ApplicationChart = ({ title }) => {
 
               </Stack>
 
-            ) : data.length === 0 ? (
+            ) : !data ? (
 
               <Stack
 
@@ -419,21 +429,8 @@ const ApplicationChart = ({ title }) => {
 
               >
 
-                <Empty
-
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
-
-                  description={
-
-                    <Typography variant="body2" color="text.secondary">
-
-                      Không có dữ liệu để thống kê
-
-                    </Typography>
-
-                  }
-
-                />
+                <InsertChartOutlinedIcon sx={{ fontSize: 42, color: "text.secondary" }} />
+                <Typography variant="body2" color="text.secondary">{t('applicationChart.noData')}</Typography>
 
               </Stack>
 
@@ -460,4 +457,3 @@ const ApplicationChart = ({ title }) => {
 };
 
 export default ApplicationChart;
-

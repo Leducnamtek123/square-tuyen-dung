@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from "react";
 
 import { useNavigate } from "react-router-dom";
@@ -21,7 +5,9 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
+
 import { useTranslation } from 'react-i18next';
+
 import Grid from "@mui/material/Grid2";
 
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
@@ -49,8 +35,11 @@ import tokenService from "../../../../services/tokenService";
 import AvatarCard from "../AvatarCard";
 
 const AccountCard = ({ title, sx }) => {
+
   const { t } = useTranslation('auth');
+
   const dispatch = useDispatch();
+
   const nav = useNavigate();
 
   const [openPopup, setOpenPopup] = React.useState(false);
@@ -71,6 +60,7 @@ const AccountCard = ({ title, sx }) => {
       .then(() =>
 
         toastMessages.success(t('account.updateSuccess'))
+
       )
 
       .catch((error) => {
@@ -134,7 +124,9 @@ const AccountCard = ({ title, sx }) => {
   };
 
   return (
+
     <>
+
       <Box
 
         sx={{
@@ -232,6 +224,7 @@ const AccountCard = ({ title, sx }) => {
                     >
 
                       {t('account.changePassword')}
+
                     </span>
 
                   </Typography>
@@ -277,6 +270,7 @@ const AccountCard = ({ title, sx }) => {
                   >
 
                     {t('account.update')}
+
                   </Button>
 
                 </Stack>
@@ -290,7 +284,9 @@ const AccountCard = ({ title, sx }) => {
         </Stack>
 
       </Box>
+
       <FormPopup
+
         title={t('account.updatePassword')}
 
         openPopup={openPopup}
@@ -308,11 +304,13 @@ const AccountCard = ({ title, sx }) => {
         />
 
       </FormPopup>
+
       {isFullScreenLoading && <BackdropLoading />}
+
     </>
+
   );
 
 };
 
 export default AccountCard;
-

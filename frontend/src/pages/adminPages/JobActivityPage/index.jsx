@@ -22,12 +22,10 @@ const JobActivityPage = () => {
         kw: searchTerm
     });
 
-    // Dialog state
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [currentActivity, setCurrentActivity] = useState(null);
     const [statusValue, setStatusValue] = useState('');
 
-    // Delete dialog
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleSearch = (e) => {

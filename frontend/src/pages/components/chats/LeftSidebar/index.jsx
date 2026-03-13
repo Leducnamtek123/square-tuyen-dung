@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { Box, CircularProgress, Skeleton, Stack, Typography } from "@mui/material";
@@ -57,6 +41,7 @@ import ChatRoomSearch from '../../../../components/chats/ChatRoomSearch';
 import { useDebounce } from '../../../../hooks';
 
 import { getUserAccount } from '../../../../services/firebaseService';
+
 import { useTranslation } from 'react-i18next';
 
 const LoadingComponentItem = () => {
@@ -90,6 +75,7 @@ const LIMIT = 20;
 const chatRoomCollectionRef = collection(db, 'chatRooms');
 
 const LeftSidebar = () => {
+
   const { t } = useTranslation('chat');
 
   const { currentUserChat, setSelectedRoomId } = React.useContext(ChatContext);
@@ -242,7 +228,6 @@ const LeftSidebar = () => {
 
     }
 
-    
   }, [currentUserChat]);
 
   // tai them du lieu
@@ -578,6 +563,7 @@ const LeftSidebar = () => {
 };
 
 const EmployerSidebar = () => {
+
   const { t } = useTranslation('chat');
 
   const { currentUserChat, setSelectedRoomId } = React.useContext(ChatContext);
@@ -730,7 +716,6 @@ const EmployerSidebar = () => {
 
     }
 
-    
   }, [currentUserChat]);
 
   // tai them du lieu
@@ -1064,4 +1049,3 @@ const EmployerSidebar = () => {
 LeftSidebar.Employer = EmployerSidebar;
 
 export default LeftSidebar;
-

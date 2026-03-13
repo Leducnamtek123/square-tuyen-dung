@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import httpx
 from enum import Enum, auto
@@ -10,6 +11,7 @@ from livekit.agents import (
     function_tool,
 )
 
+from .config import config
 from .interview_flow import decide_next_action, parse_question_payload
 from .prompts import INTERVIEWER_INSTRUCTIONS, DEFAULT_GREETING
 
@@ -82,6 +84,8 @@ class Interviewer(Agent):
         return f"Currently in the {self._current_stage.name} stage."
 
     async def _fetch_next_question(self, advance: bool = True) -> dict:
+        if advance is None:
+            advance = True
         if not self._backend_api_url or not self._room_name:
             return {"error": "missing_backend_context"}
 
@@ -103,6 +107,8 @@ class Interviewer(Agent):
         advance: bool = True,
     ) -> dict:
         """Fetch the next primary interview question from the backend."""
+        if advance is None:
+            advance = True
         return await self._fetch_next_question(advance=advance)
 
     async def get_initial_greeting(self) -> str:
@@ -122,9 +128,50 @@ class Interviewer(Agent):
         except Exception as exc:
             logger.warning("update_backend_status failed: %s", exc)
 
+    async def _append_transcript(
+        self,
+        speaker_role: str,
+        content: str,
+        speech_duration_ms: int | None = None,
+    ) -> None:
+        if not self._backend_api_url or not self._room_name:
+            return
+        if not content:
+            return
+        try:
+            payload: dict[str, Any] = {
+                "speaker_role": speaker_role,
+                "content": content,
+            }
+            if speech_duration_ms is not None:
+                payload["speech_duration_ms"] = int(speech_duration_ms)
+            async with httpx.AsyncClient() as client:
+                url = f"{self._backend_api_url}/interviews/{self._room_name}/append-transcription"
+                await client.post(url, json=payload, timeout=5.0)
+        except Exception as exc:
+            logger.warning("append_transcript failed: %s", exc)
+
+    def _extract_message_text(self, new_message: Any) -> str:
+        if new_message is None:
+            return ""
+        if isinstance(new_message, str):
+            return new_message
+        if isinstance(new_message, dict):
+            for key in ("text", "message", "content"):
+                value = new_message.get(key)
+                if isinstance(value, str) and value.strip():
+                    return value
+            return ""
+        for attr in ("text", "message", "content"):
+            value = getattr(new_message, attr, None)
+            if isinstance(value, str) and value.strip():
+                return value
+        return ""
+
     async def _say_and_wait(self, text: str, *, allow_interruptions: bool = True) -> None:
         handle = self.session.say(text, allow_interruptions=allow_interruptions)
         await handle.wait_for_playout()
+        asyncio.create_task(self._append_transcript("ai_agent", text))
 
     async def _ask_next_question(self) -> bool:
         payload = await self._fetch_next_question(advance=True)
@@ -139,17 +186,24 @@ class Interviewer(Agent):
             self._current_stage = InterviewStage.CLOSING
             closing_message = "Cảm ơn bạn đã tham gia phỏng vấn. Buổi phỏng vấn đã kết thúc."
             await self._say_and_wait(closing_message, allow_interruptions=False)
-            await self._update_backend_status("completed")
-            self.session.shutdown(drain=True)
+            if config.AUTO_END_ON_COMPLETION:
+                await self._update_backend_status("completed")
+                if self.session:
+                    self.session.shutdown(drain=True)
             self._completed = True
             return True
         return False
 
     async def on_user_turn_completed(self, turn_ctx, new_message) -> None:  # type: ignore[override]
         if self._completed:
-            raise StopResponse()
+            if config.AUTO_END_ON_COMPLETION:
+                raise StopResponse()
+            return
         if not self._backend_api_url or not self._room_name:
             return
+        text = self._extract_message_text(new_message)
+        if text:
+            asyncio.create_task(self._append_transcript("candidate", text))
         handled = await self._ask_next_question()
         if handled:
             raise StopResponse()

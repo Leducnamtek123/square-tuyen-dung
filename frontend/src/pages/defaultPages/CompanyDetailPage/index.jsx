@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from "react";
 
 import { useParams } from "react-router-dom";
@@ -23,6 +7,7 @@ import { useSelector } from "react-redux";
 import dayjs from "dayjs";
 
 import { Box, Card, IconButton, Link, Stack, Typography, Button, Skeleton } from "@mui/material";
+
 import Grid from "@mui/material/Grid2";
 
 import { LoadingButton } from "@mui/lab";
@@ -60,6 +45,7 @@ import toastMessages from "../../../utils/toastMessages";
 import Map from "../../../components/Map";
 
 import QRCodeBox from "../../../components/QRCodeBox";
+
 import SocialNetworkSharingPopup from "../../../components/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
 
 import ShareIcon from "@mui/icons-material/Share";
@@ -541,9 +527,13 @@ const CompanyDetailPage = () => {
             <Grid container spacing={3}>
 
               <Grid
+
                 size={{
+
                   xs: 12,
+
                   md: 8
+
                 }}>
 
                 <Card
@@ -673,6 +663,7 @@ const CompanyDetailPage = () => {
                       >
 
                         Việc làm đang tuyển
+
                       </Typography>
 
                       <FilterJobPostCard
@@ -694,9 +685,13 @@ const CompanyDetailPage = () => {
               </Grid>
 
               <Grid
+
                 size={{
+
                   xs: 12,
+
                   md: 4
+
                 }}>
 
                 <Card
@@ -1042,6 +1037,7 @@ const CompanyDetailPage = () => {
                       >
 
                         Bản đồ
+
                       </Typography>
 
                       <Box
@@ -1205,4 +1201,3 @@ const CompanyDetailPage = () => {
 };
 
 export default CompanyDetailPage;
-

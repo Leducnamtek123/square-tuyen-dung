@@ -33,6 +33,8 @@ import RangePickerCustom from '../../../../../components/controls/RangePickerCus
 
 import statisticService from '../../../../../services/statisticService';
 
+import { useTheme } from '@mui/material/styles';
+
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const options = {
@@ -91,6 +93,7 @@ const options = {
 
 const HiringAcademicChart = ({ title }) => {
   const { t } = useTranslation('employer');
+  const theme = useTheme();
 
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -104,19 +107,17 @@ const HiringAcademicChart = ({ title }) => {
 
   ]);
 
-  const [data, setData] = React.useState([]);
+  const [data, setData] = React.useState(null);
 
   React.useEffect(() => {
 
-    const statistics = async (data) => {
+    const statistics = async (params) => {
 
       setIsLoading(true);
 
       try {
 
-        const resData =
-
-          await statisticService.employerRecruitmentStatisticsByRank(data);
+        const resData = await statisticService.employerRecruitmentStatisticsByRank(params);
 
         setData(resData.data);
 
@@ -140,48 +141,53 @@ const HiringAcademicChart = ({ title }) => {
 
     });
 
-    
   }, [allowSubmit, selectedDateRange]);
 
-  const dataOptions = React.useMemo(() => ({
+  const dataOptions = React.useMemo(() => {
+    const labels = data?.labels?.map(label => 
+      t(`hiringAcademicChart.labels.${label.toLowerCase().replace(/[^a-z0-9]/g, '')}`, { defaultValue: label })
+    ) || [];
 
-    labels: data?.labels || [],
+    return {
 
-    datasets: [
+      labels: labels,
 
-      {
+      datasets: [
 
-        label: '# Số lượng ứng tuyển',
+        {
 
-        data: data?.data || [],
+          label: t('hiringAcademicChart.applicationCount'),
 
-        backgroundColor: [
+          data: data?.data || [],
 
-          'rgba(255, 152, 0, 0.9)',  // secondary
+          backgroundColor: [
 
-          'rgba(68, 29, 160, 0.9)',  // primary
+            'rgba(255, 152, 0, 0.9)',  // secondary
 
-          'rgba(46, 125, 50, 0.9)',  // success
+            'rgba(25, 118, 210, 0.9)', // primary (fixed blue)
 
-          'rgba(2, 136, 209, 0.9)',  // info
+            'rgba(46, 125, 50, 0.9)',  // success
 
-          'rgba(211, 47, 47, 0.9)',  // error
+            'rgba(2, 136, 209, 0.9)',  // info
 
-        ],
+            'rgba(211, 47, 47, 0.9)',  // error
 
-        borderWidth: 0,
+          ],
 
-        borderRadius: 4,
+          borderWidth: 0,
 
-        spacing: 2,
+          borderRadius: 4,
 
-        hoverOffset: 4
+          spacing: 2,
 
-      },
+          hoverOffset: 4
 
-    ],
+        },
 
-  }), [data]);
+      ],
+
+    };
+  }, [data, t]);
 
   return (
 
@@ -191,9 +197,9 @@ const HiringAcademicChart = ({ title }) => {
 
         p: 3,
 
-        boxShadow: theme => theme.customShadows.card,
+        boxShadow: theme.customShadows?.card || theme.shadows[1],
 
-        border: theme => `1px solid ${theme.palette.grey[100]}`,
+        border: `1px solid ${theme.palette.divider}`,
 
         height: '100%'
 
@@ -201,7 +207,7 @@ const HiringAcademicChart = ({ title }) => {
 
     >
 
-      <Stack>
+      <Stack spacing={3}>
 
         <Box>
 
@@ -215,17 +221,35 @@ const HiringAcademicChart = ({ title }) => {
 
           >
 
-            <Typography fontWeight="bold">{title}</Typography>
+            <Typography variant="h5" color="text.primary">{title}</Typography>
 
             <MuiTooltip
 
-              title={t('hiringAcademicChart.title.thngkchsngtuyntheotrnhhcvn', 'Thống kê chỉ số ứng tuyển theo trình độ học vấn')}
+              title={t('hiringAcademicChart.title')}
 
               arrow
 
+              placement="left"
+
             >
 
-              <InfoIcon color="disabled" />
+              <InfoIcon
+
+                sx={{
+
+                  color: 'grey.400',
+
+                  cursor: 'pointer',
+
+                  '&:hover': {
+
+                    color: 'primary.main',
+
+                  },
+
+                }}
+
+              />
 
             </MuiTooltip>
 
@@ -233,9 +257,9 @@ const HiringAcademicChart = ({ title }) => {
 
         </Box>
 
-        <Divider sx={{ mt: 2, mb: 3 }} />
+        <Divider sx={{ borderStyle: 'dashed' }} />
 
-        <Box sx={{ px: 1 }}>
+        <Box>
 
           <Stack
 
@@ -243,9 +267,9 @@ const HiringAcademicChart = ({ title }) => {
 
             justifyContent="flex-end"
 
-            spacing={0.75}
+            spacing={1}
 
-            mb={1}
+            mb={3}
 
           >
 
@@ -263,29 +287,72 @@ const HiringAcademicChart = ({ title }) => {
 
           </Stack>
 
-          <Stack justifyContent="center" alignItems="center">
+          <Box sx={{ position: 'relative', minHeight: 320 }}>
 
             {isLoading ? (
 
-              <CircularProgress color="secondary" />
+              <Stack
 
-            ) : data.length === 0 ? (
+                alignItems="center"
 
-              <Empty
+                justifyContent="center"
 
-                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                sx={{ height: 320 }}
 
-                description="No data available for statistics"
+              >
 
-              />
+                <CircularProgress 
+
+                  size={40}
+
+                  thickness={3}
+
+                  sx={{
+
+                    color: 'primary.main'
+
+                  }}
+
+                />
+
+              </Stack>
+
+            ) : !data || data.data.length === 0 ? (
+
+              <Stack
+
+                alignItems="center"
+
+                justifyContent="center"
+
+                sx={{
+
+                  height: 320,
+
+                  bgcolor: 'grey.50',
+
+                  borderRadius: 2
+
+                }}
+
+              >
+
+                <InsertChartOutlinedIcon sx={{ fontSize: 42, color: "text.secondary" }} />
+                <Typography variant="body2" color="text.secondary">
+                  {t('hiringAcademicChart.noData')}
+                </Typography>
+
+              </Stack>
 
             ) : (
 
-              <Pie data={dataOptions} options={options} height={320} />
+              <Box sx={{ height: 320 }}>
+                <Pie data={dataOptions} options={options} />
+              </Box>
 
             )}
 
-          </Stack>
+          </Box>
 
         </Box>
 
@@ -298,4 +365,3 @@ const HiringAcademicChart = ({ title }) => {
 };
 
 export default HiringAcademicChart;
-

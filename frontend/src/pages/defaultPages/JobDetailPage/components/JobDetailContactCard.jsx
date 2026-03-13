@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Card, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 
@@ -10,6 +11,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Map from "../../../../components/Map";
 
 const JobDetailContactCard = ({ jobPostDetail }) => {
+  const { t } = useTranslation(["public"]);
   return (
     <Card
       sx={{
@@ -46,7 +48,7 @@ const JobDetailContactCard = ({ jobPostDetail }) => {
                 },
               }}
             >
-              ThÃ´ng tin liÃªn há»‡
+              {t("jobDetail.contactInfo")}
             </Typography>
 
             <Stack spacing={2.5}>
@@ -68,10 +70,10 @@ const JobDetailContactCard = ({ jobPostDetail }) => {
                 <PersonIcon sx={{ color: "#9c27b0", fontSize: 24 }} />
                 <Box>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    NgÆ°á»i liÃªn há»‡
+                    {t("jobDetail.contactPerson")}
                   </Typography>
                   <Typography variant="body1" fontWeight={500}>
-                    {jobPostDetail?.contactPersonName || "ChÆ°a cáº­p nháº­t"}
+                    {jobPostDetail?.contactPersonName || t("jobDetail.notUpdated")}
                   </Typography>
                 </Box>
               </Box>
@@ -94,10 +96,10 @@ const JobDetailContactCard = ({ jobPostDetail }) => {
                 <EmailIcon sx={{ color: "#9c27b0", fontSize: 24 }} />
                 <Box>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Email liÃªn há»‡
+                    {t("jobDetail.contactEmail")}
                   </Typography>
                   <Typography variant="body1" fontWeight={500}>
-                    {jobPostDetail?.contactPersonEmail || "ChÆ°a cáº­p nháº­t"}
+                    {jobPostDetail?.contactPersonEmail || t("jobDetail.notUpdated")}
                   </Typography>
                 </Box>
               </Box>
@@ -120,10 +122,10 @@ const JobDetailContactCard = ({ jobPostDetail }) => {
                 <PhoneIcon sx={{ color: "#9c27b0", fontSize: 24 }} />
                 <Box>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Sá»‘ Ä‘iá»‡n thoáº¡i
+                    {t("jobDetail.contactPhone")}
                   </Typography>
                   <Typography variant="body1" fontWeight={500}>
-                    {jobPostDetail?.contactPersonPhone || "ChÆ°a cáº­p nháº­t"}
+                    {jobPostDetail?.contactPersonPhone || t("jobDetail.notUpdated")}
                   </Typography>
                 </Box>
               </Box>
@@ -146,10 +148,10 @@ const JobDetailContactCard = ({ jobPostDetail }) => {
                 <LocationOnIcon sx={{ color: "#9c27b0", fontSize: 24 }} />
                 <Box>
                   <Typography variant="body2" color="text.secondary" gutterBottom>
-                    Äá»‹a chá»‰
+                    {t("jobDetail.address")}
                   </Typography>
                   <Typography variant="body1" fontWeight={500}>
-                    {jobPostDetail?.location?.address || "ChÆ°a cáº­p nháº­t"}
+                    {jobPostDetail?.location?.address || t("jobDetail.notUpdated")}
                   </Typography>
                 </Box>
               </Box>
@@ -183,7 +185,7 @@ const JobDetailContactCard = ({ jobPostDetail }) => {
                 },
               }}
             >
-              Báº£n Ä‘á»“
+              {t("jobDetail.map")}
             </Typography>
             <Box
               sx={{

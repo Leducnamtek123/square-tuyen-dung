@@ -72,4 +72,3 @@ export const useDebugMode = (options = {}) => {
     };
   }, [room, session, enabled, logLevel]);
 };
-

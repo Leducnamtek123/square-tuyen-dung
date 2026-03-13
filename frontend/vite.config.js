@@ -38,11 +38,7 @@ export default defineConfig({
     port: devServerPort,
     host: devServerHost,
     strictPort: true,
-    hmr: {
-      protocol: 'ws',
-      host: devServerHmrHost,
-      port: devServerClientPort
-    },
+    hmr: false,
     proxy: {
       '/api': {
         target: 'http://backend:8001',

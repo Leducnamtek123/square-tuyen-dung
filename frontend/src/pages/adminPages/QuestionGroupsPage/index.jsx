@@ -14,7 +14,6 @@ const QuestionGroupsPage = () => {
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
-    // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState('add'); // 'add' or 'edit'
     const [currentGroup, setCurrentGroup] = useState(null);
@@ -23,12 +22,10 @@ const QuestionGroupsPage = () => {
     const [selectedQuestions, setSelectedQuestions] = useState([]);
     const [allQuestions, setAllQuestions] = useState([]);
 
-    // Create Question state
     const [openCreateQuestion, setOpenCreateQuestion] = useState(false);
     const [newQuestionContent, setNewQuestionContent] = useState('');
     const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
 
-    // Delete dialog
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const {

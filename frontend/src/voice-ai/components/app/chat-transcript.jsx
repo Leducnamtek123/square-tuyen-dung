@@ -26,7 +26,7 @@ const CONTAINER_MOTION_PROPS = {
   },
 };
 
-const Scroller = React.forwardRef(function Scroller({ className, ...props }, ref) {
+const Scroller = React.forwardRef(function Scroller({ className, itemKey, ...props }, ref) {
   return (
     <div
       ref={ref}
@@ -36,7 +36,7 @@ const Scroller = React.forwardRef(function Scroller({ className, ...props }, ref
   );
 });
 
-const List = React.forwardRef(function List({ className, ...props }, ref) {
+const List = React.forwardRef(function List({ className, itemKey, ...props }, ref) {
   return <ul ref={ref} className={cn('flex flex-col gap-4', className)} {...props} />;
 });
 

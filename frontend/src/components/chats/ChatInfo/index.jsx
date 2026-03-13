@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { Box, Stack, Typography } from "@mui/material";
@@ -147,4 +131,3 @@ const HeaderChatInfo = ({ avatarUrl, title, subTitle }) => {
 ChatInfo.HeaderChatInfo = HeaderChatInfo;
 
 export default ChatInfo;
-

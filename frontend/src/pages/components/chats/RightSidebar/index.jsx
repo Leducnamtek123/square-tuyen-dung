@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -126,7 +110,6 @@ const RightSidebar = () => {
 
     getJobPosts();
 
-    
   }, [page]);
 
   const handleAddRoom = async (partnerId, userData) => {
@@ -285,15 +268,13 @@ const RightSidebar = () => {
 
           >
 
-            <Empty description={
+            <InboxOutlinedIcon sx={{ fontSize: 48, color: 'text.disabled' }} />
 
-              <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary">
 
-                You haven't applied for any position
+              You haven't applied for any position
 
-              </Typography>
-
-            } />
+            </Typography>
 
           </Stack>
 
@@ -388,8 +369,6 @@ const RightSidebar = () => {
                       </Typography>
 
                     </Tooltip>
-
-                    
 
                     <Tooltip title={value?.companyName} arrow placement="bottom">
 
@@ -767,15 +746,13 @@ const EmployerSidebar = () => {
 
           >
 
-            <Empty description={
+            <InboxOutlinedIcon sx={{ fontSize: 48, color: 'text.disabled' }} />
 
-              <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.secondary">
 
-                Chưa có ứng viên nào ứng tuyển
+              Chưa có ứng viên nào ứng tuyển
 
-              </Typography>
-
-            } />
+            </Typography>
 
           </Stack>
 
@@ -870,8 +847,6 @@ const EmployerSidebar = () => {
                       </Typography>
 
                     </Tooltip>
-
-                    
 
                     <Tooltip title={value?.jobPostTitle} arrow placement="bottom">
 
@@ -1026,4 +1001,3 @@ const EmployerSidebar = () => {
 RightSidebar.Employer = EmployerSidebar;
 
 export default RightSidebar;
-

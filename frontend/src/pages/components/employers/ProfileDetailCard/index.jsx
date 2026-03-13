@@ -1,20 +1,5 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React, { Suspense, lazy } from "react";
+
 import { useTranslation } from 'react-i18next';
 
 import { useParams } from "react-router-dom";
@@ -22,9 +7,11 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 import { Avatar, Box, Card, Divider, Rating, Stack, Typography, Button, Skeleton, Chip } from "@mui/material";
+
 import Grid from "@mui/material/Grid2";
 
 import ReactToPrint from "react-to-print";
+
 import dayjs from "dayjs";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -81,7 +68,7 @@ import SendMailCard from "../SendMailCard";
 
 import TimeAgo from '../../../../components/TimeAgo';
 
-const item = (title, value) => {
+const item = (t, title, value) => {
 
   return (
 
@@ -125,7 +112,7 @@ const item = (title, value) => {
 
       >
 
-        {value || "Not updated"}
+        {value || t('common.notUpdated')}
 
       </Typography>
 
@@ -364,6 +351,7 @@ const Loading = (
 );
 
 const SendEmailComponent = ({ resumeSlug, email, fullName, isSentEmail }) => {
+
   const { t } = useTranslation('employer');
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
@@ -408,7 +396,7 @@ const SendEmailComponent = ({ resumeSlug, email, fullName, isSentEmail }) => {
 
         setOpenSendMailPopup(false);
 
-        toastMessages.success(t('sendEmailComponent.messages.success', 'Email sent successfully.'));
+        toastMessages.success(t('sendEmailComponent.messages.success'));
 
       } catch (error) {
 
@@ -464,7 +452,7 @@ const SendEmailComponent = ({ resumeSlug, email, fullName, isSentEmail }) => {
 
           sentEmail ? (
 
-            <MarkEmailReadRoundedIcon color="white" />
+            <MarkEmailReadRoundedIcon sx={{ color: 'white' }} />
 
           ) : (
 
@@ -476,7 +464,7 @@ const SendEmailComponent = ({ resumeSlug, email, fullName, isSentEmail }) => {
 
       >
 
-        {sentEmail ? t('sendEmailComponent.label.resendEmail', 'Resend Email') : t('sendEmailComponent.label.sendEmail', 'Send Email')}
+        {sentEmail ? t('sendEmailComponent.label.resendEmail') : t('sendEmailComponent.label.sendEmail')}
 
       </Button>
 
@@ -501,6 +489,7 @@ const SendEmailComponent = ({ resumeSlug, email, fullName, isSentEmail }) => {
 };
 
 const ProfileDetailCard = () => {
+
   const { t } = useTranslation('employer');
 
   const { slug: resumeSlug } = useParams();
@@ -582,7 +571,9 @@ const ProfileDetailCard = () => {
         setProfileDetail({ ...profileDetail, isSaved: isSaved });
 
         toastMessages.success(
+
           isSaved ? t('profileDetailCard.messages.saveSuccess') : t('profileDetailCard.messages.unsaveSuccess')
+
         );
 
       } catch (error) {
@@ -604,12 +595,19 @@ const ProfileDetailCard = () => {
   ) : profileDetail === null ? (
 
     <NoDataCard
+
       title={
+
         <p>
+
           {t('profileDetailCard.title.profileNotFound')}
+
           <br /> {t('profileDetailCard.title.privateProfile')}
+
         </p>
+
       }
+
     />
 
   ) : (
@@ -767,7 +765,9 @@ const ProfileDetailCard = () => {
                         icon={<CheckCircleRoundedIcon />}
 
                         label={`${t('profileDetailCard.label.lastViewed')} ${dayjs(
+
                           profileDetail?.lastViewedDate
+
                         ).format("DD/MM/YYYY HH:mm")}`}
 
                         size="small"
@@ -822,11 +822,9 @@ const ProfileDetailCard = () => {
 
                           startIcon={<PrintIcon />}
 
-                          fullWidth={matches}
-
                         >
 
-                          In hồ sơ
+                          {t('profileDetailCard.label.printProfile')}
 
                         </Button>
 
@@ -884,7 +882,7 @@ const ProfileDetailCard = () => {
 
                     >
 
-                      {profileDetail?.isSaved ? "Saved" : "Save profile"}
+                      {profileDetail?.isSaved ? t('profileDetailCard.label.saved') : t('profileDetailCard.label.saveProfile')}
 
                     </Button>
 
@@ -1006,11 +1004,9 @@ const ProfileDetailCard = () => {
 
                             }
 
-                            fullWidth={matches}
-
                           >
 
-                            Tải xuống
+                            {t('profileDetailCard.label.download')}
 
                           </Button>
 
@@ -1024,11 +1020,9 @@ const ProfileDetailCard = () => {
 
                             onClick={() => setOpenPopup(true)}
 
-                            fullWidth={matches}
-
                           >
 
-                            Xem
+                            {t('profileDetailCard.label.view')}
 
                           </Button>
 
@@ -1081,117 +1075,199 @@ const ProfileDetailCard = () => {
                     <Grid container>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
-                        {item("Email", profileDetail?.user?.email)}
+                        {item(t, "Email", profileDetail?.user?.email)}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.phone'),
+
                           profileDetail?.jobSeekerProfile?.phone
+
                         )}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.gender'),
+
                           allConfig?.genderDict[
+
                             profileDetail?.jobSeekerProfile?.gender
+
                           ]
+
                         )}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.dob'),
+
                           <TimeAgo date={profileDetail?.jobSeekerProfile?.birthday} type="format" />
+
                         )}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.maritalStatus'),
+
                           allConfig?.maritalStatusDict[
+
                             profileDetail?.jobSeekerProfile?.maritalStatus
+
                           ]
+
                         )}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.cityProvince'),
+
                           allConfig?.cityDict[
+
                             profileDetail?.jobSeekerProfile?.location?.city
+
                           ]
+
                         )}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.district'),
+
                           profileDetail?.jobSeekerProfile?.location
+
                             ?.districtDict?.name
+
                         )}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.address'),
+
                           profileDetail?.jobSeekerProfile?.location?.address
+
                         )}
 
                       </Grid>
@@ -1233,70 +1309,114 @@ const ProfileDetailCard = () => {
                     <Grid container>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
-                        {item(t('profileDetailCard.label.desiredPosition'), profileDetail?.title)}
+                        {item(t, t('profileDetailCard.label.desiredPosition'), profileDetail?.title)}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.desiredLevel'),
+
                           allConfig?.positionDict[profileDetail?.position]
+
                         )}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.educationLevel'),
+
                           allConfig?.academicLevelDict[
+
                             profileDetail?.academicLevel
+
                           ]
+
                         )}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.experience'),
+
                           allConfig?.experienceDict[profileDetail?.experience]
+
                         )}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
 
-                          "Career",
+                          t,
+
+                          t('profileDetailCard.label.career'),
 
                           allConfig?.careerDict[profileDetail?.career]
 
@@ -1305,15 +1425,22 @@ const ProfileDetailCard = () => {
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
 
-                          "Work Location",
+                          t,
+
+                          t('profileDetailCard.label.workLocation'),
 
                           allConfig?.cityDict[profileDetail?.city]
 
@@ -1322,48 +1449,83 @@ const ProfileDetailCard = () => {
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.desiredSalary'),
+
                           salaryString(
+
                             profileDetail?.salaryMin,
+
                             profileDetail?.salaryMax
+
                           )
+
                         )}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.workplaceType'),
+
                           allConfig?.typeOfWorkplaceDict[
+
                             profileDetail?.typeOfWorkplace
+
                           ]
+
                         )}
 
                       </Grid>
 
                       <Grid
+
                         size={{
+
                           xs: 12,
+
                           sm: 6,
+
                           md: 4
+
                         }}>
 
                         {item(
+
+                          t,
+
                           t('profileDetailCard.label.jobType'),
+
                           allConfig?.jobTypeDict[profileDetail?.jobType]
+
                         )}
 
                       </Grid>
@@ -2036,26 +2198,46 @@ const ProfileDetailCard = () => {
 
               {/* Start: Popup  */}
 
-              <FormPopup
-                title={t('sendEmailComponent.title.viewattachedresume', 'View Attached Resume')}
+                <FormPopup
+
+                title={t('sendEmailComponent.title.viewattachedresume')}
+
                 openPopup={openPopup}
+
                 setOpenPopup={setOpenPopup}
+
                 showDialogAction={false}
+
               >
+
                 <Suspense
+
                   fallback={(
+
                     <Box sx={{ p: 3, textAlign: "center" }}>
+
                       <Typography variant="subtitle2" color="text.secondary">
-                        {t('profileDetailCard.messages.loadingPdf', 'Loading PDF...')}
+
+                        {t('profileDetailCard.messages.loadingPdf')}
+
                       </Typography>
+
                     </Box>
+
                   )}
+
                 >
+
                   <LazyPdf
+
                     fileUrl={profileDetail?.fileUrl}
+
                     title={profileDetail?.title}
+
                   />
+
                 </Suspense>
+
               </FormPopup>
 
               {/* End: Popup */}
@@ -2075,4 +2257,3 @@ const ProfileDetailCard = () => {
 };
 
 export default ProfileDetailCard;
-

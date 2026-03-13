@@ -1,16 +1,6 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
 import React from "react";
 import { Box, Card, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import Grid from "@mui/material/Grid2";
 
 import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
@@ -22,31 +12,28 @@ import { TabTitle } from "../../../utils/generalFunction";
 import { APP_NAME } from "../../../configs/constants";
 
 const ServicePage = () => {
-  TabTitle(`Dịch vụ - ${APP_NAME}`);
+  const { t } = useTranslation("employer");
+  TabTitle(`${t('service.pageTitle')} - ${APP_NAME}`);
 
   const services = [
     {
-      title: "Đăng tin tuyển dụng",
-      description:
-        "Hỗ trợ tạo tin tuyển dụng chuẩn, hiển thị rõ yêu cầu và quyền lợi để tiếp cận đúng ứng viên.",
+      title: t('service.jobPost.title'),
+      description: t('service.jobPost.desc'),
       icon: FactCheckOutlinedIcon,
     },
     {
-      title: "Tìm kiếm và sàng lọc hồ sơ",
-      description:
-        "Bộ lọc theo kỹ năng, kinh nghiệm, địa điểm giúp doanh nghiệp tiết kiệm thời gian tuyển dụng.",
+      title: t('service.search.title'),
+      description: t('service.search.desc'),
       icon: SearchOutlinedIcon,
     },
     {
-      title: "Phỏng vấn và trao đổi nhanh",
-      description:
-        "Kết nối ứng viên qua chat, lên lịch phỏng vấn và theo dõi phản hồi tập trung.",
+      title: t('service.interview.title'),
+      description: t('service.interview.desc'),
       icon: VideoCallOutlinedIcon,
     },
     {
-      title: "Báo cáo tuyển dụng",
-      description:
-        "Tổng hợp dữ liệu ứng viên, tiến độ và hiệu quả tuyển dụng để tối ưu quy trình.",
+      title: t('service.report.title'),
+      description: t('service.report.desc'),
       icon: InsightsOutlinedIcon,
     },
   ];
@@ -64,7 +51,7 @@ const ServicePage = () => {
             fontWeight: 700,
           }}
         >
-          Dịch vụ
+          {t('service.heroTitle')}
         </Typography>
         <Typography
           sx={{
@@ -74,9 +61,7 @@ const ServicePage = () => {
             lineHeight: 1.8,
           }}
         >
-          {APP_NAME} tập trung vào những dịch vụ cốt lõi giúp nhà tuyển dụng
-          quản lý tuyển dụng rõ ràng và nhất quán, tránh rời rạc trong từng bước
-          làm việc.
+          {t('service.heroSubtitle', { appName: APP_NAME })}
         </Typography>
       </Box>
 

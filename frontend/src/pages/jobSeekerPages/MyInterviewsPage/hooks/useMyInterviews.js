@@ -29,4 +29,3 @@ export const useMyInterviews = (params) => {
     return query;
 
 };
-

@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from "react";
 
 import { Box, Button, Stack, styled, useTheme } from "@mui/material";
@@ -124,8 +108,6 @@ const MainJobRightBanner = () => {
 
           </StyledBannerLink>
 
-          
-
           {banner.isShowButton && banner.buttonLink && (
 
             <Box 
@@ -219,4 +201,3 @@ const MainJobRightBanner = () => {
 };
 
 export default MainJobRightBanner;
-

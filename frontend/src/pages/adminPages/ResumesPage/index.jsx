@@ -23,7 +23,6 @@ const ResumesPage = () => {
         kw: searchTerm
     });
 
-    // Dialog state
     const [openEditDialog, setOpenEditDialog] = useState(false);
     const [currentResume, setCurrentResume] = useState(null);
     const [formData, setFormData] = useState({
@@ -33,7 +32,6 @@ const ResumesPage = () => {
         isActive: true,
     });
 
-    // Delete dialog
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleSearch = (e) => {

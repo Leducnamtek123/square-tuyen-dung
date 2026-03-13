@@ -29,14 +29,12 @@ except ImportError:
     InterviewSession = None
     send_interview_invitation = None
 
-
 def _get_json_body(request: HttpRequest) -> dict:
     try:
         raw = request.body.decode("utf-8") if request.body else ""
         return json.loads(raw) if raw else {}
     except Exception:
         return {}
-
 
 @csrf_exempt
 def tts(request: HttpRequest):
@@ -96,7 +94,6 @@ def tts(request: HttpRequest):
         resp["Content-Length"] = upstream.headers["content-length"]
     return resp
 
-
 @csrf_exempt
 def transcribe(request: HttpRequest):
     """
@@ -147,10 +144,7 @@ def transcribe(request: HttpRequest):
     transcription = upstream_json.get("text") or upstream_json.get("transcription") or ""
     return JsonResponse(data_response(errors={}, data={"transcription": transcription}), status=200)
 
-
-# ==============================================================================
 # TOOLS DEFINITIONS
-# ==============================================================================
 
 RECRUITMENT_TOOLS = [
     {
@@ -244,10 +238,8 @@ def execute_tool_call(tool_call, request):
             return "Lỗi: Không thể tạo buổi phỏng vấn."
             
         try:
-            # Kiểm tra job post và ứng viên
             job_post = JobPost.objects.get(id=job_post_id)
             
-            # Tạo session mới
             session = InterviewSession.objects.create(
                 candidate_id=candidate_id,
                 job_post=job_post,

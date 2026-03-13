@@ -109,21 +109,6 @@
   },
   "interviewListCard": {
     "title": "Online Interview List",
-    "scheduleInterview": "Schedule Interview",
-    "candidate": "Candidate",
-    "position": "Position",
-    "time": "Time",
-    "status": "Status",
-    "aiScore": "AI Score",
-    "grading": "Grading...",
-    "noInterviews": "No interviews scheduled yet"
-  },
-  "interviewAdminPage": {
-    "title": "Interview Management",
-    "cardTitle": "Interview List",
-    "candidateEmployer": "Candidate / Employer",
-    "jobPost": "Job Post",
-    "type": "Type",
     "time": "Time",
     "status": "Status",
     "actions": "Actions",

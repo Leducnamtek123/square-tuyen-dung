@@ -4,7 +4,6 @@ from typing import Any
 
 from .config import config
 
-
 def build_session_kwargs() -> dict[str, Any]:
     return {
         "preemptive_generation": config.PREEMPTIVE_GENERATION,

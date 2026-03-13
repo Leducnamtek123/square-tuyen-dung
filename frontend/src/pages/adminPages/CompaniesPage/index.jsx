@@ -25,7 +25,6 @@ const CompaniesPage = () => {
         kw: searchTerm
     });
 
-    // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState('add');
     const [currentCompany, setCurrentCompany] = useState(null);
@@ -39,7 +38,6 @@ const CompaniesPage = () => {
         websiteUrl: '',
     });
 
-    // Delete dialog
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleSearch = (e) => {

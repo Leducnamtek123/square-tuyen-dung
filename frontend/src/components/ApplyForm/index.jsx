@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -25,6 +9,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
 import { Card, CircularProgress, FormControlLabel, Link, Radio, RadioGroup, Stack, Typography } from "@mui/material";
+
 import Grid from "@mui/material/Grid2";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -134,7 +119,9 @@ const ApplyForm = ({ handleApplyJob }) => {
   }, [currentUser]);
 
   return (
+
     <>
+
       <form id="modal-form" onSubmit={handleSubmit(handleApplyJob)}>
 
         <Grid container spacing={2}>
@@ -392,10 +379,11 @@ const ApplyForm = ({ handleApplyJob }) => {
         </Grid>
 
       </form>
+
     </>
+
   );
 
 };
 
 export default ApplyForm;
-

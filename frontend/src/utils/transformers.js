@@ -1,11 +1,5 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Antigravity (Google DeepMind)
-*/
-
 import i18n from '../i18n';
+
 const t = (key, options) => i18n.t(key, options);
 
 /**
@@ -79,27 +73,41 @@ export const transformInterviewSession = (session) => {
         candidateName: session.candidate_name || session.candidate_dict?.fullName || session.jobSeekerDict?.fullName || '',
 
         candidateEmail: session.candidate_email || session.candidate_dict?.email || session.jobSeekerDict?.email || '',
+
         candidate_email: session.candidate_email || session.candidate_dict?.email || session.jobSeekerDict?.email || '',
 
         jobName: session.job_name || session.job_post_name || session.job_post_dict?.jobName || session.jobPostDict?.jobName || '',
 
         scheduledAt: session.scheduled_at || session.startTime || '',
+
         status: session.status || 'PENDING',
+
         interview_type: session.interview_type || session.interviewType || null,
+
         type: session.type || session.interview_type || session.interviewType || null,
+
         inviteToken: session.invite_token || session.inviteToken || null,
+
         notes: session.notes || '',
+
         questions: (session.questions || []).map(transformQuestion),
 
         ...session,
 
         candidateName: session.candidate_name || session.candidate_dict?.fullName || session.jobSeekerDict?.fullName || '',
+
         candidateEmail: session.candidate_email || session.candidate_dict?.email || session.jobSeekerDict?.email || '',
+
         candidate_email: session.candidate_email || session.candidate_dict?.email || session.jobSeekerDict?.email || '',
+
         jobName: session.job_name || session.job_post_name || session.job_post_dict?.jobName || session.jobPostDict?.jobName || '',
+
         scheduledAt: session.scheduled_at || session.startTime || '',
+
         inviteToken: session.invite_token || session.inviteToken || null,
+
     };
+
 };
 
 export const transformJobPost = (job) => {
@@ -167,4 +175,3 @@ export const transformAppliedResume = (resume) => {
     };
 
 };
-

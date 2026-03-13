@@ -3,8 +3,8 @@ import { TokenSource } from 'livekit-client';
 import { twMerge } from 'tailwind-merge';
 import { APP_CONFIG_DEFAULTS } from '@/voice-ai/app-config';
 
-export const CONFIG_ENDPOINT = process.env.NEXT_PUBLIC_APP_CONFIG_ENDPOINT;
-export const SANDBOX_ID = process.env.SANDBOX_ID;
+export const CONFIG_ENDPOINT = import.meta.env.VITE_APP_CONFIG_ENDPOINT;
+export const SANDBOX_ID = import.meta.env.VITE_SANDBOX_ID;
 
 export function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -90,7 +90,11 @@ export function getStyles(appConfig) {
  */
 export function getSandboxTokenSource(appConfig) {
   return TokenSource.custom(async () => {
-    const url = new URL(process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT, window.location.origin);
+    const connDetailsEndpoint = import.meta.env.VITE_CONN_DETAILS_ENDPOINT;
+    if (!connDetailsEndpoint) {
+      throw new Error('Missing VITE_CONN_DETAILS_ENDPOINT');
+    }
+    const url = new URL(connDetailsEndpoint, window.location.origin);
     const sandboxId = appConfig.sandboxId ?? '';
     const roomConfig = appConfig.agentName
       ? {
@@ -109,6 +113,10 @@ export function getSandboxTokenSource(appConfig) {
           room_config: roomConfig,
         }),
       });
+      if (!res.ok) {
+        const message = await res.text();
+        throw new Error(`Conn details failed (${res.status}): ${message}`);
+      }
       return await res.json();
     } catch (error) {
       console.error('Error fetching connection details:', error);

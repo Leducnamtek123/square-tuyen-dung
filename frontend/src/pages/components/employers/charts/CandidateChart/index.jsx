@@ -1,20 +1,5 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
+
 import { useTranslation } from 'react-i18next';
 
 import { Box, Card, Divider, Stack, Tooltip as MuiTooltip, Typography, CircularProgress } from "@mui/material";
@@ -50,6 +35,8 @@ import RangePickerCustom from '../../../../../components/controls/RangePickerCus
 import statisticService from '../../../../../services/statisticService';
 
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
+
+import { useTheme } from '@mui/material/styles';
 
 ChartJS.register(
 
@@ -172,7 +159,10 @@ export const options = {
 };
 
 const CandidateChart = ({ title }) => {
+
   const { t } = useTranslation('employer');
+
+  const theme = useTheme();
 
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -186,17 +176,17 @@ const CandidateChart = ({ title }) => {
 
   ]);
 
-  const [data, setData] = React.useState([]);
+  const [data, setData] = React.useState(null);
 
   React.useEffect(() => {
 
-    const statistics = async (data) => {
+    const statistics = async (params) => {
 
       setIsLoading(true);
 
       try {
 
-        const resData = await statisticService.employerCandidateStatistics(data);
+        const resData = await statisticService.employerCandidateStatistics(params);
 
         setData(resData.data);
 
@@ -220,7 +210,6 @@ const CandidateChart = ({ title }) => {
 
     });
 
-    
   }, [allowSubmit, selectedDateRange]);
 
   const dataOptions = React.useMemo(() => ({
@@ -231,13 +220,13 @@ const CandidateChart = ({ title }) => {
 
       {
 
-        label: data?.title1,
+        label: t(`candidateChart.labels.${data?.title1?.toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data?.title1 }),
 
         data: data?.data1 || [],
 
-        borderColor: 'rgba(255, 152, 0, 1)', // theme.palette.secondary.main
+        borderColor: theme.palette.secondary.main, // theme.palette.secondary.main
 
-        backgroundColor: 'rgba(255, 152, 0, 0.1)',
+        backgroundColor: theme.palette.secondary.light || 'rgba(255, 152, 0, 0.1)',
 
         borderWidth: 2,
 
@@ -259,13 +248,13 @@ const CandidateChart = ({ title }) => {
 
       {
 
-        label: data?.title2,
+        label: t(`candidateChart.labels.${data?.title2?.toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data?.title2 }),
 
         data: data?.data2 || [],
 
-        borderColor: 'rgba(68, 29, 160, 1)', // theme.palette.primary.main
+        borderColor: theme.palette.primary.main, // theme.palette.primary.main
 
-        backgroundColor: 'rgba(68, 29, 160, 0.1)',
+        backgroundColor: theme.palette.primary.light || 'rgba(68, 29, 160, 0.1)',
 
         borderWidth: 2,
 
@@ -287,7 +276,7 @@ const CandidateChart = ({ title }) => {
 
     ],
 
-  }), [data]);
+  }), [data, t, theme]);
 
   return (
 
@@ -297,9 +286,9 @@ const CandidateChart = ({ title }) => {
 
         p: 3,
 
-        boxShadow: theme => theme.customShadows.card,
+        boxShadow: theme['customShadows']?.card || theme.shadows[1],
 
-        border: theme => `1px solid ${theme.palette.grey[100]}`,
+        border: `1px solid ${theme.palette.divider}`,
 
         height: '100%'
 
@@ -329,7 +318,7 @@ const CandidateChart = ({ title }) => {
 
             <MuiTooltip
 
-              title={t('candidateChart.title.thngkshsngtuynnhnctheongy', 'Thống kê số hồ sơ ứng tuyển nhận được theo ngày')}
+              title={t('candidateChart.title')}
 
               arrow
 
@@ -411,7 +400,7 @@ const CandidateChart = ({ title }) => {
 
               </Stack>
 
-            ) : data.length === 0 ? (
+            ) : !data ? (
 
               <Stack
 
@@ -431,21 +420,23 @@ const CandidateChart = ({ title }) => {
 
               >
 
-                <Empty
+                <Stack
 
-                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  alignItems="center"
 
-                  description={
+                  justifyContent="center"
 
-                    <Typography variant="body2" color="text.secondary">
+                  sx={{ py: 4 }}
 
-                      Không có dữ liệu để thống kê
+                >
 
-                    </Typography>
+                  <Typography variant="body2" color="text.secondary">
 
-                  }
+                    {t('candidateChart.noData')}
 
-                />
+                  </Typography>
+
+                </Stack>
 
               </Stack>
 
@@ -472,4 +463,3 @@ const CandidateChart = ({ title }) => {
 };
 
 export default CandidateChart;
-

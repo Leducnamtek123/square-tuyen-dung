@@ -6,10 +6,48 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.utils import timezone as tz
 from decouple import config
 from .models import InterviewSession
+from .livekit_service import LiveKitService
 
 logger = logging.getLogger(__name__)
+
+@shared_task
+def end_interview_session(session_id, reason="max_duration"):
+    """Force-end an interview session and delete the LiveKit room."""
+    session = None
+    try:
+        session = InterviewSession.objects.get(id=session_id)
+
+        if session.status in ("completed", "cancelled"):
+            return
+
+        now = tz.now()
+        if not session.start_time:
+            session.start_time = now
+        session.end_time = now
+        session.duration = int((session.end_time - session.start_time).total_seconds())
+        session.status = "completed"
+        session.save()
+
+        logger.info("Interview session %s ended by task (%s).", session_id, reason)
+
+        # Trigger AI Evaluation if completed
+        evaluate_interview_session.delay(session.id)
+
+    except InterviewSession.DoesNotExist:
+        logger.warning("Interview session %s not found when ending.", session_id)
+        return
+    except Exception as e:
+        logger.error("Error ending interview session %s: %s", session_id, e)
+        return
+    finally:
+        try:
+            if session is not None and session.room_name:
+                LiveKitService.delete_room(session.room_name)
+        except Exception as e:
+            logger.warning("Failed to delete LiveKit room for session %s: %s", session_id, e)
 
 @shared_task
 def send_interview_invitation(session_id):
@@ -113,7 +151,6 @@ def evaluate_interview_session(session_id):
         LƯU Ý: Phản hồi PHẢI là một JSON object hợp lệ, không có văn bản giải thích. Ngôn ngữ phản hồi là tiếng Việt.
         """
         
-        # Lấy cấu hình LLM từ environment
         llama_url = config('LLAMA_BASE_URL', default="http://llama-cpp:11434/v1")
         model_alias = config('LLAMA_MODEL_ALIAS', default="qwen2-7b")
         

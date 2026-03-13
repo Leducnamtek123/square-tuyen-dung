@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import * as React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -23,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import TimeAgo from '../TimeAgo';
 
 import { Badge, Box, IconButton, Menu, Stack, Typography } from "@mui/material";
+
 import Grid from "@mui/material/Grid2";
 
 import NotificationsIcon from '@mui/icons-material/Notifications';
@@ -460,7 +445,9 @@ const NotificationCard = () => {
   };
 
   return (
+
     <React.Fragment>
+
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
 
         <IconButton
@@ -484,6 +471,7 @@ const NotificationCard = () => {
         </IconButton>
 
       </Box>
+
       <Menu
 
         anchorEl={anchorEl}
@@ -844,10 +832,11 @@ const NotificationCard = () => {
         </Box>
 
       </Menu>
+
     </React.Fragment>
+
   );
 
 };
 
 export default NotificationCard;
-

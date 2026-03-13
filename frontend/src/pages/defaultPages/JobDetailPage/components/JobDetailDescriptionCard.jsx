@@ -1,10 +1,12 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Box, Card, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 
 import JobDetailInfoItem from "./JobDetailInfoItem";
 
 const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
+  const { t } = useTranslation(["public"]);
   return (
     <Card
       sx={{
@@ -15,7 +17,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
       }}
     >
       <Stack spacing={4}>
-        {/* MÃ´ táº£ cÃ´ng viá»‡c */}
+        {/* Job Description */}
         <Box>
           <Typography
             variant="h5"
@@ -34,7 +36,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
               },
             }}
           >
-            MÃ´ táº£ cÃ´ng viá»‡c
+            {t("jobDetail.description")}
           </Typography>
           <div
             dangerouslySetInnerHTML={{
@@ -43,7 +45,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
           />
         </Box>
 
-        {/* YÃªu cáº§u cÃ´ng viá»‡c */}
+        {/* Job Requirements */}
         <Box>
           <Typography
             variant="h5"
@@ -62,7 +64,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
               },
             }}
           >
-            YÃªu cáº§u cÃ´ng viá»‡c
+            {t("jobDetail.requirements")}
           </Typography>
           <div
             dangerouslySetInnerHTML={{
@@ -71,7 +73,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
           />
         </Box>
 
-        {/* Quyá»n lá»£i */}
+        {/* Benefits */}
         <Box>
           <Typography
             variant="h5"
@@ -90,7 +92,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
               },
             }}
           >
-            Quyá»n lá»£i
+            {t("jobDetail.benefits")}
           </Typography>
           <div
             dangerouslySetInnerHTML={{
@@ -99,7 +101,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
           />
         </Box>
 
-        {/* ThÃ´ng tin bá»• sung */}
+        {/* Additional Info */}
         <Box sx={{ mt: 2 }}>
           <Grid container spacing={2}>
             <Grid
@@ -108,7 +110,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
                 sm: 6
               }}>
               <JobDetailInfoItem
-                title="Nghá» nghiá»‡p"
+                title={t("jobDetail.career")}
                 value={allConfig.careerDict[jobPostDetail?.career]}
               />
             </Grid>
@@ -118,7 +120,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
                 sm: 6
               }}>
               <JobDetailInfoItem
-                title="NÆ¡i lÃ m viá»‡c"
+                title={t("jobDetail.workplaceType")}
                 value={
                   allConfig.typeOfWorkplaceDict[
                     jobPostDetail?.typeOfWorkplace
@@ -132,7 +134,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
                 sm: 6
               }}>
               <JobDetailInfoItem
-                title="Há»c váº¥n"
+                title={t("jobDetail.academicLevel")}
                 value={
                   allConfig.academicLevelDict[jobPostDetail?.academicLevel]
                 }
@@ -144,7 +146,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
                 sm: 6
               }}>
               <JobDetailInfoItem
-                title="Sá»‘ lÆ°á»£ng tuyá»ƒn"
+                title={t("jobDetail.quantity")}
                 value={jobPostDetail?.quantity}
               />
             </Grid>
@@ -154,7 +156,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
                 sm: 6
               }}>
               <JobDetailInfoItem
-                title="Khu vá»±c tuyá»ƒn"
+                title={t("jobDetail.location")}
                 value={allConfig.cityDict[jobPostDetail?.location?.city]}
               />
             </Grid>
@@ -164,7 +166,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
                 sm: 6
               }}>
               <JobDetailInfoItem
-                title="YÃªu cáº§u giá»›i tÃ­nh"
+                title={t("jobDetail.genderRequired")}
                 value={allConfig.genderDict[jobPostDetail?.genderRequired]}
               />
             </Grid>

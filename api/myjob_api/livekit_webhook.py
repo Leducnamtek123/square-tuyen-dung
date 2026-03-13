@@ -8,7 +8,6 @@ from django.views.decorators.csrf import csrf_exempt
 
 logger = logging.getLogger("livekit.webhook")
 
-
 def _parse_json(raw: bytes) -> dict[str, Any]:
     if not raw:
         return {}
@@ -16,7 +15,6 @@ def _parse_json(raw: bytes) -> dict[str, Any]:
         return json.loads(raw.decode("utf-8"))
     except Exception:
         return {}
-
 
 @csrf_exempt
 def livekit_webhook(request: HttpRequest):
@@ -55,6 +53,25 @@ def livekit_webhook(request: HttpRequest):
 
     if not verified:
         logger.info("LiveKit webhook received without verification.")
+
+    # Best-effort log to help debug disconnects even when enum parsing fails.
+    if isinstance(payload, dict):
+        event_name = payload.get("event") or payload.get("eventName")
+        participant = payload.get("participant") or {}
+        if isinstance(participant, dict):
+            disconnect_reason = participant.get("disconnectReason")
+            participant_identity = participant.get("identity")
+        else:
+            disconnect_reason = None
+            participant_identity = None
+
+        if event_name or disconnect_reason or participant_identity:
+            logger.info(
+                "LiveKit webhook event=%s participant=%s disconnectReason=%s",
+                event_name,
+                participant_identity,
+                disconnect_reason,
+            )
 
     # TODO: handle events if needed. For now, just acknowledge.
     return JsonResponse({"ok": True}, status=200)

@@ -248,7 +248,6 @@ const RecruitmentChart = ({ title }) => {
 
     });
 
-    
   }, [allowSubmit, selectedDateRange]);
 
   const dataOptions = React.useMemo(() => {
@@ -259,7 +258,7 @@ const RecruitmentChart = ({ title }) => {
 
       datasets.push({
 
-        label: data[i]?.label,
+        label: t(`recruitmentChart.labels.${data[i]?.label?.toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data[i]?.label }),
 
         data: data[i]?.data || [],
 
@@ -287,24 +286,17 @@ const RecruitmentChart = ({ title }) => {
 
     return d;
 
-  }, [data]);
+  }, [data, t]);
 
   return (
 
     <Card 
-
       sx={{ 
-
         p: 3,
-
-        boxShadow: theme => theme.customShadows.card,
-
-        border: theme => `1px solid ${theme.palette.grey[100]}`,
-
+        boxShadow: (theme) => theme.customShadows?.card || theme.shadows[1],
+        border: (theme) => `1px solid ${theme.palette.divider}`,
         height: '100%'
-
       }}
-
     >
 
       <Stack spacing={3}>
@@ -328,13 +320,9 @@ const RecruitmentChart = ({ title }) => {
             </Typography>
 
             <MuiTooltip
-
-              title={t('recruitmentChart.title.thngkchstuyndngtrongvng1thnggnnht', 'Thống kê chỉ số tuyển dụng trong vòng 1 tháng gần nhất')}
-
+              title={t('recruitmentChart.title')}
               arrow
-
               placement="left"
-
             >
 
               <InfoIcon
@@ -432,7 +420,7 @@ const RecruitmentChart = ({ title }) => {
               >
 
                 <InsertChartOutlinedIcon sx={{ fontSize: 42, color: "text.secondary" }} />
-                <Typography variant="body2" color="text.secondary">Khong co du lieu de thong ke</Typography>
+                <Typography variant="body2" color="text.secondary">{t('recruitmentChart.noData')}</Typography>
 
               </Stack>
 
@@ -459,4 +447,3 @@ const RecruitmentChart = ({ title }) => {
 };
 
 export default RecruitmentChart;
-

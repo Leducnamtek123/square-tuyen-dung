@@ -1,16 +1,6 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
 import React from "react";
 import { Box, Card, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import Grid from "@mui/material/Grid2";
 
 import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
@@ -21,47 +11,42 @@ import { TabTitle } from "../../../utils/generalFunction";
 import { APP_NAME } from "../../../configs/constants";
 
 const SupportPage = () => {
-  TabTitle(`Hỗ trợ - ${APP_NAME}`);
+  const { t } = useTranslation("employer");
+  TabTitle(`${t('support.pageTitle')} - ${APP_NAME}`);
 
   const supportChannels = [
     {
-      title: "Hỗ trợ trực tiếp",
-      description:
-        "Giải đáp các vấn đề kỹ thuật và nghiệp vụ tuyển dụng trong giờ hành chính.",
-      note: "Thông tin liên hệ đang được cập nhật.",
+      title: t('support.directSupport.title'),
+      description: t('support.directSupport.desc'),
+      note: t('support.directSupport.note'),
       icon: SupportAgentOutlinedIcon,
     },
     {
-      title: "Tài liệu hướng dẫn",
-      description:
-        "Hướng dẫn sử dụng các tính năng đăng tin, quản lý hồ sơ và phỏng vấn.",
-      note: "Đang cập nhật bộ hướng dẫn chi tiết.",
+      title: t('support.docs.title'),
+      description: t('support.docs.desc'),
+      note: t('support.docs.note'),
       icon: LibraryBooksOutlinedIcon,
     },
     {
-      title: "Kênh phản hồi",
-      description:
-        "Gửi góp ý để giúp chúng tôi cải thiện trải nghiệm tuyển dụng.",
-      note: "Sẽ bổ sung biểu mẫu phản hồi trong thời gian tới.",
+      title: t('support.feedback.title'),
+      description: t('support.feedback.desc'),
+      note: t('support.feedback.note'),
       icon: ChatBubbleOutlineOutlinedIcon,
     },
   ];
 
   const faqs = [
     {
-      question: "Tôi có thể đăng bao nhiêu tin tuyển dụng?",
-      answer:
-        "Số lượng tin tuyển dụng phụ thuộc vào gói dịch vụ mà doanh nghiệp lựa chọn.",
+      question: t('support.faq.q1'),
+      answer: t('support.faq.a1'),
     },
     {
-      question: "Làm sao để lọc hồ sơ theo kỹ năng?",
-      answer:
-        "Bạn có thể sử dụng bộ lọc theo ngành nghề, kinh nghiệm và vị trí trong mục tìm kiếm hồ sơ.",
+      question: t('support.faq.q2'),
+      answer: t('support.faq.a2'),
     },
     {
-      question: "Có hỗ trợ lên lịch phỏng vấn không?",
-      answer:
-        "Có. Hệ thống hỗ trợ tạo lịch phỏng vấn và gửi thông báo đến ứng viên.",
+      question: t('support.faq.q3'),
+      answer: t('support.faq.a3'),
     },
   ];
 
@@ -78,7 +63,7 @@ const SupportPage = () => {
             fontWeight: 700,
           }}
         >
-          Hỗ trợ
+          {t('support.heroTitle')}
         </Typography>
         <Typography
           sx={{
@@ -88,8 +73,7 @@ const SupportPage = () => {
             lineHeight: 1.8,
           }}
         >
-          {APP_NAME} luôn đồng hành cùng nhà tuyển dụng trong suốt quá trình sử
-          dụng nền tảng. Nếu cần hỗ trợ, vui lòng tham khảo các kênh dưới đây.
+          {t('support.heroSubtitle', { appName: APP_NAME })}
         </Typography>
       </Box>
 
@@ -139,7 +123,7 @@ const SupportPage = () => {
             fontWeight: 700,
           }}
         >
-          Câu hỏi thường gặp
+          {t('support.faq.title')}
         </Typography>
         <Grid container spacing={3}>
           {faqs.map((faq, index) => (

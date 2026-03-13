@@ -11,11 +11,15 @@ export function ViewController({ appConfig }) {
     props: {},
   });
 
-  const handleStart = () => {
-    if (!canPlayAudio && typeof startAudioProps.onClick === 'function') {
-      startAudioProps.onClick();
+  const handleStart = async () => {
+    try {
+      if (!canPlayAudio && typeof startAudioProps.onClick === 'function') {
+        startAudioProps.onClick();
+      }
+      await start();
+    } catch (error) {
+      console.error('[LiveKit] Failed to start session', error);
     }
-    start();
   };
 
   if (!isConnected) {

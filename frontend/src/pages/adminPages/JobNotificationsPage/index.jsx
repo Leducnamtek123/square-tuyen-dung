@@ -24,7 +24,6 @@ const JobNotificationsPage = () => {
         kw: searchTerm
     });
 
-    // Dialog state
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState('add');
     const [currentNotification, setCurrentNotification] = useState(null);
@@ -34,7 +33,6 @@ const JobNotificationsPage = () => {
         user: '', // Target user ID
     });
 
-    // Delete dialog
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleSearch = (e) => {

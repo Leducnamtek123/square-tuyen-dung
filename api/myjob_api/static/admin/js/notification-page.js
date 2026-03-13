@@ -40,7 +40,6 @@ onSnapshot(firstPage, (querySnapshot) => {
     lastVisiblePage = querySnapshot.docs[querySnapshot.docs.length - 1];
 });
 
-
 // Load more button click event
 document.getElementById("load-more-page").addEventListener("click", async () => {
     if (lastVisiblePage) {
@@ -70,7 +69,6 @@ const renderItemsPage = (data) => {
 
         const stt = item?.is_read === true ? '' : `<span class="badge text-bg-danger">New</span>`
 
-
         return `<tr>
                      <td class="align-middle" >
                         <div class="d-flex px-2 py-1 align-middle">
@@ -94,7 +92,6 @@ const renderItemsPage = (data) => {
                         <input id="${'notification-delete-page-' + item?.key}" type="submit" value="Delete" name="delete" style="background-color: #CC3434;">
                     </td> 
                 </tr>`
-
 
     }
     let strContent = ''

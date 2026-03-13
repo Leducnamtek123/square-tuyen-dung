@@ -277,6 +277,7 @@ services:
     environment:
       - NUM_IDLE_PROCESSES=1
       - BACKEND_API_URL=http://backend:8001/api
+      - AUTO_END_ON_COMPLETION=0
       - LIVEKIT_URL=http://livekit:7880
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}

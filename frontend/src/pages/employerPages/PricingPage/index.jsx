@@ -1,53 +1,44 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
 import React from "react";
 import { Box, Card, Stack, Typography, Button } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import Grid from "@mui/material/Grid2";
 
 import { TabTitle } from "../../../utils/generalFunction";
 import { APP_NAME } from "../../../configs/constants";
 
 const PricingPage = () => {
-  TabTitle(`Bảng giá - ${APP_NAME}`);
+  const { t } = useTranslation("employer");
+  TabTitle(`${t('pricing.heroTitle')} - ${APP_NAME}`);
 
   const plans = [
     {
-      title: "Cơ bản",
-      price: "Liên hệ",
-      description: "Phù hợp cho doanh nghiệp bắt đầu tuyển dụng.",
+      title: t('pricing.plans.basic.title'),
+      price: t('pricing.plans.basic.price'),
+      description: t('pricing.plans.basic.desc'),
       features: [
-        "Đăng tin tuyển dụng cơ bản",
-        "Quản lý hồ sơ ứng viên",
-        "Báo cáo tổng quan",
+        t('pricing.plans.basic.f1'),
+        t('pricing.plans.basic.f2'),
+        t('pricing.plans.basic.f3'),
       ],
     },
     {
-      title: "Tiêu chuẩn",
-      price: "Liên hệ",
-      description: "Dành cho đội ngũ tuyển dụng đang mở rộng quy mô.",
+      title: t('pricing.plans.standard.title'),
+      price: t('pricing.plans.standard.price'),
+      description: t('pricing.plans.standard.desc'),
       features: [
-        "Tìm kiếm và lọc hồ sơ nâng cao",
-        "Lên lịch phỏng vấn",
-        "Hỗ trợ ưu tiên",
+        t('pricing.plans.standard.f1'),
+        t('pricing.plans.standard.f2'),
+        t('pricing.plans.standard.f3'),
       ],
     },
     {
-      title: "Doanh nghiệp",
-      price: "Theo nhu cầu",
-      description: "Giải pháp riêng cho doanh nghiệp có nhu cầu lớn.",
+      title: t('pricing.plans.enterprise.title'),
+      price: t('pricing.plans.enterprise.price'),
+      description: t('pricing.plans.enterprise.desc'),
       features: [
-        "Gói tuyển dụng tùy chỉnh",
-        "Báo cáo chi tiết",
-        "Tư vấn tối ưu quy trình",
+        t('pricing.plans.enterprise.f1'),
+        t('pricing.plans.enterprise.f2'),
+        t('pricing.plans.enterprise.f3'),
       ],
     },
   ];
@@ -65,7 +56,7 @@ const PricingPage = () => {
             fontWeight: 700,
           }}
         >
-          Bảng giá
+          {t('pricing.heroTitle')}
         </Typography>
         <Typography
           sx={{
@@ -75,8 +66,7 @@ const PricingPage = () => {
             lineHeight: 1.8,
           }}
         >
-          Chúng tôi cung cấp các gói dịch vụ linh hoạt, dễ lựa chọn và có thể
-          điều chỉnh theo quy mô tuyển dụng của doanh nghiệp.
+          {t('pricing.heroSubtitle')}
         </Typography>
       </Box>
 
@@ -126,7 +116,7 @@ const PricingPage = () => {
                 sx={{ mt: 3 }}
                 color="primary"
               >
-                Liên hệ tư vấn
+                {t('pricing.contactBtn')}
               </Button>
             </Card>
           </Grid>

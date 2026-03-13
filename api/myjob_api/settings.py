@@ -11,7 +11,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 COMPANY_NAME = "MyJob"
 
-# Web client URL
 WEB_JOB_SEEKER_CLIENT_URL = config("WEB_JOB_SEEKER_CLIENT_URL", default="http://localhost:3000/")
 WEB_EMPLOYER_CLIENT_URL = config("WEB_EMPLOYER_CLIENT_URL", default="http://localhost:3000/")
 
@@ -20,9 +19,7 @@ DOMAIN_CLIENT = {
     "employer": WEB_EMPLOYER_CLIENT_URL if WEB_EMPLOYER_CLIENT_URL else "http://localhost:3000/",
 }
 
-# =====================
 # Local AI (Voice) services
-# =====================
 AI_TTS_BASE_URL = config("AI_TTS_BASE_URL", default="http://localhost:8298/v1")
 AI_TTS_DEFAULT_VOICE = config("AI_TTS_DEFAULT_VOICE", default="Ly (nữ miền Bắc)")
 AI_STT_BASE_URL = config("AI_STT_BASE_URL", default="http://localhost:11437/v1")
@@ -141,7 +138,6 @@ CKEDITOR_CONFIGS = {
     }
 }
 
-# Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 # Bo khi su dung sqlclient: mysqlclient==2.1.1
 
@@ -207,16 +203,12 @@ OAUTH2_PROVIDER = {
 }
 
 AUTHENTICATION_BACKENDS = (
-    # Facebook OAuth2
     'social_core.backends.facebook.FacebookAppOAuth2',
     'social_core.backends.facebook.FacebookOAuth2',
 
-    # Google OAuth2
     'social_core.backends.google.GoogleOAuth2',
 
-    # drf_social_oauth2
     'drf_social_oauth2.backends.DjangoOAuth2',
-    # Django
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -251,7 +243,6 @@ SERVICE_REDIS_USERNAME = config('SERVICE_REDIS_USERNAME', default='')
 SERVICE_REDIS_PASSWORD = config('SERVICE_REDIS_PASSWORD', default='')
 SERVICE_REDIS_DB = config('SERVICE_REDIS_DB', default=0, cast=int)
 
-# FACEBOOK
 # Facebook configuration
 SOCIAL_AUTH_FACEBOOK_DIALOG_URL = 'https://www.facebook.com/v15.0/dialog/oauth/'
 SOCIAL_AUTH_FACEBOOK_OAUTH2_REVOKE_TOKEN_URL = 'https://graph.facebook.com/v15.0/me/permissions'
@@ -264,7 +255,6 @@ SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
     'fields': 'id,name,email,first_name,last_name'
 }
 
-# GOOGLE
 # Google configuration
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = DOMAIN_CLIENT['job_seeker'].rstrip('/')
 SOCIAL_AUTH_GOOGLE_OAUTH2_TOKEN_URL = 'https://accounts.google.com/o/oauth2/token'
@@ -339,13 +329,14 @@ MYJOB_AUTH = {
     "TIME_REQUIRED_FORGOT_PASSWORD": 120
 }
 
+# Interview settings
+INTERVIEW_MAX_DURATION_SECONDS = int(os.getenv("INTERVIEW_MAX_DURATION_SECONDS", "1800"))
+
 REDIS_JOB_TITLE_EXPIRE_SECONDS = 14400
 
-# SMS
 SMS_BASE_URL = "https://qy1kdr.api.infobip.com"
 SMS_API_KEY = config('SMS_API_KEY', default='')
 
-# FIREBASE
 FIREBASE_CONFIG = {
     "apiKey": config('FIREBASE_API_KEY', default=''),
     "authDomain": config('FIREBASE_AUTH_DOMAIN', default=''),

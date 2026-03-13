@@ -1,13 +1,3 @@
-"""
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-"""
 
 from django.conf import settings
 
@@ -68,7 +58,6 @@ ABOUT_US_IMAGE_URLS = {
 }
 
 CHATBOT_ICONS = {
-    # Job Seeker
     "job_seeker_search_job": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['icons']}job_seeker_search_job.png",
     "job_seeker_search_company": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['icons']}job_seeker_search_company.png",
     "job_seeker_manage_profile": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['icons']}job_seeker_manage_profile.png",
@@ -80,11 +69,9 @@ CHATBOT_ICONS = {
     "job_seeker_about_us_target_2": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['icons']}job_seeker_about_us_target_2.png",
     "job_seeker_about_us_target_3": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['icons']}job_seeker_about_us_target_3.png",
     "job_seeker_about_us_target_4": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['icons']}job_seeker_about_us_target_4.png",
-    # Employer
     "employer_search_candidate": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['icons']}employer_search_candidate.png",
     "employer_manage_candidate": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['icons']}employer_manage_candidate.png",
     "employer_update_company_info": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['icons']}employer_update_company_info.png",
-    # Common
     "common_feedback": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['icons']}common_feedback.png",
     "common_support": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['icons']}common_support.png",
     "common_about_us": f"{settings.CLOUDINARY_PATH.format('1')}{settings.CLOUDINARY_DIRECTORY['icons']}common_about_us.png",

@@ -1,14 +1,3 @@
-/*
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-Email: khuy220@gmail.com
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-See the LICENSE file in the project root for full license information.
-*/
-
 import { lazy } from "react";
 import { Outlet } from "react-router-dom";
 import { HOST_NAME, ROUTES } from "./constants";
@@ -101,172 +90,339 @@ const InterviewRoomPage = lazy(() => import("../pages/candidatePages/InterviewRo
 const VoiceAiInterviewRedirectPage = lazy(() => import("../pages/candidatePages/VoiceAiInterviewRedirectPage"));
 
 const routesConfig = {
+
   [HOST_NAME.MYJOB]: [
+
     {
+
       path: ROUTES.JOB_SEEKER.HOME,
+
       layouts: Outlet,
+
       children: [
+
         {
+
           layouts: HomeLayout,
+
           children: [
+
             {
+
               index: true,
+
               element: HomePage,
+
             },
+
           ],
+
         },
+
         {
+
           layouts: DefaultLayout,
+
           children: [
+
             {
+
               path: ROUTES.JOB_SEEKER.JOBS,
+
               element: JobPage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.JOB_DETAIL,
+
               element: JobDetailPage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.COMPANY,
+
               element: CompanyPage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.COMPANY_DETAIL,
+
               element: CompanyDetailPage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.ABOUT_US,
+
               element: AboutUsPage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.JOBS_BY_CAREER,
+
               element: JobsByCareerPage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.JOBS_BY_CITY,
+
               element: JobsByCityPage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.JOBS_BY_TYPE,
+
               element: JobsByJobTypePage,
+
             },
+
           ],
+
         },
+
         {
+
           layouts: FullscreenLayout,
+
           children: [
+
             {
+
               path: ROUTES.CANDIDATE.LOGIN,
+
               element: CandidateLoginPage,
+
             },
+
             {
+
               path: ROUTES.CANDIDATE.INTERVIEW,
+
               element: VoiceAiInterviewRedirectPage,
+
             },
+
             {
+
               path: ROUTES.CANDIDATE.INTERVIEW_ROOM,
+
               element: InterviewRoomPage,
+
             },
+
           ],
+
         },
+
         {
+
           path: ROUTES.JOB_SEEKER.DASHBOARD,
+
           layouts: JobSeekerLayout,
+
           checkCondition: (settings) =>
+
             settings.isAuthenticated && settings.isJobSeekerRole,
+
           redirectUrl: "/" + ROUTES.AUTH.LOGIN,
+
           children: [
+
             {
+
               index: true,
+
               element: DashboardPage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.PROFILE,
+
               element: ProfilePage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.STEP_PROFILE,
+
               element: OnlineProfilePage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.ATTACHED_PROFILE,
+
               element: AttachedProfilePage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.MY_JOB,
+
               element: MyJobPage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.MY_COMPANY,
+
               element: MyCompanyPage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.MY_INTERVIEWS,
+
               element: MyInterviewsPage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.NOTIFICATION,
+
               element: NotificationPage,
+
             },
+
             {
+
               path: ROUTES.JOB_SEEKER.ACCOUNT,
+
               element: AccountPage,
+
             },
+
           ],
+
         },
+
         {
+
           layouts: DefaultLayout,
+
           checkCondition: (settings) => !settings.isAuthenticated,
+
           redirectUrl: "/" + ROUTES.JOB_SEEKER.HOME,
+
           children: [
+
             {
+
               path: ROUTES.AUTH.EMAIL_VERIFICATION,
+
               checkCondition: (settings) => settings.isAllowVerifyEmail,
+
               redirectUrl: "/" + ROUTES.AUTH.LOGIN,
+
               element: EmailVerificationRequiredPage,
+
             },
+
             {
+
               path: ROUTES.AUTH.FORGOT_PASSWORD,
+
               element: ForgotPasswordPage,
+
             },
+
             {
+
               path: ROUTES.AUTH.RESET_PASSWORD,
+
               element: ResetPasswordPage,
+
             },
+
             {
+
               path: ROUTES.AUTH.LOGIN,
+
               element: JobSeekerLogin,
+
             },
+
             {
+
               path: ROUTES.AUTH.REGISTER,
+
               element: JobSeekerSignUp,
+
             },
+
           ],
+
         },
+
         {
+
           path: ROUTES.JOB_SEEKER.CHAT,
+
           layouts: ChatLayout,
+
           checkCondition: (settings) =>
+
             settings.isAuthenticated && settings.isJobSeekerRole,
+
           redirectUrl: "/" + ROUTES.AUTH.LOGIN,
+
           children: [
+
             {
+
               index: true,
+
               element: ChatPage,
+
             },
+
           ],
+
         },
+
       ],
+
     },
+
     {
+
       path: ROUTES.ERROR.FORBIDDEN,
+
       element: ForbiddenPage,
+
     },
+
     {
+
       path: ROUTES.ERROR.NOT_FOUND,
+
       element: NotFoundPage,
+
     },
+
   ],
+
   [HOST_NAME.EMPLOYER_MYJOB]: [
     {
       layouts: DefaultLayout,
@@ -299,218 +455,427 @@ const routesConfig = {
         settings.isAuthenticated && settings.isEmployerRole,
       redirectUrl: ROUTES.AUTH.LOGIN,
       children: [
+
         {
+
           index: true,
+
           element: EmployerDashboardPage,
+
         },
+
         {
+
           path: ROUTES.EMPLOYER.JOB_POST,
+
           element: EmployerJobPostPage,
+
         },
+
         {
+
           path: ROUTES.EMPLOYER.APPLIED_PROFILE,
+
           element: EmployerProfileAppliedPage,
+
         },
+
         {
+
           path: ROUTES.EMPLOYER.SAVED_PROFILE,
+
           element: EmployerSavedProfilePage,
+
         },
+
         {
           path: ROUTES.EMPLOYER.PROFILE,
           element: EmployerProfilePage,
         },
         {
+          path: ROUTES.EMPLOYER.PROFILE_DETAIL,
+          element: EmployerProfileDetailPage,
+        },
+        {
+
           path: ROUTES.EMPLOYER.INTERVIEW_LIST,
+
           element: EmployerInterviewListPage,
         },
         {
           path: ROUTES.EMPLOYER.INTERVIEW_CREATE,
           element: EmployerInterviewCreatePage,
+
         },
+
         {
+
           path: ROUTES.EMPLOYER.INTERVIEW_LIVE,
+
           element: EmployerInterviewLivePage,
+
         },
+
         {
+
           path: ROUTES.EMPLOYER.QUESTION_BANK,
+
           element: EmployerQuestionBankPage,
+
         },
+
         {
+
           path: ROUTES.EMPLOYER.QUESTION_GROUPS,
+
           element: EmployerQuestionGroupsPage,
+
         },
+
         {
+
           path: ROUTES.EMPLOYER.INTERVIEW_DETAIL,
+
           element: EmployerInterviewDetailPage,
+
         },
+
         {
+
           path: ROUTES.EMPLOYER.NOTIFICATION,
+
           element: NotificationPage,
+
         },
+
         {
+
           path: ROUTES.EMPLOYER.COMPANY,
+
           element: EmployerCompanyPage,
+
         },
+
         {
+
           path: ROUTES.EMPLOYER.ACCOUNT,
+
           element: EmployerAccountPage,
+
         },
+
         {
+
           path: ROUTES.EMPLOYER.VERIFICATION,
+
           element: EmployerVerificationPage,
+
         },
+
         {
+
           path: ROUTES.EMPLOYER.SETTING,
+
           element: EmployerSettingPage,
+
         },
+
       ],
+
     },
+
     {
+
       layouts: DefaultLayout,
+
       children: [
+
         {
+
           path: ROUTES.AUTH.LOGIN,
+
           element: EmployerLogin,
+
           checkCondition: (settings) =>
+
             !settings.isAuthenticated || !settings.isEmployerRole,
+
           redirectUrl: "/",
+
         },
+
         {
+
           path: ROUTES.AUTH.FORGOT_PASSWORD,
+
           element: ForgotPasswordPage,
+
         },
+
         {
+
           path: ROUTES.AUTH.RESET_PASSWORD,
+
           element: ResetPasswordPage,
+
         },
+
         {
+
           path: ROUTES.AUTH.REGISTER,
+
           element: EmployerSignUp,
+
           checkCondition: (settings) => !settings.isAuthenticated,
+
           redirectUrl: "/",
+
         },
+
       ],
+
     },
+
     {
+
       path: ROUTES.EMPLOYER.CHAT,
+
       layouts: ChatLayout,
+
       checkCondition: (settings) =>
+
         settings.isAuthenticated && settings.isEmployerRole,
+
       redirectUrl: "/dang-nhap",
+
       children: [
+
         {
+
           index: true,
+
           element: ChatPage,
+
         },
+
       ],
+
     },
+
     {
+
       path: ROUTES.ERROR.NOT_FOUND,
+
       element: NotFoundPage,
+
     },
+
   ],
+
   [HOST_NAME.ADMIN_MYJOB]: [
+
     {
+
       layouts: AdminLayout,
+
       checkCondition: (settings) =>
+
         settings.isAuthenticated && settings.isAdminRole,
+
       redirectUrl: ROUTES.AUTH.LOGIN,
+
       children: [
+
         {
+
           index: true,
+
           element: AdminDashboardPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.USERS,
+
           element: AdminUsersPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.COMPANIES,
+
           element: AdminCompaniesPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.PROFILES,
+
           element: AdminProfilesPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.RESUMES,
+
           element: AdminResumesPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.JOBS,
+
           element: AdminJobsPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.JOB_ACTIVITY,
+
           element: AdminJobActivityPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.QUESTIONS,
+
           element: AdminQuestionsPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.QUESTION_GROUPS,
+
           element: AdminQuestionGroupsPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.INTERVIEWS,
+
           element: AdminInterviewsPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.INTERVIEW_LIVE,
+
           element: AdminInterviewLivePage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.JOB_NOTIFICATIONS,
+
           element: AdminJobNotificationsPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.SETTINGS,
+
           element: AdminSettingsPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.CAREERS,
+
           element: AdminCareersPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.CITIES,
+
           element: AdminCitiesPage,
+
         },
+
         {
+
           path: ROUTES.ADMIN.DISTRICTS,
+
           element: AdminDistrictsPage,
+
         },
+
       ],
+
     },
+
     {
+
       layouts: DefaultLayout,
+
       children: [
+
         {
+
           path: ROUTES.AUTH.LOGIN,
+
           element: AdminLogin,
+
           checkCondition: (settings) =>
+
             !settings.isAuthenticated || !settings.isAdminRole,
+
           redirectUrl: "/",
+
         },
+
         {
+
           path: ROUTES.AUTH.FORGOT_PASSWORD,
+
           element: ForgotPasswordPage,
+
         },
+
         {
+
           path: ROUTES.AUTH.RESET_PASSWORD,
+
           element: ResetPasswordPage,
+
         },
+
       ],
+
     },
+
     {
+
       path: ROUTES.ERROR.FORBIDDEN,
+
       element: ForbiddenPage,
+
     },
+
     {
+
       path: ROUTES.ERROR.NOT_FOUND,
+
       element: NotFoundPage,
+
     },
+
   ],
+
 };
 
 export default routesConfig;

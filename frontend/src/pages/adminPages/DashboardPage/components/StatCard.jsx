@@ -91,4 +91,3 @@ const StatCard = ({ title, value, icon, color, loading, trend }) => (
 );
 
 export default StatCard;
-

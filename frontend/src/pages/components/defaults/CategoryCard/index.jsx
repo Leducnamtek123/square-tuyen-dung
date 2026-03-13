@@ -1,19 +1,3 @@
-/*
-
-MyJob Recruitment System - Part of MyJob Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { InputBase, Paper, Typography } from "@mui/material";
+
 import Grid from "@mui/material/Grid2";
 
 import SearchIcon from '@mui/icons-material/Search';
@@ -84,7 +69,9 @@ const CategoryCard = ({ options, type }) => {
   };
 
   return (
+
     <Grid container spacing={2}>
+
       <Grid size={12}>
 
         <Paper
@@ -148,16 +135,25 @@ const CategoryCard = ({ options, type }) => {
         </Paper>
 
       </Grid>
+
       {items.map((item) => (
 
         <Grid
+
           key={item.id}
+
           size={{
+
             xs: 12,
+
             sm: 6,
+
             md: 4,
+
             lg: 4,
+
             xl: 3
+
           }}>
 
           <Typography
@@ -187,10 +183,11 @@ const CategoryCard = ({ options, type }) => {
         </Grid>
 
       ))}
+
     </Grid>
+
   );
 
 };
 
 export default CategoryCard;
-
