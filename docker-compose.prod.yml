@@ -1,4 +1,19 @@
 services:
+  nginx-gateway:
+    container_name: tuyendung-studio-nginx-gateway
+    build:
+      context: ./nginx-gateway
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - frontend
+      - backend
+      - livekit
+    restart: always
+    networks:
+      - square-network
+
   frontend:
     container_name: tuyendung-studio-frontend-prod
     build:
@@ -7,15 +22,15 @@ services:
       args:
         VITE_NODE_ENV: production
         REACT_APP_NODE_ENV: production
-        REACT_APP_API_JOB: http://your-domain.com/api/job/web
-        REACT_APP_API_COMPANY: http://your-domain.com/api/company/web
-        REACT_APP_API_INFO: http://your-domain.com/api/info/web
-        REACT_APP_API_AUTH: http://your-domain.com/api/auth/web
-    ports:
-      - "80:80"
+        REACT_APP_API_JOB: /api/job/web
+        REACT_APP_API_COMPANY: /api/company/web
+        REACT_APP_API_INFO: /api/info/web
+        REACT_APP_API_AUTH: /api/auth/web
+    expose:
+      - "80"
     restart: always
     networks:
-      - myjob-network
+      - square-network
 
   backend:
     container_name: tuyendung-studio-backend-prod
@@ -23,8 +38,8 @@ services:
       context: ./api
       dockerfile: Dockerfile.prod
     command: gunicorn --bind 0.0.0.0:8000 --workers 3 myjob_api.wsgi:application
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     restart: always
     depends_on:
       - db
@@ -32,16 +47,82 @@ services:
     env_file:
       - .env.prod
     networks:
-      - myjob-network
+      - square-network
 
-  # ... other services like db, redis would stay similar but with safer credentials ...
+  db:
+    image: mysql:8.0
+    container_name: tuyendung-studio-db-prod
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_DATABASE: myjob_db
+    volumes:
+      - db_data_prod:/var/lib/mysql
+      - ./tuyendungsqstudio.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - square-network
+
+  redis:
+    image: redis:7
+    container_name: tuyendung-studio-redis-prod
+    restart: always
+    networks:
+      - square-network
+
+  celery-worker:
+    container_name: tuyendung-studio-celery-worker-prod
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
+    command: celery -A myjob_api.celery worker --pool=prefork --loglevel=info
+    depends_on:
+      - db
+      - redis
+    restart: always
+    env_file:
+      - .env.prod
+    networks:
+      - square-network
+
+  celery-beat:
+    container_name: tuyendung-studio-celery-beat-prod
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
+    command: celery -A myjob_api beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    depends_on:
+      - db
+      - redis
+    restart: always
+    env_file:
+      - .env.prod
+    networks:
+      - square-network
+
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: tuyendung-studio-livekit-prod
+    command: --config /etc/livekit.yaml
+    volumes:
+      - ./voice-ai/livekit.yaml:/etc/livekit.yaml
+    expose:
+      - "7880"
+      - "7881"
+    ports:
+      - "7882:7882/udp"
+      - "50000-50010:50000-50010/udp"
+    environment:
+      LIVEKIT_KEYS: "${LIVEKIT_API_KEY:-devkey}: ${LIVEKIT_API_SECRET:-secret}"
+    restart: always
+    networks:
+      - square-network
 
 networks:
-  myjob-network:
+  square-network:
     driver: bridge
 
 volumes:
-  db_data:
+  db_data_prod:
   huggingface-cache:
   whisper-data:
   minio-data:
