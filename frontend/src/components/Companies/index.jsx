@@ -5,9 +5,6 @@ import { useSelector } from "react-redux";
 import { Box, Pagination, Stack, Typography } from "@mui/material";
 
 import Grid from "@mui/material/Grid2";
-
-import { SVG_IMAGES } from "../../configs/constants";
-
 import NoDataCard from "../NoDataCard";
 
 import Company from "../Company";
@@ -206,7 +203,7 @@ const Companies = () => {
 
             title="Hiện chưa tìm công ty phù hợp với tiêu chí của bạn"
 
-            imgComponentSgv={<SVG_IMAGES.ImageSvg4 />}
+            svgKey="ImageSvg4"
 
           />
 

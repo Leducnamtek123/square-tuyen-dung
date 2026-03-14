@@ -14,7 +14,6 @@ import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
 import { TabTitle } from "../../../utils/generalFunction";
 
-import AppIntroductionCard from "../../../components/AppIntroductionCard";
 
 import MuiImageCustom from "../../../components/MuiImageCustom";
 
@@ -658,11 +657,6 @@ const AboutUsPage = () => {
 
       </Box>
 
-      <Box sx={{ mt: 5 }}>
-
-        <AppIntroductionCard />
-
-      </Box>
 
     </Box>
 

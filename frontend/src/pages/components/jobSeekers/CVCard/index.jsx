@@ -6,6 +6,8 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 import CVForm from "../CVForm";
 
+import { useTranslation } from "react-i18next";
+
 const LazyPdf = lazy(() => import("../../../../components/Pdf"));
 import BackdropLoading from "../../../../components/loading/BackdropLoading";
 
@@ -18,6 +20,7 @@ import resumeService from "../../../../services/resumeService";
 import toastMessages from "../../../../utils/toastMessages";
 
 const CVCard = ({ title }) => {
+  const { t } = useTranslation(["jobSeeker", "common"]);
 
   const { slug: resumeSlug } = useParams();
 
@@ -77,7 +80,7 @@ const CVCard = ({ title }) => {
 
         setIsSuccess(!isSuccess);
 
-        toastMessages.success("File uploaded successfully.");
+        toastMessages.success(t("jobSeeker:profile.messages.resumeUploadSuccess"));
 
       } catch (error) {
 
@@ -155,7 +158,7 @@ const CVCard = ({ title }) => {
 
               color="primary"
 
-              aria-label="edit"
+              aria-label={t("jobSeeker:profile.actions.uploadCv")}
 
               onClick={() => setOpenPopup(true)}
 
@@ -193,7 +196,7 @@ const CVCard = ({ title }) => {
 
               <Typography variant="subtitle1" color="text.secondary">
 
-                Loading CV...
+                {t("jobSeeker:profile.cv.loading")}
 
               </Typography>
 
@@ -229,7 +232,7 @@ const CVCard = ({ title }) => {
 
               >
 
-                No CV has been uploaded yet
+                {t("jobSeeker:profile.cv.emptyTitle")}
 
               </Typography>
 
@@ -243,7 +246,7 @@ const CVCard = ({ title }) => {
 
               >
 
-                Click the upload button to add your CV
+                {t("jobSeeker:profile.cv.emptySubtitle")}
 
               </Typography>
 
@@ -271,7 +274,7 @@ const CVCard = ({ title }) => {
                   fallback={(
                     <Stack alignItems="center" justifyContent="center" sx={{ py: 6 }}>
                       <Typography variant="subtitle2" color="text.secondary">
-                        Loading preview...
+                        {t("jobSeeker:profile.cv.loadingPreview")}
                       </Typography>
                     </Stack>
                   )}
@@ -292,7 +295,7 @@ const CVCard = ({ title }) => {
 
       <FormPopup
 
-        title="Update CV"
+        title={t("jobSeeker:profile.cv.updateTitle")}
 
         openPopup={openPopup}
 

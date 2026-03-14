@@ -10,7 +10,7 @@ import Grid from "@mui/material/Grid2";
 
 import PublishIcon from "@mui/icons-material/Publish";
 
-import { CV_TYPES, SVG_IMAGES } from "../../../../configs/constants";
+import {CV_TYPES} from "../../../../configs/constants";
 
 import toastMessages from "../../../../utils/toastMessages";
 
@@ -266,7 +266,7 @@ const ProfileUpload = ({ title }) => {
 
                   title={t('jobSeeker:profile.messages.noResumeData')}
 
-                  imgComponentSgv={<SVG_IMAGES.ImageSvg2 />}
+                  svgKey="ImageSvg2"
 
                 />
 

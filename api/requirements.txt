@@ -46,3 +46,6 @@ django-celery-results
 django-timezone-field
 pymupdf
 python-docx
+requests
+beautifulsoup4
+faker

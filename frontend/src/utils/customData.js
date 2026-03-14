@@ -14,6 +14,8 @@ import draftToHtml from 'draftjs-to-html';
 
 const convertEditorStateToHTMLString = (editorState) => {
 
+  if (!editorState?.getCurrentContent) return '';
+
   const rawContentState = convertToRaw(editorState.getCurrentContent());
 
   const markup = draftToHtml(rawContentState);
@@ -23,6 +25,12 @@ const convertEditorStateToHTMLString = (editorState) => {
 };
 
 const createEditorStateFromHTMLString = (htmlString) => {
+
+  if (!htmlString) {
+
+    return EditorState.createEmpty();
+
+  }
 
   const blocksFromHTML = convertFromHTML(htmlString);
 

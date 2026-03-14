@@ -70,6 +70,8 @@ import twitterIcon from "../assets/icons/twitter-icon.png";
 
 import youtubeIcon from "../assets/icons/youtube-icon.png";
 
+import websiteIcon from "../assets/icons/website-icon.svg";
+
 import locationMarker from "../assets/icons/location-marker.gif";
 
 import loadingSpinner from "../assets/images/loading/loading-spinner.gif";
@@ -295,6 +297,8 @@ const ICONS = {
 
   YOUTUBE: youtubeIcon,
 
+  WEBSITE: websiteIcon,
+
   LOCATION_MARKER: locationMarker,
 
   JOB_SEEKER_CHATBOT_ICON: jobSeekerChatbotIcon,
@@ -313,15 +317,17 @@ const LINKS = {
 
   INSTAGRAM_LINK: "https://www.instagram.com/huybk2/",
 
-  FACEBOOK_LINK: "https://www.facebook.com/bkhuy/",
+  FACEBOOK_LINK: "https://www.facebook.com/square.vn?locale=vi_VN",
 
-  FACEBOOK_MESSENGER_LINK: "https://www.facebook.com/bkhuy/",
+  FACEBOOK_MESSENGER_LINK: "https://www.facebook.com/square.vn?locale=vi_VN",
 
   LINKEDIN_LINK: "https://www.linkedin.com/in/huy-khanh-10041b20b/",
 
   TWITTER_LINK: "https://twitter.com/HuyBuiKhanh",
 
   YOUTUBE_LINK: "https://www.youtube.com/channel/UCn49BvcP1w1mamaOSGTKVZw",
+
+  WEBSITE_LINK: "https://sqstudio.vn/",
 
 };
 

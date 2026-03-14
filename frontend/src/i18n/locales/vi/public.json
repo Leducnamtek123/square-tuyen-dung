@@ -4,7 +4,7 @@
     "topCompanies": "Công ty nổi bật",
     "urgentJobs": "Việc làm tuyển gấp",
     "keyCareers": "Ngành nghề trọng điểm",
-    "suggestedJobs": "Việc làm gợi ý",
+    "suggestedJobs": "Việc làm đề xuất",
     "exploreHeading": "Bạn cần tìm công việc phù hợp với mình?",
     "startExploring": "Bắt đầu khám phá",
     "userFeedback": "Đánh giá từ người dùng",
@@ -38,6 +38,30 @@
     "notUpdated": "Chưa cập nhật",
     "savedSuccess": "Lưu thành công.",
     "unsavedSuccess": "Bỏ lưu thành công.",
-    "noData": "Không có dữ liệu."
+    "noData": "Không có dữ liệu.",
+    "actions": {
+      "apply": "Nộp hồ sơ",
+      "applied": "Đã ứng tuyển",
+      "save": "Lưu tin",
+      "saved": "Đã lưu",
+      "share": "Chia sẻ"
+    }
+  },
+  "jobSearch": {
+    "tabTitle": "Kết quả tìm kiếm việc làm",
+    "recommendedJobs": "Việc làm đề xuất",
+    "searchPlaceholder": "Tìm kiếm cơ hội việc làm",
+    "allCareers": "Tất cả ngành nghề",
+    "allCities": "Tất cả tỉnh thành",
+    "searchButton": "Tìm kiếm",
+    "advancedFilter": "Bộ lọc nâng cao",
+    "allPositions": "Tất cả cấp bậc",
+    "allExperiences": "Tất cả kinh nghiệm",
+    "allJobTypes": "Tất cả hình thức",
+    "allWorkplaces": "Tất cả nơi làm việc",
+    "allGenders": "Tất cả giới tính",
+    "searchResults": "Kết quả tìm kiếm",
+    "posts": "tin tuyển dụng",
+    "noJobsFound": "Không tìm thấy việc làm phù hợp với tiêu chí của bạn"
   }
 }

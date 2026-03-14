@@ -10,7 +10,7 @@ import { Box, List, ListItem, ListItemText, Stack, Typography, Container, Divide
 
 import Grid from "@mui/material/Grid2";
 
-import { ICONS, IMAGES, LINKS, ROUTES, APP_NAME } from '../../../../configs/constants';
+import { ICONS, LINKS, ROUTES, APP_NAME, IMAGES } from '../../../../configs/constants';
 
 import MuiImageCustom from '../../../../components/MuiImageCustom';
 
@@ -365,77 +365,6 @@ const Footer = () => {
             }}>
 
             <List disablePadding>
-
-              <ListItem>
-
-                <Typography
-
-                  variant="subtitle1"
-
-                  sx={{
-
-                    fontWeight: 600,
-
-                    mb: 1,
-
-                  }}
-
-                >
-
-                  {t('footer.mobileApps')}
-
-                </Typography>
-
-              </ListItem>
-
-              <ListItem>
-
-                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-
-                  <Link href={LINKS.CHPLAY_LINK} target="_blank">
-
-                    <MuiImageCustom
-
-                      width={140}
-
-                      src={IMAGES.chPlayDownload}
-
-                      sx={{
-
-                        transition: 'transform 0.2s',
-
-                        '&:hover': { transform: 'scale(1.05)' }
-
-                      }}
-
-                    />
-
-                  </Link>
-
-                  <Link href={LINKS.APPSTORE_LINK} target="_blank">
-
-                    <MuiImageCustom
-
-                      width={140}
-
-                      src={IMAGES.appStoreDownload}
-
-                      sx={{
-
-                        transition: 'transform 0.2s',
-
-                        '&:hover': { transform: 'scale(1.05)' }
-
-                      }}
-
-                    />
-
-                  </Link>
-
-                </Stack>
-
-              </ListItem>
-
               <ListItem sx={{ mt: 3 }}>
 
                 <Typography
@@ -464,17 +393,9 @@ const Footer = () => {
 
                   {[
 
+                    { icon: ICONS.WEBSITE, link: LINKS.WEBSITE_LINK },
+
                     { icon: ICONS.FACEBOOK, link: LINKS.FACEBOOK_LINK },
-
-                    { icon: ICONS.FACEBOOK_MESSENGER, link: LINKS.FACEBOOK_MESSENGER_LINK },
-
-                    { icon: ICONS.INSTAGRAM, link: LINKS.INSTAGRAM_LINK },
-
-                    { icon: ICONS.LINKEDIN, link: LINKS.LINKEDIN_LINK },
-
-                    { icon: ICONS.YOUTUBE, link: LINKS.YOUTUBE_LINK },
-
-                    { icon: ICONS.TWITTER, link: LINKS.TWITTER_LINK },
 
                   ].map((social, index) => (
 

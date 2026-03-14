@@ -14,6 +14,8 @@ import { Skeleton } from "@mui/material";
 
 import Grid from "@mui/material/Grid2";
 
+import { EditorState } from 'draft-js';
+
 import errorHandling from '../../../../utils/errorHandling';
 
 import { REGEX_VATIDATE } from '../../../../configs/constants';
@@ -149,6 +151,26 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
   const { control, reset, setValue, setError, handleSubmit } = useForm({
 
     resolver: yupResolver(schema),
+
+    defaultValues: {
+
+      description: EditorState.createEmpty(),
+
+      location: {
+
+        city: '',
+
+        district: '',
+
+        address: '',
+
+        lat: '',
+
+        lng: '',
+
+      },
+
+    },
 
   });
 

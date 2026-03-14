@@ -4,6 +4,8 @@ import { Box, Typography } from "@mui/material";
 
 import Grid from "@mui/material/Grid2";
 
+import { useTranslation } from "react-i18next";
+
 import { TabTitle } from "../../../utils/generalFunction";
 
 import JobPostSearch from "../../components/defaults/JobPostSearch";
@@ -12,13 +14,14 @@ import SuggestedJobPostCard from "../../components/defaults/SuggestedJobPostCard
 
 import MainJobPostCard from "../../components/defaults/MainJobPostCard";
 
-import AppIntroductionCard from "../../../components/AppIntroductionCard";
 
 import MainJobRightBanner from "../../../components/MainJobRightBanner";
 
 const JobPage = () => {
 
-  TabTitle("Job Search Results");
+  const { t } = useTranslation(["public"]);
+
+  TabTitle(t("jobSearch.tabTitle"));
 
   return (
 
@@ -82,7 +85,7 @@ const JobPage = () => {
 
               <Box sx={{ pt: 2, pb: 3 }}>
 
-                <Typography variant="h5">Recommended Jobs</Typography>
+                <Typography variant="h5">{t("jobSearch.recommendedJobs")}</Typography>
 
               </Box>
 
@@ -118,15 +121,6 @@ const JobPage = () => {
 
         </Box>
 
-        <Box sx={{ mt: 4 }}>
-
-          {/* Start: AppIntroductionCard */}
-
-          <AppIntroductionCard />
-
-          {/* End: AppIntroductionCard */}
-
-        </Box>
 
       </Box>
 

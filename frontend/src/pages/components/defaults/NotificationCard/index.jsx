@@ -40,7 +40,7 @@ import {
 
 import db from "../../../../configs/firebase-config";
 
-import { IMAGES, SVG_IMAGES, ROUTES } from "../../../../configs/constants";
+import {IMAGES, ROUTES} from "../../../../configs/constants";
 
 import MuiImageCustom from "../../../../components/MuiImageCustom";
 
@@ -572,7 +572,7 @@ const NotificationCard = ({ title }) => {
 
               title="No notifications yet."
 
-              imgComponentSgv={<SVG_IMAGES.ImageSvg9 />}
+              svgKey="ImageSvg9"
 
             />
 

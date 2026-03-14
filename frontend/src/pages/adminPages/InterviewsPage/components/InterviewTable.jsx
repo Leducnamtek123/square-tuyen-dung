@@ -20,7 +20,7 @@ const InterviewTable = ({ interviews, loading, onView, onDelete, onUpdateStatus 
     }
 
     const getStatusChip = (status) => {
-        const lowerStatus = status?.toLowerCase();
+        const lowerStatus = String(status ?? '').toLowerCase();
         switch (lowerStatus) {
             case 'completed':
                 return <Chip label={t('common.status.completed', { ns: 'admin' })} color="success" size="small" />;

@@ -8,7 +8,7 @@ import { Box, Card, Pagination, Stack, Typography } from "@mui/material";
 
 import Grid from "@mui/material/Grid2";
 
-import { SVG_IMAGES } from '../../../../configs/constants';
+import {} from '../../../../configs/constants';
 
 import NoDataCard from '../../../../components/NoDataCard';
 
@@ -232,7 +232,7 @@ const ProfileCard = () => {
 
                   title={t('profileCard.title.noresultsfound')}
 
-                  imgComponentSgv={<SVG_IMAGES.ImageSvg11 />}
+                  svgKey="ImageSvg11"
 
                 />
 

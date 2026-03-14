@@ -212,7 +212,12 @@ const CandidateChart = ({ title }) => {
 
   }, [allowSubmit, selectedDateRange]);
 
-  const dataOptions = React.useMemo(() => ({
+  const dataOptions = React.useMemo(() => {
+    const title1 = String(data?.title1 ?? '');
+    const title1Key = title1.toLowerCase().replace(/\s+/g, '');
+    const title2 = String(data?.title2 ?? '');
+    const title2Key = title2.toLowerCase().replace(/\s+/g, '');
+    return ({
 
     labels: data?.labels || [],
 
@@ -220,7 +225,7 @@ const CandidateChart = ({ title }) => {
 
       {
 
-        label: t(`candidateChart.labels.${data?.title1?.toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data?.title1 }),
+        label: t(`candidateChart.labels.${title1Key}`, { defaultValue: title1 }),
 
         data: data?.data1 || [],
 
@@ -248,7 +253,7 @@ const CandidateChart = ({ title }) => {
 
       {
 
-        label: t(`candidateChart.labels.${data?.title2?.toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data?.title2 }),
+        label: t(`candidateChart.labels.${title2Key}`, { defaultValue: title2 }),
 
         data: data?.data2 || [],
 
@@ -276,7 +281,8 @@ const CandidateChart = ({ title }) => {
 
     ],
 
-  }), [data, t, theme]);
+  });
+  }, [data, t, theme]);
 
   return (
 

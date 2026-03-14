@@ -23,9 +23,6 @@ import {
   faLocationDot,
 
 } from "@fortawesome/free-solid-svg-icons";
-
-import { SVG_IMAGES } from "../../../../configs/constants";
-
 import toastMessages from "../../../../utils/toastMessages";
 
 import BackdropLoading from "../../../../components/loading/BackdropLoading";
@@ -45,6 +42,8 @@ import JobPostNotificationForm from "../JobPostNotificationForm";
 import errorHandling from "../../../../utils/errorHandling";
 
 import jobPostNotificationService from "../../../../services/jobPostNotificationService";
+
+import { useTranslation } from "react-i18next";
 
 const ItemLoading = () => {
 
@@ -266,6 +265,8 @@ const ItemComponent = ({
 
 }) => {
 
+  const { t } = useTranslation(["jobSeeker", "common"]);
+
   const { allConfig } = useSelector((state) => state.config);
 
   const [parentWidth, setParentWidth] = React.useState(0);
@@ -444,7 +445,7 @@ const ItemComponent = ({
 
                     >
 
-                      Not updated
+                      {t("jobSeeker:notUpdated")}
 
                     </Typography>
 
@@ -478,7 +479,7 @@ const ItemComponent = ({
 
                     >
 
-                      Not updated
+                      {t("jobSeeker:notUpdated")}
 
                     </Typography>
 
@@ -512,7 +513,7 @@ const ItemComponent = ({
 
                     >
 
-                      Not updated
+                      {t("jobSeeker:notUpdated")}
 
                     </Typography>
 
@@ -546,7 +547,7 @@ const ItemComponent = ({
 
                     >
 
-                      Not updated
+                      {t("jobSeeker:notUpdated")}
 
                     </Typography>
 
@@ -598,7 +599,7 @@ const ItemComponent = ({
 
               <IconButton
 
-                aria-label="edit"
+                aria-label={t("common:actions.edit")}
 
                 onClick={() => handleShowUpdate(id)}
 
@@ -628,7 +629,7 @@ const ItemComponent = ({
 
               <IconButton
 
-                aria-label="delete"
+                aria-label={t("common:actions.delete")}
 
                 onClick={() => handleDelete(id)}
 
@@ -669,6 +670,7 @@ const ItemComponent = ({
 const pageSize = 12;
 
 const JobPostNotificationCard = () => {
+  const { t } = useTranslation(["jobSeeker", "common"]);
 
   const { currentUser } = useSelector((state) => state.user);
 
@@ -792,7 +794,7 @@ const JobPostNotificationCard = () => {
 
         setIsSuccess(!isSuccess);
 
-        toastMessages.success("Job notification added successfully.");
+        toastMessages.success(t("jobSeeker:jobManagement.notifications.addedSuccess"));
 
       } catch (error) {
 
@@ -824,7 +826,7 @@ const JobPostNotificationCard = () => {
 
         setIsSuccess(!isSuccess);
 
-        toastMessages.success("Job notification updated successfully.");
+        toastMessages.success(t("jobSeeker:jobManagement.notifications.updatedSuccess"));
 
       } catch (error) {
 
@@ -864,7 +866,7 @@ const JobPostNotificationCard = () => {
 
         setIsSuccess(!isSuccess);
 
-        toastMessages.success("Job notification deleted successfully.");
+        toastMessages.success(t("jobSeeker:jobManagement.notifications.deletedSuccess"));
 
       } catch (error) {
 
@@ -882,9 +884,9 @@ const JobPostNotificationCard = () => {
 
       () => del(id),
 
-      "Delete Job Notification",
+      t("jobSeeker:jobManagement.notifications.deleteTitle"),
 
-      "This job notification will be permanently deleted and cannot be restored. Are you sure?",
+      t("jobSeeker:jobManagement.notifications.deleteWarning"),
 
       "warning"
 
@@ -908,7 +910,7 @@ const JobPostNotificationCard = () => {
 
                 <Typography variant="h5" fontWeight="600" color="text.primary">
 
-                  Job Notifications
+                  {t("jobSeeker:jobManagement.notifications.title")}
 
                 </Typography>
 
@@ -926,7 +928,7 @@ const JobPostNotificationCard = () => {
 
                 >
 
-                  Maximum 3 job notifications can be enabled
+                  {t("jobSeeker:jobManagement.notifications.subtitle")}
 
                 </Typography>
 
@@ -964,7 +966,7 @@ const JobPostNotificationCard = () => {
 
               >
 
-                Create Notification
+                {t("jobSeeker:jobManagement.notifications.create")}
 
               </Button>
 
@@ -994,15 +996,15 @@ const JobPostNotificationCard = () => {
 
             <NoDataCard
 
-              title="You don't have any job notifications yet"
+              title={t("jobSeeker:jobManagement.notifications.empty")}
 
-              imgComponentSgv={<SVG_IMAGES.ImageSvg10 />}
+              svgKey="ImageSvg10"
 
             >
 
               <Button variant="contained" color="primary">
 
-                Create Notification Now
+                {t("jobSeeker:jobManagement.notifications.createNow")}
 
               </Button>
 
@@ -1112,7 +1114,7 @@ const JobPostNotificationCard = () => {
 
               <Box>
 
-                <Typography variant="h5">Create Job Notification</Typography>
+                <Typography variant="h5">{t("jobSeeker:jobManagement.notifications.modalTitle")}</Typography>
 
               </Box>
 
@@ -1128,7 +1130,7 @@ const JobPostNotificationCard = () => {
 
         }
 
-        buttonText={editData ? "Save" : "Create Notification"}
+        buttonText={editData ? t("common:actions.save") : t("jobSeeker:jobManagement.notifications.create")}
 
         buttonIcon={null}
 

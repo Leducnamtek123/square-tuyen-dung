@@ -24,7 +24,7 @@ import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 
 import PsychologyIcon from '@mui/icons-material/Psychology';
 
-import { CV_TYPES, SVG_IMAGES, ROUTES } from '../../../../configs/constants';
+import {CV_TYPES, ROUTES} from '../../../../configs/constants';
 
 import DataTableCustom from '../../../../components/DataTableCustom';
 
@@ -446,7 +446,7 @@ const AppliedResumeTable = (props) => {
 
                 title={t('appliedResume.table.noCandidates')}
 
-                imgComponentSgv={<SVG_IMAGES.ImageSvg13 />}
+                svgKey="ImageSvg13"
 
               />
 

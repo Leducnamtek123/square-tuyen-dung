@@ -340,7 +340,7 @@ const AdvancedSkillCard = ({ title }) => {
 
                   color="primary"
 
-                  aria-label="add"
+                  aria-label={t("common:actions.add")}
 
                   onClick={handleShowAdd}
 
@@ -396,7 +396,7 @@ const AdvancedSkillCard = ({ title }) => {
 
                 >
 
-                  <Table aria-label="advanced skills table" size="medium">
+                  <Table aria-label={t("jobSeeker:profile.aria.advancedSkillsTable")} size="medium">
 
                     <TableHead>
 

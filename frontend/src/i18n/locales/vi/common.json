@@ -23,7 +23,10 @@
     "save": "Lưu",
     "delete": "Xóa",
     "edit": "Chỉnh sửa",
-    "confirm": "Xác nhận"
+    "confirm": "Xác nhận",
+    "add": "Thêm",
+    "download": "Tải xuống",
+    "upload": "Tải lên"
   },
   "loading": "Đang tải...",
   "noData": "Không có dữ liệu",

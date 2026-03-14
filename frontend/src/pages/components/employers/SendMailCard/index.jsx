@@ -12,6 +12,8 @@ import Grid from "@mui/material/Grid2";
 
 import SendIcon from '@mui/icons-material/Send';
 
+import { EditorState } from 'draft-js';
+
 import FormPopup from '../../../../components/controls/FormPopup';
 
 import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
@@ -68,7 +70,7 @@ const SendMailCard = ({
 
       .test('content', 'Email content is required.', (value) =>
 
-        value.getCurrentContent().hasText()
+        value?.getCurrentContent?.()?.hasText?.()
 
       ),
 
@@ -79,6 +81,14 @@ const SendMailCard = ({
   const { control, reset, handleSubmit } = useForm({
 
     resolver: yupResolver(schema),
+
+    defaultValues: {
+
+      content: EditorState.createEmpty(),
+
+      isSendMe: false,
+
+    },
 
   });
 

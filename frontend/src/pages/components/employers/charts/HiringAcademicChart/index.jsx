@@ -144,9 +144,11 @@ const HiringAcademicChart = ({ title }) => {
   }, [allowSubmit, selectedDateRange]);
 
   const dataOptions = React.useMemo(() => {
-    const labels = data?.labels?.map(label => 
-      t(`hiringAcademicChart.labels.${label.toLowerCase().replace(/[^a-z0-9]/g, '')}`, { defaultValue: label })
-    ) || [];
+    const labels = data?.labels?.map((label) => {
+      const safeLabel = String(label ?? '');
+      const labelKey = safeLabel.toLowerCase().replace(/[^a-z0-9]/g, '');
+      return t(`hiringAcademicChart.labels.${labelKey}`, { defaultValue: safeLabel });
+    }) || [];
 
     return {
 
@@ -317,7 +319,7 @@ const HiringAcademicChart = ({ title }) => {
 
               </Stack>
 
-            ) : !data || data.data.length === 0 ? (
+            ) : !data || !Array.isArray(data?.data) || data.data.length === 0 ? (
 
               <Stack
 

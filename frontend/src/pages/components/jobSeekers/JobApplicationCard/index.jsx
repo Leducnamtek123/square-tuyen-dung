@@ -100,7 +100,7 @@ const JobApplicationCard = () => {
 
         <IconButton
 
-          aria-label="ArrowForward"
+          aria-label={t('jobSeeker:jobApplication.aria.navigateToProfile')}
 
           size="medium"
 

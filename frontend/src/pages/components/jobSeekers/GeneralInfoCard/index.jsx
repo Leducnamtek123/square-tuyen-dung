@@ -310,7 +310,7 @@ const GeneralInfoCard = ({ title }) => {
 
                   color="secondary"
 
-                  aria-label="edit"
+                  aria-label={t('common:actions.edit')}
 
                   onClick={() => setOpenPopup(true)}
 

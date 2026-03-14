@@ -38,6 +38,30 @@
     "notUpdated": "Not updated",
     "savedSuccess": "Saved successfully.",
     "unsavedSuccess": "Unsaved successfully.",
-    "noData": "No data available."
+    "noData": "No data available.",
+    "actions": {
+      "apply": "Apply now",
+      "applied": "Applied",
+      "save": "Save job",
+      "saved": "Saved",
+      "share": "Share"
+    }
+  },
+  "jobSearch": {
+    "tabTitle": "Job Search Results",
+    "recommendedJobs": "Recommended Jobs",
+    "searchPlaceholder": "Search for job opportunities",
+    "allCareers": "All careers",
+    "allCities": "All cities",
+    "searchButton": "Search",
+    "advancedFilter": "Advanced Filter",
+    "allPositions": "All positions",
+    "allExperiences": "All experience",
+    "allJobTypes": "All job types",
+    "allWorkplaces": "All workplaces",
+    "allGenders": "All genders",
+    "searchResults": "Search Results",
+    "posts": "posts",
+    "noJobsFound": "No jobs found matching your criteria"
   }
 }

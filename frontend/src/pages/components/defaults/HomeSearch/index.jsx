@@ -14,6 +14,8 @@ import InputBaseSearchHomeCustom from '../../../../components/controls/InputBase
 
 import SingleSelectSearchCustom from '../../../../components/controls/SingleSelectSearchCustom';
 
+import { useTranslation } from 'react-i18next';
+
 import {
 
   resetSearchJobPostFilter,
@@ -25,6 +27,7 @@ import {
 import { ROUTES } from '../../../../configs/constants';
 
 const HomeSearch = () => {
+  const { t } = useTranslation(['common']);
 
   const dispatch = useDispatch();
 
@@ -172,7 +175,7 @@ const HomeSearch = () => {
 
               control={control}
 
-              placeholder="Tìm kiếm cơ hội việc làm"
+              placeholder={t("common:search")}
 
               showSubmitButton={true}
 
@@ -202,7 +205,7 @@ const HomeSearch = () => {
 
               name="careerId"
 
-              placeholder="Tất cả ngành nghề"
+              placeholder={t("common:placeholders.fieldOperation.all")}
 
               control={control}
 
@@ -232,7 +235,7 @@ const HomeSearch = () => {
 
               name="cityId"
 
-              placeholder="Tất cả tỉnh thành"
+              placeholder={t("common:placeholders.selectCity")}
 
               control={control}
 

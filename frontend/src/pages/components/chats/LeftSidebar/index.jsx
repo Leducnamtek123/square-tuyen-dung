@@ -30,7 +30,7 @@ import db from '../../../../configs/firebase-config';
 
 import NoDataCard from '../../../../components/NoDataCard';
 
-import { SVG_IMAGES } from '../../../../configs/constants';
+import {} from '../../../../configs/constants';
 
 import { ChatContext } from '../../../../context/ChatProvider';
 
@@ -376,7 +376,7 @@ const LeftSidebar = () => {
 
               title={t('noConversationsFound')}
 
-              imgComponentSgv={<SVG_IMAGES.ImageSvg15 />}
+              svgKey="ImageSvg15"
 
             />
 
@@ -856,7 +856,7 @@ const EmployerSidebar = () => {
 
               title={t('noConversationsFound')}
 
-              imgComponentSgv={<SVG_IMAGES.ImageSvg15 />}
+              svgKey="ImageSvg15"
 
             />
 

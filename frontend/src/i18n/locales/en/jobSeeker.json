@@ -172,7 +172,34 @@
       "noCertificateData": "Please add your certificates for employers to reference",
       "noLanguageData": "Please add your language skills for employers to reference",
       "noResumeData": "No resumes uploaded yet",
-      "notFound": "Profile information not found"
+      "notFound": "Profile information not found",
+      "profileCompletionWarning": "Please add all necessary information to complete your profile."
+    },
+    "aria": {
+      "advancedSkillsTable": "Advanced skills table",
+      "languageSkillsTable": "Language skills table"
+    },
+    "summary": {
+      "experience": "Experience",
+      "position": "Position",
+      "desiredSalary": "Desired Salary",
+      "lastUpdated": "Last Updated"
+    },
+    "actions": {
+      "editProfile": "Edit Profile",
+      "uploadCv": "Upload CV",
+      "updateCv": "Update CV",
+      "generatingPdf": "Generating PDF..."
+    },
+    "cv": {
+      "loading": "Loading CV...",
+      "emptyTitle": "No CV has been uploaded yet",
+      "emptySubtitle": "Click the upload button to add your CV",
+      "loadingPreview": "Loading preview...",
+      "updateTitle": "Update CV"
+    },
+    "tooltips": {
+      "searchable": "Enabling \"Searchable\" will help employers find your profile and contact you about new opportunities. Only one profile can be searchable at a time."
     }
   },
   "noDataForStatistics": "No data available for statistics",
@@ -251,7 +278,22 @@
     "tabs": {
       "viewed": "Employers Viewed Profile",
       "followed": "Followed Companies"
-    }
+    },
+    "aria": {
+      "tabs": "My company tabs"
+    },
+    "empty": {
+      "viewed": "No employers have viewed your profile yet",
+      "followed": "You haven't followed any employers yet"
+    },
+    "actions": {
+      "findCompanies": "Find companies",
+      "unfollow": "Unfollow"
+    },
+    "messages": {
+      "unfollowSuccess": "Unfollowed successfully."
+    },
+    "savedProfile": "Saved your profile"
   },
   "myInterviews": {
     "defaultRoomName": "Interview room",
@@ -261,7 +303,10 @@
   "jobApplication": {
     "title": "Application Resumes",
     "onlineProfile": "Online Profile",
-    "attachedResume": "Attached Resume"
+    "attachedResume": "Attached Resume",
+    "aria": {
+      "navigateToProfile": "Go to my profile"
+    }
   },
   "jobManagement": {
     "title": "My Job Management",
@@ -273,6 +318,57 @@
     "notes": {
       "expired": "Note: You cannot view jobs that have expired or are temporarily suspended from receiving applications."
     },
-    "suitableJobs": "Suitable Jobs"
+    "suitableJobs": "Suitable Jobs",
+    "aria": {
+      "tabs": "My job tabs"
+    },
+    "empty": {
+      "saved": "You haven't saved any jobs yet",
+      "applied": "You haven't applied for any jobs yet"
+    },
+    "actions": {
+      "searchJobs": "Search Jobs",
+      "unsave": "Unsave"
+    },
+    "appliedOn": "Applied on: {{date}}",
+    "messages": {
+      "saved": "Job saved successfully.",
+      "unsaved": "Job removed from saved successfully."
+    },
+    "notifications": {
+      "title": "Job Notifications",
+      "subtitle": "Maximum 3 job notifications can be enabled",
+      "empty": "You don't have any job notifications yet",
+      "create": "Create Notification",
+      "createNow": "Create Notification Now",
+      "modalTitle": "Create Job Notification",
+      "addedSuccess": "Job notification added successfully.",
+      "updatedSuccess": "Job notification updated successfully.",
+      "deletedSuccess": "Job notification deleted successfully.",
+      "deleteTitle": "Delete Job Notification",
+      "deleteWarning": "This job notification will be permanently deleted and cannot be restored. Are you sure?",
+      "form": {
+        "keyword": "Keyword",
+        "keywordPlaceholder": "Enter job name or related keywords you are searching for.",
+        "career": "Career",
+        "careerPlaceholder": "Select career",
+        "city": "City/Province",
+        "cityPlaceholder": "Select city/province",
+        "position": "Position/Level",
+        "positionPlaceholder": "Select position/level",
+        "experience": "Experience",
+        "experiencePlaceholder": "Select required experience",
+        "salary": "Desired Salary",
+        "salaryPlaceholder": "Enter your desired salary",
+        "frequency": "Notification Frequency",
+        "validation": {
+          "keywordRequired": "Keyword is required.",
+          "keywordMax": "Keyword is too long.",
+          "careerRequired": "Career is required.",
+          "cityRequired": "City/Province is required.",
+          "salaryInvalid": "Invalid desired salary."
+        }
+      }
+    }
   }
 }

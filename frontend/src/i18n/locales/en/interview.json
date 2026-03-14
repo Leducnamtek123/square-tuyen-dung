@@ -109,13 +109,26 @@
   },
   "interviewListCard": {
     "title": "Online Interview List",
+    "scheduleInterview": "Schedule interview",
+    "candidate": "Candidate",
+    "position": "Position",
     "time": "Time",
     "status": "Status",
+    "aiScore": "AI Score",
+    "grading": "Grading",
+    "noInterviews": "No interviews scheduled yet.",
     "actions": "Actions",
     "viewDetails": "View details",
     "markCompleted": "Mark as completed",
     "cancelInterview": "Cancel interview",
     "delete": "Delete",
-    "confirmDelete": "Are you sure you want to delete this interview?"
+    "confirmDelete": "Are you sure you want to delete this interview?",
+    "statuses": {
+      "scheduled": "Scheduled",
+      "in_progress": "In progress",
+      "processing": "Processing",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
   }
 }

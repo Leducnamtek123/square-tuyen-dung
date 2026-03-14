@@ -70,7 +70,7 @@ const MyJobPage = () => {
 
                                         onChange={handleChange}
 
-                                        aria-label="my job"
+                                        aria-label={t("jobManagement.aria.tabs")}
 
                                         variant="scrollable"
 

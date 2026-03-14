@@ -16,7 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 
-import { CV_TYPES, SVG_IMAGES, ROUTES } from '../../../../configs/constants';
+import {CV_TYPES, ROUTES} from '../../../../configs/constants';
 
 import NoDataCard from '../../../../components/NoDataCard';
 
@@ -56,7 +56,7 @@ const SavedResumeTable = (props) => {
 
                 title={t('savedResumeTable.title.youhaventsavedanycandidatesyet')}
 
-                imgComponentSgv={<SVG_IMAGES.ImageSvg12 />}
+                svgKey="ImageSvg12"
 
               />
 

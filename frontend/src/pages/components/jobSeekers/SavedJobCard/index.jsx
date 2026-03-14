@@ -6,7 +6,7 @@ import { Box, Stack, Button, Pagination } from "@mui/material";
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
-import { SVG_IMAGES, ROUTES } from '../../../../configs/constants';
+import {ROUTES} from '../../../../configs/constants';
 
 import NoDataCard from '../../../../components/NoDataCard';
 
@@ -18,9 +18,12 @@ import errorHandling from '../../../../utils/errorHandling';
 
 import toastMessages from '../../../../utils/toastMessages';
 
+import { useTranslation } from 'react-i18next';
+
 const pageSize = 10;
 
 const SavedJobCard = () => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
 
   const [isSuccess, setIsSuccess] = React.useState(false);
 
@@ -86,7 +89,7 @@ const SavedJobCard = () => {
 
         toastMessages.success(
 
-          isSaved ? 'Job saved successfully.' : 'Job removed from saved successfully.'
+          isSaved ? t('jobSeeker:jobManagement.messages.saved') : t('jobSeeker:jobManagement.messages.unsaved')
 
         );
 
@@ -126,9 +129,9 @@ const SavedJobCard = () => {
 
           <NoDataCard
 
-            title="You haven't saved any jobs yet"
+            title={t('jobSeeker:jobManagement.empty.saved')}
 
-            imgComponentSgv={<SVG_IMAGES.ImageSvg5 />}
+            svgKey="ImageSvg5"
 
           >
 
@@ -146,7 +149,7 @@ const SavedJobCard = () => {
 
             >
 
-              Search Jobs
+              {t('jobSeeker:jobManagement.actions.searchJobs')}
 
             </Button>
 
@@ -202,7 +205,7 @@ const SavedJobCard = () => {
 
                 >
 
-                  Unsave
+                  {t('jobSeeker:jobManagement.actions.unsave')}
 
                 </Button>
 

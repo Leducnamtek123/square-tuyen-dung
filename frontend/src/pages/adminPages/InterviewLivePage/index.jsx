@@ -137,8 +137,9 @@ const InterviewLivePage = () => {
         header: t('pages.interviewLive.table.status'),
         accessorKey: 'status',
         cell: ({ getValue }) => {
-          const status = getValue()?.toLowerCase() || '';
-          let label = getValue();
+          const rawStatus = getValue();
+          const status = String(rawStatus ?? '').toLowerCase();
+          let label = rawStatus;
           if (status === 'completed') label = t('common.status.completed');
           else if (['in_progress', 'calibration', 'processing', 'connecting', 'active'].includes(status)) label = t('common.status.inProgress');
           else if (status === 'scheduled') label = t('common.status.scheduled');

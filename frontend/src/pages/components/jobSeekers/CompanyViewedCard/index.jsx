@@ -4,7 +4,7 @@ import { Box, Stack, Pagination, Chip } from "@mui/material";
 
 import CheckIcon from '@mui/icons-material/Check';
 
-import { SVG_IMAGES } from '../../../../configs/constants';
+import {} from '../../../../configs/constants';
 
 import NoDataCard from '../../../../components/NoDataCard';
 
@@ -12,9 +12,12 @@ import CompanyAction from '../../../../components/CompanyAction';
 
 import resumeViewedService from '../../../../services/resumeViewedService';
 
+import { useTranslation } from 'react-i18next';
+
 const pageSize = 10;
 
 const CompanyViewedCard = () => {
+  const { t } = useTranslation(['jobSeeker']);
 
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -88,9 +91,9 @@ const CompanyViewedCard = () => {
 
           <NoDataCard
 
-            title="No employers have viewed your profile yet"
+            title={t('jobSeeker:myCompany.empty.viewed')}
 
-            imgComponentSgv={<SVG_IMAGES.ImageSvg6 />}
+            svgKey="ImageSvg6"
 
           ></NoDataCard>
 
@@ -122,7 +125,7 @@ const CompanyViewedCard = () => {
 
                     icon={<CheckIcon />}
 
-                    label="Saved your profile"
+                    label={t('jobSeeker:myCompany.savedProfile')}
 
                     size="small"
 

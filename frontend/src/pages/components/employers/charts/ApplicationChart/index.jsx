@@ -229,7 +229,12 @@ const ApplicationChart = ({ title }) => {
 
   }, [allowSubmit, selectedDateRange]);
 
-  const dataOptions = React.useMemo(() => ({
+  const dataOptions = React.useMemo(() => {
+    const title2 = String(data?.title2 ?? '');
+    const title2Key = title2.toLowerCase().replace(/\s+/g, '');
+    const title1 = String(data?.title1 ?? '');
+    const title1Key = title1.toLowerCase().replace(/\s+/g, '');
+    return ({
 
     labels: data?.labels || [],
 
@@ -239,7 +244,7 @@ const ApplicationChart = ({ title }) => {
 
         type: 'line',
 
-        label: t(`applicationChart.labels.${data?.title2?.toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data?.title2 }),
+        label: t(`applicationChart.labels.${title2Key}`, { defaultValue: title2 }),
 
         borderColor: theme.palette.primary.main,
 
@@ -269,7 +274,7 @@ const ApplicationChart = ({ title }) => {
 
         type: 'bar',
 
-        label: t(`applicationChart.labels.${data?.title1?.toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data?.title1 }),
+        label: t(`applicationChart.labels.${title1Key}`, { defaultValue: title1 }),
 
         backgroundColor: theme.palette.secondary.main,
 
@@ -285,7 +290,8 @@ const ApplicationChart = ({ title }) => {
 
     ],
 
-  }), [data, t, theme]);
+  });
+  }, [data, t, theme]);
 
   return (
 

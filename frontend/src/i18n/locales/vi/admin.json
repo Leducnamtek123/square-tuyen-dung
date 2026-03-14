@@ -365,8 +365,8 @@
       },
       "filter": {
         "searchPlaceholder": "Tìm kiếm theo tên hoặc email...",
-        "roleLabel": "Vai tr?",
-        "roleAll": "T?t c? vai tr?"
+        "roleLabel": "Vai trò",
+        "roleAll": "Tất cả vai trò"
       },
       "scheduleInterviewDialog": {
         "title": "Đặt lịch phỏng vấn",
@@ -381,16 +381,16 @@
         "schedulingBtn": "Đang đặt lịch..."
       },
       "roles": {
-        "admin": "Qu?n tr? vi?n",
-        "employer": "Nh? tuy?n d?ng",
-        "jobSeeker": "Ng??i t?m vi?c"
+        "admin": "Quản trị viên",
+        "employer": "Nhà tuyển dụng",
+        "jobSeeker": "Người tìm việc"
       },
       "toast": {
-        "blockSuccess": "?? kh?a t?i kho?n.",
-        "unblockSuccess": "?? m? kh?a t?i kho?n.",
-        "actionFailed": "Thao t?c th?t b?i.",
-        "roleUpdated": "?? c?p nh?t vai tr?.",
-        "roleUpdateFailed": "C?p nh?t vai tr? th?t b?i."
+        "blockSuccess": "Đã khóa tài khoản.",
+        "unblockSuccess": "Đã mở khóa tài khoản.",
+        "actionFailed": "Thao tác thất bại.",
+        "roleUpdated": "Đã cập nhật vai trò.",
+        "roleUpdateFailed": "Cập nhật vai trò thất bại."
       }
     },
     "questions": {
@@ -495,7 +495,7 @@
     "pagination": {
       "rowsPerPage": "Số hàng mỗi trang:",
       "displayedRows": "{{from}}-{{to}} của {{count}}",
-      "all": "T?t c?"
+      "all": "Tất cả"
     },
     "breadcrumb": "Đường dẫn",
     "table": {

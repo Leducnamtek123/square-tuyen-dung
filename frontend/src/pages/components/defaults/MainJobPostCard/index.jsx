@@ -1,177 +1,97 @@
 import React from 'react';
-
 import { useSelector } from 'react-redux';
-
 import { Box, Pagination, Stack, Typography } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
-import { SVG_IMAGES } from '../../../../configs/constants';
-
+import {} from '../../../../configs/constants';
 import JobPostLarge from '../../../../components/JobPostLarge';
-
 import NoDataCard from '../../../../components/NoDataCard';
-
 import jobService from '../../../../services/jobService';
 
 const MainJobPostCard = () => {
-
+  const { t } = useTranslation('public');
   const { jobPostFilter } = useSelector((state) => state.filter);
-
   const { pageSize } = jobPostFilter;
-
   const [isLoading, setIsLoading] = React.useState(true);
-
   const [jobPosts, setJobPosts] = React.useState([]);
-
   const [page, setPage] = React.useState(1);
-
   const [count, setCount] = React.useState(0);
 
   React.useEffect(() => {
-
     const getJobPosts = async () => {
-
       setIsLoading(true);
-
       try {
-
         const resData = await jobService.getJobPosts({
-
           ...jobPostFilter,
-
           page: page,
-
         });
-
         const data = resData.data;
-
         setCount(data.count);
-
         setJobPosts(data?.results || []);
-
       } catch (error) {
-
         console.error(error);
-
       } finally {
-
         setIsLoading(false);
-
       }
-
     };
-
     getJobPosts();
-
   }, [jobPostFilter, page]);
 
   const handleChangePage = (event, newPage) => {
-
     setPage(newPage);
-
   };
 
   return (
-
     <>
-
       <Box 
-
         sx={{ 
-
           pt: 3, 
-
           pb: 2,
-
           display: 'flex',
-
           alignItems: 'center',
-
           borderBottom: '1px solid',
-
           borderColor: 'divider',
-
           mb: 2,
-
         }}
-
       >
-
         <Typography 
-
           variant="h5" 
-
           sx={{
-
             color: 'text.primary',
-
             fontWeight: 600,
-
             display: 'flex',
-
             alignItems: 'center',
-
             gap: 1
-
           }}
-
         >
-
-          Search Results
-
+          {t('jobSearch.searchResults')}
           <Box 
-
             component="span"
-
             sx={{
-
               color: 'primary.main',
-
               fontWeight: 600,
-
               backgroundColor: 'primary.background',
-
               padding: '4px 12px',
-
               borderRadius: '20px',
-
               fontSize: '0.9em'
-
             }}
-
           >
-
-            {count.toLocaleString()} posts
-
+            {count.toLocaleString()} {t('jobSearch.posts')}
           </Box>
-
         </Typography>
-
       </Box>
-
       <Stack spacing={2}>
-
         {isLoading ? (
-
           Array.from(Array(10).keys()).map((value) => (
-
             <Box key={value}>
-
               <JobPostLarge.Loading />
-
             </Box>
-
           ))
-
         ) : jobPosts.length === 0 ? (
-
           <NoDataCard
-
-            title="No jobs found matching your criteria"
-
-            imgComponentSgv={<SVG_IMAGES.ImageSvg3 />}
-
+            title={t('jobSearch.noJobsFound')}
+            svgKey="ImageSvg3"
           />
-
         ) : (
 
           <>

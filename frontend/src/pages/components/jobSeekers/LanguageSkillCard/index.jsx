@@ -344,7 +344,7 @@ const LanguageSkillCard = ({ title }) => {
 
                   color="primary"
 
-                  aria-label="add"
+                  aria-label={t("common:actions.add")}
 
                   onClick={handleShowAdd}
 
@@ -400,7 +400,7 @@ const LanguageSkillCard = ({ title }) => {
 
                 >
 
-                  <Table aria-label="language skills table" size="medium">
+                  <Table aria-label={t("jobSeeker:profile.aria.languageSkillsTable")} size="medium">
 
                     <TableHead>
 

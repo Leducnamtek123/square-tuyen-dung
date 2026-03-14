@@ -120,7 +120,7 @@ const Loading = (
 
 const EducationDetailCard = ({ title }) => {
 
-  const { t } = useTranslation('jobSeeker');
+  const { t } = useTranslation(['jobSeeker', 'common']);
 
   const { slug: resumeSlug } = useParams();
 
@@ -380,7 +380,7 @@ const EducationDetailCard = ({ title }) => {
 
                   color="primary"
 
-                  aria-label="add"
+                  aria-label={t('common:actions.add')}
 
                   onClick={handleShowAdd}
 

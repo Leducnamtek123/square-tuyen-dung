@@ -77,7 +77,10 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "add": "Add",
+    "download": "Download",
+    "upload": "Upload"
   },
   "status": {
     "pending": "Pending",

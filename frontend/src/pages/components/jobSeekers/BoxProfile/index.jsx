@@ -63,6 +63,8 @@ import { formatRoute } from "../../../../utils/funcUtils";
 
 import ColorPickerDialog from '../../../../components/ColorPickerDialog';
 
+import { useTranslation } from "react-i18next";
+
 const Loading = () => {
 
   return (
@@ -174,6 +176,7 @@ const Loading = () => {
 };
 
 const BoxProfile = ({ title }) => {
+  const { t } = useTranslation(["jobSeeker", "common"]);
 
   const dispatch = useDispatch();
 
@@ -251,7 +254,7 @@ const BoxProfile = ({ title }) => {
 
         dispatch(reloadResume());
 
-        toastMessages.success("Profile status updated successfully.");
+        toastMessages.success(t("jobSeeker:profile.messages.profileStatusUpdateSuccess"));
 
       } catch (error) {
 
@@ -369,7 +372,7 @@ const BoxProfile = ({ title }) => {
 
                       color="success"
 
-                      label="Searchable"
+                      label={t("common:status.searchable")}
 
                       onClick={() => handleActive(resume.slug)}
 
@@ -401,7 +404,7 @@ const BoxProfile = ({ title }) => {
 
                       icon={<StarOutlineIcon sx={{ color: "warning.main" }} />}
 
-                      label="Searchable"
+                      label={t("common:status.searchable")}
 
                       onClick={() => handleActive(resume.slug)}
 
@@ -423,7 +426,7 @@ const BoxProfile = ({ title }) => {
 
                   <Tooltip
 
-                    title={`Enabling "Searchable" will help employers find your profile and contact you about new opportunities. Only one profile can be searchable at a time.`}
+                    title={t("jobSeeker:profile.tooltips.searchable")}
 
                     arrow
 
@@ -442,7 +445,7 @@ const BoxProfile = ({ title }) => {
                         size="small"
                         icon={<CircularProgress size={16} />}
                         color="secondary"
-                        label="Loading..."
+                          label={t("common:loading")}
                         sx={{
                           boxShadow: (theme) => theme.customShadows.medium,
                         }}
@@ -464,7 +467,7 @@ const BoxProfile = ({ title }) => {
                             size="small"
                             icon={<CircularProgress size={16} />}
                             color="secondary"
-                            label="Loading..."
+                            label={t("common:loading")}
                             sx={{
                               boxShadow: (theme) => theme.customShadows.medium,
                             }}
@@ -474,7 +477,7 @@ const BoxProfile = ({ title }) => {
                             size="small"
                             icon={<DownloadIcon />}
                             color="secondary"
-                            label="Download"
+                            label={t("common:actions.download")}
                             onClick={handleDownloadClick}
                             sx={{
                               boxShadow: (theme) => theme.customShadows.medium,
@@ -500,7 +503,7 @@ const BoxProfile = ({ title }) => {
 
                     color="secondary"
 
-                    label="Generating PDF..."
+                    label={t("jobSeeker:profile.actions.generatingPdf")}
 
                     sx={{
 
@@ -666,7 +669,7 @@ const BoxProfile = ({ title }) => {
 
                         >
 
-                          Not updated
+                          {t("jobSeeker:notUpdated")}
 
                         </Typography>
 
@@ -774,7 +777,7 @@ const BoxProfile = ({ title }) => {
 
                           >
 
-                            Not updated
+                            {t("jobSeeker:notUpdated")}
 
                           </Typography>
 
@@ -818,7 +821,7 @@ const BoxProfile = ({ title }) => {
 
                         <Typography>
 
-                          Experience:{" "}
+                          {t("jobSeeker:profile.summary.experience")}:{" "}
 
                           <Typography
 
@@ -852,7 +855,7 @@ const BoxProfile = ({ title }) => {
 
                               >
 
-                                Not updated
+                                {t("jobSeeker:notUpdated")}
 
                               </Typography>
 
@@ -892,7 +895,7 @@ const BoxProfile = ({ title }) => {
 
                         <Typography>
 
-                          Position:{" "}
+                          {t("jobSeeker:profile.summary.position")}:{" "}
 
                           <Typography
 
@@ -926,7 +929,7 @@ const BoxProfile = ({ title }) => {
 
                               >
 
-                                Not updated
+                                {t("jobSeeker:notUpdated")}
 
                               </Typography>
 
@@ -966,7 +969,7 @@ const BoxProfile = ({ title }) => {
 
                         <Typography>
 
-                          Desired Salary:{" "}
+                          {t("jobSeeker:profile.summary.desiredSalary")}:{" "}
 
                           <Typography
 
@@ -1018,7 +1021,7 @@ const BoxProfile = ({ title }) => {
 
                         <Typography>
 
-                          Last Updated:{" "}
+                          {t("jobSeeker:profile.summary.lastUpdated")}:{" "}
 
                           <Typography
 
@@ -1086,7 +1089,7 @@ const BoxProfile = ({ title }) => {
 
                   <Typography variant="body2" sx={{ color: "text.secondary" }}>
 
-                    Please add all necessary information to complete your profile.
+                    {t("jobSeeker:profile.messages.profileCompletionWarning")}
 
                   </Typography>
 
@@ -1144,7 +1147,7 @@ const BoxProfile = ({ title }) => {
 
                   >
 
-                    Edit Profile
+                    {t("jobSeeker:profile.actions.editProfile")}
 
                   </Button>
 

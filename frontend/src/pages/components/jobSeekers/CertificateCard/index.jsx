@@ -384,7 +384,7 @@ const CertificateCard = ({ title }) => {
 
                   color="primary"
 
-                  aria-label="add"
+                  aria-label={t("common:actions.add")}
 
                   onClick={handleShowAdd}
 

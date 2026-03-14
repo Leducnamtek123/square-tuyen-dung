@@ -6,7 +6,7 @@ import { Box, Stack, Button, Pagination, Chip, Typography } from "@mui/material"
 
 import DoneIcon from '@mui/icons-material/Done';
 
-import { CV_TYPES, SVG_IMAGES, ROUTES } from '../../../../configs/constants';
+import {CV_TYPES, ROUTES} from '../../../../configs/constants';
 
 import NoDataCard from '../../../../components/NoDataCard';
 
@@ -22,9 +22,12 @@ import jobPostActivityService from '../../../../services/jobPostActivityService'
 
 import dayjs from 'dayjs';
 
+import { useTranslation } from 'react-i18next';
+
 const pageSize = 10;
 
 const AppliedJobCard = () => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
 
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -100,9 +103,9 @@ const AppliedJobCard = () => {
 
           <NoDataCard
 
-            title="You haven't applied for any jobs yet"
+            title={t("jobSeeker:jobManagement.empty.applied")}
 
-            imgComponentSgv={<SVG_IMAGES.ImageSvg5 />}
+            svgKey="ImageSvg5"
 
           >
 
@@ -120,7 +123,7 @@ const AppliedJobCard = () => {
 
             >
 
-              Search Jobs
+              {t("jobSeeker:jobManagement.actions.searchJobs")}
 
             </Button>
 
@@ -168,11 +171,9 @@ const AppliedJobCard = () => {
 
                   <Chip
 
-                    label={`Applied on: ${dayjs(value?.createAt).format(
-
-                      'DD/MM/YYYY'
-
-                    )}`}
+                    label={t("jobSeeker:jobManagement.appliedOn", {
+                      date: dayjs(value?.createAt).format("DD/MM/YYYY"),
+                    })}
 
                     size="small"
 
@@ -198,7 +199,7 @@ const AppliedJobCard = () => {
 
                         />{' '}
 
-                        Online Resume
+                        {t("jobSeeker:jobApplication.onlineProfile")}
 
                       </>
 
@@ -216,7 +217,7 @@ const AppliedJobCard = () => {
 
                         />{' '}
 
-                        Attached Resume
+                        {t("jobSeeker:jobApplication.attachedResume")}
 
                       </>
 

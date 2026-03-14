@@ -251,16 +251,21 @@ const RecruitmentChart = ({ title }) => {
   }, [allowSubmit, selectedDateRange]);
 
   const dataOptions = React.useMemo(() => {
+    const safeData = Array.isArray(data) ? data : [];
 
     var datasets = [];
 
-    for (let i = data.length - 1; i >= 0; i--) {
+    for (let i = safeData.length - 1; i >= 0; i--) {
+      const labelText = safeData[i]?.label;
+      const labelKey = String(labelText ?? '')
+        .toLowerCase()
+        .replace(/\s+/g, '');
 
       datasets.push({
 
-        label: t(`recruitmentChart.labels.${data[i]?.label?.toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data[i]?.label }),
+        label: t(`recruitmentChart.labels.${labelKey}`, { defaultValue: labelText }),
 
-        data: data[i]?.data || [],
+        data: safeData[i]?.data || [],
 
         backgroundColor: colors[i],
 
@@ -399,7 +404,7 @@ const RecruitmentChart = ({ title }) => {
 
               </Stack>
 
-            ) : data.length === 0 ? (
+            ) : (Array.isArray(data) ? data.length === 0 : true) ? (
 
               <Stack
 

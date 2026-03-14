@@ -10,7 +10,10 @@ import Grid from "@mui/material/Grid2";
 
 import BasicDropzone from '../../../../components/controls/BasicDropzone';
 
+import { useTranslation } from 'react-i18next';
+
 const CVForm = ({ handleUpdate }) => {
+  const { t } = useTranslation(['jobSeeker']);
 
   const schema = yup.object().shape({
 
@@ -22,7 +25,7 @@ const CVForm = ({ handleUpdate }) => {
 
         'files empty',
 
-        'File is required.',
+        t('jobSeeker:profile.validation.fileRequired'),
 
         (value) =>
 
@@ -62,7 +65,7 @@ const CVForm = ({ handleUpdate }) => {
 
             name="files"
 
-            title="Choose your CV file"
+            title={t('jobSeeker:profile.fields.cvFile')}
 
             showRequired={true}
 

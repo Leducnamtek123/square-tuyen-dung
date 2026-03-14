@@ -16,7 +16,10 @@ import SingleSelectCustom from '../../../../components/controls/SingleSelectCust
 
 import RadioCustom from '../../../../components/controls/RadioCustom';
 
+import { useTranslation } from 'react-i18next';
+
 const JobPostNotificationForm = ({ handleAddOrUpdate, editData }) => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
 
   const { allConfig } = useSelector((state) => state.config);
 
@@ -26,25 +29,25 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }) => {
 
       .string()
 
-      .required('Keyword is required.')
+      .required(t('jobSeeker:jobManagement.notifications.form.validation.keywordRequired'))
 
-      .max(200, 'Keyword is too long.'),
+      .max(200, t('jobSeeker:jobManagement.notifications.form.validation.keywordMax')),
 
     career: yup
 
       .number()
 
-      .required('Career is required.')
+      .required(t('jobSeeker:jobManagement.notifications.form.validation.careerRequired'))
 
-      .typeError('Career is required.'),
+      .typeError(t('jobSeeker:jobManagement.notifications.form.validation.careerRequired')),
 
     city: yup
 
       .number()
 
-      .required('City/Province is required.')
+      .required(t('jobSeeker:jobManagement.notifications.form.validation.cityRequired'))
 
-      .typeError('City/Province is required.'),
+      .typeError(t('jobSeeker:jobManagement.notifications.form.validation.cityRequired')),
 
     position: yup.number().notRequired().nullable(),
 
@@ -56,7 +59,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }) => {
 
       .nullable()
 
-      .typeError('Invalid desired salary.')
+      .typeError(t('jobSeeker:jobManagement.notifications.form.validation.salaryInvalid'))
 
       .transform((value, originalValue) => {
 
@@ -130,11 +133,11 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }) => {
 
             name="jobName"
 
-            title="Keyword"
+            title={t('jobSeeker:jobManagement.notifications.form.keyword')}
 
             showRequired={true}
 
-            placeholder="Enter job name or related keywords you are searching for."
+            placeholder={t('jobSeeker:jobManagement.notifications.form.keywordPlaceholder')}
 
             control={control}
 
@@ -166,11 +169,11 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }) => {
 
             options={allConfig?.careerOptions || []}
 
-            title="Career"
+            title={t('jobSeeker:jobManagement.notifications.form.career')}
 
             showRequired={true}
 
-            placeholder="Select career"
+            placeholder={t('jobSeeker:jobManagement.notifications.form.careerPlaceholder')}
 
           />
 
@@ -200,11 +203,11 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }) => {
 
             options={allConfig?.cityOptions || []}
 
-            title="City/Province"
+            title={t('jobSeeker:jobManagement.notifications.form.city')}
 
             showRequired={true}
 
-            placeholder="Select city/province"
+            placeholder={t('jobSeeker:jobManagement.notifications.form.cityPlaceholder')}
 
           />
 
@@ -234,9 +237,9 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }) => {
 
             options={allConfig?.positionOptions || []}
 
-            title="Position/Level"
+            title={t('jobSeeker:jobManagement.notifications.form.position')}
 
-            placeholder="Select position/level"
+            placeholder={t('jobSeeker:jobManagement.notifications.form.positionPlaceholder')}
 
           />
 
@@ -266,9 +269,9 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }) => {
 
             options={allConfig?.experienceOptions || []}
 
-            title="Experience"
+            title={t('jobSeeker:jobManagement.notifications.form.experience')}
 
-            placeholder="Select required experience"
+            placeholder={t('jobSeeker:jobManagement.notifications.form.experiencePlaceholder')}
 
           />
 
@@ -294,9 +297,9 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }) => {
 
             name="salary"
 
-            title="Desired Salary"
+            title={t('jobSeeker:jobManagement.notifications.form.salary')}
 
-            placeholder="Enter your desired salary"
+            placeholder={t('jobSeeker:jobManagement.notifications.form.salaryPlaceholder')}
 
             control={control}
 
@@ -330,7 +333,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }) => {
 
             options={allConfig?.frequencyNotificationOptions || []}
 
-            title="Notification Frequency"
+            title={t('jobSeeker:jobManagement.notifications.form.frequency')}
 
           />
 

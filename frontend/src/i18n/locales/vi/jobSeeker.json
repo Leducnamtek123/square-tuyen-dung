@@ -206,7 +206,34 @@
       "noCertificateData": "Vui lòng thêm chứng chỉ để nhà tuyển dụng tham khảo",
       "noLanguageData": "Vui lòng thêm ngoại ngữ để nhà tuyển dụng tham khảo",
       "noResumeData": "Chưa có CV nào được tải lên",
-      "notFound": "Không tìm thấy thông tin hồ sơ"
+      "notFound": "Không tìm thấy thông tin hồ sơ",
+      "profileCompletionWarning": "Vui l?ng b? sung ??y ?? th?ng tin ?? ho?n thi?n h? s? c?a b?n."
+    },
+    "aria": {
+      "advancedSkillsTable": "B?ng k? n?ng n?ng cao",
+      "languageSkillsTable": "B?ng k? n?ng ngo?i ng?"
+    },
+    "summary": {
+      "experience": "Kinh nghi?m",
+      "position": "V? tr?",
+      "desiredSalary": "M?c l??ng mong mu?n",
+      "lastUpdated": "C?p nh?t l?n cu?i"
+    },
+    "actions": {
+      "editProfile": "Ch?nh s?a h? s?",
+      "uploadCv": "T?i l?n CV",
+      "updateCv": "C?p nh?t CV",
+      "generatingPdf": "?ang t?o PDF..."
+    },
+    "cv": {
+      "loading": "?ang t?i CV...",
+      "emptyTitle": "Ch?a c? CV n?o ???c t?i l?n",
+      "emptySubtitle": "Nh?n n?t t?i l?n ?? th?m CV c?a b?n",
+      "loadingPreview": "?ang t?i b?n xem tr??c...",
+      "updateTitle": "C?p nh?t CV"
+    },
+    "tooltips": {
+      "searchable": "B?t \"C? th? t?m ki?m\" s? gi?p nh? tuy?n d?ng t?m th?y h? s? v? li?n h? v?i b?n v? c?c c? h?i m?i. Ch? m?t h? s? c? th? ???c t?m ki?m t?i m?t th?i ?i?m."
     }
   },
   "account": {
@@ -259,7 +286,22 @@
     "tabs": {
       "viewed": "Nhà tuyển dụng xem hồ sơ",
       "followed": "Công ty đang theo dõi"
-    }
+    },
+    "aria": {
+      "tabs": "C?c tab c?ng ty c?a t?i"
+    },
+    "empty": {
+      "viewed": "Ch?a c? nh? tuy?n d?ng n?o xem h? s? c?a b?n",
+      "followed": "B?n ch?a theo d?i nh? tuy?n d?ng n?o"
+    },
+    "actions": {
+      "findCompanies": "T?m c?ng ty",
+      "unfollow": "B? theo d?i"
+    },
+    "messages": {
+      "unfollowSuccess": "?? b? theo d?i th?nh c?ng."
+    },
+    "savedProfile": "?? l?u h? s? c?a b?n"
   },
   "myInterviews": {
     "defaultRoomName": "Phòng phỏng vấn",
@@ -269,7 +311,10 @@
   "jobApplication": {
     "title": "Hồ sơ ứng tuyển",
     "onlineProfile": "Hồ sơ trực tuyến",
-    "attachedResume": "CV đính kèm"
+    "attachedResume": "CV đính kèm",
+    "aria": {
+      "navigateToProfile": "?i ??n h? s? c?a t?i"
+    }
   },
   "jobManagement": {
     "title": "Quản lý việc làm của tôi",
@@ -281,6 +326,57 @@
     "notes": {
       "expired": "Lưu ý: Bạn không thể xem các việc làm đã hết hạn hoặc tạm dừng nhận hồ sơ."
     },
-    "suitableJobs": "Việc làm phù hợp"
+    "suitableJobs": "Việc làm đề xuất",
+    "aria": {
+      "tabs": "Các tab việc làm của tôi"
+    },
+    "empty": {
+      "saved": "Bạn chưa lưu việc làm nào",
+      "applied": "Bạn chưa ứng tuyển việc làm nào"
+    },
+    "actions": {
+      "searchJobs": "Tìm việc",
+      "unsave": "Bỏ lưu"
+    },
+    "appliedOn": "Ứng tuyển vào: {{date}}",
+    "messages": {
+      "saved": "Đã lưu việc làm thành công.",
+      "unsaved": "Đã bỏ lưu việc làm."
+    },
+    "notifications": {
+      "title": "Thông báo việc làm",
+      "subtitle": "Tối đa 3 thông báo việc làm có thể được bật",
+      "empty": "Bạn chưa có thông báo việc làm nào",
+      "create": "Tạo thông báo",
+      "createNow": "Tạo thông báo ngay",
+      "modalTitle": "Tạo thông báo việc làm",
+      "addedSuccess": "Tạo thông báo việc làm thành công.",
+      "updatedSuccess": "Cập nhật thông báo việc làm thành công.",
+      "deletedSuccess": "Xóa thông báo việc làm thành công.",
+      "deleteTitle": "Xóa thông báo việc làm",
+      "deleteWarning": "Thông báo việc làm này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?",
+      "form": {
+        "keyword": "Từ khóa",
+        "keywordPlaceholder": "Nhập tên công việc hoặc từ khóa liên quan bạn đang tìm kiếm.",
+        "career": "Ngành nghề",
+        "careerPlaceholder": "Chọn ngành nghề",
+        "city": "Tỉnh/Thành phố",
+        "cityPlaceholder": "Chọn tỉnh/thành phố",
+        "position": "Vị trí/Cấp bậc",
+        "positionPlaceholder": "Chọn vị trí/cấp bậc",
+        "experience": "Kinh nghiệm",
+        "experiencePlaceholder": "Chọn kinh nghiệm yêu cầu",
+        "salary": "Mức lương mong muốn",
+        "salaryPlaceholder": "Nhập mức lương mong muốn",
+        "frequency": "Tần suất thông báo",
+        "validation": {
+          "keywordRequired": "Vui lòng nhập từ khóa.",
+          "keywordMax": "Từ khóa quá dài.",
+          "careerRequired": "Vui lòng chọn ngành nghề.",
+          "cityRequired": "Vui lòng chọn tỉnh/thành phố.",
+          "salaryInvalid": "Mức lương mong muốn không hợp lệ."
+        }
+      }
+    }
   }
 }

@@ -11,6 +11,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import { Typography } from "@mui/material";
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { createEditorStateFromHTMLString } from '../../../utils/customData';
 
 const RichTextEditorCustom = ({
 
@@ -46,7 +47,13 @@ const RichTextEditorCustom = ({
 
         defaultValue={EditorState.createEmpty()}
 
-        render={({ field, fieldState }) => (
+        render={({ field, fieldState }) => {
+          const safeEditorState = field.value?.getCurrentContent
+            ? field.value
+            : typeof field.value === 'string'
+            ? createEditorStateFromHTMLString(field.value)
+            : EditorState.createEmpty();
+          return (
 
           <>
 
@@ -80,7 +87,7 @@ const RichTextEditorCustom = ({
 
               }}
 
-              editorState={field.value}
+              editorState={safeEditorState}
 
               onEditorStateChange={field.onChange}
 
@@ -174,7 +181,8 @@ const RichTextEditorCustom = ({
 
           </>
 
-        )}
+        );
+        }}
 
       />
 

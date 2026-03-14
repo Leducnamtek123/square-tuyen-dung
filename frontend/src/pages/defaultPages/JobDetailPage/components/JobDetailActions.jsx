@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, Stack } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import { LoadingButton } from "@mui/lab";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
@@ -17,8 +18,11 @@ const JobDetailActions = ({
   setOpenSharePopup,
   isAuthenticated,
   currentUser,
-}) => (
-  <Stack direction="row" spacing={2}>
+}) => {
+  const { t } = useTranslation(["public"]);
+
+  return (
+    <Stack direction="row" spacing={2}>
     {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
       <>
         <Button
@@ -36,7 +40,7 @@ const JobDetailActions = ({
           disabled={isApplied}
           onClick={handleShowApplyForm}
         >
-          {isApplied ? "Da ung tuyen" : "Nop ho so"}
+          {isApplied ? t("jobDetail.actions.applied") : t("jobDetail.actions.apply")}
         </Button>
         <LoadingButton
           onClick={handleSave}
@@ -63,7 +67,7 @@ const JobDetailActions = ({
                 }),
           }}
         >
-          <span>{isSaved ? "Da luu" : "Luu tin"}</span>
+          <span>{isSaved ? t("jobDetail.actions.saved") : t("jobDetail.actions.save")}</span>
         </LoadingButton>
       </>
     )}
@@ -82,9 +86,10 @@ const JobDetailActions = ({
       }}
       onClick={() => setOpenSharePopup(true)}
     >
-      Chia se
+      {t("jobDetail.actions.share")}
     </Button>
-  </Stack>
-);
+    </Stack>
+  );
+};
 
 export default JobDetailActions;

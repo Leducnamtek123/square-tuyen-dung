@@ -14,6 +14,8 @@ import { Alert } from "@mui/material";
 
 import Grid from "@mui/material/Grid2";
 
+import { EditorState } from 'draft-js';
+
 import { DATE_OPTIONS, REGEX_VATIDATE } from '../../../../configs/constants';
 
 import useDebounce from '../../../../hooks/useDebounce';
@@ -301,6 +303,32 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }) => {
   const { control, reset, setValue, setError, handleSubmit } = useForm({
 
     resolver: yupResolver(schema),
+
+    defaultValues: {
+
+      jobDescription: EditorState.createEmpty(),
+
+      jobRequirement: EditorState.createEmpty(),
+
+      benefitsEnjoyed: EditorState.createEmpty(),
+
+      isUrgent: false,
+
+      location: {
+
+        city: '',
+
+        district: '',
+
+        address: '',
+
+        lat: '',
+
+        lng: '',
+
+      },
+
+    },
 
   });
 

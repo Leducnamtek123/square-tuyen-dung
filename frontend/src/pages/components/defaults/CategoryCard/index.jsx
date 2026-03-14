@@ -26,10 +26,9 @@ const CategoryCard = ({ options, type }) => {
 
   const handleFilterChange = (value) => {
 
+    const safeValue = String(value ?? '').toLowerCase();
     let filterItems = options.filter((option) =>
-
-      option.name.toLowerCase().includes(value.toLowerCase())
-
+      String(option?.name ?? '').toLowerCase().includes(safeValue)
     );
 
     setItems(filterItems);

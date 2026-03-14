@@ -8,7 +8,7 @@ import errorHandling from '../../../../utils/errorHandling';
 
 import toastMessages from '../../../../utils/toastMessages';
 
-import { SVG_IMAGES, ROUTES } from '../../../../configs/constants';
+import {ROUTES} from '../../../../configs/constants';
 
 import NoDataCard from '../../../../components/NoDataCard';
 
@@ -18,9 +18,12 @@ import companyFollowed from '../../../../services/companyFollowed';
 
 import companyService from '../../../../services/companyService';
 
+import { useTranslation } from 'react-i18next';
+
 const pageSize = 10;
 
 const CompanyFollowedCard = () => {
+  const { t } = useTranslation(['jobSeeker', 'common']);
 
   const [isSuccess, setIsSuccess] = React.useState(false);
 
@@ -82,7 +85,7 @@ const CompanyFollowedCard = () => {
 
         await companyService.followCompany(slugCompany);
 
-        toastMessages.success('Unfollowed successfully.');
+        toastMessages.success(t('jobSeeker:myCompany.messages.unfollowSuccess'));
 
         setIsSuccess(!isSuccess);
 
@@ -120,9 +123,9 @@ const CompanyFollowedCard = () => {
 
           <NoDataCard
 
-            title="You haven't followed any employers yet"
+            title={t('jobSeeker:myCompany.empty.followed')}
 
-            imgComponentSgv={<SVG_IMAGES.ImageSvg7 />}
+            svgKey="ImageSvg7"
 
           >
 
@@ -138,7 +141,7 @@ const CompanyFollowedCard = () => {
 
             >
 
-              Find companies
+              {t('jobSeeker:myCompany.actions.findCompanies')}
 
             </Button>
 
@@ -174,7 +177,7 @@ const CompanyFollowedCard = () => {
 
                 >
 
-                  Unfollow
+                  {t('jobSeeker:myCompany.actions.unfollow')}
 
                 </Button>
 
