@@ -55,7 +55,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
-      MYSQL_DATABASE: myjob_db
+      MYSQL_DATABASE: square_db
     volumes:
       - db_data_prod:/var/lib/mysql
       - ./tuyendungsqstudio.sql:/docker-entrypoint-initdb.d/init.sql
