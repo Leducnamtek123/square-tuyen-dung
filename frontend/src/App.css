@@ -1,5 +1,11 @@
-
 .swal2-container.swal2-backdrop-show,
 .swal2-container.swal2-noanimation {
   z-index: 9999;
+}
+
+@media (min-width: 600px) {
+  .css-1ox6zl5 {
+    padding-top: 7px !important;
+    padding-bottom: 7px !important;
+  }
 }

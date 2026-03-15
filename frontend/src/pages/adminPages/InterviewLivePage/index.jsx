@@ -85,7 +85,7 @@ const InterviewLivePage = () => {
     () => [
       {
         header: t('pages.interviewLive.table.company'),
-        accessorKey: 'companyName',
+        accessorKey: 'company_name',
         cell: ({ row }) => (
           <Typography variant="body2">
             {row.original.companyName ||

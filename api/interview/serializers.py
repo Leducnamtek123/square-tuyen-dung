@@ -62,19 +62,28 @@ class InterviewEvaluationSerializer(serializers.ModelSerializer):
 class InterviewSessionListSerializer(serializers.ModelSerializer):
     """Serializer cho danh sách (nhẹ, không nested)."""
     candidate_name = serializers.CharField(source='candidate.full_name', read_only=True)
+    candidate_email = serializers.CharField(source='candidate.email', read_only=True)
     job_name = serializers.CharField(source='job_post.job_name', read_only=True, default=None)
+    company_name = serializers.SerializerMethodField()
     evaluations_count = serializers.SerializerMethodField()
 
     class Meta:
         model = InterviewSession
         fields = [
             'id', 'room_name', 'invite_token', 'status', 'type',
-            'candidate', 'candidate_name',
-            'job_post', 'job_name',
+            'candidate', 'candidate_name', 'candidate_email',
+            'job_post', 'job_name', 'company_name',
             'scheduled_at', 'start_time', 'end_time', 'duration',
             'ai_overall_score', 'evaluations_count',
             'create_at', 'update_at'
         ]
+
+    def get_company_name(self, obj):
+        if obj.job_post and obj.job_post.company:
+            return obj.job_post.company.company_name
+        if obj.question_group and obj.question_group.company:
+            return obj.question_group.company.company_name
+        return None
 
     def get_evaluations_count(self, obj):
         return obj.evaluations.count()
@@ -84,6 +93,7 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
     candidate_name = serializers.CharField(source='candidate.full_name', read_only=True)
     candidate_email = serializers.CharField(source='candidate.email', read_only=True)
     job_name = serializers.CharField(source='job_post.job_name', read_only=True, default=None)
+    company_name = serializers.SerializerMethodField()
     questions = QuestionSerializer(many=True, read_only=True)
     transcripts = InterviewTranscriptSerializer(many=True, read_only=True)
     evaluations = InterviewEvaluationSerializer(many=True, read_only=True)
@@ -93,7 +103,7 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'room_name', 'invite_token', 'status', 'type',
             'candidate', 'candidate_name', 'candidate_email',
-            'job_post', 'job_name',
+            'job_post', 'job_name', 'company_name',
             'scheduled_at', 'start_time', 'end_time', 'duration',
             'recording_url', 'transcript_url', 'notes',
             'ai_overall_score', 'ai_technical_score', 'ai_communication_score',
@@ -106,6 +116,13 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
             'id', 'room_name', 'invite_token',
             'created_by', 'create_at', 'update_at'
         ]
+
+    def get_company_name(self, obj):
+        if obj.job_post and obj.job_post.company:
+            return obj.job_post.company.company_name
+        if obj.question_group and obj.question_group.company:
+            return obj.question_group.company.company_name
+        return None
 
 class InterviewSessionCreateSerializer(serializers.ModelSerializer):
     """Serializer tạo mới interview."""
