@@ -651,7 +651,9 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
                                                   allow_blank=True, allow_null=True, max_length=20)
     location = common_serializers.ProfileLocationSerializer()
 
-    user = auth_serializers.UserSerializer(fields=["fullName"])
+    user = auth_serializers.UserSerializer(fields=["fullName", "email", "avatarUrl"])
+
+    userDict = serializers.SerializerMethodField(method_name="get_user_dict", read_only=True)
 
     old = serializers.SerializerMethodField(
 
@@ -672,6 +674,17 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
             for field_name in existing - allowed:
 
                 self.fields.pop(field_name)
+
+    def get_user_dict(self, profile):
+        user = profile.user
+        return {
+            "fullName": user.full_name,
+            "email": user.email,
+            "avatar": user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else var_sys.AVATAR_DEFAULT["AVATAR"],
+            "phone": profile.phone,
+            "gender": profile.gender,
+            "birthday": profile.birthday,
+        }
 
     def get_old(self, job_seeker_profile):
 
@@ -696,7 +709,7 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
                   'taxCode', 'socialInsuranceNo',
                   'permanentAddress', 'contactAddress',
                   'emergencyContactName', 'emergencyContactPhone',
-                  'location', 'user', 'old')
+                  'location', 'user', 'userDict', 'old')
 
     def update(self, instance, validated_data):
         instance.birthday = validated_data.get('birthday', instance.birthday)

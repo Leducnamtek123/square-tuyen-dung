@@ -12,67 +12,42 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
+import { useTranslation } from "react-i18next";
 import { TabTitle } from "../../../utils/generalFunction";
 
-
 import MuiImageCustom from "../../../components/MuiImageCustom";
-
 import { ABOUT_IMAGES, APP_NAME } from "../../../configs/constants";
 
 const AboutUsPage = () => {
+  const { t } = useTranslation('about');
 
-  TabTitle(`Về chúng tôi - Hệ thống giới thiệu việc làm ${APP_NAME}`);
+  TabTitle(t('tabTitle', { appName: APP_NAME }));
 
   const features = [
-
     {
-
-      title: "Chân dung việc - Đi đúng hướng",
-
+      title: t('features.careerTitle'),
       icon: WorkOutlineIcon,
-
-      description: "Khám phá công việc phù hợp với định hướng nghề nghiệp. Thông tin chi tiết về yêu cầu công việc, môi trường và cơ hội phát triển tại mỗi công ty.",
-
+      description: t('features.careerDesc'),
       color: "primary.main"
-
     },
-
     {
-
-      title: "Tạo CV & Profile",
-
+      title: t('features.cvTitle'),
       icon: PersonOutlineIcon,
-
-      description: "Xây dựng hồ sơ ứng tuyển chuyên nghiệp với công cụ tạo CV thông minh. Tối ưu profile với các mẫu CV đẹp mắt theo từng ngành nghề.",
-
+      description: t('features.cvDesc'),
       color: "primary.main"
-
     },
-
     {
-
-      title: "Việc làm xung quanh bạn",
-
+      title: t('features.locationTitle'),
       icon: LocationOnOutlinedIcon,
-
-      description: "Tìm kiếm cơ hội việc làm lý tưởng trong khu vực. Với tính năng định vị thông minh, gợi ý công việc phù hợp gần nơi bạn sinh sống.",
-
+      description: t('features.locationDesc'),
       color: "primary.main"
-
     },
-
     {
-
-      title: "Thông báo việc làm mọi lúc",
-
+      title: t('features.notificationTitle'),
       icon: NotificationsNoneIcon,
-
-      description: "Không bỏ lỡ cơ hội với hệ thống thông báo thông minh. Nhận thông tin tức thì về các vị trí việc làm mới phù hợp với kỹ năng.",
-
+      description: t('features.notificationDesc'),
       color: "primary.main"
-
     },
-
   ];
 
   return (
@@ -101,8 +76,7 @@ const AboutUsPage = () => {
 
         >
 
-          Về chúng tôi
-
+          {t('heading')}
         </Typography>
 
         <Typography
@@ -121,20 +95,7 @@ const AboutUsPage = () => {
 
         >
 
-          {APP_NAME} - Kênh thông tin tuyển dụng và việc làm dành cho mọi Doanh
-
-          nghiệp và ứng viên. Chúng tôi tin tưởng sẽ đem lại "HY VỌNG" cho Doanh
-
-          nghiệp tìm kiếm nhân tài và cho ứng viên tìm kiếm cơ hội nghề
-
-          nghiệp. Với 2 hệ thống: Website dành cho Nhà Tuyển Dụng và ứng dụng
-
-          (Application) dành cho Người Tìm Việc, {APP_NAME} sẽ mang lại những trải
-
-          nghiệm mới mẻ, thú vị; kết nối ước mơ chinh phục công việc của mọi
-
-          nhân tài và giúp doanh nghiệp xây dựng đội ngũ nhân sự vững mạnh.
-
+          {t('description', { appName: APP_NAME })}
         </Typography>
 
       </Box>
@@ -156,7 +117,6 @@ const AboutUsPage = () => {
                 sm: 6,
 
                 md: 3
-
               }}>
 
               <Card
@@ -317,8 +277,7 @@ const AboutUsPage = () => {
 
       >
 
-        Mobile App {APP_NAME}
-
+        {t('mobileAppHeading', { appName: APP_NAME })}
       </Typography>
 
       <Box sx={{ mt: 5 }}>
@@ -367,30 +326,11 @@ const AboutUsPage = () => {
 
                 >
 
-                  Chân dung việc - Đi đúng hướng
-
+                  {t('features.careerTitle')}
                 </Typography>
 
                 <Typography textAlign="justify" color="text.secondary">
-
-                  Khám phá công việc phù hợp với định hướng nghề nghiệp của bạn.
-
-                </Typography>
-
-                <Typography textAlign="justify" color="text.secondary">
-
-                  Chúng tôi cung cấp thông tin chi tiết về yêu cầu công việc,
-
-                  môi trường làm việc và cơ hội phát triển tại mỗi công ty.
-
-                </Typography>
-
-                <Typography textAlign="justify" color="text.secondary">
-
-                  Đánh giá chân thực từ nhân viên sẽ giúp bạn có cái nhìn thực
-
-                  tế nhất trước khi đưa ra quyết định quan trọng cho sự nghiệp.
-
+                  {t('features.careerDesc')}
                 </Typography>
 
               </Stack>
@@ -439,32 +379,19 @@ const AboutUsPage = () => {
 
                 >
 
-                  Tạo CV & Profile
-
+                  {t('cvProfileDetail.title')}
                 </Typography>
 
                 <Typography textAlign="justify" color="text.secondary">
-
-                  Xây dựng hồ sơ ứng tuyển chuyên nghiệp với công cụ tạo CV
-
-                  thông minh.
-
+                  {t('cvProfileDetail.desc1')}
                 </Typography>
 
                 <Typography textAlign="justify" color="text.secondary">
-
-                  Tối ưu hóa profile của bạn với các mẫu CV đẹp mắt, phù hợp với
-
-                  từng ngành nghề.
-
+                  {t('cvProfileDetail.desc2')}
                 </Typography>
 
                 <Typography textAlign="justify" color="text.secondary">
-
-                  Dễ dàng cập nhật và điều chỉnh CV theo yêu cầu của nhà tuyển
-
-                  dụng, tăng cơ hội được chú ý và lựa chọn cho vị trí mong muốn.
-
+                  {t('cvProfileDetail.desc3')}
                 </Typography>
 
               </Stack>
@@ -533,32 +460,19 @@ const AboutUsPage = () => {
 
                 >
 
-                  Việc làm xung quanh bạn
-
+                  {t('aroundJobDetail.title')}
                 </Typography>
 
                 <Typography textAlign="justify" color="text.secondary">
-
-                  Tìm kiếm cơ hội việc làm lý tưởng trong khu vực của bạn.
-
+                  {t('aroundJobDetail.desc1')}
                 </Typography>
 
                 <Typography textAlign="justify" color="text.secondary">
-
-                  Với tính năng định vị thông minh, chúng tôi gợi ý những công
-
-                  việc phù hợp gần nơi bạn sinh sống.
-
+                  {t('aroundJobDetail.desc2')}
                 </Typography>
 
                 <Typography textAlign="justify" color="text.secondary">
-
-                  Tiết kiệm thời gian di chuyển và tận hưởng sự cân bằng giữa
-
-                  công việc và cuộc sống với các cơ hội việc làm trong bán kính
-
-                  mong muốn.
-
+                  {t('aroundJobDetail.desc3')}
                 </Typography>
 
               </Stack>
@@ -607,34 +521,19 @@ const AboutUsPage = () => {
 
                 >
 
-                  Thông báo việc làm mọi lúc
-
+                  {t('notificationDetail.title')}
                 </Typography>
 
                 <Typography textAlign="justify" color="text.secondary">
-
-                  Không bỏ lỡ bất kỳ cơ hội nào với hệ thống thông báo thông
-
-                  minh.
-
+                  {t('notificationDetail.desc1')}
                 </Typography>
 
                 <Typography textAlign="justify" color="text.secondary">
-
-                  Nhận thông tin tức thì về các vị trí việc làm mới phù hợp với
-
-                  kỹ năng và mong muốn của bạn.
-
+                  {t('notificationDetail.desc2')}
                 </Typography>
 
                 <Typography textAlign="justify" color="text.secondary">
-
-                  Tùy chỉnh các tiêu chí thông báo như mức lương, địa điểm,
-
-                  ngành nghề để đảm bảo bạn luôn cập nhật những cơ hội tốt nhất
-
-                  trên thị trường.
-
+                  {t('notificationDetail.desc3')}
                 </Typography>
 
               </Stack>

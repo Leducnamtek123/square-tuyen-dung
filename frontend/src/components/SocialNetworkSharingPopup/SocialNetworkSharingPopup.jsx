@@ -391,11 +391,8 @@ const SocialNetworkSharingPopup = (props) => {
 };
 
 SocialNetworkSharingPopup.propTypes = {
-
-  setOpen: PropTypes.func.isRequired,
-
+  setOpenPopup: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
-
 };
 
 export default SocialNetworkSharingPopup;

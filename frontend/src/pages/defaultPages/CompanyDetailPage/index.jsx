@@ -3,7 +3,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 
 import { useSelector } from "react-redux";
-
+import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 
 import { Box, Card, IconButton, Link, Stack, Typography, Button, Skeleton } from "@mui/material";
@@ -67,7 +67,7 @@ import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
 import CompanyDetailLoading from "./components/CompanyDetailLoading";
 
 const CompanyDetailPage = () => {
-
+  const { t } = useTranslation("public");
   const { slug } = useParams();
 
   const { allConfig } = useSelector((state) => state.config);
@@ -157,9 +157,7 @@ const CompanyDetailPage = () => {
         });
 
         toastMessages.success(
-
-          isFollowed ? "Followed successfully." : "Unfollowed successfully."
-
+          isFollowed ? t("companyDetail.followedSuccessfully") : t("companyDetail.unfollowedSuccessfully")
         );
 
       } catch (error) {
@@ -385,21 +383,13 @@ const CompanyDetailPage = () => {
                       ] || (
 
                         <span
-
                           style={{
-
                             color: "#e0e0e0",
-
                             fontStyle: "italic",
-
                             fontSize: 13,
-
                           }}
-
                         >
-
-                          Chưa cập nhật
-
+                          {t("companyDetail.notUpdated")}
                         </span>
 
                       )}
@@ -410,7 +400,7 @@ const CompanyDetailPage = () => {
 
                       <FontAwesomeIcon icon={faCalendarDays} />
 
-                      {dayjs(companyDetail?.since).format("DD/MM/YYYY")}
+                      {t("companyDetail.since", { year: dayjs(companyDetail?.since).format("YYYY") })}
 
                     </Typography>
 
@@ -420,7 +410,7 @@ const CompanyDetailPage = () => {
 
                 <Box sx={{ pt: 1 }}>
 
-                    <QRCodeBox value={window.location.href || "-"} size={80} label="Chia se bang QR" />
+                    <QRCodeBox value={window.location.href || "-"} size={80} label={t("companyDetail.shareWithQr")} />
 
                 </Box>
 
@@ -475,11 +465,8 @@ const CompanyDetailPage = () => {
                         <span>
 
                           {companyDetail.isFollowed
-
-                            ? "Đang theo dõi"
-
-                            : "Theo dõi"}{" "}
-
+                            ? t("companyDetail.followed")
+                            : t("companyDetail.follow")}{" "}
                           ({companyDetail.followNumber})
 
                         </span>
@@ -510,7 +497,7 @@ const CompanyDetailPage = () => {
 
                   >
 
-                    Chia sẻ
+                    {t("companyDetail.share")}
 
                   </Button>
 
@@ -570,7 +557,7 @@ const CompanyDetailPage = () => {
 
                       >
 
-                        Về công ty
+                        {t("companyDetail.about")}
 
                       </Typography>
 
@@ -662,7 +649,7 @@ const CompanyDetailPage = () => {
 
                       >
 
-                        Việc làm đang tuyển
+                        {t("companyDetail.hiring")}
 
                       </Typography>
 
@@ -724,7 +711,7 @@ const CompanyDetailPage = () => {
 
                       >
 
-                        Website
+                        {t("companyDetail.website")}
 
                       </Typography>
 
@@ -781,25 +768,7 @@ const CompanyDetailPage = () => {
                           </Link>
 
                         ) : (
-
-                          <span
-
-                            style={{
-
-                              color: "#e0e0e0",
-
-                              fontStyle: "italic",
-
-                              fontSize: 13,
-
-                            }}
-
-                          >
-
-                            Chưa cập nhật
-
-                          </span>
-
+                            t("companyDetail.notUpdated")
                         )}
 
                       </Typography>

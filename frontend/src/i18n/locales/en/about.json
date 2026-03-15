@@ -1,0 +1,34 @@
+{
+  "tabTitle": "About Us - {{appName}} Job Recruitment System",
+  "heading": "About Us",
+  "description": "{{appName}} - A recruitment and job information channel for every Business and candidate. We believe in bringing \"HOPE\" to Businesses seeking talent and to candidates seeking career opportunities. With 2 systems: Website for Employers and Application for Job Seekers, {{appName}} will bring fresh and exciting experiences; connecting the dream of conquering work for every talent and helping businesses build a strong human resources team.",
+  "features": {
+    "careerTitle": "Job Portraits - Go the Right Way",
+    "careerDesc": "Discover the right job for your career direction. Detailed information on job requirements, environment, and development opportunities at each company.",
+    "cvTitle": "Create CV & Profile",
+    "cvDesc": "Build a professional application profile with a smart CV creation tool. Optimize your profile with beautiful CV templates for each industry.",
+    "locationTitle": "Jobs Around You",
+    "locationDesc": "Find ideal job opportunities in your area. With smart positioning features, it suggests suitable jobs near where you live.",
+    "notificationTitle": "Job Notifications Anytime",
+    "notificationDesc": "Don't miss opportunities with a smart notification system. Receive instant information about new job positions that match your skills."
+  },
+  "mobileAppHeading": "{{appName}} Mobile App",
+  "cvProfileDetail": {
+    "title": "Create CV & Profile",
+    "desc1": "Build a professional application profile with a smart CV creation tool.",
+    "desc2": "Optimize your profile with beautiful CV templates, suitable for each industry.",
+    "desc3": "Easily update and adjust your CV according to employer requirements, increasing the chances of being noticed and selected for the desired position."
+  },
+  "aroundJobDetail": {
+    "title": "Jobs Around You",
+    "desc1": "Find ideal job opportunities in your area.",
+    "desc2": "With smart positioning features, we suggest suitable jobs near where you live.",
+    "desc3": "Save travel time and enjoy a work-life balance with job opportunities within your desired radius."
+  },
+  "notificationDetail": {
+    "title": "Job Notifications Anytime",
+    "desc1": "Don't miss any chance with a smart notification system.",
+    "desc2": "Receive instant information about new job positions that match your skills and wishes.",
+    "desc3": "Customize notification criteria such as salary, location, industry to ensure you always update the best opportunities on the market."
+  }
+}

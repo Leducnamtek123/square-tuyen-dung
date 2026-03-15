@@ -12,6 +12,7 @@ import en_errors from './locales/en/errors.json';
 import en_chat from './locales/en/chat.json';
 import en_candidate from './locales/en/candidate.json';
 import en_interview from './locales/en/interview.json';
+import en_about from './locales/en/about.json';
 
 // Vietnamese
 import vi_common from './locales/vi/common.json';
@@ -24,6 +25,7 @@ import vi_errors from './locales/vi/errors.json';
 import vi_chat from './locales/vi/chat.json';
 import vi_candidate from './locales/vi/candidate.json';
 import vi_interview from './locales/vi/interview.json';
+import vi_about from './locales/vi/about.json';
 
 const resources = {
   en: {
@@ -37,6 +39,7 @@ const resources = {
     chat: en_chat,
     candidate: en_candidate,
     interview: en_interview,
+    about: en_about,
   },
   vi: {
         common: vi_common,
@@ -49,6 +52,7 @@ const resources = {
     chat: vi_chat,
     candidate: vi_candidate,
     interview: vi_interview,
+    about: vi_about,
   }
 };
 
@@ -56,7 +60,7 @@ i18n.use(initReactI18next).init({
   resources,
   lng: 'vi', // default language
   fallbackLng: 'en',
-  ns: ["common", "admin", "employer", "jobSeeker", "auth", "public", "errors", "chat", "candidate", "interview"],
+  ns: ["common", "admin", "employer", "jobSeeker", "auth", "public", "errors", "chat", "candidate", "interview", "about"],
   defaultNS: 'common',
   interpolation: {
     escapeValue: false, // react already safes from xss

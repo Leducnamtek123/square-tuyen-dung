@@ -29,6 +29,8 @@ from common import serializers as common_serializers
 
 from info import serializers as info_serializers
 
+from authentication import serializers as auth_serializers
+
 class JobPostSerializer(serializers.ModelSerializer):
 
     jobName = serializers.CharField(source="job_name", required=True, max_length=255)
@@ -455,6 +457,36 @@ class EmployerJobPostActivitySerializer(serializers.ModelSerializer):
 
     aiAnalysisStatus = serializers.CharField(source='ai_analysis_status', read_only=True)
 
+    userDict = serializers.SerializerMethodField(method_name="get_user_dict", read_only=True)
+
+    def get_user_dict(self, activity):
+        user = activity.user
+        return {
+            "id": user.id,
+            "fullName": user.full_name,
+            "email": user.email,
+            "avatar": user.avatar.get_full_url() if hasattr(user, 'avatar') and user.avatar else var_sys.AVATAR_DEFAULT["AVATAR"],
+            "phone": activity.phone,
+        }
+
+    jobPostDict = serializers.SerializerMethodField(method_name="get_job_post_dict", read_only=True)
+    companyDict = serializers.SerializerMethodField(method_name="get_company_dict", read_only=True)
+
+    def get_job_post_dict(self, activity):
+        return {
+            "id": activity.job_post.id,
+            "jobName": activity.job_post.job_name,
+            "slug": activity.job_post.slug,
+        }
+
+    def get_company_dict(self, activity):
+        company = activity.job_post.company
+        return {
+            "id": company.id,
+            "companyName": company.company_name,
+            "slug": company.slug,
+        }
+
     def __init__(self, *args, **kwargs):
 
         fields = kwargs.pop('fields', None)
@@ -479,7 +511,8 @@ class EmployerJobPostActivitySerializer(serializers.ModelSerializer):
 
                   "resumeSlug", "jobName", "status", "createAt", "isSentEmail",
 
-                  "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus")
+                  "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus",
+                  "userDict", "jobPostDict", "companyDict")
 
 class EmployerJobPostActivityExportSerializer(serializers.ModelSerializer):
 
@@ -559,6 +592,9 @@ class JobPostNotificationSerializer(serializers.ModelSerializer):
 
     isActive = serializers.BooleanField(source='is_active', required=False)
 
+    userDict = auth_serializers.UserSerializer(source='user', read_only=True,
+                                                fields=['id', 'fullName', 'email', 'avatarUrl'])
+
     def __init__(self, *args, **kwargs):
 
         fields = kwargs.pop('fields', None)
@@ -585,7 +621,7 @@ class JobPostNotificationSerializer(serializers.ModelSerializer):
 
                   "frequency", "isActive",
 
-                  "career", "city")
+                  "career", "city", "userDict")
 
     def create(self, validated_data):
 

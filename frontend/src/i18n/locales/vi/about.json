@@ -1,0 +1,34 @@
+{
+  "tabTitle": "Về chúng tôi - Hệ thống giới thiệu việc làm {{appName}}",
+  "heading": "Về chúng tôi",
+  "description": "{{appName}} - Kênh thông tin tuyển dụng và việc làm dành cho mọi Doanh nghiệp và ứng viên. Chúng tôi tin tưởng sẽ đem lại \"HY VỌNG\" cho Doanh nghiệp tìm kiếm nhân tài và cho ứng viên tìm kiếm cơ hội nghề nghiệp. Với 2 hệ thống: Website dành cho Nhà Tuyển Dụng và ứng dụng (Application) dành cho Người Tìm Việc, {{appName}} sẽ mang lại những trải nghiệm mới mẻ, thú vị; kết nối ước mơ chinh phục công việc của mọi nhân tài và giúp doanh nghiệp xây dựng đội ngũ nhân sự vững mạnh.",
+  "features": {
+    "careerTitle": "Chân dung việc - Đi đúng hướng",
+    "careerDesc": "Khám phá công việc phù hợp với định hướng nghề nghiệp. Thông tin chi tiết về yêu cầu công việc, môi trường và cơ hội phát triển tại mỗi công ty.",
+    "cvTitle": "Tạo CV & Profile",
+    "cvDesc": "Xây dựng hồ sơ ứng tuyển chuyên nghiệp với công cụ tạo CV thông minh. Tối ưu profile với các mẫu CV đẹp mắt theo từng ngành nghề.",
+    "locationTitle": "Việc làm xung quanh bạn",
+    "locationDesc": "Tìm kiếm cơ hội việc làm lý tưởng trong khu vực. Với tính năng định vị thông minh, gợi ý công việc phù hợp gần nơi bạn sinh sống.",
+    "notificationTitle": "Thông báo việc làm mọi lúc",
+    "notificationDesc": "Không bỏ lỡ cơ hội với hệ thống thông báo thông minh. Nhận thông tin tức thì về các vị trí việc làm mới phù hợp với kỹ năng."
+  },
+  "mobileAppHeading": "Mobile App {{appName}}",
+  "cvProfileDetail": {
+    "title": "Tạo CV & Profile",
+    "desc1": "Xây dựng hồ sơ ứng tuyển chuyên nghiệp với công cụ tạo CV thông minh.",
+    "desc2": "Tối ưu hóa profile của bạn với các mẫu CV đẹp mắt, phù hợp với từng ngành nghề.",
+    "desc3": "Dễ dàng cập nhật và điều chỉnh CV theo yêu cầu của nhà tuyển dụng, tăng cơ hội được chú ý và lựa chọn cho vị trí mong muốn."
+  },
+  "aroundJobDetail": {
+    "title": "Việc làm xung quanh bạn",
+    "desc1": "Tìm kiếm cơ hội việc làm lý tưởng trong khu vực của bạn.",
+    "desc2": "Với tính năng định vị thông minh, chúng tôi gợi ý những công việc phù hợp gần nơi bạn sinh sống.",
+    "desc3": "Tiết kiệm thời gian di chuyển và tận hưởng sự cân bằng giữa công việc và cuộc sống với các cơ hội việc làm trong bán kính mong muốn."
+  },
+  "notificationDetail": {
+    "title": "Thông báo việc làm mọi lúc",
+    "desc1": "Không bỏ lỡ bất kỳ cơ hội nào với hệ thống thông báo thông minh.",
+    "desc2": "Nhận thông tin tức thì về các vị trí việc làm mới phù hợp với kỹ năng và mong muốn của bạn.",
+    "desc3": "Tùy chỉnh các tiêu chí thông báo như mức lương, địa điểm, ngành nghề để đảm bảo bạn luôn cập nhật những cơ hội tốt nhất trên thị trường."
+  }
+}

@@ -9,7 +9,7 @@ import LanguageSwitcher from '../../../layouts/components/commons/LanguageSwitch
 const CandidateLoginPage = () => {
     const [sessionId, setSessionId] = useState('');
     const navigate = useNavigate();
-    const { t } = useTranslation(['auth', 'common']);
+    const { t } = useTranslation(['candidate', 'common']);
 
     const handleJoin = () => {
         if (sessionId.trim()) {
@@ -27,15 +27,15 @@ const CandidateLoginPage = () => {
                 <Box sx={{ mt: 10, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <Paper sx={{ p: 4, width: '100%', textAlign: 'center' }}>
                         <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold' }}>
-                            {t('candidateLoginTitle')}
+                            {t('login.title')}
                         </Typography>
                         <Typography variant="body1" sx={{ mb: 4, color: 'text.secondary' }}>
-                            {t('candidateLoginBody')}
+                            {t('login.body')}
                         </Typography>
     
                         <TextField
                             fullWidth
-                            label={t('candidateLoginLabel')}
+                            label={t('login.label')}
                             variant="outlined"
                             value={sessionId}
                             onChange={(e) => setSessionId(e.target.value)}

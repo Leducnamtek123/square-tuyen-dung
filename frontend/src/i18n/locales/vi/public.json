@@ -77,5 +77,41 @@
       "2": "Kết hợp",
       "3": "Từ xa"
     }
+  },
+  "jobByCategory": {
+    "jobsByCareer": "Việc làm theo ngành nghề",
+    "jobsByCity": "Việc làm theo tỉnh thành",
+    "jobsByJobType": "Việc làm theo hình thức",
+    "viewAllCareers": "Xem tất cả ngành nghề",
+    "viewAllCities": "Xem tất cả tỉnh thành",
+    "viewAllJobTypes": "Xem tất cả hình thức"
+  },
+  "companySearch": {
+    "tabTitle": "Kết quả tìm kiếm nhà tuyển dụng",
+    "exploreHeading": "Khám Phá Văn Hóa Công ty",
+    "exploreSubtitle": "Tìm hiểu văn hóa công ty và chọn cho bạn nơi làm việc phù hợp nhất",
+    "searchPlaceholder": "Nhập tên công ty hoặc lĩnh vực cần tìm kiếm",
+    "allCities": "Tất cả tỉnh thành",
+    "searchButton": "Tìm kiếm"
+  },
+  "jobsByCategoryPage": {
+    "careerTitle": "Việc làm theo ngành nghề",
+    "cityTitle": "Việc làm theo tỉnh thành",
+    "jobTypeTitle": "Việc làm theo hình thức làm việc"
+  },
+  "companyDetail": {
+    "since": "Thành lập năm {{year}}",
+    "employeeSize": "{{size}} nhân viên",
+    "notUpdated": "Chưa cập nhật",
+    "follow": "Theo dõi",
+    "followed": "Đang theo dõi",
+    "share": "Chia sẻ",
+    "shareWithQr": "Chia sẻ bằng QR",
+    "about": "Về công ty",
+    "hiring": "Việc làm đang tuyển",
+    "contact": "Thông tin liên hệ",
+    "address": "Địa chỉ",
+    "website": "Website",
+    "taxCode": "Mã số thuế"
   }
 }

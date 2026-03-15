@@ -77,5 +77,41 @@
       "2": "Hybrid",
       "3": "Remote"
     }
+  },
+  "jobByCategory": {
+    "jobsByCareer": "Jobs by Career",
+    "jobsByCity": "Jobs by City",
+    "jobsByJobType": "Jobs by Job Type",
+    "viewAllCareers": "View all careers",
+    "viewAllCities": "View all cities",
+    "viewAllJobTypes": "View all job types"
+  },
+  "companySearch": {
+    "tabTitle": "Employer Search Results",
+    "exploreHeading": "Explore Company Culture",
+    "exploreSubtitle": "Learn about company culture and choose the workplace that suits you best",
+    "searchPlaceholder": "Enter company name or field to search",
+    "allCities": "All cities",
+    "searchButton": "Search"
+  },
+  "jobsByCategoryPage": {
+    "careerTitle": "Jobs by Career",
+    "cityTitle": "Jobs by City",
+    "jobTypeTitle": "Jobs by Job Type"
+  },
+  "companyDetail": {
+    "since": "Since {{year}}",
+    "employeeSize": "{{size}} employees",
+    "notUpdated": "Not updated",
+    "follow": "Follow",
+    "followed": "Following",
+    "share": "Share",
+    "shareWithQr": "Share via QR",
+    "about": "About company",
+    "hiring": "We are hiring",
+    "contact": "Contact info",
+    "address": "Address",
+    "website": "Website",
+    "taxCode": "Tax Code"
   }
 }

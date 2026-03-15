@@ -4,13 +4,14 @@ import { useSelector } from 'react-redux';
 
 import { Container, Divider, Typography } from "@mui/material";
 
+import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
-
 import CategoryCard from '../../components/defaults/CategoryCard';
 
 const JobsByJobTypePage = () => {
+  const { t } = useTranslation('public');
 
-  TabTitle("Việc làm theo hình thức làm việc")
+  TabTitle(t("jobsByCategoryPage.jobTypeTitle"))
 
   const { allConfig } = useSelector((state) => state.config);
 
@@ -18,7 +19,7 @@ const JobsByJobTypePage = () => {
 
     <Container maxWidth="lg" sx={{ py: 2 }}>
 
-      <Typography variant="h4">Việc làm theo Hình thức là việc</Typography>
+      <Typography variant="h4">{t("jobsByCategoryPage.jobTypeTitle")}</Typography>
 
       <Divider sx={{ mt: 1, mb: 4 }} />
 

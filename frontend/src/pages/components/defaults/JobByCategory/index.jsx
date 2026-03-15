@@ -13,7 +13,7 @@ import Grid from "@mui/material/Grid2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
-
+import { useTranslation } from "react-i18next";
 import { searchJobPost } from "../../../../redux/filterSlice";
 
 import { ROUTES } from "../../../../configs/constants";
@@ -21,7 +21,7 @@ import { ROUTES } from "../../../../configs/constants";
 const maxItem = 6;
 
 const JobByCategory = () => {
-
+  const { t } = useTranslation('public');
   const { allConfig } = useSelector((state) => state.config);
 
   const dispatch = useDispatch();
@@ -120,8 +120,7 @@ const JobByCategory = () => {
 
           >
 
-            Jobs by Career
-
+            {t('jobByCategory.jobsByCareer')}
           </Typography>
 
           <Stack spacing={1.5}>
@@ -204,8 +203,7 @@ const JobByCategory = () => {
 
               >
 
-                View all careers <FontAwesomeIcon icon={faChevronRight} />
-
+                {t('jobByCategory.viewAllCareers')} <FontAwesomeIcon icon={faChevronRight} />
               </Typography>
 
             )}
@@ -264,8 +262,7 @@ const JobByCategory = () => {
 
           >
 
-            Jobs by City
-
+            {t('jobByCategory.jobsByCity')}
           </Typography>
 
           <Stack spacing={1.5}>
@@ -348,8 +345,7 @@ const JobByCategory = () => {
 
               >
 
-                View all cities <FontAwesomeIcon icon={faChevronRight} />
-
+                {t('jobByCategory.viewAllCities')} <FontAwesomeIcon icon={faChevronRight} />
               </Typography>
 
             )}
@@ -408,8 +404,7 @@ const JobByCategory = () => {
 
           >
 
-            Jobs by Job Type
-
+            {t('jobByCategory.jobsByJobType')}
           </Typography>
 
           <Stack spacing={1.5}>
@@ -492,10 +487,8 @@ const JobByCategory = () => {
 
               >
 
-                View all job types{" "}
-
+                {t('jobByCategory.viewAllJobTypes')}{" "}
                 <FontAwesomeIcon icon={faChevronRight} />
-
               </Typography>
 
             )}

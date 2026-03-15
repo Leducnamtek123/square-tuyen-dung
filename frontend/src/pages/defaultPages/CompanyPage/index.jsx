@@ -2,15 +2,15 @@ import React from 'react';
 
 import { Box, Card, Typography, Container } from "@mui/material";
 
+import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
-
 import CompanySearch from '../../components/defaults/CompanySearch';
-
 import Companies from '../../../components/Companies';
 
 const CompanyPage = () => {
+  const { t } = useTranslation('public');
 
-  TabTitle('Kết quả tìm kiếm nhà tuyển dụng')
+  TabTitle(t('companySearch.tabTitle'))
 
   return (
 
@@ -47,33 +47,20 @@ const CompanyPage = () => {
             color: 'transparent',
 
             mb: 1
-
           }}
-
         >
-
-          Khám Phá Văn Hóa Công ty
-
+          {t('companySearch.exploreHeading')}
         </Typography>
 
         <Typography 
-
           variant="h6" 
-
           sx={{ 
-
             color: 'text.secondary',
-
             maxWidth: '800px',
-
             mb: 4
-
           }}
-
         >
-
-          Tìm hiểu văn hóa công ty và chọn cho bạn nơi làm việc phù hợp nhất
-
+          {t('companySearch.exploreSubtitle')}
         </Typography>
 
         <Box sx={{ mt: 2, mb: 6 }}>

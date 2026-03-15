@@ -3,7 +3,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { useForm } from 'react-hook-form';
-
+import { useTranslation } from 'react-i18next';
 import { Card, Button, Stack, IconButton, Box } from "@mui/material";
 
 import Grid from "@mui/material/Grid2";
@@ -23,7 +23,7 @@ import {
 } from '../../../../redux/filterSlice';
 
 const CompanySearch = () => {
-
+  const { t } = useTranslation('public');
   const dispatch = useDispatch();
 
   const { allConfig } = useSelector((state) => state.config);
@@ -98,7 +98,7 @@ const CompanySearch = () => {
 
               name="kw"
 
-              placeholder="Nhập tên công ty hoặc lĩnh vực cần tìm kiếm"
+              placeholder={t('companySearch.searchPlaceholder')}
 
               control={control}
 
@@ -126,7 +126,7 @@ const CompanySearch = () => {
 
               name="cityId"
 
-              placeholder="Tất cả tỉnh thành"
+              placeholder={t('companySearch.allCities')}
 
               control={control}
 
@@ -166,7 +166,7 @@ const CompanySearch = () => {
 
               >
 
-                Tìm kiếm
+                {t('companySearch.searchButton')}
 
               </Button>
 
