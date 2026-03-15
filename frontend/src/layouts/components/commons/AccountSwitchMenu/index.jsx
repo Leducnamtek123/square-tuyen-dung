@@ -27,7 +27,7 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
   const isEmployerPortal =
     pathname.startsWith("/employer") ||
     pathname.startsWith("/employee") ||
-    hostName === HOST_NAME.EMPLOYER_MYJOB;
+    hostName.startsWith("employer.");
 
   const openPortal = (toEmployer = false, path = "") => {
     const isSpecial = hostName === 'localhost' || hostName === '127.0.0.1' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostName);
@@ -35,18 +35,19 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
     
     let targetUrl = "";
     if (isSpecial) {
-      // Local/IP: Dùng path-based (Sửa thành /employee cho đúng router)
+      // Local/IP: Dùng path-based
       const baseUrl = toEmployer ? `${window.location.origin}/employee` : window.location.origin;
       targetUrl = `${baseUrl}${normalizedPath}`;
     } else {
-      // Production: Dùng Subdomain
+      // Production
       const targetHost = toEmployer ? HOST_NAME.EMPLOYER_MYJOB : HOST_NAME.MYJOB;
       const protocol = window.location.protocol;
       const port = window.location.port ? `:${window.location.port}` : "";
       targetUrl = `${protocol}//${targetHost}${port}${normalizedPath}`;
     }
     
-    window.open(targetUrl, "_blank");
+    // Chuyển hướng ngay trên trang hiện tại để có trải nghiệm mượt mà
+    window.location.href = targetUrl;
   };
 
   const handleClick = () => {

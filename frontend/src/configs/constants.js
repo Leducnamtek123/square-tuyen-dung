@@ -95,7 +95,7 @@ const APP_NAME = "Square";
 const getBaseHostname = () => {
   if (typeof window === 'undefined') return 'localhost';
   const hn = window.location.hostname;
-  return hn.replace(/^(admin\.|employer\.)/, '');
+  return hn.replace(/^(admin\.|employer\.|www\.)/, '');
 };
 
 const BASE_HOSTNAME = getBaseHostname();
