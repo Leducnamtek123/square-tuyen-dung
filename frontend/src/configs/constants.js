@@ -92,13 +92,21 @@ const PLATFORM = "WEB";
 
 const APP_NAME = "Square";
 
+const getBaseHostname = () => {
+  if (typeof window === 'undefined') return 'localhost';
+  const hn = window.location.hostname;
+  return hn.replace(/^(admin\.|employer\.)/, '');
+};
+
+const BASE_HOSTNAME = getBaseHostname();
+
 const HOST_NAME = {
 
-  MYJOB: import.meta.env.VITE_MYJOB_HOST_NAME || 'localhost',
+  MYJOB: import.meta.env.VITE_MYJOB_HOST_NAME || BASE_HOSTNAME,
 
-  EMPLOYER_MYJOB: import.meta.env.VITE_EMPLOYER_MYJOB_HOST_NAME || 'employer.localhost',
+  EMPLOYER_MYJOB: import.meta.env.VITE_EMPLOYER_MYJOB_HOST_NAME || `employer.${BASE_HOSTNAME}`,
 
-  ADMIN_MYJOB: import.meta.env.VITE_ADMIN_MYJOB_HOST_NAME || 'admin.localhost',
+  ADMIN_MYJOB: import.meta.env.VITE_ADMIN_MYJOB_HOST_NAME || `admin.${BASE_HOSTNAME}`,
 
 };
 
