@@ -47,6 +47,16 @@ const queryClient = new QueryClient({
 
 });
 
+const getRouterBaseName = () => {
+  const pathname = window.location.pathname || "/";
+  if (pathname.startsWith("/admin")) return "/admin";
+  if (pathname.startsWith("/employer")) return "/employer";
+  if (pathname.startsWith("/employee")) return "/employee";
+  return "/";
+};
+
+const routerBaseName = getRouterBaseName();
+
 ReactDOM.createRoot(document.getElementById('root')).render(
 
   <Provider store={store}>
@@ -54,6 +64,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <QueryClientProvider client={queryClient}>
 
       <BrowserRouter
+        basename={routerBaseName}
 
         future={{
 
