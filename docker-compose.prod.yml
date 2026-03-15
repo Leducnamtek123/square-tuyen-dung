@@ -4,8 +4,7 @@ services:
     build:
       context: ./nginx-gateway
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"
     depends_on:
       - frontend
       - backend
