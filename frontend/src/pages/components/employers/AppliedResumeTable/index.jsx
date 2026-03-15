@@ -32,7 +32,7 @@ import { faFile, faFilePdf } from '@fortawesome/free-regular-svg-icons';
 
 import NoDataCard from '../../../../components/NoDataCard';
 
-import { convertEditorStateToHTMLString } from '../../../../utils/customData';
+import { convertEditorStateToHTMLString } from '../../../../utils/editorUtils';
 
 import SendMailCard from '../SendMailCard';
 

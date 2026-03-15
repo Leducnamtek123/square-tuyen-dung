@@ -9,12 +9,9 @@ import AddIcon from '@mui/icons-material/Add';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 
 import {
-
   convertEditorStateToHTMLString,
-
   createEditorStateFromHTMLString,
-
-} from '../../../../utils/customData';
+} from '../../../../utils/editorUtils';
 
 import toastMessages from '../../../../utils/toastMessages';
 

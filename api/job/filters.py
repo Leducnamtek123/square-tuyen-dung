@@ -29,6 +29,10 @@ class JobPostFilter(django_filters.FilterSet):
 
     cityId = django_filters.NumberFilter(field_name='location__city')
 
+    districtId = django_filters.NumberFilter(field_name='location__district')
+
+    wardId = django_filters.NumberFilter(field_name='location__ward')
+
     positionId = django_filters.ChoiceFilter(choices=var_sys.POSITION_CHOICES, field_name='position')
 
     experienceId = django_filters.ChoiceFilter(choices=var_sys.EXPERIENCE_CHOICES, field_name='experience')
@@ -53,7 +57,7 @@ class JobPostFilter(django_filters.FilterSet):
 
         model = JobPost
 
-        fields = ['kw', 'careerId', 'cityId', 'positionId',
+        fields = ['kw', 'careerId', 'cityId', 'districtId', 'wardId', 'positionId',
 
                   'experienceId', 'typeOfWorkplaceId', 'jobTypeId',
 

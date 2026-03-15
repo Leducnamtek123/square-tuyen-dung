@@ -207,33 +207,33 @@
       "noLanguageData": "Vui lòng thêm ngoại ngữ để nhà tuyển dụng tham khảo",
       "noResumeData": "Chưa có CV nào được tải lên",
       "notFound": "Không tìm thấy thông tin hồ sơ",
-      "profileCompletionWarning": "Vui l?ng b? sung ??y ?? th?ng tin ?? ho?n thi?n h? s? c?a b?n."
+      "profileCompletionWarning": "Vui lòng bổ sung đầy đủ thông tin để hoàn thiện hồ sơ của bạn."
     },
     "aria": {
-      "advancedSkillsTable": "B?ng k? n?ng n?ng cao",
-      "languageSkillsTable": "B?ng k? n?ng ngo?i ng?"
+      "advancedSkillsTable": "Bảng kỹ năng nâng cao",
+      "languageSkillsTable": "Bảng kỹ năng ngoại ngữ"
     },
     "summary": {
-      "experience": "Kinh nghi?m",
-      "position": "V? tr?",
-      "desiredSalary": "M?c l??ng mong mu?n",
-      "lastUpdated": "C?p nh?t l?n cu?i"
+      "experience": "Kinh nghiệm",
+      "position": "Vị trí",
+      "desiredSalary": "Mức lương mong muốn",
+      "lastUpdated": "Cập nhật lần cuối"
     },
     "actions": {
-      "editProfile": "Ch?nh s?a h? s?",
-      "uploadCv": "T?i l?n CV",
-      "updateCv": "C?p nh?t CV",
-      "generatingPdf": "?ang t?o PDF..."
+      "editProfile": "Chỉnh sửa hồ sơ",
+      "uploadCv": "Tải lên CV",
+      "updateCv": "Cập nhật CV",
+      "generatingPdf": "Đang tạo PDF..."
     },
     "cv": {
-      "loading": "?ang t?i CV...",
-      "emptyTitle": "Ch?a c? CV n?o ???c t?i l?n",
-      "emptySubtitle": "Nh?n n?t t?i l?n ?? th?m CV c?a b?n",
-      "loadingPreview": "?ang t?i b?n xem tr??c...",
-      "updateTitle": "C?p nh?t CV"
+      "loading": "Đang tải CV...",
+      "emptyTitle": "Chưa có CV nào được tải lên",
+      "emptySubtitle": "Nhấn nút tải lên để thêm CV của bạn",
+      "loadingPreview": "Đang tải bản xem trước...",
+      "updateTitle": "Cập nhật CV"
     },
     "tooltips": {
-      "searchable": "B?t \"C? th? t?m ki?m\" s? gi?p nh? tuy?n d?ng t?m th?y h? s? v? li?n h? v?i b?n v? c?c c? h?i m?i. Ch? m?t h? s? c? th? ???c t?m ki?m t?i m?t th?i ?i?m."
+      "searchable": "Bật \"Có thể tìm kiếm\" sẽ giúp nhà tuyển dụng tìm thấy hồ sơ và liên hệ với bạn về các cơ hội mới. Chỉ một hồ sơ có thể được tìm kiếm tại một thời điểm."
     }
   },
   "account": {
@@ -288,20 +288,20 @@
       "followed": "Công ty đang theo dõi"
     },
     "aria": {
-      "tabs": "C?c tab c?ng ty c?a t?i"
+      "tabs": "Các tab công ty của tôi"
     },
     "empty": {
-      "viewed": "Ch?a c? nh? tuy?n d?ng n?o xem h? s? c?a b?n",
-      "followed": "B?n ch?a theo d?i nh? tuy?n d?ng n?o"
+      "viewed": "Chưa có nhà tuyển dụng nào xem hồ sơ của bạn",
+      "followed": "Bạn chưa theo dõi nhà tuyển dụng nào"
     },
     "actions": {
-      "findCompanies": "T?m c?ng ty",
-      "unfollow": "B? theo d?i"
+      "findCompanies": "Tìm công ty",
+      "unfollow": "Bỏ theo dõi"
     },
     "messages": {
-      "unfollowSuccess": "?? b? theo d?i th?nh c?ng."
+      "unfollowSuccess": "Đã bỏ theo dõi thành công."
     },
-    "savedProfile": "?? l?u h? s? c?a b?n"
+    "savedProfile": "Đã lưu hồ sơ của bạn"
   },
   "myInterviews": {
     "defaultRoomName": "Phòng phỏng vấn",
@@ -313,7 +313,7 @@
     "onlineProfile": "Hồ sơ trực tuyến",
     "attachedResume": "CV đính kèm",
     "aria": {
-      "navigateToProfile": "?i ??n h? s? c?a t?i"
+      "navigateToProfile": "Đi đến hồ sơ của tôi"
     }
   },
   "jobManagement": {

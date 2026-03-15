@@ -31,6 +31,15 @@ class ForgotPasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError(ERROR_MESSAGES['INVALID_PLATFORM'])
         return platform
 
+class ResendVerifyEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True, max_length=100)
+    platform = serializers.CharField(required=False, max_length=3, default="WEB")
+
+    def validate_platform(self, platform):
+        if platform not in ["WEB", "APP"]:
+            raise serializers.ValidationError(ERROR_MESSAGES['INVALID_PLATFORM'])
+        return platform
+
 class UpdatePasswordSerializer(serializers.Serializer):
     oldPassword = serializers.CharField(required=True, max_length=128)
     newPassword = serializers.CharField(required=True, max_length=128)
@@ -242,25 +251,33 @@ class UserSerializer(serializers.ModelSerializer):
         profile = self._get_job_seeker_profile_safe(user)
         return profile.id if profile else None
 
-    def get_company(self, user):
-        if getattr(user, 'role_name', None) == var_sys.EMPLOYER:
-            company = getattr(user, 'company', None)
-            if company:
-                company_logo = getattr(company, 'logo', None)
-                company_logo_url = company_logo.get_full_url() if company_logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+    def _get_company_safe(self, user):
+        if getattr(user, 'role_name', None) != var_sys.EMPLOYER:
+            return None
+        try:
+            return user.company
+        except ObjectDoesNotExist:
+            return None
+        except Exception as ex:
+            helper.print_log_error("UserSerializer._get_company_safe", ex)
+            return None
 
-                return {
-                    "id": company.id,
-                    "slug": company.slug,
-                    "companyName": company.company_name,
-                    "imageUrl": company_logo_url
-                }
+    def get_company(self, user):
+        company = self._get_company_safe(user)
+        if company:
+            company_logo = getattr(company, 'logo', None)
+            company_logo_url = company_logo.get_full_url() if company_logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+
+            return {
+                "id": company.id,
+                "slug": company.slug,
+                "companyName": company.company_name,
+                "imageUrl": company_logo_url
+            }
         return None
 
     def get_company_id(self, user):
-        if getattr(user, 'role_name', None) != var_sys.EMPLOYER:
-            return None
-        company = getattr(user, 'company', None)
+        company = self._get_company_safe(user)
         return company.id if company else None
 
     def __init__(self, *args, **kwargs):
@@ -319,11 +336,14 @@ class AvatarSerializer(serializers.ModelSerializer):
                 if user.avatar:
                     path_list = user.avatar.public_id.split('/')
                     public_id = path_list[-1] if path_list else None
+                # Call upload service
                 avatar_upload_result = CloudinaryService.upload_image(
                     file,
                     settings.CLOUDINARY_DIRECTORY["avatar"],
                     public_id=public_id
                 )
+                if not avatar_upload_result:
+                    raise Exception("Lỗi khi tải ảnh lên máy chủ lưu trữ.")
                 user.avatar = File.update_or_create_file_with_cloudinary(
                     user.avatar,
                     avatar_upload_result,

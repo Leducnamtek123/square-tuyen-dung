@@ -32,7 +32,7 @@ from django.db.models.functions import TruncDate, ExtractYear, ExtractMonth
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 
 from rest_framework import viewsets, generics
 
@@ -107,7 +107,7 @@ from info.serializers import (
 )
 
 @api_view(http_method_names=['get'])
-
+@permission_classes([perms_sys.AllowAny])
 def job_suggest_title_search(request):
 
     try:
@@ -660,6 +660,13 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
 
         headers = self.get_success_headers(serializer.data)
 
+        if settings.AI_RESUME_AUTO_ANALYZE:
+            try:
+                from ..tasks import analyze_resume_ai
+                analyze_resume_ai.delay(job_post_activity.id)
+            except Exception as ex:
+                helper.print_log_error("auto analyze resume", ex)
+
         # send email here
 
         user = request.user
@@ -742,7 +749,9 @@ class EmployerJobPostActivityViewSet(viewsets.ViewSet,
 
             serializer = self.get_serializer(page, many=True, fields=[
 
-                "id", "userId", "fullName", "email", "title", "resumeSlug", "type", "jobName", "status", "createAt", "isSentEmail"
+                "id", "userId", "fullName", "email", "title", "resumeSlug", "type",
+                "jobName", "status", "createAt", "isSentEmail",
+                "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus"
 
             ])
 

@@ -14,4 +14,8 @@ web_router.register('evaluations', views.InterviewEvaluationViewSet, basename='i
 
 urlpatterns = [
     path('web/', include(web_router.urls)),
+    path(
+        'web/statistics/admin-general-statistics/',
+        views.InterviewStatisticViewSet.as_view({'get': 'general_statistics'}),
+    ),
 ]

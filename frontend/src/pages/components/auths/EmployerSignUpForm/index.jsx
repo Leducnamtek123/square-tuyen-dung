@@ -363,6 +363,10 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
   React.useEffect(() => {
 
     const loadLocation = async (input) => {
+      if (!input || input.trim().length < 3) {
+        setLocationOptions([]);
+        return;
+      }
 
       try {
 
@@ -379,14 +383,20 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
   }, [addressDebounce]);
 
   const handleSelectLocation = async (e, value) => {
+    if (!value || typeof value !== 'object' || !value.place_id) {
+      return;
+    }
 
     try {
 
       const resData = await goongService.getPlaceDetailByPlaceId(
 
         value.place_id
-
       );
+
+      if (!resData?.result?.geometry?.location) {
+        return;
+      }
 
       setValue(
 
@@ -1014,9 +1024,9 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
 
               control={control}
 
-              title={t('form.district')}
+              title={t('form.district', 'Ward/Commune')}
 
-              placeholder={t('form.districtPlaceholder')}
+              placeholder={t('form.districtPlaceholder', 'Select ward/commune')}
 
               showRequired={true}
 
@@ -1219,3 +1229,4 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
 };
 
 export default EmployerSignUpForm;
+

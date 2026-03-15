@@ -15,6 +15,7 @@ const InterviewDetailCard = () => {
     const { t, i18n } = useTranslation(['employer', 'interview', 'common']);
     const [session, setSession] = useState(null);
     const [loading, setLoading] = useState(true);
+    const recordingUrl = session?.recordingUrl || session?.recording_url || null;
 
     const fetchDetail = useCallback(async () => {
         try {
@@ -138,6 +139,44 @@ const InterviewDetailCard = () => {
                                 </Box>
                             </Box>
                         </Paper>
+
+                        {recordingUrl && (
+                            <Paper sx={{
+                                p: 3,
+                                borderRadius: 3,
+                                border: '1px solid',
+                                borderColor: 'divider',
+                                boxShadow: (theme) => theme.customShadows?.card || 1
+                            }}>
+                                <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 700 }}>
+                                    {t('interviewDetail.subtitle.recording')}
+                                </Typography>
+                                <Divider sx={{ my: 2 }} />
+                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                    <Box
+                                        component="video"
+                                        src={recordingUrl}
+                                        controls
+                                        preload="metadata"
+                                        sx={{
+                                            width: '100%',
+                                            borderRadius: 2,
+                                            backgroundColor: 'grey.900'
+                                        }}
+                                    />
+                                    <Button
+                                        variant="outlined"
+                                        component="a"
+                                        href={recordingUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        sx={{ borderRadius: 2 }}
+                                    >
+                                        {t('interviewDetail.actions.openRecording')}
+                                    </Button>
+                                </Box>
+                            </Paper>
+                        )}
 
                         <Paper sx={{
                             p: 3,

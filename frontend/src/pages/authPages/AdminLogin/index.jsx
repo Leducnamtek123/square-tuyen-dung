@@ -128,13 +128,13 @@ const AdminLogin = () => {
 
       } catch (error) {
 
-        const res = error.response;
+        const res = error?.response;
 
-        if (res.status === 400) {
+        if (res?.status === 400) {
 
-          const errors = res?.errors;
+          const errors = res?.data?.errors;
 
-          if ('errorMessage' in errors) {
+          if (errors && 'errorMessage' in errors) {
 
             setErrorMessage(errors.errorMessage.join(' '));
 

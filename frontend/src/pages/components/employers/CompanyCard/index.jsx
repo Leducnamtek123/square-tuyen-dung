@@ -7,12 +7,9 @@ import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import CameraAltOutlinedIcon from "@mui/icons-material/CameraAltOutlined";
 
 import {
-
   convertEditorStateToHTMLString,
-
   createEditorStateFromHTMLString,
-
-} from "../../../../utils/customData";
+} from "../../../../utils/editorUtils";
 
 import toastMessages from "../../../../utils/toastMessages";
 

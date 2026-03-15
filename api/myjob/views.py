@@ -13,7 +13,7 @@ from configs import variable_response as var_res, variable_system as var_sys, ap
 
 from configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 
 from rest_framework import status
 
@@ -72,7 +72,7 @@ class FeedbackViewSet(viewsets.ViewSet,
         return var_res.Response(serializer.data)
 
 @api_view(http_method_names=['post'])
-
+@permission_classes([perms_sys.AllowAny])
 def send_sms_download_app(request):
 
     data = request.data
@@ -128,7 +128,7 @@ def send_sms_download_app(request):
     return var_res.response_data()
 
 @api_view(http_method_names=['get'])
-
+@permission_classes([perms_sys.AllowAny])
 def get_web_banner(request):
 
     query_params = request.GET
@@ -158,7 +158,7 @@ def get_web_banner(request):
     return var_res.response_data(data=serializer.data)
 
 @api_view(http_method_names=['get'])
-
+@permission_classes([perms_sys.AllowAny])
 def get_mobile_banner(request):
 
     banner_type = request.GET.get("type", "HOME")
@@ -180,7 +180,7 @@ def get_mobile_banner(request):
     return var_res.response_data(data=serializer.data)
 
 @api_view(http_method_names=['post'])
-
+@permission_classes([perms_sys.AllowAny])
 def send_notification_demo(request):
 
     # Only allow in development environment

@@ -112,6 +112,7 @@
     "eslint": "^9.31.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "postcss": "^8.5.8",
+    "rollup-plugin-visualizer": "^7.0.1",
     "sharp": "^0.34.2",
     "tailwindcss": "^4.2.1",
     "vite": "^5.0.12",

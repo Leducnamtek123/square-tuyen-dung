@@ -26,6 +26,11 @@ import './i18n';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
+// Recover from stale chunk references after a new deploy.
+window.addEventListener('vite:preloadError', () => {
+  window.location.reload();
+});
+
 const queryClient = new QueryClient({
 
   defaultOptions: {

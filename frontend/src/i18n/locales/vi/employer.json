@@ -279,7 +279,8 @@
     "subtitle": {
       "info": "Thông tin Phỏng vấn",
       "aiEvaluation": "Kết quả đánh giá AI",
-      "history": "Lịch sử cuộc trò chuyện"
+      "history": "Lịch sử cuộc trò chuyện",
+      "recording": "Ghi hình phỏng vấn"
     },
     "label": {
       "roomCode": "Mã phòng",
@@ -300,7 +301,8 @@
     },
     "actions": {
       "backToList": "Quay lại danh sách",
-      "viewReport": "Xem báo cáo chi tiết"
+      "viewReport": "Xem báo cáo chi tiết",
+      "openRecording": "Mở ghi hình"
     }
   },
   "jobPostFilterForm": {

@@ -12,7 +12,18 @@ const commonService = {
 
   getDistrictsByCityId: (cityId) => {
 
-    const url = `common/districts/?cityId=${cityId}`;
+    const normalizedCityId =
+      cityId && typeof cityId === 'object' ? cityId.id : cityId;
+
+    if (
+      normalizedCityId === undefined ||
+      normalizedCityId === null ||
+      normalizedCityId === ''
+    ) {
+      return Promise.resolve({ data: [] });
+    }
+
+    const url = `common/districts/?cityId=${encodeURIComponent(normalizedCityId)}`;
 
     return httpRequest.get(url);
 

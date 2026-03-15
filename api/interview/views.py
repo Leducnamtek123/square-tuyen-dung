@@ -2,33 +2,57 @@
 Interview Module — DRF Views
 """
 
-from datetime import timezone
 from rest_framework import viewsets, status, permissions
-from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django.db.models import Count
 
 from .models import (
     Question, QuestionGroup,
-    InterviewSession, InterviewTranscript, InterviewEvaluation
+    InterviewSession, InterviewEvaluation
 )
 from .serializers import (
     QuestionSerializer, QuestionGroupSerializer,
     InterviewSessionListSerializer, InterviewSessionDetailSerializer,
     InterviewSessionCreateSerializer,
     InterviewTranscriptSerializer, InterviewEvaluationSerializer,
-    InterviewContextSerializer, AppendTranscriptSerializer, UpdateStatusSerializer
+    AppendTranscriptSerializer, UpdateStatusSerializer
 )
-from .livekit_service import LiveKitService
+from .services import (
+    build_interview_context,
+    create_livekit_participant_token,
+    append_transcript,
+    update_interview_status,
+)
+from authentication import permissions as perms_custom
 
-def _get_session_questions(session: InterviewSession):
-    questions = session.questions.all()
-    if questions.exists():
-        return questions
-    if session.question_group_id:
-        return session.question_group.questions.all()
-    return questions
+class InterviewStatisticViewSet(viewsets.ViewSet):
+    permission_classes = [perms_custom.IsAdminUser]
+
+    def general_statistics(self, request):
+        status_counts = {
+            item["status"]: item["count"]
+            for item in InterviewSession.objects.values("status").annotate(count=Count("id"))
+        }
+
+        data = {
+            "totalInterviews": InterviewSession.objects.count(),
+            "totalInterviewDraft": status_counts.get("draft", 0),
+            "totalInterviewScheduled": status_counts.get("scheduled", 0),
+            "totalInterviewCalibration": status_counts.get("calibration", 0),
+            "totalInterviewInProgress": status_counts.get("in_progress", 0),
+            "totalInterviewProcessing": status_counts.get("processing", 0),
+            "totalInterviewCompleted": status_counts.get("completed", 0),
+            "totalInterviewCancelled": status_counts.get("cancelled", 0),
+            "totalInterviewInterrupted": status_counts.get("interrupted", 0),
+            "totalQuestions": Question.objects.count(),
+            "totalQuestionGroups": QuestionGroup.objects.count(),
+            "totalEvaluations": InterviewEvaluation.objects.count(),
+        }
+
+        return Response(data)
 
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.all()
@@ -144,21 +168,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        participant_identity = f"candidate-{session.candidate_id}"
-        participant_name = session.candidate.full_name or session.candidate.email or participant_identity
-        LiveKitService.ensure_room_with_agent(session.room_name)
-        token = LiveKitService.create_token(
-            room_name=session.room_name,
-            participant_identity=participant_identity,
-            participant_name=participant_name,
-            is_agent=False
-        )
-
-        return Response({
-            "token": token,
-            "room_name": session.room_name,
-            "participant_identity": participant_identity
-        })
+        return Response(create_livekit_participant_token(session))
 
     # GET /sessions/{room_name}/context/ — cho AI Agent
     @action(detail=False, methods=['get'], url_path='(?P<room_name>[^/.]+)/context',
@@ -175,15 +185,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        questions = _get_session_questions(session)
-        context_data = {
-            "candidateName": session.candidate.full_name,
-            "candidateEmail": session.candidate.email,
-            "jobTitle": session.job_post.job_name if session.job_post else None,
-            "questions": [{"text": q.text} for q in questions],
-            "interviewType": session.type,
-        }
-        return Response(context_data)
+        return Response(build_interview_context(session))
 
     # PATCH /sessions/{room_name}/status/ — cập nhật trạng thái
     @action(detail=False, methods=['patch'], url_path='(?P<room_name>[^/.]+)/status',
@@ -201,34 +203,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         serializer = UpdateStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        new_status = serializer.validated_data['status']
-        session.status = new_status
-        was_started = session.start_time is not None
-
-        from django.utils import timezone as tz
-        if new_status == 'in_progress' and not session.start_time:
-            session.start_time = tz.now()
-        elif new_status == 'completed' and not session.end_time:
-            session.end_time = tz.now()
-            if session.start_time:
-                session.duration = int((session.end_time - session.start_time).total_seconds())
-
-        session.save()
-
-        # Trigger AI Evaluation if completed
-        if new_status == 'completed':
-            from .tasks import evaluate_interview_session
-            evaluate_interview_session.delay(session.id)
-
-        # Enforce maximum duration once per session start
-        if new_status == 'in_progress' and not was_started:
-            from .tasks import end_interview_session
-            from django.conf import settings as dj_settings
-            end_interview_session.apply_async(
-                args=[session.id, "max_duration"],
-                countdown=int(getattr(dj_settings, "INTERVIEW_MAX_DURATION_SECONDS", 1800)),
-            )
-
+        new_status = update_interview_status(session, serializer.validated_data['status'])
         return Response({"status": new_status})
 
     # POST /sessions/{room_name}/append-transcription/
@@ -247,10 +222,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         serializer = AppendTranscriptSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        transcript = InterviewTranscript.objects.create(
-            interview=session,
-            **serializer.validated_data
-        )
+        transcript = append_transcript(session, serializer.validated_data)
         return Response(
             InterviewTranscriptSerializer(transcript).data,
             status=status.HTTP_201_CREATED

@@ -2,14 +2,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 import svgr from 'vite-plugin-svgr'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 const devServerPort = Number(process.env.VITE_DEV_SERVER_PORT || 3000);
 const devServerClientPort = Number(process.env.VITE_DEV_SERVER_CLIENT_PORT || devServerPort);
 const devServerHost = process.env.VITE_DEV_SERVER_HOST || '0.0.0.0';
 const devServerHmrHost = process.env.VITE_DEV_SERVER_HMR_HOST || 'localhost';
 
-export default defineConfig({
-  plugins: [
+const plugins = [
     react(),
     svgr({
       svgrOptions: {
@@ -21,7 +21,17 @@ export default defineConfig({
         ref: true,
       },
     }),
-  ],
+    process.env.ANALYZE
+      ? visualizer({
+          filename: 'build/stats.html',
+          gzipSize: true,
+          brotliSize: true,
+        })
+      : null,
+  ].filter(Boolean)
+
+export default defineConfig({
+  plugins,
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

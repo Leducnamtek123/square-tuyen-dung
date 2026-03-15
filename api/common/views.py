@@ -31,6 +31,8 @@ from .models import (
 
     District,
 
+    Ward
+
 )
 
 from .serializers import (
@@ -39,7 +41,9 @@ from .serializers import (
 
     CitySerializer,
 
-    DistrictSerializer
+    DistrictSerializer,
+
+    WardSerializer
 
 )
 
@@ -81,8 +85,18 @@ class AdminDistrictViewSet(viewsets.ModelViewSet):
 
     filterset_fields = ['city']
 
-@api_view(http_method_names=["GET"])
+class AdminWardViewSet(viewsets.ModelViewSet):
 
+    queryset = Ward.objects.select_related('district').all().order_by('id')
+
+    serializer_class = WardSerializer
+
+    permission_classes = [perms_custom.IsAdminUser]
+
+    filterset_fields = ['district']
+
+@api_view(http_method_names=["GET"])
+@permission_classes([AllowAny])
 def get_all_config(request):
 
     exclude_city_name = 'Toàn quốc'
@@ -292,24 +306,31 @@ def get_all_config(request):
         return var_res.response_data(data=res_data)
 
 @api_view(http_method_names=["GET"])
-
+@permission_classes([AllowAny])
 def get_districts(request):
 
     params = request.query_params
 
-    city_id = params.get('cityId', None)
+    city_id_raw = params.get('cityId', None)
 
     try:
 
-        district_queryset = District.objects
+        district_queryset = District.objects.all()
 
-        if city_id:
+        if city_id_raw not in (None, ""):
+
+            city_id = int(str(city_id_raw).strip())
 
             district_queryset = district_queryset.filter(city_id=city_id)
 
         districts = district_queryset.values_list("id", "name")
 
         district_options = utils.convert_tuple_or_list_to_options(districts)[0]
+
+    except (TypeError, ValueError):
+
+        # Invalid cityId should not break dependent forms.
+        return var_res.response_data(data=[])
 
     except Exception as ex:
 
@@ -324,7 +345,45 @@ def get_districts(request):
         return var_res.response_data(data=district_options)
 
 @api_view(http_method_names=["GET"])
+@permission_classes([AllowAny])
+def get_wards(request):
 
+    params = request.query_params
+
+    district_id_raw = params.get('districtId', None)
+
+    try:
+
+        ward_queryset = Ward.objects.all()
+
+        if district_id_raw not in (None, ""):
+
+            district_id = int(str(district_id_raw).strip())
+
+            ward_queryset = ward_queryset.filter(district_id=district_id)
+
+        wards = ward_queryset.values_list("id", "name")
+
+        ward_options = utils.convert_tuple_or_list_to_options(wards)[0]
+
+    except (TypeError, ValueError):
+
+        return var_res.response_data(data=[])
+
+    except Exception as ex:
+
+        helper.print_log_error(func_name="get_wards", error=ex)
+
+        return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+
+                                     data=None)
+
+    else:
+
+        return var_res.response_data(data=ward_options)
+
+@api_view(http_method_names=["GET"])
+@permission_classes([AllowAny])
 def get_top_10_careers(request):
 
     try:
@@ -346,7 +405,7 @@ def get_top_10_careers(request):
     return var_res.response_data(data=serializer.data)
 
 @api_view(http_method_names=["GET"])
-
+@permission_classes([AllowAny])
 def get_all_careers(request):
 
     try:
@@ -386,9 +445,7 @@ def get_all_careers(request):
         return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @api_view(['GET'])
-
 @permission_classes([AllowAny])
-
 def health_check(request):
 
     # Check database connection

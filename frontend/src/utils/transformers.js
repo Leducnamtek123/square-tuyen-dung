@@ -89,6 +89,8 @@ export const transformInterviewSession = (session) => {
         inviteToken: session.invite_token || session.inviteToken || null,
 
         notes: session.notes || '',
+        recordingUrl: session.recording_url || session.recordingUrl || null,
+        transcriptUrl: session.transcript_url || session.transcriptUrl || null,
 
         questions: (session.questions || []).map(transformQuestion),
 
@@ -105,6 +107,8 @@ export const transformInterviewSession = (session) => {
         scheduledAt: session.scheduled_at || session.startTime || '',
 
         inviteToken: session.invite_token || session.inviteToken || null,
+        recordingUrl: session.recording_url || session.recordingUrl || null,
+        transcriptUrl: session.transcript_url || session.transcriptUrl || null,
 
     };
 

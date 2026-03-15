@@ -15,7 +15,9 @@ class CommonBaseModel(models.Model):
 
 class City(CommonBaseModel):
 
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=255)
+
+    code = models.CharField(max_length=20, unique=True, null=True, blank=True)
 
     class Meta:
 
@@ -29,13 +31,31 @@ class City(CommonBaseModel):
 
 class District(CommonBaseModel):
 
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=255)
+
+    code = models.CharField(max_length=20, unique=True, null=True, blank=True)
 
     city = models.ForeignKey('City', on_delete=models.CASCADE, related_name="districts")
 
     class Meta:
 
         db_table = "myjob_common_district"
+
+    def __str__(self):
+
+        return self.name
+
+class Ward(CommonBaseModel):
+
+    name = models.CharField(max_length=255)
+
+    code = models.CharField(max_length=20, unique=True, null=True, blank=True)
+
+    district = models.ForeignKey('District', on_delete=models.CASCADE, related_name="wards")
+
+    class Meta:
+
+        db_table = "myjob_common_ward"
 
     def __str__(self):
 
@@ -51,6 +71,10 @@ class Location(CommonBaseModel):
 
                                  related_name="locations")
 
+    ward = models.ForeignKey(Ward, on_delete=models.SET_NULL, null=True,
+
+                             related_name="locations")
+
     address = models.CharField(max_length=255, blank=True, null=True)
 
     lat = models.FloatField(null=True, blank=True)
@@ -63,7 +87,7 @@ class Location(CommonBaseModel):
 
     def __str__(self):
 
-        return f"City: {self.city.name if self.city else '---'} / District: {self.district.name if self.district else '---'} / Address: {self.address} / Location: ({self.lat}:{self.lng})"
+        return f"City: {self.city.name if self.city else '---'} / District: {self.district.name if self.district else '---'} / Ward: {self.ward.name if self.ward else '---'} / Address: {self.address} / Location: ({self.lat}:{self.lng})"
 
 class Career(CommonBaseModel):
 

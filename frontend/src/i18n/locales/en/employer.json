@@ -279,7 +279,8 @@
     "subtitle": {
       "info": "Interview Information",
       "aiEvaluation": "AI Evaluation Result",
-      "history": "Conversation History"
+      "history": "Conversation History",
+      "recording": "Interview Recording"
     },
     "label": {
       "roomCode": "Room Code",
@@ -300,7 +301,8 @@
     },
     "actions": {
       "backToList": "Back to list",
-      "viewReport": "View detailed report"
+      "viewReport": "View detailed report",
+      "openRecording": "Open recording"
     }
   },
   "jobPostFilterForm": {

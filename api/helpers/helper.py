@@ -27,7 +27,13 @@ def print_log_error(func_name, error, now=datetime.now()):
 
 def get_full_client_url(func, domain_type):
 
-    return settings.DOMAIN_CLIENT[domain_type] + func
+    domain = settings.DOMAIN_CLIENT[domain_type]
+
+    if not domain.endswith('/') and not func.startswith('/'):
+
+        return f"{domain}/{func}"
+
+    return f"{domain}{func}"
 
 def check_expiration_time(expiration_time):
 
@@ -41,9 +47,9 @@ def urlsafe_base64_encode_with_expires(data, expires_in_seconds):
 
     expiration_time = current_time + expires_in_seconds
 
-    base64_time = urlsafe_base64_encode(force_bytes(expiration_time))
+    base64_time = urlsafe_base64_encode(force_bytes(str(expiration_time)))
 
-    encoded_data = f"{base64_data}|{base64_time}"
+    encoded_data = f"{base64_data}.{base64_time}"
 
     return encoded_data
 
@@ -51,7 +57,9 @@ def urlsafe_base64_decode_with_encoded_data(encoded_data):
 
     try:
 
-        encoded_data_split = str(encoded_data).split("|")
+        separator = "." if "." in str(encoded_data) else "|"
+
+        encoded_data_split = str(encoded_data).split(separator)
 
         data = force_str(urlsafe_base64_decode(encoded_data_split[0]))
 

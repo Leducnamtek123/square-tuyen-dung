@@ -1,18 +1,10 @@
 import json
 
 from django.http import HttpRequest, JsonResponse
-from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
-from interview.models import InterviewSession, InterviewTranscript
-
-def _get_session_questions(session: InterviewSession):
-    questions = session.questions.all()
-    if questions.exists():
-        return questions
-    if session.question_group_id:
-        return session.question_group.questions.all()
-    return questions
+from interview.models import InterviewSession
+from interview.services import build_interview_context, get_next_question_payload, update_interview_status, append_transcript
 
 def interview_context(request: HttpRequest, room_name: str):
     """
@@ -33,18 +25,7 @@ def interview_context(request: HttpRequest, room_name: str):
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
-    candidate = session.candidate
-    job_post = session.job_post
-
-    questions = _get_session_questions(session)
-    context_data = {
-        "candidateName": candidate.full_name,
-        "candidateEmail": candidate.email,
-        "jobTitle": job_post.job_name if job_post else None,
-        "questions": [{"text": q.text} for q in questions],
-        "interviewType": session.type,
-    }
-    return JsonResponse(context_data, status=200)
+    return JsonResponse(build_interview_context(session), status=200)
 
 @csrf_exempt
 def interview_next_question(request: HttpRequest, room_name: str):
@@ -73,41 +54,7 @@ def interview_next_question(request: HttpRequest, room_name: str):
             payload = {}
         advance = bool(payload.get("advance", True))
 
-    questions = _get_session_questions(session).order_by("sort_order", "create_at", "id")
-    total = questions.count()
-    cursor = session.question_cursor or 0
-
-    if cursor >= total:
-        return JsonResponse(
-            {
-                "done": True,
-                "question": None,
-                "index": cursor,
-                "total": total,
-                "advance": advance,
-            },
-            status=200,
-        )
-
-    question = questions[cursor]
-
-    if advance:
-        session.question_cursor = cursor + 1
-        session.save(update_fields=["question_cursor", "update_at"])
-
-    return JsonResponse(
-        {
-            "done": False,
-            "question": {
-                "id": question.id,
-                "text": question.text,
-            },
-            "index": cursor,
-            "total": total,
-            "advance": advance,
-        },
-        status=200,
-    )
+    return JsonResponse(get_next_question_payload(session, advance), status=200)
 
 @csrf_exempt
 def interview_status(request: HttpRequest, room_name: str):
@@ -135,17 +82,8 @@ def interview_status(request: HttpRequest, room_name: str):
     if not new_status:
         return JsonResponse({"detail": "Missing `status`."}, status=400)
 
-    session.status = new_status
-
-    if new_status == "in_progress" and not session.start_time:
-        session.start_time = timezone.now()
-    elif new_status == "completed" and not session.end_time:
-        session.end_time = timezone.now()
-        if session.start_time:
-            session.duration = int((session.end_time - session.start_time).total_seconds())
-
-    session.save(update_fields=["status", "start_time", "end_time", "duration", "update_at"])
-    return JsonResponse({"status": new_status}, status=200)
+    updated_status = update_interview_status(session, new_status)
+    return JsonResponse({"status": updated_status}, status=200)
 
 @csrf_exempt
 def interview_append_transcription(request: HttpRequest, room_name: str):
@@ -178,11 +116,13 @@ def interview_append_transcription(request: HttpRequest, room_name: str):
     if not isinstance(content, str) or not content.strip():
         return JsonResponse({"detail": "Missing `content`."}, status=400)
 
-    transcript = InterviewTranscript.objects.create(
-        interview=session,
-        speaker_role=speaker_role,
-        content=content.strip(),
-        speech_duration_ms=speech_duration_ms if speech_duration_ms is not None else None,
+    transcript = append_transcript(
+        session,
+        {
+            "speaker_role": speaker_role,
+            "content": content.strip(),
+            "speech_duration_ms": speech_duration_ms if speech_duration_ms is not None else None,
+        },
     )
     return JsonResponse(
         {

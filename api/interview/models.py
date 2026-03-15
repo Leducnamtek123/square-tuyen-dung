@@ -235,7 +235,7 @@ class InterviewSession(InterviewBaseModel):
     )
     question_cursor = models.IntegerField(
         default=0,
-        verbose_name="Ch??? s??? c??u h???i hi???n t???i"
+        verbose_name="Chỉ số câu hỏi hiện tại"
     )
 
     class Meta:

@@ -11,7 +11,7 @@ import { Editor } from 'react-draft-wysiwyg';
 import { Typography } from "@mui/material";
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import { createEditorStateFromHTMLString } from '../../../utils/customData';
+import { createEditorStateFromHTMLString } from '../../../utils/editorUtils';
 
 const RichTextEditorCustom = ({
 

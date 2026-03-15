@@ -53,7 +53,7 @@ ERROR_MESSAGES = {
 
     'CLOUDINARY_UPLOAD_ERROR': 'Something went wrong when upload image to cloudinary',
 
-    'CANNOT_CHANGE_OWN_ROLE': 'Báº¡n khÃ´ng thá»ƒ thay Ä‘á»•i vai trÃ² cá»§a chÃ­nh mÃ¬nh.',
+    'CANNOT_CHANGE_OWN_ROLE': 'Bạn không thể thay đổi vai trò của chính mình.',
 
     'MAXIMUM_IMAGES':'Tối đa 15 ảnh',
 

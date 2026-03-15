@@ -108,27 +108,27 @@
     }
   },
   "interviewListCard": {
-    "title": "Danh s?ch Ph?ng v?n Online",
-    "scheduleInterview": "L?n l?ch ph?ng v?n",
-    "candidate": "?ng vi?n",
-    "position": "V? tr?",
-    "time": "Th?i gian",
-    "status": "Tr?ng th?i",
-    "aiScore": "?i?m AI",
-    "grading": "?ang ch?m ?i?m",
-    "noInterviews": "Ch?a c? l?ch ph?ng v?n n?o.",
-    "actions": "Thao t?c",
-    "viewDetails": "Xem chi ti?t",
-    "markCompleted": "??nh d?u ho?n th?nh",
-    "cancelInterview": "H?y ph?ng v?n",
-    "delete": "X?a",
-    "confirmDelete": "B?n c? ch?c ch?n mu?n x?a ph?ng v?n n?y?",
+    "title": "Danh sách Phỏng vấn Online",
+    "scheduleInterview": "Lên lịch phỏng vấn",
+    "candidate": "Ứng viên",
+    "position": "Vị trí",
+    "time": "Thời gian",
+    "status": "Trạng thái",
+    "aiScore": "Điểm AI",
+    "grading": "Đang chấm điểm",
+    "noInterviews": "Chưa có lịch phỏng vấn nào.",
+    "actions": "Thao tác",
+    "viewDetails": "Xem chi tiết",
+    "markCompleted": "Đánh dấu hoàn thành",
+    "cancelInterview": "Hủy phỏng vấn",
+    "delete": "Xóa",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa phỏng vấn này?",
     "statuses": {
-      "scheduled": "?? l?n l?ch",
-      "in_progress": "?ang di?n ra",
-      "processing": "?ang x? l?",
-      "completed": "Ho?n th?nh",
-      "cancelled": "?? h?y"
+      "scheduled": "Đã lên lịch",
+      "in_progress": "Đang diễn ra",
+      "processing": "Đang xử lý",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy"
     }
   }
 }

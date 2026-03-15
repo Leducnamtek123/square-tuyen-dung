@@ -59,6 +59,8 @@ from .serializers import (
 
     CheckCredsSerializer,
 
+    ResendVerifyEmailSerializer,
+
     ForgotPasswordSerializer,
 
     UpdatePasswordSerializer,
@@ -345,6 +347,7 @@ class CustomRevokeTokenView(RevokeTokenView):
         return response
 
 @api_view(http_method_names=['post'])
+@permission_classes([AllowAny])
 def check_email_exists(request):
     data = request.data
     email = data.get('email')
@@ -357,7 +360,7 @@ def check_email_exists(request):
     return response_data(status=status.HTTP_200_OK, data={"exists": exists})
 
 @api_view(http_method_names=["POST"])
-
+@permission_classes([AllowAny])
 def check_creds(request):
 
     data = request.data
@@ -404,8 +407,35 @@ def check_creds(request):
 
     return response_data(data=res_data)
 
-@api_view(http_method_names=["GET"])
+@api_view(http_method_names=["post"])
+@permission_classes([AllowAny])
+def send_verify_email(request):
+    serializer = ResendVerifyEmailSerializer(data=request.data)
+    if not serializer.is_valid():
+        return response_data(status=status.HTTP_400_BAD_REQUEST, errors=serializer.errors)
 
+    email = serializer.validated_data.get("email")
+    platform = serializer.validated_data.get("platform", "WEB")
+
+    user = User.objects.filter(email__iexact=email).first()
+    if not user:
+        return response_data(status=status.HTTP_400_BAD_REQUEST, errors={
+            "errorMessage": [ERROR_MESSAGES["EMAIL_NOT_REGISTERED"]]
+        })
+
+    if user.is_verify_email:
+        return response_data(status=status.HTTP_200_OK, data={"emailVerified": True})
+
+    try:
+        helper.send_email_verify_email(request, user, platform=platform)
+    except Exception as ex:
+        helper.print_log_error("send_verify_email", ex)
+        return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    return response_data(status=status.HTTP_200_OK, data={"emailVerified": False})
+
+@api_view(http_method_names=["GET"])
+@permission_classes([AllowAny])
 def user_active(request, encoded_data, token):
 
     if "platform" not in request.GET:
@@ -547,7 +577,7 @@ def user_active(request, encoded_data, token):
             })
 
 @api_view(http_method_names=["post"])
-
+@permission_classes([AllowAny])
 def forgot_password(request):
 
     data = request.data
@@ -663,7 +693,7 @@ def forgot_password(request):
         })
 
 @api_view(http_method_names=["post"])
-
+@permission_classes([AllowAny])
 def reset_password(request):
 
     data = request.data
@@ -931,7 +961,7 @@ def avatar(request):
         return response_data(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 @api_view(http_method_names=['post'])
-
+@permission_classes([AllowAny])
 def employer_register(request):
 
     data = request.data
@@ -963,7 +993,7 @@ def employer_register(request):
     return response_data(status=status.HTTP_201_CREATED)
 
 @api_view(http_method_names=['post'])
-
+@permission_classes([AllowAny])
 def job_seeker_register(request):
 
     data = request.data

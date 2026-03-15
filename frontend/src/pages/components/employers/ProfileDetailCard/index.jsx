@@ -42,13 +42,9 @@ import { CV_TYPES } from "../../../../configs/constants";
 
 import BackdropLoading from "../../../../components/loading/BackdropLoading";
 
-import {
+import { convertEditorStateToHTMLString } from "../../../../utils/editorUtils";
 
-  convertEditorStateToHTMLString,
-
-  salaryString,
-
-} from "../../../../utils/customData";
+import { salaryString } from "../../../../utils/customData";
 
 import NoDataCard from "../../../../components/NoDataCard";
 

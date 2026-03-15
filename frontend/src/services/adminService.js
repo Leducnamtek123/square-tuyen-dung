@@ -20,9 +20,9 @@ const adminService = {
 
     getStats: () => {
 
-        // call the admin general statistics endpoint instead of non-existent interview stats
+        // interview statistics for admin overview
 
-        const url = 'job/web/statistics/admin-general-statistics/';
+        const url = 'interview/web/statistics/admin-general-statistics/';
 
         return httpRequest.get(url);
 

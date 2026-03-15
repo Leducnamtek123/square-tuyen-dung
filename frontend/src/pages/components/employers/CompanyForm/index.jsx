@@ -227,6 +227,10 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
   React.useEffect(() => {
 
     const loadLocation = async (input) => {
+      if (!input || input.trim().length < 3) {
+        setLocationOptions([]);
+        return;
+      }
 
       try {
 
@@ -289,6 +293,9 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
   }, [serverErrors, setError]);
 
   const handleSelectLocation = async (e, value) => {
+    if (!value || typeof value !== 'object' || !value.place_id) {
+      return;
+    }
 
     try {
 
@@ -297,6 +304,10 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
         value.place_id
 
       );
+
+      if (!resData?.result?.geometry?.location) {
+        return;
+      }
 
       setValue('location.lat', resData?.result?.geometry.location.lat || '');
 
@@ -734,11 +745,11 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
 
                 control={control}
 
-                title={t('companyForm.title.district', 'District')}
+                title={t('companyForm.title.district', 'Ward/Commune')}
 
                 showRequired={true}
 
-                placeholder={t('companyForm.placeholder.selectdistrict', 'Select district')}
+                placeholder={t('companyForm.placeholder.selectdistrict', 'Select ward/commune')}
 
               />
 

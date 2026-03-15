@@ -129,7 +129,7 @@ class CloudinaryService:
                 "version": str(int(datetime.now(timezone.utc).timestamp())),
                 "format": ext or "",
                 "resource_type": resource_type,
-                "created_at": datetime.now(timezone.utc),
+                "created_at": datetime.now(timezone.utc).isoformat(),
                 "bytes": size,
                 "bucket": bucket,
                 "url": url

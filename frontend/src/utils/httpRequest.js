@@ -4,7 +4,17 @@ import tokenService from '../services/tokenService';
 import { AUTH_CONFIG } from '../configs/constants';
 
 // API endpoints that do not require authentication
-const notAuthenticationURL = ['auth/token/', 'auth/convert-token/'];
+const notAuthenticationURL = [
+  'auth/token/',
+  'auth/convert-token/',
+  'auth/job-seeker/register/',
+  'auth/employer/register/',
+  'auth/check-creds/',
+  'auth/email-exists/',
+  'auth/forgot-password/',
+  'auth/reset-password/',
+  'auth/send-verify-email/',
+];
 const publicEndpointPrefixes = ['interview/web/sessions/invite/'];
 // Prefix for API endpoints
 const prefix = 'api'

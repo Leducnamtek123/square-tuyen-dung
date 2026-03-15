@@ -9,6 +9,8 @@ urlpatterns = [
 
     path('districts/', views.get_districts),
 
+    path('wards/', views.get_wards),
+
     path('top-careers/', views.get_top_10_careers),
 
     path('all-careers/', views.get_all_careers),
@@ -26,5 +28,7 @@ admin_router.register(r'admin/careers', views.AdminCareerViewSet, basename='admi
 admin_router.register(r'admin/cities', views.AdminCityViewSet, basename='admin-cities')
 
 admin_router.register(r'admin/districts', views.AdminDistrictViewSet, basename='admin-districts')
+
+admin_router.register(r'admin/wards', views.AdminWardViewSet, basename='admin-wards')
 
 urlpatterns += admin_router.urls

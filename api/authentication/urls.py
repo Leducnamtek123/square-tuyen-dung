@@ -23,6 +23,8 @@ urlpatterns = [
 
     path('check-creds/', views.check_creds),
 
+    path('send-verify-email/', views.send_verify_email),
+
     path('active-email/<str:encoded_data>/<str:token>/', views.user_active),
 
     path('forgot-password/', views.forgot_password),

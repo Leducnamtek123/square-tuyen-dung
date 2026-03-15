@@ -1,41 +1,91 @@
-import requests
-from bs4 import BeautifulSoup
-from common.models import City
+import json
+import os
+from common.models import City, District, Ward
 
 def seed_locations():
     """
-    Crawl 63 provinces of Vietnam from Wikipedia
+    Import Vietnamese administrative units from JSON data
     """
-    url = "https://vi.wikipedia.org/wiki/Danh_s%C3%A1ch_c%C3%A1c_%C4%91%C6%A1n_v%E1%BB%8B_h%C3%A0nh_ch%C3%ADnh_c%E1%BA%A5p_t%E1%BB%89nh_Vi%E1%BB%87t_Nam"
-    print(f"Bắt đầu crawl dữ liệu tỉnh thành từ: {url}")
+    # Try multiple possible paths to find the JSON file
+    paths_to_try = [
+        os.path.join(os.getcwd(), 'data', 'location_data', 'simplified_json_generated_data_vn_units.json'),
+        os.path.join(os.path.dirname(__file__), '../../../../data/location_data/simplified_json_generated_data_vn_units.json'),
+        '/myjob_api/data/location_data/simplified_json_generated_data_vn_units.json'
+    ]
+    
+    json_path = None
+    for path in paths_to_try:
+        if os.path.exists(path):
+            json_path = path
+            break
+
+    if not json_path:
+        print(f"Không tìm thấy file dữ liệu JSON tại các đường dẫn: {paths_to_try}")
+        return
+
+    print(f"Bắt đầu nạp dữ liệu tỉnh thành từ: {json_path}")
     
     try:
-        response = requests.get(url, timeout=10)
-        soup = BeautifulSoup(response.content, 'html.parser')
-        
-        # Tìm bảng chứa danh sách tỉnh thành (thường là bảng có class 'wikitable')
-        table = soup.find('table', {'class': 'wikitable'})
-        if not table:
-            print("Không tìm thấy bảng dữ liệu trên Wikipedia.")
-            return
+        with open(json_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
 
-        rows = table.find_all('tr')
-        count = 0
-        for row in rows[1:]:  # Bỏ qua dòng tiêu đề
-            cols = row.find_all('td')
-            if len(cols) > 1:
-                # Cột tên tỉnh thường nằm ở cột thứ 2 (index 1) hoặc có thẻ 'a'
-                city_name = cols[1].text.strip()
+        city_count = 0
+        district_count = 0
+        ward_count = 0
+
+        for province_data in data:
+            # Match by code or name
+            city = City.objects.filter(code=province_data['Code']).first()
+            if not city:
+                city = City.objects.filter(name=province_data['Name']).first()
+                if not city:
+                    city = City.objects.filter(name=province_data['FullName']).first()
+            
+            if city:
+                city.code = province_data['Code']
+                city.name = province_data['FullName']
+                city.save()
+            else:
+                city = City.objects.create(
+                    code=province_data['Code'],
+                    name=province_data['FullName']
+                )
+                city_count += 1
+            
+            for district_data in (province_data.get('District') or []):
+                district = District.objects.filter(code=district_data['Code']).first()
+                if not district:
+                    district = District.objects.filter(name=district_data['Name'], city=city).first()
+                    if not district:
+                        district = District.objects.filter(name=district_data['FullName'], city=city).first()
                 
-                # Cleanup tên (ví dụ bỏ các phần chú thích [1], [2])
-                import re
-                city_name = re.sub(r'\[.*?\]', '', city_name)
+                if district:
+                    district.code = district_data['Code']
+                    district.name = district_data['FullName']
+                    district.city = city
+                    district.save()
+                else:
+                    district = District.objects.create(
+                        code=district_data['Code'],
+                        name=district_data['FullName'],
+                        city=city
+                    )
+                    district_count += 1
                 
-                city, created = City.objects.get_or_create(name=city_name)
-                if created:
-                    count += 1
-        
-        print(f"Thành công! Đã thêm mới {count} tỉnh thành vào hệ thống.")
+                for ward_data in (district_data.get('Ward') or []):
+                    # For wards, we use update_or_create as there are many
+                    ward, created = Ward.objects.update_or_create(
+                        code=ward_data['Code'],
+                        defaults={
+                            'name': ward_data['FullName'],
+                            'district': district
+                        }
+                    )
+                    if created:
+                        ward_count += 1
+
+        print(f"Thành công! Đã nạp xong: {city_count} tỉnh thành mới, {district_count} quận huyện mới, {ward_count} phường xã mới.")
+        print(f"Tổng cộng hiện có: {City.objects.count()} tỉnh thành, {District.objects.count()} quận huyện, {Ward.objects.count()} phường xã.")
         
     except Exception as e:
-        print(f"Lỗi khi crawl tỉnh thành: {str(e)}")
+        print(f"Lỗi khi nạp dữ liệu: {str(e)}")

@@ -30,6 +30,7 @@ AI_LLM_BASE_URL = config(
     default=config("LLAMA_BASE_URL", default="http://llama-cpp:11434/v1"),
 )
 AI_LLM_MODEL = config("AI_LLM_MODEL", default=config("LLAMA_MODEL", default="qwen2-7b"))
+AI_RESUME_AUTO_ANALYZE = config("AI_RESUME_AUTO_ANALYZE", default=True, cast=bool)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
@@ -180,6 +181,9 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'configs.paginations.CustomPagination',
     'DEFAULT_RENDERER_CLASSES': (
         'configs.renderers.MyJSONRenderer',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
     ),
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',

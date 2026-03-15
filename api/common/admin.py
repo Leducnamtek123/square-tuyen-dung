@@ -21,6 +21,8 @@ from .models import (
 
     District,
 
+    Ward,
+
     Location,
 
     Career,
@@ -93,13 +95,31 @@ class DistrictAdmin(admin.ModelAdmin):
 
     list_select_related = ('city',)
 
+class WardAdmin(admin.ModelAdmin):
+
+    list_display = ("id", "name", 'district')
+
+    list_display_links = ("id", "name",)
+
+    search_fields = ("name",)
+
+    readonly_fields = ('district',)
+
+    ordering = ("id", 'name',)
+
+    list_per_page = 25
+
+    autocomplete_fields = ('district',)
+
+    list_select_related = ('district',)
+
 class LocationAdmin(admin.ModelAdmin):
 
-    list_display = ("id", "city", 'district', 'lat', 'lng', 'address')
+    list_display = ("id", "city", 'district', 'ward', 'lat', 'lng', 'address')
 
     list_display_links = ("id", "city",)
 
-    search_fields = ("address", "city__name", "district__name")
+    search_fields = ("address", "city__name", "district__name", "ward__name")
 
     list_filter = [
 
@@ -107,15 +127,17 @@ class LocationAdmin(admin.ModelAdmin):
 
         ("district", RelatedDropdownFilter),
 
+        ("ward", RelatedDropdownFilter),
+
     ]
 
     ordering = ("id", 'address',)
 
     list_per_page = 25
 
-    autocomplete_fields = ('city', 'district')
+    autocomplete_fields = ('city', 'district', 'ward')
 
-    list_select_related = ('city',)
+    list_select_related = ('city', 'district', 'ward')
 
     form = LocationForm
 
@@ -206,6 +228,8 @@ class CareerAdmin(admin.ModelAdmin):
 custom_admin_site.register(City, CityAdmin)
 
 custom_admin_site.register(District, DistrictAdmin)
+
+custom_admin_site.register(Ward, WardAdmin)
 
 custom_admin_site.register(Location, LocationAdmin)
 

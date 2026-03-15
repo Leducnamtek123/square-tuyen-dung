@@ -9,7 +9,9 @@ from .models import (
 
     Career,
 
-    City
+    City,
+
+    Ward
 
 )
 
@@ -28,6 +30,14 @@ class DistrictSerializer(serializers.ModelSerializer):
         model = District
 
         fields = ('id', 'name', 'city')
+
+class WardSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Ward
+
+        fields = ('id', 'name', 'district')
 
 class CareerSerializer(serializers.ModelSerializer):
 
@@ -81,15 +91,25 @@ class ProfileDistrictSerializers(serializers.ModelSerializer):
 
         fields = ('id', 'name')
 
+class ProfileWardSerializers(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Ward
+
+        fields = ('id', 'name')
+
 class ProfileLocationSerializer(serializers.ModelSerializer):
 
     districtDict = ProfileDistrictSerializers(source="district", read_only=True)
+
+    wardDict = ProfileWardSerializers(source="ward", read_only=True)
 
     class Meta:
 
         model = Location
 
-        fields = ('city', 'districtDict', 'address', 'district')
+        fields = ('city', 'districtDict', 'wardDict', 'address', 'district', 'ward')
 
 class LocationSerializer(serializers.ModelSerializer):
 
@@ -119,4 +139,4 @@ class LocationSerializer(serializers.ModelSerializer):
 
         model = Location
 
-        fields = ('city', 'district', 'address', 'lat', 'lng')
+        fields = ('city', 'district', 'ward', 'address', 'lat', 'lng')

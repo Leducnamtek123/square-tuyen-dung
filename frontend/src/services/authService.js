@@ -102,6 +102,22 @@ const authService = {
 
   },
 
+  sendVerifyEmail: (email, platform = "WEB") => {
+
+    const url = 'auth/send-verify-email/';
+
+    const data = {
+
+      email: email,
+
+      platform: platform,
+
+    };
+
+    return httpRequest.post(url, data);
+
+  },
+
   getUserInfo: () => {
 
     const url = 'auth/user-info/';

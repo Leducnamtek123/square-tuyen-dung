@@ -385,6 +385,10 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }) => {
   React.useEffect(() => {
 
     const loadLocation = async (input) => {
+      if (!input || input.trim().length < 3) {
+        setLocationOptions([]);
+        return;
+      }
 
       try {
 
@@ -445,14 +449,20 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }) => {
   }, [serverErrors, setError]);
 
   const handleSelectLocation = async (e, value) => {
+    if (!value || typeof value !== 'object' || !value.place_id) {
+      return;
+    }
 
     try {
 
       const resData = await goongService.getPlaceDetailByPlaceId(
 
         value.place_id
-
       );
+
+      if (!resData?.result?.geometry?.location) {
+        return;
+      }
 
       setValue('location.lat', resData?.result?.geometry.location.lat || '');
 
@@ -820,11 +830,11 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }) => {
 
             options={districtOptions}
 
-            title={t('jobPostForm.title.district', 'District')}
+            title={t('jobPostForm.title.district', 'Ward/Commune')}
 
             showRequired={true}
 
-            placeholder={t('jobPostForm.placeholder.selectdistrict', 'Select district')}
+            placeholder={t('jobPostForm.placeholder.selectdistrict', 'Select ward/commune')}
 
           />
 
@@ -995,3 +1005,4 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }) => {
 };
 
 export default JobPostForm;
+

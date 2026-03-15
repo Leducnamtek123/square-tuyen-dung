@@ -116,7 +116,29 @@ const EmployerSignUp = () => {
 
       } catch (error) {
 
-        errorHandling(error);
+        const res = error?.response;
+        const errors = res?.data?.errors;
+        const hasEmailExists = !!errors?.email;
+        if (res?.status === 400 && hasEmailExists) {
+          try {
+            const resData = await authService.checkCreds(data?.email, ROLES_NAME.EMPLOYER);
+            if (resData?.exists === true && resData?.email_verified === false) {
+              dispatch(
+                updateVerifyEmail({
+                  isAllowVerifyEmail: true,
+                  email: data?.email,
+                  roleName: ROLES_NAME.EMPLOYER,
+                })
+              );
+              nav(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
+              return;
+            }
+          } catch {
+            // fall through to default error handling
+          }
+        }
+
+        errorHandling(error, setServerErrors);
 
       } finally {
 
@@ -148,7 +170,19 @@ const EmployerSignUp = () => {
 
       const resData = await authService.checkCreds(email, roleName);
 
-      const { exists } = resData;
+      const { exists, email_verified } = resData;
+
+      if (exists === true && email_verified === false) {
+        dispatch(
+          updateVerifyEmail({
+            isAllowVerifyEmail: true,
+            email: email,
+            roleName: roleName,
+          })
+        );
+        nav(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
+        return false;
+      }
 
       if (exists === true) {
 
