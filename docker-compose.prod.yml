@@ -142,6 +142,12 @@ services:
       - "11436:11434"
     volumes:
       - ./voice-ai/inference/llama/models:/models
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:11434/v1/models > /dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
     restart: always
     networks:
       - square-network
