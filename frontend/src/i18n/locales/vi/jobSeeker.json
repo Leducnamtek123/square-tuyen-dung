@@ -1,4 +1,4 @@
-﻿{
+{
   "myInterviewsTitle": "Phỏng vấn của tôi",
   "noInterviewsTitle": "Bạn không có buổi phỏng vấn nào được lên lịch",
   "nav": {
@@ -380,19 +380,19 @@
     }
   },
   "dashboard": {
-    "pageTitle": "B?ng ?i?u khi?n ?ng vi?n",
-    "yourActivity": "Ho?t ??ng c?a b?n",
-    "suggestedJobs": "Vi?c l?m g?i ?"
+    "pageTitle": "Bảng điều khiển ứng viên",
+    "yourActivity": "Hoạt động của bạn",
+    "suggestedJobs": "Việc làm gợi ý"
   },
   "sidebarViewTotal": {
-    "title": "CV c?a b?n ?? ?? t?t ch?a?",
-    "subtitle": "C? bao nhi?u nh? tuy?n d?ng quan t?m h? s? c?a b?n?",
-    "description": "M?i l??t xem CV t? nh? tuy?n d?ng ??u l? m?t c? h?i ?? b?n ti?n g?n h?n t?i c?ng vi?c ph? h?p.",
-    "button": "Kh?m ph? ngay"
+    "title": "CV của bạn đã đủ tốt chưa?",
+    "subtitle": "Có bao nhiêu nhà tuyển dụng quan tâm hồ sơ của bạn?",
+    "description": "Mỗi lượt xem CV từ nhà tuyển dụng đều là một cơ hội để bạn tiến gần hơn tới công việc phù hợp.",
+    "button": "Khám phá ngay"
   },
-  "noDataForStatistics": "Kh?ng c? d? li?u th?ng k?",
-  "appliedJobs": "Vi?c l?m ?? ?ng tuy?n",
-  "savedJobs": "Vi?c l?m ?? l?u",
-  "employersViewedProfile": "Nh? tuy?n d?ng ?? xem h? s?",
-  "followedCompanies": "C?ng ty ?ang theo d?i"
+  "noDataForStatistics": "Không có dữ liệu thống kê",
+  "appliedJobs": "Việc làm đã ứng tuyển",
+  "savedJobs": "Việc làm đã lưu",
+  "employersViewedProfile": "Nhà tuyển dụng đã xem hồ sơ",
+  "followedCompanies": "Công ty đang theo dõi"
 }
