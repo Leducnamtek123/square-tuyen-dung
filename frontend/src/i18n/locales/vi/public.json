@@ -62,6 +62,20 @@
     "allGenders": "Tất cả giới tính",
     "searchResults": "Kết quả tìm kiếm",
     "posts": "tin tuyển dụng",
-    "noJobsFound": "Không tìm thấy việc làm phù hợp với tiêu chí của bạn"
+    "noJobsFound": "Không tìm thấy việc làm phù hợp với tiêu chí của bạn",
+    "jobTypeOptions": {
+      "1": "Toàn thời gian cố định",
+      "2": "Toàn thời gian tạm thời",
+      "3": "Bán thời gian cố định",
+      "4": "Bán thời gian tạm thời",
+      "5": "Hợp đồng tư vấn",
+      "6": "Thực tập",
+      "7": "Khác"
+    },
+    "workplaceOptions": {
+      "1": "Tại văn phòng",
+      "2": "Kết hợp",
+      "3": "Từ xa"
+    }
   }
 }

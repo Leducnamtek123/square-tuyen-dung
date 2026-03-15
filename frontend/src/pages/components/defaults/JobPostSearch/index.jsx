@@ -23,6 +23,26 @@ const JobPostSearch = () => {
   const { jobPostFilter } = useSelector((state) => state.filter);
   const [showAdvanceFilter, setShowAdvanceFilter] = React.useState(false);
   const { control, handleSubmit, reset } = useForm();
+  const localizedJobTypeOptions = React.useMemo(
+    () =>
+      (allConfig?.jobTypeOptions || []).map((option) => ({
+        ...option,
+        name:
+          t(`jobSearch.jobTypeOptions.${option.id}`, { defaultValue: '' }) ||
+          option.name,
+      })),
+    [allConfig?.jobTypeOptions, t]
+  );
+  const localizedTypeOfWorkplaceOptions = React.useMemo(
+    () =>
+      (allConfig?.typeOfWorkplaceOptions || []).map((option) => ({
+        ...option,
+        name:
+          t(`jobSearch.workplaceOptions.${option.id}`, { defaultValue: '' }) ||
+          option.name,
+      })),
+    [allConfig?.typeOfWorkplaceOptions, t]
+  );
 
   React.useEffect(() => {
     reset((formValues) => ({
@@ -237,7 +257,7 @@ const JobPostSearch = () => {
               name="jobTypeId"
               placeholder={t('jobSearch.allJobTypes')}
               control={control}
-              options={allConfig?.jobTypeOptions || []}
+              options={localizedJobTypeOptions}
             />
           </Grid>
           <Grid
@@ -252,7 +272,7 @@ const JobPostSearch = () => {
               name="typeOfWorkplaceId"
               placeholder={t('jobSearch.allWorkplaces')}
               control={control}
-              options={allConfig?.typeOfWorkplaceOptions || []}
+              options={localizedTypeOfWorkplaceOptions}
             />
           </Grid>
           <Grid

@@ -62,6 +62,20 @@
     "allGenders": "All genders",
     "searchResults": "Search Results",
     "posts": "posts",
-    "noJobsFound": "No jobs found matching your criteria"
+    "noJobsFound": "No jobs found matching your criteria",
+    "jobTypeOptions": {
+      "1": "Full-time Permanent",
+      "2": "Full-time Temporary",
+      "3": "Part-time Permanent",
+      "4": "Part-time Temporary",
+      "5": "Consultancy Contract",
+      "6": "Internship",
+      "7": "Other"
+    },
+    "workplaceOptions": {
+      "1": "On-site",
+      "2": "Hybrid",
+      "3": "Remote"
+    }
   }
 }
