@@ -30,16 +30,27 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
     hostName === HOST_NAME.EMPLOYER_MYJOB;
 
   const openPortal = (toEmployer = false, path = "") => {
-    const baseUrl = toEmployer
-      ? `${window.location.origin}/employer`
-      : window.location.origin;
+    const isSpecial = hostName === 'localhost' || hostName === '127.0.0.1' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostName);
     const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
-    window.open(`${baseUrl}${normalizedPath}`, "_blank");
+    
+    let targetUrl = "";
+    if (isSpecial) {
+      // Local/IP: Dùng path-based (Sửa thành /employee cho đúng router)
+      const baseUrl = toEmployer ? `${window.location.origin}/employee` : window.location.origin;
+      targetUrl = `${baseUrl}${normalizedPath}`;
+    } else {
+      // Production: Dùng Subdomain
+      const targetHost = toEmployer ? HOST_NAME.EMPLOYER_MYJOB : HOST_NAME.MYJOB;
+      const protocol = window.location.protocol;
+      const port = window.location.port ? `:${window.location.port}` : "";
+      targetUrl = `${protocol}//${targetHost}${port}${normalizedPath}`;
+    }
+    
+    window.open(targetUrl, "_blank");
   };
 
   const handleClick = () => {
     openPortal(!isEmployerPortal);
-
   };
 
   const handleClickAuth = (isLogin = false) => {

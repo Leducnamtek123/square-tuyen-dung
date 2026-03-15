@@ -65,14 +65,13 @@ const Header = (props) => {
   const location = useLocation();
 
   const hostName = window.location.hostname;
-  const pathname = window.location.pathname || "/";
+
   const isEmployerPortal =
-    pathname.startsWith("/employer") ||
-    pathname.startsWith("/employee") ||
+    location.pathname.startsWith("/employer") ||
+    location.pathname.startsWith("/employee") ||
     hostName === HOST_NAME.EMPLOYER_MYJOB;
-  const currentPortalHost = isEmployerPortal
-    ? HOST_NAME.EMPLOYER_MYJOB
-    : HOST_NAME.MYJOB;
+
+  const currentPortalHost = isEmployerPortal ? HOST_NAME.EMPLOYER_MYJOB : HOST_NAME.MYJOB;
 
   const nav = useNavigate();
 
