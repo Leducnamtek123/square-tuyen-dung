@@ -24,7 +24,7 @@ const AttachedProfilePage = () => {
 
     const { t } = useTranslation('jobSeeker');
 
-    TabTitle(t("attachedProfile.title"));
+    TabTitle(t("attachedProfile.pageTitle"));
 
     const refs = React.useRef([]);
 
@@ -34,7 +34,7 @@ const AttachedProfilePage = () => {
 
         { id: 1, value: t('attachedProfile.sections.general'), icon: <WorkOutlineOutlinedIcon /> },
 
-        { id: 2, value: t('attachedProfile.sections.upload'), icon: <UploadFileOutlinedIcon /> },
+        { id: 2, value: t('attachedProfile.sections.cv'), icon: <UploadFileOutlinedIcon /> },
 
     ];
 
@@ -110,7 +110,7 @@ const AttachedProfilePage = () => {
 
                             {/* Start: Cv card */}
 
-                            <CVCard title={t('attachedProfile.sections.upload')} />
+                            <CVCard title={t('attachedProfile.sections.cv')} />
 
                             {/* End: Cv card */}
 
@@ -196,7 +196,7 @@ const AttachedProfilePage = () => {
 
                                 >
 
-                                    {t('attachedProfile.sidebarTitle')}
+                                    {t('attachedProfile.sidebar.title')}
 
                                 </Typography>
 

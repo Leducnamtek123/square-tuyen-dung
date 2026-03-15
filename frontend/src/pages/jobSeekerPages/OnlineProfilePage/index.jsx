@@ -40,7 +40,7 @@ const OnlineProfilePage = () => {
 
     const { t } = useTranslation('jobSeeker');
 
-    TabTitle(t("onlineProfile.title"))
+    TabTitle(t("onlineProfile.pageTitle"))
 
     const refs = React.useRef([]);
 
@@ -232,7 +232,7 @@ const OnlineProfilePage = () => {
 
                                 >
 
-                                    {t('onlineProfile.sidebarTitle')}
+                                    {t('onlineProfile.sidebar.title')}
 
                                 </Typography>
 

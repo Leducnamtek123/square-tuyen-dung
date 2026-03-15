@@ -1,4 +1,4 @@
-{
+﻿{
   "myInterviewsTitle": "Phỏng vấn của tôi",
   "noInterviewsTitle": "Bạn không có buổi phỏng vấn nào được lên lịch",
   "nav": {
@@ -378,5 +378,21 @@
         }
       }
     }
-  }
+  },
+  "dashboard": {
+    "pageTitle": "B?ng ?i?u khi?n ?ng vi?n",
+    "yourActivity": "Ho?t ??ng c?a b?n",
+    "suggestedJobs": "Vi?c l?m g?i ?"
+  },
+  "sidebarViewTotal": {
+    "title": "CV c?a b?n ?? ?? t?t ch?a?",
+    "subtitle": "C? bao nhi?u nh? tuy?n d?ng quan t?m h? s? c?a b?n?",
+    "description": "M?i l??t xem CV t? nh? tuy?n d?ng ??u l? m?t c? h?i ?? b?n ti?n g?n h?n t?i c?ng vi?c ph? h?p.",
+    "button": "Kh?m ph? ngay"
+  },
+  "noDataForStatistics": "Kh?ng c? d? li?u th?ng k?",
+  "appliedJobs": "Vi?c l?m ?? ?ng tuy?n",
+  "savedJobs": "Vi?c l?m ?? l?u",
+  "employersViewedProfile": "Nh? tuy?n d?ng ?? xem h? s?",
+  "followedCompanies": "C?ng ty ?ang theo d?i"
 }
