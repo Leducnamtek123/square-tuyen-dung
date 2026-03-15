@@ -30,23 +30,21 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
     hostName.startsWith("employer.");
 
   const openPortal = (toEmployer = false, path = "") => {
-    const isSpecial = hostName === 'localhost' || hostName === '127.0.0.1' || /^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$/.test(hostName);
     const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
+    const protocol = window.location.protocol;
+    const port = window.location.port ? `:${window.location.port}` : "";
     
+    // Luôn ưu tiên dùng path-based cho portal Nhà tuyển dụng (/employee) 
+    // thay vì subdomain để đồng bộ với môi trường hiện tại của user
+    const mainHost = HOST_NAME.MYJOB;
     let targetUrl = "";
-    if (isSpecial) {
-      // Local/IP: Dùng path-based
-      const baseUrl = toEmployer ? `${window.location.origin}/employee` : window.location.origin;
-      targetUrl = `${baseUrl}${normalizedPath}`;
+    
+    if (toEmployer) {
+      targetUrl = `${protocol}//${mainHost}${port}/employee${normalizedPath}`;
     } else {
-      // Production
-      const targetHost = toEmployer ? HOST_NAME.EMPLOYER_MYJOB : HOST_NAME.MYJOB;
-      const protocol = window.location.protocol;
-      const port = window.location.port ? `:${window.location.port}` : "";
-      targetUrl = `${protocol}//${targetHost}${port}${normalizedPath}`;
+      targetUrl = `${protocol}//${mainHost}${port}${normalizedPath}`;
     }
     
-    // Chuyển hướng ngay trên trang hiện tại để có trải nghiệm mượt mà
     window.location.href = targetUrl;
   };
 
