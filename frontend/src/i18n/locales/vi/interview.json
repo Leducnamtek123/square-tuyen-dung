@@ -130,5 +130,20 @@
       "completed": "Hoàn thành",
       "cancelled": "Đã hủy"
     }
+  },
+  "interviewAdminPage": {
+    "title": "Quản lý Phỏng vấn",
+    "cardTitle": "Danh sách tất cả các cuộc phỏng vấn",
+    "confirmDelete": "Bạn có chắc chắn muốn xóa cuộc phỏng vấn này không?",
+    "candidateEmployer": "Ứng viên / Nhà tuyển dụng",
+    "jobPost": "Tin tuyển dụng",
+    "type": "Loại",
+    "time": "Thời gian",
+    "status": "Trạng thái",
+    "actions": "Thao tác",
+    "viewDetails": "Xem chi tiết",
+    "markCompleted": "Đánh dấu hoàn thành",
+    "cancelInterview": "Hủy phỏng vấn",
+    "delete": "Xóa"
   }
 }

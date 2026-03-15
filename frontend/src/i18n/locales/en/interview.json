@@ -130,5 +130,20 @@
       "completed": "Completed",
       "cancelled": "Cancelled"
     }
+  },
+  "interviewAdminPage": {
+    "title": "Interview Management",
+    "cardTitle": "All Interview List",
+    "confirmDelete": "Are you sure you want to delete this interview?",
+    "candidateEmployer": "Candidate / Employer",
+    "jobPost": "Job Post",
+    "type": "Type",
+    "time": "Time",
+    "status": "Status",
+    "actions": "Actions",
+    "viewDetails": "View details",
+    "markCompleted": "Mark as completed",
+    "cancelInterview": "Cancel interview",
+    "delete": "Delete"
   }
 }

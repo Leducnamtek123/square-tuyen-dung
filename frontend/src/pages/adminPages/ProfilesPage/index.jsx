@@ -12,6 +12,7 @@ import ProfileTable from './components/ProfileTable';
 
 const ProfilesPage = () => {
     const { t } = useTranslation('admin');
+    const PAGE_SIZE = 10;
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -24,6 +25,7 @@ const ProfilesPage = () => {
         isMutating
     } = useProfiles({
         page,
+        pageSize: PAGE_SIZE,
         kw: searchTerm
     });
 
@@ -187,7 +189,7 @@ const ProfilesPage = () => {
                         {data?.count > 0 && (
                             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
                                 <Pagination
-                                    count={Math.ceil(data.count / 10)}
+                                    count={Math.ceil(data.count / PAGE_SIZE)}
                                     page={page}
                                     onChange={(e, v) => setPage(v)}
                                     color="primary"
