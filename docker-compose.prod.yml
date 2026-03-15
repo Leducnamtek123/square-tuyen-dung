@@ -124,6 +124,28 @@ services:
     networks:
       - square-network
 
+  llama-cpp:
+    image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    container_name: tuyendung-studio-llama-cpp
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - "11434"
+      - --hf-repo
+      - "${LLAMA_HF_REPO:-Qwen/Qwen2.5-7B-Instruct-GGUF:q4_k_m}"
+      - --alias
+      - "${LLAMA_MODEL_ALIAS:-qwen2.5-7b}"
+      - --ctx-size
+      - "${LLAMA_CTX_SIZE:-16384}"
+    ports:
+      - "11436:11434"
+    volumes:
+      - ./voice-ai/inference/llama/models:/models
+    restart: always
+    networks:
+      - square-network
+
 networks:
   square-network:
     driver: bridge
