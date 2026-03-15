@@ -132,10 +132,10 @@ services:
       - 0.0.0.0
       - --port
       - "11434"
-      - --hf-repo
-      - "${LLAMA_HF_REPO:-Qwen/Qwen2.5-7B-Instruct-GGUF:q4_k_m}"
+      - --model
+      - /models/llama.cpp/Qwen_Qwen2-7B-Instruct-GGUF_qwen2-7b-instruct-q4_k_m.gguf
       - --alias
-      - "${LLAMA_MODEL_ALIAS:-qwen2.5-7b}"
+      - "${LLAMA_MODEL_ALIAS:-qwen2-7b}"
       - --ctx-size
       - "${LLAMA_CTX_SIZE:-16384}"
     ports:
