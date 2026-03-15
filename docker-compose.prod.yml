@@ -9,6 +9,7 @@ services:
       - frontend
       - backend
       - livekit
+      - minio
     restart: always
     networks:
       - square-network
@@ -25,13 +26,16 @@ services:
         REACT_APP_API_COMPANY: /api/company/web
         REACT_APP_API_INFO: /api/info/web
         REACT_APP_API_AUTH: /api/auth/web
-        VITE_MYJOB_SERVER_CLIENT_ID: ${VITE_MYJOB_SERVER_CLIENT_ID}
-        VITE_MYJOB_SERVER_CLIENT_SECRECT: ${VITE_MYJOB_SERVER_CLIENT_SECRECT}
-        VITE_MYJOB_HOST_NAME: ${VITE_MYJOB_HOST_NAME}
-        VITE_ADMIN_MYJOB_HOST_NAME: ${VITE_ADMIN_MYJOB_HOST_NAME}
-        VITE_EMPLOYER_MYJOB_HOST_NAME: ${VITE_EMPLOYER_MYJOB_HOST_NAME}
-        VITE_GOONGAPI_KEY: ${VITE_GOONGAPI_KEY}
-        VITE_GOONGAPI_ACCESS_TOKEN: ${VITE_GOONGAPI_ACCESS_TOKEN}
+        VITE_MYJOB_SERVER_CLIENT_ID: ${VITE_MYJOB_SERVER_CLIENT_ID:-qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS}
+        VITE_MYJOB_SERVER_CLIENT_SECRECT: ${VITE_MYJOB_SERVER_CLIENT_SECRECT:-myjob_secret_client_key_2024}
+        VITE_MYJOB_HOST_NAME: ${VITE_MYJOB_HOST_NAME:-tuyendung.square.vn}
+        VITE_ADMIN_MYJOB_HOST_NAME: ${VITE_ADMIN_MYJOB_HOST_NAME:-admin.tuyendung.square.vn}
+        VITE_EMPLOYER_MYJOB_HOST_NAME: ${VITE_EMPLOYER_MYJOB_HOST_NAME:-employer.tuyendung.square.vn}
+        VITE_GOONGAPI_KEY: ${VITE_GOONGAPI_KEY:-0Dn3IFPq2ZWDmCMBFVbUXsT6yqLaqYa5lXRUyFO0}
+        VITE_GOONGAPI_ACCESS_TOKEN: ${VITE_GOONGAPI_ACCESS_TOKEN:-}
+        VITE_LIVEKIT_URL: wss://tuyendung.square.vn/livekit
+    env_file:
+      - .env.prod
     expose:
       - "80"
     restart: always
@@ -119,6 +123,26 @@ services:
       - "50000-50010:50000-50010/udp"
     environment:
       LIVEKIT_KEYS: "${LIVEKIT_API_KEY:-devkey}: ${LIVEKIT_API_SECRET:-secret}"
+    env_file:
+      - .env.prod
+    restart: always
+    networks:
+      - square-network
+
+  minio:
+    image: minio/minio:latest
+    container_name: tuyendung-studio-minio-prod
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-password}
+    expose:
+      - "9000"
+      - "9001"
+    volumes:
+      - minio-data:/data
+    env_file:
+      - .env.prod
     restart: always
     networks:
       - square-network
