@@ -13,6 +13,24 @@ import { ThemeProvider } from "@/voice-ai/components/app/theme-provider";
 import { APP_CONFIG_DEFAULTS } from "@/voice-ai/app-config";
 import LanguageSwitcher from "../../../layouts/components/commons/LanguageSwitcher";
 
+const getSafeLiveKitUrl = () => {
+  const fallbackUrl = "wss://tuyendung.square.vn/livekit";
+  const rawUrl = (import.meta.env.VITE_LIVEKIT_URL || fallbackUrl).trim();
+
+  if (!rawUrl) return fallbackUrl;
+
+  try {
+    const normalized = new URL(rawUrl);
+    if (window.location.protocol === "https:") {
+      if (normalized.protocol === "ws:") normalized.protocol = "wss:";
+      if (normalized.protocol === "http:") normalized.protocol = "https:";
+    }
+    return normalized.toString().replace(/\/$/, "");
+  } catch {
+    return fallbackUrl;
+  }
+};
+
 const InterviewRoomPage = () => {
   const { id: inviteToken } = useParams();
   const navigate = useNavigate();
@@ -22,7 +40,7 @@ const InterviewRoomPage = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const liveKitUrl = import.meta.env.VITE_LIVEKIT_URL || "ws://localhost:7880";
+  const liveKitUrl = getSafeLiveKitUrl();
 
   useEffect(() => {
     const fetchToken = async () => {
