@@ -18,35 +18,27 @@ import {
 
 import { HOST_NAME, ROUTES } from '../../../../configs/constants';
 
-import { buildURL } from '../../../../utils/funcUtils';
-
 const AccountSwitchMenu = ({ isShowButton = false }) => {
 
   const { t } = useTranslation('common');
 
   const hostName = window.location.hostname;
+  const pathname = window.location.pathname || "/";
+  const isEmployerPortal =
+    pathname.startsWith("/employer") ||
+    pathname.startsWith("/employee") ||
+    hostName === HOST_NAME.EMPLOYER_MYJOB;
+
+  const openPortal = (toEmployer = false, path = "") => {
+    const baseUrl = toEmployer
+      ? `${window.location.origin}/employer`
+      : window.location.origin;
+    const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
+    window.open(`${baseUrl}${normalizedPath}`, "_blank");
+  };
 
   const handleClick = () => {
-
-    switch(hostName) {
-
-      case HOST_NAME.MYJOB:
-
-        window.open(buildURL(HOST_NAME.EMPLOYER_MYJOB), '_blank');
-
-        break;
-
-      case HOST_NAME.EMPLOYER_MYJOB:
-
-        window.open(buildURL(HOST_NAME.MYJOB), '_blank');
-
-        break;
-
-      default:
-
-        window.open(buildURL(HOST_NAME.MYJOB), '_blank');
-
-    }
+    openPortal(!isEmployerPortal);
 
   };
 
@@ -54,31 +46,13 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
 
     const path = isLogin ? ROUTES.AUTH.LOGIN : ROUTES.AUTH.REGISTER;
 
-    switch(hostName) {
-
-      case HOST_NAME.MYJOB:
-
-        window.open(`${buildURL(HOST_NAME.EMPLOYER_MYJOB)}/${path}`, '_blank');
-
-        break;
-
-      case HOST_NAME.EMPLOYER_MYJOB:
-
-        window.open(`${buildURL(HOST_NAME.MYJOB)}/${path}`, '_blank');
-
-        break;
-
-      default:
-
-        window.open(`${buildURL(HOST_NAME.MYJOB)}/${path}`, '_blank');
-
-    }
+    openPortal(!isEmployerPortal, path);
 
   }
 
   const title = React.useMemo(() => {
 
-    return hostName === HOST_NAME.MYJOB ? (
+    return !isEmployerPortal ? (
 
       <Stack direction="row" alignItems="center">
 
@@ -108,7 +82,7 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
 
       </Stack>
 
-    ) : hostName === HOST_NAME.EMPLOYER_MYJOB ? (
+    ) : (
 
       <Stack direction="row" alignItems="center">
 
@@ -138,39 +112,9 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
 
       </Stack>
 
-    ) : (
-
-      <Stack direction="row" alignItems="center">
-
-        <FontAwesomeIcon
-
-          color="#2c95ff"
-
-          icon={faBriefcase}
-
-          fontSize={25}
-
-          style={{ marginRight: 8 }}
-
-        />
-
-        <Stack direction="column">
-
-          <Typography>{t('nav.switch.forEmployers')}</Typography>
-
-          <Typography variant="caption" sx={{ fontSize: 11 }}>
-
-            {t('nav.switch.postFreeJob')}
-
-          </Typography>
-
-        </Stack>
-
-      </Stack>
-
     );
 
-  }, [hostName, t]);
+  }, [isEmployerPortal, t]);
 
   return (
 
@@ -196,7 +140,7 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
 
           >
 
-            {hostName === HOST_NAME.EMPLOYER_MYJOB
+            {isEmployerPortal
 
               ? t('nav.switch.candidateLogin')
 
@@ -220,7 +164,7 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
 
           >
 
-            {hostName === HOST_NAME.EMPLOYER_MYJOB
+            {isEmployerPortal
 
               ? t('nav.switch.candidateRegister')
 

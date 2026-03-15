@@ -134,6 +134,7 @@ const AppRoutes = ({ settings }) => {
   const hostName = window.location.hostname;
   const pathname = window.location.pathname || "/";
   const candidatePrefix = `/${ROUTES.CANDIDATE.INTERVIEW.replace('/:id', '')}`;
+  const employerPrefixes = ["/employer", "/employee"];
 
   // 1. Phỏng vấn ứng viên - luôn ưu tiên
   const isCandidateRoute = pathname === candidatePrefix || pathname.startsWith(`${candidatePrefix}/`);
@@ -154,13 +155,14 @@ const AppRoutes = ({ settings }) => {
     );
   }
 
-  if (pathname.startsWith('/employee')) {
+  if (employerPrefixes.some((prefix) => pathname.startsWith(prefix))) {
     return (
       <Routes>
-        <Route path="/employee">
+        <Route path="/employer">
           {renderRoutes(routesConfig[HOST_NAME.EMPLOYER_MYJOB], settings)}
         </Route>
-        <Route path="/employee/*" element={<Navigate to="/employee" replace />} />
+        <Route path="/employee/*" element={<Navigate to="/employer" replace />} />
+        <Route path="/employer/*" element={<Navigate to="/employer" replace />} />
       </Routes>
     );
   }

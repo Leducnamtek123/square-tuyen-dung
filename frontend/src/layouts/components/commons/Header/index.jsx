@@ -65,6 +65,14 @@ const Header = (props) => {
   const location = useLocation();
 
   const hostName = window.location.hostname;
+  const pathname = window.location.pathname || "/";
+  const isEmployerPortal =
+    pathname.startsWith("/employer") ||
+    pathname.startsWith("/employee") ||
+    hostName === HOST_NAME.EMPLOYER_MYJOB;
+  const currentPortalHost = isEmployerPortal
+    ? HOST_NAME.EMPLOYER_MYJOB
+    : HOST_NAME.MYJOB;
 
   const nav = useNavigate();
 
@@ -438,7 +446,7 @@ const Header = (props) => {
 
               >
 
-                {pages[hostName]?.map((page) => (
+                {pages[currentPortalHost]?.map((page) => (
 
                   <MenuItem
 
@@ -464,7 +472,7 @@ const Header = (props) => {
 
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
 
-              {pages[hostName]?.map((page) => (
+              {pages[currentPortalHost]?.map((page) => (
 
                 <Link to={page.path} key={page.id} onClick={handleCloseNavMenu}>
 
@@ -564,7 +572,7 @@ const Header = (props) => {
 
         <LeftDrawer
 
-          pages={pages[hostName] || []}
+          pages={pages[currentPortalHost] || []}
 
           mobileOpen={mobileOpen}
 
