@@ -19,6 +19,7 @@ import UserMenu from "../UserMenu";
 import LeftDrawer from "../LeftDrawer";
 
 import AccountSwitchMenu from "../AccountSwitchMenu";
+import WorkspaceSwitchMenu from "../WorkspaceSwitchMenu";
 
 import NotificationCard from "../../../../components/NotificationCard";
 
@@ -511,6 +512,7 @@ const Header = (props) => {
             </Box>
 
             <LanguageSwitcher />
+            {isAuthenticated && <WorkspaceSwitchMenu />}
 
             {/* start: NotificationCard */}
 
@@ -536,7 +538,7 @@ const Header = (props) => {
 
             {/* End: authArea */}
 
-            {!isSmall && (
+            {!isSmall && !isAuthenticated && (
 
               <>
 

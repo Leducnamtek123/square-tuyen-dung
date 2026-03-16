@@ -2,7 +2,7 @@
 import React, { Children, cloneElement, isValidElement, useMemo } from 'react';
 import { cva } from 'class-variance-authority';
 import { useMultibandTrackVolume } from '@livekit/components-react';
-import { useAgentAudioVisualizerBarAnimator } from '@/hooks/use-agent-audio-visualizer-bar';
+import { useAgentAudioVisualizerBarAnimator } from '@/hooks/agents-ui/use-agent-audio-visualizer-bar';
 import { cn } from '@/lib/utils';
 
 function cloneSingleChild(

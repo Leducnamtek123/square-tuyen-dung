@@ -112,9 +112,19 @@ class CustomTokenView(TokenView):
                     token = get_access_token_model().objects.get(token=access_token)
 
                     role_name = token.user.role_name
+                    allow_login = role_name == role_name_input
+                    if role_name_input == var_sys.EMPLOYER and not allow_login:
+                        try:
+                            from info.models import CompanyMember
+                            allow_login = CompanyMember.objects.filter(
+                                user=token.user,
+                                is_active=True,
+                                status=CompanyMember.STATUS_ACTIVE,
+                            ).exists()
+                        except Exception:
+                            allow_login = False
 
-                    if not role_name == role_name_input:
-
+                    if not allow_login:
                         return response_data(status=status.HTTP_400_BAD_REQUEST)
 
             return response_data(status=stt, data=json.loads(body))
@@ -390,8 +400,18 @@ def check_creds(request):
     user = User.objects.filter(email__iexact=email)
 
     if role_name is not None:
-
-        user = user.filter(role_name=role_name)
+        if role_name == var_sys.EMPLOYER:
+            try:
+                from info.models import CompanyMember
+                member_user_ids = CompanyMember.objects.filter(
+                    is_active=True,
+                    status=CompanyMember.STATUS_ACTIVE,
+                ).values_list("user_id", flat=True)
+                user = user.filter(Q(role_name=role_name) | Q(id__in=member_user_ids))
+            except Exception:
+                user = user.filter(role_name=role_name)
+        else:
+            user = user.filter(role_name=role_name)
 
     res_data["email"] = email
 

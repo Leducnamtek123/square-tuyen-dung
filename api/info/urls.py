@@ -49,6 +49,10 @@ web_router.register(r'companies', web_views.CompanyViewSet, basename='web-compan
 
 web_router.register(r'company-images', web_views.CompanyImageViewSet, basename='company-image')
 
+web_router.register(r'company-roles', web_views.CompanyRoleViewSet, basename='company-role')
+
+web_router.register(r'company-members', web_views.CompanyMemberViewSet, basename='company-member')
+
 web_router.register(r'admin/companies', web_views.AdminCompanyViewSet, basename='admin-companies')
 
 web_router.register(r'admin/job-seeker-profiles', web_views.AdminJobSeekerProfileViewSet, basename='admin-job-seeker-profiles')

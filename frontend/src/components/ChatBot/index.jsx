@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
-import { AUTH_CONFIG, ROLES_NAME } from "../../configs/constants";
+import { AUTH_CONFIG } from "../../configs/constants";
 import api from "../../services/axiosClient";
 import { MessageResponse } from "../ai-elements/message";
 import "./chatbot.css";
@@ -13,7 +13,7 @@ const MAX_HISTORY = 12;
 
 const ChatBot = () => {
   const { t } = useTranslation(['chat', 'common']);
-  const { currentUser, isAuthenticated } = useSelector(
+  const { currentUser, isAuthenticated, activeWorkspace } = useSelector(
     /** @type {(state: any) => any} */ ((state) => state.user)
   );
   const [botConfig, setBotConfig] = useState(null);
@@ -24,8 +24,7 @@ const ChatBot = () => {
   const [error, setError] = useState("");
   const listRef = useRef(null);
 
-  const isEmployer =
-    (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.EMPLOYER;
+  const isEmployer = activeWorkspace?.type === "company";
 
   const greeting = useMemo(() => {
     if (isEmployer) {

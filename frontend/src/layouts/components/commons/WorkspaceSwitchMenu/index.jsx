@@ -1,0 +1,92 @@
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+
+import { HOST_NAME, ROUTES } from "../../../../configs/constants";
+import { setActiveWorkspace } from "../../../../redux/userSlice";
+
+const WorkspaceSwitchMenu = () => {
+  const dispatch = useDispatch();
+  const { currentUser, activeWorkspace } = useSelector((state) => state.user);
+  const workspaces = currentUser?.workspaces || [];
+
+  const [anchorEl, setAnchorEl] = React.useState(null);
+  const open = Boolean(anchorEl);
+
+  const currentWorkspace = React.useMemo(() => {
+    if (!activeWorkspace) return null;
+    return workspaces.find((w) => {
+      if (w.type !== activeWorkspace.type) return false;
+      if (w.type === "company") return Number(w.companyId) === Number(activeWorkspace.companyId);
+      return true;
+    }) || null;
+  }, [workspaces, activeWorkspace]);
+
+  if (workspaces.length <= 1) return null;
+
+  const openPortal = (toEmployer = false, path = "") => {
+    const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
+    const protocol = window.location.protocol;
+    const port = window.location.port ? `:${window.location.port}` : "";
+    const mainHost = HOST_NAME.MYJOB;
+    const targetUrl = toEmployer
+      ? `${protocol}//${mainHost}${port}/employee${normalizedPath}`
+      : `${protocol}//${mainHost}${port}${normalizedPath}`;
+    window.location.href = targetUrl;
+  };
+
+  const handleSelectWorkspace = (workspace) => {
+    dispatch(setActiveWorkspace(workspace));
+    setAnchorEl(null);
+    if (workspace.type === "company") {
+      openPortal(true, ROUTES.EMPLOYER.DASHBOARD);
+      return;
+    }
+    openPortal(false, ROUTES.JOB_SEEKER.DASHBOARD);
+  };
+
+  return (
+    <Box sx={{ mr: 1 }}>
+      <Button
+        color="inherit"
+        onClick={(e) => setAnchorEl(e.currentTarget)}
+        endIcon={<KeyboardArrowDownIcon />}
+        sx={{
+          textTransform: "none",
+          border: "1px solid rgba(255,255,255,0.25)",
+          borderRadius: 2,
+          px: 1.5,
+          minWidth: 150,
+        }}
+      >
+        <Typography variant="body2" noWrap sx={{ maxWidth: 120 }}>
+          {currentWorkspace?.label || "Workspace"}
+        </Typography>
+      </Button>
+      <Menu
+        anchorEl={anchorEl}
+        open={open}
+        onClose={() => setAnchorEl(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        {workspaces.map((workspace) => (
+          <MenuItem
+            key={`${workspace.type}-${workspace.companyId || "candidate"}`}
+            selected={
+              workspace.type === activeWorkspace?.type &&
+              (workspace.type !== "company" ||
+                Number(workspace.companyId) === Number(activeWorkspace?.companyId))
+            }
+            onClick={() => handleSelectWorkspace(workspace)}
+          >
+            {workspace.label}
+          </MenuItem>
+        ))}
+      </Menu>
+    </Box>
+  );
+};
+
+export default WorkspaceSwitchMenu;

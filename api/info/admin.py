@@ -40,6 +40,8 @@ from .models import (
     Company,
 
     CompanyImage,
+    CompanyRole,
+    CompanyMember,
 
     ResumeSaved,
 
@@ -639,6 +641,22 @@ class CompanyFollowedAdmin(admin.ModelAdmin):
 
     list_select_related = ('company', 'user')
 
+class CompanyRoleAdmin(admin.ModelAdmin):
+    list_display = ("id", "company", "code", "name", "is_system", "is_active")
+    list_display_links = ("id", "name")
+    search_fields = ("id", "company__company_name", "code", "name")
+    list_filter = ("is_system", "is_active")
+    raw_id_fields = ("company",)
+    list_select_related = ("company",)
+
+class CompanyMemberAdmin(admin.ModelAdmin):
+    list_display = ("id", "company", "user", "role", "status", "is_active", "joined_at")
+    list_display_links = ("id",)
+    search_fields = ("id", "company__company_name", "user__email", "role__name")
+    list_filter = ("status", "is_active")
+    raw_id_fields = ("company", "user", "role", "invited_by")
+    list_select_related = ("company", "user", "role", "invited_by")
+
 custom_admin_site.register(JobSeekerProfile, JobSeekerProfileAdmin)
 
 custom_admin_site.register(Resume, ResumeAdmin)
@@ -650,3 +668,7 @@ custom_admin_site.register(ResumeSaved, ResumeSavedAdmin)
 custom_admin_site.register(ResumeViewed, ResumeViewedAdmin)
 
 custom_admin_site.register(CompanyFollowed, CompanyFollowedAdmin)
+
+custom_admin_site.register(CompanyRole, CompanyRoleAdmin)
+
+custom_admin_site.register(CompanyMember, CompanyMemberAdmin)

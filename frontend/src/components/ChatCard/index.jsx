@@ -22,13 +22,13 @@ import {
 
 import db from '../../configs/firebase-config'; 
 
-import { ROLES_NAME, ROUTES } from '../../configs/constants';
+import { ROUTES } from '../../configs/constants';
 
 const chatRoomCollectionRef = collection(db, 'chatRooms');
 
 const ChatCard = () => {
 
-  const { currentUser  } = useSelector((state) => state.user);
+  const { currentUser, activeWorkspace } = useSelector((state) => state.user);
 
   const nav = useNavigate();
 
@@ -36,9 +36,9 @@ const ChatCard = () => {
 
   const isEmployer = React.useMemo(() => {
 
-    return currentUser?.roleName === ROLES_NAME.EMPLOYER;
+    return activeWorkspace?.type === "company";
 
-  }, [currentUser]);
+  }, [activeWorkspace]);
 
   React.useEffect(() => {
 

@@ -130,6 +130,69 @@ const deleteAvatar = createAsyncThunk(
 
 );
 
+const ACTIVE_WORKSPACE_STORAGE_KEY = "active_workspace";
+
+const loadActiveWorkspace = () => {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(ACTIVE_WORKSPACE_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const persistActiveWorkspace = (workspace) => {
+  if (typeof window === "undefined") return;
+  try {
+    if (workspace) {
+      localStorage.setItem(ACTIVE_WORKSPACE_STORAGE_KEY, JSON.stringify(workspace));
+    } else {
+      localStorage.removeItem(ACTIVE_WORKSPACE_STORAGE_KEY);
+    }
+  } catch {
+    // ignore storage errors
+  }
+};
+
+const normalizeWorkspace = (workspace) => {
+  if (!workspace) return null;
+  return {
+    type: workspace.type,
+    companyId: workspace.companyId || null,
+    label: workspace.label || "",
+  };
+};
+
+const resolveActiveWorkspace = (workspaces, preferred, currentUser) => {
+  const workspaceList = Array.isArray(workspaces) ? workspaces : [];
+  if (!workspaceList.length) return null;
+
+  if (preferred?.type) {
+    const match = workspaceList.find((w) => {
+      if (w.type !== preferred.type) return false;
+      if (w.type === "company") return Number(w.companyId) === Number(preferred.companyId);
+      return true;
+    });
+    if (match) return normalizeWorkspace(match);
+  }
+
+  const defaultWorkspace = workspaceList.find((w) => w.isDefault);
+  if (defaultWorkspace) return normalizeWorkspace(defaultWorkspace);
+
+  if ((currentUser?.roleName || currentUser?.role_name) === "EMPLOYER") {
+    const firstCompany = workspaceList.find((w) => w.type === "company");
+    if (firstCompany) return normalizeWorkspace(firstCompany);
+  }
+
+  const firstJobSeeker = workspaceList.find((w) => w.type === "job_seeker");
+  if (firstJobSeeker) return normalizeWorkspace(firstJobSeeker);
+
+  return normalizeWorkspace(workspaceList[0]);
+};
+
+const storedWorkspace = loadActiveWorkspace();
+
 export const userSlice = createSlice({
 
   name: 'user',
@@ -140,9 +203,16 @@ export const userSlice = createSlice({
 
     currentUser: null,
 
+    activeWorkspace: storedWorkspace,
+
   },
 
-  reducers: {},
+  reducers: {
+    setActiveWorkspace: (state, action) => {
+      state.activeWorkspace = normalizeWorkspace(action.payload);
+      persistActiveWorkspace(state.activeWorkspace);
+    },
+  },
 
   extraReducers: (builder) => {
 
@@ -152,6 +222,13 @@ export const userSlice = createSlice({
 
       state.currentUser = action.payload;
 
+      state.activeWorkspace = resolveActiveWorkspace(
+        action.payload?.workspaces,
+        state.activeWorkspace || storedWorkspace,
+        action.payload
+      );
+      persistActiveWorkspace(state.activeWorkspace);
+
     });
 
     builder.addCase(updateUserInfo.fulfilled, (state, action) => {
@@ -160,6 +237,13 @@ export const userSlice = createSlice({
 
       state.currentUser = action.payload;
 
+      state.activeWorkspace = resolveActiveWorkspace(
+        action.payload?.workspaces,
+        state.activeWorkspace || storedWorkspace,
+        action.payload
+      );
+      persistActiveWorkspace(state.activeWorkspace);
+
     });
 
     builder.addCase(removeUserInfo.fulfilled, (state) => {
@@ -167,6 +251,9 @@ export const userSlice = createSlice({
       state.isAuthenticated = false;
 
       state.currentUser = null;
+
+      state.activeWorkspace = null;
+      persistActiveWorkspace(null);
 
     });
 
@@ -206,6 +293,8 @@ export const userSlice = createSlice({
 
 const { reducer } = userSlice;
 
+const { setActiveWorkspace } = userSlice.actions;
+
 export default reducer;
 
 export {
@@ -219,5 +308,7 @@ export {
   updateAvatar,
 
   deleteAvatar,
+
+  setActiveWorkspace,
 
 };

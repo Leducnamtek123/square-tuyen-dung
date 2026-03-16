@@ -114,6 +114,32 @@ ROLE_CHOICES = (
     (JOB_SEEKER, 'Job Seeker')
 )
 
+COMPANY_PERMISSION_KEYS = (
+    "manage_company_profile",
+    "manage_job_posts",
+    "manage_candidates",
+    "manage_interviews",
+    "manage_question_bank",
+    "manage_members",
+    "manage_roles",
+)
+
+COMPANY_SYSTEM_ROLES = {
+    "owner": {
+        "name": "Owner",
+        "permissions": ["*"],
+    },
+    "hr": {
+        "name": "HR",
+        "permissions": [
+            "manage_candidates",
+            "manage_interviews",
+            "manage_question_bank",
+            "manage_members",
+        ],
+    },
+}
+
 JOB_POST_STATUS = (
     (1, 'Pending'),
     (2, 'Rejected'),

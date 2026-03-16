@@ -41,13 +41,18 @@ function App() {
 
   const { isAllowVerifyEmail } = useSelector((state) => state.auth);
 
-  const { isAuthenticated, currentUser } = useSelector((state) => state.user);
+  const { isAuthenticated, currentUser, activeWorkspace } = useSelector((state) => state.user);
+
+  const isAdminAccount = (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.ADMIN;
+  const workspaceType = activeWorkspace?.type || null;
+  const isEmployerWorkspace = workspaceType === "company";
+  const isJobSeekerWorkspace = workspaceType === "job_seeker";
 
   const settings = {
     isAuthenticated: isAuthenticated && !!currentUser,
-    isJobSeekerRole: (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.JOB_SEEKER,
-    isEmployerRole: (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.EMPLOYER,
-    isAdminRole: (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.ADMIN,
+    isJobSeekerRole: !isAdminAccount && (isJobSeekerWorkspace || (!workspaceType && (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.JOB_SEEKER)),
+    isEmployerRole: !isAdminAccount && (isEmployerWorkspace || (!workspaceType && ((currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.EMPLOYER || !!currentUser?.canAccessEmployerPortal))),
+    isAdminRole: isAdminAccount,
     isAllowVerifyEmail: isAllowVerifyEmail,
   };
   const location = useLocation();

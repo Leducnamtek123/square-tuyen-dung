@@ -20,9 +20,11 @@ import StopCircleIcon from "@mui/icons-material/StopCircle";
 import {
   LiveKitRoom,
   RoomAudioRenderer,
-  VideoConference,
   ConnectionStateToast,
 } from "@livekit/components-react";
+
+import InterviewAgentView from "../../components/interviewAi/InterviewAgentView";
+import { cn } from "../../lib/utils";
 
 import interviewService from "../../services/interviewService";
 import { transformInterviewSession } from "../../utils/transformers";
@@ -249,19 +251,70 @@ const InterviewSessionPage = ({ role = "jobseeker" }) => {
               </>
             )}
 
-            <Box sx={{ height: { xs: 520, md: 680 }, borderRadius: 2, overflow: "hidden", bgcolor: "#0f172a" }}>
+            <Box sx={{ height: { xs: "calc(100vh - 200px)", md: 720 }, borderRadius: 4, overflow: "hidden", bgcolor: "#0b1220", border: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
               <LiveKitRoom
                 token={participantToken}
                 serverUrl={liveKitUrl}
                 connect={connectRoom}
-                video
-                audio
+                video={false} // Optimized for voice-first experience
+                audio={true}
                 data-lk-theme="default"
                 onDisconnected={handleEndInterview}
               >
+                {connectRoom ? (
+                   <>
+                     <InterviewAgentView 
+                        onDisconnect={handleEndInterview} 
+                        sessionInfo={{
+                           jobName: session?.jobName,
+                           candidateName: session?.candidateName
+                        }}
+                     />
+                     <RoomAudioRenderer />
+                   </>
+                ) : (
+                  <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', p: 4 }}>
+                     <Stack spacing={4} alignItems="center" sx={{ maxWidth: 400, textAlign: 'center' }}>
+                        <Box sx={{ 
+                           width: 120, 
+                           height: 120, 
+                           borderRadius: '50%', 
+                           bgcolor: 'rgba(31, 213, 249, 0.1)', 
+                           display: 'grid', 
+                           placeItems: 'center',
+                           border: '2px dashed rgba(31, 213, 249, 0.3)'
+                        }}>
+                           <VideoCameraFrontIcon sx={{ fontSize: 60, color: '#1fd5f9' }} />
+                        </Box>
+                        <Stack spacing={1}>
+                           <Typography variant="h5" color="white" fontWeight={700}>
+                             Ready for your interview?
+                           </Typography>
+                           <Typography variant="body2" color="rgba(255,255,255,0.6)">
+                             Make sure your microphone is working. You will be connected to our AI interviewer.
+                           </Typography>
+                        </Stack>
+                        <Button
+                          variant="contained"
+                          size="large"
+                          fullWidth
+                          onClick={handleStartInterview}
+                          disabled={starting}
+                          sx={{ 
+                            borderRadius: 10, 
+                            py: 1.5, 
+                            bgcolor: '#1fd5f9',
+                            '&:hover': { bgcolor: '#18b2d1' },
+                            fontWeight: 700,
+                            letterSpacing: 1
+                          }}
+                        >
+                          {starting ? t("loading") : t("startInterview", { defaultValue: "JOIN INTERVIEW" })}
+                        </Button>
+                     </Stack>
+                  </Box>
+                )}
                 <ConnectionStateToast />
-                <VideoConference chatMessageFormatter={(msg) => `${msg?.from?.identity || "User"}: ${msg?.message}`} />
-                <RoomAudioRenderer />
               </LiveKitRoom>
             </Box>
           </Stack>

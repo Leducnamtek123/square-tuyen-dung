@@ -2,8 +2,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { cva } from 'class-variance-authority';
 import { useMaybeRoomContext, useMediaDeviceSelect } from '@livekit/components-react';
-import { AgentAudioVisualizerBar } from '@/components/agent-audio-visualizer-bar';
-import { AgentTrackToggle } from '@/components/agent-track-toggle';
+import { AgentAudioVisualizerBar } from '@/components/agents-ui/agent-audio-visualizer-bar';
+import { AgentTrackToggle } from '@/components/agents-ui/agent-track-toggle';
 import {
   Select,
   SelectContent,

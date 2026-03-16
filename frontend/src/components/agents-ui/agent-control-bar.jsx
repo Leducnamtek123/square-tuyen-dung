@@ -6,15 +6,15 @@ import { Loader, MessageSquareTextIcon, SendHorizontal } from 'lucide-react';
 import { motion } from 'motion/react';
 
 import { cn } from '@/lib/utils';
-import { AgentDisconnectButton } from '@/components/agent-disconnect-button';
-import { AgentTrackControl } from '@/components/agent-track-control';
+import { AgentDisconnectButton } from '@/components/agents-ui/agent-disconnect-button';
+import { AgentTrackControl } from '@/components/agents-ui/agent-track-control';
 import {
   AgentTrackToggle,
   agentTrackToggleVariants,
-} from '@/components/agent-track-toggle';
+} from '@/components/agents-ui/agent-track-toggle';
 import { Button } from '@/components/ui/button';
 import { Toggle } from '@/components/ui/toggle';
-import { useInputControls, usePublishPermissions } from '@/hooks/use-agent-control-bar';
+import { useInputControls, usePublishPermissions } from '@/hooks/agents-ui/use-agent-control-bar';
 
 const LK_TOGGLE_VARIANT_1 = [
   'data-[state=off]:bg-accent data-[state=off]:hover:bg-foreground/10',

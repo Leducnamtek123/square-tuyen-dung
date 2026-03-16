@@ -203,6 +203,26 @@ class CompanyFollowed(InfoBaseModel):
 
         return f"{self.user} followed {self.company}"
 
+class CompanyRole(InfoBaseModel):
+    code = models.SlugField(max_length=50)
+    name = models.CharField(max_length=100)
+    description = models.CharField(max_length=255, blank=True, null=True)
+    permissions = models.JSONField(default=list, blank=True)
+    is_system = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
+
+    company = models.ForeignKey("Company", on_delete=models.CASCADE, related_name="roles")
+
+    class Meta:
+        db_table = "myjob_info_company_role"
+        constraints = [
+            models.UniqueConstraint(fields=["company", "code"], name="uq_company_role_code"),
+            models.UniqueConstraint(fields=["company", "name"], name="uq_company_role_name"),
+        ]
+
+    def __str__(self):
+        return f"{self.company.company_name} - {self.name}"
+
 class Company(InfoBaseModel):
 
     company_name = models.CharField(max_length=255, unique=True)
@@ -262,6 +282,41 @@ class Company(InfoBaseModel):
     def __str__(self):
 
         return f"{self.company_name if self.company_name is not None else '-'}"
+
+class CompanyMember(InfoBaseModel):
+    STATUS_INVITED = "INVITED"
+    STATUS_ACTIVE = "ACTIVE"
+    STATUS_DISABLED = "DISABLED"
+    STATUS_CHOICES = (
+        (STATUS_INVITED, "Invited"),
+        (STATUS_ACTIVE, "Active"),
+        (STATUS_DISABLED, "Disabled"),
+    )
+
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default=STATUS_ACTIVE)
+    joined_at = models.DateTimeField(null=True, blank=True)
+    invited_email = models.EmailField(max_length=100, null=True, blank=True)
+    is_active = models.BooleanField(default=True)
+
+    company = models.ForeignKey("Company", on_delete=models.CASCADE, related_name="members")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="company_memberships")
+    role = models.ForeignKey(CompanyRole, on_delete=models.PROTECT, related_name="members")
+    invited_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="company_invitations_sent",
+    )
+
+    class Meta:
+        db_table = "myjob_info_company_member"
+        constraints = [
+            models.UniqueConstraint(fields=["company", "user"], name="uq_company_member_company_user"),
+        ]
+
+    def __str__(self):
+        return f"{self.company.company_name} - {self.user.email}"
 
 class CompanyImage(InfoBaseModel):
 

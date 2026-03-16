@@ -483,6 +483,8 @@ const ROUTES = {
 
     COMPANY: "cong-ty",
 
+    EMPLOYEES: "nhan-su-va-vai-tro",
+
     NOTIFICATION: "thong-bao",
 
     ACCOUNT: "tai-khoan",

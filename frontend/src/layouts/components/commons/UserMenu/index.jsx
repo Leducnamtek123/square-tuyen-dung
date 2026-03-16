@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from 'react-i18next';
 import { Button, Menu, Stack, Typography } from "@mui/material";
@@ -10,8 +10,9 @@ import { confirmModal } from "../../../../utils/sweetalert2Modal";
 import errorHandling from "../../../../utils/errorHandling";
 
 import { removeUserInfo } from "../../../../redux/userSlice";
+import { setActiveWorkspace } from "../../../../redux/userSlice";
 
-import { ROLES_NAME, ROUTES } from "../../../../configs/constants";
+import { HOST_NAME, ROUTES } from "../../../../configs/constants";
 import tokenService from "../../../../services/tokenService";
 import {
   resetSearchCompany,
@@ -23,29 +24,49 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }) => {
   const { t } = useTranslation('common');
   const nav = useNavigate();
   const dispatch = useDispatch();
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, activeWorkspace } = useSelector((state) => state.user);
 
-  const jobSeekerUserMenu = React.useMemo(() => [
-    {
-      label: t('nav.accountManagement'),
-      path: ROUTES.JOB_SEEKER.DASHBOARD,
-    },
-  ], [t]);
+  const workspaces = currentUser?.workspaces || [];
 
-  const employerUserMenu = React.useMemo(() => [
-    {
-      label: t('footer.employerDashboard'),
-      path: ROUTES.EMPLOYER.DASHBOARD,
-    },
-  ], [t]);
+  const openPortal = (toEmployer = false, path = "") => {
+    const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
+    const protocol = window.location.protocol;
+    const port = window.location.port ? `:${window.location.port}` : "";
+    const mainHost = HOST_NAME.MYJOB;
+    const targetUrl = toEmployer
+      ? `${protocol}//${mainHost}${port}/employee${normalizedPath}`
+      : `${protocol}//${mainHost}${port}${normalizedPath}`;
+    window.location.href = targetUrl;
+  };
 
   const menuItems = React.useMemo(() => {
-    return currentUser.roleName === ROLES_NAME.JOB_SEEKER
-      ? jobSeekerUserMenu
-      : currentUser.roleName === ROLES_NAME.EMPLOYER
-      ? employerUserMenu
-      : [];
-  }, [currentUser, jobSeekerUserMenu, employerUserMenu]);
+    const items = [];
+    workspaces.forEach((workspace) => {
+      const key = `${workspace.type}-${workspace.companyId || "candidate"}`;
+      const isSelected =
+        workspace.type === activeWorkspace?.type &&
+        (workspace.type !== "company" ||
+          Number(workspace.companyId) === Number(activeWorkspace?.companyId));
+
+      items.push({
+        key,
+        isSelected,
+        label:
+          workspace.type === "company"
+            ? `${workspace.label} (${workspace.roleCode || "member"})`
+            : t("nav.accountManagement"),
+        onClick: () => {
+          dispatch(setActiveWorkspace(workspace));
+          if (workspace.type === "company") {
+            openPortal(true, ROUTES.EMPLOYER.DASHBOARD);
+            return;
+          }
+          openPortal(false, ROUTES.JOB_SEEKER.DASHBOARD);
+        },
+      });
+    });
+    return items;
+  }, [activeWorkspace, dispatch, t, workspaces]);
 
   const handleLogout = () => {
     const accessToken = tokenService.getAccessTokenFromCookie();
@@ -103,16 +124,20 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }) => {
     >
       <Stack spacing={1} sx={{ p: 1 }}>
         {menuItems.map((item) => (
-          <Link to={`/${item.path}`} key={item.path}>
-            <Button
-              color="primary"
-              variant="text"
-              sx={{ textTransform: "inherit" }}
-              fullWidth
-            >
-              <Typography marginRight="auto"> {item.label}</Typography>
-            </Button>
-          </Link>
+          <Button
+            key={item.key}
+            color="primary"
+            variant="text"
+            sx={{ textTransform: "inherit" }}
+            fullWidth
+            disabled={item.isSelected}
+            onClick={() => {
+              handleCloseUserMenu();
+              item.onClick();
+            }}
+          >
+            <Typography marginRight="auto"> {item.label}</Typography>
+          </Button>
         ))}
         <Button
           startIcon={<LogoutIcon style={{ marginLeft: 4 }} />}

@@ -1,7 +1,7 @@
 'use client';;
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useRoomContext } from '@livekit/components-react';
+import { useSessionContext } from '@livekit/components-react';
 import { PhoneOffIcon } from 'lucide-react';
 
 /**
@@ -23,11 +23,11 @@ export function AgentDisconnectButton({
   onClick,
   ...props
 }) {
-  const room = useRoomContext();
-  const handleClick = async (event) => {
+  const { end } = useSessionContext();
+  const handleClick = (event) => {
     onClick?.(event);
-    if (room?.disconnect) {
-      await room.disconnect();
+    if (typeof end === 'function') {
+      end();
     }
   };
 

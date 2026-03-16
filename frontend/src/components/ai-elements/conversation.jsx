@@ -76,10 +76,15 @@ export const ConversationScrollButton = ({
   </Button>));
 };
 
+const getMessageText = message => message.parts
+  .filter((part) => part.type === "text")
+  .map((part) => part.text)
+  .join("");
+
 const defaultFormatMessage = message => {
   const roleLabel =
     message.role.charAt(0).toUpperCase() + message.role.slice(1);
-  return `**${roleLabel}:** ${message.content}`;
+  return `**${roleLabel}:** ${getMessageText(message)}`;
 };
 
 export const messagesToMarkdown = (messages, formatMessage = defaultFormatMessage) => messages.map((msg, i) => formatMessage(msg, i)).join("\n\n");

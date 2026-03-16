@@ -2,6 +2,7 @@
 from configs import variable_system as var_sys
 
 from rest_framework import permissions
+from info.models import CompanyMember
 
 class IsJobSeekerUser(permissions.IsAuthenticated):
 
@@ -22,8 +23,16 @@ class IsEmployerUser(permissions.IsAuthenticated):
         user = request.user
 
         if user.is_authenticated:
-
-            return user.role_name == var_sys.EMPLOYER
+            if user.role_name == var_sys.EMPLOYER:
+                return True
+            try:
+                return CompanyMember.objects.filter(
+                    user=user,
+                    status=CompanyMember.STATUS_ACTIVE,
+                    is_active=True,
+                ).exists()
+            except Exception:
+                return False
 
         return False
 

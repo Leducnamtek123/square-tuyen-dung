@@ -41,7 +41,9 @@ from .models import (
 
     CompanyFollowed,
 
-    CompanyImage
+    CompanyImage,
+    CompanyRole,
+    CompanyMember
 
 )
 
@@ -469,6 +471,56 @@ class CompanyFollowedSerializer(serializers.ModelSerializer):
             'company',
 
         )
+
+class CompanyRoleSerializer(serializers.ModelSerializer):
+    companyId = serializers.IntegerField(source="company_id", read_only=True)
+    createAt = serializers.DateTimeField(source="create_at", read_only=True)
+    updateAt = serializers.DateTimeField(source="update_at", read_only=True)
+
+    class Meta:
+        model = CompanyRole
+        fields = (
+            "id",
+            "companyId",
+            "code",
+            "name",
+            "description",
+            "permissions",
+            "is_system",
+            "is_active",
+            "createAt",
+            "updateAt",
+        )
+        read_only_fields = ("id", "companyId", "is_system", "createAt", "updateAt")
+
+class CompanyMemberSerializer(serializers.ModelSerializer):
+    roleId = serializers.IntegerField(source="role_id", required=True)
+    role = CompanyRoleSerializer(read_only=True)
+    userId = serializers.IntegerField(source="user_id", required=True)
+    userDict = auth_serializers.UserSerializer(source="user", read_only=True, fields=["id", "fullName", "email", "avatarUrl"])
+    invitedById = serializers.IntegerField(source="invited_by_id", read_only=True)
+    companyId = serializers.IntegerField(source="company_id", read_only=True)
+    createAt = serializers.DateTimeField(source="create_at", read_only=True)
+    updateAt = serializers.DateTimeField(source="update_at", read_only=True)
+
+    class Meta:
+        model = CompanyMember
+        fields = (
+            "id",
+            "companyId",
+            "userId",
+            "userDict",
+            "roleId",
+            "role",
+            "status",
+            "joined_at",
+            "invited_email",
+            "invitedById",
+            "is_active",
+            "createAt",
+            "updateAt",
+        )
+        read_only_fields = ("id", "companyId", "userDict", "role", "invitedById", "createAt", "updateAt")
 
 class LogoCompanySerializer(serializers.ModelSerializer):
 

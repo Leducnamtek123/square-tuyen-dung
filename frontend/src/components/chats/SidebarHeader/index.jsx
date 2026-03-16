@@ -10,7 +10,7 @@ import GridViewIcon from '@mui/icons-material/GridView';
 
 import HomeIcon from '@mui/icons-material/Home';
 
-import { IMAGES, ROLES_NAME, ROUTES } from '../../../configs/constants';
+import { IMAGES, ROUTES } from '../../../configs/constants';
 
 import MuiImageCustom from '../../MuiImageCustom';
 
@@ -18,15 +18,15 @@ import LanguageSwitcher from '../../../layouts/components/commons/LanguageSwitch
 
 const SidebarHeader = () => {
 
-  const { currentUser } = useSelector((state) => state.user);
+  const { activeWorkspace } = useSelector((state) => state.user);
 
   const nav = useNavigate();
 
   const isEmployer = React.useMemo(() => {
 
-    return currentUser?.roleName === ROLES_NAME.EMPLOYER;
+    return activeWorkspace?.type === "company";
 
-  }, [currentUser]);
+  }, [activeWorkspace]);
 
   const handleRedirect = () => {
 

@@ -25,6 +25,7 @@ import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNone
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 
 import { IMAGES, ROUTES, APP_NAME } from '../../../../configs/constants';
 
@@ -879,10 +880,18 @@ const DrawerContent = ({ isAdmin }) => {
                     isChild
 
                   />
-
                 </List>
 
               </Collapse>
+
+              <ListItem disablePadding>
+                <MenuItem
+                  icon={GroupsOutlinedIcon}
+                  text={t('employer:sidebar.employeeRoles')}
+                  to={`/${ROUTES.EMPLOYER.EMPLOYEES}`}
+                  isSelected={location.pathname === `/${ROUTES.EMPLOYER.EMPLOYEES}`}
+                />
+              </ListItem>
 
             </>
 

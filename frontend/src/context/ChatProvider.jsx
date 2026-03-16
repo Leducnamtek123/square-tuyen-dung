@@ -2,8 +2,6 @@ import React from 'react';
 
 import { useSelector } from 'react-redux';
 
-import { ROLES_NAME } from '../configs/constants';
-
 import {
 
   checkExists,
@@ -18,15 +16,16 @@ export const ChatContext = React.createContext();
 
 const ChatProvider = ({ children }) => {
 
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, activeWorkspace } = useSelector((state) => state.user);
 
-  const { id: userId } = currentUser;
+  const userId = currentUser?.id;
 
   const [selectedRoomId, setSelectedRoomId] = React.useState('');
 
   const [currentUserChat, setCurrentUserChat] = React.useState(null);
 
   React.useEffect(() => {
+    if (!currentUser || !userId) return;
 
     const createUserChat = async () => {
 
@@ -38,9 +37,7 @@ const ChatProvider = ({ children }) => {
 
         let userData = null;
 
-        const roleName = currentUser.roleName;
-
-        if (roleName === ROLES_NAME.JOB_SEEKER) {
+        if (activeWorkspace?.type !== "company") {
 
           userData = {
 
@@ -66,7 +63,7 @@ const ChatProvider = ({ children }) => {
 
             email: currentUser?.email,
 
-            avatarUrl: currentUser?.company?.imageUrl,
+            avatarUrl: currentUser?.company?.imageUrl || currentUser?.avatarUrl,
 
             company: {
 
@@ -102,7 +99,7 @@ const ChatProvider = ({ children }) => {
 
     createUserChat();
 
-  }, [currentUser, userId]);
+  }, [activeWorkspace, currentUser, userId]);
 
   return (
 

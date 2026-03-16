@@ -5,7 +5,7 @@ import {
   ConversationScrollButton,
 } from '@/components/ai-elements/conversation';
 import { Message, MessageContent, MessageResponse } from '@/components/ai-elements/message';
-import { AgentChatIndicator } from '@/components/agent-chat-indicator';
+import { AgentChatIndicator } from '@/components/agents-ui/agent-chat-indicator';
 import { AnimatePresence } from 'motion/react';
 
 /**

@@ -499,7 +499,8 @@
     "companyInfo": "Thông tin công ty",
     "employerVerification": "Xác thực danh tính",
     "account": "Tài khoản",
-    "settings": "Cài đặt"
+    "settings": "Cài đặt",
+    "employeeRoles": "Nhân viên & Vai trò"
   },
   "interviewLive": {
     "title": "Phỏng vấn Trực tiếp",

@@ -499,7 +499,8 @@
     "companyInfo": "Company Info",
     "employerVerification": "Employer Verification",
     "account": "Account",
-    "settings": "Settings"
+    "settings": "Settings",
+    "employeeRoles": "Employees & Roles"
   },
   "interviewLive": {
     "title": "Live Interviews",

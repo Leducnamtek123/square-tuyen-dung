@@ -55,6 +55,7 @@ const EmployerProfilePage = lazy(() => import("../pages/employerPages/ProfilePag
 const EmployerSavedProfilePage = lazy(() => import("../pages/employerPages/SavedProfilePage"));
 const EmployerServicePage = lazy(() => import("../pages/employerPages/ServicePage"));
 const EmployerSettingPage = lazy(() => import("../pages/employerPages/SettingPage"));
+const EmployerEmployeesPage = lazy(() => import("../pages/employerPages/EmployeesPage"));
 const EmployerSupportPage = lazy(() => import("../pages/employerPages/SupportPage"));
 const EmployerVerificationPage = lazy(() => import("../pages/employerPages/VerificationPage"));
 
@@ -588,6 +589,10 @@ const routesConfig = {
 
           element: EmployerSettingPage,
 
+        },
+        {
+          path: ROUTES.EMPLOYER.EMPLOYEES,
+          element: EmployerEmployeesPage,
         },
 
       ],

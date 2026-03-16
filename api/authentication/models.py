@@ -125,6 +125,24 @@ class User(AbstractUser, AuthBaseModel):
 
     REQUIRED_FIELDS = ["full_name"]
 
+    def __getattr__(self, item):
+        # Backward-compatible fallback: allow employer flows to resolve company
+        # from active company membership when user does not own a company.
+        if item == "company":
+            try:
+                from info.models import CompanyMember
+                membership = CompanyMember.objects.select_related("company").filter(
+                    user=self,
+                    is_active=True,
+                    status=CompanyMember.STATUS_ACTIVE,
+                ).first()
+                if membership:
+                    return membership.company
+            except Exception:
+                pass
+            return None
+        raise AttributeError(f"{self.__class__.__name__} object has no attribute {item}")
+
 class ForgotPasswordToken(AuthBaseModel):
 
     token = models.CharField(max_length=255, null=True)

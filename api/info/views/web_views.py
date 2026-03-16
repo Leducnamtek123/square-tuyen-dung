@@ -12,6 +12,7 @@ from configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
 from django.db.models import Count, F
 
 from django.db import transaction
+from django.utils import timezone
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -44,6 +45,8 @@ from ..models import (
     AdvancedSkill, Company,
 
     CompanyFollowed, CompanyImage,
+
+    CompanyRole, CompanyMember,
 
     ContactProfile
 
@@ -95,6 +98,10 @@ from ..serializers import (
 
     CompanyImageSerializer,
 
+    CompanyRoleSerializer,
+
+    CompanyMemberSerializer,
+
     SendMailToJobSeekerSerializer
 
 )
@@ -108,6 +115,42 @@ from job.models import (
 from job import serializers as job_serializers
 
 from helpers.cloudinary_service import CloudinaryService
+
+def _get_user_company(user):
+    try:
+        owned_company = getattr(user, "company", None)
+        if owned_company:
+            return owned_company
+    except Company.DoesNotExist:
+        pass
+
+    membership = CompanyMember.objects.select_related("company").filter(
+        user=user,
+        is_active=True,
+        status=CompanyMember.STATUS_ACTIVE,
+    ).first()
+    return membership.company if membership else None
+
+def _get_company_membership(user, company):
+    return CompanyMember.objects.select_related("role").filter(
+        user=user,
+        company=company,
+        is_active=True,
+        status=CompanyMember.STATUS_ACTIVE,
+    ).first()
+
+def _has_company_permission(user, company, permission_key):
+    if company.user_id == user.id:
+        return True
+
+    membership = _get_company_membership(user, company)
+    if not membership or not membership.role:
+        return False
+
+    permissions = membership.role.permissions or []
+    if "*" in permissions:
+        return True
+    return permission_key in permissions
 
 class JobSeekerProfileViewSet(viewsets.ViewSet,
                               generics.ListAPIView,
@@ -1296,6 +1339,223 @@ class CompanyImageViewSet(viewsets.ViewSet,
         else:
 
             return Response(status=status.HTTP_204_NO_CONTENT)
+
+class CompanyRoleViewSet(viewsets.ModelViewSet):
+    queryset = CompanyRole.objects.all()
+    serializer_class = CompanyRoleSerializer
+    permission_classes = [perms_sys.IsAuthenticated]
+    renderer_classes = [renderers.MyJSONRenderer]
+
+    def get_company(self):
+        return _get_user_company(self.request.user)
+
+    def get_queryset(self):
+        company = self.get_company()
+        if not company:
+            return CompanyRole.objects.none()
+        return self.queryset.filter(company=company).order_by("id")
+
+    def create(self, request, *args, **kwargs):
+        company = self.get_company()
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["User is not associated with any company."]},
+            )
+        if not _has_company_permission(request.user, company, "manage_roles"):
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(company=company)
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        company = self.get_company()
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["User is not associated with any company."]},
+            )
+        if not _has_company_permission(request.user, company, "manage_roles"):
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        instance = self.get_object()
+        if instance.is_system and ("code" in request.data or "is_system" in request.data):
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["System role cannot change code or system flag."]},
+            )
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        company = self.get_company()
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["User is not associated with any company."]},
+            )
+        if not _has_company_permission(request.user, company, "manage_roles"):
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        instance = self.get_object()
+        if instance.is_system:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["System role cannot be deleted."]},
+            )
+        if instance.members.filter(is_active=True).exists():
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["Role is assigned to active members."]},
+            )
+        return super().destroy(request, *args, **kwargs)
+
+class CompanyMemberViewSet(viewsets.ModelViewSet):
+    queryset = CompanyMember.objects.select_related("user", "role", "company")
+    serializer_class = CompanyMemberSerializer
+    permission_classes = [perms_sys.IsAuthenticated]
+    renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
+
+    def get_company(self):
+        return _get_user_company(self.request.user)
+
+    def get_queryset(self):
+        company = self.get_company()
+        if not company:
+            return CompanyMember.objects.none()
+        return self.queryset.filter(company=company).order_by("id")
+
+    def list(self, request, *args, **kwargs):
+        company = self.get_company()
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["User is not associated with any company."]},
+            )
+        if not _has_company_permission(request.user, company, "manage_members"):
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+        return super().list(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        company = self.get_company()
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["User is not associated with any company."]},
+            )
+        if not _has_company_permission(request.user, company, "manage_members"):
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        role = CompanyRole.objects.filter(
+            id=serializer.validated_data["role_id"],
+            company=company,
+            is_active=True,
+        ).first()
+        if not role:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"roleId": ["Role is invalid for this company."]},
+            )
+
+        user_id = serializer.validated_data["user_id"]
+        member = CompanyMember.objects.filter(company=company, user_id=user_id).first()
+        if member:
+            member.role = role
+            member.status = serializer.validated_data.get("status", member.status)
+            member.invited_email = serializer.validated_data.get("invited_email", member.invited_email)
+            member.is_active = serializer.validated_data.get("is_active", member.is_active)
+            if member.status == CompanyMember.STATUS_ACTIVE and member.joined_at is None:
+                member.joined_at = timezone.now()
+            member.save()
+            return var_res.response_data(status=status.HTTP_200_OK, data=self.get_serializer(member).data)
+
+        member = serializer.save(
+            company=company,
+            invited_by=request.user,
+            joined_at=timezone.now(),
+        )
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=self.get_serializer(member).data)
+
+    def update(self, request, *args, **kwargs):
+        company = self.get_company()
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["User is not associated with any company."]},
+            )
+        if not _has_company_permission(request.user, company, "manage_members"):
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+
+        if "role_id" in serializer.validated_data:
+            role = CompanyRole.objects.filter(
+                id=serializer.validated_data["role_id"],
+                company=company,
+                is_active=True,
+            ).first()
+            if not role:
+                return var_res.response_data(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    errors={"roleId": ["Role is invalid for this company."]},
+                )
+
+        serializer.save()
+        return var_res.response_data(status=status.HTTP_200_OK, data=serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        company = self.get_company()
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["User is not associated with any company."]},
+            )
+        if not _has_company_permission(request.user, company, "manage_members"):
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        instance = self.get_object()
+        if instance.user_id == company.user_id:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["Company owner membership cannot be deleted."]},
+            )
+        return super().destroy(request, *args, **kwargs)
+
+    @action(methods=["get"], detail=False, url_path="me", url_name="company-member-me")
+    def me(self, request):
+        company = self.get_company()
+        if not company:
+            return var_res.response_data(data=None)
+
+        member = CompanyMember.objects.select_related("role").filter(
+            company=company,
+            user=request.user,
+            status=CompanyMember.STATUS_ACTIVE,
+            is_active=True,
+        ).first()
+        if not member:
+            if company.user_id == request.user.id:
+                owner_role = CompanyRole.objects.filter(company=company, code="owner").first()
+                if not owner_role:
+                    return var_res.response_data(data=None)
+                data = {
+                    "role": CompanyRoleSerializer(owner_role).data,
+                    "status": CompanyMember.STATUS_ACTIVE,
+                    "isOwner": True,
+                }
+                return var_res.response_data(data=data)
+            return var_res.response_data(data=None)
+
+        data = CompanyMemberSerializer(member).data
+        data["isOwner"] = company.user_id == request.user.id
+        return var_res.response_data(data=data)
 
 class AdminCompanyViewSet(viewsets.ModelViewSet):
 

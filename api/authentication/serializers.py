@@ -11,7 +11,8 @@ from console.jobs import queue_auth
 from .models import User
 from info.models import (
     JobSeekerProfile, Resume,
-    Company
+    Company,
+    CompanyMember
 )
 from common.models import Location, File
 from common.serializers import LocationSerializer
@@ -219,6 +220,9 @@ class UserSerializer(serializers.ModelSerializer):
     jobSeekerProfile = serializers.SerializerMethodField(method_name="get_job_seeker_profile", read_only=True)
     companyId = serializers.SerializerMethodField(method_name="get_company_id", read_only=True)
     company = serializers.SerializerMethodField(method_name="get_company", read_only=True)
+    canAccessEmployerPortal = serializers.SerializerMethodField(method_name="get_can_access_employer_portal", read_only=True)
+    employerRoleCode = serializers.SerializerMethodField(method_name="get_employer_role_code", read_only=True)
+    workspaces = serializers.SerializerMethodField(method_name="get_workspaces", read_only=True)
     
     def get_avatar_url(self, user):
         try:
@@ -252,14 +256,24 @@ class UserSerializer(serializers.ModelSerializer):
         return profile.id if profile else None
 
     def _get_company_safe(self, user):
-        if getattr(user, 'role_name', None) != var_sys.EMPLOYER:
-            return None
         try:
-            return user.company
+            if user.company:
+                return user.company
         except ObjectDoesNotExist:
-            return None
+            pass
         except Exception as ex:
             helper.print_log_error("UserSerializer._get_company_safe", ex)
+            return None
+
+        try:
+            membership = CompanyMember.objects.select_related("company").filter(
+                user=user,
+                status=CompanyMember.STATUS_ACTIVE,
+                is_active=True,
+            ).first()
+            return membership.company if membership else None
+        except Exception as ex:
+            helper.print_log_error("UserSerializer._get_company_safe_membership", ex)
             return None
 
     def get_company(self, user):
@@ -279,6 +293,84 @@ class UserSerializer(serializers.ModelSerializer):
     def get_company_id(self, user):
         company = self._get_company_safe(user)
         return company.id if company else None
+
+    def get_can_access_employer_portal(self, user):
+        if getattr(user, "role_name", None) == var_sys.ADMIN:
+            return False
+        if getattr(user, "role_name", None) == var_sys.EMPLOYER:
+            return True
+        try:
+            return CompanyMember.objects.filter(
+                user=user,
+                status=CompanyMember.STATUS_ACTIVE,
+                is_active=True,
+            ).exists()
+        except Exception:
+            return False
+
+    def get_employer_role_code(self, user):
+        try:
+            membership = CompanyMember.objects.select_related("role").filter(
+                user=user,
+                status=CompanyMember.STATUS_ACTIVE,
+                is_active=True,
+            ).first()
+            return membership.role.code if membership and membership.role else None
+        except Exception:
+            return None
+
+    def get_workspaces(self, user):
+        workspaces = []
+        if getattr(user, "role_name", None) != var_sys.ADMIN:
+            workspaces.append({
+                "type": "job_seeker",
+                "label": "Candidate",
+                "isDefault": getattr(user, "role_name", None) == var_sys.JOB_SEEKER,
+            })
+
+        company_ids = set()
+        try:
+            owned_company = getattr(user, "company", None)
+            if owned_company:
+                company_ids.add(owned_company.id)
+                logo = owned_company.logo.get_full_url() if owned_company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+                workspaces.append({
+                    "type": "company",
+                    "label": owned_company.company_name,
+                    "companyId": owned_company.id,
+                    "companySlug": owned_company.slug,
+                    "companyImageUrl": logo,
+                    "roleCode": "owner",
+                    "isDefault": getattr(user, "role_name", None) == var_sys.EMPLOYER,
+                })
+        except Exception:
+            pass
+
+        try:
+            memberships = CompanyMember.objects.select_related("company", "role", "company__logo").filter(
+                user=user,
+                status=CompanyMember.STATUS_ACTIVE,
+                is_active=True,
+            )
+            for membership in memberships:
+                company = membership.company
+                if not company or company.id in company_ids:
+                    continue
+                company_ids.add(company.id)
+                logo = company.logo.get_full_url() if company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+                workspaces.append({
+                    "type": "company",
+                    "label": company.company_name,
+                    "companyId": company.id,
+                    "companySlug": company.slug,
+                    "companyImageUrl": logo,
+                    "roleCode": membership.role.code if membership.role else None,
+                    "isDefault": False,
+                })
+        except Exception:
+            pass
+
+        return workspaces
 
     def __init__(self, *args, **kwargs):
         fields = kwargs.pop('fields', None)
@@ -311,7 +403,9 @@ class UserSerializer(serializers.ModelSerializer):
                   "isActive", "isVerifyEmail",
                   "avatarUrl", "roleName",
                   "jobSeekerProfileId", "jobSeekerProfile",
-                  "companyId", "company",)
+                  "companyId", "company",
+                  "canAccessEmployerPortal", "employerRoleCode",
+                  "workspaces",)
 
 class AvatarSerializer(serializers.ModelSerializer):
     file = serializers.FileField(required=True, write_only=True)
