@@ -56,6 +56,9 @@ services:
       - redis
     env_file:
       - .env.prod
+    environment:
+      - LIVEKIT_URL=http://livekit:7880
+      - LIVEKIT_AGENT_NAME=square-ai-interviewer
     networks:
       - square-network
 
@@ -172,6 +175,64 @@ services:
       timeout: 10s
       retries: 5
       start_period: 120s
+    restart: always
+    networks:
+      - square-network
+
+  whisper:
+    build:
+      context: ./voice-ai/inference/whisper
+    container_name: tuyendung-studio-whisper-prod
+    volumes:
+      - whisper-data:/data
+    environment:
+      - VOXBOX_HF_REPO_ID=${VOXBOX_HF_REPO_ID:-Systran/faster-whisper-medium}
+      - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cpu}
+      - DATA_DIR=/data
+    expose:
+      - "8080"
+    restart: always
+    networks:
+      - square-network
+
+  vieneu-tts:
+    build:
+      context: ./voice-ai/inference/vieneu-tts
+    container_name: tuyendung-studio-tts-prod
+    environment:
+      - PORT=8298
+      - TTS_DEVICE=${TTS_DEVICE:-cpu}
+    expose:
+      - "8298"
+    volumes:
+      - huggingface-cache:/root/.cache/huggingface
+    restart: always
+    networks:
+      - square-network
+
+  livekit-agent:
+    build:
+      context: ./voice-ai/livekit_agent
+    container_name: tuyendung-studio-livekit-agent-prod
+    volumes:
+      - ./voice-ai/livekit_agent/src:/app/src
+    environment:
+      - NUM_IDLE_PROCESSES=${NUM_IDLE_PROCESSES:-1}
+      - BACKEND_API_URL=http://backend:8000/api
+      - AUTO_END_ON_COMPLETION=${AUTO_END_ON_COMPLETION:-0}
+      - LIVEKIT_URL=http://livekit:7880
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}
+      - TTS_VOICE=${TTS_VOICE:-Binh (nam mien Bac)}
+      - LLAMA_BASE_URL=http://llama-cpp:11434/v1
+      - STT_BASE_URL=http://whisper:8080/v1
+      - TTS_BASE_URL=http://vieneu-tts:8298/v1
+    depends_on:
+      - backend
+      - livekit
+      - llama-cpp
+      - whisper
+      - vieneu-tts
     restart: always
     networks:
       - square-network
