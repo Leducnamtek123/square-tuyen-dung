@@ -197,7 +197,7 @@ services:
 
   vieneu-tts:
     build:
-      context: ./voice-ai/inference/vieneu-tts
+      context: ./voice-ai/inference/vieneu-text-to-speech
     container_name: tuyendung-studio-tts-prod
     environment:
       - PORT=8298
