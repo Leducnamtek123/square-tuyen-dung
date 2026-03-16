@@ -321,11 +321,22 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_workspaces(self, user):
         workspaces = []
-        if getattr(user, "role_name", None) != var_sys.ADMIN:
+        role_name = getattr(user, "role_name", None)
+
+        # Only add Candidate workspace if user is a Job Seeker
+        # or has an existing JobSeekerProfile (except for ADMINs)
+        has_job_seeker_profile = False
+        try:
+            # We use JobSeekerProfile already imported from info.models
+            has_job_seeker_profile = JobSeekerProfile.objects.filter(user=user).exists()
+        except Exception:
+            pass
+
+        if (role_name == var_sys.JOB_SEEKER or has_job_seeker_profile) and role_name != var_sys.ADMIN:
             workspaces.append({
                 "type": "job_seeker",
                 "label": "Candidate",
-                "isDefault": getattr(user, "role_name", None) == var_sys.JOB_SEEKER,
+                "isDefault": role_name == var_sys.JOB_SEEKER,
             })
 
         company_ids = set()
