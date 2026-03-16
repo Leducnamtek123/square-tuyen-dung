@@ -53,7 +53,7 @@ export function SessionView({ appConfig, ...props }) {
     [messages]
   );
   const lastMessageIsLocal =
-    visibleMessages.at(-1)?.from?.isLocal === true && chatOpen === true;
+    visibleMessages[visibleMessages.length - 1]?.from?.isLocal === true && chatOpen === true;
 
   const controls = useMemo(
     () => ({
@@ -75,8 +75,8 @@ export function SessionView({ appConfig, ...props }) {
       </div>
 
       {chatOpen && (
-        <div className="fixed inset-0 z-20 grid grid-cols-1 grid-rows-1">
-          <Fade top className="absolute inset-x-4 top-0 h-40" />
+        <div className="fixed inset-0 z-35 grid grid-cols-1 grid-rows-1">
+          <Fade top className="absolute inset-x-4 top-0 h-56" />
           <ChatTranscript
             messages={visibleMessages}
             followOutput={lastMessageIsLocal ? 'smooth' : false}

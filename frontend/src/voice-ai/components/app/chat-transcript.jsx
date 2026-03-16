@@ -30,7 +30,7 @@ const Scroller = React.forwardRef(function Scroller({ className, itemKey, ...pro
   return (
     <div
       ref={ref}
-      className={cn('overflow-y-auto px-4 pt-36 pb-[180px] md:px-6 md:pb-[220px]', className)}
+      className={cn('overflow-y-auto px-4 pt-48 pb-[250px] md:px-6 md:pb-[300px]', className)}
       {...props}
     />
   );
@@ -55,10 +55,12 @@ export const ChatTranscript = React.memo(function ChatTranscript({
       <Virtuoso
         data={messages}
         itemContent={(index, message) => {
-          const locale = message?.from?.isLocal ? 'you' : 'assistant';
+          const isLocal = message?.from?.isLocal;
+          const locale = isLocal ? 'you' : 'assistant';
           return (
             <ChatEntry
               key={message?.id}
+              isLocal={isLocal}
               locale={locale}
               message={message?.message ?? ''}
               timestamp={message?.timestamp ?? Date.now()}
