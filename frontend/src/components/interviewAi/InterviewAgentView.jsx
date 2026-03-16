@@ -6,7 +6,7 @@ import {
 } from "../agents-ui";
 import { 
   useAgent, 
-  useSessionMessages,
+  useChat,
   useRoomContext,
 } from "@livekit/components-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -19,18 +19,18 @@ import { cn } from "@/lib/utils";
 const InterviewAgentView = ({ onDisconnect, sessionInfo }) => {
   const room = useRoomContext();
   const { state, agentParticipant } = useAgent();
-  const { messages } = useSessionMessages();
+  const { chatMessages } = useChat({ room });
   const [isChatOpen, setIsChatOpen] = useState(false);
   
   // Format messages for AgentChatTranscript
   const formattedMessages = useMemo(() => {
-    return messages.map(msg => ({
+    return chatMessages.map(msg => ({
       id: msg.id,
       timestamp: msg.timestamp,
       from: msg.from,
       message: msg.message
     }));
-  }, [messages]);
+  }, [chatMessages]);
 
   const agentAudioTrack = useMemo(() => {
     return agentParticipant?.getTrackPublication("microphone")?.audioTrack;
