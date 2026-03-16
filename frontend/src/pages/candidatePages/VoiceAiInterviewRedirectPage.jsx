@@ -12,7 +12,7 @@ const VoiceAiInterviewRedirectPage = () => {
 
   const targetUrl = React.useMemo(() => {
     const safeId = encodeURIComponent(id || '');
-    return `/${ROUTES.CANDIDATE.INTERVIEW_ROOM.replace(':id', safeId)}`;
+    return `/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM.replace(':id', safeId)}`;
   }, [id]);
 
   React.useEffect(() => {

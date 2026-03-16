@@ -6,14 +6,14 @@ import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../../configs/constants';
 import LanguageSwitcher from '../../../layouts/components/commons/LanguageSwitcher';
 
-const CandidateLoginPage = () => {
+const JobSeekerInterviewLoginPage = () => {
     const [sessionId, setSessionId] = useState('');
     const navigate = useNavigate();
     const { t } = useTranslation(['candidate', 'common']);
 
     const handleJoin = () => {
         if (sessionId.trim()) {
-            const targetRoute = ROUTES.CANDIDATE.INTERVIEW_ROOM;
+            const targetRoute = ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM;
             navigate(`/${targetRoute.replace(':id', sessionId.trim())}`);
         }
     };
@@ -58,4 +58,4 @@ const CandidateLoginPage = () => {
     );
 };
 
-export default CandidateLoginPage;
+export default JobSeekerInterviewLoginPage;

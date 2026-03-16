@@ -494,6 +494,7 @@ const ROUTES = {
     INTERVIEW_LIST: "danh-sach-phong-van",
 
     INTERVIEW_LIVE: "phong-van-ung-vien-truc-tiep",
+    INTERVIEW_SESSION: "phong-van-truc-tiep/:id",
 
     INTERVIEW_CREATE: "len-lich-phong-van",
 
@@ -515,14 +516,10 @@ const ROUTES = {
 
   },
 
-  CANDIDATE: {
-
+  JOBSEEKER_INTERVIEW: {
     LOGIN: "phong-van/dang-nhap",
-
     INTERVIEW: "phong-van/:id",
-
     INTERVIEW_ROOM: "phong-van/room/:id",
-
   },
 
   ADMIN: {
@@ -558,10 +555,14 @@ const ROUTES = {
     JOB_NOTIFICATIONS: "thong-bao-viec-lam",
 
     INTERVIEW_LIVE: "phong-van-cong-ty-truc-tiep",
+    INTERVIEW_SESSION: "phong-van-truc-tiep/:id",
 
   },
 
 };
+
+// Backward compatibility for old key naming.
+ROUTES.CANDIDATE = ROUTES.JOBSEEKER_INTERVIEW;
 
 // SVG components
 

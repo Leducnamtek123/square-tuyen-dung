@@ -1,7 +1,7 @@
 services:
   vieneu-tts:
     build:
-      context: ./inference/vieneu-tts
+      context: ./inference/vieneu-text-to-speech
     ports:
       - "8298:8298"
     environment:

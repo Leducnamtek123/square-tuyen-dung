@@ -85,9 +85,11 @@ const AdminResumesPage = lazy(() => import("../pages/adminPages/ResumesPage"));
 const AdminJobActivityPage = lazy(() => import("../pages/adminPages/JobActivityPage"));
 const AdminJobNotificationsPage = lazy(() => import("../pages/adminPages/JobNotificationsPage"));
 
-const CandidateLoginPage = lazy(() => import("../pages/candidatePages/CandidateLoginPage"));
+const JobSeekerInterviewLoginPage = lazy(() => import("../pages/candidatePages/CandidateLoginPage"));
 const InterviewRoomPage = lazy(() => import("../pages/candidatePages/InterviewRoomPage"));
 const VoiceAiInterviewRedirectPage = lazy(() => import("../pages/candidatePages/VoiceAiInterviewRedirectPage"));
+const EmployerInterviewSessionPage = lazy(() => import("../pages/employerPages/InterviewPages/InterviewSessionPage"));
+const AdminInterviewSessionPage = lazy(() => import("../pages/adminPages/InterviewSessionPage"));
 
 const routesConfig = {
 
@@ -201,15 +203,15 @@ const routesConfig = {
 
             {
 
-              path: ROUTES.CANDIDATE.LOGIN,
+              path: ROUTES.JOBSEEKER_INTERVIEW.LOGIN,
 
-              element: CandidateLoginPage,
+              element: JobSeekerInterviewLoginPage,
 
             },
 
             {
 
-              path: ROUTES.CANDIDATE.INTERVIEW,
+              path: ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW,
 
               element: VoiceAiInterviewRedirectPage,
 
@@ -217,7 +219,7 @@ const routesConfig = {
 
             {
 
-              path: ROUTES.CANDIDATE.INTERVIEW_ROOM,
+              path: ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM,
 
               element: InterviewRoomPage,
 
@@ -519,6 +521,10 @@ const routesConfig = {
           element: EmployerInterviewLivePage,
 
         },
+        {
+          path: ROUTES.EMPLOYER.INTERVIEW_SESSION,
+          element: EmployerInterviewSessionPage,
+        },
 
         {
 
@@ -776,6 +782,10 @@ const routesConfig = {
 
           element: AdminInterviewLivePage,
 
+        },
+        {
+          path: ROUTES.ADMIN.INTERVIEW_SESSION,
+          element: AdminInterviewSessionPage,
         },
 
         {

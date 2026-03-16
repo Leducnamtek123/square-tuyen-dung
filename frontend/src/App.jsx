@@ -54,15 +54,17 @@ function App() {
   const isChatPage =
     location.pathname.startsWith(`/${ROUTES.JOB_SEEKER.CHAT}`) ||
     location.pathname.startsWith(`/${ROUTES.EMPLOYER.CHAT}`);
-  const candidateInterviewPrefix = `/${ROUTES.CANDIDATE.INTERVIEW.replace('/:id', '')}`;
-  const isCandidateInterviewRoute =
-    location.pathname === candidateInterviewPrefix ||
-    location.pathname.startsWith(`${candidateInterviewPrefix}/`);
+  const jobSeekerInterviewPrefix = `/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW.replace('/:id', '')}`;
+  const isJobSeekerInterviewRoute =
+    location.pathname === jobSeekerInterviewPrefix ||
+    location.pathname.startsWith(`${jobSeekerInterviewPrefix}/`);
   const isInterviewPage =
-    location.pathname.startsWith(`/${ROUTES.CANDIDATE.INTERVIEW}`) ||
-    location.pathname.startsWith(`/${ROUTES.CANDIDATE.INTERVIEW_ROOM}`) ||
+    location.pathname.startsWith(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW}`) ||
+    location.pathname.startsWith(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM}`) ||
     location.pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_LIVE}`) ||
-    location.pathname.startsWith(`/${ROUTES.ADMIN.INTERVIEW_LIVE}`);
+    location.pathname.startsWith(`/${ROUTES.ADMIN.INTERVIEW_LIVE}`) ||
+    location.pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', '')}`) ||
+    location.pathname.startsWith(`/${ROUTES.ADMIN.INTERVIEW_SESSION.replace(':id', '')}`);
   const canShowChatBot =
     settings.isAuthenticated &&
     (settings.isJobSeekerRole || settings.isEmployerRole || settings.isAdminRole) &&
@@ -105,7 +107,7 @@ function App() {
     };
 
     const initializeApp = async () => {
-      if (isCandidateInterviewRoute) {
+      if (isJobSeekerInterviewRoute) {
         finalizeLoader();
         return;
       }
@@ -128,7 +130,7 @@ function App() {
 
     initializeApp();
 
-  }, [dispatch, isCandidateInterviewRoute]);
+  }, [dispatch, isJobSeekerInterviewRoute]);
 
   React.useEffect(() => {
 

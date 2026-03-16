@@ -70,13 +70,13 @@ const renderRoutes = (routes, settings) => {
 const AppRoutes = ({ settings }) => {
   const hostName = window.location.hostname;
   const pathname = window.location.pathname || "/";
-  const candidatePrefix = `/${ROUTES.CANDIDATE.INTERVIEW.replace('/:id', '')}`;
+  const jobSeekerInterviewPrefix = `/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW.replace('/:id', '')}`;
   const employerPrefixes = ["/employer", "/employee"];
 
   // Candidate interview flow always uses root routes.
-  const isCandidateRoute =
-    pathname === candidatePrefix || pathname.startsWith(`${candidatePrefix}/`);
-  if (isCandidateRoute) {
+  const isJobSeekerInterviewRoute =
+    pathname === jobSeekerInterviewPrefix || pathname.startsWith(`${jobSeekerInterviewPrefix}/`);
+  if (isJobSeekerInterviewRoute) {
     return <Routes>{renderRoutes(routesConfig[HOST_NAME.MYJOB], settings)}</Routes>;
   }
 

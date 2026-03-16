@@ -21,7 +21,7 @@ const MyInterviewsPage = () => {
     const interviews = (interviewsData?.results || []).map(transformInterviewSession);
 
     const handleJoin = (inviteToken) => {
-        navigate(`/${ROUTES.CANDIDATE.INTERVIEW_ROOM.replace(':id', inviteToken)}`);
+        navigate(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM.replace(':id', inviteToken)}`);
     };
 
     const getStatusChip = (status) => {

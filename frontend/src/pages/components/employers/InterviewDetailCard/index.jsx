@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import interviewService from '../../../../services/interviewService';
 import { transformInterviewSession } from '../../../../utils/transformers';
+import { ROUTES } from '../../../../configs/constants';
 
 const InterviewDetailCard = () => {
     const { id } = useParams();
@@ -58,6 +59,8 @@ const InterviewDetailCard = () => {
         }
     };
 
+    const canJoinLiveRoom = !!session?.id && session.status !== 'cancelled' && session.status !== 'completed';
+
     return (
         <Box sx={{
             px: { xs: 1, sm: 2 },
@@ -97,6 +100,14 @@ const InterviewDetailCard = () => {
                         boxShadow: (theme) => theme.customShadows?.small || theme.shadows[1]
                     }}
                 />
+                <Button
+                    variant="contained"
+                    disabled={!canJoinLiveRoom}
+                    onClick={() => navigate(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id)}`)}
+                    sx={{ borderRadius: 2, minWidth: 180 }}
+                >
+                    {t('common:actions.joinNow')}
+                </Button>
             </Stack>
             <Grid container spacing={3}>
                 {/* Left Column: Info & Evaluation */}
