@@ -447,6 +447,14 @@ const ROUTES = {
 
     CHAT: "ket-noi-voi-nha-tuyen-dung",
 
+    CONTACT: "lien-he",
+
+    FAQ: "cau-hoi-thuong-gap",
+
+    TERMS_OF_SERVICE: "dieu-khoan-dich-vu",
+
+    PRIVACY_POLICY: "chinh-sach-bao-mat",
+
   },
 
   EMPLOYER: {
@@ -496,6 +504,14 @@ const ROUTES = {
     QUESTION_GROUPS: "bo-cau-hoi",
 
     VERIFICATION: "xac-thuc-nha-tuyen-dung",
+
+    CONTACT: "lien-he",
+
+    FAQ: "cau-hoi-thuong-gap",
+
+    TERMS_OF_SERVICE: "dieu-khoan-dich-vu",
+
+    PRIVACY_POLICY: "chinh-sach-bao-mat",
 
   },
 

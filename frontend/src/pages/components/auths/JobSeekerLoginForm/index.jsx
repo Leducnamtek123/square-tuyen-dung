@@ -262,7 +262,7 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }) => {
 
       >
 
-        <LoginSocialFacebook
+{/* <LoginSocialFacebook
 
           appId={AUTH_CONFIG.FACEBOOK_CLIENT_ID}
 
@@ -316,7 +316,7 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }) => {
 
           </StyledSocialButton>
 
-        </LoginSocialFacebook>
+        </LoginSocialFacebook> */}
 
         <StyledSocialButton
 

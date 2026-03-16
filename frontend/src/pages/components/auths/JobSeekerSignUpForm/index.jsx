@@ -350,7 +350,7 @@ const JobSeekerSignUpForm = ({
 
       >
 
-        <LoginSocialFacebook
+{/* <LoginSocialFacebook
 
           appId={AUTH_CONFIG.FACEBOOK_CLIENT_ID}
 
@@ -402,7 +402,7 @@ const JobSeekerSignUpForm = ({
 
           </StyledSocialButton>
 
-        </LoginSocialFacebook>
+        </LoginSocialFacebook> */}
 
         <StyledSocialButton
 
