@@ -185,7 +185,8 @@ class Interviewer(Agent):
         if action.kind == "closing":
             self._current_stage = InterviewStage.CLOSING
             closing_message = "Cảm ơn bạn đã tham gia phỏng vấn. Buổi phỏng vấn đã kết thúc."
-            await self._say_and_wait(closing_message, allow_interruptions=False)
+            # Allow interruptions to avoid RuntimeError when user sends input mid-speech.
+            await self._say_and_wait(closing_message, allow_interruptions=True)
             if config.AUTO_END_ON_COMPLETION:
                 await self._update_backend_status("completed")
                 if self.session:

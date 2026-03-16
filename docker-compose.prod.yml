@@ -183,6 +183,7 @@ services:
     build:
       context: ./voice-ai/inference/whisper
     container_name: tuyendung-studio-whisper-prod
+    gpus: all
     volumes:
       - whisper-data:/data
     environment:
@@ -199,9 +200,11 @@ services:
     build:
       context: ./voice-ai/inference/vieneu-text-to-speech
     container_name: tuyendung-studio-tts-prod
+    gpus: all
+    env_file:
+      - .env.prod
     environment:
       - PORT=8298
-      - TTS_DEVICE=${TTS_DEVICE:-cpu}
     expose:
       - "8298"
     volumes:

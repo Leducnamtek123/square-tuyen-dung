@@ -39,6 +39,7 @@ const InterviewRoomPage = () => {
   const [loading, setLoading] = useState(true);
 
   const liveKitUrl = serverUrl || getSafeLiveKitUrl();
+  const liveKitAgentName = (import.meta.env.VITE_LIVEKIT_AGENT_NAME || "").trim() || "square-ai-interviewer";
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -85,12 +86,13 @@ const InterviewRoomPage = () => {
   const appConfig = useMemo(
     () => ({
       ...APP_CONFIG_DEFAULTS,
+      agentName: liveKitAgentName,
       pageTitle: t("voiceAi.pageTitle"),
       pageDescription: t("voiceAi.pageDescription"),
       companyName: t("voiceAi.companyName"),
       startButtonText: t("voiceAi.startCall"),
     }),
-    [t]
+    [t, liveKitAgentName]
   );
 
   if (loading) {
