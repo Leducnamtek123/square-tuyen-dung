@@ -50,6 +50,7 @@ class Interviewer(Agent):
     def current_stage(self) -> InterviewStage:
         return self._current_stage
 
+    @function_tool
     async def set_interview_stage(
         self,
         context: RunContext,
@@ -67,13 +68,13 @@ class Interviewer(Agent):
             
             # Sync to room metadata for frontend UI
             if context.room:
-                # FIX: use set_metadata instead of update_metadata
                 await context.room.local_participant.set_metadata(new_stage.name)
                 
             return f"Interview stage updated to {stage_name}."
         except KeyError:
             return f"Invalid stage name: {stage_name}."
 
+    @function_tool
     async def get_interview_progress(
         self,
         context: RunContext,
@@ -98,15 +99,50 @@ class Interviewer(Agent):
             logger.warning("get_next_question failed: %s", exc)
             return {"error": "request_failed", "detail": str(exc)}
 
+    @function_tool
     async def get_next_question(
         self,
         context: RunContext,
-        advance: bool = True,
-    ) -> dict:
-        """Fetch the next primary interview question from the backend."""
-        if advance is None:
-            advance = True
-        return await self._fetch_next_question(advance=advance)
+    ) -> str:
+        """Fetch the next primary interview question from the backend database.
+        Use this when you are ready to move to the next technical or structured question.
+        """
+        payload = await self._fetch_next_question(advance=True)
+        if isinstance(payload, dict):
+            if payload.get("done"):
+                return "Hệ thống báo rằng đã hết câu hỏi trong danh sách. Bạn hãy chuyển sang phần hỏi đáp (Q&A) hoặc kết thúc phỏng vấn."
+            question = payload.get("question")
+            if question and "text" in question:
+                self._current_stage = InterviewStage.TECHNICAL
+                return f"Câu hỏi tiếp theo từ hệ thống là: {question['text']}"
+        return "Không thể lấy câu hỏi lúc này. Hãy thử đặt một câu hỏi của riêng bạn hoặc kết thúc phỏng vấn."
+
+    @function_tool
+    async def finish_interview(
+        self,
+        context: RunContext,
+    ) -> str:
+        """Finish the interview session. This will trigger the final evaluation and scoring.
+        Call this ONLY when you have completed all stages of the interview and said goodbye to the candidate.
+        """
+        if self._completed:
+            return "Interview is already finished."
+
+        self._current_stage = InterviewStage.CLOSING
+        self._completed = True
+        
+        # Update backend status to trigger evaluation
+        asyncio.create_task(self._update_backend_status("completed"))
+        
+        # Shutdown session after a short delay to allow last words to play
+        if self.session:
+            async def shutdown_after_delay():
+                await asyncio.sleep(2)
+                if self.session:
+                    self.session.shutdown(drain=True)
+            asyncio.create_task(shutdown_after_delay())
+            
+        return "Buổi phỏng vấn đã được đánh dấu là hoàn thành. Hệ thống đang tiến hành chấm điểm."
 
     async def get_initial_greeting(self) -> str:
         if self._context:
@@ -170,28 +206,6 @@ class Interviewer(Agent):
         await handle.wait_for_playout()
         asyncio.create_task(self._append_transcript("ai_agent", text))
 
-    async def _ask_next_question(self) -> bool:
-        payload = await self._fetch_next_question(advance=True)
-        if isinstance(payload, dict) and payload.get("error"):
-            return False
-        action = decide_next_action(parse_question_payload(payload))
-        if action.kind == "ask_question" and action.text:
-            self._current_stage = InterviewStage.TECHNICAL
-            await self._say_and_wait(action.text)
-            return True
-        if action.kind == "closing":
-            self._current_stage = InterviewStage.CLOSING
-            closing_message = "Cảm ơn bạn đã tham gia phỏng vấn. Buổi phỏng vấn đã kết thúc."
-            # Allow interruptions to avoid RuntimeError when user sends input mid-speech.
-            await self._say_and_wait(closing_message, allow_interruptions=True)
-            if config.AUTO_END_ON_COMPLETION:
-                await self._update_backend_status("completed")
-                if self.session:
-                    self.session.shutdown(drain=True)
-            self._completed = True
-            return True
-        return False
-
     async def on_user_turn_completed(self, turn_ctx, new_message) -> None:  # type: ignore[override]
         if self._completed:
             if config.AUTO_END_ON_COMPLETION:
@@ -201,7 +215,7 @@ class Interviewer(Agent):
             return
         text = self._extract_message_text(new_message)
         if text:
+            # Only append transcript, don't force next question.
+            # Let the LLM decide what to do next (acknowledge, follow up, or call tool).
             asyncio.create_task(self._append_transcript("candidate", text))
-        handled = await self._ask_next_question()
-        if handled:
-            raise StopResponse()
+
