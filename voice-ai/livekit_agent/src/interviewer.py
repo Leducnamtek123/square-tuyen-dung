@@ -50,7 +50,6 @@ class Interviewer(Agent):
     def current_stage(self) -> InterviewStage:
         return self._current_stage
 
-    @function_tool()
     async def set_interview_stage(
         self,
         context: RunContext,
@@ -75,7 +74,6 @@ class Interviewer(Agent):
         except KeyError:
             return f"Invalid stage name: {stage_name}."
 
-    @function_tool()
     async def get_interview_progress(
         self,
         context: RunContext,
@@ -100,7 +98,6 @@ class Interviewer(Agent):
             logger.warning("get_next_question failed: %s", exc)
             return {"error": "request_failed", "detail": str(exc)}
 
-    @function_tool()
     async def get_next_question(
         self,
         context: RunContext,

@@ -473,7 +473,7 @@ const routesConfig = {
         },
         {
           path: ROUTES.JOB_SEEKER.JOBS,
-          element: <Navigate to={`/${ROUTES.EMPLOYER.JOB_POST}`} replace />,
+          element: () => <Navigate to={`/${ROUTES.EMPLOYER.JOB_POST}`} replace />,
         },
 
         {
