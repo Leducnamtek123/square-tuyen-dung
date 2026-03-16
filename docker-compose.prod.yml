@@ -154,17 +154,28 @@ services:
   llama-cpp:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
     container_name: tuyendung-studio-llama-cpp
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     command:
       - --host
       - 0.0.0.0
       - --port
       - "11434"
       - --model
-      - /models/llama.cpp/Qwen2.5-7B-Instruct-Q4_K_M.gguf
+      - /models/llama.cpp/Qwen2.5-14B-Instruct-Q4_K_M.gguf
       - --alias
       - "${LLAMA_MODEL_ALIAS:-qwen2-7b}"
       - --ctx-size
       - "${LLAMA_CTX_SIZE:-16384}"
+      - --n-gpu-layers
+      - "100"
+      - --parallel
+      - "4"
     ports:
       - "11436:11434"
     volumes:
