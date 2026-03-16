@@ -9,6 +9,12 @@
   "noConversationSelected": "You haven't selected any conversation...",
   "typeYourMessage": "Type your message here...",
   "send": "Send",
+  "sendMessage": "Message",
+  "noCandidates": "No candidates have applied",
+  "sending": "Sending ...",
+  "appliedJobs": "APPLIED JOB POSTS",
+  "noAppliedJobs": "You haven't applied for any position",
+  "candidates": "CANDIDATES",
   "chatbot": {
     "greeting": {
       "employer": "Hello! I am Square AI, your recruitment assistant. How can I help you today? (e.g., finding candidates, drafting interview invitations...)",

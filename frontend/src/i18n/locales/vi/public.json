@@ -112,6 +112,12 @@
     "contact": "Thông tin liên hệ",
     "address": "Địa chỉ",
     "website": "Website",
-    "taxCode": "Mã số thuế"
+    "taxCode": "Mã số thuế",
+    "followedSuccessfully": "Theo dõi thành công.",
+    "unfollowedSuccessfully": "Bỏ theo dõi thành công.",
+    "followAt": "Theo dõi tại",
+    "generalInfo": "Thông tin chung",
+    "map": "Bản đồ",
+    "images": "Hình ảnh"
   }
 }

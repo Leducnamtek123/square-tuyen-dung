@@ -255,7 +255,7 @@
       "selectinterviewquestions": "Select Interview Questions"
     },
     "helperText": {
-      "selectaquestiongrouptoautomaticallyfillthequestionsbelow": "Select a question group to automatically fill the questions below"
+      "selectaquestiongrouptoautomaticallyfillTheQuestionsBelow": "Select a question group to automatically fill the questions below"
     },
     "validation": {
       "selectJobPost": "Please select a job post",
@@ -457,6 +457,14 @@
     },
     "placeholder": {
       "searchquestiongroups": "Search question groups..."
+    },
+    "messages": {
+      "addSuccess": "Added question group successfully",
+      "addError": "Error occurred while adding question set",
+      "updateSuccess": "Updated question group successfully",
+      "updateError": "Error occurred while updating question set",
+      "deleteSuccess": "Deleted question group successfully",
+      "deleteError": "Error occurred while deleting question set"
     }
   },
   "sendMailCard": {
@@ -474,7 +482,6 @@
       "enteremailsubject": "Enter email subject"
     }
   },
-
   "sidebar": {
     "dashboard": "Dashboard",
     "jobPostList": "Job Post List",
@@ -631,7 +638,7 @@
   },
   "pricing": {
     "heroTitle": "Pricing",
-    "heroSubtitle": "We provide flexible, easy-to-choose service packages that can be adjusted to the scale of the enterprise's recruitment.",
+    "heroSubtitle": "We provide flexible, easy-to-choose service packages that can be adjusted to the scale of the recruitment.",
     "contactBtn": "Contact for consultation",
     "plans": {
       "basic": {
@@ -760,5 +767,17 @@
   "setting": {
     "pageTitle": "Settings",
     "title": "System Settings"
+  },
+  "blog": {
+    "title": "Recruitment Blog",
+    "subtitle": "A place to update knowledge and experience for employers. Content will be added continuously according to each topic.",
+    "placeholders": {
+      "exp_title": "Sharing recruitment experience",
+      "exp_desc": "Content is being updated to bring useful information.",
+      "tips_title": "Tips for writing job descriptions",
+      "tips_desc": "Content is being updated to bring useful information.",
+      "trends_title": "Human resources market trends",
+      "trends_desc": "Content is being updated to bring useful information."
+    }
   }
 }

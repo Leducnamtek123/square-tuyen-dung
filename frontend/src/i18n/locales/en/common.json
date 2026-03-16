@@ -108,5 +108,14 @@
     "allJobTypes": "All job types",
     "allGenders": "All genders",
     "allMaritalStatuses": "All marital statuses"
-  }
+  },
+  "quickSearch": "Quick search",
+  "notUpdated": "Not updated",
+  "notificationTitle": "{{appName}} Notifications",
+  "selectedJobs": "Selected jobs: {{count}}",
+  "selectedProfiles": "Selected profiles: {{count}}",
+  "clearAll": "Clear all",
+  "cityProvince": "City, Province",
+  "jobsCount": "Jobs: {{count}}",
+  "shareVia": "Share via"
 }

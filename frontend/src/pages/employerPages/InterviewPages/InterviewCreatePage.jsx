@@ -1,12 +1,13 @@
-import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import InterviewCreateCard from '../../components/employers/InterviewCreateCard';
 
 const InterviewCreatePage = () => {
+    const { t } = useTranslation('employer');
 
     return (
 
-        <InterviewCreateCard title="Lên lịch Phỏng vấn trực tuyến" />
+        <InterviewCreateCard title={t('interviewCreateCard.title.scheduleOnlineInterview')} />
 
     );
 

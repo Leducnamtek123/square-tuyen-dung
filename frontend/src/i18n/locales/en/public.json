@@ -112,6 +112,12 @@
     "contact": "Contact info",
     "address": "Address",
     "website": "Website",
-    "taxCode": "Tax Code"
+    "taxCode": "Tax Code",
+    "followedSuccessfully": "Followed successfully.",
+    "unfollowedSuccessfully": "Unfollowed successfully.",
+    "followAt": "Follow at",
+    "generalInfo": "General information",
+    "map": "Map",
+    "images": "Images"
   }
 }

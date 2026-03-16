@@ -8,8 +8,10 @@ import { formatMessageDate } from "../../../../utils/dateHelper";
 
 import defaultTheme from "../../../../themeConfigs/defaultTheme";
 
-const Message = ({ userId, text, avatarUrl, createdAt }) => {
+import { useTranslation } from 'react-i18next';
 
+const Message = ({ userId, text, avatarUrl, createdAt }) => {
+  const { t } = useTranslation('chat');
   const { currentUserChat } = React.useContext(ChatContext);
 
   const isMe = `${currentUserChat?.userId}` === `${userId}`;
@@ -89,10 +91,8 @@ const Message = ({ userId, text, avatarUrl, createdAt }) => {
         <Typography variant="caption" color="text.secondary">
 
           {createdAt?.seconds
-
             ? formatMessageDate(createdAt?.seconds * 1000)
-
-            : "Đang gửi ..."}
+            : t('sending')}
 
         </Typography>
 

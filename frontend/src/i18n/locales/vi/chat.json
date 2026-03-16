@@ -9,6 +9,12 @@
   "noConversationSelected": "Bạn chưa chọn cuộc hội thoại nào...",
   "typeYourMessage": "Nhập tin nhắn của bạn ở đây...",
   "send": "Gửi",
+  "sendMessage": "Nhắn tin",
+  "noCandidates": "Chưa có ứng viên nào ứng tuyển",
+  "sending": "Đang gửi ...",
+  "appliedJobs": "TIN TUYỂN DỤNG ĐÃ ỨNG TUYỂN",
+  "noAppliedJobs": "Bạn chưa ứng tuyển vị trí nào",
+  "candidates": "ỨNG VIÊN ỨNG TUYỂN",
   "chatbot": {
     "launcherAria": "Mở trợ lý Square AI",
     "closeAria": "Đóng chat",

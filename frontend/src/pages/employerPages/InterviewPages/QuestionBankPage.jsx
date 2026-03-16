@@ -1,9 +1,10 @@
-import React from 'react';
+import { useTranslation } from 'react-i18next';
 import QuestionBankCard from '../../components/employers/QuestionBankCard';
 
 const QuestionBankPage = () => {
+    const { t } = useTranslation('employer');
     return (
-        <QuestionBankCard title="Ngân hàng câu hỏi AI" />
+        <QuestionBankCard title={t('sidebar.questionBank')} />
     );
 };
 

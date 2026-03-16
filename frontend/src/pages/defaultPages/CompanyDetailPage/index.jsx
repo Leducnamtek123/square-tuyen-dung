@@ -617,7 +617,7 @@ const CompanyDetailPage = () => {
 
                             >
 
-                              Chưa cập nhật
+                              {t("companyDetail.notUpdated")}
 
                             </span>
 
@@ -793,7 +793,7 @@ const CompanyDetailPage = () => {
 
                       >
 
-                        Theo dõi tại
+                        {t("companyDetail.followAt")}
 
                       </Typography>
 
@@ -875,7 +875,7 @@ const CompanyDetailPage = () => {
 
                       >
 
-                        Thông tin chung
+                        {t("companyDetail.generalInfo")}
 
                       </Typography>
 
@@ -975,7 +975,7 @@ const CompanyDetailPage = () => {
 
                             >
 
-                              Chưa cập nhật
+                              {t("companyDetail.notUpdated")}
 
                             </span>
 
@@ -1005,7 +1005,7 @@ const CompanyDetailPage = () => {
 
                       >
 
-                        Bản đồ
+                        {t("companyDetail.map")}
 
                       </Typography>
 
@@ -1061,7 +1061,7 @@ const CompanyDetailPage = () => {
 
                         >
 
-                          Hình ảnh
+                          {t("companyDetail.images")}
 
                         </Typography>
 

@@ -109,5 +109,14 @@
     "mobileApps": "Ứng dụng di động",
     "connectWith": "Kết nối với {{appName}}",
     "rightsReserved": "© {{year}} {{appName}}. Bảo lưu mọi quyền."
-  }
+  },
+  "quickSearch": "Tìm kiếm nhanh",
+  "notUpdated": "Chưa cập nhật",
+  "notificationTitle": "{{appName}} thông báo",
+  "selectedJobs": "Tin đã chọn: {{count}}",
+  "selectedProfiles": "Hồ sơ đã chọn: {{count}}",
+  "clearAll": "Xóa tất cả",
+  "cityProvince": "Tỉnh, thành phố",
+  "jobsCount": "Việc làm: {{count}}",
+  "shareVia": "Chia sẻ qua"
 }

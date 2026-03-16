@@ -457,6 +457,14 @@
     },
     "placeholder": {
       "searchquestiongroups": "Tìm kiếm nhóm câu hỏi..."
+    },
+    "messages": {
+      "addSuccess": "Thêm nhóm câu hỏi thành công",
+      "addError": "Có lỗi xảy ra khi thêm bộ câu hỏi",
+      "updateSuccess": "Cập nhật nhóm câu hỏi thành công",
+      "updateError": "Có lỗi xảy ra khi cập nhật bộ câu hỏi",
+      "deleteSuccess": "Xóa nhóm câu hỏi thành công",
+      "deleteError": "Có lỗi xảy ra khi xóa bộ câu hỏi"
     }
   },
   "sendMailCard": {
@@ -474,7 +482,6 @@
       "enteremailsubject": "Nhập tiêu đề email"
     }
   },
-
   "sidebar": {
     "dashboard": "Bảng điều khiển",
     "jobPostList": "Danh sách tin TD",
@@ -706,10 +713,10 @@
   "support": {
     "pageTitle": "Trung tâm hỗ trợ",
     "heroTitle": "Chúng tôi có thể giúp gì cho bạn?",
-    "heroSubtitle": "{{appName}} luôn sẵn sàng hỗ trợ bạn tối ưu hóa quy trình tuyển dụng. Nếu bạn gặp bất kỳ khó khăn nào, hãy liên hệ với chúng tôi qua các kênh dưới đây.",
+    "heroSubtitle": "{{appName}} luôn sẵn sàng hỗ trợ bạn tối ưu hóa quy trình tuyển dụng. Nếu bạn gặp bất kỳ khó khăn nào, hãy liên hệ with chúng tôi qua các kênh dưới đây.",
     "directSupport": {
       "title": "Hỗ trợ trực tiếp",
-      "desc": "Liên hệ với đội ngũ hỗ trợ kỹ thuật và tư vấn tuyển dụng.",
+      "desc": "Liên hệ with đội ngũ hỗ trợ kỹ thuật và tư vấn tuyển dụng.",
       "note": "Thời gian: 8:00 - 18:00 (Thứ 2 - Thứ 7)"
     },
     "docs": {
@@ -729,7 +736,7 @@
       "q2": "Công nghệ AI giúp ích gì trong việc sàng lọc hồ sơ?",
       "a2": "Hệ thống AI sẽ tự động phân tích kỹ năng, kinh nghiệm của ứng viên so với yêu cầu công việc và đưa ra điểm số phù hợp, giúp bạn tiết kiệm 70% thời gian sàng lọc.",
       "q3": "Làm thế nào để bảo mật thông tin doanh nghiệp?",
-      "a3": "Chúng tôi sử dụng mã hóa dữ liệu chuẩn quốc tế và các lớp bảo mật đa tầng để đảm bảo thông tin của bạn và ứng viên luôn an toàn."
+      "a3": "Chúng tôi sử dụng mã hóa dữ liệu chuẩn quốc tế và các lớp bảo mật đa tầng để đảm bảo thông tin của bạn and ứng viên luôn an toàn."
     }
   },
   "service": {
@@ -760,5 +767,17 @@
   "setting": {
     "pageTitle": "Cài đặt",
     "title": "Cài đặt hệ thống"
+  },
+  "blog": {
+    "title": "Blog tuyển dụng",
+    "subtitle": "Nơi cập nhật kiến thức và kinh nghiệm dành cho nhà tuyển dụng. Nội dung sẽ được bổ sung liên tục theo từng chủ đề.",
+    "placeholders": {
+      "exp_title": "Chia sẻ kinh nghiệm tuyển dụng",
+      "exp_desc": "Nội dung đang được cập nhật để mang lại thông tin hữu ích.",
+      "tips_title": "Mẹo viết mô tả công việc",
+      "tips_desc": "Nội dung đang được cập nhật để mang lại thông tin hữu ích.",
+      "trends_title": "Xu hướng thị trường nhân sự",
+      "trends_desc": "Nội dung đang được cập nhật để mang lại thông tin hữu ích."
+    }
   }
 }

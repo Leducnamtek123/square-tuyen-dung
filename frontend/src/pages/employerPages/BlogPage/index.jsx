@@ -1,91 +1,101 @@
-import React from "react";
-import { Box, Card, Stack, Typography } from "@mui/material";
-import Grid from "@mui/material/Grid2";
-
-import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
-
-import { TabTitle } from "../../../utils/generalFunction";
-import { APP_NAME } from "../../../configs/constants";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+    Container,
+    Typography,
+    Grid,
+    Card,
+    CardContent,
+    CardMedia,
+    Box,
+    Breadcrumbs,
+    Link as MuiLink,
+} from '@mui/material';
+import { Link } from 'react-router-dom';
+import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 
 const BlogPage = () => {
-  TabTitle(`Blog tuyển dụng - ${APP_NAME}`);
+    const { t } = useTranslation('employer');
 
-  const placeholders = [
-    {
-      title: "Chia sẻ kinh nghiệm tuyển dụng",
-      description: "Nội dung đang được cập nhật để mang lại thông tin hữu ích.",
-    },
-    {
-      title: "Mẹo viết mô tả công việc",
-      description: "Nội dung đang được cập nhật để mang lại thông tin hữu ích.",
-    },
-    {
-      title: "Xu hướng thị trường nhân sự",
-      description: "Nội dung đang được cập nhật để mang lại thông tin hữu ích.",
-    },
-  ];
+    const blogPosts = [
+        {
+            id: 1,
+            title: t('blog.placeholders.exp_title'),
+            description: t('blog.placeholders.exp_desc'),
+            image: 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+        },
+        {
+            id: 2,
+            title: t('blog.placeholders.tips_title'),
+            description: t('blog.placeholders.tips_desc'),
+            image: 'https://images.unsplash.com/photo-1454165833772-d99626a4407a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+        },
+        {
+            id: 3,
+            title: t('blog.placeholders.trends_title'),
+            description: t('blog.placeholders.trends_desc'),
+            image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60',
+        },
+    ];
 
-  return (
-    <Box sx={{ maxWidth: "1200px", margin: "0 auto", py: 5, px: 3 }}>
-      <Box sx={{ mb: 6, textAlign: "center" }}>
-        <Typography
-          variant="h3"
-          sx={{
-            mb: 2,
-            background: (theme) => theme.palette.primary.gradient,
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            fontWeight: 700,
-          }}
-        >
-          Blog tuyển dụng
-        </Typography>
-        <Typography
-          sx={{
-            maxWidth: "820px",
-            margin: "0 auto",
-            color: "text.secondary",
-            lineHeight: 1.8,
-          }}
-        >
-          Nơi cập nhật kiến thức và kinh nghiệm dành cho nhà tuyển dụng. Nội dung
-          sẽ được bổ sung liên tục theo từng chủ đề.
-        </Typography>
-      </Box>
-
-      <Grid container spacing={4}>
-        {placeholders.map((item, index) => (
-          <Grid
-            key={index}
-            size={{
-              xs: 12,
-              sm: 6,
-              md: 4,
-            }}
-          >
-            <Card
-              sx={{
-                height: "100%",
-                p: 3,
-                border: "1px solid",
-                borderColor: "grey.100",
-              }}
+    return (
+        <Container maxWidth="lg" sx={{ py: 4 }}>
+            {/* Breadcrumbs */}
+            <Breadcrumbs
+                separator={<NavigateNextIcon fontSize="small" />}
+                aria-label="breadcrumb"
+                sx={{ mb: 3 }}
             >
-              <Stack spacing={2}>
-                <ArticleOutlinedIcon sx={{ fontSize: 34, color: "primary.main" }} />
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                  {item.title}
+                <MuiLink component={Link} underline="hover" color="inherit" to="/employer/dashboard">
+                    {t('sidebar.dashboard')}
+                </MuiLink>
+                <Typography color="text.primary">{t('blog.title')}</Typography>
+            </Breadcrumbs>
+
+            {/* Header */}
+            <Box sx={{ mb: 6 }}>
+                <Typography variant="h3" component="h1" gutterBottom fontWeight="bold" color="primary">
+                    {t('blog.title')}
                 </Typography>
-                <Typography sx={{ color: "text.secondary", lineHeight: 1.7 }}>
-                  {item.description}
+                <Typography variant="h6" color="text.secondary" sx={{ maxWidth: '800px' }}>
+                    {t('blog.subtitle')}
                 </Typography>
-              </Stack>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
-  );
+            </Box>
+
+            {/* Blog Grid */}
+            <Grid container spacing={4}>
+                {blogPosts.map((post) => (
+                    <Grid item xs={12} sm={6} md={4} key={post.id}>
+                        <Card sx={{
+                            height: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            transition: 'transform 0.2s',
+                            '&:hover': {
+                                transform: 'translateY(-4px)',
+                                boxShadow: 4,
+                            },
+                        }}>
+                            <CardMedia
+                                component="img"
+                                height="200"
+                                image={post.image}
+                                alt={post.title}
+                            />
+                            <CardContent sx={{ flexGrow: 1 }}>
+                                <Typography gutterBottom variant="h5" component="h2" fontWeight="bold">
+                                    {post.title}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    {post.description}
+                                </Typography>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+        </Container>
+    );
 };
 
 export default BlogPage;

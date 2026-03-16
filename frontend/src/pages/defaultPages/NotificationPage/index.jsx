@@ -2,6 +2,7 @@ import React from "react";
 
 import { Card, Typography } from "@mui/material";
 
+import { useTranslation } from "react-i18next";
 import { TabTitle } from "../../../utils/generalFunction";
 
 import NotificationCard from "../../components/defaults/NotificationCard";
@@ -9,8 +10,9 @@ import NotificationCard from "../../components/defaults/NotificationCard";
 import { APP_NAME } from "../../../configs/constants";
 
 const NotificationPage = () => {
+  const { t } = useTranslation();
 
-  TabTitle(`${APP_NAME} thông báo`);
+  TabTitle(t("notificationTitle", { appName: APP_NAME }));
 
   return (
 
@@ -40,7 +42,7 @@ const NotificationPage = () => {
 
           >
 
-            {`${APP_NAME} thông báo`}
+            {t("notificationTitle", { appName: APP_NAME })}
 
           </Typography>
 

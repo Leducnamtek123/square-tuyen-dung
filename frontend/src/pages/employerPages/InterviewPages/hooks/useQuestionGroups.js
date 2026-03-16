@@ -1,8 +1,10 @@
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import questionGroupService from '../../../../services/questionGroupService';
 import { toast } from 'react-toastify';
 
 export const useQuestionGroups = (params) => {
+    const { t } = useTranslation('employer');
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -15,10 +17,10 @@ export const useQuestionGroups = (params) => {
         mutationFn: (data) => questionGroupService.createQuestionGroup(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
-            toast.success('Added question group successfully');
+            toast.success(t('questionGroupsCard.messages.addSuccess'));
         },
         onError: (err) => {
-            toast.error('Có lỗi xảy ra khi thêm bộ câu hỏi');
+            toast.error(t('questionGroupsCard.messages.addError'));
             console.error(err);
         }
     });
@@ -27,10 +29,10 @@ export const useQuestionGroups = (params) => {
         mutationFn: ({ id, data }) => questionGroupService.updateQuestionGroup(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
-            toast.success('Updated question group successfully');
+            toast.success(t('questionGroupsCard.messages.updateSuccess'));
         },
         onError: (err) => {
-            toast.error('Có lỗi xảy ra khi cập nhật bộ câu hỏi');
+            toast.error(t('questionGroupsCard.messages.updateError'));
             console.error(err);
         }
     });
@@ -39,10 +41,10 @@ export const useQuestionGroups = (params) => {
         mutationFn: (id) => questionGroupService.deleteQuestionGroup(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
-            toast.success('Deleted question group successfully');
+            toast.success(t('questionGroupsCard.messages.deleteSuccess'));
         },
         onError: (err) => {
-            toast.error('Có lỗi xảy ra khi xóa bộ câu hỏi');
+            toast.error(t('questionGroupsCard.messages.deleteError'));
             console.error(err);
         }
     });

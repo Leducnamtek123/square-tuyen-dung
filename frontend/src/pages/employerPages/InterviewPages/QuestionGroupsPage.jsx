@@ -1,9 +1,10 @@
-import React from 'react';
+import { useTranslation } from 'react-i18next';
 import QuestionGroupsCard from '../../components/employers/QuestionGroupsCard';
 
 const QuestionGroupsPage = () => {
+    const { t } = useTranslation('employer');
     return (
-        <QuestionGroupsCard title="Quản lý bộ câu hỏi" />
+        <QuestionGroupsCard title={t('sidebar.questionSets')} />
     );
 };
 
