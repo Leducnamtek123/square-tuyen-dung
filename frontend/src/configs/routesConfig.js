@@ -1,5 +1,5 @@
 import { lazy } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, Navigate } from "react-router-dom";
 import { HOST_NAME, ROUTES } from "./constants";
 import {
   HomeLayout,
@@ -470,6 +470,10 @@ const routesConfig = {
 
           element: EmployerJobPostPage,
 
+        },
+        {
+          path: ROUTES.JOB_SEEKER.JOBS,
+          element: <Navigate to={`/${ROUTES.EMPLOYER.JOB_POST}`} replace />,
         },
 
         {

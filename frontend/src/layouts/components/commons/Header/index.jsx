@@ -66,9 +66,10 @@ const Header = (props) => {
 
   const hostName = window.location.hostname;
 
+  const fullPathname = window.location.pathname;
   const isEmployerPortal =
-    location.pathname.startsWith("/employer") ||
-    location.pathname.startsWith("/employee") ||
+    fullPathname.startsWith("/employer") ||
+    fullPathname.startsWith("/employee") ||
     hostName === HOST_NAME.EMPLOYER_MYJOB;
 
   const currentPortalHost = isEmployerPortal ? HOST_NAME.EMPLOYER_MYJOB : HOST_NAME.MYJOB;
