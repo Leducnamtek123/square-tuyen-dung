@@ -43,13 +43,9 @@ const TextFieldCustom = ({
     <div>
 
       {title && (
-
-        <Typography variant="subtitle2" gutterBottom>
-
-          {title} {showRequired && <span style={{ color: 'red' }}>*</span>}
-
+        <Typography variant="body2" sx={{ fontWeight: 600, mb: 1, display: 'block', color: 'text.primary' }}>
+          {title}{showRequired && <span style={{ color: 'red', marginLeft: '4px' }}>*</span>}
         </Typography>
-
       )}
 
       <Controller

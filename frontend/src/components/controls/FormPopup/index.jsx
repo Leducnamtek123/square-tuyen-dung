@@ -97,9 +97,8 @@ const Popup = ({
           >
 
             <Typography 
-
               variant="h5"
-
+              component="div"
               sx={{
 
                 color: theme.palette.grey[900],

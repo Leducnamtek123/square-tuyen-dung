@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Typography } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 
 import SendIcon from '@mui/icons-material/Send';
 
@@ -71,15 +71,14 @@ const ApplyCard = ({
       <FormPopup
 
         title={
-
-          <>
-
-            <Typography color="gray">Ứng tuyển vị trí </Typography>
-
-            <span>{title}</span>
-
-          </>
-
+          <Stack>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500, fontSize: '0.875rem' }}>
+              Ứng tuyển vị trí
+            </Typography>
+            <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 700, mt: -0.5 }}>
+              {title}
+            </Typography>
+          </Stack>
         }
 
         buttonText="Ứng tuyển"

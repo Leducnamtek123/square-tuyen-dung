@@ -69,8 +69,12 @@ class Interviewer(Agent):
             # Sync to room metadata for frontend UI
             if context.room:
                 await context.room.local_participant.set_metadata(new_stage.name)
+            
+            msg = f"Interview stage updated to {stage_name}."
+            if new_stage == InterviewStage.TECHNICAL:
+                msg += " You should now call `get_next_question()` immediately to start the technical section."
                 
-            return f"Interview stage updated to {stage_name}."
+            return msg
         except KeyError:
             return f"Invalid stage name: {stage_name}."
 
@@ -107,6 +111,7 @@ class Interviewer(Agent):
         """Fetch the next primary interview question from the backend database.
         Use this when you are ready to move to the next technical or structured question.
         """
+        logger.info("get_next_question called by LLM")
         payload = await self._fetch_next_question(advance=True)
         if isinstance(payload, dict):
             if payload.get("done"):
@@ -114,6 +119,13 @@ class Interviewer(Agent):
             question = payload.get("question")
             if question and "text" in question:
                 self._current_stage = InterviewStage.TECHNICAL
+                # Sync metadata to room for frontend UI
+                if context.room:
+                    try:
+                        await context.room.local_participant.set_metadata(InterviewStage.TECHNICAL.name)
+                    except Exception as e:
+                        logger.warning("Could not set stage metadata in get_next_question: %s", e)
+                
                 return f"Câu hỏi tiếp theo từ hệ thống là: {question['text']}"
         return "Không thể lấy câu hỏi lúc này. Hãy thử đặt một câu hỏi của riêng bạn hoặc kết thúc phỏng vấn."
 

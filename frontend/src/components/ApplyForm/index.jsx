@@ -170,138 +170,83 @@ const ApplyForm = ({ handleApplyJob }) => {
 
                 >
 
-                  <Stack spacing={1}>
-
+                  <Stack spacing={1.5}>
                     {resumes.map((value) => (
-
-                      <Card sx={{ p: 2 }} variant="outlined" key={value.id}>
-
-                        <Stack direction="row" sx={{ width: '100%' }}>
-
-                          <Stack>
-
-                            <FormControlLabel
-
-                              value={value.id}
-
-                              control={<Radio />}
-
-                              sx={{ mr: 1 }}
-
-                            />
-
-                          </Stack>
-
-                          <Stack flex={1}>
-
-                            <Typography variant="h6" sx={{ fontSize: 17 }}>
-
-                              {value?.title}
-
-                            </Typography>
-
-                            <Typography
-
-                              variant="body2"
-
-                              sx={{ fontStyle: 'italic' }}
-
-                            >
-
-                              {value.type === CV_TYPES.cvWebsite ? (
-
-                                <>
-
+                      <Card 
+                        sx={{ 
+                          p: 1.5,
+                          transition: 'all 0.2s',
+                          '&:hover': {
+                            borderColor: 'primary.main',
+                            bgcolor: 'rgba(68, 29, 160, 0.02)'
+                          }
+                        }} 
+                        variant="outlined" 
+                        key={value.id}
+                      >
+                        <Stack direction="row" spacing={1} alignItems="center" sx={{ width: '100%' }}>
+                          <FormControlLabel
+                            value={value.id}
+                            control={<Radio />}
+                            label={
+                              <Stack spacing={0.5}>
+                                {value?.title && (
+                                  <Typography variant="subtitle1" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
+                                    {value.title}
+                                  </Typography>
+                                )}
+                                <Stack direction="row" spacing={1} alignItems="center">
                                   <FontAwesomeIcon
-
-                                    icon={faFile}
-
-                                    style={{ marginRight: 1 }}
-
-                                    color="#441da0"
-
-                                  />{' '}
-
-                                  Hồ sơ trực tuyến
-
-                                </>
-
-                              ) : value.type === CV_TYPES.cvUpload ? (
-
-                                <>
-
-                                  <FontAwesomeIcon
-
-                                    icon={faFilePdf}
-
-                                    style={{ marginRight: 1 }}
-
-                                    color="red"
-
-                                  />{' '}
-
-                                  Hồ sơ đính kèm
-
-                                </>
-
-                              ) : (
-
-                                ''
-
-                              )}
-
-                            </Typography>
-
-                          </Stack>
-
-                          <Stack justifyContent="center">
-
-                            <Link
-
-                              target="_blank"
-
-                              href={
-
-                                value.type === CV_TYPES.cvWebsite
-
-                                  ? `/${ROUTES.JOB_SEEKER.DASHBOARD}/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, value.slug)}`
-
-                                  : `/${ROUTES.JOB_SEEKER.DASHBOARD}/${formatRoute(ROUTES.JOB_SEEKER.ATTACHED_PROFILE, value.slug)}`
-
+                                    icon={value.type === CV_TYPES.cvWebsite ? faFile : faFilePdf}
+                                    color={value.type === CV_TYPES.cvWebsite ? "#441da0" : "red"}
+                                    size="sm"
+                                  />
+                                  <Typography
+                                    variant="body2"
+                                    sx={{ fontStyle: 'italic', color: 'text.secondary' }}
+                                  >
+                                    {value.type === CV_TYPES.cvWebsite ? 'Hồ sơ trực tuyến' : 'Hồ sơ đính kèm'}
+                                  </Typography>
+                                </Stack>
+                              </Stack>
+                            }
+                            sx={{ 
+                              flex: 1,
+                              ml: 0,
+                              mr: 0,
+                              '& .MuiFormControlLabel-label': {
+                                flex: 1
                               }
-
-                              style={{
-
-                                textDecoration: 'none',
-
-                              }}
-
-                            >
-
+                            }}
+                          />
+                          <Link
+                            target="_blank"
+                            href={
+                              value.type === CV_TYPES.cvWebsite
+                                ? `/${ROUTES.JOB_SEEKER.DASHBOARD}/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, value.slug)}`
+                                : `/${ROUTES.JOB_SEEKER.DASHBOARD}/${formatRoute(ROUTES.JOB_SEEKER.ATTACHED_PROFILE, value.slug)}`
+                            }
+                            sx={{
+                              textDecoration: 'none',
+                              color: '#441da0',
+                              '&:hover': {
+                                opacity: 0.8
+                              }
+                            }}
+                          >
+                            <Stack direction="row" spacing={0.5} alignItems="center">
+                              <FontAwesomeIcon icon={faEye} />
                               <Typography
-
-                                sx={{ fontWeight: 'bold', cursor: 'pointer' }}
-
-                                color="#441da0"
-
+                                sx={{ fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap' }}
                               >
-
-                                <FontAwesomeIcon icon={faEye} /> Xem hồ sơ
-
+                                Xem hồ sơ
                               </Typography>
-
-                            </Link>
-
-                          </Stack>
-
+                            </Stack>
+                          </Link>
                         </Stack>
-
                       </Card>
-
                     ))}
-
                   </Stack>
-
                 </RadioGroup>
 
               )}
