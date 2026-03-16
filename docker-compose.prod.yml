@@ -154,7 +154,7 @@ services:
   llama-cpp:
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
     container_name: tuyendung-studio-llama-cpp
-    deploy:
+    deploy: # Thêm phần này để sử dụng GPU
       resources:
         reservations:
           devices:
@@ -167,15 +167,13 @@ services:
       - --port
       - "11434"
       - --model
-      - /models/llama.cpp/Qwen2.5-14B-Instruct-Q4_K_M.gguf
+      - /models/llama.cpp/Qwen2.5-7B-Instruct-Q4_K_M.gguf # Đổi tên file đã tải
       - --alias
-      - "${LLAMA_MODEL_ALIAS:-qwen2-7b}"
+      - "qwen2.5-7b" # Giữ nguyên alias nếu không muốn sửa config.py
       - --ctx-size
-      - "${LLAMA_CTX_SIZE:-16384}"
-      - --n-gpu-layers
-      - "100"
-      - --parallel
-      - "4"
+      - "16384"
+      - --n-gpu-layers # Ép mô hình vào GPU hoàn toàn
+      - "100" 
     ports:
       - "11436:11434"
     volumes:
