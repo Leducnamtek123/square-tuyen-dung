@@ -130,13 +130,20 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }) => {
             variant="text"
             sx={{ textTransform: "inherit" }}
             fullWidth
-            disabled={item.isSelected}
             onClick={() => {
               handleCloseUserMenu();
               item.onClick();
             }}
           >
-            <Typography marginRight="auto"> {item.label}</Typography>
+            <Typography
+              marginRight="auto"
+              sx={{
+                fontWeight: item.isSelected ? 600 : 400,
+                color: item.isSelected ? "primary.main" : "text.primary",
+              }}
+            >
+              {item.label}
+            </Typography>
           </Button>
         ))}
         <Button
