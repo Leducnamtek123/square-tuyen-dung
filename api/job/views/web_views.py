@@ -201,6 +201,8 @@ class PrivateJobPostViewSet(viewsets.ViewSet,
 
     filter_backends = [DjangoFilterBackend, AliasedOrderingFilter]
 
+    lookup_field = "slug"
+
     ordering_fields = (
 
         ('jobName', 'job_name'),

@@ -28,6 +28,8 @@ import toSlug from '../../utils/customData';
 
 const Pdf = ({ fileUrl, title = '' }) => {
 
+  if (!fileUrl) return null;
+
   const zoomPluginInstance = zoomPlugin();
 
   const getFilePluginInstance = getFilePlugin({

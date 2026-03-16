@@ -36,7 +36,7 @@ export const formatRoute = (route, value, paramKey = ":slug") => {
 
 export const buildURL = (hostname) => {
 
-  const protocol = window.location.protocol; 
+  const protocol = window.location.protocol;
 
   const port = window.location.port ? `:${window.location.port}` : "";
 

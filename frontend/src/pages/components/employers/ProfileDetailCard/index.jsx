@@ -1730,7 +1730,7 @@ const ProfileDetailCard = () => {
 
                               {index <
 
-                                profileDetail.educationDetails.length - 1 && (
+                                profileDetail.experiencesDetails.length - 1 && (
 
                                 <Grid size={12}>
 
