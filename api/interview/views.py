@@ -168,7 +168,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        return Response(create_livekit_participant_token(session))
+        return Response(create_livekit_participant_token(session, request))
 
     # GET /sessions/{room_name}/context/ — cho AI Agent
     @action(detail=False, methods=['get'], url_path='(?P<room_name>[^/.]+)/context',

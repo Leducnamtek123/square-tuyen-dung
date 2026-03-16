@@ -14,23 +14,17 @@ import { APP_CONFIG_DEFAULTS } from "@/voice-ai/app-config";
 import LanguageSwitcher from "../../../layouts/components/commons/LanguageSwitcher";
 
 const getSafeLiveKitUrl = () => {
-  const fallbackUrl = "wss://tuyendung.square.vn/livekit";
-  const rawUrl = (import.meta.env.VITE_LIVEKIT_URL || fallbackUrl).trim();
+  const defaultUrl = `${window.location.protocol}//${window.location.host}/livekit`;
+  const rawUrl = (import.meta.env.VITE_LIVEKIT_URL || defaultUrl).trim();
 
-  if (!rawUrl) return fallbackUrl;
+  if (!rawUrl) return defaultUrl;
 
   try {
     const normalized = new URL(rawUrl);
-    if (window.location.protocol === "https:") {
-      // Force secure WebSocket when page is HTTPS to avoid mixed content.
-      normalized.protocol = "wss:";
-    } else {
-      // Use plain WS for non-HTTPS (dev) pages.
-      normalized.protocol = "ws:";
-    }
+    normalized.protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
     return normalized.toString().replace(/\/$/, "");
   } catch {
-    return fallbackUrl;
+    return defaultUrl;
   }
 };
 
@@ -40,10 +34,11 @@ const InterviewRoomPage = () => {
   const { t } = useTranslation("interview");
 
   const [token, setToken] = useState("");
+  const [serverUrl, setServerUrl] = useState("");
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const liveKitUrl = getSafeLiveKitUrl();
+  const liveKitUrl = serverUrl || getSafeLiveKitUrl();
 
   useEffect(() => {
     const fetchToken = async () => {
@@ -53,6 +48,9 @@ const InterviewRoomPage = () => {
 
         if (data?.token) {
           setToken(data.token);
+          if (data.server_url) {
+            setServerUrl(data.server_url);
+          }
         } else {
           setError(t("errors.tokenMissing"));
         }

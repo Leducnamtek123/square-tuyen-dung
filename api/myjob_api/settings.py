@@ -31,6 +31,7 @@ AI_LLM_BASE_URL = config(
 )
 AI_LLM_MODEL = config("AI_LLM_MODEL", default=config("LLAMA_MODEL", default="qwen2-7b"))
 AI_RESUME_AUTO_ANALYZE = config("AI_RESUME_AUTO_ANALYZE", default=True, cast=bool)
+LIVEKIT_PUBLIC_URL = config("LIVEKIT_PUBLIC_URL", default="")
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Dict, Iterable, Optional
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.utils import timezone
@@ -29,7 +30,18 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
     }
 
 
-def create_livekit_participant_token(session: InterviewSession) -> Dict[str, str]:
+def _build_public_livekit_url(request) -> str:
+    explicit = getattr(settings, "LIVEKIT_PUBLIC_URL", "") or ""
+    if explicit:
+        return explicit.rstrip("/")
+
+    forwarded_proto = (request.META.get("HTTP_X_FORWARDED_PROTO") or request.scheme or "http").split(",")[0].strip()
+    scheme = "wss" if forwarded_proto == "https" else "ws"
+    host = request.get_host()
+    return f"{scheme}://{host}/livekit"
+
+
+def create_livekit_participant_token(session: InterviewSession, request) -> Dict[str, str]:
     participant_identity = f"candidate-{session.candidate_id}"
     participant_name = session.candidate.full_name or session.candidate.email or participant_identity
     LiveKitService.ensure_room_with_agent(session.room_name)
@@ -39,10 +51,12 @@ def create_livekit_participant_token(session: InterviewSession) -> Dict[str, str
         participant_name=participant_name,
         is_agent=False,
     )
+    server_url = _build_public_livekit_url(request)
     return {
         "token": token,
         "room_name": session.room_name,
         "participant_identity": participant_identity,
+        "server_url": server_url,
     }
 
 
