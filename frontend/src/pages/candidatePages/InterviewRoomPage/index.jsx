@@ -22,8 +22,11 @@ const getSafeLiveKitUrl = () => {
   try {
     const normalized = new URL(rawUrl);
     if (window.location.protocol === "https:") {
-      if (normalized.protocol === "ws:") normalized.protocol = "wss:";
-      if (normalized.protocol === "http:") normalized.protocol = "https:";
+      // Force secure WebSocket when page is HTTPS to avoid mixed content.
+      normalized.protocol = "wss:";
+    } else {
+      // Use plain WS for non-HTTPS (dev) pages.
+      normalized.protocol = "ws:";
     }
     return normalized.toString().replace(/\/$/, "");
   } catch {
