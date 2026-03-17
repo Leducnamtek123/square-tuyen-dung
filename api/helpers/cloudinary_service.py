@@ -33,6 +33,27 @@ class CloudinaryService:
         try:
             if not client.bucket_exists(bucket):
                 client.make_bucket(bucket)
+            
+            # Set public read-only policy for the bucket
+            policy = {
+                "Version": "2012-10-17",
+                "Statement": [
+                    {
+                        "Effect": "Allow",
+                        "Principal": {"AWS": ["*"]},
+                        "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+                        "Resource": [f"arn:aws:s3:::{bucket}"]
+                    },
+                    {
+                        "Effect": "Allow",
+                        "Principal": {"AWS": ["*"]},
+                        "Action": ["s3:GetObject"],
+                        "Resource": [f"arn:aws:s3:::{bucket}/*"]
+                    }
+                ]
+            }
+            import json
+            client.set_bucket_policy(bucket, json.dumps(policy))
         except S3Error as e:
             helper.print_log_error("minio_ensure_bucket", e)
             raise
