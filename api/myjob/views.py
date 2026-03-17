@@ -69,7 +69,7 @@ class FeedbackViewSet(viewsets.ViewSet,
 
                                          fields=['id', 'content', 'rating', 'isActive', 'userDict'])
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
 @api_view(http_method_names=['post'])
 @permission_classes([perms_sys.AllowAny])

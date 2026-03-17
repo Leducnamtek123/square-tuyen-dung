@@ -1,190 +1,111 @@
-import React from 'react';
-
-import { useSelector } from 'react-redux';
-
-import { useForm } from 'react-hook-form';
-
-import { yupResolver } from '@hookform/resolvers/yup';
-
-import * as yup from 'yup';
-
+import React from "react";
+import { useSelector } from "react-redux";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { Card, CircularProgress, FormControlLabel, Link, Radio, RadioGroup, Stack, Typography } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { faEye, faFile, faFilePdf } from '@fortawesome/free-regular-svg-icons';
-
-import errorHandling from '../../utils/errorHandling';
-
-import { CV_TYPES, REGEX_VATIDATE, ROUTES } from '../../configs/constants';
-
-import TextFieldCustom from '../controls/TextFieldCustom';
-
-import jobSeekerProfileService from '../../services/jobSeekerProfileService';
-
-import { formatRoute } from '../../utils/funcUtils';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faFile, faFilePdf } from "@fortawesome/free-regular-svg-icons";
+import { useTranslation } from "react-i18next";
+import { alpha, useTheme } from "@mui/material/styles";
+import errorHandling from "../../utils/errorHandling";
+import { CV_TYPES, REGEX_VATIDATE, ROUTES } from "../../configs/constants";
+import TextFieldCustom from "../controls/TextFieldCustom";
+import jobSeekerProfileService from "../../services/jobSeekerProfileService";
+import { formatRoute } from "../../utils/funcUtils";
 
 const ApplyForm = ({ handleApplyJob }) => {
-
+  const { t } = useTranslation("public");
+  const theme = useTheme();
   const { currentUser } = useSelector((state) => state.user);
-
   const [isLoadingResumes, setIsLoadingResumes] = React.useState(false);
-
   const [resumes, setResumes] = React.useState([]);
 
   const schema = yup.object().shape({
-
     fullName: yup
-
       .string()
-
-      .required('Full name is required.')
-
-      .max(100, 'Full name exceeds allowed length.'),
-
+      .required(t("applyForm.validation.fullNameRequired", { defaultValue: "Họ và tên là bắt buộc." }))
+      .max(100, t("applyForm.validation.fullNameMax", { defaultValue: "Họ và tên vượt quá độ dài cho phép." })),
     email: yup
-
       .string()
-
-      .required('Email is required.')
-
-      .email('Invalid email.')
-
-      .max(100, 'Email exceeds allowed length.'),
-
+      .required(t("applyForm.validation.emailRequired", { defaultValue: "Email là bắt buộc." }))
+      .email(t("applyForm.validation.emailInvalid", { defaultValue: "Email không hợp lệ." }))
+      .max(100, t("applyForm.validation.emailMax", { defaultValue: "Email vượt quá độ dài cho phép." })),
     phone: yup
-
       .string()
-
-      .required('Phone number is required.')
-
-      .matches(REGEX_VATIDATE.phoneRegExp, 'Invalid phone number.')
-
-      .max(15, 'Phone number exceeds allowed length.'),
-
+      .required(t("applyForm.validation.phoneRequired", { defaultValue: "Số điện thoại là bắt buộc." }))
+      .matches(REGEX_VATIDATE.phoneRegExp, t("applyForm.validation.phoneInvalid", { defaultValue: "Số điện thoại không hợp lệ." }))
+      .max(15, t("applyForm.validation.phoneMax", { defaultValue: "Số điện thoại vượt quá độ dài cho phép." })),
   });
 
   const { control, setValue, handleSubmit } = useForm({
-
     defaultValues: {
-
       fullName: currentUser.fullName,
-
       email: currentUser.email,
-
-      phone: currentUser?.jobSeekerProfile?.phone || '',
-
-      resume: '',
-
+      phone: currentUser?.jobSeekerProfile?.phone || "",
+      resume: "",
     },
-
     resolver: yupResolver(schema),
-
   });
 
   React.useEffect(() => {
-
     const getOnlineProfile = async (jobSeekerProfileId, params) => {
-
       setIsLoadingResumes(true);
-
       try {
-
-        const resData = await jobSeekerProfileService.getResumes(
-
-          jobSeekerProfileId,
-
-          params
-
-        );
-
+        const resData = await jobSeekerProfileService.getResumes(jobSeekerProfileId, params);
         setResumes(resData.data);
-
       } catch (error) {
-
         errorHandling(error);
-
       } finally {
-
         setIsLoadingResumes(false);
-
       }
-
     };
 
     getOnlineProfile(currentUser?.jobSeekerProfileId);
-
   }, [currentUser]);
 
   return (
-
     <>
-
       <form id="modal-form" onSubmit={handleSubmit(handleApplyJob)}>
-
         <Grid container spacing={2}>
-
           <Grid size={12}>
-
             <Stack spacing={1} justifyContent="center">
-
               {isLoadingResumes ? (
-
-                <CircularProgress color="secondary" sx={{ margin: '0 auto' }} />
-
+                <CircularProgress color="secondary" sx={{ margin: "0 auto" }} />
               ) : (
-
                 <RadioGroup
-
                   aria-labelledby="resume"
-
                   defaultValue={() => {
-
-                    let defaultResumes = resumes.filter(
-
-                      (value) => value.type === CV_TYPES.cvWebsite
-
-                    );
-
+                    const defaultResumes = resumes.filter((value) => value.type === CV_TYPES.cvWebsite);
                     if (defaultResumes.length > 0) {
-
-                      setValue('resume', `${defaultResumes[0].id}`)
-
+                      setValue("resume", `${defaultResumes[0].id}`);
                       return defaultResumes[0].id;
-
-                    } else if (resumes.length > 0) {
-
-                      setValue('resume', `${resumes[0].id}`)
-
-                      return resumes[0].id;
-
                     }
-
+                    if (resumes.length > 0) {
+                      setValue("resume", `${resumes[0].id}`);
+                      return resumes[0].id;
+                    }
+                    return "";
                   }}
-
                   name="resume"
-
-                  onChange={(event) => setValue('resume', event.target.value)}
-
+                  onChange={(event) => setValue("resume", event.target.value)}
                 >
-
                   <Stack spacing={1.5}>
                     {resumes.map((value) => (
-                      <Card 
-                        sx={{ 
+                      <Card
+                        sx={{
                           p: 1.5,
-                          transition: 'all 0.2s',
-                          '&:hover': {
-                            borderColor: 'primary.main',
-                            bgcolor: 'rgba(68, 29, 160, 0.02)'
-                          }
-                        }} 
-                        variant="outlined" 
+                          transition: "all 0.2s",
+                          "&:hover": {
+                            borderColor: "primary.main",
+                            bgcolor: alpha(theme.palette.primary.main, 0.02),
+                          },
+                        }}
+                        variant="outlined"
                         key={value.id}
                       >
-                        <Stack direction="row" spacing={1} alignItems="center" sx={{ width: '100%' }}>
+                        <Stack direction="row" spacing={1} alignItems="center" sx={{ width: "100%" }}>
                           <FormControlLabel
                             value={value.id}
                             control={<Radio />}
@@ -198,25 +119,24 @@ const ApplyForm = ({ handleApplyJob }) => {
                                 <Stack direction="row" spacing={1} alignItems="center">
                                   <FontAwesomeIcon
                                     icon={value.type === CV_TYPES.cvWebsite ? faFile : faFilePdf}
-                                    color={value.type === CV_TYPES.cvWebsite ? "#441da0" : "red"}
+                                    color={value.type === CV_TYPES.cvWebsite ? theme.palette.primary.main : theme.palette.error.main}
                                     size="sm"
                                   />
-                                  <Typography
-                                    variant="body2"
-                                    sx={{ fontStyle: 'italic', color: 'text.secondary' }}
-                                  >
-                                    {value.type === CV_TYPES.cvWebsite ? 'Hồ sơ trực tuyến' : 'Hồ sơ đính kèm'}
+                                  <Typography variant="body2" sx={{ fontStyle: "italic", color: "text.secondary" }}>
+                                    {value.type === CV_TYPES.cvWebsite
+                                      ? t("applyForm.resume.online", { defaultValue: "Hồ sơ trực tuyến" })
+                                      : t("applyForm.resume.attached", { defaultValue: "Hồ sơ đính kèm" })}
                                   </Typography>
                                 </Stack>
                               </Stack>
                             }
-                            sx={{ 
+                            sx={{
                               flex: 1,
                               ml: 0,
                               mr: 0,
-                              '& .MuiFormControlLabel-label': {
-                                flex: 1
-                              }
+                              "& .MuiFormControlLabel-label": {
+                                flex: 1,
+                              },
                             }}
                           />
                           <Link
@@ -227,19 +147,17 @@ const ApplyForm = ({ handleApplyJob }) => {
                                 : `/${ROUTES.JOB_SEEKER.DASHBOARD}/${formatRoute(ROUTES.JOB_SEEKER.ATTACHED_PROFILE, value.slug)}`
                             }
                             sx={{
-                              textDecoration: 'none',
-                              color: '#441da0',
-                              '&:hover': {
-                                opacity: 0.8
-                              }
+                              textDecoration: "none",
+                              color: "primary.main",
+                              "&:hover": {
+                                opacity: 0.8,
+                              },
                             }}
                           >
                             <Stack direction="row" spacing={0.5} alignItems="center">
                               <FontAwesomeIcon icon={faEye} />
-                              <Typography
-                                sx={{ fontWeight: 'bold', cursor: 'pointer', whiteSpace: 'nowrap' }}
-                              >
-                                Xem hồ sơ
+                              <Typography sx={{ fontWeight: "bold", cursor: "pointer", whiteSpace: "nowrap" }}>
+                                {t("applyForm.resume.preview", { defaultValue: "Xem hồ sơ" })}
                               </Typography>
                             </Stack>
                           </Link>
@@ -248,87 +166,51 @@ const ApplyForm = ({ handleApplyJob }) => {
                     ))}
                   </Stack>
                 </RadioGroup>
-
               )}
-
             </Stack>
-
           </Grid>
 
           <Grid size={12}>
-
             <TextFieldCustom
-
               name="fullName"
-
-              title="Họ và tên"
-
+              title={t("applyForm.fields.fullName", { defaultValue: "Họ và tên" })}
               showRequired={true}
-
-              placeholder="Nhập họ và tên"
-
+              placeholder={t("applyForm.placeholders.fullName", { defaultValue: "Nhập họ và tên" })}
               control={control}
-
             />
-
           </Grid>
 
           <Grid size={12}>
-
             <TextFieldCustom
-
               name="email"
-
-              title="Email"
-
+              title={t("applyForm.fields.email", { defaultValue: "Email" })}
               showRequired={true}
-
-              placeholder="Nhập email"
-
+              placeholder={t("applyForm.placeholders.email", { defaultValue: "Nhập email" })}
               control={control}
-
             />
-
           </Grid>
 
           <Grid size={12}>
-
             <TextFieldCustom
-
               name="phone"
-
-              title="Số điện thoại"
-
+              title={t("applyForm.fields.phone", { defaultValue: "Số điện thoại" })}
               showRequired={true}
-
-              placeholder="Nhập số điện thoại"
-
+              placeholder={t("applyForm.placeholders.phone", { defaultValue: "Nhập số điện thoại" })}
               control={control}
-
             />
-
           </Grid>
 
           <Grid size={12}>
-
             <Typography color="GrayText" variant="caption">
-
-              Lưu ý: Họ tên, email, số điện thoại cần chính xác để nhà tuyển
-
-              dụng liên hệ với bạn.
-
+              {t("applyForm.note", {
+                defaultValue: "Lưu ý: Họ tên, email và số điện thoại cần chính xác để nhà tuyển dụng liên hệ với bạn.",
+              })}
             </Typography>
-
           </Grid>
-
         </Grid>
-
       </form>
-
     </>
-
   );
-
 };
 
 export default ApplyForm;

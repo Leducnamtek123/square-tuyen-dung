@@ -17,6 +17,7 @@ import MuiImageCustom from '../../../../components/MuiImageCustom';
 const Footer = () => {
 
   const { t } = useTranslation('common');
+  const nav = useNavigate();
 
   const theme = useTheme();
 
@@ -52,7 +53,7 @@ const Footer = () => {
 
                   sx={{ display: 'block', cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = '/'}
+                  onClick={() => nav('/')}
 
                 />
 
@@ -64,7 +65,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/${ROUTES.JOB_SEEKER.ABOUT_US}`}
+                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.ABOUT_US}`)}
 
                   primary={t('footer.aboutApp', { appName: APP_NAME })}
 
@@ -78,7 +79,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/${ROUTES.JOB_SEEKER.CONTACT}`}
+                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.CONTACT}`)}
 
                   primary={t('footer.contact')}
 
@@ -92,7 +93,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/${ROUTES.JOB_SEEKER.FAQ}`}
+                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.FAQ}`)}
 
                   primary={t('footer.faq')}
 
@@ -106,7 +107,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/${ROUTES.JOB_SEEKER.TERMS_OF_SERVICE}`}
+                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.TERMS_OF_SERVICE}`)}
 
                   primary={t('footer.tos')}
 
@@ -120,7 +121,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/${ROUTES.JOB_SEEKER.PRIVACY_POLICY}`}
+                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.PRIVACY_POLICY}`)}
 
                   primary={t('footer.privacy')}
 
@@ -174,7 +175,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/employee/${ROUTES.EMPLOYER.JOB_POST}`}
+                  onClick={() => nav(`/employee/${ROUTES.EMPLOYER.JOB_POST}`)}
 
                   primary={t('footer.postJob')}
 
@@ -188,7 +189,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/employee/${ROUTES.EMPLOYER.PROFILE}`}
+                  onClick={() => nav(`/employee/${ROUTES.EMPLOYER.PROFILE}`)}
 
                   primary={t('footer.searchResumes')}
 
@@ -202,7 +203,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/employee/${ROUTES.EMPLOYER.DASHBOARD}`}
+                  onClick={() => nav(`/employee/${ROUTES.EMPLOYER.DASHBOARD}`)}
 
                   primary={t('footer.employerDashboard')}
 
@@ -216,7 +217,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/employee/${ROUTES.EMPLOYER.CHAT}`}
+                  onClick={() => nav(`/employee/${ROUTES.EMPLOYER.CHAT}`)}
 
                   primary={t('footer.messages')}
 
@@ -230,7 +231,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/employee/${ROUTES.EMPLOYER.NOTIFICATION}`}
+                  onClick={() => nav(`/employee/${ROUTES.EMPLOYER.NOTIFICATION}`)}
 
                   primary={t('footer.notifications')}
 
@@ -284,7 +285,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/${ROUTES.JOB_SEEKER.JOBS}`}
+                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.JOBS}`)}
 
                   primary={t('nav.jobs')}
 
@@ -298,7 +299,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/${ROUTES.JOB_SEEKER.COMPANY}`}
+                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.COMPANY}`)}
 
                   primary={t('nav.companies')}
 
@@ -312,7 +313,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/${ROUTES.JOB_SEEKER.DASHBOARD}`}
+                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}`)}
 
                   primary={t('footer.candidateDashboard')}
 
@@ -326,7 +327,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/${ROUTES.JOB_SEEKER.CHAT}`}
+                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.CHAT}`)}
 
                   primary={t('footer.messages')}
 
@@ -340,7 +341,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => window.location.href = `/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.NOTIFICATION}`}
+                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.NOTIFICATION}`)}
 
                   primary={t('footer.notifications')}
 

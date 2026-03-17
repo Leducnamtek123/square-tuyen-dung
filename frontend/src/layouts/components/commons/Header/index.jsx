@@ -68,12 +68,19 @@ const Header = (props) => {
   const hostName = window.location.hostname;
 
   const fullPathname = window.location.pathname;
+  const isAdminPortal =
+    fullPathname.startsWith("/admin") ||
+    hostName === HOST_NAME.ADMIN_MYJOB;
   const isEmployerPortal =
     fullPathname.startsWith("/employer") ||
     fullPathname.startsWith("/employee") ||
     hostName === HOST_NAME.EMPLOYER_MYJOB;
 
-  const currentPortalHost = isEmployerPortal ? HOST_NAME.EMPLOYER_MYJOB : HOST_NAME.MYJOB;
+  const currentPortalHost = isAdminPortal
+    ? HOST_NAME.ADMIN_MYJOB
+    : isEmployerPortal
+      ? HOST_NAME.EMPLOYER_MYJOB
+      : HOST_NAME.MYJOB;
 
   const nav = useNavigate();
 
@@ -110,13 +117,25 @@ const Header = (props) => {
   };
 
   const handleLogin = () => {
-
+    if (isAdminPortal) {
+      nav(`/${ROUTES.ADMIN_AUTH.LOGIN}`);
+      return;
+    }
+    if (isEmployerPortal) {
+      nav(`/${ROUTES.EMPLOYER_AUTH.LOGIN}`);
+      return;
+    }
     nav(`/${ROUTES.AUTH.LOGIN}`);
 
   };
 
   const handleSignUp = () => {
 
+    if (isAdminPortal) return;
+    if (isEmployerPortal) {
+      nav(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`);
+      return;
+    }
     nav(`/${ROUTES.AUTH.REGISTER}`);
 
   };
@@ -447,7 +466,7 @@ const Header = (props) => {
 
               >
 
-                {pages[currentPortalHost]?.map((page) => (
+                {(pages[currentPortalHost] || []).map((page) => (
 
                   <MenuItem
 
@@ -473,7 +492,7 @@ const Header = (props) => {
 
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
 
-              {pages[currentPortalHost]?.map((page) => (
+              {(pages[currentPortalHost] || []).map((page) => (
 
                 <Link to={page.path} key={page.id} onClick={handleCloseNavMenu}>
 
@@ -534,11 +553,11 @@ const Header = (props) => {
 
             {/* Start: authArea */}
 
-            {authArea}
+            {!isAdminPortal && authArea}
 
             {/* End: authArea */}
 
-            {!isSmall && !isAuthenticated && (
+            {!isSmall && !isAuthenticated && !isAdminPortal && (
 
               <>
 
@@ -575,6 +594,7 @@ const Header = (props) => {
         <LeftDrawer
 
           pages={pages[currentPortalHost] || []}
+          showPublicActions={!isAdminPortal}
 
           mobileOpen={mobileOpen}
 

@@ -401,6 +401,17 @@ const ROUTES = {
     RESET_PASSWORD: "cap-nhat-mat-khau/:token",
 
   },
+  EMPLOYER_AUTH: {
+    LOGIN: "login",
+    REGISTER: "register",
+    FORGOT_PASSWORD: "forgot-password",
+    RESET_PASSWORD: "reset-password/:token",
+  },
+  ADMIN_AUTH: {
+    LOGIN: "login",
+    FORGOT_PASSWORD: "forgot-password",
+    RESET_PASSWORD: "reset-password/:token",
+  },
 
   ERROR: {
 

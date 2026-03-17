@@ -66,6 +66,37 @@ import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
 
 import CompanyDetailLoading from "./components/CompanyDetailLoading";
 
+const sanitizeCompanyDescription = (rawHtml) => {
+  if (!rawHtml || typeof rawHtml !== "string") {
+    return "";
+  }
+  if (typeof window === "undefined") {
+    return rawHtml;
+  }
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(rawHtml, "text/html");
+
+  doc
+    .querySelectorAll("script,style,iframe,object,embed,link,meta")
+    .forEach((node) => node.remove());
+
+  doc.querySelectorAll("*").forEach((element) => {
+    Array.from(element.attributes).forEach((attr) => {
+      const attrName = attr.name.toLowerCase();
+      const attrValue = (attr.value || "").trim().toLowerCase();
+      if (attrName.startsWith("on")) {
+        element.removeAttribute(attr.name);
+      }
+      if ((attrName === "href" || attrName === "src") && attrValue.startsWith("javascript:")) {
+        element.removeAttribute(attr.name);
+      }
+    });
+  });
+
+  return doc.body.innerHTML;
+};
+
 const CompanyDetailPage = () => {
   const { t } = useTranslation("public");
   const { slug } = useParams();
@@ -83,6 +114,10 @@ const CompanyDetailPage = () => {
   const [companyDetail, setCompanyDetail] = React.useState(null);
 
   const [imageList, setImageList] = React.useState([]);
+  const safeDescriptionHtml = React.useMemo(
+    () => sanitizeCompanyDescription(companyDetail?.description),
+    [companyDetail?.description]
+  );
 
   React.useEffect(() => {
 
@@ -595,7 +630,7 @@ const CompanyDetailPage = () => {
 
                               dangerouslySetInnerHTML={{
 
-                                __html: companyDetail?.description,
+                                __html: safeDescriptionHtml,
 
                               }}
 

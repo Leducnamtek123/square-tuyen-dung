@@ -112,7 +112,7 @@ export default function HomePage() {
 
             sx={{
 
-              backgroundColor: "#1976d2",
+              backgroundColor: "primary.main",
 
               p: { xs: 0.75, sm: 1, md: 1.5, lg: 1.5, xl: 1.5 },
 
@@ -182,7 +182,7 @@ export default function HomePage() {
 
               title={
 
-                <Typography variant="h5" sx={{ color: "#1976d2" }}>
+                <Typography variant="h5" sx={{ color: "primary.main" }}>
 
                   {t('home.suggestedJobs')}
 
@@ -204,7 +204,7 @@ export default function HomePage() {
 
             />
 
-            <CardContent sx={{ backgroundColor: "#e0f0ff" }}>
+            <CardContent sx={{ backgroundColor: "primary.background" }}>
 
               <Box sx={{ p: { xs: 0, sm: 0, md: 0, lg: 2, xl: 2 } }}>
 
@@ -334,7 +334,7 @@ export default function HomePage() {
 
             sx={{
 
-              backgroundColor: "#1976d2",
+              backgroundColor: "primary.main",
 
               p: { xs: 0.75, sm: 1, md: 1.5, lg: 1.5, xl: 1.5 },
 
@@ -396,7 +396,7 @@ export default function HomePage() {
 
             sx={{
 
-              backgroundColor: "#1976d2",
+              backgroundColor: "primary.main",
 
               p: { xs: 0.75, sm: 1, md: 1.5, lg: 1.5, xl: 1.5 },
 

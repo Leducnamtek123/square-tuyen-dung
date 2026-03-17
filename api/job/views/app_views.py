@@ -160,7 +160,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["get"], detail=False,
 
@@ -217,7 +217,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
 
@@ -287,7 +287,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["post"], detail=True,
 
@@ -337,9 +337,9 @@ class JobPostViewSet(viewsets.ViewSet,
 
             helper.print_log_error("count_job_posts_by_job_type", ex)
 
-            return var_res.Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return var_res.Response(data=data)
+        return var_res.response_data(data=data)
 
     @action(methods=["post"], detail=False,
 
@@ -355,7 +355,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
             print(">> BAD REQUEST >> get_job_posts_around: ", filter_serializer.errors)
 
-            return var_res.Response(status=status.HTTP_400_BAD_REQUEST)
+            return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
         filter_data = filter_serializer.data
 
@@ -421,7 +421,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
         serializer = JobPostAroundSerializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
 class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
 
@@ -508,7 +508,7 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
 class JobPostNotificationViewSet(viewsets.ViewSet,
 
@@ -553,7 +553,7 @@ class JobPostNotificationViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
 
@@ -590,14 +590,14 @@ class JobPostNotificationViewSet(viewsets.ViewSet,
                 id=job_post_notification.id
             ).count()
             if active_count >= app_setting.MAX_ACTIVE_JOB_NOTIFICATIONS:
-                return var_res.Response(
+                return var_res.response_data(
                     status=status.HTTP_400_BAD_REQUEST,
                     data={"errorMessage": [ERROR_MESSAGES["MAX_ACTIVE_JOB_NOTIFICATIONS"]]},
                 )
 
         job_post_notification.is_active = desired
         job_post_notification.save(update_fields=["is_active", "update_at"])
-        return var_res.Response(data={"isActive": job_post_notification.is_active})
+        return var_res.response_data(data={"isActive": job_post_notification.is_active})
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()

@@ -18,6 +18,10 @@ const MainJobPostCard = () => {
   const [count, setCount] = React.useState(0);
 
   React.useEffect(() => {
+    setPage(1);
+  }, [jobPostFilter]);
+
+  React.useEffect(() => {
     const getJobPosts = async () => {
       setIsLoading(true);
       try {

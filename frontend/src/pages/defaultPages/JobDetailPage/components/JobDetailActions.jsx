@@ -1,13 +1,15 @@
 import React from "react";
 import { Button, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+import { alpha, useTheme } from "@mui/material/styles";
 
 import { LoadingButton } from "@mui/lab";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
 
-import { ROLES_NAME } from "../../../../configs/constants";
+import { ROLES_NAME, ROUTES } from "../../../../configs/constants";
 
 const JobDetailActions = ({
   isApplied,
@@ -20,55 +22,70 @@ const JobDetailActions = ({
   currentUser,
 }) => {
   const { t } = useTranslation(["public"]);
+  const nav = useNavigate();
+  const theme = useTheme();
+  const canApply =
+    !isAuthenticated ||
+    (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.JOB_SEEKER;
+
+  const handleApplyClick = () => {
+    if (!isAuthenticated) {
+      nav(`/${ROUTES.AUTH.LOGIN}`);
+      return;
+    }
+    handleShowApplyForm();
+  };
 
   return (
     <Stack direction="row" spacing={2}>
-    {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
+    {canApply && (
       <>
         <Button
           variant="contained"
           size="large"
           sx={{
             textTransform: "none",
-            background: "linear-gradient(45deg, #FF9800 30%, #FF5722 90%)",
-            color: "white",
+            backgroundColor: "warning.main",
+            color: "warning.contrastText",
             fontWeight: 600,
             "&:hover": {
-              background: "linear-gradient(45deg, #FB8C00 30%, #F4511E 90%)",
+              backgroundColor: "warning.dark",
             },
           }}
           disabled={isApplied}
-          onClick={handleShowApplyForm}
+          onClick={handleApplyClick}
         >
           {isApplied ? t("jobDetail.actions.applied") : t("jobDetail.actions.apply")}
         </Button>
-        <LoadingButton
-          onClick={handleSave}
-          startIcon={isSaved ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-          loading={isLoadingSave}
-          loadingPosition="start"
-          variant={isSaved ? "contained" : "outlined"}
-          sx={{
-            textTransform: "none",
-            ...(isSaved
-              ? {
-                  backgroundColor: "#9c27b0",
-                  "&:hover": {
-                    backgroundColor: "#7b1fa2",
-                  },
-                }
-              : {
-                  borderColor: "#9c27b0",
-                  color: "#9c27b0",
-                  "&:hover": {
-                    borderColor: "#7b1fa2",
-                    backgroundColor: "rgba(156,39,176,0.04)",
-                  },
-                }),
-          }}
-        >
-          <span>{isSaved ? t("jobDetail.actions.saved") : t("jobDetail.actions.save")}</span>
-        </LoadingButton>
+        {isAuthenticated && (
+          <LoadingButton
+            onClick={handleSave}
+            startIcon={isSaved ? <FavoriteIcon /> : <FavoriteBorderIcon />}
+            loading={isLoadingSave}
+            loadingPosition="start"
+            variant={isSaved ? "contained" : "outlined"}
+            sx={{
+              textTransform: "none",
+              ...(isSaved
+                ? {
+                    backgroundColor: "secondary.main",
+                    "&:hover": {
+                      backgroundColor: "secondary.dark",
+                    },
+                  }
+                : {
+                    borderColor: "secondary.main",
+                    color: "secondary.main",
+                    "&:hover": {
+                      borderColor: "secondary.dark",
+                      backgroundColor: alpha(theme.palette.secondary.main, 0.08),
+                    },
+                  }),
+            }}
+          >
+            <span>{isSaved ? t("jobDetail.actions.saved") : t("jobDetail.actions.save")}</span>
+          </LoadingButton>
+        )}
       </>
     )}
     <Button
@@ -77,11 +94,11 @@ const JobDetailActions = ({
       startIcon={<ShareIcon />}
       sx={{
         textTransform: "none",
-        borderColor: "#9c27b0",
-        color: "#9c27b0",
+        borderColor: "secondary.main",
+        color: "secondary.main",
         "&:hover": {
-          borderColor: "#7b1fa2",
-          backgroundColor: "rgba(156,39,176,0.04)",
+          borderColor: "secondary.dark",
+          backgroundColor: alpha(theme.palette.secondary.main, 0.08),
         },
       }}
       onClick={() => setOpenSharePopup(true)}

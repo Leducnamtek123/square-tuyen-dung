@@ -56,6 +56,8 @@ function App() {
     isAllowVerifyEmail: isAllowVerifyEmail,
   };
   const location = useLocation();
+  const fullPathname = window.location.pathname || "/";
+  const isAdminPortalPath = fullPathname.startsWith("/admin");
   const isChatPage =
     location.pathname.startsWith(`/${ROUTES.JOB_SEEKER.CHAT}`) ||
     location.pathname.startsWith(`/${ROUTES.EMPLOYER.CHAT}`);
@@ -71,8 +73,7 @@ function App() {
     location.pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', '')}`) ||
     location.pathname.startsWith(`/${ROUTES.ADMIN.INTERVIEW_SESSION.replace(':id', '')}`);
   const canShowChatBot =
-    settings.isAuthenticated &&
-    (settings.isJobSeekerRole || settings.isEmployerRole || settings.isAdminRole) &&
+    !isAdminPortalPath &&
     !isChatPage &&
     !isInterviewPage;
 

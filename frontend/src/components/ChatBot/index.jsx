@@ -24,7 +24,10 @@ const ChatBot = () => {
   const [error, setError] = useState("");
   const listRef = useRef(null);
 
-  const isEmployer = activeWorkspace?.type === "company";
+  const fullPathname = window.location.pathname || "/";
+  const isEmployerRoute =
+    fullPathname.startsWith("/employer") || fullPathname.startsWith("/employee");
+  const isEmployer = activeWorkspace?.type === "company" || isEmployerRoute;
 
   const greeting = useMemo(() => {
     if (isEmployer) {

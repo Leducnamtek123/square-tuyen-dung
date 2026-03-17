@@ -1,7 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Menu, MenuItem, Stack, Typography, useTheme, Avatar } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 
 // You can use external flag icons or just text
 const languages = [
@@ -21,6 +23,8 @@ const languages = [
 
 const LanguageSwitcher = ({ color = 'white' }) => {
   const { i18n } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -34,6 +38,10 @@ const LanguageSwitcher = ({ color = 'white' }) => {
   };
 
   const changeLanguage = (lng) => {
+    const localizedPath = localizeRoutePath(location.pathname, lng);
+    if (localizedPath !== location.pathname) {
+      navigate(`${localizedPath}${location.search}${location.hash}`, { replace: true });
+    }
     i18n.changeLanguage(lng);
     handleClose();
   };

@@ -119,6 +119,10 @@ class JobPostSerializer(serializers.ModelSerializer):
 
     views = serializers.IntegerField(read_only=True)
 
+    salary = serializers.SerializerMethodField(read_only=True)
+
+    city = serializers.SerializerMethodField(read_only=True)
+
     appliedNumber = serializers.SerializerMethodField(method_name="get_applied_number", read_only=True)
 
     isSaved = serializers.SerializerMethodField(method_name='check_saved', read_only=True)
@@ -126,6 +130,12 @@ class JobPostSerializer(serializers.ModelSerializer):
     isApplied = serializers.SerializerMethodField(method_name='check_applied', read_only=True)
 
     isExpired = serializers.SerializerMethodField(method_name='check_is_expired', read_only=True)
+
+    def get_salary(self, obj):
+        return f"{obj.salary_min} - {obj.salary_max}"
+
+    def get_city(self, obj):
+        return obj.location.city.name if obj.location and obj.location.city else None
 
     def get_applied_number(self, job_post):
 
@@ -213,7 +223,7 @@ class JobPostSerializer(serializers.ModelSerializer):
 
                   'isSaved', 'isApplied', 'companyDict', 'mobileCompanyDict', 'locationDict', 'views',
 
-                  'isExpired')
+                  'isExpired', 'salary', 'city')
 
     def create(self, validated_data):
 

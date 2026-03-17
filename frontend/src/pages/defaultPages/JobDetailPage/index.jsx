@@ -1,8 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 
 import JobDetailLoading from "./components/JobDetailLoading";
@@ -18,9 +18,11 @@ import NoDataCard from "../../../components/NoDataCard";
 import jobService from "../../../services/jobService";
 import ApplyCard from "../../../components/ApplyCard";
 import SocialNetworkSharingPopup from "../../../components/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
+import { ROLES_NAME, ROUTES } from "../../../configs/constants";
 
 const JobDetailPage = () => {
   const { slug } = useParams();
+  const nav = useNavigate();
   const { t } = useTranslation(["public"]);
   const { allConfig } = useSelector((state) => state.config);
   const { isAuthenticated, currentUser } = useSelector((state) => state.user);
@@ -31,6 +33,9 @@ const JobDetailPage = () => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [isLoadingSave, setIsLoadingSave] = React.useState(false);
   const [jobPostDetail, setJobPostDetail] = React.useState(null);
+  const canApply =
+    !isAuthenticated ||
+    (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.JOB_SEEKER;
 
   React.useEffect(() => {
     const getJobPostDetail = async (jobPostSlug) => {
@@ -79,6 +84,14 @@ const JobDetailPage = () => {
     setOpenPopup(true);
   };
 
+  const handleMobileApplyClick = () => {
+    if (!isAuthenticated) {
+      nav(`/${ROUTES.AUTH.LOGIN}`);
+      return;
+    }
+    handleShowApplyForm();
+  };
+
   return (
     <>
       {isLoading ? (
@@ -86,7 +99,7 @@ const JobDetailPage = () => {
       ) : jobPostDetail === null ? (
         <NoDataCard title={t("jobDetail.noData")} />
       ) : (
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ mt: 2, pb: { xs: canApply ? 10 : 0, md: 0 } }}>
           <Grid container spacing={3}>
             <Grid
               size={{
@@ -123,6 +136,36 @@ const JobDetailPage = () => {
               <JobDetailSidebar jobPostDetail={jobPostDetail} />
             </Grid>
           </Grid>
+        </Box>
+      )}
+
+      {!isLoading && jobPostDetail && canApply && (
+        <Box
+          sx={{
+            position: "fixed",
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: (theme) => theme.zIndex.appBar,
+            display: { xs: "block", md: "none" },
+            p: 1.5,
+            bgcolor: "background.paper",
+            borderTop: "1px solid",
+            borderColor: "divider",
+          }}
+        >
+          <Button
+            fullWidth
+            variant="contained"
+            color="warning"
+            size="large"
+            disabled={jobPostDetail?.isApplied}
+            onClick={handleMobileApplyClick}
+          >
+            {jobPostDetail?.isApplied
+              ? t("jobDetail.actions.applied")
+              : t("jobDetail.actions.apply")}
+          </Button>
         </Box>
       )}
 

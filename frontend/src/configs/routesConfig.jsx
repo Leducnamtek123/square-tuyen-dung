@@ -405,6 +405,32 @@ const routesConfig = {
 
         },
 
+        {
+
+          path: ROUTES.EMPLOYER.CHAT,
+
+          layouts: ChatLayout,
+
+          checkCondition: (settings) =>
+
+            settings.isAuthenticated && settings.isEmployerRole,
+
+          redirectUrl: "/" + ROUTES.AUTH.LOGIN,
+
+          children: [
+
+            {
+
+              index: true,
+
+              element: ChatPage,
+
+            },
+
+          ],
+
+        },
+
       ],
 
     },
@@ -457,7 +483,7 @@ const routesConfig = {
       layouts: EmployerLayout,
       checkCondition: (settings) =>
         settings.isAuthenticated && settings.isEmployerRole,
-      redirectUrl: ROUTES.AUTH.LOGIN,
+      redirectUrl: "/" + ROUTES.EMPLOYER_AUTH.LOGIN,
       children: [
 
         {
@@ -608,7 +634,7 @@ const routesConfig = {
 
         {
 
-          path: ROUTES.AUTH.LOGIN,
+          path: ROUTES.EMPLOYER_AUTH.LOGIN,
 
           element: EmployerLogin,
 
@@ -622,7 +648,7 @@ const routesConfig = {
 
         {
 
-          path: ROUTES.AUTH.FORGOT_PASSWORD,
+          path: ROUTES.EMPLOYER_AUTH.FORGOT_PASSWORD,
 
           element: ForgotPasswordPage,
 
@@ -630,7 +656,7 @@ const routesConfig = {
 
         {
 
-          path: ROUTES.AUTH.RESET_PASSWORD,
+          path: ROUTES.EMPLOYER_AUTH.RESET_PASSWORD,
 
           element: ResetPasswordPage,
 
@@ -638,7 +664,7 @@ const routesConfig = {
 
         {
 
-          path: ROUTES.AUTH.REGISTER,
+          path: ROUTES.EMPLOYER_AUTH.REGISTER,
 
           element: EmployerSignUp,
 
@@ -662,7 +688,7 @@ const routesConfig = {
 
         settings.isAuthenticated && settings.isEmployerRole,
 
-      redirectUrl: "/dang-nhap",
+      redirectUrl: "/" + ROUTES.EMPLOYER_AUTH.LOGIN,
 
       children: [
 
@@ -698,7 +724,7 @@ const routesConfig = {
 
         settings.isAuthenticated && settings.isAdminRole,
 
-      redirectUrl: ROUTES.AUTH.LOGIN,
+      redirectUrl: "/" + ROUTES.ADMIN_AUTH.LOGIN,
 
       children: [
 
@@ -853,7 +879,7 @@ const routesConfig = {
 
         {
 
-          path: ROUTES.AUTH.LOGIN,
+          path: ROUTES.ADMIN_AUTH.LOGIN,
 
           element: AdminLogin,
 
@@ -867,7 +893,7 @@ const routesConfig = {
 
         {
 
-          path: ROUTES.AUTH.FORGOT_PASSWORD,
+          path: ROUTES.ADMIN_AUTH.FORGOT_PASSWORD,
 
           element: ForgotPasswordPage,
 
@@ -875,7 +901,7 @@ const routesConfig = {
 
         {
 
-          path: ROUTES.AUTH.RESET_PASSWORD,
+          path: ROUTES.ADMIN_AUTH.RESET_PASSWORD,
 
           element: ResetPasswordPage,
 

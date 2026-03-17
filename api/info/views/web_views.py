@@ -9,7 +9,7 @@ from configs import variable_response as var_res, renderers, paginations
 
 from configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
 
-from django.db.models import Count, F, Prefetch
+from django.db.models import Count, F, Q, Prefetch
 
 from django.db import transaction
 from django.utils import timezone
@@ -597,7 +597,7 @@ class ResumeViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["post"], detail=True,
 
@@ -705,11 +705,11 @@ class ResumeViewSet(viewsets.ViewSet,
 
             helper.print_log_error("view_resume", ex)
 
-            return var_res.Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         else:
 
-            return var_res.Response(status=status.HTTP_200_OK)
+            return var_res.response_data(status=status.HTTP_200_OK)
 
     @action(methods=["post"], detail=True,
 
@@ -1131,7 +1131,7 @@ class CompanyViewSet(viewsets.ViewSet,
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset.annotate(
-            follow_count=Count('companyfollowed', distinct=True),
+            follow_count=Count('companyfollowed_set', distinct=True),
             active_job_post_count=Count(
                 'job_posts',
                 filter=Q(
@@ -1167,7 +1167,7 @@ class CompanyViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
 

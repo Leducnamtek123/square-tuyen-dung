@@ -653,7 +653,7 @@ class CompanyViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
 

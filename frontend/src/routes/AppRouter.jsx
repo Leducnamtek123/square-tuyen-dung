@@ -1,6 +1,9 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useEffect } from "react";
+import { Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import routesConfig from "../configs/routesConfig";
 import { HOST_NAME, ROUTES } from "../configs/constants";
+import { getLocalizedRouteVariants, localizeRoutePath } from "../configs/routeLocalization";
 
 const PrivateRoute = ({ element: Element, checkCondition, redirectUrl, settings }) => {
   if (checkCondition && !checkCondition(settings)) {
@@ -11,7 +14,7 @@ const PrivateRoute = ({ element: Element, checkCondition, redirectUrl, settings 
 };
 
 const renderRoutes = (routes, settings) => {
-  return routes.map((route, index) => {
+  return routes.flatMap((route, index) => {
     const {
       path,
       element: Element,
@@ -36,38 +39,52 @@ const renderRoutes = (routes, settings) => {
       routeElement = <Layout />;
     }
 
-    if (checkCondition) {
-      return (
-        <Route
-          key={index}
-          {...(isIndex ? { index: true } : { path })}
-          element={
-            <PrivateRoute
-              element={routeElement}
-              checkCondition={checkCondition}
-              settings={settings}
-              redirectUrl={redirectUrl}
-            />
-          }
-        >
-          {children && renderRoutes(children, settings)}
-        </Route>
-      );
-    }
-
-    return (
-      <Route
-        key={index}
-        {...(isIndex ? { index: true } : { path })}
+    const childrenRoutes = children && renderRoutes(children, settings);
+    const wrappedElement = checkCondition ? (
+      <PrivateRoute
         element={routeElement}
-      >
-        {children && renderRoutes(children, settings)}
-      </Route>
+        checkCondition={checkCondition}
+        settings={settings}
+        redirectUrl={redirectUrl}
+      />
+    ) : (
+      routeElement
     );
+
+    const routePaths = isIndex
+      ? [undefined]
+      : typeof path === "string"
+        ? getLocalizedRouteVariants(path)
+        : [path];
+
+    return routePaths.map((routePath, pathIndex) => (
+      <Route
+        key={`${index}-${pathIndex}-${routePath ?? "index"}`}
+        {...(isIndex
+          ? { index: true }
+          : routePath !== undefined
+            ? { path: routePath }
+            : {})}
+        element={wrappedElement}
+      >
+        {childrenRoutes}
+      </Route>
+    ));
   });
 };
 
 const AppRoutes = ({ settings }) => {
+  const { i18n } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const localizedPath = localizeRoutePath(location.pathname, i18n.language);
+    if (localizedPath !== location.pathname) {
+      navigate(`${localizedPath}${location.search}${location.hash}`, { replace: true });
+    }
+  }, [i18n.language, location.pathname, location.search, location.hash, navigate]);
+
   const hostName = window.location.hostname;
   const pathname = window.location.pathname || "/";
   const jobSeekerInterviewPrefix = `/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW.replace('/:id', '')}`;

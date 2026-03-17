@@ -82,6 +82,17 @@ const JobPost = ({
 
   }, []);
 
+  const goToDetail = () => {
+    nav(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`);
+  };
+
+  const handleCardKeyDown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      goToDetail();
+    }
+  };
+
   return (
 
     <Card
@@ -164,7 +175,11 @@ const JobPost = ({
 
       }}
 
-      onClick={() => nav(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`)}
+      onClick={goToDetail}
+      role="link"
+      tabIndex={0}
+      onKeyDown={handleCardKeyDown}
+      aria-label={jobName || "Job detail"}
 
     >
 

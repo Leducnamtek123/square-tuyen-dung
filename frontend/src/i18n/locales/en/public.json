@@ -119,5 +119,33 @@
     "generalInfo": "General information",
     "map": "Map",
     "images": "Images"
+  },
+  "applyForm": {
+    "resume": {
+      "online": "Online profile",
+      "attached": "Attached CV",
+      "preview": "Preview profile"
+    },
+    "fields": {
+      "fullName": "Full name",
+      "email": "Email",
+      "phone": "Phone number"
+    },
+    "placeholders": {
+      "fullName": "Enter full name",
+      "email": "Enter email",
+      "phone": "Enter phone number"
+    },
+    "validation": {
+      "fullNameRequired": "Full name is required.",
+      "fullNameMax": "Full name exceeds allowed length.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Invalid email.",
+      "emailMax": "Email exceeds allowed length.",
+      "phoneRequired": "Phone number is required.",
+      "phoneInvalid": "Invalid phone number.",
+      "phoneMax": "Phone number exceeds allowed length."
+    },
+    "note": "Please provide accurate full name, email, and phone number so employers can contact you."
   }
 }

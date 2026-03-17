@@ -3,6 +3,7 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 
 import Grid from "@mui/material/Grid2";
+import { useSelector } from "react-redux";
 
 import { useTranslation } from "react-i18next";
 
@@ -16,10 +17,15 @@ import MainJobPostCard from "../../components/defaults/MainJobPostCard";
 
 
 import MainJobRightBanner from "../../../components/MainJobRightBanner";
+import { ROLES_NAME } from "../../../configs/constants";
 
 const JobPage = () => {
 
   const { t } = useTranslation(["public"]);
+  const { isAuthenticated, currentUser } = useSelector((state) => state.user);
+  const isJobSeekerLoggedIn =
+    isAuthenticated &&
+    (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.JOB_SEEKER;
 
   TabTitle(t("jobSearch.tabTitle"));
 
@@ -83,17 +89,21 @@ const JobPage = () => {
 
               }}>
 
-              <Box sx={{ pt: 2, pb: 3 }}>
+              {isJobSeekerLoggedIn && (
+                <>
+                  <Box sx={{ pt: 2, pb: 3 }}>
 
-                <Typography variant="h5">{t("jobSearch.recommendedJobs")}</Typography>
+                    <Typography variant="h5">{t("jobSearch.recommendedJobs")}</Typography>
 
-              </Box>
+                  </Box>
 
-              {/* Start: SuggestedJobPostCard */}
+                  {/* Start: SuggestedJobPostCard */}
 
-              <SuggestedJobPostCard fullWidth={true} />
+                  <SuggestedJobPostCard fullWidth={true} />
 
-              {/* End: SuggestedJobPostCard */}
+                  {/* End: SuggestedJobPostCard */}
+                </>
+              )}
 
               <Box
 

@@ -217,7 +217,7 @@ class PrivateJobPostViewSet(viewsets.ViewSet,
 
                                        ])
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["get"], detail=False,
 
@@ -273,7 +273,7 @@ class PrivateJobPostViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     def create(self, request, *args, **kwargs):
 
@@ -355,7 +355,7 @@ class PrivateJobPostViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["get"], detail=False,
 
@@ -417,7 +417,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
     queryset = JobPost.objects.select_related(
         'company', 'company__logo', 'company__cover_image', 'company__user',
-        'location', 'location__city', 'career'
+        'location', 'location__city'
     ).all()
 
     serializer_class = JobPostSerializer
@@ -478,7 +478,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
 
@@ -556,7 +556,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["post"], detail=True,
 
@@ -629,7 +629,7 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["get"], detail=False,
 
@@ -670,7 +670,7 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
 
             return self.get_paginated_response(res_data)
 
-        return var_res.Response(res_data)
+        return var_res.response_data(res_data)
 
     def create(self, request, *args, **kwargs):
 
@@ -788,7 +788,7 @@ class EmployerJobPostActivityViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     def destroy(self, request, *args, **kwargs):
 
@@ -804,11 +804,11 @@ class EmployerJobPostActivityViewSet(viewsets.ViewSet,
 
             helper.print_log_error("delete job post activity", ex)
 
-            return var_res.Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         else:
 
-            return var_res.Response(status=status.HTTP_204_NO_CONTENT)
+            return var_res.response_data(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=["get"], detail=False,
 
@@ -860,7 +860,7 @@ class EmployerJobPostActivityViewSet(viewsets.ViewSet,
                 else:
                     item['avatarUrl'] = var_sys.AVATAR_DEFAULT["AVATAR"]
             return self.get_paginated_response(res_data)
-        return var_res.Response(res_data)
+        return var_res.response_data(res_data)
 
     @action(methods=["get"], detail=False,
 
@@ -920,7 +920,7 @@ class EmployerJobPostActivityViewSet(viewsets.ViewSet,
 
                 # Return a bad request response if the current status is greater
 
-                return var_res.Response(status=status.HTTP_400_BAD_REQUEST)
+                return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
             # Update the status of the job post activity
 
@@ -968,11 +968,11 @@ class EmployerJobPostActivityViewSet(viewsets.ViewSet,
 
             # Return a successful response
 
-            return var_res.Response(status=status.HTTP_200_OK)
+            return var_res.response_data(status=status.HTTP_200_OK)
 
         # Return a bad request response if no status is provided
 
-        return var_res.Response(status=status.HTTP_400_BAD_REQUEST)
+        return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=["post"], detail=True,
 
@@ -1121,7 +1121,7 @@ class JobPostNotificationViewSet(viewsets.ViewSet,
 
         serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
 
@@ -1150,14 +1150,14 @@ class JobPostNotificationViewSet(viewsets.ViewSet,
                 id=job_post_notification.id
             ).count()
             if active_count >= app_setting.MAX_ACTIVE_JOB_NOTIFICATIONS:
-                return var_res.Response(
+                return var_res.response_data(
                     status=status.HTTP_400_BAD_REQUEST,
                     data={"errorMessage": [ERROR_MESSAGES["MAX_ACTIVE_JOB_NOTIFICATIONS"]]},
                 )
 
         job_post_notification.is_active = desired
         job_post_notification.save(update_fields=["is_active", "update_at"])
-        return var_res.Response(data={"isActive": job_post_notification.is_active})
+        return var_res.response_data(data={"isActive": job_post_notification.is_active})
 
     def update(self, request, *args, **kwargs):
         instance = self.get_object()

@@ -31,7 +31,7 @@ import {
 
 const drawerWidth = 240;
 
-const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle }) => {
+const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicActions = true }) => {
 
   const { t } = useTranslation('common');
 
@@ -76,6 +76,9 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle }) => {
       });
 
   };
+  const pathname = globalThis?.window?.location?.pathname || "";
+  const isEmployerPortal = pathname.startsWith("/employer") || pathname.startsWith("/employee");
+  const registerRoute = isEmployerPortal ? ROUTES.EMPLOYER_AUTH.REGISTER : ROUTES.AUTH.REGISTER;
 
   const drawer = (
 
@@ -213,7 +216,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle }) => {
 
       </List>
 
-      <AccountSwitchMenu isShowButton={true} />
+      {showPublicActions && <AccountSwitchMenu isShowButton={true} />}
 
       <Divider sx={{ my: 1, borderColor: 'grey.100' }} />
 
@@ -309,51 +312,53 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle }) => {
 
           <>
 
-            <Button
+            {showPublicActions && (
+              <Button
 
-              variant="contained"
+                variant="contained"
 
-              color="primary"
+                color="primary"
 
-              fullWidth
+                fullWidth
 
-              sx={{
+                sx={{
 
-                py: 1,
+                  py: 1,
 
-                boxShadow: (theme) => theme.customShadows.small,
+                  boxShadow: (theme) => theme.customShadows.small,
 
-                display: {
+                  display: {
 
-                  xs: 'block',
+                    xs: 'block',
 
-                  sm: 'none',
+                    sm: 'none',
 
-                  md: 'none',
+                    md: 'none',
 
-                  lg: 'none',
+                    lg: 'none',
 
-                  xl: 'none',
+                    xl: 'none',
 
-                },
+                  },
 
-                '&:hover': {
+                  '&:hover': {
 
-                  transform: 'translateY(-2px)',
+                    transform: 'translateY(-2px)',
 
-                  transition: 'transform 0.2s ease-in-out',
+                    transition: 'transform 0.2s ease-in-out',
 
-                }
+                  }
 
-              }}
+                }}
 
-              onClick={() => nav(`/${ROUTES.AUTH.REGISTER}`)}
+                onClick={() => nav(`/${registerRoute}`)}
 
-            >
+              >
 
-              {t('nav.register')}
+                {t('nav.register')}
 
-            </Button>
+              </Button>
+            )}
 
           </>
 

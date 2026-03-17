@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
 import { Box, Card, Divider, Stack, Typography } from "@mui/material";
+import { useTheme } from "@mui/material/styles";
 import Grid from "@mui/material/Grid2";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -31,6 +32,7 @@ const JobDetailHeaderCard = ({
   onOpenSharePopup,
 }) => {
   const { t } = useTranslation(["public"]);
+  const theme = useTheme();
   return (
     <Card
       sx={{
@@ -108,7 +110,7 @@ const JobDetailHeaderCard = ({
                 style={{
                   marginRight: 6,
                   fontSize: 15,
-                  color: "#9c27b0",
+                  color: theme.palette.secondary.main,
                 }}
               />
               {t("jobDetail.deadline")}: {dayjs(jobPostDetail?.deadline).format("DD/MM/YYYY")}
@@ -126,7 +128,7 @@ const JobDetailHeaderCard = ({
                 style={{
                   marginRight: 6,
                   fontSize: 15,
-                  color: "#9c27b0",
+                  color: theme.palette.secondary.main,
                 }}
               />
               {jobPostDetail?.views} {t("jobDetail.views")}
@@ -144,7 +146,7 @@ const JobDetailHeaderCard = ({
                 style={{
                   marginRight: 6,
                   fontSize: 15,
-                  color: "#9c27b0",
+                  color: theme.palette.secondary.main,
                 }}
               />
               {t("jobDetail.postedDate")}:{" "}

@@ -101,7 +101,7 @@ const JobPostSearch = () => {
 
   return (
     <Box component="form" onSubmit={handleSubmit(handleFilter)}>
-      <Card sx={{ p: 3, boxShadow: 0, backgroundColor: '#441da0' }}>
+      <Card sx={{ p: 3, boxShadow: 0, backgroundColor: 'primary.main' }}>
         <Grid container spacing={2}>
           <Grid
             size={{

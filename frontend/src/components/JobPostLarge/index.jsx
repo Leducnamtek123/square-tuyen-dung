@@ -1,6 +1,6 @@
 import React from "react";
 
-import { useTheme } from "@mui/material/styles";
+import { alpha, useTheme } from "@mui/material/styles";
 
 import { useSelector } from "react-redux";
 
@@ -69,6 +69,16 @@ const JobPostLarge = ({
   const nav = useNavigate();
 
   const { allConfig } = useSelector((state) => state.config);
+  const goToDetail = () => {
+    nav(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`);
+  };
+
+  const handleCardKeyDown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      goToDetail();
+    }
+  };
 
   return (
 
@@ -148,7 +158,7 @@ const JobPostLarge = ({
 
                 ? theme.palette.secondary.backgroundHover
 
-                : "rgba(68, 29, 160, 0.02)"
+                : alpha(theme.palette.primary.main, 0.02)
 
               : theme.palette.grey[800],
 
@@ -156,7 +166,11 @@ const JobPostLarge = ({
 
       }}
 
-      onClick={() => nav(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`)}
+      onClick={goToDetail}
+      role="link"
+      tabIndex={0}
+      onKeyDown={handleCardKeyDown}
+      aria-label={jobName || "Job detail"}
 
     >
 
