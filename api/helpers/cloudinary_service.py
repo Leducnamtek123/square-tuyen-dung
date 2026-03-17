@@ -214,9 +214,12 @@ class CloudinaryService:
             if isinstance(public_id, str) and (public_id.startswith("http://") or public_id.startswith("https://")):
                 if getattr(settings, "MINIO_USE_PRESIGNED", True):
                     base_url = getattr(settings, "MINIO_PUBLIC_URL", "").rstrip("/")
+                    bucket = settings.MINIO_BUCKET
+                    parsed = urlparse(public_id)
+
+                    # Handle public proxy URLs (https://domain/minio/...)
                     if base_url and public_id.startswith(f"{base_url}/"):
                         object_path = public_id[len(base_url) + 1 :]
-                        bucket = settings.MINIO_BUCKET
                         if object_path.startswith(f"{bucket}/"):
                             object_path = object_path[len(bucket) + 1 :]
                         client = CloudinaryService._get_client()
@@ -227,6 +230,23 @@ class CloudinaryService:
                             expires=timedelta(seconds=expires),
                         )
                         return CloudinaryService._rewrite_presigned_url(url), options_config
+
+                    # Handle legacy/internal MinIO URLs (http(s)://minio:9000/bucket/...)
+                    internal_host = str(getattr(settings, "MINIO_ENDPOINT", "minio")).replace("http://", "").replace("https://", "").split("/")[0]
+                    internal_host = internal_host.split(":")[0] if internal_host else "minio"
+                    if parsed.hostname in ("minio", internal_host):
+                        object_path = parsed.path.lstrip("/")
+                        if object_path.startswith(f"{bucket}/"):
+                            object_path = object_path[len(bucket) + 1 :]
+                        client = CloudinaryService._get_client()
+                        expires = getattr(settings, "MINIO_PRESIGN_EXPIRES", 3600)
+                        url = client.presigned_get_object(
+                            bucket,
+                            object_path,
+                            expires=timedelta(seconds=expires),
+                        )
+                        return CloudinaryService._rewrite_presigned_url(url), options_config
+
                 return public_id, options_config
 
             client = CloudinaryService._get_client()
