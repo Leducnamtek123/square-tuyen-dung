@@ -310,6 +310,7 @@ MINIO_SECURE = config('MINIO_SECURE', default=False, cast=bool)
 MINIO_PUBLIC_URL = config('MINIO_PUBLIC_URL', default='http://localhost:9000')
 MINIO_PRESIGN_EXPIRES = config('MINIO_PRESIGN_EXPIRES', default=3600, cast=int)
 MINIO_USE_PRESIGNED = config('MINIO_USE_PRESIGNED', default=True, cast=bool)
+MINIO_PRESIGN_PUBLIC = config('MINIO_PRESIGN_PUBLIC', default=False, cast=bool)
 
 # Reuse existing setting names for compatibility across the codebase.
 CLOUDINARY_PATH = f"{MINIO_PUBLIC_URL.rstrip('/')}/{MINIO_BUCKET}/"
