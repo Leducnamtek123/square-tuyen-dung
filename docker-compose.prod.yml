@@ -140,8 +140,8 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-admin}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-password}
-      MINIO_BROWSER_REDIRECT_URL: https://tuyendung.square.vn/minio-console
-      MINIO_SERVER_URL: https://tuyendung.square.vn/minio
+      MINIO_BROWSER_REDIRECT_URL: http://tuyendung.square.vn/minio-console
+      MINIO_SERVER_URL: http://tuyendung.square.vn/minio
     expose:
       - "9000"
       - "9001"

@@ -296,14 +296,16 @@ services:
       - myjob-network
 
   minio:
-    image: quay.io/minio/minio:latest
+    image: minio/minio:latest
     container_name: tuyendung-studio-minio
     ports:
       - "9000:9000"
       - "9001:9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-admin}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-password}
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-password}
+      MINIO_BROWSER_REDIRECT_URL: http://localhost:8080/minio-console
+      MINIO_SERVER_URL: http://localhost:8080/minio
     command: server /data --console-address ":9001"
     volumes:
       - minio-data:/data
