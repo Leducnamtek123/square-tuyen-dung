@@ -47,20 +47,88 @@ import BackdropLoading from "../../../../components/loading/BackdropLoading";
 import { convertEditorStateToHTMLString } from "../../../../utils/editorUtils";
 
 import { salaryString } from "../../../../utils/customData";
+import resumeService from "../../../../services/resumeService";
+import errorHandling from "../../../../utils/errorHandling";
+import TimeAgo from "../../../../components/TimeAgo";
+import FormPopup from "../../../../components/controls/FormPopup";
 
-                        color: (theme) => theme.palette.primary.main,
+const LazyPdf = lazy(() => import("../../../../components/Pdf"));
 
-                        borderBottom: "2px solid",
+const ProfileDetailCard = () => {
+  const { t } = useTranslation();
+  const { slug } = useParams();
+  const { allConfig } = useSelector((state) => state.config);
+  
+  const [profileDetail, setProfileDetail] = React.useState(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [openPopup, setOpenPopup] = React.useState(false);
 
-                        borderColor: (theme) => theme.palette.primary.light,
+  React.useEffect(() => {
+    const getProfileDetail = async () => {
+      setIsLoading(true);
+      try {
+        const resData = await resumeService.getResumeDetail(slug);
+        setProfileDetail(resData.data);
+      } catch (error) {
+        errorHandling(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    if (slug) {
+      getProfileDetail();
+    }
+  }, [slug]);
 
-                        pb: 1,
+  const item = (t, label, value) => (
+    <Box sx={{ mb: 2 }}>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{
+          fontWeight: 'bold',
+          textTransform: 'uppercase',
+          letterSpacing: 1,
+          display: 'block',
+          mb: 0.5
+        }}
+      >
+        {label}
+      </Typography>
+      <Typography variant="body1" sx={{ fontWeight: 500 }}>
+        {value || t('common.notUpdated')}
+      </Typography>
+    </Box>
+  );
 
-                        fontSize: { xs: "1.25rem", sm: "1.5rem" },
+  if (isLoading) return <BackdropLoading open={true} />;
+  if (!profileDetail) return null;
 
-                      }}
+  return (
+    <>
+      <Stack spacing={3}>
+        <Card
+          variant="outlined"
+          sx={{
+            p: { xs: 2, sm: 4 },
+            borderRadius: 3,
+            boxShadow: (theme) => theme.customShadows.medium,
+          }}
+        >
+          <Stack spacing={4}>
+            <Box>
+              <Typography
+                variant="h5"
+                sx={{
+                  mb: 2,
+                  color: (theme) => theme.palette.primary.main,
+                  borderBottom: "2px solid",
+                  borderColor: (theme) => theme.palette.primary.light,
+                  pb: 1,
+                  fontSize: { xs: "1.25rem", sm: "1.5rem" },
+                }}
+              >
 
-                    >
 
                       {t('profileDetailCard.title.personalInfo')}
 
@@ -620,7 +688,7 @@ import { salaryString } from "../../../../utils/customData";
 
             </Stack>
 
-          </>
+
 
           {profileDetail?.type && profileDetail.type === CV_TYPES.cvWebsite ? (
 
@@ -1240,9 +1308,6 @@ import { salaryString } from "../../../../utils/customData";
 
           )}
 
-        </Stack>
-
-      </Box>
 
     </>
 
