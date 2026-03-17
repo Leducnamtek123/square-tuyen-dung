@@ -82,7 +82,7 @@ services:
       - REQUIRE_CLIENT_SECRET=False
       - DB_ENGINE=django.db.backends.mysql
       - DB_HOST=tuyendung-studio-db
-      - DB_NAME=myjob_db
+      - DB_NAME=square_db
       - DB_USER=root
       - DB_PASSWORD=secret
       - DB_PORT=3306
@@ -131,14 +131,14 @@ services:
       - DEBUG=True
       - DB_ENGINE=django.db.backends.mysql
       - DB_HOST=tuyendung-studio-db
-      - DB_NAME=myjob_db
+      - DB_NAME=square_db
       - DB_USER=root
       - DB_PASSWORD=secret
       - DB_PORT=3306
       - SERVICE_REDIS_HOST=redis
       - SERVICE_REDIS_PORT=6379
     networks:
-      - myjob-network
+      - square-network
 
   celery-beat:
     container_name: tuyendung-studio-celery-beat
@@ -160,7 +160,7 @@ services:
       - DEBUG=True
       - DB_ENGINE=django.db.backends.mysql
       - DB_HOST=tuyendung-studio-db
-      - DB_NAME=myjob_db
+      - DB_NAME=square_db
       - DB_USER=root
       - DB_PASSWORD=secret
       - DB_PORT=3306
@@ -176,7 +176,7 @@ services:
       - "3310:3306"
     environment:
       MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: myjob_db
+      MYSQL_DATABASE: square_db
     volumes:
       - db_data:/var/lib/mysql
       - ./tuyendungsqstudio.sql:/docker-entrypoint-initdb.d/init.sql
