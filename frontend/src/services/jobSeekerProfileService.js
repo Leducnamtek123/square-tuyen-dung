@@ -1,28 +1,32 @@
 import httpRequest from '../utils/httpRequest';
+import { presignInObject } from '../utils/presignUrl';
 
 const jobSeekerProfileService = {
 
-  getProfile: () => {
+  getProfile: async () => {
 
     const url = 'info/profile/';
 
-    return httpRequest.get(url);
+    const data = await httpRequest.get(url);
+    return presignInObject(data);
 
   },
 
-  updateProfile: (data) => {
+  updateProfile: async (data) => {
 
     const url = 'info/profile/';
 
-    return httpRequest.put(url, data);
+    const resData = await httpRequest.put(url, data);
+    return presignInObject(resData);
 
   },
 
-  getResumes: (jobSeekerProfileId, params = {}) => {
+  getResumes: async (jobSeekerProfileId, params = {}) => {
 
     const url = `info/web/job-seeker-profiles/${jobSeekerProfileId}/resumes/`;
 
-    return httpRequest.get(url, { params: params });
+    const data = await httpRequest.get(url, { params: params });
+    return presignInObject(data);
 
   },
 

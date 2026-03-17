@@ -15,6 +15,8 @@ urlpatterns = [
 
     path('all-careers/', views.get_all_careers),
 
+    path('presign/', views.presign_url),
+
     path('health/', views.health_check, name='health_check'),
 
 ]

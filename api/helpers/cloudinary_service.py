@@ -3,7 +3,7 @@ import io
 import mimetypes
 import os
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from urllib.parse import urlparse
 
 import httpx
@@ -33,27 +33,6 @@ class CloudinaryService:
         try:
             if not client.bucket_exists(bucket):
                 client.make_bucket(bucket)
-            
-            # Set public read-only policy for the bucket
-            policy = {
-                "Version": "2012-10-17",
-                "Statement": [
-                    {
-                        "Effect": "Allow",
-                        "Principal": {"AWS": ["*"]},
-                        "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
-                        "Resource": [f"arn:aws:s3:::{bucket}"]
-                    },
-                    {
-                        "Effect": "Allow",
-                        "Principal": {"AWS": ["*"]},
-                        "Action": ["s3:GetObject"],
-                        "Resource": [f"arn:aws:s3:::{bucket}/*"]
-                    }
-                ]
-            }
-            import json
-            client.set_bucket_policy(bucket, json.dumps(policy))
         except S3Error as e:
             helper.print_log_error("minio_ensure_bucket", e)
             raise
@@ -208,10 +187,36 @@ class CloudinaryService:
             if not public_id:
                 return None
             if isinstance(public_id, str) and (public_id.startswith("http://") or public_id.startswith("https://")):
+                if getattr(settings, "MINIO_USE_PRESIGNED", True):
+                    base_url = getattr(settings, "MINIO_PUBLIC_URL", "").rstrip("/")
+                    if base_url and public_id.startswith(f"{base_url}/"):
+                        object_path = public_id[len(base_url) + 1 :]
+                        bucket = settings.MINIO_BUCKET
+                        if object_path.startswith(f"{bucket}/"):
+                            object_path = object_path[len(bucket) + 1 :]
+                        client = CloudinaryService._get_client()
+                        expires = getattr(settings, "MINIO_PRESIGN_EXPIRES", 3600)
+                        url = client.presigned_get_object(
+                            bucket,
+                            object_path,
+                            expires=timedelta(seconds=expires),
+                        )
+                        return url, options_config
                 return public_id, options_config
-                
-            base_url = settings.MINIO_PUBLIC_URL.rstrip("/")
+
+            client = CloudinaryService._get_client()
             bucket = settings.MINIO_BUCKET
+
+            if getattr(settings, "MINIO_USE_PRESIGNED", True):
+                expires = getattr(settings, "MINIO_PRESIGN_EXPIRES", 3600)
+                url = client.presigned_get_object(
+                    bucket,
+                    public_id.lstrip("/"),
+                    expires=timedelta(seconds=expires),
+                )
+                return url, options_config
+
+            base_url = settings.MINIO_PUBLIC_URL.rstrip("/")
             url = f"{base_url}/{bucket}/{public_id.lstrip('/')}"
             return url, options_config
             

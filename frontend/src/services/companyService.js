@@ -1,28 +1,31 @@
 import httpRequest from '../utils/httpRequest';
+import { presignInObject } from '../utils/presignUrl';
 
 const companyService = {
 
-  getCompany: () => {
+  getCompany: async () => {
 
     const url = 'info/web/company/';
 
-    return httpRequest.get(url);
+    const data = await httpRequest.get(url);
+    return presignInObject(data);
 
   },
 
-  updateCompany: (id, data) => {
+  updateCompany: async (id, data) => {
 
     const url = `info/web/private-companies/${id}/`;
 
-    return httpRequest.put(url, data);
+    const resData = await httpRequest.put(url, data);
+    return presignInObject(resData);
 
   },
 
-  updateCompanyImageUrl: (data) => {
+  updateCompanyImageUrl: async (data) => {
 
     const url = `info/web/private-companies/company-image-url/`;
 
-    return httpRequest.put(url, data, {
+    const resData = await httpRequest.put(url, data, {
 
       headers: {
 
@@ -31,14 +34,15 @@ const companyService = {
       },
 
     });
+    return presignInObject(resData);
 
   },
 
-  updateCompanyCoverImageUrl: (data) => {
+  updateCompanyCoverImageUrl: async (data) => {
 
     const url = `info/web/private-companies/company-cover-image-url/`;
 
-    return httpRequest.put(url, data, {
+    const resData = await httpRequest.put(url, data, {
 
       headers: {
 
@@ -47,28 +51,31 @@ const companyService = {
       },
 
     });
+    return presignInObject(resData);
 
   },
 
   // public
 
-  getCompanies: (params = {}) => {
+  getCompanies: async (params = {}) => {
 
     const url = 'info/web/companies/';
 
-    return httpRequest.get(url, {
+    const data = await httpRequest.get(url, {
 
       params: params,
 
     });
+    return presignInObject(data);
 
   },
 
-  getCompanyDetailById: (slug) => {
+  getCompanyDetailById: async (slug) => {
 
     const url = `info/web/companies/${slug}/`;
 
-    return httpRequest.get(url);
+    const data = await httpRequest.get(url);
+    return presignInObject(data);
 
   },
 
@@ -80,11 +87,12 @@ const companyService = {
 
   },
 
-  getTopCompanies: () => {
+  getTopCompanies: async () => {
 
     const url = `info/web/companies/top/`;
 
-    return httpRequest.get(url);
+    const data = await httpRequest.get(url);
+    return presignInObject(data);
 
   },
 

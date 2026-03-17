@@ -1,4 +1,10 @@
 import httpRequest from '../utils/httpRequest';
+import { presignInObject } from '../utils/presignUrl';
+
+const withPresign = async (promise) => {
+    const data = await promise;
+    return presignInObject(data);
+};
 
 const adminManagementService = {
 
@@ -6,7 +12,7 @@ const adminManagementService = {
 
         const url = 'common/admin/careers/';
 
-        return httpRequest.get(url, { params });
+        return withPresign(httpRequest.get(url, { params }));
 
     },
 
@@ -14,7 +20,7 @@ const adminManagementService = {
 
         const url = 'common/admin/careers/';
 
-        return httpRequest.post(url, data);
+        return withPresign(httpRequest.post(url, data));
 
     },
 
@@ -22,7 +28,7 @@ const adminManagementService = {
 
         const url = `common/admin/careers/${id}/`;
 
-        return httpRequest.patch(url, data);
+        return withPresign(httpRequest.patch(url, data));
 
     },
 
@@ -38,7 +44,7 @@ const adminManagementService = {
 
         const url = 'common/admin/cities/';
 
-        return httpRequest.get(url, { params });
+        return withPresign(httpRequest.get(url, { params }));
 
     },
 
@@ -46,7 +52,7 @@ const adminManagementService = {
 
         const url = 'common/admin/cities/';
 
-        return httpRequest.post(url, data);
+        return withPresign(httpRequest.post(url, data));
 
     },
 
@@ -54,7 +60,7 @@ const adminManagementService = {
 
         const url = `common/admin/cities/${id}/`;
 
-        return httpRequest.patch(url, data);
+        return withPresign(httpRequest.patch(url, data));
 
     },
 
@@ -70,7 +76,7 @@ const adminManagementService = {
 
         const url = 'common/admin/districts/';
 
-        return httpRequest.get(url, { params });
+        return withPresign(httpRequest.get(url, { params }));
 
     },
 
@@ -78,7 +84,7 @@ const adminManagementService = {
 
         const url = 'common/admin/districts/';
 
-        return httpRequest.post(url, data);
+        return withPresign(httpRequest.post(url, data));
 
     },
 
@@ -86,7 +92,7 @@ const adminManagementService = {
 
         const url = `common/admin/districts/${id}/`;
 
-        return httpRequest.patch(url, data);
+        return withPresign(httpRequest.patch(url, data));
 
     },
 
@@ -102,7 +108,7 @@ const adminManagementService = {
 
         const url = 'info/web/admin/companies/';
 
-        return httpRequest.get(url, { params });
+        return withPresign(httpRequest.get(url, { params }));
 
     },
 
@@ -110,7 +116,7 @@ const adminManagementService = {
 
         const url = `info/web/admin/companies/${id}/`;
 
-        return httpRequest.get(url);
+        return withPresign(httpRequest.get(url));
 
     },
 
@@ -118,7 +124,7 @@ const adminManagementService = {
 
         const url = 'info/web/admin/companies/';
 
-        return httpRequest.post(url, data);
+        return withPresign(httpRequest.post(url, data));
 
     },
 
@@ -126,7 +132,7 @@ const adminManagementService = {
 
         const url = `info/web/admin/companies/${id}/`;
 
-        return httpRequest.patch(url, data);
+        return withPresign(httpRequest.patch(url, data));
 
     },
 
@@ -144,7 +150,7 @@ const adminManagementService = {
 
         const url = 'info/web/admin/job-seeker-profiles/';
 
-        return httpRequest.get(url, { params });
+        return withPresign(httpRequest.get(url, { params }));
 
     },
 
@@ -152,7 +158,7 @@ const adminManagementService = {
 
         const url = `info/web/admin/job-seeker-profiles/${id}/`;
 
-        return httpRequest.get(url);
+        return withPresign(httpRequest.get(url));
 
     },
 
@@ -160,7 +166,7 @@ const adminManagementService = {
 
         const url = 'info/web/admin/job-seeker-profiles/';
 
-        return httpRequest.post(url, data);
+        return withPresign(httpRequest.post(url, data));
 
     },
 
@@ -168,7 +174,7 @@ const adminManagementService = {
 
         const url = `info/web/admin/job-seeker-profiles/${id}/`;
 
-        return httpRequest.patch(url, data);
+        return withPresign(httpRequest.patch(url, data));
 
     },
 
@@ -184,7 +190,7 @@ const adminManagementService = {
 
         const url = 'info/web/admin/resumes/';
 
-        return httpRequest.get(url, { params });
+        return withPresign(httpRequest.get(url, { params }));
 
     },
 
@@ -192,7 +198,7 @@ const adminManagementService = {
 
         const url = `info/web/admin/resumes/${id}/`;
 
-        return httpRequest.get(url);
+        return withPresign(httpRequest.get(url));
 
     },
 
@@ -200,7 +206,7 @@ const adminManagementService = {
 
         const url = 'info/web/admin/resumes/';
 
-        return httpRequest.post(url, data);
+        return withPresign(httpRequest.post(url, data));
 
     },
 
@@ -208,7 +214,7 @@ const adminManagementService = {
 
         const url = `info/web/admin/resumes/${id}/`;
 
-        return httpRequest.patch(url, data);
+        return withPresign(httpRequest.patch(url, data));
 
     },
 

@@ -1,6 +1,7 @@
 import httpRequest from '../utils/httpRequest';
 
 import { AUTH_CONFIG } from '../configs/constants';
+import { ensurePresignedUrl } from '../utils/presignUrl';
 
 const authService = {
 
@@ -118,27 +119,35 @@ const authService = {
 
   },
 
-  getUserInfo: () => {
+  getUserInfo: async () => {
 
     const url = 'auth/user-info/';
 
-    return httpRequest.get(url);
+    const data = await httpRequest.get(url);
+    if (data?.avatarUrl) {
+      data.avatarUrl = await ensurePresignedUrl(data.avatarUrl);
+    }
+    return data;
 
   },
 
-  updateUser: (data) => {
+  updateUser: async (data) => {
 
     const url = 'auth/update-user/';
 
-    return httpRequest.patch(url, data);
+    const resData = await httpRequest.patch(url, data);
+    if (resData?.avatarUrl) {
+      resData.avatarUrl = await ensurePresignedUrl(resData.avatarUrl);
+    }
+    return resData;
 
   },
 
-  updateAvatar: (data) => {
+  updateAvatar: async (data) => {
 
     const url = 'auth/avatar/';
 
-    return httpRequest.put(url, data, {
+    const resData = await httpRequest.put(url, data, {
 
       headers: {
 
@@ -147,14 +156,22 @@ const authService = {
       },
 
     });
+    if (resData?.avatarUrl) {
+      resData.avatarUrl = await ensurePresignedUrl(resData.avatarUrl);
+    }
+    return resData;
 
   },
 
-  deleteAvatar: () => {
+  deleteAvatar: async () => {
 
     const url = 'auth/avatar/';
 
-    return httpRequest.delete(url);
+    const resData = await httpRequest.delete(url);
+    if (resData?.avatarUrl) {
+      resData.avatarUrl = await ensurePresignedUrl(resData.avatarUrl);
+    }
+    return resData;
 
   },
 

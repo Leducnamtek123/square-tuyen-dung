@@ -9,7 +9,7 @@ from django.db.models import Count
 
 from rest_framework.decorators import api_view, permission_classes
 
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from rest_framework import status
 
@@ -48,6 +48,7 @@ from .serializers import (
 )
 
 from authentication import permissions as perms_custom
+from helpers.cloudinary_service import CloudinaryService
 
 from rest_framework import viewsets
 
@@ -501,3 +502,32 @@ def health_check(request):
     status_code = status.HTTP_200_OK if is_healthy else status.HTTP_503_SERVICE_UNAVAILABLE
 
     return Response(response_data, status=status_code)
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def presign_url(request):
+    """
+    Return a presigned URL for a MinIO object.
+    Accepts either `url` (full URL) or `publicId` (object key).
+    """
+    url = request.query_params.get("url", None)
+    public_id = request.query_params.get("publicId", None)
+
+    if not url and not public_id:
+        return var_res.response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"errorMessage": ["Missing url or publicId."]},
+            data=None,
+        )
+
+    target = url or public_id
+    presigned, _ = CloudinaryService.get_url_from_public_id(target, {})
+
+    if not presigned:
+        return var_res.response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"errorMessage": ["Unable to generate presigned URL."]},
+            data=None,
+        )
+
+    return var_res.response_data(data={"url": presigned})

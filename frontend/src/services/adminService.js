@@ -1,4 +1,10 @@
 import httpRequest from '../utils/httpRequest';
+import { presignInObject } from '../utils/presignUrl';
+
+const withPresign = async (promise) => {
+    const data = await promise;
+    return presignInObject(data);
+};
 
 const adminService = {
 
@@ -14,7 +20,7 @@ const adminService = {
 
         const url = 'auth/users/';
 
-        return httpRequest.get(url, { params });
+        return withPresign(httpRequest.get(url, { params }));
 
     },
 
@@ -24,7 +30,7 @@ const adminService = {
 
         const url = 'interview/web/statistics/admin-general-statistics/';
 
-        return httpRequest.get(url);
+        return withPresign(httpRequest.get(url));
 
     },
 

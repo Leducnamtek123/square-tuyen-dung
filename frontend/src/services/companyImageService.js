@@ -1,20 +1,22 @@
 import httpRequest from '../utils/httpRequest';
+import { presignInObject } from '../utils/presignUrl';
 
 const companyImageService = {
 
-  getCompanyImages: () => {
+  getCompanyImages: async () => {
 
     const url = 'info/web/company-images/';
 
-    return httpRequest.get(url);
+    const data = await httpRequest.get(url);
+    return presignInObject(data);
 
   },
 
-  addCompanyImage: (data) => {
+  addCompanyImage: async (data) => {
 
     const url = 'info/web/company-images/';
 
-    return httpRequest.post(url, data, {
+    const resData = await httpRequest.post(url, data, {
 
       headers: {
 
@@ -23,6 +25,7 @@ const companyImageService = {
       },
 
     });
+    return presignInObject(resData);
 
   },
 

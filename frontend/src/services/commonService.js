@@ -1,12 +1,14 @@
 import httpRequest from '../utils/httpRequest';
+import { presignInObject } from '../utils/presignUrl';
 
 const commonService = {
 
-  getConfigs: () => {
+  getConfigs: async () => {
 
     const url = 'common/configs/';
 
-    return httpRequest.get(url);
+    const data = await httpRequest.get(url);
+    return presignInObject(data);
 
   },
 
@@ -29,11 +31,12 @@ const commonService = {
 
   },
 
-  getTop10Careers: () => {
+  getTop10Careers: async () => {
 
     const url = 'common/top-careers/';
 
-    return httpRequest.get(url);
+    const data = await httpRequest.get(url);
+    return presignInObject(data);
 
   },
 

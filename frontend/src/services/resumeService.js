@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { presignInObject } from '../utils/presignUrl';
 
 const resumeService = {
 
@@ -10,19 +11,21 @@ const resumeService = {
 
   },
 
-  getResumes: (params = {}) => {
+  getResumes: async (params = {}) => {
 
     const url = 'info/web/resumes/';
 
-    return httpRequest.get(url, { params: params });
+    const data = await httpRequest.get(url, { params: params });
+    return presignInObject(data);
 
   },
 
-  getResumeDetail: (resumeSlug) => {
+  getResumeDetail: async (resumeSlug) => {
 
     const url = `info/web/resumes/${resumeSlug}/`;
 
-    return httpRequest.get(url);
+    const data = await httpRequest.get(url);
+    return presignInObject(data);
 
   },
 
@@ -42,27 +45,29 @@ const resumeService = {
 
   },
 
-  getResumeOwner: (resumeSlug) => {
+  getResumeOwner: async (resumeSlug) => {
 
     const url = `info/web/private-resumes/${resumeSlug}/resume-owner/`;
 
-    return httpRequest.get(url);
+    const data = await httpRequest.get(url);
+    return presignInObject(data);
 
   },
 
-  getCv: (resumeSlug) => {
+  getCv: async (resumeSlug) => {
 
     const url = `info/web/private-resumes/${resumeSlug}/cv/`;
 
-    return httpRequest.get(url);
+    const data = await httpRequest.get(url);
+    return presignInObject(data);
 
   },
 
-  updateCV: (resumeSlug, formData) => {
+  updateCV: async (resumeSlug, formData) => {
 
     const url = `info/web/private-resumes/${resumeSlug}/cv/`;
 
-    return httpRequest.put(url, formData, {
+    const resData = await httpRequest.put(url, formData, {
 
       headers: {
 
@@ -71,14 +76,15 @@ const resumeService = {
       },
 
     });
+    return presignInObject(resData);
 
   },
 
-  addResume: (data) => {
+  addResume: async (data) => {
 
     const url = 'info/web/private-resumes/';
 
-    return httpRequest.post(url, data, {
+    const resData = await httpRequest.post(url, data, {
 
       headers: {
 
@@ -87,14 +93,16 @@ const resumeService = {
       },
 
     });
+    return presignInObject(resData);
 
   },
 
-  updateResume: (resumeSlug, data) => {
+  updateResume: async (resumeSlug, data) => {
 
     const url = `info/web/private-resumes/${resumeSlug}/`;
 
-    return httpRequest.put(url, data);
+    const resData = await httpRequest.put(url, data);
+    return presignInObject(resData);
 
   },
 
@@ -106,11 +114,12 @@ const resumeService = {
 
   },
 
-  activeResume: (resumeSlug) => {
+  activeResume: async (resumeSlug) => {
 
     const url = `info/web/private-resumes/${resumeSlug}/resume-active/`;
 
-    return httpRequest.get(url);
+    const data = await httpRequest.get(url);
+    return presignInObject(data);
 
   },
 
