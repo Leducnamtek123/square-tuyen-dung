@@ -38,6 +38,31 @@ class CloudinaryService:
             raise
 
     @staticmethod
+    def _rewrite_presigned_url(url: str):
+        """
+        Rewrite internal MinIO presigned URLs to the public proxy URL.
+        """
+        try:
+            if not url:
+                return url
+            public_base = getattr(settings, "MINIO_PUBLIC_URL", "").rstrip("/")
+            if not public_base:
+                return url
+            parsed = urlparse(url)
+            internal_host = str(getattr(settings, "MINIO_ENDPOINT", "minio")).replace("http://", "").replace("https://", "").split("/")[0]
+            internal_host = internal_host.split(":")[0] if internal_host else "minio"
+            # If it's already on the public host, keep it
+            if public_base and url.startswith(public_base):
+                return url
+            # Only rewrite if the presigned URL is for internal MinIO host
+            if parsed.hostname not in ("minio", internal_host):
+                return url
+            # Rewrite host to the public proxy base, keep path/query intact
+            return f"{public_base}{parsed.path}?{parsed.query}" if parsed.query else f"{public_base}{parsed.path}"
+        except Exception:
+            return url
+
+    @staticmethod
     def _normalize_object_name(folder: str, public_id: str, ext: str):
         folder = folder or ""
         if folder and not folder.endswith("/"):
@@ -201,7 +226,7 @@ class CloudinaryService:
                             object_path,
                             expires=timedelta(seconds=expires),
                         )
-                        return url, options_config
+                        return CloudinaryService._rewrite_presigned_url(url), options_config
                 return public_id, options_config
 
             client = CloudinaryService._get_client()
@@ -214,7 +239,7 @@ class CloudinaryService:
                     public_id.lstrip("/"),
                     expires=timedelta(seconds=expires),
                 )
-                return url, options_config
+                return CloudinaryService._rewrite_presigned_url(url), options_config
 
             base_url = settings.MINIO_PUBLIC_URL.rstrip("/")
             url = f"{base_url}/{bucket}/{public_id.lstrip('/')}"
