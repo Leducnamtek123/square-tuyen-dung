@@ -47,7 +47,7 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile.prod
-    command: gunicorn --bind 0.0.0.0:8000 --workers 3 myjob_api.wsgi:application
+    command: sh docker-entrypoint.sh gunicorn --bind 0.0.0.0:8000 --workers 3 myjob_api.wsgi:application
     expose:
       - "8000"
     restart: always
