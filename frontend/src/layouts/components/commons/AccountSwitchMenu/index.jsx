@@ -17,6 +17,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import { HOST_NAME, ROUTES } from '../../../../configs/constants';
+import { buildPortalPath, getPreferredLanguage, isEmployerPortalPath } from '../../../../configs/portalRouting';
 
 const AccountSwitchMenu = ({ isShowButton = false }) => {
 
@@ -24,27 +25,23 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
 
   const hostName = window.location.hostname;
   const pathname = window.location.pathname || "/";
-  const isEmployerPortal =
-    pathname.startsWith("/employer") ||
-    pathname.startsWith("/employee") ||
-    hostName.startsWith("employer.");
+  const isEmployerPortal = isEmployerPortalPath(pathname) || hostName.startsWith("employer.");
 
   const openPortal = (toEmployer = false, path = "") => {
     const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
     const protocol = window.location.protocol;
     const port = window.location.port ? `:${window.location.port}` : "";
-    
-    // Luôn ưu tiên dùng path-based cho portal Nhà tuyển dụng (/employee) 
-    // thay vì subdomain để đồng bộ với môi trường hiện tại của user
+    const language = getPreferredLanguage();
+
     const mainHost = HOST_NAME.MYJOB;
     let targetUrl = "";
-    
+
     if (toEmployer) {
-      targetUrl = `${protocol}//${mainHost}${port}/employee${normalizedPath}`;
+      targetUrl = `${protocol}//${mainHost}${port}${buildPortalPath("employer", normalizedPath, language)}`;
     } else {
       targetUrl = `${protocol}//${mainHost}${port}${normalizedPath}`;
     }
-    
+
     window.location.href = targetUrl;
   };
 

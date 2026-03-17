@@ -30,6 +30,7 @@ import Feedback from "./components/Feedback";
 import ChatBot from "./components/ChatBot";
 import ScrollToTop from "./components/ScrollToTop";
 import { ROLES_NAME, ROUTES, AUTH_CONFIG } from "./configs/constants";
+import { isAdminPortalPath } from "./configs/portalRouting";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import tokenService from "./services/tokenService";
 
@@ -57,7 +58,7 @@ function App() {
   };
   const location = useLocation();
   const fullPathname = window.location.pathname || "/";
-  const isAdminPortalPath = fullPathname.startsWith("/admin");
+  const isAdminPortal = isAdminPortalPath(fullPathname);
   const isChatPage =
     location.pathname.startsWith(`/${ROUTES.JOB_SEEKER.CHAT}`) ||
     location.pathname.startsWith(`/${ROUTES.EMPLOYER.CHAT}`);
@@ -73,7 +74,7 @@ function App() {
     location.pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', '')}`) ||
     location.pathname.startsWith(`/${ROUTES.ADMIN.INTERVIEW_SESSION.replace(':id', '')}`);
   const canShowChatBot =
-    !isAdminPortalPath &&
+    !isAdminPortal &&
     !isChatPage &&
     !isInterviewPage;
 

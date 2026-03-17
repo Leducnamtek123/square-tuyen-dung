@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import routesConfig from "../configs/routesConfig";
 import { HOST_NAME, ROUTES } from "../configs/constants";
 import { getLocalizedRouteVariants, localizeRoutePath } from "../configs/routeLocalization";
+import { isAdminPortalPath, isEmployerPortalPath } from "../configs/portalRouting";
 
 const PrivateRoute = ({ element: Element, checkCondition, redirectUrl, settings }) => {
   if (checkCondition && !checkCondition(settings)) {
@@ -88,7 +89,6 @@ const AppRoutes = ({ settings }) => {
   const hostName = window.location.hostname;
   const pathname = window.location.pathname || "/";
   const jobSeekerInterviewPrefix = `/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW.replace('/:id', '')}`;
-  const employerPrefixes = ["/employer", "/employee"];
 
   // Candidate interview flow always uses root routes.
   const isJobSeekerInterviewRoute =
@@ -98,11 +98,11 @@ const AppRoutes = ({ settings }) => {
   }
 
   // Path-based portals: BrowserRouter basename already strips /admin or /employer.
-  if (pathname.startsWith("/admin")) {
+  if (isAdminPortalPath(pathname)) {
     return <Routes>{renderRoutes(routesConfig[HOST_NAME.ADMIN_MYJOB], settings)}</Routes>;
   }
 
-  if (employerPrefixes.some((prefix) => pathname.startsWith(prefix))) {
+  if (isEmployerPortalPath(pathname)) {
     return <Routes>{renderRoutes(routesConfig[HOST_NAME.EMPLOYER_MYJOB], settings)}</Routes>;
   }
 

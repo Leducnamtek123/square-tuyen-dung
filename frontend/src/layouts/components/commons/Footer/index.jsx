@@ -13,11 +13,14 @@ import Grid from "@mui/material/Grid2";
 import { ICONS, LINKS, ROUTES, APP_NAME, IMAGES } from '../../../../configs/constants';
 
 import MuiImageCustom from '../../../../components/MuiImageCustom';
+import { buildPortalPath, getPreferredLanguage } from '../../../../configs/portalRouting';
 
 const Footer = () => {
 
   const { t } = useTranslation('common');
   const nav = useNavigate();
+  const language = getPreferredLanguage();
+  const employerPrefix = buildPortalPath('employer', '', language);
 
   const theme = useTheme();
 
@@ -175,7 +178,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => nav(`/employee/${ROUTES.EMPLOYER.JOB_POST}`)}
+                  onClick={() => nav(`${employerPrefix}/${ROUTES.EMPLOYER.JOB_POST}`)}
 
                   primary={t('footer.postJob')}
 
@@ -189,7 +192,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => nav(`/employee/${ROUTES.EMPLOYER.PROFILE}`)}
+                  onClick={() => nav(`${employerPrefix}/${ROUTES.EMPLOYER.PROFILE}`)}
 
                   primary={t('footer.searchResumes')}
 
@@ -203,7 +206,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => nav(`/employee/${ROUTES.EMPLOYER.DASHBOARD}`)}
+                  onClick={() => nav(`${employerPrefix}/${ROUTES.EMPLOYER.DASHBOARD}`)}
 
                   primary={t('footer.employerDashboard')}
 
@@ -217,7 +220,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => nav(`/employee/${ROUTES.EMPLOYER.CHAT}`)}
+                  onClick={() => nav(`${employerPrefix}/${ROUTES.EMPLOYER.CHAT}`)}
 
                   primary={t('footer.messages')}
 
@@ -231,7 +234,7 @@ const Footer = () => {
 
                   sx={{ cursor: 'pointer' }}
 
-                  onClick={() => nav(`/employee/${ROUTES.EMPLOYER.NOTIFICATION}`)}
+                  onClick={() => nav(`${employerPrefix}/${ROUTES.EMPLOYER.NOTIFICATION}`)}
 
                   primary={t('footer.notifications')}
 

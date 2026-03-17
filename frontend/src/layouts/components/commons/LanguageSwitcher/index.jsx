@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Menu, MenuItem, Stack, Typography, useTheme, Avatar } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { localizeRoutePath } from '../../../../configs/routeLocalization';
+import { buildPortalPath, detectPortalFromPath } from '../../../../configs/portalRouting';
 
 // You can use external flag icons or just text
 const languages = [
@@ -39,7 +40,14 @@ const LanguageSwitcher = ({ color = 'white' }) => {
 
   const changeLanguage = (lng) => {
     const localizedPath = localizeRoutePath(location.pathname, lng);
-    if (localizedPath !== location.pathname) {
+    const portal = detectPortalFromPath(window.location.pathname || '/');
+    if (portal !== 'jobseeker') {
+      const nextFullPath = buildPortalPath(portal, localizedPath, lng);
+      const currentFullPath = window.location.pathname || '/';
+      if (nextFullPath !== currentFullPath) {
+        window.location.assign(`${nextFullPath}${location.search}${location.hash}`);
+      }
+    } else if (localizedPath !== location.pathname) {
       navigate(`${localizedPath}${location.search}${location.hash}`, { replace: true });
     }
     i18n.changeLanguage(lng);

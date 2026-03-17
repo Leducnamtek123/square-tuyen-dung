@@ -4,6 +4,7 @@ import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
 import { HOST_NAME, ROUTES } from "../../../../configs/constants";
+import { buildPortalPath, getPreferredLanguage } from "../../../../configs/portalRouting";
 import { setActiveWorkspace } from "../../../../redux/userSlice";
 
 const WorkspaceSwitchMenu = () => {
@@ -30,8 +31,9 @@ const WorkspaceSwitchMenu = () => {
     const protocol = window.location.protocol;
     const port = window.location.port ? `:${window.location.port}` : "";
     const mainHost = HOST_NAME.MYJOB;
+    const language = getPreferredLanguage();
     const targetUrl = toEmployer
-      ? `${protocol}//${mainHost}${port}/employee${normalizedPath}`
+      ? `${protocol}//${mainHost}${port}${buildPortalPath("employer", normalizedPath, language)}`
       : `${protocol}//${mainHost}${port}${normalizedPath}`;
     window.location.href = targetUrl;
   };

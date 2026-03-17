@@ -23,6 +23,8 @@ import 'dayjs/locale/en';
 import './configs/dayjs-config';
 
 import './i18n';
+import { localizeRoutePath } from './configs/routeLocalization';
+import { getPreferredLanguage, normalizePortalPath } from './configs/portalRouting';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -47,15 +49,26 @@ const queryClient = new QueryClient({
 
 });
 
-const getRouterBaseName = () => {
-  const pathname = window.location.pathname || "/";
-  if (pathname.startsWith("/admin")) return "/admin";
-  if (pathname.startsWith("/employer")) return "/employer";
-  if (pathname.startsWith("/employee")) return "/employee";
+const getRouterBaseName = (pathname) => {
+  const currentPath = pathname || window.location.pathname || "/";
+  if (currentPath.startsWith("/admin")) return "/admin";
+  if (currentPath.startsWith("/quan-tri")) return "/quan-tri";
+  if (currentPath.startsWith("/employer")) return "/employer";
+  if (currentPath.startsWith("/nha-tuyen-dung")) return "/nha-tuyen-dung";
+  if (currentPath.startsWith("/employee")) return "/employee";
   return "/";
 };
 
-const routerBaseName = getRouterBaseName();
+const initialPathname = window.location.pathname || "/";
+const preferredLanguage = getPreferredLanguage();
+const normalizedPortalPath = normalizePortalPath(initialPathname, preferredLanguage);
+const normalizedFullPath = localizeRoutePath(normalizedPortalPath, preferredLanguage);
+
+if (normalizedFullPath !== initialPathname) {
+  window.location.replace(`${normalizedFullPath}${window.location.search}${window.location.hash}`);
+}
+
+const routerBaseName = getRouterBaseName(normalizedFullPath);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
 

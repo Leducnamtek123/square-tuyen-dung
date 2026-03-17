@@ -26,6 +26,7 @@ import NotificationCard from "../../../../components/NotificationCard";
 import ChatCard from "../../../../components/ChatCard";
 
 import LanguageSwitcher from "../LanguageSwitcher";
+import { isAdminPortalPath, isEmployerPortalPath } from "../../../../configs/portalRouting";
 
 const Header = (props) => {
 
@@ -69,11 +70,10 @@ const Header = (props) => {
 
   const fullPathname = window.location.pathname;
   const isAdminPortal =
-    fullPathname.startsWith("/admin") ||
+    isAdminPortalPath(fullPathname) ||
     hostName === HOST_NAME.ADMIN_MYJOB;
   const isEmployerPortal =
-    fullPathname.startsWith("/employer") ||
-    fullPathname.startsWith("/employee") ||
+    isEmployerPortalPath(fullPathname) ||
     hostName === HOST_NAME.EMPLOYER_MYJOB;
 
   const currentPortalHost = isAdminPortal

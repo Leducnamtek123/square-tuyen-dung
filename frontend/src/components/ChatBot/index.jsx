@@ -5,6 +5,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import { AUTH_CONFIG } from "../../configs/constants";
+import { isEmployerPortalPath } from "../../configs/portalRouting";
 import api from "../../services/axiosClient";
 import { MessageResponse } from "../ai-elements/message";
 import "./chatbot.css";
@@ -25,8 +26,7 @@ const ChatBot = () => {
   const listRef = useRef(null);
 
   const fullPathname = window.location.pathname || "/";
-  const isEmployerRoute =
-    fullPathname.startsWith("/employer") || fullPathname.startsWith("/employee");
+  const isEmployerRoute = isEmployerPortalPath(fullPathname);
   const isEmployer = activeWorkspace?.type === "company" || isEmployerRoute;
 
   const greeting = useMemo(() => {

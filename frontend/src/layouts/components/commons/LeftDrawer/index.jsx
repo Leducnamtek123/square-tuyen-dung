@@ -19,6 +19,7 @@ import { removeUserInfo } from '../../../../redux/userSlice';
 import tokenService from '../../../../services/tokenService';
 
 import AccountSwitchMenu from '../AccountSwitchMenu';
+import { isEmployerPortalPath } from '../../../../configs/portalRouting';
 import {
 
   resetSearchCompany,
@@ -77,7 +78,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
   };
   const pathname = globalThis?.window?.location?.pathname || "";
-  const isEmployerPortal = pathname.startsWith("/employer") || pathname.startsWith("/employee");
+  const isEmployerPortal = isEmployerPortalPath(pathname);
   const registerRoute = isEmployerPortal ? ROUTES.EMPLOYER_AUTH.REGISTER : ROUTES.AUTH.REGISTER;
 
   const drawer = (
