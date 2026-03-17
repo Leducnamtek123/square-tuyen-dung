@@ -125,7 +125,7 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }) => {
                   onClick={() => setIsChatOpen(false)} 
                   className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors opacity-60 hover:opacity-100"
                 >
-                   ✕
+                   X
                 </button>
               </div>
               <div className="flex-1 p-6 overflow-hidden">
@@ -160,3 +160,4 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }) => {
 };
 
 export default InterviewAgentView;
+

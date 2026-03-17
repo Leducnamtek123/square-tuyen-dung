@@ -1,21 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  Alert,
-  Box,
-  Button,
-  Chip,
-  CircularProgress,
-  Container,
-  Divider,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
 import { useTranslation } from "react-i18next";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import VideoCameraFrontIcon from "@mui/icons-material/VideoCameraFront";
-import StopCircleIcon from "@mui/icons-material/StopCircle";
 
 import {
   LiveKitRoom,
@@ -24,7 +9,8 @@ import {
 } from "@livekit/components-react";
 
 import InterviewAgentView from "../../components/interviewAi/InterviewAgentView";
-import { cn } from "../../lib/utils";
+import { AgentAudioVisualizerAura, StartAudioButton } from "../../components/agents-ui";
+import { Button } from "../../components/ui/button";
 
 import interviewService from "../../services/interviewService";
 import { transformInterviewSession } from "../../utils/transformers";
@@ -50,12 +36,12 @@ const normalizeRole = (role) => {
   return "jobseeker";
 };
 
-const statusColorMap = {
-  scheduled: "info",
-  in_progress: "warning",
-  processing: "warning",
-  completed: "success",
-  cancelled: "error",
+const statusClassMap = {
+  scheduled: "border-sky-400/30 bg-sky-500/15 text-sky-200",
+  in_progress: "border-amber-400/30 bg-amber-500/15 text-amber-200",
+  processing: "border-amber-400/30 bg-amber-500/15 text-amber-200",
+  completed: "border-emerald-400/30 bg-emerald-500/15 text-emerald-200",
+  cancelled: "border-rose-400/30 bg-rose-500/15 text-rose-200",
 };
 
 const InterviewSessionPage = ({ role = "jobseeker" }) => {
@@ -127,7 +113,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }) => {
     resolveSessionAndToken();
   }, [resolveSessionAndToken]);
 
-  const handleStartInterview = async () => {
+  const handleStartInterview = useCallback(async () => {
     try {
       setStarting(true);
       if (roomName) {
@@ -139,9 +125,9 @@ const InterviewSessionPage = ({ role = "jobseeker" }) => {
       setConnectRoom(true);
       setStarting(false);
     }
-  };
+  }, [roomName]);
 
-  const handleEndInterview = async () => {
+  const handleEndInterview = useCallback(async () => {
     setConnectRoom(false);
     try {
       if (roomName) {
@@ -150,184 +136,143 @@ const InterviewSessionPage = ({ role = "jobseeker" }) => {
     } catch (err) {
       console.error("Cannot update interview status to completed:", err);
     }
-  };
+  }, [roomName]);
 
   if (loading) {
     return (
-      <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center", bgcolor: "#0b1220" }}>
-        <Stack spacing={2} alignItems="center">
-          <CircularProgress />
-          <Typography color="white">{t("loading", { defaultValue: "Connecting..." })}</Typography>
-        </Stack>
-      </Box>
+      <main className="grid min-h-screen place-items-center bg-slate-950 px-6 text-slate-100">
+        <div className="flex flex-col items-center gap-3 text-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-cyan-300/30 border-t-cyan-300" />
+          <p className="text-sm text-slate-300">{t("loading", { defaultValue: "Connecting..." })}</p>
+        </div>
+      </main>
     );
   }
 
   if (error) {
     return (
-      <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center", bgcolor: "#0b1220", px: 2 }}>
-        <Container maxWidth="sm">
-          <Paper sx={{ p: 3, borderRadius: 2 }}>
-            <Stack spacing={2}>
-              <Alert severity="error">{error}</Alert>
-              <Button variant="contained" onClick={() => navigate("/")}>
-                {t("common:actions.backHome", { defaultValue: "Back home" })}
-              </Button>
-            </Stack>
-          </Paper>
-        </Container>
-      </Box>
+      <main className="grid min-h-screen place-items-center bg-slate-950 px-6">
+        <section className="w-full max-w-lg rounded-2xl border border-rose-400/30 bg-rose-500/10 p-6 text-rose-100">
+          <p className="text-sm">{error}</p>
+          <Button className="mt-4" onClick={() => navigate("/")}>
+            {t("common:actions.backHome", { defaultValue: "Back home" })}
+          </Button>
+        </section>
+      </main>
     );
   }
 
-  return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#0b1220", py: 2, px: 2 }}>
-      <Container maxWidth="xl">
-        <Paper sx={{ p: 2, mb: 2, borderRadius: 2 }}>
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            justifyContent="space-between"
-            alignItems={{ xs: "flex-start", md: "center" }}
-            spacing={2}
-          >
-            <Stack spacing={0.5}>
-              <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                {sessionTitle}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {session?.jobName || "Interview"} | {session?.candidateName || "Candidate"}
-              </Typography>
-            </Stack>
+  const statusText = (session?.status || "scheduled").replaceAll("_", " ");
+  const statusKey = (session?.status || "scheduled").toLowerCase();
+  const statusClass = statusClassMap[statusKey] || "border-white/15 bg-white/10 text-slate-200";
+  const formattedSchedule =
+    session?.scheduledAt &&
+    new Date(session.scheduledAt).toLocaleString(i18n.language === "vi" ? "vi-VN" : "en-US");
 
-            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-              <Chip
-                size="small"
-                label={(session?.status || "scheduled").replaceAll("_", " ")}
-                color={statusColorMap[session?.status] || "default"}
-              />
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<ArrowBackIcon />}
-                onClick={() => navigate(-1)}
-              >
+  return (
+    <main className="min-h-screen bg-slate-950 px-4 py-4 text-slate-100 md:px-8 md:py-6">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+        <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70 p-4 backdrop-blur-xl md:p-5">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.2),transparent_45%)]" />
+          <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="space-y-1">
+              <h1 className="text-xl font-semibold tracking-tight md:text-2xl">{sessionTitle}</h1>
+              <p className="text-sm text-slate-300">
+                {session?.jobName || "Interview"} | {session?.candidateName || "Candidate"}
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium capitalize ${statusClass}`}>
+                {statusText}
+              </span>
+              <Button variant="outline" onClick={() => navigate(-1)}>
                 {t("common:actions.back", { defaultValue: "Back" })}
               </Button>
               {!connectRoom ? (
-                <Button
-                  variant="contained"
-                  size="small"
-                  startIcon={<VideoCameraFrontIcon />}
-                  onClick={handleStartInterview}
-                  disabled={starting}
-                >
-                  {t("startInterview", { defaultValue: "Start interview" })}
+                <Button onClick={handleStartInterview} disabled={starting}>
+                  {starting
+                    ? t("loading", { defaultValue: "Connecting..." })
+                    : t("startInterview", { defaultValue: "Start interview" })}
                 </Button>
               ) : (
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="small"
-                  startIcon={<StopCircleIcon />}
-                  onClick={handleEndInterview}
-                >
+                <Button variant="destructive" onClick={handleEndInterview}>
                   {t("controls.end", { defaultValue: "End call" })}
                 </Button>
               )}
-            </Stack>
-          </Stack>
-        </Paper>
+            </div>
+          </div>
+        </header>
 
-        <Paper sx={{ p: 2, borderRadius: 2 }}>
-          <Stack spacing={2}>
-            {!connectRoom && (
-              <>
-                <Alert severity="info">
-                  {t("readyBody", {
-                    defaultValue: "Click start to join the interview room with camera and microphone.",
-                  })}
-                </Alert>
-                <Divider />
-              </>
+        <section className="relative h-[calc(100vh-170px)] min-h-[560px] overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70 shadow-2xl shadow-black/30">
+          <LiveKitRoom
+            token={participantToken}
+            serverUrl={liveKitUrl}
+            connect={connectRoom}
+            video={false}
+            audio={true}
+            data-lk-theme="default"
+            onDisconnected={connectRoom ? handleEndInterview : undefined}
+            className="h-full"
+          >
+            {connectRoom ? (
+              <InterviewAgentView
+                onDisconnect={handleEndInterview}
+                sessionInfo={{
+                  jobName: session?.jobName,
+                  candidateName: session?.candidateName,
+                }}
+              />
+            ) : (
+              <div className="relative flex h-full items-center justify-center px-6">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.22),transparent_52%)]" />
+                <div className="relative flex w-full max-w-lg flex-col items-center gap-6 text-center">
+                  <AgentAudioVisualizerAura
+                    size="md"
+                    state="listening"
+                    className="h-[220px] w-[220px] md:h-[280px] md:w-[280px]"
+                  />
+                  <div className="space-y-2">
+                    <h2 className="text-2xl font-semibold tracking-tight">
+                      {t("readyTitle", { defaultValue: "Ready to start interview" })}
+                    </h2>
+                    <p className="text-sm text-slate-300">
+                      {t("readyBody", {
+                        defaultValue:
+                          "Click start to join the interview room with camera and microphone.",
+                      })}
+                    </p>
+                  </div>
+                  <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
+                    <StartAudioButton
+                      label={t("controls.enableAudio", { defaultValue: "Enable audio" })}
+                      variant="outline"
+                      className="sm:min-w-[170px]"
+                    />
+                    <Button
+                      onClick={handleStartInterview}
+                      disabled={starting}
+                      className="sm:min-w-[170px]"
+                    >
+                      {starting
+                        ? t("loading", { defaultValue: "Connecting..." })
+                        : t("startInterview", { defaultValue: "Start interview" })}
+                    </Button>
+                  </div>
+                </div>
+              </div>
             )}
+            <RoomAudioRenderer />
+            <ConnectionStateToast />
+          </LiveKitRoom>
+        </section>
 
-            <Box sx={{ height: { xs: "calc(100vh - 200px)", md: 720 }, borderRadius: 4, overflow: "hidden", bgcolor: "#0b1220", border: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)' }}>
-              <LiveKitRoom
-                token={participantToken}
-                serverUrl={liveKitUrl}
-                connect={connectRoom}
-                video={false} // Optimized for voice-first experience
-                audio={true}
-                data-lk-theme="default"
-                onDisconnected={handleEndInterview}
-              >
-                {connectRoom ? (
-                   <>
-                     <InterviewAgentView 
-                        onDisconnect={handleEndInterview} 
-                        sessionInfo={{
-                           jobName: session?.jobName,
-                           candidateName: session?.candidateName
-                        }}
-                     />
-                     <RoomAudioRenderer />
-                   </>
-                ) : (
-                  <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', p: 4 }}>
-                     <Stack spacing={4} alignItems="center" sx={{ maxWidth: 400, textAlign: 'center' }}>
-                        <Box sx={{ 
-                           width: 120, 
-                           height: 120, 
-                           borderRadius: '50%', 
-                           bgcolor: 'rgba(31, 213, 249, 0.1)', 
-                           display: 'grid', 
-                           placeItems: 'center',
-                           border: '2px dashed rgba(31, 213, 249, 0.3)'
-                        }}>
-                           <VideoCameraFrontIcon sx={{ fontSize: 60, color: '#1fd5f9' }} />
-                        </Box>
-                        <Stack spacing={1}>
-                           <Typography variant="h5" color="white" fontWeight={700}>
-                             Ready for your interview?
-                           </Typography>
-                           <Typography variant="body2" color="rgba(255,255,255,0.6)">
-                             Make sure your microphone is working. You will be connected to our AI interviewer.
-                           </Typography>
-                        </Stack>
-                        <Button
-                          variant="contained"
-                          size="large"
-                          fullWidth
-                          onClick={handleStartInterview}
-                          disabled={starting}
-                          sx={{ 
-                            borderRadius: 10, 
-                            py: 1.5, 
-                            bgcolor: '#1fd5f9',
-                            '&:hover': { bgcolor: '#18b2d1' },
-                            fontWeight: 700,
-                            letterSpacing: 1
-                          }}
-                        >
-                          {starting ? t("loading") : t("startInterview", { defaultValue: "JOIN INTERVIEW" })}
-                        </Button>
-                     </Stack>
-                  </Box>
-                )}
-                <ConnectionStateToast />
-              </LiveKitRoom>
-            </Box>
-          </Stack>
-        </Paper>
-
-        {session?.scheduledAt && (
-          <Typography variant="caption" sx={{ mt: 1, display: "block", color: "rgba(255,255,255,0.75)" }}>
-            {t("common:labels.time", { defaultValue: "Time" })}:{" "}
-            {new Date(session.scheduledAt).toLocaleString(i18n.language === "vi" ? "vi-VN" : "en-US")}
-          </Typography>
+        {formattedSchedule && (
+          <p className="text-xs text-slate-300">
+            {t("common:labels.time", { defaultValue: "Time" })}: {formattedSchedule}
+          </p>
         )}
-      </Container>
-    </Box>
+      </div>
+    </main>
   );
 };
 
