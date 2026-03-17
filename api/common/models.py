@@ -95,6 +95,8 @@ class Career(CommonBaseModel):
 
     app_icon_name = models.CharField(max_length=50, null=True)
 
+    is_hot = models.BooleanField(default=False)
+
     icon = models.OneToOneField("File", on_delete=models.SET_NULL, null=True)
 
     class Meta:

@@ -80,6 +80,7 @@ const AdminSettingsPage = lazy(() => import("../pages/adminPages/SettingsPage"))
 const AdminCareersPage = lazy(() => import("../pages/adminPages/CareersPage"));
 const AdminCitiesPage = lazy(() => import("../pages/adminPages/CitiesPage"));
 const AdminDistrictsPage = lazy(() => import("../pages/adminPages/DistrictsPage"));
+const AdminWardsPage = lazy(() => import("../pages/adminPages/WardsPage"));
 const AdminCompaniesPage = lazy(() => import("../pages/adminPages/CompaniesPage"));
 const AdminProfilesPage = lazy(() => import("../pages/adminPages/ProfilesPage"));
 const AdminResumesPage = lazy(() => import("../pages/adminPages/ResumesPage"));
@@ -830,6 +831,13 @@ const routesConfig = {
           path: ROUTES.ADMIN.DISTRICTS,
 
           element: AdminDistrictsPage,
+
+        },
+        {
+
+          path: ROUTES.ADMIN.WARDS,
+
+          element: AdminWardsPage,
 
         },
 

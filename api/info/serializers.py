@@ -1,4 +1,3 @@
-
 import datetime
 
 from datetime import date
@@ -27,24 +26,21 @@ from .models import (
 
     ResumeSaved,
 
-    EducationDetail,
+    EducationDetail, ExperienceDetail,
 
-    ExperienceDetail,
+    Certificate, LanguageSkill,
 
-    Certificate,
+    AdvancedSkill, Company,
 
-    LanguageSkill,
+    CompanyFollowed, CompanyImage,
 
-    AdvancedSkill,
+    CompanyRole, CompanyMember
 
-    Company,
+)
 
-    CompanyFollowed,
-
-    CompanyImage,
-    CompanyRole,
-    CompanyMember
-
+from job.models import (
+    JobPost,
+    JobPostActivity
 )
 
 from common.models import (
@@ -116,7 +112,6 @@ class CompanyImageSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
 
         # Extract the 'files' field from the validated data
-
         files = validated_data.pop('files', [])
 
         # Get the request from the context
@@ -2047,6 +2042,11 @@ class ResumeDetailSerializer(serializers.ModelSerializer):
 
         method_name='check_sent_email', read_only=True)
 
+    aiAnalysis = serializers.SerializerMethodField(
+
+        method_name='get_ai_analysis', read_only=True)
+
+
     def check_saved(self, resume):
 
         request = self.context.get('request', None)
@@ -2107,6 +2107,49 @@ class ResumeDetailSerializer(serializers.ModelSerializer):
 
         return contact_profile_exist
 
+    def get_ai_analysis(self, resume):
+
+        request = self.context.get('request', None)
+
+        if request is None:
+
+            return None
+
+        company = getattr(request.user, 'company', None)
+
+        if not company:
+
+            return None
+
+        # Get latest activity (application) for this resume for the current company
+
+        latest_activity = JobPostActivity.objects.filter(
+
+            resume=resume,
+
+            job_post__company=company
+
+        ).order_by('-create_at').first()
+
+        if latest_activity:
+
+            return {
+
+                'activityId': latest_activity.id,
+
+                'score': latest_activity.ai_analysis_score,
+
+                'summary': latest_activity.ai_analysis_summary,
+
+                'skills': latest_activity.ai_analysis_skills,
+
+                'status': latest_activity.ai_analysis_status
+
+            }
+
+        return None
+
+
     def get_cv_file_url(self, resume):
 
         cv_file = resume.file
@@ -2141,7 +2184,7 @@ class ResumeDetailSerializer(serializers.ModelSerializer):
 
                   "certificates", "languageSkills", "advancedSkills",
 
-                  "lastViewedDate", "isSentEmail")
+                  "lastViewedDate", "isSentEmail", "aiAnalysis")
 
 class SendMailToJobSeekerSerializer(serializers.Serializer):
 

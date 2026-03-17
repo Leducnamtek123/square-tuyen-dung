@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Pagination, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import React, { useRef, useState } from 'react';
+import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Pagination, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Switch } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
+import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useCareers } from './hooks/useCareers';
 import CareerTable from './components/CareerTable';
 
@@ -18,6 +19,10 @@ const CareersPage = () => {
     const [currentCareer, setCurrentCareer] = useState(null);
     const [careerName, setCareerName] = useState('');
     const [appIconName, setAppIconName] = useState('');
+    const [isHot, setIsHot] = useState(false);
+    const [iconFile, setIconFile] = useState(null);
+    const [iconPreviewUrl, setIconPreviewUrl] = useState('');
+    const iconInputRef = useRef(null);
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -43,6 +48,9 @@ const CareersPage = () => {
         setDialogMode('add');
         setCareerName('');
         setAppIconName('');
+        setIsHot(false);
+        setIconFile(null);
+        setIconPreviewUrl('');
         setCurrentCareer(null);
         setOpenDialog(true);
     };
@@ -52,6 +60,9 @@ const CareersPage = () => {
         setCurrentCareer(career);
         setCareerName(career.name);
         setAppIconName(career.appIconName || '');
+        setIsHot(!!career.isHot);
+        setIconFile(null);
+        setIconPreviewUrl(career.iconUrl || '');
         setOpenDialog(true);
     };
 
@@ -64,14 +75,33 @@ const CareersPage = () => {
         setOpenDialog(false);
     };
 
+    const handleChooseIcon = () => {
+        iconInputRef.current?.click();
+    };
+
+    const handleIconFileChange = (e) => {
+        const selectedFile = e.target.files?.[0];
+        if (!selectedFile) return;
+        setIconFile(selectedFile);
+        setIconPreviewUrl(URL.createObjectURL(selectedFile));
+    };
+
     const handleSave = async () => {
         if (!careerName.trim()) return;
 
+        const payload = new FormData();
+        payload.append('name', careerName.trim());
+        payload.append('app_icon_name', appIconName || '');
+        payload.append('is_hot', String(isHot));
+        if (iconFile) {
+            payload.append('iconFile', iconFile);
+        }
+
         try {
             if (dialogMode === 'add') {
-                await createCareer({ name: careerName, app_icon_name: appIconName });
+                await createCareer(payload);
             } else {
-                await updateCareer({ id: currentCareer.id, data: { name: careerName, app_icon_name: appIconName } });
+                await updateCareer({ id: currentCareer.id, data: payload });
             }
             handleCloseDialog();
         } catch (error) {
@@ -176,6 +206,37 @@ const CareersPage = () => {
                             value={appIconName}
                             onChange={(e) => setAppIconName(e.target.value)}
                         />
+                        <FormControlLabel
+                            control={<Switch checked={isHot} onChange={(e) => setIsHot(e.target.checked)} />}
+                            label={t('pages.careers.keyCareerLabel')}
+                        />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <input
+                                ref={iconInputRef}
+                                type="file"
+                                accept="image/*"
+                                hidden
+                                onChange={handleIconFileChange}
+                            />
+                            <Button
+                                variant="outlined"
+                                startIcon={<UploadFileIcon />}
+                                onClick={handleChooseIcon}
+                            >
+                                {t('pages.careers.uploadIconBtn')}
+                            </Button>
+                            <Typography variant="body2" color="text.secondary">
+                                {iconFile?.name || t('pages.careers.noIconSelected')}
+                            </Typography>
+                        </Box>
+                        {iconPreviewUrl ? (
+                            <Box
+                                component="img"
+                                src={iconPreviewUrl}
+                                alt="Career icon preview"
+                                sx={{ width: 64, height: 64, borderRadius: 2, objectFit: 'cover', border: '1px solid', borderColor: 'divider' }}
+                            />
+                        ) : null}
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>

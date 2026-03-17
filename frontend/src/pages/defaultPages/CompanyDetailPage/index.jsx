@@ -211,7 +211,7 @@ const CompanyDetailPage = () => {
                 src={
 
                   companyDetail?.companyCoverImageUrl ||
-
+                  IMAGES.companyCoverDefault ||
                   IMAGES.coverImageDefault
 
                 }
@@ -262,7 +262,7 @@ const CompanyDetailPage = () => {
 
                   <MuiImageCustom
 
-                    src={companyDetail.companyImageUrl}
+                    src={companyDetail.companyImageUrl || IMAGES.companyLogoDefault}
 
                     sx={{
 

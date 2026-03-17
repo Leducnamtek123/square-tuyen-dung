@@ -428,6 +428,17 @@ const DrawerContent = ({ isAdmin }) => {
                     isChild
 
                   />
+                  <MenuItem
+
+                    text={t('admin:sidebar.wardsManagement')}
+
+                    to={`/${ROUTES.ADMIN.WARDS}`}
+
+                    isSelected={location.pathname === `/${ROUTES.ADMIN.WARDS}`}
+
+                    isChild
+
+                  />
 
                 </List>
 

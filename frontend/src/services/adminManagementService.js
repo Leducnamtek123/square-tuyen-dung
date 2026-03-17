@@ -8,6 +8,13 @@ const withPresign = async (promise) => {
 
 const adminManagementService = {
 
+    buildMultipartConfig: (data) => {
+        if (data instanceof FormData) {
+            return { headers: { 'Content-Type': 'multipart/form-data' } };
+        }
+        return undefined;
+    },
+
     getCareers: (params = {}) => {
 
         const url = 'common/admin/careers/';
@@ -20,7 +27,7 @@ const adminManagementService = {
 
         const url = 'common/admin/careers/';
 
-        return withPresign(httpRequest.post(url, data));
+        return withPresign(httpRequest.post(url, data, adminManagementService.buildMultipartConfig(data)));
 
     },
 
@@ -28,7 +35,7 @@ const adminManagementService = {
 
         const url = `common/admin/careers/${id}/`;
 
-        return withPresign(httpRequest.patch(url, data));
+        return withPresign(httpRequest.patch(url, data, adminManagementService.buildMultipartConfig(data)));
 
     },
 
@@ -99,6 +106,38 @@ const adminManagementService = {
     deleteDistrict: (id) => {
 
         const url = `common/admin/districts/${id}/`;
+
+        return httpRequest.delete(url);
+
+    },
+
+    getWards: (params = {}) => {
+
+        const url = 'common/admin/wards/';
+
+        return withPresign(httpRequest.get(url, { params }));
+
+    },
+
+    createWard: (data) => {
+
+        const url = 'common/admin/wards/';
+
+        return withPresign(httpRequest.post(url, data));
+
+    },
+
+    updateWard: (id, data) => {
+
+        const url = `common/admin/wards/${id}/`;
+
+        return withPresign(httpRequest.patch(url, data));
+
+    },
+
+    deleteWard: (id) => {
+
+        const url = `common/admin/wards/${id}/`;
 
         return httpRequest.delete(url);
 

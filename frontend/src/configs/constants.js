@@ -43,6 +43,8 @@ import jobSeekerChatbotIcon from "../assets/icons/job_seeker_chatbot_icon.gif";
 import employerChatbotIcon from "../assets/icons/employer_chatbot_icon.gif";
 
 import coverImageDefault from "../assets/images/cover-image-default.webp";
+import companyLogoDefault from "../assets/images/company_logo_default.png";
+import companyCoverDefault from "../assets/images/company_cover_default.png";
 
 import chPlayDownload from "../assets/images/app-android-download.png";
 
@@ -276,7 +278,8 @@ const IMAGES = {
   appStoreDownload,
 
   notificationImageDefault,
-
+  companyLogoDefault,
+  companyCoverDefault,
 };
 
 const ABOUT_IMAGES = {
@@ -545,6 +548,8 @@ const ROUTES = {
     CITIES: "quan-ly-tinh-thanh",
 
     DISTRICTS: "quan-ly-quan-huyen",
+
+    WARDS: "quan-ly-phuong-xa",
 
     COMPANIES: "quan-ly-cong-ty",
 

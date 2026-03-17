@@ -13,4 +13,5 @@ export { default as ResumesPage } from './ResumesPage';
 export { default as JobActivityPage } from './JobActivityPage';
 export { default as JobNotificationsPage } from './JobNotificationsPage';
 export { default as DistrictsPage } from './DistrictsPage';
+export { default as WardsPage } from './WardsPage';
 export { default as QuestionGroupsPage } from './QuestionGroupsPage';

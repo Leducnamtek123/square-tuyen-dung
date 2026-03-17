@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip, Avatar } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip, Avatar, Chip } from "@mui/material";
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -16,6 +16,7 @@ const CareerTable = ({ data, onEdit, onDelete }) => {
                         <TableCell width={80}>{t('pages.careers.table.symbol')}</TableCell>
                         <TableCell>{t('pages.careers.table.careerName')}</TableCell>
                         <TableCell>{t('pages.careers.iconLabel')}</TableCell>
+                        <TableCell align="center">{t('pages.careers.keyCareerLabel')}</TableCell>
                         <TableCell align="center">{t('pages.careers.table.totalPosts')}</TableCell>
                         <TableCell align="right">{t('pages.careers.table.actions')}</TableCell>
                     </TableRow>
@@ -35,6 +36,11 @@ const CareerTable = ({ data, onEdit, onDelete }) => {
                             </TableCell>
                             <TableCell sx={{ fontWeight: 500 }}>{row.name}</TableCell>
                             <TableCell>{row.appIconName || '---'}</TableCell>
+                            <TableCell align="center">
+                                {row.isHot ? (
+                                    <Chip label={t('pages.careers.keyCareerBadge')} size="small" color="warning" />
+                                ) : '---'}
+                            </TableCell>
                             <TableCell align="center">{row.jobPostTotal || 0}</TableCell>
                             <TableCell align="right">
                                 <Tooltip title={t('pages.careers.table.edit')}>
@@ -52,7 +58,7 @@ const CareerTable = ({ data, onEdit, onDelete }) => {
                     ))}
                     {(!data || data.length === 0) && (
                         <TableRow>
-                            <TableCell colSpan={6} align="center" sx={{ py: 3 }}>
+                            <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
                                 {t('pages.careers.table.noData')}
                             </TableCell>
                         </TableRow>

@@ -34,7 +34,7 @@ import MuiImageCustom from "../MuiImageCustom";
 
 import { formatRoute } from "../../utils/funcUtils";
 
-import { ROUTES } from "../../configs/constants";
+import { ROUTES, IMAGES } from "../../configs/constants";
 
 import TimeAgo from '../TimeAgo';
 
@@ -172,7 +172,7 @@ const JobPostLarge = ({
 
               height={100}
 
-              src={companyImageUrl}
+              src={companyImageUrl || IMAGES.companyLogoDefault}
 
               sx={{
 

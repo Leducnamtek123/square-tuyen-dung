@@ -1,5 +1,9 @@
 
 from rest_framework import serializers
+from django.conf import settings
+from django.db import transaction
+from helpers import helper
+from helpers.cloudinary_service import CloudinaryService
 
 from .models import (
 
@@ -11,7 +15,8 @@ from .models import (
 
     City,
 
-    Ward
+    Ward,
+    File
 
 )
 
@@ -21,7 +26,7 @@ class CitySerializer(serializers.ModelSerializer):
 
         model = City
 
-        fields = ('id', 'name', 'create_at', 'update_at')
+        fields = ('id', 'name', 'code', 'create_at', 'update_at')
 
 class DistrictSerializer(serializers.ModelSerializer):
 
@@ -29,7 +34,7 @@ class DistrictSerializer(serializers.ModelSerializer):
 
         model = District
 
-        fields = ('id', 'name', 'city')
+        fields = ('id', 'name', 'code', 'city')
 
 class WardSerializer(serializers.ModelSerializer):
 
@@ -37,7 +42,7 @@ class WardSerializer(serializers.ModelSerializer):
 
         model = Ward
 
-        fields = ('id', 'name', 'district')
+        fields = ('id', 'name', 'code', 'district')
 
 class CareerSerializer(serializers.ModelSerializer):
 
@@ -45,11 +50,15 @@ class CareerSerializer(serializers.ModelSerializer):
 
     iconUrl = serializers.SerializerMethodField(method_name='get_icon_url', read_only=True)
 
-    appIconName = serializers.CharField(source='app_icon_name', read_only=True)
+    appIconName = serializers.CharField(source='app_icon_name', required=False, allow_blank=True, allow_null=True)
 
-    createAt = serializers.DateTimeField(source='create_at')
+    isHot = serializers.BooleanField(source='is_hot', required=False)
 
-    updateAt = serializers.DateTimeField(source='update_at')
+    iconFile = serializers.ImageField(write_only=True, required=False)
+
+    createAt = serializers.DateTimeField(source='create_at', read_only=True)
+
+    updateAt = serializers.DateTimeField(source='update_at', read_only=True)
 
     jobPostTotal = serializers.SerializerMethodField(method_name='get_job_post_total')
 
@@ -77,11 +86,60 @@ class CareerSerializer(serializers.ModelSerializer):
 
         return career.job_posts.count()
 
+    def _upload_icon(self, instance, icon_file):
+
+        if not icon_file:
+            return instance
+
+        public_id = None
+        if instance.icon:
+            path_list = instance.icon.public_id.split('/')
+            public_id = path_list[-1] if path_list else None
+
+        upload_result = CloudinaryService.upload_image(
+            icon_file,
+            settings.CLOUDINARY_DIRECTORY["career_image"],
+            public_id=public_id
+        )
+
+        instance.icon = File.update_or_create_file_with_cloudinary(
+            instance.icon,
+            upload_result,
+            File.CAREER_IMAGE_TYPE
+        )
+        instance.save()
+        return instance
+
+    def create(self, validated_data):
+        icon_file = validated_data.pop("iconFile", None)
+        try:
+            with transaction.atomic():
+                career = Career.objects.create(**validated_data)
+                self._upload_icon(career, icon_file)
+                return career
+        except Exception as ex:
+            helper.print_log_error("career_serializer_create", ex)
+            raise
+
+    def update(self, instance, validated_data):
+        icon_file = validated_data.pop("iconFile", None)
+        try:
+            with transaction.atomic():
+                instance.name = validated_data.get("name", instance.name)
+                instance.app_icon_name = validated_data.get("app_icon_name", instance.app_icon_name)
+                instance.is_hot = validated_data.get("is_hot", instance.is_hot)
+                instance.save()
+                self._upload_icon(instance, icon_file)
+                return instance
+        except Exception as ex:
+            helper.print_log_error("career_serializer_update", ex)
+            raise
+
     class Meta:
 
         model = Career
 
-        fields = ('id', 'name', 'iconUrl', 'appIconName', 'createAt', 'updateAt', 'jobPostTotal')
+        fields = ('id', 'name', 'iconUrl', 'iconFile', 'appIconName', 'isHot', 'createAt', 'updateAt', 'jobPostTotal')
 
 class ProfileDistrictSerializers(serializers.ModelSerializer):
 

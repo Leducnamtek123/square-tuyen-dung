@@ -665,6 +665,8 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
         if settings.AI_RESUME_AUTO_ANALYZE:
             try:
                 from ..tasks import analyze_resume_ai
+                job_post_activity.ai_analysis_status = 'processing'
+                job_post_activity.save()
                 analyze_resume_ai.delay(job_post_activity.id)
             except Exception as ex:
                 helper.print_log_error("auto analyze resume", ex)
@@ -1040,9 +1042,9 @@ class EmployerJobPostActivityViewSet(viewsets.ViewSet,
                 return Response(status=status.HTTP_403_FORBIDDEN)
 
             from ..tasks import analyze_resume_ai
-
+            job_post_activity.ai_analysis_status = 'processing'
+            job_post_activity.save()
             analyze_resume_ai.delay(job_post_activity.id)
-
             return Response({"detail": "AI analysis task has been queued."}, status=status.HTTP_202_ACCEPTED)
 
         except Exception as ex:

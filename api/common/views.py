@@ -64,7 +64,7 @@ class AdminCareerViewSet(viewsets.ModelViewSet):
 
         if self.action in ['list', 'retrieve']:
 
-            kwargs['fields'] = ['id', 'name', 'appIconName', 'jobPostTotal', 'createAt', 'updateAt']
+            kwargs['fields'] = ['id', 'name', 'iconUrl', 'appIconName', 'isHot', 'jobPostTotal', 'createAt', 'updateAt']
 
         return super().get_serializer(*args, **kwargs)
 
@@ -389,13 +389,23 @@ def get_top_10_careers(request):
 
     try:
 
-        queryset = Career.objects.annotate(num_job_posts=Count(
+        hot_qs = Career.objects.filter(is_hot=True).annotate(
+            num_job_posts=Count('job_posts')
+        ).order_by('-num_job_posts', 'id')
+        hot_ids = list(hot_qs.values_list('id', flat=True))
 
-            'job_posts')).order_by('-num_job_posts')[:10]
+        remaining = max(0, 10 - len(hot_ids))
+        normal_qs = Career.objects.exclude(id__in=hot_ids).annotate(
+            num_job_posts=Count('job_posts')
+        ).order_by('-num_job_posts', 'id')[:remaining]
 
-        serializer = CareerSerializer(queryset, many=True, fields=[
+        queryset = list(hot_qs[:10]) + list(normal_qs)
 
-                                      'id', 'name', 'iconUrl', 'jobPostTotal'])
+        serializer = CareerSerializer(
+            queryset,
+            many=True,
+            fields=['id', 'name', 'iconUrl', 'isHot', 'jobPostTotal']
+        )
 
     except Exception as ex:
 
@@ -429,13 +439,13 @@ def get_all_careers(request):
 
             serializer = CareerSerializer(page, many=True, fields=[
 
-                                          'id', 'name', 'appIconName', 'jobPostTotal'])
+                                          'id', 'name', 'appIconName', 'isHot', 'jobPostTotal'])
 
             return paginator.get_paginated_response(serializer.data)
 
         serializer = CareerSerializer(queryset, many=True, fields=[
 
-                                      'id', 'name', 'appIconName', 'jobPostTotal'])
+                                      'id', 'name', 'appIconName', 'isHot', 'jobPostTotal'])
 
         return var_res.response_data(data=serializer.data)
 

@@ -16,6 +16,7 @@ const CitiesPage = () => {
     const [dialogMode, setDialogMode] = useState('add'); // 'add' or 'edit'
     const [currentCity, setCurrentCity] = useState(null);
     const [cityName, setCityName] = useState('');
+    const [cityCode, setCityCode] = useState('');
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -31,6 +32,7 @@ const CitiesPage = () => {
     const handleOpenAdd = () => {
         setDialogMode('add');
         setCityName('');
+        setCityCode('');
         setCurrentCity(null);
         setOpenDialog(true);
     };
@@ -39,6 +41,7 @@ const CitiesPage = () => {
         setDialogMode('edit');
         setCurrentCity(city);
         setCityName(city.name);
+        setCityCode(city.code || '');
         setOpenDialog(true);
     };
 
@@ -56,9 +59,9 @@ const CitiesPage = () => {
 
         try {
             if (dialogMode === 'add') {
-                await createCity({ name: cityName });
+                await createCity({ name: cityName, code: cityCode || null });
             } else {
-                await updateCity({ id: currentCity.id, data: { name: cityName } });
+                await updateCity({ id: currentCity.id, data: { name: cityName, code: cityCode || null } });
             }
             handleCloseDialog();
         } catch (error) {
@@ -113,6 +116,7 @@ const CitiesPage = () => {
                                     <TableRow>
                                         <TableCell width={80}>{t('pages.cities.table.id')}</TableCell>
                                         <TableCell>{t('pages.cities.table.cityName')}</TableCell>
+                                        <TableCell>{t('pages.cities.table.code')}</TableCell>
                                         <TableCell align="right">{t('pages.cities.table.actions')}</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -121,6 +125,7 @@ const CitiesPage = () => {
                                         <TableRow key={row.id} hover>
                                             <TableCell>{row.id}</TableCell>
                                             <TableCell sx={{ fontWeight: 500 }}>{row.name}</TableCell>
+                                            <TableCell>{row.code || '---'}</TableCell>
                                             <TableCell align="right">
                                                 <Tooltip title={t('pages.cities.table.edit')}>
                                                     <IconButton size="small" color="primary" onClick={() => handleOpenEdit(row)}>
@@ -137,7 +142,7 @@ const CitiesPage = () => {
                                     ))}
                                     {(!data || (data.results || data).length === 0) && (
                                         <TableRow>
-                                            <TableCell colSpan={3} align="center" sx={{ py: 3 }}>
+                                            <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
                                                 {t('pages.cities.table.noData')}
                                             </TableCell>
                                         </TableRow>
@@ -171,13 +176,19 @@ const CitiesPage = () => {
                     {dialogMode === 'add' ? t('pages.cities.addConfirmTitle') : t('pages.cities.editConfirmTitle')}
                 </DialogTitle>
                 <DialogContent>
-                    <Box sx={{ pt: 1 }}>
+                    <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
                         <TextField
                             label={t('pages.cities.cityNameLabel')}
                             fullWidth
                             value={cityName}
                             onChange={(e) => setCityName(e.target.value)}
                             required
+                        />
+                        <TextField
+                            label={t('pages.cities.cityCodeLabel')}
+                            fullWidth
+                            value={cityCode}
+                            onChange={(e) => setCityCode(e.target.value)}
                         />
                     </Box>
                 </DialogContent>
