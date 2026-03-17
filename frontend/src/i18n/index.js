@@ -56,9 +56,21 @@ const resources = {
   }
 };
 
+const normalizeLanguage = (lang) => {
+  if (!lang) return "vi";
+  const code = lang.split("-")[0].split("_")[0].toLowerCase();
+  return code === "en" ? "en" : "vi";
+};
+
+const getInitialLanguage = () => {
+  if (typeof window === "undefined") return "vi";
+  const saved = window.localStorage?.getItem("i18nextLng");
+  return normalizeLanguage(saved);
+};
+
 i18n.use(initReactI18next).init({
   resources,
-  lng: 'vi', // default language
+  lng: getInitialLanguage(),
   fallbackLng: 'en',
   ns: ["common", "admin", "employer", "jobSeeker", "auth", "public", "errors", "chat", "candidate", "interview", "about"],
   defaultNS: 'common',

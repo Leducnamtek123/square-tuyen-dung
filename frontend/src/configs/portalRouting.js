@@ -24,13 +24,7 @@ const ADMIN_PREFIXES = ["/admin", "/quan-tri"];
 export const getPreferredLanguage = () => {
   const i18nLanguage =
     typeof window !== "undefined" ? window.localStorage?.getItem("i18nextLng") : null;
-  if (i18nLanguage) {
-    return normalizeLanguage(i18nLanguage);
-  }
-  if (typeof navigator !== "undefined" && navigator.language) {
-    return normalizeLanguage(navigator.language);
-  }
-  return "vi";
+  return normalizeLanguage(i18nLanguage || "vi");
 };
 
 export const getPortalPrefix = (portal, language) => {
@@ -98,4 +92,3 @@ export const normalizePortalPath = (pathname = "/", language = "vi") => {
   const childPath = stripPortalPrefix(pathname);
   return buildPortalPath(portal, childPath, language);
 };
-

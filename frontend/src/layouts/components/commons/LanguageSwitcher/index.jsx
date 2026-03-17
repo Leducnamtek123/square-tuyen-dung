@@ -39,6 +39,7 @@ const LanguageSwitcher = ({ color = 'white' }) => {
   };
 
   const changeLanguage = (lng) => {
+    window.localStorage?.setItem('i18nextLng', lng);
     const localizedPath = localizeRoutePath(location.pathname, lng);
     const portal = detectPortalFromPath(window.location.pathname || '/');
     if (portal !== 'jobseeker') {
