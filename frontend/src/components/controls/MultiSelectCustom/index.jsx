@@ -13,8 +13,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
 import { Typography } from "@mui/material";
-
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ValidationError from '../ValidationError';
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 
@@ -121,29 +120,7 @@ const MultiSelectCustom = ({
             />
 
             {fieldState.invalid && (
-
-              <span
-
-                style={{
-
-                  color: 'red',
-
-                  fontSize: 13,
-
-                  marginTop: 1,
-
-                  marginLeft: 1,
-
-                }}
-
-              >
-
-                <ErrorOutlineIcon fontSize="small" />{' '}
-
-                {fieldState.error?.message}
-
-              </span>
-
+              <ValidationError message={fieldState.error?.message} />
             )}
 
           </>

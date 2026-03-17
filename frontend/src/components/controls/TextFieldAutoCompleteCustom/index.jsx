@@ -3,8 +3,7 @@ import React from 'react';
 import { Controller } from 'react-hook-form';
 
 import { Autocomplete, TextField, Typography } from "@mui/material";
-
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ValidationError from '../ValidationError';
 
 const TextFieldAutoCompleteCustom = ({
 
@@ -127,29 +126,7 @@ const TextFieldAutoCompleteCustom = ({
             />
 
             {fieldState.invalid && (
-
-              <span
-
-                style={{
-
-                  color: 'red',
-
-                  fontSize: 13,
-
-                  marginTop: 1,
-
-                  marginLeft: 1,
-
-                }}
-
-              >
-
-                <ErrorOutlineIcon fontSize="small" />{' '}
-
-                {fieldState.error?.message}
-
-              </span>
-
+              <ValidationError message={fieldState.error?.message} />
             )}
 
           </>

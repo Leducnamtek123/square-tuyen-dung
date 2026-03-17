@@ -11,8 +11,7 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import { FormLabel, Typography } from "@mui/material";
 
 import FormControl from '@mui/material/FormControl';
-
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ValidationError from '../ValidationError';
 
 const RadioCustom = ({
 
@@ -89,29 +88,7 @@ const RadioCustom = ({
               </RadioGroup>
 
               {fieldState.invalid && (
-
-                <span
-
-                  style={{
-
-                    color: 'red',
-
-                    fontSize: 13,
-
-                    marginTop: 1,
-
-                    marginLeft: 1,
-
-                  }}
-
-                >
-
-                  <ErrorOutlineIcon fontSize="small" />{' '}
-
-                  {fieldState.error?.message}
-
-                </span>
-
+                <ValidationError message={fieldState.error?.message} />
               )}
 
             </FormControl>

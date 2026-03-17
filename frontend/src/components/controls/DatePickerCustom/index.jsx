@@ -7,8 +7,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from '../../../configs/moment-config';
 
 import { Typography } from "@mui/material";
-
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ValidationError from '../ValidationError';
 
 const DatePickerCustom = ({
 
@@ -125,29 +124,7 @@ const DatePickerCustom = ({
             </div>
 
             {fieldState.invalid && (
-
-              <span
-
-                style={{
-
-                  color: 'red',
-
-                  fontSize: 13,
-
-                  marginTop: 1,
-
-                  marginLeft: 1,
-
-                }}
-
-              >
-
-                <ErrorOutlineIcon fontSize="small" />{' '}
-
-                {fieldState.error?.message}
-
-              </span>
-
+              <ValidationError message={fieldState.error?.message} />
             )}
 
           </>

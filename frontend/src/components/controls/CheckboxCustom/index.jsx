@@ -3,8 +3,7 @@ import React from 'react';
 import { Controller } from 'react-hook-form';
 
 import { Checkbox, FormControlLabel } from "@mui/material";
-
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ValidationError from '../ValidationError';
 
 const CheckboxCustom = ({ name, control, title = '', disabled = false }) => {
 
@@ -35,29 +34,7 @@ const CheckboxCustom = ({ name, control, title = '', disabled = false }) => {
             />
 
             {fieldState.invalid && (
-
-              <span
-
-                style={{
-
-                  color: 'red',
-
-                  fontSize: 13,
-
-                  marginTop: 1,
-
-                  marginLeft: 1,
-
-                }}
-
-              >
-
-                <ErrorOutlineIcon fontSize="small" />{' '}
-
-                {fieldState.error?.message}
-
-              </span>
-
+              <ValidationError message={fieldState.error?.message} />
             )}
 
           </>

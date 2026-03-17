@@ -3,10 +3,8 @@ import React from 'react';
 import { Controller } from 'react-hook-form';
 
 import { Box, InputAdornment, OutlinedInput, Typography } from "@mui/material";
-
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import ValidationError from '../ValidationError';
 
 const PasswordTextFieldCustom = ({
 
@@ -99,29 +97,7 @@ const PasswordTextFieldCustom = ({
             />
 
             {fieldState.invalid && (
-
-              <span
-
-                style={{
-
-                  color: 'red',
-
-                  fontSize: 13,
-
-                  marginTop: 1,
-
-                  marginLeft: 1,
-
-                }}
-
-              >
-
-                <ErrorOutlineIcon fontSize="small" />{' '}
-
-                {fieldState.error?.message}
-
-              </span>
-
+              <ValidationError message={fieldState.error?.message} />
             )}
 
           </>
