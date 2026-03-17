@@ -1,9 +1,11 @@
 
+import datetime
+
 from configs import variable_system as var_sys
 
 from configs import variable_response as var_res, renderers, paginations
 
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Prefetch
 
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -39,7 +41,7 @@ from ..models import (
 
 from ..filters import (
 
-    CompanyFilter
+    CompanyFilter, AliasedOrderingFilter
 
 )
 
@@ -99,7 +101,12 @@ class JobSeekerProfileViewSet(viewsets.ViewSet,
 
             raise Exception("User doesn't have job_seeker_profile.")
 
-        resumes = job_seeker_profile.resumes
+        resumes = job_seeker_profile.resumes.select_related(
+            'user', 'job_seeker_profile', 'file'
+        ).prefetch_related(
+            'experience_details', 'education_details', 'certificates',
+            'language_skills', 'advanced_skills'
+        )
 
         # get all
 
@@ -585,7 +592,9 @@ class CompanyViewSet(viewsets.ViewSet,
 
                      generics.RetrieveAPIView):
 
-    queryset = Company.objects
+    queryset = Company.objects.select_related(
+        'user', 'logo', 'cover_image', 'location', 'location__city'
+    ).prefetch_related('company_images', 'company_images__image')
 
     serializer_class = CompanySerializer
 
@@ -597,7 +606,10 @@ class CompanyViewSet(viewsets.ViewSet,
 
     filterset_class = CompanyFilter
 
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, AliasedOrderingFilter]
+
+    ordering_fields = (('updateAt', 'update_at'), ('createAt', 'create_at'))
+
 
     def get_permissions(self):
 
@@ -608,10 +620,22 @@ class CompanyViewSet(viewsets.ViewSet,
         return [perms_sys.AllowAny()]
 
     def list(self, request, *args, **kwargs):
-
-        queryset = self.filter_queryset(self.get_queryset()
-
-                                        .order_by('-id', 'update_at', 'create_at'))
+        queryset = self.filter_queryset(self.get_queryset()).annotate(
+            follow_count=Count('companyfollowed', distinct=True),
+            active_job_post_count=Count(
+                'job_posts',
+                filter=Q(
+                    job_posts__deadline__gte=datetime.date.today(),
+                    job_posts__status=var_sys.JOB_POST_STATUS[2][0]
+                ),
+                distinct=True
+            ),
+        )
+        if request.user.is_authenticated:
+            queryset = queryset.prefetch_related(
+                Prefetch('companyfollowed_set', queryset=CompanyFollowed.objects.filter(user=request.user))
+            )
+        queryset = queryset.order_by('-id', 'update_at', 'create_at')
 
         page = self.paginate_queryset(queryset)
 

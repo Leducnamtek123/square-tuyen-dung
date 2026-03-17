@@ -12,6 +12,7 @@ export const useQuestionGroups = (params) => {
             return res;
         },
         placeholderData: keepPreviousData,
+        retry: false,
     });
 
     const createMutation = useMutation({

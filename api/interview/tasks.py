@@ -170,21 +170,30 @@ def evaluate_interview_session(session_id):
             if resp.status_code == 200:
                 content = resp.json()['choices'][0]['message']['content']
                 
-                # Làm sạch content nếu LLM trả về markdown block
-                if "```json" in content:
-                    content = content.split("```json")[1].split("```")[0].strip()
-                elif "```" in content:
-                    content = content.split("```")[1].split("```")[0].strip()
+                # Regex-based extraction is more robust than simple split
+                import re
+                json_match = re.search(r'```json\s*(.*?)\s*```', content, re.DOTALL)
+                if not json_match:
+                    json_match = re.search(r'```\s*(.*?)\s*```', content, re.DOTALL)
                 
-                eval_data = json.loads(content)
+                clean_json_str = json_match.group(1) if json_match else content.strip()
+                
+                try:
+                    eval_data = json.loads(clean_json_str)
+                except json.JSONDecodeError:
+                    # Fallback to simple cleanup if regex fails or still invalid
+                    content_clean = content.replace("```json", "").replace("```", "").strip()
+                    eval_data = json.loads(content_clean)
                 
                 # Cập nhật kết quả vào database
                 session.ai_overall_score = eval_data.get('overall_score', 0)
                 session.ai_technical_score = eval_data.get('technical_score', 0)
                 session.ai_communication_score = eval_data.get('communication_score', 0)
                 session.ai_summary = eval_data.get('summary', '')
-                session.ai_strengths = "\n".join(eval_data.get('strengths', []))
-                session.ai_weaknesses = "\n".join(eval_data.get('weaknesses', []))
+                
+                # Lưu trực tiếp dạng list vào JSONField thay vì join string
+                session.ai_strengths = eval_data.get('strengths', [])
+                session.ai_weaknesses = eval_data.get('weaknesses', [])
                 session.save()
                 
                 logger.info(f"AI Evaluation for Session {session_id} completed successfully. Score: {session.ai_overall_score}")

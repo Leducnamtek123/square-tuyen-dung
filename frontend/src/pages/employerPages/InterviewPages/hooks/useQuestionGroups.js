@@ -11,6 +11,7 @@ export const useQuestionGroups = (params) => {
         queryKey: ['employer-question-groups', params],
         queryFn: () => questionGroupService.getQuestionGroups(params),
         placeholderData: keepPreviousData,
+        retry: false,
     });
 
     const createMutation = useMutation({

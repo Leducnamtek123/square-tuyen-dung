@@ -135,7 +135,8 @@ class InterviewSession(InterviewBaseModel):
         max_length=20,
         choices=STATUS_CHOICES,
         default='draft',
-        verbose_name="Trạng thái"
+        verbose_name="Trạng thái",
+        db_index=True
     )
     type = models.CharField(
         max_length=20,
@@ -146,7 +147,8 @@ class InterviewSession(InterviewBaseModel):
 
     scheduled_at = models.DateTimeField(
         blank=True, null=True,
-        verbose_name="Thời gian dự kiến"
+        verbose_name="Thời gian dự kiến",
+        db_index=True
     )
     start_time = models.DateTimeField(
         blank=True, null=True,

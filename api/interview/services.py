@@ -42,6 +42,11 @@ def _build_public_livekit_url(request) -> str:
 
 
 def create_livekit_participant_token(session: InterviewSession, request) -> Dict[str, str]:
+    # Security: Chỉ cấp token nếu status là 'scheduled', 'calibration' hoặc 'in_progress'
+    allowed_statuses = ("scheduled", "calibration", "in_progress")
+    if session.status not in allowed_statuses:
+        raise ValueError(f"Không thể tham gia buổi phỏng vấn này vì trạng thái hiện tại là: {session.get_status_display()}")
+
     participant_identity = f"candidate-{session.candidate_id}"
     participant_name = session.candidate.full_name or session.candidate.email or participant_identity
     LiveKitService.ensure_room_with_agent(session.room_name)

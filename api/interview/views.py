@@ -8,6 +8,7 @@ from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.db.models import Count
+from django.core.exceptions import ObjectDoesNotExist
 
 from .models import (
     Question, QuestionGroup,
@@ -55,7 +56,7 @@ class InterviewStatisticViewSet(viewsets.ViewSet):
         return Response(data)
 
 class QuestionViewSet(viewsets.ModelViewSet):
-    queryset = Question.objects.all()
+    queryset = Question.objects.select_related('career', 'career__icon', 'company', 'author').all()
     serializer_class = QuestionSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['career', 'difficulty']
@@ -66,22 +67,32 @@ class QuestionViewSet(viewsets.ModelViewSet):
         user = self.request.user
         qs = super().get_queryset()
         role = getattr(user, 'role_name', None)
+        company = self._resolve_company(user)
 
-        if role == 'EMPLOYER' and hasattr(user, 'company') and user.company:
+        if role == 'EMPLOYER' and company:
             from django.db.models import Q
-            return qs.filter(Q(company__isnull=True) | Q(company=user.company))
+            return qs.filter(Q(company__isnull=True) | Q(company=company))
         return qs
+
+    def _resolve_company(self, user):
+        try:
+            return getattr(user, 'company', None)
+        except ObjectDoesNotExist:
+            return None
+        except Exception:
+            return None
 
     def perform_create(self, serializer):
         user = self.request.user
         role = getattr(user, 'role_name', None)
-        if role == 'EMPLOYER' and hasattr(user, 'company') and user.company:
-            serializer.save(author=user, company=user.company)
+        company = self._resolve_company(user)
+        if role == 'EMPLOYER' and company:
+            serializer.save(author=user, company=company)
         else:
             serializer.save(author=user)
 
 class QuestionGroupViewSet(viewsets.ModelViewSet):
-    queryset = QuestionGroup.objects.prefetch_related('questions').all()
+    queryset = QuestionGroup.objects.prefetch_related('questions', 'questions__career', 'questions__career__icon').select_related('company', 'author').all()
     serializer_class = QuestionGroupSerializer
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['name', 'description']
@@ -91,17 +102,27 @@ class QuestionGroupViewSet(viewsets.ModelViewSet):
         user = self.request.user
         qs = super().get_queryset()
         role = getattr(user, 'role_name', None)
+        company = self._resolve_company(user)
 
-        if role == 'EMPLOYER' and hasattr(user, 'company') and user.company:
+        if role == 'EMPLOYER' and company:
             from django.db.models import Q
-            return qs.filter(Q(company__isnull=True) | Q(company=user.company))
+            return qs.filter(Q(company__isnull=True) | Q(company=company))
         return qs
+
+    def _resolve_company(self, user):
+        try:
+            return getattr(user, 'company', None)
+        except ObjectDoesNotExist:
+            return None
+        except Exception:
+            return None
 
     def perform_create(self, serializer):
         user = self.request.user
         role = getattr(user, 'role_name', None)
-        if role == 'EMPLOYER' and hasattr(user, 'company') and user.company:
-            serializer.save(author=user, company=user.company)
+        company = self._resolve_company(user)
+        if role == 'EMPLOYER' and company:
+            serializer.save(author=user, company=company)
         else:
             serializer.save(author=user)
 

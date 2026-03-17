@@ -6,6 +6,21 @@ const withPresign = async (promise) => {
     return presignInObject(data);
 };
 
+const normalizeInterviewListParams = (params = {}) => {
+    const normalized = { ...params };
+    if (normalized.kw && !normalized.search) {
+        normalized.search = normalized.kw;
+        delete normalized.kw;
+    }
+    Object.keys(normalized).forEach((key) => {
+        const value = normalized[key];
+        if (value === undefined || value === null || value === '') {
+            delete normalized[key];
+        }
+    });
+    return normalized;
+};
+
 const adminManagementService = {
 
     buildMultipartConfig: (data) => {
@@ -335,7 +350,7 @@ const adminManagementService = {
 
         const url = 'interview/web/question-groups/';
 
-        return httpRequest.get(url, { params });
+        return httpRequest.get(url, { params: normalizeInterviewListParams(params) });
 
     },
 

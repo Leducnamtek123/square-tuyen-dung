@@ -204,14 +204,6 @@ const InterviewCreateCard = ({ title }) => {
 
                             ? res
 
-                            : Array.isArray(res?.data?.results)
-
-                                ? res.data.results
-
-                                : Array.isArray(res?.data)
-
-                                    ? res.data
-
                                     : [];
 
                     setCandidates(rawCandidates.map(transformAppliedResume).filter(Boolean));

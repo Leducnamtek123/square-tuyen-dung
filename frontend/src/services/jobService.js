@@ -4,7 +4,7 @@ const jobService = {
 
   searchJobSuggestTitle: (kw) => {
 
-    const url = 'job/web/seach/job-suggest-title/';
+    const url = 'job/web/search/job-suggest-title/';
 
     return httpRequest.get(url, { params: { q: kw } });
 
@@ -108,7 +108,7 @@ const jobService = {
 
   saveJobPost: (slug) => {
 
-    const url = `job/web/job-posts/${slug}/job-saved/`;
+    const url = `job/web/job-posts/${slug}/save/`;
 
     return httpRequest.post(url);
 

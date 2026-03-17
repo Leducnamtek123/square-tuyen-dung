@@ -23,31 +23,51 @@ from .models import (
 
 class JobPostFilter(django_filters.FilterSet):
 
+    class NumberInFilter(django_filters.BaseInFilter, django_filters.NumberFilter):
+        pass
+
+    class ChoiceInFilter(django_filters.BaseInFilter, django_filters.ChoiceFilter):
+        pass
+
     kw = django_filters.CharFilter(method="job_name_or_career_name")
 
     careerId = django_filters.NumberFilter(field_name='career')
+    careerIds = NumberInFilter(field_name='career', lookup_expr='in')
 
     cityId = django_filters.NumberFilter(field_name='location__city')
+    cityIds = NumberInFilter(field_name='location__city', lookup_expr='in')
 
     districtId = django_filters.NumberFilter(field_name='location__district')
+    districtIds = NumberInFilter(field_name='location__district', lookup_expr='in')
 
     wardId = django_filters.NumberFilter(field_name='location__ward')
+    wardIds = NumberInFilter(field_name='location__ward', lookup_expr='in')
 
     positionId = django_filters.ChoiceFilter(choices=var_sys.POSITION_CHOICES, field_name='position')
+    positionIds = ChoiceInFilter(choices=var_sys.POSITION_CHOICES, field_name='position', lookup_expr='in')
 
     experienceId = django_filters.ChoiceFilter(choices=var_sys.EXPERIENCE_CHOICES, field_name='experience')
+    experienceIds = ChoiceInFilter(choices=var_sys.EXPERIENCE_CHOICES, field_name='experience', lookup_expr='in')
 
     typeOfWorkplaceId = django_filters.ChoiceFilter(choices=var_sys.TYPE_OF_WORKPLACE_CHOICES,
 
                                                     field_name='type_of_workplace')
+    typeOfWorkplaceIds = ChoiceInFilter(
+        choices=var_sys.TYPE_OF_WORKPLACE_CHOICES,
+        field_name='type_of_workplace',
+        lookup_expr='in'
+    )
 
     jobTypeId = django_filters.ChoiceFilter(choices=var_sys.JOB_TYPE_CHOICES, field_name='job_type')
+    jobTypeIds = ChoiceInFilter(choices=var_sys.JOB_TYPE_CHOICES, field_name='job_type', lookup_expr='in')
 
     genderId = django_filters.ChoiceFilter(choices=var_sys.GENDER_CHOICES, field_name='gender_required')
+    genderIds = ChoiceInFilter(choices=var_sys.GENDER_CHOICES, field_name='gender_required', lookup_expr='in')
 
     isUrgent = django_filters.BooleanFilter(field_name='is_urgent')
 
     statusId = django_filters.ChoiceFilter(choices=var_sys.JOB_POST_STATUS, field_name="status")
+    statusIds = ChoiceInFilter(choices=var_sys.JOB_POST_STATUS, field_name="status", lookup_expr='in')
 
     excludeSlug = django_filters.CharFilter(method="exclude_slug")
 
@@ -61,7 +81,10 @@ class JobPostFilter(django_filters.FilterSet):
 
                   'experienceId', 'typeOfWorkplaceId', 'jobTypeId',
 
-                  'genderId', 'isUrgent', 'statusId', 'excludeSlug', 'companyId']
+                  'genderId', 'isUrgent', 'statusId', 'excludeSlug', 'companyId',
+                  'careerIds', 'cityIds', 'districtIds', 'wardIds', 'positionIds',
+                  'experienceIds', 'typeOfWorkplaceIds', 'jobTypeIds', 'genderIds',
+                  'statusIds']
 
     def job_name_or_career_name(self, queryset, name, value):
 

@@ -10,6 +10,7 @@ export const useQuestions = (params) => {
             return res;
         },
         placeholderData: keepPreviousData,
+        retry: false,
     });
 };
 

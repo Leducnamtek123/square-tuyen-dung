@@ -48,9 +48,9 @@ const jobPostNotificationService = {
 
   active: (id) => {
 
-    const url = `job/web/job-post-notifications/${id}/active/`;
+    const url = `job/web/job-post-notifications/${id}/`;
 
-    return httpRequest.put(url);
+    return httpRequest.patch(url, {});
 
   },
 

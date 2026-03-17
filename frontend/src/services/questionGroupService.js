@@ -10,6 +10,18 @@ const normalizeParams = (params = {}) => {
         delete normalized.page_size;
     }
 
+    if (normalized.kw && !normalized.search) {
+        normalized.search = normalized.kw;
+        delete normalized.kw;
+    }
+
+    Object.keys(normalized).forEach((key) => {
+        const value = normalized[key];
+        if (value === undefined || value === null || value === '') {
+            delete normalized[key];
+        }
+    });
+
     return normalized;
 };
 

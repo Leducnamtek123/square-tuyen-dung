@@ -3,6 +3,7 @@ Interview Module — DRF Serializers
 """
 
 from rest_framework import serializers
+from django.core.exceptions import ObjectDoesNotExist
 from .models import (
     Question, QuestionGroup,
     InterviewSession, InterviewTranscript, InterviewEvaluation
@@ -11,7 +12,7 @@ from common import serializers as common_serializers
 
 class QuestionSerializer(serializers.ModelSerializer):
     questionText = serializers.CharField(source="text", read_only=True)
-    careerDict = common_serializers.CareerSerializer(source="career", read_only=True)
+    careerDict = serializers.SerializerMethodField()
 
     class Meta:
         model = Question
@@ -21,8 +22,20 @@ class QuestionSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'author', 'company', 'create_at', 'update_at']
 
+    def get_careerDict(self, obj):
+        try:
+            career = obj.career
+        except ObjectDoesNotExist:
+            return None
+        except Exception:
+            return None
+
+        if not career:
+            return None
+        return common_serializers.CareerSerializer(career).data
+
 class QuestionGroupSerializer(serializers.ModelSerializer):
-    questions = QuestionSerializer(many=True, read_only=True)
+    questions = serializers.SerializerMethodField()
     questions_count = serializers.SerializerMethodField()
     question_ids = serializers.PrimaryKeyRelatedField(
         queryset=Question.objects.all(),
@@ -39,6 +52,15 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
 
     def get_questions_count(self, obj):
         return obj.questions.count()
+
+    def get_questions(self, obj):
+        items = []
+        for question in obj.questions.all():
+            try:
+                items.append(QuestionSerializer(question, context=self.context).data)
+            except Exception:
+                continue
+        return items
 
 class InterviewTranscriptSerializer(serializers.ModelSerializer):
     class Meta:

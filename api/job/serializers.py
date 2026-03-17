@@ -129,6 +129,12 @@ class JobPostSerializer(serializers.ModelSerializer):
 
     def get_applied_number(self, job_post):
 
+        if hasattr(job_post, 'applied_total'):
+            return job_post.applied_total
+
+        if hasattr(job_post, '_prefetched_objects_cache') and 'peoples_applied' in job_post._prefetched_objects_cache:
+            return len(job_post.peoples_applied.all())
+
         return job_post.peoples_applied.count()
 
     def check_saved(self, job_post):
@@ -136,13 +142,13 @@ class JobPostSerializer(serializers.ModelSerializer):
         request = self.context.get('request', None)
 
         if request is None:
-
             return False
 
         user = request.user
 
         if user.is_authenticated:
-
+            if hasattr(job_post, '_prefetched_objects_cache') and 'savedjobpost_set' in job_post._prefetched_objects_cache:
+                return any(saved.user_id == user.id for saved in job_post.savedjobpost_set.all())
             return job_post.savedjobpost_set.filter(user=user).exists()
 
         return False
@@ -152,14 +158,14 @@ class JobPostSerializer(serializers.ModelSerializer):
         request = self.context.get('request', None)
 
         if request is None:
-
             return False
 
         user = request.user
 
         if user.is_authenticated:
-
-            return job_post.jobpostactivity_set.filter(user=user).count() > 0
+            if hasattr(job_post, '_prefetched_objects_cache') and 'jobpostactivity_set' in job_post._prefetched_objects_cache:
+                return any(activity.user_id == user.id for activity in job_post.jobpostactivity_set.all())
+            return job_post.jobpostactivity_set.filter(user=user).exists()
 
         return False
 

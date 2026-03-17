@@ -4,6 +4,7 @@ import datetime
 from console.jobs import queue_mail
 
 from configs import (
+    app_setting,
 
     variable_response as var_res,
 
@@ -21,7 +22,7 @@ from helpers import helper
 
 from django.conf import settings
 
-from django.db.models import F, Count
+from django.db.models import F, Count, Prefetch
 
 from django.db.models.functions import ACos, Cos, Radians, Sin
 
@@ -56,6 +57,7 @@ from ..models import (
 from ..filters import (
 
     JobPostFilter,
+    AliasedOrderingFilter,
 
 )
 
@@ -79,7 +81,10 @@ class JobPostViewSet(viewsets.ViewSet,
 
                      generics.RetrieveAPIView):
 
-    queryset = JobPost.objects.all()
+    queryset = JobPost.objects.select_related(
+        'company', 'company__logo', 'company__cover_image', 'company__user',
+        'location', 'location__city', 'career'
+    ).all()
 
     serializer_class = JobPostSerializer
 
@@ -91,7 +96,14 @@ class JobPostViewSet(viewsets.ViewSet,
 
     filterset_class = JobPostFilter
 
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, AliasedOrderingFilter]
+    ordering_fields = (
+        ('jobName', 'job_name'),
+        ('createAt', 'create_at'),
+        ('deadline', 'deadline'),
+        ('viewedTotal', 'views'),
+        'salary_min', 'salary_max'
+    )
 
     def get_permissions(self):
 
@@ -108,12 +120,24 @@ class JobPostViewSet(viewsets.ViewSet,
         return [perms_sys.AllowAny()]
 
     def list(self, request, *args, **kwargs):
-
-        queryset = self.filter_queryset(self.get_queryset().filter(status=var_sys.JOB_POST_STATUS[2][0],
-
-                                                                   deadline__gte=datetime.datetime.now().date())
-
-                                        .order_by('-create_at', '-update_at'))
+        queryset = self.filter_queryset(
+            self.get_queryset()
+            .filter(
+                status=var_sys.JOB_POST_STATUS[2][0],
+                deadline__gte=datetime.datetime.now().date()
+            )
+            .prefetch_related(
+                Prefetch(
+                    'savedjobpost_set',
+                    queryset=SavedJobPost.objects.filter(user=request.user) if request.user.is_authenticated else SavedJobPost.objects.none(),
+                ),
+                Prefetch(
+                    'jobpostactivity_set',
+                    queryset=JobPostActivity.objects.filter(user=request.user) if request.user.is_authenticated else JobPostActivity.objects.none(),
+                ),
+            )
+            )
+        )
 
         page = self.paginate_queryset(queryset)
 
@@ -152,10 +176,25 @@ class JobPostViewSet(viewsets.ViewSet,
 
         cities_id = [x[1] for x in resumes]
 
-        queryset = JobPost.objects.filter(status=var_sys.JOB_POST_STATUS[2][0], deadline__gte=datetime.datetime.now().date()) \
+        queryset = (
+            JobPost.objects.select_related(
+                'company', 'company__logo', 'company__cover_image', 'company__user',
+                'location', 'location__city', 'career'
+            )
+            .filter(status=var_sys.JOB_POST_STATUS[2][0], deadline__gte=datetime.datetime.now().date())
             .filter(career__in=careers_id, location__city__in=cities_id)
-
-        queryset = queryset.order_by("-create_at", "-update_at")
+            .prefetch_related(
+                Prefetch(
+                    'savedjobpost_set',
+                    queryset=SavedJobPost.objects.filter(user=request.user) if request.user.is_authenticated else SavedJobPost.objects.none(),
+                ),
+                Prefetch(
+                    'jobpostactivity_set',
+                    queryset=JobPostActivity.objects.filter(user=request.user) if request.user.is_authenticated else JobPostActivity.objects.none(),
+                ),
+            )
+            .order_by("-create_at", "-update_at")
+        )
 
         page = self.paginate_queryset(queryset)
 
@@ -213,8 +252,19 @@ class JobPostViewSet(viewsets.ViewSet,
 
         user = request.user
 
-        queryset = user.saved_job_posts.filter(status=var_sys.JOB_POST_STATUS[2][0]) \
+        queryset = (
+            user.saved_job_posts
+            .filter(status=var_sys.JOB_POST_STATUS[2][0])
+            .select_related(
+                'company', 'company__logo', 'company__cover_image', 'company__user',
+                'location', 'location__city', 'career'
+            )
+            .prefetch_related(
+                Prefetch('savedjobpost_set', queryset=SavedJobPost.objects.filter(user=user)),
+                Prefetch('jobpostactivity_set', queryset=JobPostActivity.objects.filter(user=user)),
+            )
             .order_by('update_at', 'create_at')
+        )
 
         page = self.paginate_queryset(queryset)
 
@@ -242,9 +292,9 @@ class JobPostViewSet(viewsets.ViewSet,
 
     @action(methods=["post"], detail=True,
 
-            url_path="job-saved", url_name="job-saved")
+            url_path="save", url_name="save")
 
-    def job_saved(self, request, pk):
+    def save_job(self, request, pk):
 
         saved_job_posts = SavedJobPost.objects.filter(user=request.user, job_post=self.get_object())
 
@@ -380,7 +430,7 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
 
                                       generics.CreateAPIView):
 
-    queryset = JobPostActivity.objects
+    queryset = JobPostActivity.objects.select_related('job_post', 'job_post__company', 'job_post__location', 'resume')
 
     serializer_class = JobSeekerJobPostActivitySerializer
 
@@ -471,7 +521,8 @@ class JobPostNotificationViewSet(viewsets.ViewSet,
 
                                  generics.DestroyAPIView):
 
-    queryset = JobPostNotification.objects.all()
+    def get_queryset(self):
+        return JobPostNotification.objects.filter(user=self.request.user)
 
     serializer_class = JobPostNotificationSerializer
 
@@ -527,38 +578,36 @@ class JobPostNotificationViewSet(viewsets.ViewSet,
 
         return Response(status=status.HTTP_200_OK)
 
-    @action(methods=["put"], detail=True,
-
-            url_path='active', url_name="active", )
-
-    def active_job_post_notification(self, request, pk):
-
+    def _apply_active_change(self, request, job_post_notification):
         user = request.user
-
-        job_post_notification = self.get_object()
-
-        if job_post_notification.is_active:
-
-            job_post_notification.is_active = False
-
-            job_post_notification.save()
-
+        desired = request.data.get("isActive", request.data.get("is_active", None))
+        if desired is None:
+            desired = not job_post_notification.is_active
         else:
+            desired = bool(desired)
 
-            if JobPostNotification.objects.filter(user=user, is_active=True).count() >= 3:
+        if desired and not job_post_notification.is_active:
+            active_count = JobPostNotification.objects.filter(user=user, is_active=True).exclude(
+                id=job_post_notification.id
+            ).count()
+            if active_count >= app_setting.MAX_ACTIVE_JOB_NOTIFICATIONS:
+                return var_res.Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={"errorMessage": [ERROR_MESSAGES["MAX_ACTIVE_JOB_NOTIFICATIONS"]]},
+                )
 
-                return var_res.Response(status=status.HTTP_400_BAD_REQUEST,
+        job_post_notification.is_active = desired
+        job_post_notification.save(update_fields=["is_active", "update_at"])
+        return var_res.Response(data={"isActive": job_post_notification.is_active})
 
-                                        data={"errorMessage": [ERROR_MESSAGES["MAX_ACTIVE_JOB_NOTIFICATIONS"]]})
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if "isActive" in request.data or "is_active" in request.data:
+            return self._apply_active_change(request, instance)
+        return super().update(request, *args, **kwargs)
 
-            job_post_notification.is_active = True
-
-            job_post_notification.save()
-
-        is_active = job_post_notification.is_active
-
-        return var_res.Response(data={
-
-            "isActive": is_active
-
-        })
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if not request.data or "isActive" in request.data or "is_active" in request.data:
+            return self._apply_active_change(request, instance)
+        return super().partial_update(request, *args, **kwargs)

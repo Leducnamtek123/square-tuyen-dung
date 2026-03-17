@@ -45,7 +45,7 @@ class JobPost(JobPostBaseModel):
 
                          slugify=slugify, max_length=300)
 
-    deadline = models.DateField()
+    deadline = models.DateField(db_index=True)
 
     quantity = models.IntegerField()
 
@@ -77,7 +77,7 @@ class JobPost(JobPostBaseModel):
 
     is_urgent = models.BooleanField(default=False)
 
-    status = models.IntegerField(choices=var_sys.JOB_POST_STATUS, default=var_sys.JOB_POST_STATUS[0][0])
+    status = models.IntegerField(choices=var_sys.JOB_POST_STATUS, default=var_sys.JOB_POST_STATUS[0][0], db_index=True)
 
     contact_person_name = models.CharField(max_length=100)
 
@@ -112,6 +112,11 @@ class JobPost(JobPostBaseModel):
     class Meta:
 
         db_table = "myjob_job_job_post"
+        indexes = [
+            models.Index(fields=["status", "deadline"], name="job_post_stt_dead_idx"),
+            models.Index(fields=["status", "create_at"], name="job_post_stt_create_idx"),
+            models.Index(fields=["deadline", "create_at"], name="job_post_dead_create_idx"),
+        ]
 
     def __str__(self):
 
@@ -141,11 +146,11 @@ class JobPostActivity(JobPostBaseModel):
 
     phone = models.CharField(max_length=15, null=True)
 
-    status = models.IntegerField(choices=var_sys.APPLICATION_STATUS, default=1)
+    status = models.IntegerField(choices=var_sys.APPLICATION_STATUS, default=1, db_index=True)
 
     is_sent_email = models.BooleanField(default=False)
 
-    is_deleted = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False, db_index=True)
 
     job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE)
 
@@ -178,6 +183,11 @@ class JobPostActivity(JobPostBaseModel):
         db_table = "myjob_job_job_post_activity"
 
         verbose_name_plural = "Job posts activity"
+        indexes = [
+            models.Index(fields=["status", "is_deleted"], name="job_act_stt_del_idx"),
+            models.Index(fields=["job_post", "status"], name="job_act_post_stt_idx"),
+            models.Index(fields=["create_at"], name="job_act_create_idx"),
+        ]
 
 class JobPostNotification(JobPostBaseModel):
 

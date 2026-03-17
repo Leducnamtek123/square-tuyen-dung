@@ -4,75 +4,73 @@ const statisticService = {
 
   employerGeneralStatistics: () => {
 
-    const url = 'job/web/statistics/employer-general-statistics/';
+    const url = 'job/web/statistics/employer/';
 
-    return httpRequest.get(url);
+    return httpRequest.get(url, { params: { type: 'general' } });
 
   },
 
   employerRecruitmentStatisticsByRank: (data = {}) => {
 
-    const url =
+    const url = 'job/web/statistics/employer/';
 
-      'job/web/statistics/employer-recruitment-statistics-by-rank/';
-
-    return httpRequest.post(url, data);
+    return httpRequest.post(url, data, { params: { type: 'recruitment-by-rank' } });
 
   },
 
   employerApplicationStatistics: (data = {}) => {
 
-    const url = 'job/web/statistics/employer-application-statistics/';
+    const url = 'job/web/statistics/employer/';
 
-    return httpRequest.post(url, data);
+    return httpRequest.post(url, data, { params: { type: 'application' } });
 
   },
 
   employerCandidateStatistics: (data = {}) => {
 
-    const url = 'job/web/statistics/employer-candidate-statistics/';
+    const url = 'job/web/statistics/employer/';
 
-    return httpRequest.post(url, data);
+    return httpRequest.post(url, data, { params: { type: 'candidate' } });
 
   },
 
   employerRecruitmentStatistics: (data = {}) => {
 
-    const url = 'job/web/statistics/employer-recruitment-statistics/';
+    const url = 'job/web/statistics/employer/';
 
-    return httpRequest.post(url, data);
+    return httpRequest.post(url, data, { params: { type: 'recruitment' } });
 
   },
 
   jobSeekerGeneralStatistics: () => {
 
-    const url = 'job/web/statistics/job-seeker-general-statistics/';
+    const url = 'job/web/statistics/job-seeker/';
 
-    return httpRequest.get(url);
+    return httpRequest.get(url, { params: { type: 'general' } });
 
   },
 
   jobSeekerTotalView: () => {
 
-    const url = 'job/web/statistics/job-seeker-total-view/';
+    const url = 'job/web/statistics/job-seeker/';
 
-    return httpRequest.get(url);
+    return httpRequest.get(url, { params: { type: 'total-view' } });
 
   },
 
   jobSeekerActivityStatistics: () => {
 
-    const url = 'job/web/statistics/job-seeker-activity-statistics/';
+    const url = 'job/web/statistics/job-seeker/';
 
-    return httpRequest.get(url);
+    return httpRequest.get(url, { params: { type: 'activity' } });
 
   },
 
   adminGeneralStatistics: () => {
 
-    const url = 'job/web/statistics/admin-general-statistics/';
+    const url = 'job/web/statistics/admin/';
 
-    return httpRequest.get(url);
+    return httpRequest.get(url, { params: { type: 'general' } });
 
   },
 

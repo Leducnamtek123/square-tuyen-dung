@@ -3,7 +3,6 @@ import datetime
 
 import calendar
 
-import json
 
 import pandas as pd
 
@@ -11,22 +10,20 @@ from datetime import timedelta
 
 import pytz
 
-from fast_autocomplete import AutoComplete
 
 from console.jobs import queue_mail
 
 from configs import variable_response as var_res, variable_system as var_sys, \
-    renderers, paginations, table_export
+    renderers, app_setting, paginations, table_export
 
 from configs.messages import APPLICATION_STATUS_MESSAGES, ERROR_MESSAGES
 
 from helpers import utils, helper
 
-from helpers.redis_service import RedisService
 
 from django.conf import settings
 
-from django.db.models import Count, F, Q, Sum, Case, When, CharField
+from django.db.models import Count, F, Q, Sum, Case, When, CharField, Prefetch
 
 from django.db.models.functions import TruncDate, ExtractYear, ExtractMonth
 
@@ -112,67 +109,39 @@ def job_suggest_title_search(request):
 
     try:
 
-        job_title_key = "jobTitleKey"
+        q = (request.GET.get('q', '') or '').strip()
 
-        q = request.GET.get('q', None)
+        if not q:
 
-        if q:
+            return var_res.response_data(data=[])
 
-            redis_service = RedisService()
+        data = list(
 
-            cache = redis_service.redis_service
+            JobPost.objects.filter(
 
-            job_title_str = cache.get(job_title_key)
+                status=var_sys.JOB_POST_STATUS[2][0],
 
-            if job_title_str:
+                deadline__gte=datetime.datetime.now().date(),
 
-                print("Đã tồn tại => get từ Redis")
+                job_name__icontains=q,
 
-                words = json.loads(job_title_str)
+            )
 
-            else:
+            .order_by('job_name')
 
-                print("Chưa tồn tại => set vào Redis")
+            .values_list('job_name', flat=True)
 
-                job_title_list = JobPost.objects.filter(status=var_sys.JOB_POST_STATUS[2][0],
+            .distinct()[:5]
 
-                                                        deadline__gte=datetime.datetime.now().date()) \
-                    .values_list("job_name", flat=True)
+        )
 
-                job_title_dict = {}
-
-                for name in job_title_list:
-
-                    job_title_dict[name] = {}
-
-                cache.set(job_title_key, json.dumps(job_title_dict),
-
-                          settings.REDIS_JOB_TITLE_EXPIRE_SECONDS)
-
-                words = job_title_dict
-
-            # max_cost: so tu duoc phep sai
-
-            # size: so luong ket qua tra ve
-
-            synonyms = {
-
-            }
-
-            autocomplete = AutoComplete(words=words, synonyms=synonyms)
-
-            data = autocomplete.search(word=q, max_cost=3, size=5)
-
-            return var_res.response_data(data=data)
-
-        return var_res.response_data(data=[])
+        return var_res.response_data(data=data)
 
     except Exception as ex:
 
-        helper.print_log_error("job_suggest_title_search", ex)
+        helper.print_log_error('job_suggest_title_search', ex)
 
         return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 class PrivateJobPostViewSet(viewsets.ViewSet,
 
                             generics.ListAPIView,
@@ -183,9 +152,12 @@ class PrivateJobPostViewSet(viewsets.ViewSet,
 
                             generics.DestroyAPIView):
 
-    queryset = JobPost.objects.annotate(
+    queryset = JobPost.objects.select_related(
+        'company', 'company__logo', 'company__cover_image', 'company__user',
+        'location', 'location__city', 'career'
+    ).annotate(
 
-        applied_total=Count('peoples_applied'),
+        applied_total=Count('peoples_applied', distinct=True),
 
     )
 
@@ -260,12 +232,28 @@ class PrivateJobPostViewSet(viewsets.ViewSet,
 
         cities_id = [x[1] for x in resumes]
 
-        queryset = JobPost.objects.filter(status=var_sys.JOB_POST_STATUS[2][0],
-
-                                          deadline__gte=datetime.datetime.now().date()) \
+        queryset = (
+            JobPost.objects.select_related(
+                'company', 'company__logo', 'company__cover_image', 'company__user',
+                'location', 'location__city', 'career'
+            )
+            .filter(
+                status=var_sys.JOB_POST_STATUS[2][0],
+                deadline__gte=datetime.datetime.now().date(),
+            )
             .filter(career__in=careers_id, location__city__in=cities_id)
-
-        queryset = queryset.order_by("-create_at", "-update_at")
+            .prefetch_related(
+                Prefetch(
+                    'savedjobpost_set',
+                    queryset=SavedJobPost.objects.filter(user=request.user) if request.user.is_authenticated else SavedJobPost.objects.none(),
+                ),
+                Prefetch(
+                    'jobpostactivity_set',
+                    queryset=JobPostActivity.objects.filter(user=request.user) if request.user.is_authenticated else JobPostActivity.objects.none(),
+                ),
+            )
+            .order_by("-create_at", "-update_at")
+        )
 
         page = self.paginate_queryset(queryset)
 
@@ -427,7 +415,10 @@ class JobPostViewSet(viewsets.ViewSet,
 
                      generics.RetrieveAPIView):
 
-    queryset = JobPost.objects.all()
+    queryset = JobPost.objects.select_related(
+        'company', 'company__logo', 'company__cover_image', 'company__user',
+        'location', 'location__city', 'career'
+    ).all()
 
     serializer_class = JobPostSerializer
 
@@ -439,17 +430,35 @@ class JobPostViewSet(viewsets.ViewSet,
 
     filterset_class = JobPostFilter
 
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, AliasedOrderingFilter]
 
     lookup_field = "slug"
+    ordering_fields = (
+        ('jobName', 'job_name'),
+        ('createAt', 'create_at'),
+        ('deadline', 'deadline'),
+        ('viewedTotal', 'views'),
+    )
 
     def list(self, request, *args, **kwargs):
-
-        queryset = self.filter_queryset(self.get_queryset().filter(status=var_sys.JOB_POST_STATUS[2][0],
-
-                                                                   deadline__gte=datetime.datetime.now().date())
-
-                                        .order_by('-update_at', '-create_at'))
+        queryset = self.filter_queryset(
+            self.get_queryset()
+            .filter(
+                status=var_sys.JOB_POST_STATUS[2][0],
+                deadline__gte=datetime.datetime.now().date()
+            )
+            .prefetch_related(
+                Prefetch(
+                    'savedjobpost_set',
+                    queryset=SavedJobPost.objects.filter(user=request.user) if request.user.is_authenticated else SavedJobPost.objects.none(),
+                ),
+                Prefetch(
+                    'jobpostactivity_set',
+                    queryset=JobPostActivity.objects.filter(user=request.user) if request.user.is_authenticated else JobPostActivity.objects.none(),
+                ),
+            )
+            .order_by('-update_at', '-create_at')
+        )
 
         page = self.paginate_queryset(queryset)
 
@@ -515,8 +524,19 @@ class JobPostViewSet(viewsets.ViewSet,
 
         user = request.user
 
-        queryset = user.saved_job_posts.filter(status=var_sys.JOB_POST_STATUS[2][0]) \
+        queryset = (
+            user.saved_job_posts
+            .filter(status=var_sys.JOB_POST_STATUS[2][0])
+            .select_related(
+                'company', 'company__logo', 'company__cover_image', 'company__user',
+                'location', 'location__city', 'career'
+            )
+            .prefetch_related(
+                Prefetch('savedjobpost_set', queryset=SavedJobPost.objects.filter(user=user)),
+                Prefetch('jobpostactivity_set', queryset=JobPostActivity.objects.filter(user=user)),
+            )
             .order_by('update_at', 'create_at')
+        )
 
         page = self.paginate_queryset(queryset)
 
@@ -540,9 +560,9 @@ class JobPostViewSet(viewsets.ViewSet,
 
     @action(methods=["post"], detail=True,
 
-            url_path="job-saved", url_name="job-saved")
+            url_path="save", url_name="save")
 
-    def job_saved(self, request, slug):
+    def save_job(self, request, slug):
 
         saved_job_posts = SavedJobPost.objects.filter(user=request.user, job_post=self.get_object())
 
@@ -578,7 +598,7 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
 
                                       generics.CreateAPIView):
 
-    queryset = JobPostActivity.objects
+    queryset = JobPostActivity.objects.select_related('job_post', 'job_post__company', 'job_post__location', 'resume')
 
     serializer_class = JobSeekerJobPostActivitySerializer
 
@@ -725,7 +745,7 @@ class EmployerJobPostActivityViewSet(viewsets.ViewSet,
 
                                      generics.DestroyAPIView):
 
-    queryset = JobPostActivity.objects
+    queryset = JobPostActivity.objects.select_related('user', 'resume', 'job_post', 'job_post__company')
 
     serializer_class = EmployerJobPostActivitySerializer
 
@@ -737,7 +757,12 @@ class EmployerJobPostActivityViewSet(viewsets.ViewSet,
 
     filterset_class = EmployerJobPostActivityFilter
 
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, AliasedOrderingFilter]
+    ordering_fields = (
+        ('createAt', 'create_at'),
+        ('status', 'status'),
+        ('fullName', 'full_name'),
+    )
 
     def list(self, request, *args, **kwargs):
 
@@ -1063,7 +1088,8 @@ class JobPostNotificationViewSet(viewsets.ViewSet,
 
                                  generics.DestroyAPIView):
 
-    queryset = JobPostNotification.objects.all()
+    def get_queryset(self):
+        return JobPostNotification.objects.filter(user=self.request.user)
 
     serializer_class = JobPostNotificationSerializer
 
@@ -1111,45 +1137,60 @@ class JobPostNotificationViewSet(viewsets.ViewSet,
 
         return Response(data=serializer.data)
 
-    @action(methods=["put"], detail=True,
-
-            url_path='active', url_name="active", )
-
-    def active_job_post_notification(self, request, pk):
-
+    def _apply_active_change(self, request, job_post_notification):
         user = request.user
-
-        job_post_notification = self.get_object()
-
-        if job_post_notification.is_active:
-
-            job_post_notification.is_active = False
-
-            job_post_notification.save()
-
+        desired = request.data.get("isActive", request.data.get("is_active", None))
+        if desired is None:
+            desired = not job_post_notification.is_active
         else:
+            desired = bool(desired)
 
-            if JobPostNotification.objects.filter(user=user, is_active=True).count() >= 3:
+        if desired and not job_post_notification.is_active:
+            active_count = JobPostNotification.objects.filter(user=user, is_active=True).exclude(
+                id=job_post_notification.id
+            ).count()
+            if active_count >= app_setting.MAX_ACTIVE_JOB_NOTIFICATIONS:
+                return var_res.Response(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    data={"errorMessage": [ERROR_MESSAGES["MAX_ACTIVE_JOB_NOTIFICATIONS"]]},
+                )
 
-                return var_res.Response(status=status.HTTP_400_BAD_REQUEST,
+        job_post_notification.is_active = desired
+        job_post_notification.save(update_fields=["is_active", "update_at"])
+        return var_res.Response(data={"isActive": job_post_notification.is_active})
 
-                                        data={"errorMessage": [ERROR_MESSAGES["MAX_ACTIVE_JOB_NOTIFICATIONS"]]})
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if "isActive" in request.data or "is_active" in request.data:
+            return self._apply_active_change(request, instance)
+        return super().update(request, *args, **kwargs)
 
-            job_post_notification.is_active = True
-
-            job_post_notification.save()
-
-        is_active = job_post_notification.is_active
-
-        return var_res.Response(data={
-
-            "isActive": is_active
-
-        })
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if not request.data or "isActive" in request.data or "is_active" in request.data:
+            return self._apply_active_change(request, instance)
+        return super().partial_update(request, *args, **kwargs)
 
 class JobSeekerStatisticViewSet(viewsets.ViewSet):
 
     permission_classes = [perms_custom.IsJobSeekerUser]
+
+    def statistics(self, request):
+        stat_type = (request.query_params.get("type") or "general").strip().lower()
+        handlers = {
+            "general": self.general_statistics,
+            "total-view": self.total_view,
+            "activity": self.activity_statistics,
+            "activity-statistics": self.activity_statistics,
+        }
+        handler = handlers.get(stat_type)
+        if not handler:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"type": [f"Unsupported statistics type: {stat_type}"]},
+                data=None,
+            )
+        return handler(request)
 
     # thong ke tong quan
 
@@ -1322,6 +1363,33 @@ class JobSeekerStatisticViewSet(viewsets.ViewSet):
 class EmployerStatisticViewSet(viewsets.ViewSet):
 
     permission_classes = [perms_custom.IsEmployerUser]
+
+    def statistics(self, request):
+        stat_type = (request.query_params.get("type") or "general").strip().lower()
+        handlers = {
+            "general": self.general_statistics,
+            "recruitment": self.recruitment_statistics,
+            "candidate": self.candidate_statistics,
+            "application": self.application_statistics,
+            "recruitment-by-rank": self.recruitment_statistics_by_rank,
+        }
+        handler = handlers.get(stat_type)
+        if not handler:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"type": [f"Unsupported statistics type: {stat_type}"]},
+                data=None,
+            )
+
+        if stat_type == "general":
+            return handler(request)
+        if request.method != "POST":
+            return var_res.response_data(
+                status=status.HTTP_405_METHOD_NOT_ALLOWED,
+                errors={"detail": ["Use POST for this statistics type."]},
+                data=None,
+            )
+        return handler(request)
 
     # thong ke tong quan
 
@@ -1686,6 +1754,16 @@ class AdminStatisticViewSet(viewsets.ViewSet):
 
     permission_classes = [perms_custom.IsAdminUser]
 
+    def statistics(self, request):
+        stat_type = (request.query_params.get("type") or "general").strip().lower()
+        if stat_type != "general":
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"type": [f"Unsupported statistics type: {stat_type}"]},
+                data=None,
+            )
+        return self.general_statistics(request)
+
     def general_statistics(self, request):
 
         total_users = User.objects.count()
@@ -1797,3 +1875,4 @@ class AdminJobPostNotificationViewSet(viewsets.ModelViewSet):
     serializer_class = JobPostNotificationSerializer
 
     permission_classes = [perms_custom.IsAdminUser]
+

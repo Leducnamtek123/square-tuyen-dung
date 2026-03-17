@@ -319,13 +319,16 @@ class CompanySerializer(serializers.ModelSerializer):
         return var_sys.AVATAR_DEFAULT["COMPANY_COVER_IMAGE"]
 
     def get_follow_number(self, company):
-
-        return company.companyfollowed_set.filter().count()
+        if hasattr(company, "follow_count"):
+            return company.follow_count
+        if hasattr(company, "_prefetched_objects_cache") and "companyfollowed_set" in company._prefetched_objects_cache:
+            return len(company.companyfollowed_set.all())
+        return company.companyfollowed_set.count()
 
     def get_job_post_number(self, company):
-
+        if hasattr(company, "active_job_post_count"):
+            return company.active_job_post_count
         now = datetime.datetime.now().date()
-
         return company.job_posts.filter(deadline__gte=now, status=var_sys.JOB_POST_STATUS[2][0]).count()
 
     def check_followed(self, company):
@@ -339,8 +342,9 @@ class CompanySerializer(serializers.ModelSerializer):
         user = request.user
 
         if user.is_authenticated:
-
-            return company.companyfollowed_set.filter(user=user).count() > 0
+            if hasattr(company, "_prefetched_objects_cache") and "companyfollowed_set" in company._prefetched_objects_cache:
+                return len(company.companyfollowed_set.all()) > 0
+            return company.companyfollowed_set.filter(user=user).exists()
 
         return False
 
@@ -1021,7 +1025,8 @@ class ResumeSerializer(serializers.ModelSerializer):
         return fields
 
     def get_view_number(self, resume):
-
+        if hasattr(resume, "_prefetched_objects_cache") and "resumesaved_set" in resume._prefetched_objects_cache:
+            return len(resume.resumesaved_set.all())
         return resume.resumesaved_set.count()
 
     def check_saved(self, resume):
@@ -1035,7 +1040,8 @@ class ResumeSerializer(serializers.ModelSerializer):
         user = request.user
 
         if user.is_authenticated and user.role_name == var_sys.EMPLOYER:
-
+            if hasattr(resume, "_prefetched_objects_cache") and "resumesaved_set" in resume._prefetched_objects_cache:
+                return len(resume.resumesaved_set.all()) > 0
             return resume.resumesaved_set.filter(company=user.company).exists()
 
         return None
@@ -1054,9 +1060,11 @@ class ResumeSerializer(serializers.ModelSerializer):
 
             return None
 
-        resume_viewed = ResumeViewed.objects.filter(
+        if hasattr(resume, "_prefetched_objects_cache") and "resumeviewed_set" in resume._prefetched_objects_cache:
+            viewed_items = list(resume.resumeviewed_set.all())
+            return viewed_items[0].update_at if viewed_items else None
 
-            company=company, resume=resume).first()
+        resume_viewed = ResumeViewed.objects.filter(company=company, resume=resume).first()
 
         if not resume_viewed:
 
@@ -2058,7 +2066,8 @@ class ResumeDetailSerializer(serializers.ModelSerializer):
         user = request.user
 
         if user.is_authenticated and user.role_name == var_sys.EMPLOYER:
-
+            if hasattr(resume, "_prefetched_objects_cache") and "resumesaved_set" in resume._prefetched_objects_cache:
+                return len(resume.resumesaved_set.all()) > 0
             return resume.resumesaved_set.filter(company=user.company).exists()
 
         return None
@@ -2077,9 +2086,11 @@ class ResumeDetailSerializer(serializers.ModelSerializer):
 
             return None
 
-        resume_viewed = ResumeViewed.objects.filter(
+        if hasattr(resume, "_prefetched_objects_cache") and "resumeviewed_set" in resume._prefetched_objects_cache:
+            viewed_items = list(resume.resumeviewed_set.all())
+            return viewed_items[0].update_at if viewed_items else None
 
-            company=company, resume=resume).first()
+        resume_viewed = ResumeViewed.objects.filter(company=company, resume=resume).first()
 
         if not resume_viewed:
 
@@ -2101,11 +2112,10 @@ class ResumeDetailSerializer(serializers.ModelSerializer):
 
             return False
 
-        contact_profile_exist = resume.contactprofile_set.filter(
+        if hasattr(resume, "_prefetched_objects_cache") and "contactprofile_set" in resume._prefetched_objects_cache:
+            return len(resume.contactprofile_set.all()) > 0
 
-            company=company, resume=resume).exists()
-
-        return contact_profile_exist
+        return resume.contactprofile_set.filter(company=company, resume=resume).exists()
 
     def get_ai_analysis(self, resume):
 
@@ -2123,13 +2133,14 @@ class ResumeDetailSerializer(serializers.ModelSerializer):
 
         # Get latest activity (application) for this resume for the current company
 
-        latest_activity = JobPostActivity.objects.filter(
-
-            resume=resume,
-
-            job_post__company=company
-
-        ).order_by('-create_at').first()
+        if hasattr(resume, "_prefetched_objects_cache") and "jobpostactivity_set" in resume._prefetched_objects_cache:
+            activities = list(resume.jobpostactivity_set.all())
+            latest_activity = activities[0] if activities else None
+        else:
+            latest_activity = JobPostActivity.objects.filter(
+                resume=resume,
+                job_post__company=company
+            ).order_by('-create_at').first()
 
         if latest_activity:
 
