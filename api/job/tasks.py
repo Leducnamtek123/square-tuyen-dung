@@ -90,17 +90,25 @@ def analyze_resume_ai(activity_id):
         - Yêu cầu: {job_requirement}
 
         NỘI DUNG CV ỨNG VIÊN:
-        {resume_text[:4000]}  # Giới hạn text để tránh quá tải token
+        {resume_text[:4000]}
 
         Nhiệm vụ của bạn:
         1. Chấm điểm độ phù hợp (0-100) dựa trên kỹ năng, kinh nghiệm và học vấn.
-        2. Tóm tắt ngắn gọn lý do tại sao ứng viên này phù hợp hoặc không phù hợp.
+        2. Tóm tắt ngắn gọn lý do tại sao ứng viên này phù hợp hoặc không phù hợp (headhunter style).
         3. Liệt kê các kỹ năng chính mà ứng viên có.
+        4. Liệt kê các điểm mạnh vượt trội (pros).
+        5. Liệt kê các điểm yếu hoặc điểm cần lưu ý (cons).
+        6. Xác định các kỹ năng khớp với JD (matching_skills).
+        7. Xác định các kỹ năng còn thiếu so với JD (missing_skills).
 
         HÃY TRẢ VỀ JSON HỢP LỆ VỚI CÁC TRƯỜNG:
         - score: (số nguyên 0-100)
         - summary: (chuỗi văn bản tiếng Việt)
         - skills: (mảng các chuỗi kỹ năng)
+        - pros: (mảng các chuỗi điểm mạnh)
+        - cons: (mảng các chuỗi điểm yếu)
+        - matching_skills: (mảng các kỹ năng khớp JD)
+        - missing_skills: (mảng các kỹ năng thiếu so với JD)
 
         LƯU Ý: Không giải thích gì thêm, chỉ trả về JSON.
         """
@@ -133,6 +141,12 @@ def analyze_resume_ai(activity_id):
                 activity.ai_analysis_score = result.get('score', 0)
                 activity.ai_analysis_summary = result.get('summary', '')
                 activity.ai_analysis_skills = ", ".join(result.get('skills', []))
+                
+                activity.ai_analysis_pros = ", ".join(result.get('pros', []))
+                activity.ai_analysis_cons = ", ".join(result.get('cons', []))
+                activity.ai_analysis_matching_skills = result.get('matching_skills', [])
+                activity.ai_analysis_missing_skills = result.get('missing_skills', [])
+                
                 activity.ai_analysis_status = 'completed'
                 activity.save()
                 

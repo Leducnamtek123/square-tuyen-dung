@@ -79,12 +79,27 @@ class CareerSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
     def get_icon_url(self, career):
+        try:
+            icon = career.icon
+        except File.DoesNotExist:
+            # Data can be inconsistent if icon_id points to a deleted file.
+            return None
+        except Exception:
+            return None
 
-        return career.icon.get_full_url() if career.icon else None
+        if not icon:
+            return None
+
+        try:
+            return icon.get_full_url()
+        except Exception:
+            return None
 
     def get_job_post_total(self, career):
-
-        return career.job_posts.count()
+        try:
+            return career.job_posts.count()
+        except Exception:
+            return 0
 
     def _upload_icon(self, instance, icon_file):
 

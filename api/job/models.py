@@ -166,6 +166,14 @@ class JobPostActivity(JobPostBaseModel):
 
     ai_analysis_skills = models.TextField(null=True, blank=True) # JSON or Comma separated
 
+    ai_analysis_pros = models.TextField(null=True, blank=True)
+
+    ai_analysis_cons = models.TextField(null=True, blank=True)
+
+    ai_analysis_matching_skills = models.JSONField(null=True, blank=True)
+
+    ai_analysis_missing_skills = models.JSONField(null=True, blank=True)
+
     ai_analysis_status = models.CharField(max_length=20, choices=[
 
         ('pending', 'Pending'),

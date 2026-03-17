@@ -204,6 +204,10 @@ class InterviewSession(InterviewBaseModel):
         blank=True, null=True,
         verbose_name="Điểm yếu (AI)"
     )
+    ai_detailed_feedback = models.JSONField(
+        blank=True, null=True,
+        verbose_name="Phân tích chi tiết (AI)"
+    )
 
     # Foreign Keys
     candidate = models.ForeignKey(

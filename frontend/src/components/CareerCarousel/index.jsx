@@ -20,7 +20,7 @@ import MuiImageCustom from "../MuiImageCustom";
 
 import { searchJobPost } from "../../redux/filterSlice";
 
-import { ROUTES } from "../../configs/constants";
+import { IMAGES, ROUTES } from "../../configs/constants";
 
 // Cập nhật styles cho pagination
 
@@ -325,6 +325,7 @@ const CareerCarousel = () => {
                         height={72}
 
                         src={value?.iconUrl}
+                        fallbackSrc={IMAGES.companyLogoDefault}
 
                         className="career-icon"
 

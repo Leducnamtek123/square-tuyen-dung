@@ -388,18 +388,21 @@ def get_wards(request):
 def get_top_10_careers(request):
 
     try:
+        try:
+            hot_qs = Career.objects.filter(is_hot=True).annotate(
+                num_job_posts=Count('job_posts')
+            ).order_by('-num_job_posts', 'id')
+            hot_ids = list(hot_qs.values_list('id', flat=True))
 
-        hot_qs = Career.objects.filter(is_hot=True).annotate(
-            num_job_posts=Count('job_posts')
-        ).order_by('-num_job_posts', 'id')
-        hot_ids = list(hot_qs.values_list('id', flat=True))
+            remaining = max(0, 10 - len(hot_ids))
+            normal_qs = Career.objects.exclude(id__in=hot_ids).annotate(
+                num_job_posts=Count('job_posts')
+            ).order_by('-num_job_posts', 'id')[:remaining]
 
-        remaining = max(0, 10 - len(hot_ids))
-        normal_qs = Career.objects.exclude(id__in=hot_ids).annotate(
-            num_job_posts=Count('job_posts')
-        ).order_by('-num_job_posts', 'id')[:remaining]
-
-        queryset = list(hot_qs[:10]) + list(normal_qs)
+            queryset = list(hot_qs[:10]) + list(normal_qs)
+        except Exception:
+            # Fallback path to keep homepage usable when aggregate query fails.
+            queryset = list(Career.objects.all().order_by('id')[:10])
 
         serializer = CareerSerializer(
             queryset,

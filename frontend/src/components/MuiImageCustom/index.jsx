@@ -4,7 +4,31 @@ import Image from 'mui-image';
 
 const MuiImageCustom = (props) => {
 
-  const { loading = 'lazy', ...rest } = props;
+  const {
+    loading = 'lazy',
+    src,
+    fallbackSrc,
+    onError,
+    ...rest
+  } = props;
+
+  const [imageSrc, setImageSrc] = React.useState(src);
+
+  React.useEffect(() => {
+    setImageSrc(src);
+  }, [src]);
+
+  const handleError = React.useCallback(
+    (event) => {
+      if (fallbackSrc && imageSrc !== fallbackSrc) {
+        setImageSrc(fallbackSrc);
+      }
+      if (onError) {
+        onError(event);
+      }
+    },
+    [fallbackSrc, imageSrc, onError]
+  );
 
   return (
 
@@ -27,6 +51,8 @@ const MuiImageCustom = (props) => {
       distance="100px"
 
       shiftDuration={600}
+      src={imageSrc}
+      onError={handleError}
 
       {...rest}
 

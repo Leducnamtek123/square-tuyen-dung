@@ -463,6 +463,14 @@ class EmployerJobPostActivitySerializer(serializers.ModelSerializer):
 
     aiAnalysisStatus = serializers.CharField(source='ai_analysis_status', read_only=True)
 
+    aiAnalysisPros = serializers.CharField(source='ai_analysis_pros', read_only=True)
+
+    aiAnalysisCons = serializers.CharField(source='ai_analysis_cons', read_only=True)
+
+    aiAnalysisMatchingSkills = serializers.JSONField(source='ai_analysis_matching_skills', read_only=True)
+
+    aiAnalysisMissingSkills = serializers.JSONField(source='ai_analysis_missing_skills', read_only=True)
+
     userDict = serializers.SerializerMethodField(method_name="get_user_dict", read_only=True)
 
     def get_user_dict(self, activity):
@@ -517,7 +525,7 @@ class EmployerJobPostActivitySerializer(serializers.ModelSerializer):
 
                   "resumeSlug", "jobName", "status", "createAt", "isSentEmail",
 
-                  "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus",
+                  "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus", "aiAnalysisPros", "aiAnalysisCons", "aiAnalysisMatchingSkills", "aiAnalysisMissingSkills",
                   "userDict", "jobPostDict", "companyDict")
 
 class EmployerJobPostActivityExportSerializer(serializers.ModelSerializer):

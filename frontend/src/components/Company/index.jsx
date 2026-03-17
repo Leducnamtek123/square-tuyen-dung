@@ -239,6 +239,7 @@ const Company = ({
               fit="cover"
 
               src={companyCoverImageUrl || IMAGES.companyCoverDefault || IMAGES.coverImageDefault}
+              fallbackSrc={IMAGES.companyCoverDefault || IMAGES.coverImageDefault}
 
               sx={{
 
@@ -289,6 +290,7 @@ const Company = ({
                 height={80}
 
                 src={companyImageUrl || IMAGES.companyLogoDefault}
+                fallbackSrc={IMAGES.companyLogoDefault}
 
                 sx={{
 

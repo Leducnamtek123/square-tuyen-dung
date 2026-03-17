@@ -129,7 +129,7 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
             'scheduled_at', 'start_time', 'end_time', 'duration',
             'recording_url', 'transcript_url', 'notes',
             'ai_overall_score', 'ai_technical_score', 'ai_communication_score',
-            'ai_summary', 'ai_strengths', 'ai_weaknesses',
+            'ai_summary', 'ai_strengths', 'ai_weaknesses', 'ai_detailed_feedback',
             'created_by', 'question_group',
             'questions', 'transcripts', 'evaluations',
             'create_at', 'update_at'

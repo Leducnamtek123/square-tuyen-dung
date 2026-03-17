@@ -147,6 +147,10 @@ def evaluate_interview_session(session_id):
         - summary: Tóm tắt ngắn gọn nội dung phỏng vấn (Dưới 100 từ)
         - strengths: Danh sách 3-5 điểm mạnh nhất của ứng viên (Dạng list string)
         - weaknesses: Danh sách 2-3 điểm cần cải thiện (Dạng list string)
+        - detailed_feedback: Đối tượng JSON chứa:
+            - question_performance: List các object {question: string, feedback: string, score: 1-10}
+            - soft_skills: {confidence: 1-10, clarity: 1-10, tone: string}
+            - cultural_fit: string (Nhận xét về mức độ phù hợp văn hóa)
         
         LƯU Ý: Phản hồi PHẢI là một JSON object hợp lệ, không có văn bản giải thích. Ngôn ngữ phản hồi là tiếng Việt.
         """
@@ -194,6 +198,7 @@ def evaluate_interview_session(session_id):
                 # Lưu trực tiếp dạng list vào JSONField thay vì join string
                 session.ai_strengths = eval_data.get('strengths', [])
                 session.ai_weaknesses = eval_data.get('weaknesses', [])
+                session.ai_detailed_feedback = eval_data.get('detailed_feedback', {})
                 session.save()
                 
                 logger.info(f"AI Evaluation for Session {session_id} completed successfully. Score: {session.ai_overall_score}")
