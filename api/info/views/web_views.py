@@ -17,7 +17,7 @@ from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 
 from helpers import helper
-from . import filters
+from .. import filters
 
 from rest_framework import viewsets, generics, views
 

@@ -136,7 +136,6 @@ class JobPostViewSet(viewsets.ViewSet,
                     queryset=JobPostActivity.objects.filter(user=request.user) if request.user.is_authenticated else JobPostActivity.objects.none(),
                 ),
             )
-            )
         )
 
         page = self.paginate_queryset(queryset)

@@ -39,6 +39,8 @@ MIDDLEWARE_ALLOW_ANY_FOR_ROUTES = [
 
     "/" + ROUTES_PREFIX + AUTHENTICATION_PREFIX + "check-creds/",
 
+]
+
 # --- Business Logic Limits ---
 
 MAX_ACTIVE_JOB_NOTIFICATIONS = 3
