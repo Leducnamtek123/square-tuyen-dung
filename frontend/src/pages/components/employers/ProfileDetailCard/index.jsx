@@ -55,7 +55,7 @@ import FormPopup from "../../../../components/controls/FormPopup";
 const LazyPdf = lazy(() => import("../../../../components/Pdf"));
 
 const ProfileDetailCard = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('employer');
   const { slug } = useParams();
   const { allConfig } = useSelector((state) => state.config);
   

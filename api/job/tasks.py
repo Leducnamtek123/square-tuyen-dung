@@ -57,9 +57,11 @@ def analyze_resume_ai(activity_id):
         with httpx.Client() as client:
             response = client.get(resume_url)
             if response.status_code == 200:
-                temp_file = f"/tmp/resume_{activity_id}.{file_format}"
-                with open(temp_file, "wb") as f:
-                    f.write(response.content)
+                import tempfile
+                import os
+                with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
+                    tf.write(response.content)
+                    temp_file = tf.name
                 
                 if file_format == 'pdf':
                     resume_text = extract_text_from_pdf(temp_file)

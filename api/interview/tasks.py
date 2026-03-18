@@ -199,6 +199,7 @@ def evaluate_interview_session(session_id):
                 session.ai_strengths = eval_data.get('strengths', [])
                 session.ai_weaknesses = eval_data.get('weaknesses', [])
                 session.ai_detailed_feedback = eval_data.get('detailed_feedback', {})
+                session.status = 'completed'
                 session.save()
                 
                 logger.info(f"AI Evaluation for Session {session_id} completed successfully. Score: {session.ai_overall_score}")

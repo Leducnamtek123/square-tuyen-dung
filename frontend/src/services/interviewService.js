@@ -64,6 +64,20 @@ const interviewService = {
 
     },
 
+    triggerAiEvaluation: (id) => {
+        const url = `interview/web/sessions/${id}/evaluate-ai/`;
+        return httpRequest.post(url).then(unwrapData);
+    },
+
+    submitEvaluation: (data) => {
+        const url = 'interview/web/evaluations/';
+        return httpRequest.post(url, data).then(unwrapData);
+    },
+
+    getEvaluations: (sessionId) => {
+        const url = `interview/web/evaluations/`;
+        return httpRequest.get(url, { params: { interview: sessionId } }).then(unwrapData);
+    },
 };
 
 export default interviewService;

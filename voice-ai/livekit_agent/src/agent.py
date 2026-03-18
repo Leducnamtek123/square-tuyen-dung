@@ -123,10 +123,23 @@ async def entrypoint(ctx: JobContext):
         )
         
         # 6. Start session with the Interviewer agent
+        interviewer_agent = Interviewer(context=agent_context)
         await session.start(
             room=ctx.room,
-            agent=Interviewer(context=agent_context)
+            agent=interviewer_agent
         )
+
+        # 6.5. Attach transcript listeners for history persistence
+        # This ensures every turn is saved to the backend database.
+        async def _on_history_added(item):
+            # item is a ConversationItem (user or assistant)
+            role = "candidate" if item.role == "user" else "ai_agent"
+            if item.content and item.content.strip():
+                # We use the interviewer instance's method to append transcript
+                asyncio.create_task(interviewer_agent._append_transcript(role, item.content.strip()))
+
+        session.on("conversation_item_added", _on_history_added)
+
         try:
             await ctx.room.local_participant.set_attributes({
                 "lk.agent.state": "listening",
@@ -159,8 +172,11 @@ async def entrypoint(ctx: JobContext):
             })
         except Exception as e:
             logger.warning("Could not set agent state to speaking: %s", e)
+        
         # Generate initial response
+        # The 'conversation_item_added' event will handle saving this to the backend.
         await session.say(greeting, allow_interruptions=True)
+        
         try:
             await ctx.room.local_participant.set_attributes({
                 "lk.agent.state": "listening",
@@ -177,6 +193,8 @@ async def entrypoint(ctx: JobContext):
     finally:
         if session is not None:
             await session.aclose()
+        # Ensure status is 'completed' if job finishes normally
+        await _update_backend_status(ctx.room.name, "completed")
         logger.info("Job finished for room: %s", ctx.room.name)
 
 if __name__ == "__main__":

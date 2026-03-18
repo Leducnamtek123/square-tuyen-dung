@@ -13,7 +13,7 @@ from livekit.agents import (
 
 from .config import config
 from .interview_flow import decide_next_action, parse_question_payload
-from .prompts import INTERVIEWER_INSTRUCTIONS, DEFAULT_GREETING
+from .prompts import INTERVIEWER_INSTRUCTIONS
 
 logger = logging.getLogger("interviewer")
 
@@ -68,7 +68,7 @@ class Interviewer(Agent):
             
             # Sync to room metadata for frontend UI
             if context.room:
-                await context.room.local_participant.set_metadata(new_stage.name)
+                await context.room.local_participant.set_metadata(f"STAGE:{new_stage.name}")
             
             msg = f"Interview stage updated to {stage_name}."
             if new_stage == InterviewStage.TECHNICAL:
@@ -95,83 +95,60 @@ class Interviewer(Agent):
         url = f"{self._backend_api_url}/interviews/{self._room_name}/next-question"
         try:
             async with httpx.AsyncClient() as client:
-                resp = await client.post(url, json={"advance": advance}, timeout=5.0)
+                resp = await client.post(url, json={"advance": advance}, timeout=10.0)
             if resp.status_code != 200:
                 return {"error": "backend_error", "status": resp.status_code}
             return resp.json()
-        except Exception as exc:
-            logger.warning("get_next_question failed: %s", exc)
-            return {"error": "request_failed", "detail": str(exc)}
+        except Exception as e:
+            logger.error("Error fetching next question: %s", e)
+            return {"error": str(e)}
 
     @function_tool
     async def get_next_question(
         self,
         context: RunContext,
+        advance: bool = True,
     ) -> str:
-        """Fetch the next primary interview question from the backend database.
-        Use this when you are ready to move to the next technical or structured question.
+        """Get the next technical question from the interview question bank.
+        
+        Args:
+            advance: Whether to move to the next question. Default is True.
         """
-        logger.info("get_next_question called by LLM")
-        payload = await self._fetch_next_question(advance=True)
-        if isinstance(payload, dict):
-            if payload.get("done"):
-                return "Hệ thống báo rằng đã hết câu hỏi trong danh sách. Bạn hãy chuyển sang phần hỏi đáp (Q&A) hoặc kết thúc phỏng vấn."
-            question = payload.get("question")
-            if question and "text" in question:
-                self._current_stage = InterviewStage.TECHNICAL
-                # Sync metadata to room for frontend UI
-                if context.room:
-                    try:
-                        await context.room.local_participant.set_metadata(InterviewStage.TECHNICAL.name)
-                    except Exception as e:
-                        logger.warning("Could not set stage metadata in get_next_question: %s", e)
-                
-                return f"Câu hỏi tiếp theo từ hệ thống là: {question['text']}"
-        return "Không thể lấy câu hỏi lúc này. Hãy thử đặt một câu hỏi của riêng bạn hoặc kết thúc phỏng vấn."
+        payload = await self._fetch_next_question(advance)
+        if "error" in payload:
+            return f"Error: Could not retrieve questions at this time. Please proceed with personal background questions instead."
+        
+        res = parse_question_payload(payload)
+        if res.get("done"):
+            return "All predefined technical questions have been asked. You can move to the Q&A section now by calling `set_interview_stage('q_and_a')`."
+        
+        return f"The next question to ask is: {res.get('question_text')}"
 
     @function_tool
     async def finish_interview(
         self,
         context: RunContext,
     ) -> str:
-        """Finish the interview session. This will trigger the final evaluation and scoring.
-        Call this ONLY when you have completed all stages of the interview and said goodbye to the candidate.
+        """End the interview session definitely. 
+        Only call this when the farewell is complete or candidate wants to leave.
+        This will trigger the final evaluation on the backend.
         """
-        if self._completed:
-            return "Interview is already finished."
-
-        self._current_stage = InterviewStage.CLOSING
         self._completed = True
-        
-        # Update backend status to trigger evaluation
+        logger.info("Finishing interview for room: %s", self._room_name)
         asyncio.create_task(self._update_backend_status("completed"))
-        
-        # Shutdown session after a short delay to allow last words to play
-        if self.session:
-            async def shutdown_after_delay():
-                await asyncio.sleep(2)
-                if self.session:
-                    self.session.shutdown(drain=True)
-            asyncio.create_task(shutdown_after_delay())
-            
-        return "Buổi phỏng vấn đã được đánh dấu là hoàn thành. Hệ thống đang tiến hành chấm điểm."
-
-    async def get_initial_greeting(self) -> str:
-        if self._context:
-            name = self._context.get("candidateName", "bạn")
-            title = self._context.get("jobTitle", "vị trí công việc")
-            return f"Chào {name}! Tôi là trợ lý Phỏng vấn trực tuyến. Hôm nay tôi sẽ đồng hành cùng bạn trong buổi phỏng vấn cho {title}. Bạn đã sẵn sàng chưa?"
-        return DEFAULT_GREETING
+        return "The interview session is being finalized. Goodbye."
 
     async def _update_backend_status(self, status: str) -> None:
         if not self._backend_api_url or not self._room_name:
             return
         try:
+            url = f"{self._backend_api_url}/interviews/{self._room_name}/status"
             async with httpx.AsyncClient() as client:
-                url = f"{self._backend_api_url}/interviews/{self._room_name}/status"
+                # Compatibility: Some endpoints use PATCH, some POST. 
+                # Interviews compat view handles PATCH/POST.
                 await client.patch(url, json={"status": status}, timeout=5.0)
-        except Exception as exc:
-            logger.warning("update_backend_status failed: %s", exc)
+        except Exception as e:
+            logger.warning("Failed to update status: %s", e)
 
     async def _append_transcript(
         self,
@@ -181,53 +158,31 @@ class Interviewer(Agent):
     ) -> None:
         if not self._backend_api_url or not self._room_name:
             return
-        if not content:
+        if not content or not content.strip():
             return
         try:
             payload: dict[str, Any] = {
                 "speaker_role": speaker_role,
-                "content": content,
+                "content": content.strip(),
             }
             if speech_duration_ms is not None:
                 payload["speech_duration_ms"] = int(speech_duration_ms)
             async with httpx.AsyncClient() as client:
                 url = f"{self._backend_api_url}/interviews/{self._room_name}/append-transcription"
-                await client.post(url, json=payload, timeout=5.0)
+                resp = await client.post(url, json=payload, timeout=5.0)
+                if resp.status_code != 201:
+                    logger.debug("append_transcript returned %d", resp.status_code)
         except Exception as exc:
             logger.warning("append_transcript failed: %s", exc)
 
-    def _extract_message_text(self, new_message: Any) -> str:
-        if new_message is None:
-            return ""
-        if isinstance(new_message, str):
-            return new_message
-        if isinstance(new_message, dict):
-            for key in ("text", "message", "content"):
-                value = new_message.get(key)
-                if isinstance(value, str) and value.strip():
-                    return value
-            return ""
-        for attr in ("text", "message", "content"):
-            value = getattr(new_message, attr, None)
-            if isinstance(value, str) and value.strip():
-                return value
-        return ""
-
     async def _say_and_wait(self, text: str, *, allow_interruptions: bool = True) -> None:
-        handle = self.session.say(text, allow_interruptions=allow_interruptions)
-        await handle.wait_for_playout()
-        asyncio.create_task(self._append_transcript("ai_agent", text))
+        # Note: In AgentSession, self.session is available after start()
+        if hasattr(self, "session") and self.session:
+            handle = self.session.say(text, allow_interruptions=allow_interruptions)
+            await handle.wait_for_playout()
+            # Transcript is handled by agent.py listener
+        else:
+            logger.warning("Interviewer has no session attached yet.")
 
-    async def on_user_turn_completed(self, turn_ctx, new_message) -> None:  # type: ignore[override]
-        if self._completed:
-            if config.AUTO_END_ON_COMPLETION:
-                raise StopResponse()
-            return
-        if not self._backend_api_url or not self._room_name:
-            return
-        text = self._extract_message_text(new_message)
-        if text:
-            # Only append transcript, don't force next question.
-            # Let the LLM decide what to do next (acknowledge, follow up, or call tool).
-            asyncio.create_task(self._append_transcript("candidate", text))
-
+    # We don't override on_user_turn_completed anymore as it's unreliable 
+    # and we handle it via session events in agent.py for better coverage.

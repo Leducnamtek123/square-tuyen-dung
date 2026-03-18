@@ -85,7 +85,8 @@ def update_interview_status(
 
     if new_status == "completed":
         from .tasks import evaluate_interview_session
-
+        session.status = "processing"
+        session.save(update_fields=["status", "update_at"])
         evaluate_interview_session.delay(session.id)
 
     if new_status == "in_progress" and not was_started:

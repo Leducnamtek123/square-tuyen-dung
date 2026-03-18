@@ -249,6 +249,18 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
             status=status.HTTP_201_CREATED
         )
 
+    # POST /sessions/{pk}/evaluate-ai/
+    @action(detail=True, methods=['post'], url_path='evaluate-ai',
+            permission_classes=[permissions.IsAuthenticated])
+    def evaluate_ai(self, request, pk=None):
+        """Manually trigger AI evaluation for this session."""
+        session = self.get_object()
+        from .tasks import evaluate_interview_session
+        session.status = 'processing'
+        session.save(update_fields=['status', 'update_at'])
+        evaluate_interview_session.delay(session.id)
+        return Response({"detail": "AI evaluation task has been queued."})
+
 class InterviewEvaluationViewSet(viewsets.ModelViewSet):
     queryset = InterviewEvaluation.objects.select_related('interview', 'evaluator').all()
     serializer_class = InterviewEvaluationSerializer

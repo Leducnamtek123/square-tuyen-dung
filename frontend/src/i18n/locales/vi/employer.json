@@ -290,7 +290,13 @@
       "schedule": "LỊCH TRÌNH",
       "liveMonitoring": "THEO DÕI TRỰC TIẾP",
       "aiInterviewer": "Người phỏng vấn AI",
-      "candidateSmall": "Ứng viên"
+      "candidateSmall": "Ứng viên",
+      "technicalScore": "Điểm kỹ thuật",
+      "communicationScore": "Điểm giao tiếp",
+      "detailedAnalysis": "Phân tích chi tiết AI",
+      "strengths": "Điểm mạnh",
+      "weaknesses": "Điểm yếu",
+      "feedback": "Nhận xét chi tiết"
     },
     "messages": {
       "notFound": "Không tìm thấy thông tin phiên phỏng vấn",
@@ -302,7 +308,21 @@
     "actions": {
       "backToList": "Quay lại danh sách",
       "viewReport": "Xem báo cáo chi tiết",
-      "openRecording": "Mở ghi hình"
+      "openRecording": "Mở ghi hình",
+      "retryAi": "Phân tích lại bằng AI",
+      "questionList": "Danh sách câu hỏi phỏng vấn",
+      "hrEvaluation": "Đánh giá của Nhà tuyển dụng",
+      "attitudeScore": "Điểm thái độ",
+      "professionalScore": "Điểm chuyên môn",
+      "overallScore": "Điểm tổng quan",
+      "resultLabel": "Kết quả cuối cùng",
+      "comments": "Nhận xét chi tiết",
+      "proposedSalary": "Lương đề xuất (VNĐ)",
+      "submitEvaluation": "Gửi đánh giá cuối cùng",
+      "evalSuccess": "Gửi đánh giá thành công!",
+      "passed": "Chấp nhận (Đạt)",
+      "failed": "Từ chối (Không đạt)",
+      "pending": "Chờ xem xét"
     }
   },
   "jobPostFilterForm": {
