@@ -1,0 +1,145 @@
+// @ts-nocheck
+import * as React from 'react';
+
+import { Controller } from 'react-hook-form';
+
+import Checkbox from '@mui/material/Checkbox';
+
+import TextField from '@mui/material/TextField';
+
+import Autocomplete from '@mui/material/Autocomplete';
+
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+
+import { Typography } from "@mui/material";
+import ValidationError from '../ValidationError';
+
+interface Props {
+  [key: string]: any;
+}
+
+
+
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
+const MultiSelectCustom = ({
+
+  name,
+
+  control,
+
+  options = [],
+
+  title = null,
+
+  showRequired = false,
+
+  placeholder = '',
+
+}: Props) => {
+
+  return (
+
+    <div>
+
+      {title && (
+
+        <Typography variant="subtitle2" gutterBottom>
+
+          {title} {showRequired && <span style={{ color: 'red' }}>*</span>}
+
+        </Typography>
+
+      )}
+
+      <Controller
+
+        name={name}
+
+        control={control}
+
+        render={({ field, fieldState }) => (
+
+          <>
+
+            <Autocomplete
+
+              multiple
+
+              limitTags={1}
+
+              id={name}
+
+              options={options}
+
+              disableCloseOnSelect
+
+              onChange={(e, value) =>
+
+                field.onChange(value.map((value) => value?.id))
+
+              }
+
+              getOptionLabel={(option) => option.name}
+
+              renderOption={(props, option, { selected }) => (
+
+                <li {...props}>
+
+                  <Checkbox
+
+                    icon={icon}
+
+                    checkedIcon={checkedIcon}
+
+                    style={{ marginRight: 8 }}
+
+                    checked={selected}
+
+                  />
+
+                  {option.name}
+
+                </li>
+
+              )}
+
+              renderInput={(params) => (
+
+                <TextField
+
+                  error={fieldState.invalid}
+
+                  {...params}
+
+                  placeholder={placeholder}
+
+                  size="small"
+
+                />
+
+              )}
+
+            />
+
+            {fieldState.invalid && (
+              <ValidationError message={fieldState.error?.message} />
+            )}
+
+          </>
+
+        )}
+
+      />
+
+    </div>
+
+  );
+
+};
+
+export default MultiSelectCustom;

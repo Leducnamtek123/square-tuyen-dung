@@ -5,10 +5,10 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    container_name: myjob-frontend-container
+    container_name: project-frontend-container
     volumes:
-      - .:/myjob_web_app
-      - /myjob_web_app/node_modules
+      - .:/project_web_app
+      - /project_web_app/node_modules
     ports:
       - "3000:3000"
     environment:
@@ -16,16 +16,16 @@ services:
     env_file:
       - .env
     networks:
-      - myjob-network
+      - project-network
 
   frontend_nginx:
     image: nginx:1.24.0-alpine
-    container_name: myjob-frontend-nginx-container
+    container_name: project-frontend-nginx-container
     restart: unless-stopped
     env_file:
       - .env
     networks:
-      - myjob-network
+      - project-network
     ports:
       - "443:443"
     volumes:
@@ -35,5 +35,5 @@ services:
       - frontend_dev
 
 networks:
-  myjob-network:
-    name: myjob-network
+  project-network:
+    name: project-network

@@ -1,36 +1,24 @@
-# Frontend development environment
-FROM node:20
+# =============================================================================
+# frontend/Dockerfile — Development
+# =============================================================================
+FROM node:20-slim
 
-WORKDIR /myjob_web_app
+WORKDIR /project_web_app
 
-# Optional proxy support for npm during build
-ARG HTTP_PROXY
-ARG HTTPS_PROXY
-ARG NO_PROXY
-
-# Make proxies available to npm if provided
-ENV HTTP_PROXY=${HTTP_PROXY}
-ENV HTTPS_PROXY=${HTTPS_PROXY}
-ENV NO_PROXY=${NO_PROXY}
-ENV NPM_CONFIG_INCLUDE_OPTIONAL=true
-
-# Copy package.json and package-lock.json
+# Install dependencies first (layer caching)
 COPY package*.json ./
 
-# Install dependencies
-RUN if [ -n "$HTTP_PROXY" ]; then npm config set proxy "$HTTP_PROXY"; fi \
-  && if [ -n "$HTTPS_PROXY" ]; then npm config set https-proxy "$HTTPS_PROXY"; fi \
-  && npm config set fetch-retries 5 \
-  && npm config set fetch-retry-mintimeout 20000 \
-  && npm config set fetch-retry-maxtimeout 120000 \
-  && npm config set fetch-timeout 300000 \
-  && npm ci --include=optional --no-audit --no-fund
+ENV NPM_CONFIG_INCLUDE_OPTIONAL=true
+RUN npm ci --include=optional --no-audit --no-fund
 
-# Copy all remaining application files
+# Copy application code
 COPY . .
 
-# Expose port for dev server
+# Ownership for non-root user (node user exists in base image)
+RUN chown -R node:node /project_web_app
+
+USER node
+
 EXPOSE 3000
 
-# Default command when container starts
 CMD ["npm", "run", "start"]

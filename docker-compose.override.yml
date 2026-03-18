@@ -1,16 +1,98 @@
+# =============================================================================
+# docker-compose.override.yml — DEVELOPMENT overrides
+# =============================================================================
+# This file is auto-loaded by `docker compose up` (no -f flag needed).
+# It adds: dev ports, volume mounts for hot-reload, dev commands.
+# =============================================================================
+
 services:
-  vieneu-tts:
-    gpus: all
+  frontend:
+    container_name: tuyendung-studio-frontend
+    build:
+      dockerfile: Dockerfile
+    ports:
+      - "3005:3000"
+    volumes:
+      - ./frontend:/project_web_app
+      - /project_web_app/node_modules
     environment:
-      - TTS_DEVICE=cuda
+      - VITE_NODE_ENV=local
+      - VITE_PROJECT_HOST_NAME=localhost
+      - VITE_ADMIN_PROJECT_HOST_NAME=admin.localhost
+      - VITE_EMPLOYER_PROJECT_HOST_NAME=employer.localhost
+
+  backend:
+    container_name: tuyendung-studio-backend
+    build:
+      dockerfile: Dockerfile
+    command: sh docker-entrypoint.sh python manage.py runserver 0.0.0.0:8001
+    ports:
+      - "8010:8001"
+    volumes:
+      - ./api:/api
+    environment:
+      - DEBUG=True
+      - ALLOWED_HOSTS=*
+
+  celery-worker:
+    container_name: tuyendung-studio-celery-worker
+    build:
+      dockerfile: Dockerfile
+    volumes:
+      - ./api:/api
+    environment:
+      - DEBUG=True
+
+  celery-beat:
+    container_name: tuyendung-studio-celery-beat
+    build:
+      dockerfile: Dockerfile
+    volumes:
+      - ./api:/api
+    environment:
+      - DEBUG=True
+
+  db:
+    container_name: tuyendung-studio-db
+    ports:
+      - "3310:3306"
+
+  redis:
+    container_name: tuyendung-studio-redis
+    ports:
+      - "6380:6379"
+
+  livekit:
+    container_name: tuyendung-studio-livekit
+    command: --config /etc/livekit.yaml --dev --bind 0.0.0.0
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+      - "50000-50010:50000-50010/udp"
+
+  vieneu-tts:
+    container_name: tuyendung-studio-tts
+    environment:
+      - TTS_DEVICE=cpu
+    ports:
+      - "8298:8298"
 
   whisper:
-    gpus: all
-    environment:
-      - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cuda:0}
+    container_name: tuyendung-studio-whisper
+    ports:
+      - "11437:8080"
 
   llama-cpp:
-    image: ghcr.io/ggml-org/llama.cpp:server-cuda
-    gpus: all
-    environment:
-      - LLAMA_ARG_N_GPU_LAYERS=${LLAMA_N_GPU_LAYERS:-35}
+    container_name: tuyendung-studio-llama-cpp
+    ports:
+      - "11436:11434"
+
+  livekit-agent:
+    container_name: tuyendung-studio-livekit-agent
+
+  minio:
+    container_name: tuyendung-studio-minio
+    ports:
+      - "9000:9000"
+      - "9001:9001"

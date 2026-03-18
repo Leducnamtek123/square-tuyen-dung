@@ -1,13 +1,13 @@
 
 import math
 
-from configs import variable_system as var_sys
+from shared.configs import variable_system as var_sys
 
 from django.db.models import Count
 
 from celery import shared_task, chord
 
-from authentication.models import User
+from apps.accounts.models import User
 
 from . import queue_mail
 

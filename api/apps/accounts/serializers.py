@@ -1,0 +1,471 @@
+
+from shared.configs import variable_system as var_sys
+from shared.configs.messages import ERROR_MESSAGES
+from shared.helpers import helper
+from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+from django.conf import settings
+from django.db import transaction
+from console.jobs import queue_auth
+from .models import User
+from apps.profiles.models import (
+    JobSeekerProfile, Resume,
+    Company,
+    CompanyMember
+)
+from apps.locations.models import Location
+from apps.files.models import File
+from common.serializers import LocationSerializer
+from shared.helpers.cloudinary_service import CloudinaryService
+
+class CheckCredsSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True, max_length=100)
+    roleName = serializers.CharField(required=False, max_length=10,
+                                     allow_null=True, allow_blank=True)
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True, max_length=100)
+    platform = serializers.CharField(required=True)
+
+    def validate_platform(self, platform):
+        if platform not in ["WEB", "APP"]:
+            raise serializers.ValidationError(ERROR_MESSAGES['INVALID_PLATFORM'])
+        return platform
+
+class ResendVerifyEmailSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True, max_length=100)
+    platform = serializers.CharField(required=False, max_length=3, default="WEB")
+
+    def validate_platform(self, platform):
+        if platform not in ["WEB", "APP"]:
+            raise serializers.ValidationError(ERROR_MESSAGES['INVALID_PLATFORM'])
+        return platform
+
+class UpdatePasswordSerializer(serializers.Serializer):
+    oldPassword = serializers.CharField(required=True, max_length=128)
+    newPassword = serializers.CharField(required=True, max_length=128)
+    confirmPassword = serializers.CharField(required=True, max_length=128)
+
+    def validate(self, attrs):
+        user = self.context['user']
+
+        old_pass = attrs.get('oldPassword', '')
+        new_pass = attrs.get('newPassword', '')
+        confirm_pass = attrs.get('confirmPassword', '')
+        if not new_pass == confirm_pass:
+            raise serializers.ValidationError({'confirmPassword': ERROR_MESSAGES['CONFIRM_PASSWORD_MISMATCH']})
+
+        if not user.check_password(old_pass):
+            raise serializers.ValidationError({'oldPassword': ERROR_MESSAGES['CURRENT_PASSWORD_INCORRECT']})
+        return attrs
+
+    def update(self, instance, validated_data):
+        instance.set_password(validated_data.get('newPassword'))
+        instance.save()
+
+        return instance
+
+class ResetPasswordSerializer(serializers.Serializer):
+    newPassword = serializers.CharField(required=True, max_length=128)
+    confirmPassword = serializers.CharField(required=True, max_length=128)
+    token = serializers.CharField(required=False)
+    code = serializers.CharField(required=False)
+    platform = serializers.CharField(required=True)
+
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop('fields', None)
+
+        super().__init__(*args, **kwargs)
+
+        if fields is not None:
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
+    def validate(self, attrs):
+        new_pass = attrs.get('newPassword', '')
+        confirm_pass = attrs.get('confirmPassword', '')
+        if not new_pass == confirm_pass:
+            raise serializers.ValidationError({'confirmPassword': ERROR_MESSAGES['CONFIRM_PASSWORD_MISMATCH']})
+
+        platform = attrs.get("platform", "")
+        if platform not in ["APP", "WEB"]:
+            raise serializers.ValidationError({'platform': ERROR_MESSAGES['INVALID_PLATFORM']})
+        if platform == "APP":
+            if not attrs.get("code", None):
+                raise serializers.ValidationError({'code': ERROR_MESSAGES['CODE_REQUIRED']})
+        elif platform == "WEB":
+            if not attrs.get("token", None):
+                raise serializers.ValidationError({'token': ERROR_MESSAGES['TOKEN_REQUIRED']})
+        return attrs
+
+class JobSeekerRegisterSerializer(serializers.Serializer):
+    fullName = serializers.CharField(source="full_name", required=True, max_length=100)
+    email = serializers.EmailField(required=True, max_length=100,
+                                   validators=[UniqueValidator(queryset=User.objects.all(),
+                                                               message=ERROR_MESSAGES['EMAIL_EXISTS'])])
+    password = serializers.CharField(required=True, max_length=100)
+    confirmPassword = serializers.CharField(required=True, max_length=100)
+    platform = serializers.CharField(required=True, max_length=3)
+
+    def validate(self, attrs):
+        if not attrs["password"] == attrs["confirmPassword"]:
+            raise serializers.ValidationError({'confirmPassword': ERROR_MESSAGES['CONFIRM_PASSWORD_MISMATCH']})
+        return attrs
+
+    def create(self, validated_data):
+        try:
+            with transaction.atomic():
+                validated_data.pop("confirmPassword")
+                validated_data.pop("platform")
+                user = User.objects.create_user_with_role_name(**validated_data,
+                                                               is_active=False,
+                                                               role_name=var_sys.JOB_SEEKER)
+                job_seeker_profile = JobSeekerProfile.objects.create(user=user)
+                Resume.objects.create(job_seeker_profile=job_seeker_profile, user=user,
+                                      type=var_sys.CV_WEBSITE)
+
+                return user
+        except Exception as ex:
+            helper.print_log_error("create user in JobSeekerRegisterSerializer", ex)
+            raise
+
+    class Meta:
+        model = User
+        fields = ("fullName", "email", "password", "confirmPassword", "platform")
+
+class CompanyRegisterSerializer(serializers.ModelSerializer):
+    companyName = serializers.CharField(source="company_name", required=True, max_length=255,
+                                        validators=[UniqueValidator(Company.objects.all(),
+                                                                    message=ERROR_MESSAGES['COMPANY_NAME_EXISTS'])])
+    companyEmail = serializers.EmailField(source='company_email', required=True, max_length=100,
+                                          validators=[UniqueValidator(Company.objects.all(),
+                                                                      message=ERROR_MESSAGES['COMPANY_EMAIL_EXISTS'])])
+    companyPhone = serializers.CharField(source='company_phone', required=False, max_length=15,
+                                         validators=[UniqueValidator(Company.objects.all(),
+                                                                     message=ERROR_MESSAGES['COMPANY_PHONE_EXISTS'])])
+    taxCode = serializers.CharField(source="tax_code", required=True, max_length=30,
+                                    validators=[UniqueValidator(Company.objects.all(),
+                                                                message=ERROR_MESSAGES['COMPANY_TAX_CODE_EXISTS'])])
+    fieldOperation = serializers.CharField(source="field_operation", required=False,
+                                           max_length=255,
+                                           allow_null=True,
+                                           allow_blank=True)
+    since = serializers.DateField(required=False,
+                                  input_formats=[var_sys.DATE_TIME_FORMAT["ISO8601"],
+                                                 var_sys.DATE_TIME_FORMAT["Ymd"]],
+                                  allow_null=True)
+    employeeSize = serializers.IntegerField(source="employee_size", required=True)
+    websiteUrl = serializers.URLField(source="website_url", required=False, max_length=300,
+                                      allow_blank=True,
+                                      allow_null=True)
+    description = serializers.CharField(required=False)
+    location = LocationSerializer()
+
+    class Meta:
+        model = Company
+        fields = ("companyName", "companyEmail", "companyPhone",
+                  "taxCode", "fieldOperation", "since",
+                  "employeeSize",
+                  "websiteUrl", "description",
+                  "location")
+
+class EmployerRegisterSerializer(serializers.Serializer):
+    company = CompanyRegisterSerializer()
+    fullName = serializers.CharField(source="full_name", required=True, max_length=100)
+    email = serializers.EmailField(required=True, max_length=100,
+                                   validators=[UniqueValidator(queryset=User.objects.all())])
+    password = serializers.CharField(required=True, max_length=100)
+    confirmPassword = serializers.CharField(required=True, max_length=100)
+    platform = serializers.CharField(required=True, max_length=3)
+
+    def validate(self, attrs):
+        if not attrs["password"] == attrs["confirmPassword"]:
+            raise serializers.ValidationError({'confirmPassword': ERROR_MESSAGES['CONFIRM_PASSWORD_MISMATCH']})
+        return attrs
+
+    def create(self, validated_data):
+        try:
+            with transaction.atomic():
+                validated_data.pop("confirmPassword")
+                validated_data.pop("platform")
+                company = validated_data.pop("company")
+                location = company.pop("location")
+
+                location_obj = Location.objects.create(**location)
+                user = User.objects.create_user_with_role_name(**validated_data,
+                                                               is_active=False,
+                                                               has_company=True,
+                                                               role_name=var_sys.EMPLOYER)
+                Company.objects.create(user=user, **company, location=location_obj)
+
+                return user
+        except Exception as ex:
+            helper.print_log_error("create user in JobSeekerRegisterSerializer", ex)
+            raise
+
+    class Meta:
+        model = User
+        fields = ("fullName", "email", "password", "confirmPassword", "company", "platform")
+
+class UserSerializer(serializers.ModelSerializer):
+    fullName = serializers.CharField(source="full_name", required=False, allow_blank=True)
+    email = serializers.EmailField(read_only=True)
+    avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
+    isActive = serializers.BooleanField(source='is_active', read_only=True)
+    isVerifyEmail = serializers.BooleanField(source='is_verify_email', read_only=True)
+    roleName = serializers.ChoiceField(source="role_name", choices=var_sys.ROLE_CHOICES, required=False)
+    jobSeekerProfileId = serializers.SerializerMethodField(method_name="get_job_seeker_profile_id", read_only=True)
+    jobSeekerProfile = serializers.SerializerMethodField(method_name="get_job_seeker_profile", read_only=True)
+    companyId = serializers.SerializerMethodField(method_name="get_company_id", read_only=True)
+    company = serializers.SerializerMethodField(method_name="get_company", read_only=True)
+    canAccessEmployerPortal = serializers.SerializerMethodField(method_name="get_can_access_employer_portal", read_only=True)
+    employerRoleCode = serializers.SerializerMethodField(method_name="get_employer_role_code", read_only=True)
+    workspaces = serializers.SerializerMethodField(method_name="get_workspaces", read_only=True)
+    
+    def get_avatar_url(self, user):
+        try:
+            avatar = getattr(user, 'avatar', None)
+            if avatar:
+                return avatar.get_full_url()
+        except Exception as ex:
+            helper.print_log_error("UserSerializer.get_avatar_url", ex)
+        return var_sys.AVATAR_DEFAULT["AVATAR"]
+
+    def _get_job_seeker_profile_safe(self, user):
+        if getattr(user, 'role_name', None) != var_sys.JOB_SEEKER:
+            return None
+        try:
+            return JobSeekerProfile.objects.only("id", "phone").filter(user=user).first()
+        except Exception as ex:
+            helper.print_log_error("UserSerializer._get_job_seeker_profile_safe", ex)
+            return None
+
+    def get_job_seeker_profile(self, user):
+        profile = self._get_job_seeker_profile_safe(user)
+        if profile:
+            return {
+                "id": profile.id,
+                "phone": profile.phone
+            }
+        return None
+
+    def get_job_seeker_profile_id(self, user):
+        profile = self._get_job_seeker_profile_safe(user)
+        return profile.id if profile else None
+
+    def _get_company_safe(self, user):
+        try:
+            return user.get_active_company()
+        except Exception as ex:
+            helper.print_log_error("UserSerializer._get_company_safe", ex)
+            return None
+
+    def get_company(self, user):
+        company = self._get_company_safe(user)
+        if company:
+            company_logo = getattr(company, 'logo', None)
+            company_logo_url = company_logo.get_full_url() if company_logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+
+            return {
+                "id": company.id,
+                "slug": company.slug,
+                "companyName": company.company_name,
+                "imageUrl": company_logo_url
+            }
+        return None
+
+    def get_company_id(self, user):
+        company = self._get_company_safe(user)
+        return company.id if company else None
+
+    def get_can_access_employer_portal(self, user):
+        if getattr(user, "role_name", None) == var_sys.ADMIN:
+            return False
+        if getattr(user, "role_name", None) == var_sys.EMPLOYER:
+            return True
+        try:
+            return CompanyMember.objects.filter(
+                user=user,
+                status=CompanyMember.STATUS_ACTIVE,
+                is_active=True,
+            ).exists()
+        except Exception:
+            return False
+
+    def get_employer_role_code(self, user):
+        try:
+            membership = CompanyMember.objects.select_related("role").filter(
+                user=user,
+                status=CompanyMember.STATUS_ACTIVE,
+                is_active=True,
+            ).first()
+            return membership.role.code if membership and membership.role else None
+        except Exception:
+            return None
+
+    def get_workspaces(self, user):
+        workspaces = []
+        role_name = getattr(user, "role_name", None)
+
+        # Only add Candidate workspace if user is a Job Seeker
+        # or has an existing JobSeekerProfile (except for ADMINs)
+        has_job_seeker_profile = False
+        try:
+            # We use JobSeekerProfile already imported from apps.profiles.models
+            has_job_seeker_profile = JobSeekerProfile.objects.filter(user=user).exists()
+        except Exception:
+            pass
+
+        if (role_name == var_sys.JOB_SEEKER or has_job_seeker_profile) and role_name != var_sys.ADMIN:
+            workspaces.append({
+                "type": "job_seeker",
+                "label": "Candidate",
+                "isDefault": role_name == var_sys.JOB_SEEKER,
+            })
+
+        company_ids = set()
+        try:
+            owned_company = user.get_active_company()
+            if owned_company:
+                company_ids.add(owned_company.id)
+                logo = owned_company.logo.get_full_url() if owned_company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+                workspaces.append({
+                    "type": "company",
+                    "label": owned_company.company_name,
+                    "companyId": owned_company.id,
+                    "companySlug": owned_company.slug,
+                    "companyImageUrl": logo,
+                    "roleCode": "owner",
+                    "isDefault": getattr(user, "role_name", None) == var_sys.EMPLOYER,
+                })
+        except Exception:
+            pass
+
+        try:
+            memberships = CompanyMember.objects.select_related("company", "role", "company__logo").filter(
+                user=user,
+                status=CompanyMember.STATUS_ACTIVE,
+                is_active=True,
+            )
+            for membership in memberships:
+                company = membership.company
+                if not company or company.id in company_ids:
+                    continue
+                company_ids.add(company.id)
+                logo = company.logo.get_full_url() if company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+                workspaces.append({
+                    "type": "company",
+                    "label": company.company_name,
+                    "companyId": company.id,
+                    "companySlug": company.slug,
+                    "companyImageUrl": logo,
+                    "roleCode": membership.role.code if membership.role else None,
+                    "isDefault": False,
+                })
+        except Exception:
+            pass
+
+        return workspaces
+
+    def __init__(self, *args, **kwargs):
+        fields = kwargs.pop('fields', None)
+
+        super().__init__(*args, **kwargs)
+
+        if fields is not None:
+            allowed = set(fields)
+            existing = set(self.fields)
+            for field_name in existing - allowed:
+                self.fields.pop(field_name)
+
+    def update(self, user, validated_data):
+        if "full_name" in validated_data:
+            full_name = validated_data.get("full_name")
+            if full_name is not None:
+                user.full_name = full_name
+            if not user.has_company:
+                queue_auth.update_info.delay(user.id, full_name)
+
+        if "role_name" in validated_data:
+            user.role_name = validated_data.get("role_name")
+
+        user.save()
+        return user
+
+    class Meta:
+        model = User
+        fields = ("id", "fullName", "email",
+                  "isActive", "isVerifyEmail",
+                  "avatarUrl", "roleName",
+                  "jobSeekerProfileId", "jobSeekerProfile",
+                  "companyId", "company",
+                  "canAccessEmployerPortal", "employerRoleCode",
+                  "workspaces",)
+
+class AvatarSerializer(serializers.ModelSerializer):
+    file = serializers.FileField(required=True, write_only=True)
+    avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
+    
+    def get_avatar_url(self, user):
+        try:
+            avatar = getattr(user, 'avatar', None)
+            if avatar:
+                return avatar.get_full_url()
+        except Exception as ex:
+            helper.print_log_error("AvatarSerializer.get_avatar_url", ex)
+        return var_sys.AVATAR_DEFAULT["AVATAR"]
+
+    def update(self, user, validated_data):
+        file = validated_data.pop('file')
+
+        try:
+            with transaction.atomic():
+                public_id = None
+                # Overwrite if image already exists
+                if user.avatar:
+                    path_list = user.avatar.public_id.split('/')
+                    public_id = path_list[-1] if path_list else None
+                # Call upload service
+                avatar_upload_result = CloudinaryService.upload_image(
+                    file,
+                    settings.CLOUDINARY_DIRECTORY["avatar"],
+                    public_id=public_id
+                )
+                if not avatar_upload_result:
+                    raise Exception("Lỗi khi tải ảnh lên máy chủ lưu trữ.")
+                user.avatar = File.update_or_create_file_with_cloudinary(
+                    user.avatar,
+                    avatar_upload_result,
+                    File.AVATAR_TYPE
+                )
+                user.save()
+
+                # update in firebase
+                if not user.has_company:
+                    queue_auth.update_avatar.delay(user.id, user.avatar.get_full_url())
+            
+            return user
+        except Exception as ex:
+            helper.print_log_error("AvatarSerializer.update", ex)
+            raise
+
+    class Meta:
+        model = User
+        fields = ('file', 'avatarUrl')
+
+class UserSettingSerializer(serializers.ModelSerializer):
+    emailNotificationActive = serializers.BooleanField(required=True, source='email_notification_active')
+    smsNotificationActive = serializers.BooleanField(required=True, source='sms_notification_active')
+
+    def update(self, user, validated_data):
+        user.email_notification_active = validated_data.get("email_notification_active", True)
+        user.sms_notification_active = validated_data.get("sms_notification_active", True)
+        user.save()
+
+        return user
+
+    class Meta:
+        model = User
+        fields = ('emailNotificationActive', 'smsNotificationActive')

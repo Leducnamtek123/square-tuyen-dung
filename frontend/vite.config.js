@@ -39,6 +39,7 @@ export default defineConfig({
       '@fortawesome/free-solid-svg-icons': path.resolve(__dirname, './src/icon-shims/fontawesome-solid.js'),
       '@fortawesome/free-regular-svg-icons': path.resolve(__dirname, './src/icon-shims/fontawesome-regular.js'),
     },
+    dedupe: ['react', 'react-dom'],
   },
   define: {
     global: 'globalThis',
@@ -59,12 +60,18 @@ export default defineConfig({
   build: {
     outDir: 'build',
     sourcemap: false,
-    chunkSizeWarningLimit: 1600,
-    rollupOptions: {
+    chunkSizeWarningLimit: 2000,
+    rolldownOptions: {
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) return;
 
+          // --- React core (good for long-term caching) ---
+          if (id.includes('react-dom') || id.includes('/react/')) {
+            return 'react-vendor';
+          }
+
+          // --- Streamdown ecosystem ---
           if (id.includes('@streamdown/mermaid') || id.includes('mermaid') || id.includes('cytoscape')) {
             return 'mermaid';
           }
@@ -81,56 +88,76 @@ export default defineConfig({
             return 'streamdown';
           }
 
+          // --- PDF: split pdfjs-dist (large) from viewer ---
           if (id.includes('pdfjs-dist')) {
             return 'pdfjs';
           }
 
           if (id.includes('@react-pdf-viewer') || id.includes('@react-pdf/renderer')) {
-            return 'pdf';
+            return 'pdf-viewer';
           }
 
+          // --- UI framework ---
           if (id.includes('@mui') || id.includes('@emotion')) {
             return 'mui';
           }
 
+          // --- Routing ---
           if (id.includes('react-router')) {
             return 'router';
           }
 
+          // --- State management ---
           if (id.includes('@reduxjs') || id.includes('react-redux')) {
             return 'redux';
           }
 
+          // --- Charts ---
           if (id.includes('chart.js') || id.includes('react-chartjs-2')) {
             return 'charts';
           }
 
+          // --- LiveKit ---
           if (id.includes('livekit')) {
             return 'livekit';
           }
 
+          // --- Firebase ---
           if (id.includes('firebase')) {
             return 'firebase';
           }
 
+          // --- Rich text editor ---
           if (id.includes('react-draft-wysiwyg') || id.includes('draft-js') || id.includes('draftjs-to-html')) {
             return 'editor';
           }
 
+          // --- Maps ---
           if (id.includes('react-leaflet') || id.includes('leaflet') || id.includes('@goongmaps')) {
             return 'maps';
           }
 
+          // --- Spreadsheet ---
           if (id.includes('xlsx')) {
             return 'xlsx';
+          }
+
+          // --- i18n ---
+          if (id.includes('i18next') || id.includes('react-i18next')) {
+            return 'i18n';
+          }
+
+          // --- Swiper ---
+          if (id.includes('swiper')) {
+            return 'swiper';
           }
         },
       },
       onwarn(warning, warn) {
-        if (warning?.message?.includes('pdfjs-dist') && warning?.message?.includes('Use of eval')) {
+        // Suppress eval warning from pdfjs-dist (third-party, cannot fix)
+        if (warning?.message?.includes('pdfjs-dist') && warning?.message?.includes('eval')) {
           return;
         }
-
         warn(warning);
       },
     },

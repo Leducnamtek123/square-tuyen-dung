@@ -1,13 +1,12 @@
 
 from celery import shared_task
 
-from firebase_admin import firestore
-
 from google.cloud import firestore as google_cloud_firestore
 
-from helpers import helper
+from shared.helpers import helper
+from common.firebase import get_firestore_client
 
-from configs import variable_system as var_sys
+from shared.configs import variable_system as var_sys
 
 @shared_task
 
@@ -25,7 +24,9 @@ def add_notification_to_user(title, content, type_name, image=None,
 
             user_id_list = []
 
-        database = firestore.client()
+        database = get_firestore_client()
+        if not database:
+            return "Add notification failed!"
 
         for user_id in user_id_list:
 

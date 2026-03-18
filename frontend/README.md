@@ -119,7 +119,7 @@ Firebase serves notification and chat functionality.
 ```env
 VITE_FIREBASE_API_KEY=<API_Key>
 VITE_FIREBASE_AUTH_DOMAIN=<Auth_Domain>
-VITE_FIREBASE_PROJECT_ID=<Project_ID>
+VITE_FIREBASE_project_ID=<project_ID>
 VITE_FIREBASE_STORAGE_BUCKET=<Storage_Bucket>
 VITE_FIREBASE_MESSAGING_SENDER_ID=<Sender_ID>
 VITE_FIREBASE_APP_ID=<App_ID>
@@ -380,7 +380,7 @@ docker-compose up -d --build
 
 ### Bước 5: Giả lập domain
 
-Cho phép www.myjob.com, employer.myjob.com thay thế cho localhost (127.0.0.1)
+Cho phép www.project.com, employer.project.com thay thế cho localhost (127.0.0.1)
 
 **Đối với MacOS, Linux:**
 
@@ -390,8 +390,8 @@ sudo vim /etc/hosts
 ```
 Thêm 2 dòng:
 ```
-127.0.0.1       www.myjob.com
-127.0.0.1       employer.myjob.com
+127.0.0.1       www.project.com
+127.0.0.1       employer.project.com
 ```
 
 **Đối với Windows:**
@@ -403,8 +403,8 @@ Thêm 2 dòng trên vào file `hosts` (Mở với quyền administrators)
 ### Bước 6: Kiểm Tra Kết Quả
 
 Sau khi khởi chạy thành công, truy cập:
-- 🌐 **Trang người tìm việc**: https://www.myjob.com
-- 🌐 **Trang nhà tuyển dụng**: https://employer.myjob.com
+- 🌐 **Trang người tìm việc**: https://www.project.com
+- 🌐 **Trang nhà tuyển dụng**: https://employer.project.com
 
 ---
 
@@ -435,7 +435,7 @@ Firebase phục vụ cho chức năng thông báo (notification) và nhắn tin 
 ```env
 VITE_FIREBASE_API_KEY=<API_Key>
 VITE_FIREBASE_AUTH_DOMAIN=<Auth_Domain>
-VITE_FIREBASE_PROJECT_ID=<Project_ID>
+VITE_FIREBASE_project_ID=<project_ID>
 VITE_FIREBASE_STORAGE_BUCKET=<Storage_Bucket>
 VITE_FIREBASE_MESSAGING_SENDER_ID=<Sender_ID>
 VITE_FIREBASE_APP_ID=<App_ID>
@@ -455,8 +455,8 @@ Cấu hình Client ID và Client Secret cho các phương thức đăng nhập.
 
 **Biến môi trường cần thiết:**
 ```env
-VITE_MYJOB_SERVER_CLIENT_ID=<Client_ID>
-VITE_MYJOB_SERVER_CLIENT_SECRECT=<Client_Secret>
+VITE_project_SERVER_CLIENT_ID=<Client_ID>
+VITE_project_SERVER_CLIENT_SECRECT=<Client_Secret>
 ```
 
 **Các bước cấu hình:**
@@ -465,8 +465,8 @@ VITE_MYJOB_SERVER_CLIENT_SECRECT=<Client_Secret>
 2. Click nút **`New Application`**
 3. Điền thông tin như sau:
    - **Name**: Đặt tên tuỳ ý (ví dụ: `Default authentication`)
-   - **Client id**: Giữ nguyên giá trị mặc định → Copy và cập nhật vào `VITE_MYJOB_SERVER_CLIENT_ID`
-   - **Client secret**: Giữ nguyên giá trị mặc định → Copy và cập nhật vào `VITE_MYJOB_SERVER_CLIENT_SECRECT`
+   - **Client id**: Giữ nguyên giá trị mặc định → Copy và cập nhật vào `VITE_project_SERVER_CLIENT_ID`
+   - **Client secret**: Giữ nguyên giá trị mặc định → Copy và cập nhật vào `VITE_project_SERVER_CLIENT_SECRECT`
    - **Hash client secret**: ✅ Tích chọn
    - **Client type**: Chọn `Confidential`
    - **Authorization grant type**: Chọn `Resource owner password-based`
@@ -549,13 +549,13 @@ Bạn cần tạo **2 agent chatbot**: một cho người tìm việc và một 
 1. Truy cập [Dialogflow Console](https://dialogflow.cloud.google.com/)
 2. Click **`Create new agent`**
 3. Điền thông tin agent:
-   - Tạo agent thứ nhất với tên: `JobSeekerMyJobAgent` (dành cho người tìm việc)
-   - Tạo agent thứ hai với tên: `EmployerMyJobAgent` (dành cho nhà tuyển dụng)
+   - Tạo agent thứ nhất với tên: `JobSeekerProjectAgent` (dành cho người tìm việc)
+   - Tạo agent thứ hai với tên: `EmployerProjectAgent` (dành cho nhà tuyển dụng)
    - Có thể chọn Google Project đã tạo trước đó hoặc tạo mới
 4. Sau khi tạo agent, truy cập **`Integrations`** → Chọn **`Dialogflow Messenger`** → Click **`ENABLE`**
 5. Hộp thoại hiển thị **agent-id**, copy và điền vào:
-   - `VITE_JOB_SEEKER_BOT_AGENT_ID` (cho JobSeekerMyJobAgent)
-   - `VITE_EMPLOYER_BOT_AGENT_ID` (cho EmployerMyJobAgent)
+   - `VITE_JOB_SEEKER_BOT_AGENT_ID` (cho JobSeekerProjectAgent)
+   - `VITE_EMPLOYER_BOT_AGENT_ID` (cho EmployerProjectAgent)
 
 > 💡 **Mẹo**: Lặp lại các bước từ 2-5 cho cả hai agent
 
@@ -570,7 +570,7 @@ Bạn cần tạo **2 agent chatbot**: một cho người tìm việc và một 
 **Các bước thực hiện:**
 
 1. Truy cập [Dialogflow Console](https://dialogflow.cloud.google.com/)
-2. Chọn agent `JobSeekerMyJobAgent` (hoặc `EmployerMyJobAgent` để cấu hình cho nhà tuyển dụng)
+2. Chọn agent `JobSeekerProjectAgent` (hoặc `EmployerProjectAgent` để cấu hình cho nhà tuyển dụng)
 
 3. **Cấu hình Webhook** để chatbot gọi API Backend:
    - Truy cập **Fulfillment** → Bật **Enabled Webhook**
@@ -588,11 +588,11 @@ Bạn cần tạo **2 agent chatbot**: một cho người tìm việc và một 
    - Chọn tab **Export and Import**
    - Click **`IMPORT FROM ZIP`**
    - Chọn file tương ứng từ thư mục `data/chatbot/` của Backend:
-     - `JobSeekerMyJobAgent.zip` (cho agent người tìm việc)
-     - `EmployerMyJobAgent.zip` (cho agent nhà tuyển dụng)
+     - `JobSeekerProjectAgent.zip` (cho agent người tìm việc)
+     - `EmployerProjectAgent.zip` (cho agent nhà tuyển dụng)
    - Đợi quá trình import hoàn tất
 
-> 💡 **Lưu ý**: Thực hiện tương tự cho cả 2 agent (JobSeekerMyJobAgent và EmployerMyJobAgent)
+> 💡 **Lưu ý**: Thực hiện tương tự cho cả 2 agent (JobSeekerProjectAgent và EmployerProjectAgent)
 
 ---
 
@@ -622,7 +622,7 @@ Bạn cần tạo **2 agent chatbot**: một cho người tìm việc và một 
 
 ## 🎉 Hoàn Tất!
 
-Bạn đã hoàn thành việc cài đặt và cấu hình **MyJob Web Application**. Truy cập ứng dụng và trải nghiệm!
+Bạn đã hoàn thành việc cài đặt và cấu hình **Project Web Application**. Truy cập ứng dụng và trải nghiệm!
 
 **Liên kết hữu ích:**
 - 📖 [Documentation](https://github.com/Square/square-job-web-app)
@@ -630,3 +630,4 @@ Bạn đã hoàn thành việc cài đặt và cấu hình **MyJob Web Applicati
 - 💬 [Thảo luận](https://github.com/Square/square-job-web-app/discussions)
 
 </details>
+

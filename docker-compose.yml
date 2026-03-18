@@ -1,256 +1,184 @@
+# =============================================================================
+# docker-compose.yml — BASE (shared across dev & prod)
+# =============================================================================
+# Usage:
+#   Dev:  docker compose up                    (auto-loads override.yml)
+#   Prod: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# =============================================================================
 
 services:
+  # ---------------------------------------------------------------------------
+  # Frontend
+  # ---------------------------------------------------------------------------
   frontend:
-    container_name: tuyendung-studio-frontend
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-      args:
-          REACT_APP_NODE_ENV: local
-          REACT_APP_API_JOB: http://localhost:8010/api/job/web
-          REACT_APP_API_COMPANY: http://localhost:8010/api/company/web
-          REACT_APP_API_INFO: http://localhost:8010/api/info/web
-          REACT_APP_API_AUTH: http://localhost:8010/api/auth/web
-
-           # GOONG - gợi ý địa điểm trong ô Địa điểm khi người dùng gõ vài từ
-          REACT_APP_GOONGAPI_KEY: ${REACT_APP_GOONGAPI_KEY}
-          REACT_APP_GOONGAPI_ACCESS_TOKEN: ${REACT_APP_GOONGAPI_ACCESS_TOKEN:-}
-
-          # FIREBASE
-          REACT_APP_FIREBASE_API_KEY: ${REACT_APP_FIREBASE_API_KEY}
-          REACT_APP_FIREBASE_AUTH_DOMAIN: ${REACT_APP_FIREBASE_AUTH_DOMAIN}
-          REACT_APP_FIREBASE_PROJECT_ID: ${REACT_APP_FIREBASE_PROJECT_ID}
-          REACT_APP_FIREBASE_STORAGE_BUCKET: ${REACT_APP_FIREBASE_STORAGE_BUCKET}
-          REACT_APP_FIREBASE_MESSAGING_SENDER_ID: ${REACT_APP_FIREBASE_MESSAGING_SENDER_ID}
-          REACT_APP_FIREBASE_APP_ID: ${REACT_APP_FIREBASE_APP_ID}
     env_file:
-      - ./frontend/.env
-    ports:
-      - "3005:3000"
-    volumes:
-      - ./frontend:/myjob_web_app
-      - /myjob_web_app/node_modules
+      - .env
     restart: unless-stopped
-    environment:
-      - VITE_NODE_ENV=local
-      - VITE_MYJOB_HOST_NAME=localhost
-      - VITE_ADMIN_MYJOB_HOST_NAME=admin.localhost
-      - VITE_EMPLOYER_MYJOB_HOST_NAME=employer.localhost
-      - VITE_MYJOB_SERVER_CLIENT_ID=${VITE_MYJOB_SERVER_CLIENT_ID}
-      - VITE_MYJOB_SERVER_CLIENT_SECRECT=${VITE_MYJOB_SERVER_CLIENT_SECRECT}
-      - VITE_GOOGLE_CLIENT_ID=${REACT_APP_GOOGLE_CLIENT_ID:-dummy-google-id}
-      - REACT_APP_NODE_ENV=local
-      - REACT_APP_API_JOB=http://localhost:8010/api/job/web
-      - REACT_APP_API_COMPANY=http://localhost:8010/api/company/web
-      - REACT_APP_API_INFO=http://localhost:8010/api/info/web
-      - REACT_APP_API_AUTH=http://localhost:8010/api/auth/web
-      - REACT_APP_FACEBOOK_CLIENT_ID=${REACT_APP_FACEBOOK_CLIENT_ID}
-      - REACT_APP_FACEBOOK_CLIENT_SECRET=${REACT_APP_FACEBOOK_CLIENT_SECRET}
-      - REACT_APP_GOOGLE_CLIENT_ID=${REACT_APP_GOOGLE_CLIENT_ID}
-      - REACT_APP_GOOGLE_CLIENT_SECRET=${REACT_APP_GOOGLE_CLIENT_SECRET}
-
     networks:
       - square-network
 
+  # ---------------------------------------------------------------------------
+  # Backend (Django)
+  # ---------------------------------------------------------------------------
   backend:
-    container_name: tuyendung-studio-backend
     build:
       context: ./api
-      dockerfile: Dockerfile
     env_file:
       - .env
-    command: sh docker-entrypoint.sh python manage.py runserver 0.0.0.0:8001
-    volumes:
-      - ./api:/myjob_api
-    ports:
-      - "8010:8001"
     restart: unless-stopped
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - APP_ENV=local
-      - DEBUG=True
-      - APPEND_SLASH=True
-      - ALLOWED_HOSTS=*
-      - CSRF_TRUSTED_ORIGINS=https://tuyendung.sqstudio.vn,http://localhost:3002,http://127.0.0.1:3000,http://localhost:8001,http://localhost:8010,http://localhost:3005,http://admin.localhost:3005,http://employer.localhost:3005
-      - WEB_CLIENT_URL=http://localhost:3002
-      - WEB_JOB_SEEKER_CLIENT_URL=http://localhost:3002
-      - WEB_EMPLOYER_CLIENT_URL=http://localhost:3002
-      - CLIENT_ID=${CLIENT_ID}
-      - CLIENT_SECRET=${CLIENT_SECRET}
-      - REQUIRE_CLIENT_SECRET=False
-      - DB_ENGINE=django.db.backends.mysql
-      - DB_HOST=tuyendung-studio-db
-      - DB_NAME=square_db
-      - DB_USER=root
-      - DB_PASSWORD=secret
+      - DB_HOST=db
       - DB_PORT=3306
-      - EMAIL_HOST=smtp.gmail.com
-      - EMAIL_PORT=587
-      - EMAIL_HOST_USER=demow3907@gmail.com
-      - EMAIL_HOST_PASSWORD=enasoenfnxnxzzki
       - SERVICE_REDIS_HOST=redis
       - SERVICE_REDIS_PORT=6379
-      - SERVICE_REDIS_USERNAME=
-      - SERVICE_REDIS_PASSWORD=
       - SERVICE_REDIS_DB=0
-      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
-      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
-      - TWILIO_PHONE=${TWILIO_PHONE}
-      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
-      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
-      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
-      - SOCIAL_AUTH_FACEBOOK_KEY=${SOCIAL_AUTH_FACEBOOK_KEY}
-      - SOCIAL_AUTH_FACEBOOK_SECRET=${SOCIAL_AUTH_FACEBOOK_SECRET}
-      - SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=${SOCIAL_AUTH_GOOGLE_OAUTH2_KEY}
-      - SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=${SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET}
-      - SMS_API_KEY=${SMS_API_KEY}
       - LIVEKIT_URL=http://livekit:7880
       - LIVEKIT_AGENT_NAME=square-ai-interviewer
     networks:
       - square-network
 
+  # ---------------------------------------------------------------------------
+  # Celery Worker
+  # ---------------------------------------------------------------------------
   celery-worker:
-    container_name: tuyendung-studio-celery-worker
     build:
       context: ./api
-      dockerfile: Dockerfile
     env_file:
       - .env
-    working_dir: /myjob_api
-    command: celery -A myjob_api.celery worker --pool=prefork --loglevel=info
-    volumes:
-      - ./api:/myjob_api
-    depends_on:
-      - db
-      - redis
+    working_dir: /api
+    command: celery -A config.celery worker --pool=prefork --loglevel=info
     restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - APP_ENV=local
-      - DEBUG=True
-      - DB_ENGINE=django.db.backends.mysql
-      - DB_HOST=tuyendung-studio-db
-      - DB_NAME=square_db
-      - DB_USER=root
-      - DB_PASSWORD=secret
+      - DB_HOST=db
       - DB_PORT=3306
       - SERVICE_REDIS_HOST=redis
       - SERVICE_REDIS_PORT=6379
     networks:
       - square-network
 
+  # ---------------------------------------------------------------------------
+  # Celery Beat
+  # ---------------------------------------------------------------------------
   celery-beat:
-    container_name: tuyendung-studio-celery-beat
     build:
       context: ./api
-      dockerfile: Dockerfile
     env_file:
       - .env
-    working_dir: /myjob_api
-    command: celery -A myjob_api beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    volumes:
-      - ./api:/myjob_api
-    depends_on:
-      - db
-      - redis
+    working_dir: /api
+    command: celery -A config.celery beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
-      - APP_ENV=local
-      - DEBUG=True
-      - DB_ENGINE=django.db.backends.mysql
-      - DB_HOST=tuyendung-studio-db
-      - DB_NAME=square_db
-      - DB_USER=root
-      - DB_PASSWORD=secret
+      - DB_HOST=db
       - DB_PORT=3306
       - SERVICE_REDIS_HOST=redis
       - SERVICE_REDIS_PORT=6379
     networks:
       - square-network
 
+  # ---------------------------------------------------------------------------
+  # MySQL Database
+  # ---------------------------------------------------------------------------
   db:
     image: mysql:8.0
-    container_name: tuyendung-studio-db
-    ports:
-      - "3310:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: secret
-      MYSQL_DATABASE: square_db
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_DATABASE: ${DB_NAME:-square_db}
     volumes:
       - db_data:/var/lib/mysql
       - ./tuyendungsqstudio.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-secret}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
     networks:
       - square-network
 
+  # ---------------------------------------------------------------------------
+  # Redis
+  # ---------------------------------------------------------------------------
   redis:
     image: redis:7
-    container_name: tuyendung-studio-redis
-    ports:
-      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
     networks:
       - square-network
 
+  # ---------------------------------------------------------------------------
+  # LiveKit Server
+  # ---------------------------------------------------------------------------
   livekit:
     image: livekit/livekit-server:latest
-    container_name: tuyendung-studio-livekit
-    ports:
-      - "7880:7880"
-      - "7881:7881"
-      - "7882:7882/udp"
-      - "50000-50010:50000-50010/udp"
     environment:
       LIVEKIT_KEYS: "${LIVEKIT_API_KEY:-devkey}: ${LIVEKIT_API_SECRET:-secret}"
     volumes:
       - ./voice-ai/livekit.yaml:/etc/livekit.yaml
-    command: --config /etc/livekit.yaml --dev --bind 0.0.0.0
-    networks:
-      - square-network
     restart: unless-stopped
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
+    networks:
+      - square-network
 
+  # ---------------------------------------------------------------------------
+  # Vietnamese TTS
+  # ---------------------------------------------------------------------------
   vieneu-tts:
     build:
       context: ./voice-ai/inference/vieneu-text-to-speech
-    container_name: tuyendung-studio-tts
     environment:
       - PORT=8298
-      - TTS_DEVICE=cuda
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    ports:
-      - "8298:8298"
     volumes:
       - huggingface-cache:/root/.cache/huggingface
     restart: unless-stopped
     networks:
       - square-network
 
+  # ---------------------------------------------------------------------------
+  # Whisper STT
+  # ---------------------------------------------------------------------------
   whisper:
     build:
       context: ./voice-ai/inference/whisper
-    container_name: tuyendung-studio-whisper
     volumes:
       - whisper-data:/data
     environment:
       - VOXBOX_HF_REPO_ID=${VOXBOX_HF_REPO_ID:-Systran/faster-whisper-medium}
       - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cpu}
       - DATA_DIR=/data
-    ports:
-      - "11437:8080"
     restart: unless-stopped
     networks:
       - square-network
 
+  # ---------------------------------------------------------------------------
+  # LLaMA.cpp (LLM inference)
+  # ---------------------------------------------------------------------------
   llama-cpp:
     image: ghcr.io/ggml-org/llama.cpp:server
-    container_name: tuyendung-studio-llama-cpp
     command:
       - --host
       - 0.0.0.0
@@ -260,28 +188,34 @@ services:
       - "${LLAMA_HF_REPO:-Qwen/Qwen2-7B-Instruct-GGUF}"
       - --alias
       - "${LLAMA_MODEL_ALIAS:-qwen2-7b}"
-    ports:
-      - "11436:11434"
     volumes:
       - ./voice-ai/inference/llama/models:/models
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:11434/v1/models > /dev/null"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
     restart: unless-stopped
     networks:
       - square-network
 
+  # ---------------------------------------------------------------------------
+  # LiveKit Agent
+  # ---------------------------------------------------------------------------
   livekit-agent:
     build:
       context: ./voice-ai/livekit_agent
-    container_name: tuyendung-studio-livekit-agent
     volumes:
       - ./voice-ai/livekit_agent/src:/app/src
     environment:
-      - NUM_IDLE_PROCESSES=1
+      - NUM_IDLE_PROCESSES=${NUM_IDLE_PROCESSES:-1}
       - BACKEND_API_URL=http://backend:8001/api
-      - AUTO_END_ON_COMPLETION=0
+      - AUTO_END_ON_COMPLETION=${AUTO_END_ON_COMPLETION:-0}
       - LIVEKIT_URL=http://livekit:7880
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}
-      - TTS_VOICE=Bình (nam miền Bắc)
+      - TTS_VOICE=${TTS_VOICE:-Bình (nam miền Bắc)}
       - LLAMA_BASE_URL=http://llama-cpp:11434/v1
       - STT_BASE_URL=http://whisper:8080/v1
       - TTS_BASE_URL=http://vieneu-tts:8298/v1
@@ -295,16 +229,15 @@ services:
     networks:
       - square-network
 
+  # ---------------------------------------------------------------------------
+  # MinIO (Object Storage)
+  # ---------------------------------------------------------------------------
   minio:
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z
-    container_name: tuyendung-studio-minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-admin}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-password}
-      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL:-https://tuyendung.square.vn/minio-console/}
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL:-http://localhost:9001}
       MINIO_SERVER_URL: ${MINIO_SERVER_URL:-http://minio:9000}
     command: server /data --console-address ":9001"
     volumes:
@@ -313,6 +246,9 @@ services:
     networks:
       - square-network
 
+# =============================================================================
+# Shared resources
+# =============================================================================
 networks:
   square-network:
     driver: bridge

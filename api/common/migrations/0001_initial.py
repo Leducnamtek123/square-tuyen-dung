@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('icon_url', models.URLField(max_length=300)),
             ],
             options={
-                'db_table': 'myjob_common_career',
+                'db_table': 'project_common_career',
             },
         ),
         migrations.CreateModel(
@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'verbose_name_plural': 'Cities',
-                'db_table': 'myjob_common_city',
+                'db_table': 'project_common_city',
             },
         ),
         migrations.CreateModel(
@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                 ('city', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='districts', to='common.city')),
             ],
             options={
-                'db_table': 'myjob_common_district',
+                'db_table': 'project_common_district',
             },
         ),
         migrations.CreateModel(
@@ -64,7 +64,9 @@ class Migration(migrations.Migration):
                 ('district', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='locations', to='common.district')),
             ],
             options={
-                'db_table': 'myjob_common_location',
+                'db_table': 'project_common_location',
             },
         ),
     ]
+
+

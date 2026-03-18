@@ -7,9 +7,9 @@ from celery import shared_task
 
 from django.db import transaction
 
-from common.models import File
+from apps.files.models import File
 
-from helpers.cloudinary_service import CloudinaryService
+from shared.helpers.cloudinary_service import CloudinaryService
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 

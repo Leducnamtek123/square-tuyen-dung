@@ -1,0 +1,18 @@
+// @ts-nocheck
+interface Props {
+  [key: string]: any;
+}
+
+export { default as ChatLayout } from './ChatLayout'
+
+export { default as DefaultLayout } from './DefaultLayout'
+
+export { default as EmployerLayout } from './EmployerLayout'
+
+export { default as JobSeekerLayout } from './JobSeekerLayout'
+
+export { default as HomeLayout } from './HomeLayout'
+
+export { default as AdminLayout } from './AdminLayout'
+
+export { default as FullscreenLayout } from './FullscreenLayout'

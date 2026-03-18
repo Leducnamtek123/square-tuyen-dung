@@ -4,16 +4,17 @@ import datetime
 from django.utils import timezone
 
 # Setup Django 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'myjob_api.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
-from authentication.models import User
-from info.models import JobSeekerProfile, Resume, Company
-from common.models import Location, City, District, Career
-from job.models import JobPost, JobPostActivity
-from interview.models import Question, QuestionGroup, InterviewSession
+from apps.accounts.models import User
+from apps.profiles.models import JobSeekerProfile, Resume, Company
+from apps.locations.models import Location, City, District
+from common.models import Career
+from apps.jobs.models import JobPost, JobPostActivity
+from apps.interviews.models import Question, QuestionGroup, InterviewSession
 from oauth2_provider.models import Application
-from configs import variable_system as var_sys
+from shared.configs import variable_system as var_sys
 
 print("Removing ALL users...")
 User.objects.all().delete()
@@ -42,13 +43,13 @@ career = Career.objects.create(name="Công nghệ thông tin (IT)")
 # 2. USERS
 print("Creating Administrative User...")
 admin_user = User.objects.create_superuser(
-    email="admin@myjob.com",
+    email="admin@project.com",
     full_name="System Admin",
     password="Password123!"
 )
 
 print("Creating Employer User...")
-employer_email = "employer@myjob.com"
+employer_email = "employer@project.com"
 emp_user = User.objects.create_user_with_role_name(
     email=employer_email,
     full_name="Great Employer",
@@ -71,7 +72,7 @@ company = Company.objects.create(
 )
 
 print("Creating Job Seeker User...")
-js_email = "candidate@myjob.com"
+js_email = "candidate@project.com"
 js_user = User.objects.create_user_with_role_name(
     email=js_email,
     full_name="Active Candidate",
@@ -164,9 +165,9 @@ Application.objects.create(
     user=admin_user,
     client_type=Application.CLIENT_CONFIDENTIAL,
     authorization_grant_type=Application.GRANT_PASSWORD,
-    name='myjob_web_app',
+    name='project_web_app',
     client_id=os.environ.get('CLIENT_ID', 'qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS'),
-    client_secret=os.environ.get('CLIENT_SECRET', 'myjob_secret_client_key_2024')
+    client_secret=os.environ.get('CLIENT_SECRET', 'project_secret_client_key_2024')
 )
 print("- OAuth2 Application created.")
 

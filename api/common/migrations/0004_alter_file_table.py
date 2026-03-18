@@ -12,6 +12,8 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterModelTable(
             name='file',
-            table='myjob_files',
+            table='project_files',
         ),
     ]
+
+

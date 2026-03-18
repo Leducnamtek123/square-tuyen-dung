@@ -3,6 +3,22 @@
 MAX_RETRIES="${DB_WAIT_MAX_RETRIES:-30}"
 SLEEP_SECONDS="${DB_WAIT_SLEEP_SECONDS:-2}"
 
+if ! python - <<'PY' >/dev/null 2>&1
+import pkg_resources  # noqa: F401
+PY
+then
+  echo "pkg_resources missing. Installing setuptools (user site)..."
+  python -m pip install --no-cache-dir --user --upgrade setuptools
+fi
+
+if ! python - <<'PY' >/dev/null 2>&1
+import pkg_resources  # noqa: F401
+PY
+then
+  echo "pkg_resources still missing after install. Check pip permissions or PYTHONNOUSERSITE."
+  exit 1
+fi
+
 echo "Waiting for database and applying migrations..."
 i=1
 while [ "$i" -le "$MAX_RETRIES" ]; do

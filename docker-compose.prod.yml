@@ -1,4 +1,14 @@
+# =============================================================================
+# docker-compose.prod.yml — PRODUCTION overrides
+# =============================================================================
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# Only contains production-specific differences from the base.
+# =============================================================================
+
 services:
+  # ---------------------------------------------------------------------------
+  # Nginx Gateway (prod only)
+  # ---------------------------------------------------------------------------
   nginx-gateway:
     container_name: tuyendung-studio-nginx-gateway
     build:
@@ -14,110 +24,96 @@ services:
     networks:
       - square-network
 
+  # ---------------------------------------------------------------------------
+  # Frontend — prod build with Nginx
+  # ---------------------------------------------------------------------------
   frontend:
     container_name: tuyendung-studio-frontend-prod
     build:
-      context: ./frontend
       dockerfile: Dockerfile.prod
       args:
         VITE_NODE_ENV: production
-        REACT_APP_NODE_ENV: production
-        REACT_APP_API_JOB: /api/job/web
-        REACT_APP_API_COMPANY: /api/company/web
-        REACT_APP_API_INFO: /api/info/web
-        REACT_APP_API_AUTH: /api/auth/web
-        VITE_MYJOB_SERVER_CLIENT_ID: ${VITE_MYJOB_SERVER_CLIENT_ID:-qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS}
-        VITE_MYJOB_SERVER_CLIENT_SECRECT: ${VITE_MYJOB_SERVER_CLIENT_SECRECT:-myjob_secret_client_key_2024}
-        VITE_MYJOB_HOST_NAME: ${VITE_MYJOB_HOST_NAME:-tuyendung.square.vn}
-        VITE_ADMIN_MYJOB_HOST_NAME: ${VITE_ADMIN_MYJOB_HOST_NAME:-admin.tuyendung.square.vn}
-        VITE_EMPLOYER_MYJOB_HOST_NAME: ${VITE_EMPLOYER_MYJOB_HOST_NAME:-employer.tuyendung.square.vn}
-        VITE_GOONGAPI_KEY: ${VITE_GOONGAPI_KEY:-0Dn3IFPq2ZWDmCMBFVbUXsT6yqLaqYa5lXRUyFO0}
+        VITE_PROJECT_HOST_NAME: ${VITE_PROJECT_HOST_NAME}
+        VITE_ADMIN_PROJECT_HOST_NAME: ${VITE_ADMIN_PROJECT_HOST_NAME}
+        VITE_EMPLOYER_PROJECT_HOST_NAME: ${VITE_EMPLOYER_PROJECT_HOST_NAME}
+        VITE_PROJECT_SERVER_CLIENT_ID: ${VITE_PROJECT_SERVER_CLIENT_ID}
+        VITE_PROJECT_SERVER_CLIENT_SECRECT: ${VITE_PROJECT_SERVER_CLIENT_SECRECT}
+        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID}
+        VITE_GOOGLE_CLIENT_SECRET: ${VITE_GOOGLE_CLIENT_SECRET}
+        VITE_FACEBOOK_CLIENT_ID: ${VITE_FACEBOOK_CLIENT_ID:-}
+        VITE_FACEBOOK_CLIENT_SECRET: ${VITE_FACEBOOK_CLIENT_SECRET:-}
+        VITE_GOONGAPI_KEY: ${VITE_GOONGAPI_KEY}
         VITE_GOONGAPI_ACCESS_TOKEN: ${VITE_GOONGAPI_ACCESS_TOKEN:-}
-        VITE_LIVEKIT_URL: wss://tuyendung.square.vn/livekit
+        VITE_LIVEKIT_URL: ${VITE_LIVEKIT_URL}
+        VITE_FIREBASE_API_KEY: ${VITE_FIREBASE_API_KEY}
+        VITE_FIREBASE_AUTH_DOMAIN: ${VITE_FIREBASE_AUTH_DOMAIN}
+        VITE_FIREBASE_PROJECT_ID: ${VITE_FIREBASE_PROJECT_ID}
+        VITE_FIREBASE_STORAGE_BUCKET: ${VITE_FIREBASE_STORAGE_BUCKET}
+        VITE_FIREBASE_MESSAGING_SENDER_ID: ${VITE_FIREBASE_MESSAGING_SENDER_ID}
+        VITE_FIREBASE_APP_ID: ${VITE_FIREBASE_APP_ID}
+        VITE_FIREBASE_DATABASE_URL: ${VITE_FIREBASE_DATABASE_URL}
     env_file:
       - .env.prod
     expose:
       - "80"
     restart: always
-    networks:
-      - square-network
 
+  # ---------------------------------------------------------------------------
+  # Backend — Gunicorn
+  # ---------------------------------------------------------------------------
   backend:
     container_name: tuyendung-studio-backend-prod
     build:
-      context: ./api
       dockerfile: Dockerfile.prod
-    command: sh docker-entrypoint.sh gunicorn --bind 0.0.0.0:8000 --workers 3 myjob_api.wsgi:application
+    command: sh docker-entrypoint.sh gunicorn --bind 0.0.0.0:8000 --workers 3 config.wsgi:application
+    env_file:
+      - .env.prod
     expose:
       - "8000"
     restart: always
-    depends_on:
-      - db
-      - redis
-    env_file:
-      - .env.prod
     environment:
-      - LIVEKIT_URL=http://livekit:7880
-      - LIVEKIT_AGENT_NAME=square-ai-interviewer
-    networks:
-      - square-network
+      - DEBUG=False
 
-  db:
-    image: mysql:8.0
-    container_name: tuyendung-studio-db-prod
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
-      MYSQL_DATABASE: square_db
-    volumes:
-      - db_data_prod:/var/lib/mysql
-      - ./tuyendungsqstudio.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - square-network
-
-  redis:
-    image: redis:7
-    container_name: tuyendung-studio-redis-prod
-    restart: always
-    networks:
-      - square-network
-
+  # ---------------------------------------------------------------------------
+  # Celery (prod)
+  # ---------------------------------------------------------------------------
   celery-worker:
     container_name: tuyendung-studio-celery-worker-prod
     build:
-      context: ./api
       dockerfile: Dockerfile.prod
-    command: celery -A myjob_api.celery worker --pool=prefork --loglevel=info
-    depends_on:
-      - db
-      - redis
-    restart: always
     env_file:
       - .env.prod
-    networks:
-      - square-network
+    restart: always
 
   celery-beat:
     container_name: tuyendung-studio-celery-beat-prod
     build:
-      context: ./api
       dockerfile: Dockerfile.prod
-    command: celery -A myjob_api beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    depends_on:
-      - db
-      - redis
-    restart: always
     env_file:
       - .env.prod
-    networks:
-      - square-network
+    restart: always
 
+  # ---------------------------------------------------------------------------
+  # DB / Redis — no ports exposed externally in prod
+  # ---------------------------------------------------------------------------
+  db:
+    container_name: tuyendung-studio-db-prod
+    restart: always
+    volumes:
+      - db_data_prod:/var/lib/mysql
+
+  redis:
+    container_name: tuyendung-studio-redis-prod
+    restart: always
+
+  # ---------------------------------------------------------------------------
+  # LiveKit — prod mode (no --dev flag)
+  # ---------------------------------------------------------------------------
   livekit:
-    image: livekit/livekit-server:latest
     container_name: tuyendung-studio-livekit-prod
     command: --config /etc/livekit.yaml
-    volumes:
-      - ./voice-ai/livekit.yaml:/etc/livekit.yaml
+    env_file:
+      - .env.prod
     expose:
       - "7880"
       - "7881"
@@ -125,39 +121,15 @@ services:
       - "7881:7881/tcp"
       - "7882:7882/udp"
       - "50000-50010:50000-50010/udp"
-    environment:
-      LIVEKIT_KEYS: "${LIVEKIT_API_KEY:-devkey}: ${LIVEKIT_API_SECRET:-secret}"
-    env_file:
-      - .env.prod
     restart: always
-    networks:
-      - square-network
 
- 
-  minio:
-    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
-    container_name: tuyendung-studio-minio-prod
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-admin}
-      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-password}
-      MINIO_BROWSER_REDIRECT_URL: https://tuyendung.square.vn/minio-console/
-      MINIO_SERVER_URL: http://minio:9000
-    expose:
-      - "9000"
-      - "9001"
-    command: server /data --console-address ":9001"
-    volumes:
-      - minio-data:/data
-    env_file:
-      - .env.prod
-    restart: unless-stopped
-    networks:
-      - square-network
-
+  # ---------------------------------------------------------------------------
+  # LLaMA.cpp — GPU for prod
+  # ---------------------------------------------------------------------------
   llama-cpp:
+    container_name: tuyendung-studio-llama-cpp-prod
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
-    container_name: tuyendung-studio-llama-cpp
-    deploy: # Thêm phần này để sử dụng GPU
+    deploy:
       resources:
         reservations:
           devices:
@@ -170,94 +142,79 @@ services:
       - --port
       - "11434"
       - --model
-      - /models/llama.cpp/Qwen2.5-7B-Instruct-Q4_K_M.gguf # Đổi tên file đã tải
+      - /models/llama.cpp/Qwen2.5-7B-Instruct-Q4_K_M.gguf
       - --alias
-      - "qwen2.5-7b" # Giữ nguyên alias nếu không muốn sửa config.py
+      - "qwen2.5-7b"
       - --ctx-size
       - "16384"
-      - --n-gpu-layers # Ép mô hình vào GPU hoàn toàn
-      - "100" 
+      - --n-gpu-layers
+      - "100"
     ports:
       - "11436:11434"
-    volumes:
-      - ./voice-ai/inference/llama/models:/models
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:11434/v1/models > /dev/null"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 120s
     restart: always
-    networks:
-      - square-network
 
+  # ---------------------------------------------------------------------------
+  # Whisper — prod (GPU)
+  # ---------------------------------------------------------------------------
   whisper:
-    build:
-      context: ./voice-ai/inference/whisper
     container_name: tuyendung-studio-whisper-prod
-    gpus: all
-    volumes:
-      - whisper-data:/data
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     environment:
-      - VOXBOX_HF_REPO_ID=${VOXBOX_HF_REPO_ID:-Systran/faster-whisper-medium}
-      - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cpu}
-      - DATA_DIR=/data
+      - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cuda:0}
     expose:
       - "8080"
     restart: always
-    networks:
-      - square-network
 
+  # ---------------------------------------------------------------------------
+  # TTS — prod (GPU)
+  # ---------------------------------------------------------------------------
   vieneu-tts:
-    build:
-      context: ./voice-ai/inference/vieneu-text-to-speech
     container_name: tuyendung-studio-tts-prod
-    gpus: all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
     env_file:
       - .env.prod
     environment:
-      - PORT=8298
+      - TTS_DEVICE=cuda
     expose:
       - "8298"
-    volumes:
-      - huggingface-cache:/root/.cache/huggingface
     restart: always
-    networks:
-      - square-network
 
+  # ---------------------------------------------------------------------------
+  # LiveKit Agent — prod
+  # ---------------------------------------------------------------------------
   livekit-agent:
-    build:
-      context: ./voice-ai/livekit_agent
     container_name: tuyendung-studio-livekit-agent-prod
-    volumes:
-      - ./voice-ai/livekit_agent/src:/app/src
     environment:
-      - NUM_IDLE_PROCESSES=${NUM_IDLE_PROCESSES:-1}
       - BACKEND_API_URL=http://backend:8000/api
-      - AUTO_END_ON_COMPLETION=${AUTO_END_ON_COMPLETION:-0}
-      - LIVEKIT_URL=http://livekit:7880
-      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
-      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}
-      - TTS_VOICE=${TTS_VOICE:-Binh (nam mien Bac)}
-      - LLAMA_BASE_URL=http://llama-cpp:11434/v1
-      - STT_BASE_URL=http://whisper:8080/v1
-      - TTS_BASE_URL=http://vieneu-tts:8298/v1
-    depends_on:
-      - backend
-      - livekit
-      - llama-cpp
-      - whisper
-      - vieneu-tts
     restart: always
-    networks:
-      - square-network
 
-networks:
-  square-network:
-    driver: bridge
+  # ---------------------------------------------------------------------------
+  # MinIO — prod
+  # ---------------------------------------------------------------------------
+  minio:
+    container_name: tuyendung-studio-minio-prod
+    env_file:
+      - .env.prod
+    environment:
+      MINIO_BROWSER_REDIRECT_URL: https://tuyendung.square.vn/minio-console/
+      MINIO_SERVER_URL: http://minio:9000
+    expose:
+      - "9000"
+      - "9001"
+    restart: always
 
+# Override volumes for prod (separate from dev)
 volumes:
   db_data_prod:
-  huggingface-cache:
-  whisper-data:
-  minio-data:

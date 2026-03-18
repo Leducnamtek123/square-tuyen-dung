@@ -2,23 +2,12 @@
 from rest_framework import serializers
 from django.conf import settings
 from django.db import transaction
-from helpers import helper
-from helpers.cloudinary_service import CloudinaryService
+from shared.helpers import helper
+from shared.helpers.cloudinary_service import CloudinaryService
 
-from .models import (
-
-    District,
-
-    Location,
-
-    Career,
-
-    City,
-
-    Ward,
-    File
-
-)
+from apps.files.models import File
+from apps.locations.models import City, District, Location, Ward
+from .models import Career
 
 class CitySerializer(serializers.ModelSerializer):
 

@@ -1,27 +1,27 @@
 
-from configs import variable_system as var_sys
+from shared.configs import variable_system as var_sys
 
 from django.conf import settings
 
 from datetime import datetime
 
-from helpers import utils, helper
+from shared.helpers import utils, helper
 
 from celery import shared_task
 
-from configs.messages import MAIL_MESSAGES
+from shared.configs.messages import MAIL_MESSAGES
 
 from django.template.loader import render_to_string
 
 from django.utils.html import strip_tags
 
-from authentication.models import (
+from apps.accounts.models import (
 
     User
 
 )
 
-from job.models import (
+from apps.jobs.models import (
 
     JobPost,
 

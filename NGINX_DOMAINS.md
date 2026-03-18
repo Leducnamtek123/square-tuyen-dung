@@ -11,17 +11,17 @@ Vì vậy, bạn sẽ cần cấu hình DNS trỏ (A Record) các tên miền sa
 
 ### 1.1 Tên Miền Chính Dành Cho Ứng Viên (Main Portal)
 Đây là trang chủ mặc định cho ứng viên tìm kiếm việc làm.
-*   **Biến môi trường tương ứng:** `VITE_MYJOB_HOST_NAME=localhost`
+*   **Biến môi trường tương ứng:** `VITE_PROJECT_HOST_NAME=localhost`
 *   **Ví dụ Production:** `tuyendung.com`
 
 ### 1.2 Tên Miền Phụ Dành Cho Nhà Tuyển Dụng (Employer Portal)
 Dành cho công ty đăng nhập, đăng tuyển dụng và quản lý CV.
-*   **Biến môi trường tương ứng:** `VITE_EMPLOYER_MYJOB_HOST_NAME=employer.localhost`
+*   **Biến môi trường tương ứng:** `VITE_EMPLOYER_PROJECT_HOST_NAME=employer.localhost`
 *   **Ví dụ Production:** `employer.tuyendung.com`
 
 ### 1.3 Tên Miền Phụ Dành Cho Quản Trị Viên (Admin Portal)
 Dành cho admin hệ thống quản lý danh mục, kiểm duyệt nhà tuyển dụng,...
-*   **Biến môi trường tương ứng:** `VITE_ADMIN_MYJOB_HOST_NAME=admin.localhost`
+*   **Biến môi trường tương ứng:** `VITE_ADMIN_PROJECT_HOST_NAME=admin.localhost`
 *   **Ví dụ Production:** `admin.tuyendung.com`
 
 > **Lưu ý cấu hình Nginx:**

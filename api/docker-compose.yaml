@@ -3,16 +3,16 @@ version: '3'
 services:
   db:
     image: mysql:8.0
-    container_name: myjob-db-container
+    container_name: project-db-container
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
       - MYSQL_DATABASE=${DB_NAME}
     volumes:
-      - ./data/myjob_db.sql:/docker-entrypoint-initdb.d/data.sql
-      - myjob-volume:/var/lib/mysql
+      - ./data/project_db.sql:/docker-entrypoint-initdb.d/data.sql
+      - project-volume:/var/lib/mysql
     networks:
-      - myjob-network
+      - project-network
     ports:
       - "${DB_PORT}:${DB_PORT}"
     healthcheck:
@@ -30,11 +30,11 @@ services:
           memory: 1G
   redis:
     image: redis:alpine
-    container_name: myjob-redis
+    container_name: project-redis
     restart: always
     command: redis-server --requirepass ${SERVICE_REDIS_PASSWORD} --port ${SERVICE_REDIS_PORT}
     networks:
-      - myjob-network
+      - project-network
     ports:
       - "${SERVICE_REDIS_PORT}:${SERVICE_REDIS_PORT}"
     healthcheck:
@@ -48,8 +48,8 @@ services:
           cpus: '0.5'
           memory: 512M
   backend:
-    image: myjob-backend
-    container_name: myjob-backend-container
+    image: project-backend
+    container_name: project-backend-container
     build:
       context: .
       dockerfile: Dockerfile
@@ -57,9 +57,9 @@ services:
     env_file:
       - .env
     networks:
-      - myjob-network
+      - project-network
     volumes:
-      - ./:/myjob_api
+      - ./:/api
     depends_on:
       db:
         condition: service_healthy
@@ -79,16 +79,16 @@ services:
           cpus: '1'
           memory: 1G
   celery-worker:
-    image: myjob-backend
-    container_name: myjob-celery-worker
+    image: project-backend
+    container_name: project-celery-worker
     restart: always
-    command: bash -c "celery -A myjob_api.celery worker --loglevel=info --concurrency=4 --max-memory-per-child=512000 & celery -A myjob_api.celery beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler & wait"
+    command: bash -c "celery -A config.celery worker --loglevel=info --concurrency=4 --max-memory-per-child=512000 & celery -A config.celery beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler & wait"
     env_file:
       - .env
     networks:
-      - myjob-network
+      - project-network
     volumes:
-      - ./:/myjob_api
+      - ./:/api
     depends_on:
       db:
         condition: service_healthy
@@ -111,7 +111,7 @@ services:
   # Domain: ngrok-url (ngrok-url.com)
   ngrok:
     image: ngrok/ngrok:latest
-    container_name: myjob-ngrok-container
+    container_name: project-ngrok-container
     restart: always
     command: start --all --config /etc/ngrok/ngrok.yml
     volumes:
@@ -119,15 +119,15 @@ services:
     environment:
       - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
     networks:
-      - myjob-network
+      - project-network
     depends_on:
       backend:
         condition: service_healthy
         required: true
 
 networks:
-  myjob-network:
-    name: myjob-network
+  project-network:
+    name: project-network
 
 volumes:
-  myjob-volume:
+  project-volume:

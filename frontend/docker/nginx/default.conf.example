@@ -1,7 +1,7 @@
 # HTTP server block - Redirect all HTTP traffic to HTTPS
 server {
     listen 80;
-    server_name myjob.com www.myjob.com employer.myjob.com;
+    server_name Project.com www.Project.com employer.Project.com;
     
     # Redirect all HTTP requests to HTTPS
     return 301 https://$host$request_uri;
@@ -10,11 +10,11 @@ server {
 # HTTPS server block
 server {
     listen 443 ssl;
-    server_name myjob.com www.myjob.com employer.myjob.com;
+    server_name Project.com www.Project.com employer.Project.com;
 
     # SSL Configuration
-    ssl_certificate /etc/nginx/certs/myjob.crt;
-    ssl_certificate_key /etc/nginx/certs/myjob.key;
+    ssl_certificate /etc/nginx/certs/Project.crt;
+    ssl_certificate_key /etc/nginx/certs/Project.key;
     
     # SSL protocols and ciphers for better security
     ssl_protocols TLSv1.2 TLSv1.3;

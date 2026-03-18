@@ -1,7 +1,7 @@
 
 import os
 
-file_path = r'c:\Users\leduc\Documents\TuyenDungSquare\my-job-web-app\src\utils\transformers.js'
+file_path = r'c:\Users\leduc\Documents\TuyenDungSquare\project-web-app\src\utils\transformers.js'
 
 with open(file_path, 'r', encoding='utf-8') as f:
     content = f.read()

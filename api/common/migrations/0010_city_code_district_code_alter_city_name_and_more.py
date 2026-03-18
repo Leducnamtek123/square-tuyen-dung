@@ -42,7 +42,7 @@ class Migration(migrations.Migration):
                 ('district', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='wards', to='common.district')),
             ],
             options={
-                'db_table': 'myjob_common_ward',
+                'db_table': 'project_common_ward',
             },
         ),
         migrations.AddField(
@@ -51,3 +51,5 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='locations', to='common.ward'),
         ),
     ]
+
+

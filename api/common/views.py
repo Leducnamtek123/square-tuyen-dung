@@ -1,9 +1,10 @@
+from shared import pagination as paginations
 
-from configs import variable_system as var_sys
+from shared.configs import variable_system as var_sys
 
-from helpers import utils, helper
+from shared.helpers import utils, helper
 
-from configs import variable_response as var_res, paginations
+from shared.configs import variable_response as var_res
 
 from django.db.models import Count
 
@@ -23,17 +24,8 @@ from redis import Redis
 
 from django.conf import settings
 
-from .models import (
-
-    Career,
-
-    City,
-
-    District,
-
-    Ward
-
-)
+from apps.locations.models import City, District, Ward
+from .models import Career
 
 from .serializers import (
 
@@ -47,8 +39,8 @@ from .serializers import (
 
 )
 
-from authentication import permissions as perms_custom
-from helpers.cloudinary_service import CloudinaryService
+from apps.accounts import permissions as perms_custom
+from shared.helpers.cloudinary_service import CloudinaryService
 
 from rest_framework import viewsets
 

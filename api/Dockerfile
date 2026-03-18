@@ -1,7 +1,13 @@
+# =============================================================================
+# api/Dockerfile — Development
+# =============================================================================
 FROM python:3.11-slim
 
-WORKDIR /myjob_api
+# Prevent .pyc files and enable unbuffered output
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libssl-dev \
@@ -13,13 +19,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     netcat-traditional \
     && rm -rf /var/lib/apt/lists/*
 
+# Create non-root user
+RUN groupadd --gid 1000 appuser \
+    && useradd --uid 1000 --gid appuser --create-home appuser
+
+WORKDIR /api
+
+# Install Python dependencies first (better layer caching)
 COPY requirements.txt .
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install --no-cache-dir -r requirements.txt
 
-RUN pip install --upgrade pip setuptools wheel
-RUN pip install --no-cache-dir -r requirements.txt
-
+# Copy application code
 COPY . .
 
-CMD ["sh", "docker-entrypoint.sh", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Change ownership to non-root user
+RUN chown -R appuser:appuser /api
 
-EXPOSE 8000
+# Switch to non-root user
+USER appuser
+
+EXPOSE 8001
+
+CMD ["sh", "docker-entrypoint.sh", "python", "manage.py", "runserver", "0.0.0.0:8001"]

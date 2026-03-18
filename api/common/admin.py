@@ -9,31 +9,19 @@ from django.conf import settings
 
 from django.db import transaction
 
-from helpers import helper
+from shared.helpers import helper
 
-from configs import variable_system as var_sys
+from shared.configs import variable_system as var_sys
 
-from myjob_api.admin import custom_admin_site
+from config.admin import custom_admin_site
 
-from .models import (
-
-    City,
-
-    District,
-
-    Ward,
-
-    Location,
-
-    Career,
-
-    File
-
-)
+from apps.files.models import File
+from apps.locations.models import City, District, Location, Ward
+from .models import Career
 
 from django_admin_listfilter_dropdown.filters import (RelatedDropdownFilter)
 
-from helpers.cloudinary_service import CloudinaryService
+from shared.helpers.cloudinary_service import CloudinaryService
 
 class LocationForm(forms.ModelForm):
 
