@@ -1,8 +1,9 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Card, CircularProgress, FormControlLabel, Link, Radio, RadioGroup, Stack, Typography } from "@mui/material";
+import { Button, Card, CircularProgress, FormControlLabel, Link, Radio, RadioGroup, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faFile, faFilePdf } from "@fortawesome/free-regular-svg-icons";
@@ -30,6 +31,7 @@ interface ApplyFormValues {
 const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
   const { t } = useTranslation("public");
   const theme = useTheme();
+  const nav = useNavigate();
   const { currentUser } = useAppSelector((state) => state.user);
   const [isLoadingResumes, setIsLoadingResumes] = React.useState(false);
   const [resumes, setResumes] = React.useState<Resume[]>([]);
@@ -86,6 +88,33 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
             <Stack spacing={1} justifyContent="center">
               {isLoadingResumes ? (
                 <CircularProgress color="secondary" sx={{ margin: "0 auto" }} />
+              ) : resumes.length === 0 ? (
+                <Card
+                  variant="outlined"
+                  sx={{
+                    p: 2,
+                    textAlign: "center",
+                    borderStyle: "dashed",
+                    borderColor: "error.main",
+                    bgcolor: alpha(theme.palette.error.main, 0.02),
+                  }}
+                >
+                  <Typography variant="body1" color="error" sx={{ fontWeight: 600, mb: 1 }}>
+                    {t("applyForm.resume.empty", { defaultValue: "Bạn chưa có hồ sơ nào." })}
+                  </Typography>
+                  <Typography variant="body2" sx={{ mb: 2 }}>
+                    {t("applyForm.resume.pleaseUpload", { defaultValue: "Vui lòng tải lên hoặc tạo hồ sơ để ứng tuyển." })}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="small"
+                    onClick={() => nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.STEP_PROFILE}`)}
+                    sx={{ textTransform: "none" }}
+                  >
+                    {t("applyForm.resume.createNow", { defaultValue: "Tạo hồ sơ ngay" })}
+                  </Button>
+                </Card>
               ) : (
                 <RadioGroup
                   aria-labelledby="resume"
@@ -137,8 +166,8 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
                                   />
                                   <Typography variant="body2" sx={{ fontStyle: "italic", color: "text.secondary" }}>
                                     {value.type === CV_TYPES.cvWebsite
-                                      ? t("applyForm.resume.online", { defaultValue: "Hồ sơ trực tuyến" })
-                                      : t("applyForm.resume.attached", { defaultValue: "Hồ sơ đính kèm" })}
+                                      ? t("applyForm.resume.online")
+                                      : t("applyForm.resume.attached")}
                                   </Typography>
                                 </Stack>
                               </Stack>
@@ -170,7 +199,7 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
                             <Stack direction="row" spacing={0.5} alignItems="center">
                               <FontAwesomeIcon icon={faEye} />
                               <Typography sx={{ fontWeight: "bold", cursor: "pointer", whiteSpace: "nowrap" }}>
-                                {t("applyForm.resume.preview", { defaultValue: "Xem hồ sơ" })}
+                                {t("applyForm.resume.preview")}
                               </Typography>
                             </Stack>
                           </Link>
