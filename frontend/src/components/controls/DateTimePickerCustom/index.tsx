@@ -1,7 +1,6 @@
-// @ts-nocheck
 import React from 'react';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
@@ -11,52 +10,40 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 import dayjs from '../../../configs/moment-config';
 
-import { Typography, Box } from "@mui/material";
+import { Typography, Box, SxProps, Theme } from "@mui/material";
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 interface Props {
-  [key: string]: any;
+    name: string;
+    control: Control<any>;
+    title?: string | null;
+    showRequired?: boolean;
+    minDateTime?: any;
+    maxDateTime?: any;
+    fullWidth?: boolean;
+    sx?: SxProps<Theme>;
 }
 
-
-
 const DateTimePickerCustom = ({
-
     name,
-
     control,
-
     title = null,
-
     showRequired = false,
-
     minDateTime = null,
-
     maxDateTime = null,
-
     fullWidth = true,
-
     sx = {},
-
 }: Props) => {
 
-    const parseDate = (date) => {
-
-        if (!date) return null;
-
+    const parseDate = (date: any) => {
+        if (!date) return undefined;
         try {
-
             const parsedDate = dayjs(date);
-
-            return parsedDate.isValid() ? parsedDate : null;
-
+            return parsedDate.isValid() ? parsedDate : undefined;
         } catch {
-
-            return null;
-
+            return undefined;
         }
-
     };
 
     return (

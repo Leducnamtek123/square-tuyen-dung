@@ -1,17 +1,13 @@
-// @ts-nocheck
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Chip, CircularProgress, Stack, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-
 import { useNavigate, useParams } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useTranslation } from 'react-i18next';
-
 import interviewService from '../../../../services/interviewService';
 import { transformInterviewSession } from '../../../../utils/transformers';
 import { ROUTES } from '../../../../configs/constants';
-
 import InterviewAiEvaluationCard from './InterviewAiEvaluationCard';
 import InterviewAnalysisPanel from './InterviewAnalysisPanel';
 import InterviewHrEvaluationForm from './InterviewHrEvaluationForm';
@@ -20,18 +16,55 @@ import InterviewQuestionsCard from './InterviewQuestionsCard';
 import InterviewRecordingCard from './InterviewRecordingCard';
 import InterviewTranscriptPanel from './InterviewTranscriptPanel';
 
-interface Props {
-  [key: string]: any;
+export interface Evaluation {
+  attitude_score: number;
+  professional_score: number;
+  result: string;
+  comments: string;
+  proposed_salary: number;
+}
+
+export interface InterviewSession {
+  id: number;
+  status: string;
+  room_name: string;
+  ai_overall_score?: number | null;
+  ai_technical_score?: number | null;
+  ai_communication_score?: number | null;
+  ai_summary?: string | null;
+  ai_strengths?: string[] | string;
+  ai_weaknesses?: string[] | string;
+  ai_detailed_feedback?: string | any;
+  recordingUrl?: string;
+  recording_url?: string;
+  evaluations?: Evaluation[];
+  candidateName?: string;
+  candidateEmail?: string;
+  candidate_email?: string;
+  jobName?: string;
+  type?: string;
+  interview_type?: string;
+  scheduledAt?: string;
+  questions?: any[];
+  transcripts?: any[];
+}
+
+export interface EvalFormType {
+  attitude_score: number | string;
+  professional_score: number | string;
+  result: string;
+  comments: string;
+  proposed_salary: number | string;
 }
 
 
 
 const InterviewDetailCard = () => {
-    const { id } = useParams();
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const { t, i18n } = useTranslation(['employer', 'interview', 'common']);
-    const [evalForm, setEvalForm] = useState({
+    const [evalForm, setEvalForm] = useState<EvalFormType>({
         attitude_score: 0,
         professional_score: 0,
         result: 'pending',
@@ -39,12 +72,12 @@ const InterviewDetailCard = () => {
         proposed_salary: 0
     });
 
-    const { data: session, isLoading: loading } = useQuery({
+    const { data: session, isLoading: loading } = useQuery<InterviewSession>({
         queryKey: ['interview-session-detail', id],
         enabled: !!id,
         queryFn: async () => {
-            const res = await interviewService.getSessionDetail(id);
-            return transformInterviewSession(res);
+            const res = await interviewService.getSessionDetail(id as string) as any;
+            return transformInterviewSession(res) as InterviewSession;
         },
         refetchInterval: (query) => {
             const currentSession = query.state.data;
@@ -58,14 +91,14 @@ const InterviewDetailCard = () => {
     });
 
     const submitEvaluationMutation = useMutation({
-        mutationFn: (payload) => interviewService.submitEvaluation(payload),
+        mutationFn: (payload: EvalFormType & { interview: string | undefined }) => interviewService.submitEvaluation(payload as any),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['interview-session-detail', id] });
         },
     });
 
     const triggerAiMutation = useMutation({
-        mutationFn: (sessionId) => interviewService.triggerAiEvaluation(sessionId),
+        mutationFn: (sessionId: number | string) => interviewService.triggerAiEvaluation(sessionId),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['interview-session-detail', id] });
         },
@@ -87,7 +120,7 @@ const InterviewDetailCard = () => {
         });
     }, [session?.id, session?.evaluations]);
 
-    const handleEvalChange = (e) => {
+    const handleEvalChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         setEvalForm(prev => ({ ...prev, [name]: value }));
     };
@@ -112,7 +145,7 @@ const InterviewDetailCard = () => {
         </Box>
     );
 
-    const getStatusColor = (status) => {
+    const getStatusColor = (status: string | undefined) => {
         switch (status) {
             case 'completed': return 'success';
             case 'in_progress': return 'primary';
@@ -166,7 +199,7 @@ const InterviewDetailCard = () => {
                 <Button
                     variant="contained"
                     disabled={!canJoinLiveRoom}
-                    onClick={() => navigate(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id)}`)}
+                    onClick={() => navigate(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id.toString())}`)}
                     sx={{ borderRadius: 2, minWidth: 180 }}
                 >
                     {t('common:actions.joinNow')}

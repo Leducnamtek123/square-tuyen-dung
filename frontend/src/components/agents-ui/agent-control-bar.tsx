@@ -1,11 +1,10 @@
-// @ts-nocheck
 'use client';;
 import { useEffect, useRef, useState } from 'react';
 import type { HTMLAttributes, KeyboardEvent } from 'react';
 import { useChat } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { Loader, MessageSquareTextIcon, SendHorizontal } from 'lucide-react';
-import { motion } from 'motion/react';
+import { motion, type HTMLMotionProps } from 'motion/react';
 
 import { cn } from '@/lib/utils';
 import { AgentDisconnectButton } from '@/components/agents-ui/agent-disconnect-button';
@@ -35,7 +34,7 @@ type AgentControlBarProps = HTMLAttributes<HTMLDivElement> & {
   onIsChatOpenChange?: (open: boolean) => void;
 };
 
-const resolveMuiButtonVariant = (variant) => {
+const resolveMuiButtonVariant = (variant: string | undefined): 'outlined' | 'text' | 'contained' => {
   switch (variant) {
     case 'outline':
       return 'outlined';
@@ -46,18 +45,20 @@ const resolveMuiButtonVariant = (variant) => {
   }
 };
 
-const resolveMuiButtonColor = (variant) => {
+const resolveMuiButtonColor = (variant: string | undefined): 'secondary' | 'error' | 'inherit' | 'primary' | 'info' | 'success' | 'warning' => {
   switch (variant) {
     case 'secondary':
       return 'secondary';
     case 'destructive':
       return 'error';
+    case 'primary':
+      return 'primary';
     default:
       return 'inherit';
   }
 };
 
-const resolveMuiButtonSize = (size) => {
+const resolveMuiButtonSize = (size: string | undefined): 'small' | 'large' | 'medium' => {
   switch (size) {
     case 'icon':
     case 'icon-sm':
@@ -93,7 +94,7 @@ const LK_TOGGLE_VARIANT_2 = [
   'dark:data-[state=on]:bg-blue-500/20 dark:data-[state=on]:text-blue-300',
 ];
 
-const MOTION_PROPS: any = {
+const MOTION_PROPS: HTMLMotionProps<'div'> = {
   variants: {
     hidden: {
       height: 0,
@@ -180,7 +181,7 @@ function AgentChatInput({
         type="button"
         disabled={isDisabled}
         variant={resolveMuiButtonVariant('default')}
-        color={resolveMuiButtonColor(isDisabled ? 'secondary' : 'default')}
+        color={isDisabled ? 'secondary' : 'inherit'}
         title={isSending ? 'Sending...' : 'Send'}
         onClick={handleButtonClick}
         className="self-end disabled:cursor-not-allowed">
@@ -238,7 +239,7 @@ export function AgentControlBar({
     handleVideoDeviceChange,
     handleMicrophoneDeviceSelectError,
     handleCameraDeviceSelectError,
-  } = useInputControls({ onDeviceError, saveUserChoices } as any);
+  } = useInputControls({ onDeviceError, saveUserChoices });
 
   const handleSendMessage = async (message: string) => {
     await send(message);
@@ -270,7 +271,7 @@ export function AgentControlBar({
       {...props}>
       <motion.div
         {...MOTION_PROPS}
-        {...({ inert: !(isChatOpen || isChatOpenUncontrolled) } as Record<string, unknown>)}
+        {...({ inert: !(isChatOpen || isChatOpenUncontrolled) ? '' : undefined } as any)}
         animate={isChatOpen || isChatOpenUncontrolled ? 'visible' : 'hidden'}
         className="border-input/50 flex w-full items-start overflow-hidden border-b">
         <AgentChatInput

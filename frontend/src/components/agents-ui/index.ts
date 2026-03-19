@@ -1,4 +1,3 @@
-// @ts-nocheck
 export * from './agent-audio-visualizer-aura';
 export * from './agent-audio-visualizer-bar';
 export * from './agent-audio-visualizer-grid';

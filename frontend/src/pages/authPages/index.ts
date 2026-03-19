@@ -1,4 +1,3 @@
-// @ts-nocheck
 export { default as EmailVerificationRequiredPage } from './EmailVerificationRequiredPage'
 
 export { default as EmployerLogin } from './EmployerLogin'

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
@@ -22,13 +21,18 @@ import { formatRoute } from "../../../../utils/funcUtils";
 import JobDetailActions from "./JobDetailActions";
 import JobDetailInfoItem from "./JobDetailInfoItem";
 
-interface Props {
-  [key: string]: any;
+interface JobDetailHeaderCardProps {
+  jobPostDetail: any;
+  allConfig: any;
+  isAuthenticated: boolean;
+  currentUser: any;
+  isLoadingSave: boolean;
+  onSave: () => void;
+  onShowApplyForm: () => void;
+  onOpenSharePopup: (open: boolean) => void;
 }
 
-
-
-const JobDetailHeaderCard = ({
+const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
   jobPostDetail,
   allConfig,
   isAuthenticated,
@@ -77,7 +81,7 @@ const JobDetailHeaderCard = ({
                 {jobPostDetail?.companyDict?.companyName}
               </Typography>
               <Typography variant="subtitle2" gutterBottom color="GrayText">
-                {allConfig?.employeeSizeDict[
+                {(allConfig?.employeeSizeDict as any)?.[
                   jobPostDetail?.companyDict?.employeeSize
                 ] || (
                   <span
@@ -117,7 +121,7 @@ const JobDetailHeaderCard = ({
                 style={{
                   marginRight: 6,
                   fontSize: 15,
-                  color: theme.palette.secondary.main,
+                  color: (theme.palette.secondary as any).main,
                 }}
               />
               {t("jobDetail.deadline")}: {dayjs(jobPostDetail?.deadline).format("DD/MM/YYYY")}
@@ -135,7 +139,7 @@ const JobDetailHeaderCard = ({
                 style={{
                   marginRight: 6,
                   fontSize: 15,
-                  color: theme.palette.secondary.main,
+                  color: (theme.palette.secondary as any).main,
                 }}
               />
               {jobPostDetail?.views} {t("jobDetail.views")}
@@ -153,7 +157,7 @@ const JobDetailHeaderCard = ({
                 style={{
                   marginRight: 6,
                   fontSize: 15,
-                  color: theme.palette.secondary.main,
+                  color: (theme.palette.secondary as any).main,
                 }}
               />
               {t("jobDetail.postedDate")}:{" "}
@@ -198,7 +202,7 @@ const JobDetailHeaderCard = ({
             }}>
             <JobDetailInfoItem
               title={t("jobDetail.experience")}
-              value={allConfig?.experienceDict[jobPostDetail?.experience]}
+              value={(allConfig?.experienceDict as any)?.[jobPostDetail?.experience]}
             />
           </Grid>
           <Grid
@@ -209,7 +213,7 @@ const JobDetailHeaderCard = ({
             }}>
             <JobDetailInfoItem
               title={t("jobDetail.position")}
-              value={allConfig?.positionDict[jobPostDetail?.position]}
+              value={(allConfig?.positionDict as any)?.[jobPostDetail?.position]}
             />
           </Grid>
           <Grid
@@ -220,7 +224,7 @@ const JobDetailHeaderCard = ({
             }}>
             <JobDetailInfoItem
               title={t("jobDetail.jobType")}
-              value={allConfig?.jobTypeDict[jobPostDetail?.jobType]}
+              value={(allConfig?.jobTypeDict as any)?.[jobPostDetail?.jobType]}
             />
           </Grid>
         </Grid>

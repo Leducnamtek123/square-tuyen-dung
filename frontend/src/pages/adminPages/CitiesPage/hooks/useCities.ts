@@ -1,9 +1,8 @@
-// @ts-nocheck
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import { toast } from 'react-toastify';
 
-export const useCities = (params) => {
+export const useCities = (params: any = {}) => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -16,36 +15,36 @@ export const useCities = (params) => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data) => adminManagementService.createCity(data),
+        mutationFn: (data: any) => adminManagementService.createCity(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-cities'] });
             toast.success('City added successfully');
         },
-        onError: (err) => {
+        onError: (err: any) => {
             toast.error('An error occurred while adding the city');
             console.error(err);
         }
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }) => adminManagementService.updateCity(id, data),
+        mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateCity(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-cities'] });
             toast.success('City updated successfully');
         },
-        onError: (err) => {
+        onError: (err: any) => {
             toast.error('An error occurred while updating the city');
             console.error(err);
         }
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id) => adminManagementService.deleteCity(id),
+        mutationFn: (id: any) => adminManagementService.deleteCity(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-cities'] });
             toast.success('City deleted successfully');
         },
-        onError: (err) => {
+        onError: (err: any) => {
             toast.error('An error occurred while deleting the city');
             console.error(err);
         }
@@ -57,5 +56,5 @@ export const useCities = (params) => {
         updateCity: updateMutation.mutateAsync,
         deleteCity: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    };
+    } as any;
 };

@@ -1,34 +1,29 @@
-// @ts-nocheck
 import React from "react";
-
 import { useForm } from "react-hook-form";
-
 import { yupResolver } from "@hookform/resolvers/yup";
-
 import * as yup from "yup";
-
 import { Box, Button, Stack, styled, Divider } from "@mui/material";
-
 import HowToRegIcon from "@mui/icons-material/HowToReg";
-
-import FacebookIcon from "@mui/icons-material/Facebook";
-
 import GoogleIcon from "@mui/icons-material/Google";
-
-import { LoginSocialFacebook } from "reactjs-social-login";
-
 import { useGoogleLogin } from "@react-oauth/google";
-
 import { useTranslation } from 'react-i18next';
-
 import TextFieldCustom from "../../../../components/controls/TextFieldCustom";
-
 import PasswordTextFieldCustom from "../../../../components/controls/PasswordTextFieldCustom";
+import type { RoleName } from "../../../../types/auth";
 
-import { AUTH_CONFIG } from "../../../../configs/constants";
+interface JobSeekerSignUpFormData {
+  fullName: string;
+  email: string;
+  password?: string;
+  confirmPassword?: string;
+}
 
-interface Props {
-  [key: string]: any;
+interface JobSeekerSignUpFormProps {
+  onRegister: (data: JobSeekerSignUpFormData) => void;
+  onFacebookRegister: (result: any) => void;
+  onGoogleRegister: (result: any) => void;
+  serverErrors?: Record<string, string[]>;
+  checkCreds?: (email: string, roleName: RoleName) => Promise<boolean>;
 }
 
 
@@ -108,16 +103,11 @@ const StyledDivider = styled(Divider)({
 });
 
 const JobSeekerSignUpForm = ({
-
   onRegister,
-
   onFacebookRegister,
-
   onGoogleRegister,
-
   serverErrors = {},
-
-}) => {
+}: JobSeekerSignUpFormProps) => {
 
   const { t } = useTranslation('auth');
 
@@ -163,32 +153,20 @@ const JobSeekerSignUpForm = ({
 
   });
 
-  const { control, setError, handleSubmit } = useForm({
-
+  const { control, setError, handleSubmit } = useForm<JobSeekerSignUpFormData>({
     defaultValues: {
-
       fullName: "",
-
       email: "",
-
       password: "",
-
       confirmPassword: "",
-
     },
-
-    resolver: yupResolver(schema),
-
+    resolver: yupResolver(schema) as any,
   });
 
   React.useEffect(() => {
-
-    for (let err in serverErrors) {
-
-      setError(err, { type: 400, message: serverErrors[err]?.join(" ") });
-
+    for (const err in serverErrors) {
+      setError(err as any, { type: 'manual', message: serverErrors[err]?.join(" ") });
     }
-
   }, [serverErrors, setError]);
 
   const googleRegister = useGoogleLogin({

@@ -1,9 +1,6 @@
-// @ts-nocheck
 import React from "react";
 
 import { useNavigate } from "react-router-dom";
-
-import { useDispatch, useSelector } from "react-redux";
 
 import { Link } from "react-router-dom";
 
@@ -16,52 +13,54 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "react-i18next";
 import { searchJobPost } from "../../../../redux/filterSlice";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/useAppStore";
 
 import { ROUTES } from "../../../../configs/constants";
 
-interface Props {
-  [key: string]: any;
+interface Option {
+  id: string | number;
+  name: string;
 }
 
-
+type FilterType = "CARRER" | "CITY" | "JOB_TYPE";
 
 const maxItem = 6;
 
 const JobByCategory = () => {
   const { t } = useTranslation('public');
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const nav = useNavigate();
 
-  const { jobPostFilter } = useSelector((state) => state.filter);
+  const { jobPostFilter } = useAppSelector((state) => state.filter);
 
-  const careerOptions = allConfig?.careerOptions || [];
+  const careerOptions = (allConfig?.careerOptions || []) as any[];
 
-  const cityOptions = allConfig?.cityOptions || [];
+  const cityOptions = (allConfig?.cityOptions || []) as any[];
 
-  const jobTypeOptions = allConfig?.jobTypeOptions || [];
+  const jobTypeOptions = (allConfig?.jobTypeOptions || []) as any[];
 
-  const handleFilter = (id, type) => {
+  const handleFilter = (id: string | number, type: string) => {
 
     switch (type) {
 
       case "CARRER":
 
-        dispatch(searchJobPost({ ...jobPostFilter, careerId: id }));
+        dispatch(searchJobPost({ ...jobPostFilter, careerId: id as any }));
 
         break;
 
       case "CITY":
 
-        dispatch(searchJobPost({ ...jobPostFilter, cityId: id }));
+        dispatch(searchJobPost({ ...jobPostFilter, cityId: id as any }));
 
         break;
 
       case "JOB_TYPE":
 
-        dispatch(searchJobPost({ ...jobPostFilter, jobTypeId: id }));
+        dispatch(searchJobPost({ ...jobPostFilter, jobTypeId: id as any }));
 
         break;
 

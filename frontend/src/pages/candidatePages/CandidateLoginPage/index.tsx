@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Box, Paper, Typography, TextField, Button, Container } from "@mui/material";
 
@@ -6,12 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../../configs/constants';
 import LanguageSwitcher from '../../../layouts/components/commons/LanguageSwitcher';
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const JobSeekerInterviewLoginPage = () => {
     const [sessionId, setSessionId] = useState('');

@@ -1,23 +1,20 @@
-// @ts-nocheck
 import React from 'react';
-
 import { DropzoneDialog } from 'mui-file-dropzone';
-
 import { IconButton, Typography, Stack } from "@mui/material";
-
 import CloseIcon from '@mui/icons-material/Close';
 
 interface Props {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  handleUpload: (files: File[]) => void;
+  title?: string;
   [key: string]: any;
 }
 
-
-
 const DropzoneDialogCustom = (props: Props) => {
+  const { open, setOpen, handleUpload, title = 'Tiêu đề', ...others } = props;
 
-  const { open, setOpen, handleUpload, title = 'Tiêu đề' } = props;
-
-  const dialogTitle = (title) => (
+  const dialogTitle = (title: string) => (
 
     <>
 
@@ -55,12 +52,9 @@ const DropzoneDialogCustom = (props: Props) => {
 
       onClose={() => setOpen(false)}
 
-      onSave={(files) => {
-
+      onSave={(files: File[]) => {
         setOpen(false);
-
         handleUpload(files);
-
       }}
 
       showPreviews={true}
@@ -71,21 +65,17 @@ const DropzoneDialogCustom = (props: Props) => {
 
       previewText="Xem trước"
 
-      getFileLimitExceedMessage={(number) =>
-
+      getFileLimitExceedMessage={(number: number | string) =>
         `Giới hạn tải lên là ${number} tệp.`
-
       }
 
-      getFileAddedMessage={(fileName) =>
-
+      getFileAddedMessage={(fileName: string) =>
         `File ${fileName} added successfully.`
-
       }
 
-      getFileRemovedMessage={(fileName) => `Tệp ${fileName} đã được hủy`}
+      getFileRemovedMessage={(fileName: string) => `Tệp ${fileName} đã được hủy`}
 
-      {...props}
+      {...others}
 
     />
 

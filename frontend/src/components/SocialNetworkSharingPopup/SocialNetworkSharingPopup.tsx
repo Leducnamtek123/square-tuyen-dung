@@ -1,35 +1,29 @@
-// @ts-nocheck
 import { Dialog, DialogTitle, IconButton, List, ListItem, Stack, Typography } from "@mui/material";
-
-import PropTypes from 'prop-types';
-
 import {
-
   FacebookShareButton,
-
   FacebookIcon,
-
   FacebookMessengerShareButton,
-
   FacebookMessengerIcon,
-
   EmailShareButton,
-
   EmailIcon,
-
   TwitterShareButton,
-
   TwitterIcon,
-
   LinkedinShareButton,
-
   LinkedinIcon,
-
 } from 'react-share';
-
 import CloseIcon from '@mui/icons-material/Close';
 
-const SocialNetworkSharingPopup = (props) => {
+interface SocialNetworkSharingPopupProps {
+  setOpenPopup: (open: boolean) => void;
+  open: boolean;
+  facebook?: { url?: string; quote?: string; hashtag?: string } | null;
+  facebookMessenger?: { url?: string; to?: string } | null;
+  linkedin?: { url?: string; title?: string; summary?: string; source?: string } | null;
+  twitter?: { url?: string; title?: string; via?: string; hashtags?: string[]; related?: string[] } | null;
+  email?: { url?: string; subject?: string; body?: string } | null;
+}
+
+const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
 
   const {
 
@@ -176,17 +170,8 @@ const SocialNetworkSharingPopup = (props) => {
                   }}
 
                   style={{
-
                     cursor: 'pointer',
-
                     transition: 'all 0.2s ease-in-out',
-
-                    '&:hover': {
-
-                      transform: 'scale(1.1)'
-
-                    }
-
                   }}
 
                 />
@@ -222,17 +207,8 @@ const SocialNetworkSharingPopup = (props) => {
                   }}
 
                   style={{
-
                     cursor: 'pointer',
-
                     transition: 'all 0.2s ease-in-out',
-
-                    '&:hover': {
-
-                      transform: 'scale(1.1)'
-
-                    }
-
                   }}
 
                 />
@@ -268,17 +244,8 @@ const SocialNetworkSharingPopup = (props) => {
                   }}
 
                   style={{
-
                     cursor: 'pointer',
-
                     transition: 'all 0.2s ease-in-out',
-
-                    '&:hover': {
-
-                      transform: 'scale(1.1)'
-
-                    }
-
                   }}
 
                 />
@@ -316,17 +283,8 @@ const SocialNetworkSharingPopup = (props) => {
                   }}
 
                   style={{
-
                     cursor: 'pointer',
-
                     transition: 'all 0.2s ease-in-out',
-
-                    '&:hover': {
-
-                      transform: 'scale(1.1)'
-
-                    }
-
                   }}
 
                 />
@@ -360,17 +318,8 @@ const SocialNetworkSharingPopup = (props) => {
                   }}
 
                   style={{
-
                     cursor: 'pointer',
-
                     transition: 'all 0.2s ease-in-out',
-
-                    '&:hover': {
-
-                      transform: 'scale(1.1)'
-
-                    }
-
                   }}
 
                 />
@@ -386,14 +335,7 @@ const SocialNetworkSharingPopup = (props) => {
       </List>
 
     </Dialog>
-
   );
-
-};
-
-SocialNetworkSharingPopup.propTypes = {
-  setOpenPopup: PropTypes.func.isRequired,
-  open: PropTypes.bool.isRequired,
 };
 
 export default SocialNetworkSharingPopup;

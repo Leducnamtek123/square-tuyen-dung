@@ -1,47 +1,38 @@
-// @ts-nocheck
 import React from 'react';
-
 import { useNavigate } from 'react-router-dom';
-
 import dayjs from 'dayjs';
-
 import { Box, Card, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
-
 import { useTheme } from '@mui/material/styles';
-
 import defaultTheme from '../../themeConfigs/defaultTheme';
-
 import MuiImageCustom from '../MuiImageCustom';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import {
-
   faBriefcase,
-
   faFontAwesome,
-
   faUsers,
-
 } from '@fortawesome/free-solid-svg-icons';
-
 import { formatRoute } from '../../utils/funcUtils';
-
 import { ROUTES } from '../../configs/constants';
+import { RootState } from '../../redux/store';
 
-interface Props {
-  [key: string]: any;
+interface CompanyActionProps {
+  id: string | number;
+  views: number;
+  createAt: string;
+  resume: any;
+  company: any;
+  children: React.ReactNode;
 }
 
 
 
-const CompanyAction = ({ id, views, createAt, resume, company, children }: Props) => {
+const CompanyAction = ({ id, views, createAt, resume, company, children }: CompanyActionProps) => {
 
   const nav = useNavigate();
 
   const [parentWidth, setParentWidth] = React.useState(0);
 
-  const [stackDirection, setStackDirection] = React.useState('column');
+  const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>('column');
 
   const theme = useTheme();
 
@@ -267,13 +258,19 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Props
 
 };
 
-const CompanyActionFollow = ({ id, company, children }) => {
+interface CompanyActionFollowProps {
+  id: string | number;
+  company: any;
+  children: React.ReactNode;
+}
+
+const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) => {
 
   const nav = useNavigate();
 
   const [parentWidth, setParentWidth] = React.useState(0);
 
-  const [stackDirection, setStackDirection] = React.useState('column');
+  const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>('column');
 
   const theme = useTheme();
 

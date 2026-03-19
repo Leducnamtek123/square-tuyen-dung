@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -27,8 +26,24 @@ import resumeService from '../../../../services/resumeService';
 
 import { salaryString } from '../../../../utils/customData';
 
-interface Props {
-  [key: string]: any;
+interface ResumeDetail {
+  description: string | null;
+  skillsSummary: string | null;
+  title: string | null;
+  position: string;
+  academicLevel: string;
+  experience: string;
+  career: string;
+  city: string;
+  salaryMin: number | null;
+  salaryMax: number | null;
+  expectedSalary: number | null;
+  typeOfWorkplace: string;
+  jobType: string;
+}
+
+interface GeneralInfoCardProps {
+  title: string;
 }
 
 
@@ -83,7 +98,7 @@ const Loading = (
 
             .fill(0)
 
-            .map((item, index) => (
+            .map((_, index) => (
 
               <Typography component="div" variant="h5" key={index}>
 
@@ -101,7 +116,7 @@ const Loading = (
 
             .fill(0)
 
-            .map((item, index) => (
+            .map((_, index) => (
 
               <Typography component="div" variant="h5" key={index}>
 
@@ -121,13 +136,13 @@ const Loading = (
 
 );
 
-const GeneralInfoCard = ({ title }) => {
+const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
     const { t } = useTranslation(['jobSeeker', 'common']);
 
-    const { slug: resumeSlug } = useParams();
+    const { slug: resumeSlug } = useParams<{ slug: string }>();
 
-    const { allConfig } = useSelector((state) => state.config);
+    const { allConfig } = useSelector((state: any) => state.config);
 
     const [openPopup, setOpenPopup] = React.useState(false);
 
@@ -139,9 +154,9 @@ const GeneralInfoCard = ({ title }) => {
 
     const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-    const [resumeDetail, setResumeDetail] = React.useState({});
+    const [resumeDetail, setResumeDetail] = React.useState<ResumeDetail | null>(null);
 
-    const item = (title, value) => {
+    const renderItem = (itemTitle: string, value: string | number | null) => {
 
         return (
 
@@ -169,7 +184,7 @@ const GeneralInfoCard = ({ title }) => {
 
                 >
 
-                    {title}
+                    {itemTitle}
 
                 </Typography>
 
@@ -195,15 +210,16 @@ const GeneralInfoCard = ({ title }) => {
 
   React.useEffect(() => {
 
-    const getResumeDetail = async (resumeSlug) => {
+    const getResumeDetail = async (slug: string | undefined) => {
+      if (!slug) return;
 
       try {
 
-        const resData = await resumeService.getResumeOwner(resumeSlug);
+        const resData = await resumeService.getResumeOwner(slug) as any;
 
         setResumeDetail(resData.data);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -219,15 +235,16 @@ const GeneralInfoCard = ({ title }) => {
 
   }, [isSuccess, resumeSlug]);
 
-  const handleUpdateResumeDetail = (data) => {
+  const handleUpdateResumeDetail = (data: any) => {
 
-    const updateResume = async (resumeSlug, data) => {
+    const updateResume = async (slug: string | undefined, payload: any) => {
+      if (!slug) return;
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await resumeService.updateResume(resumeSlug, data);
+        await resumeService.updateResume(slug, payload);
 
         setIsSuccess(!isSuccess);
 
@@ -235,7 +252,7 @@ const GeneralInfoCard = ({ title }) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.profileUpdateSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -261,7 +278,7 @@ const GeneralInfoCard = ({ title }) => {
 
       p: 3,
 
-      boxShadow: (theme) => theme.customShadows.card,
+      boxShadow: (theme: any) => theme.customShadows.card,
 
     }}>
 
@@ -323,7 +340,7 @@ const GeneralInfoCard = ({ title }) => {
 
                   sx={{
 
-                    boxShadow: (theme) => theme.customShadows.medium,
+                    boxShadow: (theme: any) => theme.customShadows.medium,
 
                     '&:hover': {
 
@@ -353,11 +370,11 @@ const GeneralInfoCard = ({ title }) => {
 
                 <Grid size={12}>
 
-                  {item(t('jobSeeker:profile.fields.objective'), resumeDetail?.description)}
+                  {renderItem(t('jobSeeker:profile.fields.objective'), resumeDetail?.description)}
 
                   <Divider sx={{ my: 1, borderColor: 'grey.300' }} />
 
-                  {item(
+                  {renderItem(
 
                     t('jobSeeker:profile.fields.skillsSummary'),
 
@@ -381,37 +398,37 @@ const GeneralInfoCard = ({ title }) => {
 
                   <Stack spacing={1.5}>
 
-                    {item(t('jobSeeker:profile.fields.desiredPosition'), resumeDetail?.title)}
+                    {renderItem(t('jobSeeker:profile.fields.desiredPosition'), resumeDetail?.title)}
 
-                    {item(
+                    {renderItem(
 
                       t('jobSeeker:profile.fields.desiredLevel'),
 
-                      allConfig.positionDict[resumeDetail?.position]
+                      allConfig.positionDict[resumeDetail?.position ?? '']
 
                     )}
 
-                    {item(
+                    {renderItem(
 
                       t('jobSeeker:profile.fields.academicLevel'),
 
-                      allConfig.academicLevelDict[resumeDetail?.academicLevel]
+                      allConfig.academicLevelDict[resumeDetail?.academicLevel ?? '']
 
                     )}
 
-                    {item(
+                    {renderItem(
 
                       t('jobSeeker:profile.fields.experience'),
 
-                      allConfig.experienceDict[resumeDetail?.experience]
+                      allConfig.experienceDict[resumeDetail?.experience ?? '']
 
                     )}
 
-                    {item(
+                    {renderItem(
 
                       t('jobSeeker:profile.fields.career'),
 
-                      allConfig.careerDict[resumeDetail?.career]
+                      allConfig.careerDict[resumeDetail?.career ?? '']
 
                     )}
 
@@ -431,29 +448,29 @@ const GeneralInfoCard = ({ title }) => {
 
                   <Stack spacing={1.5}>
 
-                    {item(
+                    {renderItem(
 
                       t('jobSeeker:profile.fields.workLocation'),
 
-                      allConfig.cityDict[resumeDetail?.city]
+                      allConfig.cityDict[resumeDetail?.city ?? '']
 
                     )}
 
-                    {item(
+                    {renderItem(
 
                       t('jobSeeker:profile.fields.desiredSalary'),
 
                       salaryString(
 
-                        resumeDetail?.salaryMin,
+                        resumeDetail?.salaryMin ?? null,
 
-                        resumeDetail?.salaryMax
+                        resumeDetail?.salaryMax ?? null
 
                       )
 
                     )}
 
-                    {item(
+                    {renderItem(
 
                       t('jobSeeker:profile.fields.expectedSalary'),
 
@@ -465,23 +482,23 @@ const GeneralInfoCard = ({ title }) => {
 
                     )}
 
-                    {item(
+                    {renderItem(
 
                       t('jobSeeker:profile.fields.workplaceType'),
 
                       allConfig.typeOfWorkplaceDict[
 
-                        resumeDetail?.typeOfWorkplace
+                        resumeDetail?.typeOfWorkplace ?? ''
 
                       ]
 
                     )}
 
-                    {item(
+                    {renderItem(
 
                       t('jobSeeker:profile.fields.jobType'),
 
-                      allConfig.jobTypeDict[resumeDetail?.jobType]
+                      allConfig.jobTypeDict[resumeDetail?.jobType ?? '']
 
                     )}
 

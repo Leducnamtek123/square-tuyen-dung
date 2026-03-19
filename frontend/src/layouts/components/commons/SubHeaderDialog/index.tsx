@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTranslation } from 'react-i18next';
@@ -8,13 +7,27 @@ import Grid from "@mui/material/Grid2";
 import CloseIcon from '@mui/icons-material/Close';
 import { useSelector } from 'react-redux';
 
-interface Props {
-  [key: string]: any;
+interface CareerOption {
+  id: string;
+  name: string;
+  isHot?: boolean;
+}
+
+interface SubHeaderDialogProps {
+  open: boolean;
+  setOpen: (open: boolean) => void;
+  topCareers: CareerOption[];
+  handleFilter: (id: string) => void;
 }
 
 
 
-const DesktopContent = (setOpen, careers, handleFilter, t) => {
+const DesktopContent = (
+  setOpen: (open: boolean) => void,
+  careers: CareerOption[],
+  handleFilter: (id: string) => void,
+  t: any
+) => {
   const theme = useTheme();
 
   return (
@@ -119,7 +132,12 @@ const DesktopContent = (setOpen, careers, handleFilter, t) => {
   );
 };
 
-const MobileContent = (setOpen, careers, handleFilter, t) => {
+const MobileContent = (
+  setOpen: (open: boolean) => void,
+  careers: CareerOption[],
+  handleFilter: (id: string) => void,
+  t: any
+) => {
   return (
     <Box>
       <Stack direction="row" alignItems="center" sx={{ mb: 2 }}>
@@ -169,14 +187,14 @@ const MobileContent = (setOpen, careers, handleFilter, t) => {
   );
 };
 
-const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }) => {
+const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderDialogProps) => {
   const { t } = useTranslation('common');
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
-  const customCareers = React.useCallback((allCareers, topCareers) => {
-    var topCarrersId = topCareers.map((value) => value.id);
+  const customCareers = React.useCallback((allCareers: CareerOption[], topCareers: CareerOption[]) => {
+    const topCarrersId = topCareers.map((value: CareerOption) => value.id);
     var careerResult = [];
 
     for (let i = 0; i < allCareers.length; i++) {

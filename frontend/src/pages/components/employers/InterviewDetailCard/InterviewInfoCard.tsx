@@ -1,14 +1,14 @@
-// @ts-nocheck
 import React from 'react';
 import { Box, Divider, Paper, Typography } from '@mui/material';
+import { InterviewSession } from './index';
 
-interface Props {
-  [key: string]: any;
+interface InterviewInfoCardProps {
+  session: InterviewSession;
+  t: (key: string, options?: any) => string;
+  i18n: any;
 }
 
-
-
-const InterviewInfoCard = ({ session, t, i18n }) => {
+const InterviewInfoCard: React.FC<InterviewInfoCardProps> = ({ session, t, i18n }) => {
     return (
         <Paper sx={{
             p: 3,
@@ -40,7 +40,7 @@ const InterviewInfoCard = ({ session, t, i18n }) => {
                 <Box>
                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('interviewDetail.label.schedule')}</Typography>
                     <Typography variant="body2" sx={{ mt: 0.5, fontWeight: 500 }}>
-                        {new Date(session.scheduledAt).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US')}
+                        {session.scheduledAt ? new Date(session.scheduledAt).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US') : '---'}
                     </Typography>
                 </Box>
             </Box>

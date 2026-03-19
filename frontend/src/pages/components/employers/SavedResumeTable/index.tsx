@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useTranslation } from 'react-i18next';
@@ -29,13 +28,14 @@ import { faFile, faFilePdf } from '@fortawesome/free-regular-svg-icons';
 
 import { formatRoute } from '../../../../utils/funcUtils';
 
-interface Props {
+interface SavedResumeTableProps {
+  rows: any[];
+  isLoading: boolean;
+  handleUnsave: (slug: string) => void;
   [key: string]: any;
 }
 
-
-
-const SavedResumeTable = (props) => {
+const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
 
   const { t } = useTranslation('employer');
 
@@ -45,7 +45,7 @@ const SavedResumeTable = (props) => {
 
   const rowsSafe = Array.isArray(rows) ? rows : [];
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
   return (
 
@@ -73,7 +73,7 @@ const SavedResumeTable = (props) => {
 
         ) : (
 
-          rowsSafe.map((row) => (
+          rowsSafe.map((row: any) => (
 
             <TableRow key={row.id}>
 

@@ -1,15 +1,15 @@
-// @ts-nocheck
 import React from 'react';
-
 import Image from 'mui-image';
 
-interface Props {
+interface MuiImageCustomProps {
+  loading?: 'lazy' | 'eager';
+  src: string;
+  fallbackSrc?: string;
+  onError?: (event: any) => void;
   [key: string]: any;
 }
 
-
-
-const MuiImageCustom = (props: Props) => {
+const MuiImageCustom = (props: MuiImageCustomProps) => {
 
   const {
     loading = 'lazy',
@@ -26,7 +26,7 @@ const MuiImageCustom = (props: Props) => {
   }, [src]);
 
   const handleError = React.useCallback(
-    (event) => {
+    (event: any) => {
       if (fallbackSrc && imageSrc !== fallbackSrc) {
         setImageSrc(fallbackSrc);
       }

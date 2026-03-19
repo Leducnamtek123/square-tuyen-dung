@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Box, Card, CardHeader, CardContent, Typography, TablePagination } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -8,12 +7,6 @@ import { transformInterviewSession } from '../../../utils/transformers';
 import InterviewTable from './components/InterviewTable';
 import { useDeleteInterview, useUpdateInterviewStatus, useInterviews } from './hooks/useInterviews';
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
 const InterviewsPage = () => {
     const { t } = useTranslation(['interview', 'admin']);
     const [page, setPage] = useState(0);
@@ -22,32 +15,32 @@ const InterviewsPage = () => {
     const { data: interviewsData, isLoading } = useInterviews({
         page: page + 1,
         pageSize: rowsPerPage,
-    });
+    }) as any;
 
-    const interviews = (interviewsData?.results || []).map(transformInterviewSession);
-    const deleteMutation = useDeleteInterview();
-    const updateStatusMutation = useUpdateInterviewStatus();
+    const interviews = ((interviewsData as any)?.results || []).map(transformInterviewSession);
+    const deleteMutation = useDeleteInterview() as any;
+    const updateStatusMutation = useUpdateInterviewStatus() as any;
 
-    const handleChangePage = (event, newPage) => {
+    const handleChangePage = (event: any, newPage: number) => {
         setPage(newPage);
     };
 
-    const handleChangeRowsPerPage = (event) => {
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
-    const handleViewDetail = (interview) => {
+    const handleViewDetail = (interview: any) => {
         console.log('View interview detail:', interview);
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = (id: any) => {
         if (window.confirm(t('interviewAdminPage.confirmDelete', { ns: 'interview' }))) {
             deleteMutation.mutate(id);
         }
     };
 
-    const handleUpdateStatus = (id, status) => {
+    const handleUpdateStatus = (id: any, status: string) => {
         updateStatusMutation.mutate({ id, status });
     };
 
@@ -70,7 +63,7 @@ const InterviewsPage = () => {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={interviewsData?.count || 0}
+                        count={(interviewsData as any)?.count || 0}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from 'react';
 
 import { useDispatch } from 'react-redux';
@@ -17,7 +16,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import ClearIcon from '@mui/icons-material/Clear';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import { Box, List, ListItem, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
 
@@ -36,30 +35,23 @@ import jobService from '../../../services/jobService';
 import { ROUTES } from '../../../configs/constants';
 
 interface Props {
-  [key: string]: any;
+  name: string;
+  control: Control<any>;
+  placeholder?: string;
+  showSubmitButton?: boolean;
+  location?: 'HOME' | string;
 }
 
-
-
 const InputBaseSearchHomeCustom = ({
-
   name,
-
   control,
-
   placeholder,
-
   showSubmitButton = false,
-
   location = 'HOME',
-
 }: Props) => {
-
   const theme = useTheme();
-
-  const inputRef = React.useRef();
-
-  const inputSearchRef = React.useRef();
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
+  const inputSearchRef = React.useRef<HTMLDivElement | null>(null);
 
   const nav = useNavigate();
 
@@ -78,82 +70,31 @@ const InputBaseSearchHomeCustom = ({
   const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
-
-    try {
-
-      const keywordListStr = localStorage.getItem('project_search_history');
-
-      if (
-
-        keywordListStr !== null ||
-
-        keywordListStr !== undefined ||
-
-        keywordListStr !== ''
-
-      ) {
-
-        setRecentSearch(JSON.parse(keywordListStr));
-
-      }
-
-    } catch (error) {
-
-      console.error('Loi khi lay tu khoa tu local storage: ', error);
-
-    }
-
-  }, []);
-
-  React.useEffect(() => {
-
-    if (!debounded.trim()) {
-
-      setSearchResult([]);
-
-      return;
-
-    }
-
-    const getSuggestTitle = async (kw) => {
-
+    const getSuggestTitle = async (kw: string) => {
       if (!isLoading) {
-
         setIsLoading(true);
-
       }
-
       try {
-
         const resData = await jobService.searchJobSuggestTitle(kw);
-
         const data = resData?.data;
-
         setSearchResult(data.flat());
-
       } catch (error) {
-
         console.error('Search failed: ', error);
-
       } finally {
-
         setIsLoading(false);
-
       }
-
     };
 
-    getSuggestTitle(debounded);
-
+    if (debounded) {
+      getSuggestTitle(debounded);
+    }
   }, [debounded, isLoading]);
 
   const handleHideResult = () => {
-
     setShowResult(!showResult);
-
   };
 
-  const handleClickItem = (kw) => {
+  const handleClickItem = (kw: string) => {
 
     dispatch(searchJobPostWithKeyword({ kw: kw }));
 
@@ -493,7 +434,7 @@ const InputBaseSearchHomeCustom = ({
 
                         setSearchValue('');
 
-                        inputRef.current.focus();
+                        inputRef.current?.focus();
 
                       }}
 

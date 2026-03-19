@@ -1,30 +1,31 @@
-// @ts-nocheck
 import React from 'react';
-
 import { useTranslation } from 'react-i18next';
-
 import { useSelector } from 'react-redux';
-
 import { Box, Card, Pagination, Stack, Typography } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
 import {} from '../../../../configs/constants';
-
 import NoDataCard from '../../../../components/NoDataCard';
-
 import errorHandling from '../../../../utils/errorHandling';
-
 import toastMessages from '../../../../utils/toastMessages';
-
 import ProfileSearch from '../ProfileSearch';
-
 import JobSeekerProfile from '../../../../components/JobSeekerProfile';
-
 import resumeService from '../../../../services/resumeService';
 
-interface Props {
-  [key: string]: any;
+interface ResumeItem {
+  id: number;
+  slug: string;
+  title: string;
+  salaryMin: number | null;
+  salaryMax: number | null;
+  experience: number | null;
+  updateAt: string;
+  isSaved: boolean;
+  viewEmployerNumber: number;
+  userDict: object;
+  city: number;
+  jobSeekerProfileDict: object;
+  type: number;
+  lastViewedDate: string | null;
 }
 
 
@@ -33,7 +34,7 @@ const ProfileCard = () => {
 
   const { t } = useTranslation('employer');
 
-  const { resumeFilter } = useSelector((state) => state.filter);
+  const { resumeFilter } = useSelector((state: any) => state.filter);
 
   const { pageSize } = resumeFilter;
 
@@ -43,7 +44,7 @@ const ProfileCard = () => {
 
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const [resumes, setResumes] = React.useState([]);
+  const [resumes, setResumes] = React.useState<ResumeItem[]>([]);
 
   React.useEffect(() => {
 
@@ -53,7 +54,7 @@ const ProfileCard = () => {
 
       try {
 
-        const resData = await resumeService.getResumes({
+        const resData: any = await resumeService.getResumes({
 
           ...resumeFilter,
 
@@ -67,7 +68,7 @@ const ProfileCard = () => {
 
         setResumes(data?.results || []);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -83,19 +84,19 @@ const ProfileCard = () => {
 
   }, [resumeFilter, page]);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
 
     setPage(newPage);
 
   };
 
-  const handleSave = (slug) => {
+  const handleSave = (slug: string) => {
 
-    const save = async (slugResume) => {
+    const save = async (slugResume: string) => {
 
       try {
 
-        const resData = await resumeService.saveResume(slugResume);
+        const resData: any = await resumeService.saveResume(slugResume);
 
         const isSaved = resData.data.isSaved;
 
@@ -135,7 +136,7 @@ const ProfileCard = () => {
 
         );
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -285,11 +286,11 @@ const ProfileCard = () => {
 
                               title={value.title}
 
-                              salaryMin={value.salaryMin}
+                              salaryMin={value.salaryMin ?? undefined}
 
-                              salaryMax={value.salaryMin}
+                              salaryMax={value.salaryMax ?? undefined}
 
-                              experience={value.experience}
+                              experience={value.experience ?? undefined}
 
                               updateAt={value.updateAt}
 
@@ -303,9 +304,9 @@ const ProfileCard = () => {
 
                               jobSeekerProfile={value.jobSeekerProfileDict}
 
-                              type={value.type}
+                              type={value.type?.toString()}
 
-                              lastViewedDate={value.lastViewedDate}
+                              lastViewedDate={value.lastViewedDate ?? undefined}
 
                               handleSave={handleSave}
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from 'react';
 
 import { useTheme } from '@mui/material/styles';
@@ -11,28 +10,24 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import ClearIcon from '@mui/icons-material/Clear';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import { Box } from "@mui/material";
 
 import { IconButton, InputAdornment } from "@mui/material";
 
 interface Props {
-  [key: string]: any;
+  name: string;
+  control: Control<any>;
+  placeholder?: string;
+  showSubmitButton?: boolean;
 }
 
-
-
 const InputBaseSearchCompanyCustom = ({
-
   name,
-
   control,
-
   placeholder,
-
   showSubmitButton = false,
-
 }: Props) => {
 
   const theme = useTheme();

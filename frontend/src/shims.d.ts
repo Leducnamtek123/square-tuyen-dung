@@ -59,6 +59,9 @@ declare module 'draft-js' {
 
 declare module 'draftjs-to-html';
 declare module 'react-color';
+declare module 'mui-file-dropzone';
+declare module 'react-draft-wysiwyg';
+declare module 'mui-image';
 
 declare module '@hookform/resolvers/*' {
   export const yupResolver: any;

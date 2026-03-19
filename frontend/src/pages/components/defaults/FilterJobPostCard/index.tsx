@@ -1,29 +1,21 @@
-// @ts-nocheck
 import React from 'react';
-
 import { Pagination, Stack } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
 import jobService from '../../../../services/jobService';
-
 import JobPost from '../../../../components/JobPost';
-
 import NoDataCard from '../../../../components/NoDataCard';
 
-interface Props {
-  [key: string]: any;
+interface FilterJobPostCardProps {
+  params?: any;
 }
-
-
 
 const pageSize = 12;
 
-const FilterJobPostCard = ({ params = {}}) => {
+const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) => {
 
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const [jobPosts, setJobPosts] = React.useState([]);
+  const [jobPosts, setJobPosts] = React.useState<any[]>([]);
 
   const [page, setPage] = React.useState(1);
 
@@ -45,13 +37,11 @@ const FilterJobPostCard = ({ params = {}}) => {
 
     const handleResize = () => {
 
-      const newWidth = document.getElementById(
+      const element = document.getElementById("filter-job-post-card");
 
-        'filter-job-post-card'
-
-      ).offsetWidth;
-
-      setParentWidth(newWidth);
+      if (element) {
+        setParentWidth(element.offsetWidth);
+      }
 
     };
 
@@ -105,7 +95,7 @@ const FilterJobPostCard = ({ params = {}}) => {
 
           page: page,
 
-        });
+        }) as any;
 
         const data = resData.data;
 
@@ -127,7 +117,7 @@ const FilterJobPostCard = ({ params = {}}) => {
 
   }, [page, resolvedParams]);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
 
     setPage(newPage);
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Chip, Autocomplete, CircularProgress, Alert } from "@mui/material";
 import { useTranslation, Trans } from 'react-i18next';
@@ -7,31 +6,31 @@ import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import questionService from '../../../../services/questionService';
 import { useScheduleInterview } from '../../InterviewsPage/hooks/useInterviews';
 
-interface Props {
-  [key: string]: any;
+interface ScheduleInterviewDialogProps {
+    open: boolean;
+    onClose: () => void;
+    user: any;
 }
 
-
-
-const ScheduleInterviewDialog = ({ open, onClose, user }) => {
+const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialogProps) => {
     const { t } = useTranslation('admin');
-    const [scheduledAt, setScheduledAt] = useState(dayjs().add(1, 'day'));
+    const [scheduledAt, setScheduledAt] = useState<Dayjs | null>(dayjs().add(1, 'day'));
     const [notes, setNotes] = useState('');
-    const [selectedQuestions, setSelectedQuestions] = useState([]);
-    const [questions, setQuestions] = useState([]);
+    const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
+    const [questions, setQuestions] = useState<any[]>([]);
     const [loadingQuestions, setLoadingQuestions] = useState(false);
 
-    const scheduleInterviewMutation = useScheduleInterview();
+    const scheduleInterviewMutation = useScheduleInterview() as any;
 
     useEffect(() => {
         if (open) {
             setLoadingQuestions(true);
             questionService.getQuestions({ pageSize: 100 })
-                .then((res) => {
+                .then((res: any) => {
                     const items = res?.results || res || [];
                     setQuestions(items);
                 })
@@ -49,6 +48,7 @@ const ScheduleInterviewDialog = ({ open, onClose, user }) => {
     }, [open]);
 
     const handleSubmit = async () => {
+        if (!scheduledAt) return;
         const payload = {
             candidate: user?.id,
             candidate_name: user?.fullName || user?.email,

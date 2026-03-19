@@ -1,19 +1,13 @@
-// @ts-nocheck
 import React from 'react';
-
 import { Box, Pagination, Stack } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
 import JobPost from '../JobPost';
 
-interface Props {
+interface JobPostsProps {
   [key: string]: any;
 }
 
-
-
-const JobPosts = (_props: Props) => {
+const JobPosts = (_props: JobPostsProps) => {
 
   return (
 
@@ -41,7 +35,7 @@ const JobPosts = (_props: Props) => {
 
               }}>
 
-              <JobPost />
+              <JobPost {...({} as any)} />
 
             </Grid>
 

@@ -3,7 +3,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
-import { Alert } from "@mui/material";
+import { Alert, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { EditorState } from 'draft-js';
 import dayjs from 'dayjs';
@@ -54,8 +54,6 @@ interface JobPostFormValues {
   contactPersonEmail?: string;
   isUrgent?: boolean;
 }
-
-
 
 const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormProps) => {
 
@@ -310,22 +308,37 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
       .string()
 
       .required(t('jobPostForm.validation.contactpersonemailisrequired', 'Contact person email is required.'))
+
       .email(t('jobPostForm.validation.invalidemail', 'Invalid email.'))
+
       .max(100, t('jobPostForm.validation.contactpersonemailexceededallowedlength', 'Contact person email exceeded allowed length.')),
+
     isUrgent: yup.boolean().default(false),
+
   });
 
   const {
+
     register,
+
     handleSubmit,
+
     control,
+
     setValue,
+
     setError,
+
     reset,
+
     formState: { errors: formErrors },
+
   } = useForm<JobPostFormValues>({
+
     resolver: yupResolver(schema),
+
     defaultValues: {
+
       jobDescription: EditorState.createEmpty(),
 
       jobRequirement: EditorState.createEmpty(),
@@ -398,16 +411,18 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
     }
 
-     
-
   }, [cityId, setValue, districtOptions.length]);
 
   React.useEffect(() => {
 
     const loadLocation = async (input: string) => {
+
       if (!input || input.trim().length < 3) {
+
         setLocationOptions([]);
+
         return;
+
       }
 
       try {
@@ -428,7 +443,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
     if (editData) {
 
-      reset((formValues) => ({
+      reset((formValues: any) => ({
 
         ...formValues,
 
@@ -455,15 +470,19 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
           type: 'manual',
 
           message: serverErrors[err]?.join(' '),
+
         });
 
     }
 
   }, [serverErrors, setError, reset]);
 
-  const handleSelectLocation = async (e: any, value: any) => {
+  const handleSelectLocation = async (e: React.SyntheticEvent, value: any) => {
+
     if (!value || typeof value !== 'object' || !value.place_id) {
+
       return;
+
     }
 
     try {
@@ -471,13 +490,19 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
       const resData = await goongService.getPlaceDetailByPlaceId(
 
         value.place_id
+
       );
 
       if (!(resData as any)?.result?.geometry?.location) {
+
         return;
+
       }
+
       const location = (resData as any).result.geometry.location;
+
       setValue('location.lng', location.lng);
+
       setValue('location.lat', location.lat);
 
     } catch (error) {}
@@ -526,7 +551,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
             control={control}
 
-            options={allConfig?.careerOptions || []}
+            options={(allConfig?.careerOptions || []) as any[]}
 
             title={t('jobPostForm.title.career', 'Career')}
 
@@ -546,7 +571,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
             control={control}
 
-            options={allConfig?.positionOptions || []}
+            options={(allConfig?.positionOptions || []) as any[]}
 
             title={t('jobPostForm.title.position', 'Position')}
 
@@ -566,7 +591,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
             control={control}
 
-            options={allConfig?.experienceOptions || []}
+            options={(allConfig?.experienceOptions || []) as any[]}
 
             title={t('jobPostForm.title.experience', 'Experience')}
 
@@ -586,7 +611,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
             control={control}
 
-            options={allConfig?.typeOfWorkplaceOptions || []}
+            options={(allConfig?.typeOfWorkplaceOptions || []) as any[]}
 
             title={t('jobPostForm.title.workplace', 'Workplace')}
 
@@ -606,7 +631,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
             control={control}
 
-            options={allConfig?.jobTypeOptions || []}
+            options={(allConfig?.jobTypeOptions || []) as any[]}
 
             title={t('jobPostForm.title.jobtype', 'Job Type')}
 
@@ -619,15 +644,23 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
         </Grid>
 
         <Grid size={6}>
+
           <TextFieldCustom
+
             name="quantity"
+
             title={t('jobPostForm.title.numberofvacancies', 'Number of Vacancies')}
+
             placeholder={t('jobPostForm.placeholder.enternumberofvacancies', 'Enter number of vacancies')}
-            error={!!(formErrors as any).quantity}
+
             showRequired={true}
+
             control={control}
+
             type="number"
+
           />
+
         </Grid>
 
         <Grid size={6}>
@@ -638,7 +671,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
             control={control}
 
-            options={allConfig?.genderOptions || []}
+            options={(allConfig?.genderOptions || []) as any[]}
 
             title={t('jobPostForm.title.genderrequirement', 'Gender Requirement')}
 
@@ -698,7 +731,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
             control={control}
 
-            options={allConfig?.academicLevelOptions || []}
+            options={(allConfig?.academicLevelOptions || []) as any[]}
 
             title={t('jobPostForm.title.academiclevel', 'Academic Level')}
 
@@ -798,7 +831,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
             control={control}
 
-            options={allConfig?.cityOptions || []}
+            options={(allConfig?.cityOptions || []) as any[]}
 
             title={t('jobPostForm.title.cityprovince', 'City/Province')}
 
@@ -832,13 +865,13 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
             control={control}
 
-            options={districtOptions}
+            options={(districtOptions || []) as any[]}
 
-            title={t('jobPostForm.title.district', 'Ward/Commune')}
+            title={t('jobPostForm.title.district', 'District')}
 
             showRequired={true}
 
-            placeholder={t('jobPostForm.placeholder.selectdistrict', 'Select ward/commune')}
+            placeholder={t('jobPostForm.placeholder.selectdistrict', 'Select district')}
 
           />
 
@@ -850,17 +883,15 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
             name="location.address"
 
+            control={control}
+
+            options={locationOptions}
+
             title={t('jobPostForm.title.address', 'Address')}
 
             showRequired={true}
 
             placeholder={t('jobPostForm.placeholder.enteraddress', 'Enter address')}
-
-            control={control}
-
-            options={locationOptions}
-
-            loading={true}
 
             handleSelect={handleSelectLocation}
 
@@ -868,75 +899,23 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
         </Grid>
 
-        <Grid
+        <Grid size={12}>
 
-          size={{
+          <CheckboxCustom
 
-            xs: 12,
-
-            sm: 12,
-
-            md: 6,
-
-            lg: 6,
-
-            xl: 6
-
-          }}>
-
-          <TextFieldCustom
-
-            name="location.lat"
-
-            title={t('jobPostForm.title.latitude', 'Latitude')}
-
-            showRequired={true}
-
-            placeholder={t('jobPostForm.placeholder.enterlatitudecoordinateofthecompanyonthemap', 'Enter latitude coordinate of the company on the map.')}
-
-            helperText={t('jobPostForm.helperText.automaticallyfilledifyouchooseasuggestedaddress', 'Automatically filled if you choose a suggested address.')}
+            name="isUrgent"
 
             control={control}
 
-            type="number"
+            title={t('jobPostForm.label.isUrgent', 'Is Urgent')}
 
           />
 
         </Grid>
 
-        <Grid
+        <Grid size={12}>
 
-          size={{
-
-            xs: 12,
-
-            sm: 12,
-
-            md: 6,
-
-            lg: 6,
-
-            xl: 6
-
-          }}>
-
-          <TextFieldCustom
-
-            name="location.lng"
-
-            title={t('jobPostForm.title.longitude', 'Longitude')}
-
-            showRequired={true}
-
-            placeholder={t('jobPostForm.placeholder.enterlongitudecoordinateofthecompanyonthemap', 'Enter longitude coordinate of the company on the map.')}
-
-            helperText={t('jobPostForm.helperText.automaticallyfilledifyouchooseasuggestedaddress', 'Automatically filled if you choose a suggested address.')}
-
-            control={control}
-
-            type="number"
-
-          />
+          <Typography variant="h6" sx={{ fontWeight: 600, mt: 2 }}>{t('jobPostForm.title.contactinformation', 'Contact Information')}</Typography>
 
         </Grid>
 
@@ -958,7 +937,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
         </Grid>
 
-        <Grid size={12}>
+        <Grid size={6}>
 
           <TextFieldCustom
 
@@ -976,7 +955,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
         </Grid>
 
-        <Grid size={12}>
+        <Grid size={6}>
 
           <TextFieldCustom
 
@@ -994,12 +973,6 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
         </Grid>
 
-        <Grid size={12}>
-
-          <CheckboxCustom name="isUrgent" control={control} title={t('jobPostForm.title.urgent', 'Urgent')} />
-
-        </Grid>
-
       </Grid>
 
     </form>
@@ -1009,4 +982,3 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 };
 
 export default JobPostForm;
-

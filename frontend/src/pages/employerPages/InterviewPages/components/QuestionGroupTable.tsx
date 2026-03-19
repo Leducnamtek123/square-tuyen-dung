@@ -1,19 +1,31 @@
-// @ts-nocheck
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Tooltip, IconButton, Box, CircularProgress } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 
-interface Props {
-  [key: string]: any;
+interface Question {
+    id: string | number;
+    [key: string]: any;
 }
 
+interface QuestionGroup {
+    id: string | number;
+    name: string;
+    description?: string;
+    questions?: Question[];
+}
 
+interface QuestionGroupTableProps {
+    data: QuestionGroup[];
+    loading: boolean;
+    onEdit: (item: QuestionGroup) => void;
+    onDelete: (item: QuestionGroup) => void;
+}
 
-const QuestionGroupTable = ({ data, loading, onEdit, onDelete }) => {
+const QuestionGroupTable = ({ data, loading, onEdit, onDelete }: QuestionGroupTableProps) => {
     const { t } = useTranslation('employer');
+
     if (loading && (!data || data.length === 0)) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>

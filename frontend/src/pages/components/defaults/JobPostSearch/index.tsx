@@ -1,6 +1,4 @@
-// @ts-nocheck
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { Box, Button, Card, IconButton, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -9,30 +7,24 @@ import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useTranslation } from 'react-i18next';
-
 import InputBaseSearchHomeCustom from '../../../../components/controls/InputBaseSearchHomeCustom';
 import SingleSelectSearchCustom from '../../../../components/controls/SingleSelectSearchCustom';
 import {
   resetSearchJobPostFilter,
   searchJobPost,
 } from '../../../../redux/filterSlice';
-
-interface Props {
-  [key: string]: any;
-}
-
-
+import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppStore';
 
 const JobPostSearch = () => {
   const { t } = useTranslation('public');
-  const dispatch = useDispatch();
-  const { allConfig } = useSelector((state) => state.config);
-  const { jobPostFilter } = useSelector((state) => state.filter);
+  const dispatch = useAppDispatch();
+  const { allConfig } = useAppSelector((state) => state.config);
+  const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [showAdvanceFilter, setShowAdvanceFilter] = React.useState(false);
   const { control, handleSubmit, reset } = useForm();
   const localizedJobTypeOptions = React.useMemo(
     () =>
-      (allConfig?.jobTypeOptions || []).map((option) => ({
+      ((allConfig?.jobTypeOptions || []) as any[]).map((option) => ({
         ...option,
         name:
           t(`jobSearch.jobTypeOptions.${option.id}`, { defaultValue: '' }) ||
@@ -42,7 +34,7 @@ const JobPostSearch = () => {
   );
   const localizedTypeOfWorkplaceOptions = React.useMemo(
     () =>
-      (allConfig?.typeOfWorkplaceOptions || []).map((option) => ({
+      ((allConfig?.typeOfWorkplaceOptions || []) as any[]).map((option) => ({
         ...option,
         name:
           t(`jobSearch.workplaceOptions.${option.id}`, { defaultValue: '' }) ||
@@ -62,7 +54,7 @@ const JobPostSearch = () => {
     setShowAdvanceFilter(!showAdvanceFilter);
   };
 
-  const handleSaveKeyworLocalStorage = (kw) => {
+  const handleSaveKeywordLocalStorage = (kw: string | null | undefined) => {
     try {
       if (kw) {
         const keywordListStr = localStorage.getItem('project_search_history');
@@ -97,9 +89,12 @@ const JobPostSearch = () => {
     }
   };
 
-  const handleFilter = (data) => {
-    handleSaveKeyworLocalStorage(data?.kw);
+  const handleFilter = (data: any) => {
+
+    handleSaveKeywordLocalStorage(data?.kw);
+
     dispatch(searchJobPost(data));
+
   };
 
   const handleReset = () => {

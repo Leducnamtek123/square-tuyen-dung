@@ -1,17 +1,9 @@
-// @ts-nocheck
 import React from "react";
 import { Card, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import Grid from "@mui/material/Grid2";
-
 import { TabTitle } from "../../../utils/generalFunction";
 import AccountCard from "../../components/auths/AccountCard";
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const AccountPage = () => {
   const { t } = useTranslation("employer");

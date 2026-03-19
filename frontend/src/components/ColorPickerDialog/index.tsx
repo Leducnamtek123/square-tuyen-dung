@@ -1,14 +1,12 @@
-// @ts-nocheck
 import React from 'react';
-
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Stack, Typography } from "@mui/material";
-
-import { ChromePicker } from 'react-color';
-
+import { ChromePicker, ColorResult } from 'react-color';
 import defaultTheme from '../../themeConfigs/defaultTheme';
 
 interface Props {
-  [key: string]: any;
+  open: boolean;
+  onClose: () => void;
+  onColorSelect: (color: string) => void;
 }
 
 
@@ -29,11 +27,11 @@ const DEFAULT_COLORS = [
 
 const ColorPickerDialog = ({ open, onClose, onColorSelect }: Props) => {
 
-  const [selectedColor, setSelectedColor] = React.useState(defaultTheme.palette.primary.main);
+  const [selectedColor, setSelectedColor] = React.useState<string>(defaultTheme.palette.primary.main);
 
   const [showCustomPicker, setShowCustomPicker] = React.useState(false);
 
-  const handleColorSelect = (color) => {
+  const handleColorSelect = (color: string) => {
 
     setSelectedColor(color);
 
@@ -41,7 +39,7 @@ const ColorPickerDialog = ({ open, onClose, onColorSelect }: Props) => {
 
   };
 
-  const handleCustomColorChange = (color) => {
+  const handleCustomColorChange = (color: ColorResult) => {
 
     setSelectedColor(color.hex);
 

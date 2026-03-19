@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useMemo, useState } from "react";
 import { Box, Card, Typography, Divider, TextField, Button, Chip, Alert, Snackbar, Stack } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -7,16 +6,10 @@ import { TabTitle } from "../../../utils/generalFunction";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "../../../configs/constants";
 import { useTranslation } from "react-i18next";
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const makeId = () => {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -24,6 +17,14 @@ const makeId = () => {
     }
     return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 };
+
+interface RequestedInterview {
+    id: string;
+    scheduledAt: Dayjs | null;
+    contactName: string;
+    contactPhone: string;
+    notes: string;
+}
 
 const VerificationPage = () => {
     const { t } = useTranslation("employer");
@@ -40,39 +41,44 @@ const VerificationPage = () => {
         email: "",
         website: "",
     });
-    const [interviewRequest, setInterviewRequest] = useState({
+    const [interviewRequest, setInterviewRequest] = useState<{
+        scheduledAt: Dayjs | null;
+        contactName: string;
+        contactPhone: string;
+        notes: string;
+    }>({
         scheduledAt: dayjs().add(2, "day"),
         contactName: "",
         contactPhone: "",
         notes: "",
     });
-    const [requestedInterviews, setRequestedInterviews] = useState([]);
+    const [requestedInterviews, setRequestedInterviews] = useState<RequestedInterview[]>([]);
 
     const interviewStatus = useMemo(() => {
         if (requestedInterviews.length === 0) return t("verification.messages.noScheduleYet");
         return t("verification.messages.waitingConfirmation");
     }, [requestedInterviews.length, t]);
 
-    const handleLegalProfileChange = (field) => (event) => {
+    const handleLegalProfileChange = (field: keyof typeof legalProfile) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setLegalProfile((prev) => ({
             ...prev,
             [field]: event.target.value,
         }));
     };
 
-    const handleInterviewChange = (field) => (event) => {
+    const handleInterviewChange = (field: keyof typeof interviewRequest) => (event: React.ChangeEvent<HTMLInputElement>) => {
         setInterviewRequest((prev) => ({
             ...prev,
             [field]: event.target.value,
         }));
     };
 
-    const handleSaveLegalProfile = (event) => {
+    const handleSaveLegalProfile = (event: React.FormEvent) => {
         event.preventDefault();
         setSnackbarOpen(true);
     };
 
-    const handleRequestInterview = (event) => {
+    const handleRequestInterview = (event: React.FormEvent) => {
         event.preventDefault();
         if (!interviewRequest.scheduledAt || !interviewRequest.contactName) return;
         setRequestedInterviews((prev) => [

@@ -1,9 +1,8 @@
-// @ts-nocheck
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import questionService from '../../../../services/questionService';
 import { toast } from 'react-toastify';
 
-export const useQuestions = (params) => {
+export const useQuestions = (params: any) => {
     return useQuery({
         queryKey: ['admin-questions', params],
         queryFn: async () => {
@@ -18,7 +17,7 @@ export const useQuestions = (params) => {
 export const useCreateQuestion = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data) => questionService.createQuestion(data),
+        mutationFn: (data: any) => questionService.createQuestion(data),
         onSuccess: () => {
             toast.success('Question added successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-questions'] });
@@ -30,7 +29,7 @@ export const useCreateQuestion = () => {
 export const useUpdateQuestion = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, data }) => questionService.updateQuestion(id, data),
+        mutationFn: ({ id, data }: { id: any; data: any }) => questionService.updateQuestion(id, data),
         onSuccess: () => {
             toast.success('Question updated successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-questions'] });
@@ -42,7 +41,7 @@ export const useUpdateQuestion = () => {
 export const useDeleteQuestion = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (id) => questionService.deleteQuestion(id),
+        mutationFn: (id: any) => questionService.deleteQuestion(id),
         onSuccess: () => {
             toast.success('Question deleted successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-questions'] });

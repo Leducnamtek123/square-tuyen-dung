@@ -1,5 +1,4 @@
-// @ts-nocheck
-'use client';;
+'use client';
 import { useMemo } from 'react';
 import { cva } from 'class-variance-authority';
 import { useMultibandTrackVolume } from '@livekit/components-react';
@@ -30,6 +29,18 @@ export const AgentAudioVisualizerRadialVariants = cva([
   },
 });
 
+interface AgentAudioVisualizerRadialProps {
+  size?: 'icon' | 'sm' | 'md' | 'lg' | 'xl';
+  state?: string;
+  color?: string;
+  radius?: number;
+  barCount?: number;
+  audioTrack?: any;
+  className?: string;
+  style?: React.CSSProperties;
+  [key: string]: any;
+}
+
 /**
  * A radial (circular) audio visualizer that responds to agent state and audio levels.
  * Displays animated bars arranged in a circle that react to the current agent state
@@ -57,7 +68,7 @@ export function AgentAudioVisualizerRadial({
   className,
   style,
   ...props
-}) {
+}: AgentAudioVisualizerRadialProps) {
   const _barCount = useMemo(() => {
     if (barCount) {
       return barCount;

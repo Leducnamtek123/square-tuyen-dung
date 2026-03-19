@@ -1,9 +1,8 @@
-// @ts-nocheck
 import { cva } from 'class-variance-authority';
 import { motion } from 'motion/react';
 import type { HTMLMotionProps } from 'motion/react';
-
 import { cn } from '@/lib/utils';
+import { ComponentProps } from 'react';
 
 const motionAnimationProps: any = {
   variants: {
@@ -45,6 +44,11 @@ const agentChatIndicatorVariants = cva('bg-muted-foreground inline-block size-2.
   },
 });
 
+type AgentChatIndicatorProps = {
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+} & HTMLMotionProps<'span'>;
+
 /**
  * An animated indicator that shows the agent is processing or thinking.
  * Displays as a pulsing dot, typically used in chat interfaces.
@@ -64,13 +68,8 @@ export function AgentChatIndicator({
   return (
     <motion.span
       {...motionAnimationProps}
-      transition={{ duration: 0.1, ease: "linear" }}
+      transition={{ duration: 0.1, ease: "linear" } as any}
       className={cn(agentChatIndicatorVariants({ size }), className)}
       {...props} />
   );
 }
-
-type AgentChatIndicatorProps = {
-  size?: 'sm' | 'md' | 'lg';
-  className?: string;
-} & HTMLMotionProps<'span'>;

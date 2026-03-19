@@ -1,15 +1,13 @@
-// @ts-nocheck
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Box, Typography } from "@mui/material";
 
-interface Props {
-  [key: string]: any;
+interface JobDetailInfoItemProps {
+  title: string;
+  value: React.ReactNode;
 }
 
-
-
-const JobDetailInfoItem = ({ title, value }) => {
+const JobDetailInfoItem: React.FC<JobDetailInfoItemProps> = ({ title, value }) => {
   const { t } = useTranslation(["public"]);
   return (
     <Box>

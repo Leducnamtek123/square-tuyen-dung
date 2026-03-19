@@ -1,13 +1,6 @@
-// @ts-nocheck
 import React from "react";
 import { Box, Card, Skeleton, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const JobDetailLoading = () => {
   return (

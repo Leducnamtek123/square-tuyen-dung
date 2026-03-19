@@ -1,27 +1,14 @@
-// @ts-nocheck
 import React from "react";
-
 import { Box, Card, Stack, Typography } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
-
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
-
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-
 import { useTranslation } from "react-i18next";
 import { TabTitle } from "../../../utils/generalFunction";
-
 import MuiImageCustom from "../../../components/MuiImageCustom";
 import { ABOUT_IMAGES, APP_NAME } from "../../../configs/constants";
-
-interface Props {
-  [key: string]: any;
-}
 
 
 
@@ -71,7 +58,7 @@ const AboutUsPage = () => {
 
             mb: 2,
 
-            background: (theme) => theme.palette.primary.gradient,
+            background: (theme: any) => theme.palette.primary.gradient,
 
             WebkitBackgroundClip: "text",
 
@@ -150,11 +137,11 @@ const AboutUsPage = () => {
 
                     transform: "translateY(-8px)",
 
-                    boxShadow: (theme) => theme.customShadows.card,
+                    boxShadow: (theme: any) => theme.customShadows.card,
 
                     borderColor: 'primary.light',
 
-                    backgroundColor: (theme) => `${theme.palette.primary.background}`,
+                    backgroundColor: (theme: any) => `${theme.palette.primary.background}`,
 
                     "& .feature-icon": {
 
@@ -272,7 +259,7 @@ const AboutUsPage = () => {
 
           textAlign: "center",
 
-          background: (theme) => theme.palette.primary.gradient,
+          background: (theme: any) => theme.palette.primary.gradient,
 
           WebkitBackgroundClip: "text",
 

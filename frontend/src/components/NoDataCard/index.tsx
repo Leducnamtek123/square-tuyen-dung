@@ -1,15 +1,18 @@
-// @ts-nocheck
 import React from 'react';
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { SVG_IMAGES } from '../../configs/constants';
 import SvgIcon from '../SvgIcon';
 
-interface Props {
-  [key: string]: any;
+interface NoDataCardProps {
+  title?: string;
+  content?: string;
+  buttonText?: string;
+  onClick?: () => void;
+  svgKey?: string;
+  imgComponentSgv?: React.ReactNode;
+  children?: React.ReactNode;
 }
-
-
 
 const NoDataCard = ({
   title,
@@ -18,7 +21,8 @@ const NoDataCard = ({
   onClick,
   svgKey = 'ImageSvg1',
   imgComponentSgv,
-}: Props) => {
+  children,
+}: NoDataCardProps) => {
   const { t } = useTranslation('common');
   const displayTitle = title || t('noData');
 
@@ -36,7 +40,7 @@ const NoDataCard = ({
         {imgComponentSgv ? (
           imgComponentSgv
         ) : (
-          <SvgIcon src={SVG_IMAGES[svgKey]} />
+          <SvgIcon src={(SVG_IMAGES as any)[svgKey]} />
         )}
       </Box>
       <Typography variant="h6" align="center">
@@ -52,6 +56,7 @@ const NoDataCard = ({
           {buttonText}
         </Button>
       )}
+      {children}
     </Stack>
   );
 };

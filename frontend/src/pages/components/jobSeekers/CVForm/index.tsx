@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
@@ -13,83 +12,160 @@ import BasicDropzone from '../../../../components/controls/BasicDropzone';
 
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  [key: string]: any;
+interface FormValues {
+  files: any;
+}
+
+interface CVFormProps {
+  handleUpdate: (data: any) => void;
 }
 
 
 
-const CVForm = ({ handleUpdate }) => {
+const CVForm = ({ handleUpdate }: CVFormProps) => {
+
   const { t } = useTranslation(['jobSeeker']);
+
+
 
   const schema = yup.object().shape({
 
+
+
     files: yup
+
+
 
       .mixed()
 
+
+
       .test(
+
+
 
         'files empty',
 
+
+
         t('jobSeeker:profile.validation.fileRequired'),
 
-        (value) =>
+
+
+        (value: any) =>
+
+
 
           !(
 
+
+
             value === undefined ||
+
+
 
             value === null ||
 
+
+
             value === '' ||
+
+
 
             value.length === 0
 
+
+
           )
+
+
 
       ),
 
-  });
 
-  const { control, handleSubmit } = useForm({
-
-    resolver: yupResolver(schema),
 
   });
+
+
+
+  const { control, handleSubmit } = useForm<FormValues>({
+
+
+
+    resolver: yupResolver(schema) as any,
+
+
+
+  });
+
+
 
   return (
 
+
+
     <form id="modal-form" onSubmit={handleSubmit(handleUpdate)}>
+
+
 
       <Grid container spacing={2}>
 
+
+
         <Grid size={12}>
+
+
 
           <BasicDropzone
 
+
+
             control={control}
+
+
 
             name="files"
 
+
+
             title={t('jobSeeker:profile.fields.cvFile')}
+
+
 
             showRequired={true}
 
+
+
           />
 
+
+
         </Grid>
+
+
 
         <Grid size={12}>
 
+
+
         </Grid>
+
+
 
       </Grid>
 
+
+
     </form>
+
+
 
   );
 
+
+
 };
+
+
 
 export default CVForm;

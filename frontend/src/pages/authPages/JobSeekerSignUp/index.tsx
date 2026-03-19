@@ -1,7 +1,4 @@
-// @ts-nocheck
 import * as React from 'react';
-
-import { useDispatch } from 'react-redux';
 
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -29,9 +26,13 @@ import authService from '../../../services/authService';
 
 import JobSeekerSignUpForm from '../../components/auths/JobSeekerSignUpForm';
 
-interface Props {
-  [key: string]: any;
-}
+import { useAppDispatch } from '../../../hooks/useAppStore';
+
+import type { RoleName, AuthProvider } from '../../../types/auth';
+
+import type { AxiosError } from 'axios';
+
+import tokenService from '../../../services/tokenService';
 
 
 
@@ -89,17 +90,17 @@ const JobSeekerSignUp = () => {
 
   TabTitle(t('signup.jobSeekerTitle'));
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const nav = useNavigate();
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const [serverErrors, setServerErrors] = React.useState({});
+  const [serverErrors, setServerErrors] = React.useState<Record<string, string[]>>({});
 
-  const handleRegister = (data) => {
+  const handleRegister = (data: any) => {
 
-    const register = async (data, roleName) => {
+    const register = async (data: any, roleName: RoleName) => {
 
       setIsFullScreenLoading(true);
 
@@ -125,18 +126,19 @@ const JobSeekerSignUp = () => {
 
       } catch (error) {
 
-        const res = error?.response;
+        const axiosError = error as AxiosError<any>;
+        const res = axiosError?.response;
         const errors = res?.data?.errors;
         const hasEmailExists = !!errors?.email;
         if (res?.status === 400 && hasEmailExists) {
           try {
-            const resData = await authService.checkCreds(data?.email, ROLES_NAME.JOB_SEEKER);
+            const resData = await authService.checkCreds(data?.email, ROLES_NAME.JOB_SEEKER as RoleName) as any;
             if (resData?.exists === true && resData?.email_verified === false) {
               dispatch(
                 updateVerifyEmail({
                   isAllowVerifyEmail: true,
                   email: data?.email,
-                  roleName: ROLES_NAME.JOB_SEEKER,
+                  roleName: ROLES_NAME.JOB_SEEKER as RoleName,
                 })
               );
               nav(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
@@ -147,7 +149,7 @@ const JobSeekerSignUp = () => {
           }
         }
 
-        errorHandling(error, setServerErrors);
+        errorHandling(axiosError, setServerErrors as (errors: Record<string, unknown>) => void);
 
       } finally {
 
@@ -157,19 +159,19 @@ const JobSeekerSignUp = () => {
 
     };
 
-    register({ ...data, platform: PLATFORM }, ROLES_NAME.JOB_SEEKER);
+    register({ ...data, platform: PLATFORM }, ROLES_NAME.JOB_SEEKER as RoleName);
 
   };
 
   const handleSocialRegister = async (
 
-    clientId,
+    clientId: string,
 
-    clientSecrect,
+    clientSecrect: string,
 
-    provider,
+    provider: AuthProvider,
 
-    token
+    token: string
 
   ) => {
 
@@ -187,7 +189,7 @@ const JobSeekerSignUp = () => {
 
         token
 
-      );
+      ) as any;
 
       const {
 
@@ -201,7 +203,7 @@ const JobSeekerSignUp = () => {
 
       const isSaveTokenToCookie =
 
-        authService.saveAccessTokenAndRefreshTokenToCookie(
+        tokenService.saveAccessTokenAndRefreshTokenToCookie(
 
           accessToken,
 
@@ -225,7 +227,7 @@ const JobSeekerSignUp = () => {
 
           .catch(() => {
 
-            errorHandling();
+            errorHandling({ response: null } as unknown as AxiosError<any>);
 
           });
 
@@ -233,7 +235,7 @@ const JobSeekerSignUp = () => {
 
     } catch (error) {
 
-      errorHandling(error);
+      errorHandling(error as AxiosError<any>);
 
     } finally {
 
@@ -243,7 +245,7 @@ const JobSeekerSignUp = () => {
 
   };
 
-  const handleFacebookRegister = (result) => {
+  const handleFacebookRegister = (result: any) => {
 
     const accessToken = result?.data?.accessToken;
 
@@ -255,7 +257,7 @@ const JobSeekerSignUp = () => {
 
         AUTH_CONFIG.FACEBOOK_CLIENT_SECRET,
 
-        AUTH_PROVIDER.FACEBOOK,
+        AUTH_PROVIDER.FACEBOOK as AuthProvider,
 
         accessToken
 
@@ -265,7 +267,7 @@ const JobSeekerSignUp = () => {
 
   };
 
-  const handleGoogleRegister = (result) => {
+  const handleGoogleRegister = (result: any) => {
 
     const code = result?.code;
 
@@ -277,7 +279,7 @@ const JobSeekerSignUp = () => {
 
         AUTH_CONFIG.GOOGLE_CLIENT_SECRET,
 
-        AUTH_PROVIDER.GOOGLE,
+        AUTH_PROVIDER.GOOGLE as AuthProvider,
 
         code
 
@@ -287,11 +289,11 @@ const JobSeekerSignUp = () => {
 
   };
 
-  const checkCreds = async (email, roleName) => {
+  const checkCreds = async (email: string, roleName: RoleName) => {
 
     try {
 
-      const resData = await authService.checkCreds(email, roleName);
+      const resData = await authService.checkCreds(email, roleName) as any;
 
       const { exists, email_verified } = resData;
 
@@ -323,7 +325,7 @@ const JobSeekerSignUp = () => {
 
     } catch (error) {
 
-      errorHandling(error);
+      errorHandling(error as AxiosError<any>);
 
       return false;
 

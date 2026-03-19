@@ -1,6 +1,4 @@
-// @ts-nocheck
 import React from "react";
-import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Box, Button } from "@mui/material";
@@ -20,32 +18,29 @@ import jobService from "../../../services/jobService";
 import ApplyCard from "../../../components/ApplyCard";
 import SocialNetworkSharingPopup from "../../../components/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
 import { ROLES_NAME, ROUTES } from "../../../configs/constants";
-
-interface Props {
-  [key: string]: any;
-}
-
-
+import { useAppSelector } from "../../../hooks/useAppStore";
 
 const JobDetailPage = () => {
   const { slug } = useParams();
   const nav = useNavigate();
   const { t } = useTranslation(["public"]);
-  const { allConfig } = useSelector((state) => state.config);
-  const { isAuthenticated, currentUser } = useSelector((state) => state.user);
+  const { allConfig } = useAppSelector((state) => state.config);
+  const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
 
   const [openSharePopup, setOpenSharePopup] = React.useState(false);
   const [openPopup, setOpenPopup] = React.useState(false);
   const [isApplySucces, setIsApplySuccess] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isLoadingSave, setIsLoadingSave] = React.useState(false);
-  const [jobPostDetail, setJobPostDetail] = React.useState(null);
+  const [jobPostDetail, setJobPostDetail] = React.useState<any>(null);
   const canApply =
     !isAuthenticated ||
     (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.JOB_SEEKER;
 
   React.useEffect(() => {
-    const getJobPostDetail = async (jobPostSlug) => {
+    const getJobPostDetail = async (jobPostSlug: string | undefined) => {
+
+      if (!jobPostSlug) return;
       try {
         const resData = await jobService.getJobPostDetailById(jobPostSlug);
         const data = resData;
@@ -62,7 +57,7 @@ const JobDetailPage = () => {
 
   React.useEffect(() => {
     if (isApplySucces) {
-      setJobPostDetail((prev) =>
+      setJobPostDetail((prev: any) =>
         prev ? { ...prev, isApplied: true } : prev
       );
     }
@@ -72,14 +67,14 @@ const JobDetailPage = () => {
     const saveJobPost = async () => {
       setIsLoadingSave(true);
       try {
-        const resData = await jobService.saveJobPost(slug);
+        const resData = await jobService.saveJobPost(slug as string);
         const isSaved = resData.isSaved;
         setJobPostDetail({ ...jobPostDetail, isSaved: isSaved });
         toastMessages.success(
           isSaved ? t("jobDetail.savedSuccess") : t("jobDetail.unsavedSuccess")
         );
       } catch (error) {
-        errorHandling(error);
+        errorHandling(error as any);
       } finally {
         setIsLoadingSave(false);
       }
@@ -185,32 +180,34 @@ const JobDetailPage = () => {
       />
 
       <SocialNetworkSharingPopup
-        setOpenPopup={setOpenSharePopup}
-        open={openSharePopup}
-        facebook={{
-          url: window.location.href,
-          quote: jobPostDetail?.jobName,
-          hashtag: "#Project",
-        }}
-        facebookMessenger={{
-          url: window.location.href,
-        }}
-        linkedin={{
-          url: window.location.href,
-          title: jobPostDetail?.jobName,
-          summary: jobPostDetail?.jobDescription,
-          source: "Project",
-        }}
-        twitter={{
-          url: window.location.href,
-          title: jobPostDetail?.jobName,
-          hashtags: ["Project", "tuyendung"],
-        }}
-        email={{
-          url: window.location.href,
-          subject: jobPostDetail?.jobName,
-          body: jobPostDetail?.jobDescription,
-        }}
+        {...({
+          setOpenPopup: setOpenSharePopup,
+          open: openSharePopup,
+          facebook: {
+            url: window.location.href,
+            quote: jobPostDetail?.jobName,
+            hashtag: "#Project",
+          },
+          facebookMessenger: {
+            url: window.location.href,
+          },
+          linkedin: {
+            url: window.location.href,
+            title: jobPostDetail?.jobName,
+            summary: jobPostDetail?.jobDescription,
+            source: "Project",
+          },
+          twitter: {
+            url: window.location.href,
+            title: jobPostDetail?.jobName,
+            hashtags: ["Project", "tuyendung"],
+          },
+          email: {
+            url: window.location.href,
+            subject: jobPostDetail?.jobName,
+            body: jobPostDetail?.jobDescription,
+          },
+        } as any)}
       />
     </>
   );

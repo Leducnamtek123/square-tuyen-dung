@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
@@ -15,8 +14,15 @@ import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
 
 import RatingCustom from '../../../../components/controls/RatingCustom';
 
-interface Props {
-  [key: string]: any;
+interface FormValues {
+  name: string;
+  level: number;
+}
+
+interface AdvancedSkillFormProps {
+  handleAddOrUpdate: (data: any) => void;
+  editData: any;
+  serverErrors?: any;
 }
 
 
@@ -29,7 +35,7 @@ const AdvancedSkillForm = ({
 
   serverErrors = null,
 
-}) => {
+}: AdvancedSkillFormProps) => {
 
   const { t } = useTranslation(['jobSeeker', 'common']);
 
@@ -47,9 +53,9 @@ const AdvancedSkillForm = ({
 
   });
 
-  const { control, reset, setError, handleSubmit } = useForm({
+  const { control, reset, setError, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
 
   });
 
@@ -77,24 +83,19 @@ const AdvancedSkillForm = ({
 
   React.useEffect(() => {
 
-    if (serverErrors !== null)
+    if (serverErrors !== null) {
 
       for (let err in serverErrors) {
 
-        setError(err, {
+        setError(err as any, {
 
-          type: 400,
+          type: 'server',
 
           message: serverErrors[err]?.join(' '),
 
         });
 
       }
-
-    else {
-
-      setError();
-
     }
 
   }, [serverErrors, setError]);

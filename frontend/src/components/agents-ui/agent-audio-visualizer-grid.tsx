@@ -1,30 +1,29 @@
-// @ts-nocheck
-'use client';;
-import React, { Children, cloneElement, isValidElement, memo, useMemo } from 'react';
+'use client';
+import React, { Children, cloneElement, isValidElement, memo, useMemo, ReactElement } from 'react';
 import { cva } from 'class-variance-authority';
 import { useMultibandTrackVolume } from '@livekit/components-react';
 import { useAgentAudioVisualizerGridAnimator } from '@/hooks/agents-ui/use-agent-audio-visualizer-grid';
 import { cn } from '@/lib/utils';
 
 function cloneSingleChild(
-  children,
-  props,
-  key,
-) {
+  children: React.ReactNode,
+  props: any,
+  key?: string | number,
+): React.ReactNode {
   return Children.map(children, (child) => {
     // Checking isValidElement is the safe way and avoids a typescript error too.
     if (isValidElement(child) && Children.only(children)) {
-      const childProps = child.props;
+      const childProps = child.props as any;
+      let finalProps = { ...props };
       if (childProps.className) {
         // make sure we retain classnames of both passed props and child
-        props ??= {};
-        props.className = cn(childProps.className, props.className);
-        props.style = {
+        finalProps.className = cn(childProps.className, props.className);
+        finalProps.style = {
           ...(childProps.style),
           ...(props.style),
         };
       }
-      return cloneElement(child, { ...props, key: key ? String(key) : undefined });
+      return cloneElement(child as ReactElement, { ...finalProps, key: key ? String(key) : undefined });
     }
     return child;
   });
@@ -63,7 +62,7 @@ export const AgentAudioVisualizerGridVariants = cva('grid', {
   },
 });
 
-const sizeDefaults = {
+const sizeDefaults: Record<string, number> = {
   icon: 3,
   sm: 5,
   md: 5,
@@ -72,10 +71,10 @@ const sizeDefaults = {
 };
 
 function useGrid(
-  size = 'md',
-  columnCount = sizeDefaults[size],
-  rowCount = sizeDefaults[size],
-) {
+  size: string = 'md',
+  columnCount: number = sizeDefaults[size],
+  rowCount?: number,
+): { columnCount: number; rowCount: number; items: number[] } {
   return useMemo(() => {
     const _columnCount = columnCount;
     const _rowCount = rowCount ?? columnCount;
@@ -83,6 +82,17 @@ function useGrid(
 
     return { columnCount: _columnCount, rowCount: _rowCount, items };
   }, [columnCount, rowCount]);
+}
+
+interface GridCellProps {
+  index: number;
+  state: string;
+  interval: number;
+  rowCount: number;
+  columnCount: number;
+  volumeBands: number[];
+  highlightedCoordinate: { x: number; y: number };
+  children: React.ReactNode;
 }
 
 const GridCell = memo(function GridCell({
@@ -94,7 +104,7 @@ const GridCell = memo(function GridCell({
   volumeBands,
   highlightedCoordinate,
   children
-}) {
+}: GridCellProps) {
   if (state === 'speaking') {
     const y = Math.floor(index / columnCount);
     const rowMidPoint = Math.floor(rowCount / 2);
@@ -123,6 +133,21 @@ const GridCell = memo(function GridCell({
     },
   });
 });
+
+interface AgentAudioVisualizerGridProps {
+  size?: 'icon' | 'sm' | 'md' | 'lg' | 'xl';
+  state?: string;
+  radius?: number;
+  color?: string;
+  rowCount?: number;
+  columnCount?: number;
+  interval?: number;
+  className?: string;
+  children?: React.ReactNode;
+  audioTrack?: any; // Consider a more specific type if available, e.g., LocalAudioTrack | RemoteAudioTrack
+  style?: React.CSSProperties;
+  [key: string]: any; // For additional props passed to the div
+}
 
 /**
  * A grid-style audio visualizer that responds to agent state and audio levels.
@@ -155,9 +180,9 @@ export function AgentAudioVisualizerGrid({
   audioTrack,
   style,
   ...props
-}) {
+}: AgentAudioVisualizerGridProps) {
   const { columnCount, rowCount, items } = useGrid(size, _columnCount, _rowCount);
-  const highlightedCoordinate = useAgentAudioVisualizerGridAnimator(state, rowCount, columnCount, interval, radius);
+  const highlightedCoordinate = useAgentAudioVisualizerGridAnimator(state as any, rowCount, columnCount, interval, radius);
   const volumeBands = useMultibandTrackVolume(audioTrack, {
     bands: columnCount,
     loPass: 100,

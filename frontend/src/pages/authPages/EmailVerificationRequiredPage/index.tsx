@@ -1,7 +1,4 @@
-// @ts-nocheck
 import * as React from 'react';
-
-import { useDispatch, useSelector } from 'react-redux';
 
 import { Box, Button, Card, Container, Typography } from "@mui/material";
 
@@ -9,21 +6,13 @@ import { useTranslation } from 'react-i18next';
 
 import { TabTitle } from '../../../utils/generalFunction';
 
-import { ROUTES } from '../../../configs/constants';
-
-import toastMessages from '../../../utils/toastMessages';
-
 import BackdropLoading from '../../../components/loading/BackdropLoading';
-
-import { updateVerifyEmail } from '../../../redux/authSlice';
 
 import authService from '../../../services/authService';
 
-interface Props {
-  [key: string]: any;
-}
+import toastMessages from '../../../utils/toastMessages';
 
-
+import { useAppSelector } from '../../../hooks/useAppStore';
 
 const EmailVerificationRequiredPage = () => {
 
@@ -31,9 +20,7 @@ const EmailVerificationRequiredPage = () => {
 
   TabTitle(t('verification.pageTitle'));
 
-  const dispatch = useDispatch();
-
-  const { email } = useSelector((state) => state.auth);
+  const { email } = useAppSelector((state) => state.auth);
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 

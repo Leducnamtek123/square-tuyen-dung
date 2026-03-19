@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 
 import { Box, Dialog, DialogContent, DialogTitle, IconButton, Stack, Typography } from "@mui/material";
@@ -19,23 +18,22 @@ import companyImageService from '../../../../services/companyImageService';
 
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
 
-interface Props {
-  [key: string]: any;
+interface FileItem {
+  uid: number | string;
+  url: string;
 }
-
-
 
 const CompanyImageCard = () => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const [fileList, setFileList] = useState([]);
+  const [fileList, setFileList] = useState<FileItem[]>([]);
 
   const [previewVisible, setPreviewVisible] = useState(false);
 
   const [previewImage, setPreviewImage] = useState('');
 
-  const fileInputRef = React.useRef(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
 
@@ -43,13 +41,13 @@ const CompanyImageCard = () => {
 
       try {
 
-        const resData = await companyImageService.getCompanyImages();
+        const resData = await companyImageService.getCompanyImages() as any;
 
         const data = resData.data;
 
         const results = data.results;
 
-        const newResults = results.map((item) => ({
+        const newResults = results.map((item: any) => ({
 
           uid: item.id,
 
@@ -71,13 +69,13 @@ const CompanyImageCard = () => {
 
   }, []);
 
-  const handleUploadFiles = async (files) => {
+  const handleUploadFiles = async (files: File[]) => {
 
     if (!files?.length) return;
 
     const formData = new FormData();
 
-    files.forEach((file) => {
+    files.forEach((file: File) => {
 
       formData.append('files', file);
 
@@ -87,11 +85,11 @@ const CompanyImageCard = () => {
 
     try {
 
-      const resData = await companyImageService.addCompanyImage(formData);
+      const resData = await companyImageService.addCompanyImage(formData) as any;
 
       const results = resData.data;
 
-      const newResults = results.map((item) => ({
+      const newResults = results.map((item: any) => ({
 
         uid: item.id,
 
@@ -103,7 +101,7 @@ const CompanyImageCard = () => {
 
       toastMessages.success('Tai anh len thanh cong.');
 
-    } catch (error) {
+    } catch (error: any) {
 
       errorHandling(error);
 
@@ -115,9 +113,9 @@ const CompanyImageCard = () => {
 
   };
 
-  const handleDelete = (file) => {
+  const handleDelete = (file: FileItem) => {
 
-    const deleteCompanyImage = async (id) => {
+    const deleteCompanyImage = async (id: number | string) => {
 
       setIsFullScreenLoading(true);
 
@@ -129,7 +127,7 @@ const CompanyImageCard = () => {
 
         toastMessages.success('Xoa hinh anh thanh cong.');
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -155,7 +153,7 @@ const CompanyImageCard = () => {
 
   };
 
-  const handlePreview = (file) => {
+  const handlePreview = (file: FileItem) => {
 
     setPreviewImage(file.url);
 
@@ -169,9 +167,9 @@ const CompanyImageCard = () => {
 
   };
 
-  const handleFileChange = (event) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 
-    const files = Array.from(event.target.files || []);
+    const files = Array.from(event.target.files || []) as File[];
 
     if (files.length === 0) return;
 

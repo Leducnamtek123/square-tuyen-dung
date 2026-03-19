@@ -1,17 +1,15 @@
-// @ts-nocheck
 import React from 'react';
 import { TextField, InputAdornment, Box } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 
 import SearchIcon from '@mui/icons-material/Search';
 
-interface Props {
-  [key: string]: any;
+interface JobFiltersProps {
+    searchTerm: string;
+    onSearchChange: (value: string) => void;
 }
 
-
-
-const JobFilters = ({ searchTerm, onSearchChange }) => {
+const JobFilters = ({ searchTerm, onSearchChange }: JobFiltersProps) => {
     const { t } = useTranslation('admin');
     return (
         <Box sx={{ mb: 3 }}>

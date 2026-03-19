@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip, Avatar, Chip, Typography } from "@mui/material";
 
@@ -7,13 +6,14 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  [key: string]: any;
+interface CompanyTableProps {
+    data: any[];
+    onEdit: (company: any) => void;
+    onView?: (company: any) => void;
+    onDelete: (company: any) => void;
 }
 
-
-
-const CompanyTable = ({ data, onEdit, onView, onDelete }) => {
+const CompanyTable = ({ data, onEdit, onView, onDelete }: CompanyTableProps) => {
     const { t } = useTranslation('admin');
     return (
         <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip, Chip, Typography } from "@mui/material";
 
@@ -7,13 +6,13 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from '../../../../configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  [key: string]: any;
+interface ResumeTableProps {
+    data: any[];
+    onEdit?: (resume: any) => void;
+    onDelete?: (resume: any) => void;
 }
 
-
-
-const ResumeTable = ({ data, onView, onDelete }) => {
+const ResumeTable = ({ data, onEdit, onDelete }: ResumeTableProps) => {
     const { t } = useTranslation('admin');
     return (
         <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
@@ -60,7 +59,7 @@ const ResumeTable = ({ data, onView, onDelete }) => {
                             </TableCell>
                             <TableCell align="right">
                                 <Tooltip title={t('pages.resumes.table.viewDetails')}>
-                                    <IconButton size="small" onClick={() => onView?.(row)}>
+                                    <IconButton size="small" onClick={() => onEdit?.(row)}>
                                         <VisibilityIcon fontSize="small" />
                                     </IconButton>
                                 </Tooltip>

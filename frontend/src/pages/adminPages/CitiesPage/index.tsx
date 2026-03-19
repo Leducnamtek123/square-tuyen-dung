@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Box, Typography, Breadcrumbs, Link, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, TextField, TablePagination } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -8,20 +7,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCities } from './hooks/useCities';
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
 const CitiesPage = () => {
     const { t } = useTranslation('admin');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const [openDialog, setOpenDialog] = useState(false);
-    const [dialogMode, setDialogMode] = useState('add'); // 'add' or 'edit'
-    const [currentCity, setCurrentCity] = useState(null);
+    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+    const [currentCity, setCurrentCity] = useState<any>(null);
     const [cityName, setCityName] = useState('');
     const [cityCode, setCityCode] = useState('');
 
@@ -34,7 +27,7 @@ const CitiesPage = () => {
         updateCity,
         deleteCity,
         isMutating
-    } = useCities({ page: page + 1, pageSize: rowsPerPage });
+    } = useCities({ page: page + 1, pageSize: rowsPerPage }) as any;
 
     const handleOpenAdd = () => {
         setDialogMode('add');
@@ -44,7 +37,7 @@ const CitiesPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (city) => {
+    const handleOpenEdit = (city: any) => {
         setDialogMode('edit');
         setCurrentCity(city);
         setCityName(city.name);
@@ -52,7 +45,7 @@ const CitiesPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (city) => {
+    const handleOpenDelete = (city: any) => {
         setCurrentCity(city);
         setOpenDeleteDialog(true);
     };
@@ -84,6 +77,8 @@ const CitiesPage = () => {
             console.error(error);
         }
     };
+
+    const displayData = data?.results || data || [];
 
     return (
         <Box>
@@ -128,7 +123,7 @@ const CitiesPage = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {(data?.results || data)?.map((row) => (
+                                    {displayData.map((row: any) => (
                                         <TableRow key={row.id} hover>
                                             <TableCell>{row.id}</TableCell>
                                             <TableCell sx={{ fontWeight: 500 }}>{row.name}</TableCell>
@@ -147,7 +142,7 @@ const CitiesPage = () => {
                                             </TableCell>
                                         </TableRow>
                                     ))}
-                                    {(!data || (data.results || data).length === 0) && (
+                                    {displayData.length === 0 && (
                                         <TableRow>
                                             <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
                                                 {t('pages.cities.table.noData')}
@@ -215,7 +210,7 @@ const CitiesPage = () => {
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
                 <DialogTitle>{t('pages.cities.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.cities.deleteText', { name: currentCity?.name }) }} />
+                    <Typography dangerouslySetInnerHTML={{ __html: String(t('pages.cities.deleteText', { name: currentCity?.name })) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.cities.cancelBtn')}</Button>

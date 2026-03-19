@@ -1,23 +1,11 @@
-// @ts-nocheck
 import * as React from 'react';
-
 import { useNavigate } from 'react-router-dom';
-
 import { Alert, AlertTitle, Box, Card, Container, Typography } from "@mui/material";
-
 import { useTranslation } from 'react-i18next';
-
 import { TabTitle } from '../../../utils/generalFunction';
-
-import toastMessages from '../../../utils/toastMessages';
-
 import ForgotPasswordForm from '../../components/auths/ForgotPasswordForm';
-
 import authService from '../../../services/authService';
-
-interface Props {
-  [key: string]: any;
-}
+import type { AxiosError } from 'axios';
 
 
 
@@ -33,20 +21,13 @@ const ForgotPasswordPage = () => {
 
   const [errorMessage, setErrorMessage] = React.useState(null);
 
-  const handleRequestResetPassword = async (data) => {
-
+  const handleRequestResetPassword = async (data: any) => {
     try {
-
-      await authService.resetPassword(data.email);
-
-      setSuccessMessage(t('forgotPassword.success', { email: data?.email }));
-
+      await authService.forgotPassword({ email: data.email, platform: 'WEB' });
+      setSuccessMessage(t('forgotPassword.success', { email: data?.email }) as any);
     } catch (error) {
-
-      setErrorMessage(t('messages.tryAgain'));
-
+      setErrorMessage(t('messages.tryAgain') as any);
     }
-
   };
 
   return (

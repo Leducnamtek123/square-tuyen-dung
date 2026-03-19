@@ -1,39 +1,24 @@
-// @ts-nocheck
 import React from 'react';
-
 import { Viewer, Worker } from '@react-pdf-viewer/core';
-
 import '@react-pdf-viewer/core/lib/styles/index.css';
-
 import { zoomPlugin } from '@react-pdf-viewer/zoom';
-
 import { getFilePlugin } from '@react-pdf-viewer/get-file';
-
 import '@react-pdf-viewer/zoom/lib/styles/index.css';
-
 import { SpecialZoomLevel } from '@react-pdf-viewer/core';
-
 import Button from '@mui/material/Button';
-
 import { Box, Chip, IconButton, Stack } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
 import ZoomOutOutlinedIcon from '@mui/icons-material/ZoomOutOutlined';
-
 import ZoomInOutlinedIcon from '@mui/icons-material/ZoomInOutlined';
-
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
-
 import toSlug from '../../utils/customData';
 
-interface Props {
-  [key: string]: any;
+interface PdfProps {
+  fileUrl: string;
+  title?: string;
 }
 
-
-
-const Pdf = ({ fileUrl, title = '' }: Props) => {
+const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
 
   if (!fileUrl) return null;
 
@@ -104,8 +89,7 @@ const Pdf = ({ fileUrl, title = '' }: Props) => {
               >
 
                 <ZoomOut>
-
-                  {(props) => (
+                  {(props: any) => (
 
                     <IconButton
 
@@ -126,8 +110,7 @@ const Pdf = ({ fileUrl, title = '' }: Props) => {
                 </ZoomOut>
 
                 <Zoom>
-
-                  {(props) => (
+                  {(props: any) => (
 
                     <Chip
 
@@ -148,8 +131,7 @@ const Pdf = ({ fileUrl, title = '' }: Props) => {
                 </Zoom>
 
                 <ZoomIn>
-
-                  {(props) => (
+                  {(props: any) => (
 
                     <IconButton
 
@@ -178,14 +160,12 @@ const Pdf = ({ fileUrl, title = '' }: Props) => {
               <Stack direction="row" justifyContent="flex-end">
 
                 <Download>
-
-                  {(props) => (
+                  {(props: any) => (
 
                     <Button
 
                       sx={{
-
-                        boxShadow: (theme) => theme.customShadows.medium,
+                        boxShadow: (theme: any) => theme.customShadows.medium,
 
                         color: 'white',
 

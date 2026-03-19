@@ -173,7 +173,7 @@ const JobPostCard = () => {
 
   const [serverErrors, setServerErrors] = React.useState<any>(null);
 
-  const handleRequestSort = (event: any, property: string) => {
+  const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
 
     const isAsc = orderBy === property && order === 'asc';
 
@@ -183,7 +183,7 @@ const JobPostCard = () => {
 
   };
 
-  const handleChangePage = (event: any, newPage: number) => {
+  const handleChangePage = (event: unknown, newPage: number) => {
 
     setPage(newPage);
 
@@ -245,13 +245,13 @@ const JobPostCard = () => {
 
       try {
 
-        const resData = await jobService.getEmployerJobPostDetailById(
+        const resData: any = await jobService.getEmployerJobPostDetailById(
 
           jobPostId
 
         );
 
-        var data = resData;
+        let data = resData;
 
         data = {
 
@@ -421,7 +421,7 @@ const JobPostCard = () => {
 
   };
 
-  const handleFilter = (data: { kw: string, isUrgent: number }) => {
+  const handleFilter = (data: { kw: string, isUrgent: number | string }) => {
 
     setFilterData({
 

@@ -1,9 +1,8 @@
-// @ts-nocheck
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import { toast } from 'react-toastify';
 
-export const useProfiles = (params) => {
+export const useProfiles = (params: any) => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -16,36 +15,36 @@ export const useProfiles = (params) => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data) => adminManagementService.createProfile(data),
+        mutationFn: (data: any) => adminManagementService.createProfile(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
             toast.success('Candidate profile added successfully');
         },
-        onError: (err) => {
+        onError: (err: any) => {
             toast.error('An error occurred while adding the candidate profile');
             console.error(err);
         }
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }) => adminManagementService.updateProfile(id, data),
+        mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateProfile(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
             toast.success('Candidate profile updated successfully');
         },
-        onError: (err) => {
+        onError: (err: any) => {
             toast.error('An error occurred while updating the candidate profile');
             console.error(err);
         }
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id) => adminManagementService.deleteProfile(id),
+        mutationFn: (id: any) => adminManagementService.deleteProfile(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
             toast.success('Candidate profile deleted successfully');
         },
-        onError: (err) => {
+        onError: (err: any) => {
             toast.error('An error occurred while deleting the candidate profile');
             console.error(err);
         }
@@ -57,5 +56,5 @@ export const useProfiles = (params) => {
         updateProfile: updateMutation.mutateAsync,
         deleteProfile: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    };
+    } as any;
 };

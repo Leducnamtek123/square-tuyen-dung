@@ -1,35 +1,21 @@
-// @ts-nocheck
 import React from "react";
-
 import { Box, Typography } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-import { useSelector } from "react-redux";
-
 import { useTranslation } from "react-i18next";
-
 import { TabTitle } from "../../../utils/generalFunction";
-
 import JobPostSearch from "../../components/defaults/JobPostSearch";
-
 import SuggestedJobPostCard from "../../components/defaults/SuggestedJobPostCard";
-
 import MainJobPostCard from "../../components/defaults/MainJobPostCard";
-
-
 import MainJobRightBanner from "../../../components/MainJobRightBanner";
 import { ROLES_NAME } from "../../../configs/constants";
-
-interface Props {
-  [key: string]: any;
-}
+import { useAppSelector } from "../../../hooks/useAppStore";
 
 
 
 const JobPage = () => {
 
   const { t } = useTranslation(["public"]);
-  const { isAuthenticated, currentUser } = useSelector((state) => state.user);
+  const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
   const isJobSeekerLoggedIn =
     isAuthenticated &&
     (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.JOB_SEEKER;

@@ -1,30 +1,29 @@
-// @ts-nocheck
-'use client';;
-import React, { Children, cloneElement, isValidElement, useMemo } from 'react';
+'use client';
+import React, { Children, cloneElement, isValidElement, useMemo, ReactElement } from 'react';
 import { cva } from 'class-variance-authority';
 import { useMultibandTrackVolume } from '@livekit/components-react';
 import { useAgentAudioVisualizerBarAnimator } from '@/hooks/agents-ui/use-agent-audio-visualizer-bar';
 import { cn } from '@/lib/utils';
 
 function cloneSingleChild(
-  children,
-  props,
-  key,
-) {
+  children: React.ReactNode,
+  props: any,
+  key?: string | number,
+): React.ReactNode {
   return Children.map(children, (child) => {
     // Checking isValidElement is the safe way and avoids a typescript error too.
     if (isValidElement(child) && Children.only(children)) {
-      const childProps = child.props;
+      const childProps = child.props as any;
+      let finalProps = { ...props };
       if (childProps.className) {
         // make sure we retain classnames of both passed props and child
-        props ??= {};
-        props.className = cn(childProps.className, props.className);
-        props.style = {
+        finalProps.className = cn(childProps.className, props.className);
+        finalProps.style = {
           ...(childProps.style),
           ...(props.style),
         };
       }
-      return cloneElement(child, { ...props, key: key ? String(key) : undefined });
+      return cloneElement(child as ReactElement, { ...finalProps, key: key ? String(key) : undefined });
     }
     return child;
   });
@@ -63,6 +62,18 @@ export const AgentAudioVisualizerBarVariants = cva('relative flex items-center j
   },
 });
 
+interface AgentAudioVisualizerBarProps {
+  size?: 'icon' | 'sm' | 'md' | 'lg' | 'xl';
+  state?: string;
+  color?: string;
+  barCount?: number;
+  audioTrack?: any;
+  className?: string;
+  children?: React.ReactNode;
+  style?: React.CSSProperties;
+  [key: string]: any;
+}
+
 /**
  * A bar-style audio visualizer that responds to agent state and audio levels.
  * Displays animated bars that react to the current agent state (connecting, thinking, speaking, etc.)
@@ -89,7 +100,7 @@ export function AgentAudioVisualizerBar({
   children,
   style,
   ...props
-}) {
+}: AgentAudioVisualizerBarProps) {
   const _barCount = useMemo(() => {
     if (barCount) {
       return barCount;
@@ -124,7 +135,7 @@ export function AgentAudioVisualizerBar({
     }
   }, [state, _barCount]);
 
-  const highlightedIndices = useAgentAudioVisualizerBarAnimator(state, _barCount, sequencerInterval);
+  const highlightedIndices = useAgentAudioVisualizerBarAnimator(state as any, _barCount, sequencerInterval);
 
   const bands = useMemo(
     () => (state === 'speaking' ? volumeBands : new Array(_barCount).fill(0)),

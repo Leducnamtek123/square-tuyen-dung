@@ -1,41 +1,24 @@
-// @ts-nocheck
 import React from 'react';
-
-import { useDispatch, useSelector } from 'react-redux';
-
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Card, Button, Stack, IconButton, Box } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-
 import InputBaseSearchCompanyCustom from '../../../../components/controls/InputBaseSearchCompanyCustom';
-
 import SingleSelectSearchCustom from '../../../../components/controls/SingleSelectSearchCustom';
-
 import {
-
   resetSearchCompany,
-
   searchCompany,
-
 } from '../../../../redux/filterSlice';
-
-interface Props {
-  [key: string]: any;
-}
-
-
+import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppStore';
 
 const CompanySearch = () => {
   const { t } = useTranslation('public');
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
-  const { companyFilter } = useSelector((state) => state.filter);
+  const { companyFilter } = useAppSelector((state) => state.filter);
 
   const { control, handleSubmit, reset } = useForm();
 
@@ -51,7 +34,7 @@ const CompanySearch = () => {
 
   }, [companyFilter, reset]);
 
-  const handleFilter = (data) => {
+  const handleFilter = (data: any) => {
 
     dispatch(searchCompany(data));
 

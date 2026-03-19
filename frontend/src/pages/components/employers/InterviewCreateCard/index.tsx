@@ -1,53 +1,73 @@
-// @ts-nocheck
-import { useState, useEffect } from 'react';
-
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper, TextField, MenuItem, FormControl, InputLabel, Select, OutlinedInput, Chip, CircularProgress, Stack, Divider, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
 import { useNavigate } from 'react-router-dom';
-
 import { useForm, Controller } from 'react-hook-form';
-
 import { toast } from 'react-toastify';
-
 import { useTranslation } from 'react-i18next';
-
 import interviewService from '../../../../services/interviewService';
-
 import questionService from '../../../../services/questionService';
-
 import questionGroupService from '../../../../services/questionGroupService';
-
 import jobService from '../../../../services/jobService';
-
 import jobPostActivityService from '../../../../services/jobPostActivityService';
-
 import { ROUTES } from '../../../../configs/constants';
-
 import { transformQuestion, transformJobPost, transformAppliedResume, transformQuestionGroup } from '../../../../utils/transformers';
-
 import DateTimePickerCustom from '../../../../components/controls/DateTimePickerCustom';
 
-interface Props {
+interface JobPost {
+  jobName: string;
   [key: string]: any;
 }
 
+interface Question {
+  id: number;
+  text?: string;
+  questionText?: string;
+  content?: string;
+  [key: string]: any;
+}
 
+interface QuestionGroup {
+  id: number;
+  name: string;
+  questions?: Question[];
+  [key: string]: any;
+}
 
-const InterviewCreateCard = ({ title }) => {
+interface Candidate {
+  id?: number;
+  candidateId?: number;
+  fullName?: string;
+  candidateName?: string;
+  email?: string;
+  [key: string]: any;
+}
+
+interface FormValues {
+  job_post: string | number;
+  candidate: string | number;
+  scheduled_at: string;
+  selected_group: string | number;
+  selected_questions: number[];
+}
+
+interface InterviewCreateCardProps {
+  title?: string;
+}
+
+const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title }) => {
 
     const navigate = useNavigate();
 
     const { t } = useTranslation(['employer', 'interview', 'common']);
 
-    const [jobs, setJobs] = useState([]);
+    const [jobs, setJobs] = useState<JobPost[]>([]);
 
-    const [questions, setQuestions] = useState([]);
+    const [questions, setQuestions] = useState<Question[]>([]);
 
-    const [questionGroups, setQuestionGroups] = useState([]);
+    const [questionGroups, setQuestionGroups] = useState<QuestionGroup[]>([]);
 
-    const [candidates, setCandidates] = useState([]);
+    const [candidates, setCandidates] = useState<Candidate[]>([]);
 
     const [isLoadingData, setIsLoadingData] = useState(true);
 
@@ -57,9 +77,9 @@ const InterviewCreateCard = ({ title }) => {
 
     const [questionDraft, setQuestionDraft] = useState('');
 
-    const [editingQuestionId, setEditingQuestionId] = useState(null);
+    const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
 
-    const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm({
+    const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
 
         defaultValues: {
 
@@ -83,7 +103,7 @@ const InterviewCreateCard = ({ title }) => {
 
     const fetchQuestions = async () => {
 
-        const questionsRes = await questionService.getQuestions({ pageSize: 1000 });
+        const questionsRes: any = await questionService.getQuestions({ pageSize: 1000 });
 
         const rawQuestions = Array.isArray(questionsRes?.results)
 
@@ -115,7 +135,7 @@ const InterviewCreateCard = ({ title }) => {
 
                     questionGroupService.getQuestionGroups({ pageSize: 1000 })
 
-                ]);
+                ]) as any[];
 
                 const rawJobs = Array.isArray(jobsRes?.results)
 
@@ -201,7 +221,7 @@ const InterviewCreateCard = ({ title }) => {
 
             jobPostActivityService.getAppliedResume({ jobPostId: selectedJobPostId, pageSize: 100 })
 
-                .then(res => {
+                .then((res: any) => {
 
                     const rawCandidates = Array.isArray(res?.results)
 
@@ -301,7 +321,7 @@ const InterviewCreateCard = ({ title }) => {
 
             } else {
 
-                const newQuestion = await questionService.createQuestion({ text: trimmed });
+                const newQuestion = (await questionService.createQuestion({ text: trimmed })) as any;
 
                 toast.success(t('interview:employer.questions.createSuccess'));
 
@@ -335,7 +355,7 @@ const InterviewCreateCard = ({ title }) => {
 
     };
 
-    const onSubmit = async (data) => {
+    const onSubmit = async (data: FormValues) => {
 
         try {
 
@@ -659,17 +679,17 @@ const InterviewCreateCard = ({ title }) => {
 
                                             input={<OutlinedInput label={t('interviewCreateCard.label.selectinterviewquestions')} />}
 
-                                            renderValue={(selected) => (
+                                            renderValue={(selected: unknown) => (
 
                                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
 
-                                                    {(Array.isArray(selected) ? selected : []).map((value) => {
+                                                    {(Array.isArray(selected) ? selected : []).map((value: number) => {
 
                                                         const q = questions.find(item => item.id === value);
 
                                                         const label = q?.text || q?.questionText || q?.content || `Question #${value}`;
 
-                                                        return <Chip key={value} label={label.substring(0, 30) + (label.length > 30 ? '...' : '')} size="small" />;
+                                                        return <Chip key={value} label={(label as string).substring(0, 30) + ((label as string).length > 30 ? '...' : '')} size="small" />;
 
                                                     })}
 

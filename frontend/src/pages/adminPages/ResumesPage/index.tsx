@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Box, Typography, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -7,12 +6,6 @@ import Grid from "@mui/material/Grid2";
 import SearchIcon from '@mui/icons-material/Search';
 import { useResumes } from './hooks/useResumes';
 import ResumeTable from './components/ResumeTable';
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const ResumesPage = () => {
     const { t } = useTranslation('admin');
@@ -30,10 +23,10 @@ const ResumesPage = () => {
         page,
         pageSize: PAGE_SIZE,
         kw: searchTerm
-    });
+    }) as any;
 
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [currentResume, setCurrentResume] = useState(null);
+    const [currentResume, setCurrentResume] = useState<any>(null);
     const [formData, setFormData] = useState({
         title: '',
         salaryMin: 0,
@@ -43,12 +36,12 @@ const ResumesPage = () => {
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
         setPage(1);
     };
 
-    const handleOpenEdit = (resume) => {
+    const handleOpenEdit = (resume: any) => {
         setCurrentResume(resume);
         setFormData({
             title: resume.title || '',
@@ -59,7 +52,7 @@ const ResumesPage = () => {
         setOpenEditDialog(true);
     };
 
-    const handleOpenDelete = (resume) => {
+    const handleOpenDelete = (resume: any) => {
         setCurrentResume(resume);
         setOpenDeleteDialog(true);
     };
@@ -69,7 +62,7 @@ const ResumesPage = () => {
         setOpenDeleteDialog(false);
     };
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({
             ...prev,
@@ -99,7 +92,7 @@ const ResumesPage = () => {
     };
 
     return (
-        <>
+        <Box sx={{ p: 2 }}>
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
@@ -136,7 +129,7 @@ const ResumesPage = () => {
                                 <Pagination
                                     count={Math.ceil(data.count / PAGE_SIZE)}
                                     page={page}
-                                    onChange={(e, v) => setPage(v)}
+                                    onChange={(_, v) => setPage(v)}
                                     color="primary"
                                 />
                             </Box>
@@ -210,7 +203,7 @@ const ResumesPage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </>
+        </Box>
     );
 };
 

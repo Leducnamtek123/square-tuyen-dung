@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useEnsureRoom, useStartAudio } from '@livekit/components-react';
 import Button from '@mui/material/Button';
 import type { ComponentProps, ReactNode } from 'react';
@@ -38,5 +37,5 @@ type StartAudioButtonProps = {
   size?: 'default' | 'sm' | 'xs' | 'lg' | string;
   variant?: 'default' | 'outline' | string;
   label?: ReactNode;
-  room?: any;
+  room?: Parameters<typeof useEnsureRoom>[0];
 } & Omit<ComponentProps<typeof Button>, 'size' | 'variant'>;

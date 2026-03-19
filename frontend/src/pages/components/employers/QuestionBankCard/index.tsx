@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box, Typography, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Stack, Divider, LinearProgress } from "@mui/material";
 
@@ -18,13 +17,11 @@ import { transformQuestion } from '../../../../utils/transformers';
 
 import DataTable from '../../../../components/DataTable';
 
-interface Props {
-  [key: string]: any;
+interface QuestionBankCardProps {
+  title?: string;
 }
 
-
-
-const QuestionBankCard = ({ title }) => {
+const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
   const { t } = useTranslation(['interview', 'common']);
 
@@ -42,7 +39,7 @@ const QuestionBankCard = ({ title }) => {
 
   const [open, setOpen] = useState(false);
 
-  const [currentQuestion, setCurrentQuestion] = useState({ text: '' });
+  const [currentQuestion, setCurrentQuestion] = useState<any>({ text: '', id: null });
 
   const [isEdit, setIsEdit] = useState(false);
 
@@ -55,24 +52,17 @@ const QuestionBankCard = ({ title }) => {
         page: page + 1,
 
         pageSize: rowsPerPage,
-
-      });
+      }) as any;
 
       const rawQuestions = Array.isArray(data?.results)
-
         ? data.results
-
         : Array.isArray(data)
-
         ? data
-
         : [];
-
       setQuestions(rawQuestions.map(transformQuestion).filter(Boolean));
-
       setCount(typeof data?.count === 'number' ? data.count : rawQuestions.length);
 
-    } catch (error) {
+    } catch (error: any) {
 
       console.error('Error fetching questions', error);
 
@@ -85,13 +75,13 @@ const QuestionBankCard = ({ title }) => {
     fetchQuestions();
   }, [fetchQuestions]);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: unknown, newPage: number) => { // Changed event type to unknown
 
     setPage(newPage);
 
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 
     setRowsPerPage(parseInt(event.target.value, 10));
 
@@ -99,7 +89,7 @@ const QuestionBankCard = ({ title }) => {
 
   };
 
-  const handleOpen = useCallback((q = { text: '' }) => {
+  const handleOpen = useCallback((q: any = { text: '' }) => { // Changed q type to any
     setCurrentQuestion(q);
     setIsEdit(!!q.id);
     setOpen(true);
@@ -107,6 +97,8 @@ const QuestionBankCard = ({ title }) => {
 
   const handleClose = useCallback(() => {
     setOpen(false);
+    setCurrentQuestion({ text: '', id: null });
+    setIsEdit(false);
   }, []);
 
   const handleSubmit = async () => {
@@ -145,7 +137,7 @@ const QuestionBankCard = ({ title }) => {
 
       handleClose();
 
-    } catch (error) {
+    } catch (error: any) {
 
       toast.error(t('employer.questionBank.saveError'));
 
@@ -153,13 +145,13 @@ const QuestionBankCard = ({ title }) => {
 
   };
 
-  const handleDelete = useCallback(async (id) => {
+  const handleDelete = useCallback(async (id: string) => { // Changed id type to string
     if (window.confirm(t('employer.questionBank.deleteConfirm'))) {
       try {
         await questionService.deleteQuestion(id);
         toast.success(t('employer.questionBank.deleteSuccess'));
         fetchQuestions();
-      } catch (error) {
+      } catch (error: any) {
         toast.error(t('employer.questionBank.deleteError'));
       }
     }
@@ -173,7 +165,7 @@ const QuestionBankCard = ({ title }) => {
 
         accessorKey: 'text',
 
-        cell: ({ getValue }) => (
+        cell: ({ getValue }: any) => ( // Added type for getValue
 
           <Typography
 
@@ -209,8 +201,7 @@ const QuestionBankCard = ({ title }) => {
 
         id: 'actions',
 
-        cell: ({ row }) => (
-
+        cell: ({ row }: any) => ( // Added type for row
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
 
             <IconButton
@@ -291,7 +282,7 @@ const QuestionBankCard = ({ title }) => {
 
             fontWeight: 600,
 
-            background: (theme) =>
+            background: (theme: any) =>
 
               theme.palette.primary.gradient || theme.palette.primary.main,
 
@@ -325,13 +316,13 @@ const QuestionBankCard = ({ title }) => {
 
             px: 3,
 
-            background: (theme) => theme.palette.primary.gradient,
+            background: (theme: any) => theme.palette.primary.gradient,
 
-            boxShadow: (theme) => theme.customShadows?.small || 1,
+            boxShadow: (theme: any) => theme.customShadows?.small || 1,
 
             '&:hover': {
 
-              boxShadow: (theme) => theme.customShadows?.medium || 2,
+              boxShadow: (theme: any) => theme.customShadows?.medium || 2,
 
             },
 
@@ -354,17 +345,11 @@ const QuestionBankCard = ({ title }) => {
             color="primary"
 
             sx={{
-
               height: { xs: 4, sm: 6 },
-
               borderRadius: 3,
-
               backgroundColor: 'primary.background',
-
             }}
-
           />
-
         </Box>
 
       ) : (
@@ -381,7 +366,7 @@ const QuestionBankCard = ({ title }) => {
 
           borderRadius: 2,
 
-          boxShadow: (theme) => theme.customShadows?.card || 1,
+          boxShadow: (theme: any) => theme.customShadows?.card || 1,
 
           overflow: 'hidden',
 

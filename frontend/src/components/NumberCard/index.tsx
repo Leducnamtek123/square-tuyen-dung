@@ -1,15 +1,12 @@
-// @ts-nocheck
 import React from 'react';
-
 import { Box, Card, Typography } from "@mui/material";
 
-interface Props {
-  [key: string]: any;
+interface NumberCardProps {
+  color?: string;
+  backgroundColor?: string;
 }
 
-
-
-const NumberCard = ({ color, backgroundColor }: Props) => {
+const NumberCard = ({ color, backgroundColor }: NumberCardProps) => {
 
   return (
 

@@ -1,26 +1,17 @@
-// @ts-nocheck
 import React from 'react';
-import { useSelector } from 'react-redux';
 import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-
-import {} from '../../../../configs/constants';
 import JobPostLarge from '../../../../components/JobPostLarge';
 import NoDataCard from '../../../../components/NoDataCard';
 import jobService from '../../../../services/jobService';
-
-interface Props {
-  [key: string]: any;
-}
-
-
+import { useAppSelector } from '../../../../hooks/useAppStore';
 
 const MainJobPostCard = () => {
   const { t } = useTranslation('public');
-  const { jobPostFilter } = useSelector((state) => state.filter);
+  const { jobPostFilter } = useAppSelector((state) => state.filter);
   const { pageSize } = jobPostFilter;
   const [isLoading, setIsLoading] = React.useState(true);
-  const [jobPosts, setJobPosts] = React.useState([]);
+  const [jobPosts, setJobPosts] = React.useState<any[]>([]);
   const [page, setPage] = React.useState(1);
   const [count, setCount] = React.useState(0);
 
@@ -48,7 +39,7 @@ const MainJobPostCard = () => {
     getJobPosts();
   }, [jobPostFilter, page]);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
   };
 

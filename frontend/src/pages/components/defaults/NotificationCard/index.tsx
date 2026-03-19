@@ -1,79 +1,53 @@
-// @ts-nocheck
 import React from "react";
-
-import { useSelector } from "react-redux";
-
 import { useNavigate } from "react-router-dom";
-
 import { Box, Button, CircularProgress, Divider, IconButton, ListItem, ListItemAvatar, ListItemButton, ListItemText, Stack, Typography } from "@mui/material";
-
 import ClearIcon from "@mui/icons-material/Clear";
-
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
-
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-
 import {
-
   collection,
-
   getDocs,
-
   limit,
-
   onSnapshot,
-
   query,
-
   where,
-
   startAfter,
-
   orderBy,
-
   updateDoc,
-
   doc,
-
   writeBatch,
-
 } from "firebase/firestore";
-
 import db from "../../../../configs/firebase-config";
-
-import {IMAGES, ROUTES} from "../../../../configs/constants";
-
+import { IMAGES, ROUTES } from "../../../../configs/constants";
 import MuiImageCustom from "../../../../components/MuiImageCustom";
-
 import NoDataCard from "../../../../components/NoDataCard";
-
 import TimeAgo from "../../../../components/TimeAgo";
-
 import { formatRoute } from "../../../../utils/funcUtils";
-
-interface Props {
-  [key: string]: any;
-}
-
-
+import { useAppSelector } from "../../../../hooks/useAppStore";
 
 const PAGE_SIZE = 10;
 
-const NotificationCard = ({ title }) => {
+interface NotificationCardProps {
+  title: React.ReactNode;
+}
+
+const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
 
   const nav = useNavigate();
 
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useAppSelector((state) => state.user);
 
   const [count, setCount] = React.useState(0);
 
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const [notifications, setNotifications] = React.useState([]);
+  const [notifications, setNotifications] = React.useState<any[]>([]);
 
-  const [lastKey, setLastKey] = React.useState(null);
+  const [lastKey, setLastKey] = React.useState<any>(null);
 
   React.useEffect(() => {
+
+    if (!currentUser) return;
 
     const notificationsRef = collection(
 
@@ -81,7 +55,7 @@ const NotificationCard = ({ title }) => {
 
       "users",
 
-      `${currentUser.id}`,
+      `${currentUser?.id}`,
 
       "notifications"
 
@@ -93,7 +67,7 @@ const NotificationCard = ({ title }) => {
 
       let total = 0;
 
-      querySnapshot.forEach((doc) => {
+      querySnapshot.forEach((docSnap) => {
 
         total = total + 1;
 
@@ -109,9 +83,11 @@ const NotificationCard = ({ title }) => {
 
     };
 
-  }, [currentUser.id]);
+  }, [currentUser]);
 
   React.useEffect(() => {
+
+    if (!currentUser) return;
 
     setIsLoading(true);
 
@@ -121,7 +97,7 @@ const NotificationCard = ({ title }) => {
 
       "users",
 
-      `${currentUser.id}`,
+      `${currentUser?.id}`,
 
       "notifications"
 
@@ -141,23 +117,23 @@ const NotificationCard = ({ title }) => {
 
     const unsubscribe = onSnapshot(first, (querySnapshot) => {
 
-      const notificationList = [];
+      const notificationList: any[] = [];
 
-      querySnapshot.forEach((doc) => {
+      querySnapshot.forEach((docSnap) => {
 
         notificationList.push({
 
-          ...doc.data(),
+          ...docSnap.data(),
 
-          key: doc.id,
+          key: docSnap.id,
 
         });
 
       });
 
-      setNotifications(notificationList);
+      setNotifications(notificationList as any);
 
-      setLastKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setLastKey(querySnapshot.docs[querySnapshot.docs.length - 1] as any);
 
       setIsLoading(false);
 
@@ -169,9 +145,11 @@ const NotificationCard = ({ title }) => {
 
     });
 
-  }, [currentUser.id]);
+  }, [currentUser]);
 
   const loadMore = async () => {
+
+    if (!currentUser) return;
 
     const notificationsRef = collection(
 
@@ -199,7 +177,7 @@ const NotificationCard = ({ title }) => {
 
     );
 
-    const nextNotificationList = [];
+    const nextNotificationList: any[] = [];
 
     const nextQuerySnapshot = await getDocs(nextQuery);
 
@@ -207,13 +185,13 @@ const NotificationCard = ({ title }) => {
 
       nextQuerySnapshot.docs[nextQuerySnapshot.docs.length - 1];
 
-    nextQuerySnapshot.forEach((doc) => {
+    nextQuerySnapshot.forEach((docSnap) => {
 
       nextNotificationList.push({
 
-        ...doc.data(),
+        ...docSnap.data(),
 
-        key: doc.id,
+        key: docSnap.id,
 
       });
 
@@ -225,7 +203,9 @@ const NotificationCard = ({ title }) => {
 
   };
 
-  const handleRead = (key) => {
+  const handleRead = (key: string) => {
+
+    if (!currentUser) return;
 
     updateDoc(doc(db, "users", `${currentUser.id}`, "notifications", key), {
 
@@ -243,7 +223,7 @@ const NotificationCard = ({ title }) => {
 
   };
 
-  const handleClickItem = (item) => {
+  const handleClickItem = (item: any) => {
 
     switch (item.type) {
 
@@ -321,7 +301,9 @@ const NotificationCard = ({ title }) => {
 
   };
 
-  const handleRemove = (key) => {
+  const handleRemove = (key: string) => {
+
+    if (!currentUser) return;
 
     updateDoc(doc(db, "users", `${currentUser.id}`, "notifications", key), {
 
@@ -355,6 +337,8 @@ const NotificationCard = ({ title }) => {
 
   const handleRemoveAll = async () => {
 
+    if (!currentUser) return;
+
     // Get a reference to the notifications collection
 
     const notificationsRef = collection(
@@ -385,9 +369,9 @@ const NotificationCard = ({ title }) => {
 
     // Iterate over all documents and add them to the batch
 
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach((docSnap) => {
 
-      const docRef = doc.ref;
+      const docRef = docSnap.ref;
 
       batch.update(docRef, { is_deleted: true });
 
@@ -400,6 +384,8 @@ const NotificationCard = ({ title }) => {
   };
 
   const handleMakeAllRead = async () => {
+
+    if (!currentUser) return;
 
     // Get a reference to the notifications collection
 
@@ -425,9 +411,9 @@ const NotificationCard = ({ title }) => {
 
     // Iterate over all documents and add them to the batch
 
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach((docSnap) => {
 
-      const docRef = doc.ref;
+      const docRef = docSnap.ref;
 
       batch.update(docRef, { is_read: true });
 

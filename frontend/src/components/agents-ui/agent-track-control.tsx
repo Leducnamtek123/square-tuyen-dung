@@ -1,9 +1,9 @@
-// @ts-nocheck
 'use client';;
 import { useEffect, useMemo, useState } from 'react';
 import type { ComponentProps, ReactNode } from 'react';
 import { cva } from 'class-variance-authority';
 import { useMaybeRoomContext, useMediaDeviceSelect } from '@livekit/components-react';
+import { Track } from 'livekit-client';
 import { AgentAudioVisualizerBar } from '@/components/agents-ui/agent-audio-visualizer-bar';
 import { AgentTrackToggle } from '@/components/agents-ui/agent-track-toggle';
 import FormControl from '@mui/material/FormControl';
@@ -85,7 +85,7 @@ type TrackDeviceSelectProps = {
   onMediaDeviceError?: (error: unknown) => void;
   onDeviceListChange?: (devices: MediaDeviceInfo[]) => void;
   onActiveDeviceChange?: (deviceId: string) => void;
-} & Omit<ComponentProps<typeof Select>, 'onChange' | 'value' | 'size' | 'variant'>;
+} & Omit<ComponentProps<typeof Select>, 'onChange' | 'value' | 'size' | 'variant' | 'defaultValue'>;
 
 function TrackDeviceSelect({
   kind,
@@ -245,7 +245,7 @@ export function AgentTrackControl({
 type AgentTrackControlProps = {
   kind?: MediaDeviceKind;
   variant?: 'default' | 'outline';
-  source: any;
+  source: Track.Source;
   pressed?: boolean;
   pending?: boolean;
   disabled?: boolean;

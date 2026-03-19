@@ -1,7 +1,4 @@
-// @ts-nocheck
 import * as React from 'react';
-
-import { useDispatch } from 'react-redux';
 
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -41,9 +38,11 @@ import authService from '../../../services/authService';
 
 import tokenService from '../../../services/tokenService';
 
-interface Props {
-  [key: string]: any;
-}
+import { useAppDispatch } from '../../../hooks/useAppStore';
+
+import type { RoleName, AuthProvider } from '../../../types/auth';
+
+import type { AxiosError } from 'axios';
 
 
 
@@ -101,7 +100,7 @@ const JobSeekerLogin = () => {
 
   TabTitle(t('login.jobSeekerTitle'));
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const nav = useNavigate();
 
@@ -109,9 +108,9 @@ const JobSeekerLogin = () => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const [errorMessage, setErrorMessage] = React.useState(null);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
-  const [successMessage, setSuccessMessage] = React.useState(null);
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
 
   React.useEffect(() => {
 
@@ -129,9 +128,9 @@ const JobSeekerLogin = () => {
 
   }, [searchParams]);
 
-  const handleLogin = (data) => {
+  const handleLogin = (data: any) => {
 
-    const getAccesToken = async (email, password, roleName) => {
+    const getAccessToken = async (email: string, password: string, roleName: RoleName) => {
 
       setIsFullScreenLoading(true);
 
@@ -140,14 +139,10 @@ const JobSeekerLogin = () => {
         const resData = await authService.getToken(email, password, roleName);
 
         const {
-
           access_token: accessToken,
-
           refresh_token: refreshToken,
-
           backend,
-
-        } = resData;
+        } = resData as any;
 
         const isSaveTokenToCookie =
 
@@ -187,7 +182,8 @@ const JobSeekerLogin = () => {
 
       } catch (error) {
 
-        const res = error?.response;
+        const axiosError = error as AxiosError<any>;
+        const res = axiosError?.response;
 
         if (res?.status === 400) {
 
@@ -213,13 +209,13 @@ const JobSeekerLogin = () => {
 
     };
 
-    const checkCreds = async (email, password, roleName) => {
+    const checkCreds = async (email: string, password: string, roleName: RoleName) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        const resData = await authService.checkCreds(email, roleName);
+        const resData = await authService.checkCreds(email, roleName) as any;
 
         const { exists, email: resEmail, email_verified } = resData;
 
@@ -251,7 +247,7 @@ const JobSeekerLogin = () => {
 
         }
 
-        getAccesToken(resEmail, password, roleName);
+        getAccessToken(resEmail, password, roleName);
 
       } catch (error) {
 
@@ -265,19 +261,19 @@ const JobSeekerLogin = () => {
 
     };
 
-    checkCreds(data.email, data.password, ROLES_NAME.JOB_SEEKER);
+    checkCreds(data.email, data.password, ROLES_NAME.JOB_SEEKER as RoleName);
 
   };
 
   const handleSocialLogin = async (
 
-    clientId,
+    clientId: string,
 
-    clientSecrect,
+    clientSecrect: string,
 
-    provider,
+    provider: AuthProvider,
 
-    token
+    token: string
 
   ) => {
 
@@ -295,7 +291,7 @@ const JobSeekerLogin = () => {
 
         token
 
-      );
+      ) as any;
 
       const {
 
@@ -344,25 +340,16 @@ const JobSeekerLogin = () => {
       }
 
     } catch (error) {
-
-      const res = error?.response;
-
+      const axiosError = error as AxiosError<any>;
+      const res = axiosError?.response;
       if (res?.status === 400) {
-
         const errors = res?.data?.errors;
-
         if (errors && 'errorMessage' in errors) {
-
           setErrorMessage(errors.errorMessage.join(' '));
-
         } else {
-
           toastMessages.error(t('messages.tryAgain'));
-
         }
-
       }
-
     } finally {
 
       setIsFullScreenLoading(false);
@@ -393,7 +380,7 @@ const JobSeekerLogin = () => {
 
   // };
 
-  const handleGoogleLogin = (result) => {
+  const handleGoogleLogin = (result: any) => {
 
     const code = result?.code;
 
@@ -405,7 +392,7 @@ const JobSeekerLogin = () => {
 
         AUTH_CONFIG.GOOGLE_CLIENT_SECRET,
 
-        AUTH_PROVIDER.GOOGLE,
+        AUTH_PROVIDER.GOOGLE as AuthProvider,
 
         code
 

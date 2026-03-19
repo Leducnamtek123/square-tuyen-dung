@@ -1,7 +1,6 @@
-// @ts-nocheck
 import React from 'react';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import { DatePicker } from '@mui/x-date-pickers';
 
@@ -11,43 +10,33 @@ import { Typography } from "@mui/material";
 import ValidationError from '../ValidationError';
 
 interface Props {
-  [key: string]: any;
+  name: string;
+  control: Control<any>;
+  title?: string | null;
+  showRequired?: boolean;
+  minDate?: any;
+  maxDate?: any;
+  sx?: any;
 }
 
-
-
 const DatePickerCustom = ({
-
   name,
-
   control,
-
   title = null,
-
   showRequired = false,
-
   minDate = null,
-
   maxDate = null,
-
+  sx = {},
 }: Props) => {
 
-  const parseDate = (date) => {
-
-    if (!date) return null;
-
+  const parseDate = (date: any) => {
+    if (!date) return undefined;
     try {
-
       const parsedDate = dayjs(date);
-
-      return parsedDate.isValid() ? parsedDate : null;
-
+      return parsedDate.isValid() ? parsedDate : undefined;
     } catch {
-
-      return null;
-
+      return undefined;
     }
-
   };
 
   return (
@@ -85,17 +74,12 @@ const DatePickerCustom = ({
                 format="DD-MM-YYYY"
 
                 sx={{
-
+                  ...sx,
                   '& .MuiOutlinedInput-root': {
-
                     height: '1.4375em',
-
                     py: 2.5,
-
                   },
-
                   width: '100%',
-
                 }}
 
                 value={parseDate(field.value)}

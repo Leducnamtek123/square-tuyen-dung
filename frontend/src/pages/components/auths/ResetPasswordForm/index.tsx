@@ -1,25 +1,24 @@
-// @ts-nocheck
 import React from 'react';
-
 import { useForm } from 'react-hook-form';
-
 import { yupResolver } from '@hookform/resolvers/yup';
-
 import * as yup from 'yup';
-
 import { Box, Button, Stack } from "@mui/material";
-
 import { useTranslation } from 'react-i18next';
-
 import PasswordTextFieldCustom from '../../../../components/controls/PasswordTextFieldCustom';
 
-interface Props {
-  [key: string]: any;
+interface ResetPasswordFormData {
+  newPassword?: string;
+  confirmPassword?: string;
+}
+
+interface ResetPasswordFormProps {
+  handleResetPassword: (data: ResetPasswordFormData) => void;
+  serverErrors?: Record<string, string[]>;
 }
 
 
 
-const ResetPasswordForm = ({ handleResetPassword, serverErrors = {} }) => {
+const ResetPasswordForm = ({ handleResetPassword, serverErrors = {} }: ResetPasswordFormProps) => {
 
   const { t } = useTranslation('auth');
 
@@ -53,28 +52,18 @@ const ResetPasswordForm = ({ handleResetPassword, serverErrors = {} }) => {
 
   });
 
-  const { control, setError, handleSubmit } = useForm({
-
+  const { control, setError, handleSubmit } = useForm<ResetPasswordFormData>({
     defaultValues: {
-
       newPassword: '',
-
       confirmPassword: '',
-
     },
-
-    resolver: yupResolver(schema),
-
+    resolver: yupResolver(schema) as any,
   });
 
   React.useEffect(() => {
-
-    for (let err in serverErrors) {
-
-      setError(err, { type: 400, message: serverErrors[err]?.join(' ') });
-
+    for (const err in serverErrors) {
+      setError(err as any, { type: 'manual', message: serverErrors[err]?.join(' ') });
     }
-
   }, [serverErrors, setError]);
 
   return (
@@ -121,7 +110,7 @@ const ResetPasswordForm = ({ handleResetPassword, serverErrors = {} }) => {
 
         sx={{ mt: 3, mb: 2 }}
 
-        onClick={handleSubmit(handleResetPassword)}
+        onClick={handleSubmit(handleResetPassword as any)}
 
       >
 

@@ -1,11 +1,11 @@
-// @ts-nocheck
 import { memo, useEffect, useMemo, useState } from "react";
 import type { HTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
-const hasMermaid = (content) => /```mermaid[\s\S]*?```/i.test(content);
-const hasCode = (content) => /```[\s\S]*?```/.test(content) || /`[^`]+`/.test(content);
-const hasMath = (content) => /\$\$[\s\S]*?\$\$/.test(content) || /(^|[^\\])\$(.+?)([^\\])\$/s.test(content);
+const hasMermaid = (content: string) => /```mermaid[\s\S]*?```/i.test(content);
+const hasCode = (content: string) => /```[\s\S]*?```/.test(content) || /`[^`]+`/.test(content);
+const hasMath = (content: string) => /\$\$[\s\S]*?\$\$/.test(content) || /(^|[^\\])\$(.+?)([^\\])\$/s.test(content);
+
 const STREAMDOWN_CODE_CDN =
   import.meta.env.VITE_STREAMDOWN_CODE_CDN ||
   "https://esm.sh/@streamdown/code@1.1.0";

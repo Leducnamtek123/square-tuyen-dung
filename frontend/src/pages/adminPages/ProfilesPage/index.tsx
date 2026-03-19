@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Box, Typography, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -10,12 +9,6 @@ import { useProfiles } from './hooks/useProfiles';
 import { useCities } from '../CitiesPage/hooks/useCities';
 import { useDistricts } from '../DistrictsPage/hooks/useDistricts';
 import ProfileTable from './components/ProfileTable';
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const ProfilesPage = () => {
     const { t } = useTranslation('admin');
@@ -34,14 +27,14 @@ const ProfilesPage = () => {
         page,
         pageSize: PAGE_SIZE,
         kw: searchTerm
-    });
+    }) as any;
 
-    const { data: citiesData } = useCities();
-    const cities = citiesData?.results || citiesData;
+    const { data: citiesData } = useCities() as any;
+    const cities = (citiesData?.results || citiesData) as any[];
 
     const [openDialog, setOpenDialog] = useState(false);
-    const [dialogMode, setDialogMode] = useState('add');
-    const [currentProfile, setCurrentProfile] = useState(null);
+    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+    const [currentProfile, setCurrentProfile] = useState<any>(null);
     const [formData, setFormData] = useState({
         user: { fullName: '' },
         phone: '',
@@ -55,12 +48,12 @@ const ProfilesPage = () => {
         }
     });
 
-    const { data: districtsData } = useDistricts({ city: formData.location.city });
-    const districts = districtsData?.results || districtsData;
+    const { data: districtsData } = useDistricts({ city: formData.location.city }) as any;
+    const districts = (districtsData?.results || districtsData) as any[];
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
         setPage(1);
     };
@@ -83,7 +76,7 @@ const ProfilesPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (profile) => {
+    const handleOpenEdit = (profile: any) => {
         setDialogMode('edit');
         setCurrentProfile(profile);
         setFormData({
@@ -101,7 +94,7 @@ const ProfilesPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (profile) => {
+    const handleOpenDelete = (profile: any) => {
         setCurrentProfile(profile);
         setOpenDeleteDialog(true);
     };
@@ -110,7 +103,7 @@ const ProfilesPage = () => {
         setOpenDialog(false);
     };
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         if (name === 'fullName') {
             setFormData(prev => ({ ...prev, user: { ...prev.user, fullName: value } }));
@@ -121,7 +114,7 @@ const ProfilesPage = () => {
                 location: { ...prev.location, [locField]: value }
             }));
         } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
+            setFormData(prev => ({ ...prev, [name]: value as any }));
         }
     };
 
@@ -189,14 +182,14 @@ const ProfilesPage = () => {
                 ) : (
                     <>
                         <ProfileTable
-                            data={data?.results || data}
+                            data={(data as any)?.results || data}
                             onEdit={handleOpenEdit}
                             onDelete={handleOpenDelete}
                         />
-                        {data?.count > 0 && (
+                        {(data as any)?.count > 0 && (
                             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
                                 <Pagination
-                                    count={Math.ceil(data.count / PAGE_SIZE)}
+                                    count={Math.ceil((data as any).count / PAGE_SIZE)}
                                     page={page}
                                     onChange={(e, v) => setPage(v)}
                                     color="primary"

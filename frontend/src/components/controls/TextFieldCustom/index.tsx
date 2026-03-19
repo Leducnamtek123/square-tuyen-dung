@@ -1,47 +1,41 @@
-// @ts-nocheck
 import React from 'react';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import { InputAdornment, TextField, Typography } from "@mui/material";
 import ValidationError from '../ValidationError';
 
 interface Props {
-  [key: string]: any;
+  name: string;
+  control: Control<any>;
+  title?: string | null;
+  showRequired?: boolean;
+  placeholder?: string;
+  helperText?: string;
+  disabled?: boolean;
+  icon?: React.ReactNode;
+  type?: string;
+  sx?: any;
 }
 
-
-
 const TextFieldCustom = ({
-
   name,
-
   control,
-
   title = null,
-
   showRequired = false,
-
   placeholder = '',
-
   helperText = '',
-
   disabled = false,
-
   icon = null,
-
   type = 'text',
-
+  sx = {},
 }: Props) => {
 
   // Format display number with comma
 
-  const formatDisplay = (value) => {
-
+  const formatDisplay = (value: any) => {
     if (type !== 'number' || !value) return value;
-
     return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
   };
 
   return (
@@ -65,7 +59,7 @@ const TextFieldCustom = ({
           <>
 
             <TextField
-
+              sx={sx}
               fullWidth
 
               variant="outlined"

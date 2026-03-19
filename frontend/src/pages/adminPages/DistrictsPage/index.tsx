@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Breadcrumbs, Link, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, IconButton, Tooltip, MenuItem, TextField, Dialog, DialogTitle, DialogContent, DialogActions, TablePagination } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -9,18 +8,12 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useDistricts } from './hooks/useDistricts';
 import { useCities } from '../CitiesPage/hooks/useCities';
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
 const DistrictsPage = () => {
     const { t } = useTranslation('admin');
-    const { data: citiesData, isLoading: isLoadingCities } = useCities();
-    const cities = citiesData?.results || citiesData;
+    const { data: citiesData, isLoading: isLoadingCities } = useCities() as any;
+    const cities = (citiesData?.results || citiesData) as any[];
 
-    const [selectedCity, setSelectedCity] = useState('');
+    const [selectedCity, setSelectedCity] = useState<string | number>('');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -37,16 +30,16 @@ const DistrictsPage = () => {
         updateDistrict,
         deleteDistrict,
         isMutating
-    } = useDistricts({ city: selectedCity, page: page + 1, pageSize: rowsPerPage });
+    } = useDistricts({ city: selectedCity, page: page + 1, pageSize: rowsPerPage }) as any;
 
-    const districts = districtsData?.results || districtsData;
+    const districts = (districtsData?.results || districtsData) as any[];
 
     const [openDialog, setOpenDialog] = useState(false);
-    const [dialogMode, setDialogMode] = useState('add');
-    const [currentDistrict, setCurrentDistrict] = useState(null);
+    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+    const [currentDistrict, setCurrentDistrict] = useState<any>(null);
     const [districtName, setDistrictName] = useState('');
     const [districtCode, setDistrictCode] = useState('');
-    const [targetCityId, setTargetCityId] = useState('');
+    const [targetCityId, setTargetCityId] = useState<string | number>('');
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -59,7 +52,7 @@ const DistrictsPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (district) => {
+    const handleOpenEdit = (district: any) => {
         setDialogMode('edit');
         setCurrentDistrict(district);
         setDistrictName(district.name);
@@ -68,7 +61,7 @@ const DistrictsPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (district) => {
+    const handleOpenDelete = (district: any) => {
         setCurrentDistrict(district);
         setOpenDeleteDialog(true);
     };
@@ -143,7 +136,7 @@ const DistrictsPage = () => {
                         }}
                         disabled={isLoadingCities}
                     >
-                        {cities?.map((city) => (
+                        {cities?.map((city: any) => (
                             <MenuItem key={city.id} value={city.id}>
                                 {city.name}
                             </MenuItem>
@@ -168,7 +161,7 @@ const DistrictsPage = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {districts?.map((row) => (
+                                    {districts?.map((row: any) => (
                                         <TableRow key={row.id} hover>
                                             <TableCell>{row.id}</TableCell>
                                             <TableCell sx={{ fontWeight: 500 }}>{row.name}</TableCell>
@@ -239,7 +232,7 @@ const DistrictsPage = () => {
                             onChange={(e) => setTargetCityId(e.target.value)}
                             required
                         >
-                            {cities?.map((city) => (
+                            {cities?.map((city: any) => (
                                 <MenuItem key={city.id} value={city.id}>
                                     {city.name}
                                 </MenuItem>
@@ -276,7 +269,7 @@ const DistrictsPage = () => {
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
                 <DialogTitle>{t('pages.districts.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.districts.deleteText', { name: currentDistrict?.name }) }} />
+                    <Typography dangerouslySetInnerHTML={{ __html: String(t('pages.districts.deleteText', { name: currentDistrict?.name })) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.districts.cancelBtn')}</Button>

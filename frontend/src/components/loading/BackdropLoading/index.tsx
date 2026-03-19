@@ -1,19 +1,14 @@
-// @ts-nocheck
 import * as React from 'react';
-
 import Backdrop from '@mui/material/Backdrop';
-
 import Fade from '@mui/material/Fade';
-
 import { LOADING_IMAGES } from '../../../configs/constants';
 
-interface Props {
-  [key: string]: any;
+interface BackdropLoadingProps {
+  bgColor?: string;
+  open?: boolean;
 }
 
-
-
-const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: Props) => {
+const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: BackdropLoadingProps) => {
 
   return (
 

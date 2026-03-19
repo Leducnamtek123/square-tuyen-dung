@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -33,8 +32,14 @@ import resumeService from '../../../../services/resumeService';
 
 import languageSkillService from '../../../../services/languageSkillService';
 
-interface Props {
-  [key: string]: any;
+interface LanguageSkill {
+  id: string | number;
+  language: string;
+  level: number;
+}
+
+interface LanguageSkillCardProps {
+  title: string;
 }
 
 
@@ -85,7 +90,7 @@ const Loading = (
 
         .fill(0)
 
-        .map((item, index) => (          <Box sx={{ py: 0.5 }} key={index}>
+        .map((_, index) => (          <Box sx={{ py: 0.5 }} key={index}>
 
             <Skeleton height={30} />
 
@@ -99,13 +104,13 @@ const Loading = (
 
 );
 
-const LanguageSkillCard = ({ title }) => {
+const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
   const { t } = useTranslation(['jobSeeker', 'common']);
 
-  const { slug: resumeSlug } = useParams();
+  const { slug: resumeSlug } = useParams<{ slug: string }>();
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
   const [openPopup, setOpenPopup] = React.useState(false);
 
@@ -117,25 +122,26 @@ const LanguageSkillCard = ({ title }) => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const [languageSkills, setLanguageSkills] = React.useState([]);
+  const [languageSkills, setLanguageSkills] = React.useState<LanguageSkill[]>([]);
 
-  const [editData, setEditData] = React.useState(null);
+  const [editData, setEditData] = React.useState<LanguageSkill | null>(null);
 
-  const [serverErrors, setServerErrors] = React.useState(null);
+  const [serverErrors, setServerErrors] = React.useState<any>(null);
 
   React.useEffect(() => {
 
-    const loadLanguageSkills = async (resumeSlug) => {
+    const loadLanguageSkills = async (slug: string | undefined) => {
+      if (!slug) return;
 
       setIsLoadingLanguageSkills(true);
 
       try {
 
-        const resData = await resumeService.getLanguageSkills(resumeSlug);
+        const resData = await resumeService.getLanguageSkills(slug) as any;
 
         setLanguageSkills(resData.data);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -151,23 +157,23 @@ const LanguageSkillCard = ({ title }) => {
 
   }, [resumeSlug, isSuccess]);
 
-  const handleShowUpdate = (id) => {
+  const handleShowUpdate = (id: string | number) => {
 
     setServerErrors(null);
 
-    const loadLanguageSkillById = async (id) => {
+    const loadLanguageSkillById = async (skillId: string | number) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        const resData = await languageSkillService.getLanguageSkillById(id);
+        const resData = await languageSkillService.getLanguageSkillById(skillId) as any;
 
         setEditData(resData.data);
 
         setOpenPopup(true);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -193,15 +199,15 @@ const LanguageSkillCard = ({ title }) => {
 
   };
 
-  const handleAddOrUpdate = (data) => {
+  const handleAddOrUpdate = (data: any) => {
 
-    const create = async (data) => {
+    const create = async (payload: any) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await languageSkillService.addLanguageSkills(data);
+        await languageSkillService.addLanguageSkills(payload);
 
         setOpenPopup(false);
 
@@ -209,7 +215,7 @@ const LanguageSkillCard = ({ title }) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.languageAddSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error, setServerErrors);
 
@@ -221,13 +227,13 @@ const LanguageSkillCard = ({ title }) => {
 
     };
 
-    const update = async (data) => {
+    const update = async (payload: any) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await languageSkillService.updateLanguageSkillById(data.id, data);
+        await languageSkillService.updateLanguageSkillById(payload.id, payload);
 
         setOpenPopup(false);
 
@@ -235,7 +241,7 @@ const LanguageSkillCard = ({ title }) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.languageUpdateSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -269,19 +275,19 @@ const LanguageSkillCard = ({ title }) => {
 
   };
 
-  const handleDeleteLanguageSkill = (id) => {
+  const handleDeleteLanguageSkill = (id: string | number) => {
 
-    const del = async (id) => {
+    const del = async (skillId: string | number) => {
 
       try {
 
-        await languageSkillService.deleteLanguageSkillById(id);
+        await languageSkillService.deleteLanguageSkillById(skillId);
 
         setIsSuccess(!isSuccess);
 
         toastMessages.success(t('jobSeeker:profile.messages.languageDeleteSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -321,7 +327,7 @@ const LanguageSkillCard = ({ title }) => {
 
           p: 3,
 
-          boxShadow: (theme) => theme.customShadows.card,
+          boxShadow: (theme: any) => theme.customShadows.card,
 
         }}
 
@@ -357,7 +363,7 @@ const LanguageSkillCard = ({ title }) => {
 
                   sx={{
 
-                    boxShadow: (theme) => theme.customShadows.medium,
+                    boxShadow: (theme: any) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -529,7 +535,7 @@ const LanguageSkillCard = ({ title }) => {
 
                           >
 
-                            {allConfig.languageDict[value?.language]}
+                            {allConfig.languageDict[value?.language ?? '']}
 
                           </TableCell>
 

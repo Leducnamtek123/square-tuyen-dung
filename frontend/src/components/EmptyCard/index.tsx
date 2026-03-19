@@ -1,19 +1,15 @@
-// @ts-nocheck
 import React from 'react';
-
 import { Box } from '@mui/system';
-
 import AddIcon from '@mui/icons-material/Add';
-
 import { Button, Typography } from "@mui/material";
 
-interface Props {
-  [key: string]: any;
+interface EmptyCardProps {
+  content: string | React.ReactNode;
+  labelButton?: string;
+  onClick?: () => void;
 }
 
-
-
-const EmptyCard = ({ content, labelButton="Thêm mới", onClick }: Props) => {
+const EmptyCard = ({ content, labelButton="Thêm mới", onClick }: EmptyCardProps) => {
 
   return (
 

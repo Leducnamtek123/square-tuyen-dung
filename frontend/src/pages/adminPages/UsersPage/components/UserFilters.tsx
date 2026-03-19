@@ -1,18 +1,18 @@
-// @ts-nocheck
 import React from 'react';
-import { TextField, InputAdornment, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material";
+import { TextField, InputAdornment, Stack, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 
 import SearchIcon from '@mui/icons-material/Search';
 import { ROLES_NAME } from '../../../../configs/constants';
 
-interface Props {
-  [key: string]: any;
+interface UserFiltersProps {
+    search: string;
+    role: string;
+    onSearchChange: (value: string) => void;
+    onRoleChange: (value: string) => void;
 }
 
-
-
-const UserFilters = ({ search, role, onSearchChange, onRoleChange }) => {
+const UserFilters = ({ search, role, onSearchChange, onRoleChange }: UserFiltersProps) => {
     const { t } = useTranslation('admin');
     return (
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 2 }}>
@@ -40,7 +40,7 @@ const UserFilters = ({ search, role, onSearchChange, onRoleChange }) => {
                     labelId="user-role-filter-label"
                     value={role}
                     label={t('pages.users.filter.roleLabel')}
-                    onChange={(e) => onRoleChange(e.target.value)}
+                    onChange={(e: SelectChangeEvent<string>) => onRoleChange(e.target.value)}
                 >
                     <MenuItem value="">{t('pages.users.filter.roleAll')}</MenuItem>
                     <MenuItem value={ROLES_NAME.ADMIN}>{t('pages.users.roles.admin')}</MenuItem>

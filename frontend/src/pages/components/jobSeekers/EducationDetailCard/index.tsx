@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useParams } from 'react-router-dom';
@@ -53,8 +52,18 @@ import TimeAgo from '../../../../components/TimeAgo';
 
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  [key: string]: any;
+interface EducationDetail {
+  id: string | number;
+  startDate: string;
+  completedDate: string | null;
+  degreeName: string;
+  trainingPlaceName: string;
+  major: string | null;
+  description: string | null;
+}
+
+interface EducationDetailCardProps {
+  title: string;
 }
 
 
@@ -105,7 +114,7 @@ const Loading = (
 
         .fill(0)
 
-        .map((item, index) => (
+        .map((_, index) => (
 
           <Box sx={{ py: 1 }} key={index}>
 
@@ -125,11 +134,11 @@ const Loading = (
 
 );
 
-const EducationDetailCard = ({ title }) => {
+const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
   const { t } = useTranslation(['jobSeeker', 'common']);
 
-  const { slug: resumeSlug } = useParams();
+  const { slug: resumeSlug } = useParams<{ slug: string }>();
 
   const [openPopup, setOpenPopup] = React.useState(false);
 
@@ -141,23 +150,24 @@ const EducationDetailCard = ({ title }) => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const [educationsDetail, setEducationsDetail] = React.useState([]);
+  const [educationsDetail, setEducationsDetail] = React.useState<EducationDetail[]>([]);
 
-  const [editData, setEditData] = React.useState(null);
+  const [editData, setEditData] = React.useState<EducationDetail | null>(null);
 
   React.useEffect(() => {
 
-    const loadEducationsDetail = async (resumeSlug) => {
+    const loadEducationsDetail = async (slug: string | undefined) => {
+      if (!slug) return;
 
       setIsLoadingEductionsDetail(true);
 
       try {
 
-        const resData = await resumeService.getEducationsDetail(resumeSlug);
+        const resData = await resumeService.getEducationsDetail(slug) as any;
 
         setEducationsDetail(resData.data);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -173,21 +183,21 @@ const EducationDetailCard = ({ title }) => {
 
   }, [resumeSlug, isSuccess]);
 
-  const handleShowUpdate = (id) => {
+  const handleShowUpdate = (id: string | number) => {
 
-    const loadEducationDetailById = async (id) => {
+    const loadEducationDetailById = async (eduId: string | number) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        const resData = await educationDetailService.getEducationDetailById(id);
+        const resData = await educationDetailService.getEducationDetailById(eduId) as any;
 
         setEditData(resData.data);
 
         setOpenPopup(true);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -211,15 +221,15 @@ const EducationDetailCard = ({ title }) => {
 
   };
 
-  const handleAddOrUpdate = (data) => {
+  const handleAddOrUpdate = (data: any) => {
 
-    const create = async (data) => {
+    const create = async (payload: any) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await educationDetailService.addEducationsDetail(data);
+        await educationDetailService.addEducationsDetail(payload);
 
         setOpenPopup(false);
 
@@ -227,7 +237,7 @@ const EducationDetailCard = ({ title }) => {
 
         toastMessages.success(t('profile.messages.educationAddSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -239,13 +249,13 @@ const EducationDetailCard = ({ title }) => {
 
     };
 
-    const update = async (data) => {
+    const update = async (payload: any) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await educationDetailService.updateEducationDetailById(data.id, data);
+        await educationDetailService.updateEducationDetailById(payload.id, payload);
 
         setOpenPopup(false);
 
@@ -253,7 +263,7 @@ const EducationDetailCard = ({ title }) => {
 
         toastMessages.success(t('profile.messages.educationUpdateSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -287,19 +297,19 @@ const EducationDetailCard = ({ title }) => {
 
   };
 
-  const handleDeleteducationsDetail = (id) => {
+  const handleDeleteducationsDetail = (id: string | number) => {
 
-    const del = async (id) => {
+    const del = async (eduId: string | number) => {
 
       try {
 
-        await educationDetailService.deleteEducationDetailById(id);
+        await educationDetailService.deleteEducationDetailById(eduId);
 
         setIsSuccess(!isSuccess);
 
         toastMessages.success(t('profile.messages.educationDeleteSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -339,7 +349,7 @@ const EducationDetailCard = ({ title }) => {
 
           p: 3,
 
-          boxShadow: (theme) => theme.customShadows.card,
+          boxShadow: (theme: any) => theme.customShadows.card,
 
         }}
 
@@ -393,7 +403,7 @@ const EducationDetailCard = ({ title }) => {
 
                   sx={{
 
-                    boxShadow: (theme) => theme.customShadows.medium,
+                    boxShadow: (theme: any) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -459,9 +469,9 @@ const EducationDetailCard = ({ title }) => {
 
                           sx={{
 
-                            background: (theme) => theme.palette.primary.gradient,
+                            background: (theme: any) => theme.palette.primary.gradient,
 
-                            boxShadow: (theme) => theme.customShadows.small,
+                            boxShadow: (theme: any) => theme.customShadows.small,
 
                           }}
 

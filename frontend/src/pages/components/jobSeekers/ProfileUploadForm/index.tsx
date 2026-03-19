@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -21,17 +20,34 @@ import SingleSelectCustom from '../../../../components/controls/SingleSelectCust
 
 import FileUploadCustom from '../../../../components/controls/FileUploadCustom';
 
-interface Props {
-  [key: string]: any;
+interface FormValues {
+  file: any;
+  title: string;
+  position: number | string;
+  academicLevel: number | string;
+  experience: number | string;
+  career: number | string;
+  city: number | string;
+  salaryMin: number;
+  salaryMax: number;
+  expectedSalary: number | null;
+  typeOfWorkplace: number | string;
+  jobType: number | string;
+  description: string;
+  skillsSummary: string;
+}
+
+interface ProfileUploadFormProps {
+  handleAdd: (data: any) => void;
 }
 
 
 
-const ProfileUploadForm = ({ handleAdd }) => {
+const ProfileUploadForm = ({ handleAdd }: ProfileUploadFormProps) => {
 
   const { t } = useTranslation(['jobSeeker']);
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
   const schema = yup.object().shape({
 
@@ -45,7 +61,7 @@ const ProfileUploadForm = ({ handleAdd }) => {
 
         t('jobSeeker:profile.validation.fileRequired'),
 
-        (value) =>
+        (value: any) =>
 
           !(
 
@@ -126,8 +142,8 @@ const ProfileUploadForm = ({ handleAdd }) => {
         t('jobSeeker:profile.validation.salaryMinComparison'),
 
         function (value) {
-
-          return !(value >= this.parent.salaryMax);
+          const { salaryMax } = this.parent;
+          return !(salaryMax !== undefined && value !== undefined && value >= salaryMax);
 
         }
 
@@ -150,8 +166,8 @@ const ProfileUploadForm = ({ handleAdd }) => {
         t('jobSeeker:profile.validation.salaryMaxComparison'),
 
         function (value) {
-
-          return !(value <= this.parent.salaryMin);
+          const { salaryMin } = this.parent;
+          return !(salaryMin !== undefined && value !== undefined && value <= salaryMin);
 
         }
 
@@ -191,9 +207,9 @@ const ProfileUploadForm = ({ handleAdd }) => {
 
   });
 
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
 
   });
 

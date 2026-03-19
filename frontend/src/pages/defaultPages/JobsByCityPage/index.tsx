@@ -1,17 +1,9 @@
-// @ts-nocheck
 import React from 'react';
-
-import { useSelector } from 'react-redux';
-
 import { Container, Divider, Typography } from "@mui/material";
-
 import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
 import CategoryCard from '../../components/defaults/CategoryCard';
-
-interface Props {
-  [key: string]: any;
-}
+import { useAppSelector } from '../../../hooks/useAppStore';
 
 
 
@@ -20,7 +12,7 @@ const JobsByCityPage = () => {
 
   TabTitle(t("jobsByCategoryPage.cityTitle"))
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   return (
 

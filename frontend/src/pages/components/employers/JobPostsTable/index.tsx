@@ -8,6 +8,20 @@ import DataTable from '../../../../components/DataTable';
 import { JOB_POST_STATUS_BG_COLOR } from '../../../../configs/constants';
 import { useAppSelector } from '../../../../redux/hooks';
 
+interface JobPost {
+  id: number;
+  slug?: string;
+  jobName: string;
+  createAt: string;
+  deadline: string;
+  appliedNumber?: number;
+  views?: number;
+  isVerify?: boolean;
+  isUrgent: boolean;
+  isExpired?: boolean;
+  status?: number;
+}
+
 interface JobPostsTableProps {
   rows: any[];
   isLoading: boolean;
@@ -18,13 +32,11 @@ interface JobPostsTableProps {
   handleChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleDelete: (slugOrId: string | number) => void;
   handleUpdate: (slugOrId: string | number) => void;
-  handleRequestSort: (event: any, property: string) => void;
+  handleRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
   headCells: any[];
   order: 'asc' | 'desc';
   orderBy: string;
 }
-
-
 
 const JobPostsTable = ({
   rows,
@@ -54,7 +66,7 @@ const JobPostsTable = ({
 
       accessorKey: 'jobName',
 
-      cell: ({ row }: { row: any }) => (
+      cell: ({ row }: { row: { original: JobPost } }) => (
 
         <Box>
 
@@ -100,7 +112,7 @@ const JobPostsTable = ({
 
       accessorKey: 'deadline',
 
-      cell: ({ row }: { row: any }) => (
+      cell: ({ row }: { row: { original: JobPost } }) => (
 
         <span style={{ color: row.original.isExpired ? 'red' : '#2a3eb1' }}>
 
@@ -138,7 +150,7 @@ const JobPostsTable = ({
 
         <Chip
 
-          label={allConfig?.jobPostStatusDict?.[getValue() as any] || '---'}
+          label={(allConfig?.jobPostStatusDict as any)?.[getValue() as any] || '---'}
 
           color={(JOB_POST_STATUS_BG_COLOR as any)[getValue() as any] || 'default'}
 
@@ -156,7 +168,7 @@ const JobPostsTable = ({
 
       id: 'actions',
 
-      cell: ({ row }: { row: any }) => (
+      cell: ({ row }: { row: { original: JobPost } }) => (
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
 

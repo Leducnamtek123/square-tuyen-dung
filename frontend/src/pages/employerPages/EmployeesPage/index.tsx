@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useMemo, useState } from "react";
 import {
   Box,
@@ -24,6 +23,7 @@ import {
   TableRow,
   TextField,
   Typography,
+  SelectChangeEvent,
 } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
@@ -31,12 +31,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import companyTeamService from "../../../services/companyTeamService";
 import toastMessages from "../../../utils/toastMessages";
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const COMPANY_PERMISSION_OPTIONS = [
   { key: "manage_company_profile", label: "Company profile" },
@@ -48,14 +42,14 @@ const COMPANY_PERMISSION_OPTIONS = [
   { key: "manage_roles", label: "Roles" },
 ];
 
-const slugifyCode = (value) =>
+const slugifyCode = (value: string) =>
   String(value || "")
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-const normalizeListPayload = (payload) => {
+const normalizeListPayload = (payload: any) => {
   if (!payload) return [];
   if (Array.isArray(payload)) return payload;
   if (Array.isArray(payload.results)) return payload.results;
@@ -67,7 +61,12 @@ const EmployeesPage = () => {
   const [tab, setTab] = useState("roles");
   const [openRoleDialog, setOpenRoleDialog] = useState(false);
   const [openMemberDialog, setOpenMemberDialog] = useState(false);
-  const [roleForm, setRoleForm] = useState({
+  const [roleForm, setRoleForm] = useState<{
+    code: string;
+    name: string;
+    description: string;
+    permissions: string[];
+  }>({
     code: "",
     name: "",
     description: "",
@@ -82,77 +81,72 @@ const EmployeesPage = () => {
 
   const { data: rolePayload, isLoading: rolesLoading } = useQuery({
     queryKey: ["company-roles"],
-    queryFn: () => companyTeamService.getRoles(),
+    queryFn: () => companyTeamService.getRoles() as Promise<any>,
   });
 
   const { data: memberPayload, isLoading: membersLoading } = useQuery({
     queryKey: ["company-members"],
-    queryFn: () => companyTeamService.getMembers(),
+    queryFn: () => companyTeamService.getMembers() as Promise<any>,
   });
 
   const roles = useMemo(() => normalizeListPayload(rolePayload), [rolePayload]);
   const members = useMemo(() => normalizeListPayload(memberPayload), [memberPayload]);
-  const roleById = useMemo(() => {
-    const map = new Map();
-    roles.forEach((r) => map.set(r.id, r));
-    return map;
-  }, [roles]);
 
   const createRoleMutation = useMutation({
-    mutationFn: companyTeamService.createRole,
+    mutationFn: (data: any) => companyTeamService.createRole(data),
     onSuccess: () => {
       toastMessages.success("Tạo role thành công");
       queryClient.invalidateQueries({ queryKey: ["company-roles"] });
       setOpenRoleDialog(false);
       setRoleForm({ code: "", name: "", description: "", permissions: [] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toastMessages.error(error?.response?.data?.errors?.errorMessage?.[0] || "Không thể tạo role");
     },
   });
 
   const deleteRoleMutation = useMutation({
-    mutationFn: companyTeamService.deleteRole,
+    mutationFn: (id: any) => companyTeamService.deleteRole(id),
     onSuccess: () => {
       toastMessages.success("Đã xóa role");
       queryClient.invalidateQueries({ queryKey: ["company-roles"] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toastMessages.error(error?.response?.data?.errors?.errorMessage?.[0] || "Không thể xóa role");
     },
   });
 
   const createMemberMutation = useMutation({
-    mutationFn: companyTeamService.createMember,
+    mutationFn: (data: any) => companyTeamService.createMember(data),
     onSuccess: () => {
       toastMessages.success("Đã thêm nhân viên vào công ty");
       queryClient.invalidateQueries({ queryKey: ["company-members"] });
       setOpenMemberDialog(false);
       setMemberForm({ userId: "", roleId: "", status: "ACTIVE", invitedEmail: "" });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toastMessages.error(error?.response?.data?.errors?.errorMessage?.[0] || "Không thể thêm nhân viên");
     },
   });
 
   const updateMemberMutation = useMutation({
-    mutationFn: ({ id, data }) => companyTeamService.updateMember(id, data),
+    mutationFn: ({ id, data }: { id: any; data: any }) => companyTeamService.updateMember(id, data),
     onSuccess: () => {
       toastMessages.success("Đã cập nhật role nhân viên");
       queryClient.invalidateQueries({ queryKey: ["company-members"] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toastMessages.error(error?.response?.data?.errors?.errorMessage?.[0] || "Không thể cập nhật nhân viên");
     },
   });
 
   const deleteMemberMutation = useMutation({
-    mutationFn: companyTeamService.deleteMember,
+    mutationFn: (id: any) => companyTeamService.deleteMember(id),
     onSuccess: () => {
       toastMessages.success("Đã xóa nhân viên khỏi công ty");
       queryClient.invalidateQueries({ queryKey: ["company-members"] });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toastMessages.error(error?.response?.data?.errors?.errorMessage?.[0] || "Không thể xóa nhân viên");
     },
   });
@@ -221,7 +215,7 @@ const EmployeesPage = () => {
               </TableHead>
               <TableBody>
                 {!rolesLoading &&
-                  roles.map((role) => (
+                  roles.map((role: any) => (
                     <TableRow key={role.id}>
                       <TableCell>{role.id}</TableCell>
                       <TableCell>{role.code}</TableCell>
@@ -229,7 +223,7 @@ const EmployeesPage = () => {
                       <TableCell>
                         <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
                           {(role.permissions || []).length === 0 && <Chip size="small" label="No permissions" />}
-                          {(role.permissions || []).map((p) => (
+                          {(role.permissions || []).map((p: any) => (
                             <Chip size="small" key={`${role.id}-${p}`} label={p} />
                           ))}
                         </Stack>
@@ -268,7 +262,7 @@ const EmployeesPage = () => {
               </TableHead>
               <TableBody>
                 {!membersLoading &&
-                  members.map((member) => (
+                  members.map((member: any) => (
                     <TableRow key={member.id}>
                       <TableCell>{member.id}</TableCell>
                       <TableCell>{member.userDict?.fullName || "-"}</TableCell>
@@ -276,8 +270,8 @@ const EmployeesPage = () => {
                       <TableCell sx={{ minWidth: 220 }}>
                         <FormControl size="small" fullWidth>
                           <Select
-                            value={member.roleId || member.role?.id || ""}
-                            onChange={(e) => {
+                            value={(member.roleId || member.role?.id || "").toString()}
+                            onChange={(e: SelectChangeEvent) => {
                               const nextRoleId = Number(e.target.value);
                               if (!nextRoleId || nextRoleId === (member.roleId || member.role?.id)) return;
                               updateMemberMutation.mutate({
@@ -286,8 +280,8 @@ const EmployeesPage = () => {
                               });
                             }}
                           >
-                            {roles.map((role) => (
-                              <MenuItem key={role.id} value={role.id}>
+                            {roles.map((role: any) => (
+                              <MenuItem key={role.id} value={role.id.toString()}>
                                 {role.name}
                               </MenuItem>
                             ))}
@@ -349,7 +343,7 @@ const EmployeesPage = () => {
                 multiple
                 label="Permissions"
                 value={roleForm.permissions}
-                onChange={(e) => setRoleForm((p) => ({ ...p, permissions: e.target.value }))}
+                onChange={(e: SelectChangeEvent<string[]>) => setRoleForm((p) => ({ ...p, permissions: e.target.value as string[] }))}
                 renderValue={(selected) => selected.join(", ")}
               >
                 {COMPANY_PERMISSION_OPTIONS.map((item) => (
@@ -390,10 +384,10 @@ const EmployeesPage = () => {
               <Select
                 label="Role"
                 value={memberForm.roleId}
-                onChange={(e) => setMemberForm((p) => ({ ...p, roleId: e.target.value }))}
+                onChange={(e: SelectChangeEvent) => setMemberForm((p) => ({ ...p, roleId: e.target.value }))}
               >
-                {roles.map((role) => (
-                  <MenuItem key={role.id} value={role.id}>
+                {roles.map((role: any) => (
+                  <MenuItem key={role.id} value={role.id.toString()}>
                     {role.name}
                   </MenuItem>
                 ))}
@@ -404,7 +398,7 @@ const EmployeesPage = () => {
               <Select
                 label="Status"
                 value={memberForm.status}
-                onChange={(e) => setMemberForm((p) => ({ ...p, status: e.target.value }))}
+                onChange={(e: SelectChangeEvent) => setMemberForm((p) => ({ ...p, status: e.target.value }))}
               >
                 <MenuItem value="ACTIVE">ACTIVE</MenuItem>
                 <MenuItem value="INVITED">INVITED</MenuItem>

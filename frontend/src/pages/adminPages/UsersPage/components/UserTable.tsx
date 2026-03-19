@@ -1,20 +1,22 @@
-// @ts-nocheck
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Tooltip, Switch, CircularProgress, Typography, Stack, Select, MenuItem } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Tooltip, Switch, CircularProgress, Typography, Stack, Select, MenuItem, SelectChangeEvent } from "@mui/material";
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useTranslation } from 'react-i18next';
 import { ROLES_NAME } from '../../../../configs/constants';
 
-interface Props {
-  [key: string]: any;
+interface UserTableProps {
+    users: any[];
+    loading?: boolean;
+    onToggleStatus: (user: any) => void;
+    onRoleChange: (user: any, roleName: string) => void;
+    currentUserId: string | number;
+    disableRoleActions?: boolean;
 }
 
-
-
-const UserTable = ({ users, loading, onToggleStatus, onRoleChange, currentUserId, disableRoleActions }) => {
+const UserTable = ({ users, loading, onToggleStatus, onRoleChange, currentUserId, disableRoleActions }: UserTableProps) => {
     const { t } = useTranslation('admin');
-    const getRoleLabel = (roleName) => {
+    const getRoleLabel = (roleName: string) => {
         switch (roleName) {
             case ROLES_NAME.ADMIN:
                 return t('pages.users.roles.admin');
@@ -27,7 +29,7 @@ const UserTable = ({ users, loading, onToggleStatus, onRoleChange, currentUserId
         }
     };
 
-    const getRoleColor = (roleName) => {
+    const getRoleColor = (roleName: string) => {
         if (roleName === ROLES_NAME.ADMIN) {
             return 'error';
         }
@@ -77,7 +79,7 @@ const UserTable = ({ users, loading, onToggleStatus, onRoleChange, currentUserId
                                 <Select
                                     value={user.roleName || ''}
                                     size="small"
-                                    onChange={(event) => onRoleChange(user, event.target.value)}
+                                    onChange={(event: SelectChangeEvent<string>) => onRoleChange(user, event.target.value)}
                                     disabled={disableRoleActions || user.id === currentUserId}
                                     renderValue={(value) => (
                                         <Chip
@@ -96,7 +98,7 @@ const UserTable = ({ users, loading, onToggleStatus, onRoleChange, currentUserId
                             <TableCell>
                                 {user.isVerifyEmail ? (
                                     <Tooltip title={t('pages.users.table.verified')}>
-                                        <CheckCircleIcon color="success" size="small" />
+                                        <CheckCircleIcon color="success" sx={{ fontSize: '1.25rem' }} />
                                     </Tooltip>
                                 ) : (
                                     <Typography variant="caption" color="error">{t('pages.users.table.unverified')}</Typography>

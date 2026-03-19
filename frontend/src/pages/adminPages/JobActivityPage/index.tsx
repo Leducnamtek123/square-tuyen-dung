@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -6,12 +5,6 @@ import { useTranslation } from 'react-i18next';
 import SearchIcon from '@mui/icons-material/Search';
 import { useJobActivities } from './hooks/useJobActivities';
 import JobActivityTable from './components/JobActivityTable';
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const JobActivityPage = () => {
     const { t } = useTranslation('admin');
@@ -29,26 +22,26 @@ const JobActivityPage = () => {
         page,
         pageSize: PAGE_SIZE,
         kw: searchTerm
-    });
+    }) as any;
 
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [currentActivity, setCurrentActivity] = useState(null);
+    const [currentActivity, setCurrentActivity] = useState<any>(null);
     const [statusValue, setStatusValue] = useState('');
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
         setPage(1);
     };
 
-    const handleOpenEdit = (activity) => {
+    const handleOpenEdit = (activity: any) => {
         setCurrentActivity(activity);
         setStatusValue(activity.status || 'PENDING');
         setOpenEditDialog(true);
     };
 
-    const handleOpenDelete = (activity) => {
+    const handleOpenDelete = (activity: any) => {
         setCurrentActivity(activity);
         setOpenDeleteDialog(true);
     };
@@ -120,14 +113,14 @@ const JobActivityPage = () => {
                 ) : (
                     <>
                         <JobActivityTable
-                            data={data?.results || data}
+                            data={(data as any)?.results || data}
                             onEdit={handleOpenEdit}
                             onDelete={handleOpenDelete}
                         />
-                        {data?.count > 0 && (
+                        {(data as any)?.count > 0 && (
                             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
                                 <Pagination
-                                    count={Math.ceil(data.count / PAGE_SIZE)}
+                                    count={Math.ceil((data as any).count / PAGE_SIZE)}
                                     page={page}
                                     onChange={(e, v) => setPage(v)}
                                     color="primary"

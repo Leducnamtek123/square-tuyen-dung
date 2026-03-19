@@ -1,37 +1,25 @@
-// @ts-nocheck
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-
 import { Box, Typography, Button, Chip, IconButton, Stack, Divider, LinearProgress } from "@mui/material";
-
 import AddIcon from '@mui/icons-material/Add';
-
 import VisibilityIcon from '@mui/icons-material/Visibility';
-
 import { Link } from 'react-router-dom';
-
 import interviewService from '../../../../services/interviewService';
-
 import { transformInterviewSession } from '../../../../utils/transformers';
-
 import { ROUTES } from '../../../../configs/constants';
-
 import DataTable from '../../../../components/DataTable';
-
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  [key: string]: any;
+interface InterviewListCardProps {
+  title?: string;
 }
 
-
-
-const InterviewListCard = ({ title }) => {
+const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
     const { t } = useTranslation('interview');
 
     const displayTitle = title || t('interviewListCard.title');
 
-    const [sessions, setSessions] = useState([]);
+    const [sessions, setSessions] = useState<any[]>([]);
 
     const [count, setCount] = useState(0);
 
@@ -47,7 +35,7 @@ const InterviewListCard = ({ title }) => {
 
         try {
 
-            const res = await interviewService.getSessions({
+            const res: any = await interviewService.getSessions({
 
                 page: page + 1,
 
@@ -91,7 +79,7 @@ const InterviewListCard = ({ title }) => {
 
     useEffect(() => {
 
-        const hasActiveSession = sessions.some((session) => ['in_progress', 'calibration', 'processing'].includes(session.status));
+        const hasActiveSession = sessions.some((session: any) => ['in_progress', 'calibration', 'processing'].includes(session.status));
 
         if (!hasActiveSession) {
 
@@ -105,13 +93,13 @@ const InterviewListCard = ({ title }) => {
 
     }, [sessions, fetchSessions]);
 
-    const handleChangePage = (event, newPage) => {
+    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
 
         setPage(newPage);
 
     };
 
-    const handleChangeRowsPerPage = (event) => {
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
 
         setRowsPerPage(parseInt(event.target.value, 10));
 
@@ -119,7 +107,7 @@ const InterviewListCard = ({ title }) => {
 
     };
 
-    const getStatusColor = (status) => {
+    const getStatusColor = (status: string): "success" | "primary" | "info" | "error" | "default" => {
 
         switch (status) {
 
@@ -137,7 +125,7 @@ const InterviewListCard = ({ title }) => {
 
     };
 
-    const getLink = (path) => {
+    const getLink = (path: string) => {
 
         const base = ROUTES.EMPLOYER.DASHBOARD ? `/${ROUTES.EMPLOYER.DASHBOARD}/` : '/';
 
@@ -153,7 +141,7 @@ const InterviewListCard = ({ title }) => {
 
             accessorKey: 'candidateName',
 
-            cell: ({ row }) => (
+            cell: ({ row }: { row: { original: any } }) => (
 
                 <Box>
 
@@ -173,7 +161,7 @@ const InterviewListCard = ({ title }) => {
 
             accessorKey: 'jobName',
 
-            cell: ({ getValue }) => <Typography variant="body2">{getValue() || 'N/A'}</Typography>,
+            cell: ({ getValue }: { getValue: () => any }) => <Typography variant="body2">{getValue() || 'N/A'}</Typography>,
 
         },
 
@@ -183,7 +171,7 @@ const InterviewListCard = ({ title }) => {
 
             accessorKey: 'scheduledAt',
 
-            cell: ({ getValue }) => (
+            cell: ({ getValue }: { getValue: () => any }) => (
 
                 <Typography variant="body2">
 
@@ -201,7 +189,7 @@ const InterviewListCard = ({ title }) => {
 
             accessorKey: 'status',
 
-            cell: ({ getValue }) => (
+            cell: ({ getValue }: { getValue: () => any }) => (
 
                 <Chip
 
@@ -225,7 +213,7 @@ const InterviewListCard = ({ title }) => {
 
             accessorKey: 'ai_overall_score',
 
-            cell: ({ row }) => (
+            cell: ({ row }: { row: { original: any } }) => (
 
                 row.original.ai_overall_score ? (
 
@@ -251,7 +239,7 @@ const InterviewListCard = ({ title }) => {
 
             id: 'actions',
 
-            cell: ({ row }) => (
+            cell: ({ row }: { row: { original: any } }) => (
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
 
@@ -260,6 +248,8 @@ const InterviewListCard = ({ title }) => {
                         component={Link}
 
                         to={getLink(ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', row.original.id))}
+
+                        {...({} as any)}
 
                         color="primary"
 
@@ -325,7 +315,7 @@ const InterviewListCard = ({ title }) => {
 
                         fontWeight: 600,
 
-                        background: (theme) => theme.palette.primary.gradient || theme.palette.primary.main,
+                        background: (theme: any) => theme.palette.primary.gradient || theme.palette.primary.main,
 
                         WebkitBackgroundClip: 'text',
 
@@ -353,19 +343,21 @@ const InterviewListCard = ({ title }) => {
 
                     to={getLink(ROUTES.EMPLOYER.INTERVIEW_CREATE)}
 
+                    {...({} as any)}
+
                     sx={{
 
                         borderRadius: 2,
 
                         px: 3,
 
-                        background: (theme) => theme.palette.primary.gradient,
+                        background: (theme: any) => theme.palette.primary.gradient,
 
-                        boxShadow: (theme) => theme.customShadows?.small || 1,
+                        boxShadow: (theme: any) => theme.customShadows?.small || 1,
 
                         '&:hover': {
 
-                            boxShadow: (theme) => theme.customShadows?.medium || 2
+                            boxShadow: (theme: any) => theme.customShadows?.medium || 2
 
                         }
 
@@ -417,7 +409,7 @@ const InterviewListCard = ({ title }) => {
 
                 borderRadius: 2,
 
-                boxShadow: (theme) => theme.customShadows?.card || 1,
+                boxShadow: (theme: any) => theme.customShadows?.card || 1,
 
                 overflow: 'hidden',
 

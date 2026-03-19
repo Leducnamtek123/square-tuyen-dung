@@ -1,10 +1,9 @@
-// @ts-nocheck
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import questionGroupService from '../../../../services/questionGroupService';
 import { toast } from 'react-toastify';
 
-export const useQuestionGroups = (params) => {
+export const useQuestionGroups = (params: any) => {
     const { t } = useTranslation('employer');
     const queryClient = useQueryClient();
 
@@ -16,7 +15,7 @@ export const useQuestionGroups = (params) => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data) => questionGroupService.createQuestionGroup(data),
+        mutationFn: (data: any) => questionGroupService.createQuestionGroup(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
             toast.success(t('questionGroupsCard.messages.addSuccess'));
@@ -28,7 +27,7 @@ export const useQuestionGroups = (params) => {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }) => questionGroupService.updateQuestionGroup(id, data),
+        mutationFn: ({ id, data }: { id: string | number, data: any }) => questionGroupService.updateQuestionGroup(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
             toast.success(t('questionGroupsCard.messages.updateSuccess'));
@@ -40,7 +39,7 @@ export const useQuestionGroups = (params) => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id) => questionGroupService.deleteQuestionGroup(id),
+        mutationFn: (id: string | number) => questionGroupService.deleteQuestionGroup(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
             toast.success(t('questionGroupsCard.messages.deleteSuccess'));

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 
 import { useParams } from "react-router-dom";
@@ -53,8 +52,17 @@ import resumeService from "../../../../services/resumeService";
 
 import experienceDetailService from "../../../../services/experienceDetailService";
 
-interface Props {
-  [key: string]: any;
+interface ExperienceDetail {
+  id: string | number;
+  startDate: string;
+  endDate: string | null;
+  jobName: string;
+  companyName: string;
+  description: string | null;
+}
+
+interface ExperienceDetailCardProps {
+  title: string;
 }
 
 
@@ -105,7 +113,7 @@ const Loading = (
 
         .fill(0)
 
-        .map((item, index) => (
+        .map((_, index) => (
 
           <Box sx={{ py: 1 }} key={index}>
 
@@ -125,11 +133,11 @@ const Loading = (
 
 );
 
-const ExperienceDetailCard = ({ title }) => {
+const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
     const { t } = useTranslation(['jobSeeker', 'common']);
 
-    const { slug: resumeSlug } = useParams();
+    const { slug: resumeSlug } = useParams<{ slug: string }>();
 
   const [openPopup, setOpenPopup] = React.useState(false);
 
@@ -141,23 +149,24 @@ const ExperienceDetailCard = ({ title }) => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const [experiencesDetail, setExperiencesDetail] = React.useState([]);
+  const [experiencesDetail, setExperiencesDetail] = React.useState<ExperienceDetail[]>([]);
 
-  const [editData, setEditData] = React.useState(null);
+  const [editData, setEditData] = React.useState<ExperienceDetail | null>(null);
 
   React.useEffect(() => {
 
-    const loadExperiencesDetail = async (resumeSlug) => {
+    const loadExperiencesDetail = async (slug: string | undefined) => {
+      if (!slug) return;
 
       setIsLoadingExperiencesDetail(true);
 
       try {
 
-        const resData = await resumeService.getExperiencesDetail(resumeSlug);
+        const resData = await resumeService.getExperiencesDetail(slug) as any;
 
         setExperiencesDetail(resData.data);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -173,9 +182,9 @@ const ExperienceDetailCard = ({ title }) => {
 
   }, [resumeSlug, isSuccess]);
 
-  const handleShowUpdate = (id) => {
+  const handleShowUpdate = (id: string | number) => {
 
-    const loadExperienceDetailById = async (experienceId) => {
+    const loadExperienceDetailById = async (experienceId: string | number) => {
 
       setIsFullScreenLoading(true);
 
@@ -185,13 +194,13 @@ const ExperienceDetailCard = ({ title }) => {
 
           experienceId
 
-        );
+        ) as any;
 
         setEditData(resData.data);
 
         setOpenPopup(true);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -215,15 +224,15 @@ const ExperienceDetailCard = ({ title }) => {
 
   };
 
-  const handleAddOrUpdate = (data) => {
+  const handleAddOrUpdate = (data: any) => {
 
-    const create = async (data) => {
+    const create = async (payload: any) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await experienceDetailService.addExperienceDetail(data);
+        await experienceDetailService.addExperienceDetail(payload);
 
         setOpenPopup(false);
 
@@ -231,7 +240,7 @@ const ExperienceDetailCard = ({ title }) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.experienceAddSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -243,13 +252,13 @@ const ExperienceDetailCard = ({ title }) => {
 
     };
 
-    const update = async (data) => {
+    const update = async (payload: any) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await experienceDetailService.updateExperienceDetailById(data.id, data);
+        await experienceDetailService.updateExperienceDetailById(payload.id, payload);
 
         setOpenPopup(false);
 
@@ -257,7 +266,7 @@ const ExperienceDetailCard = ({ title }) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.experienceUpdateSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -291,19 +300,19 @@ const ExperienceDetailCard = ({ title }) => {
 
   };
 
-  const handleDeleteExperiencesDetail = (id) => {
+  const handleDeleteExperiencesDetail = (id: string | number) => {
 
-    const del = async (id) => {
+    const del = async (experienceId: string | number) => {
 
       try {
 
-        await experienceDetailService.deleteExperienceDetailById(id);
+        await experienceDetailService.deleteExperienceDetailById(experienceId);
 
         setIsSuccess(!isSuccess);
 
         toastMessages.success(t('jobSeeker:profile.messages.experienceDeleteSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -343,7 +352,7 @@ const ExperienceDetailCard = ({ title }) => {
 
           p: 3,
 
-          boxShadow: (theme) => theme.customShadows.card,
+          boxShadow: (theme: any) => theme.customShadows.card,
 
         }}
 
@@ -397,7 +406,7 @@ const ExperienceDetailCard = ({ title }) => {
 
                   sx={{
 
-                    boxShadow: (theme) => theme.customShadows.medium,
+                    boxShadow: (theme: any) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -463,11 +472,11 @@ const ExperienceDetailCard = ({ title }) => {
 
                           sx={{
 
-                            background: (theme) =>
+                            background: (theme: any) =>
 
                               theme.palette.primary.gradient,
 
-                            boxShadow: (theme) => theme.customShadows.small,
+                            boxShadow: (theme: any) => theme.customShadows.small,
 
                           }}
 

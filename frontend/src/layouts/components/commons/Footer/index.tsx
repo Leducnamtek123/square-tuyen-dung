@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useNavigate } from 'react-router-dom';
@@ -15,12 +14,6 @@ import { ICONS, LINKS, ROUTES, APP_NAME, IMAGES } from '../../../../configs/cons
 
 import MuiImageCustom from '../../../../components/MuiImageCustom';
 import { buildPortalPath, getPreferredLanguage } from '../../../../configs/portalRouting';
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const Footer = () => {
 

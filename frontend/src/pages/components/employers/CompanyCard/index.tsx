@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 
 import { Box, Button, Stack, Typography, Paper } from "@mui/material";
@@ -24,12 +23,6 @@ import companyService from "../../../../services/companyService";
 
 import MuiImageCustom from "../../../../components/MuiImageCustom";
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
 const CompanyCard = () => {
 
   const [isSuccess, setIsSuccess] = React.useState(false);
@@ -38,17 +31,17 @@ const CompanyCard = () => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const [editData, setEditData] = React.useState(null);
+  const [editData, setEditData] = React.useState<any>(null);
 
-  const [companyImageUrl, setCompanyImageUrl] = React.useState(null);
+  const [companyImageUrl, setCompanyImageUrl] = React.useState<string | null>(null);
 
-  const [companyCoverImageUrl, setCompanyCoverImageUrl] = React.useState(null);
+  const [companyCoverImageUrl, setCompanyCoverImageUrl] = React.useState<string | null>(null);
 
-  const [serverErrors, setServerErrors] = React.useState(null);
+  const [serverErrors, setServerErrors] = React.useState<any>(null);
 
-  const logoInputRef = React.useRef(null);
+  const logoInputRef = React.useRef<HTMLInputElement>(null);
 
-  const coverInputRef = React.useRef(null);
+  const coverInputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
 
@@ -58,7 +51,7 @@ const CompanyCard = () => {
 
       try {
 
-        const resData = await companyService.getCompany();
+        const resData = await companyService.getCompany() as any;
 
         var data = resData.data;
 
@@ -84,7 +77,7 @@ const CompanyCard = () => {
 
         }
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -102,9 +95,9 @@ const CompanyCard = () => {
 
   }, [isSuccess, companyCoverImageUrl, companyImageUrl]);
 
-  const handleUpdate = (data) => {
+  const handleUpdate = (data: any) => {
 
-    const update = async (id, data) => {
+    const update = async (id: any, data: any) => {
 
       setIsFullScreenLoading(true);
 
@@ -118,7 +111,7 @@ const CompanyCard = () => {
 
         toastMessages.success("Company information updated successfully.");
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error, setServerErrors);
 
@@ -142,15 +135,15 @@ const CompanyCard = () => {
 
   };
 
-  const handleUpdateCompanyImageUrl = (file) => {
+  const handleUpdateCompanyImageUrl = (file: File) => {
 
-    const update = async (formData) => {
+    const update = async (formData: FormData) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        const resData = await companyService.updateCompanyImageUrl(formData);
+        const resData = await companyService.updateCompanyImageUrl(formData) as any;
 
         const data = resData.data;
 
@@ -158,7 +151,7 @@ const CompanyCard = () => {
 
         setCompanyImageUrl(data?.companyImageUrl);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -178,9 +171,9 @@ const CompanyCard = () => {
 
   };
 
-  const handleUpdateCompanyCoverImageUrl = (file) => {
+  const handleUpdateCompanyCoverImageUrl = (file: File) => {
 
-    const update = async (formData) => {
+    const update = async (formData: FormData) => {
 
       setIsFullScreenLoading(true);
 
@@ -190,7 +183,7 @@ const CompanyCard = () => {
 
           formData
 
-        );
+        ) as any;
 
         const data = resData.data;
 
@@ -198,7 +191,7 @@ const CompanyCard = () => {
 
         setCompanyCoverImageUrl(data?.companyCoverImageUrl);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -250,7 +243,7 @@ const CompanyCard = () => {
 
             <MuiImageCustom
 
-              src={companyImageUrl}
+              src={companyImageUrl || ''}
 
               width={120}
 
@@ -260,9 +253,9 @@ const CompanyCard = () => {
 
                 borderRadius: 2,
 
-                border: (theme) => `1px solid ${theme.palette.grey[200]}`,
+                border: (theme: any) => `1px solid ${theme.palette.grey[200]}`,
 
-                boxShadow: (theme) => theme.customShadows.small,
+                boxShadow: (theme: any) => theme.customShadows.small,
 
               }}
 
@@ -328,7 +321,7 @@ const CompanyCard = () => {
 
             <MuiImageCustom
 
-              src={companyCoverImageUrl}
+              src={companyCoverImageUrl || ''}
 
               height={160}
 
@@ -338,9 +331,9 @@ const CompanyCard = () => {
 
                 borderRadius: 2,
 
-                border: (theme) => `1px solid ${theme.palette.grey[200]}`,
+                border: (theme: any) => `1px solid ${theme.palette.grey[200]}`,
 
-                boxShadow: (theme) => theme.customShadows.small,
+                boxShadow: (theme: any) => theme.customShadows.small,
 
               }}
 
@@ -398,7 +391,7 @@ const CompanyCard = () => {
 
                 editData={editData}
 
-                serverErrors={serverErrors}
+                serverErrors={serverErrors as any}
 
               />
 

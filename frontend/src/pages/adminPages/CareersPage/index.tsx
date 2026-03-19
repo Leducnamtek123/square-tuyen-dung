@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useRef, useState } from 'react';
 import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Pagination, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Switch } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -9,12 +8,6 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useCareers } from './hooks/useCareers';
 import CareerTable from './components/CareerTable';
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
 const CareersPage = () => {
     const { t } = useTranslation('admin');
     const PAGE_SIZE = 10;
@@ -22,14 +15,14 @@ const CareersPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const [openDialog, setOpenDialog] = useState(false);
-    const [dialogMode, setDialogMode] = useState('add'); // 'add' or 'edit'
-    const [currentCareer, setCurrentCareer] = useState(null);
+    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add'); // 'add' or 'edit'
+    const [currentCareer, setCurrentCareer] = useState<any>(null);
     const [careerName, setCareerName] = useState('');
     const [appIconName, setAppIconName] = useState('');
     const [isHot, setIsHot] = useState(false);
-    const [iconFile, setIconFile] = useState(null);
+    const [iconFile, setIconFile] = useState<File | null>(null);
     const [iconPreviewUrl, setIconPreviewUrl] = useState('');
-    const iconInputRef = useRef(null);
+    const iconInputRef = useRef<HTMLInputElement>(null);
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -44,9 +37,9 @@ const CareersPage = () => {
         page,
         pageSize: PAGE_SIZE,
         kw: searchTerm
-    });
+    }) as any;
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
         setPage(1);
     };
@@ -62,7 +55,7 @@ const CareersPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (career) => {
+    const handleOpenEdit = (career: any) => {
         setDialogMode('edit');
         setCurrentCareer(career);
         setCareerName(career.name);
@@ -73,7 +66,7 @@ const CareersPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (career) => {
+    const handleOpenDelete = (career: any) => {
         setCurrentCareer(career);
         setOpenDeleteDialog(true);
     };
@@ -86,7 +79,7 @@ const CareersPage = () => {
         iconInputRef.current?.click();
     };
 
-    const handleIconFileChange = (e) => {
+    const handleIconFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
         if (!selectedFile) return;
         setIconFile(selectedFile);
@@ -176,14 +169,14 @@ const CareersPage = () => {
                 ) : (
                     <>
                         <CareerTable
-                            data={data?.results || data}
+                            data={(data as any)?.results || data}
                             onEdit={handleOpenEdit}
                             onDelete={handleOpenDelete}
                         />
-                        {data?.count > 0 && (
+                        {(data as any)?.count > 0 && (
                             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
                                 <Pagination
-                                    count={Math.ceil(data.count / PAGE_SIZE)}
+                                    count={Math.ceil((data as any).count / PAGE_SIZE)}
                                     page={page}
                                     onChange={(e, v) => setPage(v)}
                                     color="primary"

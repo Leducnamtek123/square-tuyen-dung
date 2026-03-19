@@ -1,69 +1,46 @@
-// @ts-nocheck
 import React from 'react';
-
 import { useSelector } from 'react-redux';
-
+import { useTheme } from '@mui/material/styles';
+import defaultTheme from '../../themeConfigs/defaultTheme';
 import { Link } from 'react-router-dom';
-
 import { Avatar, Box, Card, Skeleton, Stack, Typography } from "@mui/material";
-
 import { LoadingButton } from '@mui/lab';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import {
-
   faBriefcase,
-
   faFontAwesome,
-
   faMapLocation,
-
   faUser,
-
   faUsers,
-
 } from '@fortawesome/free-solid-svg-icons';
-
 import BookmarkIcon from '@mui/icons-material/Bookmark';
-
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
-
 import { IMAGES, ROLES_NAME, ROUTES } from '../../configs/constants';
-
 import MuiImageCustom from '../MuiImageCustom';
-
 import companyService from '../../services/companyService';
-
 import toastMessages from '../../utils/toastMessages';
-
 import errorHandling from '../../utils/errorHandling';
-
 import { formatRoute } from '../../utils/funcUtils';
+import { RootState } from '../../redux/store';
 
-interface Props {
-  [key: string]: any;
+interface FollowProps {
+  slug: string;
+  isFollowed: boolean;
 }
 
-
-
-const FollowComponent = ({ slug, isFollowed }: Props) => {
-
-  const { isAuthenticated, currentUser } = useSelector((state) => state.user);
-
+const FollowComponent = ({ slug, isFollowed }: FollowProps) => {
+  const { isAuthenticated, currentUser } = useSelector((state: RootState) => state.user);
   const [isLoadingFollow, setIsLoadingFollow] = React.useState(false);
-
   const [followed, setFollowed] = React.useState(isFollowed);
 
-  const handleFollow = (slug) => {
-
-    const follow = async (slugCompany) => {
+  const handleFollow = (slug: string) => {
+    const follow = async (slugCompany: string) => {
 
       setIsLoadingFollow(true);
 
       try {
 
-        const resData = await companyService.followCompany(slugCompany);
+        const resData = (await companyService.followCompany(slugCompany)) as any;
 
         const isFollowed = resData.data.isFollowed;
 
@@ -75,10 +52,8 @@ const FollowComponent = ({ slug, isFollowed }: Props) => {
 
         );
 
-      } catch (error) {
-
+      } catch (error: any) {
         errorHandling(error);
-
       } finally {
 
         setIsLoadingFollow(false);
@@ -157,35 +132,36 @@ const FollowComponent = ({ slug, isFollowed }: Props) => {
 
 };
 
+interface CompanyProps {
+  id: string | number;
+  slug: string;
+  companyImageUrl?: string;
+  companyCoverImageUrl?: string;
+  companyName: string;
+  employeeSize: string | number;
+  fieldOperation?: string;
+  city: string | number;
+  followNumber: number;
+  jobPostNumber: number;
+  isFollowed: boolean;
+}
+
 const Company = ({
-
   id,
-
   slug,
-
   companyImageUrl,
-
   companyCoverImageUrl,
-
   companyName,
-
   employeeSize,
-
   fieldOperation,
-
   city,
-
   followNumber,
-
   jobPostNumber,
-
   isFollowed,
-
-}) => {
-
-  const { allConfig } = useSelector((state) => state.config);
-
-  const { isAuthenticated, currentUser } = useSelector((state) => state.user);
+}: CompanyProps) => {
+  const theme = useTheme();
+  const { allConfig } = useSelector((state: RootState) => state.config);
+  const { isAuthenticated, currentUser } = useSelector((state: RootState) => state.user);
 
   return (
 
@@ -345,7 +321,7 @@ const Company = ({
 
                   style={{ marginRight: 4 }}
 
-                  color={(theme) => theme.palette.text.secondary}
+                  color={theme.palette.text.secondary}
 
                 />
 
@@ -389,7 +365,7 @@ const Company = ({
 
               >
 
-                {companyName.substr(0, 55)}
+                {companyName.substring(0, 55)}
 
                 {companyName.length > 55 && '...'}
 
@@ -402,13 +378,8 @@ const Company = ({
               <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 
                 <FontAwesomeIcon
-
                   icon={faFontAwesome}
-
-                  style={{ width: 16 }}
-
-                  sx={{ color: 'grey.600' }}
-
+                  style={{ width: 16, color: '#757575' }}
                 />
 
                 {fieldOperation || (
@@ -426,16 +397,11 @@ const Company = ({
               <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 
                 <FontAwesomeIcon
-
                   icon={faMapLocation}
-
-                  style={{ width: 16 }}
-
-                  sx={{ color: 'grey.600' }}
-
+                  style={{ width: 16, color: '#757575' }}
                 />
 
-                {allConfig?.cityDict[city] || (
+                {(allConfig as any)?.cityDict[city] || (
 
                   <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
 
@@ -450,16 +416,11 @@ const Company = ({
               <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
 
                 <FontAwesomeIcon
-
                   icon={faUser}
-
-                  style={{ width: 16 }}
-
-                  sx={{ color: 'grey.600' }}
-
+                  style={{ width: 16, color: '#757575' }}
                 />
 
-                {allConfig?.employeeSizeDict[employeeSize] || (
+                {(allConfig as any)?.employeeSizeDict[employeeSize] || (
 
                   <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
 
@@ -492,13 +453,8 @@ const Company = ({
               >
 
                 <FontAwesomeIcon
-
                   icon={faBriefcase}
-
-                  style={{ width: 16 }}
-
-                  sx={{ color: 'primary.main' }}
-
+                  style={{ width: 16, color: defaultTheme.palette.primary.main }}
                 />
 
                 {jobPostNumber} việc làm

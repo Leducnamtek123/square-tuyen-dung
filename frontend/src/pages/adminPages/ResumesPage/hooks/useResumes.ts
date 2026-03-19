@@ -1,9 +1,8 @@
-// @ts-nocheck
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import { toast } from 'react-toastify';
 
-export const useResumes = (params) => {
+export const useResumes = (params: any) => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -16,36 +15,36 @@ export const useResumes = (params) => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data) => adminManagementService.createResume(data),
+        mutationFn: (data: any) => adminManagementService.createResume(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-resumes'] });
             toast.success('Resume added successfully');
         },
-        onError: (err) => {
+        onError: (err: any) => {
             toast.error('An error occurred while adding the resume');
             console.error(err);
         }
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }) => adminManagementService.updateResume(id, data),
+        mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateResume(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-resumes'] });
             toast.success('Resume updated successfully');
         },
-        onError: (err) => {
+        onError: (err: any) => {
             toast.error('An error occurred while updating the resume');
             console.error(err);
         }
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id) => adminManagementService.deleteResume(id),
+        mutationFn: (id: any) => adminManagementService.deleteResume(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-resumes'] });
             toast.success('Resume deleted successfully');
         },
-        onError: (err) => {
+        onError: (err: any) => {
             toast.error('An error occurred while deleting the resume');
             console.error(err);
         }
@@ -57,5 +56,5 @@ export const useResumes = (params) => {
         updateResume: updateMutation.mutateAsync,
         deleteResume: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    };
+    } as any;
 };

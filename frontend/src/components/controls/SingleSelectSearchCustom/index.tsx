@@ -1,30 +1,25 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useTheme } from '@mui/material/styles';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import TextField from '@mui/material/TextField';
 
 import Autocomplete from '@mui/material/Autocomplete';
 
 interface Props {
-  [key: string]: any;
+  name: string;
+  control: Control<any>;
+  placeholder?: string;
+  options?: any[];
 }
 
-
-
 const SingleSelectSearchCustom = ({
-
   placeholder = '',
-
   name,
-
   control,
-
   options = [],
-
 }: Props) => {
 
   const theme = useTheme();

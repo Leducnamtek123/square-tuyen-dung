@@ -1,11 +1,9 @@
-// @ts-nocheck
 import React from 'react';
 
 interface Props {
+  src: string;
   [key: string]: any;
 }
-
-
 
 const SvgIcon = ({ src, ...props }: Props) => {
   return (

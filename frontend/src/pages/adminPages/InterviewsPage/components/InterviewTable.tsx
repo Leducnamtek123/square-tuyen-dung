@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Chip, Tooltip, IconButton, Box, CircularProgress, Stack } from "@mui/material";
 
@@ -9,13 +8,15 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import dayjs from '../../../../configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  [key: string]: any;
+interface InterviewTableProps {
+    interviews: any[];
+    loading: boolean;
+    onView: (interview: any) => void;
+    onDelete: (id: any) => void;
+    onUpdateStatus: (id: any, status: string) => void;
 }
 
-
-
-const InterviewTable = ({ interviews, loading, onView, onDelete, onUpdateStatus }) => {
+const InterviewTable = ({ interviews, loading, onView, onDelete, onUpdateStatus }: InterviewTableProps) => {
     const { t } = useTranslation(['interview', 'admin']);
     
     if (loading && interviews.length === 0) {
@@ -26,7 +27,7 @@ const InterviewTable = ({ interviews, loading, onView, onDelete, onUpdateStatus 
         );
     }
 
-    const getStatusChip = (status) => {
+    const getStatusChip = (status: any) => {
         const lowerStatus = String(status ?? '').toLowerCase();
         switch (lowerStatus) {
             case 'completed':
@@ -46,7 +47,7 @@ const InterviewTable = ({ interviews, loading, onView, onDelete, onUpdateStatus 
         }
     };
 
-    const getTypeChip = (type) => {
+    const getTypeChip = (type: any) => {
         switch (type?.toUpperCase()) {
             case 'VETTING':
                 return <Chip label={t('pages.interviews.type.vetting', { ns: 'admin' })} color="warning" size="small" variant="outlined" />;

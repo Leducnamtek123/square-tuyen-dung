@@ -1,48 +1,54 @@
-// @ts-nocheck
 import React from 'react';
-
-import { useSelector } from 'react-redux';
-
 import { useForm, useWatch } from 'react-hook-form';
-
 import { yupResolver } from '@hookform/resolvers/yup';
-
 import * as yup from 'yup';
-
 import { Box, Button, Stack, Step, StepLabel, Stepper, styled } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
-
 import HowToRegIcon from '@mui/icons-material/HowToReg';
-
 import { useTranslation } from 'react-i18next';
-
 import useDebounce from '../../../../hooks/useDebounce';
-
 import { REGEX_VALIDATE } from '../../../../configs/constants';
-
 import errorHandling from '../../../../utils/errorHandling';
-
 import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
-
 import PasswordTextFieldCustom from '../../../../components/controls/PasswordTextFieldCustom';
-
 import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
-
 import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
-
 import TextFieldAutoCompleteCustom from '../../../../components/controls/TextFieldAutoCompleteCustom';
-
 import commonService from '../../../../services/commonService';
-
 import goongService from '../../../../services/goongService';
+import { useAppSelector } from '../../../../hooks/useAppStore';
+import type { AxiosError } from 'axios';
 
-interface Props {
-  [key: string]: any;
+interface EmployerSignUpFormData {
+  fullName: string;
+  email: string;
+  password?: string;
+  confirmPassword?: string;
+  company: {
+    companyName: string;
+    companyEmail: string;
+    companyPhone: string;
+    taxCode: string;
+    since?: any;
+    fieldOperation: string;
+    employeeSize: string | number;
+    websiteUrl: string;
+    location: {
+      city: string | number;
+      district: string | number;
+      address: string;
+      lat: string;
+      lng: string;
+    };
+  };
+}
+
+interface EmployerSignUpFormProps {
+  onSignUp: (data: EmployerSignUpFormData) => void;
+  serverErrors?: Record<string, any>;
+  checkCreds: (email: string, roleName: any) => Promise<boolean>;
 }
 
 
@@ -97,7 +103,7 @@ const StyledStepper = styled(Stepper)(({ theme }) => ({
 
 }));
 
-const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
+const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: EmployerSignUpFormProps) => {
 
   const { t } = useTranslation('auth');
 
@@ -105,7 +111,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
 
   const [activeStep, setActiveStep] = React.useState(0);
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useAppSelector((state: any) => state.config);
 
   const [districtOptions, setDistrictOptions] = React.useState([]);
 
@@ -195,7 +201,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
 
         .max(30, t('validation.maxTaxCode')),
 
-      since: yup.date().nullable().typeError(),
+      since: yup.date().nullable().typeError(t('validation.invalidDate') as any),
 
       fieldOperation: yup
 
@@ -236,13 +242,11 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
           .typeError(t('validation.requiredDistrict')),
 
         address: yup
-
           .string()
-
           .required(t('validation.requiredAddress'))
-
           .max(255, t('validation.maxAddress')),
-
+        lat: yup.string().optional(),
+        lng: yup.string().optional(),
       }),
 
     }),
@@ -250,51 +254,31 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
   });
 
   const { control, setError, clearErrors, setValue, getValues, handleSubmit } =
-
-    useForm({
-
+    useForm<EmployerSignUpFormData>({
       defaultValues: {
-
         fullName: '',
-
         email: '',
-
         password: '',
-
         confirmPassword: '',
-
         company: {
-
           companyName: '',
-
           companyEmail: '',
-
           companyPhone: '',
-
           taxCode: '',
-
+          since: null,
           fieldOperation: '',
-
           employeeSize: '',
-
           websiteUrl: '',
-
           location: {
-
             city: '',
-
             district: '',
-
             address: '',
-
+            lat: '',
+            lng: '',
           },
-
         },
-
       },
-
-      resolver: yupResolver(schema),
-
+      resolver: yupResolver(schema) as any,
     });
 
   const cityId = useWatch({
@@ -316,189 +300,115 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
   const addressDebounce = useDebounce(address, 500);
 
   React.useEffect(() => {
-
-    for (let err in serverErrors) {
-
-      if (err === 'company') {
-
-        for (let companyErr in serverErrors['company']) {
-
-          if (companyErr === 'location') {
-
-            for (let locationErr in serverErrors[err]['location']) {
-
-              setError(`${err}.${'location'}.${locationErr}`, {
-
-                type: 400,
-
-                message: serverErrors[err]['location'][locationErr]?.join(' '),
-
+    for (const err in serverErrors) {
+      if (err === 'company' && typeof serverErrors[err] === 'object') {
+        const companyErrors = serverErrors[err];
+        for (const companyErr in companyErrors) {
+          if (companyErr === 'location' && typeof companyErrors[companyErr] === 'object') {
+            const locationErrors = companyErrors[companyErr];
+            for (const locationErr in locationErrors) {
+              setError(`company.location.${locationErr}` as any, {
+                type: 'manual',
+                message: locationErrors[locationErr]?.join(' '),
               });
-
             }
-
           } else {
-
-            setError(`${err}.${companyErr}`, {
-
-              type: 400,
-
-              message: serverErrors[err][companyErr]?.join(' '),
-
+            setError(`company.${companyErr}` as any, {
+              type: 'manual',
+              message: companyErrors[companyErr]?.join(' '),
             });
-
           }
-
         }
-
       } else {
-
-        setError(err, {
-
-          type: 400,
-
+        setError(err as any, {
+          type: 'manual',
           message: serverErrors[err]?.join(' '),
-
         });
-
       }
-
     }
-
   }, [serverErrors, setError]);
 
   React.useEffect(() => {
-
-    const loadLocation = async (input) => {
+    const loadLocation = async (input: string) => {
       if (!input || input.trim().length < 3) {
         setLocationOptions([]);
         return;
       }
 
       try {
-
-        const resData = await goongService.getPlaces(input);
-
+        const resData = await goongService.getPlaces(input) as any;
         if (resData.predictions) setLocationOptions(resData.predictions);
-
       } catch (error) {}
-
     };
 
     loadLocation(addressDebounce);
-
   }, [addressDebounce]);
 
-  const handleSelectLocation = async (e, value) => {
+  const handleSelectLocation = async (e: any, value: any) => {
     if (!value || typeof value !== 'object' || !value.place_id) {
       return;
     }
 
     try {
-
       const resData = await goongService.getPlaceDetailByPlaceId(
-
         value.place_id
-      );
+      ) as any;
 
       if (!resData?.result?.geometry?.location) {
         return;
       }
 
       setValue(
-
         'company.location.lat',
-
-        resData?.result?.geometry.location.lat || ''
-
+        resData?.result?.geometry.location.lat?.toString() || ''
       );
 
       setValue(
-
         'company.location.lng',
-
-        resData?.result?.geometry.location.lng || ''
-
+        resData?.result?.geometry.location.lng?.toString() || ''
       );
-
     } catch (error) {}
-
   };
 
   React.useEffect(() => {
-
-    const loadDistricts = async (cityId) => {
-
+    const loadDistricts = async (cityId: number) => {
       try {
-
-        const resData = await commonService.getDistrictsByCityId(cityId);
-
+        const resData = await commonService.getDistrictsByCityId(cityId) as any;
         if (districtOptions.length > 0)
-
-          setValue('company.location.district', '');
-
+          setValue('company.location.district', '' as any);
         setDistrictOptions(resData.data);
-
       } catch (error) {
-
-        errorHandling(error);
-
-      } finally {
-
+        errorHandling(error as AxiosError<any>, undefined);
       }
-
     };
 
     if (cityId) {
-
-      loadDistricts(cityId);
-
+      loadDistricts(cityId as unknown as number);
     }
-
-     
-
   }, [cityId, setValue, districtOptions.length]);
 
-  const handleSubmtNextSuccess = (data) => {
-
+  const handleSubmtNextSuccess = (data: any) => {
     handleNext(data.email);
-
   };
 
-  const handleSubmitNextError = async (errors, e) => {
-
+  const handleSubmitNextError = async (errors: any) => {
     if (
-
       !('fullName' in errors) &&
-
       !('email' in errors) &&
-
       !('password' in errors) &&
-
       !('confirmPassword' in errors)
-
     ) {
-
       const email = getValues('email');
-
       handleNext(email);
-
     }
-
   };
 
-  const handleNext = async (email) => {
-
+  const handleNext = async (email: string) => {
     const checkCredsResult = await checkCreds(email, null);
-
     if (checkCredsResult === true) {
-
       clearErrors();
-
       setActiveStep(activeStep + 1);
-
     }
-
   };
 
   const handleBack = () => {
@@ -507,7 +417,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
 
   };
 
-  const formContent = (actStep) => (
+  const formContent = (actStep: number) => (
 
     <Box>
 
@@ -1123,7 +1033,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }) => {
 
         activeStep === steps.length - 1
 
-          ? handleSubmit(onSignUp)
+          ? handleSubmit(onSignUp as any)
 
           : handleSubmit(handleSubmtNextSuccess, handleSubmitNextError)
 

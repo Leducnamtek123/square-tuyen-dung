@@ -1,21 +1,9 @@
-// @ts-nocheck
 import React from "react";
-
 import { Outlet } from "react-router-dom";
-
 import { Box, Container } from "@mui/material";
-
 import Header from "../components/commons/Header";
-
 import TabBar from "../components/jobSeekers/TabBar";
-
 import Footer from "../components/commons/Footer";
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const JobSeekerLayout = () => {
 

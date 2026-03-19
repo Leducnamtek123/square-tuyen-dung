@@ -1,9 +1,8 @@
-// @ts-nocheck
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import { toast } from 'react-toastify';
 
-export const useJobNotifications = (params) => {
+export const useJobNotifications = (params: any) => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -16,36 +15,36 @@ export const useJobNotifications = (params) => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data) => adminManagementService.createJobNotification(data),
+        mutationFn: (data: any) => adminManagementService.createJobNotification(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-notifications'] });
             toast.success('Notification created successfully');
         },
-        onError: (err) => {
+        onError: (err: any) => {
             toast.error('An error occurred while creating the notification');
             console.error(err);
         }
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }) => adminManagementService.updateJobNotification(id, data),
+        mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateJobNotification(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-notifications'] });
             toast.success('Notification updated successfully');
         },
-        onError: (err) => {
+        onError: (err: any) => {
             toast.error('An error occurred while updating the notification');
             console.error(err);
         }
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id) => adminManagementService.deleteJobNotification(id),
+        mutationFn: (id: any) => adminManagementService.deleteJobNotification(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-notifications'] });
             toast.success('Notification deleted successfully');
         },
-        onError: (err) => {
+        onError: (err: any) => {
             toast.error('An error occurred while deleting the notification');
             console.error(err);
         }
@@ -57,5 +56,5 @@ export const useJobNotifications = (params) => {
         updateJobNotification: updateMutation.mutateAsync,
         deleteJobNotification: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    };
+    } as any;
 };

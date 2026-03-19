@@ -1,17 +1,14 @@
-// @ts-nocheck
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Box, Card, Stack, Typography } from "@mui/material";
 
 import FilterJobPostCard from "../../../components/defaults/FilterJobPostCard";
 
-interface Props {
-  [key: string]: any;
+interface JobDetailSidebarProps {
+  jobPostDetail: any;
 }
 
-
-
-const JobDetailSidebar = ({ jobPostDetail }) => {
+const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) => {
   const { t } = useTranslation(["public"]);
   return (
     <Card sx={{ p: { xs: 1.5, sm: 1.5, md: 2, lg: 2, xl: 2 } }}>

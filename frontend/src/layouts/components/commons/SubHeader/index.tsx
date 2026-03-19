@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -29,13 +28,14 @@ import { searchJobPost } from '../../../../redux/filterSlice';
 
 import { ROUTES } from '../../../../configs/constants';
 
-interface Props {
-  [key: string]: any;
+interface CareerItem {
+  id: string;
+  name: string;
 }
 
 
 
-const listItems = (items, handleFilter) => (
+const listItems = (items: CareerItem[], handleFilter: (id: string) => void) => (
 
   <Stack
 
@@ -113,7 +113,7 @@ const SubHeader = () => {
 
   const nav = useNavigate();
 
-  const { jobPostFilter } = useSelector((state) => state.filter);
+  const { jobPostFilter } = useSelector((state: any) => state.filter);
 
   const [open, setOpen] = React.useState(false);
 
@@ -143,7 +143,7 @@ const SubHeader = () => {
 
   }, []);
 
-  const handleFilter = (id) => {
+  const handleFilter = (id: string) => {
 
     dispatch(searchJobPost({ ...jobPostFilter, careerId: id }));
 

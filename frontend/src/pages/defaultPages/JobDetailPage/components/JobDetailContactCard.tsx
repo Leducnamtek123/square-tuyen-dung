@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Box, Card, Stack, Typography } from "@mui/material";
@@ -11,13 +10,11 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 import Map from "../../../../components/Map";
 
-interface Props {
-  [key: string]: any;
+interface JobDetailContactCardProps {
+  jobPostDetail: any;
 }
 
-
-
-const JobDetailContactCard = ({ jobPostDetail }) => {
+const JobDetailContactCard: React.FC<JobDetailContactCardProps> = ({ jobPostDetail }) => {
   const { t } = useTranslation(["public"]);
   return (
     <Card

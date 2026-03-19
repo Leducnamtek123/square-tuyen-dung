@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useTranslation } from 'react-i18next';
@@ -14,23 +13,14 @@ import Grid from "@mui/material/Grid2";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
-
   faBriefcase,
-
   faMagicWandSparkles,
-
   faUsers,
-
   faGraduationCap,
-
   faBuilding,
-
   faPersonDigging,
-
   faVenusMars,
-
   faPeopleRoof,
-
 } from '@fortawesome/free-solid-svg-icons';
 
 import SearchIcon from '@mui/icons-material/Search';
@@ -43,27 +33,21 @@ import SingleSelectCustom from '../../../../components/controls/SingleSelectCust
 
 import { resetSearchResume, searchResume } from '../../../../redux/filterSlice';
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
-const ProfileSearch = () => {
+const ProfileSearch: React.FC = () => {
 
   const { t } = useTranslation('employer');
 
   const dispatch = useDispatch();
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
-  const { resumeFilter } = useSelector((state) => state.filter);
+  const { resumeFilter } = useSelector((state: any) => state.filter);
 
-  const { control, reset, handleSubmit } = useForm();
+  const { control, reset, handleSubmit } = useForm<any>();
 
   React.useEffect(() => {
 
-    reset((formValues) => ({
+    reset((formValues: any) => ({
 
       ...formValues,
 
@@ -73,9 +57,9 @@ const ProfileSearch = () => {
 
   }, [resumeFilter, reset]);
 
-  const handleFilter = (data) => {
+  const handleFilter = (data: any) => {
 
-    dispatch(searchResume(data));
+    dispatch(searchResume(data) as any);
 
   };
 
@@ -121,29 +105,20 @@ const ProfileSearch = () => {
 
               icon={<SearchIcon sx={{ color: 'grey.500' }} />}
 
-              sx={{
-
-                '& .MuiOutlinedInput-root': {
-
-                  backgroundColor: 'background.paper',
-
-                  borderRadius: '12px',
-
-                  '&:hover': {
-
-                    backgroundColor: 'grey.50',
-
-                  },
-
-                  '& fieldset': {
-
-                    borderColor: 'grey.200',
-
-                  },
-
+              {...({
+                sx: {
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'background.paper',
+                    borderRadius: '12px',
+                    '&:hover': {
+                      backgroundColor: 'grey.50',
+                    },
+                    '& fieldset': {
+                      borderColor: 'grey.200',
+                    },
+                  }
                 }
-
-              }}
+              } as any)}
 
             />
 
@@ -177,29 +152,20 @@ const ProfileSearch = () => {
 
               placeholder={t('profileSearch.placeholder.selectcityprovince')}
 
-              sx={{
-
-                '& .MuiOutlinedInput-root': {
-
-                  backgroundColor: 'background.paper',
-
-                  borderRadius: '12px',
-
-                  '&:hover': {
-
-                    backgroundColor: 'grey.50',
-
-                  },
-
-                  '& fieldset': {
-
-                    borderColor: 'grey.200',
-
-                  },
-
+              {...({
+                sx: {
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: 'background.paper',
+                    borderRadius: '12px',
+                    '&:hover': {
+                      backgroundColor: 'grey.50',
+                    },
+                    '& fieldset': {
+                      borderColor: 'grey.200',
+                    },
+                  }
                 }
-
-              }}
+              } as any)}
 
             />
 
@@ -239,11 +205,11 @@ const ProfileSearch = () => {
 
                   boxShadow: 'none',
 
-                  background: (theme) => theme.palette.secondary.gradient,
+                  background: (theme: any) => theme.palette.secondary.gradient,
 
                   '&:hover': {
 
-                    boxShadow: (theme) => theme.customShadows.medium,
+                    boxShadow: (theme: any) => theme.customShadows.medium,
 
                   }
 
@@ -301,7 +267,7 @@ const ProfileSearch = () => {
 
             borderColor: 'grey.100',
 
-            boxShadow: (theme) => theme.customShadows.card
+            boxShadow: (theme: any) => theme.customShadows.card
 
           }}
 
@@ -373,29 +339,20 @@ const ProfileSearch = () => {
 
                 placeholder={t('profileSearch.placeholder.allcareers')}
 
-                sx={{
-
-                  '& .MuiOutlinedInput-root': {
-
-                    backgroundColor: 'background.paper',
-
-                    borderRadius: '10px',
-
-                    '&:hover': {
-
-                      backgroundColor: 'grey.50',
-
-                    },
-
-                    '& fieldset': {
-
-                      borderColor: 'grey.200',
-
+                {...({
+                  sx: {
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'background.paper',
+                      borderRadius: '10px',
+                      '&:hover': {
+                        backgroundColor: 'grey.50',
+                      },
+                      '& fieldset': {
+                        borderColor: 'grey.200',
+                      }
                     }
-
                   }
-
-                }}
+                } as any)}
 
               />
 
@@ -421,29 +378,20 @@ const ProfileSearch = () => {
 
                 placeholder={t('profileSearch.placeholder.allexperience')}
 
-                sx={{
-
-                  '& .MuiOutlinedInput-root': {
-
-                    backgroundColor: 'background.paper',
-
-                    borderRadius: '10px',
-
-                    '&:hover': {
-
-                      backgroundColor: 'grey.50',
-
-                    },
-
-                    '& fieldset': {
-
-                      borderColor: 'grey.200',
-
+                {...({
+                  sx: {
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'background.paper',
+                      borderRadius: '10px',
+                      '&:hover': {
+                        backgroundColor: 'grey.50',
+                      },
+                      '& fieldset': {
+                        borderColor: 'grey.200',
+                      }
                     }
-
                   }
-
-                }}
+                } as any)}
 
               />
 
@@ -469,29 +417,20 @@ const ProfileSearch = () => {
 
                 placeholder={t('profileSearch.placeholder.allpositions')}
 
-                sx={{
-
-                  '& .MuiOutlinedInput-root': {
-
-                    backgroundColor: 'background.paper',
-
-                    borderRadius: '10px',
-
-                    '&:hover': {
-
-                      backgroundColor: 'grey.50',
-
-                    },
-
-                    '& fieldset': {
-
-                      borderColor: 'grey.200',
-
+                {...({
+                  sx: {
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'background.paper',
+                      borderRadius: '10px',
+                      '&:hover': {
+                        backgroundColor: 'grey.50',
+                      },
+                      '& fieldset': {
+                        borderColor: 'grey.200',
+                      }
                     }
-
                   }
-
-                }}
+                } as any)}
 
               />
 
@@ -517,29 +456,20 @@ const ProfileSearch = () => {
 
                 placeholder={t('profileSearch.placeholder.allacademiclevels')}
 
-                sx={{
-
-                  '& .MuiOutlinedInput-root': {
-
-                    backgroundColor: 'background.paper',
-
-                    borderRadius: '10px',
-
-                    '&:hover': {
-
-                      backgroundColor: 'grey.50',
-
-                    },
-
-                    '& fieldset': {
-
-                      borderColor: 'grey.200',
-
+                {...({
+                  sx: {
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'background.paper',
+                      borderRadius: '10px',
+                      '&:hover': {
+                        backgroundColor: 'grey.50',
+                      },
+                      '& fieldset': {
+                        borderColor: 'grey.200',
+                      }
                     }
-
                   }
-
-                }}
+                } as any)}
 
               />
 
@@ -565,29 +495,20 @@ const ProfileSearch = () => {
 
                 placeholder={t('profileSearch.placeholder.allworkplaces')}
 
-                sx={{
-
-                  '& .MuiOutlinedInput-root': {
-
-                    backgroundColor: 'background.paper',
-
-                    borderRadius: '10px',
-
-                    '&:hover': {
-
-                      backgroundColor: 'grey.50',
-
-                    },
-
-                    '& fieldset': {
-
-                      borderColor: 'grey.200',
-
+                {...({
+                  sx: {
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'background.paper',
+                      borderRadius: '10px',
+                      '&:hover': {
+                        backgroundColor: 'grey.50',
+                      },
+                      '& fieldset': {
+                        borderColor: 'grey.200',
+                      }
                     }
-
                   }
-
-                }}
+                } as any)}
 
               />
 
@@ -613,29 +534,20 @@ const ProfileSearch = () => {
 
                 placeholder={t('profileSearch.placeholder.allemploymenttypes')}
 
-                sx={{
-
-                  '& .MuiOutlinedInput-root': {
-
-                    backgroundColor: 'background.paper',
-
-                    borderRadius: '10px',
-
-                    '&:hover': {
-
-                      backgroundColor: 'grey.50',
-
-                    },
-
-                    '& fieldset': {
-
-                      borderColor: 'grey.200',
-
+                {...({
+                  sx: {
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'background.paper',
+                      borderRadius: '10px',
+                      '&:hover': {
+                        backgroundColor: 'grey.50',
+                      },
+                      '& fieldset': {
+                        borderColor: 'grey.200',
+                      }
                     }
-
                   }
-
-                }}
+                } as any)}
 
               />
 
@@ -661,29 +573,20 @@ const ProfileSearch = () => {
 
                 placeholder={t('profileSearch.placeholder.allgenders')}
 
-                sx={{
-
-                  '& .MuiOutlinedInput-root': {
-
-                    backgroundColor: 'background.paper',
-
-                    borderRadius: '10px',
-
-                    '&:hover': {
-
-                      backgroundColor: 'grey.50',
-
-                    },
-
-                    '& fieldset': {
-
-                      borderColor: 'grey.200',
-
+                {...({
+                  sx: {
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'background.paper',
+                      borderRadius: '10px',
+                      '&:hover': {
+                        backgroundColor: 'grey.50',
+                      },
+                      '& fieldset': {
+                        borderColor: 'grey.200',
+                      }
                     }
-
                   }
-
-                }}
+                } as any)}
 
               />
 
@@ -709,29 +612,20 @@ const ProfileSearch = () => {
 
                 placeholder={t('profileSearch.placeholder.allmaritalstatuses')}
 
-                sx={{
-
-                  '& .MuiOutlinedInput-root': {
-
-                    backgroundColor: 'background.paper',
-
-                    borderRadius: '10px',
-
-                    '&:hover': {
-
-                      backgroundColor: 'grey.50',
-
-                    },
-
-                    '& fieldset': {
-
-                      borderColor: 'grey.200',
-
+                {...({
+                  sx: {
+                    '& .MuiOutlinedInput-root': {
+                      backgroundColor: 'background.paper',
+                      borderRadius: '10px',
+                      '&:hover': {
+                        backgroundColor: 'grey.50',
+                      },
+                      '& fieldset': {
+                        borderColor: 'grey.200',
+                      }
                     }
-
                   }
-
-                }}
+                } as any)}
 
               />
 

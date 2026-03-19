@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from 'react';
 
 import { Outlet } from 'react-router-dom';
@@ -11,15 +10,15 @@ import Header from '../components/employers/Header';
 
 import Sidebar from '../components/employers/Sidebar';
 
-interface Props {
-  [key: string]: any;
+interface AdminLayoutProps {
+  window?: () => Window;
 }
 
 
 
 const drawerWidth = 240;
 
-const AdminLayout = (props) => {
+const AdminLayout = (props: AdminLayoutProps) => {
 
   const { window } = props;
 

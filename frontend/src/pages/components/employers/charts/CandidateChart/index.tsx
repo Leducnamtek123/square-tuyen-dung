@@ -54,8 +54,7 @@ interface CandidateChartData {
   title2: string;
   labels: string[];
   data1: (number | null)[];
-  // Assuming there might be a data2 based on title2, but not present in snippet
-  // data2: (number | null)[];
+  data2: (number | null)[];
 }
 
 ChartJS.register(
@@ -192,7 +191,7 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
     dayjs(new Date()),
   ]);
 
-  const [data, setData] = React.useState<any>(null);
+  const [data, setData] = React.useState<CandidateChartData | null>(null);
 
   React.useEffect(() => {
 

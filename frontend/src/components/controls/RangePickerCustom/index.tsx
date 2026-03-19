@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { Box, Button, IconButton, Stack } from "@mui/material";
@@ -10,70 +9,44 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs from 'dayjs';
 
 interface Props {
-  [key: string]: any;
+  allowSubmit: boolean;
+  setAllowSubmit: (allow: boolean) => void;
+  selectedDateRange: [any, any] | null;
+  setSelectedDateRange: (range: [any, any]) => void;
 }
 
-
-
-function getMonthDiff(dateA, dateB: Props) {
-
-  const msPerDay = 86400000; // so milisecond trong mot ngay
-
-  // tinh so ngay giua hai ngay
-
-  const daysDiff = Math.round((dateB - dateA) / msPerDay);
-
-  // tinh so thang va ngay con lai
-
+function getMonthDiff(dateA: any, dateB: any) {
+  const msPerDay = 86400000;
+  const daysDiff = Math.round((dateB.getTime() - dateA.getTime()) / msPerDay);
   const monthDiff = Math.floor(daysDiff / 30);
-
   const daysRemaining = daysDiff % 30;
-
   return { months: monthDiff, days: daysRemaining };
-
 }
 
 const RangePickerCustom = ({
-
   allowSubmit,
-
   setAllowSubmit,
-
   selectedDateRange,
-
   setSelectedDateRange,
-
-}) => {
+}: Props) => {
 
   const [maxDate, setMaxDate] = React.useState(dayjs());
 
-  const handleDateRangeChange = (startValue, endValue) => {
-
+  const handleDateRangeChange = (startValue: any, endValue: any) => {
     if (startValue && endValue) {
-
       const startDate = new Date(dayjs(startValue).format('YYYY-MM-DD'));
-
       const endDate = new Date(dayjs(endValue).format('YYYY-MM-DD'));
-
       const { months, days } = getMonthDiff(startDate, endDate);
-
       if (months > 1 || (months === 1 && days > 1)) {
-
         const capped = dayjs(startValue).add(1, 'month');
-
         setSelectedDateRange([startValue, capped]);
-
         return;
-
       }
-
     }
-
     setSelectedDateRange([startValue, endValue]);
-
   };
 
-  function handleCalendarChange(dates) {
+  function handleCalendarChange(dates: any) {
 
     if (
 

@@ -1,7 +1,6 @@
-// @ts-nocheck
 import * as React from 'react';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import Checkbox from '@mui/material/Checkbox';
 
@@ -17,29 +16,25 @@ import { Typography } from "@mui/material";
 import ValidationError from '../ValidationError';
 
 interface Props {
-  [key: string]: any;
+  name: string;
+  control: Control<any>;
+  options?: any[];
+  title?: string | null;
+  showRequired?: boolean;
+  placeholder?: string;
 }
-
-
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const MultiSelectCustom = ({
-
   name,
-
   control,
-
   options = [],
-
   title = null,
-
   showRequired = false,
-
   placeholder = '',
-
 }: Props) => {
 
   return (

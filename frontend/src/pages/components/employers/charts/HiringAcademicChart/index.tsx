@@ -43,6 +43,11 @@ interface HiringAcademicChartProps {
   title: string;
 }
 
+interface HiringAcademicData {
+  labels: string[];
+  data: number[];
+}
+
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const options = {
@@ -111,7 +116,7 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
     dayjs(new Date()),
   ]);
 
-  const [data, setData] = React.useState<any>(null);
+  const [data, setData] = React.useState<HiringAcademicData | null>(null);
 
   React.useEffect(() => {
 
@@ -148,7 +153,7 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
   }, [allowSubmit, selectedDateRange]);
 
   const dataOptions = React.useMemo(() => {
-    const labels = data?.labels?.map((label: any) => {
+    const labels = data?.labels?.map((label: string) => {
       const safeLabel = String(label ?? '');
       const labelKey = safeLabel.toLowerCase().replace(/[^a-z0-9]/g, '');
       return t(`hiringAcademicChart.labels.${labelKey}`, { defaultValue: safeLabel });

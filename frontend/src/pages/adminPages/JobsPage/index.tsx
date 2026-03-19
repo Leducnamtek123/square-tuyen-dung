@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Box, Card, CardHeader, CardContent, Typography, TablePagination, Dialog, DialogTitle, DialogContent, DialogActions, Button, Divider, TextField } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -8,18 +7,12 @@ import JobTable from './components/JobTable';
 import JobFilters from './components/JobFilters';
 import dayjs from '../../../configs/moment-config';
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
 const JobsPage = () => {
     const { t } = useTranslation('admin');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
-    const [selectedJob, setSelectedJob] = useState(null);
+    const [selectedJob, setSelectedJob] = useState<any>(null);
     const [openDetail, setOpenDetail] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const [editJob, setEditJob] = useState({ jobName: '', deadline: '' });
@@ -28,33 +21,33 @@ const JobsPage = () => {
         page: page + 1,
         pageSize: rowsPerPage,
         search: searchTerm,
-    });
+    }) as any;
 
-    const approveMutation = useApproveJob();
-    const rejectMutation = useRejectJob();
-    const updateMutation = useUpdateJob();
-    const deleteMutation = useDeleteJob();
+    const approveMutation = useApproveJob() as any;
+    const rejectMutation = useRejectJob() as any;
+    const updateMutation = useUpdateJob() as any;
+    const deleteMutation = useDeleteJob() as any;
 
-    const handleChangePage = (event, newPage) => {
+    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         setPage(newPage);
     };
 
-    const handleChangeRowsPerPage = (event) => {
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
-    const handleSearchChange = (value) => {
+    const handleSearchChange = (value: string) => {
         setSearchTerm(value);
         setPage(0);
     };
 
-    const handleViewDetail = (job) => {
+    const handleViewDetail = (job: any) => {
         setSelectedJob(job);
         setOpenDetail(true);
     };
 
-    const handleEdit = (job) => {
+    const handleEdit = (job: any) => {
         setSelectedJob(job);
         setEditJob({ jobName: job.jobName, deadline: job.deadline });
         setOpenEdit(true);
@@ -66,7 +59,7 @@ const JobsPage = () => {
         });
     };
 
-    const handleDelete = (id) => {
+    const handleDelete = (id: any) => {
         if (window.confirm(t('pages.jobs.deleteConfirm'))) {
             deleteMutation.mutate(id);
         }
@@ -77,12 +70,12 @@ const JobsPage = () => {
             <JobFilters searchTerm={searchTerm} onSearchChange={handleSearchChange} />
             <Card>
                 <CardHeader
-                    title={`${t('pages.jobs.title')} (${jobsData?.count || 0} ${t('pages.jobs.total')})`}
-                    subheader={jobsData ? `${t('common.pagination.displayedRows', { from: page * rowsPerPage + 1, to: Math.min(page * rowsPerPage + rowsPerPage, jobsData.count), count: jobsData.count })}` : ''}
+                    title={`${t('pages.jobs.title')} (${(jobsData as any)?.count || 0} ${t('pages.jobs.total')})`}
+                    subheader={jobsData ? `${t('common.pagination.displayedRows', { from: page * rowsPerPage + 1, to: Math.min(page * rowsPerPage + rowsPerPage, (jobsData as any).count), count: (jobsData as any).count })}` : ''}
                 />
                 <CardContent>
                     <JobTable
-                        jobs={jobsData?.results || []}
+                        jobs={(jobsData as any)?.results || []}
                         loading={isLoading}
                         onView={handleViewDetail}
                         onEdit={handleEdit}
@@ -93,7 +86,7 @@ const JobsPage = () => {
                     <TablePagination
                         rowsPerPageOptions={[5, 10, 25]}
                         component="div"
-                        count={jobsData?.count || 0}
+                        count={(jobsData as any)?.count || 0}
                         rowsPerPage={rowsPerPage}
                         page={page}
                         onPageChange={handleChangePage}
@@ -141,9 +134,9 @@ const JobsPage = () => {
                             </Box>
                             <Divider sx={{ my: 2 }} />
                             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>{t('pages.jobs.jobDescription')}</Typography>
-                            <Box dangerouslySetInnerHTML={{ __html: selectedJob.jobDescription }} sx={{ fontSize: '0.875rem' }} />
+                            <Box dangerouslySetInnerHTML={{ __html: String(selectedJob.jobDescription) }} sx={{ fontSize: '0.875rem' }} />
                             <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mt: 2, mb: 1 }}>{t('pages.jobs.jobRequirements')}</Typography>
-                            <Box dangerouslySetInnerHTML={{ __html: selectedJob.jobRequirement }} sx={{ fontSize: '0.875rem' }} />
+                            <Box dangerouslySetInnerHTML={{ __html: String(selectedJob.jobRequirement) }} sx={{ fontSize: '0.875rem' }} />
                         </Box>
                     )}
                 </DialogContent>

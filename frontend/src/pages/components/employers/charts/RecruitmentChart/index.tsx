@@ -59,6 +59,11 @@ interface RecruitmentChartProps {
   title: string;
 }
 
+interface RecruitmentDataItem {
+  label: string;
+  data: number[];
+}
+
 
 const colors = [
 
@@ -211,7 +216,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
     dayjs(new Date()),
   ]);
 
-  const [data, setData] = React.useState<any[]>([]);
+  const [data, setData] = React.useState<RecruitmentDataItem[]>([]);
 
   React.useEffect(() => {
 
@@ -266,7 +271,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
 
         label: t(`recruitmentChart.labels.${labelKey}`, { defaultValue: labelText }),
 
-        data: (safeData[i]?.data || []) as any,
+        data: (safeData[i]?.data || []),
 
         backgroundColor: colors[i],
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
@@ -19,13 +18,24 @@ import MultilineTextFieldCustom from '../../../../components/controls/MultilineT
 
 import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
 
-interface Props {
-  [key: string]: any;
+interface FormValues {
+  jobName: string;
+  companyName: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  description: string | null;
+  lastSalary: number | null;
+  leaveReason: string | null;
+}
+
+interface ExperienceDetailFormProps {
+  handleAddOrUpdate: (data: any) => void;
+  editData: any;
 }
 
 
 
-const ExperienceDetaiForm = ({ handleAddOrUpdate, editData }) => {
+const ExperienceDetailForm = ({ handleAddOrUpdate, editData }: ExperienceDetailFormProps) => {
 
   const { t } = useTranslation(['jobSeeker']);
 
@@ -64,8 +74,9 @@ const ExperienceDetaiForm = ({ handleAddOrUpdate, editData }) => {
         t('jobSeeker:profile.validation.startDateComparison'),
 
         function (value) {
-
-          return !(value >= this.parent.endDate);
+          const endDate = this.parent.endDate;
+          if (!value || !endDate) return true;
+          return !(value >= endDate);
 
         }
 
@@ -93,9 +104,10 @@ const ExperienceDetaiForm = ({ handleAddOrUpdate, editData }) => {
 
         t('jobSeeker:profile.validation.endDateComparison'),
 
-        function (value) {
-
-          return !(value <= this.parent.startDate);
+        function (value: any) {
+          const startDate = this.parent.startDate;
+          if (!value || !startDate) return true;
+          return !(value <= startDate);
 
         }
 
@@ -107,9 +119,9 @@ const ExperienceDetaiForm = ({ handleAddOrUpdate, editData }) => {
 
   });
 
-  const { control, reset, handleSubmit } = useForm({
+  const { control, reset, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
 
   });
 
@@ -303,4 +315,4 @@ const ExperienceDetaiForm = ({ handleAddOrUpdate, editData }) => {
 
 };
 
-export default ExperienceDetaiForm;
+export default ExperienceDetailForm;

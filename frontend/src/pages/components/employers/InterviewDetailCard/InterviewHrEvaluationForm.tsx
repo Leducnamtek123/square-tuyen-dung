@@ -1,14 +1,17 @@
-// @ts-nocheck
 import React from 'react';
 import { Box, Button, CircularProgress, Divider, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material';
+import { EvalFormType } from './index';
 
-interface Props {
-  [key: string]: any;
+interface InterviewHrEvaluationFormProps {
+  evalForm: EvalFormType;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onSubmit: () => void;
+  disabled: boolean;
+  submitting: boolean;
+  t: (key: string, options?: any) => string;
 }
 
-
-
-const InterviewHrEvaluationForm = ({ evalForm, onChange, onSubmit, disabled, submitting, t }) => {
+const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({ evalForm, onChange, onSubmit, disabled, submitting, t }) => {
     return (
         <Paper sx={{
             p: 3,

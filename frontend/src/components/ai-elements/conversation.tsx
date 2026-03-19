@@ -1,5 +1,4 @@
-// @ts-nocheck
-"use client";;
+"use client";
 import Button from "@mui/material/Button";
 import { cn } from "@/lib/utils";
 import { ArrowDownIcon, DownloadIcon } from "lucide-react";
@@ -93,23 +92,25 @@ export const ConversationScrollButton = ({
     scrollToBottom();
   }, [scrollToBottom]);
 
-  return (!isAtBottom && (<Button
-    className={cn(
-      "absolute bottom-4 left-[50%] translate-x-[-50%] rounded-full dark:bg-background dark:hover:bg-muted",
-      className
-    )}
-    onClick={handleScrollToBottom}
-    size="small"
-    type="button"
-    variant="outlined"
-    {...props}>
-    <ArrowDownIcon className="size-4" />
-  </Button>));
+  return (!isAtBottom && (
+    <Button
+      className={cn(
+        "absolute bottom-4 left-[50%] translate-x-[-50%] rounded-full dark:bg-background dark:hover:bg-muted",
+        className
+      )}
+      onClick={handleScrollToBottom}
+      size="small"
+      type="button"
+      variant="outlined"
+      {...props}>
+      <ArrowDownIcon className="size-4" />
+    </Button>
+  ));
 };
 
 const getMessageText = (message: any) => (message?.parts || [])
-  .filter((part) => part.type === "text")
-  .map((part) => part.text || "")
+  .filter((part: any) => part.type === "text")
+  .map((part: any) => part.text || "")
   .join("");
 
 const defaultFormatMessage = (message: { role: string }) => {

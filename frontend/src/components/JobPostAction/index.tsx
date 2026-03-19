@@ -1,77 +1,59 @@
-// @ts-nocheck
 import React from 'react';
-
 import { useSelector } from 'react-redux';
-
 import { useNavigate } from 'react-router-dom';
-
 import dayjs from 'dayjs';
-
 import { Box, Card, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
-
 import { useTheme } from '@mui/material/styles';
-
 import { salaryString } from '../../utils/customData';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import {
-
   faCalendarDays,
-
   faCircleDollarToSlot,
-
   faLocationDot,
-
 } from '@fortawesome/free-solid-svg-icons';
-
 import MuiImageCustom from '../MuiImageCustom';
-
 import { ROUTES } from '../../configs/constants';
-
 import { formatRoute } from '../../utils/funcUtils';
 
-interface Props {
-  [key: string]: any;
+interface JobPostActionProps {
+  id: string | number;
+  slug: string;
+  companyImageUrl?: string;
+  companyName: string;
+  jobName: string;
+  cityId: any;
+  deadline: string | Date;
+  isUrgent?: boolean;
+  isHot?: boolean;
+  salaryMin?: number;
+  salaryMax?: number;
+  children?: React.ReactNode;
 }
 
 
 
 const JobPostAction = ({
-
   id,
-
   slug,
-
   companyImageUrl,
-
   companyName,
-
   jobName,
-
   cityId,
-
   deadline,
-
   isUrgent,
-
   isHot,
-
   salaryMin,
-
   salaryMax,
-
   children,
-
-}: Props) => {
+}: JobPostActionProps) => {
 
   const nav = useNavigate();
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
   const [parentWidth, setParentWidth] = React.useState(0);
 
-  const [stackDirection, setStackDirection] = React.useState('column');
+  const [stackDirection, setStackDirection] = React.useState<'column' | 'row'>('column');
 
   const theme = useTheme();
 
@@ -79,9 +61,11 @@ const JobPostAction = ({
 
     const handleResize = () => {
 
-      const newWidth = document.getElementById('job-post-action').offsetWidth;
-
-      setParentWidth(newWidth);
+      const element = document.getElementById('job-post-action');
+      if (element) {
+        const newWidth = element.offsetWidth;
+        setParentWidth(newWidth);
+      }
 
     };
 
@@ -153,7 +137,7 @@ const JobPostAction = ({
 
                   height={70}
 
-                  src={companyImageUrl}
+                  src={companyImageUrl || ''}
 
                   sx={{
 
@@ -369,13 +353,11 @@ const Loading = () => {
 
     const handleResize = () => {
 
-      const newWidth = document.getElementById(
-
-        'job-post-action-loading'
-
-      ).offsetWidth;
-
-      setParentWidth(newWidth);
+      const element = document.getElementById('job-post-action-loading');
+      if (element) {
+        const newWidth = element.offsetWidth;
+        setParentWidth(newWidth);
+      }
 
     };
 
@@ -421,7 +403,7 @@ const Loading = () => {
 
       >
 
-        <Stack direction={stackDirection} spacing={2}>
+        <Stack direction={stackDirection as any} spacing={2}>
 
           <Box flex={1}>
 

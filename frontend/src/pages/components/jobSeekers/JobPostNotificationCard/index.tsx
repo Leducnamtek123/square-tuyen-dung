@@ -1,53 +1,31 @@
-// @ts-nocheck
 import React from "react";
-
 import { useSelector } from "react-redux";
-
 import { Box, Button, Divider, IconButton, Pagination, Skeleton, Stack, Switch, Typography } from "@mui/material";
-
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-
 import AddIcon from "@mui/icons-material/Add";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
-import {
-
-  faBriefcase,
-
-  faCalendarAlt,
-
-  faCircleDollarToSlot,
-
-  faLocationDot,
-
-} from "@fortawesome/free-solid-svg-icons";
+import { faBriefcase, faCalendarAlt, faCircleDollarToSlot, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import toastMessages from "../../../../utils/toastMessages";
-
 import BackdropLoading from "../../../../components/loading/BackdropLoading";
-
 import { confirmModal } from "../../../../utils/sweetalert2Modal";
-
 import { convertMoney } from "../../../../utils/customData";
-
 import NoDataCard from "../../../../components/NoDataCard";
-
 import MuiImageCustom from "../../../../components/MuiImageCustom";
-
 import FormPopup from "../../../../components/controls/FormPopup";
-
 import JobPostNotificationForm from "../JobPostNotificationForm";
-
 import errorHandling from "../../../../utils/errorHandling";
-
 import jobPostNotificationService from "../../../../services/jobPostNotificationService";
-
 import { useTranslation } from "react-i18next";
 
-interface Props {
-  [key: string]: any;
+interface JobPostNotification {
+  id: number;
+  jobName: string;
+  salary: number | null;
+  frequency: number;
+  isActive: boolean;
+  career: number;
+  city: number;
 }
 
 
@@ -56,19 +34,16 @@ const ItemLoading = () => {
 
   const [parentWidth, setParentWidth] = React.useState(0);
 
-  const [stackDirection, setStackDirection] = React.useState("column");
+  const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>("column");
 
   React.useEffect(() => {
 
     const handleResize = () => {
 
-      const newWidth = document.getElementById(
-
-        "job-post-notification-loading"
-
-      ).offsetWidth;
-
-      setParentWidth(newWidth);
+      const element = document.getElementById("job-post-notification-loading");
+      if (element) {
+        setParentWidth(element.offsetWidth);
+      }
 
     };
 
@@ -100,7 +75,7 @@ const ItemLoading = () => {
 
       <Box>
 
-        <Stack direction="row" spacing={3} alignItem="center">
+        <Stack direction="row" spacing={3} alignItems="center">
 
           <Box flex={1}>
 
@@ -196,7 +171,12 @@ const ItemLoading = () => {
 
 };
 
-const ActiveButtonComponent = ({ id, isActive }) => {
+interface ActiveButtonComponentProps {
+  id: number;
+  isActive: boolean;
+}
+
+const ActiveButtonComponent = ({ id, isActive }: ActiveButtonComponentProps) => {
 
   const [checked, setChecked] = React.useState(isActive);
 
@@ -204,19 +184,19 @@ const ActiveButtonComponent = ({ id, isActive }) => {
 
   const handleUpdateActive = () => {
 
-    const updateJobPostNotification = async (id) => {
+    const updateJobPostNotification = async (id: number) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        const resData = await jobPostNotificationService.active(id);
+        const resData = await jobPostNotificationService.active(id) as any;
 
         const data = resData.data;
 
         setChecked(data.isActive);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -250,6 +230,18 @@ const ActiveButtonComponent = ({ id, isActive }) => {
 
 };
 
+interface ItemComponentProps {
+  id: number;
+  jobName: string;
+  salary: number | null;
+  frequency: number;
+  isActive: boolean;
+  career: number;
+  city: number;
+  handleShowUpdate: (id: number) => void;
+  handleDelete: (id: number) => void;
+}
+
 const ItemComponent = ({
 
   id,
@@ -270,27 +262,24 @@ const ItemComponent = ({
 
   handleDelete,
 
-}) => {
+}: ItemComponentProps) => {
 
   const { t } = useTranslation(["jobSeeker", "common"]);
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
   const [parentWidth, setParentWidth] = React.useState(0);
 
-  const [stackDirection, setStackDirection] = React.useState("column");
+  const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>("column");
 
   React.useEffect(() => {
 
     const handleResize = () => {
 
-      const newWidth = document.getElementById(
-
-        "job-post-notification"
-
-      ).offsetWidth;
-
-      setParentWidth(newWidth);
+      const element = document.getElementById("job-post-notification");
+      if (element) {
+        setParentWidth(element.offsetWidth);
+      }
 
     };
 
@@ -679,7 +668,7 @@ const pageSize = 12;
 const JobPostNotificationCard = () => {
   const { t } = useTranslation(["jobSeeker", "common"]);
 
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state: any) => state.user);
 
   const [page, setPage] = React.useState(1);
 
@@ -695,13 +684,13 @@ const JobPostNotificationCard = () => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const [jobPostNotifications, setJobPostNotifications] = React.useState([]);
+  const [jobPostNotifications, setJobPostNotifications] = React.useState<JobPostNotification[]>([]);
 
-  const [editData, setEditData] = React.useState(null);
+  const [editData, setEditData] = React.useState<any>(null);
 
   React.useEffect(() => {
 
-    const loadJobPostNotification = async (params) => {
+    const loadJobPostNotification = async (params: any) => {
 
       setIsLoadingJobPostNotifications(true);
 
@@ -709,7 +698,7 @@ const JobPostNotificationCard = () => {
 
         const resData =
 
-          await jobPostNotificationService.getJobPostNotifications(params);
+          await jobPostNotificationService.getJobPostNotifications(params) as any;
 
         const data = resData.data;
 
@@ -717,7 +706,7 @@ const JobPostNotificationCard = () => {
 
         setJobPostNotifications(data.results);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -739,15 +728,15 @@ const JobPostNotificationCard = () => {
 
   }, [isSuccess, page]);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
 
     setPage(newPage);
 
   };
 
-  const handleShowUpdate = (id) => {
+  const handleShowUpdate = (id: number) => {
 
-    const loadJobPostNotificationDetailById = async (id) => {
+    const loadJobPostNotificationDetailById = async (id: number) => {
 
       setIsFullScreenLoading(true);
 
@@ -755,15 +744,15 @@ const JobPostNotificationCard = () => {
 
         const resData =
 
-          await jobPostNotificationService.getJobPostNotificationDetailById(id);
+          await jobPostNotificationService.getJobPostNotificationDetailById(id) as any;
 
-        var data = resData.data;
+        const data = resData.data;
 
         setEditData(data);
 
         setOpenPopup(true);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -787,9 +776,9 @@ const JobPostNotificationCard = () => {
 
   };
 
-  const handleAddOrUpdate = (data) => {
+  const handleAddOrUpdate = (data: any) => {
 
-    const create = async (data) => {
+    const create = async (data: any) => {
 
       setIsFullScreenLoading(true);
 
@@ -803,7 +792,7 @@ const JobPostNotificationCard = () => {
 
         toastMessages.success(t("jobSeeker:jobManagement.notifications.addedSuccess"));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -815,7 +804,7 @@ const JobPostNotificationCard = () => {
 
     };
 
-    const update = async (data) => {
+    const update = async (data: any) => {
 
       setIsFullScreenLoading(true);
 
@@ -835,7 +824,7 @@ const JobPostNotificationCard = () => {
 
         toastMessages.success(t("jobSeeker:jobManagement.notifications.updatedSuccess"));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -859,9 +848,9 @@ const JobPostNotificationCard = () => {
 
   };
 
-  const handleDeleteJobPostNotification = (id) => {
+  const handleDeleteJobPostNotification = (id: number) => {
 
-    const del = async (id) => {
+    const del = async (id: number) => {
 
       try {
 
@@ -875,7 +864,7 @@ const JobPostNotificationCard = () => {
 
         toastMessages.success(t("jobSeeker:jobManagement.notifications.deletedSuccess"));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -1097,7 +1086,7 @@ const JobPostNotificationCard = () => {
 
       <FormPopup
 
-        title={
+        title={(
 
           <Stack direction="row" alignItems="center" spacing={1}>
 
@@ -1135,7 +1124,7 @@ const JobPostNotificationCard = () => {
 
           </Stack>
 
-        }
+        ) as any}
 
         buttonText={editData ? t("common:actions.save") : t("jobSeeker:jobManagement.notifications.create")}
 

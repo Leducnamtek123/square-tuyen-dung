@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Chip, Typography, IconButton, Tooltip } from "@mui/material";
 
@@ -7,13 +6,23 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from '../../../../configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  [key: string]: any;
+// Define specific types for the data rows
+interface JobActivityRow {
+    id: string;
+    userDict?: { fullName: string; email?: string };
+    jobPostDict?: { jobName: string };
+    companyDict?: { companyName: string };
+    status: 'APPLIED' | 'ACCEPTED' | 'REJECTED' | string; // More specific status types
+    updateAt: string;
 }
 
+interface JobActivityTableProps {
+    data: JobActivityRow[]; // Use the specific row type
+    onEdit?: (row: JobActivityRow) => void; // Type the handler parameter
+    onDelete?: (row: JobActivityRow) => void; // Type the handler parameter
+}
 
-
-const JobActivityTable = ({ data, onEdit, onDelete }) => {
+const JobActivityTable = ({ data, onEdit, onDelete }: JobActivityTableProps) => {
     const { t } = useTranslation('admin');
     return (
         <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -9,20 +8,19 @@ import SearchIcon from '@mui/icons-material/Search';
 import { searchJobPost } from '../../../../redux/filterSlice';
 import { ROUTES } from '../../../../configs/constants';
 
-interface Props {
-  [key: string]: any;
+interface CategoryCardProps {
+  options: any[];
+  type: string;
 }
 
-
-
-const CategoryCard = ({ options, type }) => {
+const CategoryCard = ({ options, type }: CategoryCardProps) => {
   const { t } = useTranslation('common');
   const dispatch = useDispatch();
   const nav = useNavigate();
-  const { jobPostFilter } = useSelector((state) => state.filter);
+  const { jobPostFilter } = useSelector((state: any) => state.filter);
   const [items, setItems] = React.useState(options);
 
-  const handleFilterChange = (value) => {
+  const handleFilterChange = (value: string) => {
     const safeValue = String(value ?? '').toLowerCase();
     let filterItems = options.filter((option) =>
       String(option?.name ?? '').toLowerCase().includes(safeValue)
@@ -30,7 +28,7 @@ const CategoryCard = ({ options, type }) => {
     setItems(filterItems);
   };
 
-  const handleFilter = (id) => {
+  const handleFilter = (id: string | number) => {
     switch (type) {
       case 'CARRER':
         dispatch(searchJobPost({ ...jobPostFilter, careerId: id }));
@@ -61,13 +59,7 @@ const CategoryCard = ({ options, type }) => {
             backgroundColor: 'white',
             border: 1,
             borderColor: '#441da0',
-            maxWidth: {
-              xs: '100%',
-              sm: '60%',
-              md: '30%',
-              lg: '30%',
-              xl: '30%',
-            },
+            maxWidth: { xs: '100%', md: '30%' },
             mb: 1,
           }}
         >
@@ -82,15 +74,7 @@ const CategoryCard = ({ options, type }) => {
         </Paper>
       </Grid>
       {items.map((item) => (
-        <Grid
-          key={item.id}
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 4,
-            lg: 4,
-            xl: 3
-          }}>
+        <Grid key={item.id} size={{ xs: 12, sm: 6, md: 4, lg: 4, xl: 3 }}>
           <Typography
             sx={{
               cursor: 'pointer',

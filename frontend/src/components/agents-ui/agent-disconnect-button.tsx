@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';;
 import Button from '@mui/material/Button';
 import { cn } from '@/lib/utils';

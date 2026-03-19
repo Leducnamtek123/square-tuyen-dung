@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from 'react';
 
 import PropTypes from 'prop-types';
@@ -23,15 +22,18 @@ import { visuallyHidden } from '@mui/utils';
 
 import { Skeleton, Stack } from "@mui/material";
 
-interface Props {
-  [key: string]: any;
+interface EnhancedTableHeadProps {
+  headCells: any[];
+  order: 'asc' | 'desc';
+  orderBy: string;
+  onRequestSort?: (event: React.MouseEvent<unknown>, property: string) => void;
 }
 
 
 
-function EnhancedTableHead({ headCells = [], order, orderBy, onRequestSort }: Props) {
+function EnhancedTableHead({ headCells = [], order, orderBy, onRequestSort }: EnhancedTableHeadProps) {
 
-  const createSortHandler = (property) => (event) => {
+  const createSortHandler = (property: string) => (event: React.MouseEvent<unknown>) => {
 
     if (!onRequestSort) return;
 
@@ -45,7 +47,7 @@ function EnhancedTableHead({ headCells = [], order, orderBy, onRequestSort }: Pr
 
       <TableRow>
 
-        {headCells.map((headCell) => (
+        {headCells.map((headCell: any) => (
 
           <TableCell
 
@@ -117,35 +119,37 @@ EnhancedTableHead.propTypes = {
 
 };
 
+interface DataTableCustomProps {
+  headCells?: any[];
+  rows?: any[];
+  order?: 'asc' | 'desc';
+  orderBy?: string;
+  page?: number;
+  rowsPerPage?: number;
+  count?: number;
+  handleRequestSort?: (event: React.MouseEvent<unknown>, property: string) => void;
+  handleChangePage?: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+  handleChangeRowsPerPage?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleDelete?: (id: any) => void;
+  handleUpdate?: (id: any) => void;
+  children?: React.ReactNode;
+}
+
 const DataTableCustom = ({
-
   headCells = [],
-
-  rows,
-
+  rows = [],
   order,
-
   orderBy,
-
-  page,
-
-  rowsPerPage,
-
-  count,
-
+  page = 0,
+  rowsPerPage = 10,
+  count = 0,
   handleRequestSort,
-
   handleChangePage,
-
   handleChangeRowsPerPage,
-
   handleDelete,
-
   handleUpdate,
-
   children,
-
-}) => {
+}: DataTableCustomProps) => {
 
   const resolvedOrder = order ?? 'asc';
 
@@ -199,7 +203,7 @@ const DataTableCustom = ({
 
         page={page}
 
-        onPageChange={handleChangePage}
+        onPageChange={handleChangePage || (() => { })}
 
         onRowsPerPageChange={handleChangeRowsPerPage}
 
@@ -218,9 +222,7 @@ const Loading = () => {
     <Stack>
 
       {Array(12)
-
-        .fill()
-
+        .fill(null)
         .map((_, index) => (
 
           <Skeleton key={index} height={50} />

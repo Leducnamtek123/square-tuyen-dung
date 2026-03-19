@@ -1,21 +1,14 @@
-// @ts-nocheck
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Divider, Switch, List, ListItem, ListItemText, Button, CircularProgress } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 
 import { useSystemSettings, useUpdateSystemSettings } from './hooks/useSystemSettings';
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
 const SettingsPage = () => {
     const { t } = useTranslation('admin');
-    const { data: settings, isLoading } = useSystemSettings();
-    const updateMutation = useUpdateSystemSettings();
-    const [localSettings, setLocalSettings] = useState(settings || {});
+    const { data: settings, isLoading } = useSystemSettings() as any;
+    const updateMutation = useUpdateSystemSettings() as any;
+    const [localSettings, setLocalSettings] = useState<any>(settings || {});
 
     useEffect(() => {
         if (settings) {
@@ -23,8 +16,8 @@ const SettingsPage = () => {
         }
     }, [settings]);
 
-    const handleToggle = (key) => (event) => {
-        setLocalSettings(prev => ({ ...prev, [key]: event.target.checked }));
+    const handleToggle = (key: string) => (event: React.ChangeEvent<HTMLInputElement>) => {
+        setLocalSettings((prev: any) => ({ ...prev, [key]: event.target.checked }));
     };
 
     const handleSave = () => {

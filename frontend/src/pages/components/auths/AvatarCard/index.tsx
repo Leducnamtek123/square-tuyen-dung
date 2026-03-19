@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -21,7 +20,7 @@ import MuiImageCustom from '../../../../components/MuiImageCustom';
 
 import { deleteAvatar, updateAvatar } from '../../../../redux/userSlice';
 
-interface Props {
+interface AvatarCardProps {
   [key: string]: any;
 }
 
@@ -33,13 +32,13 @@ const AvatarCard = () => {
 
   const dispatch = useDispatch();
 
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state: any) => state.user);
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const fileInputRef = React.useRef(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleUpload = async (file) => {
+  const handleUpload = async (file: File) => {
 
     const formData = new FormData();
 
@@ -47,7 +46,7 @@ const AvatarCard = () => {
 
     setIsFullScreenLoading(true);
 
-    dispatch(updateAvatar(formData))
+    (dispatch as any)(updateAvatar(formData))
 
       .unwrap()
 
@@ -73,7 +72,7 @@ const AvatarCard = () => {
 
       setIsFullScreenLoading(true);
 
-      dispatch(deleteAvatar())
+      (dispatch as any)(deleteAvatar())
 
         .unwrap()
 
@@ -113,7 +112,7 @@ const AvatarCard = () => {
 
   };
 
-  const handleFileChange = (event) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 
     const file = event.target.files?.[0];
 

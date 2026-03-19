@@ -1,7 +1,6 @@
-// @ts-nocheck
 import React from 'react';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import Radio from '@mui/material/Radio';
 
@@ -15,23 +14,19 @@ import FormControl from '@mui/material/FormControl';
 import ValidationError from '../ValidationError';
 
 interface Props {
-  [key: string]: any;
+  name: string;
+  control: Control<any>;
+  title?: string;
+  showRequired?: boolean;
+  options?: any[];
 }
 
-
-
 const RadioCustom = ({
-
   name,
-
   control,
-
   title = '',
-
   showRequired = false,
-
   options = [],
-
 }: Props) => {
 
   return (

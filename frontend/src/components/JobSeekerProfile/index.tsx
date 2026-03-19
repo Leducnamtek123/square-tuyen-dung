@@ -1,83 +1,69 @@
-// @ts-nocheck
 import React from 'react';
-
 import { useNavigate } from 'react-router-dom';
-
 import { Card, Chip, IconButton, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
-
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import { faFilePdf } from '@fortawesome/free-regular-svg-icons';
-
 import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
-
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
-
 import RoomIcon from '@mui/icons-material/Room';
-
 import FavoriteIcon from '@mui/icons-material/Favorite';
-
 import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined';
-
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
-
 import dayjs from 'dayjs';
-
 import { salaryString } from '../../utils/customData';
-
 import { useSelector } from 'react-redux';
-
 import { CV_TYPES, ROUTES } from '../../configs/constants';
-
 import { formatRoute } from '../../utils/funcUtils';
-
 import defaultTheme from '../../themeConfigs/defaultTheme';
 
-interface Props {
-  [key: string]: any;
+interface JobSeekerProfileProps {
+  id: string | number;
+  slug: string;
+  title: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  experience: any;
+  updateAt: string | Date;
+  isSaved?: boolean;
+  viewEmployerNumber?: number;
+  city: any;
+  user?: {
+    fullName?: string;
+    [key: string]: any;
+  };
+  jobSeekerProfile?: {
+    old?: number | string;
+    [key: string]: any;
+  };
+  type?: string;
+  lastViewedDate?: string | Date;
+  handleSave: (slug: string) => void;
 }
 
 
 
 const JobSeekerProfile = ({
-
   id,
-
   slug,
-
   title,
-
   salaryMin,
-
   salaryMax,
-
   experience,
-
   updateAt,
-
   isSaved,
-
   viewEmployerNumber,
-
   city,
-
   user,
-
   jobSeekerProfile,
-
   type,
-
   lastViewedDate,
-
   handleSave,
-
-}: Props) => {
+}: JobSeekerProfileProps) => {
 
   const nav = useNavigate();
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
   return (
 
@@ -175,11 +161,11 @@ const JobSeekerProfile = ({
 
                     sx={{
 
-                      color: defaultTheme.palette.text.placeholder,
+                      color: (defaultTheme.palette.text as any).placeholder,
 
                       fontStyle: 'italic',
 
-                      ...defaultTheme.palette.text.italic
+                      ...(defaultTheme.palette.text as any).italic
 
                     }}
 
@@ -211,7 +197,7 @@ const JobSeekerProfile = ({
 
                   {jobSeekerProfile?.old || (
 
-                    <span style={defaultTheme.palette.text.italic}>
+                    <span style={(defaultTheme.palette.text as any).italic}>
 
                       Chưa cập nhật
 
@@ -249,7 +235,7 @@ const JobSeekerProfile = ({
 
                   borderRadius: '6px',
 
-                  backgroundColor: defaultTheme.palette.success.background,
+                  backgroundColor: (defaultTheme.palette.success as any).background,
 
                   borderColor: defaultTheme.palette.success.light,
 
@@ -311,7 +297,7 @@ const JobSeekerProfile = ({
 
                 component="span"
 
-                sx={defaultTheme.palette.text.italic}
+                sx={(defaultTheme.palette.text as any).italic}
 
               >
 
@@ -335,7 +321,7 @@ const JobSeekerProfile = ({
 
                 salaryString(salaryMin, salaryMax) || (
 
-                  <Typography component="span" sx={defaultTheme.palette.text.italic}>
+                  <Typography component="span" sx={(defaultTheme.palette.text as any).italic}>
 
                     Chưa cập nhật
 
@@ -347,13 +333,13 @@ const JobSeekerProfile = ({
 
               sx={{
 
-                backgroundColor: defaultTheme.palette.secondary.background,
+                backgroundColor: (defaultTheme.palette.secondary as any).background,
 
                 color: defaultTheme.palette.secondary.dark,
 
                 '&:hover': {
 
-                  backgroundColor: defaultTheme.palette.secondary.backgroundHover,
+                  backgroundColor: (defaultTheme.palette.secondary as any).backgroundHover,
 
                 }
 
@@ -371,7 +357,7 @@ const JobSeekerProfile = ({
 
                 allConfig.experienceDict[experience] || (
 
-                  <Typography component="span" sx={defaultTheme.palette.text.italic}>
+                  <Typography component="span" sx={(defaultTheme.palette.text as any).italic}>
 
                     Chưa cập nhật
 
@@ -383,7 +369,7 @@ const JobSeekerProfile = ({
 
               sx={{
 
-                backgroundColor: defaultTheme.palette.primary.background,
+                backgroundColor: (defaultTheme.palette.primary as any).background,
 
                 color: defaultTheme.palette.primary.main,
 
@@ -401,7 +387,7 @@ const JobSeekerProfile = ({
 
                 allConfig.cityDict[city] || (
 
-                  <Typography component="span" sx={defaultTheme.palette.text.italic}>
+                  <Typography component="span" sx={(defaultTheme.palette.text as any).italic}>
 
                     Chưa cập nhật
 
@@ -413,7 +399,7 @@ const JobSeekerProfile = ({
 
               sx={{
 
-                backgroundColor: defaultTheme.palette.info.background,
+                backgroundColor: (defaultTheme.palette.info as any).background,
 
                 color: defaultTheme.palette.info.main,
 
@@ -463,7 +449,7 @@ const JobSeekerProfile = ({
 
                   '&:hover': {
 
-                    backgroundColor: defaultTheme.palette.error.background,
+                    backgroundColor: (defaultTheme.palette.error as any).background,
 
                   }
 
@@ -501,7 +487,7 @@ const JobSeekerProfile = ({
 
                   '&:hover': {
 
-                    backgroundColor: defaultTheme.palette.primary.background,
+                    backgroundColor: (defaultTheme.palette.primary as any).background,
 
                   }
 

@@ -1,40 +1,35 @@
-// @ts-nocheck
 import React from 'react';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import { Box, InputAdornment, OutlinedInput, Typography } from "@mui/material";
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ValidationError from '../ValidationError';
 
 interface Props {
-  [key: string]: any;
+  name: string;
+  control: Control<any>;
+  title?: string | null;
+  showRequired?: boolean;
+  placeholder?: string;
+  sx?: any;
 }
 
-
-
 const PasswordTextFieldCustom = ({
-
   name,
-
   control,
-
   title = null,
-
   showRequired = false,
-
   placeholder = '',
-
+  sx = {},
 }: Props) => {
 
   const [showPassword, setShowPassword] = React.useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-  const handleMouseDownPassword = (event) => {
-
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
-
   };
 
   return (
@@ -62,7 +57,7 @@ const PasswordTextFieldCustom = ({
           <>
 
             <OutlinedInput
-
+              sx={sx}
               fullWidth
 
               size="small"

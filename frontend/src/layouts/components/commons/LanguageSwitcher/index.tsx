@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -7,37 +6,34 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { localizeRoutePath } from '../../../../configs/routeLocalization';
 import { buildPortalPath, detectPortalFromPath } from '../../../../configs/portalRouting';
 
-interface Props {
-  [key: string]: any;
+interface LanguageSwitcherProps {
+  color?: string;
 }
 
-
-
-// You can use external flag icons or just text
 const languages = [
   {
     code: 'en',
     label: 'English',
     shortLabel: 'EN',
-    flag: 'https://cdn-icons-png.flaticon.com/512/197/197374.png' // UK Flag
+    flag: 'https://cdn-icons-png.flaticon.com/512/197/197374.png'
   },
   {
     code: 'vi',
     label: 'Tiếng Việt',
     shortLabel: 'VI',
-    flag: 'https://cdn-icons-png.flaticon.com/512/197/197473.png' // Vietnam Flag
+    flag: 'https://cdn-icons-png.flaticon.com/512/197/197473.png'
   }
 ];
 
-const LanguageSwitcher = ({ color = 'white' }) => {
+const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
   const { i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const theme = useTheme();
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event) => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -45,7 +41,7 @@ const LanguageSwitcher = ({ color = 'white' }) => {
     setAnchorEl(null);
   };
 
-  const changeLanguage = (lng) => {
+  const changeLanguage = (lng: string) => {
     window.localStorage?.setItem('i18nextLng', lng);
     const localizedPath = localizeRoutePath(location.pathname, lng);
     const portal = detectPortalFromPath(window.location.pathname || '/');
@@ -62,7 +58,7 @@ const LanguageSwitcher = ({ color = 'white' }) => {
     handleClose();
   };
 
-  const getLangCode = (lang) => {
+  const getLangCode = (lang: string) => {
     if (!lang) return 'vi';
     return lang.split('-')[0].split('_')[0];
   };
@@ -134,7 +130,7 @@ const LanguageSwitcher = ({ color = 'white' }) => {
               py: 1,
               px: 2,
               '&.Mui-selected': {
-                backgroundColor: theme.palette.primary.light + '20',
+                backgroundColor: (theme.palette.primary as any).light + '20',
               }
             }}
           >

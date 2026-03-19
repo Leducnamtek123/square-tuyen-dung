@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
@@ -8,7 +7,7 @@ import { HOST_NAME, ROUTES } from "../../../../configs/constants";
 import { buildPortalPath, getPreferredLanguage } from "../../../../configs/portalRouting";
 import { setActiveWorkspace } from "../../../../redux/userSlice";
 
-interface Props {
+interface WorkspaceSwitchMenuProps {
   [key: string]: any;
 }
 
@@ -16,15 +15,15 @@ interface Props {
 
 const WorkspaceSwitchMenu = () => {
   const dispatch = useDispatch();
-  const { currentUser, activeWorkspace } = useSelector((state) => state.user);
-  const workspaces = useMemo(() => currentUser?.workspaces || [], [currentUser?.workspaces]);
+  const { currentUser, activeWorkspace } = useSelector((state: any) => state.user);
+  const workspaces = React.useMemo(() => (currentUser?.workspaces as any[]) || [], [currentUser?.workspaces]);
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
   const currentWorkspace = React.useMemo(() => {
     if (!activeWorkspace) return null;
-    return workspaces.find((w) => {
+    return workspaces.find((w: any) => {
       if (w.type !== activeWorkspace.type) return false;
       if (w.type === "company") return Number(w.companyId) === Number(activeWorkspace.companyId);
       return true;
@@ -45,7 +44,7 @@ const WorkspaceSwitchMenu = () => {
     window.location.href = targetUrl;
   };
 
-  const handleSelectWorkspace = (workspace) => {
+  const handleSelectWorkspace = (workspace: any) => {
     dispatch(setActiveWorkspace(workspace));
     setAnchorEl(null);
     if (workspace.type === "company") {

@@ -18,7 +18,7 @@ import AvatarCard from "../AvatarCard";
 import { useAppDispatch } from "../../../../redux/hooks";
 
 interface AccountCardProps {
-  title: string;
+  title: React.ReactNode;
   sx?: SxProps<Theme>;
 }
 
@@ -90,7 +90,7 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
 
           borderRadius: 3,
 
-          boxShadow: (theme) => theme.customShadows.card,
+          boxShadow: (theme: any) => theme.customShadows?.card,
 
           p: 3,
 
@@ -209,15 +209,15 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
 
                       fontSize: "0.9rem",
 
-                      background: (theme) => theme.palette.primary.gradient,
+                      background: (theme: any) => (theme.palette.primary as any).gradient,
 
                       "&:hover": {
 
-                        background: (theme) => theme.palette.primary.gradient,
+                        background: (theme: any) => (theme.palette.primary as any).gradient,
 
                         opacity: 0.9,
 
-                        boxShadow: (theme) => theme.customShadows.medium,
+                        boxShadow: (theme: any) => theme.customShadows?.medium,
 
                       },
 

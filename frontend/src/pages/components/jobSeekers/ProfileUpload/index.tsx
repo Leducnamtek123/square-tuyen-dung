@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -35,13 +34,23 @@ import NoDataCard from "../../../../components/NoDataCard";
 
 import { reloadResume } from "../../../../redux/profileSlice";
 
-interface Props {
-  [key: string]: any;
+interface Resume {
+  id: string | number;
+  imageUrl?: string;
+  fileUrl: string;
+  title: string;
+  updateAt: string;
+  slug: string;
+  isActive: boolean;
+}
+
+interface ProfileUploadProps {
+  title: string;
 }
 
 
 
-const ProfileUpload = ({ title }) => {
+const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
   const { t } = useTranslation(['jobSeeker', 'common']);
 
@@ -51,13 +60,13 @@ const ProfileUpload = ({ title }) => {
 
     resume: { isReloadResume },
 
-  } = useSelector((state) => state.profile);
+  } = useSelector((state: any) => state.profile);
 
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state: any) => state.user);
 
   const [isLoadingResumes, setIsLoadingResumes] = React.useState(false);
 
-  const [resumes, setResumes] = React.useState([]);
+  const [resumes, setResumes] = React.useState<Resume[]>([]);
 
   const [openPopup, setOpenPopup] = React.useState(false);
 
@@ -67,7 +76,8 @@ const ProfileUpload = ({ title }) => {
 
   React.useEffect(() => {
 
-    const getOnlineProfile = async (jobSeekerProfileId, params) => {
+    const getOnlineProfile = async (jobSeekerProfileId: string | number | undefined, params: any) => {
+      if (!jobSeekerProfileId) return;
 
       setIsLoadingResumes(true);
 
@@ -79,11 +89,11 @@ const ProfileUpload = ({ title }) => {
 
           params
 
-        );
+        ) as any;
 
         setResumes(resData.data);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -103,9 +113,9 @@ const ProfileUpload = ({ title }) => {
 
   }, [currentUser, isSuccess, isReloadResume]);
 
-  const handleAdd = (data) => {
+  const handleAdd = (data: any) => {
 
-    const addResumeUpload = async (formData) => {
+    const addResumeUpload = async (formData: FormData) => {
 
       setIsFullScreenLoading(true);
 
@@ -119,7 +129,7 @@ const ProfileUpload = ({ title }) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.resumeUploadSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -131,9 +141,9 @@ const ProfileUpload = ({ title }) => {
 
     };
 
-    var formData = new FormData();
+    const formData = new FormData();
 
-    for (var key in data) {
+    for (const key in data) {
 
       formData.append(key, data[key]);
 
@@ -143,19 +153,19 @@ const ProfileUpload = ({ title }) => {
 
   };
 
-  const handleDelete = (slug) => {
+  const handleDelete = (slug: string) => {
 
-    const del = async (slug) => {
+    const del = async (resumeSlug: string) => {
 
       try {
 
-        await resumeService.deleteResume(slug);
+        await resumeService.deleteResume(resumeSlug);
 
         setIsSuccess(!isSuccess);
 
         toastMessages.success(t('jobSeeker:profile.messages.resumeDeleteSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -181,9 +191,9 @@ const ProfileUpload = ({ title }) => {
 
   };
 
-  const handleActive = (slug) => {
+  const handleActive = (slug: string) => {
 
-    const activeResume = async (resumeSlug) => {
+    const activeResume = async (resumeSlug: string) => {
 
       setIsFullScreenLoading(true);
 
@@ -195,7 +205,7 @@ const ProfileUpload = ({ title }) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.profileStatusUpdateSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -239,7 +249,7 @@ const ProfileUpload = ({ title }) => {
 
                 <Grid container spacing={2}>
 
-                  {Array.from(Array(3).keys()).map((value, index) => (
+                  {Array.from(Array(3).keys()).map((_, index) => (
 
                     <Grid
 
@@ -302,25 +312,15 @@ const ProfileUpload = ({ title }) => {
                       }}>
 
                       <ProfileUploadCard
-
-                        resumeImage={value?.imageUrl}
-
-                        fileUrl={value?.fileUrl}
-
-                        title={value?.title}
-
-                        updateAt={value?.updateAt}
-
+                        resumeImage={value.imageUrl || ''}
+                        fileUrl={value.fileUrl}
+                        title={value.title}
+                        updateAt={value.updateAt}
                         slug={value.slug}
-
                         id={value.id}
-
                         isActive={value.isActive}
-
                         handleDelete={handleDelete}
-
                         handleActive={handleActive}
-
                       />
 
                     </Grid>
@@ -349,11 +349,11 @@ const ProfileUpload = ({ title }) => {
 
                   py: 1.5,
 
-                  background: (theme) => theme.palette.primary.gradient,
+                  background: (theme: any) => theme.palette.primary.gradient,
 
                   "&:hover": {
 
-                    background: (theme) => theme.palette.primary.gradient,
+                    background: (theme: any) => theme.palette.primary.gradient,
 
                     opacity: 0.9,
 

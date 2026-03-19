@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Typography, Chip, Stack, Divider, LinearProgress } from "@mui/material";
@@ -7,15 +6,9 @@ import interviewService from '../../../services/interviewService';
 import { transformInterviewSession } from '../../../utils/transformers';
 import DataTable from '../../../components/DataTable';
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
 const ACTIVE_STATUSES = ['in_progress', 'calibration', 'processing', 'connecting', 'active'];
 
-const getStatusColor = (status) => {
+const getStatusColor = (status: string): any => {
   switch (status) {
     case 'completed':
       return 'success';
@@ -36,7 +29,7 @@ const getStatusColor = (status) => {
 
 const InterviewLivePage = () => {
   const { t } = useTranslation('admin');
-  const [sessions, setSessions] = useState([]);
+  const [sessions, setSessions] = useState<any[]>([]);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -48,7 +41,7 @@ const InterviewLivePage = () => {
       const res = await interviewService.getSessions({
         page: page + 1,
         pageSize: rowsPerPage,
-      });
+      }) as any;
       const data = res;
       const rawSessions = data.results || data || [];
       const mapped = rawSessions.map(transformInterviewSession);
@@ -72,11 +65,11 @@ const InterviewLivePage = () => {
     return () => clearInterval(interval);
   }, [sessions, fetchSessions]);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: any, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
@@ -93,7 +86,7 @@ const InterviewLivePage = () => {
       {
         header: t('pages.interviewLive.table.company'),
         accessorKey: 'company_name',
-        cell: ({ row }) => (
+        cell: ({ row }: any) => (
           <Typography variant="body2">
             {row.original.companyName ||
               row.original.company_name ||
@@ -106,7 +99,7 @@ const InterviewLivePage = () => {
       {
         header: t('pages.interviewLive.table.candidate'),
         accessorKey: 'candidateName',
-        cell: ({ row }) => (
+        cell: ({ row }: any) => (
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
               {row.original.candidateName || t('common.na')}
@@ -120,12 +113,12 @@ const InterviewLivePage = () => {
       {
         header: t('pages.interviewLive.table.position'),
         accessorKey: 'jobName',
-        cell: ({ getValue }) => <Typography variant="body2">{getValue() || t('common.na')}</Typography>,
+        cell: ({ getValue }: any) => <Typography variant="body2">{getValue() || t('common.na')}</Typography>,
       },
       {
         header: t('pages.interviewLive.table.room'),
         accessorKey: 'room_name',
-        cell: ({ row }) => (
+        cell: ({ row }: any) => (
           <Typography variant="body2">
             {row.original.room_name || row.original.roomName || row.original.room || t('common.na')}
           </Typography>
@@ -134,7 +127,7 @@ const InterviewLivePage = () => {
       {
         header: t('pages.interviewLive.table.time'),
         accessorKey: 'scheduledAt',
-        cell: ({ getValue }) => (
+        cell: ({ getValue }: any) => (
           <Typography variant="body2">
             {getValue() ? new Date(getValue()).toLocaleString() : t('common.na')}
           </Typography>
@@ -143,7 +136,7 @@ const InterviewLivePage = () => {
       {
         header: t('pages.interviewLive.table.status'),
         accessorKey: 'status',
-        cell: ({ getValue }) => {
+        cell: ({ getValue }: any) => {
           const rawStatus = getValue();
           const status = String(rawStatus ?? '').toLowerCase();
           let label = rawStatus;
@@ -212,7 +205,7 @@ const InterviewLivePage = () => {
         sx={{
           backgroundColor: 'background.paper',
           borderRadius: 2,
-          boxShadow: (theme) => theme.customShadows?.card || 1,
+          boxShadow: (theme: any) => theme.customShadows?.card || 1,
           overflow: 'hidden',
           width: '100%',
           '& .MuiTableContainer-root': {

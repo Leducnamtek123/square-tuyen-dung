@@ -1,27 +1,13 @@
-// @ts-nocheck
-/**
- * @license
- *
- * Originally developed for Unicorn Studio
- * https://unicorn.studio
- *
- * Licensed under the Polyform Non-Resale License 1.0.0
- * https://polyformproject.org/licenses/non-resale/1.0.0/
- *
- * © 2026 UNCRN LLC
- */
-
-'use client';;
+'use client';
 import React, { useMemo } from 'react';
 import { cva } from 'class-variance-authority';
-
 import { ReactShaderToy } from '@/components/agents-ui/react-shader-toy';
 import { useAgentAudioVisualizerAura } from '@/hooks/agents-ui/use-agent-audio-visualizer-aura';
 import { cn } from '@/lib/utils';
 
 const DEFAULT_COLOR = '#1FD5F9';
 
-function hexToRgb(hexColor) {
+function hexToRgb(hexColor: string): number[] {
   try {
     const rgbColor = hexColor.match(/^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/);
 
@@ -209,6 +195,22 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
   }
 }`;
 
+interface AuraShaderProps {
+  shape?: number;
+  speed?: number;
+  amplitude?: number;
+  frequency?: number;
+  scale?: number;
+  blur?: number;
+  color?: string;
+  colorShift?: number;
+  brightness?: number;
+  themeMode?: 'dark' | 'light';
+  ref?: any;
+  className?: string;
+  [key: string]: any;
+}
+
 function AuraShader({
   shape = 1.0,
   speed = 1.0,
@@ -219,52 +221,36 @@ function AuraShader({
   color = DEFAULT_COLOR,
   colorShift = 1.0,
   brightness = 1.0,
-
-  themeMode = typeof window !== 'undefined' && document.documentElement.classList.contains('dark')
-    ? 'dark'
-    : 'light',
-
+  themeMode,
   ref,
   className,
   ...props
-}) {
+}: AuraShaderProps) {
   const rgbColor = useMemo(() => hexToRgb(color), [color]);
+  const currentThemeMode = themeMode || (typeof window !== 'undefined' && document.documentElement.classList.contains('dark') ? 'dark' : 'light');
 
   return (
     <div ref={ref} className={className} {...props}>
       <ReactShaderToy
         fs={shaderSource}
-        devicePixelRatio={globalThis.devicePixelRatio ?? 1}
+        devicePixelRatio={(globalThis as any).devicePixelRatio ?? 1}
         uniforms={{
-          // Aurora wave speed
           uSpeed: { type: '1f', value: speed },
-          // Edge blur/softness
           uBlur: { type: '1f', value: blur },
-          // Shape scale
           uScale: { type: '1f', value: scale },
-          // Shape type: 1=circle, 2=line
           uShape: { type: '1f', value: shape },
-          // Wave frequency and complexity
           uFrequency: { type: '1f', value: frequency },
-          // Turbulence amplitude
           uAmplitude: { type: '1f', value: amplitude },
-          // Light intensity (bloom)
           uBloom: { type: '1f', value: 0.0 },
-          // Brightness of the aurora (0-1)
           uMix: { type: '1f', value: brightness },
-          // Color variation across layers (0-1)
           uSpacing: { type: '1f', value: 0.5 },
-          // Color palette offset - shifts colors along the gradient (0-1)
           uColorShift: { type: '1f', value: colorShift },
-          // Color variation across layers (0-1)
           uVariance: { type: '1f', value: 0.1 },
-          // Smoothing of the aurora (0-1)
           uSmoothing: { type: '1f', value: 1.0 },
-          // Display mode: 0=dark background, 1=light background
-          uMode: { type: '1f', value: themeMode === 'light' ? 1.0 : 0.0 },
-          // Color
+          uMode: { type: '1f', value: currentThemeMode === 'light' ? 1.0 : 0.0 },
           uColor: { type: '3fv', value: rgbColor ?? [0, 0.7, 1] },
         }}
+        onDoneLoadingTextures={() => {}}
         onError={(error) => {
           console.error('Shader error:', error);
         }}
@@ -293,6 +279,18 @@ export const AgentAudioVisualizerAuraVariants = cva(['aspect-square'], {
   },
 });
 
+interface AgentAudioVisualizerAuraProps {
+  size?: 'icon' | 'sm' | 'md' | 'lg' | 'xl';
+  state?: string;
+  color?: string;
+  colorShift?: number;
+  audioTrack?: any;
+  themeMode?: 'dark' | 'light';
+  className?: string;
+  ref?: any;
+  [key: string]: any;
+}
+
 /**
  * An shader-based audio visualizer that responds to agent state and audio levels.
  * Displays an animated elliptical aura that reacts to the current agent state (connecting, thinking, speaking, etc.)
@@ -319,8 +317,8 @@ export function AgentAudioVisualizerAura({
   className,
   ref,
   ...props
-}) {
-  const { speed, scale, amplitude, frequency, brightness } = useAgentAudioVisualizerAura(state, audioTrack);
+}: AgentAudioVisualizerAuraProps) {
+  const { speed, scale, amplitude, frequency, brightness } = useAgentAudioVisualizerAura(state as any, audioTrack);
 
   return (
     <AuraShader

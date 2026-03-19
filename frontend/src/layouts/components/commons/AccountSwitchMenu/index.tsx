@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from 'react';
 
 import { Stack, Typography, Button, Box } from "@mui/material";
@@ -20,13 +19,13 @@ import {
 import { HOST_NAME, ROUTES } from '../../../../configs/constants';
 import { buildPortalPath, getPreferredLanguage, isEmployerPortalPath } from '../../../../configs/portalRouting';
 
-interface Props {
-  [key: string]: any;
+interface AccountSwitchMenuProps {
+  isShowButton?: boolean;
 }
 
 
 
-const AccountSwitchMenu = ({ isShowButton = false }) => {
+const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => {
 
   const { t } = useTranslation('common');
 

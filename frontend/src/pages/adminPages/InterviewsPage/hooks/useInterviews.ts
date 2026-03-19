@@ -1,9 +1,8 @@
-// @ts-nocheck
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import adminInterviewService from '../../../../services/adminInterviewService';
 import toastMessages from '../../../../utils/toastMessages';
 
-export const useInterviews = (params) => {
+export const useInterviews = (params: any) => {
     return useQuery({
         queryKey: ['admin-interviews', params],
         queryFn: async () => {
@@ -11,24 +10,24 @@ export const useInterviews = (params) => {
             return res;
         },
         placeholderData: (previousData) => previousData,
-        refetchInterval: (query) => {
+        refetchInterval: (query: any) => {
             const interviews = query.state.data?.results || [];
-            const hasActiveInterview = interviews.some((item) => ['in_progress', 'calibration', 'processing'].includes(item.status));
+            const hasActiveInterview = interviews.some((item: any) => ['in_progress', 'calibration', 'processing'].includes(item.status));
             return hasActiveInterview ? 5000 : false;
         },
-    });
+    }) as any;
 };
 
 export const useScheduleInterview = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data) => adminInterviewService.scheduleInterview(data),
+        mutationFn: (data: any) => adminInterviewService.scheduleInterview(data),
         onSuccess: () => {
             toastMessages.success('Interview scheduled successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
         },
-        onError: (error) => {
+        onError: (error: any) => {
             toastMessages.error(error.response?.data?.errors?.detail || 'Failed to schedule interview');
         },
     });
@@ -38,12 +37,12 @@ export const useUpdateInterviewStatus = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: ({ id, status }) => adminInterviewService.updateInterviewStatus(id, status),
+        mutationFn: ({ id, status }: { id: any; status: any }) => adminInterviewService.updateInterviewStatus(id, status),
         onSuccess: () => {
             toastMessages.success('Status updated successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
         },
-        onError: (error) => {
+        onError: (error: any) => {
             toastMessages.error(error.response?.data?.errors?.detail || 'Update failed');
         },
     });
@@ -53,12 +52,12 @@ export const useDeleteInterview = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (id) => adminInterviewService.deleteInterview(id),
+        mutationFn: (id: any) => adminInterviewService.deleteInterview(id),
         onSuccess: () => {
             toastMessages.success('Interview deleted successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
         },
-        onError: (error) => {
+        onError: (error: any) => {
             toastMessages.error(error.response?.data?.errors?.detail || 'Delete failed');
         },
     });

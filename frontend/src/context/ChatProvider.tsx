@@ -12,8 +12,16 @@ interface ChatProviderProps {
   children: React.ReactNode;
 }
 
+interface ChatUser {
+  userId: string;
+  name: string;
+  email: string;
+  avatarUrl?: string;
+  company?: any;
+}
+
 interface ChatContextValue {
-  currentUserChat: Record<string, unknown> | null;
+  currentUserChat: ChatUser | null;
   selectedRoomId: string;
   setSelectedRoomId: (id: string) => void;
 }
@@ -26,7 +34,7 @@ const ChatProvider = ({ children }: ChatProviderProps) => {
   const userId = currentUser?.id;
 
   const [selectedRoomId, setSelectedRoomId] = React.useState('');
-  const [currentUserChat, setCurrentUserChat] = React.useState<Record<string, unknown> | null>(null);
+  const [currentUserChat, setCurrentUserChat] = React.useState<ChatUser | null>(null);
 
   React.useEffect(() => {
     if (!currentUser || !userId) return;
@@ -70,7 +78,7 @@ const ChatProvider = ({ children }: ChatProviderProps) => {
       }
 
       // lay thong tin user hien tai
-      const userChat = await getUserAccount('accounts', userId);
+      const userChat = await getUserAccount('accounts', userId) as unknown as ChatUser;
       setCurrentUserChat(userChat);
       console.log('userChat: ', userChat);
     };

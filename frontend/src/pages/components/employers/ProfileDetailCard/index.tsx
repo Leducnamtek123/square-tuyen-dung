@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { Suspense, lazy } from "react";
 
 import { useTranslation } from 'react-i18next';
@@ -48,25 +47,23 @@ import BackdropLoading from "../../../../components/loading/BackdropLoading";
 import { convertEditorStateToHTMLString } from "../../../../utils/editorUtils";
 
 import { salaryString } from "../../../../utils/customData";
+
 import resumeService from "../../../../services/resumeService";
+
 import errorHandling from "../../../../utils/errorHandling";
+
 import TimeAgo from "../../../../components/TimeAgo";
+
 import FormPopup from "../../../../components/controls/FormPopup";
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const LazyPdf = lazy(() => import("../../../../components/Pdf"));
 
-const ProfileDetailCard = () => {
+const ProfileDetailCard: React.FC = () => {
   const { t } = useTranslation('employer');
-  const { slug } = useParams();
-  const { allConfig } = useSelector((state) => state.config);
+  const { slug } = useParams<{ slug: string }>();
+  const { allConfig } = useSelector((state: any) => state.config);
   
-  const [profileDetail, setProfileDetail] = React.useState(null);
+  const [profileDetail, setProfileDetail] = React.useState<any>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [openPopup, setOpenPopup] = React.useState(false);
 
@@ -74,9 +71,9 @@ const ProfileDetailCard = () => {
     const getProfileDetail = async () => {
       setIsLoading(true);
       try {
-        const resData = await resumeService.getResumeDetail(slug);
+        const resData = await resumeService.getResumeDetail(slug as string) as any;
         setProfileDetail(resData.data);
-      } catch (error) {
+      } catch (error: any) {
         errorHandling(error);
       } finally {
         setIsLoading(false);
@@ -87,7 +84,7 @@ const ProfileDetailCard = () => {
     }
   }, [slug]);
 
-  const item = (t, label, value) => (
+  const item = (t: any, label: string, value: any) => (
     <Box sx={{ mb: 2 }}>
       <Typography
         variant="caption"
@@ -119,7 +116,7 @@ const ProfileDetailCard = () => {
           sx={{
             p: { xs: 2, sm: 4 },
             borderRadius: 3,
-            boxShadow: (theme) => theme.customShadows.medium,
+            boxShadow: (theme: any) => theme.customShadows.medium,
           }}
         >
           <Stack spacing={4}>
@@ -128,9 +125,9 @@ const ProfileDetailCard = () => {
                 variant="h5"
                 sx={{
                   mb: 2,
-                  color: (theme) => theme.palette.primary.main,
+                  color: (theme: any) => theme.palette.primary.main,
                   borderBottom: "2px solid",
-                  borderColor: (theme) => theme.palette.primary.light,
+                  borderColor: (theme: any) => theme.palette.primary.light,
                   pb: 1,
                   fontSize: { xs: "1.25rem", sm: "1.5rem" },
                 }}
@@ -641,11 +638,11 @@ const ProfileDetailCard = () => {
 
                         p: 3,
 
-                        background: (theme) => theme.palette.grey[50],
+                        background: (theme: any) => theme.palette.grey[50],
 
                         border: "1px solid",
 
-                        borderColor: (theme) => theme.palette.grey[200],
+                        borderColor: (theme: any) => theme.palette.grey[200],
 
                         boxShadow: 0,
 
@@ -655,28 +652,17 @@ const ProfileDetailCard = () => {
 
                       <Typography
 
-                        sx={{
-
+                         sx={{
                           color: profileDetail?.description
-
                             ? defaultTheme.palette.text.primary
-
                             : defaultTheme.palette.text.disabled,
-
                           fontStyle: profileDetail?.description
-
                             ? "normal"
-
                             : "italic",
-
                           fontSize: profileDetail?.description
-
                             ? "0.95rem"
-
-                            : defaultTheme.palette.text.disabled.fontSize,
-
+                            : (defaultTheme.palette.text as any).disabled?.fontSize || '0.875rem',
                           lineHeight: 1.6,
-
                         }}
 
                       >
@@ -726,8 +712,7 @@ const ProfileDetailCard = () => {
                       <Grid container spacing={1}>
 
                         {profileDetail.experiencesDetails.map(
-
-                          (value, index) => (
+                          (value: any, index: number) => (
 
                             <>
 
@@ -855,7 +840,7 @@ const ProfileDetailCard = () => {
 
                       <Grid container spacing={1}>
 
-                        {profileDetail.educationDetails.map((value, index) => (
+                        {profileDetail.educationDetails.map((value: any, index: number) => (
 
                           <>
 

@@ -1,39 +1,36 @@
-// @ts-nocheck
 import React from 'react';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import { Autocomplete, TextField, Typography } from "@mui/material";
 import ValidationError from '../ValidationError';
 
 interface Props {
-  [key: string]: any;
+  name: string;
+  control: Control<any>;
+  title?: string | null;
+  showRequired?: boolean;
+  placeholder?: string;
+  disabled?: boolean;
+  options: any[];
+  loading?: boolean;
+  handleSelect?: (event: any, value: any) => void;
+  helperText?: string;
+  sx?: any;
 }
 
-
-
 const TextFieldAutoCompleteCustom = ({
-
   name,
-
   control,
-
   title = null,
-
   showRequired=false,
-
   placeholder = '',
-
   disabled = false,
-
   options,
-
   loading,
-
   handleSelect,
-
   helperText = '',
-
+  sx = {},
 }: Props) => {
 
   const [open, setOpen] = React.useState(false);
@@ -65,7 +62,7 @@ const TextFieldAutoCompleteCustom = ({
           <>
 
             <Autocomplete
-
+              sx={sx}
               freeSolo
 
               id={field.name}

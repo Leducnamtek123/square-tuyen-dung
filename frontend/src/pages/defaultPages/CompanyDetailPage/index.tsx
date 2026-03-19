@@ -1,79 +1,43 @@
-// @ts-nocheck
 import React from "react";
-
 import { useParams } from "react-router-dom";
-
-import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
-
-import { Box, Card, IconButton, Link, Stack, Typography, Button, Skeleton } from "@mui/material";
-
+import { Box, Card, IconButton, Link, Stack, Typography, Button } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-
 import { LoadingButton } from "@mui/lab";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import {
-
   faBriefcase,
-
   faUsers,
-
   faCalendarDays,
-
   faGlobe,
-
   faEnvelope,
-
   faPhoneVolume,
-
   faHashtag,
-
   faLocationDot,
-
 } from "@fortawesome/free-solid-svg-icons";
-
 import { TabTitle } from "../../../utils/generalFunction";
-
 import { ICONS, IMAGES, ROLES_NAME } from "../../../configs/constants";
-
 import errorHandling from "../../../utils/errorHandling";
-
 import toastMessages from "../../../utils/toastMessages";
-
 import Map from "../../../components/Map";
-
 import QRCodeBox from "../../../components/QRCodeBox";
-
 import SocialNetworkSharingPopup from "../../../components/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
-
 import ShareIcon from "@mui/icons-material/Share";
-
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
-
 import MuiImageCustom from "../../../components/MuiImageCustom";
-
 import NoDataCard from "../../../components/NoDataCard";
-
 import ImageGalleryCustom from "../../../components/ImageGalleryCustom";
-
 import companyService from "../../../services/companyService";
-
 import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
-
 import CompanyDetailLoading from "./components/CompanyDetailLoading";
-
-interface Props {
-  [key: string]: any;
-}
+import { useAppSelector } from "../../../hooks/useAppStore";
+import type { AxiosError } from "axios";
 
 
 
-const sanitizeCompanyDescription = (rawHtml) => {
+const sanitizeCompanyDescription = (rawHtml: string | undefined) => {
   if (!rawHtml || typeof rawHtml !== "string") {
     return "";
   }
@@ -108,9 +72,9 @@ const CompanyDetailPage = () => {
   const { t } = useTranslation("public");
   const { slug } = useParams();
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
-  const { isAuthenticated, currentUser } = useSelector((state) => state.user);
+  const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
 
   const [openSharePopup, setOpenSharePopup] = React.useState(false);
 
@@ -118,9 +82,9 @@ const CompanyDetailPage = () => {
 
   const [isLoadingFollow, setIsLoadingFollow] = React.useState(false);
 
-  const [companyDetail, setCompanyDetail] = React.useState(null);
+  const [companyDetail, setCompanyDetail] = React.useState<any>(null);
 
-  const [imageList, setImageList] = React.useState([]);
+  const [imageList, setImageList] = React.useState<any[]>([]);
   const safeDescriptionHtml = React.useMemo(
     () => sanitizeCompanyDescription(companyDetail?.description),
     [companyDetail?.description]
@@ -128,11 +92,11 @@ const CompanyDetailPage = () => {
 
   React.useEffect(() => {
 
-    const getCompanyDetail = async (companySlug) => {
+    const getCompanyDetail = async (companySlug: string | undefined) => {
 
       try {
 
-        const resData = await companyService.getCompanyDetailById(companySlug);
+        const resData = await companyService.getCompanyDetailById(companySlug as string) as any;
 
         const data = resData;
 
@@ -180,7 +144,7 @@ const CompanyDetailPage = () => {
 
       try {
 
-        const resData = await companyService.followCompany(slug);
+        const resData = await companyService.followCompany(slug as string) as any;
 
         const isFollowed = resData.isFollowed;
 
@@ -204,7 +168,7 @@ const CompanyDetailPage = () => {
 
       } catch (error) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<any>);
 
       } finally {
 
@@ -240,7 +204,7 @@ const CompanyDetailPage = () => {
 
               overflow: "visible",
 
-              boxShadow: (theme) => theme.customShadows.medium,
+              boxShadow: (theme: any) => theme.customShadows.medium,
 
             }}
 
@@ -316,7 +280,7 @@ const CompanyDetailPage = () => {
 
                       bgcolor: "white",
 
-                      boxShadow: (theme) => theme.customShadows.small,
+                      boxShadow: (theme: any) => theme.customShadows.small,
 
                       border: "2px solid #fff",
 
@@ -418,12 +382,9 @@ const CompanyDetailPage = () => {
 
                       <FontAwesomeIcon icon={faUsers} />
 
-                      {allConfig?.employeeSizeDict[
-
-                        companyDetail.employeeSize
-
-                      ] || (
-
+                      {(allConfig as any)?.employeeSizeDict[
+                         companyDetail.employeeSize
+                       ] || (
                         <span
                           style={{
                             color: "#e0e0e0",
@@ -433,8 +394,7 @@ const CompanyDetailPage = () => {
                         >
                           {t("companyDetail.notUpdated")}
                         </span>
-
-                      )}
+                       )}
 
                     </Typography>
 
@@ -571,7 +531,7 @@ const CompanyDetailPage = () => {
 
                     p: 3,
 
-                    boxShadow: (theme) => theme.customShadows.small,
+                    boxShadow: (theme: any) => theme.customShadows.small,
 
                   }}
 
@@ -729,7 +689,7 @@ const CompanyDetailPage = () => {
 
                     p: 3,
 
-                    boxShadow: (theme) => theme.customShadows.small,
+                    boxShadow: (theme: any) => theme.customShadows.small,
 
                   }}
 
@@ -1068,15 +1028,10 @@ const CompanyDetailPage = () => {
                       >
 
                         <Map
-
                           title={companyDetail?.companyName}
-
-                          subTitle={companyDetail?.location?.address}
-
-                          latitude={companyDetail?.location?.lat}
-
-                          longitude={companyDetail?.location?.lng}
-
+                          subTitle={companyDetail?.address}
+                          latitude={companyDetail?.lat}
+                          longitude={companyDetail?.lng}
                         />
 
                       </Box>
@@ -1147,61 +1102,33 @@ const CompanyDetailPage = () => {
 
       {/* Start: SocialNetworkSharingPopup */}
 
-      <SocialNetworkSharingPopup
-
-        open={openSharePopup}
-
-        setOpenPopup={setOpenSharePopup}
-
-        facebook={{
-
-          url: window.location.href,
-
-        }}
-
-        facebookMessenger={{
-
-          url: window.location.href,
-
-        }}
-
-        linkedin={{
-
-          url: window.location.href,
-
-          source: "",
-
-          title: "",
-
-          summary: "",
-
-        }}
-
-        twitter={{
-
-          url: window.location.href,
-
-          title: "",
-
-          via: "",
-
-          hashtags: [],
-
-          related: [],
-
-        }}
-
-        email={{
-
-          url: window.location.href,
-
-          subject: "",
-
-          body: "",
-
-        }}
-
-      />
+        <SocialNetworkSharingPopup
+          {...({
+            open: openSharePopup,
+            setOpenPopup: setOpenSharePopup,
+            facebook: {
+              url: window.location.href,
+            },
+            facebookMessenger: {
+              url: window.location.href,
+            },
+            linkedin: {
+              url: window.location.href,
+              source: window.location.href,
+              title: companyDetail?.companyName,
+              summary: companyDetail?.description,
+            },
+            twitter: {
+              url: window.location.href,
+              title: companyDetail?.companyName,
+            },
+            email: {
+              url: window.location.href,
+              subject: companyDetail?.companyName,
+              body: companyDetail?.description,
+            },
+          } as any)}
+        />
 
       {/* End: SocialNetworkSharingPopup */}
 

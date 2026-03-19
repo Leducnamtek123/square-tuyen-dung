@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Box, Paper, TablePagination } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -9,19 +8,13 @@ import { useUsers, useToggleUserStatus, useUpdateUserRole } from './hooks/useUse
 import UserTable from './components/UserTable';
 import UserFilters from './components/UserFilters';
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
 const UsersPage = () => {
     const { t } = useTranslation('admin');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(-1);
     const [search, setSearch] = useState('');
     const [roleFilter, setRoleFilter] = useState('');
-    const currentUserId = useSelector((state) => state.user?.currentUser?.id);
+    const currentUserId = useSelector((state: any) => state.user?.currentUser?.id);
     const resolvedPageSize = rowsPerPage === -1 ? PAGINATION.ADMIN_MAX_PAGE_SIZE : rowsPerPage;
 
     const { data: usersData, isLoading } = useUsers({
@@ -29,37 +22,37 @@ const UsersPage = () => {
         pageSize: resolvedPageSize,
         search: search || undefined,
         roleName: roleFilter || undefined,
-    });
+    }) as any;
 
-    const toggleStatusMutation = useToggleUserStatus();
-    const updateRoleMutation = useUpdateUserRole();
-    const users = usersData?.results || [];
-    const totalUsers = usersData?.count || 0;
+    const toggleStatusMutation = useToggleUserStatus() as any;
+    const updateRoleMutation = useUpdateUserRole() as any;
+    const users = (usersData?.results || []) as any[];
+    const totalUsers = (usersData?.count || 0) as number;
 
-    const handleChangePage = (event, newPage) => {
+    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         setPage(newPage);
     };
 
-    const handleChangeRowsPerPage = (event) => {
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
 
-    const handleSearchChange = (value) => {
+    const handleSearchChange = (value: string) => {
         setSearch(value);
         setPage(0);
     };
 
-    const handleRoleFilterChange = (value) => {
+    const handleRoleFilterChange = (value: string) => {
         setRoleFilter(value);
         setPage(0);
     };
 
-    const handleToggleStatus = (user) => {
+    const handleToggleStatus = (user: any) => {
         toggleStatusMutation.mutate(user);
     };
 
-    const handleRoleChange = (user, roleName) => {
+    const handleRoleChange = (user: any, roleName: string) => {
         if (!user || user.roleName === roleName || user.id === currentUserId) {
             return;
         }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState, useMemo } from "react";
 import { 
   AgentAudioVisualizerAura,
@@ -17,13 +16,17 @@ import {
 import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
-/**
- * InterviewAgentView Component
- * A premium, voice-first interview interface using LiveKit Agents UI.
- */
-const InterviewAgentView = ({ onDisconnect, sessionInfo }) => {
+interface InterviewAgentViewProps {
+  onDisconnect: () => void;
+  sessionInfo: {
+    jobName?: string;
+    candidateName?: string;
+  };
+}
+
+const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewProps) => {
   const room = useRoomContext();
-  const { state, agentParticipant } = useAgent();
+  const { state, agentParticipant } = useAgent() as any;
   const { chatMessages } = useChat({ room });
   const [isChatOpen, setIsChatOpen] = useState(false);
   

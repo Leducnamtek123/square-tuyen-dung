@@ -1,8 +1,3 @@
-// @ts-nocheck
-interface Props {
-  [key: string]: any;
-}
-
 export { default as ChatLayout } from './ChatLayout'
 
 export { default as DefaultLayout } from './DefaultLayout'

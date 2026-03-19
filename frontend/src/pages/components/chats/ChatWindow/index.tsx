@@ -1,810 +1,317 @@
-// @ts-nocheck
 import React from 'react';
-
 import { useSelector } from 'react-redux';
-
-import { Box, Stack, TextField, Button, CircularProgress, Typography } from "@mui/material";
-
-import SendIcon from '@mui/icons-material/Send';
-
-import InfiniteScroll from 'react-infinite-scroll-component';
-
-import {
-
-  collection,
-
-  onSnapshot,
-
-  query,
-
-  where,
-
-  orderBy,
-
-  startAfter,
-
-  limit,
-
-  getDocs,
-
-  doc,
-
-  updateDoc,
-
-} from 'firebase/firestore';
-
-import db from '../../../../configs/firebase-config';
-
-import { ChatContext } from '../../../../context/ChatProvider';
-
-import Message from '../Message';
-
-import { ROLES_NAME } from '../../../../configs/constants';
-
-import {
-
-  addDocument,
-
-  getChatRoomById,
-
-  updateChatRoomByPartnerId,
-
-} from '../../../../services/firebaseService';
-
-import ChatInfo from '../../../../components/chats/ChatInfo';
-
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-
 import { useTranslation } from 'react-i18next';
+import {
+  Box,
+  CircularProgress,
+  IconButton,
+  InputBase,
+  Paper,
+  Stack,
+  Typography,
+  Avatar,
+  Divider,
+} from "@mui/material";
+import SendIcon from '@mui/icons-material/Send';
+import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
+import AttachFileIcon from '@mui/icons-material/AttachFile';
+import {
+  collection,
+  onSnapshot,
+  query,
+  where,
+  orderBy,
+  limit,
+  addDoc,
+  serverTimestamp,
+  doc,
+  updateDoc,
+  getDocs,
+  startAfter,
+  QueryDocumentSnapshot,
+  DocumentData,
+} from 'firebase/firestore';
+import db from '../../../../configs/firebase-config';
+import { ChatContext } from '../../../../context/ChatProvider';
+import Message from '../Message';
+import { RootState } from '../../../../redux/store';
 
-interface Props {
-  [key: string]: any;
+// Types
+interface ChatRoom {
+  id: string;
+  members: string[];
+  updatedAt: any;
+  recipientId: string;
+  createdBy: string;
+  unreadCount?: number;
 }
 
+interface MessageData {
+  id: string;
+  text: string;
+  senderId: string;
+  createdAt: any;
+}
 
-
-const LIMIT = 20;
-
+const LIMIT_MESSAGE = 20;
 const messageCollectionRef = collection(db, 'messages');
 
 const ChatWindow = () => {
-
   const { t } = useTranslation('chat');
+  const { currentUser } = useSelector((state: RootState) => state.user);
+  const context = React.useContext(ChatContext);
 
-  const { currentUser } = useSelector((state) => state.user);
-
-  const { currentUserChat, selectedRoomId } = React.useContext(ChatContext);
-
-  const inputRef = React.useRef(null);
-
-  const messageListRef = React.useRef(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
+  const messageListRef = React.useRef<HTMLDivElement>(null);
 
   const [inputValue, setInputValue] = React.useState('');
-
-  const [selectedRoom, setSelectedRoom] = React.useState({});
-
-  const [partnerId, setPartnerId] = React.useState(null);
-
+  const [selectedRoom, setSelectedRoom] = React.useState<ChatRoom | null>(null);
+  const [partnerId, setPartnerId] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
-
   const [hasMore, setHasMore] = React.useState(true);
-
-  const [lastDocument, setLastDocument] = React.useState(null);
-
-  const [messages, setMessages] = React.useState([]);
-
+  const [lastDocument, setLastDocument] = React.useState<QueryDocumentSnapshot<DocumentData> | null>(null);
+  const [messages, setMessages] = React.useState<MessageData[]>([]);
   const [page, setPage] = React.useState(1);
-
   const [count, setCount] = React.useState(0);
 
-  // cap nhat unreadCount
+  const { currentUserChat, selectedRoomId } = context || {};
 
+  // Update unreadCount
   React.useEffect(() => {
-
     if (selectedRoomId && currentUserChat) {
-
-      const chatRoomDocRef = doc(db, 'chatRooms', `${selectedRoomId}`);
-
-      const unsub = onSnapshot(chatRoomDocRef, (doc) => {
-
-        const { recipientId, unreadCount } = doc.data();
-
-        if (recipientId === `${currentUserChat.userId}` && unreadCount > 0) {
-
-          updateDoc(chatRoomDocRef, {
-
-            unreadCount: 0,
-
-          })
-
-            .then(() => {
-
-              console.log('update chatRoom success -> unreadCount=0');
-
-            })
-
-            .catch((error) => {
-
-              console.log(
-
-                'update chatRoom failed: -> unreadCount: Notchange',
-
-                error
-
-              );
-
-            });
-
-        }
-
+      const chatRoomRef = doc(db, 'chatRooms', selectedRoomId);
+      updateDoc(chatRoomRef, {
+        unreadCount: 0,
+        recipientId: '',
       });
-
-      return () => unsub();
-
     }
-
-  }, [currentUserChat, selectedRoomId]);
-
-  // lay thong tin partner
-
-  React.useEffect(() => {
-
-    const getChatRoom = async (selectedRoomId, userId) => {
-
-      const selectRoom = await getChatRoomById(selectedRoomId, userId);
-
-      setSelectedRoom(selectRoom);
-
-      setPartnerId(selectRoom?.user?.userId);
-
-    };
-
-    if (selectedRoomId && currentUserChat) {
-
-      getChatRoom(selectedRoomId, currentUserChat.userId);
-
-    }
-
   }, [selectedRoomId, currentUserChat]);
 
-  // lang nghe tong message
-
+  // Load chat room details
   React.useEffect(() => {
-
     if (selectedRoomId) {
+      const chatRoomRef = doc(db, 'chatRooms', selectedRoomId);
+      const unsubscribeChatRoom = onSnapshot(chatRoomRef, (doc) => {
+        if (doc.exists()) {
+          const roomData = { id: doc.id, ...doc.data() } as ChatRoom;
+          setSelectedRoom(roomData);
+          if (currentUserChat) {
+            const partner = roomData.members.find(
+              (member) => member !== `${currentUserChat.userId}`
+            );
+            setPartnerId(partner || null);
+          }
+        }
+      });
+      return () => unsubscribeChatRoom();
+    }
+  }, [selectedRoomId, currentUserChat]);
 
+  // Listen to messages (real-time)
+  React.useEffect(() => {
+    if (selectedRoomId) {
+      setIsLoading(true);
       const q = query(
-
         messageCollectionRef,
-
-        where('roomId', '==', `${selectedRoomId}`)
-
+        where('chatRoomId', '==', selectedRoomId),
+        orderBy('createdAt', 'desc'),
+        limit(LIMIT_MESSAGE)
       );
 
-      const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-
-        setCount(querySnapshot?.size || 0);
-
+      const unsubscribeMessages = onSnapshot(q, (querySnapshot) => {
+        const messagesData: MessageData[] = [];
+        querySnapshot.forEach((doc) => {
+          messagesData.push({ id: doc.id, ...doc.data() } as MessageData);
+        });
+        setMessages(messagesData.reverse());
+        if (querySnapshot.docs.length > 0) {
+          setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
+        }
+        setIsLoading(false);
+        setHasMore(querySnapshot.docs.length === LIMIT_MESSAGE);
       });
 
-      return () => {
-
-        unsubscribe();
-
-      };
-
+      return () => unsubscribeMessages();
     }
-
   }, [selectedRoomId]);
 
-  // danh sach messages
-
+  // Load total message count
   React.useEffect(() => {
-
-    setIsLoading(true);
-
-    let q = query(
-
-      messageCollectionRef,
-
-      where('roomId', '==', `${selectedRoomId}`),
-
-      orderBy('createdAt', 'desc'),
-
-      limit(LIMIT)
-
-    );
-
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-
-      const messagesData = querySnapshot.docs.map((doc) => ({
-
-        ...doc.data(),
-
-        id: doc.id,
-
-      }));
-
-      if (querySnapshot.docs.length > 0) {
-
-        setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
-
-      }
-
-      setMessages(messagesData);
-
-      setPage(1);
-
-      setHasMore(true);
-
-      setIsLoading(false);
-
-    });
-
-    return () => unsubscribe();
-
+    if (selectedRoomId) {
+      const q = query(
+        messageCollectionRef,
+        where('chatRoomId', '==', selectedRoomId)
+      );
+      getDocs(q).then((snapshot) => {
+        setCount(snapshot.size);
+      });
+    }
   }, [selectedRoomId]);
 
-  // tai them du lieu
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputValue.trim() || !selectedRoomId || !currentUserChat) return;
 
-  const handleLoadMore = () => {
-
-    const getMoreData = async () => {
-
-      if (lastDocument !== null) {
-
-        const q = query(
-
-          messageCollectionRef,
-
-          where('roomId', '==', `${selectedRoomId}`),
-
-          orderBy('createdAt', 'desc'),
-
-          startAfter(lastDocument),
-
-          limit(LIMIT)
-
-        );
-
-        const querySnapshot = await getDocs(q);
-
-        if (querySnapshot.docs.length > 0) {
-
-          setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
-
-        }
-
-        const messagesData = querySnapshot.docs.map((doc) => ({
-
-          ...doc.data(),
-
-          id: doc.id,
-
-        }));
-
-        setMessages([...messages, ...messagesData]);
-
-      }
-
+    const messageData = {
+      chatRoomId: selectedRoomId,
+      senderId: `${currentUserChat.userId}`,
+      text: inputValue,
+      createdAt: serverTimestamp(),
     };
 
-    if (Math.ceil(count / LIMIT) > page) {
-
-      setPage(page + 1);
-
-      getMoreData();
-
-    } else {
-
-      setHasMore(false);
-
-    }
-
-  };
-
-  const handleInputChange = (e) => {
-
-    setInputValue(e.target.value);
-
-  };
-
-  const handleOnSubmit = (e) => {
-
-    e.preventDefault();
-
-    if (inputValue.trim() !== '') {
-
-      // them message
-
-      addDocument('messages', {
-
-        text: inputValue,
-
-        userId: `${currentUserChat?.userId}`,
-
-        roomId: selectedRoomId,
-
-      });
-
-      // cap nhat chat room
-
-      updateChatRoomByPartnerId(partnerId, selectedRoomId);
-
+    try {
       setInputValue('');
-
-      if (inputRef?.current) {
-
-        setTimeout(() => {
-
-          inputRef.current.focus();
-
-        });
-
-      }
-
+      await addDoc(messageCollectionRef, messageData);
+      
+      const chatRoomRef = doc(db, 'chatRooms', selectedRoomId);
+      await updateDoc(chatRoomRef, {
+        updatedAt: serverTimestamp(),
+        lastMessage: inputValue,
+        recipientId: partnerId,
+        unreadCount: (selectedRoom?.unreadCount || 0) + 1,
+      });
+    } catch (error) {
+      console.error("Error sending message: ", error);
     }
-
   };
 
-  const handleKeyDown = (event) => {
+  const handleLoadMore = async () => {
+    if (!lastDocument || !selectedRoomId) return;
 
-    if (event.key === 'Enter' && event.shiftKey === false) {
+    const q = query(
+      messageCollectionRef,
+      where('chatRoomId', '==', selectedRoomId),
+      orderBy('createdAt', 'desc'),
+      startAfter(lastDocument),
+      limit(LIMIT_MESSAGE)
+    );
 
-      event.preventDefault();
+    const querySnapshot = await getDocs(q);
+    const moreMessages: MessageData[] = [];
+    querySnapshot.forEach((doc) => {
+      moreMessages.push({ id: doc.id, ...doc.data() } as MessageData);
+    });
 
-      handleOnSubmit(event);
-
+    if (querySnapshot.docs.length > 0) {
+      setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setMessages((prev) => [...moreMessages.reverse(), ...prev]);
     }
-
+    setHasMore(querySnapshot.docs.length === LIMIT_MESSAGE);
   };
 
+  // Scroll to bottom when messages change
   React.useEffect(() => {
-
-    // scroll to bottom after message changed
-
-    if (messageListRef?.current) {
-
-      messageListRef.current.scrollTop =
-
-        messageListRef.current.scrollHeight + 50;
-
+    if (messageListRef.current) {
+      messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
     }
-
   }, [messages]);
 
-  return (
-
-    <Stack 
-
-      direction="column" 
-
-      sx={{ 
-
-        height: '100%',
-
-        position: 'relative',
-
-        bgcolor: 'background.default'
-
-      }}
-
-    >
-
-      {selectedRoomId && (
-
-        <Box
-
-          sx={{
-
-            position: 'absolute',
-
-            top: 0,
-
-            left: 0,
-
-            right: 0,
-
-            zIndex: 10,
-
-            bgcolor: 'background.paper',
-
-            borderBottom: 1,
-
-            borderColor: 'divider',
-
-          }}
-
-        >
-
-          <Stack>
-
-            {currentUser?.roleName === ROLES_NAME.JOB_SEEKER ? (
-
-              <ChatInfo.HeaderChatInfo
-
-                avatarUrl={selectedRoom?.user?.avatarUrl}
-
-                title={selectedRoom?.user?.name}
-
-                subTitle={selectedRoom?.user?.company?.companyName}
-
-              />
-
-            ) : (
-
-              <ChatInfo.HeaderChatInfo
-
-                avatarUrl={selectedRoom?.user?.avatarUrl}
-
-                title={selectedRoom?.user?.name}
-
-                subTitle={selectedRoom?.user?.email}
-
-              />
-
-            )}
-
-          </Stack>
-
-        </Box>
-
-      )}
-
+  if (!context || !currentUserChat || !selectedRoomId) {
+    return (
       <Box 
-
         sx={{ 
-
-          flexGrow: 1, 
-
-          overflow: 'hidden',
-
-          mt: selectedRoomId ? '72px' : 0, // Chiều cao của header chat
-
-          mb: '80px' // Chiều cao của khung nhập tin nhắn
-
+          height: '100%', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center',
+          bgcolor: 'background.default'
         }}
-
       >
-
-        {selectedRoomId ? (
-
-          <Stack sx={{ height: '100%' }}>
-
-            <Box 
-
-              sx={{ 
-
-                height: '100%',
-
-                position: 'relative'
-
-              }}
-
-            >
-
-              {isLoading ? (
-
-                <Stack
-
-                  justifyContent="center"
-
-                  alignItems="center"
-
-                  height="100%"
-
-                >
-
-                  <CircularProgress color="primary" />
-
-                </Stack>
-
-              ) : messages.length === 0 ? (
-
-                <Stack
-
-                  justifyContent="center" 
-
-                  alignItems="center"
-
-                  height="100%"
-
-                  p={2}
-
-                >
-
-                  {currentUser?.roleName === ROLES_NAME.JOB_SEEKER ? (
-
-                    <ChatInfo
-
-                      avatarUrl={selectedRoom?.user?.avatarUrl}
-
-                      title={selectedRoom?.user?.name}
-
-                      subTitle={selectedRoom?.user?.company?.companyName}
-
-                      description={
-
-                        selectedRoom?.createdBy !== `${currentUserChat?.userId}`
-
-                          ? t('companyHasConnected', { companyName: selectedRoom?.user?.company?.companyName })
-
-                          : t('youConnectedToCompany', { companyName: selectedRoom?.user?.company?.companyName })
-
-                      }
-
-                    />
-
-                  ) : (
-
-                    <ChatInfo
-
-                      avatarUrl={selectedRoom?.user?.avatarUrl}
-
-                      title={selectedRoom?.user?.name}
-
-                      subTitle={selectedRoom?.user?.email}
-
-                      description={
-
-                        selectedRoom?.createdBy !== `${currentUserChat?.userId}`
-
-                          ? t('userHasConnected', { userName: selectedRoom?.user?.name })
-
-                          : t('youConnectedToUser', { userName: selectedRoom?.user?.name })
-
-                      }
-
-                    />
-
-                  )}
-
-                </Stack>
-
-              ) : (
-
-                <div
-
-                  ref={messageListRef}
-
-                  id="scrollableDiv"
-
-                  style={{
-
-                    height: '100%',
-
-                    overflow: 'auto',
-
-                    display: 'flex',
-
-                    flexDirection: 'column-reverse',
-
-                    padding: '16px'
-
-                  }}
-
-                >
-
-                  <InfiniteScroll
-
-                    style={{
-
-                      display: 'flex',
-
-                      flexDirection: 'column-reverse',
-
-                    }}
-
-                    scrollableTarget="scrollableDiv"
-
-                    dataLength={messages.length}
-
-                    next={handleLoadMore}
-
-                    hasMore={hasMore}
-
-                    inverse={true}
-
-                    loader={
-
-                      <Stack sx={{ py: 2 }} justifyContent="center">
-
-                        <CircularProgress
-
-                          color="primary"
-
-                          size={30}
-
-                          sx={{ margin: '0 auto' }}
-
-                        />
-
-                      </Stack>
-
-                    }
-
-                  >
-
-                    {messages.map((value) => (
-
-                      <Message
-
-                        key={value.id}
-
-                        userId={value?.userId}
-
-                        text={value?.text}
-
-                        avatarUrl={
-
-                          `${currentUserChat?.userId}` === `${value?.userId}`
-
-                            ? currentUserChat?.avatarUrl
-
-                            : selectedRoom?.user?.avatarUrl
-
-                        }
-
-                        createdAt={value?.createdAt}
-
-                      />
-
-                    ))}
-
-                  </InfiniteScroll>
-
-                </div>
-
-              )}
-
-            </Box>
-
-          </Stack>
-
+        <Typography color="text.secondary">
+          {t('selectConversation')}
+        </Typography>
+      </Box>
+    );
+  }
+
+  return (
+    <Stack sx={{ height: '100%', bgcolor: 'background.paper' }}>
+      {/* Messages list */}
+      <Box
+        ref={messageListRef}
+        sx={{
+          flexGrow: 1,
+          overflowY: 'auto',
+          p: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+          '&::-webkit-scrollbar': {
+            width: '6px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgba(0,0,0,0.1)',
+            borderRadius: '10px',
+          },
+        }}
+      >
+        {isLoading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <CircularProgress size={24} />
+          </Box>
         ) : (
-
-          <Stack 
-
-            justifyContent="center" 
-
-            alignItems="center" 
-
-            height="100%"
-
-            spacing={2}
-
-            p={2}
-
-          >
-
-            <ChatBubbleOutlineIcon sx={{ fontSize: 48, color: 'text.disabled' }} />
-
-            <Typography color="text.secondary">
-
-              {t('noConversationSelected')}
-
-            </Typography>
-
-          </Stack>
-
+          <>
+            {hasMore && (
+              <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
+                <Typography 
+                  variant="caption" 
+                  sx={{ cursor: 'pointer', color: 'primary.main' }}
+                  onClick={handleLoadMore}
+                >
+                  {t('loadPreviousMessages')}
+                </Typography>
+              </Box>
+            )}
+            {messages.map((msg) => (
+              <Message
+                key={msg.id}
+                userId={msg.senderId}
+                text={msg.text}
+                createdAt={msg.createdAt}
+              />
+            ))}
+          </>
         )}
-
       </Box>
 
-      {selectedRoomId && (
-
-        <Box
-
-          component="form"
-
-          onSubmit={handleOnSubmit}
-
-          sx={{
-
-            position: 'absolute',
-
-            bottom: 0,
-
-            left: 0,
-
-            right: 0,
-
-            p: 2,
-
-            borderTop: 1,
-
-            borderColor: 'divider',
-
-            bgcolor: 'background.paper',
-
-            zIndex: 10
-
-          }}
-
+      {/* Input area */}
+      <Paper
+        component="form"
+        onSubmit={handleSendMessage}
+        elevation={0}
+        sx={{
+          p: '12px 16px',
+          display: 'flex',
+          alignItems: 'center',
+          borderTop: 1,
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+        }}
+      >
+        <IconButton size="small" sx={{ mr: 1 }}>
+          <AttachFileIcon fontSize="small" />
+        </IconButton>
+        <IconButton size="small" sx={{ mr: 1 }}>
+          <SentimentSatisfiedAltIcon fontSize="small" />
+        </IconButton>
+        <InputBase
+          sx={{ ml: 1, flex: 1, fontSize: 14 }}
+          placeholder={t('typeAMessage')}
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          inputRef={inputRef}
+        />
+        <IconButton 
+          type="submit" 
+          color="primary" 
+          disabled={!inputValue.trim()}
+          sx={{ ml: 1 }}
         >
-
-          <Stack direction="row" spacing={2} alignItems="flex-end">
-
-            <TextField
-
-              inputRef={inputRef}
-
-              fullWidth
-
-              placeholder={t('typeYourMessage')}
-
-              value={inputValue}
-
-              onChange={handleInputChange}
-
-              onKeyDown={handleKeyDown}
-
-              multiline
-
-              maxRows={5}
-
-              variant="outlined"
-
-              sx={{
-
-                '& .MuiOutlinedInput-root': {
-
-                  borderRadius: 2,
-
-                  bgcolor: 'background.default',
-
-                  '&:hover': {
-
-                    '& > fieldset': {
-
-                      borderColor: 'primary.main',
-
-                    }
-
-                  }
-
-                }
-
-              }}
-
-            />
-
-            <Button
-
-              variant="contained"
-
-              color="primary"
-
-              endIcon={<SendIcon />}
-
-              type="submit"
-
-              sx={{
-
-                height: 54,
-
-                px: 3,
-
-                background: (theme) => theme.palette.primary.gradient
-
-              }}
-
-            >
-
-              {t('send')}
-
-            </Button>
-
-          </Stack>
-
-        </Box>
-
-      )}
-
+          <SendIcon fontSize="small" />
+        </IconButton>
+      </Paper>
     </Stack>
-
   );
-
 };
 
 export default ChatWindow;

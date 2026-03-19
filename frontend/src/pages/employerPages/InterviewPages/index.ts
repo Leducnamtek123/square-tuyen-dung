@@ -1,4 +1,3 @@
-// @ts-nocheck
 import InterviewListPage from './InterviewListPage';
 import InterviewCreatePage from './InterviewCreatePage';
 import InterviewDetailPage from './InterviewDetailPage';

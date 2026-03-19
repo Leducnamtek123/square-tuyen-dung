@@ -1,35 +1,19 @@
-// @ts-nocheck
 import * as React from 'react';
-
-import { useDispatch } from 'react-redux';
-
 import { Link, useNavigate } from 'react-router-dom';
-
 import { Avatar, Box, Card, Container, Typography, styled } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-
 import { useTranslation } from 'react-i18next';
-
 import { TabTitle } from '../../../utils/generalFunction';
-
 import { PLATFORM, ROLES_NAME, ROUTES } from '../../../configs/constants';
-
 import errorHandling from '../../../utils/errorHandling';
-
 import BackdropLoading from '../../../components/loading/BackdropLoading';
-
 import { updateVerifyEmail } from '../../../redux/authSlice';
-
 import authService from '../../../services/authService';
-
 import EmployerSignUpForm from '../../components/auths/EmployerSignUpForm';
-
-interface Props {
-  [key: string]: any;
-}
+import { useAppDispatch } from '../../../hooks/useAppStore';
+import type { RoleName } from '../../../types/auth';
+import type { AxiosError } from 'axios';
 
 
 
@@ -87,7 +71,7 @@ const EmployerSignUp = () => {
 
   TabTitle(t('signup.employerTitle'));
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const nav = useNavigate();
 
@@ -95,9 +79,9 @@ const EmployerSignUp = () => {
 
   const [serverErrors, setServerErrors] = React.useState({});
 
-  const handleRegister = (data) => {
+  const handleRegister = (data: any) => {
 
-    const register = async (data, roleName) => {
+    const register = async (data: any, roleName: RoleName) => {
 
       setIsFullScreenLoading(true);
 
@@ -123,18 +107,19 @@ const EmployerSignUp = () => {
 
       } catch (error) {
 
-        const res = error?.response;
+        const axiosError = error as AxiosError<any>;
+        const res = axiosError?.response;
         const errors = res?.data?.errors;
         const hasEmailExists = !!errors?.email;
         if (res?.status === 400 && hasEmailExists) {
           try {
-            const resData = await authService.checkCreds(data?.email, ROLES_NAME.EMPLOYER);
+            const resData = await authService.checkCreds(data?.email, ROLES_NAME.EMPLOYER as RoleName) as any;
             if (resData?.exists === true && resData?.email_verified === false) {
               dispatch(
                 updateVerifyEmail({
                   isAllowVerifyEmail: true,
                   email: data?.email,
-                  roleName: ROLES_NAME.EMPLOYER,
+                  roleName: ROLES_NAME.EMPLOYER as RoleName,
                 })
               );
               nav(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
@@ -145,7 +130,7 @@ const EmployerSignUp = () => {
           }
         }
 
-        errorHandling(error, setServerErrors);
+        errorHandling(error as AxiosError<any>, setServerErrors as React.Dispatch<React.SetStateAction<any>>);
 
       } finally {
 
@@ -165,17 +150,17 @@ const EmployerSignUp = () => {
 
       },
 
-      ROLES_NAME.EMPLOYER
+      ROLES_NAME.EMPLOYER as RoleName
 
     );
 
   };
 
-  const checkCreds = async (email, roleName) => {
+  const checkCreds = async (email: string, roleName: RoleName) => {
 
     try {
 
-      const resData = await authService.checkCreds(email, roleName);
+      const resData = await authService.checkCreds(email, roleName) as any;
 
       const { exists, email_verified } = resData;
 
@@ -207,7 +192,7 @@ const EmployerSignUp = () => {
 
     } catch (error) {
 
-      errorHandling(error);
+      errorHandling(error as AxiosError<any>, undefined);
 
       return false;
 

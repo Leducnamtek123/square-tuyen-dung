@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
@@ -13,13 +12,20 @@ import { useTranslation } from 'react-i18next';
 
 import PasswordTextFieldCustom from '../../../../components/controls/PasswordTextFieldCustom';
 
-interface Props {
-  [key: string]: any;
+interface UpdatePasswordFormData {
+  oldPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+}
+
+interface UpdatePasswordFormProps {
+  handleUpdatePassword: (data: UpdatePasswordFormData) => void;
+  serverErrors?: Record<string, string[]>;
 }
 
 
 
-const UpdatePasswordForm = ({ handleUpdatePassword, serverErrors = {} }) => {
+const UpdatePasswordForm = ({ handleUpdatePassword, serverErrors = {} }: UpdatePasswordFormProps) => {
 
   const { t } = useTranslation('auth');
 
@@ -61,28 +67,19 @@ const UpdatePasswordForm = ({ handleUpdatePassword, serverErrors = {} }) => {
 
   });
 
-  const { control, setError, handleSubmit } = useForm({
-
+  const { control, setError, handleSubmit } = useForm<UpdatePasswordFormData>({
     defaultValues: {
-
       oldPassword: '',
-
       newPassword: '',
-
       confirmPassword: '',
-
     },
-
-    resolver: yupResolver(schema),
-
+    resolver: yupResolver(schema) as any,
   });
 
   React.useEffect(() => {
 
-    for (let err in serverErrors) {
-
-      setError(err, { type: 400, message: serverErrors[err]?.join(' ') });
-
+    for (const err in serverErrors) {
+      setError(err as any, { type: 'manual', message: serverErrors[err]?.join(' ') });
     }
 
   }, [serverErrors, setError]);

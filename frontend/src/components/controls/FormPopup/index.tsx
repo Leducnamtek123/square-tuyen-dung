@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useTheme } from '@mui/material/styles';
@@ -12,27 +11,23 @@ import SaveIcon from '@mui/icons-material/Save';
 import { LoadingButton } from '@mui/lab';
 
 interface Props {
-  [key: string]: any;
+  title: string;
+  openPopup: boolean;
+  setOpenPopup: (open: boolean) => void;
+  showDialogAction?: boolean;
+  buttonText?: string;
+  buttonIcon?: React.ReactNode;
+  children: React.ReactNode;
 }
 
-
-
 const Popup = ({
-
   title,
-
   openPopup,
-
   setOpenPopup,
-
   showDialogAction = true,
-
   buttonText = 'Lưu',
-
   buttonIcon = <SaveIcon />,
-
   children,
-
 }: Props) => {
 
   const theme = useTheme();

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useEffect, useMemo, useState } from 'react';
 import {
     Box,
@@ -33,19 +32,13 @@ import { useCities } from '../CitiesPage/hooks/useCities';
 import { useDistricts } from '../DistrictsPage/hooks/useDistricts';
 import { useWards } from './hooks/useWards';
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
 const WardsPage = () => {
     const { t } = useTranslation('admin');
-    const { data: citiesData, isLoading: isLoadingCities } = useCities();
-    const cities = citiesData?.results || citiesData;
+    const { data: citiesData, isLoading: isLoadingCities } = useCities() as any;
+    const cities = (citiesData?.results || citiesData) as any[];
 
-    const [selectedCity, setSelectedCity] = useState('');
-    const [selectedDistrict, setSelectedDistrict] = useState('');
+    const [selectedCity, setSelectedCity] = useState<string | number>('');
+    const [selectedDistrict, setSelectedDistrict] = useState<string | number>('');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -59,15 +52,15 @@ const WardsPage = () => {
         city: selectedCity,
         page: 1,
         pageSize: 1000
-    });
-    const districts = districtsData?.results || districtsData;
+    }) as any;
+    const districts = (districtsData?.results || districtsData) as any[];
 
     useEffect(() => {
         if (!districts || districts.length === 0) {
             setSelectedDistrict('');
             return;
         }
-        const hasSelectedDistrict = districts.some((value) => String(value.id) === String(selectedDistrict));
+        const hasSelectedDistrict = districts.some((value: any) => String(value.id) === String(selectedDistrict));
         if (!hasSelectedDistrict) {
             setSelectedDistrict(districts[0].id);
         }
@@ -80,23 +73,23 @@ const WardsPage = () => {
         updateWard,
         deleteWard,
         isMutating
-    } = useWards({ district: selectedDistrict, page: page + 1, pageSize: rowsPerPage });
-    const wards = wardsData?.results || wardsData;
+    } = useWards({ district: selectedDistrict, page: page + 1, pageSize: rowsPerPage }) as any;
+    const wards = (wardsData?.results || wardsData) as any[];
 
     const districtNameById = useMemo(() => {
-        const result = {};
-        (districts || []).forEach((district) => {
+        const result: Record<string | number, string> = {};
+        (districts || []).forEach((district: any) => {
             result[district.id] = district.name;
         });
         return result;
     }, [districts]);
 
     const [openDialog, setOpenDialog] = useState(false);
-    const [dialogMode, setDialogMode] = useState('add');
-    const [currentWard, setCurrentWard] = useState(null);
+    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+    const [currentWard, setCurrentWard] = useState<any>(null);
     const [wardName, setWardName] = useState('');
     const [wardCode, setWardCode] = useState('');
-    const [targetDistrictId, setTargetDistrictId] = useState('');
+    const [targetDistrictId, setTargetDistrictId] = useState<string | number>('');
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -109,7 +102,7 @@ const WardsPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (ward) => {
+    const handleOpenEdit = (ward: any) => {
         setDialogMode('edit');
         setCurrentWard(ward);
         setWardName(ward.name);
@@ -118,7 +111,7 @@ const WardsPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (ward) => {
+    const handleOpenDelete = (ward: any) => {
         setCurrentWard(ward);
         setOpenDeleteDialog(true);
     };
@@ -193,7 +186,7 @@ const WardsPage = () => {
                         }}
                         disabled={isLoadingCities}
                     >
-                        {cities?.map((city) => (
+                        {cities?.map((city: any) => (
                             <MenuItem key={city.id} value={city.id}>
                                 {city.name}
                             </MenuItem>
@@ -211,7 +204,7 @@ const WardsPage = () => {
                         }}
                         disabled={isLoadingDistricts || !(districts && districts.length > 0)}
                     >
-                        {districts?.map((district) => (
+                        {districts?.map((district: any) => (
                             <MenuItem key={district.id} value={district.id}>
                                 {district.name}
                             </MenuItem>
@@ -237,7 +230,7 @@ const WardsPage = () => {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {wards?.map((row) => (
+                                    {wards?.map((row: any) => (
                                         <TableRow key={row.id} hover>
                                             <TableCell>{row.id}</TableCell>
                                             <TableCell sx={{ fontWeight: 500 }}>{row.name}</TableCell>
@@ -308,7 +301,7 @@ const WardsPage = () => {
                             onChange={(e) => setTargetDistrictId(e.target.value)}
                             required
                         >
-                            {districts?.map((district) => (
+                            {districts?.map((district: any) => (
                                 <MenuItem key={district.id} value={district.id}>
                                     {district.name}
                                 </MenuItem>
@@ -344,7 +337,7 @@ const WardsPage = () => {
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
                 <DialogTitle>{t('pages.wards.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.wards.deleteText', { name: currentWard?.name }) }} />
+                    <Typography dangerouslySetInnerHTML={{ __html: String(t('pages.wards.deleteText', { name: currentWard?.name })) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.wards.cancelBtn')}</Button>

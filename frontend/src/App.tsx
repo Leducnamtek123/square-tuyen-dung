@@ -1,32 +1,17 @@
-// @ts-nocheck
 import "sweetalert2/dist/sweetalert2.min.css";
-
 import "./App.css";
-
 import * as React from "react";
-
 import { useLocation } from "react-router-dom";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import { getUserInfo } from "./redux/userSlice";
-
 import { getAllConfig } from "./redux/configSlice";
-
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-
 import { CssBaseline } from "@mui/material";
-
 import { viVN } from "@mui/material/locale";
-
 import { toast, ToastContainer } from "react-toastify";
-
 import "react-toastify/dist/ReactToastify.css";
-
 import defaultTheme from "./themeConfigs/defaultTheme";
-
 import AppRoutes from "./routes/AppRouter";
-
 import Feedback from "./components/Feedback";
 import ChatBot from "./components/ChatBot";
 import ScrollToTop from "./components/ScrollToTop";
@@ -36,13 +21,9 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 import tokenService from "./services/tokenService";
 
 function App() {
-
   const dispatch = useDispatch<any>();
-
   const [isInitializing, setIsInitializing] = React.useState(true);
-
   const { isAllowVerifyEmail } = useSelector((state: any) => state.auth);
-
   const { isAuthenticated, currentUser, activeWorkspace } = useSelector((state: any) => state.user);
 
   const isAdminAccount = (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.ADMIN;
@@ -97,10 +78,8 @@ function App() {
   );
 
   React.useEffect(() => {
-
     const finalizeLoader = () => {
       const loader = document.getElementById("initial-loader");
-
       if (loader) {
         setIsInitializing(false);
         requestAnimationFrame(() => {
@@ -132,121 +111,70 @@ function App() {
       } finally {
         finalizeLoader();
       }
-
     };
 
     initializeApp();
-
   }, [dispatch, isJobSeekerInterviewRoute]);
 
   React.useEffect(() => {
-
-    const handleError = (event) => {
-
+    const handleError = (event: ErrorEvent) => {
       if (event.message?.includes("ResizeObserver")) return;
-
       toast.error(
-
         <div style={{ textAlign: "left" }}>
-
           <strong>Đã có lỗi xảy ra.</strong> Vui lòng thử lại sau.
-
         </div>,
-
         {
-
           autoClose: 8000,
-
           position: "top-right",
-
           closeOnClick: true,
-
           pauseOnHover: true,
-
         }
-
       );
-
     };
 
-    const handleRejection = (event) => {
-
+    const handleRejection = (event: PromiseRejectionEvent) => {
       console.error("Unhandled Promise Rejection:", event.reason);
-
       toast.error(
-
         <div style={{ textAlign: "left" }}>
-
           <strong>Yêu cầu chưa thể xử lý.</strong> Vui lòng thử lại sau.
-
         </div>,
-
         { autoClose: 6000 }
-
       );
-
     };
 
     window.addEventListener("error", handleError);
-
     window.addEventListener("unhandledrejection", handleRejection);
 
     return () => {
-
       window.removeEventListener("error", handleError);
-
       window.removeEventListener("unhandledrejection", handleRejection);
-
     };
-
   }, []);
 
   if (isInitializing) {
-
     return null;
-
   }
 
   return (
-
     <>
-
       <ThemeProvider theme={theme}>
-
         <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
-
           <CssBaseline enableColorScheme />
           <React.Suspense fallback={routeFallback}>
             <AppRoutes settings={settings} />
           </React.Suspense>
-          {/* Start: toast */}
-
           <ToastContainer autoClose={1300} />
-
-          {/* End: toast */}
-
-          {/* Do not show feedback in chat or interview pages */}
           {!isChatPage && !isInterviewPage && (
             <>
-              {/* Start: Feedback */}
               {isAuthenticated && <Feedback />}
-              {/* End: Feedback */}
             </>
           )}
-
-          {/* Start: ChatBot */}
           {canShowChatBot && <ChatBot />}
-          {/* End: ChatBot */}
         </GoogleOAuthProvider>
-
       </ThemeProvider>
-
       <ScrollToTop />
-
     </>
-
   );
-
 }
 
 export default App;

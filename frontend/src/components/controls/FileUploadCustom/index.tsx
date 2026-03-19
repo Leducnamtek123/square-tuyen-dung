@@ -1,7 +1,6 @@
-// @ts-nocheck
 import React from 'react';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import { Stack, Alert, Box, Button, Typography } from "@mui/material";
 
@@ -12,42 +11,31 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 
 interface Props {
-  [key: string]: any;
+  control: Control<any>;
+  name: string;
+  title?: string;
+  showRequired?: boolean;
 }
 
-
-
 const FileUploadCustom = ({
-
   control,
-
   name,
-
   title = '',
-
   showRequired = false,
-
 }: Props) => {
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+  const inputRef = React.useRef<HTMLInputElement | null>(null);
 
-  const [selectedFile, setSelectedFile] = React.useState(null);
-
-  const inputRef = React.useRef(null);
-
-  const handleInputClick = (e) => {
-
+  const handleInputClick = (e: React.MouseEvent) => {
     e.preventDefault();
-
-    inputRef.current.click();
-
+    inputRef.current?.click();
   };
 
-  const handleFileChange = (event, onChange) => {
-
-    const file = event.target.files[0];
-
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>, onChange: (file: File | null) => void) => {
+    const file = event.target.files?.[0];
     setSelectedFile(file || null);
 
-    onChange(file);
+    onChange(file || null);
 
   };
 

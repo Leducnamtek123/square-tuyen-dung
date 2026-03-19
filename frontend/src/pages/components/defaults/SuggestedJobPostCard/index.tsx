@@ -1,33 +1,24 @@
-// @ts-nocheck
 import React from "react";
-
 import { Pagination, Stack } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
-import {ROLES_NAME} from "../../../../configs/constants";
-
+import { ROLES_NAME } from "../../../../configs/constants";
 import NoDataCard from "../../../../components/NoDataCard";
-
 import jobService from "../../../../services/jobService";
-
 import JobPost from "../../../../components/JobPost";
+import { useAppSelector } from "../../../../hooks/useAppStore";
 
-import { useSelector } from "react-redux";
-
-interface Props {
-  [key: string]: any;
+interface SuggestedJobPostCardProps {
+  pageSize?: number;
+  fullWidth?: boolean;
 }
 
+const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 12, fullWidth = false }) => {
 
-
-const SuggestedJobPostCard = ({ pageSize = 12, fullWidth = false }) => {
-
-  const { currentUser, isAuthenticated } = useSelector((state) => state.user);
+  const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
 
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const [jobPosts, setJobPosts] = React.useState([]);
+  const [jobPosts, setJobPosts] = React.useState<any[]>([]);
 
   const [page, setPage] = React.useState(1);
 
@@ -41,13 +32,11 @@ const SuggestedJobPostCard = ({ pageSize = 12, fullWidth = false }) => {
 
     const handleResize = () => {
 
-      const newWidth = document.getElementById(
+      const element = document.getElementById("suggested-job-post-card");
 
-        "suggested-job-post-card"
-
-      ).offsetWidth;
-
-      setParentWidth(newWidth);
+      if (element) {
+        setParentWidth(element.offsetWidth);
+      }
 
     };
 
@@ -95,7 +84,7 @@ const SuggestedJobPostCard = ({ pageSize = 12, fullWidth = false }) => {
 
           page: page,
 
-        });
+        }) as any;
 
         const data = resData.data;
 
@@ -127,7 +116,7 @@ const SuggestedJobPostCard = ({ pageSize = 12, fullWidth = false }) => {
 
   }, [page, currentUser?.roleName, isAuthenticated, pageSize]);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
 
     setPage(newPage);
 

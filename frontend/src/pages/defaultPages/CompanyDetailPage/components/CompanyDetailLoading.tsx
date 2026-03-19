@@ -1,12 +1,5 @@
-// @ts-nocheck
 import React from "react";
 import { Box, Card, Skeleton, Stack, Typography } from "@mui/material";
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const CompanyDetailLoading = () => {
   return (
@@ -19,10 +12,7 @@ const CompanyDetailLoading = () => {
           <Stack
             direction={{
               xs: "column",
-              sm: "column",
               md: "row",
-              lg: "row",
-              xl: "row",
             }}
             spacing={2}
             alignItems="center"
@@ -36,11 +26,8 @@ const CompanyDetailLoading = () => {
                 direction={{
                   xs: "column",
                   sm: "row",
-                  md: "row",
-                  lg: "row",
-                  xl: "row",
                 }}
-                spacing={{ xs: 0.5, sm: 2, md: 3, lg: 3, xl: 3 }}
+                spacing={{ xs: 0.5, sm: 2, md: 3 }}
               >
                 <Skeleton variant="rounded" width={140} />
                 <Skeleton variant="rounded" width={160} />

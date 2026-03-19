@@ -1,9 +1,8 @@
-// @ts-nocheck
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 import React from 'react';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import { EditorState } from 'draft-js';
 
@@ -15,21 +14,17 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { createEditorStateFromHTMLString } from '../../../utils/editorUtils';
 
 interface Props {
-  [key: string]: any;
+  control: Control<any>;
+  name: string;
+  title?: string;
+  showRequired?: boolean;
 }
 
-
-
 const RichTextEditorCustom = ({
-
   control,
-
   name,
-
   title = '',
-
   showRequired = false,
-
 }: Props) => {
 
   return (

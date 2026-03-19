@@ -1,18 +1,9 @@
-// @ts-nocheck
 import React from "react";
-
 import { Card, Typography } from "@mui/material";
-
 import { useTranslation } from "react-i18next";
 import { TabTitle } from "../../../utils/generalFunction";
-
 import NotificationCard from "../../components/defaults/NotificationCard";
-
 import { APP_NAME } from "../../../configs/constants";
-
-interface Props {
-  [key: string]: any;
-}
 
 
 

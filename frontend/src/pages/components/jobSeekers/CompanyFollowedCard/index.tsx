@@ -1,31 +1,14 @@
-// @ts-nocheck
 import React from 'react';
-
 import { Link } from 'react-router-dom';
-
 import { Box, Stack, Pagination, Button } from "@mui/material";
-
 import errorHandling from '../../../../utils/errorHandling';
-
 import toastMessages from '../../../../utils/toastMessages';
-
 import {ROUTES} from '../../../../configs/constants';
-
 import NoDataCard from '../../../../components/NoDataCard';
-
 import CompanyAction from '../../../../components/CompanyAction';
-
 import companyFollowed from '../../../../services/companyFollowed';
-
 import companyService from '../../../../services/companyService';
-
 import { useTranslation } from 'react-i18next';
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const pageSize = 10;
 
@@ -36,7 +19,7 @@ const CompanyFollowedCard = () => {
 
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const [resumesViewed, setResumesViewed] = React.useState([]);
+  const [resumesViewed, setResumesViewed] = React.useState<any[]>([]);
 
   const [page, setPage] = React.useState(1);
 
@@ -44,13 +27,13 @@ const CompanyFollowedCard = () => {
 
   React.useEffect(() => {
 
-    const getCompaniesFollowed = async (params) => {
+    const getCompaniesFollowed = async (params: any) => {
 
       setIsLoading(true);
 
       try {
 
-        const resData = await companyFollowed.getCompaniesFollowed(params);
+        const resData: any = await companyFollowed.getCompaniesFollowed(params);
 
         const data = resData.data;
 
@@ -58,8 +41,8 @@ const CompanyFollowedCard = () => {
 
         setResumesViewed(data.results);
 
-      } catch (error) {
-
+      } catch (error: any) {
+        // Suppress or handle error
       } finally {
 
         setIsLoading(false);
@@ -76,17 +59,17 @@ const CompanyFollowedCard = () => {
 
     });
 
-      }, [page, isSuccess]);
+  }, [page, isSuccess]);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number) => {
 
     setPage(newPage);
 
   };
 
-  const handleFollow = (slug) => {
+  const handleFollow = (slug: string) => {
 
-    const follow = async (slugCompany) => {
+    const follow = async (slugCompany: string) => {
 
       try {
 
@@ -96,7 +79,7 @@ const CompanyFollowedCard = () => {
 
         setIsSuccess(!isSuccess);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -158,7 +141,7 @@ const CompanyFollowedCard = () => {
 
           <Stack spacing={2}>
 
-            {resumesViewed.map((value) => (
+            {resumesViewed.map((value: any) => (
 
               <CompanyAction.CompanyActionFollow
 
@@ -198,7 +181,7 @@ const CompanyFollowedCard = () => {
 
                 <Pagination
 
-                  color="text"
+                  color="standard"
 
                   size="medium"
 

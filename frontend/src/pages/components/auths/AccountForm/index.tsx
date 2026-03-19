@@ -7,8 +7,14 @@ import Grid from "@mui/material/Grid2";
 import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
 import { useAppSelector } from '../../../../redux/hooks';
 
+interface AccountFormData {
+  fullName: string;
+  email?: string;
+  password?: string;
+}
+
 interface AccountFormProps {
-  handleUpdate: (data: any) => void;
+  handleUpdate: (data: AccountFormData) => void;
   serverErrors: Record<string, string[]> | null;
 }
 
@@ -16,7 +22,7 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
 
   const { t } = useTranslation('auth');
 
-  const { currentUser } = useAppSelector((state) => state.user);
+  const { currentUser } = useAppSelector((state: any) => state.user);
 
   const schema = yup.object().shape({
 
@@ -30,9 +36,9 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
 
   });
 
-  const { control, reset, setError, handleSubmit } = useForm({
+  const { control, reset, setError, handleSubmit } = useForm<AccountFormData>({
 
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
 
   });
 
@@ -56,11 +62,11 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
 
   React.useEffect(() => {
 
-    if (serverErrors !== null)
+    if (serverErrors !== null) {
 
-      for (let err in serverErrors) {
+      for (const err in serverErrors) {
 
-        setError(err, {
+        setError(err as any, {
 
           type: 'manual',
 
@@ -70,7 +76,7 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
 
       }
 
-    else {
+    } else {
       // Clear all errors if serverErrors is null
       reset(undefined, { keepValues: true });
     }
@@ -79,7 +85,7 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
 
   return (
 
-    <form id="account-form" onSubmit={handleSubmit(handleUpdate)}>
+    <form id="account-form" onSubmit={handleSubmit(handleUpdate as any)}>
 
       <Grid container spacing={2}>
 

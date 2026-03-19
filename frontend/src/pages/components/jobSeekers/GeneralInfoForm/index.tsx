@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -19,17 +18,34 @@ import MultilineTextFieldCustom from '../../../../components/controls/MultilineT
 
 import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
 
-interface Props {
-  [key: string]: any;
+interface FormValues {
+  title: string;
+  position: string | number;
+  academicLevel: string | number;
+  experience: string | number;
+  career: string | number;
+  city: string | number;
+  salaryMin: number | string;
+  salaryMax: number | string;
+  expectedSalary: number | string;
+  typeOfWorkplace: string | number;
+  jobType: string | number;
+  description: string;
+  skillsSummary: string;
+}
+
+interface GeneralInfoFormProps {
+  handleUpdate: (data: any) => void;
+  editData: any;
 }
 
 
 
-const GeneralInfoForm = ({ handleUpdate, editData }) => {
+const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
   const { t } = useTranslation(['jobSeeker']);
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
   const schema = yup.object().shape({
 
@@ -98,8 +114,9 @@ const GeneralInfoForm = ({ handleUpdate, editData }) => {
         t('jobSeeker:profile.validation.salaryMinComparison'),
 
         function (value) {
-
-          return !(value >= this.parent.salaryMax);
+          const salaryMax = this.parent.salaryMax;
+          if (!value || !salaryMax) return true;
+          return !(value >= salaryMax);
 
         }
 
@@ -122,8 +139,9 @@ const GeneralInfoForm = ({ handleUpdate, editData }) => {
         t('jobSeeker:profile.validation.salaryMaxComparison'),
 
         function (value) {
-
-          return !(value <= this.parent.salaryMin);
+          const salaryMin = this.parent.salaryMin;
+          if (!value || !salaryMin) return true;
+          return !(value <= salaryMin);
 
         }
 
@@ -163,9 +181,9 @@ const GeneralInfoForm = ({ handleUpdate, editData }) => {
 
   });
 
-  const { control, reset, handleSubmit } = useForm({
+  const { control, reset, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
 
   });
 
@@ -175,7 +193,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }) => {
 
       ...formValues,
 
-      title: editData.title || '',
+      title: editData?.title || '',
 
       position: editData?.position || '',
 

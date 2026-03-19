@@ -1,49 +1,27 @@
-// @ts-nocheck
 import * as React from "react";
-
 import { useNavigate } from "react-router-dom";
-
-import { useSelector } from "react-redux";
-
 import { useTranslation } from 'react-i18next';
-
 import { Avatar, Box, Card, CardContent, CardHeader, Stack, Typography, Button } from "@mui/material";
-
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-
 import TipsAndUpdatesIcon from "@mui/icons-material/TipsAndUpdates";
-
 import SearchIcon from "@mui/icons-material/Search";
-
 import { TabTitle } from "../../../utils/generalFunction";
-
 import {
-
   HOME_FILTER_CAREER,
-
   ROLES_NAME,
-
   ROUTES,
-
   APP_NAME,
-
 } from "../../../configs/constants";
-
 import TopCompanyCarousel from "../../../components/TopCompanyCarousel";
-
 import CareerCarousel from "../../../components/CareerCarousel";
-
 import FeedbackCarousel from "../../../components/FeedbackCarousel";
-
 import JobByCategory from "../../components/defaults/JobByCategory";
-
 import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
-
 import SuggestedJobPostCard from "../../components/defaults/SuggestedJobPostCard";
-
 import bannerExplore from '../../../assets/images/banner-explore.webp';
-
 import bannerExplorePc from '../../../assets/images/banner-explore-pc.webp';
+import { useAppSelector } from "../../../hooks/useAppStore";
+import type { SvgIconComponent } from "@mui/icons-material";
 
 interface Props {
   [key: string]: any;
@@ -57,16 +35,13 @@ export default function HomePage() {
 
   TabTitle(t('home.tabTitle', { appName: APP_NAME }));
 
-  const { isAuthenticated, currentUser } = useSelector((state) => state.user);
+  const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
 
   const nav = useNavigate();
 
-  const getIcon = (icon) => {
-
+  const getIcon = (icon: SvgIconComponent) => {
     const Icon = icon;
-
     return <Icon color="secondary" />
-
   }
 
   return (

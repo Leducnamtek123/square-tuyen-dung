@@ -1,11 +1,19 @@
-// @ts-nocheck
 import React from "react";
 import { Box, Button, Stack, styled, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { BANNER_TYPES } from "../../configs/constants";
 import ProjectService from "../../services/ProjectService";
 
-interface Props {
+interface Banner {
+  id: string | number;
+  imageUrl: string;
+  description?: string;
+  buttonLink?: string;
+  buttonText?: string;
+  isShowButton?: boolean;
+}
+
+interface MainJobRightBannerProps {
   [key: string]: any;
 }
 
@@ -26,15 +34,15 @@ const StyledBannerLink = styled("a")({
   },
 });
 
-const MainJobRightBanner = (_props: Props) => {
+const MainJobRightBanner = (_props: MainJobRightBannerProps) => {
   const { t } = useTranslation("common");
-  const [rightBanners, setRightBanners] = React.useState([]);
+  const [rightBanners, setRightBanners] = React.useState<Banner[]>([]);
   const theme = useTheme();
 
   React.useEffect(() => {
     const getRightBanners = async () => {
       try {
-        const resData = await ProjectService.getBanners({
+        const resData: any = await ProjectService.getBanners({
           type: BANNER_TYPES.MAIN_JOB_RIGHT,
         });
         const data = resData?.data || [];
@@ -74,7 +82,7 @@ const MainJobRightBanner = (_props: Props) => {
                 bottom: '20px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                zIndex: theme.zIndex.card + 1
+                zIndex: (theme.zIndex as any).card + 1
               }}
             >
               <Button

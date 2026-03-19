@@ -1,4 +1,3 @@
-// @ts-nocheck
 export { default as AccountPage } from './AccountPage';
 export { default as AttachedProfilePage } from './AttachedProfilePage';
 export { default as DashboardPage } from './DashboardPage';

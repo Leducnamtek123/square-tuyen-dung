@@ -1,6 +1,5 @@
-// @ts-nocheck
 import React, { useState } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Pagination, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Pagination, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip, SelectChangeEvent } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 
 import SearchIcon from '@mui/icons-material/Search';
@@ -10,12 +9,6 @@ import QuestionGroupTable from './components/QuestionGroupTable';
 import questionService from '../../../services/questionService';
 import { transformQuestion, transformQuestionGroup } from '../../../utils/transformers';
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
 const QuestionGroupsPage = () => {
     const { t } = useTranslation('admin');
     const PAGE_SIZE = 10;
@@ -23,12 +16,12 @@ const QuestionGroupsPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const [openDialog, setOpenDialog] = useState(false);
-    const [dialogMode, setDialogMode] = useState('add'); // 'add' or 'edit'
-    const [currentGroup, setCurrentGroup] = useState(null);
+    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+    const [currentGroup, setCurrentGroup] = useState<any>(null);
     const [groupName, setGroupName] = useState('');
     const [groupDescription, setGroupDescription] = useState('');
-    const [selectedQuestions, setSelectedQuestions] = useState([]);
-    const [allQuestions, setAllQuestions] = useState([]);
+    const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
+    const [allQuestions, setAllQuestions] = useState<any[]>([]);
 
     const [openCreateQuestion, setOpenCreateQuestion] = useState(false);
     const [newQuestionContent, setNewQuestionContent] = useState('');
@@ -47,12 +40,12 @@ const QuestionGroupsPage = () => {
         page,
         pageSize: PAGE_SIZE,
         kw: searchTerm
-    });
+    }) as any;
 
     React.useEffect(() => {
         const fetchQuestions = async () => {
             try {
-                const res = await questionService.getAllQuestions({ pageSize: 1000 });
+                const res = await questionService.getAllQuestions({ pageSize: 1000 }) as any;
                 const rawQuestions = Array.isArray(res?.results) ? res.results : Array.isArray(res) ? res : [];
                 setAllQuestions(rawQuestions.map(transformQuestion).filter(Boolean));
             } catch (error) {
@@ -70,7 +63,7 @@ const QuestionGroupsPage = () => {
                 text: newQuestionContent.trim(),
                 category: ''
             });
-            const newQ = transformQuestion(res);
+            const newQ = transformQuestion(res as any);
             if (newQ) {
                 setAllQuestions(prev => [newQ, ...prev]);
                 setSelectedQuestions(prev => [...prev, newQ.id]);
@@ -84,7 +77,7 @@ const QuestionGroupsPage = () => {
         }
     };
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
         setPage(1);
     };
@@ -98,16 +91,16 @@ const QuestionGroupsPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (group) => {
+    const handleOpenEdit = (group: any) => {
         setDialogMode('edit');
         setCurrentGroup(group);
         setGroupName(group.name);
         setGroupDescription(group.description || '');
-        setSelectedQuestions(group.questions?.map(q => q.id) || []);
+        setSelectedQuestions(group.questions?.map((q: any) => q.id) || []);
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (group) => {
+    const handleOpenDelete = (group: any) => {
         setCurrentGroup(group);
         setOpenDeleteDialog(true);
     };
@@ -206,10 +199,10 @@ const QuestionGroupsPage = () => {
                             onEdit={handleOpenEdit}
                             onDelete={handleOpenDelete}
                         />
-                        {data?.count > 0 && (
+                        {(data as any)?.count > 0 && (
                             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
                                 <Pagination
-                                    count={Math.ceil(data.count / PAGE_SIZE)}
+                                    count={Math.ceil((data as any).count / PAGE_SIZE)}
                                     page={page}
                                     onChange={(e, v) => setPage(v)}
                                     color="primary"
@@ -246,11 +239,11 @@ const QuestionGroupsPage = () => {
                             <Select
                                 multiple
                                 value={selectedQuestions}
-                                onChange={(e) => setSelectedQuestions(e.target.value)}
+                                onChange={(e: SelectChangeEvent<string[]>) => setSelectedQuestions(e.target.value as string[])}
                                 input={<OutlinedInput label={t('pages.questionGroups.selectQuestionsLabel')} />}
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                        {selected.map((value) => {
+                                        {(selected as string[]).map((value) => {
                                             const q = allQuestions.find((item) => item.id === value);
                                             return <Chip key={value} label={q?.text?.substring(0, 30) || 'Question'} />;
                                         })}

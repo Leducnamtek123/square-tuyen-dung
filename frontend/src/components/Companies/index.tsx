@@ -1,16 +1,11 @@
-// @ts-nocheck
 import React from "react";
-
 import { useSelector } from "react-redux";
-
 import { Box, Pagination, Stack, Typography } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
 import NoDataCard from "../NoDataCard";
-
 import Company from "../Company";
-
 import companyService from "../../services/companyService";
+import { RootState } from "../../redux/store";
 
 interface Props {
   [key: string]: any;
@@ -20,13 +15,13 @@ interface Props {
 
 const Companies = (_props: Props) => {
 
-  const { companyFilter } = useSelector((state) => state.filter);
+  const { companyFilter } = useSelector((state: RootState) => state.filter);
 
   const { pageSize } = companyFilter;
 
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const [companies, setCompanies] = React.useState([]);
+  const [companies, setCompanies] = React.useState<any[]>([]);
 
   const [page, setPage] = React.useState(1);
 
@@ -40,13 +35,10 @@ const Companies = (_props: Props) => {
 
       try {
 
-        const resData = await companyService.getCompanies({
-
+        const resData = (await companyService.getCompanies({
           ...companyFilter,
-
           page: page,
-
-        });
+        })) as any;
 
         const data = resData.data;
 
@@ -70,7 +62,7 @@ const Companies = (_props: Props) => {
 
   }, [companyFilter, page]);
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number) => {
 
     setPage(newPage);
 

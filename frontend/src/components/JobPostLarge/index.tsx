@@ -1,86 +1,64 @@
-// @ts-nocheck
 import React from "react";
-
 import { alpha, useTheme } from "@mui/material/styles";
-
 import { useSelector } from "react-redux";
-
 import { useNavigate } from "react-router-dom";
-
 import dayjs from "dayjs";
-
 import { Box, Card, Skeleton, Stack, Typography, Tooltip, Divider } from "@mui/material";
-
 import {
-
   faCalendarDays,
-
   faCircleDollarToSlot,
-
   faLocationDot,
-
   faBolt,
-
   faFire,
-
   faClock,
-
 } from "@fortawesome/free-solid-svg-icons";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
 import { salaryString } from "../../utils/customData";
-
 import MuiImageCustom from "../MuiImageCustom";
-
 import { formatRoute } from "../../utils/funcUtils";
-
 import { ROUTES, IMAGES } from "../../configs/constants";
-
 import TimeAgo from '../TimeAgo';
 
-interface Props {
-  [key: string]: any;
+interface JobPostLargeProps {
+  id: string | number;
+  slug: string;
+  companyImageUrl?: string;
+  companyName: string;
+  jobName: string;
+  cityId: any;
+  deadline: string | Date;
+  isUrgent?: boolean;
+  isHot?: boolean;
+  salaryMin?: number;
+  salaryMax?: number;
 }
 
 
 
 const JobPostLarge = ({
-
   id,
-
   slug,
-
   companyImageUrl,
-
   companyName,
-
   jobName,
-
   cityId,
-
   deadline,
-
   isUrgent,
-
   isHot,
-
   salaryMin,
-
   salaryMax,
-
-}: Props) => {
+}: JobPostLargeProps) => {
 
   const theme = useTheme();
 
   const nav = useNavigate();
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
   const goToDetail = () => {
     nav(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`);
   };
 
-  const handleCardKeyDown = (event) => {
+  const handleCardKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       goToDetail();
@@ -725,7 +703,7 @@ const Loading = () => (
 
         </Box>
 
-        <Box flex={1} justifyContent="center" spacing={0.8}>
+        <Stack flex={1} justifyContent="center" spacing={0.8}>
 
           <Typography variant="subtitle2">
 
@@ -745,7 +723,7 @@ const Loading = () => (
 
           </Typography>
 
-        </Box>
+        </Stack>
 
       </Stack>
 

@@ -1,9 +1,8 @@
-// @ts-nocheck
 import * as React from 'react';
 
 import { useTheme } from '@mui/material/styles';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import Checkbox from '@mui/material/Checkbox';
 
@@ -16,25 +15,21 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
 interface Props {
-  [key: string]: any;
+  name: string;
+  control: Control<any>;
+  placeholder?: string;
+  options?: any[];
 }
-
-
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const MultiSelectSearchCustom = ({
-
   name,
-
   control,
-
   placeholder = '',
-
   options = [],
-
 }: Props) => {
 
   const theme = useTheme();

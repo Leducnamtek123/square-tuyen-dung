@@ -1,4 +1,3 @@
-// @ts-nocheck
 "use client";;
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
@@ -21,7 +20,10 @@ import type { ReactNode, HTMLAttributes, ComponentProps } from "react";
 
 const LazyMessageResponse = lazy(() => import("./message-response"));
 
-const resolveMuiButtonVariant = (variant) => {
+type MuiButtonVariant = "outlined" | "text" | "contained";
+type MuiButtonSize = "small" | "medium" | "large";
+
+const resolveMuiButtonVariant = (variant: string): MuiButtonVariant => {
   switch (variant) {
     case "outline":
       return "outlined";
@@ -36,7 +38,7 @@ const resolveMuiButtonVariant = (variant) => {
   }
 };
 
-const resolveMuiButtonSize = (size) => {
+const resolveMuiButtonSize = (size: string): MuiButtonSize => {
   switch (size) {
     case "icon-xs":
     case "icon-sm":
@@ -185,7 +187,7 @@ export const MessageBranch = ({
   const [currentBranch, setCurrentBranch] = useState(defaultBranch);
   const [branches, setBranches] = useState<ReactNode[]>([]);
 
-  const handleBranchChange = useCallback((newBranch) => {
+  const handleBranchChange = useCallback((newBranch: number) => {
     setCurrentBranch(newBranch);
     onBranchChange?.(newBranch);
   }, [onBranchChange]);
@@ -236,20 +238,24 @@ export const MessageBranchContent = ({
     }
   }, [childrenArray, branches, setBranches]);
 
-  return childrenArray.map((branch, index) => {
-    const key = (branch as { key?: string | number } | null)?.key ?? index;
-    return (
-    <div
-      className={cn(
-        "grid gap-2 overflow-hidden [&>div]:pb-0",
-        index === currentBranch ? "block" : "hidden"
-      )}
-      key={key}
-      {...props}>
-      {branch}
-    </div>
-    );
-  });
+  return (
+    <>
+      {childrenArray.map((branch, index) => {
+        const key = (branch as { key?: string | number } | null)?.key ?? index;
+        return (
+          <div
+            className={cn(
+              "grid gap-2 overflow-hidden [&>div]:pb-0",
+              index === currentBranch ? "block" : "hidden"
+            )}
+            key={key}
+            {...props}>
+            {branch}
+          </div>
+        );
+      })}
+    </>
+  );
 };
 
 type MessageBranchSelectorProps = Omit<ComponentProps<typeof ButtonGroup>, "children"> & {

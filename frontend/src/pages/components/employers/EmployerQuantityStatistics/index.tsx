@@ -7,6 +7,14 @@ import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import statisticService from '../../../../services/statisticService';
+
+interface StatisticsData {
+  totalJobPost: number;
+  totalJobPostingPendingApproval: number;
+  totalJobPostExpired: number;
+  totalApply: number;
+}
+
 interface StatItemProps {
   title: string;
   value: number | undefined;
@@ -71,7 +79,7 @@ const EmployerQuantityStatistics = () => {
 
   const [isLoading, setIsLoading] = React.useState(true);
 
-  const [data, setData] = React.useState<any>(null);
+  const [data, setData] = React.useState<StatisticsData | null>(null);
 
   React.useEffect(() => {
 

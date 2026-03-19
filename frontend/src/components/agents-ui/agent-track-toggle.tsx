@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Fragment, useMemo, useState } from 'react';
 import type { ComponentProps, ComponentType } from 'react';
 import { cva } from 'class-variance-authority';

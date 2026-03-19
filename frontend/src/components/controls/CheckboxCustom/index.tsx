@@ -1,16 +1,16 @@
-// @ts-nocheck
 import React from 'react';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import { Checkbox, FormControlLabel } from "@mui/material";
 import ValidationError from '../ValidationError';
 
 interface Props {
-  [key: string]: any;
+  name: string;
+  control: Control<any>;
+  title?: string;
+  disabled?: boolean;
 }
-
-
 
 const CheckboxCustom = ({ name, control, title = '', disabled = false }: Props) => {
 

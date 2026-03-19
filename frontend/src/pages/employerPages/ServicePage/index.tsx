@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 import { Box, Card, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -11,12 +10,6 @@ import InsightsOutlinedIcon from "@mui/icons-material/InsightsOutlined";
 
 import { TabTitle } from "../../../utils/generalFunction";
 import { APP_NAME } from "../../../configs/constants";
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const ServicePage = () => {
   const { t } = useTranslation("employer");
@@ -52,7 +45,7 @@ const ServicePage = () => {
           variant="h3"
           sx={{
             mb: 2,
-            background: (theme) => theme.palette.primary.gradient,
+            background: (theme: any) => theme.palette.primary.gradient,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 700,
@@ -91,7 +84,7 @@ const ServicePage = () => {
                 transition: "all 0.3s ease-in-out",
                 "&:hover": {
                   transform: "translateY(-6px)",
-                  boxShadow: (theme) => theme.customShadows.card,
+                  boxShadow: (theme: any) => theme.customShadows.card,
                   borderColor: "primary.light",
                 },
               }}

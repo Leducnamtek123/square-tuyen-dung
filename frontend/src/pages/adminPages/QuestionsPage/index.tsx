@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Box, Card, CardHeader, CardContent, Typography, Button, TablePagination, Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -8,18 +7,12 @@ import { useQuestions, useCreateQuestion, useUpdateQuestion, useDeleteQuestion }
 import { useCareers } from '../CareersPage/hooks/useCareers';
 import QuestionTable from './components/QuestionTable';
 
-interface Props {
-  [key: string]: any;
-}
-
-
-
 const QuestionsPage = () => {
     const { t } = useTranslation('admin');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [openDialog, setOpenDialog] = useState(false);
-    const [editingQuestion, setEditingQuestion] = useState(null);
+    const [editingQuestion, setEditingQuestion] = useState<any>(null);
     const [formData, setFormData] = useState({
         questionText: '',
         difficulty: 1,
@@ -29,20 +22,20 @@ const QuestionsPage = () => {
     const { data: questionsData, isLoading } = useQuestions({
         page: page + 1,
         pageSize: rowsPerPage,
-    });
+    }) as any;
 
-    const { data: careersData } = useCareers({ pageSize: 100 });
-    const careers = careersData?.results || [];
+    const { data: careersData } = useCareers({ pageSize: 100 }) as any;
+    const careers = (careersData?.results || []) as any[];
 
-    const createMutation = useCreateQuestion();
-    const updateMutation = useUpdateQuestion();
-    const deleteMutation = useDeleteQuestion();
+    const createMutation = useCreateQuestion() as any;
+    const updateMutation = useUpdateQuestion() as any;
+    const deleteMutation = useDeleteQuestion() as any;
 
-    const handleChangePage = (event, newPage) => {
+    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
         setPage(newPage);
     };
 
-    const handleChangeRowsPerPage = (event) => {
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
@@ -53,7 +46,7 @@ const QuestionsPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (question) => {
+    const handleOpenEdit = (question: any) => {
         setEditingQuestion(question);
         setFormData({
             questionText: question.questionText,
@@ -91,14 +84,14 @@ const QuestionsPage = () => {
                 </Button>
             </Box>
 
-            <Card sx={{ borderRadius: '12px', boxShadow: (theme) => theme.customShadows.card }} elevation={0}>
+            <Card sx={{ borderRadius: '12px', boxShadow: (theme) => (theme as any).customShadows.card }} elevation={0}>
                 <CardHeader title={t('pages.questions.listTitle')} sx={{ pb: 0 }} />
                 <CardContent>
                     <QuestionTable
                         questions={questionsData?.results || []}
                         loading={isLoading}
                         onEdit={handleOpenEdit}
-                        onDelete={(id) => {
+                        onDelete={(id: string | number) => {
                             if (window.confirm(t('pages.questions.deleteConfirm'))) {
                                 deleteMutation.mutate(id);
                             }
@@ -139,7 +132,7 @@ const QuestionsPage = () => {
                             select
                             label={t('pages.questions.difficultyLabel')}
                             value={formData.difficulty}
-                            onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
+                            onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as any })}
                         >
                             <MenuItem value={1}>{t('pages.questions.difficulty.easy')}</MenuItem>
                             <MenuItem value={2}>{t('pages.questions.difficulty.medium')}</MenuItem>

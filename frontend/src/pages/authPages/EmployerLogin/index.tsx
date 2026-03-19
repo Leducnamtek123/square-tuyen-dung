@@ -1,6 +1,4 @@
-// @ts-nocheck
 import * as React from 'react';
-import { useDispatch } from 'react-redux';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Alert, AlertTitle, Avatar, Box, Card, Container, Typography, styled } from '@mui/material';
 import Grid from '@mui/material/Grid2';
@@ -15,10 +13,9 @@ import { getUserInfo } from '../../../redux/userSlice';
 import EmployerLoginForm from '../../components/auths/EmployerLoginForm';
 import authService from '../../../services/authService';
 import tokenService from '../../../services/tokenService';
-
-interface Props {
-  [key: string]: any;
-}
+import { useAppDispatch } from '../../../hooks/useAppStore';
+import type { RoleName, AuthProvider } from '../../../types/auth';
+import type { AxiosError } from 'axios';
 
 
 
@@ -53,13 +50,13 @@ const EmployerLogin = () => {
   const { t } = useTranslation('auth');
   TabTitle(t('login.employerTitle'));
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const nav = useNavigate();
   const [searchParams] = useSearchParams();
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-  const [errorMessage, setErrorMessage] = React.useState(null);
-  const [successMessage, setSuccessMessage] = React.useState(null);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const successMsg = searchParams.get('successMessage');
@@ -72,8 +69,8 @@ const EmployerLogin = () => {
     setErrorMessage(errorMsg);
   }, [searchParams]);
 
-  const handleLogin = (data) => {
-    const getAccesToken = async (email, password, roleName) => {
+  const handleLogin = (data: any) => {
+    const getAccessToken = async (email: string, password: string, roleName: RoleName) => {
       setIsFullScreenLoading(true);
 
       try {
@@ -82,7 +79,7 @@ const EmployerLogin = () => {
           access_token: accessToken,
           refresh_token: refreshToken,
           backend,
-        } = resData;
+        } = resData as any;
 
         const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
           accessToken,
@@ -103,7 +100,8 @@ const EmployerLogin = () => {
           toastMessages.error(t('messages.loginError'));
         }
       } catch (error) {
-        const res = error?.response;
+        const axiosError = error as AxiosError<any>;
+        const res = axiosError?.response;
 
         if (res?.status === 400) {
           const errors = res?.data?.errors;
@@ -119,19 +117,19 @@ const EmployerLogin = () => {
       }
     };
 
-    const checkCreds = async (email, password, roleName) => {
+    const checkCreds = async (email: string, password: string, roleName: RoleName) => {
       setIsFullScreenLoading(true);
 
       try {
-        const resData = await authService.checkCreds(email, roleName);
+        const resData = await authService.checkCreds(email, roleName) as any;
         const { exists, email: resEmail, email_verified } = resData;
 
         if (exists === true && email_verified === false) {
           dispatch(
             updateVerifyEmail({
               isAllowVerifyEmail: true,
-              email,
-              roleName,
+              email: email,
+              roleName: roleName,
             })
           );
 
@@ -144,7 +142,7 @@ const EmployerLogin = () => {
           return;
         }
 
-        getAccesToken(resEmail, password, roleName);
+        getAccessToken(resEmail, password, roleName);
       } catch (error) {
         toastMessages.error(t('messages.loginError'));
       } finally {
@@ -152,14 +150,14 @@ const EmployerLogin = () => {
       }
     };
 
-    checkCreds(data.email, data.password, ROLES_NAME.EMPLOYER);
+    checkCreds(data.email, data.password, ROLES_NAME.EMPLOYER as RoleName);
   };
 
-  const handleSocialLogin = async (clientId, clientSecrect, provider, token) => {
+  const handleSocialLogin = async (clientId: string, clientSecrect: string, provider: AuthProvider, token: string) => {
     setIsFullScreenLoading(true);
 
     try {
-      const resData = await authService.convertToken(clientId, clientSecrect, provider, token);
+      const resData = await authService.convertToken(clientId, clientSecrect, provider, token) as any;
       const {
         access_token: accessToken,
         refresh_token: refreshToken,
@@ -185,7 +183,8 @@ const EmployerLogin = () => {
         toastMessages.error(t('messages.loginError'));
       }
     } catch (error) {
-      const res = error?.response;
+      const axiosError = error as AxiosError<any>;
+      const res = axiosError?.response;
 
       if (res?.status === 400) {
         const errors = res?.data?.errors;
@@ -201,14 +200,14 @@ const EmployerLogin = () => {
     }
   };
 
-  const handleGoogleLogin = (result) => {
+  const handleGoogleLogin = (result: any) => {
     const code = result?.code;
 
     if (code) {
       handleSocialLogin(
         AUTH_CONFIG.GOOGLE_CLIENT_ID,
         AUTH_CONFIG.GOOGLE_CLIENT_SECRET,
-        AUTH_PROVIDER.GOOGLE,
+        AUTH_PROVIDER.GOOGLE as AuthProvider,
         code
       );
     }

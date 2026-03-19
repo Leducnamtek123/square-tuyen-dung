@@ -1,8 +1,7 @@
-// @ts-nocheck
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { Box, Chip, Pagination, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
+import { Box, Chip, Pagination, Skeleton, Stack, Tooltip, Typography, Theme } from "@mui/material";
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import { ChatContext } from '../../../../context/ChatProvider';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
@@ -13,12 +12,7 @@ import {
   checkExists,
   createUser,
 } from '../../../../services/firebaseService';
-
-interface Props {
-  [key: string]: any;
-}
-
-
+import { RootState } from '../../../../redux/store';
 
 const pageSize = 12;
 
@@ -39,24 +33,27 @@ const LoadingComponentItem = () => {
   );
 };
 
-const RightSidebar = () => {
+export const RightSidebar = () => {
   const { t } = useTranslation('chat');
-  const { setSelectedRoomId } = React.useContext(ChatContext);
-  const { currentUser } = useSelector((state) => state.user);
-  const { id: userId } = currentUser;
+  const context = React.useContext(ChatContext);
+  const { currentUser } = useSelector((state: RootState) => state.user);
+  const userId = currentUser?.id;
+  
   const [isLoading, setIsLoading] = React.useState(true);
-  const [jobPostsApplied, setJobPostsApplied] = React.useState([]);
+  const [jobPostsApplied, setJobPostsApplied] = React.useState<any[]>([]);
   const [page, setPage] = React.useState(1);
   const [count, setCount] = React.useState(0);
+
+  const { setSelectedRoomId } = context || {};
 
   React.useEffect(() => {
     const getJobPosts = async () => {
       setIsLoading(true);
       try {
-        const resData = await jobPostActivityService.getJobPostChatActivity({
+        const resData = (await jobPostActivityService.getJobPostChatActivity({
           page: page,
           pageSize: pageSize,
-        });
+        })) as any;
         const data = resData.data;
         setCount(data.count);
         setJobPostsApplied(data.results);
@@ -69,7 +66,11 @@ const RightSidebar = () => {
     getJobPosts();
   }, [page]);
 
-  const handleAddRoom = async (partnerId, userData) => {
+  if (!context || !setSelectedRoomId) return null;
+
+  const handleAddRoom = async (partnerId: string, userData: any) => {
+    if (!userId) return;
+    
     let allowCreateNewChatRoom = false;
     const isExists = await checkExists('accounts', partnerId);
     if (!isExists) {
@@ -158,9 +159,9 @@ const RightSidebar = () => {
                   bgcolor: 'background.default',
                   transition: 'all 0.2s ease-in-out',
                   '&:hover': {
-                    bgcolor: 'primary.background',
+                    bgcolor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.04)',
                     transform: 'translateY(-2px)',
-                    boxShadow: (theme) => theme.customShadows.card
+                    boxShadow: (theme: Theme) => (theme as any).customShadows?.card
                   }
                 }}
               >
@@ -179,7 +180,7 @@ const RightSidebar = () => {
                     />
                   </Box>
                   <Stack flex={1} minWidth={0}>
-                    <Tooltip title={value?.jobPostTitle} arrow placement="top">
+                    <Tooltip title={value?.jobPostTitle || ''} arrow placement="top">
                       <Typography
                         variant="subtitle2"
                         noWrap
@@ -193,7 +194,7 @@ const RightSidebar = () => {
                         {value?.jobPostTitle || '---'}
                       </Typography>
                     </Tooltip>
-                    <Tooltip title={value?.companyName} arrow placement="bottom">
+                    <Tooltip title={value?.companyName || ''} arrow placement="bottom">
                       <Typography
                         variant="caption"
                         noWrap
@@ -230,7 +231,8 @@ const RightSidebar = () => {
                       sx={{
                         borderRadius: 1,
                         '&:hover': {
-                          bgcolor: 'primary.background',
+                          bgcolor: 'primary.main',
+                          color: 'white',
                           borderColor: 'primary.main'
                         }
                       }}
@@ -259,7 +261,7 @@ const RightSidebar = () => {
             variant="outlined"
             count={Math.ceil(count / pageSize)}
             page={page}
-            onChange={(event, newPage) => {
+            onChange={(_event, newPage) => {
               setPage(newPage);
             }}
             sx={{
@@ -274,23 +276,26 @@ const RightSidebar = () => {
   );
 };
 
-const EmployerSidebar = () => {
+export const EmployerSidebar = () => {
   const { t } = useTranslation('chat');
-  const { setSelectedRoomId } = React.useContext(ChatContext);
-  const { currentUser } = useSelector((state) => state.user);
-  const { id: userId } = currentUser;
+  const context = React.useContext(ChatContext);
+  const { currentUser } = useSelector((state: RootState) => state.user);
+  const userId = currentUser?.id;
+
   const [isLoading, setIsLoading] = React.useState(true);
-  const [jobPostsApplied, setJobPostsApplied] = React.useState([]);
+  const [jobPostsApplied, setJobPostsApplied] = React.useState<any[]>([]);
   const [page, setPage] = React.useState(1);
   const [count, setCount] = React.useState(0);
 
+  const { setSelectedRoomId } = context || {};
+
   React.useEffect(() => {
-    const loadJobPostActivity = async (params) => {
+    const loadJobPostActivity = async (params: any) => {
       setIsLoading(true);
       try {
-        const resData = await jobPostActivityService.getAppliedResumeChat(
+        const resData = (await jobPostActivityService.getAppliedResumeChat(
           params
-        );
+        )) as any;
         const data = resData.data;
         setCount(data.count);
         setJobPostsApplied(data.results);
@@ -306,7 +311,11 @@ const EmployerSidebar = () => {
     });
   }, [page]);
 
-  const handleAddRoom = async (partnerId, userData) => {
+  if (!context || !setSelectedRoomId) return null;
+
+  const handleAddRoom = async (partnerId: string, userData: any) => {
+    if (!userId) return;
+
     let allowCreateNewChatRoom = false;
     const isExists = await checkExists('accounts', partnerId);
     if (!isExists) {
@@ -395,9 +404,9 @@ const EmployerSidebar = () => {
                   bgcolor: 'background.default',
                   transition: 'all 0.2s ease-in-out',
                   '&:hover': {
-                    bgcolor: 'primary.background',
+                    bgcolor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.04)',
                     transform: 'translateY(-2px)',
-                    boxShadow: (theme) => theme.customShadows.card
+                    boxShadow: (theme: Theme) => (theme as any).customShadows?.card
                   }
                 }}
               >
@@ -416,7 +425,7 @@ const EmployerSidebar = () => {
                     />
                   </Box>
                   <Stack flex={1} minWidth={0}>
-                    <Tooltip title={value?.fullName} arrow placement="top">
+                    <Tooltip title={value?.fullName || ''} arrow placement="top">
                       <Typography
                         variant="subtitle2"
                         noWrap
@@ -430,7 +439,7 @@ const EmployerSidebar = () => {
                         {value?.fullName || '---'}
                       </Typography>
                     </Tooltip>
-                    <Tooltip title={value?.jobPostTitle} arrow placement="bottom">
+                    <Tooltip title={value?.jobPostTitle || ''} arrow placement="bottom">
                       <Typography
                         variant="caption"
                         noWrap
@@ -462,7 +471,8 @@ const EmployerSidebar = () => {
                       sx={{
                         borderRadius: 1,
                         '&:hover': {
-                          bgcolor: 'primary.background',
+                          bgcolor: 'primary.main',
+                          color: 'white',
                           borderColor: 'primary.main'
                         }
                       }}
@@ -491,7 +501,7 @@ const EmployerSidebar = () => {
             variant="outlined"
             count={Math.ceil(count / pageSize)}
             page={page}
-            onChange={(event, newPage) => {
+            onChange={(_event, newPage) => {
               setPage(newPage);
             }}
             sx={{
@@ -506,6 +516,6 @@ const EmployerSidebar = () => {
   );
 };
 
-RightSidebar.Employer = EmployerSidebar;
+const MainRightSidebar = Object.assign(RightSidebar, { Employer: EmployerSidebar });
 
-export default RightSidebar;
+export default MainRightSidebar;

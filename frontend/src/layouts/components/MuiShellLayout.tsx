@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from 'react';
 
 import { NavLink, useLocation } from 'react-router-dom';
@@ -25,17 +24,27 @@ import LanguageSwitcher from './commons/LanguageSwitcher';
 
 import { IMAGES } from '../../configs/constants';
 
-interface Props {
-  [key: string]: any;
+interface NavItem {
+  id: string;
+  type?: 'section' | 'item';
+  label: string;
+  icon?: any;
+  to?: string;
+  children?: NavItem[];
+}
+
+interface MuiShellLayoutProps {
+  title?: string;
+  navItems: NavItem[];
+  children: React.ReactNode;
 }
 
 
 
 const drawerWidth = 240;
 
-const createInitialExpanded = (items) => {
-
-  const expanded = {};
+const createInitialExpanded = (items: NavItem[]) => {
+  const expanded: Record<string, boolean> = {};
 
   items.forEach((item) => {
 
@@ -51,17 +60,17 @@ const createInitialExpanded = (items) => {
 
 };
 
-const MuiShellLayout = ({ title, navItems, children }) => {
+const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
   const location = useLocation();
 
-  const { currentUser, isAuthenticated } = useSelector((state) => state.user);
+  const { currentUser, isAuthenticated } = useSelector((state: any) => state.user);
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
-  const [expandedItems, setExpandedItems] = React.useState(() => createInitialExpanded(navItems));
+  const [expandedItems, setExpandedItems] = React.useState<Record<string, boolean>>(() => createInitialExpanded(navItems));
 
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
   const handleDrawerToggle = () => {
 
@@ -69,13 +78,13 @@ const MuiShellLayout = ({ title, navItems, children }) => {
 
   };
 
-  const handleToggleGroup = (id) => {
+  const handleToggleGroup = (id: string) => {
 
     setExpandedItems((prev) => ({ ...prev, [id]: !prev[id] }));
 
   };
 
-  const handleOpenUserMenu = (event) => {
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
 
     setAnchorElUser(event.currentTarget);
 
@@ -87,7 +96,7 @@ const MuiShellLayout = ({ title, navItems, children }) => {
 
   };
 
-  const renderNavItems = (items, isChild = false) =>
+  const renderNavItems = (items: NavItem[], isChild = false) =>
 
     items.map((item) => {
 

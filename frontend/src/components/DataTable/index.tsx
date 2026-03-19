@@ -1,30 +1,38 @@
-// @ts-nocheck
 import React from 'react';
 import {
     flexRender,
     getCoreRowModel,
     useReactTable,
+    ColumnDef,
 } from '@tanstack/react-table';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, TablePagination, Box, Typography, CircularProgress } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  [key: string]: any;
+interface Props<TData> {
+  columns: ColumnDef<TData, any>[];
+  data: TData[];
+  isLoading?: boolean;
+  count?: number;
+  page?: number;
+  rowsPerPage?: number;
+  onPageChange?: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
+  onRowsPerPageChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  emptyMessage?: string;
 }
 
 
 
-const DataTable = ({
+const DataTable = <TData,>({
     columns,
     data,
-    isLoading,
-    count,
-    page,
-    rowsPerPage,
+    isLoading = false,
+    count = 0,
+    page = 0,
+    rowsPerPage = 10,
     onPageChange,
     onRowsPerPageChange,
     emptyMessage,
-}: Props) => {
+}: Props<TData>) => {
     const { t } = useTranslation('admin');
     
     const table = useReactTable({
@@ -93,7 +101,7 @@ const DataTable = ({
                 count={count}
                 rowsPerPage={rowsPerPage}
                 page={page}
-                onPageChange={onPageChange}
+                onPageChange={onPageChange || (() => { })}
                 onRowsPerPageChange={onRowsPerPageChange}
                 labelRowsPerPage={t('common.pagination.rowsPerPage')}
                 labelDisplayedRows={({ from, to, count }) => 

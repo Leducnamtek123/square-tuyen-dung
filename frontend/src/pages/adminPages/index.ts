@@ -1,4 +1,3 @@
-// @ts-nocheck
 export { default as DashboardPage } from './DashboardPage';
 export { default as QuestionsPage } from './QuestionsPage';
 export { default as UsersPage } from './UsersPage';

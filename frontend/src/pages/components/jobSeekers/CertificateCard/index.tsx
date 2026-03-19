@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useParams } from 'react-router-dom';
@@ -51,8 +50,16 @@ import resumeService from '../../../../services/resumeService';
 
 import certificateService from '../../../../services/certificateService';
 
-interface Props {
-  [key: string]: any;
+interface Certificate {
+  id: string | number;
+  name: string;
+  trainingPlace: string;
+  startDate: string | Date;
+  expirationDate: string | Date | null;
+}
+
+interface CertificateCardProps {
+  title: string;
 }
 
 
@@ -103,7 +110,7 @@ const Loading = (
 
         .fill(0)
 
-        .map((item, index) => (
+        .map((_, index) => (
 
           <Box sx={{ py: 1 }} key={index}>
 
@@ -123,11 +130,11 @@ const Loading = (
 
 );
 
-const CertificateCard = ({ title }) => {
+const CertificateCard = ({ title }: CertificateCardProps) => {
 
   const { t } = useTranslation(['jobSeeker', 'common']);
 
-  const { slug: resumeSlug } = useParams();
+  const { slug: resumeSlug } = useParams<{ slug: string }>();
 
   const [openPopup, setOpenPopup] = React.useState(false);
 
@@ -139,25 +146,26 @@ const CertificateCard = ({ title }) => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const [certificates, setCertificates] = React.useState([]);
+  const [certificates, setCertificates] = React.useState<Certificate[]>([]);
 
-  const [editData, setEditData] = React.useState(null);
+  const [editData, setEditData] = React.useState<Certificate | null>(null);
 
-  const [serverErrors, setServerErrors] = React.useState(null);
+  const [serverErrors, setServerErrors] = React.useState<any>(null);
 
   React.useEffect(() => {
 
-    const loadCertificates = async (resumeSlug) => {
+    const loadCertificates = async (slug: string | undefined) => {
+      if (!slug) return;
 
       setIsLoadingCertificatesl(true);
 
       try {
 
-        const resData = await resumeService.getCertificates(resumeSlug);
+        const resData = await resumeService.getCertificates(slug) as any;
 
         setCertificates(resData.data);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -173,23 +181,23 @@ const CertificateCard = ({ title }) => {
 
   }, [resumeSlug, isSuccess]);
 
-  const handleShowUpdate = (id) => {
+  const handleShowUpdate = (id: string | number) => {
 
     setServerErrors(null);
 
-    const loadCertificateById = async (id) => {
+    const loadCertificateById = async (certId: string | number) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        const resData = await certificateService.getCertificateById(id);
+        const resData = await certificateService.getCertificateById(certId) as any;
 
         setEditData(resData.data);
 
         setOpenPopup(true);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -215,15 +223,15 @@ const CertificateCard = ({ title }) => {
 
   };
 
-  const handleAddOrUpdate = (data) => {
+  const handleAddOrUpdate = (data: any) => {
 
-    const create = async (data) => {
+    const create = async (payload: any) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await certificateService.addCertificates(data);
+        await certificateService.addCertificates(payload);
 
         setOpenPopup(false);
 
@@ -231,7 +239,7 @@ const CertificateCard = ({ title }) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.certificateAddSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error, setServerErrors);
 
@@ -243,13 +251,13 @@ const CertificateCard = ({ title }) => {
 
     };
 
-    const update = async (data) => {
+    const update = async (payload: any) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await certificateService.updateCertificateById(data.id, data);
+        await certificateService.updateCertificateById(payload.id, payload);
 
         setOpenPopup(false);
 
@@ -257,7 +265,7 @@ const CertificateCard = ({ title }) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.certificateUpdateSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -291,19 +299,19 @@ const CertificateCard = ({ title }) => {
 
   };
 
-  const handleDeleteCertificates = (id) => {
+  const handleDeleteCertificates = (id: string | number) => {
 
-    const del = async (id) => {
+    const del = async (certId: string | number) => {
 
       try {
 
-        await certificateService.deleteCertificateById(id);
+        await certificateService.deleteCertificateById(certId);
 
         setIsSuccess(!isSuccess);
 
         toastMessages.success(t('jobSeeker:profile.messages.certificateDeleteSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -343,7 +351,7 @@ const CertificateCard = ({ title }) => {
 
           p: 3,
 
-          boxShadow: (theme) => theme.customShadows.card,
+          boxShadow: (theme: any) => theme.customShadows.card,
 
         }}
 
@@ -397,7 +405,7 @@ const CertificateCard = ({ title }) => {
 
                   sx={{
 
-                    boxShadow: (theme) => theme.customShadows.medium,
+                    boxShadow: (theme: any) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -463,9 +471,9 @@ const CertificateCard = ({ title }) => {
 
                           sx={{
 
-                            background: (theme) => theme.palette.primary.gradient,
+                            background: (theme: any) => theme.palette.primary.gradient,
 
-                            boxShadow: (theme) => theme.customShadows.small,
+                            boxShadow: (theme: any) => theme.customShadows.small,
 
                           }}
 

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -37,11 +36,9 @@ import jobPostActivityService from '../../../../services/jobPostActivityService'
 
 import jobService from '../../../../services/jobService';
 
-interface Props {
-  [key: string]: any;
+interface AppliedResumeCardProps {
+  title: string;
 }
-
-
 
 const pageSize = 10;
 
@@ -67,11 +64,11 @@ const defaultFilterData = {
 
 };
 
-const AppliedResumeCard = ({ title: cardTitle }) => {
+const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle }) => {
 
   const { t } = useTranslation('employer');
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
   const headCells = [
 
@@ -191,7 +188,7 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const [jobPostOptions, setJobPostOptions] = React.useState([]);
+  const [jobPostOptions, setJobPostOptions] = React.useState<any[]>([]);
 
   const [jobPostIdSelect, setJobPostIdSelect] = React.useState('');
 
@@ -205,17 +202,17 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
     let count = 0;
 
-    let keys = Object.keys(filterData);
+    let keys = Object.keys(filterData) as Array<keyof typeof filterData>;
 
     for (let i = 0; i < keys.length; i++) {
 
         if (
 
-            keys[i] !== 'jobPostId' &&
+            keys[i] !== ('jobPostId' as any) &&
 
-            keys[i] !== 'pageSize' &&
+            keys[i] !== ('pageSize' as any) &&
 
-            filterData[keys[i]] !== ''
+            (filterData as any)[keys[i]] !== ''
 
         ) {
 
@@ -231,11 +228,11 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
   React.useEffect(() => {
 
-    const loadJobPostOptions = async (params) => {
+    const loadJobPostOptions = async (params?: any) => {
 
       try {
 
-        const resData = await jobService.getJobPostOptions(params);
+        const resData = await (jobService as any).getJobPostOptions() as any;
 
         setJobPostOptions(Array.isArray(resData?.data) ? resData.data : []);
 
@@ -253,13 +250,13 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
   React.useEffect(() => {
 
-    const loadJobPostActivity = async (params) => {
+    const loadJobPostActivity = async (params: any) => {
 
       setIsLoading(true);
 
       try {
 
-        const resData = await jobPostActivityService.getAppliedResume(params);
+        const resData = await jobPostActivityService.getAppliedResume(params) as any;
 
         const data = resData?.data;
 
@@ -277,7 +274,7 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
         retResumes(rawResumes);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -319,7 +316,7 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
   ]);
 
-  const handleFilter = (data) => {
+  const handleFilter = (data: any) => {
 
     setOpenPopup(false);
 
@@ -337,7 +334,7 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
   const handleExport = () => {
 
-    const exportJobPostsActivity = async (params) => {
+    const exportJobPostsActivity = async (params: any) => {
 
       setIsFullScreenLoading(true);
 
@@ -347,13 +344,13 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
           params
 
-        );
+        ) as any;
 
         const data = resData.data;
 
         xlsxUtils.exportToXLSX(data, 'AppliedProfilesList');
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -381,9 +378,9 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
   };
 
-  const handleChangeApplicationStatus = (id, value, callback) => {
+  const handleChangeApplicationStatus = (id: string, value: any, callback: (result: boolean) => void) => {
 
-    const changeStatus = async (id, data) => {
+    const changeStatus = async (id: string, data: any) => {
 
       setIsFullScreenLoading(true);
 
@@ -397,7 +394,7 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
         callback(true);
 
-      } catch (error) {
+      } catch (error: any) {
 
         // Failed
 
@@ -417,9 +414,9 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: string) => {
 
-    const del = async (id) => {
+    const del = async (id: string) => {
 
       try {
 
@@ -429,7 +426,7 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
         toastMessages.success(t('appliedResume.delete.success'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -455,13 +452,13 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
   };
 
-  const handleChangePage = (event, newPage) => {
+  const handleChangePage = (event: unknown, newPage: number) => {
 
     setPage(newPage);
 
   };
 
-  const handleChangeRowsPerPage = (event) => {
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
 
     setRowsPerPage(parseInt(event.target.value, 10));
 
@@ -669,7 +666,7 @@ const AppliedResumeCard = ({ title: cardTitle }) => {
 
                 allConfig?.applicationStatusOptions.find(
 
-                  (o) => o.id === applicationStatusSelect
+                  (o: any) => o.id === applicationStatusSelect
 
                 ) || null
 

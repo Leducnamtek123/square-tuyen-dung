@@ -1,130 +1,79 @@
-// @ts-nocheck
 import React from 'react';
-
 import { useSelector } from 'react-redux';
-
 import { useNavigate } from 'react-router-dom';
-
 import { Badge, IconButton } from "@mui/material";
-
 import ForumIcon from '@mui/icons-material/Forum';
-
 import {
-
   collection,
-
   onSnapshot,
-
   query,
-
   where,
-
+  QueryDocumentSnapshot,
+  DocumentData,
 } from 'firebase/firestore';
-
-import db from '../../configs/firebase-config'; 
-
+import db from '../../configs/firebase-config';
 import { ROUTES } from '../../configs/constants';
 
-interface Props {
-  [key: string]: any;
+interface ChatCardProps {
+  // Add specific props if needed
 }
-
-
 
 const chatRoomCollectionRef = collection(db, 'chatRooms');
 
-const ChatCard = (_props: Props) => {
-
-  const { currentUser, activeWorkspace } = useSelector((state) => state.user);
-
+const ChatCard = (_props: ChatCardProps) => {
+  const { currentUser, activeWorkspace } = useSelector((state: any) => state.user);
   const nav = useNavigate();
-
-  const [count, setCount] = React.useState(0)
+  const [count, setCount] = React.useState(0);
 
   const isEmployer = React.useMemo(() => {
-
     return activeWorkspace?.type === "company";
-
   }, [activeWorkspace]);
 
   React.useEffect(() => {
+    if (!currentUser?.id) return;
 
     const q = query(
-
       chatRoomCollectionRef,
-
       where('recipientId', '==', `${currentUser.id}`),
-
       where('unreadCount', '>', 0)
-
     );
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-
       let total = 0;
-
-      querySnapshot.forEach((doc) => {
-
+      querySnapshot.forEach((doc: QueryDocumentSnapshot<DocumentData>) => {
         const documentData = doc.data();
-
         const unreadCount = documentData.unreadCount || 0;
-
         total += unreadCount;
-
       });
-
       setCount(total);
-
-      console.log("TOTAL: ", total)
-
+      console.log("TOTAL: ", total);
     });
 
     return () => {
-
       unsubscribe();
-
     };
-
   }, [currentUser]);
 
   const handleRedirect = () => {
-
     if (isEmployer) {
-
       nav(`/${ROUTES.EMPLOYER.CHAT}`);
-
     } else {
-
       nav(`/${ROUTES.JOB_SEEKER.CHAT}`);
-
     }
-
   };
 
   return (
-
     <IconButton
-
       onClick={handleRedirect}
-
       size="large"
-
       aria-label="show new notifications"
-
       color="inherit"
-
     >
-
       <Badge badgeContent={count} color="error">
-
         <ForumIcon />
-
       </Badge>
-
     </IconButton>
-
   );
-
 };
 
 export default ChatCard;

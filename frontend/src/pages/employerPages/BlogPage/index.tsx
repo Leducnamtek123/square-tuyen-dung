@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -14,12 +13,6 @@ import {
 } from '@mui/material';
 import { Link } from 'react-router-dom';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const BlogPage = () => {
     const { t } = useTranslation('employer');
@@ -53,7 +46,7 @@ const BlogPage = () => {
                 aria-label="breadcrumb"
                 sx={{ mb: 3 }}
             >
-                <MuiLink component={Link} underline="hover" color="inherit" to="/employer/dashboard">
+                <MuiLink component={Link} underline="hover" color="inherit" to="/employer/dashboard" {...({} as any)}>
                     {t('sidebar.dashboard')}
                 </MuiLink>
                 <Typography color="text.primary">{t('blog.title')}</Typography>

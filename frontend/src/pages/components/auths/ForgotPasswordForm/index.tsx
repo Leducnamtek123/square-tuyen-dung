@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
@@ -13,13 +12,17 @@ import { useTranslation } from 'react-i18next';
 
 import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
 
-interface Props {
-  [key: string]: any;
+interface ForgotPasswordFormData {
+  email: string;
+}
+
+interface ForgotPasswordFormProps {
+  handleRequestResetPassword: (data: ForgotPasswordFormData) => void;
 }
 
 
 
-const ForgotPasswordForm = ({ handleRequestResetPassword }) => {
+const ForgotPasswordForm = ({ handleRequestResetPassword }: ForgotPasswordFormProps) => {
 
   const { t } = useTranslation('auth');
 
@@ -35,7 +38,7 @@ const ForgotPasswordForm = ({ handleRequestResetPassword }) => {
 
   });
 
-  const { control, handleSubmit } = useForm({
+  const { control, handleSubmit } = useForm<ForgotPasswordFormData>({
 
     defaultValues: {
 

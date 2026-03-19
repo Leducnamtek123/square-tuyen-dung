@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Avatar, Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Stack, useTheme, Button } from "@mui/material";
 
 import React from 'react';
@@ -31,15 +30,25 @@ import {
 
 } from '../../../../redux/filterSlice';
 
-interface Props {
-  [key: string]: any;
+interface PageItem {
+  id: string;
+  path: string;
+  label: string;
+}
+
+interface LeftDrawerProps {
+  window?: () => Window;
+  pages: PageItem[];
+  mobileOpen: boolean;
+  handleDrawerToggle: () => void;
+  showPublicActions?: boolean;
 }
 
 
 
 const drawerWidth = 240;
 
-const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicActions = true }) => {
+const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicActions = true }: LeftDrawerProps) => {
 
   const { t } = useTranslation('common');
 
@@ -49,7 +58,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
   const theme = useTheme();
 
-  const { isAuthenticated } = useSelector((state) => state.user);
+  const { isAuthenticated } = useSelector((state: any) => state.user);
 
   const container =
 
@@ -57,11 +66,10 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
   const handleLogout = () => {
 
-    const accessToken = tokenService.getAccessTokenFromCookie();
+    const accessToken = tokenService.getAccessTokenFromCookie() || '';
+    const backend = tokenService.getProviderFromCookie() || '';
 
-    const backend = tokenService.getProviderFromCookie();
-
-    dispatch(removeUserInfo({ accessToken, backend }))
+    (dispatch as any)(removeUserInfo({ accessToken, backend }))
 
       .unwrap()
 
@@ -77,7 +85,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
       })
 
-      .catch((error) => {
+      .catch((error: any) => {
 
         errorHandling(error);
 

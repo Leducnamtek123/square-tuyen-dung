@@ -1,9 +1,8 @@
-// @ts-nocheck
 import React from 'react';
 
-import { useDropzone } from 'react-dropzone';
+import { useDropzone, Accept } from 'react-dropzone';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import { Stack, Box, Typography, Button } from "@mui/material";
 
@@ -11,13 +10,13 @@ import FileUploadOutlinedIcon from '@mui/icons-material/FileUploadOutlined';
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
-interface Props {
-  [key: string]: any;
+interface FileDropzoneProps {
+  accept?: Accept;
+  onDrop: (files: File[]) => void;
+  values?: any;
 }
 
-
-
-const FileDropzone = ({ accept, onDrop, values }: Props) => {
+const FileDropzone = ({ accept, onDrop, values }: FileDropzoneProps) => {
 
   const { getRootProps, getInputProps } = useDropzone({
 
@@ -239,7 +238,14 @@ const FileDropzone = ({ accept, onDrop, values }: Props) => {
 
 };
 
-const BasicDropzone = ({ control, name, title = '', showRequired = false }) => {
+interface BasicDropzoneProps {
+  control: Control<any>;
+  name: string;
+  title?: string;
+  showRequired?: boolean;
+}
+
+const BasicDropzone = ({ control, name, title = '', showRequired = false }: BasicDropzoneProps) => {
 
   return (
 
@@ -257,7 +263,7 @@ const BasicDropzone = ({ control, name, title = '', showRequired = false }) => {
 
             fontWeight: 600,
 
-            color: (theme) => theme.palette.grey[800],
+            color: 'grey.800',
 
             mb: 1
 
@@ -265,7 +271,7 @@ const BasicDropzone = ({ control, name, title = '', showRequired = false }) => {
 
         >
 
-          {title} {showRequired && <span style={{ color: (theme) => theme.palette.error.main }}>*</span>}
+          {title} {showRequired && <Box component="span" sx={{ color: (theme) => theme.palette.error.main }}>*</Box>}
 
         </Typography>
 
@@ -284,15 +290,9 @@ const BasicDropzone = ({ control, name, title = '', showRequired = false }) => {
             <>
 
               <FileDropzone
-
-                name="file"
-
-                accept="image/*"
-
                 onDrop={field.onChange}
-
+                accept={{ 'image/*': [] }}
                 values={field.value}
-
               />
 
               {fieldState.invalid && (

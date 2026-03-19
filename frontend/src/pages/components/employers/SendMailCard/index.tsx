@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useTranslation } from 'react-i18next';
@@ -23,13 +22,14 @@ import RichTextEditorCustom from '../../../../components/controls/RichTextEditor
 
 import CheckboxCustom from '../../../../components/controls/CheckboxCustom';
 
-interface Props {
-  [key: string]: any;
+interface SendMailCardProps {
+  openPopup: boolean;
+  setOpenPopup: (open: boolean) => void;
+  sendMailData: any;
+  handleSendEmail: (data: any) => void;
 }
 
-
-
-const SendMailCard = ({
+const SendMailCard: React.FC<SendMailCardProps> = ({
 
   openPopup,
 
@@ -75,7 +75,7 @@ const SendMailCard = ({
 
       .mixed()
 
-      .test('content', 'Email content is required.', (value) =>
+      .test('content', 'Email content is required.', (value: any) =>
 
         value?.getCurrentContent?.()?.hasText?.()
 
@@ -85,7 +85,7 @@ const SendMailCard = ({
 
   });
 
-  const { control, reset, handleSubmit } = useForm({
+  const { control, reset, handleSubmit } = useForm<any>({
 
     resolver: yupResolver(schema),
 
@@ -113,7 +113,7 @@ const SendMailCard = ({
 
     if (sendMailData) {
 
-      reset((formValues) => ({
+      reset((formValues: any) => ({
 
         ...formValues,
 

@@ -1,24 +1,13 @@
-// @ts-nocheck
 import 'swiper/css';
-
 import 'swiper/css/pagination';
-
 import React from 'react';
-
 import { useNavigate } from 'react-router-dom';
-
 import { Pagination, Autoplay } from 'swiper/modules';
-
 import { Swiper, SwiperSlide } from 'swiper/react';
-
 import { Box, Card, Skeleton, Stack, Typography } from "@mui/material";
-
 import MuiImageCustom from '../MuiImageCustom';
-
 import companyService from '../../services/companyService';
-
 import { ROUTES } from '../../configs/constants';
-
 import { formatRoute } from '../../utils/funcUtils';
 
 interface Props {
@@ -51,7 +40,7 @@ const styles = {
 
     opacity: 0.5,
 
-    backgroundColor: (theme) => theme.palette.primary.main,
+    backgroundColor: (theme: any) => theme.palette.primary.main,
 
     transition: "all 0.3s ease",
 
@@ -150,15 +139,10 @@ const Loading = (_props: Props) => {
 };
 
 const TopCompanyCarousel = () => {
-
   const nav = useNavigate();
-
   const [isLoading, setIsLoading] = React.useState(true);
-
-  const [companies, setCompanies] = React.useState([]);
-
+  const [companies, setCompanies] = React.useState<any[]>([]);
   const [parentWidth, setParentWidth] = React.useState(0);
-
   const [col, setCol] = React.useState(5);
 
   React.useEffect(() => {
@@ -166,11 +150,8 @@ const TopCompanyCarousel = () => {
     const handleResize = () => {
 
       const newWidth = document.getElementById(
-
         'top-company-carousel'
-
-      ).offsetWidth;
-
+      )?.offsetWidth || 0;
       setParentWidth(newWidth);
 
     };
@@ -213,8 +194,7 @@ const TopCompanyCarousel = () => {
 
       try {
 
-        const resData = await companyService.getTopCompanies();
-
+        const resData: any = await companyService.getTopCompanies();
         setCompanies(resData?.data || []);
 
       } catch (error) {
@@ -311,7 +291,7 @@ const TopCompanyCarousel = () => {
 
                         transform: 'translateY(-4px)',
 
-                        boxShadow: (theme) => theme.customShadows.medium,
+                        boxShadow: (theme: any) => theme.customShadows.medium,
 
                         borderColor: 'primary.main',
 

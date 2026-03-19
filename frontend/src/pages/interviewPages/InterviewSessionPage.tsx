@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -15,12 +14,6 @@ import Button from "@mui/material/Button";
 
 import interviewService from "../../services/interviewService";
 import { transformInterviewSession } from "../../utils/transformers";
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const getSafeLiveKitUrl = () => {
   const defaultUrl = `${window.location.protocol}//${window.location.host}/livekit`;
@@ -91,10 +84,10 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
       if (normalizedRole === "jobseeker") {
         inviteToken = routeId;
         if (!inviteToken) throw new Error(t("errors.missingInvite"));
-        detailRaw = await interviewService.getSessionDetailByInviteToken(inviteToken);
+        detailRaw = await interviewService.getSessionDetailByInviteToken(inviteToken) as any;
       } else {
         if (!routeId) throw new Error("Missing session id.");
-        detailRaw = await interviewService.getSessionDetail(routeId);
+        detailRaw = await interviewService.getSessionDetail(routeId) as any;
         inviteToken = detailRaw?.invite_token || detailRaw?.inviteToken;
       }
 
@@ -102,7 +95,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         throw new Error(t("errors.tokenMissing"));
       }
 
-      const tokenData = await interviewService.getLiveKitTokenByInviteToken(inviteToken);
+      const tokenData = await interviewService.getLiveKitTokenByInviteToken(inviteToken) as any;
       const mappedSession = transformInterviewSession(detailRaw);
 
       if (!tokenData?.token) {
@@ -114,7 +107,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
       if (tokenData.server_url) {
         setServerUrl(tokenData.server_url);
       }
-    } catch (err) {
+    } catch (err: any) {
       setError(err?.message || t("errors.invalidSession"));
     } finally {
       setLoading(false);

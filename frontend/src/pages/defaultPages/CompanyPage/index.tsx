@@ -1,16 +1,9 @@
-// @ts-nocheck
 import React from 'react';
-
 import { Box, Card, Typography, Container } from "@mui/material";
-
 import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
 import CompanySearch from '../../components/defaults/CompanySearch';
 import Companies from '../../../components/Companies';
-
-interface Props {
-  [key: string]: any;
-}
 
 
 
@@ -84,7 +77,7 @@ const CompanyPage = () => {
 
             py: 4,
 
-            boxShadow: (theme) => theme.customShadows.large,
+            boxShadow: (theme: any) => theme.customShadows.large,
 
             bgcolor: 'background.paper',
 

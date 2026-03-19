@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 import { Box, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -8,12 +7,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useCompanies } from './hooks/useCompanies';
 import CompanyTable from './components/CompanyTable';
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const CompaniesPage = () => {
     const { t } = useTranslation('admin');
@@ -32,11 +25,11 @@ const CompaniesPage = () => {
         page,
         pageSize: PAGE_SIZE,
         kw: searchTerm
-    });
+    }) as any;
 
     const [openDialog, setOpenDialog] = useState(false);
-    const [dialogMode, setDialogMode] = useState('add');
-    const [currentCompany, setCurrentCompany] = useState(null);
+    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+    const [currentCompany, setCurrentCompany] = useState<any>(null);
     const [formData, setFormData] = useState({
         companyName: '',
         taxCode: '',
@@ -49,7 +42,7 @@ const CompaniesPage = () => {
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
         setPage(1);
     };
@@ -69,7 +62,7 @@ const CompaniesPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (company) => {
+    const handleOpenEdit = (company: any) => {
         setDialogMode('edit');
         setCurrentCompany(company);
         setFormData({
@@ -84,7 +77,7 @@ const CompaniesPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (company) => {
+    const handleOpenDelete = (company: any) => {
         setCurrentCompany(company);
         setOpenDeleteDialog(true);
     };
@@ -93,7 +86,7 @@ const CompaniesPage = () => {
         setOpenDialog(false);
     };
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
@@ -171,14 +164,14 @@ const CompaniesPage = () => {
                 ) : (
                     <>
                         <CompanyTable
-                            data={data?.results || data}
+                            data={((data as any)?.results || data) as any[]}
                             onEdit={handleOpenEdit}
                             onDelete={handleOpenDelete}
                         />
-                        {data?.count > 0 && (
+                        {(data as any)?.count > 0 && (
                             <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
                                 <Pagination
-                                    count={Math.ceil(data.count / PAGE_SIZE)}
+                                    count={Math.ceil((data as any).count / PAGE_SIZE)}
                                     page={page}
                                     onChange={(e, v) => setPage(v)}
                                     color="primary"
@@ -282,7 +275,7 @@ const CompaniesPage = () => {
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
                 <DialogTitle>{t('pages.companies.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.companies.deleteText', { name: currentCompany?.companyName }) }} />
+                    <Typography dangerouslySetInnerHTML={{ __html: String(t('pages.companies.deleteText', { name: currentCompany?.companyName })) }} />
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.companies.cancelBtn')}</Button>

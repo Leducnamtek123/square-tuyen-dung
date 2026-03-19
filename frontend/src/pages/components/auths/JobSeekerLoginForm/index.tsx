@@ -1,34 +1,24 @@
-// @ts-nocheck
 import React from "react";
-
 import { useForm } from "react-hook-form";
-
 import { yupResolver } from "@hookform/resolvers/yup";
-
 import * as yup from "yup";
-
 import { Box, Button, Stack, styled, Divider } from "@mui/material";
-
 import LoginIcon from "@mui/icons-material/Login";
-
-import FacebookIcon from "@mui/icons-material/Facebook";
-
 import GoogleIcon from "@mui/icons-material/Google";
-
-import { LoginSocialFacebook } from "reactjs-social-login";
-
 import { useGoogleLogin } from "@react-oauth/google";
-
 import { useTranslation } from 'react-i18next';
-
 import TextFieldCustom from "../../../../components/controls/TextFieldCustom";
-
 import PasswordTextFieldCustom from "../../../../components/controls/PasswordTextFieldCustom";
 
-import { AUTH_CONFIG } from "../../../../configs/constants";
+interface JobSeekerLoginFormData {
+  email: string;
+  password?: string;
+}
 
-interface Props {
-  [key: string]: any;
+interface JobSeekerLoginFormProps {
+  onLogin: (data: JobSeekerLoginFormData) => void;
+  onFacebookLogin?: (result: any) => void;
+  onGoogleLogin: (result: any) => void;
 }
 
 
@@ -107,7 +97,7 @@ const StyledDivider = styled(Divider)({
 
 });
 
-const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }) => {
+const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeekerLoginFormProps) => {
 
   const { t } = useTranslation('auth');
 
@@ -141,18 +131,12 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }) => {
 
   });
 
-  const { control, handleSubmit } = useForm({
-
+  const { control, handleSubmit } = useForm<JobSeekerLoginFormData>({
     defaultValues: {
-
       email: "",
-
       password: "",
-
     },
-
-    resolver: yupResolver(schema),
-
+    resolver: yupResolver(schema) as any,
   });
 
   const googleLogin = useGoogleLogin({

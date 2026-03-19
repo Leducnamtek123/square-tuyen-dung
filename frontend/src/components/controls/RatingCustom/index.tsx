@@ -1,21 +1,18 @@
-// @ts-nocheck
 import React from 'react';
-
-import { Controller } from 'react-hook-form';
-
+import { Controller, Control } from 'react-hook-form';
 import Rating from '@mui/material/Rating';
-
 import Typography from '@mui/material/Typography';
-
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
-interface Props {
+interface RatingCustomProps {
+  name: string;
+  control: Control<any>;
+  title?: string | null;
+  onChangeActive?: (event: React.SyntheticEvent, value: number) => void;
   [key: string]: any;
 }
 
-
-
-const RatingCustom = ({ name, control, title = null, onChangeActive, ...props }: Props) => {
+const RatingCustom = ({ name, control, title = null, onChangeActive, ...props }: RatingCustomProps) => {
 
   return (
 

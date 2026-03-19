@@ -1,4 +1,3 @@
-// @ts-nocheck
 export { default as AccountPage } from './AccountPage'
 
 export { default as CompanyPage } from './CompanyPage'

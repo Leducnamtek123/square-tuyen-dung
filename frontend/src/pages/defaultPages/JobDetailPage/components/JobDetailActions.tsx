@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 import { Button, Stack } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -12,13 +11,18 @@ import ShareIcon from "@mui/icons-material/Share";
 
 import { ROLES_NAME, ROUTES } from "../../../../configs/constants";
 
-interface Props {
-  [key: string]: any;
+interface JobDetailActionsProps {
+  isApplied: boolean;
+  isSaved: boolean;
+  isLoadingSave: boolean;
+  handleSave: () => void;
+  handleShowApplyForm: () => void;
+  setOpenSharePopup: (open: boolean) => void;
+  isAuthenticated: boolean;
+  currentUser: any;
 }
 
-
-
-const JobDetailActions = ({
+const JobDetailActions: React.FC<JobDetailActionsProps> = ({
   isApplied,
   isSaved,
   isLoadingSave,

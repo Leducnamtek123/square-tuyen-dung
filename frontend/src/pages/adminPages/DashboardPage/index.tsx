@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Box, Typography, Card, CardHeader, CardContent, Skeleton, Paper, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -12,12 +11,6 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 import { useAdminStats } from './hooks/useAdminStats';
 import StatCard from './components/StatCard';
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -46,14 +39,14 @@ const DashboardPage = () => {
     ],
   };
 
-  const pieOptions = {
+  const pieOptions: any = {
     plugins: {
       legend: {
         position: 'bottom',
       },
       tooltip: {
         callbacks: {
-          label: (context) => `${context.label}: ${context.parsed}`,
+          label: (context: any) => `${context.label}: ${context.parsed}`,
         },
       },
     },

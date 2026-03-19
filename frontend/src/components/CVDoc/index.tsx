@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import {
@@ -22,37 +21,26 @@ import {
 import { LOGO_IMAGES } from '../../configs/constants';
 
 interface Props {
-  [key: string]: any;
+  resume: any;
+  user?: any;
+  themeColor?: string;
 }
 
-
-
 // Register Roboto font
-
 Font.register({
-
   family: 'Roboto',
-
   fonts: [
-
     { src: '/fonts/roboto/Roboto-Regular.ttf', fontWeight: 400 },
-
     { src: '/fonts/roboto/Roboto-Medium.ttf', fontWeight: 500 },
-
     { src: '/fonts/roboto/Roboto-Bold.ttf', fontWeight: 700 },
-
     { src: '/fonts/roboto/Roboto-Black.ttf', fontWeight: 900 },
-
     { src: '/fonts/roboto/Roboto-Italic.ttf', fontWeight: 400, fontStyle: 'italic' },
-
   ],
-
 });
 
 const DEFAULT_THEME_COLOR = '#140861';
 
 const CVDoc = ({ resume, user, themeColor }: Props) => {
-
   const currentThemeColor = themeColor || DEFAULT_THEME_COLOR;
 
   const styles = StyleSheet.create({
@@ -441,7 +429,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
   });
 
-  const renderLanguageLevel = (level) => {
+  const renderLanguageLevel = (level: string) => {
 
     const maxLevel = 5;
 
@@ -455,7 +443,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
           key={`level-dot-${i}`}
 
-          style={i < level ? styles.levelDot : styles.levelDotEmpty}
+          style={i < Number(level) ? styles.levelDot : styles.levelDotEmpty}
 
         />
 
@@ -467,7 +455,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
 
     if (!dateString) return '';
 
@@ -643,7 +631,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
             <Text style={styles.sectionTitle}>KINH NGHIỆM LÀM VIỆC</Text>
 
-            {resume?.experienceDetails?.map((exp, index) => (
+            {resume?.experienceDetails?.map((exp: any, index: number) => (
 
               <View key={index} style={styles.experienceItem}>
 
@@ -679,7 +667,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
             <Text style={styles.sectionTitle}>HỌC VẤN</Text>
 
-            {resume?.educationDetails?.map((edu, index) => (
+            {resume?.educationDetails?.map((edu: any, index: number) => (
 
               <View key={index} style={styles.experienceItem}>
 
@@ -733,7 +721,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
               <View style={styles.skillsGrid}>
 
-                {resume?.advancedSkills?.map((skill, index) => (
+                {resume?.advancedSkills?.map((skill: any, index: number) => (
 
                   <View key={index} style={styles.skillItem}>
 
@@ -759,7 +747,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
               <View style={styles.languageWrapper}>
 
-                {resume?.languageSkills?.map((lang, index) => (
+                {resume?.languageSkills?.map((lang: any, index: number) => (
 
                   <View key={index} style={styles.languageItem}>
 
@@ -793,7 +781,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
               <Text style={styles.sectionTitle}>CHỨNG CHỈ</Text>
 
-              {resume.certificateDetails.map((cert, index) => (
+              {resume?.certificateDetails?.map((cert: any, index: number) => (
 
                 <View key={index} style={styles.experienceItem}>
 
@@ -840,15 +828,6 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
     </Document>
 
   );
-
-};
-
-// Add default props
-
-CVDoc.defaultProps = {
-
-  themeColor: DEFAULT_THEME_COLOR,
-
 };
 
 export default CVDoc;

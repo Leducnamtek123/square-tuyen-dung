@@ -1,81 +1,54 @@
-// @ts-nocheck
 import * as React from 'react';
-
-import { useSelector } from 'react-redux';
-
 import { useNavigate } from 'react-router-dom';
-
 import TimeAgo from '../TimeAgo';
-
 import { Badge, Box, IconButton, Menu, Stack, Typography } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
 import NotificationsIcon from '@mui/icons-material/Notifications';
-
 import ClearIcon from '@mui/icons-material/Clear';
-
 import {
-
   collection,
-
   getDocs,
-
   limit,
-
   onSnapshot,
-
   query,
-
   where,
-
   startAfter,
-
   orderBy,
-
   updateDoc,
-
   doc,
-
   writeBatch,
-
 } from 'firebase/firestore';
-
 import db from '../../configs/firebase-config';
-
 import { IMAGES, ROUTES } from '../../configs/constants';
-
 import MuiImageCustom from '../MuiImageCustom';
-
 import { formatRoute } from '../../utils/funcUtils';
+import { useAppSelector } from '../../hooks/useAppStore';
 
-interface Props {
+interface NotificationCardProps {
   [key: string]: any;
 }
 
-
-
 const PAGE_SIZE = 5;
 
-const NotificationCard = (_props: Props) => {
+const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
   const nav = useNavigate();
 
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useAppSelector((state) => state.user);
 
   const [count, setCount] = React.useState(0);
 
   const [badgeCount, setBadgeCount] = React.useState(0);
 
-  const [notifications, setNotifications] = React.useState([]);
+  const [notifications, setNotifications] = React.useState<any[]>([]);
 
-  const [lastKey, setLastKey] = React.useState(null);
+  const [lastKey, setLastKey] = React.useState<any>(null);
 
-  const [anchorEl, setAnchorEl] = React.useState(null);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const open = Boolean(anchorEl);
 
-  const handleClick = (event) => {
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
 
     setAnchorEl(event.currentTarget);
 
@@ -89,13 +62,15 @@ const NotificationCard = (_props: Props) => {
 
   React.useEffect(() => {
 
+    if (!currentUser) return;
+
     const notificationsRef = collection(
 
       db,
 
       'users',
 
-      `${currentUser.id}`,
+      `${currentUser?.id}`,
 
       'notifications'
 
@@ -112,15 +87,10 @@ const NotificationCard = (_props: Props) => {
     );
 
     const unsubscribe = onSnapshot(allQuery, (querySnapshot) => {
-
       let total = 0;
-
-      querySnapshot.forEach((doc) => {
-
+      querySnapshot.forEach((docSnap) => {
         total = total + 1;
-
       });
-
       setBadgeCount(total);
 
     });
@@ -131,9 +101,11 @@ const NotificationCard = (_props: Props) => {
 
     };
 
-  }, [currentUser.id]);
+  }, [currentUser]);
 
   React.useEffect(() => {
+
+    if (!currentUser) return;
 
     const notificationsRef = collection(
 
@@ -141,7 +113,7 @@ const NotificationCard = (_props: Props) => {
 
       'users',
 
-      `${currentUser.id}`,
+      `${currentUser?.id}`,
 
       'notifications'
 
@@ -153,7 +125,7 @@ const NotificationCard = (_props: Props) => {
 
       let total = 0;
 
-      querySnapshot.forEach((doc) => {
+      querySnapshot.forEach((docSnap) => {
 
         total = total + 1;
 
@@ -169,9 +141,11 @@ const NotificationCard = (_props: Props) => {
 
     };
 
-  }, [currentUser.id]);
+  }, [currentUser]);
 
   React.useEffect(() => {
+
+    if (!currentUser) return;
 
     const notificationsRef = collection(
 
@@ -179,7 +153,7 @@ const NotificationCard = (_props: Props) => {
 
       'users',
 
-      `${currentUser.id}`,
+      `${currentUser?.id}`,
 
       'notifications'
 
@@ -199,23 +173,23 @@ const NotificationCard = (_props: Props) => {
 
     const unsubscribe = onSnapshot(first, (querySnapshot) => {
 
-      const notificationList = [];
+      const notificationList: any[] = [];
 
-      querySnapshot.forEach((doc) => {
+      querySnapshot.forEach((docSnap) => {
 
         notificationList.push({
 
-          ...doc.data(),
+          ...docSnap.data(),
 
-          key: doc.id,
+          key: docSnap.id,
 
         });
 
       });
 
-      setNotifications(notificationList);
+      setNotifications(notificationList as any);
 
-      setLastKey(querySnapshot.docs[querySnapshot.docs.length - 1]);
+      setLastKey(querySnapshot.docs[querySnapshot.docs.length - 1] as any);
 
       return () => {
 
@@ -225,9 +199,11 @@ const NotificationCard = (_props: Props) => {
 
     });
 
-  }, [currentUser.id]);
+  }, [currentUser]);
 
   const loadMore = async () => {
+
+    if (!currentUser) return;
 
     const notificationsRef = collection(
 
@@ -255,7 +231,7 @@ const NotificationCard = (_props: Props) => {
 
     );
 
-    const nextNotificationList = [];
+    const nextNotificationList: any[] = [];
 
     const nextQuerySnapshot = await getDocs(nextQuery);
 
@@ -263,13 +239,13 @@ const NotificationCard = (_props: Props) => {
 
       nextQuerySnapshot.docs[nextQuerySnapshot.docs.length - 1];
 
-    nextQuerySnapshot.forEach((doc) => {
+    nextQuerySnapshot.forEach((docSnap) => {
 
       nextNotificationList.push({
 
-        ...doc.data(),
+        ...docSnap.data(),
 
-        key: doc.id,
+        key: docSnap.id,
 
       });
 
@@ -281,7 +257,9 @@ const NotificationCard = (_props: Props) => {
 
   };
 
-  const handleRemove = (key) => {
+  const handleRemove = (key: string) => {
+
+    if (!currentUser) return;
 
     updateDoc(doc(db, 'users', `${currentUser.id}`, 'notifications', key), {
 
@@ -313,7 +291,9 @@ const NotificationCard = (_props: Props) => {
 
   };
 
-  const handleRead = (key) => {
+  const handleRead = (key: string) => {
+
+    if (!currentUser) return;
 
     updateDoc(doc(db, 'users', `${currentUser.id}`, 'notifications', key), {
 
@@ -332,6 +312,8 @@ const NotificationCard = (_props: Props) => {
   };
 
   const handleRemoveAll = async () => {
+
+    if (!currentUser) return;
 
     // Get a reference to the notifications collection
 
@@ -377,7 +359,7 @@ const NotificationCard = (_props: Props) => {
 
   };
 
-  const handleClickItem = (item) => {
+  const handleClickItem = (item: any) => {
 
     switch (item.type) {
 

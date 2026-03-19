@@ -1,41 +1,26 @@
-// @ts-nocheck
 import React from 'react';
-
 import { useForm } from 'react-hook-form';
-
 import { yupResolver } from '@hookform/resolvers/yup';
-
 import * as yup from 'yup';
-
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography, Box } from "@mui/material";
-
 import Grid from "@mui/material/Grid2";
-
 import CloseIcon from '@mui/icons-material/Close';
-
 import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
-
 import errorHandling from '../../utils/errorHandling';
-
 import toastMessages from '../../utils/toastMessages';
-
 import BackdropLoading from '../loading/BackdropLoading';
-
 import RatingCustom from '../controls/RatingCustom';
-
 import MultilineTextFieldCustom from '../controls/MultilineTextFieldCustom';
-
+const DefaultMultilineTextFieldCustom = MultilineTextFieldCustom as any;
 import ProjectService from '../../services/ProjectService';
-
 import { FEEDBACK_IMAGES } from '../../configs/constants';
 
-interface Props {
+interface FeedbackProps {
+  // Define props if any, current ones seem unused or passed via _props
   [key: string]: any;
 }
 
-
-
-const Feedback = (_props: Props) => {
+const Feedback = (_props: FeedbackProps) => {
 
   const [open, setOpen] = React.useState(false);
 
@@ -87,9 +72,9 @@ const Feedback = (_props: Props) => {
 
   };
 
-  const handleSendFeedback = (data) => {
+  const handleSendFeedback = (data: any) => {
 
-    const sendFeedback = async (data) => {
+    const sendFeedback = async (data: any) => {
 
       setIsFullScreenLoading(true);
 
@@ -101,7 +86,7 @@ const Feedback = (_props: Props) => {
 
         toastMessages.success('Feedback sent successfully.');
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -143,11 +128,11 @@ const Feedback = (_props: Props) => {
 
           zIndex: 1250,
 
-          boxShadow: (theme) => theme.customShadows.feedback,
+          boxShadow: (theme: any) => theme.customShadows.feedback,
 
           backdropFilter: 'blur(8px)',
 
-          backgroundColor: (theme) => theme.palette.feedback.button.background,
+          backgroundColor: (theme: any) => theme.palette.feedback.button.background,
 
           borderRadius: '20px 20px 20px 4px',
 
@@ -159,11 +144,11 @@ const Feedback = (_props: Props) => {
 
           '&:hover': {
 
-            backgroundColor: (theme) => theme.palette.feedback.button.hover,
+            backgroundColor: (theme: any) => theme.palette.feedback.button.hover,
 
             transform: 'translateY(-2px)',
 
-            boxShadow: (theme) => `0 12px 24px ${theme.palette.feedback.button.shadow}`,
+            boxShadow: (theme: any) => `0 12px 24px ${theme.palette.feedback.button.shadow}`,
 
           },
 
@@ -269,9 +254,9 @@ const Feedback = (_props: Props) => {
 
               borderRadius: '24px',
 
-              boxShadow: (theme) => theme.customShadows.large,
+              boxShadow: (theme: any) => theme.customShadows.large,
 
-              border: (theme) => `1px solid ${theme.palette.feedback.dialog.border}`,
+              border: (theme: any) => `1px solid ${theme.palette.feedback.dialog.border}`,
 
             }
 
@@ -305,7 +290,7 @@ const Feedback = (_props: Props) => {
 
                 fontWeight: 700,
 
-                background: (theme) => theme.palette.secondary.gradient,
+                background: (theme: any) => theme.palette.secondary.gradient,
 
                 backgroundClip: 'text',
 
@@ -373,7 +358,7 @@ const Feedback = (_props: Props) => {
 
                   component="img"
 
-                  src={FEEDBACK_IMAGES[`${hover !== -1 ? hover : currentRating}star`]}
+                  src={FEEDBACK_IMAGES[`${(hover !== -1 ? hover : currentRating)}star` as keyof typeof FEEDBACK_IMAGES]}
 
                   alt={`${hover !== -1 ? hover : currentRating} star feedback`}
 
@@ -433,9 +418,9 @@ const Feedback = (_props: Props) => {
 
                   }}
 
-                  onChangeActive={(event, newHover) => {
+                  onChangeActive={(_event: any, newHover: number | null) => {
 
-                    setHover(newHover);
+                    setHover(newHover as number);
 
                   }}
 
@@ -447,40 +432,23 @@ const Feedback = (_props: Props) => {
 
             <Grid size={12}>
 
-              <MultilineTextFieldCustom
-
+              <DefaultMultilineTextFieldCustom
                 name="content"
-
                 placeholder="Chia sẻ trải nghiệm của bạn..."
-
                 control={control}
-
                 minRows={5}
-
                 maxRows={8}
-
                 sx={{
-
                   '& .MuiOutlinedInput-root': {
-
                     borderRadius: '16px',
-
-                    backgroundColor: (theme) => theme.palette.grey[50],
-
+                    backgroundColor: (theme: any) => theme.palette.grey[50],
                     transition: 'all 0.2s ease-in-out',
-
                     '&:hover, &.Mui-focused': {
-
                       backgroundColor: '#fff',
-
-                      boxShadow: (theme) => theme.customShadows.small,
-
+                      boxShadow: (theme: any) => theme.customShadows.small,
                     }
-
                   }
-
-                }}
-
+                } as any}
               />
 
             </Grid>
@@ -505,17 +473,17 @@ const Feedback = (_props: Props) => {
 
               borderRadius: '12px',
 
-              background: (theme) => theme.palette.feedback.button.gradient,
+              background: (theme: any) => (theme.palette as any).feedback.button.gradient,
 
-              boxShadow: (theme) => theme.customShadows.feedback,
+              boxShadow: (theme: any) => theme.customShadows.feedback,
 
               '&:hover': {
 
-                background: (theme) => theme.palette.feedback.button.gradient,
+                background: (theme: any) => (theme.palette as any).feedback.button.gradient,
 
                 transform: 'translateY(-1px)',
 
-                boxShadow: (theme) => `0 8px 24px ${theme.palette.feedback.button.shadow}`,
+                boxShadow: (theme: any) => `0 8px 24px ${(theme.palette as any).feedback.button.shadow}`,
 
               }
 

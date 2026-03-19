@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
@@ -19,13 +18,24 @@ import MultilineTextFieldCustom from '../../../../components/controls/MultilineT
 
 import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
 
-interface Props {
-  [key: string]: any;
+interface FormValues {
+  degreeName: string;
+  major: string;
+  trainingPlaceName: string;
+  startDate: Date | null;
+  completedDate: Date | null;
+  gradeOrRank: string | null;
+  description: string | null;
+}
+
+interface EducationDetailFormProps {
+  handleAddOrUpdate: (data: any) => void;
+  editData: any;
 }
 
 
 
-const EducationDetaiForm = ({ handleAddOrUpdate, editData }) => {
+const EducationDetailForm = ({ handleAddOrUpdate, editData }: EducationDetailFormProps) => {
 
   const { t } = useTranslation(['jobSeeker']);
 
@@ -69,9 +79,9 @@ const EducationDetaiForm = ({ handleAddOrUpdate, editData }) => {
 
   });
 
-  const { control, reset, handleSubmit } = useForm({
+  const { control, reset, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
 
   });
 
@@ -245,4 +255,4 @@ const EducationDetaiForm = ({ handleAddOrUpdate, editData }) => {
 
 };
 
-export default EducationDetaiForm;
+export default EducationDetailForm;

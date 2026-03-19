@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React, { useState } from 'react';
 
 import { Link, NavLink, useLocation } from 'react-router-dom';
@@ -30,8 +29,26 @@ import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 
 import { IMAGES, ROUTES, APP_NAME } from '../../../../configs/constants';
 
-interface Props {
-  [key: string]: any;
+interface SidebarProps {
+  drawerWidth: number;
+  isAdmin?: boolean;
+}
+
+interface MobileSidebarProps extends SidebarProps {
+  container?: any;
+  mobileOpen: boolean;
+  handleDrawerToggle: () => void;
+}
+
+interface MenuItemProps {
+  icon?: any;
+  text: string;
+  to?: string;
+  onClick?: () => void;
+  isSelected?: boolean;
+  isExpanded?: boolean;
+  hasChildren?: boolean;
+  isChild?: boolean;
 }
 
 
@@ -108,7 +125,7 @@ const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
 
 }));
 
-const MenuItem = ({ icon: Icon, text, to, onClick, isSelected, isExpanded, hasChildren, isChild }) => {
+const MenuItem = ({ icon: Icon, text, to, onClick, isSelected, isExpanded, hasChildren, isChild }: MenuItemProps) => {
 
   return (
 
@@ -208,7 +225,7 @@ const MenuItem = ({ icon: Icon, text, to, onClick, isSelected, isExpanded, hasCh
 
 };
 
-const DrawerContent = ({ isAdmin }) => {
+const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
 
   const { t } = useTranslation(['admin', 'employer']);
 
@@ -234,16 +251,11 @@ const DrawerContent = ({ isAdmin }) => {
 
   });
 
-  const handleExpand = (section) => {
-
+  const handleExpand = (section: string) => {
     setExpandedItems(prev => ({
-
       ...prev,
-
-      [section]: !prev[section]
-
+      [section]: !prev[section as keyof typeof prev]
     }));
-
   };
 
   return (
@@ -927,7 +939,7 @@ const DrawerContent = ({ isAdmin }) => {
 
 };
 
-const Sidebar = ({ drawerWidth, isAdmin }) => {
+const Sidebar = ({ drawerWidth, isAdmin }: SidebarProps) => {
 
   const theme = useTheme();
 
@@ -963,7 +975,7 @@ const Sidebar = ({ drawerWidth, isAdmin }) => {
 
           backgroundColor: theme.palette.background.paper,
 
-          boxShadow: theme.customShadows.sidebar,
+          boxShadow: (theme as any).customShadows.sidebar,
 
           borderRadius: '0px 10px 10px 0px',
 
@@ -984,18 +996,12 @@ const Sidebar = ({ drawerWidth, isAdmin }) => {
 };
 
 const MobileSidebar = ({
-
   drawerWidth,
-
   container,
-
   mobileOpen,
-
   handleDrawerToggle,
-
   isAdmin,
-
-}) => {
+}: MobileSidebarProps) => {
 
   const theme = useTheme();
 
@@ -1043,7 +1049,7 @@ const MobileSidebar = ({
 
           backgroundColor: theme.palette.background.paper,
 
-          boxShadow: theme.customShadows.sidebar,
+          boxShadow: (theme as any).customShadows.sidebar,
 
           borderRadius: '0px 10px 10px 0px',
 

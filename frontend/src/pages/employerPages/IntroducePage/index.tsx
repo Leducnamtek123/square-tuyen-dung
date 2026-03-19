@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 import { Box, Card, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
@@ -11,12 +10,6 @@ import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
 
 import { TabTitle } from "../../../utils/generalFunction";
 import { APP_NAME } from "../../../configs/constants";
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const IntroducePage = () => {
   const { t } = useTranslation("employer");
@@ -71,7 +64,7 @@ const IntroducePage = () => {
           variant="h3"
           sx={{
             mb: 2,
-            background: (theme) => theme.palette.primary.gradient,
+            background: (theme: any) => theme.palette.primary.gradient,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 700,
@@ -110,7 +103,7 @@ const IntroducePage = () => {
                 transition: "all 0.3s ease-in-out",
                 "&:hover": {
                   transform: "translateY(-6px)",
-                  boxShadow: (theme) => theme.customShadows.card,
+                  boxShadow: (theme: any) => theme.customShadows.card,
                   borderColor: "primary.light",
                 },
               }}
@@ -135,7 +128,7 @@ const IntroducePage = () => {
           sx={{
             mb: 4,
             textAlign: "center",
-            background: (theme) => theme.palette.primary.gradient,
+            background: (theme: any) => theme.palette.primary.gradient,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 700,

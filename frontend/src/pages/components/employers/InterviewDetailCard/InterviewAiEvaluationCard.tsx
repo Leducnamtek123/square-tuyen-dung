@@ -1,14 +1,14 @@
-// @ts-nocheck
 import React from 'react';
 import { Box, Button, Chip, CircularProgress, Divider, Paper, Stack, Typography } from '@mui/material';
+import { InterviewSession } from './index';
 
-interface Props {
-  [key: string]: any;
+interface InterviewAiEvaluationCardProps {
+  session: InterviewSession;
+  t: (key: string, options?: any) => string;
+  onTriggerAi: () => void;
 }
 
-
-
-const InterviewAiEvaluationCard = ({ session, t, onTriggerAi }) => {
+const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ session, t, onTriggerAi }) => {
     const hasResult = session.ai_overall_score !== null && session.ai_overall_score !== undefined;
 
     return (

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useNavigate } from 'react-router-dom';
@@ -49,13 +48,14 @@ import { confirmModal, errorModal } from '../../../../utils/sweetalert2Modal';
 
 import { formatRoute } from '../../../../utils/funcUtils';
 
-interface Props {
-  [key: string]: any;
+interface SendEmailComponentProps {
+  jobPostActivityId: string;
+  isSentEmail: boolean;
+  email: string;
+  fullName: string;
 }
 
-
-
-const SendEmailComponent = ({
+const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
 
   jobPostActivityId,
 
@@ -73,11 +73,11 @@ const SendEmailComponent = ({
 
   const [openSendMailPopup, setOpenSendMailPopup] = React.useState(false);
 
-  const [sendMailData, setSendMailData] = React.useState(null);
+  const [sendMailData, setSendMailData] = React.useState<any>(null);
 
   const [sentEmail, setSentEmail] = React.useState(isSentEmail);
 
-  const handleOpenSendMail = (email, fullName) => {
+  const handleOpenSendMail = (email: string, fullName: string) => {
 
     setSendMailData({
 
@@ -91,9 +91,9 @@ const SendEmailComponent = ({
 
   };
 
-  const handleSendEmail = (data) => {
+  const handleSendEmail = (data: any) => {
 
-    const sendEmail = async (id, data) => {
+    const sendEmail = async (id: string, data: any) => {
 
       setIsFullScreenLoading(true);
 
@@ -111,7 +111,7 @@ const SendEmailComponent = ({
 
         toastMessages.success(t('appliedResume.email.sentSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -193,7 +193,14 @@ const SendEmailComponent = ({
 
 };
 
-const AppliedStatusComponent = ({
+interface AppliedStatusComponentProps {
+  options: any[];
+  defaultStatus: number;
+  id: string;
+  handleChangeApplicationStatus: (id: string, value: any, callback: (result: boolean) => void) => void;
+}
+
+const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
 
   options,
 
@@ -207,13 +214,13 @@ const AppliedStatusComponent = ({
 
   const { t } = useTranslation('employer');
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
   const [applyStatus, setApplyStatus] = React.useState(defaultStatus);
 
-  const handleChangeValue = (e) => {
+  const handleChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
 
-    const chooseValue = e.target.value;
+    const chooseValue = parseInt(e.target.value, 10);
 
     if (chooseValue < applyStatus) {
 
@@ -237,7 +244,7 @@ const AppliedStatusComponent = ({
 
         () =>
 
-          handleChangeApplicationStatus(id, chooseValue, (result) => {
+          handleChangeApplicationStatus(id, chooseValue, (result: boolean) => {
 
             if (result) {
 
@@ -293,7 +300,11 @@ const AppliedStatusComponent = ({
 
 };
 
-const AIAnalysisComponent = ({ row }) => {
+interface AIAnalysisComponentProps {
+  row: any;
+}
+
+const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row }) => {
 
   const { t } = useTranslation('employer');
 
@@ -311,7 +322,7 @@ const AIAnalysisComponent = ({ row }) => {
 
       toastMessages.success(t('appliedResume.ai.analysisStarted'));
 
-    } catch (error) {
+    } catch (error: any) {
 
       errorHandling(error);
 
@@ -423,7 +434,15 @@ const AIAnalysisComponent = ({ row }) => {
 
 };
 
-const AppliedResumeTable = (props) => {
+interface AppliedResumeTableProps {
+  rows: any[];
+  isLoading: boolean;
+  handleChangeApplicationStatus: (id: string, value: any, callback: (result: boolean) => void) => void;
+  handleDelete: (id: string) => void;
+  [key: string]: any;
+}
+
+const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
 
   const { t } = useTranslation(['employer', 'common']);
 
@@ -435,7 +454,7 @@ const AppliedResumeTable = (props) => {
 
   const rowsSafe = Array.isArray(rows) ? rows : [];
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
   return (
 
@@ -463,7 +482,7 @@ const AppliedResumeTable = (props) => {
 
         ) : (
 
-          rowsSafe.map((row) => (
+          rowsSafe.map((row: any) => (
 
             <TableRow key={row.id}>
 

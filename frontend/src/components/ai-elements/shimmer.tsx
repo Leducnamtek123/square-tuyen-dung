@@ -1,5 +1,4 @@
-// @ts-nocheck
-"use client";;
+"use client";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { memo, useMemo } from "react";
@@ -11,7 +10,7 @@ const motionComponentCache = new Map<ElementType, any>();
 const getMotionComponent = (element: ElementType) => {
   let component = motionComponentCache.get(element);
   if (!component) {
-    component = motion.create(element);
+    component = motion.create(element as any);
     motionComponentCache.set(element, component);
   }
   return component;
@@ -51,10 +50,9 @@ const ShimmerComponent = ({
       style={
         {
           "--spread": `${dynamicSpread}px`,
-
           backgroundImage:
             "var(--bg), linear-gradient(var(--color-muted-foreground), var(--color-muted-foreground))"
-        }
+        } as any
       }
       transition={{
         duration,

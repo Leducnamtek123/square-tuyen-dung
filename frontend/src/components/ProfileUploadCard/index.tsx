@@ -1,57 +1,40 @@
-// @ts-nocheck
 import * as React from 'react';
-
 import { useNavigate } from 'react-router-dom';
-
 import dayjs from 'dayjs';
-
 import { Box, IconButton, Typography, Stack, Chip, Skeleton, Tooltip } from "@mui/material";
-
 import HelpIcon from '@mui/icons-material/Help';
-
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
-
 import StarIcon from '@mui/icons-material/Star';
-
 import EditIcon from '@mui/icons-material/Edit';
-
 import DownloadIcon from '@mui/icons-material/Download';
-
 import DeleteForever from '@mui/icons-material/DeleteForever';
-
 import downloadPdf, { formatRoute } from '../../utils/funcUtils';
-
 import { ROUTES } from '../../configs/constants';
-
 import defaultTheme from '../../themeConfigs/defaultTheme';
 
-interface Props {
-  [key: string]: any;
+interface ProfileUploadCardProps {
+  resumeImage: string;
+  fileUrl: string;
+  title: string;
+  updateAt: string | number | Date;
+  slug: string;
+  id: string | number;
+  isActive: boolean;
+  handleDelete: (slug: string) => void;
+  handleActive: (slug: string) => void;
 }
 
-
-
 const ProfileUploadCard = ({
-
   resumeImage,
-
   fileUrl,
-
   title,
-
   updateAt,
-
   slug,
-
   id,
-
   isActive,
-
   handleDelete,
-
   handleActive,
-
-}: Props) => {
+}: ProfileUploadCardProps) => {
 
   const nav = useNavigate();
 
@@ -71,16 +54,11 @@ const ProfileUploadCard = ({
 
         borderRadius: 2,
 
-        boxShadow: (theme) => theme.customShadows.card,
-
+        boxShadow: (theme: any) => theme.customShadows.card,
         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-
         '&:hover': {
-
           transform: 'translateY(-4px)',
-
-          boxShadow: (theme) => theme.customShadows.large,
-
+          boxShadow: (theme: any) => theme.customShadows.large,
         }
 
       }}

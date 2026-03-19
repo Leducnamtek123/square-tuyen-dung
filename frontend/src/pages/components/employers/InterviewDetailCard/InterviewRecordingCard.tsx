@@ -1,14 +1,12 @@
-// @ts-nocheck
 import React from 'react';
 import { Box, Button, Divider, Paper, Typography } from '@mui/material';
 
-interface Props {
-  [key: string]: any;
+interface InterviewRecordingCardProps {
+  recordingUrl: string | null;
+  t: any;
 }
 
-
-
-const InterviewRecordingCard = ({ recordingUrl, t }) => {
+const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordingUrl, t }) => {
     if (!recordingUrl) return null;
 
     return (

@@ -1,24 +1,18 @@
-// @ts-nocheck
 import "leaflet/dist/leaflet.css";
-
 import L from "leaflet";
-
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-
 import markerIconRetina from "leaflet/dist/images/marker-icon-2x.png";
-
 import * as React from "react";
-
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-
 import { Box, Typography, Paper } from "@mui/material";
-
 import { ICONS } from "../../configs/constants";
 
 interface Props {
-  [key: string]: any;
+  title?: string;
+  subTitle?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 
@@ -122,24 +116,15 @@ const Map = ({ title, subTitle, latitude, longitude }: Props) => {
     >
 
       <MapContainer
-
-        center={[latitude, longitude]}
-
+        center={[latitude as number, longitude as number] as any}
         zoom={15}
-
         scrollWheelZoom={false}
-
         style={{ height: "100%", width: "100%"}}
-
       >
-
         <TileLayer
-
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-
         />
-
-        <Marker position={[latitude, longitude]}>
+        <Marker position={[latitude as number, longitude as number] as any}>
 
           <Popup>
 

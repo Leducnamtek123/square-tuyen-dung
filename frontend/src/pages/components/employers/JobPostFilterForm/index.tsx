@@ -31,7 +31,7 @@ const JobPostFilterForm = ({ handleFilter }: JobPostFilterFormProps) => {
 
     formState: { defaultValues },
 
-  } = useForm({
+  } = useForm<any>({
 
     defaultValues: {
 
@@ -111,7 +111,7 @@ const JobPostFilterForm = ({ handleFilter }: JobPostFilterFormProps) => {
 
             control={control}
 
-            options={allConfig?.jobPostStatusOptions || []}
+            options={(allConfig?.jobPostStatusOptions || []) as any[]}
 
             showRequired={true}
 

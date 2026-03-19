@@ -1,14 +1,14 @@
-// @ts-nocheck
 import React from 'react';
 import { Box, Paper, Stack, Typography } from '@mui/material';
+import { InterviewSession } from './index';
 
-interface Props {
-  [key: string]: any;
+interface InterviewTranscriptPanelProps {
+  session: InterviewSession;
+  t: (key: string, options?: any) => string;
+  i18n: any;
 }
 
-
-
-const InterviewTranscriptPanel = ({ session, t, i18n }) => {
+const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n }) => {
     return (
         <Paper sx={{
             p: 0,
@@ -56,7 +56,7 @@ const InterviewTranscriptPanel = ({ session, t, i18n }) => {
                 '&::-webkit-scrollbar': { width: 6 },
                 '&::-webkit-scrollbar-thumb': { bgcolor: 'divider', borderRadius: 3 }
             }}>
-                {Array.isArray(session.transcripts) && session.transcripts.length > 0 ? session.transcripts.map((t_msg, index) => (
+                {Array.isArray(session.transcripts) && session.transcripts.length > 0 ? session.transcripts.map((t_msg: any, index: number) => (
                     <Box key={index} sx={{
                         alignSelf: t_msg.speaker_role === 'ai_agent' ? 'flex-start' : 'flex-end',
                         maxWidth: { xs: '90%', sm: '80%' }

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useTranslation } from 'react-i18next';
@@ -19,17 +18,15 @@ import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
 
 import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
 
-interface Props {
-  [key: string]: any;
+interface SavedResumeFilterFormProps {
+  handleFilter: (data: any) => void;
 }
 
-
-
-const SavedResumeFilterForm = ({ handleFilter }) => {
+const SavedResumeFilterForm: React.FC<SavedResumeFilterFormProps> = ({ handleFilter }) => {
 
   const { t } = useTranslation('employer');
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
   const {
 
@@ -41,7 +38,7 @@ const SavedResumeFilterForm = ({ handleFilter }) => {
 
     formState: { defaultValues },
 
-  } = useForm({
+  } = useForm<any>({
 
     defaultValues: {
 
@@ -209,7 +206,7 @@ const SavedResumeFilterForm = ({ handleFilter }) => {
 
                   reset();
 
-                  handleSubmit(handleFilter(defaultValues));
+                  handleSubmit(() => handleFilter(defaultValues))();
 
                 }}
 

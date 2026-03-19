@@ -11,7 +11,7 @@ COMPANY_CONTACT_EMAIL = config("COMPANY_CONTACT_EMAIL", default=config("SUPPORT_
 COMPANY_CONTACT_PHONE = config("COMPANY_CONTACT_PHONE", default="0888-425-094")
 COMPANY_CONTACT_ADDRESS = config(
     "COMPANY_CONTACT_ADDRESS",
-    default="1242 QL1A, Tan Tao A, Binh Tan, Ho Chi Minh City",
+    default="",
 )
 COMPANY_WORK_TIME = config("COMPANY_WORK_TIME", default="8:00 - 17:30 (Monday - Friday)")
 

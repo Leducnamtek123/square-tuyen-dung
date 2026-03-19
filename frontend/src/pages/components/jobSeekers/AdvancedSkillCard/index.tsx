@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useParams } from 'react-router-dom';
@@ -31,8 +30,14 @@ import resumeService from '../../../../services/resumeService';
 
 import advancedSkillService from '../../../../services/advancedSkillService';
 
-interface Props {
-  [key: string]: any;
+interface AdvancedSkill {
+  id: string | number;
+  name: string;
+  level: number;
+}
+
+interface AdvancedSkillCardProps {
+  title: string;
 }
 
 
@@ -83,7 +88,7 @@ const Loading = (
 
         .fill(0)
 
-        .map((item, index) => (          <Box sx={{ py: 0.5 }} key={index}>
+        .map((_, index) => (          <Box sx={{ py: 0.5 }} key={index}>
 
             <Skeleton height={30} />
 
@@ -97,11 +102,11 @@ const Loading = (
 
 );
 
-const AdvancedSkillCard = ({ title }) => {
+const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
   const { t } = useTranslation(['jobSeeker', 'common']);
 
-  const { slug: resumeSlug } = useParams();
+  const { slug: resumeSlug } = useParams<{ slug: string }>();
 
   const [openPopup, setOpenPopup] = React.useState(false);
 
@@ -113,25 +118,26 @@ const AdvancedSkillCard = ({ title }) => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const [advancedSkills, setAdvancedSkills] = React.useState([]);
+  const [advancedSkills, setAdvancedSkills] = React.useState<AdvancedSkill[]>([]);
 
-  const [editData, setEditData] = React.useState(null);
+  const [editData, setEditData] = React.useState<AdvancedSkill | null>(null);
 
-  const [serverErrors, setServerErrors] = React.useState(null);
+  const [serverErrors, setServerErrors] = React.useState<any>(null);
 
   React.useEffect(() => {
 
-    const loadAdvancedSkills = async (resumeSlug) => {
+    const loadAdvancedSkills = async (slug: string | undefined) => {
+      if (!slug) return;
 
       setIsLoadingAdvancedSkills(true);
 
       try {
 
-        const resData = await resumeService.getAdvancedSkills(resumeSlug);
+        const resData = await resumeService.getAdvancedSkills(slug) as any;
 
         setAdvancedSkills(resData.data);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -147,23 +153,23 @@ const AdvancedSkillCard = ({ title }) => {
 
   }, [resumeSlug, isSuccess]);
 
-  const handleShowUpdate = (id) => {
+  const handleShowUpdate = (id: string | number) => {
 
     setServerErrors(null);
 
-    const loadAdvancedSkillById = async (id) => {
+    const loadAdvancedSkillById = async (skillId: string | number) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        const resData = await advancedSkillService.getAdvancedSkillById(id);
+        const resData = await advancedSkillService.getAdvancedSkillById(skillId) as any;
 
         setEditData(resData.data);
 
         setOpenPopup(true);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -189,15 +195,15 @@ const AdvancedSkillCard = ({ title }) => {
 
   };
 
-  const handleAddOrUpdate = (data) => {
+  const handleAddOrUpdate = (data: any) => {
 
-    const create = async (data) => {
+    const create = async (payload: any) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await advancedSkillService.addAdvancedSkills(data);
+        await advancedSkillService.addAdvancedSkills(payload);
 
         setOpenPopup(false);
 
@@ -205,7 +211,7 @@ const AdvancedSkillCard = ({ title }) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.skillAddSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error, setServerErrors);
 
@@ -217,13 +223,13 @@ const AdvancedSkillCard = ({ title }) => {
 
     };
 
-    const update = async (data) => {
+    const update = async (payload: any) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await advancedSkillService.updateAdvancedSkillById(data.id, data);
+        await advancedSkillService.updateAdvancedSkillById(payload.id, payload);
 
         setOpenPopup(false);
 
@@ -231,7 +237,7 @@ const AdvancedSkillCard = ({ title }) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.skillUpdateSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -265,19 +271,19 @@ const AdvancedSkillCard = ({ title }) => {
 
   };
 
-  const handleDeleteAdvancedSkill = (id) => {
+  const handleDeleteAdvancedSkill = (id: string | number) => {
 
-    const del = async (id) => {
+    const del = async (skillId: string | number) => {
 
       try {
 
-        await advancedSkillService.deleteAdvancedSkillById(id);
+        await advancedSkillService.deleteAdvancedSkillById(skillId);
 
         setIsSuccess(!isSuccess);
 
         toastMessages.success(t('jobSeeker:profile.messages.skillDeleteSuccess'));
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -317,7 +323,7 @@ const AdvancedSkillCard = ({ title }) => {
 
           p: 3,
 
-          boxShadow: (theme) => theme.customShadows.card,
+          boxShadow: (theme: any) => theme.customShadows.card,
 
         }}
 
@@ -353,7 +359,7 @@ const AdvancedSkillCard = ({ title }) => {
 
                   sx={{
 
-                    boxShadow: (theme) => theme.customShadows.medium,
+                    boxShadow: (theme: any) => theme.customShadows.medium,
 
                     "&:hover": {
 

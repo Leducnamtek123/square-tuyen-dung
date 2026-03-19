@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Chip, Tooltip, IconButton, Box, CircularProgress } from "@mui/material";
@@ -11,13 +10,17 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import dayjs from '../../../../configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  [key: string]: any;
+interface JobTableProps {
+    jobs: any[];
+    loading: boolean;
+    onView: (job: any) => void;
+    onEdit: (job: any) => void;
+    onApprove: (id: any) => void;
+    onReject: (id: any) => void;
+    onDelete: (id: any) => void;
 }
 
-
-
-const JobTable = ({ jobs, loading, onView, onEdit, onApprove, onReject, onDelete }) => {
+const JobTable = ({ jobs, loading, onView, onEdit, onApprove, onReject, onDelete }: JobTableProps) => {
     const { t } = useTranslation('admin');
     if (loading && jobs.length === 0) {
         return (
@@ -27,7 +30,7 @@ const JobTable = ({ jobs, loading, onView, onEdit, onApprove, onReject, onDelete
         );
     }
 
-    const getStatusChip = (status) => {
+    const getStatusChip = (status: number) => {
         switch (status) {
             case 1:
                 return <Chip label={t('pages.jobs.table.status.pending')} color="warning" size="small" />;

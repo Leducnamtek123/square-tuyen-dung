@@ -1,35 +1,30 @@
-// @ts-nocheck
 import React from 'react';
 
-import { Controller } from 'react-hook-form';
+import { Control, Controller } from 'react-hook-form';
 
 import { TextField, Typography } from "@mui/material";
 import ValidationError from '../ValidationError';
 
 interface Props {
-  [key: string]: any;
+  name: string;
+  control: Control<any>;
+  title?: string | null;
+  showRequired?: boolean;
+  placeholder?: string;
+  disabled?: boolean;
+  maxRows?: number;
+  minRows?: number;
 }
 
-
-
 const MultilineTextFieldCustom = ({
-
   name,
-
   control,
-
   title = null,
-
   showRequired = false,
-
   placeholder = '',
-
   disabled = false,
-
   maxRows = 10,
-
   minRows = 4
-
 }: Props) => {
 
   return (

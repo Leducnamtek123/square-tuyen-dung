@@ -1,5 +1,4 @@
-// @ts-nocheck
-import React from "react";
+import React, { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useTranslation } from 'react-i18next';
@@ -22,17 +21,19 @@ import {
   resetSearchResume,
 } from "../../../../redux/filterSlice";
 
-interface Props {
-  [key: string]: any;
+interface UserMenuProps {
+  anchorElUser: HTMLElement | null;
+  open: boolean;
+  handleCloseUserMenu: () => void;
 }
 
 
 
-const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }) => {
+const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) => {
   const { t } = useTranslation('common');
   const nav = useNavigate();
   const dispatch = useDispatch();
-  const { currentUser, activeWorkspace } = useSelector((state) => state.user);
+  const { currentUser, activeWorkspace } = useSelector((state: any) => state.user);
 
   const workspaces = useMemo(() => currentUser?.workspaces || [], [currentUser?.workspaces]);
 
@@ -40,17 +41,13 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }) => {
     const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
     const protocol = window.location.protocol;
     const port = window.location.port ? `:${window.location.port}` : "";
-    const mainHost = HOST_NAME.PROJECT;
-    const language = getPreferredLanguage();
-    const targetUrl = toEmployer
-      ? `${protocol}//${mainHost}${port}${buildPortalPath("employer", normalizedPath, language)}`
-      : `${protocol}//${mainHost}${port}${normalizedPath}`;
-    window.location.href = targetUrl;
+    const targetPath = toEmployer ? buildPortalPath("employer", normalizedPath, getPreferredLanguage()) : normalizedPath;
+    window.location.href = `${protocol}//${HOST_NAME.PROJECT}${port}${targetPath}`;
   };
 
   const menuItems = React.useMemo(() => {
-    const items = [];
-    workspaces.forEach((workspace) => {
+    const items: any[] = [];
+    workspaces.forEach((workspace: any) => {
       const key = `${workspace.type}-${workspace.companyId || "candidate"}`;
       const isSelected =
         workspace.type === activeWorkspace?.type &&
@@ -78,9 +75,9 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }) => {
   }, [activeWorkspace, dispatch, t, workspaces]);
 
   const handleLogout = () => {
-    const accessToken = tokenService.getAccessTokenFromCookie();
-    const backend = tokenService.getProviderFromCookie();
-    dispatch(removeUserInfo({ accessToken, backend }))
+    const accessToken = tokenService.getAccessTokenFromCookie() || '';
+    const backend = tokenService.getProviderFromCookie() || '';
+    (dispatch as any)(removeUserInfo({ accessToken, backend }))
       .unwrap()
       .then(() => {
         dispatch(resetSearchJobPostFilter());
@@ -89,7 +86,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }) => {
 
         nav(`/${ROUTES.AUTH.LOGIN}`);
       })
-      .catch((error) => {
+      .catch((error: any) => {
         errorHandling(error);
       });
   };

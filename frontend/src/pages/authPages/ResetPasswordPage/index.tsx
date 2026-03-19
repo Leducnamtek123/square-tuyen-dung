@@ -1,23 +1,11 @@
-// @ts-nocheck
 import * as React from 'react';
-
 import { useNavigate, useParams } from 'react-router-dom';
-
 import { Alert, AlertTitle, Card, Container, Typography } from "@mui/material";
-
 import { useTranslation } from 'react-i18next';
-
 import { TabTitle } from '../../../utils/generalFunction';
-
-import toastMessages from '../../../utils/toastMessages';
-
 import ResetPasswordForm from '../../components/auths/ResetPasswordForm';
-
 import authService from '../../../services/authService';
-
-interface Props {
-  [key: string]: any;
-}
+import type { AxiosError } from 'axios';
 
 
 
@@ -33,20 +21,18 @@ const ResetPasswordPage = () => {
 
   const [errorMessage, setErrorMessage] = React.useState(null);
 
-  const handleResetPassword = async (data) => {
-
+  const handleResetPassword = async (data: any) => {
     try {
-
-      await authService.updatePassword(token, data.newPassword, data.confirmPassword);
-
+      await authService.resetPassword({
+        token,
+        newPassword: data.newPassword,
+        confirmPassword: data.confirmPassword,
+        platform: 'WEB'
+      });
       navigate('/dang-nhap?successMessage=Password updated successfully');
-
     } catch (error) {
-
-      setErrorMessage(t('messages.tryAgain'));
-
+      setErrorMessage(t('messages.tryAgain') as any);
     }
-
   };
 
   return (

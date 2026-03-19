@@ -1,14 +1,13 @@
-// @ts-nocheck
 import React from 'react';
 import { Box, Divider, Paper, Typography } from '@mui/material';
+import { InterviewSession } from './index';
 
-interface Props {
-  [key: string]: any;
+interface InterviewQuestionsCardProps {
+  session: InterviewSession;
+  t: (key: string, options?: any) => string;
 }
 
-
-
-const InterviewQuestionsCard = ({ session, t }) => {
+const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session, t }) => {
     return (
         <Paper sx={{
             p: 3,
@@ -22,7 +21,7 @@ const InterviewQuestionsCard = ({ session, t }) => {
             </Typography>
             <Divider sx={{ my: 2 }} />
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {session.questions?.length > 0 ? session.questions.map((q, idx) => (
+                {(session.questions?.length ?? 0) > 0 ? session.questions?.map((q: any, idx: number) => (
                     <Box key={q.id || idx} sx={{ p: 1.5, bgcolor: 'background.neutral', borderRadius: 2 }}>
                         <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main', mb: 0.5 }}>
                             Q{idx + 1}:

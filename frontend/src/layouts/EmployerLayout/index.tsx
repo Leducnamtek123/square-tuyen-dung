@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from 'react';
 
 import { Outlet } from 'react-router-dom';
@@ -11,15 +10,15 @@ import Header from '../components/employers/Header';
 
 import Sidebar from '../components/employers/Sidebar';
 
-interface Props {
-  [key: string]: any;
+interface EmployerLayoutProps {
+  window?: () => Window;
 }
 
 
 
 const drawerWidth = 240;
 
-function EmployerLayout(props) {
+function EmployerLayout(props: EmployerLayoutProps) {
 
   const { window } = props;
 
@@ -61,18 +60,13 @@ function EmployerLayout(props) {
 
         {/* Start: Sidebar */}
 
-        <Sidebar drawerWidth={drawerWidth} />
-
+        <Sidebar drawerWidth={drawerWidth} isAdmin={false} />
         <Sidebar.MobileSidebar
-
           drawerWidth={drawerWidth}
-
           container={container}
-
           mobileOpen={mobileOpen}
-
           handleDrawerToggle={handleDrawerToggle}
-
+          isAdmin={false}
         />
 
         {/* End: Sidebar */}

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useTranslation } from 'react-i18next';
@@ -37,21 +36,21 @@ import goongService from '../../../../services/goongService';
 
 import RichTextEditorCustom from '../../../../components/controls/RichTextEditorCustom';
 
-interface Props {
-  [key: string]: any;
+interface CompanyFormProps {
+  handleUpdate: (data: any) => void;
+  editData: any;
+  serverErrors?: any;
 }
 
-
-
-const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
+const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFormProps) => {
 
   const { t } = useTranslation('employer');
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
-  const [districtOptions, setDistrictOptions] = React.useState([]);
+  const [districtOptions, setDistrictOptions] = React.useState<any[]>([]);
 
-  const [locationOptions, setLocationOptions] = React.useState([]);
+  const [locationOptions, setLocationOptions] = React.useState<any[]>([]);
 
   const schema = yup.object().shape({
 
@@ -201,7 +200,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
 
   React.useEffect(() => {
 
-    const loadDistricts = async (cityId) => {
+    const loadDistricts = async (cityId: any) => {
 
       try {
 
@@ -211,7 +210,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
 
         setDistrictOptions(resData.data);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -233,7 +232,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
 
   React.useEffect(() => {
 
-    const loadLocation = async (input) => {
+    const loadLocation = async (input: string) => {
       if (!input || input.trim().length < 3) {
         setLocationOptions([]);
         return;
@@ -243,9 +242,9 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
 
         const resData = await goongService.getPlaces(input);
 
-        if (resData.predictions) setLocationOptions(resData.predictions);
+        if (resData.predictions) setLocationOptions(resData.predictions as any[]);
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -281,9 +280,9 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
 
       for (let err in serverErrors) {
 
-        setError(err, {
+        setError(err as any, {
 
-          type: 400,
+          type: 400 as any,
 
           message: serverErrors[err]?.join(' '),
 
@@ -293,13 +292,13 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
 
     else {
 
-      setError();
+      (setError as any)();
 
     }
 
   }, [serverErrors, setError]);
 
-  const handleSelectLocation = async (e, value) => {
+  const handleSelectLocation = async (e: any, value: any) => {
     if (!value || typeof value !== 'object' || !value.place_id) {
       return;
     }
@@ -310,7 +309,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
 
         value.place_id
 
-      );
+      ) as any;
 
       if (!resData?.result?.geometry?.location) {
         return;
@@ -320,7 +319,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }) => {
 
       setValue('location.lng', resData?.result?.geometry.location.lng || '');
 
-    } catch (error) {
+    } catch (error: any) {
 
       errorHandling(error);
 

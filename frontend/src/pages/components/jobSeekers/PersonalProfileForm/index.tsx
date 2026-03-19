@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 
 import { useSelector } from 'react-redux';
@@ -25,17 +24,42 @@ import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
 
 import commonService from '../../../../services/commonService';
 
-interface Props {
-  [key: string]: any;
+interface FormValues {
+  user: {
+    fullName: string;
+  };
+  phone: string;
+  birthday: Date | string | null;
+  gender: string;
+  maritalStatus: string;
+  location: {
+    city: number | string;
+    district: number | string;
+    address: string;
+  };
+  idCardNumber?: string;
+  idCardIssueDate?: Date | null;
+  idCardIssuePlace?: string;
+  taxCode?: string;
+  socialInsuranceNo?: string;
+  permanentAddress?: string;
+  contactAddress?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+}
+
+interface PersonalProfileFormProps {
+  handleUpdateProfile: (data: any) => void;
+  editData: any;
 }
 
 
 
-const PersonalProfileForm = ({ handleUpdateProfile, editData }) => {
+const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileFormProps) => {
 
   const { t } = useTranslation(['jobSeeker']);
 
-  const { allConfig } = useSelector((state) => state.config);
+  const { allConfig } = useSelector((state: any) => state.config);
 
   const schema = yup.object().shape({
 
@@ -147,11 +171,11 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }) => {
 
   });
 
-  const [districtOptions, setDistrictOptions] = React.useState([]);
+  const [districtOptions, setDistrictOptions] = React.useState<any[]>([]);
 
-  const { control, setValue, reset, handleSubmit } = useForm({
+  const { control, setValue, reset, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
 
   });
 
@@ -217,17 +241,17 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }) => {
 
   React.useEffect(() => {
 
-    const loadDistricts = async (cityId) => {
+    const loadDistricts = async (id: number | string) => {
 
       try {
 
-        const resData = await commonService.getDistrictsByCityId(cityId);
+        const resData = await commonService.getDistrictsByCityId(id) as any;
 
         if (districtOptions.length > 0) setValue('location.district', '');
 
         setDistrictOptions(resData.data); 
 
-      } catch (error) {
+      } catch (error: any) {
 
         errorHandling(error);
 
@@ -485,8 +509,6 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }) => {
             control={control}
 
             title={t('jobSeeker:profile.fields.idCardIssueDate')}
-
-            placeholder={t('jobSeeker:profile.placeholders.idCardIssueDate')}
 
             maxDate={DATE_OPTIONS.today}
 

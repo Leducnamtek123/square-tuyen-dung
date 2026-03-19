@@ -1,15 +1,13 @@
-// @ts-nocheck
-'use client';;
+'use client';
 import { useMemo } from 'react';
 import { cva } from 'class-variance-authority';
-
 import { ReactShaderToy } from '@/components/agents-ui/react-shader-toy';
 import { useAgentAudioVisualizerWave } from '@/hooks/agents-ui/use-agent-audio-visualizer-wave';
 import { cn } from '@/lib/utils';
 
 const DEFAULT_COLOR = '#1FD5F9';
 
-function hexToRgb(hexColor) {
+function hexToRgb(hexColor: string): number[] {
   try {
     const rgbColor = hexColor.match(/^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/);
 
@@ -145,6 +143,20 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
   fragColor = vec4(color * uMix, alpha);
 }`;
 
+interface WaveShaderProps {
+  speed?: number;
+  color?: string;
+  colorShift?: number;
+  mix?: number;
+  amplitude?: number;
+  frequency?: number;
+  lineWidth?: number;
+  blur?: number;
+  ref?: any;
+  className?: string;
+  [key: string]: any;
+}
+
 function WaveShader({
   speed = 10,
   color = '#1FD5F9',
@@ -157,14 +169,14 @@ function WaveShader({
   ref,
   className,
   ...props
-}) {
+}: WaveShaderProps) {
   const rgbColor = useMemo(() => hexToRgb(color), [color]);
 
   return (
     <div ref={ref} className={className} {...props}>
       <ReactShaderToy
         fs={shaderSource}
-        devicePixelRatio={globalThis.devicePixelRatio ?? 1}
+        devicePixelRatio={(globalThis as any).devicePixelRatio ?? 1}
         uniforms={{
           uSpeed: { type: '1f', value: speed },
           uAmplitude: { type: '1f', value: amplitude },
@@ -175,6 +187,7 @@ function WaveShader({
           uColor: { type: '3fv', value: rgbColor },
           uColorShift: { type: '1f', value: colorShift },
         }}
+        onDoneLoadingTextures={() => {}}
         onError={(error) => {
           console.error('Shader error:', error);
         }}
@@ -203,6 +216,19 @@ export const AgentAudioVisualizerWaveVariants = cva(['aspect-square'], {
   },
 });
 
+interface AgentAudioVisualizerWaveProps {
+  size?: 'icon' | 'sm' | 'md' | 'lg' | 'xl';
+  state?: string;
+  color?: string;
+  colorShift?: number;
+  lineWidth?: number;
+  blur?: number;
+  audioTrack?: any;
+  className?: string;
+  ref?: any;
+  [key: string]: any;
+}
+
 /**
  * A wave-style audio visualizer that responds to agent state and audio levels.
  * Displays an animated wave that reacts to the current agent state (connecting, thinking, speaking, etc.)
@@ -225,7 +251,7 @@ export const AgentAudioVisualizerWaveVariants = cva(['aspect-square'], {
 export function AgentAudioVisualizerWave({
   size = 'lg',
   state = 'speaking',
-  color,
+  color = DEFAULT_COLOR,
   colorShift = 0.05,
   lineWidth,
   blur,
@@ -233,7 +259,7 @@ export function AgentAudioVisualizerWave({
   className,
   ref,
   ...props
-}) {
+}: AgentAudioVisualizerWaveProps) {
   const _lineWidth = useMemo(() => {
     if (lineWidth !== undefined) {
       return lineWidth;

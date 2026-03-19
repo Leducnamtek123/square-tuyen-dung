@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import adminSettingsService from '../../../../services/adminSettingsService';
@@ -23,7 +22,7 @@ export const useUpdateSystemSettings = () => {
     const queryClient = useQueryClient();
 
     return useMutation({
-        mutationFn: (data) => adminSettingsService.updateSystemSettings(data),
+        mutationFn: (data: any) => adminSettingsService.updateSystemSettings(data),
         onSuccess: () => {
             toastMessages.success('Cai dat da duoc luu');
             queryClient.invalidateQueries({ queryKey: ['system-settings'] });

@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip, Avatar, Chip } from "@mui/material";
 
@@ -6,13 +5,13 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  [key: string]: any;
+interface CareerTableProps {
+    data: any[];
+    onEdit?: (row: any) => void;
+    onDelete?: (row: any) => void;
 }
 
-
-
-const CareerTable = ({ data, onEdit, onDelete }) => {
+const CareerTable = ({ data, onEdit, onDelete }: CareerTableProps) => {
     const { t } = useTranslation('admin');
     return (
         <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>

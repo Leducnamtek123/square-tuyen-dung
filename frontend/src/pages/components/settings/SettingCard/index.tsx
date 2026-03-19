@@ -8,7 +8,7 @@ import toastMessages from "../../../../utils/toastMessages";
 import { useAppSelector } from "../../../../redux/hooks";
 
 interface SettingCardProps {
-  title: string;
+  title: React.ReactNode;
   sx?: SxProps<Theme>;
 }
 

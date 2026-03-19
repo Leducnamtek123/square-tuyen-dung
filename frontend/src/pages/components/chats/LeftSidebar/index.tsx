@@ -1,1058 +1,520 @@
-// @ts-nocheck
 import React from 'react';
-
 import { Box, CircularProgress, Skeleton, Stack, Typography } from "@mui/material";
-
 import InfiniteScroll from 'react-infinite-scroll-component';
-
 import CircleIcon from '@mui/icons-material/Circle';
-
 import {
-
   collection,
-
   onSnapshot,
-
   query,
-
   where,
-
   orderBy,
-
   startAfter,
-
   limit,
-
   getDocs,
-
 } from 'firebase/firestore';
-
 import db from '../../../../configs/firebase-config';
-
 import NoDataCard from '../../../../components/NoDataCard';
-
-import {} from '../../../../configs/constants';
-
 import { ChatContext } from '../../../../context/ChatProvider';
-
 import MuiImageCustom from '../../../../components/MuiImageCustom';
-
 import ChatRoomSearch from '../../../../components/chats/ChatRoomSearch';
-
 import { useDebounce } from '../../../../hooks';
-
 import { getUserAccount } from '../../../../services/firebaseService';
-
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  [key: string]: any;
+interface UserAccount {
+  id?: string;
+  userId?: string;
+  name?: string;
+  avatarUrl?: string;
+  email?: string;
+  company?: {
+    companyName?: string;
+  };
 }
 
-
+interface ChatRoomData {
+  id: string;
+  members: string[];
+  updatedAt: any;
+  user?: UserAccount;
+  recipientId?: string;
+  unreadCount?: number;
+}
 
 const LoadingComponentItem = () => {
-
   return (
-
     <Stack direction="row" spacing={1} alignItems="center">
-
       <Box>
-
         <Skeleton variant="circular" width={54} height={54} />
-
       </Box>
-
       <Stack flex={1} spacing={1}>
-
         <Skeleton variant="rounded" />
-
         <Skeleton variant="rounded" />
-
       </Stack>
-
     </Stack>
-
   );
-
 };
 
 const LIMIT = 20;
-
 const chatRoomCollectionRef = collection(db, 'chatRooms');
 
 const LeftSidebar = () => {
-
   const { t } = useTranslation('chat');
-
-  const { currentUserChat, setSelectedRoomId } = React.useContext(ChatContext);
-
+  const { currentUserChat, setSelectedRoomId } = React.useContext(ChatContext) as any;
   const [searchText, setSearchText] = React.useState('');
-
   const deboundedTextValue = useDebounce(searchText, 500);
-
   const [isLoading, setIsLoading] = React.useState(true);
-
   const [hasMore, setHasMore] = React.useState(true);
-
-  const [lastDocument, setLastDocument] = React.useState(null);
-
-  const [chatRooms, setChatRooms] = React.useState([]);
-
+  const [lastDocument, setLastDocument] = React.useState<any>(null);
+  const [chatRooms, setChatRooms] = React.useState<ChatRoomData[]>([]);
   const [page, setPage] = React.useState(0);
-
   const [count, setCount] = React.useState(0);
 
-  const handleSelectRoom = (chatRoom) => {
-
+  const handleSelectRoom = (chatRoom: ChatRoomData) => {
     setSelectedRoomId(chatRoom?.id);
-
   };
 
   React.useEffect(() => {
-
-    console.log('==> Bắn API Search: ', deboundedTextValue);
-
-  }, [deboundedTextValue]);
-
-  // lang nghe tong chat rooms
-
-  React.useEffect(() => {
-
     if (currentUserChat) {
-
       const q = query(
-
         chatRoomCollectionRef,
-
         where('members', 'array-contains', `${currentUserChat.userId}`)
-
       );
-
       const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-
         setCount(querySnapshot?.size || 0);
-
       });
-
-      return () => {
-
-        unsubscribe();
-
-      };
-
+      return () => unsubscribe();
     }
-
   }, [currentUserChat]);
-
-  // load danh sach chat rooms
 
   React.useEffect(() => {
-
     if (currentUserChat) {
-
       setIsLoading(true);
-
       let q = query(
-
         chatRoomCollectionRef,
-
         where('members', 'array-contains', `${currentUserChat.userId}`),
-
         orderBy('updatedAt', 'desc'),
-
         limit(LIMIT)
-
       );
-
       const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-
-        let chatRoomsData = [];
-
+        let chatRoomsData: ChatRoomData[] = [];
         const promises = querySnapshot.docs.map(async (doc) => {
-
           try {
-
             let partnerId = '';
-
             const chatRoomData = doc.data();
-
             if (chatRoomData?.members[0] === `${currentUserChat.userId}`) {
-
               partnerId = chatRoomData?.members[1];
-
             } else {
-
               partnerId = chatRoomData?.members[0];
-
             }
-
             const userAccount = await getUserAccount(
-
               'accounts',
-
               `${partnerId}`
-
-            );
-
+            ) as UserAccount;
             chatRoomsData.push({
-
-              ...chatRoomData,
-
+              ...(chatRoomData as any),
               id: doc.id,
-
               user: userAccount,
-
             });
-
           } catch (error) {
-
             console.error(error);
-
           }
-
         });
-
         if (querySnapshot.docs.length > 0) {
-
           setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
-
         }
-
         await Promise.all(promises);
-
         setChatRooms(chatRoomsData);
-
         setHasMore(true);
-
         setPage(1);
-
         setIsLoading(false);
-
       });
-
       return () => unsubscribe();
-
     }
-
   }, [currentUserChat]);
-
-  // tai them du lieu
 
   const handleLoadMore = () => {
-
     const getMoreData = async () => {
-
-      if (lastDocument !== null) {
-
+      if (lastDocument !== null && currentUserChat) {
         const q = query(
-
           chatRoomCollectionRef,
-
           where('members', 'array-contains', `${currentUserChat.userId}`),
-
           orderBy('updatedAt', 'desc'),
-
           startAfter(lastDocument),
-
           limit(LIMIT)
-
         );
-
         const querySnapshot = await getDocs(q);
-
-        let chatRoomsData = [];
-
+        let chatRoomsData: ChatRoomData[] = [];
         if (querySnapshot.docs.length > 0) {
-
           setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
-
         }
-
         const promises = querySnapshot.docs.map(async (doc) => {
-
           try {
-
             let partnerId = '';
-
             const chatRoomData = doc.data();
-
             if (chatRoomData?.members[0] === `${currentUserChat.userId}`) {
-
               partnerId = chatRoomData?.members[1];
-
             } else {
-
               partnerId = chatRoomData?.members[0];
-
             }
-
             const userAccount = await getUserAccount(
-
               'accounts',
-
               `${partnerId}`
-
-            );
-
+            ) as UserAccount;
             chatRoomsData.push({
-
-              ...chatRoomData,
-
+              ...(chatRoomData as any),
               id: doc.id,
-
               user: userAccount,
-
             });
-
           } catch (error) {
-
             console.error(error);
-
           }
-
         });
-
         await Promise.all(promises);
-
-        setChatRooms([...chatRooms, ...chatRoomsData]);
-
+        setChatRooms(prev => [...prev, ...chatRoomsData]);
       }
-
     };
-
     if (Math.ceil(count / LIMIT) > page) {
-
       setPage(page + 1);
-
       getMoreData();
-
     } else {
-
       setHasMore(false);
-
     }
-
   };
 
   return (
-
     <Box>
-
       <Stack spacing={2}>
-
         <Box>
-
           <ChatRoomSearch
-
             value={searchText}
-
             setValue={setSearchText}
-
             placeholder={t('searchPlaceholderCompany')}
-
           />
-
         </Box>
-
-        <Box
-
-          sx={{
-
-            height: '75vh',
-
-          }}
-
-        >
-
+        <Box sx={{ height: '75vh' }}>
           {isLoading ? (
-
             <Stack spacing={2} overflow={'hidden'} height="100%">
-
               {Array.from(Array(12).keys()).map((value) => (
-
                 <LoadingComponentItem key={value} />
-
               ))}
-
             </Stack>
-
           ) : chatRooms.length === 0 ? (
-
             <NoDataCard
-
               title={t('noConversationsFound')}
-
               svgKey="ImageSvg15"
-
             />
-
           ) : (
-
             <Stack spacing={1}>
-
               <InfiniteScroll
-
                 height={'75vh'}
-
-                style={{
-
-                  overflowY: 'auto',
-
-                }}
-
+                style={{ overflowY: 'auto' }}
                 dataLength={chatRooms.length}
-
                 next={handleLoadMore}
-
                 hasMore={hasMore}
-
                 loader={
-
                   <Stack sx={{ py: 2 }} justifyContent="center">
-
-                    <CircularProgress
-
-                      color="secondary"
-
-                      sx={{ margin: '0 auto' }}
-
-                    />
-
+                    <CircularProgress color="secondary" sx={{ margin: '0 auto' }} />
                   </Stack>
-
                 }
-
               >
-
                 {chatRooms.map((value) => (
-
                   <Stack
-
                     onClick={() => handleSelectRoom(value)}
-
                     direction="row"
-
                     spacing={1}
-
                     alignItems="center"
-
                     key={value.id}
-
                     sx={{
-
                       p: 1,
-
                       borderRadius: 2,
-
-                      '&:hover': {
-
-                        backgroundColor: '#ede7f6',
-
-                      },
-
+                      '&:hover': { backgroundColor: '#ede7f6' },
                     }}
-
                   >
-
                     <Box>
-
                       <MuiImageCustom
-
                         width={54}
-
                         height={54}
-
                         sx={{
-
                           borderRadius: 50,
-
                           border: 1,
-
                           borderColor: '#e0e0e0',
-
                           p: 0.25,
-
                         }}
-
                         src={`${value?.user?.avatarUrl}`}
-
                       />
-
                     </Box>
-
                     <Stack flex={1} width={'50%'}>
-
                       <span
-
                         style={{
-
                           fontWeight: 700,
-
                           fontSize: 15,
-
                           whiteSpace: 'nowrap',
-
                           overflow: 'hidden',
-
                           textOverflow: 'ellipsis',
-
                           cursor: 'pointer',
-
                         }}
-
                       >
-
                         {`${value?.user?.name}`}
-
                       </span>
-
                       <Typography
-
                         variant="caption"
-
                         sx={{
-
                           whiteSpace: 'nowrap',
-
                           overflow: 'hidden',
-
                           textOverflow: 'ellipsis',
-
                           cursor: 'pointer',
-
                         }}
-
                       >
-
                         {`${value?.user?.company?.companyName}` || '---'}
-
                       </Typography>
-
                     </Stack>
-
                     <Box>
-
-                      {`${value?.recipientId}` ===
-
-                        `${currentUserChat.userId}` &&
-
-                        value?.unreadCount > 0 && (
-
-                          <CircleIcon
-
-                            style={{ color: '#2979ff', fontSize: 12 }}
-
-                          />
-
+                      {`${value?.recipientId}` === `${currentUserChat?.userId}` &&
+                        (value?.unreadCount || 0) > 0 && (
+                          <CircleIcon style={{ color: '#2979ff', fontSize: 12 }} />
                         )}
-
                     </Box>
-
                   </Stack>
-
                 ))}
-
               </InfiniteScroll>
-
             </Stack>
-
           )}
-
         </Box>
-
       </Stack>
-
     </Box>
-
   );
-
 };
 
 const EmployerSidebar = () => {
-
   const { t } = useTranslation('chat');
-
-  const { currentUserChat, setSelectedRoomId } = React.useContext(ChatContext);
-
+  const { currentUserChat, setSelectedRoomId } = React.useContext(ChatContext) as any;
   const [searchText, setSearchText] = React.useState('');
-
   const deboundedTextValue = useDebounce(searchText, 500);
-
   const [isLoading, setIsLoading] = React.useState(true);
-
   const [hasMore, setHasMore] = React.useState(true);
-
-  const [lastDocument, setLastDocument] = React.useState(null);
-
-  const [chatRooms, setChatRooms] = React.useState([]);
-
+  const [lastDocument, setLastDocument] = React.useState<any>(null);
+  const [chatRooms, setChatRooms] = React.useState<ChatRoomData[]>([]);
   const [page, setPage] = React.useState(0);
-
   const [count, setCount] = React.useState(0);
 
-  const handleSelectRoom = (chatRoom) => {
-
+  const handleSelectRoom = (chatRoom: ChatRoomData) => {
     setSelectedRoomId(chatRoom?.id);
-
   };
 
   React.useEffect(() => {
-
-    console.log('==> Bắn API Search: ', deboundedTextValue);
-
-  }, [deboundedTextValue]);
-
-  // lang nghe tong chat rooms
-
-  React.useEffect(() => {
-
     if (currentUserChat) {
-
       const q = query(
-
         chatRoomCollectionRef,
-
         where('members', 'array-contains', `${currentUserChat.userId}`)
-
       );
-
       const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-
         setCount(querySnapshot?.size || 0);
-
       });
-
-      return () => {
-
-        unsubscribe();
-
-      };
-
+      return () => unsubscribe();
     }
-
   }, [currentUserChat]);
-
-  // load danh sach chat rooms
 
   React.useEffect(() => {
-
     if (currentUserChat) {
-
       setIsLoading(true);
-
       let q = query(
-
         chatRoomCollectionRef,
-
         where('members', 'array-contains', `${currentUserChat.userId}`),
-
         orderBy('updatedAt', 'desc'),
-
         limit(LIMIT)
-
       );
-
       const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-
-        let chatRoomsData = [];
-
+        let chatRoomsData: ChatRoomData[] = [];
         const promises = querySnapshot.docs.map(async (doc) => {
-
           try {
-
             let partnerId = '';
-
             const chatRoomData = doc.data();
-
             if (chatRoomData?.members[0] === `${currentUserChat.userId}`) {
-
               partnerId = chatRoomData?.members[1];
-
             } else {
-
               partnerId = chatRoomData?.members[0];
-
             }
-
             const userAccount = await getUserAccount(
-
               'accounts',
-
               `${partnerId}`
-
-            );
-
+            ) as UserAccount;
             chatRoomsData.push({
-
-              ...chatRoomData,
-
+              ...(chatRoomData as any),
               id: doc.id,
-
               user: userAccount,
-
             });
-
           } catch (error) {
-
             console.error(error);
-
           }
-
         });
-
         if (querySnapshot.docs.length > 0) {
-
           setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
-
         }
-
         await Promise.all(promises);
-
         setChatRooms(chatRoomsData);
-
         setHasMore(true);
-
         setPage(1);
-
         setIsLoading(false);
-
       });
-
       return () => unsubscribe();
-
     }
-
   }, [currentUserChat]);
-
-  // tai them du lieu
 
   const handleLoadMore = () => {
-
     const getMoreData = async () => {
-
-      if (lastDocument !== null) {
-
+      if (lastDocument !== null && currentUserChat) {
         const q = query(
-
           chatRoomCollectionRef,
-
           where('members', 'array-contains', `${currentUserChat.userId}`),
-
           orderBy('updatedAt', 'desc'),
-
           startAfter(lastDocument),
-
           limit(LIMIT)
-
         );
-
         const querySnapshot = await getDocs(q);
-
-        let chatRoomsData = [];
-
+        let chatRoomsData: ChatRoomData[] = [];
         if (querySnapshot.docs.length > 0) {
-
           setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
-
         }
-
         const promises = querySnapshot.docs.map(async (doc) => {
-
           try {
-
             let partnerId = '';
-
             const chatRoomData = doc.data();
-
             if (chatRoomData?.members[0] === `${currentUserChat.userId}`) {
-
               partnerId = chatRoomData?.members[1];
-
             } else {
-
               partnerId = chatRoomData?.members[0];
-
             }
-
             const userAccount = await getUserAccount(
-
               'accounts',
-
               `${partnerId}`
-
-            );
-
+            ) as UserAccount;
             chatRoomsData.push({
-
-              ...chatRoomData,
-
+              ...(chatRoomData as any),
               id: doc.id,
-
               user: userAccount,
-
             });
-
           } catch (error) {
-
             console.error(error);
-
           }
-
         });
-
         await Promise.all(promises);
-
-        setChatRooms([...chatRooms, ...chatRoomsData]);
-
+        setChatRooms(prev => [...prev, ...chatRoomsData]);
       }
-
     };
-
     if (Math.ceil(count / LIMIT) > page) {
-
       setPage(page + 1);
-
       getMoreData();
-
     } else {
-
       setHasMore(false);
-
     }
-
   };
 
   return (
-
     <Box>
-
       <Stack spacing={2}>
-
         <Box>
-
           <ChatRoomSearch
-
             value={searchText}
-
             setValue={setSearchText}
-
             placeholder={t('searchPlaceholderCandidate')}
-
           />
-
         </Box>
-
         <Box sx={{ height: '75vh', overflowY: 'auto' }}>
-
           {isLoading ? (
-
             <Stack spacing={2}>
-
               {Array.from(Array(12).keys()).map((value) => (
-
                 <LoadingComponentItem key={value} />
-
               ))}
-
             </Stack>
-
           ) : chatRooms.length === 0 ? (
-
             <NoDataCard
-
               title={t('noConversationsFound')}
-
               svgKey="ImageSvg15"
-
             />
-
           ) : (
-
             <Stack spacing={1}>
-
               <Box>
-
                 <InfiniteScroll
-
                   height={'75vh'}
-
-                  style={{
-
-                    overflowY: 'auto',
-
-                  }}
-
+                  style={{ overflowY: 'auto' }}
                   dataLength={chatRooms.length}
-
                   next={handleLoadMore}
-
                   hasMore={hasMore}
-
                   loader={
-
                     <Stack sx={{ py: 2 }} justifyContent="center">
-
-                      <CircularProgress
-
-                        color="secondary"
-
-                        sx={{ margin: '0 auto' }}
-
-                      />
-
+                      <CircularProgress color="secondary" sx={{ margin: '0 auto' }} />
                     </Stack>
-
                   }
-
                 >
-
                   {chatRooms.map((value) => (
-
                     <Stack
-
                       onClick={() => handleSelectRoom(value)}
-
                       direction="row"
-
                       spacing={1}
-
                       alignItems="center"
-
                       key={value.id}
-
                       sx={{
-
                         p: 1,
-
                         borderRadius: 2,
-
-                        '&:hover': {
-
-                          backgroundColor: '#ede7f6',
-
-                        },
-
+                        '&:hover': { backgroundColor: '#ede7f6' },
                       }}
-
                     >
-
                       <Box>
-
                         <MuiImageCustom
-
                           width={54}
-
                           height={54}
-
                           sx={{
-
                             borderRadius: 50,
-
                             border: 1,
-
                             borderColor: '#e0e0e0',
-
                             p: 0.25,
-
                           }}
-
                           src={`${value?.user?.avatarUrl}`}
-
                         />
-
                       </Box>
-
                       <Stack flex={1} width={'50%'}>
-
                         <span
-
                           style={{
-
                             fontWeight: 700,
-
                             fontSize: 15,
-
                             whiteSpace: 'nowrap',
-
                             overflow: 'hidden',
-
                             textOverflow: 'ellipsis',
-
                             cursor: 'pointer',
-
                           }}
-
                         >
-
                           {`${value?.user?.name}` || '---'}
-
                         </span>
-
                         <Typography
-
                           variant="caption"
-
                           sx={{
-
                             whiteSpace: 'nowrap',
-
                             overflow: 'hidden',
-
                             textOverflow: 'ellipsis',
-
                             cursor: 'pointer',
-
                           }}
-
                         >
-
                           {`${value?.user?.email}` || '---'}
-
                         </Typography>
-
                       </Stack>
-
                       <Box>
-
-                        {`${value?.recipientId}` ===
-
-                          `${currentUserChat.userId}` &&
-
-                          value?.unreadCount > 0 && (
-
-                            <CircleIcon
-
-                              style={{ color: '#2979ff', fontSize: 12 }}
-
-                            />
-
+                        {`${value?.recipientId}` === `${currentUserChat?.userId}` &&
+                          (value?.unreadCount || 0) > 0 && (
+                            <CircleIcon style={{ color: '#2979ff', fontSize: 12 }} />
                           )}
-
                       </Box>
-
                     </Stack>
-
                   ))}
-
                 </InfiniteScroll>
-
               </Box>
-
             </Stack>
-
           )}
-
         </Box>
-
       </Stack>
-
     </Box>
-
   );
-
 };
 
-LeftSidebar.Employer = EmployerSidebar;
-
-export default LeftSidebar;
+const MainLeftSidebar = Object.assign(LeftSidebar, { Employer: EmployerSidebar });
+export default MainLeftSidebar;

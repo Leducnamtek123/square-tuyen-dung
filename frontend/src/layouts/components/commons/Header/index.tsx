@@ -1,4 +1,3 @@
-// @ts-nocheck
 import * as React from "react";
 
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -29,13 +28,11 @@ import ChatCard from "../../../../components/ChatCard";
 import LanguageSwitcher from "../LanguageSwitcher";
 import { isAdminPortalPath, isEmployerPortalPath } from "../../../../configs/portalRouting";
 
-interface Props {
+interface HeaderProps {
   [key: string]: any;
 }
 
-
-
-const Header = (props) => {
+const Header = (props: HeaderProps) => {
 
   const { t } = useTranslation('common');
 
@@ -91,11 +88,11 @@ const Header = (props) => {
 
   const nav = useNavigate();
 
-  const { currentUser, isAuthenticated } = useSelector((state) => state.user);
+  const { currentUser, isAuthenticated } = useSelector((state: any) => state.user);
 
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
 
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -111,7 +108,7 @@ const Header = (props) => {
 
   };
 
-  const handleOpenUserMenu = (event) => {
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
 
     setAnchorElUser(event.currentTarget);
 
@@ -185,7 +182,7 @@ const Header = (props) => {
 
               px: 1,
 
-              color: (theme) =>
+              color: (theme: any) =>
 
                 theme.palette.mode === "light" ? "white" : "white",
 
@@ -538,7 +535,9 @@ const Header = (props) => {
             </Box>
 
             <Stack direction="row" alignItems="center" spacing={2}>
+
               <LanguageSwitcher />
+
               {isAuthenticated && <WorkspaceSwitchMenu />}
 
               {/* start: NotificationCard */}
@@ -582,6 +581,7 @@ const Header = (props) => {
                 </>
 
               )}
+
             </Stack>
 
           </Toolbar>

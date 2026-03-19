@@ -1,13 +1,10 @@
-// @ts-nocheck
 import React from 'react';
 import { Box } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 interface Props {
-  [key: string]: any;
+  message?: string;
 }
-
-
 
 const ValidationError = ({ message }: Props) => {
   if (!message) return null;

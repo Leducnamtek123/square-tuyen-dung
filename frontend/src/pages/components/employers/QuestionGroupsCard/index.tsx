@@ -1,9 +1,8 @@
-// @ts-nocheck
 import React, { useState, useMemo, useEffect } from 'react';
 
 import { useTranslation } from 'react-i18next';
 
-import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip, IconButton, Stack, Divider, LinearProgress } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip, IconButton, Stack, Divider, LinearProgress, SelectChangeEvent } from "@mui/material";
 
 import SearchIcon from '@mui/icons-material/Search';
 
@@ -21,13 +20,11 @@ import questionService from '../../../../services/questionService';
 
 import { transformQuestion, transformQuestionGroup } from '../../../../utils/transformers';
 
-interface Props {
-  [key: string]: any;
+interface QuestionGroupsCardProps {
+  title?: string;
 }
 
-
-
-const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
+const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Question Groups Management" }) => {
 
   const { t } = useTranslation('employer');
 
@@ -39,17 +36,17 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
     const [openDialog, setOpenDialog] = useState(false);
 
-    const [dialogMode, setDialogMode] = useState('add'); // 'add' or 'edit'
+    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add'); // 'add' or 'edit'
 
-    const [currentGroup, setCurrentGroup] = useState(null);
+    const [currentGroup, setCurrentGroup] = useState<any>(null);
 
     const [groupName, setGroupName] = useState('');
 
     const [groupDescription, setGroupDescription] = useState('');
 
-    const [selectedQuestions, setSelectedQuestions] = useState([]);
+    const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
 
-    const [allQuestions, setAllQuestions] = useState([]);
+    const [allQuestions, setAllQuestions] = useState<any[]>([]);
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -83,13 +80,13 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
     });
 
-    const handleChangePage = (event, newPage) => {
+    const handleChangePage = (event: any, newPage: number) => {
 
         setPage(newPage);
 
     };
 
-    const handleChangeRowsPerPage = (event) => {
+    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 
         setRowsPerPage(parseInt(event.target.value, 10));
 
@@ -103,13 +100,13 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
             try {
 
-                const res = await questionService.getQuestions({ pageSize: 1000 });
+                const res = await questionService.getQuestions({ pageSize: 1000 }) as any;
 
                 const rawQuestions = Array.isArray(res?.results) ? res.results : Array.isArray(res) ? res : [];
 
                 setAllQuestions(rawQuestions.map(transformQuestion).filter(Boolean));
 
-            } catch (error) {
+            } catch (error: any) {
 
                 console.error("Error fetching questions", error);
 
@@ -121,7 +118,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
     }, []);
 
-    const handleSearch = (e) => {
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
 
         setSearchTerm(e.target.value);
 
@@ -145,7 +142,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
     };
 
-    const handleOpenEdit = (group) => {
+    const handleOpenEdit = (group: any) => {
 
         setDialogMode('edit');
 
@@ -155,13 +152,13 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
         setGroupDescription(group.description || '');
 
-        setSelectedQuestions(group.questions?.map(q => q.id) || []);
+        setSelectedQuestions(group.questions?.map((q: any) => q.id) || []);
 
         setOpenDialog(true);
 
     };
 
-    const handleOpenDelete = (group) => {
+    const handleOpenDelete = (group: any) => {
 
         setCurrentGroup(group);
 
@@ -209,7 +206,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
             handleCloseDialog();
 
-        } catch (error) {
+        } catch (error: any) {
 
             console.error(error);
 
@@ -229,7 +226,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
                 text: newQuestionContent.trim()
 
-            });
+            }) as any;
 
             const newQ = transformQuestion(res);
 
@@ -245,7 +242,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
             setNewQuestionContent('');
 
-        } catch (error) {
+        } catch (error: any) {
 
             console.error("Error creating question", error);
 
@@ -265,7 +262,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
             setOpenDeleteDialog(false);
 
-        } catch (error) {
+        } catch (error: any) {
 
             console.error(error);
 
@@ -281,7 +278,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
             accessorKey: 'name',
 
-            cell: ({ getValue }) => getValue(),
+            cell: ({ getValue }: any) => getValue(),
 
         },
 
@@ -291,7 +288,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
             accessorKey: 'questions',
 
-            cell: ({ getValue }) => getValue()?.length || 0,
+            cell: ({ getValue }: any) => getValue()?.length || 0,
 
         },
 
@@ -301,7 +298,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
             accessorKey: 'description',
 
-            cell: ({ getValue }) => getValue() || 'N/A',
+            cell: ({ getValue }: any) => getValue() || 'N/A',
 
         },
 
@@ -311,7 +308,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
             id: 'actions',
 
-            cell: ({ row }) => (
+            cell: ({ row }: any) => (
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
 
@@ -433,13 +430,13 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
                         px: 3,
 
-                        background: (theme) => theme.palette.primary.gradient,
+                        background: (theme: any) => theme.palette.primary.gradient,
 
-                        boxShadow: (theme) => theme.customShadows?.small || 1,
+                        boxShadow: (theme: any) => theme.customShadows?.small || 1,
 
                         '&:hover': {
 
-                            boxShadow: (theme) => theme.customShadows?.medium || 2
+                            boxShadow: (theme: any) => theme.customShadows?.medium || 2
 
                         }
 
@@ -539,7 +536,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
                 borderRadius: 2,
 
-                boxShadow: (theme) => theme.customShadows?.card || 1,
+                boxShadow: (theme: any) => theme.customShadows?.card || 1,
 
                 overflow: 'hidden',
 
@@ -627,13 +624,13 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
                             <InputLabel>Select Questions</InputLabel>
 
-                            <Select
+                             <Select
 
                                 multiple
 
                                 value={selectedQuestions}
 
-                                onChange={(e) => setSelectedQuestions(e.target.value)}
+                                onChange={(e: SelectChangeEvent<any[]>) => setSelectedQuestions(e.target.value as any[])}
 
                                 input={<OutlinedInput label={t('questionGroupsCard.label.selectquestions', 'Select Questions')} />}
 
@@ -641,7 +638,7 @@ const QuestionGroupsCard = ({ title = "Question Groups Management" }) => {
 
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
 
-                                        {selected.map((value) => {
+                                        {(selected as any[]).map((value) => {
 
                                             const q = allQuestions.find((item) => item.id === value);
 

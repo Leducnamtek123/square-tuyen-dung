@@ -1,5 +1,4 @@
-// @ts-nocheck
-'use client';;
+'use client';
 import {
   Conversation,
   ConversationContent,
@@ -9,6 +8,19 @@ import { Message, MessageContent, MessageResponse } from '@/components/ai-elemen
 import { AgentChatIndicator } from '@/components/agents-ui/agent-chat-indicator';
 import { AnimatePresence } from 'motion/react';
 import type { ComponentPropsWithoutRef, ReactNode } from 'react';
+
+type AgentChatMessage = {
+  id: string | number;
+  timestamp: number | string | Date;
+  from?: { isLocal?: boolean };
+  message?: ReactNode;
+};
+
+type AgentChatTranscriptProps = {
+  agentState?: 'thinking' | 'idle' | string;
+  messages?: AgentChatMessage[];
+  className?: string;
+} & ComponentPropsWithoutRef<'div'>;
 
 /**
  * A chat transcript component that displays a conversation between the user and agent.
@@ -57,16 +69,3 @@ export function AgentChatTranscript({
     </Conversation>
   );
 }
-
-type AgentChatMessage = {
-  id: string | number;
-  timestamp: number | string | Date;
-  from?: { isLocal?: boolean };
-  message?: ReactNode;
-};
-
-type AgentChatTranscriptProps = {
-  agentState?: 'thinking' | 'idle' | string;
-  messages?: AgentChatMessage[];
-  className?: string;
-} & ComponentPropsWithoutRef<'div'>;

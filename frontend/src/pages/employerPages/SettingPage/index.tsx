@@ -1,16 +1,9 @@
-// @ts-nocheck
 import React from "react";
 import { Card, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import Grid from "@mui/material/Grid2";
 
 import SettingCard from "../../components/settings/SettingCard";
-
-interface Props {
-  [key: string]: any;
-}
-
-
 
 const SettingPage = () => {
   const { t } = useTranslation("employer");
@@ -34,8 +27,9 @@ const SettingPage = () => {
                   variant="h5"
                   sx={{
                     fontWeight: 600,
-                    background: "primary.gradient",
+                    background: (theme: any) => theme.palette.primary.gradient,
                     WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
                     fontSize: { xs: "1.25rem", sm: "1.5rem" },
                   }}
                 >

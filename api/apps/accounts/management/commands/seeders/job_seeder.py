@@ -41,10 +41,15 @@ def seed_jobs():
                 job_description=f"<p>{fake.text(max_nb_chars=500)}</p>",
                 salary_min=random.randint(8, 20) * 1000000,
                 salary_max=random.randint(25, 50) * 1000000,
+                position=random.randint(1, 6), # Cấp bậc ngẫu nhiên
+                type_of_workplace=random.randint(1, 3),
                 experience=random.randint(0, 5),
                 academic_level=random.randint(1, 4),
                 job_type=random.randint(1, 3),
-                status=3 # Active
+                status=3, # Active
+                contact_person_name=fake.name(),
+                contact_person_phone=fake.phone_number(),
+                contact_person_email=fake.company_email()
             )
             job_count += 1
 
@@ -61,7 +66,10 @@ def seed_jobs():
                 city=random.choice(cities) if cities.exists() else None,
                 salary_min=10000000,
                 salary_max=20000000,
+                position=random.randint(1, 6), # Cấp bậc ngẫu nhiên
                 experience=random.randint(1, 10),
+                academic_level=random.randint(1, 4),
+                type_of_workplace=random.randint(1, 3),
                 is_active=True
             )
             resume_count += 1

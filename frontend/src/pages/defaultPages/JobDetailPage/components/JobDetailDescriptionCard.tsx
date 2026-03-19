@@ -1,4 +1,3 @@
-// @ts-nocheck
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Box, Card, Stack, Typography } from "@mui/material";
@@ -6,13 +5,12 @@ import Grid from "@mui/material/Grid2";
 
 import JobDetailInfoItem from "./JobDetailInfoItem";
 
-interface Props {
-  [key: string]: any;
+interface JobDetailDescriptionCardProps {
+  jobPostDetail: any;
+  allConfig: any;
 }
 
-
-
-const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
+const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ jobPostDetail, allConfig }) => {
   const { t } = useTranslation(["public"]);
   return (
     <Card
@@ -118,7 +116,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
               }}>
               <JobDetailInfoItem
                 title={t("jobDetail.career")}
-                value={allConfig.careerDict[jobPostDetail?.career]}
+                value={(allConfig?.careerDict as any)?.[jobPostDetail?.career]}
               />
             </Grid>
             <Grid
@@ -129,7 +127,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
               <JobDetailInfoItem
                 title={t("jobDetail.workplaceType")}
                 value={
-                  allConfig.typeOfWorkplaceDict[
+                  (allConfig?.typeOfWorkplaceDict as any)?.[
                     jobPostDetail?.typeOfWorkplace
                   ]
                 }
@@ -143,7 +141,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
               <JobDetailInfoItem
                 title={t("jobDetail.academicLevel")}
                 value={
-                  allConfig.academicLevelDict[jobPostDetail?.academicLevel]
+                  (allConfig?.academicLevelDict as any)?.[jobPostDetail?.academicLevel]
                 }
               />
             </Grid>
@@ -164,7 +162,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
               }}>
               <JobDetailInfoItem
                 title={t("jobDetail.location")}
-                value={allConfig.cityDict[jobPostDetail?.location?.city]}
+                value={(allConfig?.cityDict as any)?.[jobPostDetail?.location?.city]}
               />
             </Grid>
             <Grid
@@ -174,7 +172,7 @@ const JobDetailDescriptionCard = ({ jobPostDetail, allConfig }) => {
               }}>
               <JobDetailInfoItem
                 title={t("jobDetail.genderRequired")}
-                value={allConfig.genderDict[jobPostDetail?.genderRequired]}
+                value={(allConfig?.genderDict as any)?.[jobPostDetail?.genderRequired]}
               />
             </Grid>
           </Grid>
