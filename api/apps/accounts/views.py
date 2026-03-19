@@ -196,7 +196,23 @@ class CustomTokenView(TokenView):
 
 class CustomConvertTokenView(ConvertTokenView):
 
-    def get_google_access_token(self, code):
+    def _normalize_redirect_uri(self, value):
+        if not value:
+            return None
+        return str(value).strip().rstrip('/')
+
+    def _get_allowed_redirect_uris(self):
+        allowed = []
+        for candidate in (
+            getattr(settings, "WEB_JOB_SEEKER_CLIENT_URL", None),
+            getattr(settings, "WEB_EMPLOYER_CLIENT_URL", None),
+        ):
+            normalized = self._normalize_redirect_uri(candidate)
+            if normalized:
+                allowed.append(normalized)
+        return allowed
+
+    def get_google_access_token(self, code, redirect_uri=None):
 
         """
 
@@ -205,6 +221,15 @@ class CustomConvertTokenView(ConvertTokenView):
         """
 
         try:
+
+            normalized_redirect_uri = self._normalize_redirect_uri(redirect_uri)
+            allowed_redirect_uris = self._get_allowed_redirect_uris()
+            if normalized_redirect_uri:
+                if normalized_redirect_uri not in allowed_redirect_uris:
+                    raise BadRequest("redirect_uri khÃ´ng hÃ³p lá»‡")
+                redirect_uri_value = normalized_redirect_uri
+            else:
+                redirect_uri_value = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI
 
             # Send request to Google OAuth2 token endpoint
 
@@ -216,7 +241,7 @@ class CustomConvertTokenView(ConvertTokenView):
 
                 'client_secret': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
 
-                'redirect_uri': settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI,
+                'redirect_uri': redirect_uri_value,
 
                 'grant_type': 'authorization_code'
 
@@ -260,6 +285,7 @@ class CustomConvertTokenView(ConvertTokenView):
 
             mutable_data = request.data.copy()
             request_data = mutable_data.copy()
+            redirect_uri = request_data.pop("redirect_uri", None)
 
             # If backend is google-oauth2, get access token from code
 
@@ -267,7 +293,10 @@ class CustomConvertTokenView(ConvertTokenView):
 
             if request_data.get("backend") == 'google-oauth2':
 
-                request_data['token'] = self.get_google_access_token(request_data.get("token"))
+                request_data['token'] = self.get_google_access_token(
+                    request_data.get("token"),
+                    redirect_uri=redirect_uri,
+                )
 
             oauth_request = _build_oauth_request(request, request_data)
             url, headers, body, stt = self.create_token_response(oauth_request)

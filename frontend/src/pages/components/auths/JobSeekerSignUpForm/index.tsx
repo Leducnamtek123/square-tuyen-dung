@@ -174,6 +174,8 @@ const JobSeekerSignUpForm = ({
     onSuccess: onGoogleRegister,
 
     flow: "auth-code",
+    ux_mode: "popup",
+    redirect_uri: window.location.origin,
 
   });
 

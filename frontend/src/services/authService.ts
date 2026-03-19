@@ -32,16 +32,20 @@ const authService = {
     clientId: string,
     clientSecrect: string,
     provider: AuthProvider,
-    token: string
+    token: string,
+    redirectUri?: string
   ): Promise<TokenResponse> => {
     const url = 'auth/convert-token/';
-    const data = {
+    const data: AnyRecord = {
       grant_type: AUTH_CONFIG.CONVERT_TOKEN_KEY,
       client_id: clientId,
       client_secret: clientSecrect,
       backend: provider,
       token: token,
     };
+    if (redirectUri) {
+      data.redirect_uri = redirectUri;
+    }
     return httpRequest.post(url, data);
   },
 

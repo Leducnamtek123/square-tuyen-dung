@@ -144,6 +144,8 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeek
     onSuccess: onGoogleLogin,
 
     flow: "auth-code",
+    ux_mode: "popup",
+    redirect_uri: window.location.origin,
 
   });
 

@@ -144,6 +144,8 @@ const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: Employer
     onSuccess: onGoogleLogin,
 
     flow: "auth-code",
+    ux_mode: "popup",
+    redirect_uri: window.location.origin,
 
   });
 

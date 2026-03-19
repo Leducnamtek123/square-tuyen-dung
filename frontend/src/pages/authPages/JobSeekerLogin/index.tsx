@@ -278,6 +278,7 @@ const JobSeekerLogin = () => {
     token: string
 
   ) => {
+    const redirectUri = window.location.origin;
 
     setIsFullScreenLoading(true);
 
@@ -291,7 +292,8 @@ const JobSeekerLogin = () => {
 
         provider,
 
-        token
+        token,
+        redirectUri
 
       ) as any;
 

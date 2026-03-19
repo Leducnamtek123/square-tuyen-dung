@@ -154,10 +154,11 @@ const EmployerLogin = () => {
   };
 
   const handleSocialLogin = async (clientId: string, clientSecrect: string, provider: AuthProvider, token: string) => {
+    const redirectUri = window.location.origin;
     setIsFullScreenLoading(true);
 
     try {
-      const resData = await authService.convertToken(clientId, clientSecrect, provider, token) as any;
+      const resData = await authService.convertToken(clientId, clientSecrect, provider, token, redirectUri) as any;
       const {
         access_token: accessToken,
         refresh_token: refreshToken,
