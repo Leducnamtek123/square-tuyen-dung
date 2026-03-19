@@ -1,113 +1,66 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Box, Button, Card, CardMedia, InputBase, Paper, Stack, Typography, Link as MuiLink } from "@mui/material";
-import { IMAGES, LINKS } from '../../configs/constants';
-import toastMessages from '../../utils/toastMessages';
-import ProjectService from '../../services/ProjectService';
-import BackdropLoading from '../loading/BackdropLoading';
+import { Box, Button, Card, Stack, Typography } from "@mui/material";
+import { ABOUT_IMAGES, HOST_NAME, ROUTES } from '../../configs/constants';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import MuiImageCustom from '../MuiImageCustom';
 
 interface AppIntroductionCardProps {
   // Add specific props if needed, otherwise use an empty interface or React.FC
 }
 
 const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
-  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-  const [value, setValue] = React.useState('');
-
-  const handleSendSMS = (event: React.FormEvent<HTMLDivElement>) => {
-    event.preventDefault();
-
-    const sendSMS = async (data: { phone: string }) => {
-      setIsFullScreenLoading(true);
-      try {
-        await ProjectService.sendSMSDownloadApp(data);
-        toastMessages.success('Sent successfully. Please check your messages');
-        setValue('');
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setIsFullScreenLoading(false);
-      }
-    };
-
-    if (value !== '') {
-      if (/^(0?)(3[2-9]|5[6|8|9]|7[0|6-9]|8[0-6|8|9]|9[0-4|6-9])[0-9]{7}$/.test(value)) {
-        sendSMS({ phone: value });
-      } else {
-        toastMessages.error('Invalid phone number!');
-      }
-    }
-  };
+  const { t } = useTranslation('common');
+  const nav = useNavigate();
 
   return (
-    <>
-      <Card sx={{ p: 3 }}>
-        <Stack spacing={3} alignItems="center">
-          <Box>
-            <Typography variant="h5">Tải ứng dụng miễn phí</Typography>
-          </Box>
-          <Box>
-            <Typography>
-              Tìm việc hiệu quả bằng cách tải Project về di động của bạn và sẵn
-              sàng nhận việc làm ngay hôm nay!
-            </Typography>
-          </Box>
-          <Box component="form" onSubmit={(e: React.FormEvent<HTMLFormElement>) => handleSendSMS(e as any)}>
-            <Paper
-              sx={{
-                boxShadow: 0,
-                p: '3.5px 4px',
-                display: 'flex',
-                alignItems: 'center',
-                width: '100%',
-                border: 1,
-                borderColor: 'GrayText',
-                borderRadius: 10,
-              }}
-            >
-              <InputBase
-                sx={{ ml: 1, flex: 1 }}
-                inputProps={{ 'aria-label': 'search' }}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                placeholder="Nhập số điện thoại"
-              />
-              <Button
-                variant="contained"
-                color="warning"
-                style={{ borderRadius: 20, color: 'white' }}
-                type="submit"
-              >
-                gửi đi
-              </Button>
-            </Paper>
-          </Box>
-          <Box>
-            <Stack direction="row" spacing={2}>
-              <MuiLink href={LINKS.CHPLAY_LINK} target="_blank">
-                <CardMedia
-                  height="50"
-                  sx={{ width: 150 }}
-                  component="img"
-                  image={IMAGES.chPlayDownload}
-                  alt="Google Play"
-                />
-              </MuiLink>
-              <MuiLink href={LINKS.APPSTORE_LINK} target="_blank">
-                <CardMedia
-                  height="50"
-                  sx={{ width: 150 }}
-                  component="img"
-                  image={IMAGES.appStoreDownload}
-                  alt="App Store"
-                />
-              </MuiLink>
-            </Stack>
-          </Box>
+    <Card sx={{ p: 4, position: 'relative', overflow: 'hidden' }}>
+      <Stack spacing={3} alignItems="flex-start">
+        <Box>
+          <Typography variant="h4" fontWeight="bold" color="primary.main">
+            Sẵn sàng bứt phá nhân sự?
+          </Typography>
+        </Box>
+        <Box>
+          <Typography variant="body1" color="text.secondary" sx={{ maxWidth: 500 }}>
+            Tham gia cộng đồng tuyển dụng hiện đại, nơi doanh nghiệp và nhân tài kết nối 
+            thông qua quy trình xác thực minh bạch và công nghệ phỏng vấn tiên tiến.
+          </Typography>
+        </Box>
+        <Stack direction="row" spacing={2}>
+          <Button
+            variant="contained"
+            color="primary"
+            size="large"
+            onClick={() => nav(`/${ROUTES.JOB_SEEKER.JOBS}`)}
+            sx={{ borderRadius: 2, px: 4 }}
+          >
+            Tìm việc ngay
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            size="large"
+            onClick={() => window.open(`https://${HOST_NAME.EMPLOYER_PROJECT}`, '_blank')}
+            sx={{ borderRadius: 2, px: 4 }}
+          >
+            Dành cho Nhà tuyển dụng
+          </Button>
         </Stack>
-      </Card>
-      {isFullScreenLoading && <BackdropLoading />}
-    </>
+        <Box sx={{ width: '100%', pt: 2 }}>
+           <MuiImageCustom 
+            src={ABOUT_IMAGES.LIVE_INTERVIEW} 
+            sx={{ 
+              borderRadius: 2, 
+              maxHeight: 300, 
+              objectFit: 'cover',
+              boxShadow: (theme: any) => theme.shadows[1]
+            }} 
+          />
+        </Box>
+      </Stack>
+    </Card>
   );
 };
 

@@ -658,76 +658,76 @@
     "title": "Thông tin công ty"
   },
   "pricing": {
-    "heroTitle": "Bảng giá",
-    "heroSubtitle": "Chúng tôi cung cấp các gói dịch vụ linh hoạt, dễ lựa chọn và có thể điều chỉnh theo quy mô tuyển dụng của doanh nghiệp.",
-    "contactBtn": "Liên hệ tư vấn",
+    "heroTitle": "Giải pháp Đầu tư Nhân sự",
+    "heroSubtitle": "Lựa chọn gói dịch vụ tối ưu để tiếp cận nguồn lực tài năng chất lượng cao và nâng cao hiệu suất tuyển dụng của doanh nghiệp.",
+    "contactBtn": "Nhận tư vấn ngay",
     "plans": {
       "basic": {
-        "title": "Cơ bản",
-        "price": "Liên hệ",
-        "desc": "Phù hợp cho doanh nghiệp bắt đầu tuyển dụng.",
-        "f1": "Đăng tin tuyển dụng cơ bản",
-        "f2": "Quản lý hồ sơ ứng viên",
-        "f3": "Báo cáo tổng quan"
+        "title": "Gói Khởi tạo",
+        "price": "Miễn phí",
+        "desc": "Giải pháp hoàn hảo để trải nghiệm các tính năng cốt lõi.",
+        "f1": "Đăng tin tuyển dụng tiêu chuẩn",
+        "f2": "Quản lý hồ sơ ứng viên cơ bản",
+        "f3": "Xác thực doanh nghiệp"
       },
       "standard": {
-        "title": "Tiêu chuẩn",
+        "title": "Gói Tăng trưởng",
         "price": "Liên hệ",
-        "desc": "Dành cho đội ngũ tuyển dụng đang mở rộng quy mô.",
-        "f1": "Tìm kiếm và lọc hồ sơ nâng cao",
-        "f2": "Lên lịch phỏng vấn",
-        "f3": "Hỗ trợ ưu tiên"
+        "desc": "Tăng cường khả năng tiếp cận và sàng lọc ứng viên chuyên sâu.",
+        "f1": "Tìm kiếm hồ sơ bằng bộ lọc thông minh",
+        "f2": "Tích hợp phỏng vấn trực tuyến",
+        "f3": "Hệ thống AI Matching Score"
       },
       "enterprise": {
-        "title": "Doanh nghiệp",
-        "price": "Theo nhu cầu",
-        "desc": "Giải pháp riêng cho doanh nghiệp có nhu cầu lớn.",
-        "f1": "Gói tuyển dụng tùy chỉnh",
-        "f2": "Báo cáo chi tiết",
-        "f3": "Tư vấn tối ưu quy trình"
+        "title": "Gói Doanh nghiệp",
+        "price": "Tùy chỉnh",
+        "desc": "Giải pháp toàn diện cho các tập đoàn có nhu cầu tuyển dụng lớn.",
+        "f1": "Quản trị quy trình tuyển chọn tập trung",
+        "f2": "Báo cáo phân tích hiệu suất nhân sự",
+        "f3": "Hỗ trợ 24/7 từ chuyên gia tư vấn"
       }
     }
   },
   "introduce": {
-    "pageTitle": "Giới thiệu",
-    "heroTitle": "Giới thiệu",
-    "heroSubtitle": "{{appName}} hỗ trợ nhà tuyển dụng tối ưu hóa toàn bộ quy trình tìm kiếm nhân sự, từ đăng tin, tiếp cận ứng viên đến quản lý phỏng vấn và đánh giá. Mục tiêu của chúng tôi là giúp doanh nghiệp tuyển được đúng người nhanh hơn, rõ ràng hơn và hiệu quả hơn.",
-    "processTitle": "Quy trình tuyển dụng đơn giản",
+    "pageTitle": "Giải pháp Tuyển dụng",
+    "heroTitle": "Nâng tầm Quy trình Nhân sự của bạn",
+    "heroSubtitle": "{{appName}} cung cấp hệ sinh thái tuyển dụng thông minh, giúp doanh nghiệp từ khâu xây dựng thương hiệu, đăng tuyển đến phỏng vấn và quản lý ứng viên. Chúng tôi tập trung vào sự minh bạch, xác thực và hiệu quả cao để bạn tìm đúng người trong thời gian ngắn nhất.",
+    "processTitle": "Quy trình Tuyển dụng Chuyên nghiệp",
     "stepLabel": "Bước {{index}}",
     "highlights": {
       "h1": {
-        "title": "Đăng tin nhanh, tiếp cận đúng người",
-        "desc": "Tạo tin tuyển dụng chuẩn, hiển thị rõ yêu cầu và quyền lợi để thu hút ứng viên phù hợp."
+        "title": "Đăng tuyển chuẩn hóa, thu hút tài năng",
+        "desc": "Xây dựng tin tuyển dụng chuyên nghiệp với các trường thông tin đầy đủ, giúp ứng viên dễ dàng nắm bắt và ứng tuyển ngay."
       },
       "h2": {
-        "title": "Tìm kiếm hồ sơ theo kỹ năng",
-        "desc": "Bộ lọc theo ngành nghề, kinh nghiệm, địa điểm giúp rút ngắn thời gian sàng lọc."
+        "title": "Tìm kiếm ứng viên theo năng lực",
+        "desc": "Hệ thống lọc thông minh theo kỹ năng, kinh nghiệm và vị trí địa lý giúp bạn tiếp cận đúng đối tượng mục tiêu."
       },
       "h3": {
-        "title": "Theo dõi quy trình tuyển dụng",
-        "desc": "Quản lý trạng thái ứng viên, lịch phỏng vấn và phản hồi tập trung trên một màn hình."
+        "title": "Quản lý ứng viên tập trung (CRM)",
+        "desc": "Theo dõi toàn bộ vòng đời ứng viên từ lúc nộp hồ sơ đến khi nhận việc trên một giao diện quản trị duy nhất."
       },
       "h4": {
-        "title": "Xây dựng thương hiệu tuyển dụng",
-        "desc": "Trang hồ sơ công ty rõ ràng, đáng tin cậy giúp tăng tỷ lệ ứng viên quan tâm."
+        "title": "Xác thực Doanh nghiệp uy tín",
+        "desc": "Quy trình kiểm duyệt giấy phép kinh doanh giúp nâng cao vị thế và sự tin cậy của doanh nghiệp trong mắt ứng viên."
       }
     },
     "steps": {
       "s1": {
-        "title": "Đăng tin",
-        "desc": "Tạo tin tuyển dụng với thông tin đầy đủ và chuẩn hóa."
+        "title": "Khai báo & Xác thực",
+        "desc": "Hoàn thiện hồ sơ doanh nghiệp và gửi tài liệu xác thực để bắt đầu đăng tin."
       },
       "s2": {
-        "title": "Nhận hồ sơ",
-        "desc": "Ứng viên nộp hồ sơ trực tuyến, tập trung trong một nơi."
+        "title": "Đăng tuyển thông minh",
+        "desc": "Tạo tin tuyển dụng với các tùy chọn đa dạng để tối ưu lượt tiếp cận."
       },
       "s3": {
-        "title": "Đánh giá",
-        "desc": "Sàng lọc theo tiêu chí, ghi chú và chia sẻ trong nội bộ."
+        "title": "Sàng lọc & Đánh giá",
+        "desc": "Sử dụng các công cụ đánh giá, ghi chú và phân đoạn trạng thái ứng viên hiệu quả."
       },
       "s4": {
-        "title": "Phỏng vấn",
-        "desc": "Lên lịch và phản hồi nhanh, đảm bảo trải nghiệm ứng viên."
+        "title": "Phỏng vấn & Kết nối",
+        "desc": "Lên lịch phỏng vấn trực tiếp hoặc phỏng vấn AI để đưa ra quyết định tuyển dụng chính xác."
       }
     }
   },
@@ -761,24 +761,24 @@
     }
   },
   "service": {
-    "pageTitle": "Dịch vụ của chúng tôi",
-    "heroTitle": "Giải pháp tuyển dụng toàn diện",
-    "heroSubtitle": "{{appName}} cung cấp các công cụ mạnh mẽ giúp bạn tìm kiếm, kết nối và quản lý nhân tài một cách hiệu quả nhất.",
+    "pageTitle": "Giải pháp của chúng tôi",
+    "heroTitle": "Công nghệ dẫn đầu trong Tuyển dụng",
+    "heroSubtitle": "{{appName}} mang đến bộ công cụ toàn diện giúp doanh nghiệp xây dựng đội ngũ nhân sự mạnh mẽ và bền vững.",
     "jobPost": {
-      "title": "Đăng tin tuyển dụng",
-      "desc": "Tiếp cận hàng ngàn ứng viên tiềm năng mỗi ngày thông qua nền tảng của chúng tôi."
+      "title": "Hệ thống Đăng tuyển Chuẩn",
+      "desc": "Đăng tuyển nhanh chóng, hỗ trợ định dạng chuyên nghiệp để thu hút đúng đối tượng tài năng."
     },
     "search": {
-      "title": "Tìm kiếm hồ sơ",
-      "desc": "Sử dụng bộ lọc thông minh để tìm chính xác ứng viên phù hợp với kỹ năng bạn cần."
+      "title": "Truy vấn Ứng viên Thông minh",
+      "desc": "Sử dụng các bộ lọc chuyên sâu để tìm kiếm nhân tài phù hợp nhất với yêu cầu công việc của bạn."
     },
     "interview": {
-      "title": "Phỏng vấn trực tuyến",
-      "desc": "Tích hợp công cụ phỏng vấn Video Call chất lượng cao, ghi chú và đánh giá tức thì."
+      "title": "Phỏng vấn Trực tuyến Tích hợp",
+      "desc": "Hệ thống Video Call chất lượng cao kết hợp ghi chú đánh giá trực tiếp trong buổi phỏng vấn."
     },
     "report": {
-      "title": "Báo cáo & Phân tích",
-      "desc": "Theo dõi hiệu quả tuyển dụng thông qua các số liệu thống kê chi tiết và minh bạch."
+      "title": "Quản trị & Báo cáo Số liệu",
+      "desc": "Theo dõi hiệu suất tuyển dụng qua các biểu đồ trực quan, giúp tối ưu hóa quy trình tìm kiếm nhân sự."
     }
   },
   "account": {

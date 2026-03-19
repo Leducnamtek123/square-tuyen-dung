@@ -1,34 +1,34 @@
 {
-  "tabTitle": "Về chúng tôi - Hệ thống giới thiệu việc làm {{appName}}",
-  "heading": "Về chúng tôi",
-  "description": "{{appName}} - Kênh thông tin tuyển dụng và việc làm dành cho mọi Doanh nghiệp và ứng viên. Chúng tôi tin tưởng sẽ đem lại \"HY VỌNG\" cho Doanh nghiệp tìm kiếm nhân tài và cho ứng viên tìm kiếm cơ hội nghề nghiệp. Với 2 hệ thống: Website dành cho Nhà Tuyển Dụng và ứng dụng (Application) dành cho Người Tìm Việc, {{appName}} sẽ mang lại những trải nghiệm mới mẻ, thú vị; kết nối ước mơ chinh phục công việc của mọi nhân tài và giúp doanh nghiệp xây dựng đội ngũ nhân sự vững mạnh.",
+  "tabTitle": "Về chúng tôi - Hệ sinh thái Tuyển dụng {{appName}}",
+  "heading": "Sứ mệnh của chúng tôi",
+  "description": "{{appName}} là nền tảng công nghệ nhân sự hàng đầu, được xây dựng để giải quyết những thách thức lớn nhất trong việc kết nối tài năng và doanh nghiệp. Chúng tôi không chỉ đơn thuần là một trang web kết nối, mà là một hệ sinh thái toàn diện hỗ trợ Phân tích hồ sơ, Đánh giá năng lực và Quản lý phỏng vấn trực tuyến. {{appName}} cam kết mang lại sự minh bạch, bảo mật và hiệu quả vượt trội cho quy trình tuyển dụng hiện đại.",
   "features": {
-    "careerTitle": "Chân dung việc - Đi đúng hướng",
-    "careerDesc": "Khám phá công việc phù hợp với định hướng nghề nghiệp. Thông tin chi tiết về yêu cầu công việc, môi trường và cơ hội phát triển tại mỗi công ty.",
-    "cvTitle": "Tạo CV & Profile",
-    "cvDesc": "Xây dựng hồ sơ ứng tuyển chuyên nghiệp với công cụ tạo CV thông minh. Tối ưu profile với các mẫu CV đẹp mắt theo từng ngành nghề.",
-    "locationTitle": "Việc làm xung quanh bạn",
-    "locationDesc": "Tìm kiếm cơ hội việc làm lý tưởng trong khu vực. Với tính năng định vị thông minh, gợi ý công việc phù hợp gần nơi bạn sinh sống.",
-    "notificationTitle": "Thông báo việc làm mọi lúc",
-    "notificationDesc": "Không bỏ lỡ cơ hội với hệ thống thông báo thông minh. Nhận thông tin tức thì về các vị trí việc làm mới phù hợp với kỹ năng."
+    "careerTitle": "Định hướng Nghề nghiệp Chuẩn xác",
+    "careerDesc": "Cung cấp cái nhìn toàn diện về bản đồ nghề nghiệp, yêu cầu kỹ năng và lộ trình phát triển tại các doanh nghiệp hàng đầu.",
+    "cvTitle": "Xây dựng Hồ sơ Chuyên nghiệp",
+    "cvDesc": "Công cụ tạo CV và Profile trực tuyến giúp ứng viên nổi bật hơn trong mắt nhà tuyển dụng với cấu trúc thông tin khoa học.",
+    "locationTitle": "Kết nối Việc làm Địa phương",
+    "locationDesc": "Số hóa bản đồ việc làm, giúp ứng viên dễ dàng tìm thấy các cơ hội nghề nghiệp ngay tại nơi mình sinh sống.",
+    "notificationTitle": "Hệ thống Cập nhật Tức thì",
+    "notificationDesc": "Thông báo đa kênh giúp cả ứng viên và nhà tuyển dụng không bỏ lỡ bất kỳ phản hồi hay cơ hội phỏng vấn quan trọng nào."
   },
-  "mobileAppHeading": "Mobile App {{appName}}",
+  "mobileAppHeading": "Quy trình Tuyển dụng Toàn diện",
   "cvProfileDetail": {
-    "title": "Tạo CV & Profile",
-    "desc1": "Xây dựng hồ sơ ứng tuyển chuyên nghiệp với công cụ tạo CV thông minh.",
-    "desc2": "Tối ưu hóa profile của bạn với các mẫu CV đẹp mắt, phù hợp với từng ngành nghề.",
-    "desc3": "Dễ dàng cập nhật và điều chỉnh CV theo yêu cầu của nhà tuyển dụng, tăng cơ hội được chú ý và lựa chọn cho vị trí mong muốn."
+    "title": "Số hóa Hồ sơ Ứng tuyển",
+    "desc1": "Tạo Profile trực tuyến chuyên nghiệp, dễ dàng chia sẻ và ứng tuyển chỉ với một click.",
+    "desc2": "Hỗ trợ đính kèm CV tệp cũ và tự động trích xuất các thông tin quan trọng giúp tối ưu hóa kết quả tìm kiếm.",
+    "desc3": "Luôn cập nhật và điều chỉnh linh hoạt để phù hợp với từng định hướng công việc khác nhau của ứng viên."
   },
   "aroundJobDetail": {
-    "title": "Việc làm xung quanh bạn",
-    "desc1": "Tìm kiếm cơ hội việc làm lý tưởng trong khu vực của bạn.",
-    "desc2": "Với tính năng định vị thông minh, chúng tôi gợi ý những công việc phù hợp gần nơi bạn sinh sống.",
-    "desc3": "Tiết kiệm thời gian di chuyển và tận hưởng sự cân bằng giữa công việc và cuộc sống với các cơ hội việc làm trong bán kính mong muốn."
+    "title": "Việc làm thông minh theo khu vực",
+    "desc1": "Tìm kiếm công việc trong bán kính mong muốn một cách dễ dàng.",
+    "desc2": "Sử dụng bản đồ trực quan để xác định vị trí doanh nghiệp, giúp bạn chủ động hơn trong việc lựa chọn nơi làm việc.",
+    "desc3": "Tiết kiệm thời gian di chuyển và tìm thấy sự cân bằng hoàn hảo giữa công việc và đời sống cá nhân."
   },
   "notificationDetail": {
-    "title": "Thông báo việc làm mọi lúc",
-    "desc1": "Không bỏ lỡ bất kỳ cơ hội nào với hệ thống thông báo thông minh.",
-    "desc2": "Nhận thông tin tức thì về các vị trí việc làm mới phù hợp với kỹ năng và mong muốn của bạn.",
-    "desc3": "Tùy chỉnh các tiêu chí thông báo như mức lương, địa điểm, ngành nghề để đảm bảo bạn luôn cập nhật những cơ hội tốt nhất trên thị trường."
+    "title": "Quản lý tương tác hiệu quả",
+    "desc1": "Hệ thống thông báo thông minh giúp bạn theo sát trạng thái hồ sơ ứng tuyển.",
+    "desc2": "Nhận lịch hẹn phỏng vấn trực tiếp từ nhà tuyển dụng và phản hồi ngay trên nền tảng.",
+    "desc3": "Đảm bảo sự giao tiếp thông suốt giữa doanh nghiệp và ứng viên trong suốt quá trình tuyển chọn."
   }
 }

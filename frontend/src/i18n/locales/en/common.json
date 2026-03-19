@@ -64,9 +64,8 @@
     "forCandidates": "For Candidates",
     "candidateDashboard": "Candidate Dashboard",
     "employerDashboard": "Employer Dashboard",
-    "mobileApps": "Mobile Apps",
     "connectWith": "Connect with {{appName}}",
-    "rightsReserved": "© {{year}} {{appName}}. All rights reserved."
+    "rightsReserved": "© {{year}} {{appName}}. All Rights Reserved."
   },
   "actions": {
     "start": "Start",

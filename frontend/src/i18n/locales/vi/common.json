@@ -103,12 +103,11 @@
     "dashboard": "Bảng điều khiển",
     "messages": "Tin nhắn",
     "notifications": "Thông báo",
-    "forCandidates": "Dành cho ứng viên",
+    "forJobSeekers": "Dành cho ứng viên",
     "candidateDashboard": "Bảng điều khiển ứng viên",
     "employerDashboard": "Bảng điều khiển nhà tuyển dụng",
-    "mobileApps": "Ứng dụng di động",
     "connectWith": "Kết nối với {{appName}}",
-    "rightsReserved": "© {{year}} {{appName}}. Bảo lưu mọi quyền."
+    "rightsReserved": "© {{year}} {{appName}}. All Rights Reserved."
   },
   "quickSearch": "Tìm kiếm nhanh",
   "notUpdated": "Chưa cập nhật",

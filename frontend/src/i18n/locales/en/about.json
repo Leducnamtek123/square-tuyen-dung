@@ -1,34 +1,34 @@
 {
-  "tabTitle": "About Us - {{appName}} Job Recruitment System",
-  "heading": "About Us",
-  "description": "{{appName}} - A recruitment and job information channel for every Business and candidate. We believe in bringing \"HOPE\" to Businesses seeking talent and to candidates seeking career opportunities. With 2 systems: Website for Employers and Application for Job Seekers, {{appName}} will bring fresh and exciting experiences; connecting the dream of conquering work for every talent and helping businesses build a strong human resources team.",
+  "tabTitle": "About Us - {{appName}} Recruitment Ecosystem",
+  "heading": "Our Mission",
+  "description": "{{appName}} is a leading HR technology platform built to solve the biggest challenges in connecting talent and businesses. We are not just a connection website, but a comprehensive ecosystem supporting Profile Analysis, Competency Assessment, and Online Interview Management. {{appName}} is committed to bringing transparency, security, and superior efficiency to the modern recruitment process.",
   "features": {
-    "careerTitle": "Job Portraits - Go the Right Way",
-    "careerDesc": "Discover the right job for your career direction. Detailed information on job requirements, environment, and development opportunities at each company.",
-    "cvTitle": "Create CV & Profile",
-    "cvDesc": "Build a professional application profile with a smart CV creation tool. Optimize your profile with beautiful CV templates for each industry.",
-    "locationTitle": "Jobs Around You",
-    "locationDesc": "Find ideal job opportunities in your area. With smart positioning features, it suggests suitable jobs near where you live.",
-    "notificationTitle": "Job Notifications Anytime",
-    "notificationDesc": "Don't miss opportunities with a smart notification system. Receive instant information about new job positions that match your skills."
+    "careerTitle": "Accurate Career Orientation",
+    "careerDesc": "Provide a comprehensive view of career maps, skill requirements, and development paths at leading enterprises.",
+    "cvTitle": "Professional Profile Building",
+    "cvDesc": "Online CV and Profile creation tools help candidates stand out to employers with scientific information structures.",
+    "locationTitle": "Local Job Connection",
+    "locationDesc": "Digitized job maps make it easy for candidates to find career opportunities right where they live.",
+    "notificationTitle": "Instant Update System",
+    "notificationDesc": "Multi-channel notifications help both candidates and employers not miss any important feedback or interview opportunities."
   },
-  "mobileAppHeading": "{{appName}} Mobile App",
+  "mobileAppHeading": "Comprehensive Recruitment Process",
   "cvProfileDetail": {
-    "title": "Create CV & Profile",
-    "desc1": "Build a professional application profile with a smart CV creation tool.",
-    "desc2": "Optimize your profile with beautiful CV templates, suitable for each industry.",
-    "desc3": "Easily update and adjust your CV according to employer requirements, increasing the chances of being noticed and selected for the desired position."
+    "title": "Digitize Application Profiles",
+    "desc1": "Create a professional online Profile, easily share and apply with just one click.",
+    "desc2": "Support attaching old file CVs and automatically extract important information to optimize search results.",
+    "desc3": "Always updated and flexibly adjusted to suit each different career direction of candidates."
   },
   "aroundJobDetail": {
-    "title": "Jobs Around You",
-    "desc1": "Find ideal job opportunities in your area.",
-    "desc2": "With smart positioning features, we suggest suitable jobs near where you live.",
-    "desc3": "Save travel time and enjoy a work-life balance with job opportunities within your desired radius."
+    "title": "Smart Regional Jobs",
+    "desc1": "Easily search for jobs within your desired radius.",
+    "desc2": "Use visual maps to identify business locations, helping you be more proactive in choosing where to work.",
+    "desc3": "Save travel time and find the perfect balance between work and personal life."
   },
   "notificationDetail": {
-    "title": "Job Notifications Anytime",
-    "desc1": "Don't miss any chance with a smart notification system.",
-    "desc2": "Receive instant information about new job positions that match your skills and wishes.",
-    "desc3": "Customize notification criteria such as salary, location, industry to ensure you always update the best opportunities on the market."
+    "title": "Effective Interaction Management",
+    "desc1": "Smart notification system helps you closely follow the status of your application profile.",
+    "desc2": "Receive interview appointments directly from employers and respond right on the platform.",
+    "desc3": "Ensure seamless communication between businesses and candidates throughout the selection process."
   }
 }

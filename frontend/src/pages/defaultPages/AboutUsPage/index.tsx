@@ -300,9 +300,9 @@ const AboutUsPage = () => {
 
             <Box width="100%">
 
-              <Box sx={{ height: 600 }}>
+              <Box sx={{ height: 400 }}>
 
-                <MuiImageCustom src={ABOUT_IMAGES.JOB_POST} />
+                <MuiImageCustom src={ABOUT_IMAGES.AI_SKILLS} />
 
               </Box>
 
@@ -394,9 +394,9 @@ const AboutUsPage = () => {
 
             <Box width="100%">
 
-              <Box sx={{ height: 600 }}>
+              <Box sx={{ height: 400 }}>
 
-                <MuiImageCustom src={ABOUT_IMAGES.PROFILE} />
+                <MuiImageCustom src={ABOUT_IMAGES.CANDIDATE_CRM} />
 
               </Box>
 
@@ -434,9 +434,9 @@ const AboutUsPage = () => {
 
             <Box width="100%">
 
-              <Box sx={{ height: 600 }}>
+              <Box sx={{ height: 400 }}>
 
-                <MuiImageCustom src={ABOUT_IMAGES.AROUND_JOB_POST} />
+                <MuiImageCustom src={ABOUT_IMAGES.COMPANY_VERIFICATION} />
 
               </Box>
 
@@ -536,9 +536,9 @@ const AboutUsPage = () => {
 
             <Box width="100%">
 
-              <Box sx={{ height: 600 }}>
+              <Box sx={{ height: 400 }}>
 
-                <MuiImageCustom src={ABOUT_IMAGES.JOB_POST_NOTIFICATION} />
+                <MuiImageCustom src={ABOUT_IMAGES.LIVE_INTERVIEW} />
 
               </Box>
 

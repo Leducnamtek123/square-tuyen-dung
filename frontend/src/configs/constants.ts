@@ -1,4 +1,4 @@
-﻿import dayjs from './dayjs-config';
+import dayjs from './dayjs-config';
 import DeveloperBoardIcon from '@mui/icons-material/DeveloperBoard';
 import DevicesIcon from '@mui/icons-material/Devices';
 
@@ -32,6 +32,11 @@ import aroundJobPost from '../assets/images/about-images/around-job-post.webp';
 import jobPostNotification from '../assets/images/about-images/job-notification-img.webp';
 import jobPostImg from '../assets/images/about-images/job-post-img.webp';
 import profileImg from '../assets/images/about-images/profile-img.webp';
+
+import liveInterviewImg from '../assets/images/about-images/live-interview.png';
+import candidateCrmImg from '../assets/images/about-images/candidate-crm.png';
+import companyVerificationImg from '../assets/images/about-images/company-verification.png';
+import aiSkillsImg from '../assets/images/about-images/ai-skills-matching.png';
 import instagramIcon from '../assets/icons/instagram-icon.png';
 import facebookIcon from '../assets/icons/facebook-icon.png';
 import facebookMessengerIcon from '../assets/icons/facebook-messenger-icon.png';
@@ -168,6 +173,10 @@ const ABOUT_IMAGES = {
   JOB_POST_NOTIFICATION: jobPostNotification,
   JOB_POST: jobPostImg,
   PROFILE: profileImg,
+  LIVE_INTERVIEW: liveInterviewImg,
+  CANDIDATE_CRM: candidateCrmImg,
+  COMPANY_VERIFICATION: companyVerificationImg,
+  AI_SKILLS: aiSkillsImg,
 } as const;
 
 const ICONS = {

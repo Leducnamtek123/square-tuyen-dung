@@ -638,76 +638,76 @@
     "title": "Company Information"
   },
   "pricing": {
-    "heroTitle": "Pricing",
-    "heroSubtitle": "We provide flexible, easy-to-choose service packages that can be adjusted to the scale of the recruitment.",
-    "contactBtn": "Contact for consultation",
+    "heroTitle": "HR Investment Solutions",
+    "heroSubtitle": "Choose the optimal service package to reach high-quality talent and improve your business recruitment performance.",
+    "contactBtn": "Get Consultation Now",
     "plans": {
       "basic": {
-        "title": "Basic",
-        "price": "Contact",
-        "desc": "Suitable for enterprises starting to recruit.",
-        "f1": "Basic job posting",
-        "f2": "Candidate management",
-        "f3": "Overview report"
+        "title": "Startup Package",
+        "price": "Free",
+        "desc": "Perfect solution to experience core features.",
+        "f1": "Standard job posting",
+        "f2": "Basic candidate management",
+        "f3": "Business verification"
       },
       "standard": {
-        "title": "Standard",
+        "title": "Growth Package",
         "price": "Contact",
-        "desc": "For recruitment teams expanding scale.",
-        "f1": "Advanced search and filtering",
-        "f2": "Interview scheduling",
-        "f3": "Priority support"
+        "desc": "Enhance reach and in-depth candidate screening.",
+        "f1": "Resume search with smart filters",
+        "f2": "Integrated online interviews",
+        "f3": "AI Matching Score system"
       },
       "enterprise": {
-        "title": "Enterprise",
-        "price": "On Demand",
-        "desc": "Custom solution for enterprises with large needs.",
-        "f1": "Custom recruitment package",
-        "f2": "Detailed reports",
-        "f3": "Process optimization consulting"
+        "title": "Enterprise Package",
+        "price": "Custom",
+        "desc": "Comprehensive solution for corporations with large recruitment needs.",
+        "f1": "Centralized selection process management",
+        "f2": "HR performance analysis reports",
+        "f3": "24/7 support from expert consultants"
       }
     }
   },
   "introduce": {
-    "pageTitle": "Introduction",
-    "heroTitle": "Introduction",
-    "heroSubtitle": "{{appName}} supports employers in optimizing the entire recruitment process, from posting, reaching candidates to managing interviews and evaluations. Our goal is to help businesses recruit the right people faster, clearer, and more effectively.",
-    "processTitle": "Simple Recruitment Process",
+    "pageTitle": "Recruitment Solutions",
+    "heroTitle": "Elevate Your HR Process",
+    "heroSubtitle": "{{appName}} provides a smart recruitment ecosystem, helping businesses from brand building, posting to interviewing and candidate management. We focus on transparency, verification, and high efficiency so you find the right people in the shortest time.",
+    "processTitle": "Professional Recruitment Process",
     "stepLabel": "Step {{index}}",
     "highlights": {
       "h1": {
-        "title": "Post quickly, reach the right people",
-        "desc": "Create standard job posts, clearly displaying requirements and benefits to attract suitable candidates."
+        "title": "Standardized Posting, Attract Talent",
+        "desc": "Build professional job posts with complete fields, helping candidates easily grasp and apply immediately."
       },
       "h2": {
-        "title": "Search profiles by skill",
-        "desc": "Filters by industry, experience, location help shorten screening time."
+        "title": "Search Candidates by Competency",
+        "desc": "Smart filtering system by skills, experience, and location helps you reach exactly your target audience."
       },
       "h3": {
-        "title": "Track recruitment process",
-        "desc": "Manage candidate status, interview schedule, and feedback centrally on one screen."
+        "title": "Centralized Candidate Management (CRM)",
+        "desc": "Track the entire candidate lifecycle from application to hiring on a single management interface."
       },
       "h4": {
-        "title": "Build recruitment brand",
-        "desc": "Clear, reliable company profile pages help increase candidate interest rates."
+        "title": "Trusted Employer Verification",
+        "desc": "Business license review process enhances the position and credibility of the business in the eyes of candidates."
       }
     },
     "steps": {
       "s1": {
-        "title": "Post Job",
-        "desc": "Create job posts with complete and standardized information."
+        "title": "Declare & Verify",
+        "desc": "Complete your company profile and submit verification documents to start posting."
       },
       "s2": {
-        "title": "Receive Profiles",
-        "desc": "Candidates submit profiles online, concentrated in one place."
+        "title": "Smart Posting",
+        "desc": "Create job posts with diverse options to optimize reach."
       },
       "s3": {
-        "title": "Evaluate",
-        "desc": "Screen according to criteria, note and share internally."
+        "title": "Screen & Evaluate",
+        "desc": "Use evaluation tools, notes, and efficient candidate status segmentation."
       },
       "s4": {
-        "title": "Interview",
-        "desc": "Schedule and respond quickly, ensuring candidate experience."
+        "title": "Interview & Connect",
+        "desc": "Schedule live or AI interviews to make accurate hiring decisions."
       }
     }
   },
@@ -741,24 +741,24 @@
     }
   },
   "service": {
-    "pageTitle": "Our Services",
-    "heroTitle": "Comprehensive Recruitment Solutions",
-    "heroSubtitle": "{{appName}} provides powerful tools to help you find, connect, and manage talent most effectively.",
+    "pageTitle": "Our Solutions",
+    "heroTitle": "Leading Technology in Recruitment",
+    "heroSubtitle": "{{appName}} brings a comprehensive toolkit helping businesses build a strong and sustainable HR team.",
     "jobPost": {
-      "title": "Job Posting",
-      "desc": "Reach thousands of potential candidates every day through our platform."
+      "title": "Standard Posting System",
+      "desc": "Post quickly, supporting professional formats to attract the right talent."
     },
     "search": {
-      "title": "Resume Search",
-      "desc": "Use smart filters to find exactly the right candidate for the skills you need."
+      "title": "Smart Candidate Query",
+      "desc": "Use in-depth filters to find the best talent for your job requirements."
     },
     "interview": {
-      "title": "Online Interview",
-      "desc": "Integrated high-quality Video Call interview tools, notes, and instant evaluation."
+      "title": "Integrated Online Interview",
+      "desc": "High-quality Video Call system combined with in-interview evaluation notes."
     },
     "report": {
-      "title": "Reporting & Analytics",
-      "desc": "Track recruitment effectiveness through detailed and transparent statistics."
+      "title": "Management & Data Reports",
+      "desc": "Track recruitment performance through visual charts, optimizing the hiring process."
     }
   },
   "account": {
