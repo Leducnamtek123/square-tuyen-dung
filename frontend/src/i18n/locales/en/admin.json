@@ -537,7 +537,23 @@
         "label": "Email Notifications",
         "description": "Send system notifications via email to administrators"
       },
-      "saveBtn": "Save Changes"
+      "saveBtn": "Save Changes",
+      "notificationDemo": {
+        "title": "Notification Demo",
+        "description": "Send a demo notification to verify delivery settings.",
+        "send": "Send demo notification",
+        "sending": "Sending...",
+        "success": "Demo notification sent.",
+        "error": "Failed to send demo notification."
+      },
+      "healthCheck": {
+        "title": "System Health",
+        "description": "Check database and cache connectivity.",
+        "check": "Check health",
+        "checking": "Checking...",
+        "database": "Database",
+        "redis": "Redis"
+      }
     }
   },
   "common": {

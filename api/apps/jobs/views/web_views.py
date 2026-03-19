@@ -490,13 +490,8 @@ class JobPostViewSet(viewsets.ViewSet,
         instance = self.get_object()
 
         try:
-
-            instance.views = F('views') + 1
-
-            instance.save()
-
+            JobPost.objects.filter(pk=instance.pk).update(views=F('views') + 1)
             instance.refresh_from_db()
-
         except Exception as ex:
 
             helper.print_log_error("save views", ex)
@@ -1694,8 +1689,11 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         end_date = pd.to_datetime(end_date_str)
 
         user = request.user
+        company = getattr(user, 'company', None)
+        if not company:
+            return var_res.response_data(data={"labels": [], "data": []})
 
-        queryset = JobPost.objects.filter(company=user.company) \
+        queryset = JobPost.objects.filter(company=company) \
             .values(academicLevel=F('academic_level')) \
             .filter(
 

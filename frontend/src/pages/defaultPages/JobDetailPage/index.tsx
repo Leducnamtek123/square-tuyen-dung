@@ -15,6 +15,7 @@ import toastMessages from "../../../utils/toastMessages";
 import errorHandling from "../../../utils/errorHandling";
 import NoDataCard from "../../../components/NoDataCard";
 import jobService from "../../../services/jobService";
+import companyService from "../../../services/companyService";
 import ApplyCard from "../../../components/ApplyCard";
 import SocialNetworkSharingPopup from "../../../components/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
 import { ROLES_NAME, ROUTES } from "../../../configs/constants";
@@ -47,7 +48,22 @@ const JobDetailPage = () => {
         setJobPostDetail(data);
         TabTitle(data?.jobName);
       } catch (error) {
-        // Error handled by caller or silent
+        const slugValue = String(jobPostSlug || '');
+        const isNumericId = /^\d+$/.test(slugValue);
+        if (isNumericId) {
+          try {
+            const fallbackData = await companyService.getCompanyJobPostDetailById(
+              Number(slugValue)
+            );
+            setJobPostDetail(fallbackData);
+            TabTitle((fallbackData as any)?.jobName);
+            return;
+          } catch (fallbackError) {
+            errorHandling(fallbackError as any);
+          }
+        } else {
+          errorHandling(error as any);
+        }
       } finally {
         setIsLoading(false);
       }

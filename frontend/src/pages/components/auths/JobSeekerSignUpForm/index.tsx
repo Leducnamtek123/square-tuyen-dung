@@ -1,5 +1,5 @@
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Box, Button, Stack, styled, Divider } from "@mui/material";
@@ -9,6 +9,8 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useTranslation } from 'react-i18next';
 import TextFieldCustom from "../../../../components/controls/TextFieldCustom";
 import PasswordTextFieldCustom from "../../../../components/controls/PasswordTextFieldCustom";
+import useDebounce from "../../../../hooks/useDebounce";
+import authService from "../../../../services/authService";
 import type { RoleName } from "../../../../types/auth";
 
 interface JobSeekerSignUpFormData {
@@ -153,7 +155,7 @@ const JobSeekerSignUpForm = ({
 
   });
 
-  const { control, setError, handleSubmit } = useForm<JobSeekerSignUpFormData>({
+  const { control, setError, clearErrors, handleSubmit } = useForm<JobSeekerSignUpFormData>({
     defaultValues: {
       fullName: "",
       email: "",
@@ -163,11 +165,50 @@ const JobSeekerSignUpForm = ({
     resolver: yupResolver(schema) as any,
   });
 
+  const email = useWatch({
+    control,
+    name: 'email',
+  });
+
+  const emailDebounce = useDebounce(email, 500);
+  const [emailExistsError, setEmailExistsError] = React.useState(false);
+
   React.useEffect(() => {
     for (const err in serverErrors) {
       setError(err as any, { type: 'manual', message: serverErrors[err]?.join(" ") });
     }
   }, [serverErrors, setError]);
+
+  React.useEffect(() => {
+    const normalizedEmail = String(emailDebounce || '').trim();
+    if (!normalizedEmail || !normalizedEmail.includes('@')) {
+      if (emailExistsError) {
+        clearErrors('email');
+        setEmailExistsError(false);
+      }
+      return;
+    }
+
+    const checkEmail = async () => {
+      try {
+        const resData = (await authService.emailExists(normalizedEmail)) as any;
+        if (resData?.exists === true) {
+          setError('email', {
+            type: 'manual',
+            message: t('validation.emailExists'),
+          });
+          setEmailExistsError(true);
+        } else if (emailExistsError) {
+          clearErrors('email');
+          setEmailExistsError(false);
+        }
+      } catch {
+        // ignore email existence errors
+      }
+    };
+
+    checkEmail();
+  }, [emailDebounce, emailExistsError, clearErrors, setError, t]);
 
   const googleRegister = useGoogleLogin({
 

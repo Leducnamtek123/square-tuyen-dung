@@ -5,6 +5,7 @@ import { Box, Typography, Chip, Stack, Divider, LinearProgress } from "@mui/mate
 import interviewService from '../../../services/interviewService';
 import { transformInterviewSession } from '../../../utils/transformers';
 import DataTable from '../../../components/DataTable';
+import AIToolsCard from '../../../components/AIToolsCard';
 
 const ACTIVE_STATUSES = ['in_progress', 'calibration', 'processing', 'connecting', 'active'];
 
@@ -225,6 +226,8 @@ const InterviewLivePage = () => {
           emptyMessage={t('pages.interviewLive.table.emptyMessage')}
         />
       </Box>
+
+      <AIToolsCard />
     </Box>
   );
 };

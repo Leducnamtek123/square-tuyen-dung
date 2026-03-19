@@ -208,9 +208,16 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
     return careerResult;
   }, []);
 
+  const careersSource = React.useMemo(() => {
+    if (Array.isArray(allConfig?.careers) && allConfig.careers.length > 0) {
+      return allConfig.careers;
+    }
+    return allConfig?.careerOptions || [];
+  }, [allConfig?.careers, allConfig?.careerOptions]);
+
   const careers = React.useMemo(
-    () => customCareers(allConfig?.careerOptions || [], topCareers),
-    [allConfig?.careerOptions, topCareers, customCareers]
+    () => customCareers(careersSource, topCareers),
+    [careersSource, topCareers, customCareers]
   );
 
   return (

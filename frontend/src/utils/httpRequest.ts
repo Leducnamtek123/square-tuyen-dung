@@ -37,7 +37,7 @@ const httpRequest = axios.create({
 
     serialize: (params) => {
 
-      return queryString.stringify(params, { arrayFormat: 'bracket' });
+      return queryString.stringify(params, { arrayFormat: 'none' });
 
     },
 

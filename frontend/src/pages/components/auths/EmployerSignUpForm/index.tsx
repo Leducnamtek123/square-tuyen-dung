@@ -18,6 +18,7 @@ import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
 import TextFieldAutoCompleteCustom from '../../../../components/controls/TextFieldAutoCompleteCustom';
 import commonService from '../../../../services/commonService';
 import goongService from '../../../../services/goongService';
+import authService from '../../../../services/authService';
 import { useAppSelector } from '../../../../hooks/useAppStore';
 import type { AxiosError } from 'axios';
 
@@ -289,6 +290,14 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
 
   });
 
+  const email = useWatch({
+
+    control,
+
+    name: 'email',
+
+  });
+
   const address = useWatch({
 
     control,
@@ -297,7 +306,11 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
 
   });
 
+  const emailDebounce = useDebounce(email, 500);
+
   const addressDebounce = useDebounce(address, 500);
+
+  const [emailExistsError, setEmailExistsError] = React.useState(false);
 
   React.useEffect(() => {
     for (const err in serverErrors) {
@@ -343,6 +356,37 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
 
     loadLocation(addressDebounce);
   }, [addressDebounce]);
+
+  React.useEffect(() => {
+    const normalizedEmail = String(emailDebounce || '').trim();
+    if (!normalizedEmail || !normalizedEmail.includes('@')) {
+      if (emailExistsError) {
+        clearErrors('email');
+        setEmailExistsError(false);
+      }
+      return;
+    }
+
+    const checkEmail = async () => {
+      try {
+        const resData = (await authService.emailExists(normalizedEmail)) as any;
+        if (resData?.exists === true) {
+          setError('email', {
+            type: 'manual',
+            message: t('validation.emailExists'),
+          });
+          setEmailExistsError(true);
+        } else if (emailExistsError) {
+          clearErrors('email');
+          setEmailExistsError(false);
+        }
+      } catch {
+        // ignore email existence errors
+      }
+    };
+
+    checkEmail();
+  }, [emailDebounce, clearErrors, emailExistsError, setError, t]);
 
   const handleSelectLocation = async (e: any, value: any) => {
     if (!value || typeof value !== 'object' || !value.place_id) {

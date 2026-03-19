@@ -117,5 +117,30 @@
   "clearAll": "Xóa tất cả",
   "cityProvince": "Tỉnh, thành phố",
   "jobsCount": "Việc làm: {{count}}",
-  "shareVia": "Chia sẻ qua"
+  "shareVia": "Chia sẻ qua",
+  "aiTools": {
+    "title": "Công cụ AI",
+    "tts": {
+      "title": "Văn bản thành giọng nói",
+      "textLabel": "Nội dung",
+      "textPlaceholder": "Nhập nội dung để tạo giọng nói...",
+      "voiceLabel": "Giọng đọc (tuỳ chọn)",
+      "voicePlaceholder": "Ví dụ: Ly",
+      "speedLabel": "Tốc độ",
+      "generate": "Tạo âm thanh",
+      "generating": "Đang tạo...",
+      "validation": "Vui lòng nhập nội dung cần đọc.",
+      "error": "Không thể tạo âm thanh lúc này."
+    },
+    "transcribe": {
+      "title": "Giọng nói thành văn bản",
+      "selectFile": "Chọn file âm thanh",
+      "changeFile": "Đổi file âm thanh",
+      "run": "Chuyển thành văn bản",
+      "transcribing": "Đang chuyển...",
+      "resultLabel": "Kết quả chuyển đổi",
+      "validation": "Vui lòng chọn file âm thanh.",
+      "error": "Không thể chuyển âm thanh lúc này."
+    }
+  }
 }

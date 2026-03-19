@@ -202,7 +202,7 @@ class EmployerRegisterSerializer(serializers.Serializer):
 
                 return user
         except Exception as ex:
-            helper.print_log_error("create user in JobSeekerRegisterSerializer", ex)
+            helper.print_log_error("create user in EmployerRegisterSerializer", ex)
             raise
 
     class Meta:

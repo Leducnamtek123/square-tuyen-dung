@@ -537,7 +537,23 @@
         "label": "Thông báo Email",
         "description": "Gửi thông báo hệ thống qua email cho quản trị viên"
       },
-      "saveBtn": "Lưu thay đổi"
+      "saveBtn": "Lưu thay đổi",
+      "notificationDemo": {
+        "title": "Demo thông báo",
+        "description": "Gửi một thông báo demo để kiểm tra cấu hình.",
+        "send": "Gửi thông báo demo",
+        "sending": "Đang gửi...",
+        "success": "Đã gửi thông báo demo.",
+        "error": "Gửi thông báo demo thất bại."
+      },
+      "healthCheck": {
+        "title": "Tình trạng hệ thống",
+        "description": "Kiểm tra kết nối cơ sở dữ liệu và bộ nhớ đệm.",
+        "check": "Kiểm tra",
+        "checking": "Đang kiểm tra...",
+        "database": "Cơ sở dữ liệu",
+        "redis": "Redis"
+      }
     }
   },
   "common": {

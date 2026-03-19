@@ -54,6 +54,12 @@ const companyService = {
     return presignInObject(data);
   },
 
+  getCompanyJobPostDetailById: async (id: IdType): Promise<unknown> => {
+    const url = `info/web/company/job-posts/${id}/`;
+    const data = await httpRequest.get(url);
+    return presignInObject(data);
+  },
+
   followCompany: (slug: IdType): Promise<unknown> => {
     const url = `info/web/companies/${slug}/followed/`;
     return httpRequest.post(url);

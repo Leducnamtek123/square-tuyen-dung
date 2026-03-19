@@ -22,6 +22,11 @@ const ProjectService = {
     const url = 'Project/web/banner/';
     return httpRequest.get(url, { params: params });
   },
+
+  sendNotificationDemo: (): Promise<unknown> => {
+    const url = 'Project/send-noti-demo/';
+    return httpRequest.post(url);
+  },
 };
 
 export default ProjectService;

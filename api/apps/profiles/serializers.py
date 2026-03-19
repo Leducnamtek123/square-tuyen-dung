@@ -95,8 +95,9 @@ class CompanyImageSerializer(serializers.ModelSerializer):
         user = request.user
 
         if user.role_name == var_sys.EMPLOYER:
-
-            company = user.company
+            company = getattr(user, "company", None)
+            if not company:
+                return attrs
 
             if CompanyImage.objects.filter(company=company).count() + count_upload_file > 15:
 
@@ -127,11 +128,14 @@ class CompanyImageSerializer(serializers.ModelSerializer):
 
             for file in files:
 
+                company = getattr(request.user, "company", None)
+                if not company:
+                     continue
                 # Create a new CompanyImage object for the current user's company
 
                 company_image = CompanyImage.objects.create(
 
-                    company=request.user.company)
+                    company=company)
 
                 # Upload the file to Cloudinary
 

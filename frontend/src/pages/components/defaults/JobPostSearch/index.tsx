@@ -1,5 +1,5 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { Box, Button, Card, IconButton, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
@@ -9,6 +9,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { useTranslation } from 'react-i18next';
 import InputBaseSearchHomeCustom from '../../../../components/controls/InputBaseSearchHomeCustom';
 import SingleSelectSearchCustom from '../../../../components/controls/SingleSelectSearchCustom';
+import commonService from '../../../../services/commonService';
 import {
   resetSearchJobPostFilter,
   searchJobPost,
@@ -21,11 +22,17 @@ const JobPostSearch = () => {
   const { allConfig } = useAppSelector((state) => state.config);
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [showAdvanceFilter, setShowAdvanceFilter] = React.useState(false);
-  const { control, handleSubmit, reset } = useForm({
+  const [districtOptions, setDistrictOptions] = React.useState<any[]>([]);
+  const [wardOptions, setWardOptions] = React.useState<any[]>([]);
+  const prevCityIdRef = React.useRef<any>(null);
+  const prevDistrictIdRef = React.useRef<any>(null);
+  const { control, handleSubmit, reset, setValue } = useForm({
     defaultValues: {
       kw: '',
       careerId: '',
       cityId: '',
+      districtId: '',
+      wardId: '',
       positionId: '',
       experienceId: '',
       jobTypeId: '',
@@ -60,6 +67,63 @@ const JobPostSearch = () => {
       ...jobPostFilter,
     }));
   }, [jobPostFilter, reset]);
+
+  const cityId = useWatch({
+    control,
+    name: 'cityId',
+  });
+
+  const districtId = useWatch({
+    control,
+    name: 'districtId',
+  });
+
+  React.useEffect(() => {
+    const loadDistricts = async () => {
+      try {
+        const resData = (await commonService.getDistrictsByCityId(cityId)) as any;
+        setDistrictOptions(resData?.data || []);
+        if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
+          setValue('districtId', '');
+          setValue('wardId', '');
+        }
+      } catch (error) {
+        setDistrictOptions([]);
+      }
+    };
+
+    if (cityId) {
+      loadDistricts();
+    } else {
+      setDistrictOptions([]);
+      if (prevCityIdRef.current !== null) {
+        setValue('districtId', '');
+        setValue('wardId', '');
+      }
+    }
+    prevCityIdRef.current = cityId || null;
+  }, [cityId, setValue]);
+
+  React.useEffect(() => {
+    const loadWards = async () => {
+      try {
+        const resData = (await commonService.getWardsByDistrictId(districtId)) as any;
+        setWardOptions(resData?.data || []);
+      } catch (error) {
+        setWardOptions([]);
+      }
+    };
+
+    if (districtId) {
+      loadWards();
+    } else {
+      setWardOptions([]);
+      if (prevDistrictIdRef.current !== null) {
+        setValue('wardId', '');
+      }
+    }
+    prevDistrictIdRef.current = districtId || null;
+  }, [districtId, setValue]);
 
   const handleChangeShowFilter = () => {
     setShowAdvanceFilter(!showAdvanceFilter);
@@ -256,6 +320,36 @@ const JobPostSearch = () => {
               placeholder={t('jobSearch.allExperiences')}
               control={control}
               options={allConfig?.experienceOptions || []}
+            />
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
+              lg: 2,
+              xl: 2
+            }}>
+            <SingleSelectSearchCustom
+              name="districtId"
+              placeholder={t('jobSearch.allDistricts')}
+              control={control}
+              options={districtOptions}
+            />
+          </Grid>
+          <Grid
+            size={{
+              xs: 12,
+              sm: 6,
+              md: 4,
+              lg: 2,
+              xl: 2
+            }}>
+            <SingleSelectSearchCustom
+              name="wardId"
+              placeholder={t('jobSearch.allWards')}
+              control={control}
+              options={wardOptions}
             />
           </Grid>
           <Grid

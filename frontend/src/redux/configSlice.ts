@@ -10,7 +10,25 @@ const getAllConfig = createAsyncThunk<SystemConfig, void>(
   'config/getAllConfig',
   async () => {
     const resData = await commonService.getConfigs();
-    return resData as SystemConfig;
+    let merged = { ...(resData as SystemConfig) };
+
+    try {
+      const careers = await commonService.getAllCareers({ pageSize: 1000 });
+      if (Array.isArray(careers) && careers.length > 0) {
+        merged = {
+          ...merged,
+          careers,
+          careerOptions: careers.map((career: any) => ({
+            id: career.id,
+            name: career.name,
+          })),
+        };
+      }
+    } catch {
+      // Fall back to config-provided careers if the full list endpoint fails.
+    }
+
+    return merged as SystemConfig;
   }
 );
 

@@ -81,6 +81,11 @@ const authService = {
     return httpRequest.post(url, data);
   },
 
+  emailExists: (email: string): Promise<unknown> => {
+    const url = 'auth/email-exists/';
+    return httpRequest.post(url, { email });
+  },
+
   jobSeekerRegister: (data: AnyRecord): Promise<unknown> => {
     const url = 'auth/job-seeker/register/';
     return httpRequest.post(url, data);

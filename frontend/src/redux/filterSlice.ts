@@ -4,6 +4,8 @@ interface JobPostFilter {
   kw: string;
   careerId: string;
   cityId: string;
+  districtId: string;
+  wardId: string;
   positionId: string;
   experienceId: string;
   typeOfWorkplaceId: string;
@@ -45,6 +47,8 @@ const initialJobPostFilter: JobPostFilter = {
   kw: '',
   careerId: '',
   cityId: '',
+  districtId: '',
+  wardId: '',
   positionId: '',
   experienceId: '',
   typeOfWorkplaceId: '',

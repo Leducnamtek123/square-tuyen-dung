@@ -8,6 +8,7 @@ import interviewService from '../../../services/interviewService';
 import { transformInterviewSession } from '../../../utils/transformers';
 import { ROUTES } from '../../../configs/constants';
 import DataTable from '../../../components/DataTable';
+import AIToolsCard from '../../../components/AIToolsCard';
 
 const ACTIVE_STATUSES = ['in_progress', 'calibration', 'processing', 'connecting', 'active'];
 
@@ -263,6 +264,8 @@ const InterviewLivePage = () => {
           emptyMessage={t('interviewLive.table.emptyMessage')}
         />
       </Box>
+
+      <AIToolsCard />
     </Box>
   );
 };

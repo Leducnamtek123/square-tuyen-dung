@@ -116,5 +116,30 @@
   "clearAll": "Clear all",
   "cityProvince": "City, Province",
   "jobsCount": "Jobs: {{count}}",
-  "shareVia": "Share via"
+  "shareVia": "Share via",
+  "aiTools": {
+    "title": "AI Tools",
+    "tts": {
+      "title": "Text-to-Speech",
+      "textLabel": "Text",
+      "textPlaceholder": "Enter text to synthesize...",
+      "voiceLabel": "Voice (optional)",
+      "voicePlaceholder": "e.g. Ly",
+      "speedLabel": "Speed",
+      "generate": "Generate Audio",
+      "generating": "Generating...",
+      "validation": "Please enter text to synthesize.",
+      "error": "Unable to generate audio right now."
+    },
+    "transcribe": {
+      "title": "Speech-to-Text",
+      "selectFile": "Select audio file",
+      "changeFile": "Change audio file",
+      "run": "Transcribe",
+      "transcribing": "Transcribing...",
+      "resultLabel": "Transcription",
+      "validation": "Please select an audio file.",
+      "error": "Unable to transcribe audio right now."
+    }
+  }
 }
