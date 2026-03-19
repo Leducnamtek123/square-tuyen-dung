@@ -19,11 +19,11 @@ const MuiImageCustom = (props: MuiImageCustomProps) => {
     ...rest
   } = props;
 
-  const [imageSrc, setImageSrc] = React.useState(src);
+  const [imageSrc, setImageSrc] = React.useState(src || fallbackSrc || '');
 
   React.useEffect(() => {
-    setImageSrc(src);
-  }, [src]);
+    setImageSrc(src || fallbackSrc || '');
+  }, [src, fallbackSrc]);
 
   const handleError = React.useCallback(
     (event: any) => {
