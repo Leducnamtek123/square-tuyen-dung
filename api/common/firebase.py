@@ -4,7 +4,7 @@ from typing import Optional
 
 import firebase_admin
 from django.conf import settings
-from firebase_admin import credentials, firestore
+from firebase_admin import auth, credentials, firestore
 
 logger = logging.getLogger(__name__)
 _FIREBASE_APP: Optional[firebase_admin.App] = None
@@ -41,3 +41,15 @@ def get_firestore_client():
     if not app:
         return None
     return firestore.client(app=app)
+
+
+def verify_id_token(id_token: str):
+    app = _FIREBASE_APP or initialize_firebase_app()
+    if not app:
+        return None
+    try:
+        decoded_token = auth.verify_id_token(id_token, app=app)
+        return decoded_token
+    except Exception:
+        logger.exception("Firebase token verification failed")
+        return None

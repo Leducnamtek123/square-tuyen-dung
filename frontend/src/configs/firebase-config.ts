@@ -1,4 +1,5 @@
-﻿import { initializeApp, type FirebaseOptions } from 'firebase/app';
+import { initializeApp, type FirebaseOptions } from 'firebase/app';
+import { getAuth } from 'firebase/auth';
 import { getFirestore, serverTimestamp } from 'firebase/firestore';
 
 let firebaseConfig: FirebaseOptions;
@@ -28,6 +29,7 @@ if (import.meta.env.MODE === 'production') {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 
-export { serverTimestamp };
+export { serverTimestamp, auth };
 export default db;

@@ -15,6 +15,8 @@ urlpatterns = [
 
     path('convert-token/', views.CustomConvertTokenView.as_view()),
 
+    path('firebase-login/', views.FirebaseLoginView.as_view()),
+
     path('revoke-token/', views.CustomRevokeTokenView.as_view()),
 
     path('', include('drf_social_oauth2.urls', namespace='drf')),

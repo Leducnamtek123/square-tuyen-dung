@@ -1,4 +1,4 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 import { AUTH_CONFIG } from '../configs/constants';
 import { ensurePresignedUrl } from '../utils/presignUrl';
 import type { AuthProvider, RoleName, TokenPair } from '../types/auth';
@@ -41,6 +41,18 @@ const authService = {
       client_secret: clientSecrect,
       backend: provider,
       token: token,
+    };
+    return httpRequest.post(url, data);
+  },
+
+  firebaseLogin: (idToken: string, roleName: RoleName): Promise<TokenResponse> => {
+    const url = 'auth/firebase-login/';
+    const data = {
+      grant_type: 'convert_token',
+      client_id: AUTH_CONFIG.CLIENT_ID,
+      client_secret: AUTH_CONFIG.CLIENT_SECRET,
+      token: idToken,
+      role_name: roleName,
     };
     return httpRequest.post(url, data);
   },

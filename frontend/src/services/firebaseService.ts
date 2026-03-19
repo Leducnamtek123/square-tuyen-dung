@@ -1,4 +1,4 @@
-﻿import {
+import {
   getFirestore,
   collection,
   setDoc,
@@ -11,8 +11,13 @@
   updateDoc,
   increment,
 } from 'firebase/firestore';
+import {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  type ConfirmationResult,
+} from 'firebase/auth';
 
-import db, { serverTimestamp } from '../configs/firebase-config';
+import db, { serverTimestamp, auth } from '../configs/firebase-config';
 
 type AnyRecord = Record<string, unknown>;
 
@@ -187,4 +192,32 @@ export const generateKeywords = (displayName: string): string[] => {
   }, [] as string[]);
 
   return keywords;
+};
+
+export const setupRecaptcha = (containerId: string): RecaptchaVerifier => {
+  return new RecaptchaVerifier(auth, containerId, {
+    size: 'normal',
+    callback: () => {
+      // reCAPTCHA solved, allow signInWithPhoneNumber.
+    },
+    'expired-callback': () => {
+      // Response expired. Ask user to solve reCAPTCHA again.
+    },
+  });
+};
+
+export const signInWithPhone = async (
+  phoneNumber: string,
+  appVerifier: RecaptchaVerifier
+): Promise<ConfirmationResult> => {
+  return signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+};
+
+export const verifyCode = async (
+  confirmationResult: ConfirmationResult,
+  code: string
+): Promise<string> => {
+  const result = await confirmationResult.confirm(code);
+  const user = result.user;
+  return user.getIdToken();
 };

@@ -98,6 +98,8 @@ class User(AbstractUser, AuthBaseModel):
 
     email = models.EmailField(max_length=100, unique=True, db_index=True)
 
+    phone_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
+
     email_notification_active = models.BooleanField(default=True)
 
     sms_notification_active = models.BooleanField(default=True)

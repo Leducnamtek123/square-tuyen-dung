@@ -69,6 +69,18 @@ const colors = {
     default: '#f8f9fa',
     paper: '#ffffff',
   },
+  feedback: {
+    button: {
+      background: 'linear-gradient(135deg, #6e8efb 0%, #a777e3 100%)',
+      hover: 'linear-gradient(135deg, #5a7dfa 0%, #9666d2 100%)',
+      shadow: 'rgba(110, 142, 251, 0.4)',
+      gradient: 'linear-gradient(135deg, #6e8efb 0%, #a777e3 100%)',
+    },
+    dialog: {
+      border: 'rgba(110, 142, 251, 0.1)',
+      gradient: 'linear-gradient(135deg, #6e8efb 0%, #a777e3 100%)',
+    }
+  },
 } as const;
 
 const customShadows = {
@@ -76,6 +88,7 @@ const customShadows = {
   medium: '0px 4px 10px rgba(0, 0, 0, 0.08)',
   large: '0px 8px 24px rgba(0, 0, 0, 0.12)',
   card: '0px 4px 20px rgba(0, 0, 0, 0.08)',
+  feedback: '0 8px 32px rgba(110, 142, 251, 0.15)',
 } as const;
 
 const defaultTheme = {

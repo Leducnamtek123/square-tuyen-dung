@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 
-import { Alert, AlertTitle, Avatar, Box, Card, Container, Typography, styled } from "@mui/material";
+import { Alert, AlertTitle, Avatar, Box, Button, Card, Container, Typography, styled } from "@mui/material";
 
 import Grid from "@mui/material/Grid2";
 
@@ -33,6 +33,7 @@ import { updateVerifyEmail } from '../../../redux/authSlice';
 import { getUserInfo } from '../../../redux/userSlice';
 
 import JobSeekerLoginForm from '../../components/auths/JobSeekerLoginForm';
+import PhoneOTPLoginForm from '../../components/auths/PhoneOTPLoginForm';
 
 import authService from '../../../services/authService';
 
@@ -111,6 +112,7 @@ const JobSeekerLogin = () => {
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
+  const [loginMode, setLoginMode] = React.useState<'email' | 'phone'>('email');
 
   React.useEffect(() => {
 
@@ -402,6 +404,52 @@ const JobSeekerLogin = () => {
 
   };
 
+  const handleFirebaseLogin = async (idToken: string) => {
+    setIsFullScreenLoading(true);
+    try {
+      const resData = await authService.firebaseLogin(idToken, ROLES_NAME.JOB_SEEKER as RoleName);
+      const {
+        access_token: accessToken,
+        refresh_token: refreshToken,
+        backend,
+      } = resData as any;
+
+      const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
+        accessToken,
+        refreshToken,
+        backend
+      );
+
+      if (isSaveTokenToCookie) {
+        dispatch(getUserInfo())
+          .unwrap()
+          .then(() => {
+            nav('/');
+          })
+          .catch(() => {
+            toastMessages.error(t('messages.loginError'));
+          });
+      } else {
+        toastMessages.error(t('messages.loginError'));
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError<any>;
+      const res = axiosError?.response;
+      if (res?.status === 400) {
+        const errors = res?.data?.errors;
+        if (errors && 'errorMessage' in errors) {
+          setErrorMessage(errors.errorMessage.join(' '));
+        } else if (errors && 'token' in errors) {
+           setErrorMessage(errors.token.join(' '));
+        } else {
+          toastMessages.error(t('messages.tryAgain'));
+        }
+      }
+    } finally {
+      setIsFullScreenLoading(false);
+    }
+  };
+
   return (
 
     <>
@@ -557,17 +605,37 @@ const JobSeekerLogin = () => {
           )}
 
           <Box sx={{ mt: 2 }}>
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
+              <Button 
+                variant={loginMode === 'email' ? 'contained' : 'outlined'}
+                onClick={() => setLoginMode('email')}
+                sx={{ mr: 1, borderRadius: '20px', textTransform: 'none' }}
+                size="small"
+              >
+                Email
+              </Button>
+              <Button 
+                variant={loginMode === 'phone' ? 'contained' : 'outlined'}
+                onClick={() => setLoginMode('phone')}
+                sx={{ borderRadius: '20px', textTransform: 'none' }}
+                size="small"
+              >
+                {t('login.phone', 'Số điện thoại')}
+              </Button>
+            </Box>
 
-            <JobSeekerLoginForm
-
-              onLogin={handleLogin}
-
-              // onFacebookLogin={handleFacebookLogin}
-
-              onGoogleLogin={handleGoogleLogin}
-
-            />
-
+            {loginMode === 'email' ? (
+              <JobSeekerLoginForm
+                onLogin={handleLogin}
+                // onFacebookLogin={handleFacebookLogin}
+                onGoogleLogin={handleGoogleLogin}
+              />
+            ) : (
+              <PhoneOTPLoginForm
+                onLogin={handleFirebaseLogin}
+                isLoading={isFullScreenLoading}
+              />
+            )}
           </Box>
 
           <Grid
