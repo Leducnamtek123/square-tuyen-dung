@@ -23,6 +23,7 @@ from django.db.utils import OperationalError
 from redis import Redis
 
 from django.conf import settings
+from urllib.parse import urlparse
 
 from apps.locations.models import City, District, Ward
 from .models import Career
@@ -536,6 +537,8 @@ def presign_url(request):
     presigned, _ = CloudinaryService.get_url_from_public_id(target, {})
 
     if not presigned:
+        if url and _is_allowed_public_minio_url(url):
+            return var_res.response_data(data={"url": url})
         return var_res.response_data(
             status=status.HTTP_400_BAD_REQUEST,
             errors={"errorMessage": ["Unable to generate presigned URL."]},
@@ -543,3 +546,22 @@ def presign_url(request):
         )
 
     return var_res.response_data(data={"url": presigned})
+
+
+def _is_allowed_public_minio_url(value: str) -> bool:
+    try:
+        parsed = urlparse(value)
+        if parsed.scheme not in ("http", "https"):
+            return False
+
+        public_base = getattr(settings, "MINIO_PUBLIC_URL", "").rstrip("/")
+        if public_base and value.startswith(f"{public_base}/"):
+            return True
+
+        server_url = getattr(settings, "MINIO_SERVER_URL", "").rstrip("/")
+        if server_url and value.startswith(f"{server_url}/"):
+            return True
+
+        return False
+    except Exception:
+        return False

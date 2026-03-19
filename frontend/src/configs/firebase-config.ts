@@ -1,6 +1,6 @@
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore, serverTimestamp } from 'firebase/firestore';
+import { getFirestore, initializeFirestore, serverTimestamp } from 'firebase/firestore';
 
 let firebaseConfig: FirebaseOptions;
 
@@ -28,7 +28,12 @@ if (import.meta.env.MODE === 'production') {
 }
 
 const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const enableLongPolling = import.meta.env.VITE_FIREBASE_FORCE_LONG_POLLING === 'true';
+const db = enableLongPolling
+  ? initializeFirestore(app, {
+      experimentalForceLongPolling: true,
+    })
+  : getFirestore(app);
 const auth = getAuth(app);
 
 export { serverTimestamp, auth };

@@ -27,15 +27,13 @@ interface SavedResumeCardProps {
   title: string;
 }
 
-interface EmployerState {
-  savedResumes: any[]; // Define a more specific type if available
-  isLoading: boolean;
-  // Add other properties of the employer state slice if they exist
-}
-
 interface RootState {
-  employer: EmployerState;
   // Add other state slices if they exist
+  auth: any;
+  user: any;
+  config: any;
+  filter: any;
+  profile: any;
 }
 
 const getHeadCells = (t: (key: string) => string) => [
@@ -94,7 +92,6 @@ const pageSize = 5;
 
 const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
   const { t } = useTranslation('employer');
-  const { savedResumes, isLoading: employerLoading } = useSelector((state: RootState) => state.employer);
 
   const headCells = React.useMemo(() => getHeadCells(t), [t]);
 
