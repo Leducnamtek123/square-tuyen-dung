@@ -4,9 +4,9 @@ import employerRoutes from "./routes/employerRoutes";
 import adminRoutes from "./routes/adminRoutes";
 
 const routesConfig = {
-  [HOST_NAME.Project]: ProjectRoutes,
-  [HOST_NAME.EMPLOYER_Project]: employerRoutes,
-  [HOST_NAME.ADMIN_Project]: adminRoutes,
+  [HOST_NAME.PROJECT]: ProjectRoutes,
+  [HOST_NAME.EMPLOYER_PROJECT]: employerRoutes,
+  [HOST_NAME.ADMIN_PROJECT]: adminRoutes,
 };
 
 export default routesConfig;

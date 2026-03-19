@@ -84,9 +84,9 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
 
         <Stack direction="column">
 
-          <Typography>{t('nav.switch.forEmployers')}</Typography>
+          <Typography sx={{ whiteSpace: 'nowrap', lineHeight: 1.2 }}>{t('nav.switch.forEmployers')}</Typography>
 
-          <Typography variant="caption" sx={{ fontSize: 11 }}>
+          <Typography variant="caption" sx={{ fontSize: 10, whiteSpace: 'nowrap', lineHeight: 1 }}>
 
             {t('nav.switch.postFreeJob')}
 
@@ -106,7 +106,7 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
 
           icon={faUsers}
 
-          fontSize={25}
+          fontSize={20}
 
           style={{ marginRight: 8 }}
 
@@ -114,9 +114,9 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
 
         <Stack direction="column">
 
-          <Typography>{t('nav.switch.forJobSeekers')}</Typography>
+          <Typography sx={{ whiteSpace: 'nowrap', lineHeight: 1.2 }}>{t('nav.switch.forJobSeekers')}</Typography>
 
-          <Typography variant="caption" sx={{ fontSize: 11 }}>
+          <Typography variant="caption" sx={{ fontSize: 10, whiteSpace: 'nowrap', lineHeight: 1 }}>
 
             <FontAwesomeIcon icon={faArrowRight} /> {t('nav.switch.switch')}
 
@@ -192,7 +192,7 @@ const AccountSwitchMenu = ({ isShowButton = false }) => {
 
         <Box
 
-          sx={{ ml: 1, cursor: 'pointer' }}
+          sx={{ cursor: 'pointer' }}
 
           onClick={handleClick}
 

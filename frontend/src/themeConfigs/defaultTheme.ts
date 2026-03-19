@@ -1,4 +1,4 @@
-﻿const mode = 'light';
+const mode = 'light';
 
 // Define colors
 const colors = {
@@ -71,9 +71,18 @@ const colors = {
   },
 } as const;
 
+const customShadows = {
+  small: '0px 2px 4px rgba(0, 0, 0, 0.05)',
+  medium: '0px 4px 10px rgba(0, 0, 0, 0.08)',
+  large: '0px 8px 24px rgba(0, 0, 0, 0.12)',
+  card: '0px 4px 20px rgba(0, 0, 0, 0.08)',
+} as const;
+
 const defaultTheme = {
   mode,
-  colors,
+  palette: colors,
+  customShadows,
 } as const;
 
 export default defaultTheme;
+

@@ -172,8 +172,3 @@ code {
   }
 }
 
-/* Reduce excessive toolbar padding for company icon container */
-.css-k9jzsh-MuiToolbar-root {
-  padding-top: 7px !important;
-  padding-bottom: 7px !important;
-}

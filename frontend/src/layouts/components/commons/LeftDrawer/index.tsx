@@ -282,7 +282,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
               py: 1,
 
-              boxShadow: (theme) => theme.customShadows.small,
+              boxShadow: (theme) => theme.customShadows?.small || 'none',
 
               '&:hover': {
 
@@ -333,7 +333,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
                   py: 1,
 
-                  boxShadow: (theme) => theme.customShadows.small,
+                  boxShadow: (theme) => theme.customShadows?.small || 'none',
 
                   display: {
 
@@ -406,7 +406,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
           width: drawerWidth,
 
-          boxShadow: (theme) => theme.customShadows.card,
+          boxShadow: (theme) => theme.customShadows?.card || 'none',
 
           border: 'none',
 

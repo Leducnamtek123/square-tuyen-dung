@@ -22,7 +22,7 @@ fi
 echo "Waiting for database and applying migrations..."
 i=1
 while [ "$i" -le "$MAX_RETRIES" ]; do
-  if python manage.py migrate --noinput; then
+  if python manage.py migrate --noinput --fake-initial; then
     echo "Migrations applied successfully."
     break
   fi

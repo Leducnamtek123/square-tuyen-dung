@@ -79,7 +79,7 @@ const Loading = (
 
   <Card
 
-    sx: Props ={{
+    sx={{
 
       alignItems: "center",
 

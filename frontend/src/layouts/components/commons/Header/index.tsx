@@ -237,7 +237,7 @@ const Header = (props) => {
 
       sx={{
 
-        ml: 3,
+        ml: 1,
 
         display: {
 
@@ -321,7 +321,7 @@ const Header = (props) => {
 
       <AppBar position="sticky" sx={{ boxShadow: 0 }} id="common-header">
 
-        <Container maxWidth="lg">
+        <Container maxWidth="xl">
 
           <Toolbar disableGutters>
 
@@ -353,8 +353,6 @@ const Header = (props) => {
 
                   height: 42,
 
-                  pb: 0.5,
-
                 }}
 
                 variant="square"
@@ -375,7 +373,7 @@ const Header = (props) => {
 
               sx={{
 
-                mx: 2,
+                mx: 1,
 
                 borderColor: "lightgray",
 
@@ -509,13 +507,15 @@ const Header = (props) => {
 
                     sx={{
 
-                      my: 2,
+                      my: 1,
 
-                      mr: 1,
+                      mr: 0.5,
 
                       color: "white",
 
                       display: "block",
+
+                      whiteSpace: 'nowrap',
 
                       backgroundColor: location?.pathname?.startsWith(page.path)
 
@@ -537,58 +537,52 @@ const Header = (props) => {
 
             </Box>
 
-            <LanguageSwitcher />
-            {isAuthenticated && <WorkspaceSwitchMenu />}
+            <Stack direction="row" alignItems="center" spacing={2}>
+              <LanguageSwitcher />
+              {isAuthenticated && <WorkspaceSwitchMenu />}
 
-            {/* start: NotificationCard */}
+              {/* start: NotificationCard */}
 
-            {isAuthenticated && <NotificationCard />}
+              {isAuthenticated && <NotificationCard />}
 
-            {/* End: NotificationCard */}
+              {/* End: NotificationCard */}
 
-            {/* start: ChatCard */}
+              {/* start: ChatCard */}
 
-            {isAuthenticated && <ChatCard />}
+              {isAuthenticated && <ChatCard />}
 
-            {/* End: ChatCard */}
+              {/* End: ChatCard */}
 
-            {/* Start: SwitchModeButton */}
+              {/* Start: authArea */}
 
-            {/* <SwitchModeButton /> */}
+              {!isAdminPortal && authArea}
 
-            {/* End: SwitchModeButton */}
+              {/* End: authArea */}
 
-            {/* Start: authArea */}
+              {!isSmall && !isAuthenticated && !isAdminPortal && (
 
-            {!isAdminPortal && authArea}
+                <>
 
-            {/* End: authArea */}
+                  <Divider
 
-            {!isSmall && !isAuthenticated && !isAdminPortal && (
+                    orientation="vertical"
 
-              <>
+                    flexItem
 
-                <Divider
+                    sx={{ mx: 1, height: 24, alignSelf: 'center', borderColor: "rgba(255, 255, 255, 0.3)" }}
 
-                  orientation="vertical"
+                  />
 
-                  flexItem
+                  {/* Start: Account switch menu */}
 
-                  variant="middle"
+                  <AccountSwitchMenu />
 
-                  sx={{ mx: 2, borderColor: "lightgray" }}
+                  {/* Start: Account switch menu */}
 
-                />
+                </>
 
-                {/* Start: Account switch menu */}
-
-                <AccountSwitchMenu />
-
-                {/* Start: Account switch menu */}
-
-              </>
-
-            )}
+              )}
+            </Stack>
 
           </Toolbar>
 
