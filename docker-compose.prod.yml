@@ -33,7 +33,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.prod
       args:
-        VITE_NODE_ENV: production
+        VITE_NODE_ENV: ${VITE_NODE_ENV:-production}
         VITE_PROJECT_HOST_NAME: ${VITE_PROJECT_HOST_NAME}
         VITE_ADMIN_PROJECT_HOST_NAME: ${VITE_ADMIN_PROJECT_HOST_NAME}
         VITE_EMPLOYER_PROJECT_HOST_NAME: ${VITE_EMPLOYER_PROJECT_HOST_NAME}
@@ -69,16 +69,37 @@ services:
     build:
       context: ./api
       dockerfile: Dockerfile.prod
-    command: sh docker-entrypoint.sh gunicorn --bind 0.0.0.0:8000 --workers 3 config.wsgi:application
+    command: sh docker-entrypoint.sh gunicorn --bind ${GUNICORN_BIND:-0.0.0.0:8000} --workers ${GUNICORN_WORKERS:-3} ${GUNICORN_APP:-config.wsgi:application}
     env_file:
       - .env.prod
     expose:
       - "8000"
     restart: always
     environment:
-      - DEBUG=False
+      - DEBUG=${DEBUG:-False}
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-0}
     networks:
       - proxy-net
+      - app-net
+      - data-net
+
+  # ---------------------------------------------------------------------------
+  # Migration (run once per deploy)
+  # ---------------------------------------------------------------------------
+  migrate:
+    container_name: tuyendung-studio-migrate-prod
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
+    command: sh docker-entrypoint.sh true
+    env_file:
+      - .env.prod
+    environment:
+      - DEBUG=${DEBUG:-False}
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-1}
+    depends_on:
+      - db
+    networks:
       - app-net
       - data-net
 
@@ -169,19 +190,19 @@ services:
               capabilities: [gpu]
     command:
       - --host
-      - 0.0.0.0
+      - ${LLAMA_HOST:-0.0.0.0}
       - --port
-      - "11434"
+      - "${LLAMA_PORT:-11434}"
       - --hf-repo
-      - "bartowski/Qwen2.5-14B-Instruct-GGUF"
+      - "${LLAMA_HF_REPO:-bartowski/Qwen2.5-14B-Instruct-GGUF}"
       - --hf-file
-      - "Qwen2.5-14B-Instruct-Q4_K_M.gguf"
+      - "${LLAMA_HF_FILE:-Qwen2.5-14B-Instruct-Q4_K_M.gguf}"
       - --alias
-      - "qwen2.5-14b"
+      - "${LLAMA_MODEL_ALIAS:-qwen2.5-14b}"
       - --ctx-size
-      - "16384"
+      - "${LLAMA_CTX_SIZE:-16384}"
       - --n-gpu-layers
-      - "100"
+      - "${LLAMA_N_GPU_LAYERS:-100}"
     volumes:
       - llama-models:/root/.cache
     ports:
@@ -223,7 +244,7 @@ services:
     env_file:
       - .env.prod
     environment:
-      - TTS_DEVICE=cuda
+      - TTS_DEVICE=${TTS_DEVICE:-cuda}
     expose:
       - "8298"
     restart: always
@@ -237,13 +258,13 @@ services:
     env_file:
       - .env.prod
     environment:
-      - BACKEND_API_URL=http://backend:8000/api
-      - LIVEKIT_URL=http://livekit:7880
+      - BACKEND_API_URL=${BACKEND_API_URL:-http://backend:8000/api}
+      - LIVEKIT_URL=${LIVEKIT_URL:-http://livekit:7880}
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}
-      - LLAMA_BASE_URL=http://llama-cpp:11434/v1
-      - STT_BASE_URL=http://whisper:8080/v1
-      - TTS_BASE_URL=http://vieneu-tts:8298/v1
+      - LLAMA_BASE_URL=${LLAMA_BASE_URL:-http://llama-cpp:11434/v1}
+      - STT_BASE_URL=${STT_BASE_URL:-http://whisper:8080/v1}
+      - TTS_BASE_URL=${TTS_BASE_URL:-http://vieneu-tts:8298/v1}
     depends_on:
       - livekit
       - vieneu-tts
@@ -260,12 +281,12 @@ services:
   minio:
     container_name: tuyendung-studio-minio-prod
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z
-    command: server /data --console-address ":9001"
+    command: server /data --console-address "${MINIO_CONSOLE_ADDRESS:-:9001}"
     env_file:
       - .env.prod
     environment:
-      MINIO_BROWSER_REDIRECT_URL: https://tuyendung.square.vn/minio-console/
-      MINIO_SERVER_URL: http://minio:9000
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL:-https://tuyendung.square.vn/minio-console/}
+      MINIO_SERVER_URL: ${MINIO_SERVER_URL:-http://minio:9000}
     expose:
       - "9000"
       - "9001"

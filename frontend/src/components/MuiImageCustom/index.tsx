@@ -9,6 +9,8 @@ interface MuiImageCustomProps {
   [key: string]: any;
 }
 
+const ImageWithLoading = Image as any;
+
 const MuiImageCustom = (props: MuiImageCustomProps) => {
 
   const {
@@ -39,7 +41,7 @@ const MuiImageCustom = (props: MuiImageCustomProps) => {
 
   return (
 
-    <Image
+    <ImageWithLoading
 
       loading={loading}
 

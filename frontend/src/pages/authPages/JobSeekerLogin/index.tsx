@@ -606,22 +606,58 @@ const JobSeekerLogin = () => {
 
           <Box sx={{ mt: 2 }}>
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'center' }}>
-              <Button 
-                variant={loginMode === 'email' ? 'contained' : 'outlined'}
-                onClick={() => setLoginMode('email')}
-                sx={{ mr: 1, borderRadius: '20px', textTransform: 'none' }}
-                size="small"
+              <Box
+                sx={{
+                  display: 'flex',
+                  gap: '4px',
+                  p: '4px',
+                  width: '100%',
+                  maxWidth: 320,
+                  backgroundColor: 'rgba(63, 81, 181, 0.12)',
+                  borderRadius: '14px',
+                }}
               >
-                Email
-              </Button>
-              <Button 
-                variant={loginMode === 'phone' ? 'contained' : 'outlined'}
-                onClick={() => setLoginMode('phone')}
-                sx={{ borderRadius: '20px', textTransform: 'none' }}
-                size="small"
-              >
-                {t('login.phone', 'Số điện thoại')}
-              </Button>
+                <Button
+                  onClick={() => setLoginMode('email')}
+                  disableElevation
+                  sx={{
+                    flex: 1,
+                    textTransform: 'none',
+                    borderRadius: '12px',
+                    fontWeight: 600,
+                    py: 0.75,
+                    color: loginMode === 'email' ? 'common.white' : 'text.secondary',
+                    backgroundColor: loginMode === 'email' ? 'primary.main' : 'transparent',
+                    boxShadow:
+                      loginMode === 'email' ? '0 6px 14px rgba(63, 81, 181, 0.28)' : 'none',
+                    '&:hover': {
+                      backgroundColor: loginMode === 'email' ? 'primary.dark' : 'rgba(0,0,0,0.04)',
+                    },
+                  }}
+                >
+                  Email
+                </Button>
+                <Button
+                  onClick={() => setLoginMode('phone')}
+                  disableElevation
+                  sx={{
+                    flex: 1,
+                    textTransform: 'none',
+                    borderRadius: '12px',
+                    fontWeight: 600,
+                    py: 0.75,
+                    color: loginMode === 'phone' ? 'common.white' : 'text.secondary',
+                    backgroundColor: loginMode === 'phone' ? 'primary.main' : 'transparent',
+                    boxShadow:
+                      loginMode === 'phone' ? '0 6px 14px rgba(63, 81, 181, 0.28)' : 'none',
+                    '&:hover': {
+                      backgroundColor: loginMode === 'phone' ? 'primary.dark' : 'rgba(0,0,0,0.04)',
+                    },
+                  }}
+                >
+                  {t('login.phone', 'Số điện thoại')}
+                </Button>
+              </Box>
             </Box>
 
             {loginMode === 'email' ? (

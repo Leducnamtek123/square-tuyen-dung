@@ -19,22 +19,26 @@ then
   exit 1
 fi
 
-echo "Waiting for database and applying migrations..."
-i=1
-while [ "$i" -le "$MAX_RETRIES" ]; do
-  if python manage.py migrate --noinput --fake-initial; then
-    echo "Migrations applied successfully."
-    break
-  fi
+if [ "${AUTO_MIGRATE:-0}" = "1" ]; then
+  echo "AUTO_MIGRATE enabled. Waiting for database and applying migrations..."
+  i=1
+  while [ "$i" -le "$MAX_RETRIES" ]; do
+    if python manage.py migrate --noinput --fake-initial; then
+      echo "Migrations applied successfully."
+      break
+    fi
 
-  if [ "$i" -eq "$MAX_RETRIES" ]; then
-    echo "Failed to apply migrations after ${MAX_RETRIES} attempts."
-    exit 1
-  fi
+    if [ "$i" -eq "$MAX_RETRIES" ]; then
+      echo "Failed to apply migrations after ${MAX_RETRIES} attempts."
+      exit 1
+    fi
 
-  echo "Migration attempt ${i}/${MAX_RETRIES} failed. Retrying in ${SLEEP_SECONDS}s..."
-  i=$((i + 1))
-  sleep "$SLEEP_SECONDS"
-done
+    echo "Migration attempt ${i}/${MAX_RETRIES} failed. Retrying in ${SLEEP_SECONDS}s..."
+    i=$((i + 1))
+    sleep "$SLEEP_SECONDS"
+  done
+else
+  echo "AUTO_MIGRATE disabled. Skipping migrations."
+fi
 
 exec "$@"
