@@ -33,10 +33,10 @@ import jobPostNotification from '../assets/images/about-images/job-notification-
 import jobPostImg from '../assets/images/about-images/job-post-img.webp';
 import profileImg from '../assets/images/about-images/profile-img.webp';
 
-import liveInterviewImg from '../assets/images/about-images/live-interview.png';
-import candidateCrmImg from '../assets/images/about-images/candidate-crm.png';
-import companyVerificationImg from '../assets/images/about-images/company-verification.png';
-import aiSkillsImg from '../assets/images/about-images/ai-skills-matching.png';
+import liveInterviewImg from '../assets/images/about-images/around-job-post.png';
+import candidateCrmImg from '../assets/images/about-images/job-notification-img.png';
+import companyVerificationImg from '../assets/images/about-images/job-post-img.png';
+import aiSkillsImg from '../assets/images/about-images/profile-img.png';
 import instagramIcon from '../assets/icons/instagram-icon.png';
 import facebookIcon from '../assets/icons/facebook-icon.png';
 import facebookMessengerIcon from '../assets/icons/facebook-messenger-icon.png';
