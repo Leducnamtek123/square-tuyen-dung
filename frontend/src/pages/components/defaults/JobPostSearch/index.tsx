@@ -135,8 +135,8 @@ const JobPostSearch = () => {
               xs: 12,
               sm: 6,
               md: 3,
-              lg: 3,
-              xl: 3
+              lg: 2,
+              xl: 2
             }}>
             <SingleSelectSearchCustom
               name="careerId"
@@ -165,8 +165,8 @@ const JobPostSearch = () => {
               xs: 12,
               sm: 12,
               md: 12,
-              lg: 3,
-              xl: 3
+              lg: 4,
+              xl: 4
             }}>
             <Stack
               spacing={2}
@@ -182,14 +182,14 @@ const JobPostSearch = () => {
               <Button
                 variant="contained"
                 color="info"
-                sx={{ py: 1 }}
+                sx={{ py: 1, whiteSpace: 'nowrap' }}
                 type="submit"
               >
                 {t('jobSearch.searchButton')}
               </Button>
               <Button
                 variant="contained"
-                sx={{ py: 1, color: 'white' }}
+                sx={{ py: 1, color: 'white', whiteSpace: 'nowrap' }}
                 startIcon={
                   showAdvanceFilter ? <FilterAltOffIcon /> : <FilterAltIcon />
                 }

@@ -20,6 +20,7 @@
 ## 🎯 Introduction
 
 **Square** is a platform connecting employers and job seekers, including:
+
 - 👨‍💼 **Job seeker interface**: `https://www.square.com`
 - 🏢 **Employer interface**: `https://employer.square.com`
 
@@ -50,7 +51,7 @@ cp .env.example .env
 
 1. Copy file `default.conf.example` → `default.conf`
 2. Update `<ngrok domain>` in the file with the ngrok domain configured in Backend
-   
+
    Example: `<ngrok domain>` → `sought-shiner-utterly.ngrok-free.app`
 
 ### Step 4: Launch Application
@@ -69,10 +70,13 @@ Allow www.square.com and employer.square.com to replace localhost (127.0.0.1)
 **For MacOS, Linux:**
 
 Open terminal and run:
+
 ```bash
 sudo vim /etc/hosts
 ```
+
 Add these 2 lines:
+
 ```
 127.0.0.1       www.square.com
 127.0.0.1       employer.square.com
@@ -83,10 +87,10 @@ Add these 2 lines:
 Navigate to `C:\Windows\System32\drivers\etc\`
 Add the above 2 lines to the `hosts` file (Open with administrator privileges)
 
-
 ### Step 6: Verify Results
 
 After successful launch, access:
+
 - 🌐 **Job seeker page**: https://www.square.com
 - 🌐 **Employer page**: https://employer.square.com
 
@@ -99,6 +103,7 @@ After successful launch, access:
 GOONG Maps is used to display maps and addresses.
 
 **Required environment variables:**
+
 ```env
 VITE_GOONGAPI_KEY=<API_Key>
 ```
@@ -116,6 +121,7 @@ VITE_GOONGAPI_KEY=<API_Key>
 Firebase serves notification and chat functionality.
 
 **Required environment variables:**
+
 ```env
 VITE_FIREBASE_API_KEY=<API_Key>
 VITE_FIREBASE_AUTH_DOMAIN=<Auth_Domain>
@@ -137,8 +143,9 @@ Configure Client ID and Client Secret for login methods.
 
 #### 3.1. Login With Email & Password
 
-   **Required environment variables:**
-   ```env
+**Required environment variables:**
+
+````env
 VITE_SQUARE_SERVER_CLIENT_ID=<Client_ID>
 VITE_SQUARE_SERVER_CLIENT_SECRECT=<Client_Secret>
 **Configuration steps:**
@@ -146,15 +153,15 @@ VITE_SQUARE_SERVER_CLIENT_SECRECT=<Client_Secret>
 1. Access the Backend `Applications` page at: `https://ngrok-domain/o/applications/`
 2. Click **`New Application`** button
 3. Fill in information as follows:
-   - **Name**: Choose any name (e.g., `Default authentication`)
-   - **Client id**: Keep default value → Copy and update to `VITE_SQUARE_SERVER_CLIENT_ID`
-   - **Client secret**: Keep default value → Copy and update to `VITE_SQUARE_SERVER_CLIENT_SECRECT`
-   - **Hash client secret**: ✅ Check
-   - **Client type**: Select `Confidential`
-   - **Authorization grant type**: Select `Resource owner password-based`
-   - Other fields can be left empty
-   
-   > ⚠️ **Important note**: Client id and Client secret must be **copied and saved** before clicking Save (cannot be viewed again after Save)
+- **Name**: Choose any name (e.g., `Default authentication`)
+- **Client id**: Keep default value → Copy and update to `VITE_SQUARE_SERVER_CLIENT_ID`
+- **Client secret**: Keep default value → Copy and update to `VITE_SQUARE_SERVER_CLIENT_SECRECT`
+- **Hash client secret**: ✅ Check
+- **Client type**: Select `Confidential`
+- **Authorization grant type**: Select `Resource owner password-based`
+- Other fields can be left empty
+
+> ⚠️ **Important note**: Client id and Client secret must be **copied and saved** before clicking Save (cannot be viewed again after Save)
 
 4. Click **`Save`**
 
@@ -162,11 +169,11 @@ VITE_SQUARE_SERVER_CLIENT_SECRECT=<Client_Secret>
 
 #### 3.2. Login With Facebook
 
-   **Required environment variables:**
-   ```env
+**Required environment variables:**
+```env
 VITE_FACEBOOK_CLIENT_ID=<Client_ID>
 VITE_FACEBOOK_CLIENT_SECRET=<Client_Secret>
-```
+````
 
 **Configuration steps:**
 
@@ -180,7 +187,7 @@ VITE_FACEBOOK_CLIENT_SECRET=<Client_Secret>
    - **Client type**: Select `Confidential`
    - **Authorization grant type**: Select `Client credentials`
    - Other fields can be left empty
-   
+
    > ⚠️ **Important note**: Client id and Client secret must be **copied and saved** before clicking Save
 
 4. Click **`Save`**
@@ -189,8 +196,9 @@ VITE_FACEBOOK_CLIENT_SECRET=<Client_Secret>
 
 #### 3.3. Login With Google
 
-   **Required environment variables:**
-   ```env
+**Required environment variables:**
+
+```env
 VITE_GOOGLE_CLIENT_ID=<Client_ID>
 VITE_GOOGLE_CLIENT_SECRET=<Client_Secret>
 ```
@@ -207,7 +215,7 @@ VITE_GOOGLE_CLIENT_SECRET=<Client_Secret>
    - **Client type**: Select `Confidential`
    - **Authorization grant type**: Select `Client credentials`
    - Other fields can be left empty
-   
+
    > ⚠️ **Important note**: Client id and Client secret must be **copied and saved** before clicking Save
 
 4. Click **`Save`**
@@ -219,6 +227,7 @@ VITE_GOOGLE_CLIENT_SECRET=<Client_Secret>
 Configure chatbot for job seekers and employers.
 
 **Required environment variables:**
+
 ```env
 VITE_JOB_SEEKER_BOT_AGENT_ID=<Job_Seeker_Agent_ID>
 VITE_EMPLOYER_BOT_AGENT_ID=<Employer_Agent_ID>
@@ -257,10 +266,10 @@ You need to create **2 chatbot agents**: one for job seekers and one for employe
 3. **Configure Webhook** for chatbot to call Backend API:
    - Access **Fulfillment** → Enable **Enabled Webhook**
    - Enter information:
-     - **URL**: 
+     - **URL**:
        - For job seekers: `https://ngrok-domain/api/chatbot/jobseeker/webhook/`
        - For employers: `https://ngrok-domain/api/chatbot/employer/webhook/`
-     - **Basic Auth**: 
+     - **Basic Auth**:
        - Username: `temp`
        - Password: `temp`
    - Click **Save**
@@ -286,7 +295,7 @@ You need to create **2 chatbot agents**: one for job seekers and one for employe
 
 1. Access the **Backend admin page** (Django Admin)
 2. Go to **Periodic tasks** (Manage periodic tasks)
-3. Find and select the record named: 
+3. Find and select the record named:
    ```
    [SETUP] Upload Files To Cloudinary One-time Task: every 60 seconds
    ```
@@ -294,7 +303,8 @@ You need to create **2 chatbot agents**: one for job seekers and one for employe
 5. Click **`Save`**
 6. Wait **60 seconds** for the cron job to automatically run and upload images
 
-> ⚠️ **Important note**: 
+> ⚠️ **Important note**:
+>
 > - This is a **one-time cron job** (one-time task)
 > - The cron job will automatically upload all images from the `data/cloudinary/cloudinary_files.json` file (in Backend) to Cloudinary
 > - **Do not shut down the Backend** while the cron job is running (at least 10 minutes)
@@ -307,6 +317,7 @@ You need to create **2 chatbot agents**: one for job seekers and one for employe
 You have completed the installation and configuration of **Square Web Application**. Access the application and enjoy!
 
 **Useful links:**
+
 - 📖 [Documentation](https://github.com/Square/square-job-web-app)
 - 🐛 [Report Issues](https://github.com/Square/square-job-web-app/issues)
 - 💬 [Discussions](https://github.com/Square/square-job-web-app/discussions)
@@ -338,6 +349,7 @@ You have completed the installation and configuration of **Square Web Applicatio
 ## 🎯 Giới Thiệu
 
 **Square** là nền tảng kết nối giữa nhà tuyển dụng và người tìm việc, bao gồm:
+
 - 👨‍💼 **Giao diện dành cho người tìm việc**: `https://www.square.com`
 - 🏢 **Giao diện dành cho nhà tuyển dụng**: `https://employer.square.com`
 
@@ -365,9 +377,10 @@ cp .env.example .env
 3. Lưu file lại
 
 ### Bước 3: Cấu hình nginx
+
 1. Clone file `default.conf.example` → `default.conf`
 2. Cập nhật `<ngrok domain>` trong file thành domain của ngrok đã setup ở Backend
-Ví dụ: `<ngrok domain>` → `sought-shiner-utterly.ngrok-free.app`
+   Ví dụ: `<ngrok domain>` → `sought-shiner-utterly.ngrok-free.app`
 
 ### Bước 4: Khởi Chạy Ứng Dụng
 
@@ -385,10 +398,13 @@ Cho phép www.project.com, employer.project.com thay thế cho localhost (127.0.
 **Đối với MacOS, Linux:**
 
 Vào terminal, gõ lệnh:
+
 ```bash
 sudo vim /etc/hosts
 ```
+
 Thêm 2 dòng:
+
 ```
 127.0.0.1       www.project.com
 127.0.0.1       employer.project.com
@@ -399,10 +415,10 @@ Thêm 2 dòng:
 Truy cập vào `C:\Windows\System32\drivers\etc\`
 Thêm 2 dòng trên vào file `hosts` (Mở với quyền administrators)
 
-
 ### Bước 6: Kiểm Tra Kết Quả
 
 Sau khi khởi chạy thành công, truy cập:
+
 - 🌐 **Trang người tìm việc**: https://www.project.com
 - 🌐 **Trang nhà tuyển dụng**: https://employer.project.com
 
@@ -415,6 +431,7 @@ Sau khi khởi chạy thành công, truy cập:
 GOONG Maps được sử dụng để hiển thị bản đồ và địa chỉ.
 
 **Biến môi trường cần thiết:**
+
 ```env
 VITE_GOONGAPI_KEY=<API_Key>
 ```
@@ -432,6 +449,7 @@ VITE_GOONGAPI_KEY=<API_Key>
 Firebase phục vụ cho chức năng thông báo (notification) và nhắn tin (chat).
 
 **Biến môi trường cần thiết:**
+
 ```env
 VITE_FIREBASE_API_KEY=<API_Key>
 VITE_FIREBASE_AUTH_DOMAIN=<Auth_Domain>
@@ -454,9 +472,10 @@ Cấu hình Client ID và Client Secret cho các phương thức đăng nhập.
 #### 3.1. Đăng Nhập Với Email & Password
 
 **Biến môi trường cần thiết:**
+
 ```env
 VITE_project_SERVER_CLIENT_ID=<Client_ID>
-VITE_project_SERVER_CLIENT_SECRECT=<Client_Secret>
+VITE_PROJECT_SERVER_CLIENT_SECRECT =<Client_Secret>
 ```
 
 **Các bước cấu hình:**
@@ -466,12 +485,12 @@ VITE_project_SERVER_CLIENT_SECRECT=<Client_Secret>
 3. Điền thông tin như sau:
    - **Name**: Đặt tên tuỳ ý (ví dụ: `Default authentication`)
    - **Client id**: Giữ nguyên giá trị mặc định → Copy và cập nhật vào `VITE_project_SERVER_CLIENT_ID`
-   - **Client secret**: Giữ nguyên giá trị mặc định → Copy và cập nhật vào `VITE_project_SERVER_CLIENT_SECRECT`
+   - **Client secret**: Giữ nguyên giá trị mặc định → Copy và cập nhật vào `VITE_PROJECT_SERVER_CLIENT_SECRECT `
    - **Hash client secret**: ✅ Tích chọn
    - **Client type**: Chọn `Confidential`
    - **Authorization grant type**: Chọn `Resource owner password-based`
    - Các trường còn lại có thể để trống
-   
+
    > ⚠️ **Lưu ý quan trọng**: Client id và Client secret phải được **copy và lưu lại** trước khi nhấn Save (sau khi Save sẽ không thể xem lại)
 
 4. Nhấn **`Save`**
@@ -481,6 +500,7 @@ VITE_project_SERVER_CLIENT_SECRECT=<Client_Secret>
 #### 3.2. Đăng Nhập Với Facebook
 
 **Biến môi trường cần thiết:**
+
 ```env
 VITE_FACEBOOK_CLIENT_ID=<Client_ID>
 VITE_FACEBOOK_CLIENT_SECRET=<Client_Secret>
@@ -498,7 +518,7 @@ VITE_FACEBOOK_CLIENT_SECRET=<Client_Secret>
    - **Client type**: Chọn `Confidential`
    - **Authorization grant type**: Chọn `Client credentials`
    - Các trường còn lại có thể để trống
-   
+
    > ⚠️ **Lưu ý quan trọng**: Client id và Client secret phải được **copy và lưu lại** trước khi nhấn Save
 
 4. Nhấn **`Save`**
@@ -508,6 +528,7 @@ VITE_FACEBOOK_CLIENT_SECRET=<Client_Secret>
 #### 3.3. Đăng Nhập Với Google
 
 **Biến môi trường cần thiết:**
+
 ```env
 VITE_GOOGLE_CLIENT_ID=<Client_ID>
 VITE_GOOGLE_CLIENT_SECRET=<Client_Secret>
@@ -525,7 +546,7 @@ VITE_GOOGLE_CLIENT_SECRET=<Client_Secret>
    - **Client type**: Chọn `Confidential`
    - **Authorization grant type**: Chọn `Client credentials`
    - Các trường còn lại có thể để trống
-   
+
    > ⚠️ **Lưu ý quan trọng**: Client id và Client secret phải được **copy và lưu lại** trước khi nhấn Save
 
 4. Nhấn **`Save`**
@@ -537,6 +558,7 @@ VITE_GOOGLE_CLIENT_SECRET=<Client_Secret>
 Cấu hình chatbot cho người tìm việc và nhà tuyển dụng.
 
 **Biến môi trường cần thiết:**
+
 ```env
 VITE_JOB_SEEKER_BOT_AGENT_ID=<Agent_ID_người_tìm_việc>
 VITE_EMPLOYER_BOT_AGENT_ID=<Agent_ID_nhà_tuyển_dụng>
@@ -575,10 +597,10 @@ Bạn cần tạo **2 agent chatbot**: một cho người tìm việc và một 
 3. **Cấu hình Webhook** để chatbot gọi API Backend:
    - Truy cập **Fulfillment** → Bật **Enabled Webhook**
    - Nhập thông tin:
-     - **URL**: 
+     - **URL**:
        - Cho người tìm việc: `https://ngrok-domain/api/chatbot/jobseeker/webhook/`
        - Cho nhà tuyển dụng: `https://ngrok-domain/api/chatbot/employer/webhook/`
-     - **Basic Auth**: 
+     - **Basic Auth**:
        - Username: `temp`
        - Password: `temp`
    - Click **Save**
@@ -604,7 +626,7 @@ Bạn cần tạo **2 agent chatbot**: một cho người tìm việc và một 
 
 1. Truy cập **trang quản trị Backend** (Django Admin)
 2. Vào mục **Periodic tasks** (Quản lý các tác vụ định kỳ)
-3. Tìm và chọn record có tên: 
+3. Tìm và chọn record có tên:
    ```
    [SETUP] Upload Files To Cloudinary One-time Task: every 60 seconds
    ```
@@ -612,7 +634,8 @@ Bạn cần tạo **2 agent chatbot**: một cho người tìm việc và một 
 5. Nhấn **`Save`**
 6. Đợi **60 giây** để cron job tự động chạy và upload hình ảnh
 
-> ⚠️ **Lưu ý quan trọng**: 
+> ⚠️ **Lưu ý quan trọng**:
+>
 > - Đây là **cron job chạy một lần duy nhất** (one-time task)
 > - Cron job sẽ tự động upload tất cả hình ảnh từ file `data/cloudinary/cloudinary_files.json` (trong Backend) lên Cloudinary
 > - **Không tắt Backend** trong quá trình cron job đang chạy (ít nhất 10 phút)
@@ -625,9 +648,9 @@ Bạn cần tạo **2 agent chatbot**: một cho người tìm việc và một 
 Bạn đã hoàn thành việc cài đặt và cấu hình **Project Web Application**. Truy cập ứng dụng và trải nghiệm!
 
 **Liên kết hữu ích:**
+
 - 📖 [Documentation](https://github.com/Square/square-job-web-app)
 - 🐛 [Báo lỗi](https://github.com/Square/square-job-web-app/issues)
 - 💬 [Thảo luận](https://github.com/Square/square-job-web-app/discussions)
 
 </details>
-
