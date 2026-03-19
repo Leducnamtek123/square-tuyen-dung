@@ -64,7 +64,10 @@
       "language": "Language",
       "trainingPlace": "Training Place",
       "noExpiration": "No Expiration",
-      "cvFile": "Choose your CV file"
+      "cvFile": "Choose your CV file",
+      "salaryMin": "Minimum Salary",
+      "salaryMax": "Maximum Salary",
+      "skillName": "Skill Name"
     },
     "placeholders": {
       "fullName": "Enter full name",
@@ -81,7 +84,11 @@
       "selectGender": "Select gender",
       "selectMaritalStatus": "Select marital status",
       "selectCity": "Select city/province",
-      "selectDistrict": "Select district"
+      "selectDistrict": "Select district",
+      "selectLanguage": "Select language",
+      "skillName": "Enter skill name",
+      "salaryMin": "Enter minimum salary",
+      "salaryMax": "Enter maximum salary"
     },
     "validation": {
       "fullNameRequired": "Full name is required.",

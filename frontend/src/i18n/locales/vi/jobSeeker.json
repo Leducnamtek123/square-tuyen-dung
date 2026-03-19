@@ -76,7 +76,10 @@
       "degreeName": "Tên bằng cấp/Chứng chỉ",
       "major": "Chuyên ngành",
       "completedDate": "Ngày hoàn thành",
-      "gradeOrRank": "Xếp loại/Điểm số"
+      "gradeOrRank": "Xếp loại/Điểm số",
+      "salaryMin": "Lương tối thiểu",
+      "salaryMax": "Lương tối đa",
+      "skillName": "Tên kỹ năng"
     },
     "placeholders": {
       "fullName": "Nhập họ và tên",
@@ -115,7 +118,9 @@
       "degreeName": "VD: Cử nhân Công nghệ thông tin",
       "major": "Nhập chuyên ngành",
       "trainingPlace": "Nhập tên trường/trung tâm đào tạo",
-      "gradeOrRank": "Nhập xếp loại/điểm số"
+      "gradeOrRank": "Nhập xếp loại/điểm số",
+      "selectLanguage": "Chọn ngoại ngữ",
+      "skillName": "Nhập tên kỹ năng"
     },
     "validation": {
       "fullNameRequired": "Vui lòng nhập họ và tên.",
