@@ -33,6 +33,9 @@ RUN pip install --upgrade pip setuptools wheel \
 # Copy application code
 COPY . .
 
+# Ensure STATIC_ROOT exists to avoid WhiteNoise warnings
+RUN mkdir -p /api/staticfiles
+
 # Change ownership to non-root user
 RUN chown -R appuser:appuser /api
 

@@ -8,13 +8,17 @@ from firebase_admin import auth, credentials, firestore
 
 logger = logging.getLogger(__name__)
 _FIREBASE_APP: Optional[firebase_admin.App] = None
+_FIREBASE_DISABLED = False
 
 
 def initialize_firebase_app() -> Optional[firebase_admin.App]:
     global _FIREBASE_APP
+    global _FIREBASE_DISABLED
 
     if _FIREBASE_APP:
         return _FIREBASE_APP
+    if _FIREBASE_DISABLED:
+        return None
 
     try:
         _FIREBASE_APP = firebase_admin.get_app()
@@ -25,6 +29,7 @@ def initialize_firebase_app() -> Optional[firebase_admin.App]:
     credentials_path = getattr(settings, "FIREBASE_CREDENTIALS_PATH", "")
     if not credentials_path or not os.path.isfile(credentials_path):
         logger.info("Firebase disabled: FIREBASE_CREDENTIALS_PATH is missing or invalid.")
+        _FIREBASE_DISABLED = True
         return None
 
     try:
@@ -33,6 +38,7 @@ def initialize_firebase_app() -> Optional[firebase_admin.App]:
         return _FIREBASE_APP
     except Exception:
         logger.exception("Firebase initialization failed")
+        _FIREBASE_DISABLED = True
         return None
 
 

@@ -23,11 +23,14 @@ WORKDIR /app
 
 # Install Python dependencies first (layer caching)
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip setuptools wheel gunicorn \
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel \
     && pip install --no-cache-dir -r requirements.txt
 
 # Copy the application code
 COPY . .
+
+# Ensure STATIC_ROOT exists to avoid WhiteNoise warnings
+RUN mkdir -p /app/staticfiles
 
 # Ownership for non-root user
 RUN chown -R appuser:appuser /app
