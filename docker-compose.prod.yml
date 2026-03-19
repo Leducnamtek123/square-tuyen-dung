@@ -22,7 +22,7 @@ services:
       - minio
     restart: always
     networks:
-      - square-network
+      - proxy-net
 
   # ---------------------------------------------------------------------------
   # Frontend — prod build with Nginx
@@ -57,6 +57,8 @@ services:
     expose:
       - "80"
     restart: always
+    networks:
+      - proxy-net
 
   # ---------------------------------------------------------------------------
   # Backend — Gunicorn
@@ -73,6 +75,10 @@ services:
     restart: always
     environment:
       - DEBUG=False
+    networks:
+      - proxy-net
+      - app-net
+      - data-net
 
   # ---------------------------------------------------------------------------
   # Celery (prod)
@@ -84,6 +90,9 @@ services:
     env_file:
       - .env.prod
     restart: always
+    networks:
+      - app-net
+      - data-net
 
   celery-beat:
     container_name: tuyendung-studio-celery-beat-prod
@@ -92,6 +101,9 @@ services:
     env_file:
       - .env.prod
     restart: always
+    networks:
+      - app-net
+      - data-net
 
   # ---------------------------------------------------------------------------
   # DB / Redis — no ports exposed externally in prod
@@ -101,13 +113,17 @@ services:
     restart: always
     volumes:
       - db_data_prod:/var/lib/mysql
+    networks:
+      - data-net
 
   redis:
     container_name: tuyendung-studio-redis-prod
     restart: always
+    networks:
+      - data-net
 
   # ---------------------------------------------------------------------------
-  # LiveKit — prod mode (no --dev flag)
+  # LiveKit — prod mode
   # ---------------------------------------------------------------------------
   livekit:
     container_name: tuyendung-studio-livekit-prod
@@ -122,9 +138,12 @@ services:
       - "7882:7882/udp"
       - "50000-50010:50000-50010/udp"
     restart: always
+    networks:
+      - proxy-net
+      - data-net
 
   # ---------------------------------------------------------------------------
-  # LLaMA.cpp — GPU for prod
+  # AI Engineering (GPU for prod)
   # ---------------------------------------------------------------------------
   llama-cpp:
     container_name: tuyendung-studio-llama-cpp-prod
@@ -152,10 +171,9 @@ services:
     ports:
       - "11436:11434"
     restart: always
+    networks:
+      - app-net
 
-  # ---------------------------------------------------------------------------
-  # Whisper — prod (GPU)
-  # ---------------------------------------------------------------------------
   whisper:
     container_name: tuyendung-studio-whisper-prod
     deploy:
@@ -170,10 +188,9 @@ services:
     expose:
       - "8080"
     restart: always
+    networks:
+      - app-net
 
-  # ---------------------------------------------------------------------------
-  # TTS — prod (GPU)
-  # ---------------------------------------------------------------------------
   vieneu-tts:
     container_name: tuyendung-studio-tts-prod
     deploy:
@@ -190,15 +207,16 @@ services:
     expose:
       - "8298"
     restart: always
+    networks:
+      - app-net
 
-  # ---------------------------------------------------------------------------
-  # LiveKit Agent — prod
-  # ---------------------------------------------------------------------------
   livekit-agent:
     container_name: tuyendung-studio-livekit-agent-prod
     environment:
       - BACKEND_API_URL=http://backend:8000/api
     restart: always
+    networks:
+      - app-net
 
   # ---------------------------------------------------------------------------
   # MinIO — prod
@@ -214,7 +232,20 @@ services:
       - "9000"
       - "9001"
     restart: always
+    networks:
+      - proxy-net
+      - app-net
 
-# Override volumes for prod (separate from dev)
+# =============================================================================
+# Production Infrastructure (Isolated Networks)
+# =============================================================================
+networks:
+  proxy-net:
+    driver: bridge
+  app-net:
+    driver: bridge
+  data-net:
+    driver: bridge
+
 volumes:
   db_data_prod:
