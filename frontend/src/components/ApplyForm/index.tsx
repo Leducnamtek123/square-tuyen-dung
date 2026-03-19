@@ -109,7 +109,7 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
                     variant="contained"
                     color="primary"
                     size="small"
-                    onClick={() => nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.STEP_PROFILE}`)}
+                    onClick={() => nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.PROFILE}`)}
                     sx={{ textTransform: "none" }}
                   >
                     {t("applyForm.resume.createNow", { defaultValue: "Tạo hồ sơ ngay" })}
