@@ -475,7 +475,7 @@ Cấu hình Client ID và Client Secret cho các phương thức đăng nhập.
 
 ```env
 VITE_project_SERVER_CLIENT_ID=<Client_ID>
-VITE_PROJECT_SERVER_CLIENT_SECRECT =<Client_Secret>
+VITE_PROJECT_SERVER_CLIENT_SECRECT  =<Client_Secret>
 ```
 
 **Các bước cấu hình:**
@@ -485,7 +485,7 @@ VITE_PROJECT_SERVER_CLIENT_SECRECT =<Client_Secret>
 3. Điền thông tin như sau:
    - **Name**: Đặt tên tuỳ ý (ví dụ: `Default authentication`)
    - **Client id**: Giữ nguyên giá trị mặc định → Copy và cập nhật vào `VITE_project_SERVER_CLIENT_ID`
-   - **Client secret**: Giữ nguyên giá trị mặc định → Copy và cập nhật vào `VITE_PROJECT_SERVER_CLIENT_SECRECT `
+   - **Client secret**: Giữ nguyên giá trị mặc định → Copy và cập nhật vào `VITE_PROJECT_SERVER_CLIENT_SECRECT  `
    - **Hash client secret**: ✅ Tích chọn
    - **Client type**: Chọn `Confidential`
    - **Authorization grant type**: Chọn `Resource owner password-based`
