@@ -21,7 +21,18 @@ const JobPostSearch = () => {
   const { allConfig } = useAppSelector((state) => state.config);
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [showAdvanceFilter, setShowAdvanceFilter] = React.useState(false);
-  const { control, handleSubmit, reset } = useForm();
+  const { control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      kw: '',
+      careerId: '',
+      cityId: '',
+      positionId: '',
+      experienceId: '',
+      jobTypeId: '',
+      typeOfWorkplaceId: '',
+      genderId: '',
+    },
+  });
   const localizedJobTypeOptions = React.useMemo(
     () =>
       ((allConfig?.jobTypeOptions || []) as any[]).map((option) => ({

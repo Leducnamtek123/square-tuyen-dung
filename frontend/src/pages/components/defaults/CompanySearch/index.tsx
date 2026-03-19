@@ -20,7 +20,12 @@ const CompanySearch = () => {
 
   const { companyFilter } = useAppSelector((state) => state.filter);
 
-  const { control, handleSubmit, reset } = useForm();
+  const { control, handleSubmit, reset } = useForm({
+    defaultValues: {
+      kw: '',
+      cityId: '',
+    },
+  });
 
   React.useEffect(() => {
 
@@ -66,7 +71,7 @@ const CompanySearch = () => {
 
       <Box component="form" onSubmit={handleSubmit(handleFilter)}>
 
-        <Grid container spacing={2}>
+        <Grid container spacing={2} alignItems="center">
 
           <Grid
 
@@ -76,11 +81,11 @@ const CompanySearch = () => {
 
               sm: 12,
 
-              md: 7,
+              md: 6,
 
-              lg: 7,
+              lg: 6,
 
-              xl: 7
+              xl: 6
 
             }}>
 
@@ -134,15 +139,15 @@ const CompanySearch = () => {
 
               sm: 12,
 
-              md: 2,
+              md: 3,
 
-              lg: 2,
+              lg: 3,
 
-              xl: 2
+              xl: 3
 
             }}>
 
-            <Stack direction="row" justifyContent="space-between">
+            <Stack direction="row" spacing={1} justifyContent="flex-start" alignItems="center">
 
               <Button
 
@@ -150,7 +155,7 @@ const CompanySearch = () => {
 
                 color="info"
 
-                sx={{ color: 'white' }}
+                sx={{ color: 'white', whiteSpace: 'nowrap', px: 3 }}
 
                 type="submit"
 

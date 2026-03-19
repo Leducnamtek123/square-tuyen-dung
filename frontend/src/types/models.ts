@@ -258,6 +258,11 @@ export interface Banner {
   bannerType: number;
 }
 
+interface SelectOption {
+  id: number | string;
+  name: string;
+}
+
 export interface SystemConfig {
   careers?: Career[];
   cities?: City[];
@@ -269,5 +274,17 @@ export interface SystemConfig {
   banners?: Banner[];
   socialMediaLinks?: Record<string, string>;
   companyInfo?: Record<string, string>;
+  cityOptions?: SelectOption[];
+  careerOptions?: SelectOption[];
+  jobTypeOptions?: SelectOption[];
+  typeOfWorkplaceOptions?: SelectOption[];
+  positionOptions?: SelectOption[];
+  experienceOptions?: SelectOption[];
+  academicLevelOptions?: SelectOption[];
+  genderOptions?: SelectOption[];
+  maritalStatusOptions?: SelectOption[];
+  employeeSizeOptions?: SelectOption[];
+  languageOptions?: SelectOption[];
+  frequencyNotificationOptions?: SelectOption[];
   [key: string]: unknown;
 }

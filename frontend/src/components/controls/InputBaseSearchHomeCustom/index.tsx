@@ -380,7 +380,7 @@ const InputBaseSearchHomeCustom = ({
 
                 inputProps={{ 'aria-label': 'search' }}
 
-                value={field.value}
+                value={field.value ?? ''}
 
                 onFocus={() => setShowResult(true)}
 
