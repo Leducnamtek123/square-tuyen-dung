@@ -171,13 +171,15 @@ services:
       - --port
       - "11434"
       - --model
-      - /models/llama.cpp/Qwen2.5-7B-Instruct-Q4_K_M.gguf
+      - /models/llama.cpp/Qwen2.5-14B-Instruct-Q4_K_M.gguf
       - --alias
       - "qwen2.5-7b"
       - --ctx-size
       - "16384"
       - --n-gpu-layers
       - "100"
+    volumes:
+      - ./voice-ai/inference/llama/models:/models
     ports:
       - "11436:11434"
     restart: always
@@ -228,11 +230,25 @@ services:
     container_name: tuyendung-studio-livekit-agent-prod
     build:
       context: ./voice-ai/livekit_agent
+    env_file:
+      - .env.prod
     environment:
       - BACKEND_API_URL=http://backend:8000/api
+      - LIVEKIT_URL=http://livekit:7880
+      - LIVEKIT_API_KEY=${LIVEKIT_API_KEY:-devkey}
+      - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}
+      - LLAMA_BASE_URL=http://llama-cpp:11434/v1
+      - STT_BASE_URL=http://whisper:8080/v1
+      - TTS_BASE_URL=http://vieneu-tts:8298/v1
+    depends_on:
+      - livekit
+      - vieneu-tts
+      - whisper
+      - llama-cpp
     restart: always
     networks:
       - app-net
+      - data-net
 
   # ---------------------------------------------------------------------------
   # MinIO — prod
