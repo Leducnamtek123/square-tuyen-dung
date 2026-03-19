@@ -173,9 +173,9 @@ services:
       - --port
       - "11434"
       - --hf-repo
-      - "Qwen/Qwen2.5-14B-Instruct-GGUF"
+      - "bartowski/Qwen2.5-14B-Instruct-GGUF"
       - --hf-file
-      - "qwen2.5-14b-instruct-q4_k_m.gguf"
+      - "Qwen2.5-14B-Instruct-Q4_K_M.gguf"
       - --alias
       - "qwen2.5-14b"
       - --ctx-size
