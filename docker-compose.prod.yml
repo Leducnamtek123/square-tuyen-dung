@@ -172,16 +172,18 @@ services:
       - 0.0.0.0
       - --port
       - "11434"
-      - --model
-      - /models/llama.cpp/Qwen2.5-14B-Instruct-Q4_K_M.gguf
+      - --hf-repo
+      - "Qwen/Qwen2.5-14B-Instruct-GGUF"
+      - --hf-file
+      - "qwen2.5-14b-instruct-q4_k_m.gguf"
       - --alias
-      - "qwen2.5-7b"
+      - "qwen2.5-14b"
       - --ctx-size
       - "16384"
       - --n-gpu-layers
       - "100"
     volumes:
-      - ./voice-ai/inference/llama/models:/models
+      - llama-models:/root/.cache
     ports:
       - "11436:11434"
     restart: always
@@ -285,3 +287,4 @@ networks:
 
 volumes:
   db_data_prod:
+  llama-models:
