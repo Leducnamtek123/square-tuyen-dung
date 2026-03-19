@@ -206,8 +206,8 @@ const EmployerLogin = () => {
 
     if (code) {
       handleSocialLogin(
-        AUTH_CONFIG.GOOGLE_CLIENT_ID,
-        AUTH_CONFIG.GOOGLE_CLIENT_SECRET,
+        AUTH_CONFIG.CLIENT_ID,
+        AUTH_CONFIG.CLIENT_SECRET,
         AUTH_PROVIDER.GOOGLE as AuthProvider,
         code
       );

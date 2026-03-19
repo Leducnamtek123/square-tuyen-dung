@@ -255,9 +255,9 @@ const JobSeekerSignUp = () => {
 
       handleSocialRegister(
 
-        AUTH_CONFIG.FACEBOOK_CLIENT_ID,
+        AUTH_CONFIG.CLIENT_ID,
 
-        AUTH_CONFIG.FACEBOOK_CLIENT_SECRET,
+        AUTH_CONFIG.CLIENT_SECRET,
 
         AUTH_PROVIDER.FACEBOOK as AuthProvider,
 
@@ -277,9 +277,9 @@ const JobSeekerSignUp = () => {
 
       handleSocialRegister(
 
-        AUTH_CONFIG.GOOGLE_CLIENT_ID,
+        AUTH_CONFIG.CLIENT_ID,
 
-        AUTH_CONFIG.GOOGLE_CLIENT_SECRET,
+        AUTH_CONFIG.CLIENT_SECRET,
 
         AUTH_PROVIDER.GOOGLE as AuthProvider,
 
