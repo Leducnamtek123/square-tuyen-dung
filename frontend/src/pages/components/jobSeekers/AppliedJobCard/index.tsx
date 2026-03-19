@@ -29,10 +29,10 @@ const AppliedJobCard = () => {
           pageSize: pageSize,
           page: page,
         });
-        const data = resData.data;
+        const data = (resData as any).data;
         setCount(data.count);
         setJobPostsApplied(data.results);
-      } catch (error) {
+      } catch (error: any) {
         errorHandling(error);
       } finally {
         setIsLoading(false);

@@ -3,6 +3,7 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertTitle, Avatar, Box, Card, Container, Typography, styled } from "@mui/material";
 import { Theme } from "@mui/material/styles";
+import type { RoleName } from '../../../types/auth';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
@@ -43,7 +44,7 @@ const AdminLogin = () => {
     const getAccesToken = async (email: string, password: any, roleName: string) => {
       setIsFullScreenLoading(true);
       try {
-        const resData = await authService.getToken(email, password, roleName);
+        const resData = await authService.getToken(email, password, roleName as RoleName);
         const {
           access_token: accessToken,
           refresh_token: refreshToken,
@@ -54,7 +55,7 @@ const AdminLogin = () => {
           tokenService.saveAccessTokenAndRefreshTokenToCookie(
             accessToken,
             refreshToken,
-            backend
+            backend as any
           );
 
         if (isSaveTokenToCookie) {
@@ -87,7 +88,7 @@ const AdminLogin = () => {
     const checkCreds = async (email: string, password: any, roleName: string) => {
       setIsFullScreenLoading(true);
       try {
-        const resData = await authService.checkCreds(email, roleName);
+        const resData = await authService.checkCreds(email, roleName as RoleName);
         const { exists, email: resEmail, email_verified } = resData as any;
 
         if (exists === true && email_verified === false) {
@@ -95,7 +96,7 @@ const AdminLogin = () => {
             updateVerifyEmail({
               isAllowVerifyEmail: true,
               email: email,
-              roleName: roleName,
+              roleName: roleName as RoleName,
             })
           );
           nav(`/dang-nhap`);
@@ -171,7 +172,7 @@ const AdminLogin = () => {
             </Alert>
           )}
           <Box sx={{ mt: 2 }}>
-            <AdminLoginForm onLogin={handleLogin} />
+            <AdminLoginForm onLogin={handleLogin} onGoogleLogin={() => {}} />
           </Box>
         </StyledCard>
       </Container>

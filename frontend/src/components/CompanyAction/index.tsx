@@ -39,11 +39,10 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
   React.useEffect(() => {
 
     const handleResize = () => {
-
-      const newWidth = document.getElementById('parent-element').offsetWidth;
-
-      setParentWidth(newWidth);
-
+      const element = document.getElementById('parent-element');
+      if (element) {
+        setParentWidth(element.offsetWidth);
+      }
     };
 
     handleResize();
@@ -277,15 +276,10 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
   React.useEffect(() => {
 
     const handleResize = () => {
-
-      const newWidth = document.getElementById(
-
-        'company-action-follow'
-
-      ).offsetWidth;
-
-      setParentWidth(newWidth);
-
+      const element = document.getElementById('company-action-follow');
+      if (element) {
+        setParentWidth(element.offsetWidth);
+      }
     };
 
     handleResize();

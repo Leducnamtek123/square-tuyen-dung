@@ -62,32 +62,13 @@ const RichTextEditorCustom = ({
             <Editor
 
               editorStyle={{
-
-                header: {
-
-                  marginBottom: '20px',
-
-                  fontWeight: 'bold',
-
-                  fontSize: '24px',
-
-                  color: 'red',
-
-                },
-
                 border: '1px solid',
-
                 borderColor: '#e0e0e0',
-
                 marginTop: -1,
-
                 minHeight: 200,
-
                 borderBottomLeftRadius: 4,
-
                 borderBottomRightRadius: 4,
-
-              }}
+              } as any}
 
               editorState={safeEditorState}
 

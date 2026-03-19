@@ -3,7 +3,7 @@ import dayjs from '../../configs/dayjs-config';
 
 interface Props {
   date: string | number | Date | any;
-  type?: 'fromNow' | 'format';
+  type?: 'fromNow' | 'format' | 'ago';
   format?: string;
   [key: string]: any;
 }

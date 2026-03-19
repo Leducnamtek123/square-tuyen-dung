@@ -1,4 +1,5 @@
 import React from 'react';
+// @ts-ignore
 import { DropzoneDialog } from 'mui-file-dropzone';
 import { IconButton, Typography, Stack } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';

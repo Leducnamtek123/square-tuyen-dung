@@ -20,10 +20,10 @@ const CompanyViewedCard = () => {
       setIsLoading(true);
       try {
         const resData = await resumeViewedService.getResumeViewed(params);
-        const data = resData.data;
+        const data = (resData as any).data;
         setCount(data.count);
         setResumesViewed(data.results);
-      } catch (error) {
+      } catch (error: any) {
         console.error(error);
       } finally {
         setIsLoading(false);

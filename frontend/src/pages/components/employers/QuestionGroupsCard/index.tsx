@@ -334,7 +334,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
     const transformedData = useMemo(() => {
 
-        const rawGroups = Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : [];
+        const rawGroups = Array.isArray((data as any)?.results) ? (data as any).results : Array.isArray(data) ? data : [];
 
         return rawGroups.map(transformQuestionGroup).filter(Boolean);
 
@@ -558,7 +558,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                     isLoading={isLoading}
 
-                    count={typeof data?.count === 'number' ? data.count : transformedData.length}
+                    count={typeof (data as any)?.count === 'number' ? (data as any).count : transformedData.length}
 
                     page={page}
 

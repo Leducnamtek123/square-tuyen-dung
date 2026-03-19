@@ -3,7 +3,7 @@ import Image from 'mui-image';
 
 interface MuiImageCustomProps {
   loading?: 'lazy' | 'eager';
-  src: string;
+  src: string | null | undefined;
   fallbackSrc?: string;
   onError?: (event: any) => void;
   [key: string]: any;

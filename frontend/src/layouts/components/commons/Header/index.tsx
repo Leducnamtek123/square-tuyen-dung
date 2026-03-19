@@ -39,27 +39,16 @@ const Header = (props: HeaderProps) => {
   const pages = React.useMemo(() => ({
 
     [HOST_NAME.PROJECT]: [
-
-      { id: 1, label: t('nav.jobs'), path: `/${ROUTES.JOB_SEEKER.JOBS}` },
-
-      { id: 2, label: t('nav.companies'), path: `/${ROUTES.JOB_SEEKER.COMPANY}` },
-
-      { id: 3, label: t('nav.aboutUs'), path: `/${ROUTES.JOB_SEEKER.ABOUT_US}` },
-
+      { id: '1', label: t('nav.jobs'), path: `/${ROUTES.JOB_SEEKER.JOBS}` },
+      { id: '2', label: t('nav.companies'), path: `/${ROUTES.JOB_SEEKER.COMPANY}` },
+      { id: '3', label: t('nav.aboutUs'), path: `/${ROUTES.JOB_SEEKER.ABOUT_US}` },
     ],
-
     [HOST_NAME.EMPLOYER_PROJECT]: [
-
-      { id: 1, label: t('nav.introduction'), path: `/${ROUTES.EMPLOYER.INTRODUCE}` },
-
-      { id: 2, label: t('nav.services'), path: `/${ROUTES.EMPLOYER.SERVICE}` },
-
-      { id: 3, label: t('nav.pricing'), path: `/${ROUTES.EMPLOYER.PRICING}` },
-
-      { id: 4, label: t('nav.support'), path: `/${ROUTES.EMPLOYER.SUPPORT}` },
-
-      { id: 5, label: t('nav.blog'), path: `/${ROUTES.EMPLOYER.BLOG}` },
-
+      { id: '1', label: t('nav.introduction'), path: `/${ROUTES.EMPLOYER.INTRODUCE}` },
+      { id: '2', label: t('nav.services'), path: `/${ROUTES.EMPLOYER.SERVICE}` },
+      { id: '3', label: t('nav.pricing'), path: `/${ROUTES.EMPLOYER.PRICING}` },
+      { id: '4', label: t('nav.support'), path: `/${ROUTES.EMPLOYER.SUPPORT}` },
+      { id: '5', label: t('nav.blog'), path: `/${ROUTES.EMPLOYER.BLOG}` },
     ],
 
   }), [t]);
@@ -402,7 +391,7 @@ const Header = (props: HeaderProps) => {
 
               <Avatar
 
-                src={IMAGES.getLogo("medium", "light")}
+                src={IMAGES.getLogo("light")}
 
                 sx={{
 

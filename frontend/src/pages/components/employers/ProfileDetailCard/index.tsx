@@ -948,7 +948,7 @@ const ProfileDetailCard: React.FC = () => {
 
                       <Grid container spacing={1}>
 
-                        {profileDetail.certificates.map((value, index) => (
+                        {profileDetail.certificates.map((value: any, index: number) => (
 
                           <>
 
@@ -1056,7 +1056,7 @@ const ProfileDetailCard: React.FC = () => {
 
                       <Grid container spacing={1}>
 
-                        {profileDetail.languageSkills.map((value, index) => (
+                        {profileDetail.languageSkills.map((value: any, index: number) => (
 
                           <>
 
@@ -1162,7 +1162,7 @@ const ProfileDetailCard: React.FC = () => {
 
                       <Grid container spacing={1}>
 
-                        {profileDetail.advancedSkills.map((value, index) => (
+                        {profileDetail.advancedSkills.map((value: any, index: number) => (
 
                           <>
 

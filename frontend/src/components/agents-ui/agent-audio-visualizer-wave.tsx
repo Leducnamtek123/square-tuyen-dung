@@ -147,15 +147,20 @@ interface WaveShaderProps {
   speed?: number;
   color?: string;
   colorShift?: number;
-  mix?: number;
-  amplitude?: number;
-  frequency?: number;
+  mix?: number | number[];
+  amplitude?: number | number[];
+  frequency?: number | number[];
   lineWidth?: number;
   blur?: number;
   ref?: any;
   className?: string;
   [key: string]: any;
 }
+
+const toNum = (val: number | number[] | undefined, fallback: number): number => {
+  if (val === undefined) return fallback;
+  return Array.isArray(val) ? val[0] : val;
+};
 
 function WaveShader({
   speed = 10,
@@ -179,9 +184,9 @@ function WaveShader({
         devicePixelRatio={(globalThis as any).devicePixelRatio ?? 1}
         uniforms={{
           uSpeed: { type: '1f', value: speed },
-          uAmplitude: { type: '1f', value: amplitude },
-          uFrequency: { type: '1f', value: frequency },
-          uMix: { type: '1f', value: mix },
+          uAmplitude: { type: '1f', value: toNum(amplitude, 0.02) },
+          uFrequency: { type: '1f', value: toNum(frequency, 20.0) },
+          uMix: { type: '1f', value: toNum(mix, 1.0) },
           uLineWidth: { type: '1f', value: lineWidth },
           uSmoothing: { type: '1f', value: blur },
           uColor: { type: '3fv', value: rgbColor },

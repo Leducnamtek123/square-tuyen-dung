@@ -53,7 +53,7 @@ interface MenuItemProps {
 
 
 
-const StyledListItemButton = styled(ListItemButton)(({ theme }) => ({
+const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementType; to?: string }>(({ theme }) => ({
 
   borderRadius: '8px',
 
@@ -131,7 +131,7 @@ const MenuItem = ({ icon: Icon, text, to, onClick, isSelected, isExpanded, hasCh
 
     <StyledListItemButton
 
-      component={to ? NavLink : 'div'}
+      component={(to ? NavLink : 'div') as any}
 
       to={to}
 

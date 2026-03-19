@@ -198,18 +198,23 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
 interface AuraShaderProps {
   shape?: number;
   speed?: number;
-  amplitude?: number;
-  frequency?: number;
-  scale?: number;
+  amplitude?: number | number[];
+  frequency?: number | number[];
+  scale?: number | number[];
   blur?: number;
   color?: string;
   colorShift?: number;
-  brightness?: number;
+  brightness?: number | number[];
   themeMode?: 'dark' | 'light';
   ref?: any;
   className?: string;
   [key: string]: any;
 }
+
+const toNum = (val: number | number[] | undefined, fallback: number): number => {
+  if (val === undefined) return fallback;
+  return Array.isArray(val) ? val[0] : val;
+};
 
 function AuraShader({
   shape = 1.0,
@@ -237,12 +242,12 @@ function AuraShader({
         uniforms={{
           uSpeed: { type: '1f', value: speed },
           uBlur: { type: '1f', value: blur },
-          uScale: { type: '1f', value: scale },
+          uScale: { type: '1f', value: toNum(scale, 0.2) },
           uShape: { type: '1f', value: shape },
-          uFrequency: { type: '1f', value: frequency },
-          uAmplitude: { type: '1f', value: amplitude },
+          uFrequency: { type: '1f', value: toNum(frequency, 0.5) },
+          uAmplitude: { type: '1f', value: toNum(amplitude, 0.5) },
           uBloom: { type: '1f', value: 0.0 },
-          uMix: { type: '1f', value: brightness },
+          uMix: { type: '1f', value: toNum(brightness, 1.0) },
           uSpacing: { type: '1f', value: 0.5 },
           uColorShift: { type: '1f', value: colorShift },
           uVariance: { type: '1f', value: 0.1 },

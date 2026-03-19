@@ -11,7 +11,7 @@ import SaveIcon from '@mui/icons-material/Save';
 import { LoadingButton } from '@mui/lab';
 
 interface Props {
-  title: string;
+  title: React.ReactNode;
   openPopup: boolean;
   setOpenPopup: (open: boolean) => void;
   showDialogAction?: boolean;

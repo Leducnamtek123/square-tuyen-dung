@@ -25,6 +25,7 @@ import MuiImageCustom from "../../../../components/MuiImageCustom";
 import toSlug, { salaryString } from "../../../../utils/customData";
 import NoDataCard from "../../../../components/NoDataCard";
 import { PDFDownloadLink } from "@react-pdf/renderer";
+const PDFDownloadLinkAny = PDFDownloadLink as any;
 import CVDoc from "../../../../components/CVDoc";
 import { reloadResume } from "../../../../redux/profileSlice";
 import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
@@ -97,7 +98,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
           jobSeekerProfileId,
           params
         );
-        setResume(resData.data);
+        setResume((resData as any).data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -118,7 +119,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
         await resumeService.activeResume(resumeSlug);
         dispatch(reloadResume());
         toastMessages.success(t("jobSeeker:profile.messages.profileStatusUpdateSuccess"));
-      } catch (error) {
+      } catch (error: any) {
         errorHandling(error);
       } finally {
         setIsFullScreenLoading(false);
@@ -186,7 +187,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                   </Tooltip>
                 </Stack>
                 {!isGeneratingPDF && (
-                  <PDFDownloadLink
+                  <PDFDownloadLinkAny
                     document={<CVDoc resume={resume} user={currentUser} themeColor={selectedColor} />}
                     fileName={`${APP_NAME}_CV_${currentUser?.fullName}-${toSlug(resume?.title || "title")}.pdf`}
                     style={{ textDecoration: "none" }}
@@ -218,7 +219,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                         />
                       );
                     }}
-                  </PDFDownloadLink>
+                  </PDFDownloadLinkAny>
                 )}
                 {isGeneratingPDF && (
                   <Chip
