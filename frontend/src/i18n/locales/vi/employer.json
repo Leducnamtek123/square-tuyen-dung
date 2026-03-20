@@ -255,7 +255,8 @@
       "selectinterviewquestions": "Chọn câu hỏi phỏng vấn"
     },
     "helperText": {
-      "selectaquestiongrouptoautomaticallyfillthequestionsbelow": "Chọn một nhóm câu hỏi để tự động điền các câu hỏi bên dưới"
+      "selectaquestiongrouptoautomaticallyfillthequestionsbelow": "Chọn một nhóm câu hỏi để tự động điền các câu hỏi bên dưới",
+      "selectaquestiongrouptoautomaticallyfillTheQuestionsBelow": "Chọn một nhóm câu hỏi để tự động điền các câu hỏi bên dưới"
     },
     "validation": {
       "selectJobPost": "Vui lòng chọn tin tuyển dụng",

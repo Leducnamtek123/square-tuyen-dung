@@ -121,5 +121,33 @@
     "generalInfo": "Thông tin chung",
     "map": "Bản đồ",
     "images": "Hình ảnh"
+  },
+  "applyForm": {
+    "resume": {
+      "online": "Hồ sơ trực tuyến",
+      "attached": "CV đính kèm",
+      "preview": "Xem trước hồ sơ"
+    },
+    "fields": {
+      "fullName": "Họ và tên",
+      "email": "Email",
+      "phone": "Số điện thoại"
+    },
+    "placeholders": {
+      "fullName": "Nhập họ và tên",
+      "email": "Nhập email",
+      "phone": "Nhập số điện thoại"
+    },
+    "validation": {
+      "fullNameRequired": "Vui lòng nhập họ và tên.",
+      "fullNameMax": "Họ và tên vượt quá độ dài cho phép.",
+      "emailRequired": "Vui lòng nhập email.",
+      "emailInvalid": "Email không hợp lệ.",
+      "emailMax": "Email vượt quá độ dài cho phép.",
+      "phoneRequired": "Vui lòng nhập số điện thoại.",
+      "phoneInvalid": "Số điện thoại không hợp lệ.",
+      "phoneMax": "Số điện thoại vượt quá độ dài cho phép."
+    },
+    "note": "Vui lòng cung cấp chính xác họ tên, email và số điện thoại để nhà tuyển dụng có thể liên hệ với bạn."
   }
 }

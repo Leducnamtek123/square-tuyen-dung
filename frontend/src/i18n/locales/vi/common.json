@@ -1,4 +1,5 @@
 {
+  "appName": "Project",
   "city": "Tỉnh/Thành phố",
   "career": "Ngành nghề",
   "experience": "Kinh nghiệm",
@@ -49,6 +50,7 @@
   },
   "placeholders": {
     "selectCity": "Chọn Tỉnh/Thành phố",
+    "allCareers": "Tất cả ngành nghề",
     "fieldOperation": {
       "all": "Tất cả ngành nghề"
     },
@@ -103,6 +105,7 @@
     "dashboard": "Bảng điều khiển",
     "messages": "Tin nhắn",
     "notifications": "Thông báo",
+    "forCandidates": "Dành cho ứng viên",
     "forJobSeekers": "Dành cho ứng viên",
     "candidateDashboard": "Bảng điều khiển ứng viên",
     "employerDashboard": "Bảng điều khiển nhà tuyển dụng",
