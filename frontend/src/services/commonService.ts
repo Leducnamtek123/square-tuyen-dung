@@ -1,4 +1,4 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 import type { SystemConfig } from '../types/models';
 
@@ -50,6 +50,24 @@ const commonService = {
     const url = 'common/top-careers/';
     const data = await httpRequest.get(url);
     return presignInObject(data);
+  },
+
+  /**
+   * Single-request career fetch for app initialization.
+   * No while-loop pagination, no presignInObject (careers have no MinIO URLs).
+   */
+  getAllCareersSimple: async (params: AnyRecord = {}): Promise<any[]> => {
+    const url = 'common/all-careers/';
+    const res = (await httpRequest.get(url, {
+      params: { page: 1, pageSize: Number(params.pageSize || 1000) },
+    })) as AnyRecord;
+
+    return (
+      (Array.isArray(res?.results) && res.results) ||
+      (Array.isArray((res as any)?.data?.results) && (res as any).data.results) ||
+      (Array.isArray(res) && res) ||
+      []
+    );
   },
 
   getAllCareers: async (params: AnyRecord = {}): Promise<any[]> => {

@@ -1,4 +1,4 @@
-﻿import axios from 'axios';
+import axios from 'axios';
 import tokenService from '../services/tokenService';
 
 const isPresigned = (url: string | null | undefined): boolean => {
@@ -45,43 +45,74 @@ export const ensurePresignedUrl = async (
   }
 };
 
+interface UrlLocation {
+  parent: Record<string, unknown> | unknown[];
+  key: string | number;
+  url: string;
+}
+
+/**
+ * Collect all MinIO URLs that need presigning, then presign them
+ * ALL IN PARALLEL instead of one-by-one sequentially.
+ */
 export const presignInObject = async <T>(
   value: T,
   maxItems = 200
 ): Promise<T> => {
-  let count = 0;
+  const locations: UrlLocation[] = [];
 
-  const walk = async (node: unknown): Promise<unknown | undefined> => {
-    if (!node || count >= maxItems) return;
-    if (typeof node === 'string') {
-      if (isMinioPublicUrl(node) && !isPresigned(node)) {
-        count += 1;
-        return ensurePresignedUrl(node);
-      }
-      return node;
-    }
+  // Phase 1: Collect all MinIO URLs that need presigning (synchronous walk)
+  const collect = (node: unknown): void => {
+    if (!node || locations.length >= maxItems) return;
+    if (typeof node === 'string') return; // strings are handled by parent
     if (Array.isArray(node)) {
       for (let i = 0; i < node.length; i += 1) {
-        if (count >= maxItems) break;
-        const updated = await walk(node[i]);
-        if (typeof updated === 'string') node[i] = updated;
+        if (locations.length >= maxItems) break;
+        const item = node[i];
+        if (typeof item === 'string' && isMinioPublicUrl(item) && !isPresigned(item)) {
+          locations.push({ parent: node, key: i, url: item });
+        } else {
+          collect(item);
+        }
       }
-      return node;
+      return;
     }
     if (typeof node === 'object') {
       const record = node as Record<string, unknown>;
       const keys = Object.keys(record);
       for (let i = 0; i < keys.length; i += 1) {
-        if (count >= maxItems) break;
+        if (locations.length >= maxItems) break;
         const key = keys[i];
-        const updated = await walk(record[key]);
-        if (typeof updated === 'string') record[key] = updated;
+        const val = record[key];
+        if (typeof val === 'string' && isMinioPublicUrl(val) && !isPresigned(val)) {
+          locations.push({ parent: record, key, url: val });
+        } else {
+          collect(val);
+        }
       }
-      return record;
     }
-    return node;
   };
 
-  await walk(value);
+  collect(value);
+
+  if (locations.length === 0) return value;
+
+  // Phase 2: Presign ALL URLs in parallel (instead of sequential!)
+  const presigned = await Promise.all(
+    locations.map((loc) =>
+      ensurePresignedUrl(loc.url).then((result) => ({
+        ...loc,
+        presigned: result,
+      }))
+    )
+  );
+
+  // Phase 3: Apply presigned URLs back to the original object
+  for (const item of presigned) {
+    if (typeof item.presigned === 'string') {
+      (item.parent as any)[item.key] = item.presigned;
+    }
+  }
+
   return value;
 };

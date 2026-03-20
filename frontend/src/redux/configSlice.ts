@@ -1,4 +1,4 @@
-﻿import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import type { SystemConfig } from '../types/models';
 import commonService from '../services/commonService';
 
@@ -9,23 +9,23 @@ interface ConfigState {
 const getAllConfig = createAsyncThunk<SystemConfig, void>(
   'config/getAllConfig',
   async () => {
-    const resData = await commonService.getConfigs();
+    // Fire both requests in parallel instead of sequentially
+    const [resData, careersRes] = await Promise.all([
+      commonService.getConfigs(),
+      commonService.getAllCareersSimple().catch(() => [] as any[]),
+    ]);
+
     let merged = { ...(resData as SystemConfig) };
 
-    try {
-      const careers = await commonService.getAllCareers({ pageSize: 1000 });
-      if (Array.isArray(careers) && careers.length > 0) {
-        merged = {
-          ...merged,
-          careers,
-          careerOptions: careers.map((career: any) => ({
-            id: career.id,
-            name: career.name,
-          })),
-        };
-      }
-    } catch {
-      // Fall back to config-provided careers if the full list endpoint fails.
+    if (Array.isArray(careersRes) && careersRes.length > 0) {
+      merged = {
+        ...merged,
+        careers: careersRes,
+        careerOptions: careersRes.map((career: any) => ({
+          id: career.id,
+          name: career.name,
+        })),
+      };
     }
 
     return merged as SystemConfig;

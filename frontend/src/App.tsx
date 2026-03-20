@@ -86,7 +86,7 @@ function App() {
           loader.classList.add("fade-out");
           setTimeout(() => {
             loader.remove();
-          }, 1200);
+          }, 500);
         });
       } else {
         setIsInitializing(false);
@@ -100,12 +100,11 @@ function App() {
       }
 
       try {
-        const tasks = [dispatch(getAllConfig()).unwrap()];
+        // Fire both requests truly in parallel (don't wait for one to start the other)
+        const configPromise = dispatch(getAllConfig());
         const hasAccessToken = !!tokenService.getAccessTokenFromCookie();
-        if (hasAccessToken) {
-          tasks.push(dispatch(getUserInfo()).unwrap());
-        }
-        await Promise.all(tasks);
+        const userPromise = hasAccessToken ? dispatch(getUserInfo()) : null;
+        await Promise.allSettled([configPromise, userPromise].filter(Boolean));
       } catch (err) {
         console.error("App initialization failed", err);
       } finally {

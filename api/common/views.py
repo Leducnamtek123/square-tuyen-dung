@@ -25,6 +25,7 @@ from redis import Redis
 from django.conf import settings
 from urllib.parse import urlparse
 
+from django.core.cache import cache as django_cache
 from apps.locations.models import City, District, Ward
 from .models import Career
 
@@ -92,6 +93,13 @@ class AdminWardViewSet(viewsets.ModelViewSet):
 @api_view(http_method_names=["GET"])
 @permission_classes([AllowAny])
 def get_all_config(request):
+
+    CACHE_KEY = 'common_all_config'
+    CACHE_TTL = 300  # 5 minutes
+
+    cached = django_cache.get(CACHE_KEY)
+    if cached is not None:
+        return var_res.response_data(data=cached)
 
     exclude_city_name = 'Toàn quốc'
 
@@ -297,6 +305,7 @@ def get_all_config(request):
 
     else:
 
+        django_cache.set(CACHE_KEY, res_data, CACHE_TTL)
         return var_res.response_data(data=res_data)
 
 @api_view(http_method_names=["GET"])
