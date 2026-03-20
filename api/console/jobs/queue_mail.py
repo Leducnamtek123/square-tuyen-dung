@@ -6,6 +6,7 @@ from django.conf import settings
 from datetime import datetime
 
 from shared.helpers import utils, helper
+from shared.helpers.cloudinary_service import CloudinaryService
 
 from celery import shared_task
 
@@ -353,7 +354,7 @@ def send_email_for_user(user_id, full_name, to_email, frequency):
 
                                         "salary_max", "company__company_name",
 
-                                        "company__company_image_url",
+                                        "company__logo__public_id",
 
                                         "company__slug",
 
@@ -384,6 +385,11 @@ def send_email_for_user(user_id, full_name, to_email, frequency):
             else:
 
                 domain = settings.DOMAIN_CLIENT["employer"]
+
+            for item in job_post_list:
+                public_id = item.pop("company__logo__public_id", None)
+                url, _ = CloudinaryService.get_url_from_public_id(public_id, {}) if public_id else (None, None)
+                item["company__company_image_url"] = url or var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
 
             data = {
 

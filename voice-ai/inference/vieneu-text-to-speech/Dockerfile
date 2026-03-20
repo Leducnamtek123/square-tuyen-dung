@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.5
-ARG MIRROR_PREFIX=nvidia
+ARG MIRROR_PREFIX=docker.io/nvidia
 
 # --- SINGLE STAGE BUILD FOR RELIABILITY ---
 FROM ${MIRROR_PREFIX}/cuda:12.4.1-runtime-ubuntu22.04

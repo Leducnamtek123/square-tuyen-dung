@@ -6,6 +6,7 @@ import uuid
 from datetime import datetime, timezone, timedelta
 from urllib.parse import urlparse
 
+from PIL import Image
 import httpx
 from django.conf import settings
 from shared.helpers import helper
@@ -13,6 +14,20 @@ from minio import Minio
 from minio.error import S3Error
 
 class CloudinaryService:
+    @staticmethod
+    def _process_image(file_obj):
+        try:
+            img = Image.open(file_obj)
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+            MAX_SIZE = (1200, 1200)
+            img.thumbnail(MAX_SIZE, Image.LANCZOS)
+            output = io.BytesIO()
+            img.save(output, format='WEBP', quality=85, method=6)
+            output.seek(0)
+            return output, output.getbuffer().nbytes, 'image/webp', 'webp'
+        except Exception: return None, None, None, None
+
     @staticmethod
     def _resolve_endpoint(endpoint: str, secure_default: bool):
         secure = secure_default
@@ -153,6 +168,11 @@ class CloudinaryService:
 
             file_obj, size, filename, content_type = CloudinaryService._open_file_source(file)
             ext, resource_type = CloudinaryService._detect_format_and_type(filename, content_type)
+            # 🎨 Auto-Optimization for Images
+            if resource_type == 'image' and ext.lower() not in ['gif', 'svg']:
+                opt_file, opt_size, opt_ct, opt_ext = CloudinaryService._process_image(file_obj)
+                if opt_file:
+                    file_obj, size, content_type, ext = opt_file, opt_size, opt_ct, opt_ext
             object_name = CloudinaryService._normalize_object_name(folder, public_id, ext)
 
             client.put_object(

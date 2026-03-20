@@ -87,8 +87,26 @@ class JobPostFilter(django_filters.FilterSet):
                   'statusIds']
 
     def job_name_or_career_name(self, queryset, name, value):
-
-        return queryset.filter(Q(job_name__icontains=value) | Q(career__name__icontains=value))
+        try:
+            from .documents import JobPostDocument
+            s = JobPostDocument.search().query(
+                "multi_match", 
+                query=value, 
+                fields=['job_name^3', 'career.name^2', 'company.company_name'],
+                fuzziness="AUTO"
+            )
+            # Fetch IDs and cast to int to match Django's pk
+            ids = [int(hit.id) for hit in s[:200]]
+            
+            if ids:
+                from django.db.models import Case, When
+                preserved = Case(*[When(id=pk, then=pos) for pos, pk in enumerate(ids)])
+                return queryset.filter(id__in=ids).order_by(preserved)
+            
+            return queryset.none()
+        except Exception:
+            # Fallback to DB search
+            return queryset.filter(Q(job_name__icontains=value) | Q(career__name__icontains=value))
 
     def exclude_slug(self, queryset, name, value):
 

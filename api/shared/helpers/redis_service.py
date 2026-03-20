@@ -111,3 +111,16 @@ class RedisService:
             logger.exception("remove_value_by_key failed: %s", e)
 
             return self.redis_response(status=False)
+
+    def get_json(self, key):
+        if self.redis_service is None: return None
+        try:
+            data = self.redis_service.get(key)
+            return json.loads(data) if data else None
+        except: return None
+
+    def set_json(self, key, value, seconds=300):
+        if self.redis_service is None: return False
+        try:
+            return self.redis_service.set(key, json.dumps(value), seconds)
+        except: return False

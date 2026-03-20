@@ -93,6 +93,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_celery_results',
     'timezone_field',
+    'django_elasticsearch_dsl',
 ]
 
 MIDDLEWARE = [
@@ -444,3 +445,8 @@ if STRICT_ENV_VALIDATION:
     validate_required_settings(globals())
 
 
+ELASTICSEARCH_DSL = {
+    'default': {
+        'hosts': config('ELASTICSEARCH_HOST', default='elasticsearch:9200')
+    },
+}

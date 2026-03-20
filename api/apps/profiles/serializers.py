@@ -95,9 +95,15 @@ class CompanyImageSerializer(serializers.ModelSerializer):
         user = request.user
 
         if user.role_name == var_sys.EMPLOYER:
-            company = getattr(user, "company", None)
+            company = None
+            if hasattr(user, "get_active_company"):
+                company = user.get_active_company()
             if not company:
-                return attrs
+                company = getattr(user, "company", None)
+            if not company:
+                raise serializers.ValidationError(
+                    {'errorMessage': ["Company not found."]}
+                )
 
             if CompanyImage.objects.filter(company=company).count() + count_upload_file > 15:
 
@@ -128,9 +134,15 @@ class CompanyImageSerializer(serializers.ModelSerializer):
 
             for file in files:
 
-                company = getattr(request.user, "company", None)
+                company = None
+                if hasattr(request.user, "get_active_company"):
+                    company = request.user.get_active_company()
                 if not company:
-                     continue
+                    company = getattr(request.user, "company", None)
+                if not company:
+                    raise serializers.ValidationError(
+                        {'errorMessage': ["Company not found."]}
+                    )
                 # Create a new CompanyImage object for the current user's company
 
                 company_image = CompanyImage.objects.create(

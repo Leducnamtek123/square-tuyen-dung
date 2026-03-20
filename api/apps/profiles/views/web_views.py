@@ -1035,9 +1035,17 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
         files = request.FILES
 
+        company = None
+        if hasattr(request.user, "get_active_company"):
+            company = request.user.get_active_company()
+        if not company:
+            company = getattr(request.user, "company", None)
+        if not company:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         company_image_url_serializer = LogoCompanySerializer(
 
-            request.user.company, data=files)
+            company, data=files)
 
         if not company_image_url_serializer.is_valid():
 
@@ -1065,9 +1073,17 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
         files = request.FILES
 
+        company = None
+        if hasattr(request.user, "get_active_company"):
+            company = request.user.get_active_company()
+        if not company:
+            company = getattr(request.user, "company", None)
+        if not company:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
         company_cover_image_url_serializer = CompanyCoverImageSerializer(
 
-            request.user.company, data=files)
+            company, data=files)
 
         if not company_cover_image_url_serializer.is_valid():
 
@@ -1334,7 +1350,15 @@ class CompanyImageViewSet(viewsets.ViewSet,
 
         if self.request.user.is_authenticated:
 
-            queryset = queryset.filter(company=self.request.user.company) \
+            company = None
+            if hasattr(self.request.user, "get_active_company"):
+                company = self.request.user.get_active_company()
+            if not company:
+                company = getattr(self.request.user, "company", None)
+            if not company:
+                return queryset.none()
+
+            queryset = queryset.filter(company=company) \
                 .order_by('update_at', 'create_at')
 
         return queryset

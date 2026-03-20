@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.5
-ARG MIRROR_PREFIX=nvidia
+ARG MIRROR_PREFIX=docker.io/nvidia
 ARG WHISPER_BASE=${MIRROR_PREFIX}/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 FROM ${WHISPER_BASE}
 

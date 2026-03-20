@@ -446,6 +446,13 @@ class JobPostViewSet(viewsets.ViewSet,
     )
 
     def list(self, request, *args, **kwargs):
+        # 🚀 Cache check
+        from shared.helpers.redis_service import RedisService
+        redis_obj = RedisService()
+        query_str = request.GET.urlencode()
+        cache_key = f'job_list_{hash(query_str)}_{request.user.id if request.user.is_authenticated else 0}'
+        cached_res = redis_obj.get_json(cache_key)
+        if cached_res: return Response(cached_res)
         queryset = self.filter_queryset(
             self.get_queryset()
             .filter(
@@ -479,7 +486,9 @@ class JobPostViewSet(viewsets.ViewSet,
 
             ])
 
-            return self.get_paginated_response(serializer.data)
+            paginated_response = self.get_paginated_response(serializer.data)
+            redis_obj.set_json(cache_key, paginated_response.data, 300)
+            return paginated_response
 
         serializer = self.get_serializer(queryset, many=True)
 
@@ -653,12 +662,12 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
 
                       companySlug=F('job_post__company__slug'),
 
-                      companyImageUrl=F('job_post__company__company_image_url'),
+                      companyImageId=F('job_post__company__logo__id'),
 
                       jobPostTitle=F('job_post__job_name')) \
             .values('id', 'userId', 'fullName', 'userEmail',
 
-                    'companyId', "companyName", "companySlug", 'companyImageUrl',
+                    'companyId', "companyName", "companySlug", 'companyImageId',
 
                     'jobPostTitle')
 
@@ -667,6 +676,18 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
         res_data = page
 
         if page is not None:
+
+            res_data = list(page)
+            for item in res_data:
+                logo_id = item.pop("companyImageId", None)
+                if logo_id:
+                    try:
+                        logo = File.objects.get(id=logo_id)
+                        item["companyImageUrl"] = logo.get_full_url() if logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+                    except File.DoesNotExist:
+                        item["companyImageUrl"] = var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+                else:
+                    item["companyImageUrl"] = var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
 
             return self.get_paginated_response(res_data)
 

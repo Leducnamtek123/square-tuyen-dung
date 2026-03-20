@@ -73,8 +73,24 @@ class ResumeFilter(django_filters.FilterSet):
     maritalStatusIds = ChoiceInFilter(choices=var_sys.MARITAL_STATUS_CHOICES, field_name="job_seeker_profile__marital_status", lookup_expr='in')
 
     def title_or_full_name(self, queryset, name, value):
-
-        return queryset.filter(Q(title__icontains=value) | Q(job_seeker_profile__user__full_name__icontains=value))
+        try:
+            from .documents import ResumeDocument
+            s = ResumeDocument.search().query(
+                "multi_match",
+                query=value,
+                fields=['title^3', 'user.full_name^2', 'skills_summary', 'description'],
+                fuzziness="AUTO"
+            )
+            ids = [int(hit.id) for hit in s[:200]]
+            
+            if ids:
+                from django.db.models import Case, When
+                preserved = Case(*[When(id=pk, then=pos) for pos, pk in enumerate(ids)])
+                return queryset.filter(id__in=ids).order_by(preserved)
+            
+            return queryset.none()
+        except Exception:
+            return queryset.filter(Q(title__icontains=value) | Q(job_seeker_profile__user__full_name__icontains=value))
 
     class Meta:
 
@@ -129,8 +145,24 @@ class CompanyFilter(django_filters.FilterSet):
     cityIds = NumberInFilter(field_name='location__city', lookup_expr='in')
 
     def company_name_or_field_operation(self, queryset, name, value):
-
-        return queryset.filter(Q(company_name__icontains=value) | Q(field_operation__icontains=value))
+        try:
+            from .documents import CompanyDocument
+            s = CompanyDocument.search().query(
+                "multi_match",
+                query=value,
+                fields=['company_name^3', 'field_operation^2', 'description'],
+                fuzziness="AUTO"
+            )
+            ids = [int(hit.id) for hit in s[:200]]
+            
+            if ids:
+                from django.db.models import Case, When
+                preserved = Case(*[When(id=pk, then=pos) for pos, pk in enumerate(ids)])
+                return queryset.filter(id__in=ids).order_by(preserved)
+            
+            return queryset.none()
+        except Exception:
+            return queryset.filter(Q(company_name__icontains=value) | Q(field_operation__icontains=value))
 
     def exclude_slug(self, queryset, name, value):
 

@@ -3,7 +3,7 @@
 # =============================================================================
 
 # --- Stage 1: Build ---
-FROM node:20-slim AS builder
+FROM public.ecr.aws/docker/library/node:20-slim AS builder
 
 WORKDIR /app
 
@@ -17,7 +17,6 @@ RUN npm ci --include=optional --no-audit --no-fund
 COPY . .
 
 # Build-time VITE_* variables
-# (Vite bakes VITE_* env vars into the JS bundle at build time)
 ARG VITE_NODE_ENV=production
 ARG VITE_PROJECT_HOST_NAME
 ARG VITE_ADMIN_PROJECT_HOST_NAME
@@ -65,7 +64,7 @@ ENV VITE_NODE_ENV=$VITE_NODE_ENV \
 RUN npm run build
 
 # --- Stage 2: Serve with Nginx ---
-FROM nginx:alpine
+FROM public.ecr.aws/docker/library/nginx:alpine
 
 # Create non-root user for nginx
 RUN addgroup -g 1000 -S appuser && adduser -u 1000 -S appuser -G appuser

@@ -1,4 +1,4 @@
-FROM nginx:alpine
+FROM public.ecr.aws/docker/library/nginx:alpine
 
 # Xóa cấu hình mặc định
 RUN rm /etc/nginx/conf.d/default.conf
