@@ -1138,6 +1138,21 @@ class CompanyViewSet(viewsets.ViewSet,
         return [perms_sys.AllowAny()]
 
     def list(self, request, *args, **kwargs):
+        from shared.helpers.redis_service import RedisService
+        import hashlib
+        from urllib.parse import parse_qsl, urlencode
+
+        redis_obj = RedisService()
+        raw_query_str = request.GET.urlencode()
+        filtered_query = [(k, v) for k, v in parse_qsl(raw_query_str, keep_blank_values=False) if v != ""]
+        filtered_query.sort()
+        query_str = urlencode(filtered_query)
+        query_hash = hashlib.md5(query_str.encode("utf-8")).hexdigest()
+        cache_key = f'company_list_{query_hash}_{request.user.id if request.user.is_authenticated else 0}'
+        cached_res = redis_obj.get_json(cache_key)
+        if cached_res:
+            return Response(cached_res)
+
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset.annotate(
             follow_count=Count('companyfollowed_set', distinct=True),
@@ -1172,7 +1187,9 @@ class CompanyViewSet(viewsets.ViewSet,
 
             ])
 
-            return self.get_paginated_response(serializer.data)
+            paginated_response = self.get_paginated_response(serializer.data)
+            redis_obj.set_json(cache_key, paginated_response.data, 300)
+            return paginated_response
 
         serializer = self.get_serializer(queryset, many=True)
 

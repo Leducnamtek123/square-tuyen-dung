@@ -145,6 +145,8 @@ class CompanyFilter(django_filters.FilterSet):
     cityIds = NumberInFilter(field_name='location__city', lookup_expr='in')
 
     def company_name_or_field_operation(self, queryset, name, value):
+        if value is None or (isinstance(value, str) and not value.strip()):
+            return queryset
         try:
             from .documents import CompanyDocument
             s = CompanyDocument.search().query(

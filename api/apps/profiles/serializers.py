@@ -77,11 +77,11 @@ class CompanyImageSerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
     def get_image_url(self, company_image):
-
-        if company_image.image:
-
-            return company_image.image.get_full_url()
-
+        try:
+            if company_image.image:
+                return company_image.image.get_full_url()
+        except Exception as ex:
+            helper.print_log_error("CompanyImageSerializer.get_image_url", ex)
         return None
 
     def validate(self, attrs):
@@ -312,23 +312,21 @@ class CompanySerializer(serializers.ModelSerializer):
                 self.fields.pop(field_name)
 
     def get_company_logo_url(self, company):
-
-        logo = company.logo
-
-        if logo:
-
-            return logo.get_full_url()
-
+        try:
+            logo = company.logo
+            if logo:
+                return logo.get_full_url()
+        except Exception as ex:
+            helper.print_log_error("CompanySerializer.get_company_logo_url", ex)
         return var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
 
     def get_company_cover_image_url(self, company):
-
-        cover_image = company.cover_image
-
-        if cover_image:
-
-            return cover_image.get_full_url()
-
+        try:
+            cover_image = company.cover_image
+            if cover_image:
+                return cover_image.get_full_url()
+        except Exception as ex:
+            helper.print_log_error("CompanySerializer.get_company_cover_image_url", ex)
         return var_sys.AVATAR_DEFAULT["COMPANY_COVER_IMAGE"]
 
     def get_follow_number(self, company):
