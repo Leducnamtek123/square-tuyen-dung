@@ -60,146 +60,94 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
   };
 
+  const buildNotificationsRef = React.useCallback(() => {
+    if (!currentUser?.id) return null;
+    return collection(db, 'users', `${currentUser.id}`, 'notifications');
+  }, [currentUser]);
+
   React.useEffect(() => {
+    const notificationsRef = buildNotificationsRef();
+    if (!notificationsRef) return;
 
-    if (!currentUser) return;
+    let isActive = true;
+    const loadCountsOnce = async () => {
+      try {
+        const unreadQuery = query(
+          notificationsRef,
+          where('is_deleted', '==', false),
+          where('is_read', '==', false)
+        );
+        const allQuery = query(
+          notificationsRef,
+          where('is_deleted', '==', false)
+        );
+        const [unreadSnap, allSnap] = await Promise.all([
+          getDocs(unreadQuery),
+          getDocs(allQuery),
+        ]);
+        if (!isActive) return;
+        setBadgeCount(unreadSnap.size);
+        setCount(allSnap.size);
+      } catch {
+        if (!isActive) return;
+        setBadgeCount(0);
+        setCount(0);
+      }
+    };
 
-    const notificationsRef = collection(
+    loadCountsOnce();
+    return () => {
+      isActive = false;
+    };
+  }, [buildNotificationsRef]);
 
-      db,
+  React.useEffect(() => {
+    if (!open) return;
+    const notificationsRef = buildNotificationsRef();
+    if (!notificationsRef) return;
 
-      'users',
-
-      `${currentUser?.id}`,
-
-      'notifications'
-
-    );
-
-    const allQuery = query(
-
+    const unreadQuery = query(
       notificationsRef,
-
       where('is_deleted', '==', false),
-
       where('is_read', '==', false)
-
     );
-
-    const unsubscribe = onSnapshot(allQuery, (querySnapshot) => {
-      let total = 0;
-      querySnapshot.forEach((docSnap) => {
-        total = total + 1;
-      });
-      setBadgeCount(total);
-
-    });
-
-    return () => {
-
-      unsubscribe();
-
-    };
-
-  }, [currentUser]);
-
-  React.useEffect(() => {
-
-    if (!currentUser) return;
-
-    const notificationsRef = collection(
-
-      db,
-
-      'users',
-
-      `${currentUser?.id}`,
-
-      'notifications'
-
-    );
-
-    const allQuery = query(notificationsRef, where('is_deleted', '==', false));
-
-    const unsubscribe = onSnapshot(allQuery, (querySnapshot) => {
-
-      let total = 0;
-
-      querySnapshot.forEach((docSnap) => {
-
-        total = total + 1;
-
-      });
-
-      setCount(total);
-
-    });
-
-    return () => {
-
-      unsubscribe();
-
-    };
-
-  }, [currentUser]);
-
-  React.useEffect(() => {
-
-    if (!currentUser) return;
-
-    const notificationsRef = collection(
-
-      db,
-
-      'users',
-
-      `${currentUser?.id}`,
-
-      'notifications'
-
-    );
-
-    const first = query(
-
+    const allQuery = query(
       notificationsRef,
-
+      where('is_deleted', '==', false)
+    );
+    const first = query(
+      notificationsRef,
       where('is_deleted', '==', false),
-
       orderBy('time', 'desc'),
-
       limit(PAGE_SIZE)
-
     );
 
-    const unsubscribe = onSnapshot(first, (querySnapshot) => {
-
-      const notificationList: any[] = [];
-
-      querySnapshot.forEach((docSnap) => {
-
-        notificationList.push({
-
-          ...docSnap.data(),
-
-          key: docSnap.id,
-
-        });
-
-      });
-
-      setNotifications(notificationList as any);
-
-      setLastKey(querySnapshot.docs[querySnapshot.docs.length - 1] as any);
-
-      return () => {
-
-        unsubscribe();
-
-      };
-
+    const unsubscribeUnread = onSnapshot(unreadQuery, (querySnapshot) => {
+      setBadgeCount(querySnapshot.size);
     });
 
-  }, [currentUser]);
+    const unsubscribeAll = onSnapshot(allQuery, (querySnapshot) => {
+      setCount(querySnapshot.size);
+    });
+
+    const unsubscribeList = onSnapshot(first, (querySnapshot) => {
+      const notificationList: any[] = [];
+      querySnapshot.forEach((docSnap) => {
+        notificationList.push({
+          ...docSnap.data(),
+          key: docSnap.id,
+        });
+      });
+      setNotifications(notificationList as any);
+      setLastKey(querySnapshot.docs[querySnapshot.docs.length - 1] || null);
+    });
+
+    return () => {
+      unsubscribeUnread();
+      unsubscribeAll();
+      unsubscribeList();
+    };
+  }, [buildNotificationsRef, open]);
 
   const loadMore = async () => {
 
