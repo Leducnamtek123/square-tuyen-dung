@@ -2,6 +2,17 @@
 
 type AnyRecord = Record<string, unknown>;
 
+const cleanParams = (params: AnyRecord): AnyRecord => {
+  const cleaned: AnyRecord = {};
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+    if (typeof value === 'string' && value.trim() === '') return;
+    if (Array.isArray(value) && value.length === 0) return;
+    cleaned[key] = value;
+  });
+  return cleaned;
+};
+
 const jobService = {
   searchJobSuggestTitle: (kw: string): Promise<any> => {
     const url = 'job/web/search/job-suggest-title/';
@@ -10,12 +21,12 @@ const jobService = {
 
   getEmployerJobPost: (params: AnyRecord = {}): Promise<any> => {
     const url = 'job/web/private-job-posts/';
-    return httpRequest.get(url, { params: params });
+    return httpRequest.get(url, { params: cleanParams(params) });
   },
 
   exportEmployerJobPosts: (params: AnyRecord = {}): Promise<any> => {
     const url = 'job/web/private-job-posts/export/';
-    return httpRequest.get(url, { params: params });
+    return httpRequest.get(url, { params: cleanParams(params) });
   },
 
   getEmployerJobPostDetailById: (slug: string | number): Promise<any> => {
@@ -46,7 +57,7 @@ const jobService = {
   getJobPosts: (params: AnyRecord = {}): Promise<any> => {
     const url = 'job/web/job-posts/';
     return httpRequest.get(url, {
-      params: params,
+      params: cleanParams(params),
     });
   },
 
@@ -58,13 +69,13 @@ const jobService = {
   getSuggestedJobPosts: (params: AnyRecord = {}): Promise<any> => {
     const url = 'job/web/private-job-posts/suggested-job-posts/';
     return httpRequest.get(url, {
-      params: params,
+      params: cleanParams(params),
     });
   },
 
   getJobPostsSaved: (params: AnyRecord = {}): Promise<any> => {
     const url = `job/web/job-posts/job-posts-saved/`;
-    return httpRequest.get(url, { params: params });
+    return httpRequest.get(url, { params: cleanParams(params) });
   },
 
   saveJobPost: (slug: string | number): Promise<any> => {

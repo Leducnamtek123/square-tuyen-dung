@@ -448,9 +448,15 @@ class JobPostViewSet(viewsets.ViewSet,
     def list(self, request, *args, **kwargs):
         # 🚀 Cache check
         from shared.helpers.redis_service import RedisService
+        import hashlib
+        from urllib.parse import parse_qsl, urlencode
         redis_obj = RedisService()
-        query_str = request.GET.urlencode()
-        cache_key = f'job_list_{hash(query_str)}_{request.user.id if request.user.is_authenticated else 0}'
+        raw_query_str = request.GET.urlencode()
+        filtered_query = [(k, v) for k, v in parse_qsl(raw_query_str, keep_blank_values=False) if v != ""]
+        filtered_query.sort()
+        query_str = urlencode(filtered_query)
+        query_hash = hashlib.md5(query_str.encode("utf-8")).hexdigest()
+        cache_key = f'job_list_{query_hash}_{request.user.id if request.user.is_authenticated else 0}'
         cached_res = redis_obj.get_json(cache_key)
         if cached_res: return Response(cached_res)
         queryset = self.filter_queryset(

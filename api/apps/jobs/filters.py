@@ -87,6 +87,8 @@ class JobPostFilter(django_filters.FilterSet):
                   'statusIds']
 
     def job_name_or_career_name(self, queryset, name, value):
+        if value is None or (isinstance(value, str) and not value.strip()):
+            return queryset
         try:
             from .documents import JobPostDocument
             s = JobPostDocument.search().query(

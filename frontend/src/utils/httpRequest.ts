@@ -25,6 +25,17 @@ const prefix = 'api'
 
 const baseURL = import.meta.env.VITE_API_BASE || `/${prefix}/`;
 
+const cleanParams = (params: Record<string, unknown>): Record<string, unknown> => {
+  const cleaned: Record<string, unknown> = {};
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === undefined || value === null) return;
+    if (typeof value === 'string' && value.trim() === '') return;
+    if (Array.isArray(value) && value.length === 0) return;
+    cleaned[key] = value;
+  });
+  return cleaned;
+};
+
 const httpRequest = axios.create({
   baseURL,
   headers: {
@@ -76,6 +87,10 @@ let refreshPromise: Promise<unknown> | null = null;
 
 httpRequest.interceptors.request.use(
   (config) => {
+    const retryConfig = config as RetryAxiosRequestConfig;
+    if (retryConfig.params && !retryConfig.keepEmptyParams) {
+      retryConfig.params = cleanParams(retryConfig.params as Record<string, unknown>);
+    }
     const accessToken = tokenService.getAccessTokenFromCookie();
 
     if (accessToken && !isPublicEndpoint(config.url)) {

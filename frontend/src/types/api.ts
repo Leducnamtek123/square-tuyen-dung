@@ -21,4 +21,5 @@ export interface ApiError {
 /** Axios config extended with retry flag (used by httpRequest interceptor). */
 export interface RetryAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
+  keepEmptyParams?: boolean;
 }
