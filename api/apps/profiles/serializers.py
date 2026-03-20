@@ -340,7 +340,7 @@ class CompanySerializer(serializers.ModelSerializer):
         if hasattr(company, "active_job_post_count"):
             return company.active_job_post_count
         now = datetime.datetime.now().date()
-        return company.job_posts.filter(deadline__gte=now, status=var_sys.JOB_POST_STATUS[2][0]).count()
+        return company.job_posts.filter(deadline__gte=now, status=var_sys.JobPostStatus.APPROVED).count()
 
     def check_followed(self, company):
 
@@ -2219,3 +2219,4 @@ class SendMailToJobSeekerSerializer(serializers.Serializer):
     email = serializers.EmailField(max_length=100, required=True)
 
     isSendMe = serializers.BooleanField(default=False)
+

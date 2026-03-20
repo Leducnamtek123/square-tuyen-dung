@@ -78,7 +78,7 @@ class JobPost(JobPostBaseModel):
 
     is_urgent = models.BooleanField(default=False)
 
-    status = models.IntegerField(choices=var_sys.JOB_POST_STATUS, default=var_sys.JOB_POST_STATUS[0][0], db_index=True)
+    status = models.IntegerField(choices=var_sys.JOB_POST_STATUS, default=var_sys.JobPostStatus.PENDING, db_index=True)
 
     contact_person_name = models.CharField(max_length=100)
 
@@ -147,7 +147,11 @@ class JobPostActivity(JobPostBaseModel):
 
     phone = models.CharField(max_length=15, null=True)
 
-    status = models.IntegerField(choices=var_sys.APPLICATION_STATUS, default=1, db_index=True)
+    status = models.IntegerField(
+        choices=var_sys.APPLICATION_STATUS,
+        default=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+        db_index=True,
+    )
 
     is_sent_email = models.BooleanField(default=False)
 
@@ -229,5 +233,6 @@ class JobPostNotification(JobPostBaseModel):
         db_table = "project_job_job_post_notification"
 
         verbose_name_plural = "Job post notifications"
+
 
 

@@ -1,7 +1,8 @@
 "use client";
-import Button from "@mui/material/Button";
 import { cn } from "@/lib/utils";
-import { ArrowDownIcon, DownloadIcon } from "lucide-react";
+import { Button } from "@/ui/button";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import DownloadIcon from "@mui/icons-material/Download";
 import { useCallback } from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 import type { ComponentProps, ReactNode, HTMLAttributes } from "react";
@@ -99,11 +100,10 @@ export const ConversationScrollButton = ({
         className
       )}
       onClick={handleScrollToBottom}
-      size="small"
-      type="button"
-      variant="outlined"
+      size="icon-sm"
+      variant="outline"
       {...props}>
-      <ArrowDownIcon className="size-4" />
+      <ArrowDownwardIcon fontSize="small" />
     </Button>
   ));
 };
@@ -164,7 +164,7 @@ export const ConversationDownload = ({
       type="button"
       variant="outlined"
       {...props}>
-      {children ?? <DownloadIcon className="size-4" />}
+      {children ?? <DownloadIcon fontSize="small" />}
     </Button>
   );
 };

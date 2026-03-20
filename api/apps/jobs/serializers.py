@@ -296,7 +296,7 @@ class JobPostSerializer(serializers.ModelSerializer):
 
             instance.contact_person_email = validated_data.get('contact_person_email', instance.contact_person_email)
 
-            instance.status = var_sys.JOB_POST_STATUS[0][0]
+            instance.status = var_sys.JobPostStatus.PENDING
 
             location_obj = instance.location
             location_data = validated_data.get("location")
@@ -673,3 +673,4 @@ class StatisticsSerializer(serializers.Serializer):
     startDate = serializers.DateField(required=True)
 
     endDate = serializers.DateField(required=True)
+

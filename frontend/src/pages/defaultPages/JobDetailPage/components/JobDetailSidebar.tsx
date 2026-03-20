@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Box, Card, Stack, Typography } from "@mui/material";
 
 import FilterJobPostCard from "../../../components/defaults/FilterJobPostCard";
 
@@ -11,11 +10,11 @@ interface JobDetailSidebarProps {
 const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) => {
   const { t } = useTranslation(["public"]);
   return (
-    <Card sx={{ p: { xs: 1.5, sm: 1.5, md: 2, lg: 2, xl: 2 } }}>
-      <Stack spacing={2}>
-        <Typography variant="h5">{t("jobDetail.similarJobs")}</Typography>
-        <Box sx={{ width: 120, height: 5, backgroundColor: "#1976d2" }}></Box>
-        <Box>
+    <div className="rounded-xl border border-border/60 bg-card p-4 shadow-sm">
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">{t("jobDetail.similarJobs")}</h3>
+        <div className="h-1 w-28 rounded bg-blue-600" />
+        <div>
           <FilterJobPostCard
             params={{
               excludeSlug: jobPostDetail?.slug,
@@ -23,9 +22,9 @@ const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) =>
               // careerId: jobPostDetail?.career
             }}
           />
-        </Box>
-      </Stack>
-    </Card>
+        </div>
+      </div>
+    </div>
   );
 };
 

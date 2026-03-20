@@ -47,15 +47,15 @@ class Banner(ProjectBaseModel):
 
     description_location = models.IntegerField(choices=var_sys.DESCRIPTION_LOCATION,
 
-                                               default=var_sys.DESCRIPTION_LOCATION[2][0])
+                                               default=var_sys.DescriptionLocation.BOTTOM_LEFT)
 
     platform = models.CharField(max_length=3, choices=var_sys.PLATFORM_CHOICES,
 
-                                default=var_sys.DESCRIPTION_LOCATION[0][0])
+                                default=var_sys.DescriptionLocation.TOP_LEFT)
 
     type = models.IntegerField(choices=var_sys.BANNER_TYPE,
 
-                               default=var_sys.BANNER_TYPE[0][0])
+                               default=var_sys.BannerType.HOME)
 
     is_active = models.BooleanField(default=False)
 
@@ -70,5 +70,6 @@ class Banner(ProjectBaseModel):
     def __str__(self):
 
         return str(self.id)
+
 
 

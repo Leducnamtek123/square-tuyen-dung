@@ -322,7 +322,7 @@ def send_email_for_user(user_id, full_name, to_email, frequency):
 
                 query = JobPost.objects.filter(
 
-                    status=var_sys.JOB_POST_STATUS[2][0],
+                    status=var_sys.JobPostStatus.APPROVED,
 
                     deadline__gte=datetime.now().date(),
 
@@ -428,3 +428,4 @@ def send_email_for_user(user_id, full_name, to_email, frequency):
         helper.print_log_error("send_email_for_user", ex)
 
         return f'Send job notification email to {to_email} has errors.'
+

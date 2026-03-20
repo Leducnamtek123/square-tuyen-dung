@@ -1,17 +1,7 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
+import { cleanParams } from '../utils/params';
 
 type AnyRecord = Record<string, unknown>;
-
-const cleanParams = (params: AnyRecord): AnyRecord => {
-  const cleaned: AnyRecord = {};
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value === undefined || value === null) return;
-    if (typeof value === 'string' && value.trim() === '') return;
-    if (Array.isArray(value) && value.length === 0) return;
-    cleaned[key] = value;
-  });
-  return cleaned;
-};
 
 const jobService = {
   searchJobSuggestTitle: (kw: string): Promise<any> => {
@@ -85,3 +75,5 @@ const jobService = {
 };
 
 export default jobService;
+
+

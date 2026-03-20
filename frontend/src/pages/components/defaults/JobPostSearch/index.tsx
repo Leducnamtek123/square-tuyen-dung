@@ -17,7 +17,7 @@ import {
 import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppStore';
 
 const JobPostSearch = () => {
-  const { t } = useTranslation('public');
+  const { t } = useTranslation(['public', 'common']);
   const dispatch = useAppDispatch();
   const { allConfig } = useAppSelector((state) => state.config);
   const { jobPostFilter } = useAppSelector((state) => state.filter);
@@ -40,25 +40,43 @@ const JobPostSearch = () => {
       genderId: '',
     },
   });
-  const localizedJobTypeOptions = React.useMemo(
-    () =>
-      ((allConfig?.jobTypeOptions || []) as any[]).map((option) => ({
+
+  const localizeOptions = React.useCallback(
+    (options: any[], prefix: string) => {
+      return (options || []).map((option) => ({
         ...option,
         name:
-          t(`jobSearch.jobTypeOptions.${option.id}`, { defaultValue: '' }) ||
+          t(`${prefix}.${option.id}`, { defaultValue: '' }) ||
+          t(`choices.${option.name}`, { defaultValue: '' }) ||
           option.name,
-      })),
-    [allConfig?.jobTypeOptions, t]
+      }));
+    },
+    [t]
   );
+
+  const localizedJobTypeOptions = React.useMemo(
+    () => localizeOptions(allConfig?.jobTypeOptions, 'jobSearch.jobTypeOptions'),
+    [allConfig?.jobTypeOptions, localizeOptions]
+  );
+
   const localizedTypeOfWorkplaceOptions = React.useMemo(
-    () =>
-      ((allConfig?.typeOfWorkplaceOptions || []) as any[]).map((option) => ({
-        ...option,
-        name:
-          t(`jobSearch.workplaceOptions.${option.id}`, { defaultValue: '' }) ||
-          option.name,
-      })),
-    [allConfig?.typeOfWorkplaceOptions, t]
+    () => localizeOptions(allConfig?.typeOfWorkplaceOptions, 'jobSearch.workplaceOptions'),
+    [allConfig?.typeOfWorkplaceOptions, localizeOptions]
+  );
+
+  const localizedPositionOptions = React.useMemo(
+    () => localizeOptions(allConfig?.positionOptions, 'jobSearch.positionOptions'),
+    [allConfig?.positionOptions, localizeOptions]
+  );
+
+  const localizedExperienceOptions = React.useMemo(
+    () => localizeOptions(allConfig?.experienceOptions, 'jobSearch.experienceOptions'),
+    [allConfig?.experienceOptions, localizeOptions]
+  );
+
+  const localizedGenderOptions = React.useMemo(
+    () => localizeOptions(allConfig?.genderOptions, 'jobSearch.genderOptions'),
+    [allConfig?.genderOptions, localizeOptions]
   );
 
   React.useEffect(() => {
@@ -304,7 +322,7 @@ const JobPostSearch = () => {
               name="positionId"
               placeholder={t('jobSearch.allPositions')}
               control={control}
-              options={allConfig?.positionOptions || []}
+              options={localizedPositionOptions}
             />
           </Grid>
           <Grid
@@ -319,7 +337,7 @@ const JobPostSearch = () => {
               name="experienceId"
               placeholder={t('jobSearch.allExperiences')}
               control={control}
-              options={allConfig?.experienceOptions || []}
+              options={localizedExperienceOptions}
             />
           </Grid>
           <Grid
@@ -394,7 +412,7 @@ const JobPostSearch = () => {
               name="genderId"
               placeholder={t('jobSearch.allGenders')}
               control={control}
-              options={allConfig?.genderOptions || []}
+              options={localizedGenderOptions}
             />
           </Grid>
           <Grid
@@ -432,5 +450,3 @@ const JobPostSearch = () => {
 };
 
 export default JobPostSearch;
-
-

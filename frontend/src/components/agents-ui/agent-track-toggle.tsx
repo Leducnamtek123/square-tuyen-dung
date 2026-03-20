@@ -2,16 +2,12 @@ import { Fragment, useMemo, useState } from 'react';
 import type { ComponentProps, ComponentType } from 'react';
 import { cva } from 'class-variance-authority';
 import { Track } from 'livekit-client';
-import {
-  MicIcon,
-  MicOffIcon,
-  MonitorUpIcon,
-  MonitorOffIcon,
-  LoaderIcon,
-  VideoIcon,
-  VideoOffIcon,
-} from 'lucide-react';
-import ToggleButton from '@mui/material/ToggleButton';
+import MicIcon from '@mui/icons-material/Mic';
+import MicOffIcon from '@mui/icons-material/MicOff';
+import ScreenShareIcon from '@mui/icons-material/ScreenShare';
+import StopScreenShareIcon from '@mui/icons-material/StopScreenShare';
+import VideocamIcon from '@mui/icons-material/Videocam';
+import VideocamOffIcon from '@mui/icons-material/VideocamOff';
 import { cn } from '@/lib/utils';
 
 export const agentTrackToggleVariants = cva(['size-9'], {
@@ -53,20 +49,29 @@ type AgentTrackToggleProps = {
   defaultPressed?: boolean;
   className?: string;
   onPressedChange?: (pressed: boolean) => void;
-} & Omit<ComponentProps<typeof ToggleButton>, 'value' | 'onChange' | 'selected' | 'size'>;
+} & Omit<ComponentProps<'button'>, 'onChange'>;
+
+const PendingIcon = ({ className }: { className?: string }) => (
+  <span
+    className={cn(
+      'inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent',
+      className
+    )}
+  />
+);
 
 function getSourceIcon(source: Track.Source, enabled: boolean, pending = false) {
   if (pending) {
-    return LoaderIcon;
+    return PendingIcon;
   }
 
   switch (source) {
     case Track.Source.Microphone:
       return enabled ? MicIcon : MicOffIcon;
     case Track.Source.Camera:
-      return enabled ? VideoIcon : VideoOffIcon;
+      return enabled ? VideocamIcon : VideocamOffIcon;
     case Track.Source.ScreenShare:
-      return enabled ? MonitorUpIcon : MonitorOffIcon;
+      return enabled ? ScreenShareIcon : StopScreenShareIcon;
     default:
       return Fragment;
   }
@@ -111,15 +116,12 @@ export function AgentTrackToggle({
     }
     onPressedChange?.(nextPressed);
   };
-  const muiSize = size === 'sm' ? 'small' : size === 'lg' ? 'large' : 'medium';
-
   return (
-    <ToggleButton
-      value="toggle"
-      selected={resolvedPressed}
-      size={muiSize}
+    <button
+      type="button"
+      aria-pressed={resolvedPressed}
       aria-label={`Toggle ${source}`}
-      onChange={(_, nextPressed) => handlePressedChange(nextPressed)}
+      onClick={() => handlePressedChange(!resolvedPressed)}
       data-state={resolvedPressed ? 'on' : 'off'}
       className={cn(agentTrackToggleVariants({
         size,
@@ -129,6 +131,6 @@ export function AgentTrackToggle({
       {...props}>
       <IconComponent className={cn(pending && 'animate-spin')} />
       {props.children}
-    </ToggleButton>
+    </button>
   );
 }

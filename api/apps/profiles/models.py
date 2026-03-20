@@ -31,7 +31,7 @@ class JobSeekerProfile(InfoBaseModel):
     gender = models.CharField(max_length=1, choices=var_sys.GENDER_CHOICES, null=True)
     marital_status = models.CharField(max_length=1,
                                       choices=var_sys.MARITAL_STATUS_CHOICES,
-                                      default=var_sys.MARITAL_STATUS_CHOICES[0][0],
+                                      default=var_sys.MaritalStatus.SINGLE,
                                       null=True)
     id_card_number = models.CharField(max_length=30, blank=True, null=True)
     id_card_issue_date = models.DateField(blank=True, null=True)
@@ -379,5 +379,6 @@ class ContactProfile(InfoBaseModel):
     def __str__(self):
 
         return f"{self.company} saved {self.resume}"
+
 
 

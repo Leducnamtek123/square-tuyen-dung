@@ -1,6 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Box, Typography } from "@mui/material";
 
 interface JobDetailInfoItemProps {
   title: string;
@@ -8,26 +7,24 @@ interface JobDetailInfoItemProps {
 }
 
 const JobDetailInfoItem: React.FC<JobDetailInfoItemProps> = ({ title, value }) => {
-  const { t } = useTranslation(["public"]);
+  const { t } = useTranslation(["public", "common"]);
   return (
-    <Box>
-      <Typography
-        variant="body2"
-        color="text.secondary"
-        sx={{ fontWeight: "normal", pb: 1 }}
-      >
+    <div>
+      <p className="pb-1 text-sm font-normal text-muted-foreground">
         {title}
-      </Typography>
-      <Typography variant="body1" gutterBottom sx={{ textAlign: "justify" }}>
+      </p>
+      <p className="text-sm leading-6 text-foreground">
         {value ? (
-          <span style={{ fontWeight: "bold" }}>{value}</span>
+          <span className="font-semibold">
+            {typeof value === "string" ? t([`choices.${value}`, value]) : value}
+          </span>
         ) : (
-          <span style={{ color: "#e0e0e0", fontStyle: "italic", fontSize: 13 }}>
+          <span className="text-xs italic text-gray-300">
             {t("jobDetail.notUpdated")}
           </span>
         )}
-      </Typography>
-    </Box>
+      </p>
+    </div>
   );
 };
 

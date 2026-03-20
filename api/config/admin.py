@@ -331,19 +331,19 @@ class CustomAdminSite(admin.AdminSite):
 
         queryset1 = (
             JobPost.objects
-            .filter(create_at__date__range=[start_date, end_date], status=var_sys.JOB_POST_STATUS[0][0])
+            .filter(create_at__date__range=[start_date, end_date], status=var_sys.JobPostStatus.PENDING)
             .order_by('create_at')
         )
 
         queryset2 = (
             JobPost.objects
-            .filter(create_at__date__range=[start_date, end_date], status=var_sys.JOB_POST_STATUS[1][0])
+            .filter(create_at__date__range=[start_date, end_date], status=var_sys.JobPostStatus.REJECTED)
             .order_by('create_at')
         )
 
         queryset3 = (
             JobPost.objects
-            .filter(create_at__date__range=[start_date, end_date], status=var_sys.JOB_POST_STATUS[2][0])
+            .filter(create_at__date__range=[start_date, end_date], status=var_sys.JobPostStatus.APPROVED)
             .order_by('create_at')
         )
 
@@ -898,4 +898,5 @@ class CustomAdminSite(admin.AdminSite):
         return app_list + super().get_app_list(request)
 
 custom_admin_site = CustomAdminSite(name='custom_admin')
+
 

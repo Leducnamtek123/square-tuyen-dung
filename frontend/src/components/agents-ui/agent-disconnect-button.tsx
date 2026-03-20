@@ -1,8 +1,8 @@
 'use client';;
-import Button from '@mui/material/Button';
 import { cn } from '@/lib/utils';
 import { useRoomContext } from '@livekit/components-react';
-import { PhoneOffIcon } from 'lucide-react';
+import CallEndIcon from '@mui/icons-material/CallEnd';
+import { Button } from '@/ui/button';
 import type { ComponentProps, MouseEvent, ReactNode } from 'react';
 
 /**
@@ -31,18 +31,17 @@ export function AgentDisconnectButton({
       void room.disconnect();
     }
   };
-  const muiVariant = variant === 'outline' ? 'outlined' : 'contained';
-  const muiSize = size === 'sm' || size === 'xs' ? 'small' : size === 'lg' ? 'large' : 'medium';
+  const buttonVariant = variant === 'outline' ? 'outline' : variant === 'destructive' ? 'destructive' : 'default';
+  const buttonSize = size === 'sm' || size === 'xs' ? 'sm' : size === 'lg' ? 'lg' : 'default';
 
   return (
     <Button
-      size={muiSize}
-      variant={muiVariant}
-      color={variant === 'destructive' ? 'error' : 'inherit'}
+      size={buttonSize}
+      variant={buttonVariant}
       onClick={handleClick}
       {...props}
     >
-      {icon ?? <PhoneOffIcon />}
+      {icon ?? <CallEndIcon />}
       {children ?? <span className={cn(size?.includes('icon') && 'sr-only')}>END CALL</span>}
     </Button>
   );

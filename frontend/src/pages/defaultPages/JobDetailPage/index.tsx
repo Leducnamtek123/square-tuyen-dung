@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Box, Button } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { cn } from "@/lib/utils";
+import { Button } from "@/ui/button";
 
 import JobDetailLoading from "./components/JobDetailLoading";
 import JobDetailHeaderCard from "./components/JobDetailHeaderCard";
@@ -117,16 +117,9 @@ const JobDetailPage = () => {
       ) : jobPostDetail === null ? (
         <NoDataCard title={t("jobDetail.noData")} />
       ) : (
-        <Box sx={{ mt: 2, pb: { xs: canApply ? 10 : 0, md: 0 } }}>
-          <Grid container spacing={3}>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 12,
-                md: 8,
-                lg: 8,
-                xl: 8
-              }}>
+        <div className={cn("mt-2", canApply ? "pb-20 md:pb-0" : "")}>
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+            <div>
               <JobDetailHeaderCard
                 jobPostDetail={jobPostDetail}
                 allConfig={allConfig}
@@ -142,41 +135,19 @@ const JobDetailPage = () => {
                 allConfig={allConfig}
               />
               <JobDetailContactCard jobPostDetail={jobPostDetail} />
-            </Grid>
-            <Grid
-              size={{
-                xs: 12,
-                sm: 12,
-                md: 4,
-                lg: 4,
-                xl: 4
-              }}>
+            </div>
+            <div>
               <JobDetailSidebar jobPostDetail={jobPostDetail} />
-            </Grid>
-          </Grid>
-        </Box>
+            </div>
+          </div>
+        </div>
       )}
 
       {!isLoading && jobPostDetail && canApply && (
-        <Box
-          sx={{
-            position: "fixed",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: (theme) => theme.zIndex.appBar,
-            display: { xs: "block", md: "none" },
-            p: 1.5,
-            bgcolor: "background.paper",
-            borderTop: "1px solid",
-            borderColor: "divider",
-          }}
-        >
+        <div className="fixed inset-x-0 bottom-0 z-50 block border-t border-border bg-background p-4 md:hidden">
           <Button
-            fullWidth
-            variant="contained"
-            color="warning"
-            size="large"
+            className="w-full bg-amber-500 text-white hover:bg-amber-600"
+            size="lg"
             disabled={jobPostDetail?.isApplied}
             onClick={handleMobileApplyClick}
           >
@@ -184,7 +155,7 @@ const JobDetailPage = () => {
               ? t("jobDetail.actions.applied")
               : t("jobDetail.actions.apply")}
           </Button>
-        </Box>
+        </div>
       )}
 
       <ApplyCard

@@ -1,5 +1,5 @@
 import { useEnsureRoom, useStartAudio } from '@livekit/components-react';
-import Button from '@mui/material/Button';
+import { Button } from '@/ui/button';
 import type { ComponentProps, ReactNode } from 'react';
 
 /**
@@ -23,11 +23,11 @@ export function StartAudioButton({
 }: StartAudioButtonProps) {
   const roomEnsured = useEnsureRoom(room);
   const { mergedProps } = useStartAudio({ room: roomEnsured, props });
-  const muiVariant = variant === 'outline' ? 'outlined' : 'contained';
-  const muiSize = size === 'sm' || size === 'xs' ? 'small' : size === 'lg' ? 'large' : 'medium';
+  const buttonVariant = variant === 'outline' ? 'outline' : 'default';
+  const buttonSize = size === 'sm' || size === 'xs' ? 'sm' : size === 'lg' ? 'lg' : 'default';
 
   return (
-   <Button size={muiSize} variant={muiVariant} {...props} {...(mergedProps as any)}>
+   <Button size={buttonSize} variant={buttonVariant} {...props} {...(mergedProps as any)}>
     {label}
    </Button>
   );

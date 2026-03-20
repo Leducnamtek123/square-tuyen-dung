@@ -114,7 +114,7 @@ class JobPostViewSet(viewsets.ViewSet,
         queryset = self.filter_queryset(
             self.get_queryset()
             .filter(
-                status=var_sys.JOB_POST_STATUS[2][0],
+                status=var_sys.JobPostStatus.APPROVED,
                 deadline__gte=datetime.datetime.now().date()
             )
             .prefetch_related(
@@ -171,7 +171,7 @@ class JobPostViewSet(viewsets.ViewSet,
                 'company', 'company__logo', 'company__cover_image', 'company__user',
                 'location', 'location__city', 'career'
             )
-            .filter(status=var_sys.JOB_POST_STATUS[2][0], deadline__gte=datetime.datetime.now().date())
+            .filter(status=var_sys.JobPostStatus.APPROVED, deadline__gte=datetime.datetime.now().date())
             .filter(career__in=careers_id, location__city__in=cities_id)
             .prefetch_related(
                 Prefetch(
@@ -244,7 +244,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
         queryset = (
             user.saved_job_posts
-            .filter(status=var_sys.JOB_POST_STATUS[2][0])
+            .filter(status=var_sys.JobPostStatus.APPROVED)
             .select_related(
                 'company', 'company__logo', 'company__cover_image', 'company__user',
                 'location', 'location__city', 'career'
@@ -372,7 +372,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
         queryset = self.filter_queryset(self.get_queryset()
 
-                                        .filter(status=var_sys.JOB_POST_STATUS[2][0], deadline__gte=datetime.datetime.now().date()
+                                        .filter(status=var_sys.JobPostStatus.APPROVED, deadline__gte=datetime.datetime.now().date()
 
                                                 ).annotate(
 
@@ -601,3 +601,4 @@ class JobPostNotificationViewSet(viewsets.ViewSet,
         if not request.data or "isActive" in request.data or "is_active" in request.data:
             return self._apply_active_change(request, instance)
         return super().partial_update(request, *args, **kwargs)
+

@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { Outlet } from 'react-router-dom';
-import { Box } from "@mui/material";
 import ChatProvider from '../../context/ChatProvider';
 
 const ChatLayout = () => {
@@ -9,23 +8,11 @@ const ChatLayout = () => {
 
     <ChatProvider>
 
-      <Box
-
-        sx={{
-
-          backgroundColor: 'white',
-
-        }}
-
-      >
-
+      <div className="bg-white">
         <section>
-
           <Outlet />
-
         </section>
-
-      </Box>
+      </div>
 
     </ChatProvider>
 

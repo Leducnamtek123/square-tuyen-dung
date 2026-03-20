@@ -1,7 +1,5 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { Box, Card, Stack, Typography } from "@mui/material";
-import Grid from "@mui/material/Grid2";
 
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
@@ -17,198 +15,81 @@ interface JobDetailContactCardProps {
 const JobDetailContactCard: React.FC<JobDetailContactCardProps> = ({ jobPostDetail }) => {
   const { t } = useTranslation(["public"]);
   return (
-    <Card
-      sx={{
-        py: 4,
-        mt: 3,
-        px: { xs: 1.5, sm: 1.5, md: 2, lg: 4, xl: 4 },
-        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-      }}
-    >
-      <Grid container spacing={4}>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 12,
-            md: 6,
-            lg: 6,
-            xl: 6
-          }}>
-          <Box>
-            <Typography
-              variant="h5"
-              sx={{
-                fontSize: "1.3rem",
-                fontWeight: 700,
-                mb: 3,
-                "&::after": {
-                  content: '""',
-                  display: "block",
-                  width: "50px",
-                  height: "3px",
-                  background: "#9c27b0",
-                  borderRadius: "2px",
-                  mt: 1,
-                },
-              }}
-            >
-              {t("jobDetail.contactInfo")}
-            </Typography>
+    <div className="mt-3 rounded-xl border border-border/60 bg-card px-4 py-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)] sm:px-6 lg:px-8">
+      <div className="grid gap-8 md:grid-cols-2">
+        <div>
+          <h3 className="text-lg font-bold">
+            {t("jobDetail.contactInfo")}
+          </h3>
+          <div className="mt-1 h-1 w-12 rounded bg-purple-600" />
 
-            <Stack spacing={2.5}>
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: "rgba(156,39,176,0.04)",
-                  transition: "all 0.2s",
-                  "&:hover": {
-                    bgcolor: "rgba(156,39,176,0.08)",
-                    transform: "translateX(8px)",
-                  },
-                }}
-              >
-                <PersonIcon sx={{ color: "#9c27b0", fontSize: 24 }} />
-                <Box>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {t("jobDetail.contactPerson")}
-                  </Typography>
-                  <Typography variant="body1" fontWeight={500}>
-                    {jobPostDetail?.contactPersonName || t("jobDetail.notUpdated")}
-                  </Typography>
-                </Box>
-              </Box>
+          <div className="mt-6 space-y-3">
+            <div className="flex items-center gap-3 rounded-lg bg-purple-50/60 p-3 transition hover:translate-x-2 hover:bg-purple-50">
+              <PersonIcon className="text-purple-600" fontSize="medium" />
+              <div>
+                <p className="text-xs text-muted-foreground">
+                  {t("jobDetail.contactPerson")}
+                </p>
+                <p className="text-sm font-medium">
+                  {jobPostDetail?.contactPersonName || t("jobDetail.notUpdated")}
+                </p>
+              </div>
+            </div>
 
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: "rgba(156,39,176,0.04)",
-                  transition: "all 0.2s",
-                  "&:hover": {
-                    bgcolor: "rgba(156,39,176,0.08)",
-                    transform: "translateX(8px)",
-                  },
-                }}
-              >
-                <EmailIcon sx={{ color: "#9c27b0", fontSize: 24 }} />
-                <Box>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {t("jobDetail.contactEmail")}
-                  </Typography>
-                  <Typography variant="body1" fontWeight={500}>
-                    {jobPostDetail?.contactPersonEmail || t("jobDetail.notUpdated")}
-                  </Typography>
-                </Box>
-              </Box>
+            <div className="flex items-center gap-3 rounded-lg bg-purple-50/60 p-3 transition hover:translate-x-2 hover:bg-purple-50">
+              <EmailIcon className="text-purple-600" fontSize="medium" />
+              <div>
+                <p className="text-xs text-muted-foreground">
+                  {t("jobDetail.contactEmail")}
+                </p>
+                <p className="text-sm font-medium">
+                  {jobPostDetail?.contactPersonEmail || t("jobDetail.notUpdated")}
+                </p>
+              </div>
+            </div>
 
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: "rgba(156,39,176,0.04)",
-                  transition: "all 0.2s",
-                  "&:hover": {
-                    bgcolor: "rgba(156,39,176,0.08)",
-                    transform: "translateX(8px)",
-                  },
-                }}
-              >
-                <PhoneIcon sx={{ color: "#9c27b0", fontSize: 24 }} />
-                <Box>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {t("jobDetail.contactPhone")}
-                  </Typography>
-                  <Typography variant="body1" fontWeight={500}>
-                    {jobPostDetail?.contactPersonPhone || t("jobDetail.notUpdated")}
-                  </Typography>
-                </Box>
-              </Box>
+            <div className="flex items-center gap-3 rounded-lg bg-purple-50/60 p-3 transition hover:translate-x-2 hover:bg-purple-50">
+              <PhoneIcon className="text-purple-600" fontSize="medium" />
+              <div>
+                <p className="text-xs text-muted-foreground">
+                  {t("jobDetail.contactPhone")}
+                </p>
+                <p className="text-sm font-medium">
+                  {jobPostDetail?.contactPersonPhone || t("jobDetail.notUpdated")}
+                </p>
+              </div>
+            </div>
 
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  p: 2,
-                  borderRadius: 2,
-                  bgcolor: "rgba(156,39,176,0.04)",
-                  transition: "all 0.2s",
-                  "&:hover": {
-                    bgcolor: "rgba(156,39,176,0.08)",
-                    transform: "translateX(8px)",
-                  },
-                }}
-              >
-                <LocationOnIcon sx={{ color: "#9c27b0", fontSize: 24 }} />
-                <Box>
-                  <Typography variant="body2" color="text.secondary" gutterBottom>
-                    {t("jobDetail.address")}
-                  </Typography>
-                  <Typography variant="body1" fontWeight={500}>
-                    {jobPostDetail?.location?.address || t("jobDetail.notUpdated")}
-                  </Typography>
-                </Box>
-              </Box>
-            </Stack>
-          </Box>
-        </Grid>
+            <div className="flex items-center gap-3 rounded-lg bg-purple-50/60 p-3 transition hover:translate-x-2 hover:bg-purple-50">
+              <LocationOnIcon className="text-purple-600" fontSize="medium" />
+              <div>
+                <p className="text-xs text-muted-foreground">
+                  {t("jobDetail.address")}
+                </p>
+                <p className="text-sm font-medium">
+                  {jobPostDetail?.location?.address || t("jobDetail.notUpdated")}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <Grid
-          size={{
-            xs: 12,
-            sm: 12,
-            md: 6,
-            lg: 6,
-            xl: 6
-          }}>
-          <Box>
-            <Typography
-              variant="h5"
-              sx={{
-                fontSize: "1.3rem",
-                fontWeight: 700,
-                mb: 3,
-                "&::after": {
-                  content: '""',
-                  display: "block",
-                  width: "50px",
-                  height: "3px",
-                  background: "#9c27b0",
-                  borderRadius: "2px",
-                  mt: 1,
-                },
-              }}
-            >
-              {t("jobDetail.map")}
-            </Typography>
-            <Box
-              sx={{
-                borderRadius: 2,
-                overflow: "hidden",
-                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
-              }}
-            >
-              <Map
-                title={jobPostDetail?.jobName}
-                subTitle={jobPostDetail?.location?.address}
-                latitude={jobPostDetail?.location?.lat}
-                longitude={jobPostDetail?.location?.lng}
-              />
-            </Box>
-          </Box>
-        </Grid>
-      </Grid>
-    </Card>
+        <div>
+          <h3 className="text-lg font-bold">
+            {t("jobDetail.map")}
+          </h3>
+          <div className="mt-1 h-1 w-12 rounded bg-purple-600" />
+          <div className="mt-6 overflow-hidden rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.08)]">
+            <Map
+              title={jobPostDetail?.jobName}
+              subTitle={jobPostDetail?.location?.address}
+              latitude={jobPostDetail?.location?.lat}
+              longitude={jobPostDetail?.location?.lng}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
 

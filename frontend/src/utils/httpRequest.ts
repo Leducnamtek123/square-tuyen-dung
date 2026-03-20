@@ -4,6 +4,7 @@ import tokenService from '../services/tokenService';
 import { AUTH_CONFIG } from '../configs/constants';
 import type { RetryAxiosRequestConfig } from '../types/api';
 import type { TokenPair } from '../types/auth';
+import { cleanParams } from './params';
 
 // API endpoints that do not require authentication
 const notAuthenticationURL = [
@@ -24,17 +25,6 @@ const prefix = 'api'
 // Use relative path to work with nginx proxy, allow override via env if needed
 
 const baseURL = import.meta.env.VITE_API_BASE || `/${prefix}/`;
-
-const cleanParams = (params: Record<string, unknown>): Record<string, unknown> => {
-  const cleaned: Record<string, unknown> = {};
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value === undefined || value === null) return;
-    if (typeof value === 'string' && value.trim() === '') return;
-    if (Array.isArray(value) && value.length === 0) return;
-    cleaned[key] = value;
-  });
-  return cleaned;
-};
 
 const httpRequest = axios.create({
   baseURL,

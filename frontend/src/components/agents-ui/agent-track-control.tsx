@@ -1,15 +1,11 @@
 'use client';;
 import { useEffect, useMemo, useState } from 'react';
-import type { ComponentProps, ReactNode } from 'react';
+import type { ComponentProps } from 'react';
 import { cva } from 'class-variance-authority';
 import { useMaybeRoomContext, useMediaDeviceSelect } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { AgentAudioVisualizerBar } from '@/components/agents-ui/agent-audio-visualizer-bar';
 import { AgentTrackToggle } from '@/components/agents-ui/agent-track-toggle';
-import FormControl from '@mui/material/FormControl';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import type { SelectChangeEvent } from '@mui/material/Select';
 import { cn } from '@/lib/utils';
 
 const AudioVisualizerBar = AgentAudioVisualizerBar as any;
@@ -85,7 +81,7 @@ type TrackDeviceSelectProps = {
   onMediaDeviceError?: (error: unknown) => void;
   onDeviceListChange?: (devices: MediaDeviceInfo[]) => void;
   onActiveDeviceChange?: (deviceId: string) => void;
-} & Omit<ComponentProps<typeof Select>, 'onChange' | 'value' | 'size' | 'variant' | 'defaultValue'>;
+} & Omit<ComponentProps<'select'>, 'onChange' | 'value' | 'defaultValue'>;
 
 function TrackDeviceSelect({
   kind,
@@ -100,7 +96,6 @@ function TrackDeviceSelect({
   ...props
 }: TrackDeviceSelectProps) {
   const room = useMaybeRoomContext();
-  const [open, setOpen] = useState(false);
   const [requestPermissionsState, setRequestPermissionsState] = useState(requestPermissions);
   const { devices, activeDeviceId, setActiveMediaDevice } = useMediaDeviceSelect({
     room,
@@ -114,9 +109,8 @@ function TrackDeviceSelect({
     onDeviceListChange?.(devices);
   }, [devices, onDeviceListChange]);
 
-  const handleOpenChange = (open: boolean) => {
-    setOpen(open);
-    if (open) {
+  const handleOpen = () => {
+    if (!requestPermissionsState) {
       setRequestPermissionsState(true);
     }
   };
@@ -133,33 +127,26 @@ function TrackDeviceSelect({
   }
 
   return (
-    <FormControl className={cn(selectVariants({ size, variant }), className)} size="small">
-      <Select
-        open={open}
+    <div className={cn(selectVariants({ size, variant }), className)}>
+      <select
         value={activeDeviceId || ''}
-        onOpen={() => handleOpenChange(true)}
-        onClose={() => handleOpenChange(false)}
-        onChange={(event: SelectChangeEvent<string>) => handleActiveDeviceChange(event.target.value)}
-        displayEmpty
-        renderValue={(selected) => {
-          const selectedValue = selected as string;
-          if (!selectedValue) return size !== 'sm' ? `Select a ${kind}` : '';
-          const device = filteredDevices.find((d) => d.deviceId === selectedValue);
-          return (device?.label || selectedValue) as ReactNode;
-        }}
+        onFocus={handleOpen}
+        onMouseDown={handleOpen}
+        onChange={(event) => handleActiveDeviceChange(event.target.value)}
+        className={cn(
+          'h-full w-full bg-transparent pr-7 text-xs outline-none',
+          size === 'sm' && 'min-w-[120px]'
+        )}
         {...props}
       >
+        <option value="">{size !== 'sm' ? `Select a ${kind}` : ''}</option>
         {filteredDevices.map((device) => (
-          <MenuItem
-            key={device.deviceId}
-            value={device.deviceId}
-            className="font-mono text-xs"
-          >
+          <option key={device.deviceId} value={device.deviceId}>
             {device.label}
-          </MenuItem>
+          </option>
         ))}
-      </Select>
-    </FormControl>
+      </select>
+    </div>
   );
 }
 

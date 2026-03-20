@@ -1,3 +1,5 @@
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from shared.configs.storage_interface import asset_url, get_setting
 
@@ -100,18 +102,20 @@ SOCIAL_MEDIA_LINKS = {
     "telegram": "",
 }
 
-PLATFORM_CHOICES = (
-    ('WEB', 'Website'),
-    ('APP', 'Application')
-)
+class Platform(models.TextChoices):
+    WEB = 'WEB', _('Website')
+    APP = 'APP', _('Application')
+
+
+PLATFORM_CHOICES = Platform.choices
 
 LINK_GOOGLE_PLAY = "https://play.google.com/store/apps?hl=en"
 LINK_APPSTORE = "https://www.apple.com/vn/app-store/"
 
 ROLE_CHOICES = (
-    (ADMIN, 'Administrator'),
-    (EMPLOYER, 'Employer'),
-    (JOB_SEEKER, 'Job Seeker')
+    (ADMIN, _('Administrator')),
+    (EMPLOYER, _('Employer')),
+    (JOB_SEEKER, _('Job Seeker'))
 )
 
 COMPANY_PERMISSION_KEYS = (
@@ -126,11 +130,11 @@ COMPANY_PERMISSION_KEYS = (
 
 COMPANY_SYSTEM_ROLES = {
     "owner": {
-        "name": "Owner",
+        "name": _("Owner"),
         "permissions": ["*"],
     },
     "hr": {
-        "name": "HR",
+        "name": _("HR"),
         "permissions": [
             "manage_candidates",
             "manage_interviews",
@@ -140,123 +144,132 @@ COMPANY_SYSTEM_ROLES = {
     },
 }
 
-JOB_POST_STATUS = (
-    (1, 'Pending'),
-    (2, 'Rejected'),
-    (3, 'Approved')
-)
+class JobPostStatus(models.IntegerChoices):
+    PENDING = 1, _('Pending')
+    REJECTED = 2, _('Rejected')
+    APPROVED = 3, _('Approved')
+
+
+JOB_POST_STATUS = JobPostStatus.choices
 
 GENDER_CHOICES = (
-    ('M', 'Male'),
-    ('F', 'Female'),
-    ('O', 'Other')
+    ('M', _('Male')),
+    ('F', _('Female')),
+    ('O', _('Other'))
 )
 
-MARITAL_STATUS_CHOICES = (
-    ('S', 'Single'),
-    ('M', 'Married')
-)
+class MaritalStatus(models.TextChoices):
+    SINGLE = 'S', _('Single')
+    MARRIED = 'M', _('Married')
+
+
+MARITAL_STATUS_CHOICES = MaritalStatus.choices
 
 LANGUAGE_CHOICES = (
-    (1, 'Vietnamese'),
-    (2, 'English'),
-    (3, 'Japanese'),
-    (4, 'French'),
-    (5, 'Chinese'),
-    (6, 'Russian'),
-    (7, 'Korean'),
-    (8, 'German'),
-    (9, 'Italian'),
-    (10, 'Arabic'),
-    (11, 'Other'),
+    (1, _('Vietnamese')),
+    (2, _('English')),
+    (3, _('Japanese')),
+    (4, _('French')),
+    (5, _('Chinese')),
+    (6, _('Russian')),
+    (7, _('Korean')),
+    (8, _('German')),
+    (9, _('Italian')),
+    (10, _('Arabic')),
+    (11, _('Other')),
 )
 
 LANGUAGE_LEVEL_CHOICES = (
-    (1, 'Level 1'),
-    (2, 'Level 2'),
-    (3, 'Level 3'),
-    (4, 'Level 4'),
-    (5, 'Level 5')
+    (1, _('Level 1')),
+    (2, _('Level 2')),
+    (3, _('Level 3')),
+    (4, _('Level 4')),
+    (5, _('Level 5'))
 )
 
 POSITION_CHOICES = (
-    (1, 'Senior Management'),
-    (2, 'Middle Management'),
-    (3, 'Team Leader - Supervisor'),
-    (4, 'Specialist'),
-    (5, 'Staff / Employee'),
-    (6, 'Collaborator'),
+    (1, _('Senior Management')),
+    (2, _('Middle Management')),
+    (3, _('Team Leader - Supervisor')),
+    (4, _('Specialist')),
+    (5, _('Staff / Employee')),
+    (6, _('Collaborator')),
 )
 
 TYPE_OF_WORKPLACE_CHOICES = (
-    (1, 'Office-based'),
-    (2, 'Hybrid'),
-    (3, 'Remote / Work from home')
+    (1, _('Office-based')),
+    (2, _('Hybrid')),
+    (3, _('Remote / Work from home'))
 )
 
 # OK
 JOB_TYPE_CHOICES = (
-    (1, 'Full-time Permanent'),
-    (2, 'Full-time Temporary'),
-    (3, 'Part-time Permanent'),
-    (4, 'Part-time Temporary'),
-    (5, 'Consultancy Contract'),
-    (6, 'Internship'),
-    (7, 'Other'),
+    (1, _('Full-time Permanent')),
+    (2, _('Full-time Temporary')),
+    (3, _('Part-time Permanent')),
+    (4, _('Part-time Temporary')),
+    (5, _('Consultancy Contract')),
+    (6, _('Internship')),
+    (7, _('Other')),
 )
 
 EXPERIENCE_CHOICES = (
-    (1, 'No experience'),
-    (2, 'Under 1 year'),
-    (3, '1 year'),
-    (4, '2 years'),
-    (5, '3 years'),
-    (6, '4 years'),
-    (7, '5 years'),
-    (8, 'Over 5 years')
+    (1, _('No experience')),
+    (2, _('Under 1 year')),
+    (3, _('1 year')),
+    (4, _('2 years')),
+    (5, _('3 years')),
+    (6, _('4 years')),
+    (7, _('5 years')),
+    (8, _('Over 5 years'))
 )
 
 ACADEMIC_LEVEL = (
-    (1, 'Postgraduate'),
-    (2, 'University'),
-    (3, 'College'),
-    (4, 'Vocational / Intermediate'),
-    (5, 'High School'),
-    (6, 'Certificate')
+    (1, _('Postgraduate')),
+    (2, _('University')),
+    (3, _('College')),
+    (4, _('Vocational / Intermediate')),
+    (5, _('High School')),
+    (6, _('Certificate'))
 )
 
 EMPLOYEE_SIZE_CHOICES = (
-    (1, 'Under 10 employees'),
-    (2, '10 - 150 employees'),
-    (3, '150 - 300 employees'),
-    (4, 'Over 300 employees'),
+    (1, _('Under 10 employees')),
+    (2, _('10 - 150 employees')),
+    (3, _('150 - 300 employees')),
+    (4, _('Over 300 employees')),
 )
 
-APPLICATION_STATUS = (
-    (1, 'Pending Confirmation'),
-    (2, 'Contacted'),
-    (3, 'Tested'),
-    (4, 'Interviewed'),
-    (5, 'Hired'),
-    (6, 'Not Selected')
-)
+class ApplicationStatus(models.IntegerChoices):
+    PENDING_CONFIRMATION = 1, _('Pending Confirmation')
+    CONTACTED = 2, _('Contacted')
+    TESTED = 3, _('Tested')
+    INTERVIEWED = 4, _('Interviewed')
+    HIRED = 5, _('Hired')
+    NOT_SELECTED = 6, _('Not Selected')
+
+
+APPLICATION_STATUS = ApplicationStatus.choices
 
 FREQUENCY_NOTIFICATION = (
-    (1, 'Daily'),
-    (2, 'Every 3 Days'),
-    (3, 'Weekly'),
+    (1, _('Daily')),
+    (2, _('Every 3 Days')),
+    (3, _('Weekly')),
 )
 
-DESCRIPTION_LOCATION = (
-    (1, 'TOP_LEFT'),
-    (2, 'TOP_RIGHT'),
-    (3, 'BOTTOM_LEFT'),
-    (4, 'BOTTOM_RIGHT')
-)
-
-BANNER_TYPE = (
-    (1, 'HOME'),
-    (2, 'MAIN_JOB_RIGHT'),
-)
+class DescriptionLocation(models.IntegerChoices):
+    TOP_LEFT = 1, 'TOP_LEFT'
+    TOP_RIGHT = 2, 'TOP_RIGHT'
+    BOTTOM_LEFT = 3, 'BOTTOM_LEFT'
+    BOTTOM_RIGHT = 4, 'BOTTOM_RIGHT'
 
 
+DESCRIPTION_LOCATION = DescriptionLocation.choices
+
+
+class BannerType(models.IntegerChoices):
+    HOME = 1, 'HOME'
+    MAIN_JOB_RIGHT = 2, 'MAIN_JOB_RIGHT'
+
+
+BANNER_TYPE = BannerType.choices

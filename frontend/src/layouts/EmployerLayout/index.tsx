@@ -4,7 +4,6 @@ import { Outlet } from 'react-router-dom';
 
 import PropTypes from 'prop-types';
 
-import { Box } from "@mui/material";
 
 import Header from '../components/employers/Header';
 
@@ -35,8 +34,7 @@ function EmployerLayout(props: EmployerLayoutProps) {
     window !== undefined ? () => window().document.body : undefined;
 
   return (
-
-    <Box sx={{ display: 'flex' }}>
+    <div className="flex">
 
       {/* Start: Header */}
 
@@ -50,13 +48,7 @@ function EmployerLayout(props: EmployerLayoutProps) {
 
       {/* End: Header */}
 
-      <Box
-
-        component="nav"
-
-        sx={{ width: { xl: drawerWidth }, flexShrink: { sm: 0 } }}
-
-      >
+      <nav className="shrink-0 xl:w-[240px]">
 
         {/* Start: Sidebar */}
 
@@ -71,67 +63,21 @@ function EmployerLayout(props: EmployerLayoutProps) {
 
         {/* End: Sidebar */}
 
-      </Box>
+      </nav>
 
-      <Box
-
-        component="main"
-
-        sx={{
-
-          flexGrow: 1,
-
-          width: {
-
-            xs: '100%',
-
-            sm: '100%',
-
-            md: '100%',
-
-            lg: '100%',
-
-            xl: `calc(100% - ${drawerWidth}px)`,
-
-          },
-
-        }}
-
-      >
+      <main className="flex-1">
 
         {/* <Toolbar /> */}
 
-        <Box
-
-          sx={{
-
-            p: {
-
-              xs: 1,
-
-              sm: 3,
-
-              md: 3,
-
-              lg: 3,
-
-              xl: 3,
-
-            },
-
-            mt: 7,
-
-          }}
-
-        >
+        <div className="mt-7 p-2 sm:p-4">
 
           <Outlet />
 
-        </Box>
+        </div>
 
-      </Box>
+      </main>
 
-    </Box>
+    </div>
 
   );
 

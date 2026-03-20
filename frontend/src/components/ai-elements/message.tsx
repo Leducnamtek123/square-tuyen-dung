@@ -1,10 +1,8 @@
 "use client";;
-import Button from "@mui/material/Button";
-import ButtonGroup from "@mui/material/ButtonGroup";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
 import { cn } from "@/lib/utils";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { Button } from "@/ui/button";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import {
   createContext,
   lazy,
@@ -20,36 +18,35 @@ import type { ReactNode, HTMLAttributes, ComponentProps } from "react";
 
 const LazyMessageResponse = lazy(() => import("./message-response"));
 
-type MuiButtonVariant = "outlined" | "text" | "contained";
-type MuiButtonSize = "small" | "medium" | "large";
-
-const resolveMuiButtonVariant = (variant: string): MuiButtonVariant => {
+const resolveButtonVariant = (variant: string) => {
   switch (variant) {
     case "outline":
-      return "outlined";
+      return "outline";
     case "ghost":
+      return "ghost";
     case "link":
-      return "text";
-    case "secondary":
+      return "link";
     case "destructive":
-      return "contained";
+      return "destructive";
     default:
-      return "contained";
+      return "default";
   }
 };
 
-const resolveMuiButtonSize = (size: string): MuiButtonSize => {
+const resolveButtonSize = (size: string) => {
   switch (size) {
     case "icon-xs":
     case "icon-sm":
+    case "icon-lg":
+    case "icon":
+      return size;
     case "xs":
     case "sm":
-      return "small";
+      return "sm";
     case "lg":
-    case "icon-lg":
-      return "large";
+      return "lg";
     default:
-      return "medium";
+      return "default";
   }
 };
 
@@ -125,29 +122,17 @@ export const MessageAction = ({
   size = "icon-sm",
   ...props
 }: MessageActionProps) => {
-  const muiVariant = resolveMuiButtonVariant(variant);
-  const muiSize = resolveMuiButtonSize(size);
   const button = (
     <Button
-      size={muiSize}
-      type="button"
-      variant={muiVariant}
-      color={variant === "destructive" ? "error" : "inherit"}
+      size={resolveButtonSize(size)}
+      variant={resolveButtonVariant(variant)}
+      title={tooltip}
       {...props}
     >
       {children}
       <span className="sr-only">{label || tooltip}</span>
     </Button>
   );
-
-  if (tooltip) {
-    return (
-      <Tooltip title={tooltip}>
-        <span>{button}</span>
-      </Tooltip>
-    );
-  }
-
   return button;
 };
 
@@ -258,7 +243,7 @@ export const MessageBranchContent = ({
   );
 };
 
-type MessageBranchSelectorProps = Omit<ComponentProps<typeof ButtonGroup>, "children"> & {
+type MessageBranchSelectorProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
 };
 
@@ -274,15 +259,14 @@ export const MessageBranchSelector = ({
   }
 
   return (
-    <ButtonGroup
-      variant="text"
-      size="small"
+    <div
+      role="group"
       className={cn(
-        "[&>*:not(:first-child)]:rounded-l-md [&>*:not(:last-child)]:rounded-r-md",
+        "inline-flex gap-1 [&>*:not(:first-child)]:rounded-l-md [&>*:not(:last-child)]:rounded-r-md",
         className
       )}
-      orientation="horizontal"
-      {...props} />
+      {...props}
+    />
   );
 };
 
@@ -301,11 +285,10 @@ export const MessageBranchPrevious = ({
       aria-label="Previous branch"
       disabled={totalBranches <= 1}
       onClick={goToPrevious}
-      size={resolveMuiButtonSize("icon-sm")}
-      type="button"
-      variant={resolveMuiButtonVariant("ghost")}
+      size="icon-sm"
+      variant="ghost"
       {...props}>
-      {children ?? <ChevronLeftIcon size={14} />}
+      {children ?? <ChevronLeftIcon sx={{ fontSize: 14 }} />}
     </Button>
   );
 };
@@ -321,11 +304,10 @@ export const MessageBranchNext = ({
       aria-label="Next branch"
       disabled={totalBranches <= 1}
       onClick={goToNext}
-      size={resolveMuiButtonSize("icon-sm")}
-      type="button"
-      variant={resolveMuiButtonVariant("ghost")}
+      size="icon-sm"
+      variant="ghost"
       {...props}>
-      {children ?? <ChevronRightIcon size={14} />}
+      {children ?? <ChevronRightIcon sx={{ fontSize: 14 }} />}
     </Button>
   );
 };
@@ -341,12 +323,11 @@ export const MessageBranchPage = ({
   const { currentBranch, totalBranches } = useMessageBranch();
 
   return (
-    <Typography
-      component="div"
+    <div
       className={cn("border-none bg-transparent text-muted-foreground shadow-none", className)}
       {...props}>
       {currentBranch + 1}of {totalBranches}
-    </Typography>
+    </div>
   );
 };
 

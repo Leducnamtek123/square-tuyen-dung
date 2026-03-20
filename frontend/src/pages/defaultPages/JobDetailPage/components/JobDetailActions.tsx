@@ -1,10 +1,8 @@
 import React from "react";
-import { Button, Stack } from "@mui/material";
+import { Button } from "@/ui/button";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { alpha, useTheme } from "@mui/material/styles";
 
-import { LoadingButton } from "@mui/lab";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
@@ -34,7 +32,6 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
 }) => {
   const { t } = useTranslation(["public"]);
   const nav = useNavigate();
-  const theme = useTheme();
   const canApply =
     !isAuthenticated ||
     (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.JOB_SEEKER;
@@ -48,75 +45,52 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
   };
 
   return (
-    <Stack direction="row" spacing={2}>
-    {canApply && (
-      <>
-        <Button
-          variant="contained"
-          size="large"
-          sx={{
-            textTransform: "none",
-            backgroundColor: "warning.main",
-            color: "warning.contrastText",
-            fontWeight: 600,
-            "&:hover": {
-              backgroundColor: "warning.dark",
-            },
-          }}
-          disabled={isApplied}
-          onClick={handleApplyClick}
-        >
-          {isApplied ? t("jobDetail.actions.applied") : t("jobDetail.actions.apply")}
-        </Button>
-        {isAuthenticated && (
-          <LoadingButton
-            onClick={handleSave}
-            startIcon={isSaved ? <FavoriteIcon /> : <FavoriteBorderIcon />}
-            loading={isLoadingSave}
-            loadingPosition="start"
-            variant={isSaved ? "contained" : "outlined"}
-            sx={{
-              textTransform: "none",
-              ...(isSaved
-                ? {
-                    backgroundColor: "secondary.main",
-                    "&:hover": {
-                      backgroundColor: "secondary.dark",
-                    },
-                  }
-                : {
-                    borderColor: "secondary.main",
-                    color: "secondary.main",
-                    "&:hover": {
-                      borderColor: "secondary.dark",
-                      backgroundColor: alpha(theme.palette.secondary.main, 0.08),
-                    },
-                  }),
-            }}
+    <div className="flex flex-wrap items-center gap-2">
+      {canApply && (
+        <>
+          <Button
+            variant="default"
+            size="lg"
+            className="bg-amber-500 font-semibold text-white hover:bg-amber-600"
+            disabled={isApplied}
+            onClick={handleApplyClick}
           >
-            <span>{isSaved ? t("jobDetail.actions.saved") : t("jobDetail.actions.save")}</span>
-          </LoadingButton>
-        )}
-      </>
-    )}
-    <Button
-      variant="outlined"
-      size="large"
-      startIcon={<ShareIcon />}
-      sx={{
-        textTransform: "none",
-        borderColor: "secondary.main",
-        color: "secondary.main",
-        "&:hover": {
-          borderColor: "secondary.dark",
-          backgroundColor: alpha(theme.palette.secondary.main, 0.08),
-        },
-      }}
-      onClick={() => setOpenSharePopup(true)}
-    >
-      {t("jobDetail.actions.share")}
-    </Button>
-    </Stack>
+            {isApplied ? t("jobDetail.actions.applied") : t("jobDetail.actions.apply")}
+          </Button>
+          {isAuthenticated && (
+            <Button
+              onClick={handleSave}
+              variant={isSaved ? "default" : "outline"}
+              size="lg"
+              disabled={isLoadingSave}
+              className={
+                isSaved
+                  ? "bg-purple-600 text-white hover:bg-purple-700"
+                  : "border-purple-600 text-purple-600 hover:bg-purple-50"
+              }
+            >
+              {isLoadingSave ? (
+                <span className="mr-2 inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              ) : isSaved ? (
+                <FavoriteIcon fontSize="small" className="mr-2" />
+              ) : (
+                <FavoriteBorderIcon fontSize="small" className="mr-2" />
+              )}
+              <span>{isSaved ? t("jobDetail.actions.saved") : t("jobDetail.actions.save")}</span>
+            </Button>
+          )}
+        </>
+      )}
+      <Button
+        variant="outline"
+        size="lg"
+        onClick={() => setOpenSharePopup(true)}
+        className="border-purple-600 text-purple-600 hover:bg-purple-50"
+      >
+        <ShareIcon fontSize="small" className="mr-2" />
+        {t("jobDetail.actions.share")}
+      </Button>
+    </div>
   );
 };
 

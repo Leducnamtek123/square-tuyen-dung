@@ -3,7 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import type { HTMLAttributes, KeyboardEvent } from 'react';
 import { useChat } from '@livekit/components-react';
 import { Track } from 'livekit-client';
-import { Loader, MessageSquareTextIcon, SendHorizontal } from 'lucide-react';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import SendIcon from '@mui/icons-material/Send';
 import { motion, type HTMLMotionProps } from 'motion/react';
 
 import { cn } from '@/lib/utils';
@@ -13,8 +14,7 @@ import {
   AgentTrackToggle,
   agentTrackToggleVariants,
 } from '@/components/agents-ui/agent-track-toggle';
-import Button from '@mui/material/Button';
-import ToggleButton from '@mui/material/ToggleButton';
+import { Button } from '@/ui/button';
 import { useInputControls, usePublishPermissions } from '@/hooks/agents-ui/use-agent-control-bar';
 
 type AgentControlBarProps = HTMLAttributes<HTMLDivElement> & {
@@ -34,42 +34,16 @@ type AgentControlBarProps = HTMLAttributes<HTMLDivElement> & {
   onIsChatOpenChange?: (open: boolean) => void;
 };
 
-const resolveMuiButtonVariant = (variant: string | undefined): 'outlined' | 'text' | 'contained' => {
+const resolveButtonVariant = (variant: string | undefined) => {
   switch (variant) {
     case 'outline':
-      return 'outlined';
+      return 'outline';
     case 'ghost':
-      return 'text';
-    default:
-      return 'contained';
-  }
-};
-
-const resolveMuiButtonColor = (variant: string | undefined): 'secondary' | 'error' | 'inherit' | 'primary' | 'info' | 'success' | 'warning' => {
-  switch (variant) {
-    case 'secondary':
-      return 'secondary';
+      return 'ghost';
     case 'destructive':
-      return 'error';
-    case 'primary':
-      return 'primary';
+      return 'destructive';
     default:
-      return 'inherit';
-  }
-};
-
-const resolveMuiButtonSize = (size: string | undefined): 'small' | 'large' | 'medium' => {
-  switch (size) {
-    case 'icon':
-    case 'icon-sm':
-    case 'sm':
-    case 'xs':
-      return 'small';
-    case 'lg':
-    case 'icon-lg':
-      return 'large';
-    default:
-      return 'medium';
+      return 'default';
   }
 };
 
@@ -177,15 +151,17 @@ function AgentChatInput({
         onChange={(e) => setMessage(e.target.value)}
         className="field-sizing-content max-h-16 min-h-8 flex-1 resize-none py-2 [scrollbar-width:thin] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50" />
       <Button
-        size={resolveMuiButtonSize('icon')}
-        type="button"
+        size="icon"
         disabled={isDisabled}
-        variant={resolveMuiButtonVariant('default')}
-        color={isDisabled ? 'secondary' : 'inherit'}
+        variant={resolveButtonVariant(isDisabled ? 'outline' : 'default')}
         title={isSending ? 'Sending...' : 'Send'}
         onClick={handleButtonClick}
         className="self-end disabled:cursor-not-allowed">
-        {isSending ? <Loader className="animate-spin" /> : <SendHorizontal />}
+        {isSending ? (
+          <span className="inline-block size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        ) : (
+          <SendIcon fontSize="small" />
+        )}
       </Button>
     </div>
   );
@@ -333,21 +309,22 @@ export function AgentControlBar({
 
           {/* Toggle Transcript */}
           {visibleControls.chat && (
-            <ToggleButton
-              value="chat"
-              selected={isChatOpen || isChatOpenUncontrolled}
+            <button
+              type="button"
+              aria-pressed={isChatOpen || isChatOpenUncontrolled}
               aria-label="Toggle transcript"
-              onChange={(_, state) => {
-                if (!onIsChatOpenChange) setIsChatOpenUncontrolled(state);
-                else onIsChatOpenChange(state);
+              onClick={() => {
+                const nextState = !(isChatOpen || isChatOpenUncontrolled);
+                if (!onIsChatOpenChange) setIsChatOpenUncontrolled(nextState);
+                else onIsChatOpenChange(nextState);
               }}
               data-state={(isChatOpen || isChatOpenUncontrolled) ? 'on' : 'off'}
               className={agentTrackToggleVariants({
                 variant: variant === 'outline' ? 'outline' : 'default',
                 className: cn(variant === 'livekit' && [LK_TOGGLE_VARIANT_2, 'rounded-full']),
               })}>
-              <MessageSquareTextIcon />
-            </ToggleButton>
+              <ChatBubbleOutlineIcon />
+            </button>
           )}
         </div>
 
