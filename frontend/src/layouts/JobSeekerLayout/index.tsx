@@ -1,5 +1,6 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
+import { Box, Container } from "@mui/material";
 import Header from "../components/commons/Header";
 import TabBar from "../components/jobSeekers/TabBar";
 import Footer from "../components/commons/Footer";
@@ -7,18 +8,117 @@ import Footer from "../components/commons/Footer";
 const JobSeekerLayout = () => {
 
   return (
-    <div>
+
+    <Box>
+
       <Header />
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <TabBar />
-      </div>
-      <div className="mx-auto my-2 max-w-7xl px-4 sm:my-3 sm:px-6 lg:px-8">
+
+      <Box>
+
+        <Container maxWidth="xl">
+
+          <TabBar />
+
+        </Container>
+
+      </Box>
+
+      <Container
+
+        maxWidth="xl"
+
+        sx={{
+
+          my: {
+
+            xs: 1.5,
+
+            sm: 2,
+
+            md: 3,
+
+            lg: 3,
+
+            xl: 3,
+
+          },
+
+          paddingLeft: { xs: 1, sm: 4, md: 6, lg: 8, xl: 8 },
+
+          paddingRight: { xs: 1, sm: 4, md: 6, lg: 8, xl: 8 },
+
+        }}
+
+      >
+
         <Outlet />
-      </div>
-      <div className="mt-0 border-t border-border bg-background px-4 py-4 text-foreground sm:mt-2 sm:px-8 md:mt-6 lg:mt-8 lg:px-12 lg:py-8">
+
+      </Container>
+
+      <Box
+
+        sx={{
+
+          mt: {
+
+            xs: 0,
+
+            sm: 2,
+
+            md: 6,
+
+            lg: 8,
+
+            xl: 10,
+
+          },
+
+          px: {
+
+            xs: 1,
+
+            sm: 5,
+
+            md: 8,
+
+            lg: 10,
+
+            xl: 14,
+
+          },
+
+          py: {
+
+            xs: 2,
+
+            sm: 2,
+
+            md: 2,
+
+            lg: 5,
+
+            xl: 5,
+
+          },
+
+          color: "text.primary",
+
+          bgcolor: "background.paper",
+
+          borderTop: '1px solid',
+
+          borderColor: 'divider',
+
+        }}
+
+      >
+
         <Footer />
-      </div>
-    </div>
+
+      </Box>
+
+    </Box>
+
   );
 
 };

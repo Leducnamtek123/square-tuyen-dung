@@ -378,7 +378,7 @@ const InputBaseSearchHomeCustom = ({
 
                 placeholder={placeholder}
 
-                inputProps={{ 'aria-label': 'search' }}
+                slotProps={{ input: { 'aria-label': 'search' } }}
 
                 value={field.value ?? ''}
 

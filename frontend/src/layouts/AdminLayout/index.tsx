@@ -4,6 +4,7 @@ import { Outlet } from 'react-router-dom';
 
 import PropTypes from 'prop-types';
 
+import { Box } from "@mui/material";
 
 import Header from '../components/employers/Header';
 
@@ -34,7 +35,8 @@ const AdminLayout = (props: AdminLayoutProps) => {
     window !== undefined ? () => window().document.body : undefined;
 
   return (
-    <div className="flex">
+
+    <Box sx={{ display: 'flex' }}>
 
       {/* Start: Header */}
 
@@ -48,7 +50,13 @@ const AdminLayout = (props: AdminLayoutProps) => {
 
       {/* End: Header */}
 
-      <nav className="shrink-0 xl:w-[240px]">
+      <Box
+
+        component="nav"
+
+        sx={{ width: { xl: drawerWidth }, flexShrink: { sm: 0 } }}
+
+      >
 
         {/* Start: Sidebar */}
 
@@ -70,21 +78,71 @@ const AdminLayout = (props: AdminLayoutProps) => {
 
         {/* End: Sidebar */}
 
-      </nav>
+      </Box>
 
-      <main className="flex-1">
+      <Box
+
+        component="main"
+
+        sx={{
+
+          flexGrow: 1,
+
+          width: {
+
+            xs: '100%',
+
+            sm: '100%',
+
+            md: '100%',
+
+            lg: '100%',
+
+            xl: `calc(100% - ${drawerWidth}px)`,
+
+          },
+
+        }}
+
+      >
 
         {/* <Toolbar /> */}
 
-        <div className="mt-7 min-h-screen bg-gray-50 p-2 sm:p-4">
+        <Box
+
+          sx={{
+
+            p: {
+
+              xs: 1,
+
+              sm: 3,
+
+              md: 3,
+
+              lg: 3,
+
+              xl: 3,
+
+            },
+
+            mt: 7,
+
+            bgcolor: 'grey.50',
+
+            minHeight: '100vh',
+
+          }}
+
+        >
 
           <Outlet />
 
-        </div>
+        </Box>
 
-      </main>
+      </Box>
 
-    </div>
+    </Box>
 
   );
 

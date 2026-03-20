@@ -1,22 +1,103 @@
 import * as React from 'react';
 import { Outlet } from 'react-router-dom';
+import { Box, Container } from "@mui/material";
 import Header from '../components/commons/Header';
 import Footer from '../components/commons/Footer';
 
 const DefaultLayout = () => {
 
   return (
-    <div>
+
+    <Box>
+
       <Header />
-      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+
+      <Container
+
+        maxWidth="lg"
+
+        sx={{
+
+          paddingLeft: { xs: 1, sm: 4, md: 6, lg: 8, xl: 0 },
+
+          paddingRight: { xs: 1, sm: 4, md: 6, lg: 8, xl: 0 },
+
+        }}
+
+      >
+
         <section>
+
           <Outlet />
+
         </section>
-      </div>
-      <div className="mt-8 border-t border-border bg-background px-4 py-4 text-foreground sm:mt-10 sm:px-8 lg:px-12 lg:py-8">
+
+      </Container>
+
+      <Box
+
+        sx={{
+
+          mt: {
+
+            xs: 2,
+
+            sm: 10,
+
+            md: 10,
+
+            lg: 10,
+
+            xl: 10,
+
+          },
+
+          px: {
+
+            xs: 1,
+
+            sm: 5,
+
+            md: 8,
+
+            lg: 10,
+
+            xl: 14,
+
+          },
+
+          py: {
+
+            xs: 2,
+
+            sm: 2,
+
+            md: 2,
+
+            lg: 5,
+
+            xl: 5,
+
+          },
+
+          color: 'text.primary',
+
+          bgcolor: 'background.paper',
+
+          borderTop: '1px solid',
+
+          borderColor: 'divider',
+
+        }}
+
+      >
+
         <Footer />
-      </div>
-    </div>
+
+      </Box>
+
+    </Box>
+
   );
 
 };

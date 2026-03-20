@@ -1,5 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
+import { Box, Container } from "@mui/material";
 import Header from '../components/commons/Header';
 import SubHeader from '../components/commons/SubHeader';
 import TopSlide from '../components/commons/TopSlide';
@@ -8,23 +9,109 @@ import Footer from '../components/commons/Footer';
 const HomeLayout = () => {
 
   return (
-    <div>
+
+    <Box>
+
       <Header />
+
       <SubHeader />
-      <div className="w-full">
+
+      <Container
+
+        maxWidth="xl"
+
+        sx={{
+
+          paddingLeft: 0,
+
+          paddingRight: 0,
+
+        }}
+
+      >
+
         <section>
+
           <TopSlide />
+
         </section>
-      </div>
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+
+      </Container>
+
+      <Container
+
+        maxWidth="xl"
+
+        sx={{
+
+          paddingLeft: { xs: 1, sm: 4, md: 6, lg: 8, xl: 8 },
+
+          paddingRight: { xs: 1, sm: 4, md: 6, lg: 8, xl: 8 },
+
+        }}
+
+      >
+
         <section>
+
           <Outlet />
+
         </section>
-      </div>
-      <div className="mt-10 border-t border-border bg-background px-4 py-4 text-foreground sm:px-8 lg:px-12 lg:py-8">
+
+      </Container>
+
+      <Box
+
+        sx={{
+
+          mt: 10,
+
+          px: {
+
+            xs: 1,
+
+            sm: 5,
+
+            md: 8,
+
+            lg: 10,
+
+            xl: 14
+
+          },
+
+          py: {
+
+            xs: 2,
+
+            sm: 2,
+
+            md: 2,
+
+            lg: 5,
+
+            xl: 5
+
+          },
+
+          color: 'text.primary',
+
+          bgcolor: 'background.paper',
+
+          borderTop: '1px solid',
+
+          borderColor: 'divider',
+
+        }}
+
+      >
+
         <Footer />
-      </div>
-    </div>
+
+      </Box>
+
+    </Box>
+
   );
 
 };
