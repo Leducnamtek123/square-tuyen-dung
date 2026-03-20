@@ -14,19 +14,33 @@ from minio.error import S3Error
 
 class CloudinaryService:
     @staticmethod
-    def _get_client():
-        endpoint = settings.MINIO_ENDPOINT
-        secure = settings.MINIO_SECURE
+    def _resolve_endpoint(endpoint: str, secure_default: bool):
+        secure = secure_default
         if endpoint.startswith("http://") or endpoint.startswith("https://"):
             parsed = urlparse(endpoint)
             endpoint = parsed.netloc
             secure = parsed.scheme == "https"
+        return endpoint, secure
+
+    @staticmethod
+    def _get_client(endpoint_override: str = None):
+        endpoint = endpoint_override or settings.MINIO_ENDPOINT
+        endpoint, secure = CloudinaryService._resolve_endpoint(
+            endpoint, settings.MINIO_SECURE
+        )
         return Minio(
             endpoint=endpoint,
             access_key=settings.MINIO_ACCESS_KEY,
             secret_key=settings.MINIO_SECRET_KEY,
             secure=secure
         )
+
+    @staticmethod
+    def _get_presign_client():
+        public_base = getattr(settings, "MINIO_PUBLIC_URL", "").strip()
+        if public_base:
+            return CloudinaryService._get_client(endpoint_override=public_base)
+        return CloudinaryService._get_client()
 
     @staticmethod
     def _ensure_bucket(client: Minio, bucket: str):
@@ -222,7 +236,7 @@ class CloudinaryService:
                         object_path = public_id[len(base_url) + 1 :]
                         if object_path.startswith(f"{bucket}/"):
                             object_path = object_path[len(bucket) + 1 :]
-                        client = CloudinaryService._get_client()
+                        client = CloudinaryService._get_presign_client()
                         expires = getattr(settings, "MINIO_PRESIGN_EXPIRES", 3600)
                         url = client.presigned_get_object(
                             bucket,
@@ -238,7 +252,7 @@ class CloudinaryService:
                         object_path = parsed.path.lstrip("/")
                         if object_path.startswith(f"{bucket}/"):
                             object_path = object_path[len(bucket) + 1 :]
-                        client = CloudinaryService._get_client()
+                        client = CloudinaryService._get_presign_client()
                         expires = getattr(settings, "MINIO_PRESIGN_EXPIRES", 3600)
                         url = client.presigned_get_object(
                             bucket,
@@ -249,7 +263,7 @@ class CloudinaryService:
 
                 return public_id, options_config
 
-            client = CloudinaryService._get_client()
+            client = CloudinaryService._get_presign_client()
             bucket = settings.MINIO_BUCKET
 
             if getattr(settings, "MINIO_USE_PRESIGNED", True):
