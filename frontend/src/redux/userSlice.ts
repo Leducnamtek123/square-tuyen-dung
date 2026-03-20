@@ -14,10 +14,19 @@ interface RemoveUserInfoPayload {
   backend?: string;
 }
 
+const getUserWorkspaces = createAsyncThunk<Partial<User>, void>(
+  'user/getUserWorkspaces',
+  async () => {
+    const resData = await authService.getUserWorkspaces();
+    return resData as Partial<User>;
+  }
+);
+
 const getUserInfo = createAsyncThunk<User, void>(
   'user/getUserInfo',
-  async () => {
+  async (_, thunkAPI) => {
     const resData = await authService.getUserInfo();
+    thunkAPI.dispatch(getUserWorkspaces());
     return resData as User;
   }
 );
@@ -151,12 +160,14 @@ export const userSlice = createSlice({
     builder.addCase(getUserInfo.fulfilled, (state, action) => {
       state.isAuthenticated = true;
       state.currentUser = action.payload;
-      state.activeWorkspace = resolveActiveWorkspace(
-        action.payload?.workspaces,
-        state.activeWorkspace || storedWorkspace,
-        action.payload
-      );
-      persistActiveWorkspace(state.activeWorkspace);
+      if (Array.isArray(action.payload?.workspaces) && action.payload.workspaces.length) {
+        state.activeWorkspace = resolveActiveWorkspace(
+          action.payload.workspaces,
+          state.activeWorkspace || storedWorkspace,
+          action.payload
+        );
+        persistActiveWorkspace(state.activeWorkspace);
+      }
     });
 
     builder.addCase(updateUserInfo.fulfilled, (state, action) => {
@@ -166,6 +177,20 @@ export const userSlice = createSlice({
         action.payload?.workspaces,
         state.activeWorkspace || storedWorkspace,
         action.payload
+      );
+      persistActiveWorkspace(state.activeWorkspace);
+    });
+
+    builder.addCase(getUserWorkspaces.fulfilled, (state, action) => {
+      const nextUser = {
+        ...(state.currentUser || {}),
+        ...(action.payload || {}),
+      } as User;
+      state.currentUser = nextUser;
+      state.activeWorkspace = resolveActiveWorkspace(
+        action.payload?.workspaces,
+        state.activeWorkspace || storedWorkspace,
+        nextUser
       );
       persistActiveWorkspace(state.activeWorkspace);
     });
@@ -202,6 +227,7 @@ const { setActiveWorkspace } = userSlice.actions;
 export default reducer;
 export {
   getUserInfo,
+  getUserWorkspaces,
   updateUserInfo,
   removeUserInfo,
   updateAvatar,

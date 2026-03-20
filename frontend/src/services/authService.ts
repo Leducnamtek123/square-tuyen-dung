@@ -106,12 +106,17 @@ const authService = {
   },
 
   getUserInfo: async (): Promise<UserResponse> => {
-    const url = 'auth/user-info/';
+    const url = 'auth/user-info-basic/';
     const data = (await httpRequest.get(url)) as UserResponse;
     if (data?.avatarUrl) {
       data.avatarUrl = await ensurePresignedUrl(data.avatarUrl);
     }
     return data;
+  },
+
+  getUserWorkspaces: async (): Promise<UserResponse> => {
+    const url = 'auth/user-workspaces/';
+    return (await httpRequest.get(url)) as UserResponse;
   },
 
   updateUser: async (data: AnyRecord): Promise<UserResponse> => {

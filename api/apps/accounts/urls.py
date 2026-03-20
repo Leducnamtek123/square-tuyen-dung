@@ -40,6 +40,8 @@ urlpatterns = [
     path('avatar/', views.avatar),
 
     path('user-info/', views.get_user_info),
+    path('user-info-basic/', views.get_user_info_basic),
+    path('user-workspaces/', views.get_user_workspaces),
 
     path('job-seeker/register/', views.job_seeker_register),
 

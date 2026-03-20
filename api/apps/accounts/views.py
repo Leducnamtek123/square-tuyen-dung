@@ -6,6 +6,7 @@ import json
 import datetime
 import logging
 import copy
+import time
 
 import pytz
 
@@ -15,6 +16,7 @@ from django.conf import settings
 from django.http import QueryDict
 
 from django.db import transaction
+from django.db import connection, reset_queries
 
 from django.utils.encoding import force_bytes, force_str
 
@@ -22,7 +24,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 
 from django_otp.oath import TOTP
 
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 
 from rest_framework.decorators import api_view, permission_classes, action
 
@@ -59,6 +61,7 @@ from .tokens_custom import email_verification_token
 from . import permissions as perms_custom
 
 from .models import User, ForgotPasswordToken
+from apps.profiles.models import CompanyMember
 
 from common.firebase import verify_id_token
 
@@ -92,6 +95,64 @@ from .serializers import (
 )
 
 logger = logging.getLogger(__name__)
+
+USER_INFO_BASIC_FIELDS = (
+    "id",
+    "fullName",
+    "email",
+    "isActive",
+    "isVerifyEmail",
+    "avatarUrl",
+    "roleName",
+    "jobSeekerProfileId",
+    "jobSeekerProfile",
+)
+
+USER_WORKSPACE_FIELDS = (
+    "companyId",
+    "company",
+    "canAccessEmployerPortal",
+    "employerRoleCode",
+    "workspaces",
+)
+
+def _get_user_for_info(user_id, include_memberships=True):
+    queryset = User.objects.select_related(
+        "avatar",
+        "job_seeker_profile",
+        "company",
+        "company__logo",
+    )
+
+    if include_memberships:
+        memberships_qs = CompanyMember.objects.select_related(
+            "company", "role", "company__logo"
+        ).filter(
+            status=CompanyMember.STATUS_ACTIVE,
+            is_active=True,
+        )
+        queryset = queryset.prefetch_related(
+            Prefetch(
+                "company_memberships",
+                queryset=memberships_qs,
+                to_attr="_active_memberships",
+            )
+        )
+
+    return queryset.get(pk=user_id)
+
+def _log_user_info_perf(label, user_id, start_at):
+    if not getattr(settings, "DEBUG", False):
+        return
+    duration = time.monotonic() - start_at
+    query_count = len(connection.queries)
+    logger.info(
+        "user-info[%s] user=%s duration=%.3fs queries=%s",
+        label,
+        user_id,
+        duration,
+        query_count,
+    )
 
 
 def _build_oauth_request(request, payload):
@@ -1091,12 +1152,44 @@ def job_seeker_register(request):
 @permission_classes(permission_classes=[IsAuthenticated])
 
 def get_user_info(request):
+    start_at = time.monotonic()
+    if getattr(settings, "DEBUG", False):
+        reset_queries()
 
-    user_info = request.user
-
+    user_info = _get_user_for_info(request.user.id, include_memberships=True)
     user_info_serializer = UserSerializer(user_info)
+    response = response_data(status=status.HTTP_200_OK, data=user_info_serializer.data)
 
-    return response_data(status=status.HTTP_200_OK, data=user_info_serializer.data)
+    _log_user_info_perf("full", request.user.id, start_at)
+    return response
+
+@api_view(http_method_names=["GET"])
+@permission_classes(permission_classes=[IsAuthenticated])
+def get_user_info_basic(request):
+    start_at = time.monotonic()
+    if getattr(settings, "DEBUG", False):
+        reset_queries()
+
+    user_info = _get_user_for_info(request.user.id, include_memberships=False)
+    user_info_serializer = UserSerializer(user_info, fields=USER_INFO_BASIC_FIELDS)
+    response = response_data(status=status.HTTP_200_OK, data=user_info_serializer.data)
+
+    _log_user_info_perf("basic", request.user.id, start_at)
+    return response
+
+@api_view(http_method_names=["GET"])
+@permission_classes(permission_classes=[IsAuthenticated])
+def get_user_workspaces(request):
+    start_at = time.monotonic()
+    if getattr(settings, "DEBUG", False):
+        reset_queries()
+
+    user_info = _get_user_for_info(request.user.id, include_memberships=True)
+    user_info_serializer = UserSerializer(user_info, fields=USER_WORKSPACE_FIELDS)
+    response = response_data(status=status.HTTP_200_OK, data=user_info_serializer.data)
+
+    _log_user_info_perf("workspaces", request.user.id, start_at)
+    return response
 
 class UserSettingAPIView(APIView):
 

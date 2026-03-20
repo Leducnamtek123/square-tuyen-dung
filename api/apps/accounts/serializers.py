@@ -237,6 +237,12 @@ class UserSerializer(serializers.ModelSerializer):
         if getattr(user, 'role_name', None) != var_sys.JOB_SEEKER:
             return None
         try:
+            cached = getattr(user, "job_seeker_profile", None)
+            if cached is not None:
+                return cached
+        except Exception:
+            cached = None
+        try:
             return JobSeekerProfile.objects.only("id", "phone").filter(user=user).first()
         except Exception as ex:
             helper.print_log_error("UserSerializer._get_job_seeker_profile_safe", ex)
@@ -286,6 +292,9 @@ class UserSerializer(serializers.ModelSerializer):
         if getattr(user, "role_name", None) == var_sys.EMPLOYER:
             return True
         try:
+            memberships = getattr(user, "_active_memberships", None)
+            if memberships is not None:
+                return len(memberships) > 0
             return CompanyMember.objects.filter(
                 user=user,
                 status=CompanyMember.STATUS_ACTIVE,
@@ -296,11 +305,15 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_employer_role_code(self, user):
         try:
-            membership = CompanyMember.objects.select_related("role").filter(
-                user=user,
-                status=CompanyMember.STATUS_ACTIVE,
-                is_active=True,
-            ).first()
+            memberships = getattr(user, "_active_memberships", None)
+            if memberships is not None:
+                membership = memberships[0] if memberships else None
+            else:
+                membership = CompanyMember.objects.select_related("role").filter(
+                    user=user,
+                    status=CompanyMember.STATUS_ACTIVE,
+                    is_active=True,
+                ).first()
             return membership.role.code if membership and membership.role else None
         except Exception:
             return None
@@ -344,11 +357,13 @@ class UserSerializer(serializers.ModelSerializer):
             pass
 
         try:
-            memberships = CompanyMember.objects.select_related("company", "role", "company__logo").filter(
-                user=user,
-                status=CompanyMember.STATUS_ACTIVE,
-                is_active=True,
-            )
+            memberships = getattr(user, "_active_memberships", None)
+            if memberships is None:
+                memberships = CompanyMember.objects.select_related("company", "role", "company__logo").filter(
+                    user=user,
+                    status=CompanyMember.STATUS_ACTIVE,
+                    is_active=True,
+                )
             for membership in memberships:
                 company = membership.company
                 if not company or company.id in company_ids:
