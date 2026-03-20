@@ -27,7 +27,7 @@ WORKDIR /api
 
 # Install Python dependencies first (better layer caching)
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade "pip<24.1" setuptools wheel \
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel \
     && pip install --no-cache-dir -r requirements.txt
 
 # Copy application code

@@ -93,6 +93,8 @@ class CompanyDocument(Document):
         })
     })
 
+    description = fields.TextField()
+
     class Index:
         name = 'companies'
         settings = {'number_of_shards': 1, 'number_of_replicas': 0}
@@ -106,7 +108,6 @@ class CompanyDocument(Document):
             'company_phone',
             'website_url',
             'field_operation',
-            'description',
             'employee_size',
             'create_at',
             'update_at',
