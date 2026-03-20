@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { useNavigate } from 'react-router-dom';
 
-import { Container, Stack } from "@mui/material";
+import { Container, Stack, useMediaQuery } from "@mui/material";
 
 import AppBar from '@mui/material/AppBar';
 
@@ -46,8 +46,12 @@ const listItems = (items: CareerItem[], handleFilter: (id: string) => void) => (
     alignContent="center"
 
     sx={{ 
-
-      overflow: 'hidden',
+      overflowX: 'auto',
+      scrollbarWidth: 'none',
+      msOverflowStyle: 'none',
+      '&::-webkit-scrollbar': {
+        display: 'none',
+      },
 
       '& .MuiTypography-root:hover': {
 
@@ -120,6 +124,7 @@ const SubHeader = () => {
   const [topCareers, setTopCareers] = React.useState([]);
 
   const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.down('md'));
 
   React.useEffect(() => {
 
@@ -249,7 +254,7 @@ const SubHeader = () => {
 
               </Box>
 
-              {listItems(topCareers, handleFilter)}
+              {!isSmall && listItems(topCareers, handleFilter)}
 
             </Toolbar>
 
