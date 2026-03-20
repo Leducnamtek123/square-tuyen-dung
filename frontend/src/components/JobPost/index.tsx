@@ -16,7 +16,7 @@ import TimeAgo from '../TimeAgo';
 import MuiImageCustom from '../MuiImageCustom';
 import { salaryString } from '../../utils/customData';
 import { formatRoute } from '../../utils/funcUtils';
-import { ROUTES } from '../../configs/constants';
+import { ROUTES, IMAGES } from '../../configs/constants';
 import { useAppSelector } from '../../hooks/useAppStore';
 
 interface JobPostProps {
@@ -246,6 +246,7 @@ const JobPost = ({
               height={65}
 
               src={companyImageUrl}
+              fallbackSrc={IMAGES.companyLogoDefault}
 
               sx={{
 

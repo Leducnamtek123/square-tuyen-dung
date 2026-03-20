@@ -172,6 +172,7 @@ const JobPostLarge = ({
               height={100}
 
               src={companyImageUrl || IMAGES.companyLogoDefault}
+              fallbackSrc={IMAGES.companyLogoDefault}
 
               sx={{
 

@@ -7,7 +7,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Box, Card, Skeleton, Stack, Typography } from "@mui/material";
 import MuiImageCustom from '../MuiImageCustom';
 import companyService from '../../services/companyService';
-import { ROUTES } from '../../configs/constants';
+import { ROUTES, IMAGES } from '../../configs/constants';
 import { formatRoute } from '../../utils/funcUtils';
 
 interface Props {
@@ -318,8 +318,10 @@ const TopCompanyCarousel = () => {
                         height={120}
 
                         src={value?.companyImageUrl}
+                        fallbackSrc={IMAGES.companyLogoDefault}
 
                         duration={1500}
+
 
                         sx={{ 
 

@@ -8,7 +8,7 @@ import { Box, Link } from "@mui/material";
 import HomeSearch from '../../../../pages/components/defaults/HomeSearch';
 import MuiImageCustom from '../../../../components/MuiImageCustom';
 import ProjectService from '../../../../services/ProjectService';
-import { BANNER_TYPES } from '../../../../configs/constants';
+import { BANNER_TYPES, IMAGES } from '../../../../configs/constants';
 
 const styles = {
   ".swiper-pagination-bullet": {
@@ -74,13 +74,28 @@ const TopSlide = () => {
           className="mySwiper"
           style={{ height: '100%' }}
         >
-          {banners.map((value) => (
-            <SwiperSlide key={value.id} style={{ cursor: 'pointer' }}>
-              <Link href={value?.buttonLink} target="_blank">
-                <RenderItem item={value} />
-              </Link>
+          {banners.length > 0 ? (
+            banners.map((value) => (
+              <SwiperSlide key={value.id} style={{ cursor: 'pointer' }}>
+                <Link href={value?.buttonLink} target="_blank">
+                  <RenderItem item={value} />
+                </Link>
+              </SwiperSlide>
+            ))
+          ) : (
+            <SwiperSlide>
+              <MuiImageCustom
+                width="100%"
+                height={320}
+                src={IMAGES.coverImageDefault}
+                sx={{
+                  borderRadius: 1.5,
+                }}
+                fit="cover"
+              />
             </SwiperSlide>
-          ))}
+          )}
+
         </Swiper>
       </Box>
       <Box
