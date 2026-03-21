@@ -268,6 +268,7 @@ class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
         'company__user',
         'location',
         'location__city',
+        'career',
     ).all()
     serializer_class = JobPostSerializer
     renderer_classes = [renderers.MyJSONRenderer]

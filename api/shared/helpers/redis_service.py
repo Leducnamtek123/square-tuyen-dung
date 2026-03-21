@@ -26,7 +26,13 @@ class RedisService:
 
                 decode_responses=True,
 
-                charset="utf-8"
+                charset="utf-8",
+
+                socket_connect_timeout=3,
+
+                socket_timeout=3,
+
+                retry_on_timeout=False
 
             )
 

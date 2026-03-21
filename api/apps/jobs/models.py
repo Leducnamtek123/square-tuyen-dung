@@ -117,6 +117,7 @@ class JobPost(JobPostBaseModel):
             models.Index(fields=["status", "deadline"], name="job_post_stt_dead_idx"),
             models.Index(fields=["status", "create_at"], name="job_post_stt_create_idx"),
             models.Index(fields=["deadline", "create_at"], name="job_post_dead_create_idx"),
+            models.Index(fields=["status", "deadline", "-update_at", "-create_at"], name="job_post_list_idx"),
         ]
 
     def __str__(self):
