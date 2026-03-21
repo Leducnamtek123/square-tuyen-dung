@@ -1,4 +1,157 @@
+"""
+Unit tests for the Profiles app — models, services, and serializers.
+"""
+import pytest
 
-from django.test import TestCase
+from apps.profiles.models import (
+    Resume, Company, CompanyFollowed,
+    JobSeekerProfile, ResumeViewed, ResumeSaved,
+    EducationDetail, ExperienceDetail
+)
+from apps.profiles.services import ResumeService, CompanyService
 
-# Create your tests here.
+
+# ==================== Model Tests ====================
+
+@pytest.mark.django_db
+class TestResumeModel:
+    """Tests for Resume model."""
+
+    def test_resume_creation(self, resume):
+        assert resume.title == 'Backend Developer'
+        assert resume.is_active is True
+        assert resume.salary_min == 15000000
+
+    def test_resume_str(self, resume):
+        result = str(resume)
+        assert 'Backend Developer' in result
+
+    def test_resume_belongs_to_user(self, resume, job_seeker_user):
+        assert resume.user == job_seeker_user
+
+    def test_resume_has_career(self, resume, career):
+        assert resume.career == career
+
+
+@pytest.mark.django_db
+class TestCompanyModel:
+    """Tests for Company model."""
+
+    def test_company_creation(self, company):
+        assert company.company_name == 'Test Company'
+        assert company.tax_code == '1234567890'
+
+    def test_company_str(self, company):
+        assert str(company) is not None
+
+    def test_company_belongs_to_employer(self, company, employer_user):
+        assert company.user == employer_user
+
+    def test_company_unique_tax_code(self, company, db):
+        from django.db import IntegrityError
+        with pytest.raises(IntegrityError):
+            Company.objects.create(
+                company_name='Another Company',
+                company_email='other@test.com',
+                company_phone='0912345678',
+                tax_code='1234567890',  # duplicate
+                user=company.user,
+            )
+
+
+@pytest.mark.django_db
+class TestCompanyFollowed:
+    """Tests for CompanyFollowed model."""
+
+    def test_follow_company(self, job_seeker_user, company):
+        follow = CompanyFollowed.objects.create(
+            user=job_seeker_user, company=company
+        )
+        assert follow.user == job_seeker_user
+        assert follow.company == company
+
+    def test_follow_str(self, job_seeker_user, company):
+        follow = CompanyFollowed.objects.create(
+            user=job_seeker_user, company=company
+        )
+        assert str(follow) is not None
+
+
+# ==================== Service Tests ====================
+
+@pytest.mark.django_db
+class TestResumeService:
+    """Tests for ResumeService."""
+
+    def test_get_optimized_queryset(self, resume):
+        qs = ResumeService.get_optimized_resume_queryset()
+        assert resume in qs
+
+    def test_get_active_resumes(self, resume):
+        resumes = ResumeService.get_active_resumes()
+        assert resume in resumes
+
+    def test_get_active_resumes_excludes_inactive(self, resume):
+        resume.is_active = False
+        resume.save()
+        resumes = ResumeService.get_active_resumes()
+        assert resume not in resumes
+
+    def test_get_active_resumes_filter_career(self, resume, career):
+        resumes = ResumeService.get_active_resumes(career_id=career.id)
+        assert resume in resumes
+
+        resumes = ResumeService.get_active_resumes(career_id=99999)
+        assert resume not in resumes
+
+    def test_toggle_save_resume(self, company, resume):
+        # Save
+        saved, msg = ResumeService.toggle_save_resume(company, resume)
+        assert saved is True
+        assert ResumeSaved.objects.filter(company=company, resume=resume).exists()
+
+        # Unsave
+        saved, msg = ResumeService.toggle_save_resume(company, resume)
+        assert saved is False
+        assert not ResumeSaved.objects.filter(company=company, resume=resume).exists()
+
+    def test_record_resume_view(self, company, resume):
+        created = ResumeService.record_resume_view(company, resume)
+        assert created is True
+        assert ResumeViewed.objects.filter(company=company, resume=resume).exists()
+
+        # Second view — idempotent
+        created = ResumeService.record_resume_view(company, resume)
+        assert created is False
+        assert ResumeViewed.objects.filter(company=company, resume=resume).count() == 1
+
+
+@pytest.mark.django_db
+class TestCompanyService:
+    """Tests for CompanyService."""
+
+    def test_get_optimized_queryset(self, company):
+        qs = CompanyService.get_optimized_company_queryset()
+        assert company in qs
+
+    def test_toggle_follow(self, job_seeker_user, company):
+        # Follow
+        following, msg = CompanyService.toggle_follow(job_seeker_user, company)
+        assert following is True
+        assert CompanyFollowed.objects.filter(
+            user=job_seeker_user, company=company
+        ).exists()
+
+        # Unfollow
+        following, msg = CompanyService.toggle_follow(job_seeker_user, company)
+        assert following is False
+        assert not CompanyFollowed.objects.filter(
+            user=job_seeker_user, company=company
+        ).exists()
+
+    def test_get_company_stats(self, company):
+        stats = CompanyService.get_company_stats(company)
+        assert stats['total_followers'] == 0
+        assert stats['total_jobs'] >= 0
+        assert 'resumes_saved' in stats
+        assert 'resumes_viewed' in stats

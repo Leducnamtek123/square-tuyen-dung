@@ -48,3 +48,4 @@ python-docx
 requests
 beautifulsoup4
 faker
+sentry-sdk[django]>=2.0.0

@@ -178,8 +178,9 @@ def send_evaluation_report(session_id):
         logger.error("Error sending report email for session %s: %s", session_id, e)
 
 
-@shared_task
-def evaluate_interview_session(session_id):
+@shared_task(bind=True, autoretry_for=(httpx.TimeoutException, httpx.ConnectError),
+             retry_backoff=True, retry_kwargs={'max_retries': 3})
+def evaluate_interview_session(self, session_id):
     """Call LLM to evaluate interview transcript and persist validated structured output."""
     try:
         session = InterviewSession.objects.prefetch_related("transcripts").get(id=session_id)

@@ -81,7 +81,7 @@ class Resume(InfoBaseModel):
 
     job_type = models.SmallIntegerField(choices=var_sys.JOB_TYPE_CHOICES, null=True)
 
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=False, db_index=True)
 
     type = models.CharField(max_length=10, default=var_sys.CV_UPLOAD)
 
@@ -102,6 +102,10 @@ class Resume(InfoBaseModel):
     class Meta:
 
         db_table = "project_info_resume"
+        indexes = [
+            models.Index(fields=['is_active', '-update_at'], name='idx_resume_active_updated'),
+            models.Index(fields=['user', 'is_active'], name='idx_resume_user_active'),
+        ]
 
     def __str__(self):
 
@@ -196,6 +200,10 @@ class CompanyFollowed(InfoBaseModel):
         db_table = "project_info_company_followed"
 
         verbose_name_plural = "Companies followed"
+        indexes = [
+            models.Index(fields=['user', 'company'], name='idx_followed_user_company'),
+        ]
+        unique_together = [('user', 'company')]
 
     def __str__(self):
 

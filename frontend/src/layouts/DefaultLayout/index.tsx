@@ -13,15 +13,10 @@ const DefaultLayout = () => {
       <Header />
 
       <Container
-
-        maxWidth="lg"
-
+        maxWidth="xl"
         sx={{
-
-          paddingLeft: { xs: 1, sm: 4, md: 6, lg: 8, xl: 0 },
-
-          paddingRight: { xs: 1, sm: 4, md: 6, lg: 8, xl: 0 },
-
+          paddingLeft: { xs: 1, sm: 4, md: 6, lg: 8, xl: 8 },
+          paddingRight: { xs: 1, sm: 4, md: 6, lg: 8, xl: 8 },
         }}
 
       >

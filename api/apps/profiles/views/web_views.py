@@ -198,7 +198,10 @@ class PrivateResumeViewSet(viewsets.ViewSet,
 
                            generics.DestroyAPIView):
 
-    queryset = Resume.objects.all()
+    queryset = Resume.objects.select_related(
+        'user', 'user__avatar', 'city', 'career', 'file',
+        'job_seeker_profile'
+    )
 
     serializer_class = ResumeSerializer
 
@@ -757,6 +760,8 @@ class ResumeViewedAPIView(views.APIView):
 
             resume__user=user
 
+        ).select_related(
+            'company', 'company__logo', 'resume', 'resume__user'
         ).order_by('-update_at', '-create_at')
 
         paginator = self.pagination_class()
@@ -800,6 +805,11 @@ class ResumeSavedViewSet(viewsets.ViewSet,
         queryset = self.filter_queryset(self.get_queryset()
 
                                         .filter(company=user.company, resume__is_active=True)
+
+                                        .select_related(
+                                            'resume', 'resume__user', 'resume__user__avatar',
+                                            'resume__city', 'resume__career', 'company'
+                                        )
 
                                         .order_by("-create_at"))
 

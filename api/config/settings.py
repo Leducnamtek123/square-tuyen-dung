@@ -98,6 +98,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -105,7 +106,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.locale.LocaleMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
@@ -210,7 +210,15 @@ REST_FRAMEWORK = {
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
         'drf_social_oauth2.authentication.SocialAuthentication',
     ),
-    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '60/minute',
+        'user': '200/minute',
+    },
 }
 
 OAUTH2_PROVIDER = {
@@ -219,7 +227,8 @@ OAUTH2_PROVIDER = {
         'write': 'Write scope',
     },
     'CLIENT_ID_GENERATOR_CLASS': 'oauth2_provider.generators.ClientIdGenerator',
-    'ACCESS_TOKEN_EXPIRE_SECONDS': 100000
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 3600,  # 1 hour
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 86400,  # 24 hours
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -450,3 +459,30 @@ ELASTICSEARCH_DSL = {
         'hosts': config('ELASTICSEARCH_HOST', default='elasticsearch:9200')
     },
 }
+
+
+
+# === Sentry Error Tracking ===
+SENTRY_DSN = config('SENTRY_DSN', default='')
+if SENTRY_DSN:
+    import sentry_sdk
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        traces_sample_rate=0.1,
+        environment=APP_ENVIRONMENT,
+    )
+
+# === Security Headers ===
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+if APP_ENVIRONMENT == 'production':
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+
+# === Database Connection Persistence ===
+CONN_MAX_AGE = 600  # Keep DB connections alive for 10 minutes

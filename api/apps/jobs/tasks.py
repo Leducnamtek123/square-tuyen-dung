@@ -1,6 +1,8 @@
 import logging
 import httpx
 import json
+import os
+import tempfile
 import fitz  # PyMuPDF
 import docx
 from celery import shared_task
@@ -33,11 +35,14 @@ def extract_text_from_docx(file_path):
         logger.error(f"Error extracting DOCX: {e}")
     return text
 
-@shared_task
-def analyze_resume_ai(activity_id):
+@shared_task(bind=True, autoretry_for=(httpx.TimeoutException, httpx.ConnectError),
+             retry_backoff=True, retry_kwargs={'max_retries': 3})
+def analyze_resume_ai(self, activity_id):
     """
     Task phân tích CV bằng AI.
+    Tự động retry lên đến 3 lần với exponential backoff khi LLM timeout.
     """
+    temp_file = None
     try:
         activity = JobPostActivity.objects.select_related('job_post', 'resume', 'resume__file').get(id=activity_id)
         
@@ -54,11 +59,9 @@ def analyze_resume_ai(activity_id):
         file_format = activity.resume.file.format.lower()
         
         resume_text = ""
-        with httpx.Client() as client:
+        with httpx.Client(timeout=30.0) as client:
             response = client.get(resume_url)
             if response.status_code == 200:
-                import tempfile
-                import os
                 with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
                     tf.write(response.content)
                     temp_file = tf.name
@@ -68,7 +71,6 @@ def analyze_resume_ai(activity_id):
                 elif file_format in ['docx', 'doc']:
                     resume_text = extract_text_from_docx(temp_file)
                 else:
-                    # Thử extract như text nếu là định dạng khác
                     resume_text = response.text
             else:
                 raise Exception(f"Failed to download resume file from {resume_url}")
@@ -126,13 +128,15 @@ def analyze_resume_ai(activity_id):
                 {"role": "user", "content": prompt}
             ],
             "temperature": 0.2,
+            "response_format": {"type": "json_object"},
         }
 
-        with httpx.Client(timeout=120.0) as client:
+        with httpx.Client(timeout=httpx.Timeout(timeout=120.0, connect=10.0)) as client:
             resp = client.post(f"{llama_url}/chat/completions", json=payload)
             if resp.status_code == 200:
                 content = resp.json()['choices'][0]['message']['content']
                 
+                # Extract JSON from possible markdown fences
                 if "```json" in content:
                     content = content.split("```json")[1].split("```")[0].strip()
                 elif "```" in content:
@@ -156,12 +160,22 @@ def analyze_resume_ai(activity_id):
             else:
                 raise Exception(f"LLM API failed with status {resp.status_code}")
 
+    except (httpx.TimeoutException, httpx.ConnectError):
+        # Let Celery autoretry handle these
+        raise
     except Exception as e:
         logger.error(f"Error in analyze_resume_ai for activity {activity_id}: {e}")
         try:
             activity = JobPostActivity.objects.get(id=activity_id)
             activity.ai_analysis_status = 'failed'
-            activity.ai_analysis_summary = str(e)
+            activity.ai_analysis_summary = str(e)[:500]
             activity.save()
-        except:
-            pass
+        except Exception:
+            logger.error(f"Failed to update activity {activity_id} status after error")
+    finally:
+        # Always cleanup temp files
+        if temp_file and os.path.exists(temp_file):
+            try:
+                os.unlink(temp_file)
+            except OSError:
+                pass
