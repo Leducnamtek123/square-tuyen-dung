@@ -15,6 +15,7 @@ import {
 } from "@livekit/components-react";
 import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 interface InterviewAgentViewProps {
   onDisconnect: () => void;
@@ -25,6 +26,7 @@ interface InterviewAgentViewProps {
 }
 
 const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewProps) => {
+  const { t } = useTranslation("interview");
   const room = useRoomContext();
   const { state, agentParticipant } = useAgent() as any;
   const { chatMessages } = useChat({ room });
@@ -85,10 +87,10 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
 
       <div className="absolute left-6 top-6 z-20 flex flex-col gap-1">
         <h2 className="text-xl font-bold tracking-tight text-white/90">
-          {sessionInfo?.jobName || "Technical Interview"}
+          {sessionInfo?.jobName || t("agentView.technicalInterview")}
         </h2>
         <p className="text-xs uppercase tracking-[0.22em] text-white/45">
-          Live Session | {sessionInfo?.candidateName || "Candidate"}
+          Live Session | {sessionInfo?.candidateName || t("agentView.candidate")}
         </p>
       </div>
 
@@ -117,9 +119,9 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
                   state === 'listening' ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.5)]" : "bg-white/20"
                 )} />
                 <span className="text-xs font-bold uppercase tracking-[0.2em] text-white/70">
-                  {state === 'speaking' ? 'Agent is speaking' : 
-                   state === 'thinking' ? 'Agent is thinking' : 
-                   state === 'listening' ? 'Listening...' : 'Ready'}
+                  {state === 'speaking' ? t('agentView.agentSpeaking') : 
+                   state === 'thinking' ? t('agentView.agentThinking') : 
+                   state === 'listening' ? t('agentView.listening') : t('agentView.ready')}
                 </span>
              </div>
           </motion.div>
@@ -139,7 +141,7 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
               <div className="flex items-center justify-between border-b border-white/5 bg-white/5 px-6 py-5">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-cyan-400" />
-                  <h3 className="font-bold text-sm uppercase tracking-widest opacity-80">Transcript</h3>
+                  <h3 className="font-bold text-sm uppercase tracking-widest opacity-80">{t('agentView.transcript')}</h3>
                 </div>
                 <button 
                   onClick={() => setIsChatOpen(false)} 

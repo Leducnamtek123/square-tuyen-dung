@@ -47,6 +47,7 @@ import errorHandling from '../../../../utils/errorHandling';
 import { confirmModal, errorModal } from '../../../../utils/sweetalert2Modal';
 
 import { formatRoute } from '../../../../utils/funcUtils';
+import { tConfig } from '../../../../utils/tConfig';
 
 interface SendEmailComponentProps {
   jobPostActivityId: string;
@@ -230,9 +231,9 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
 
         t('appliedResume.status.errorMsg', {
 
-          fromStatus: allConfig?.applicationStatusDict[applyStatus] || '---',
+          fromStatus: tConfig(allConfig?.applicationStatusDict[applyStatus]) || '---',
 
-          toStatus: allConfig?.applicationStatusDict[e.target.value] || '---',
+          toStatus: tConfig(allConfig?.applicationStatusDict[e.target.value]) || '---',
 
         })
 
@@ -256,7 +257,7 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
 
         t('appliedResume.status.updateTitle'),
 
-        t('appliedResume.status.updateConfirm', { statusName: allConfig?.applicationStatusDict[e.target.value] || '---' }),
+        t('appliedResume.status.updateConfirm', { statusName: tConfig(allConfig?.applicationStatusDict[e.target.value]) || '---' }),
 
         'question'
 

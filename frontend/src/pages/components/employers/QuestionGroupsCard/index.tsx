@@ -274,7 +274,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
         {
 
-            header: 'Question Group Name',
+            header: t('questionGroupsCard.table.groupName'),
 
             accessorKey: 'name',
 
@@ -284,7 +284,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
         {
 
-            header: 'Number of Questions',
+            header: t('questionGroupsCard.table.numberOfQuestions'),
 
             accessorKey: 'questions',
 
@@ -294,11 +294,11 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
         {
 
-            header: 'Description',
+            header: t('questionGroupsCard.table.description'),
 
             accessorKey: 'description',
 
-            cell: ({ getValue }: any) => getValue() || 'N/A',
+            cell: ({ getValue }: any) => getValue() || t('questionGroupsCard.table.na'),
 
         },
 
@@ -406,9 +406,9 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                         </Link>
 
-                        <Typography color="text.secondary" sx={{ fontSize: '0.875rem' }}>Online Interview</Typography>
+                        <Typography color="text.secondary" sx={{ fontSize: '0.875rem' }}>{t("questionGroupsCard.onlineInterview")}</Typography>
 
-                        <Typography color="text.primary" sx={{ fontSize: '0.875rem' }}>Question Groups</Typography>
+                        <Typography color="text.primary" sx={{ fontSize: '0.875rem' }}>{t("questionGroupsCard.questionGroups")}</Typography>
 
                     </Breadcrumbs>
 
@@ -578,7 +578,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                 <DialogTitle sx={{ fontWeight: 600 }}>
 
-                    {dialogMode === 'add' ? 'Add New Question Group' : 'Edit Question Group'}
+                    {dialogMode === 'add' ? t('questionGroupsCard.dialog.addTitle') : t('questionGroupsCard.dialog.editTitle')}
 
                 </DialogTitle>
 
@@ -692,7 +692,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                 <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
 
-                    <Button onClick={handleCloseDialog} color="inherit">Cancel</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('questionGroupsCard.dialog.cancel')}</Button>
 
                     <Button
 
@@ -706,7 +706,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                     >
 
-                        {isMutating ? 'Saving...' : 'Save'}
+                        {isMutating ? t('questionGroupsCard.dialog.saving') : t('questionGroupsCard.dialog.save')}
 
                     </Button>
 
@@ -718,7 +718,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
             <Dialog open={openCreateQuestion} onClose={() => setOpenCreateQuestion(false)} fullWidth maxWidth="xs">
 
-                <DialogTitle sx={{ fontWeight: 600 }}>Create New Question</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 600 }}>{t('questionGroupsCard.dialog.createNewQuestion')}</DialogTitle>
 
                 <DialogContent>
 
@@ -750,7 +750,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                 <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
 
-                    <Button onClick={() => setOpenCreateQuestion(false)} color="inherit">Cancel</Button>
+                    <Button onClick={() => setOpenCreateQuestion(false)} color="inherit">{t('questionGroupsCard.dialog.cancel')}</Button>
 
                     <Button
 
@@ -764,7 +764,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                     >
 
-                        {isCreatingQuestion ? 'Creating...' : 'Create'}
+                        {isCreatingQuestion ? t('questionGroupsCard.dialog.creating') : t('questionGroupsCard.dialog.create')}
 
                     </Button>
 
@@ -776,7 +776,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
 
-                <DialogTitle sx={{ fontWeight: 600 }}>Confirm Delete</DialogTitle>
+                <DialogTitle sx={{ fontWeight: 600 }}>{t('questionGroupsCard.dialog.confirmDeleteTitle')}</DialogTitle>
 
                 <DialogContent>
 
@@ -796,7 +796,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                 <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
 
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">Cancel</Button>
+                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('questionGroupsCard.dialog.cancel')}</Button>
 
                     <Button
 
@@ -812,7 +812,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                     >
 
-                        {isMutating ? 'Deleting...' : 'Confirm Delete'}
+                        {isMutating ? t('questionGroupsCard.dialog.deleting') : t('questionGroupsCard.dialog.confirmDeleteBtn')}
 
                     </Button>
 

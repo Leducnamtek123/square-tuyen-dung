@@ -16,6 +16,7 @@ import { useSelector } from 'react-redux';
 import { CV_TYPES, ROUTES } from '../../configs/constants';
 import { formatRoute } from '../../utils/funcUtils';
 import defaultTheme from '../../themeConfigs/defaultTheme';
+import { tConfig } from '../../utils/tConfig';
 
 interface JobSeekerProfileProps {
   id: string | number;
@@ -355,7 +356,7 @@ const JobSeekerProfile = ({
 
               label={
 
-                allConfig.experienceDict[experience] || (
+                tConfig(allConfig.experienceDict[experience]) || (
 
                   <Typography component="span" sx={(defaultTheme.palette.text as any).italic}>
 
@@ -385,7 +386,7 @@ const JobSeekerProfile = ({
 
               label={
 
-                allConfig.cityDict[city] || (
+                tConfig(allConfig.cityDict[city]) || (
 
                   <Typography component="span" sx={(defaultTheme.palette.text as any).italic}>
 

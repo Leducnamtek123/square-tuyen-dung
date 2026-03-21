@@ -11,6 +11,7 @@ import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import { useTranslation } from 'react-i18next';
 
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
@@ -33,6 +34,7 @@ const MultiSelectSearchCustom = ({
 }: Props) => {
 
   const theme = useTheme();
+  const { t } = useTranslation('common');
 
   return (
 
@@ -62,7 +64,7 @@ const MultiSelectSearchCustom = ({
 
           }
 
-          getOptionLabel={(option) => option.name}
+          getOptionLabel={(option) => typeof option.name === 'string' ? t(`choices.${option.name}`, option.name) : option.name}
 
           renderOption={(props, option, { selected }) => (
 
@@ -80,7 +82,7 @@ const MultiSelectSearchCustom = ({
 
               />
 
-              {option.name}
+              {typeof option.name === 'string' ? t(`choices.${option.name}`, option.name) : option.name}
 
             </li>
 

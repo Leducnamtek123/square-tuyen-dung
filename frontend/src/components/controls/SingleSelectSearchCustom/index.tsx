@@ -7,6 +7,7 @@ import { Control, Controller } from 'react-hook-form';
 import TextField from '@mui/material/TextField';
 
 import Autocomplete from '@mui/material/Autocomplete';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   name: string;
@@ -23,6 +24,7 @@ const SingleSelectSearchCustom = ({
 }: Props) => {
 
   const theme = useTheme();
+  const { t } = useTranslation('common');
 
   return (
 
@@ -44,7 +46,7 @@ const SingleSelectSearchCustom = ({
 
           autoHighlight={false}
 
-          getOptionLabel={(option) => option.name}
+          getOptionLabel={(option) => typeof option.name === 'string' ? t(`choices.${option.name}`, option.name) : option.name}
 
           value={options.find((o) => o.id === field.value) || null}
 

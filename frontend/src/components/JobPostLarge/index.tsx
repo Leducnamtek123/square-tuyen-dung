@@ -18,6 +18,7 @@ import MuiImageCustom from "../MuiImageCustom";
 import { formatRoute } from "../../utils/funcUtils";
 import { ROUTES, IMAGES } from "../../configs/constants";
 import TimeAgo from '../TimeAgo';
+import { tConfig } from '../../utils/tConfig';
 
 interface JobPostLargeProps {
   id: string | number;
@@ -550,7 +551,7 @@ const JobPostLarge = ({
 
                 >
 
-                  {allConfig?.cityDict[cityId] || (
+                  {tConfig(allConfig?.cityDict[cityId]) || (
 
                     <span style={{ fontStyle: "italic", opacity: 0.7 }}>
 

@@ -399,7 +399,11 @@
       "contactpersonname": "Tên người liên hệ",
       "contactpersonphone": "SĐT liên hệ",
       "contactpersonemail": "Email liên hệ",
+      "contactinformation": "Thông tin liên hệ",
       "urgent": "Gấp"
+    },
+    "label": {
+      "isUrgent": "Tuyển gấp"
     },
     "placeholder": {
       "enterjobtitle": "Nhập tiêu đề C.V",
@@ -800,6 +804,61 @@
       "tips_desc": "Nội dung đang được cập nhật để mang lại thông tin hữu ích.",
       "trends_title": "Xu hướng thị trường nhân sự",
       "trends_desc": "Nội dung đang được cập nhật để mang lại thông tin hữu ích."
+    }
+  },
+  "employees": {
+    "pageTitle": "Quản lý nhân sự công ty",
+    "pageDescription": "Quản lý role, thêm nhân viên và gán role trực tiếp.",
+    "addRole": "Thêm role",
+    "addMember": "Thêm nhân viên",
+    "tabs": {
+      "roles": "Roles",
+      "members": "Members"
+    },
+    "table": {
+      "id": "ID",
+      "code": "Code",
+      "roleName": "Tên role",
+      "permissions": "Quyền",
+      "system": "System",
+      "actions": "Thao tác",
+      "user": "User",
+      "email": "Email",
+      "role": "Role",
+      "status": "Trạng thái",
+      "noPermissions": "No permissions",
+      "yes": "Yes",
+      "no": "No",
+      "delete": "Xóa"
+    },
+    "dialog": {
+      "addRoleTitle": "Thêm role mới",
+      "roleNameLabel": "Tên role",
+      "codeLabel": "Code (slug)",
+      "codeHelperText": "Để trống sẽ tự sinh từ tên role.",
+      "descriptionLabel": "Mô tả",
+      "permissionsLabel": "Permissions",
+      "cancel": "Hủy",
+      "createRole": "Tạo role",
+      "addMemberTitle": "Thêm nhân viên",
+      "userIdLabel": "User ID",
+      "userIdHelperText": "Nhập ID tài khoản user cần thêm vào công ty.",
+      "roleLabel": "Role",
+      "statusLabel": "Status",
+      "invitedEmailLabel": "Invited email (optional)",
+      "createMember": "Thêm nhân viên"
+    },
+    "toast": {
+      "createRoleSuccess": "Tạo role thành công",
+      "createRoleError": "Không thể tạo role",
+      "deleteRoleSuccess": "Đã xóa role",
+      "deleteRoleError": "Không thể xóa role",
+      "createMemberSuccess": "Đã thêm nhân viên vào công ty",
+      "createMemberError": "Không thể thêm nhân viên",
+      "updateMemberSuccess": "Đã cập nhật role nhân viên",
+      "updateMemberError": "Không thể cập nhật nhân viên",
+      "deleteMemberSuccess": "Đã xóa nhân viên khỏi công ty",
+      "deleteMemberError": "Không thể xóa nhân viên"
     }
   }
 }

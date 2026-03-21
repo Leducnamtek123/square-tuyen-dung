@@ -25,6 +25,7 @@ import BackdropLoading from '../../../../components/loading/BackdropLoading';
 import resumeService from '../../../../services/resumeService';
 
 import { salaryString } from '../../../../utils/customData';
+import { tConfig } from '../../../../utils/tConfig';
 
 interface ResumeDetail {
   description: string | null;
@@ -404,7 +405,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
                       t('jobSeeker:profile.fields.desiredLevel'),
 
-                      allConfig.positionDict[resumeDetail?.position ?? '']
+                      tConfig(allConfig.positionDict[resumeDetail?.position ?? ''])
 
                     )}
 
@@ -412,7 +413,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
                       t('jobSeeker:profile.fields.academicLevel'),
 
-                      allConfig.academicLevelDict[resumeDetail?.academicLevel ?? '']
+                      tConfig(allConfig.academicLevelDict[resumeDetail?.academicLevel ?? ''])
 
                     )}
 
@@ -420,7 +421,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
                       t('jobSeeker:profile.fields.experience'),
 
-                      allConfig.experienceDict[resumeDetail?.experience ?? '']
+                      tConfig(allConfig.experienceDict[resumeDetail?.experience ?? ''])
 
                     )}
 
@@ -428,7 +429,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
                       t('jobSeeker:profile.fields.career'),
 
-                      allConfig.careerDict[resumeDetail?.career ?? '']
+                      tConfig(allConfig.careerDict[resumeDetail?.career ?? ''])
 
                     )}
 
@@ -452,7 +453,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
                       t('jobSeeker:profile.fields.workLocation'),
 
-                      allConfig.cityDict[resumeDetail?.city ?? '']
+                      tConfig(allConfig.cityDict[resumeDetail?.city ?? ''])
 
                     )}
 
@@ -486,11 +487,11 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
                       t('jobSeeker:profile.fields.workplaceType'),
 
-                      allConfig.typeOfWorkplaceDict[
+                      tConfig(allConfig.typeOfWorkplaceDict[
 
                         resumeDetail?.typeOfWorkplace ?? ''
 
-                      ]
+                      ])
 
                     )}
 
@@ -498,7 +499,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
                       t('jobSeeker:profile.fields.jobType'),
 
-                      allConfig.jobTypeDict[resumeDetail?.jobType ?? '']
+                      tConfig(allConfig.jobTypeDict[resumeDetail?.jobType ?? ''])
 
                     )}
 

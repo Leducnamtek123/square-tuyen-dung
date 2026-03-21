@@ -14,6 +14,7 @@ import {
 import MuiImageCustom from '../MuiImageCustom';
 import { ROUTES } from '../../configs/constants';
 import { formatRoute } from '../../utils/funcUtils';
+import { tConfig } from '../../utils/tConfig';
 
 interface JobPostActionProps {
   id: string | number;
@@ -277,7 +278,7 @@ const JobPostAction = ({
 
                     <FontAwesomeIcon icon={faLocationDot} />
 
-                    {allConfig?.cityDict[cityId] || (
+                    {tConfig(allConfig?.cityDict[cityId]) || (
 
                       <span style={{
 

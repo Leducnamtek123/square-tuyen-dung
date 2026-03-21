@@ -13,6 +13,7 @@ import PersonalProfileForm from "../PersonalProfileForm";
 import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
 import { getUserInfo } from "../../../../redux/userSlice";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
+import { tConfig } from '../../../../utils/tConfig';
 
 interface PersonalInfoCardProps {
   title: string;
@@ -306,7 +307,7 @@ return (
 
                   {item(t('jobSeeker:profile.fields.phone'), profile?.phone)}
 
-                  {item(t('jobSeeker:profile.fields.gender'), allConfig?.genderDict?.[profile?.gender as any])}
+                  {item(t('jobSeeker:profile.fields.gender'), tConfig(allConfig?.genderDict?.[profile?.gender as any]))}
 
                   {item(
 
@@ -324,7 +325,7 @@ return (
 
                     t('jobSeeker:profile.fields.maritalStatus'),
 
-                    allConfig?.maritalStatusDict?.[profile?.maritalStatus as any]
+                    tConfig(allConfig?.maritalStatusDict?.[profile?.maritalStatus as any])
 
                   )}
 
@@ -354,7 +355,7 @@ return (
 
                     t('common:city'),
 
-                    allConfig?.cityDict?.[profile?.location?.city as any]
+                    tConfig(allConfig?.cityDict?.[profile?.location?.city as any])
 
                   )}
 

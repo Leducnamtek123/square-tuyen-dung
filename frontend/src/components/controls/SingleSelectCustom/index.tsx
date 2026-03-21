@@ -3,6 +3,7 @@ import React from 'react';
 import { Control, Controller } from 'react-hook-form';
 
 import { Autocomplete, TextField, Typography } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 import ValidationError from '../ValidationError';
 
 interface Props {
@@ -24,11 +25,10 @@ const SingleSelectCustom = ({
   placeholder = '',
   sx = {},
 }: Props) => {
+  const { t } = useTranslation('common');
 
   return (
-
     <div>
-
       {title && (
 
         <Typography variant="subtitle2" gutterBottom>
@@ -61,7 +61,7 @@ const SingleSelectCustom = ({
 
               autoHighlight={false}
 
-              getOptionLabel={(option) => option.name}
+              getOptionLabel={(option) => typeof option.name === 'string' ? t(`choices.${option.name}`, option.name) : option.name}
 
               value={options.find((o) => o.id === field.value) || null}
 

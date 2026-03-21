@@ -33,6 +33,7 @@ import resumeService from "../../../../services/resumeService";
 import { formatRoute } from "../../../../utils/funcUtils";
 import ColorPickerDialog from '../../../../components/ColorPickerDialog';
 import { useTranslation } from "react-i18next";
+import { tConfig } from '../../../../utils/tConfig';
 
 const Loading = () => {
   return (
@@ -293,8 +294,8 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                   <Grid size={12}>
                     <Stack spacing={2}>
                       {[
-                        { icon: faMagicWandSparkles, label: t("jobSeeker:profile.summary.experience"), value: allConfig.experienceDict[resume.experience] },
-                        { icon: faUser, label: t("jobSeeker:profile.summary.position"), value: allConfig.positionDict[resume.position] },
+                        { icon: faMagicWandSparkles, label: t("jobSeeker:profile.summary.experience"), value: tConfig(allConfig.experienceDict[resume.experience]) },
+                        { icon: faUser, label: t("jobSeeker:profile.summary.position"), value: tConfig(allConfig.positionDict[resume.position]) },
                         { icon: faDollarSign, label: t("jobSeeker:profile.summary.desiredSalary"), value: salaryString(resume.salaryMin, resume.salaryMax) },
                         { icon: faCalendar, label: t("jobSeeker:profile.summary.lastUpdated"), value: dayjs(resume.updateAt).format("DD/MM/YYYY HH:mm:ss") }
                       ].map((item, idx) => (

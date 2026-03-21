@@ -17,6 +17,7 @@ import JobPostNotificationForm from "../JobPostNotificationForm";
 import errorHandling from "../../../../utils/errorHandling";
 import jobPostNotificationService from "../../../../services/jobPostNotificationService";
 import { useTranslation } from "react-i18next";
+import { tConfig } from '../../../../utils/tConfig';
 
 interface JobPostNotification {
   id: number;
@@ -453,11 +454,11 @@ const ItemComponent = ({
 
                   <FontAwesomeIcon icon={faLocationDot} />
 
-                  {allConfig?.cityDict[city] ? (
+                  {tConfig(allConfig?.cityDict[city]) ? (
 
                     <Typography component="span" fontSize="14px">
 
-                      {allConfig?.cityDict[city]}
+                      {tConfig(allConfig?.cityDict[city])}
 
                     </Typography>
 
@@ -487,11 +488,11 @@ const ItemComponent = ({
 
                   <FontAwesomeIcon icon={faBriefcase} />
 
-                  {allConfig?.careerDict[career] ? (
+                  {tConfig(allConfig?.careerDict[career]) ? (
 
                     <Typography component="span" fontSize="14px">
 
-                      {allConfig?.careerDict[career]}
+                      {tConfig(allConfig?.careerDict[career])}
 
                     </Typography>
 
@@ -521,11 +522,11 @@ const ItemComponent = ({
 
                   <FontAwesomeIcon icon={faCalendarAlt} />
 
-                  {allConfig?.frequencyNotificationDict[frequency] ? (
+                  {tConfig(allConfig?.frequencyNotificationDict[frequency]) ? (
 
                     <Typography component="span" fontSize="14px">
 
-                      {allConfig?.frequencyNotificationDict[frequency]}
+                      {tConfig(allConfig?.frequencyNotificationDict[frequency])}
 
                     </Typography>
 

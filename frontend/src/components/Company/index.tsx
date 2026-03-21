@@ -22,6 +22,7 @@ import toastMessages from '../../utils/toastMessages';
 import errorHandling from '../../utils/errorHandling';
 import { formatRoute } from '../../utils/funcUtils';
 import { RootState } from '../../redux/store';
+import { tConfig } from '../../utils/tConfig';
 
 interface FollowProps {
   slug: string;
@@ -401,7 +402,7 @@ const Company = ({
                   style={{ width: 16, color: '#757575' }}
                 />
 
-                {(allConfig as any)?.cityDict[city] || (
+                {tConfig((allConfig as any)?.cityDict[city]) || (
 
                   <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
 
@@ -420,7 +421,7 @@ const Company = ({
                   style={{ width: 16, color: '#757575' }}
                 />
 
-                {(allConfig as any)?.employeeSizeDict[employeeSize] || (
+                {tConfig((allConfig as any)?.employeeSizeDict[employeeSize]) || (
 
                   <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
 

@@ -31,6 +31,7 @@ import LanguageSkillForm from '../LanguageSkillForm';
 import resumeService from '../../../../services/resumeService';
 
 import languageSkillService from '../../../../services/languageSkillService';
+import { tConfig } from '../../../../utils/tConfig';
 
 interface LanguageSkill {
   id: string | number;
@@ -535,7 +536,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
                           >
 
-                            {allConfig.languageDict[value?.language ?? '']}
+                            {tConfig(allConfig.languageDict[value?.language ?? ''])}
 
                           </TableCell>
 

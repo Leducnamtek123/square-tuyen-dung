@@ -112,7 +112,7 @@ const RangePickerCustom = ({
 
       <Stack direction="row" spacing={1} alignItems="center">
 
-        <Box width={120}>
+        <Box width={145}>
 
           <DatePicker
 
@@ -136,7 +136,7 @@ const RangePickerCustom = ({
 
         </Box>
 
-        <Box width={120}>
+        <Box width={145}>
 
           <DatePicker
 

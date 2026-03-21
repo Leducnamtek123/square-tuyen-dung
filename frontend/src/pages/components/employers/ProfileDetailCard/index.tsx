@@ -55,6 +55,7 @@ import errorHandling from "../../../../utils/errorHandling";
 import TimeAgo from "../../../../components/TimeAgo";
 
 import FormPopup from "../../../../components/controls/FormPopup";
+import { tConfig } from '../../../../utils/tConfig';
 
 const LazyPdf = lazy(() => import("../../../../components/Pdf"));
 
@@ -198,11 +199,11 @@ const ProfileDetailCard: React.FC = () => {
 
                           t('profileDetailCard.label.gender'),
 
-                          allConfig?.genderDict[
+                          tConfig(allConfig?.genderDict[
 
                             profileDetail?.jobSeekerProfile?.gender
 
-                          ]
+                          ])
 
                         )}
 
@@ -250,11 +251,11 @@ const ProfileDetailCard: React.FC = () => {
 
                           t('profileDetailCard.label.maritalStatus'),
 
-                          allConfig?.maritalStatusDict[
+                          tConfig(allConfig?.maritalStatusDict[
 
                             profileDetail?.jobSeekerProfile?.maritalStatus
 
-                          ]
+                          ])
 
                         )}
 
@@ -278,11 +279,11 @@ const ProfileDetailCard: React.FC = () => {
 
                           t('profileDetailCard.label.cityProvince'),
 
-                          allConfig?.cityDict[
+                          tConfig(allConfig?.cityDict[
 
                             profileDetail?.jobSeekerProfile?.location?.city
 
-                          ]
+                          ])
 
                         )}
 
@@ -408,7 +409,7 @@ const ProfileDetailCard: React.FC = () => {
 
                           t('profileDetailCard.label.desiredLevel'),
 
-                          allConfig?.positionDict[profileDetail?.position]
+                          tConfig(allConfig?.positionDict[profileDetail?.position])
 
                         )}
 
@@ -432,11 +433,11 @@ const ProfileDetailCard: React.FC = () => {
 
                           t('profileDetailCard.label.educationLevel'),
 
-                          allConfig?.academicLevelDict[
+                          tConfig(allConfig?.academicLevelDict[
 
                             profileDetail?.academicLevel
 
-                          ]
+                          ])
 
                         )}
 
@@ -460,7 +461,7 @@ const ProfileDetailCard: React.FC = () => {
 
                           t('profileDetailCard.label.experience'),
 
-                          allConfig?.experienceDict[profileDetail?.experience]
+                          tConfig(allConfig?.experienceDict[profileDetail?.experience])
 
                         )}
 
@@ -484,7 +485,7 @@ const ProfileDetailCard: React.FC = () => {
 
                           t('profileDetailCard.label.career'),
 
-                          allConfig?.careerDict[profileDetail?.career]
+                          tConfig(allConfig?.careerDict[profileDetail?.career])
 
                         )}
 
@@ -508,7 +509,7 @@ const ProfileDetailCard: React.FC = () => {
 
                           t('profileDetailCard.label.workLocation'),
 
-                          allConfig?.cityDict[profileDetail?.city]
+                          tConfig(allConfig?.cityDict[profileDetail?.city])
 
                         )}
 
@@ -562,11 +563,11 @@ const ProfileDetailCard: React.FC = () => {
 
                           t('profileDetailCard.label.workplaceType'),
 
-                          allConfig?.typeOfWorkplaceDict[
+                          tConfig(allConfig?.typeOfWorkplaceDict[
 
                             profileDetail?.typeOfWorkplace
 
-                          ]
+                          ])
 
                         )}
 
@@ -590,7 +591,7 @@ const ProfileDetailCard: React.FC = () => {
 
                           t('profileDetailCard.label.jobType'),
 
-                          allConfig?.jobTypeDict[profileDetail?.jobType]
+                          tConfig(allConfig?.jobTypeDict[profileDetail?.jobType])
 
                         )}
 
@@ -1076,7 +1077,7 @@ const ProfileDetailCard: React.FC = () => {
 
                               >
 
-                                {allConfig?.languageDict[value?.language]}
+                                {tConfig(allConfig?.languageDict[value?.language])}
 
                               </Typography>
 

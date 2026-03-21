@@ -34,6 +34,7 @@ import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
 import CompanyDetailLoading from "./components/CompanyDetailLoading";
 import { useAppSelector } from "../../../hooks/useAppStore";
 import type { AxiosError } from "axios";
+import { tConfig } from '../../../utils/tConfig';
 
 
 
@@ -382,9 +383,9 @@ const CompanyDetailPage = () => {
 
                       <FontAwesomeIcon icon={faUsers} />
 
-                      {(allConfig as any)?.employeeSizeDict[
+                      {tConfig((allConfig as any)?.employeeSizeDict[
                          companyDetail.employeeSize
-                       ] || (
+                       ]) || (
                         <span
                           style={{
                             color: "#e0e0e0",

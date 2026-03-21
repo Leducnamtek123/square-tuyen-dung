@@ -455,6 +455,30 @@
       "selectquestions": "Select Questions",
       "questioncontent": "Question Content"
     },
+    "onlineInterview": "Online Interview",
+    "questionGroups": "Question Groups",
+    "addQuestionGroup": "Add Question Group",
+    "table": {
+      "groupName": "Question Group Name",
+      "numberOfQuestions": "Number of Questions",
+      "description": "Description",
+      "na": "N/A"
+    },
+    "dialog": {
+      "addTitle": "Add New Question Group",
+      "editTitle": "Edit Question Group",
+      "createNewQuestion": "Create New Question",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "create": "Create",
+      "creating": "Creating...",
+      "confirmDeleteTitle": "Confirm Delete",
+      "confirmDeleteMessage1": "Are you sure you want to delete the question group",
+      "confirmDeleteMessage2": "The questions inside will not be deleted, but their association with this group will be lost.",
+      "confirmDeleteBtn": "Confirm Delete",
+      "deleting": "Deleting..."
+    },
     "placeholder": {
       "searchquestiongroups": "Search question groups..."
     },
@@ -779,6 +803,61 @@
       "tips_desc": "Content is being updated to bring useful information.",
       "trends_title": "Human resources market trends",
       "trends_desc": "Content is being updated to bring useful information."
+    }
+  },
+  "employees": {
+    "pageTitle": "Company Personnel Management",
+    "pageDescription": "Manage roles, add employees, and assign roles directly.",
+    "addRole": "Add Role",
+    "addMember": "Add Member",
+    "tabs": {
+      "roles": "Roles",
+      "members": "Members"
+    },
+    "table": {
+      "id": "ID",
+      "code": "Code",
+      "roleName": "Role Name",
+      "permissions": "Permissions",
+      "system": "System",
+      "actions": "Actions",
+      "user": "User",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "noPermissions": "No permissions",
+      "yes": "Yes",
+      "no": "No",
+      "delete": "Delete"
+    },
+    "dialog": {
+      "addRoleTitle": "Add New Role",
+      "roleNameLabel": "Role Name",
+      "codeLabel": "Code (slug)",
+      "codeHelperText": "Leave empty to auto-generate from role name.",
+      "descriptionLabel": "Description",
+      "permissionsLabel": "Permissions",
+      "cancel": "Cancel",
+      "createRole": "Create Role",
+      "addMemberTitle": "Add Member",
+      "userIdLabel": "User ID",
+      "userIdHelperText": "Enter the user account ID to add to the company.",
+      "roleLabel": "Role",
+      "statusLabel": "Status",
+      "invitedEmailLabel": "Invited email (optional)",
+      "createMember": "Add Member"
+    },
+    "toast": {
+      "createRoleSuccess": "Role created successfully",
+      "createRoleError": "Failed to create role",
+      "deleteRoleSuccess": "Role deleted",
+      "deleteRoleError": "Failed to delete role",
+      "createMemberSuccess": "Member added to company",
+      "createMemberError": "Failed to add member",
+      "updateMemberSuccess": "Member role updated",
+      "updateMemberError": "Failed to update member",
+      "deleteMemberSuccess": "Member removed from company",
+      "deleteMemberError": "Failed to remove member"
     }
   }
 }

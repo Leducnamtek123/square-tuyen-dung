@@ -13,6 +13,7 @@ import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
 import { Typography } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 import ValidationError from '../ValidationError';
 
 interface Props {
@@ -36,6 +37,7 @@ const MultiSelectCustom = ({
   showRequired = false,
   placeholder = '',
 }: Props) => {
+  const { t } = useTranslation('common');
 
   return (
 
@@ -79,7 +81,7 @@ const MultiSelectCustom = ({
 
               }
 
-              getOptionLabel={(option) => option.name}
+              getOptionLabel={(option) => typeof option.name === 'string' ? t(`choices.${option.name}`, option.name) : option.name}
 
               renderOption={(props, option, { selected }) => (
 
@@ -97,7 +99,7 @@ const MultiSelectCustom = ({
 
                   />
 
-                  {option.name}
+                  {typeof option.name === 'string' ? t(`choices.${option.name}`, option.name) : option.name}
 
                 </li>
 

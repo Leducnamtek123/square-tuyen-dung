@@ -18,6 +18,7 @@ import { salaryString } from '../../utils/customData';
 import { formatRoute } from '../../utils/funcUtils';
 import { ROUTES, IMAGES } from '../../configs/constants';
 import { useAppSelector } from '../../hooks/useAppStore';
+import { tConfig } from '../../utils/tConfig';
 
 interface JobPostProps {
   id: number;
@@ -482,7 +483,7 @@ const JobPost = ({
 
           <Typography sx={{ fontWeight: 500, fontSize: 13 }} variant="body2">
 
-            {allConfig?.cityDict[cityId] || (
+            {tConfig(allConfig?.cityDict[cityId]) || (
 
               <span style={{ fontStyle: 'italic', color: theme.palette.grey[500] }}>
 

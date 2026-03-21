@@ -27,6 +27,7 @@ import { salaryString } from '../../../../utils/customData';
 import { faFile, faFilePdf } from '@fortawesome/free-regular-svg-icons';
 
 import { formatRoute } from '../../../../utils/funcUtils';
+import { tConfig } from '../../../../utils/tConfig';
 
 interface SavedResumeTableProps {
   rows: any[];
@@ -177,7 +178,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
 
               <TableCell align="left">
 
-                {allConfig?.experienceDict[row?.resume?.experience] || (
+                {tConfig(allConfig?.experienceDict[row?.resume?.experience]) || (
 
                   <span
 
@@ -203,7 +204,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
 
               <TableCell align="left">
 
-                {allConfig?.cityDict[row?.resume?.city] || (
+                {tConfig(allConfig?.cityDict[row?.resume?.city]) || (
 
                   <span
 
