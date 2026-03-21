@@ -70,24 +70,12 @@ const JobApplicationCard = () => {
 
 
         const resData = await jobSeekerProfileService.getResumes(
-
-
-
           jobSeekerProfileId,
-
-
-
           params
-
-
-
         ) as any;
-
-
-
-        setData(resData.data);
-
-
+        
+        const parsedData = Array.isArray(resData) ? resData : (resData?.data || resData?.results || []);
+        setData(parsedData);
 
       } catch (error) {
 
@@ -501,7 +489,7 @@ const JobApplicationCard = () => {
 
 
 
-                        {t('common:labels.lastModified')} {dayjs(item?.updateAt).format("DD/MM/YYYY")}
+                        {t('common:lastModified')} {dayjs(item?.updateAt).format("DD/MM/YYYY")}
 
 
 

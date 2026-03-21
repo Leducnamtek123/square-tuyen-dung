@@ -99,7 +99,8 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
           jobSeekerProfileId,
           params
         );
-        setResume((resData as any).data);
+        const parsedResumes = Array.isArray(resData) ? resData : ((resData as any).data || (resData as any).results || []);
+        setResume(parsedResumes.length > 0 ? parsedResumes[0] : null);
       } catch (error) {
         console.error(error);
       } finally {

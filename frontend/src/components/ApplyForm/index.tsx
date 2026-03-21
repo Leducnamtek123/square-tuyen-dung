@@ -69,7 +69,8 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
       setIsLoadingResumes(true);
       try {
         const resData = await jobSeekerProfileService.getResumes(jobSeekerProfileId);
-        setResumes(resData.results || []);
+        const parsedResumes = Array.isArray(resData) ? resData : (resData.results || []);
+        setResumes(parsedResumes);
       } catch (error: any) {
         errorHandling(error);
       } finally {
