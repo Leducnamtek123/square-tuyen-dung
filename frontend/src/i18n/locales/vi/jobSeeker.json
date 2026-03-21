@@ -398,6 +398,13 @@
   "noDataForStatistics": "Không có dữ liệu thống kê",
   "educationAddedSuccess": "Thêm thông tin học vấn thành công.",
   "educationUpdatedSuccess": "Cập nhật thông tin học vấn thành công.",
+  "activityChart": {
+    "labels": {
+      "appliedjobs": "Việc đã ứng tuyển",
+      "savedjobs": "Việc đã lưu",
+      "companiesfollowed": "Công ty đang theo dõi"
+    }
+  },
   "educationDeletedSuccess": "Xóa thông tin học vấn thành công.",
   "deleteEducationTitle": "Xóa thông tin học vấn",
   "deleteEducationWarning": "Thông tin học vấn này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?",

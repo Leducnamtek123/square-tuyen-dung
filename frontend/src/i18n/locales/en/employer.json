@@ -157,7 +157,8 @@
     "labels": {
       "totalapplications": "Total Applications",
       "averageapplications": "Average Applications",
-      "applications": "Applications"
+      "applications": "Applications",
+      "jobs": "Jobs"
     }
   },
   "candidateChart": {
@@ -174,12 +175,12 @@
     "applicationCount": "Application count",
     "noData": "No data available for statistics",
     "labels": {
-      "chuatotnghiep": "Not Graduated",
-      "trungcap": "Intermediate",
-      "caodang": "Associate",
-      "daihoc": "Bachelor",
-      "saudaihoc": "Postgraduate",
-      "khac": "Other"
+      "postgraduate": "Postgraduate",
+      "university": "University",
+      "college": "College",
+      "vocational/intermediate": "Vocational / Intermediate",
+      "highschool": "High School",
+      "certificate": "Certificate"
     }
   },
   "recruitmentChart": {
@@ -191,7 +192,12 @@
       "interviewing": "Interviewing",
       "offered": "Offered",
       "hired": "Hired",
-      "rejected": "Rejected"
+      "rejected": "Rejected",
+      "pendingconfirmation": "Pending Confirmation",
+      "contacted": "Contacted",
+      "tested": "Tested",
+      "interviewed": "Interviewed",
+      "notselected": "Not Selected"
     }
   },
   "companyForm": {

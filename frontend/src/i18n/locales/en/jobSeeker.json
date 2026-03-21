@@ -212,6 +212,13 @@
   "noDataForStatistics": "No data available for statistics",
   "educationAddedSuccess": "Education information added successfully.",
   "educationUpdatedSuccess": "Education information updated successfully.",
+  "activityChart": {
+    "labels": {
+      "appliedjobs": "Applied Jobs",
+      "savedjobs": "Saved Jobs",
+      "companiesfollowed": "Companies Followed"
+    }
+  },
   "educationDeletedSuccess": "Education information deleted successfully.",
   "deleteEducationTitle": "Delete Education Information",
   "deleteEducationWarning": "This education information will be permanently deleted and cannot be restored. Are you sure?",

@@ -114,9 +114,9 @@ class JobSeekerStatisticViewSet(viewsets.ViewSet):
         data2 = []
         data3 = []
 
-        title1 = "Viá»‡c Ä‘Ã£ á»©ng tuyá»ƒn"
-        title2 = "Viá»‡c Ä‘Ã£ lÆ°u"
-        title3 = "CÃ´ng ty Ä‘ang theo dÃµi"
+        title1 = "Applied Jobs"
+        title2 = "Saved Jobs"
+        title3 = "Companies Followed"
 
         date_range = pd.date_range(
             start=first_day_of_month_no_utc,
@@ -368,8 +368,8 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
 
         return var_res.response_data(
             data={
-                "title1": "Viá»‡c lÃ m",
-                "title2": "á»¨ng tuyá»ƒn",
+                "title1": "Jobs",
+                "title2": "Applications",
                 "labels": labels,
                 "data1": data1,
                 "data2": data2,

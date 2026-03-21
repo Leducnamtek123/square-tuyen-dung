@@ -88,7 +88,7 @@ const ActivityChart = () => {
       labels: data?.labels || [],
       datasets: [
         {
-          label: data?.title1,
+          label: t(`activityChart.labels.${String(data?.title1 || '').toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data?.title1 }),
           data: data?.data1 || [],
           borderColor: defaultTheme.palette.primary.main,
           backgroundColor: defaultTheme.palette.primary.light,
@@ -99,7 +99,7 @@ const ActivityChart = () => {
           pointBackgroundColor: defaultTheme.palette.primary.main,
         },
         {
-          label: data?.title2,
+          label: t(`activityChart.labels.${String(data?.title2 || '').toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data?.title2 }),
           data: data?.data2 || [],
           borderColor: defaultTheme.palette.secondary.main,
           backgroundColor: defaultTheme.palette.secondary.light,
@@ -110,7 +110,7 @@ const ActivityChart = () => {
           pointBackgroundColor: defaultTheme.palette.secondary.main,
         },
         {
-          label: data?.title3,
+          label: t(`activityChart.labels.${String(data?.title3 || '').toLowerCase().replace(/\s+/g, '')}`, { defaultValue: data?.title3 }),
           data: data?.data3 || [],
           borderColor: defaultTheme.palette.info.main,
           backgroundColor: defaultTheme.palette.info.light,
@@ -123,7 +123,7 @@ const ActivityChart = () => {
       ],
     };
     return d;
-  }, [data]);
+  }, [data, t]);
 
   return (
     <>

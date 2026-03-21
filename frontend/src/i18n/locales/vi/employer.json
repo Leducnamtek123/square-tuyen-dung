@@ -157,7 +157,8 @@
     "labels": {
       "totalapplications": "Tổng số lượng ứng tuyển",
       "averageapplications": "Trung bình lượng ứng tuyển",
-      "applications": "Đơn ứng tuyển"
+      "applications": "Đơn ứng tuyển",
+      "jobs": "Việc làm"
     }
   },
   "candidateChart": {
@@ -174,12 +175,12 @@
     "applicationCount": "Số lượng ứng tuyển",
     "noData": "Không có dữ liệu để thống kê",
     "labels": {
-      "chuatotnghiep": "Chưa tốt nghiệp",
-      "trungcap": "Trung cấp",
-      "caodang": "Cao đẳng",
-      "daihoc": "Đại học",
-      "saudaihoc": "Sau đại học",
-      "khac": "Khác"
+      "postgraduate": "Sau đại học",
+      "university": "Đại học",
+      "college": "Cao đẳng",
+      "vocational/intermediate": "Trung cấp / Nghề",
+      "highschool": "Trung học phổ thông",
+      "certificate": "Chứng chỉ"
     }
   },
   "recruitmentChart": {
@@ -191,7 +192,12 @@
       "interviewing": "Đang phỏng vấn",
       "offered": "Đã mời làm việc",
       "hired": "Đã tuyển dụng",
-      "rejected": "Đã từ chối"
+      "rejected": "Đã từ chối",
+      "pendingconfirmation": "Chờ xác nhận",
+      "contacted": "Đã liên hệ",
+      "tested": "Đã làm bài test",
+      "interviewed": "Đã phỏng vấn",
+      "notselected": "Không được chọn"
     }
   },
   "companyForm": {
