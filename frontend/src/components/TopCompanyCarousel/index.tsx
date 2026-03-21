@@ -275,7 +275,7 @@ const TopCompanyCarousel = () => {
 
                       cursor: 'pointer',
 
-                      minHeight: 165,
+                      minHeight: 200,
 
                       borderRadius: 3,
 
@@ -309,35 +309,52 @@ const TopCompanyCarousel = () => {
 
                   >
 
-                    <Stack direction="row" justifyContent="center">
+                    <Stack direction="row" justifyContent="center" sx={{ py: 1 }}>
 
-                      <MuiImageCustom
-
-                        width={120}
-
-                        height={120}
-
-                        src={value?.companyImageUrl}
-                        fallbackSrc={IMAGES.companyLogoDefault}
-
-                        duration={1500}
-
-
-                        sx={{ 
-
-                          margin: '0 auto',
-
-                          borderRadius: 2,
-
-                          p: 1,
-
-                          bgcolor: 'grey.50',
-
-                          objectFit: 'contain',
-
+                      <Box
+                        sx={{
+                          width: 120,
+                          height: 120,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: 3,
+                          border: '2px solid',
+                          borderColor: 'grey.100',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                          overflow: 'hidden',
+                          backgroundColor: 'white',
+                          transition: 'all 0.3s ease',
+                          '&:hover': {
+                            borderColor: 'primary.light',
+                            boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+                          },
                         }}
+                      >
+                        <MuiImageCustom
 
-                      />
+                          width={100}
+
+                          height={100}
+
+                          src={value?.companyImageUrl}
+                          fallbackSrc={IMAGES.companyLogoDefault}
+
+                          duration={1500}
+
+
+                          sx={{ 
+
+                            margin: '0 auto',
+
+                            borderRadius: 2,
+
+                            objectFit: 'contain',
+
+                          }}
+
+                        />
+                      </Box>
 
                     </Stack>
 
@@ -355,7 +372,7 @@ const TopCompanyCarousel = () => {
 
                         fontWeight: 600,
 
-                        fontSize: 16,
+                        fontSize: 15,
 
                         mt: 2,
 

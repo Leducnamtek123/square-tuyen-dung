@@ -71,21 +71,21 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
 
         <FontAwesomeIcon
 
-          color="#2c95ff"
+          color="white"
 
           icon={faBriefcase}
 
-          fontSize={25}
+          fontSize={18}
 
-          style={{ marginRight: 8 }}
+          style={{ marginRight: 10 }}
 
         />
 
         <Stack direction="column">
 
-          <Typography sx={{ whiteSpace: 'nowrap', lineHeight: 1.2 }}>{t('nav.switch.forEmployers')}</Typography>
+          <Typography sx={{ whiteSpace: 'nowrap', lineHeight: 1.2, color: 'white', fontWeight: 600, fontSize: '0.875rem' }}>{t('nav.switch.forEmployers')}</Typography>
 
-          <Typography variant="caption" sx={{ fontSize: 10, whiteSpace: 'nowrap', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ fontSize: 11, whiteSpace: 'nowrap', lineHeight: 1, color: 'rgba(255,255,255,0.7)' }}>
 
             {t('nav.switch.postFreeJob')}
 
@@ -101,21 +101,21 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
 
         <FontAwesomeIcon
 
-          color="#2c95ff"
+          color="white"
 
           icon={faUsers}
 
-          fontSize={20}
+          fontSize={18}
 
-          style={{ marginRight: 8 }}
+          style={{ marginRight: 10 }}
 
         />
 
         <Stack direction="column">
 
-          <Typography sx={{ whiteSpace: 'nowrap', lineHeight: 1.2 }}>{t('nav.switch.forJobSeekers')}</Typography>
+          <Typography sx={{ whiteSpace: 'nowrap', lineHeight: 1.2, color: 'white', fontWeight: 600, fontSize: '0.875rem' }}>{t('nav.switch.forJobSeekers')}</Typography>
 
-          <Typography variant="caption" sx={{ fontSize: 10, whiteSpace: 'nowrap', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ fontSize: 11, whiteSpace: 'nowrap', lineHeight: 1, color: 'rgba(255,255,255,0.7)' }}>
 
             <FontAwesomeIcon icon={faArrowRight} /> {t('nav.switch.switch')}
 
@@ -191,15 +191,29 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
 
         <Box
 
-          sx={{ cursor: 'pointer' }}
+        sx={{
+          cursor: 'pointer',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          borderRadius: '12px',
+          px: 2,
+          py: 1,
+          backdropFilter: 'blur(8px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          transition: 'all 0.3s ease',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+            borderColor: 'rgba(255, 255, 255, 0.4)',
+            transform: 'translateY(-1px)',
+          },
+        }}
 
-          onClick={handleClick}
+        onClick={handleClick}
 
-        >
+      >
 
-          {title}
+        {title}
 
-        </Box>
+      </Box>
 
       )}
 

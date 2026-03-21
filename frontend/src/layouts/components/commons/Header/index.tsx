@@ -149,11 +149,25 @@ const Header = (props: HeaderProps) => {
 
           borderRadius: 50,
 
-          backgroundColor: "transparent",
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
 
-          borderColor: "#7e57c2",
+          borderColor: "rgba(255, 255, 255, 0.4)",
 
           cursor: "pointer",
+
+          transition: 'all 0.3s ease',
+
+          backdropFilter: 'blur(8px)',
+
+          '&:hover': {
+
+            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+
+            borderColor: 'rgba(255, 255, 255, 0.6)',
+
+            transform: 'translateY(-1px)',
+
+          },
 
         }}
 
@@ -161,31 +175,33 @@ const Header = (props: HeaderProps) => {
 
         <Stack direction="row" justifyContent="center" alignItems="center">
 
-          <Avatar alt="User Avatar" src={currentUser?.avatarUrl} />
+          <Avatar
+            alt="User Avatar"
+            src={currentUser?.avatarUrl}
+            sx={{
+              width: 36,
+              height: 36,
+              border: '2px solid rgba(255, 255, 255, 0.6)',
+            }}
+          />
 
           <Typography
 
-            variant="subtitle1"
+            variant="subtitle2"
 
             sx={{
 
               px: 1,
 
-              color: (theme: any) =>
+              color: "white",
 
-                theme.palette.mode === "light" ? "white" : "white",
+              fontWeight: 600,
 
               display: {
 
                 xs: "none",
 
                 sm: "block",
-
-                md: "block",
-
-                lg: "block",
-
-                xl: "block",
 
               },
 
@@ -225,19 +241,7 @@ const Header = (props: HeaderProps) => {
 
         ml: 1,
 
-        display: {
-
-          xs: "block",
-
-          sm: "block",
-
-          md: "block",
-
-          lg: "block",
-
-          xl: "block",
-
-        },
+        display: "block",
 
       }}
 
@@ -251,7 +255,23 @@ const Header = (props: HeaderProps) => {
 
           color="inherit"
 
-          sx={{ color: "white" }}
+          sx={{
+            color: "white",
+            borderColor: "rgba(255, 255, 255, 0.5)",
+            borderRadius: "24px",
+            px: 2.5,
+            py: 0.75,
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            textTransform: 'none',
+            backdropFilter: 'blur(4px)',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              borderColor: "white",
+              backgroundColor: "rgba(255, 255, 255, 0.15)",
+              transform: 'translateY(-1px)',
+            },
+          }}
 
           onClick={handleLogin}
 
@@ -263,25 +283,31 @@ const Header = (props: HeaderProps) => {
 
         <Button
 
-          variant="outlined"
-
-          color="inherit"
+          variant="contained"
 
           sx={{
 
-            color: "white",
+            color: "primary.main",
+            backgroundColor: "white",
+            borderRadius: "24px",
+            px: 2.5,
+            py: 0.75,
+            fontSize: '0.85rem',
+            fontWeight: 600,
+            textTransform: 'none',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            transition: 'all 0.3s ease',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.9)',
+              transform: 'translateY(-1px)',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            },
 
             display: {
 
               xs: "none",
 
               sm: "block",
-
-              md: "block",
-
-              lg: "block",
-
-              xl: "block",
 
             },
 
