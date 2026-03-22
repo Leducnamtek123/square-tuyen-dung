@@ -265,7 +265,6 @@ services:
   # ---------------------------------------------------------------------------
   elasticsearch:
     image: public.ecr.aws/bitnami/elasticsearch:7.17.18
-    container_name: tuyendung-studio-elasticsearch
     environment:
       - discovery.type=single-node
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"

@@ -145,6 +145,12 @@ class JobSeekerDialogFlowService:
                     "how_to_use_link": self.links.how_to_use_link,
                 }
             )
+        if intent == JobSeekerChatResponse.AI_INTERVIEW_GUIDE_INTENT:
+            return self.job_seeker_chat_response.get_ai_interview_guide_intent_response()
+        if intent == JobSeekerChatResponse.CV_PREPARATION_INTENT:
+            return self.job_seeker_chat_response.get_cv_preparation_intent_response(
+                params={"manage_profile_link": self.links.manage_profile_link}
+            )
         if intent == JobSeekerChatResponse.ABOUT_US_INTENT:
             params = {
                 "about_us_company_count": "20.000+",
@@ -247,6 +253,10 @@ class EmployerDialogFlowService:
                     "how_to_use_link": self.links.how_to_use_link,
                 }
             )
+        if intent == EmployerChatResponse.AI_INTERVIEW_GUIDE_INTENT:
+            return self.employer_chat_response.get_ai_interview_guide_intent_response()
+        if intent == EmployerChatResponse.POST_JOB_AI_INTENT:
+            return self.employer_chat_response.get_post_job_ai_intent_response()
         if intent == EmployerChatResponse.ABOUT_US_INTENT:
             params = {
                 "about_us_company_count": "20.000+",

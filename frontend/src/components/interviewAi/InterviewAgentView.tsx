@@ -32,6 +32,28 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
   const { chatMessages } = useChat({ room });
   const [isChatOpen, setIsChatOpen] = useState(false);
   
+  // Parse metadata for interview stage and progress
+  const { stage, currentQuestion, totalQuestions } = useMemo(() => {
+    const metadata = agentParticipant?.metadata;
+    if (!metadata || !metadata.startsWith("STAGE:")) {
+      return { stage: "INTRODUCTION", currentQuestion: 0, totalQuestions: 0 };
+    }
+    const content = metadata.replace("STAGE:", "");
+    // Format can be "STAGE:TECHNICAL|1/5" or just "STAGE:INTRODUCTION"
+    const [stageName, progress] = content.split("|");
+    let current = 0;
+    let total = 0;
+    if (progress && progress.includes("/")) {
+      const [c, t] = progress.split("/").map(Number);
+      current = c;
+      total = t;
+    }
+    return { stage: stageName, currentQuestion: current, totalQuestions: total };
+  }, [agentParticipant?.metadata]);
+
+  const stages = ["INTRODUCTION", "EXPERIENCE", "TECHNICAL", "BEHAVIORAL", "CLOSING"];
+  const currentStageIndex = stages.indexOf(stage);
+
   // Format messages for AgentChatTranscript
   const formattedMessages = useMemo(() => {
     return chatMessages.map(msg => ({
@@ -93,6 +115,43 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
           Live Session | {sessionInfo?.candidateName || t("agentView.candidate")}
         </p>
       </div>
+
+      {/* Stage Progress Bar */}
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-20 w-full max-w-xl px-4 hidden md:block">
+        <div className="flex items-center justify-between gap-2">
+          {stages.map((s, idx) => (
+            <React.Fragment key={s}>
+              <div className="flex flex-col items-center gap-2 flex-1">
+                <div className={cn(
+                  "h-1 w-full rounded-full transition-all duration-500",
+                  idx <= currentStageIndex ? "bg-cyan-400" : "bg-white/10"
+                )} />
+                <span className={cn(
+                  "text-[10px] uppercase font-bold tracking-widest transition-colors duration-500",
+                  idx <= currentStageIndex ? "text-cyan-400" : "text-white/20"
+                )}>
+                  {t(`stages.${s}`)}
+                </span>
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+
+      {/* Question Counter for Technical Stage */}
+      {stage === "TECHNICAL" && totalQuestions > 0 && (
+        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-20">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 backdrop-blur-md"
+          >
+            <span className="text-xs font-bold text-cyan-400 uppercase tracking-widest">
+              {t("stages.currentQuestion", { current: currentQuestion, total: totalQuestions })}
+            </span>
+          </motion.div>
+        </div>
+      )}
 
       <div className="relative z-10 flex h-full flex-col items-center justify-center p-12">
         <div className="relative flex flex-col items-center">

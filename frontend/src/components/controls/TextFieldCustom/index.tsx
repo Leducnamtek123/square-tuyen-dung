@@ -87,23 +87,14 @@ const TextFieldCustom = ({
               helperText={!fieldState.invalid ? helperText : ''}
 
               slotProps={{
-
                 input: {
-
-                  inputProps: {
-
-                    inputMode: type === 'number' ? 'numeric' : 'text',
-
-                  },
-
                   startAdornment: icon && (
-
                     <InputAdornment position="start">{icon}</InputAdornment>
-
                   ),
-
-                }
-
+                },
+                htmlInput: {
+                  inputMode: type === 'number' ? 'numeric' : 'text',
+                },
               }}
 
             />

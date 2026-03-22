@@ -75,7 +75,9 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
               )}
             </p>
           </div>
-          <QRCodeBox value={window.location.href || "-"} size={75} />
+          <div className="hidden sm:block">
+            <QRCodeBox value={window.location.href || "-"} size={75} />
+          </div>
         </div>
 
         <div className="h-px w-full bg-border" />

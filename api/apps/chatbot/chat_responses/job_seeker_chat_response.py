@@ -28,6 +28,8 @@ class JobSeekerChatResponse(CommonChatResponse):
     ACCOUNT_AND_PASSWORD_INTENT = "AccountAndPasswordIntent"
 
     ABOUT_US_INTENT = "AboutUsIntent"
+    AI_INTERVIEW_GUIDE_INTENT = "AIInterviewGuideIntent"
+    CV_PREPARATION_INTENT = "CVPreparationIntent"
 
     def __init__(self):
 
@@ -140,25 +142,83 @@ class JobSeekerChatResponse(CommonChatResponse):
                                 )
 
                             ]
-
                         ]
-
                     }
-
                 },
-
                 self._get_text_response_component(
-
                     text=[
-
                         "Không biết bạn cần hỗ trợ gì ha? 😊"
-
                     ]
-
                 )
-
             ]
+        }
 
+    def get_ai_interview_guide_intent_response(self, params={}):
+        """
+        Return response for AIInterviewGuideIntent
+        """
+        return {
+            "fulfillmentMessages": [
+                self._get_text_response_component(
+                    text=[
+                        f"Phỏng vấn với AI của {self.app_name} là một trải nghiệm hiện đại và thân thiện! 🤖",
+                        "Bạn sẽ trò chuyện trực tiếp với trợ lý Voice AI của chúng tôi qua giọng nói."
+                    ]
+                ),
+                {
+                    "payload": {
+                        "richContent": [
+                            [
+                                self._get_info_response_component(
+                                    title="Quy trình phỏng vấn AI",
+                                    subtitle="Giới thiệu -> Kinh nghiệm -> Chuyên môn -> Kết thúc",
+                                    image_url=self.chatbot_icons.get("job_seeker_ai_interview_guide", ""),
+                                    action_link=""
+                                ),
+                                self._get_description_response_component(
+                                    title="Lưu ý quan trọng",
+                                    text=[
+                                        "• Đảm bảo micro của bạn hoạt động tốt.",
+                                        "• Chọn không gian yên tĩnh.",
+                                        "• Trả lời tự tin."
+                                    ]
+                                )
+                            ]
+                        ]
+                    }
+                }
+            ]
+        }
+
+    def get_cv_preparation_intent_response(self, params={}):
+        """
+        Return response for CVPreparationIntent
+        """
+        return {
+            "fulfillmentMessages": [
+                self._get_text_response_component(
+                    text=[
+                        "Cập nhật CV chuẩn AI giúp bạn dễ tìm việc hơn! 📄✨"
+                    ]
+                ),
+                {
+                    "payload": {
+                        "richContent": [
+                            [
+                                self._get_suggestion_chip_response_component(
+                                    options=[
+                                        {
+                                            "text": "Cập nhật hồ sơ",
+                                            "icon_url": self.chatbot_icons["job_seeker_manage_profile"],
+                                            "link": params.get("manage_profile_link", "")
+                                        }
+                                    ]
+                                )
+                            ]
+                        ]
+                    }
+                }
+            ]
         }
 
     def get_search_job_intent_response(self, params={}):

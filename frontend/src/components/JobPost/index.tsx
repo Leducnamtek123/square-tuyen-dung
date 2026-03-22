@@ -431,7 +431,7 @@ const JobPost = ({
 
         spacing={2}
 
-        sx={{ mt: 2 }}
+        sx={{ mt: 2, flexWrap: 'wrap', gap: 1 }}
 
         justifyContent="flex-start"
 

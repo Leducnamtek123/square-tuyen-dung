@@ -67,6 +67,14 @@
       "toggleGeneric": "Bật/Tắt {{target}}"
     }
   },
+  "stages": {
+    "INTRODUCTION": "Giới thiệu",
+    "EXPERIENCE": "Kinh nghiệm làm việc",
+    "TECHNICAL": "Kiến thức chuyên môn",
+    "BEHAVIORAL": "Câu hỏi tình huống",
+    "CLOSING": "Kết thúc",
+    "currentQuestion": "Câu hỏi {{current}} / {{total}}"
+  },
   "loading": "Đang kết nối đến phòng phỏng vấn...",
   "errors": {
     "missingInvite": "Thiếu mã mời phỏng vấn.",

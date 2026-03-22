@@ -296,6 +296,19 @@ services:
       - proxy-net
       - app-net
 
+  # ---------------------------------------------------------------------------
+  # Elasticsearch — prod
+  # ---------------------------------------------------------------------------
+  elasticsearch:
+    container_name: tuyendung-studio-elasticsearch-prod
+    image: public.ecr.aws/bitnami/elasticsearch:7.17.18
+    restart: always
+    volumes:
+      - elasticsearch_data_prod:/usr/share/elasticsearch/data
+    networks:
+      - app-net
+      - data-net
+
 # =============================================================================
 # Production Infrastructure (Isolated Networks)
 # =============================================================================
@@ -310,3 +323,4 @@ networks:
 volumes:
   db_data_prod:
   llama-models:
+  elasticsearch_data_prod:

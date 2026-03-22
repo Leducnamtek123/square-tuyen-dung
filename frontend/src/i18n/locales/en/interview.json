@@ -67,6 +67,14 @@
       "toggleGeneric": "Toggle {{target}}"
     }
   },
+  "stages": {
+    "INTRODUCTION": "Introduction",
+    "EXPERIENCE": "Work Experience",
+    "TECHNICAL": "Technical Knowledge",
+    "BEHAVIORAL": "Behavioral Questions",
+    "CLOSING": "Closing",
+    "currentQuestion": "Question {{current}} / {{total}}"
+  },
   "loading": "Connecting to interview room...",
   "errors": {
     "missingInvite": "Missing interview invite code.",

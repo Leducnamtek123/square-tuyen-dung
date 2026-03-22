@@ -96,3 +96,8 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
+
+  elasticsearch:
+    container_name: tuyendung-studio-elasticsearch
+    ports:
+      - "9200:9200"

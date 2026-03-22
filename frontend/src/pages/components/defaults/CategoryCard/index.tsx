@@ -66,7 +66,7 @@ const CategoryCard = ({ options, type }: CategoryCardProps) => {
           <SearchIcon color="disabled" />
           <InputBase
             sx={{ ml: 1, flex: 1 }}
-            inputProps={{ 'aria-label': 'search' }}
+            slotProps={{ input: { 'aria-label': 'search' } }}
             defaultValue=""
             placeholder={t('quickSearch')}
             onChange={(event) => handleFilterChange(event.target.value)}

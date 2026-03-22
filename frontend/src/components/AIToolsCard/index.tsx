@@ -64,7 +64,7 @@ const AIToolsCard = () => {
     setTranscription('');
     try {
       const res = await aiService.transcribe(transcribeFile, { language: 'vi' });
-      setTranscription(res?.transcription || '');
+      setTranscription(String(res?.transcription || ''));
     } catch (error: any) {
       setTranscribeError(
         error?.response?.data?.errors?.detail ||
@@ -106,7 +106,7 @@ const AIToolsCard = () => {
             value={ttsSpeed}
             onChange={(e) => setTtsSpeed(e.target.value)}
             type="number"
-            inputProps={{ step: 0.1, min: 0.5, max: 2 }}
+            slotProps={{ htmlInput: { step: 0.1, min: 0.5, max: 2 } }}
             sx={{ maxWidth: 140 }}
           />
         </Stack>

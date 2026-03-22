@@ -443,7 +443,7 @@ const JobPostLarge = ({
 
             {/* Info Cards Section */}
 
-            <Stack direction="row" spacing={1.5} sx={{ mt: 0.75 }}>
+            <Stack direction="row" spacing={1.5} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
 
               <Box
 

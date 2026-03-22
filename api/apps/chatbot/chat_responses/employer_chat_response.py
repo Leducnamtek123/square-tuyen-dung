@@ -22,12 +22,109 @@ class EmployerChatResponse(CommonChatResponse):
     ACCOUNT_AND_PASSWORD_INTENT = "AccountAndPasswordIntent"
 
     ABOUT_US_INTENT = "AboutUsIntent"
+    AI_INTERVIEW_GUIDE_INTENT = "AIInterviewGuideIntent"
+    POST_JOB_AI_INTENT = "PostJobAIIntent"
 
     def __init__(self):
 
         super().__init__()
 
     def get_welcome_intent_response(self, params={}):
+        """
+        Return response with list of chip options for WelcomeIntent
+        """
+        return {
+            "fulfillmentMessages": [
+                self._get_text_response_component(
+                    text=[
+                        f"Xin chào! Mình là trợ lý tuyển dụng của {self.app_name}. Mình có thể giúp gì cho bạn? 👋"
+                    ]
+                ),
+                {
+                    "payload": {
+                        "richContent": [
+                            [
+                                self._get_suggestion_chip_response_component(options=[
+                                    {"text": "Tìm kiếm ứng viên",
+                                        "icon_url": self.chatbot_icons["employer_search_candidate"]},
+                                    {"text": "Hồ sơ ứng tuyển",
+                                        "icon_url": self.chatbot_icons["employer_manage_candidate"]},
+                                    {"text": "Cập nhật thông tin công ty",
+                                        "icon_url": self.chatbot_icons["employer_update_company_info"]},
+                                    {"text": "Hướng dẫn phỏng vấn AI",
+                                        "icon_url": self.chatbot_icons.get("job_seeker_ai_interview_guide", "")},
+                                    {"text": "Đăng tin với AI",
+                                        "icon_url": self.chatbot_icons.get("employer_post_job_ai", "")},
+                                    {"text": "Đánh giá và phản hồi",
+                                        "icon_url": self.chatbot_icons["common_feedback"]},
+                                    {"text": "Hỗ trợ",
+                                        "icon_url": self.chatbot_icons["common_support"]},
+                                    {"text": "Về chúng tôi",
+                                        "icon_url": self.chatbot_icons["common_about_us"]},
+                                ])
+                            ]
+                        ]
+                    }
+                },
+                self._get_text_response_component(
+                    text=[
+                        "Không biết bạn cần hỗ trợ gì ha? 😊"
+                    ]
+                )
+            ]
+        }
+
+    def get_ai_interview_guide_intent_response(self, params={}):
+        """
+        Return response for AIInterviewGuideIntent
+        """
+        return {
+            "fulfillmentMessages": [
+                self._get_text_response_component(
+                    text=[
+                        f"Phỏng vấn AI giúp bạn đánh giá ứng viên nhanh chóng và chính xác hơn! 🤖✅",
+                        "Hệ thống sẽ tự động thực hiện cuộc gọi Voice AI với ứng viên dựa trên bộ câu hỏi bạn chuẩn bị."
+                    ]
+                ),
+                {
+                    "payload": {
+                        "richContent": [
+                            [
+                                self._get_info_response_component(
+                                    title="Lợi ích của Phỏng vấn AI",
+                                    subtitle="Tiết kiệm 70% thời gian sàng lọc sơ bộ",
+                                    image_url=self.chatbot_icons.get("job_seeker_ai_interview_guide", ""),
+                                    action_link=""
+                                ),
+                                self._get_description_response_component(
+                                    title="Cách bắt đầu",
+                                    text=[
+                                        "1. Tạo lịch phỏng vấn chọn loại 'AI Interview'.",
+                                        "2. Thiết lập bộ câu hỏi trong Ngân hàng câu hỏi AI.",
+                                        "3. Xem kết quả và điểm đánh giá AI sau khi phỏng vấn kết thúc."
+                                    ]
+                                )
+                            ]
+                        ]
+                    }
+                }
+            ]
+        }
+
+    def get_post_job_ai_intent_response(self, params={}):
+        """
+        Return response for PostJobAIIntent
+        """
+        return {
+            "fulfillmentMessages": [
+                self._get_text_response_component(
+                    text=[
+                        "Bạn muốn đăng tin tuyển dụng nhanh và thu hút hơn? Square AI có thể hỗ trợ! ✍️✨",
+                        "Chúng tôi cung cấp chuyên nghiệp dựa trên tiêu đề và yêu cầu của bạn."
+                    ]
+                )
+            ]
+        }
 
         """
 
@@ -76,11 +173,15 @@ class EmployerChatResponse(CommonChatResponse):
                                         "icon_url": self.chatbot_icons["employer_manage_candidate"]},
 
                                     {"text": "Cập nhật thông tin công ty",
-
                                         "icon_url": self.chatbot_icons["employer_update_company_info"]},
 
-                                    {"text": "Đánh giá và phản hồi",
+                                    {"text": "Hướng dẫn phỏng vấn AI",
+                                        "icon_url": self.chatbot_icons.get("job_seeker_ai_interview_guide", "")},
 
+                                    {"text": "Đăng tin với AI",
+                                        "icon_url": self.chatbot_icons.get("employer_post_job_ai", "")},
+
+                                    {"text": "Đánh giá và phản hồi",
                                         "icon_url": self.chatbot_icons["common_feedback"]},
 
                                     {"text": "Hỗ trợ",
