@@ -105,7 +105,9 @@ const MessageResponseInner = memo(({
       className={cn("size-full [&>*:first-child]:mt-0 [&>*:last-child]:mb-0", className)}
       plugins={streamdownState.plugins}
       {...props}
-    />
+    >
+      {children}
+    </Streamdown>
   );
 }, (prevProps, nextProps) => prevProps.children === nextProps.children);
 
