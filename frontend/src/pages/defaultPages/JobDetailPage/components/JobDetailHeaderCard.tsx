@@ -85,7 +85,7 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
             {jobPostDetail?.jobName}
           </h2>
 
-          <div className="mt-4 flex flex-wrap gap-6 text-sm text-muted-foreground">
+          <div className="mt-4 flex flex-wrap gap-8 text-sm text-muted-foreground">
             <div className="flex items-center gap-3">
               <FontAwesomeIcon icon={faCalendarDay} className="text-purple-600" />
               <span>
@@ -106,7 +106,8 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
             </div>
           </div>
 
-          <JobDetailActions
+          <div className="mt-8">
+            <JobDetailActions
             isApplied={jobPostDetail.isApplied}
             isSaved={jobPostDetail.isSaved}
             isLoadingSave={isLoadingSave}
@@ -115,7 +116,8 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
             setOpenSharePopup={onOpenSharePopup}
             isAuthenticated={isAuthenticated}
             currentUser={currentUser}
-          />
+            />
+          </div>
         </div>
 
         <div className="h-px w-full bg-border" />

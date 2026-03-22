@@ -45,7 +45,7 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-wrap items-center gap-4">
       {canApply && (
         <>
           <Button
