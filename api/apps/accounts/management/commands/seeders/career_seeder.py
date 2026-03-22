@@ -1,20 +1,26 @@
+"""
+Career Seeder
+Giữ toàn bộ 40 ngành nghề gốc (đa ngành) + bổ sung thêm các ngành
+chuyên biệt cho lĩnh vực Xây dựng & Thiết kế từ ID 41 trở đi.
+"""
 from common.models import Career
 
 
 def seed_careers():
-    """Seed danh mục ngành nghề theo chuẩn dữ liệu hiện tại của hệ thống."""
+    """Seed danh mục ngành nghề: giữ nguyên 40 ngành gốc + thêm xây dựng/thiết kế."""
     print("Bắt đầu nạp danh mục ngành nghề...")
 
     careers_data = [
-        {"id": 1, "name": "Kinh doanh / Bán hàng"},
-        {"id": 2, "name": "Công nghệ thông tin (IT - Phần mềm)"},
-        {"id": 3, "name": "Marketing / Truyền thông / Quảng cáo"},
-        {"id": 4, "name": "Dịch vụ khách hàng / Chăm sóc khách hàng"},
-        {"id": 5, "name": "Tài chính / Kế toán / Kiểm toán"},
-        {"id": 6, "name": "Nhân sự (HR) / Hành chính"},
-        {"id": 7, "name": "Logistics / Chuỗi cung ứng / Vận tải"},
-        {"id": 8, "name": "Sản xuất / Chế biến / Cơ khí"},
-        {"id": 9, "name": "Xây dựng / Kiến trúc / Kỹ thuật xây dựng"},
+        # ── 40 ngành gốc (giữ nguyên) ──────────────────────────────────────
+        {"id": 1,  "name": "Kinh doanh / Bán hàng"},
+        {"id": 2,  "name": "Công nghệ thông tin (IT - Phần mềm)"},
+        {"id": 3,  "name": "Marketing / Truyền thông / Quảng cáo"},
+        {"id": 4,  "name": "Dịch vụ khách hàng / Chăm sóc khách hàng"},
+        {"id": 5,  "name": "Tài chính / Kế toán / Kiểm toán"},
+        {"id": 6,  "name": "Nhân sự (HR) / Hành chính"},
+        {"id": 7,  "name": "Logistics / Chuỗi cung ứng / Vận tải"},
+        {"id": 8,  "name": "Sản xuất / Chế biến / Cơ khí"},
+        {"id": 9,  "name": "Xây dựng / Kiến trúc / Kỹ thuật xây dựng"},
         {"id": 10, "name": "Y tế / Dược phẩm / Chăm sóc sức khỏe"},
         {"id": 11, "name": "Giáo dục / Đào tạo"},
         {"id": 12, "name": "Du lịch / Khách sạn / Nhà hàng"},
@@ -46,6 +52,23 @@ def seed_careers():
         {"id": 38, "name": "Data / Phân tích dữ liệu"},
         {"id": 39, "name": "Freelance / Remote / Làm việc tự do"},
         {"id": 40, "name": "Khác / Khác"},
+
+        # ── Ngành chuyên biệt: Xây dựng & Thiết kế ────────────────────────
+        {"id": 41, "name": "Kỹ sư Kết cấu / Địa kỹ thuật / Nền móng"},
+        {"id": 42, "name": "Kỹ sư Cầu đường / Hạ tầng giao thông"},
+        {"id": 43, "name": "Thiết kế nội thất / Kiến trúc nội thất"},
+        {"id": 44, "name": "Kỹ sư Cơ điện M&E (Điện, HVAC, Plumbing)"},
+        {"id": 45, "name": "Kỹ sư Phòng cháy chữa cháy (PCCC)"},
+        {"id": 46, "name": "BIM Coordinator / BIM Manager"},
+        {"id": 47, "name": "Giám sát thi công / Chỉ huy trưởng công trường"},
+        {"id": 48, "name": "Dự toán công trình / Đo bóc khối lượng (QS)"},
+        {"id": 49, "name": "An toàn lao động HSE công trình"},
+        {"id": 50, "name": "Quản lý tòa nhà / Facility Management"},
+        {"id": 51, "name": "Kiến trúc sư cảnh quan / Quy hoạch đô thị"},
+        {"id": 52, "name": "Kinh doanh vật liệu xây dựng / Nội thất"},
+        {"id": 53, "name": "Phát triển dự án xây dựng / Bất động sản"},
+        {"id": 54, "name": "Pháp lý hợp đồng xây dựng / Đấu thầu"},
+        {"id": 55, "name": "Công nhân kỹ thuật / Thợ lành nghề xây dựng"},
     ]
 
     created_count = 0

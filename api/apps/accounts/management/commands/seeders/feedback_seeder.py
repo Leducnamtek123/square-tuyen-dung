@@ -1,6 +1,6 @@
 """
 Feedback Seeder
-Tạo dữ liệu đánh giá mẫu từ các user Job Seeker hiện có trong hệ thống.
+Tạo dữ liệu đánh giá mẫu từ các ứng viên (Job Seeker) ngành Xây dựng & Thiết kế.
 """
 import random
 
@@ -10,53 +10,51 @@ from shared.configs import variable_system as var_sys
 
 
 FEEDBACK_CONTENTS = [
-    "Trang web rất dễ sử dụng, tìm kiếm việc làm nhanh chóng và hiệu quả!",
-    "Giao diện thân thiện, thông tin công việc đầy đủ và chi tiết. Rất hài lòng!",
-    "Tôi đã tìm được việc làm mơ ước qua nền tảng này. Cảm ơn rất nhiều!",
-    "Hệ thống gợi ý việc làm phù hợp với hồ sơ của tôi. Rất hữu ích!",
-    "Chức năng lọc việc làm theo ngành nghề và vị trí rất tiện lợi.",
-    "Thông báo việc làm mới gửi qua email rất kịp thời. Không bỏ lỡ cơ hội nào.",
-    "Ứng tuyển chỉ vài bước đơn giản. Tiết kiệm rất nhiều thời gian!",
-    "Hệ thống theo dõi trạng thái ứng tuyển rất rõ ràng và minh bạch.",
-    "Thông tin công ty được hiển thị đầy đủ, giúp tôi nghiên cứu trước khi ứng tuyển.",
-    "Tính năng tải CV trực tiếp lên hệ thống rất tiện. Không cần gửi email thủ công.",
-    "Nền tảng có nhiều cơ hội việc làm hơn tôi nghĩ. Ấn tượng!",
-    "Giao diện đẹp, hiện đại. Trải nghiệm tìm việc trở nên thú vị hơn.",
-    "Tôi được nhà tuyển dụng liên hệ trong vòng 24 giờ sau khi đăng hồ sơ.",
-    "Tính năng lưu tin tuyển dụng yêu thích rất hữu ích để xem lại sau.",
-    "Dịch vụ hỗ trợ phản hồi nhanh và nhiệt tình. Cảm ơn đội ngũ Square!",
+    "Tìm được việc kỹ sư xây dựng phù hợp chỉ trong 1 tuần. Nền tảng rất tốt!",
+    "Tin tuyển dụng ngành xây dựng rất đa dạng, từ kỹ sư đến kiến trúc sư đều có.",
+    "Tôi là kiến trúc sư và đã nhận được 3 lời mời phỏng vấn sau khi đăng hồ sơ.",
+    "Hệ thống lọc việc theo chuyên ngành M&E rất tiện, tiết kiệm nhiều thời gian!",
+    "Thông tin công ty xây dựng hiển thị rõ ràng: dự án, quy mô, văn hóa công ty.",
+    "Nhận thông báo việc làm kỹ sư cầu đường đúng ngành mình muốn. Rất hài lòng!",
+    "Chức năng ứng tuyển nhanh rất tiện, chỉ vài bước là gửi được hồ sơ ngay.",
+    "Theo dõi trạng thái ứng tuyển rõ ràng, không cần gọi điện hỏi thêm.",
+    "Công ty Square Construction & Design của tôi đã tìm được 5 kỹ sư giỏi qua đây.",
+    "Giao diện đẹp, dễ sử dụng. Lọc việc theo location và kinh nghiệm rất chính xác.",
+    "Tôi tìm được vị trí BIM Coordinator trong 2 tuần. Tuyệt vời!",
+    "Nền tảng tuyển dụng chuyên ngành xây dựng, không bị loãng bởi các ngành khác.",
+    "Ứng tuyển vị trí thiết kế nội thất senior và được phản hồi rất nhanh.",
+    "Hơi ít tin tuyển dụng ở tỉnh, mong có thêm cơ hội cho kỹ sư ngoài TP.HCM.",
+    "Dịch vụ hỗ trợ phản hồi tốt, giải đáp thắc mắc rất nhanh. Cảm ơn đội ngũ!",
 ]
 
-RATINGS = [5, 5, 5, 4, 4, 4, 5, 3, 4, 5, 4, 5, 5, 4, 3]
+RATINGS = [5, 5, 5, 4, 5, 4, 5, 4, 5, 4, 5, 5, 4, 3, 4]
 
 
 def seed_feedbacks():
-    """Seed dữ liệu Feedback mẫu từ users Job Seeker hiện có."""
-    print("Bắt đầu nạp dữ liệu Feedback...")
+    """Seed dữ liệu Feedback ngành xây dựng & thiết kế từ Job Seekers hiện có."""
+    print("Bắt đầu nạp dữ liệu Feedback (xây dựng & thiết kế)...")
 
     job_seekers = list(
         User.objects.filter(role_name=var_sys.JOB_SEEKER, is_active=True)
     )
 
     if not job_seekers:
-        print("  ⚠  Không có Job Seeker nào trong hệ thống. Hãy chạy seed accounts trước.")
+        print("  ⚠  Không có Job Seeker nào. Hãy chạy seed accounts trước.")
         return
 
     created_count = 0
     skipped_count = 0
 
     for i, content in enumerate(FEEDBACK_CONTENTS):
-        # Chọn user theo vòng nếu ít user hơn feedback
         user = job_seekers[i % len(job_seekers)]
         rating = RATINGS[i]
 
-        # Không tạo trùng feedback của cùng 1 user với cùng nội dung
         already_exists = Feedback.objects.filter(user=user, content=content).exists()
         if already_exists:
             skipped_count += 1
             continue
 
-        # 12 feedback đầu is_active=True, 3 cuối is_active=False (chờ duyệt)
+        # 12 feedback đầu hiển thị, 3 cuối chờ duyệt
         is_active = i < 12
 
         Feedback.objects.create(

@@ -123,6 +123,11 @@ class AdminBannerSerializer(serializers.ModelSerializer):
     imageUrl = serializers.SerializerMethodField(read_only=True)
     imageMobileUrl = serializers.SerializerMethodField(read_only=True)
 
+    # Allow relative paths like /nha-tuyen-dung/tim-ung-vien (URLField rejects them)
+    button_link = serializers.CharField(
+        allow_blank=True, allow_null=True, required=False
+    )
+
     class Meta:
         model = Banner
         fields = (
@@ -132,6 +137,17 @@ class AdminBannerSerializer(serializers.ModelSerializer):
             'imageUrl', 'imageMobileUrl', 'create_at', 'update_at',
         )
         read_only_fields = ('id', 'create_at', 'update_at', 'imageUrl', 'imageMobileUrl')
+
+    def validate(self, attrs):
+        """Convert string booleans sent via multipart/FormData to proper Python booleans."""
+        for bool_field in ('is_show_button', 'is_active'):
+            val = attrs.get(bool_field)
+            if isinstance(val, str):
+                attrs[bool_field] = val.lower() in ('true', '1', 'yes')
+        # Treat empty string as None for button_link
+        if attrs.get('button_link') == '':
+            attrs['button_link'] = None
+        return attrs
 
     def get_imageUrl(self, banner):
         if banner.image:

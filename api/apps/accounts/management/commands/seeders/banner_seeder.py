@@ -1,8 +1,9 @@
 """
 Banner Seeder
-Tạo dữ liệu mẫu cho Banner. Ảnh placeholder được download tự động từ
-picsum.photos rồi upload lên MinIO — không cần file thực.
+Tạo dữ liệu mẫu cho Banner ngành Xây dựng & Thiết kế.
+Ảnh thật được upload lên MinIO từ local file — không cần URL ngoài.
 """
+import os
 from datetime import datetime, timezone
 
 from apps.content.models import Banner
@@ -10,30 +11,25 @@ from apps.files.models import File
 from shared.configs import variable_system as var_sys
 from shared.helpers.cloudinary_service import CloudinaryService
 
-
 # ---------------------------------------------------------------------------
-# Placeholder image sources — picsum.photos trả về ảnh ngẫu nhiên theo kích thước
+# Đường dẫn thư mục chứa ảnh seed (relative to manage.py / BASE_DIR)
 # ---------------------------------------------------------------------------
-WEB_IMAGES = [
-    "https://picsum.photos/seed/banner1/1200/400",
-    "https://picsum.photos/seed/banner2/1200/400",
-    "https://picsum.photos/seed/banner3/1200/400",
-    "https://picsum.photos/seed/banner4/1200/400",
-    "https://picsum.photos/seed/banner5/1200/400",
-]
+_SEED_IMG_DIR = os.path.normpath(os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "..", "..", "..", "..", "..", "data", "seed_images"
+))
 
-MOBILE_IMAGES = [
-    "https://picsum.photos/seed/mob1/600/400",
-    "https://picsum.photos/seed/mob2/600/400",
-    "https://picsum.photos/seed/mob3/600/400",
-    "https://picsum.photos/seed/mob4/600/400",
-    "https://picsum.photos/seed/mob5/600/400",
-]
+
+def _img(subfolder, filename):
+    """Resolve đường dẫn tuyệt đối đến ảnh seed."""
+    path = os.path.normpath(os.path.join(_SEED_IMG_DIR, subfolder, filename))
+    return path if os.path.exists(path) else None
+
 
 BANNERS_DATA = [
     {
         "id": 1,
-        "description": "Tìm việc làm phù hợp — Hàng nghìn cơ hội mỗi ngày",
+        "description": "Tìm việc làm xây dựng phù hợp — Hàng nghìn cơ hội mỗi ngày",
         "button_text": "Tìm việc ngay",
         "button_link": "/viec-lam",
         "is_show_button": True,
@@ -41,12 +37,12 @@ BANNERS_DATA = [
         "type": var_sys.BannerType.HOME,
         "description_location": var_sys.DescriptionLocation.BOTTOM_LEFT,
         "is_active": True,
-        "web_img_url": WEB_IMAGES[0],
-        "mobile_img_url": MOBILE_IMAGES[0],
+        "web_img": "banner_1_web.png",
+        "mobile_img": "banner_1_web.png",
     },
     {
         "id": 2,
-        "description": "Đăng tin tuyển dụng — Tiếp cận hàng triệu ứng viên",
+        "description": "Đăng tin tuyển dụng ngành xây dựng — Tiếp cận hàng nghìn kỹ sư",
         "button_text": "Đăng tin ngay",
         "button_link": "/nha-tuyen-dung",
         "is_show_button": True,
@@ -54,55 +50,58 @@ BANNERS_DATA = [
         "type": var_sys.BannerType.MAIN_JOB_RIGHT,
         "description_location": var_sys.DescriptionLocation.BOTTOM_RIGHT,
         "is_active": True,
-        "web_img_url": WEB_IMAGES[1],
-        "mobile_img_url": MOBILE_IMAGES[1],
+        "web_img": "banner_2_web.png",
+        "mobile_img": "banner_2_web.png",
     },
     {
         "id": 3,
-        "description": "IT & Công nghệ — Cơ hội tốt nhất cho kỹ sư phần mềm",
-        "button_text": "Xem việc IT",
-        "button_link": "/viec-lam?career=2",
+        "description": "Kiến trúc & Kỹ thuật — Cơ hội tốt nhất cho kỹ sư & kiến trúc sư",
+        "button_text": "Xem việc kiến trúc",
+        "button_link": "/viec-lam?career=9",
         "is_show_button": True,
         "platform": var_sys.Platform.WEB,
         "type": var_sys.BannerType.HOME,
         "description_location": var_sys.DescriptionLocation.TOP_LEFT,
         "is_active": True,
-        "web_img_url": WEB_IMAGES[2],
-        "mobile_img_url": MOBILE_IMAGES[2],
+        "web_img": "banner_3_web.png",
+        "mobile_img": "banner_3_web.png",
     },
     {
         "id": 4,
-        "description": "Ứng viên chất lượng cao — Giải pháp tuyển dụng thông minh",
-        "button_text": "Tìm ứng viên",
-        "button_link": "/nha-tuyen-dung/tim-ung-vien",
+        "description": "Thiết kế nội thất — Nhân tài sáng tạo không gian sống",
+        "button_text": "Tìm việc thiết kế",
+        "button_link": "/viec-lam?career=14",
         "is_show_button": True,
         "platform": var_sys.Platform.APP,
         "type": var_sys.BannerType.HOME,
         "description_location": var_sys.DescriptionLocation.BOTTOM_LEFT,
         "is_active": True,
-        "web_img_url": WEB_IMAGES[3],
-        "mobile_img_url": MOBILE_IMAGES[3],
+        "web_img": "banner_4_web.png",
+        "mobile_img": "banner_4_web.png",
     },
     {
         "id": 5,
-        "description": "Sự kiện tuyển dụng tháng 4 — Kết nối nhà tuyển dụng & ứng viên",
+        "description": "Ngày hội tuyển dụng ngành xây dựng — Kết nối nhà thầu & nhân tài",
         "button_text": "Xem sự kiện",
         "button_link": "/su-kien",
         "is_show_button": True,
         "platform": var_sys.Platform.WEB,
         "type": var_sys.BannerType.HOME,
         "description_location": var_sys.DescriptionLocation.TOP_RIGHT,
-        "is_active": False,           # inactive — banner hết hạn
-        "web_img_url": WEB_IMAGES[4],
-        "mobile_img_url": MOBILE_IMAGES[4],
+        "is_active": False,   # banner hết hạn
+        "web_img": "banner_5_web.png",
+        "mobile_img": "banner_5_web.png",
     },
 ]
 
 
-def _upload_placeholder(url: str, folder: str, object_name: str, file_type: str) -> File | None:
-    """Download ảnh từ URL rồi upload lên MinIO, trả về File instance."""
+def _upload_local_image(filepath: str, folder: str, object_name: str, file_type: str) -> "File | None":
+    """Upload ảnh từ local file lên MinIO, trả về File instance."""
+    if not filepath:
+        print(f"  ⚠  Không tìm thấy file ảnh: {filepath}")
+        return None
     try:
-        result = CloudinaryService.upload_image(url, folder, public_id=object_name)
+        result = CloudinaryService.upload_image(filepath, folder, public_id=object_name)
         if not result:
             return None
         return File.objects.create(
@@ -115,13 +114,13 @@ def _upload_placeholder(url: str, folder: str, object_name: str, file_type: str)
             metadata=result,
         )
     except Exception as e:
-        print(f"  ⚠  Không upload được ảnh placeholder: {e}")
+        print(f"  ⚠  Upload thất bại ({object_name}): {e}")
         return None
 
 
 def seed_banners():
-    """Seed dữ liệu Banner mẫu với ảnh placeholder từ picsum.photos."""
-    print("Bắt đầu nạp dữ liệu Banner...")
+    """Seed dữ liệu Banner ngành Xây dựng & Thiết kế với ảnh thật từ local."""
+    print("Bắt đầu nạp dữ liệu Banner (xây dựng & thiết kế)...")
     created_count = 0
     updated_count = 0
 
@@ -130,7 +129,7 @@ def seed_banners():
         existing = Banner.objects.filter(id=bid).first()
 
         if existing:
-            # Cập nhật các trường text
+            # Cập nhật các trường text, không đụng ảnh nếu đã có
             existing.description = data["description"]
             existing.button_text = data["button_text"]
             existing.button_link = data["button_link"]
@@ -141,20 +140,21 @@ def seed_banners():
             existing.is_active = data["is_active"]
             existing.save()
             updated_count += 1
-            print(f"  Cập nhật Banner #{bid}: {data['description'][:50]}...")
+            print(f"  ↻ Cập nhật Banner #{bid}: {data['description'][:60]}")
             continue
 
         # Tạo mới — upload ảnh trước
-        print(f"  Đang upload ảnh cho Banner #{bid}...")
-        web_file = _upload_placeholder(
-            data["web_img_url"],
-            folder="banners/web",
+        print(f"  ↑ Đang upload ảnh cho Banner #{bid}...")
+        web_path = _img("banners", data["web_img"])
+        mobile_path = _img("banners", data["mobile_img"])
+
+        web_file = _upload_local_image(
+            web_path, folder="banners/web",
             object_name=f"banner_{bid}_web",
             file_type=File.WEB_BANNER_TYPE,
         )
-        mobile_file = _upload_placeholder(
-            data["mobile_img_url"],
-            folder="banners/mobile",
+        mobile_file = _upload_local_image(
+            mobile_path, folder="banners/mobile",
             object_name=f"banner_{bid}_mobile",
             file_type=File.MOBILE_BANNER_TYPE,
         )
@@ -173,7 +173,7 @@ def seed_banners():
             image_mobile=mobile_file,
         )
         created_count += 1
-        print(f"  ✓ Tạo Banner #{bid}: {data['description'][:50]}...")
+        print(f"  ✓ Tạo Banner #{bid}: {data['description'][:60]}")
 
     print(
         f"Thành công! Đã tạo {created_count} banner mới, cập nhật {updated_count} banner."
