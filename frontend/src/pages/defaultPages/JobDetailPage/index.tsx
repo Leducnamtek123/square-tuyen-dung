@@ -118,8 +118,8 @@ const JobDetailPage = () => {
         <NoDataCard title={t("jobDetail.noData")} />
       ) : (
         <div className={cn("mt-2", canApply ? "pb-20 md:pb-0" : "")}>
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-            <div>
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+            <div className="flex flex-col gap-8">
               <JobDetailHeaderCard
                 jobPostDetail={jobPostDetail}
                 allConfig={allConfig}

@@ -15,7 +15,7 @@ interface JobDetailContactCardProps {
 const JobDetailContactCard: React.FC<JobDetailContactCardProps> = ({ jobPostDetail }) => {
   const { t } = useTranslation(["public"]);
   return (
-    <div className="mt-3 rounded-xl border border-border/60 bg-card px-4 py-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)] sm:px-6 lg:px-8">
+    <div className="rounded-xl border border-border/60 bg-card px-4 py-6 shadow-[0_4px_12px_rgba(0,0,0,0.1)] sm:px-6 lg:px-8">
       <div className="grid gap-8 md:grid-cols-2">
         <div>
           <h3 className="text-lg font-bold">
