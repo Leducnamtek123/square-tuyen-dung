@@ -12,6 +12,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useTranslation } from 'react-i18next';
 import adminManagementService from '../../../services/adminManagementService';
+import { IMAGES } from '../../../configs/constants';
 
 const PLATFORM_OPTIONS = [
   { value: 'WEB', label: 'Web' },
@@ -207,14 +208,24 @@ const BannersPage = () => {
                   <TableCell>{b.id}</TableCell>
                   <TableCell>
                     {b.imageUrl ? (
-                      <Box component="img" src={b.imageUrl} alt="web banner"
-                        sx={{ width: 120, height: 60, objectFit: 'cover', borderRadius: 1 }} />
+                      <Box
+                        component="img"
+                        src={b.imageUrl}
+                        alt="web banner"
+                        onError={(e: any) => { e.currentTarget.src = IMAGES.companyLogoDefault; }}
+                        sx={{ width: 120, height: 60, objectFit: 'cover', borderRadius: 1 }}
+                      />
                     ) : '—'}
                   </TableCell>
                   <TableCell>
                     {b.imageMobileUrl ? (
-                      <Box component="img" src={b.imageMobileUrl} alt="mobile banner"
-                        sx={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 1 }} />
+                      <Box
+                        component="img"
+                        src={b.imageMobileUrl}
+                        alt="mobile banner"
+                        onError={(e: any) => { e.currentTarget.src = IMAGES.companyLogoDefault; }}
+                        sx={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 1 }}
+                      />
                     ) : '—'}
                   </TableCell>
                   <TableCell sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -269,29 +280,57 @@ const BannersPage = () => {
             <FormControlLabel control={<Switch checked={isActive} onChange={e => setIsActive(e.target.checked)} color="success" />} label={t('pages.banners.form.activeLabel')} />
 
             {/* Web Image Upload */}
-            <Typography variant="subtitle2" sx={{ mt: 1 }}>{t('pages.banners.form.webImageLabel')}</Typography>
+            <Typography variant="subtitle2" sx={{ mt: 1, fontWeight: 600 }}>{t('pages.banners.form.webImageLabel')}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <input ref={webInputRef} type="file" accept="image/*" hidden onChange={handleFileChange(setWebImage, setWebPreview)} />
               <Button variant="outlined" startIcon={<UploadFileIcon />} onClick={() => webInputRef.current?.click()}>
                 {webImage ? webImage.name : t('pages.banners.form.chooseWeb')}
               </Button>
             </Box>
-            {webPreview && (
-              <Box component="img" src={webPreview} alt="Web preview"
-                sx={{ width: '100%', maxHeight: 150, objectFit: 'contain', borderRadius: 1, border: '1px solid', borderColor: 'divider' }} />
+            {webPreview ? (
+              <Box sx={{ position: 'relative' }}>
+                <Box
+                  component="img"
+                  src={webPreview}
+                  alt="Web preview"
+                  onError={(e: any) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement)?.style && ((e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'); }}
+                  sx={{ width: '100%', maxHeight: 150, objectFit: 'contain', borderRadius: 1, border: '1px solid', borderColor: 'divider', display: 'block' }}
+                />
+                <Box sx={{ display: 'none', width: '100%', height: 80, borderRadius: 1, border: '1px dashed', borderColor: 'divider', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontSize: 13 }}>
+                  Không thể tải ảnh. Vui lòng chọn ảnh mới.
+                </Box>
+              </Box>
+            ) : (
+              <Box sx={{ width: '100%', height: 80, borderRadius: 1, border: '1px dashed', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontSize: 13, bgcolor: 'action.hover' }}>
+                Chưa có ảnh web
+              </Box>
             )}
 
             {/* Mobile Image Upload */}
-            <Typography variant="subtitle2" sx={{ mt: 1 }}>{t('pages.banners.form.mobileImageLabel')}</Typography>
+            <Typography variant="subtitle2" sx={{ mt: 1, fontWeight: 600 }}>{t('pages.banners.form.mobileImageLabel')}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <input ref={mobileInputRef} type="file" accept="image/*" hidden onChange={handleFileChange(setMobileImage, setMobilePreview)} />
               <Button variant="outlined" startIcon={<UploadFileIcon />} onClick={() => mobileInputRef.current?.click()}>
                 {mobileImage ? mobileImage.name : t('pages.banners.form.chooseMobile')}
               </Button>
             </Box>
-            {mobilePreview && (
-              <Box component="img" src={mobilePreview} alt="Mobile preview"
-                sx={{ width: 200, maxHeight: 150, objectFit: 'contain', borderRadius: 1, border: '1px solid', borderColor: 'divider' }} />
+            {mobilePreview ? (
+              <Box sx={{ position: 'relative' }}>
+                <Box
+                  component="img"
+                  src={mobilePreview}
+                  alt="Mobile preview"
+                  onError={(e: any) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement)?.style && ((e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'); }}
+                  sx={{ width: 200, maxHeight: 150, objectFit: 'contain', borderRadius: 1, border: '1px solid', borderColor: 'divider', display: 'block' }}
+                />
+                <Box sx={{ display: 'none', width: 200, height: 80, borderRadius: 1, border: '1px dashed', borderColor: 'divider', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontSize: 13 }}>
+                  Không thể tải ảnh. Vui lòng chọn ảnh mới.
+                </Box>
+              </Box>
+            ) : (
+              <Box sx={{ width: 200, height: 80, borderRadius: 1, border: '1px dashed', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontSize: 13, bgcolor: 'action.hover' }}>
+                Chưa có ảnh mobile
+              </Box>
             )}
           </Box>
         </DialogContent>

@@ -230,13 +230,27 @@ const CareersPage = () => {
                             </Typography>
                         </Box>
                         {iconPreviewUrl ? (
-                            <Box
-                                component="img"
-                                src={iconPreviewUrl}
-                                alt="Career icon preview"
-                                sx={{ width: 64, height: 64, borderRadius: 2, objectFit: 'cover', border: '1px solid', borderColor: 'divider' }}
-                            />
-                        ) : null}
+                            <Box sx={{ position: 'relative', display: 'inline-block' }}>
+                                <Box
+                                    component="img"
+                                    src={iconPreviewUrl}
+                                    alt="Career icon preview"
+                                    onError={(e: any) => {
+                                        e.currentTarget.style.display = 'none';
+                                        const sibling = e.currentTarget.nextSibling as HTMLElement;
+                                        if (sibling) sibling.style.display = 'flex';
+                                    }}
+                                    sx={{ width: 64, height: 64, borderRadius: 2, objectFit: 'cover', border: '1px solid', borderColor: 'divider', display: 'block' }}
+                                />
+                                <Box sx={{ display: 'none', width: 64, height: 64, borderRadius: 2, border: '1px dashed', borderColor: 'divider', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontSize: 11, textAlign: 'center', p: 0.5 }}>
+                                    Lỗi ảnh
+                                </Box>
+                            </Box>
+                        ) : (
+                            <Box sx={{ width: 64, height: 64, borderRadius: 2, border: '1px dashed', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontSize: 11, textAlign: 'center', bgcolor: 'action.hover' }}>
+                                Chưa có icon
+                            </Box>
+                        )}
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>

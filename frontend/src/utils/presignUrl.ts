@@ -8,7 +8,18 @@ const isPresigned = (url: string | null | undefined): boolean => {
 
 const isMinioPublicUrl = (url: string | null | undefined): boolean => {
   if (!url || typeof url !== 'string') return false;
-  return url.includes('/minio/');
+  // Nhận diện URL MinIO: có /minio/ trong path, hoặc là MinIO public URL dạng host:port/bucket/
+  if (url.includes('/minio/')) return true;
+  // MinIO URL thường có port 9000 hoặc 9001
+  try {
+    const parsed = new URL(url);
+    if (parsed.port === '9000' || parsed.port === '9001') return true;
+    // MinIO hostname thường chứa 'minio' trong tên
+    if (parsed.hostname.includes('minio')) return true;
+  } catch {
+    // ignore invalid URLs
+  }
+  return false;
 };
 
 const getBaseUrl = (): string => {
