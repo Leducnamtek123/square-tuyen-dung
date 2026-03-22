@@ -163,6 +163,17 @@ code {
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* SweetAlert2: remove default icon border for custom iconHtml */
+.swal2-icon.swal2-no-border {
+  border: none !important;
+  box-shadow: none !important;
+  margin-bottom: 0 !important;
+}
+.swal2-icon.swal2-no-border::before,
+.swal2-icon.swal2-no-border::after {
+  display: none !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
