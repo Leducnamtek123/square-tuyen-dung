@@ -220,3 +220,171 @@ def send_notification_demo(request):
     )
 
     return var_res.response_data()
+
+
+# ===== Admin ViewSets =====
+
+class AdminBannerViewSet(viewsets.ModelViewSet):
+    """Admin CRUD for Banners with MinIO image upload."""
+    queryset = Banner.objects.all().select_related('image', 'image_mobile').order_by('-create_at')
+    permission_classes = [perms_sys.IsAdminUser]
+    renderer_classes = [renderers.MyJSONRenderer]
+
+    def get_serializer_class(self):
+        from .serializers import AdminBannerSerializer
+        return AdminBannerSerializer
+
+    def _handle_image_upload(self, file_obj, file_type, existing_file=None):
+        """Upload image to MinIO and create/update File record."""
+        from shared.helpers.cloudinary_service import CloudinaryService
+        from apps.files.models import File
+
+        folder = 'banners'
+        upload_result = CloudinaryService.upload_image(file_obj, folder)
+        if not upload_result:
+            return None
+
+        return File.update_or_create_file_with_cloudinary(
+            existing_file, upload_result, file_type
+        )
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        platform = request.GET.get('platform', None)
+        banner_type = request.GET.get('type', None)
+        is_active = request.GET.get('is_active', None)
+
+        if platform:
+            queryset = queryset.filter(platform=platform)
+        if banner_type:
+            queryset = queryset.filter(type=banner_type)
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active in ['true', '1', 'True'])
+
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        from apps.files.models import File
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        banner = serializer.save()
+
+        # Handle web image upload
+        web_image = request.FILES.get('imageFile')
+        if web_image:
+            file_record = self._handle_image_upload(
+                web_image, File.WEB_BANNER_TYPE
+            )
+            if file_record:
+                banner.image = file_record
+                banner.save()
+
+        # Handle mobile image upload
+        mobile_image = request.FILES.get('imageMobileFile')
+        if mobile_image:
+            file_record = self._handle_image_upload(
+                mobile_image, File.MOBILE_BANNER_TYPE
+            )
+            if file_record:
+                banner.image_mobile = file_record
+                banner.save()
+
+        # Re-serialize with image URLs
+        banner.refresh_from_db()
+        output = self.get_serializer(banner)
+        return var_res.response_data(data=output.data)
+
+    def update(self, request, *args, **kwargs):
+        from apps.files.models import File
+
+        banner = self.get_object()
+        serializer = self.get_serializer(banner, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        # Handle web image upload
+        web_image = request.FILES.get('imageFile')
+        if web_image:
+            file_record = self._handle_image_upload(
+                web_image, File.WEB_BANNER_TYPE, banner.image
+            )
+            if file_record:
+                banner.image = file_record
+                banner.save()
+
+        # Handle mobile image upload
+        mobile_image = request.FILES.get('imageMobileFile')
+        if mobile_image:
+            file_record = self._handle_image_upload(
+                mobile_image, File.MOBILE_BANNER_TYPE, banner.image_mobile
+            )
+            if file_record:
+                banner.image_mobile = file_record
+                banner.save()
+
+        banner.refresh_from_db()
+        output = self.get_serializer(banner)
+        return var_res.response_data(data=output.data)
+
+
+class AdminFeedbackViewSet(viewsets.ModelViewSet):
+    """Admin management for Feedbacks."""
+    queryset = Feedback.objects.all().select_related('user').order_by('-create_at')
+    permission_classes = [perms_sys.IsAdminUser]
+    renderer_classes = [renderers.MyJSONRenderer]
+
+    def get_serializer_class(self):
+        from .serializers import AdminFeedbackSerializer
+        return AdminFeedbackSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        is_active = request.GET.get('is_active', None)
+        rating = request.GET.get('rating', None)
+
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active in ['true', '1', 'True'])
+        if rating:
+            queryset = queryset.filter(rating=int(rating))
+
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
+
+
+@api_view(http_method_names=['GET', 'PUT'])
+@permission_classes([perms_sys.IsAdminUser])
+def system_settings_view(request):
+    """GET/PUT system settings (key-value store)."""
+    from .models import SystemSetting
+
+    DEFAULTS = {
+        'maintenanceMode': ('false', 'Enable maintenance mode'),
+        'autoApproveJobs': ('false', 'Auto-approve job posts'),
+        'emailNotifications': ('true', 'Enable email notifications'),
+    }
+
+    if request.method == 'GET':
+        # Ensure defaults exist
+        for key, (default_val, desc) in DEFAULTS.items():
+            SystemSetting.objects.get_or_create(
+                key=key, defaults={'value': default_val, 'description': desc}
+            )
+        settings_qs = SystemSetting.objects.all()
+        data = {}
+        for s in settings_qs:
+            # Convert string booleans
+            if s.value.lower() in ('true', 'false'):
+                data[s.key] = s.value.lower() == 'true'
+            else:
+                data[s.key] = s.value
+        return var_res.response_data(data=data)
+
+    elif request.method == 'PUT':
+        for key, value in request.data.items():
+            str_value = str(value).lower() if isinstance(value, bool) else str(value)
+            SystemSetting.objects.update_or_create(
+                key=key, defaults={'value': str_value}
+            )
+        return var_res.response_data()

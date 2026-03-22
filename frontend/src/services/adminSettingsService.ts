@@ -1,15 +1,14 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 
 type AnyRecord = Record<string, unknown>;
 
 const adminSettingsService = {
   getSystemSettings: (): Promise<unknown> => {
-    // assuming a new endpoint for system settings
-    const url = 'admin/web/system-settings/';
+    const url = 'Project/web/admin/system-settings/';
     return httpRequest.get(url);
   },
   updateSystemSettings: (data: AnyRecord): Promise<unknown> => {
-    const url = 'admin/web/system-settings/';
+    const url = 'Project/web/admin/system-settings/';
     return httpRequest.put(url, data);
   },
 };

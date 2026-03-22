@@ -249,6 +249,8 @@ const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
 
     recruitment: true,
 
+    content: true,
+
   });
 
   const handleExpand = (section: string) => {
@@ -463,7 +465,57 @@ const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
 
               </Collapse>
 
-              {/* Info & Profiles */}
+              {/* Content Management */}
+
+              <ListItem disablePadding>
+
+                <MenuItem
+
+                  icon={BusinessOutlinedIcon}
+
+                  text="Quản lý nội dung"
+
+                  hasChildren
+
+                  isExpanded={expandedItems.content}
+
+                  onClick={() => handleExpand('content')}
+
+                />
+
+              </ListItem>
+
+              <Collapse in={expandedItems.content} timeout="auto" unmountOnExit>
+
+                <List component="div" disablePadding>
+
+                  <MenuItem
+
+                    text="Quản lý Banner"
+
+                    to={`/${ROUTES.ADMIN.BANNERS}`}
+
+                    isSelected={location.pathname === `/${ROUTES.ADMIN.BANNERS}`}
+
+                    isChild
+
+                  />
+
+                  <MenuItem
+
+                    text="Quản lý Đánh giá"
+
+                    to={`/${ROUTES.ADMIN.FEEDBACKS}`}
+
+                    isSelected={location.pathname === `/${ROUTES.ADMIN.FEEDBACKS}`}
+
+                    isChild
+
+                  />
+
+                </List>
+
+              </Collapse>
 
               <ListItem disablePadding>
 

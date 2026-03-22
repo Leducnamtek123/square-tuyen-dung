@@ -15,3 +15,5 @@ export { default as JobNotificationsPage } from './JobNotificationsPage';
 export { default as DistrictsPage } from './DistrictsPage';
 export { default as WardsPage } from './WardsPage';
 export { default as QuestionGroupsPage } from './QuestionGroupsPage';
+export { default as BannersPage } from './BannersPage';
+export { default as FeedbacksPage } from './FeedbacksPage';

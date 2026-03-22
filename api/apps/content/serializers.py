@@ -3,7 +3,9 @@ from rest_framework import serializers
 
 from .models import (
 
-    Feedback
+    Feedback,
+
+    Banner
 
 )
 
@@ -105,7 +107,7 @@ class BannerSerializer(serializers.ModelSerializer):
 
     class Meta:
 
-        model = Feedback
+        model = Banner
 
         fields = ('id', 'imageUrl', 'imageMobileUrl',
 
@@ -114,3 +116,47 @@ class BannerSerializer(serializers.ModelSerializer):
                   'buttonLink', 'isShowButton',
 
                   'isActive', 'descriptionLocation')
+
+
+class AdminBannerSerializer(serializers.ModelSerializer):
+    """Full admin serializer for Banner CRUD."""
+    imageUrl = serializers.SerializerMethodField(read_only=True)
+    imageMobileUrl = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Banner
+        fields = (
+            'id', 'button_text', 'description', 'button_link',
+            'is_show_button', 'description_location', 'platform',
+            'type', 'is_active', 'image', 'image_mobile',
+            'imageUrl', 'imageMobileUrl', 'create_at', 'update_at',
+        )
+        read_only_fields = ('id', 'create_at', 'update_at', 'imageUrl', 'imageMobileUrl')
+
+    def get_imageUrl(self, banner):
+        if banner.image:
+            return banner.image.get_full_url()
+        return None
+
+    def get_imageMobileUrl(self, banner):
+        if banner.image_mobile:
+            return banner.image_mobile.get_full_url()
+        return None
+
+
+class AdminFeedbackSerializer(serializers.ModelSerializer):
+    """Full admin serializer for Feedback management."""
+    userDict = auth_serializers.UserSerializer(
+        source="user",
+        fields=['id', 'fullName', 'avatarUrl', 'email'],
+        read_only=True
+    )
+
+    class Meta:
+        model = Feedback
+        fields = (
+            'id', 'content', 'rating', 'is_active',
+            'user', 'userDict', 'create_at', 'update_at',
+        )
+        read_only_fields = ('id', 'create_at', 'update_at', 'userDict')
+

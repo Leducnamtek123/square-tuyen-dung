@@ -72,4 +72,15 @@ class Banner(ProjectBaseModel):
         return str(self.id)
 
 
+class SystemSetting(models.Model):
+    """Key-value store for system-wide settings."""
+    key = models.CharField(max_length=100, unique=True, db_index=True)
+    value = models.TextField(default='')
+    description = models.CharField(max_length=255, blank=True, default='')
 
+    class Meta:
+        db_table = "project_project_system_setting"
+        verbose_name_plural = "System settings"
+
+    def __str__(self):
+        return f"{self.key} = {self.value}"

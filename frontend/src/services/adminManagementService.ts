@@ -1,4 +1,4 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 
 type AnyRecord = Record<string, unknown>;
@@ -255,6 +255,38 @@ const adminManagementService = {
 
   deleteQuestionGroup: (id: IdType): Promise<unknown> => {
     const url = `interview/web/question-groups/${id}/`;
+    return httpRequest.delete(url);
+  },
+
+  // Banners (Admin)
+  getBanners: (params: AnyRecord = {}): Promise<unknown> => {
+    const url = 'Project/web/admin/banners/';
+    return withPresign(httpRequest.get(url, { params }));
+  },
+  createBanner: (data: AnyRecord): Promise<unknown> => {
+    const url = 'Project/web/admin/banners/';
+    return withPresign(httpRequest.post(url, data));
+  },
+  updateBanner: (id: IdType, data: AnyRecord): Promise<unknown> => {
+    const url = `Project/web/admin/banners/${id}/`;
+    return withPresign(httpRequest.patch(url, data));
+  },
+  deleteBanner: (id: IdType): Promise<unknown> => {
+    const url = `Project/web/admin/banners/${id}/`;
+    return httpRequest.delete(url);
+  },
+
+  // Feedbacks (Admin)
+  getFeedbacks: (params: AnyRecord = {}): Promise<unknown> => {
+    const url = 'Project/web/admin/feedbacks/';
+    return httpRequest.get(url, { params });
+  },
+  updateFeedback: (id: IdType, data: AnyRecord): Promise<unknown> => {
+    const url = `Project/web/admin/feedbacks/${id}/`;
+    return httpRequest.patch(url, data);
+  },
+  deleteFeedback: (id: IdType): Promise<unknown> => {
+    const url = `Project/web/admin/feedbacks/${id}/`;
     return httpRequest.delete(url);
   },
 };

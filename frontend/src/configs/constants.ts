@@ -340,6 +340,8 @@ const ROUTES = {
     JOB_NOTIFICATIONS: 'thong-bao-viec-lam',
     INTERVIEW_LIVE: 'phong-van-cong-ty-truc-tiep',
     INTERVIEW_SESSION: 'phong-van-truc-tiep/:id',
+    BANNERS: 'quan-ly-banner',
+    FEEDBACKS: 'quan-ly-danh-gia',
   },
 };
 

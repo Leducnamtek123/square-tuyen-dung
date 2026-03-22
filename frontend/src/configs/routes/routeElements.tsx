@@ -87,6 +87,8 @@ const AdminResumesPage = lazy(() => import("../../pages/adminPages/ResumesPage")
 const AdminJobActivityPage = lazy(() => import("../../pages/adminPages/JobActivityPage"));
 const AdminJobNotificationsPage = lazy(() => import("../../pages/adminPages/JobNotificationsPage"));
 const AdminInterviewSessionPage = lazy(() => import("../../pages/adminPages/InterviewSessionPage"));
+const AdminBannersPage = lazy(() => import("../../pages/adminPages/BannersPage"));
+const AdminFeedbacksPage = lazy(() => import("../../pages/adminPages/FeedbacksPage"));
 
 const JobSeekerInterviewLoginPage = lazy(() => import("../../pages/candidatePages/CandidateLoginPage"));
 const InterviewRoomPage = lazy(() => import("../../pages/candidatePages/InterviewRoomPage"));
@@ -176,6 +178,8 @@ export const routePages = {
   AdminJobActivityPage,
   AdminJobNotificationsPage,
   AdminInterviewSessionPage,
+  AdminBannersPage,
+  AdminFeedbacksPage,
   JobSeekerInterviewLoginPage,
   InterviewRoomPage,
   VoiceAiInterviewRedirectPage,

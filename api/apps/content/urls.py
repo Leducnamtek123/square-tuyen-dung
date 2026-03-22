@@ -11,6 +11,10 @@ web_router = DefaultRouter()
 
 web_router.register(r'feedbacks', views.FeedbackViewSet, basename='feedback')
 
+admin_router = DefaultRouter()
+admin_router.register(r'banners', views.AdminBannerViewSet, basename='admin-banner')
+admin_router.register(r'feedbacks', views.AdminFeedbackViewSet, basename='admin-feedback')
+
 urlpatterns = [
 
     path('', include([
@@ -35,6 +39,11 @@ urlpatterns = [
 
         path('banner/', views.get_web_banner)
 
-    ]))
+    ])),
+
+    path('web/admin/', include([
+        path('', include(admin_router.urls)),
+        path('system-settings/', views.system_settings_view),
+    ])),
 
 ]

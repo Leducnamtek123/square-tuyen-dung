@@ -23,6 +23,8 @@ const {
   AdminCitiesPage,
   AdminDistrictsPage,
   AdminWardsPage,
+  AdminBannersPage,
+  AdminFeedbacksPage,
   AdminLogin,
   ForgotPasswordPage,
   ResetPasswordPage,
@@ -54,6 +56,8 @@ const adminRoutes = [
       { path: ROUTES.ADMIN.CITIES, element: AdminCitiesPage },
       { path: ROUTES.ADMIN.DISTRICTS, element: AdminDistrictsPage },
       { path: ROUTES.ADMIN.WARDS, element: AdminWardsPage },
+      { path: ROUTES.ADMIN.BANNERS, element: AdminBannersPage },
+      { path: ROUTES.ADMIN.FEEDBACKS, element: AdminFeedbacksPage },
     ],
   },
   {
