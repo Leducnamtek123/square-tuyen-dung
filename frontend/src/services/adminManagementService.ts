@@ -289,6 +289,12 @@ const adminManagementService = {
     const url = `content/web/admin/feedbacks/${id}/`;
     return httpRequest.delete(url);
   },
+
+  // Chat Conversations (Admin)
+  getConversations: (params: AnyRecord = {}): Promise<unknown> => {
+    const url = 'chat/web/admin/conversations/';
+    return httpRequest.get(url, { params });
+  },
 };
 
 export default adminManagementService;

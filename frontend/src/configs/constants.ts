@@ -351,6 +351,7 @@ const ROUTES = {
     INTERVIEW_SESSION: 'phong-van-truc-tiep/:id',
     BANNERS: 'quan-ly-banner',
     FEEDBACKS: 'quan-ly-danh-gia',
+    CHAT: 'ket-noi-voi-nha-tuyen-dung',
   },
 };
 

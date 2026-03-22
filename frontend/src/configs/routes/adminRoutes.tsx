@@ -25,6 +25,7 @@ const {
   AdminWardsPage,
   AdminBannersPage,
   AdminFeedbacksPage,
+  AdminChatPage,
   AdminLogin,
   ForgotPasswordPage,
   ResetPasswordPage,
@@ -58,6 +59,7 @@ const adminRoutes = [
       { path: ROUTES.ADMIN.WARDS, element: AdminWardsPage },
       { path: ROUTES.ADMIN.BANNERS, element: AdminBannersPage },
       { path: ROUTES.ADMIN.FEEDBACKS, element: AdminFeedbacksPage },
+      { path: ROUTES.ADMIN.CHAT, element: AdminChatPage },
     ],
   },
   {

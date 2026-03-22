@@ -17,3 +17,4 @@ export { default as WardsPage } from './WardsPage';
 export { default as QuestionGroupsPage } from './QuestionGroupsPage';
 export { default as BannersPage } from './BannersPage';
 export { default as FeedbacksPage } from './FeedbacksPage';
+export { default as ChatPage } from './ChatPage';

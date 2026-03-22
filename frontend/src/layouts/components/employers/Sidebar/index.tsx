@@ -513,6 +513,18 @@ const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
 
                   />
 
+                  <MenuItem
+
+                    text="Kết nối với nhà tuyển dụng"
+
+                    to={`/${ROUTES.ADMIN.CHAT}`}
+
+                    isSelected={location.pathname === `/${ROUTES.ADMIN.CHAT}`}
+
+                    isChild
+
+                  />
+
                 </List>
 
               </Collapse>
