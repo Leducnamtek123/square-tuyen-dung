@@ -16,7 +16,6 @@ import {
   faHashtag,
   faLocationDot,
 } from "@fortawesome/free-solid-svg-icons";
-import { TabTitle } from "../../../utils/generalFunction";
 import { ICONS, IMAGES, ROLES_NAME } from "../../../configs/constants";
 import errorHandling from "../../../utils/errorHandling";
 import toastMessages from "../../../utils/toastMessages";
@@ -35,6 +34,8 @@ import CompanyDetailLoading from "./components/CompanyDetailLoading";
 import { useAppSelector } from "../../../hooks/useAppStore";
 import type { AxiosError } from "axios";
 import { tConfig } from '../../../utils/tConfig';
+import useSEO from "../../../hooks/useSEO";
+import useStructuredData from "../../../hooks/useStructuredData";
 
 
 
@@ -105,8 +106,6 @@ const CompanyDetailPage = () => {
 
         setCompanyDetail(data);
 
-        TabTitle(data?.companyName);
-
         var imagelistNew = [];
 
         for (let i = 0; i < companyImages.length; i++) {
@@ -136,6 +135,56 @@ const CompanyDetailPage = () => {
     getCompanyDetail(slug);
 
   }, [slug]);
+
+  // --- Dynamic SEO ---
+  const stripHtml = (html: string) => (html || '').replace(/<[^>]*>/g, '').slice(0, 160);
+
+  useSEO({
+    title: companyDetail?.companyName,
+    description: companyDetail
+      ? `${companyDetail.companyName} - ${companyDetail.fieldOperation || 'Công ty tuyển dụng'}. ${stripHtml(companyDetail.description || '')} Xem việc làm đang tuyển.`
+      : undefined,
+    image: companyDetail?.companyImageUrl || undefined,
+    url: window.location.href,
+    type: 'article',
+    keywords: companyDetail
+      ? `${companyDetail.companyName}, tuyển dụng, việc làm, ${companyDetail.fieldOperation || ''}`
+      : undefined,
+  });
+
+  useStructuredData(
+    companyDetail
+      ? [
+          {
+            type: 'Organization' as const,
+            name: companyDetail.companyName,
+            url: companyDetail.websiteUrl || window.location.href,
+            logoUrl: companyDetail.companyImageUrl,
+            description: companyDetail.description,
+            email: companyDetail.email,
+            phone: companyDetail.phone,
+            address: companyDetail.address,
+            city: companyDetail.cityName,
+            country: 'VN',
+            foundingDate: companyDetail.since ? dayjs(companyDetail.since).format('YYYY') : undefined,
+            numberOfEmployees: companyDetail.employeeSize,
+            sameAs: [
+              companyDetail.facebookUrl,
+              companyDetail.linkedinUrl,
+              companyDetail.websiteUrl,
+            ].filter(Boolean),
+          },
+          {
+            type: 'BreadcrumbList' as const,
+            items: [
+              { name: 'Trang chủ', url: window.location.origin },
+              { name: 'Công ty', url: `${window.location.origin}/cong-ty` },
+              { name: companyDetail.companyName, url: window.location.href },
+            ],
+          },
+        ]
+      : []
+  );
 
   const handleFollow = () => {
 

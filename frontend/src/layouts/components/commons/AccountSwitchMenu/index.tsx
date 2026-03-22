@@ -135,7 +135,8 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
 
       {isShowButton ? (
 
-        <Stack spacing={1} sx={{ px: 2 }}>
+        /* Drawer mode: compact buttons, text wraps, không cắt */
+        <Stack spacing={1} sx={{ px: 2, overflow: 'hidden' }}>
 
           <Button
 
@@ -143,13 +144,21 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
 
             fullWidth
 
-            color="inherit"
+            color="primary"
 
             onClick={() => handleClickAuth(true)}
 
             size="small"
 
-            sx={{ textTransform: 'inherit' }}
+            sx={{
+              textTransform: 'none',
+              fontSize: '0.78rem',
+              lineHeight: 1.4,
+              whiteSpace: 'normal',
+              textAlign: 'center',
+              py: 0.75,
+              borderRadius: 2,
+            }}
 
           >
 
@@ -169,9 +178,17 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
 
             size="small"
 
-            color="inherit"
+            color="primary"
 
-            sx={{ textTransform: 'inherit' }}
+            sx={{
+              textTransform: 'none',
+              fontSize: '0.78rem',
+              lineHeight: 1.4,
+              whiteSpace: 'normal',
+              textAlign: 'center',
+              py: 0.75,
+              borderRadius: 2,
+            }}
 
             onClick={() => handleClickAuth(false)}
 

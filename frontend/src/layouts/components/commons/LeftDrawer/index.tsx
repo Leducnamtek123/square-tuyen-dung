@@ -1,4 +1,4 @@
-import { Avatar, Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Stack, useTheme, Button } from "@mui/material";
+import { Avatar, Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Stack, useTheme, Button, Typography } from "@mui/material";
 
 import React from 'react';
 
@@ -46,7 +46,8 @@ interface LeftDrawerProps {
 
 
 
-const drawerWidth = 240;
+const DRAWER_WIDTH_SM = 260; // px on sm+
+const DRAWER_WIDTH_XS = '80vw'; // relative on xs — chiếm 80% để có đủ chỗ cho text
 
 const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicActions = true }: LeftDrawerProps) => {
 
@@ -92,51 +93,43 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
       });
 
   };
+  
   const pathname = globalThis?.window?.location?.pathname || "";
   const isEmployerPortal = isEmployerPortalPath(pathname);
+  const loginRoute = isEmployerPortal ? ROUTES.EMPLOYER_AUTH.LOGIN : ROUTES.AUTH.LOGIN;
   const registerRoute = isEmployerPortal ? ROUTES.EMPLOYER_AUTH.REGISTER : ROUTES.AUTH.REGISTER;
 
   const drawer = (
 
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: 'center' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
 
-      <Stack
-
-        sx={{
-
-          py: 2,
-
-          backgroundColor: 'background.paper',
-
-        }}
-
-        justifyContent="center"
-
-        alignItems="center"
-
+      {/* ---- HEADER: Logo ---- */}
+      <Box
         component={Link}
-
         to="/"
-
+        onClick={handleDrawerToggle}
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          py: 2.5,
+          px: 2,
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+          backgroundColor: 'background.paper',
+          textDecoration: 'none',
+          flexShrink: 0,
+        }}
       >
-
         <Avatar
 
           src={IMAGES.getTextLogo('dark')}
 
           sx={{
 
-            width: '80%',
+            width: 'auto',
 
-            height: 48,
-
-            transition: 'transform 0.2s ease-in-out',
-
-            '&:hover': {
-
-              transform: 'scale(1.05)',
-
-            }
+            height: 36,
 
           }}
 
@@ -146,157 +139,157 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
         />
 
-      </Stack>
+      </Box>
 
-      <Divider sx={{ borderColor: 'grey.200' }} />
+      {/* ---- SCROLLABLE CONTENT ---- */}
+      <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden' }}>
 
-      <List sx={{ py: 2 }}>
+        {/* Nav links */}
+        <List sx={{ py: 1.5 }}>
 
-        {pages.map((page) => (
+          {pages.map((page) => (
 
-          <ListItem
+            <ListItem
 
-            key={page.id}
+              key={page.id}
 
-            component={NavLink}
+              component={NavLink}
 
-            to={page.path}
+              to={page.path}
 
-            disablePadding
+              disablePadding
 
-            sx={{
-
-              mb: 1,
-
-              mx: 1,
-
-            }}
-
-          >
-
-            <ListItemButton
+              onClick={handleDrawerToggle}
 
               sx={{
 
-                textAlign: 'center',
+                mb: 0.5,
 
-                borderRadius: 2,
+                mx: 1,
 
-                transition: 'all 0.2s ease-in-out',
-
-                color: 'primary.main',
-
-                '&.active': {
-
-                  backgroundColor: 'primary.background',
-
-                  color: 'primary.main',
-
-                  fontWeight: 600,
-
-                },
-
-                '&:hover': {
-
-                  backgroundColor: 'grey.100',
-
-                  transform: 'translateX(5px)',
-
-                }
+                width: 'auto',
 
               }}
 
             >
 
-              <ListItemText
+              <ListItemButton
 
-                primary={page.label}
+                sx={{
 
-                slotProps={{
+                  textAlign: 'left',
 
-                  primary: {
+                  borderRadius: 2,
 
-                    fontSize: '0.95rem',
+                  transition: 'all 0.2s ease-in-out',
+
+                  color: 'text.primary',
+
+                  '&.active': {
+
+                    backgroundColor: 'primary.main',
+
+                    color: 'white',
+
+                    '& .MuiListItemText-primary': {
+                      fontWeight: 700,
+                    },
+
+                  },
+
+                  '&:hover': {
+
+                    backgroundColor: (t) => t.palette.mode === 'light' ? 'grey.100' : 'grey.800',
+
+                    paddingLeft: '20px',
 
                   }
 
                 }}
 
-              />
+              >
 
-            </ListItemButton>
+                <ListItemText
 
-          </ListItem>
+                  primary={page.label}
 
-        ))}
+                  slotProps={{
 
-      </List>
+                    primary: {
 
-      {showPublicActions && <AccountSwitchMenu isShowButton={true} />}
+                      fontSize: '0.9rem',
 
-      <Divider sx={{ my: 1, borderColor: 'grey.100' }} />
+                    }
 
-      <Divider
+                  }}
 
-        variant="middle"
+                />
 
+              </ListItemButton>
+
+            </ListItem>
+
+          ))}
+
+        </List>
+
+        {/* Employer / Candidate switch links — chỉ khi chưa đăng nhập */}
+        {showPublicActions && !isAuthenticated && (
+
+          <Box onClick={(e) => e.stopPropagation()}>
+
+            <Divider sx={{ mx: 2, borderColor: 'divider' }}>
+              <Typography variant="caption" color="text.secondary" sx={{ px: 1, fontSize: '0.7rem' }}>
+                {isEmployerPortal ? t('nav.switch.forJobSeekers') : t('nav.switch.forEmployers')}
+              </Typography>
+            </Divider>
+
+            <Box sx={{ px: 2, py: 1.5 }}>
+              <AccountSwitchMenu isShowButton={true} />
+            </Box>
+
+          </Box>
+
+        )}
+
+      </Box>
+
+      {/* ---- FOOTER: Auth actions ---- */}
+      <Box
         sx={{
-
-          my: 2,
-
-          borderColor: 'grey.200',
-
-          display: {
-
-            xs: 'block',
-
-            sm: 'none',
-
-            md: 'none',
-
-            lg: 'none',
-
-            xl: 'none',
-
-          },
-
-        }}
-
-      />
-
-      <Stack
-
-        spacing={1.5}
-
-        sx={{
-
+          flexShrink: 0,
+          borderTop: '1px solid',
+          borderColor: 'divider',
           p: 2,
-
         }}
-
+        onClick={(e) => e.stopPropagation()}
       >
 
         {isAuthenticated ? (
 
           <Button
 
-            variant="contained"
+            variant="outlined"
 
             color="error"
 
             fullWidth
 
+            size="medium"
+
             sx={{
 
-              py: 1,
+              textTransform: 'none',
 
-              boxShadow: (theme) => theme.customShadows?.small || 'none',
+              borderRadius: 2,
+
+              fontWeight: 600,
 
               '&:hover': {
 
-                transform: 'translateY(-2px)',
+                backgroundColor: 'error.main',
 
-                transition: 'transform 0.2s ease-in-out',
+                color: 'white',
 
               }
 
@@ -324,63 +317,73 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
           </Button>
 
-        ) : (
+        ) : showPublicActions ? (
 
-          <>
+          <Stack spacing={1}>
 
-            {showPublicActions && (
-              <Button
+            <Button
 
-                variant="contained"
+              variant="outlined"
 
-                color="primary"
+              color="primary"
 
-                fullWidth
+              fullWidth
 
-                sx={{
+              size="medium"
 
-                  py: 1,
+              sx={{
 
-                  boxShadow: (theme) => theme.customShadows?.small || 'none',
+                textTransform: 'none',
 
-                  display: {
+                borderRadius: 2,
 
-                    xs: 'block',
+                fontSize: '0.85rem',
 
-                    sm: 'none',
+              }}
 
-                    md: 'none',
+              onClick={() => { nav(`/${loginRoute}`); handleDrawerToggle(); }}
 
-                    lg: 'none',
+            >
 
-                    xl: 'none',
+              {t('nav.login')}
 
-                  },
+            </Button>
 
-                  '&:hover': {
+            <Button
 
-                    transform: 'translateY(-2px)',
+              variant="contained"
 
-                    transition: 'transform 0.2s ease-in-out',
+              color="primary"
 
-                  }
+              fullWidth
 
-                }}
+              size="medium"
 
-                onClick={() => nav(`/${registerRoute}`)}
+              sx={{
 
-              >
+                textTransform: 'none',
 
-                {t('nav.register')}
+                borderRadius: 2,
 
-              </Button>
-            )}
+                fontSize: '0.85rem',
 
-          </>
+                fontWeight: 600,
 
-        )}
+              }}
 
-      </Stack>
+              onClick={() => { nav(`/${registerRoute}`); handleDrawerToggle(); }}
+
+            >
+
+              {t('nav.register')}
+
+            </Button>
+
+          </Stack>
+
+        ) : null}
+
+      </Box>
 
     </Box>
 
@@ -412,13 +415,17 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
           boxSizing: 'border-box',
 
-          width: drawerWidth,
+          width: { xs: DRAWER_WIDTH_XS, sm: DRAWER_WIDTH_SM },
 
-          boxShadow: (theme) => theme.customShadows?.card || 'none',
+          maxWidth: DRAWER_WIDTH_SM,
+
+          boxShadow: (theme) => theme.customShadows?.card || '0 8px 32px rgba(0,0,0,0.15)',
 
           border: 'none',
 
-          borderRadius: '0 10px 0 0',
+          borderRadius: '0 16px 16px 0',
+
+          overflow: 'hidden',
 
         },
 

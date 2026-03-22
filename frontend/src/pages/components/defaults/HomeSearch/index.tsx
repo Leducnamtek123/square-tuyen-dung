@@ -77,8 +77,8 @@ const HomeSearch = () => {
       sx={{
         backgroundColor: 'rgba(0,0,0,.35)',
         borderRadius: 3.5,
-        p: 4,
-        pt: 5,
+        p: { xs: 2, sm: 3, md: 4 },
+        pt: { xs: 2.5, sm: 3.5, md: 5 },
       }}
     >
       <form onSubmit={handleSubmit(handleFilter)}>

@@ -1,3 +1,33 @@
+# robots.txt - Square Tuyển Dụng
 # https://www.robotstxt.org/robotstxt.html
+
 User-agent: *
-Disallow:
+Allow: /
+Allow: /viec-lam
+Allow: /cong-ty
+Allow: /ve-chung-toi
+Allow: /viec-lam-theo-nganh-nghe
+Allow: /viec-lam-theo-tinh-thanh
+Allow: /viec-lam-theo-hinh-thuc-lam-viec
+
+# Disallow authenticated & admin/employer portal paths
+Disallow: /admin/
+Disallow: /employer/
+Disallow: /dang-nhap
+Disallow: /dang-ky
+Disallow: /quen-mat-khau
+Disallow: /cap-nhat-mat-khau/
+Disallow: /email-verification-required
+Disallow: /bang-dieu-khien
+Disallow: /ho-so
+Disallow: /viec-lam-cua-toi
+Disallow: /cong-ty-cua-toi
+Disallow: /phong-van-cua-toi
+Disallow: /tai-khoan
+Disallow: /ket-noi-voi-nha-tuyen-dung
+Disallow: /thong-bao
+Disallow: /phong-van/
+Disallow: /forbidden
+
+# Sitemap location
+Sitemap: https://sqstudio.vn/sitemap.xml

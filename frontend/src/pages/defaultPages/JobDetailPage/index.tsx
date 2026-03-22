@@ -10,7 +10,6 @@ import JobDetailDescriptionCard from "./components/JobDetailDescriptionCard";
 import JobDetailContactCard from "./components/JobDetailContactCard";
 import JobDetailSidebar from "./components/JobDetailSidebar";
 
-import { TabTitle } from "../../../utils/generalFunction";
 import toastMessages from "../../../utils/toastMessages";
 import errorHandling from "../../../utils/errorHandling";
 import NoDataCard from "../../../components/NoDataCard";
@@ -20,6 +19,8 @@ import ApplyCard from "../../../components/ApplyCard";
 import SocialNetworkSharingPopup from "../../../components/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
 import { ROLES_NAME, ROUTES } from "../../../configs/constants";
 import { useAppSelector } from "../../../hooks/useAppStore";
+import useSEO from "../../../hooks/useSEO";
+import useStructuredData from "../../../hooks/useStructuredData";
 
 const JobDetailPage = () => {
   const { slug } = useParams();
@@ -46,7 +47,6 @@ const JobDetailPage = () => {
         const resData = await jobService.getJobPostDetailById(jobPostSlug);
         const data = resData;
         setJobPostDetail(data);
-        TabTitle(data?.jobName);
       } catch (error) {
         const slugValue = String(jobPostSlug || '');
         const isNumericId = /^\d+$/.test(slugValue);
@@ -56,7 +56,6 @@ const JobDetailPage = () => {
               Number(slugValue)
             );
             setJobPostDetail(fallbackData);
-            TabTitle((fallbackData as any)?.jobName);
             return;
           } catch (fallbackError) {
             errorHandling(fallbackError as any);
@@ -70,6 +69,58 @@ const JobDetailPage = () => {
     };
     getJobPostDetail(slug);
   }, [slug]);
+
+  // --- Dynamic SEO ---
+  const jobDescription = jobPostDetail?.jobDescription || '';
+  const stripHtml = (html: string) => html.replace(/<[^>]*>/g, '').slice(0, 160);
+
+  useSEO({
+    title: jobPostDetail?.jobName,
+    description: jobPostDetail
+      ? `Tuyển dụng: ${jobPostDetail.jobName} tại ${jobPostDetail.companyName || 'công ty uy tín'}. ${stripHtml(jobDescription)}`
+      : undefined,
+    image: jobPostDetail?.companyImageUrl || undefined,
+    url: window.location.href,
+    type: 'article',
+    keywords: jobPostDetail
+      ? `${jobPostDetail.jobName}, ${jobPostDetail.companyName || ''}, tuyển dụng, việc làm`
+      : undefined,
+  });
+
+  useStructuredData(
+    jobPostDetail
+      ? [
+          {
+            type: 'JobPosting' as const,
+            title: jobPostDetail.jobName,
+            description: jobDescription,
+            companyName: jobPostDetail.companyName,
+            companyUrl: jobPostDetail.companySlug
+              ? `${window.location.origin}/cong-ty/${jobPostDetail.companySlug}`
+              : undefined,
+            companyLogoUrl: jobPostDetail.companyImageUrl,
+            location: jobPostDetail.locationName || jobPostDetail.location,
+            salary: {
+              min: jobPostDetail.salaryMin,
+              max: jobPostDetail.salaryMax,
+              currency: 'VND',
+            },
+            jobType: jobPostDetail.jobTypeName || jobPostDetail.jobType,
+            datePosted: jobPostDetail.createAt || jobPostDetail.createdAt,
+            validThrough: jobPostDetail.deadline,
+            url: window.location.href,
+          },
+          {
+            type: 'BreadcrumbList' as const,
+            items: [
+              { name: 'Trang chủ', url: window.location.origin },
+              { name: 'Việc làm', url: `${window.location.origin}/viec-lam` },
+              { name: jobPostDetail.jobName, url: window.location.href },
+            ],
+          },
+        ]
+      : []
+  );
 
   React.useEffect(() => {
     if (isApplySucces) {

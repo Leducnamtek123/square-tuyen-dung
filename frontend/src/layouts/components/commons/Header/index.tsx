@@ -247,7 +247,7 @@ const Header = (props: HeaderProps) => {
 
     >
 
-      <Stack direction="row" spacing={1}>
+      <Stack direction="row" spacing={{ xs: 0.5, sm: 1 }}>
 
         <Button
 
@@ -259,9 +259,9 @@ const Header = (props: HeaderProps) => {
             color: "white",
             borderColor: "rgba(255, 255, 255, 0.5)",
             borderRadius: "24px",
-            px: 2.5,
+            px: { xs: 1.5, sm: 2.5 },
             py: 0.75,
-            fontSize: '0.85rem',
+            fontSize: { xs: '0.75rem', sm: '0.85rem' },
             fontWeight: 600,
             textTransform: 'none',
             backdropFilter: 'blur(4px)',
@@ -290,9 +290,9 @@ const Header = (props: HeaderProps) => {
             color: "primary.main",
             backgroundColor: "white",
             borderRadius: "24px",
-            px: 2.5,
+            px: { xs: 1.5, sm: 2.5 },
             py: 0.75,
-            fontSize: '0.85rem',
+            fontSize: { xs: '0.72rem', sm: '0.85rem' },
             fontWeight: 600,
             textTransform: 'none',
             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
@@ -301,14 +301,6 @@ const Header = (props: HeaderProps) => {
               backgroundColor: 'rgba(255, 255, 255, 0.9)',
               transform: 'translateY(-1px)',
               boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-            },
-
-            display: {
-
-              xs: "none",
-
-              sm: "block",
-
             },
 
           }}
@@ -351,6 +343,7 @@ const Header = (props: HeaderProps) => {
 
             >
 
+              {/* Desktop: full text logo */}
               <Avatar
 
                 src={IMAGES.getTextLogo("light")}
@@ -361,9 +354,32 @@ const Header = (props: HeaderProps) => {
 
                   mr: 1,
 
-                  width: "100%",
+                  width: "auto",
 
                   height: 42,
+
+                }}
+
+                variant="square"
+
+                alt="LOGO"
+
+              />
+
+              {/* Mobile: text logo thu nhỏ */}
+              <Avatar
+
+                src={IMAGES.getTextLogo("light")}
+
+                sx={{
+
+                  display: { xs: "flex", md: "none" },
+
+                  mr: 1,
+
+                  width: "auto",
+
+                  height: 30,
 
                 }}
 
@@ -405,7 +421,7 @@ const Header = (props: HeaderProps) => {
 
               onClick={handleDrawerToggle}
 
-              sx={{ mr: 2, display: { md: "none" } }}
+              sx={{ mr: 1, display: { md: "none" } }}
 
             >
 
@@ -413,41 +429,8 @@ const Header = (props: HeaderProps) => {
 
             </IconButton>
 
+            {/* Mobile: flex grow spacer */}
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-
-              <Avatar
-
-                src={IMAGES.getLogo("light")}
-
-                sx={{
-
-                  display: {
-
-                    xs: "flex",
-
-                    sm: "flex",
-
-                    md: "none",
-
-                    lg: "none",
-
-                    xl: "none",
-
-                  },
-
-                  mr: 1,
-
-                  width: 40,
-
-                  height: 40,
-
-                }}
-
-                variant="square"
-
-                alt="LOGO"
-
-              />
 
               <Menu
 
@@ -507,6 +490,7 @@ const Header = (props: HeaderProps) => {
 
             </Box>
 
+            {/* Desktop: nav links */}
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
 
               {(pages[currentPortalHost] || []).map((page) => (
@@ -549,7 +533,7 @@ const Header = (props: HeaderProps) => {
 
             </Box>
 
-            <Stack direction="row" alignItems="center" spacing={2}>
+            <Stack direction="row" alignItems="center" spacing={{ xs: 1, sm: 2 }}>
 
               <LanguageSwitcher />
 
@@ -591,7 +575,7 @@ const Header = (props: HeaderProps) => {
 
                   <AccountSwitchMenu />
 
-                  {/* Start: Account switch menu */}
+                  {/* End: Account switch menu */}
 
                 </>
 

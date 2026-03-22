@@ -160,7 +160,8 @@ const SubHeader = () => {
 
     <>
 
-      <Box sx={{ flexGrow: 1 }}>
+      {/* SubHeader ẩn trên xs vì HomeSearch đã nằm dưới TopSlide; hiện từ sm+ */}
+      <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
 
         <AppBar
 

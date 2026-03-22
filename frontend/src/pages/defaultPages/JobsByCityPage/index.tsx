@@ -1,16 +1,21 @@
 import React from 'react';
 import { Container, Divider, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import { TabTitle } from '../../../utils/generalFunction';
 import CategoryCard from '../../components/defaults/CategoryCard';
 import { useAppSelector } from '../../../hooks/useAppStore';
+import useSEO from '../../../hooks/useSEO';
 
 
 
 const JobsByCityPage = () => {
   const { t } = useTranslation('public');
 
-  TabTitle(t("jobsByCategoryPage.cityTitle"))
+  useSEO({
+    title: t('jobsByCategoryPage.cityTitle'),
+    description: 'Tìm kiếm việc làm theo tỉnh thành trên toàn quốc tại Square. Việc làm tại Hà Nội, TP.HCM và các tỉnh thành khác.',
+    url: `${window.location.origin}/viec-lam-theo-tinh-thanh`,
+    keywords: 'việc làm Hà Nội, việc làm TP.HCM, việc làm theo tỉnh thành, tuyển dụng địa phương',
+  });
 
   const { allConfig } = useAppSelector((state) => state.config);
 

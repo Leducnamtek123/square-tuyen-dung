@@ -2,13 +2,13 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { useTranslation } from "react-i18next";
-import { TabTitle } from "../../../utils/generalFunction";
 import JobPostSearch from "../../components/defaults/JobPostSearch";
 import SuggestedJobPostCard from "../../components/defaults/SuggestedJobPostCard";
 import MainJobPostCard from "../../components/defaults/MainJobPostCard";
 import MainJobRightBanner from "../../../components/MainJobRightBanner";
 import { ROLES_NAME } from "../../../configs/constants";
 import { useAppSelector } from "../../../hooks/useAppStore";
+import useSEO from "../../../hooks/useSEO";
 
 
 
@@ -20,7 +20,12 @@ const JobPage = () => {
     isAuthenticated &&
     (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.JOB_SEEKER;
 
-  TabTitle(t("jobSearch.tabTitle"));
+  useSEO({
+    title: t("jobSearch.tabTitle"),
+    description: 'Tìm kiếm hàng nghìn việc làm mới nhất tại Square. Lọc theo ngành nghề, mức lương, địa điểm. Ứng tuyển nhanh chóng, dễ dàng.',
+    url: `${window.location.origin}/viec-lam`,
+    keywords: 'tìm việc làm, việc làm mới nhất, tuyển dụng, ứng tuyển online, việc làm tốt',
+  });
 
   return (
 

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Trang chủ -->
+  <url>
+    <loc>https://sqstudio.vn/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Tìm việc làm -->
+  <url>
+    <loc>https://sqstudio.vn/viec-lam</loc>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Danh sách công ty -->
+  <url>
+    <loc>https://sqstudio.vn/cong-ty</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Về chúng tôi -->
+  <url>
+    <loc>https://sqstudio.vn/ve-chung-toi</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <!-- Việc làm theo ngành nghề -->
+  <url>
+    <loc>https://sqstudio.vn/viec-lam-theo-nganh-nghe</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Việc làm theo tỉnh thành -->
+  <url>
+    <loc>https://sqstudio.vn/viec-lam-theo-tinh-thanh</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Việc làm theo hình thức làm việc -->
+  <url>
+    <loc>https://sqstudio.vn/viec-lam-theo-hinh-thuc-lam-viec</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Điều khoản dịch vụ -->
+  <url>
+    <loc>https://sqstudio.vn/dieu-khoan-dich-vu</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Chính sách bảo mật -->
+  <url>
+    <loc>https://sqstudio.vn/chinh-sach-bao-mat</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Câu hỏi thường gặp -->
+  <url>
+    <loc>https://sqstudio.vn/cau-hoi-thuong-gap</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!-- Liên hệ -->
+  <url>
+    <loc>https://sqstudio.vn/lien-he</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+</urlset>

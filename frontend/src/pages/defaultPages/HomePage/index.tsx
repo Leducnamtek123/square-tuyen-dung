@@ -5,13 +5,13 @@ import { Avatar, Box, Card, CardContent, CardHeader, Stack, Typography, Button }
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import TipsAndUpdatesIcon from "@mui/icons-material/TipsAndUpdates";
 import SearchIcon from "@mui/icons-material/Search";
-import { TabTitle } from "../../../utils/generalFunction";
 import {
   HOME_FILTER_CAREER,
   ROLES_NAME,
   ROUTES,
-  APP_NAME,
 } from "../../../configs/constants";
+import useSEO from "../../../hooks/useSEO";
+import useStructuredData from "../../../hooks/useStructuredData";
 import TopCompanyCarousel from "../../../components/TopCompanyCarousel";
 import CareerCarousel from "../../../components/CareerCarousel";
 import FeedbackCarousel from "../../../components/FeedbackCarousel";
@@ -33,7 +33,32 @@ export default function HomePage() {
 
   const { t } = useTranslation('public');
 
-  TabTitle(t('home.tabTitle', { appName: APP_NAME }));
+  useSEO({
+    title: 'Tìm việc nhanh, tuyển dụng hiệu quả',
+    description: 'Square - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, ứng tuyển nhanh chóng và kết nối với nhà tuyển dụng uy tín.',
+    url: window.location.origin + '/',
+    keywords: 'tìm việc, tuyển dụng, việc làm, ứng tuyển, nhà tuyển dụng, Square',
+  });
+
+  useStructuredData([
+    {
+      type: 'WebSite',
+      name: 'Square Tuyển Dụng',
+      url: window.location.origin,
+      searchUrl: `${window.location.origin}/viec-lam?keyword={search_term_string}`,
+    },
+    {
+      type: 'Organization',
+      name: 'Square',
+      url: window.location.origin,
+      logoUrl: `${window.location.origin}/square-icons/logo.svg`,
+      description: 'Nền tảng tuyển dụng trực tuyến hàng đầu Việt Nam',
+      sameAs: [
+        'https://www.facebook.com/square.vn',
+        'https://sqstudio.vn',
+      ],
+    },
+  ]);
 
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
 

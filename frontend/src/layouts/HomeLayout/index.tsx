@@ -17,17 +17,11 @@ const HomeLayout = () => {
       <SubHeader />
 
       <Container
-
         maxWidth="xl"
-
         sx={{
-
           paddingLeft: 0,
-
           paddingRight: 0,
-
         }}
-
       >
 
         <section>
@@ -39,17 +33,11 @@ const HomeLayout = () => {
       </Container>
 
       <Container
-
         maxWidth="xl"
-
         sx={{
-
-          paddingLeft: { xs: 1, sm: 4, md: 6, lg: 8, xl: 8 },
-
-          paddingRight: { xs: 1, sm: 4, md: 6, lg: 8, xl: 8 },
-
+          paddingLeft: { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
+          paddingRight: { xs: 2, sm: 4, md: 6, lg: 8, xl: 8 },
         }}
-
       >
 
         <section>
@@ -61,49 +49,27 @@ const HomeLayout = () => {
       </Container>
 
       <Box
-
         sx={{
-
           mt: 10,
-
           px: {
-
-            xs: 1,
-
-            sm: 5,
-
-            md: 8,
-
-            lg: 10,
-
-            xl: 14
-
-          },
-
-          py: {
-
             xs: 2,
-
-            sm: 2,
-
-            md: 2,
-
-            lg: 5,
-
-            xl: 5
-
+            sm: 5,
+            md: 8,
+            lg: 10,
+            xl: 14,
           },
-
+          py: {
+            xs: 3,
+            sm: 3,
+            md: 3,
+            lg: 5,
+            xl: 5,
+          },
           color: 'text.primary',
-
           bgcolor: 'background.paper',
-
           borderTop: '1px solid',
-
           borderColor: 'divider',
-
         }}
-
       >
 
         <Footer />

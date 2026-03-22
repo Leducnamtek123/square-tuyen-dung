@@ -2,15 +2,20 @@ import React from 'react';
 import { Container, Divider, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import CategoryCard from '../../components/defaults/CategoryCard';
-import { TabTitle } from '../../../utils/generalFunction';
 import { useAppSelector } from '../../../hooks/useAppStore';
+import useSEO from '../../../hooks/useSEO';
 
 
 
 const JobsByCareerPage = () => {
   const { t } = useTranslation('public');
 
-  TabTitle(t('jobsByCategoryPage.careerTitle'));
+  useSEO({
+    title: t('jobsByCategoryPage.careerTitle'),
+    description: 'Khám phá việc làm theo ngành nghề tại Square. Chọn ngành nghề bạn yêu thích và tìm công việc phù hợp ngay hôm nay.',
+    url: `${window.location.origin}/viec-lam-theo-nganh-nghe`,
+    keywords: 'việc làm theo ngành nghề, ngành IT, ngành kế toán, ngành marketing, tuyển dụng',
+  });
 
   const { allConfig } = useAppSelector((state) => state.config);
 

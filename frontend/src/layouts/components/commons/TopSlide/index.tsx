@@ -28,7 +28,7 @@ const RenderItem = ({ item }: { item: any }) => {
   return (
     <MuiImageCustom
       width="100%"
-      height={320}
+      height="100%"
       src={item.imageUrl}
       sx={{
         borderRadius: 1.5,
@@ -44,7 +44,7 @@ const TopSlide = () => {
   React.useEffect(() => {
     const getBanners = async () => {
       try {
-        const resData = await ProjectService.getBanners({type: BANNER_TYPES.HOME});
+        const resData = await ProjectService.getBanners({ type: BANNER_TYPES.HOME });
         const data = (resData as any)?.data || [];
         setBanners(data);
       } catch (error) {
@@ -55,56 +55,76 @@ const TopSlide = () => {
   }, []);
 
   return (
-    <Box
-      className="justify-content-center"
-      style={{ height: 320, position: 'relative' }}
-    >
-      <Box sx={styles}>
-        <Swiper
-          spaceBetween={30}
-          pagination={{
-            clickable: true,
-            dynamicBullets: true,
-          }}
-          autoplay={{
-            delay: 6000,
-            disableOnInteraction: false,
-          }}
-          modules={[Autoplay, Pagination]}
-          className="mySwiper"
-          style={{ height: '100%' }}
-        >
-          {banners.length > 0 ? (
-            banners.map((value) => (
-              <SwiperSlide key={value.id} style={{ cursor: 'pointer' }}>
-                <Link href={value?.buttonLink} target="_blank">
-                  <RenderItem item={value} />
-                </Link>
-              </SwiperSlide>
-            ))
-          ) : (
-            <SwiperSlide>
-              <MuiImageCustom
-                width="100%"
-                height={320}
-                src={IMAGES.coverImageDefault}
-                sx={{
-                  borderRadius: 1.5,
-                }}
-                fit="cover"
-              />
-            </SwiperSlide>
-          )}
-
-        </Swiper>
-      </Box>
+    <Box>
+      {/* Banner image — responsive height by breakpoint */}
       <Box
         sx={{
-          position: 'absolute',
-          top: { xs: 0, sm: '20%' },
-          paddingLeft: { xs: 0, sm: '5%' },
-          paddingRight: { xs: 0, sm: '5%' },
-          zIndex: 10,
+          height: { xs: 200, sm: 280, md: 320 },
+          position: 'relative',
+        }}
+      >
+        <Box sx={{ ...styles, height: '100%' }}>
+          <Swiper
+            spaceBetween={30}
+            pagination={{
+              clickable: true,
+              dynamicBullets: true,
+            }}
+            autoplay={{
+              delay: 6000,
+              disableOnInteraction: false,
+            }}
+            modules={[Autoplay, Pagination]}
+            className="mySwiper"
+            style={{ height: '100%' }}
+          >
+            {banners.length > 0 ? (
+              banners.map((value) => (
+                <SwiperSlide key={value.id} style={{ cursor: 'pointer' }}>
+                  <Link href={value?.buttonLink} target="_blank">
+                    <RenderItem item={value} />
+                  </Link>
+                </SwiperSlide>
+              ))
+            ) : (
+              <SwiperSlide>
+                <MuiImageCustom
+                  width="100%"
+                  height="100%"
+                  src={IMAGES.coverImageDefault}
+                  sx={{
+                    borderRadius: 1.5,
+                  }}
+                  fit="cover"
+                />
+              </SwiperSlide>
+            )}
+          </Swiper>
+        </Box>
+
+        {/* HomeSearch overlay on banner — visible sm+ only */}
+        <Box
+          sx={{
+            display: { xs: 'none', sm: 'block' },
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: { sm: '90%', md: '80%', lg: '70%' },
+            zIndex: 10,
+          }}
+        >
+          <HomeSearch />
+        </Box>
+      </Box>
+
+      {/* HomeSearch below banner — visible on xs only */}
+      <Box
+        sx={{
+          display: { xs: 'block', sm: 'none' },
+          px: 2,
+          py: 2,
+          backgroundColor: 'background.default',
         }}
       >
         <HomeSearch />

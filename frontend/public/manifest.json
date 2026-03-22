@@ -1,25 +1,25 @@
 {
   "short_name": "Square",
-  "name": "Square | Hệ thống giới thiệu việc làm",
+  "name": "Square Tuyển Dụng",
+  "description": "Nền tảng tuyển dụng hàng đầu Việt Nam - Tìm việc nhanh chóng, tuyển dụng hiệu quả",
+  "lang": "vi",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
+      "src": "/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
     },
     {
-      "src": "logo192.png",
-      "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "src": "/square-icons/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#1976d2",
+  "background_color": "#ffffff",
+  "categories": ["jobs", "recruitment", "career"],
+  "scope": "/"
 }
