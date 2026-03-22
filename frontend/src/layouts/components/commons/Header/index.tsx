@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import { useSelector } from "react-redux";
 
@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useTheme } from "@mui/material/styles";
 
-import { AppBar, Avatar, Box, Button, Card, Container, Divider, IconButton, Menu, MenuItem, Stack, Toolbar, Typography, useMediaQuery } from "@mui/material";
+import { AppBar, Avatar, Box, Button, Card, Container, Divider, IconButton, Stack, Toolbar, Typography, useMediaQuery } from "@mui/material";
 
 import MenuIcon from "@mui/icons-material/Menu";
 
@@ -323,264 +323,128 @@ const Header = (props: HeaderProps) => {
 
     <>
 
-      <AppBar position="sticky" sx={{ boxShadow: 0 }} id="common-header">
+      <AppBar
+        position="sticky"
+        id="common-header"
+        sx={{
+          boxShadow: '0 2px 20px rgba(15, 57, 127, 0.35)',
+          background: 'linear-gradient(135deg, #1e6bb8 0%, #1a407d 45%, #0f2d5e 100%)',
+        }}
+      >
 
         <Container maxWidth="xl">
 
-          <Toolbar disableGutters>
+          <Toolbar disableGutters sx={{ minHeight: { xs: 56, sm: 64 } }}>
 
-            <Stack
-
-              direction="row"
-
-              alignItems="center"
-
-              justifyContent="space-between"
-
-              component={Link}
-
-              to="/"
-
-            >
-
-              {/* Desktop: full text logo */}
-              <Avatar
-
-                src={IMAGES.getTextLogo("light")}
-
-                sx={{
-
-                  display: { xs: "none", md: "flex" },
-
-                  mr: 1,
-
-                  width: "auto",
-
-                  height: 42,
-
-                }}
-
-                variant="square"
-
-                alt="LOGO"
-
-              />
-
-              {/* Mobile: text logo thu nhỏ */}
-              <Avatar
-
-                src={IMAGES.getTextLogo("light")}
-
-                sx={{
-
-                  display: { xs: "flex", md: "none" },
-
-                  mr: 1,
-
-                  width: "auto",
-
-                  height: 30,
-
-                }}
-
-                variant="square"
-
-                alt="LOGO"
-
-              />
-
-            </Stack>
-
-            <Divider
-
-              orientation="vertical"
-
-              flexItem
-
-              variant="middle"
-
-              sx={{
-
-                mx: 1,
-
-                borderColor: "lightgray",
-
-                display: { xs: "none", md: "flex" },
-
-              }}
-
-            />
-
+            {/* ── Mobile: Hamburger icon TRƯỚC logo (chuẩn MUI) ── */}
             <IconButton
-
               color="inherit"
-
               aria-label="open drawer"
-
               edge="start"
-
               onClick={handleDrawerToggle}
-
               sx={{ mr: 1, display: { md: "none" } }}
-
             >
-
               <MenuIcon />
-
             </IconButton>
 
-            {/* Mobile: flex grow spacer */}
-            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
-
-              <Menu
-
-                anchorEl={anchorElNav}
-
-                anchorOrigin={{
-
-                  vertical: "bottom",
-
-                  horizontal: "left",
-
-                }}
-
-                keepMounted
-
-                transformOrigin={{
-
-                  vertical: "top",
-
-                  horizontal: "left",
-
-                }}
-
-                open={Boolean(anchorElNav)}
-
-                onClose={handleCloseNavMenu}
-
+            {/* ── Logo ── */}
+            <Box
+              component={Link}
+              to="/"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                textDecoration: 'none',
+                flexShrink: 0,
+              }}
+            >
+              <Box
+                component="img"
+                src={IMAGES.getTextLogo("light")}
+                alt="Square Logo"
                 sx={{
-
-                  display: { xs: "block", md: "none" },
-
+                  height: { xs: 26, md: 34 },
+                  width: 'auto',
+                  display: 'block',
                 }}
-
-              >
-
-                {(pages[currentPortalHost] || []).map((page) => (
-
-                  <MenuItem
-
-                    key={page.id}
-
-                    onClick={handleCloseNavMenu}
-
-                    component={NavLink}
-
-                    to={page.path}
-
-                  >
-
-                    <Typography textAlign="center">{page.label}</Typography>
-
-                  </MenuItem>
-
-                ))}
-
-              </Menu>
-
+              />
             </Box>
 
-            {/* Desktop: nav links */}
+            <Divider
+              orientation="vertical"
+              flexItem
+              variant="middle"
+              sx={{
+                mx: 1.5,
+                borderColor: "rgba(255,255,255,0.3)",
+                display: { xs: "none", md: "flex" },
+              }}
+            />
+
+            {/* ── Desktop: nav links (flex grow) ── */}
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
-
               {(pages[currentPortalHost] || []).map((page) => (
-
                 <Link to={page.path} key={page.id} onClick={handleCloseNavMenu}>
-
                   <Button
-
                     color="primary"
-
                     sx={{
-
                       my: 1,
-
                       mr: 0.5,
-
                       color: "white",
-
                       display: "block",
-
                       whiteSpace: 'nowrap',
-
                       backgroundColor: location?.pathname?.startsWith(page.path)
-
                         ? "rgba(255, 255, 255, 0.1)"
-
                         : null,
-
                     }}
-
                   >
-
                     {page.label}
-
                   </Button>
-
                 </Link>
-
               ))}
-
             </Box>
 
-            <Stack direction="row" alignItems="center" spacing={{ xs: 1, sm: 2 }}>
+            {/* ── Mobile: spacer để đẩy icons sang phải ── */}
+            <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }} />
 
-              <LanguageSwitcher />
+            {/* ── Right side: icons + auth ── */}
+            <Stack
+              direction="row"
+              alignItems="center"
+              spacing={{ xs: 0.5, sm: 1, md: 2 }}
+            >
+              {/* LanguageSwitcher: ẩn trên xs để đỡ chật */}
+              <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
+                <LanguageSwitcher />
+              </Box>
 
               {isAuthenticated && <WorkspaceSwitchMenu />}
 
-              {/* start: NotificationCard */}
-
-              {isAuthenticated && <NotificationCard />}
-
-              {/* End: NotificationCard */}
-
-              {/* start: ChatCard */}
-
-              {isAuthenticated && <ChatCard />}
-
-              {/* End: ChatCard */}
-
-              {/* Start: authArea */}
-
-              {!isAdminPortal && authArea}
-
-              {/* End: authArea */}
-
-              {!isSmall && !isAuthenticated && !isAdminPortal && (
-
-                <>
-
-                  <Divider
-
-                    orientation="vertical"
-
-                    flexItem
-
-                    sx={{ mx: 1, height: 24, alignSelf: 'center', borderColor: "rgba(255, 255, 255, 0.3)" }}
-
-                  />
-
-                  {/* Start: Account switch menu */}
-
-                  <AccountSwitchMenu />
-
-                  {/* End: Account switch menu */}
-
-                </>
-
+              {/* Notification + Chat: chỉ hiện từ sm trở lên trên mobile */}
+              {isAuthenticated && (
+                <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
+                  <NotificationCard />
+                </Box>
+              )}
+              {isAuthenticated && (
+                <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
+                  <ChatCard />
+                </Box>
               )}
 
+              {/* Auth buttons */}
+              {!isAdminPortal && authArea}
+
+              {!isSmall && !isAuthenticated && !isAdminPortal && (
+                <>
+                  <Divider
+                    orientation="vertical"
+                    flexItem
+                    sx={{ mx: 0.5, height: 24, alignSelf: 'center', borderColor: "rgba(255, 255, 255, 0.3)" }}
+                  />
+                  <AccountSwitchMenu />
+                </>
+              )}
             </Stack>
 
           </Toolbar>

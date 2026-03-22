@@ -206,31 +206,40 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
 
       ) : (
 
-        <Box
-
-        sx={{
-          cursor: 'pointer',
-          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-          borderRadius: '12px',
-          px: 2,
-          py: 1,
-          backdropFilter: 'blur(8px)',
-          border: '1px solid rgba(255, 255, 255, 0.2)',
-          transition: 'all 0.3s ease',
-          '&:hover': {
-            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-            borderColor: 'rgba(255, 255, 255, 0.4)',
-            transform: 'translateY(-1px)',
-          },
-        }}
-
-        onClick={handleClick}
-
-      >
-
-        {title}
-
-      </Box>
+        <Button
+          variant="contained"
+          size="small"
+          onClick={handleClick}
+          startIcon={
+            <FontAwesomeIcon
+              icon={!isEmployerPortal ? faBriefcase : faUsers}
+              fontSize={12}
+            />
+          }
+          sx={{
+            backgroundColor: 'rgba(255, 255, 255, 0.15)',
+            color: 'white',
+            borderRadius: '20px',
+            px: 1.5,
+            py: 0.6,
+            fontSize: '0.78rem',
+            fontWeight: 600,
+            textTransform: 'none',
+            whiteSpace: 'nowrap',
+            boxShadow: 'none',
+            border: '1px solid rgba(255,255,255,0.3)',
+            backdropFilter: 'blur(8px)',
+            transition: 'all 0.25s ease',
+            '&:hover': {
+              backgroundColor: 'rgba(255, 255, 255, 0.25)',
+              borderColor: 'rgba(255,255,255,0.55)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+              transform: 'translateY(-1px)',
+            },
+          }}
+        >
+          {!isEmployerPortal ? t('nav.switch.forEmployers') : t('nav.switch.forJobSeekers')}
+        </Button>
 
       )}
 

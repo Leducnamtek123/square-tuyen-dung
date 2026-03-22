@@ -1,94 +1,95 @@
 const mode = 'light';
 
-// Define colors
+// Define colors — extracted from Square logo SVG (public/square-icons/logo.svg)
+// Logo colors: #2aa9e1 (sky blue fill), #1a407d (navy shadow), #0f397f (deep navy text)
 const colors = {
   primary: {
-    main: '#1976d2', // Blue
-    light: '#42a5f5', // Light blue
-    dark: '#1565c0', // Dark blue
+    light: '#2aa9e1',    // Sky blue — logo main square fill
+    main: '#1a407d',     // Navy blue — logo shadow/depth
+    dark: '#0f397f',     // Deep navy — logo text color
     contrastText: '#ffffff',
-    background: 'rgba(25, 118, 210, 0.05)',
-    gradient: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
+    background: 'rgba(42, 169, 225, 0.07)',
+    gradient: 'linear-gradient(45deg, #2aa9e1 30%, #1a407d 90%)',
   },
   secondary: {
-    main: '#ff9800', // Orange
-    light: '#ffb74d',
-    dark: '#f57c00',
+    main: '#10b981',     // Emerald — growth & opportunity
+    light: '#34d399',
+    dark: '#059669',
     contrastText: '#ffffff',
-    background: '#fffaf5',
-    backgroundHover: '#fff5e6',
-    gradient: 'linear-gradient(45deg, #ff9800 30%, #ffb74d 90%)',
+    background: 'rgba(16, 185, 129, 0.07)',
+    backgroundHover: 'rgba(16, 185, 129, 0.12)',
+    gradient: 'linear-gradient(45deg, #10b981 30%, #34d399 90%)',
   },
   hot: {
-    main: '#ff3b3b',
-    light: '#ff6b6b',
-    dark: '#cc2f2f',
-    background: 'rgba(255, 59, 59, 0.1)',
+    main: '#f59e0b',     // Amber — urgent jobs badge
+    light: '#fcd34d',
+    dark: '#d97706',
+    background: 'rgba(245, 158, 11, 0.1)',
     contrastText: '#ffffff',
   },
   success: {
-    main: '#2e7d32', // Green
-    light: '#4caf50',
-    dark: '#1b5e20',
-    background: 'rgba(46, 125, 50, 0.05)',
+    main: '#059669',
+    light: '#10b981',
+    dark: '#047857',
+    background: 'rgba(5, 150, 105, 0.06)',
   },
   error: {
-    main: '#d32f2f', // Red
-    light: '#ef5350',
-    dark: '#c62828',
+    main: '#dc2626',
+    light: '#ef4444',
+    dark: '#b91c1c',
   },
   warning: {
-    main: '#fca34d', // Orange
-    light: '#fdb872',
-    dark: '#f88c1a',
+    main: '#f59e0b',
+    light: '#fbbf24',
+    dark: '#d97706',
   },
   info: {
-    main: '#0288d1', // Blue
-    light: '#03a9f4',
-    dark: '#01579b',
-    background: 'rgba(2, 136, 209, 0.05)',
+    main: '#2aa9e1',     // matches primary.light — cohesive
+    light: '#38bdf8',
+    dark: '#1a407d',
+    background: 'rgba(42, 169, 225, 0.06)',
   },
   grey: {
-    50: '#f8f9fa',
-    100: '#f0f1f5',
-    200: '#e9ecef',
-    300: '#dee2e6',
-    400: '#ced4da',
-    500: '#adb5bd',
-    600: '#6c757d',
-    700: '#495057',
-    800: '#343a40',
-    900: '#212529',
+    50:  '#f0f7ff',
+    100: '#e1effe',
+    200: '#c3ddfd',
+    300: '#a4cafe',
+    400: '#76a9fa',
+    500: '#3f83f8',
+    600: '#1c64f2',
+    700: '#1a56db',
+    800: '#1e429f',
+    900: '#0f397f',
   },
   text: {
-    primary: '#212529',
-    secondary: '#6c757d',
-    disabled: '#adb5bd',
+    primary: '#0f397f',
+    secondary: '#3f6fc6',
+    disabled: '#a4cafe',
   },
   background: {
-    default: '#f8f9fa',
+    default: '#f0f7ff',
     paper: '#ffffff',
   },
   feedback: {
     button: {
-      background: 'linear-gradient(135deg, #6e8efb 0%, #a777e3 100%)',
-      hover: 'linear-gradient(135deg, #5a7dfa 0%, #9666d2 100%)',
-      shadow: 'rgba(110, 142, 251, 0.4)',
-      gradient: 'linear-gradient(135deg, #6e8efb 0%, #a777e3 100%)',
+      background: 'linear-gradient(135deg, #2aa9e1 0%, #1a407d 100%)',
+      hover: 'linear-gradient(135deg, #1a407d 0%, #0f397f 100%)',
+      shadow: 'rgba(42, 169, 225, 0.35)',
+      gradient: 'linear-gradient(135deg, #2aa9e1 0%, #1a407d 100%)',
     },
     dialog: {
-      border: 'rgba(110, 142, 251, 0.1)',
-      gradient: 'linear-gradient(135deg, #6e8efb 0%, #a777e3 100%)',
+      border: 'rgba(42, 169, 225, 0.15)',
+      gradient: 'linear-gradient(135deg, #2aa9e1 0%, #1a407d 100%)',
     }
   },
 } as const;
 
 const customShadows = {
-  small: '0px 2px 4px rgba(0, 0, 0, 0.05)',
-  medium: '0px 4px 10px rgba(0, 0, 0, 0.08)',
-  large: '0px 8px 24px rgba(0, 0, 0, 0.12)',
-  card: '0px 4px 20px rgba(0, 0, 0, 0.08)',
-  feedback: '0 8px 32px rgba(110, 142, 251, 0.15)',
+  small:    '0px 2px 4px rgba(26, 64, 125, 0.06)',
+  medium:   '0px 4px 10px rgba(26, 64, 125, 0.10)',
+  large:    '0px 8px 24px rgba(26, 64, 125, 0.14)',
+  card:     '0px 4px 20px rgba(26, 64, 125, 0.08)',
+  feedback: '0 8px 32px rgba(42, 169, 225, 0.18)',
 } as const;
 
 const defaultTheme = {
@@ -98,4 +99,3 @@ const defaultTheme = {
 } as const;
 
 export default defaultTheme;
-

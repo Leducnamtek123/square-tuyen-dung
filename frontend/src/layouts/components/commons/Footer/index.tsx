@@ -6,9 +6,19 @@ import Link from '@mui/material/Link';
 
 import { useTranslation } from 'react-i18next';
 
-import { Box, List, ListItem, ListItemText, Stack, Typography, Container, Divider, useTheme } from "@mui/material";
+import {
+  Box,
+  List,
+  ListItem,
+  ListItemText,
+  Stack,
+  Typography,
+  Container,
+  Divider,
+  useTheme,
+} from '@mui/material';
 
-import Grid from "@mui/material/Grid2";
+import Grid from '@mui/material/Grid2';
 
 import { ICONS, LINKS, ROUTES, APP_NAME, IMAGES } from '../../../../configs/constants';
 
@@ -24,405 +34,201 @@ const Footer = () => {
 
   const theme = useTheme();
 
+  // Brand colors from Square logo
+  const brandNavy   = '#1a407d';
+  const brandSky    = '#2aa9e1';
+  const brandLight  = '#e1effe';
+
+  const linkSx = {
+    cursor: 'pointer',
+    color: brandNavy,
+    transition: 'color 0.18s',
+    '&:hover': { color: brandSky },
+  };
+
+  const sectionHeaderSx = {
+    fontWeight: 700,
+    mb: 1,
+    color: brandNavy,
+    letterSpacing: '0.01em',
+  };
+
   return (
 
-    <Box>
+    <Box
+      sx={{
+        backgroundColor: '#f0f7ff',
+        borderTop: `3px solid ${brandSky}`,
+        pt: 6,
+        pb: 0,
+      }}
+    >
 
       <Container maxWidth="lg">
 
         <Grid container spacing={4}>
 
+          {/* Col 1 — Brand */}
           <Grid
-
             size={{
-
               xs: 12,
-
               sm: 6,
-
-              md: 3
-
-            }}>
+              md: 3,
+            }}
+          >
 
             <List disablePadding>
 
-              <ListItem sx={{ pb: 2 }}>
+              <ListItem sx={{ pb: 2, pl: 0 }}>
 
                 <MuiImageCustom
-
                   width={150}
-
                   src={IMAGES.getTextLogo(theme.palette.mode === 'light' ? 'dark' : 'light')}
-
                   sx={{ display: 'block', cursor: 'pointer' }}
-
                   onClick={() => nav('/')}
-
                 />
 
               </ListItem>
 
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.ABOUT_US}`)}
-
-                  primary={t('footer.aboutApp', { appName: APP_NAME })}
-
-                />
-
-              </ListItem>
-
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.CONTACT}`)}
-
-                  primary={t('footer.contact')}
-
-                />
-
-              </ListItem>
-
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.FAQ}`)}
-
-                  primary={t('footer.faq')}
-
-                />
-
-              </ListItem>
-
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.TERMS_OF_SERVICE}`)}
-
-                  primary={t('footer.tos')}
-
-                />
-
-              </ListItem>
-
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.PRIVACY_POLICY}`)}
-
-                  primary={t('footer.privacy')}
-
-                />
-
-              </ListItem>
+              {[
+                { label: t('footer.aboutApp', { appName: APP_NAME }), route: `/${ROUTES.JOB_SEEKER.ABOUT_US}` },
+                { label: t('nav.jobs'),  route: `/${ROUTES.JOB_SEEKER.JOBS}` },
+                { label: t('nav.companies'), route: `/${ROUTES.JOB_SEEKER.COMPANY}` },
+              ].map((item) => (
+                <ListItem key={item.label} sx={{ pl: 0, py: 0.5 }}>
+                  <ListItemText
+                    sx={linkSx}
+                    onClick={() => nav(item.route)}
+                    primary={item.label}
+                    slotProps={{ primary: { variant: 'body2' } }}
+                  />
+                </ListItem>
+              ))}
 
             </List>
 
           </Grid>
 
+          {/* Col 2 — Employers */}
           <Grid
-
             size={{
-
               xs: 12,
-
               sm: 6,
-
-              md: 3
-
-            }}>
+              md: 3,
+            }}
+          >
 
             <List disablePadding>
 
-              <ListItem>
-
-                <Typography
-
-                  variant="subtitle1"
-
-                  sx={{
-
-                    fontWeight: 600,
-
-                    mb: 1,
-
-                  }}
-
-                >
-
+              <ListItem sx={{ pl: 0 }}>
+                <Typography variant="subtitle2" sx={sectionHeaderSx}>
                   {t('footer.forEmployers')}
-
                 </Typography>
-
               </ListItem>
 
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`${employerPrefix}/${ROUTES.EMPLOYER.JOB_POST}`)}
-
-                  primary={t('footer.postJob')}
-
-                />
-
-              </ListItem>
-
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`${employerPrefix}/${ROUTES.EMPLOYER.PROFILE}`)}
-
-                  primary={t('footer.searchResumes')}
-
-                />
-
-              </ListItem>
-
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`${employerPrefix}/${ROUTES.EMPLOYER.DASHBOARD}`)}
-
-                  primary={t('footer.employerDashboard')}
-
-                />
-
-              </ListItem>
-
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`${employerPrefix}/${ROUTES.EMPLOYER.CHAT}`)}
-
-                  primary={t('footer.messages')}
-
-                />
-
-              </ListItem>
-
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`${employerPrefix}/${ROUTES.EMPLOYER.NOTIFICATION}`)}
-
-                  primary={t('footer.notifications')}
-
-                />
-
-              </ListItem>
+              {[
+                { label: t('footer.postJob'),          route: `${employerPrefix}/${ROUTES.EMPLOYER.JOB_POST}` },
+                { label: t('footer.searchResumes'),    route: `${employerPrefix}/${ROUTES.EMPLOYER.PROFILE}` },
+                { label: t('footer.employerDashboard'),route: `${employerPrefix}/` },
+              ].map((item) => (
+                <ListItem key={item.label} sx={{ pl: 0, py: 0.5 }}>
+                  <ListItemText
+                    sx={linkSx}
+                    onClick={() => nav(item.route)}
+                    primary={item.label}
+                    slotProps={{ primary: { variant: 'body2' } }}
+                  />
+                </ListItem>
+              ))}
 
             </List>
 
           </Grid>
 
+          {/* Col 3 — Candidates */}
           <Grid
-
             size={{
-
               xs: 12,
-
               sm: 6,
-
-              md: 3
-
-            }}>
+              md: 3,
+            }}
+          >
 
             <List disablePadding>
 
-              <ListItem>
-
-                <Typography
-
-                  variant="subtitle1"
-
-                  sx={{
-
-                    fontWeight: 600,
-
-                    mb: 1,
-
-                  }}
-
-                >
-
+              <ListItem sx={{ pl: 0 }}>
+                <Typography variant="subtitle2" sx={sectionHeaderSx}>
                   {t('footer.forCandidates')}
-
                 </Typography>
-
               </ListItem>
 
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.JOBS}`)}
-
-                  primary={t('nav.jobs')}
-
-                />
-
-              </ListItem>
-
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.COMPANY}`)}
-
-                  primary={t('nav.companies')}
-
-                />
-
-              </ListItem>
-
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}`)}
-
-                  primary={t('footer.candidateDashboard')}
-
-                />
-
-              </ListItem>
-
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.CHAT}`)}
-
-                  primary={t('footer.messages')}
-
-                />
-
-              </ListItem>
-
-              <ListItem>
-
-                <ListItemText
-
-                  sx={{ cursor: 'pointer' }}
-
-                  onClick={() => nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.NOTIFICATION}`)}
-
-                  primary={t('footer.notifications')}
-
-                />
-
-              </ListItem>
+              {[
+                { label: t('nav.jobs'),                   route: `/${ROUTES.JOB_SEEKER.JOBS}` },
+                { label: t('nav.companies'),              route: `/${ROUTES.JOB_SEEKER.COMPANY}` },
+                { label: t('footer.candidateDashboard'),  route: `/${ROUTES.JOB_SEEKER.DASHBOARD}` },
+              ].map((item) => (
+                <ListItem key={item.label} sx={{ pl: 0, py: 0.5 }}>
+                  <ListItemText
+                    sx={linkSx}
+                    onClick={() => nav(item.route)}
+                    primary={item.label}
+                    slotProps={{ primary: { variant: 'body2' } }}
+                  />
+                </ListItem>
+              ))}
 
             </List>
 
           </Grid>
 
+          {/* Col 4 — Social */}
           <Grid
-
             size={{
-
               xs: 12,
-
               sm: 6,
-
-              md: 3
-
-            }}>
+              md: 3,
+            }}
+          >
 
             <List disablePadding>
 
-              <ListItem sx={{ mt: 3 }}>
-
-                <Typography
-
-                  variant="subtitle1"
-
-                  sx={{
-
-                    fontWeight: 600,
-
-                    mb: 1,
-
-                  }}
-
-                >
-
+              <ListItem sx={{ pl: 0 }}>
+                <Typography variant="subtitle2" sx={sectionHeaderSx}>
                   {t('footer.connectWith', { appName: APP_NAME })}
-
                 </Typography>
-
               </ListItem>
 
-              <ListItem>
+              <ListItem sx={{ pl: 0 }}>
 
-                <Stack direction="row" spacing={0} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
+                <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
 
                   {[
-
-                    { icon: ICONS.WEBSITE, link: LINKS.WEBSITE_LINK },
-
+                    { icon: ICONS.WEBSITE,  link: LINKS.WEBSITE_LINK },
                     { icon: ICONS.FACEBOOK, link: LINKS.FACEBOOK_LINK },
-
                   ].map((social, index) => (
 
                     <Link
-
                       key={index}
-
                       href={social.link}
-
                       target="_blank"
-
                       sx={{
-
-                        transition: 'transform 0.2s',
-
-                        '&:hover': { transform: 'scale(1.1)' }
-
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 40,
+                        height: 40,
+                        borderRadius: '50%',
+                        border: `2px solid ${brandSky}`,
+                        transition: 'all 0.2s',
+                        '&:hover': {
+                          backgroundColor: brandSky,
+                          transform: 'scale(1.1)',
+                          '& img': { filter: 'brightness(10)' },
+                        },
                       }}
-
                     >
 
-                      <img height="35" width="35" src={social.icon} alt="" />
+                      <img height={22} width={22} src={social.icon} alt="" />
 
                     </Link>
 
@@ -438,23 +244,25 @@ const Footer = () => {
 
         </Grid>
 
-        <Divider sx={{ my: 4 }} />
+        <Divider sx={{ mt: 4, borderColor: brandLight }} />
 
-        <Typography
-
-          variant="body2"
-
-          color="grey.400"
-
-          align="center"
-
-          sx={{ pt: 2 }}
-
+        {/* Bottom bar */}
+        <Box
+          sx={{
+            py: 2.5,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
         >
-
-          {t('footer.rightsReserved', { year: new Date().getFullYear(), appName: APP_NAME })}
-
-        </Typography>
+          <Typography
+            variant="body2"
+            sx={{ color: brandNavy, opacity: 0.7 }}
+            align="center"
+          >
+            {t('footer.rightsReserved', { year: new Date().getFullYear(), appName: APP_NAME })}
+          </Typography>
+        </Box>
 
       </Container>
 

@@ -56,7 +56,7 @@ type StructuredDataSchema =
 
 /** Map job type strings to schema.org employment types */
 const mapJobType = (type?: string): string => {
-  if (!type) return 'FULL_TIME';
+  if (!type || typeof type !== 'string') return 'FULL_TIME';
   const map: Record<string, string> = {
     'full-time': 'FULL_TIME',
     'full_time': 'FULL_TIME',

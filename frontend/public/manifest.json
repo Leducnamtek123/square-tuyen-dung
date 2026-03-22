@@ -5,12 +5,7 @@
   "lang": "vi",
   "icons": [
     {
-      "src": "/favicon.png",
-      "sizes": "64x64",
-      "type": "image/png"
-    },
-    {
-      "src": "/square-icons/logo.svg",
+      "src": "/square-icons/icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
