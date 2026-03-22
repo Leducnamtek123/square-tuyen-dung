@@ -1,40 +1,12 @@
-from rest_framework.views import APIView
+"""
+Chatbot views.
 
-from rest_framework import status
-from rest_framework.permissions import AllowAny
+The legacy DialogFlow webhook views (JobSeekerDialogFlowWebhookView,
+EmployerDialogFlowWebhookView) have been removed — they were never called
+by any frontend or external system and relied on an external DialogFlow
+dependency that is no longer maintained.
 
-from rest_framework.response import Response
-
-from apps.chatbot.services import JobSeekerDialogFlowService, EmployerDialogFlowService
-
-
-class JobSeekerDialogFlowWebhookView(APIView):
-    permission_classes = [AllowAny]
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.service = JobSeekerDialogFlowService()
-
-    def post(self, request):
-        try:
-            res = self.service.handle_request(request.data)
-            return Response(status=status.HTTP_200_OK, data=res)
-        except Exception as e:
-            print(f"[JobSeekerDialogFlowWebhookView] Error when processing: {e}")
-            res = self.service.job_seeker_chat_response.get_error_intent_response()
-            return Response(status=status.HTTP_200_OK, data=res)
-
-
-class EmployerDialogFlowWebhookView(APIView):
-    permission_classes = [AllowAny]
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.service = EmployerDialogFlowService()
-
-    def post(self, request):
-        try:
-            res = self.service.handle_request(request.data)
-            return Response(status=status.HTTP_200_OK, data=res)
-        except Exception as e:
-            print(f"[EmployerDialogFlowWebhookView] Error when processing: {e}")
-            res = self.service.employer_chat_response.get_error_intent_response()
-            return Response(status=status.HTTP_200_OK, data=res)
+The active AI chat functionality is handled by:
+  /api/ai/chat/ → integrations.ai.views.ChatAPIView
+"""
+# No views currently defined in this module.

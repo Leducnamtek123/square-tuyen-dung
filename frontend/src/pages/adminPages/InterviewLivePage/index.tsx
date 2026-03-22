@@ -6,6 +6,7 @@ import interviewService from '../../../services/interviewService';
 import { transformInterviewSession } from '../../../utils/transformers';
 import DataTable from '../../../components/DataTable';
 import AIToolsCard from '../../../components/AIToolsCard';
+import AIServiceHealthBanner from '../../../components/AIServiceHealthBanner';
 
 const ACTIVE_STATUSES = ['in_progress', 'calibration', 'processing', 'connecting', 'active'];
 
@@ -180,6 +181,9 @@ const InterviewLivePage = () => {
           {t('pages.interviewLive.title')}
         </Typography>
       </Stack>
+
+      {/* AI Service Health Badges */}
+      <AIServiceHealthBanner />
 
       <Stack direction="row" spacing={1.5} mb={3} flexWrap="wrap">
         <Chip label={t('pages.interviewLive.stats.inProgress', { count: stats.active })} color="primary" variant="outlined" />

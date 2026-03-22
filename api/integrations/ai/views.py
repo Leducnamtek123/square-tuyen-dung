@@ -12,8 +12,24 @@ from django.http import (
 )
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.request import Request as DRFRequest
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.throttling import AnonRateThrottle
 
 from shared.configs.variable_response import data_response
+
+try:
+    from config.throttles import (
+        AIChatThrottle, AIChatUserThrottle,
+        AIHeavyAnonThrottle, AIHeavyUserThrottle,
+    )
+except ImportError:
+    AIChatThrottle = AnonRateThrottle
+    AIChatUserThrottle = None
+    AIHeavyAnonThrottle = AnonRateThrottle
+    AIHeavyUserThrottle = None
 
 # Import models for tools
 try:
@@ -37,7 +53,7 @@ def _get_json_body(request: HttpRequest) -> dict:
         return {}
 
 @csrf_exempt
-def tts(request: HttpRequest):
+def _tts_fn(request: HttpRequest):
     """
     POST /api/ai/tts/
     Body: { "text": "...", "voice"?: "...", "format"?: "mp3"|"wav"|"pcm", "speed"?: number }
@@ -94,8 +110,26 @@ def tts(request: HttpRequest):
         resp["Content-Length"] = upstream.headers["content-length"]
     return resp
 
+
+class TTSAPIView(APIView):
+    """
+    Rate-limited wrapper around the TTS proxy.
+    10 req/min (anon), 20 req/min (auth).
+    """
+    permission_classes = [AllowAny]
+    throttle_classes = [AIHeavyAnonThrottle, AIHeavyUserThrottle] if AIHeavyUserThrottle else [AIHeavyAnonThrottle]
+
+    def post(self, request: DRFRequest):
+        # Delegate to the original function-based logic using the underlying HttpRequest
+        return _tts_fn(request._request)
+
+
+# Backward-compat alias — urls.py uses ai_views.tts
+tts = TTSAPIView.as_view()
+
+
 @csrf_exempt
-def transcribe(request: HttpRequest):
+def _transcribe_fn(request: HttpRequest):
     """
     POST /api/ai/transcribe/
     multipart/form-data: audio=<file>
@@ -144,7 +178,32 @@ def transcribe(request: HttpRequest):
     transcription = upstream_json.get("text") or upstream_json.get("transcription") or ""
     return JsonResponse(data_response(errors={}, data={"transcription": transcription}), status=200)
 
-# TOOLS DEFINITIONS
+
+class TranscribeAPIView(APIView):
+    """
+    Rate-limited wrapper around the STT proxy.
+    10 req/min (anon), 20 req/min (auth).
+    """
+    permission_classes = [AllowAny]
+    throttle_classes = [AIHeavyAnonThrottle, AIHeavyUserThrottle] if AIHeavyUserThrottle else [AIHeavyAnonThrottle]
+
+    def post(self, request: DRFRequest):
+        return _transcribe_fn(request._request)
+
+
+# Backward-compat alias—urls.py uses ai_views.transcribe
+transcribe = TranscribeAPIView.as_view()
+
+
+# ---------------------------------------------------------------------------
+# Helper for tool calls (used by ChatAPIView)
+# ---------------------------------------------------------------------------
+
+_LLM_FALLBACK_REPLY = (
+    "Xin lỗi, hệ thống AI đang bận hoặc chưa sẵn sàng. "
+    "Vui lòng thử lại sau ít phút. "
+    "Nếu vấn đề tiếp diễn, hãy liên hệ bộ phận hỗ trợ."
+)
 
 RECRUITMENT_TOOLS = [
     {
@@ -258,8 +317,7 @@ def execute_tool_call(tool_call, request):
             
     return f"Công cụ {name} không được hỗ trợ."
 
-@csrf_exempt
-def chat(request: HttpRequest):
+class ChatAPIView(APIView):
     """
     POST /api/ai/chat/
     Body:
@@ -267,104 +325,126 @@ def chat(request: HttpRequest):
       - or { "message": "...", "system"?: "..." }
 
     Proxies to an OpenAI-compatible chat completions server, with support for function calling.
+    Returns a friendly reply if the LLM service is unavailable.
     """
-    if request.method != "POST":
-        return JsonResponse({"detail": "Method not allowed."}, status=405)
+    permission_classes = [AllowAny]
+    throttle_classes = [AIChatThrottle, AIChatUserThrottle] if AIChatUserThrottle else [AIChatThrottle]
 
-    body = _get_json_body(request)
-    messages = body.get("messages")
 
-    if not isinstance(messages, list) or not messages:
-        message = (body.get("message") or "").strip()
-        if not message:
-            return JsonResponse({"detail": "Missing `message` or `messages`."}, status=400)
-        system_prompt = (body.get("system") or "").strip()
-        messages = []
-        if system_prompt:
-            messages.append({"role": "system", "content": system_prompt})
-        messages.append({"role": "user", "content": message})
+    def post(self, request: DRFRequest):
+        body = request.data if isinstance(request.data, dict) else {}
+        messages = body.get("messages")
 
-    base_url = getattr(settings, "AI_LLM_BASE_URL", "http://llama-cpp:11434/v1").rstrip("/")
-    model = body.get("model") or getattr(settings, "AI_LLM_MODEL", "qwen2-7b")
-    url = f"{base_url}/chat/completions"
+        if not isinstance(messages, list) or not messages:
+            message = (body.get("message") or "").strip()
+            if not message:
+                return Response({"detail": "Missing `message` or `messages`."}, status=400)
+            system_prompt = (body.get("system") or "").strip()
+            messages = []
+            if system_prompt:
+                messages.append({"role": "system", "content": system_prompt})
+            messages.append({"role": "user", "content": message})
 
-    payload = {
-        "model": model,
-        "messages": messages,
-        "tools": RECRUITMENT_TOOLS,
-        "tool_choice": "auto"
-    }
-    if "temperature" in body:
-        payload["temperature"] = body.get("temperature")
-    if "max_tokens" in body:
-        payload["max_tokens"] = body.get("max_tokens")
+        base_url = getattr(settings, "AI_LLM_BASE_URL", "http://llama-cpp:11434/v1").rstrip("/")
+        model = body.get("model") or getattr(settings, "AI_LLM_MODEL", "qwen2-7b")
+        url = f"{base_url}/chat/completions"
 
-    try:
-        # 1. First call to LLM
-        upstream = requests.post(url, json=payload, timeout=(10, 300))
-        if upstream.status_code >= 400:
-            return JsonResponse({"detail": f"LLM error: {upstream.text}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR if hasattr(status, 'HTTP_500_INTERNAL_SERVER_ERROR') else 500)
-            
-        upstream_json = upstream.json()
-        message = upstream_json.get("choices", [{}])[0].get("message", {})
-        
-        # 2. Check for tool calls
-        tool_calls = message.get("tool_calls")
-        if tool_calls:
-            # Append assistant message with tool calls to history
-            messages.append(message)
-            
-            # Execute tools and append results to history
-            for tool_call in tool_calls:
-                result = execute_tool_call(tool_call, request)
-                messages.append({
-                    "role": "tool",
-                    "tool_call_id": tool_call.get("id"),
-                    "name": tool_call.get("function", {}).get("name"),
-                    "content": result
-                })
-                
-            # 3. Second call to LLM with tool results
-            final_payload = {
-                "model": model,
-                "messages": messages
-            }
-            final_upstream = requests.post(url, json=final_payload, timeout=(10, 300))
-            if final_upstream.status_code == 200:
-                upstream_json = final_upstream.json()
-    except requests.RequestException as e:
-        return JsonResponse({"detail": f"LLM upstream unavailable: {str(e)}"}, status=502)
+        # Determine which tools to make available.
+        # Only authenticated employers/admins can create interview invitations.
+        available_tools = list(RECRUITMENT_TOOLS)
+        can_create_interview = (
+            request.user.is_authenticated
+            and getattr(request.user, 'role_name', None) in ('employer', 'admin')
+        )
+        if not can_create_interview:
+            # Strip create_interview_invitation tool for unauthenticated / non-employer users
+            available_tools = [
+                t for t in available_tools
+                if t.get("function", {}).get("name") != "create_interview_invitation"
+            ]
 
-    if upstream.status_code >= 400:
+        payload = {
+            "model": model,
+            "messages": messages,
+            "tools": available_tools,
+            "tool_choice": "auto",
+        }
+        if "temperature" in body:
+            payload["temperature"] = body.get("temperature")
+        if "max_tokens" in body:
+            payload["max_tokens"] = body.get("max_tokens")
+
         try:
-            err = upstream.json()
-        except Exception:
-            err = {"detail": upstream.text[:500]}
-        return JsonResponse({"detail": "LLM upstream error.", "upstream": err}, status=502)
+            # 1. First call to LLM
+            upstream = requests.post(url, json=payload, timeout=(10, 120))
+            if upstream.status_code >= 400:
+                return Response(
+                    data_response(errors={}, data={"reply": _LLM_FALLBACK_REPLY, "model": model}),
+                    status=200,
+                )
 
-    try:
-        upstream_json = upstream.json()
-    except Exception:
-        upstream_json = {}
+            upstream_json = upstream.json()
+            message_obj = upstream_json.get("choices", [{}])[0].get("message", {})
 
-    reply = ""
-    try:
-        if isinstance(upstream_json, dict):
-            choices = upstream_json.get("choices") or []
-            if choices:
-                message = choices[0].get("message") or {}
-                reply = message.get("content") or choices[0].get("text") or ""
-    except Exception:
+            # 2. Check for tool calls
+            tool_calls = message_obj.get("tool_calls")
+            if tool_calls:
+                messages.append(message_obj)
+                for tool_call in tool_calls:
+                    result = execute_tool_call(tool_call, request)
+                    messages.append({
+                        "role": "tool",
+                        "tool_call_id": tool_call.get("id"),
+                        "name": tool_call.get("function", {}).get("name"),
+                        "content": result,
+                    })
+
+                # 3. Second call to LLM with tool results
+                final_payload = {"model": model, "messages": messages}
+                try:
+                    final_upstream = requests.post(url, json=final_payload, timeout=(10, 120))
+                    if final_upstream.status_code == 200:
+                        upstream_json = final_upstream.json()
+                except requests.RequestException:
+                    pass  # Use first response if second call fails
+
+        except (requests.ConnectionError, requests.Timeout):
+            # LLM not reachable — return friendly fallback
+            return Response(
+                data_response(errors={}, data={"reply": _LLM_FALLBACK_REPLY, "model": model}),
+                status=200,
+            )
+        except requests.RequestException as e:
+            return Response(
+                data_response(errors={}, data={"reply": _LLM_FALLBACK_REPLY, "model": model}),
+                status=200,
+            )
+
         reply = ""
+        try:
+            if isinstance(upstream_json, dict):
+                choices = upstream_json.get("choices") or []
+                if choices:
+                    msg = choices[0].get("message") or {}
+                    reply = msg.get("content") or choices[0].get("text") or ""
+        except Exception:
+            reply = _LLM_FALLBACK_REPLY
 
-    return JsonResponse(
-        data_response(
-            errors={},
-            data={
-                "reply": reply,
-                "model": model,
-                "usage": upstream_json.get("usage") if isinstance(upstream_json, dict) else None,
-            },
-        ),
-        status=200,
-    )
+        if not reply:
+            reply = _LLM_FALLBACK_REPLY
+
+        return Response(
+            data_response(
+                errors={},
+                data={
+                    "reply": reply,
+                    "model": model,
+                    "usage": upstream_json.get("usage") if isinstance(upstream_json, dict) else None,
+                },
+            ),
+            status=200,
+        )
+
+
+# Keep backward-compat function-based alias (urls.py references ai_views.chat)
+chat = ChatAPIView.as_view()

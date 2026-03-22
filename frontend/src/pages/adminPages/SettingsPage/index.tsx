@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useSystemSettings, useUpdateSystemSettings } from './hooks/useSystemSettings';
 import commonService from '../../../services/commonService';
-import ProjectService from '../../../services/ProjectService';
+import contentService from '../../../services/contentService';
 
 const SettingsPage = () => {
     const { t } = useTranslation('admin');
@@ -34,7 +34,7 @@ const SettingsPage = () => {
         setIsSendingDemo(true);
         setDemoMessage(null);
         try {
-            await ProjectService.sendNotificationDemo();
+            await contentService.sendNotificationDemo();
             setDemoMessage(t('pages.settings.notificationDemo.success'));
         } catch (error) {
             setDemoMessage(t('pages.settings.notificationDemo.error'));

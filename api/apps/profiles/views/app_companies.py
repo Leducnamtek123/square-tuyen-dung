@@ -117,7 +117,7 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
             ],
         )
 
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["get"], detail=False, url_path="top", url_name="companies-top")
     def get_top_companies(self, request):
@@ -144,9 +144,9 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
         except Exception as ex:
             helper.print_log_error("get_top_companies", ex)
 
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["post"], detail=True, url_path="followed", url_name="followed")
     def followed(self, request, pk):
@@ -168,7 +168,7 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
 
             is_followed = True
 
-        return Response(data={"isFollowed": is_followed})
+        return var_res.response_data(data={"isFollowed": is_followed})
 
 
 class CompanyFollowedAPIView(views.APIView):
@@ -198,4 +198,4 @@ class CompanyFollowedAPIView(views.APIView):
             queryset, many=True, context={"request": request}
         )
 
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)

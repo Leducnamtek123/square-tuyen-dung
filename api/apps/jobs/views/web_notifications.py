@@ -66,7 +66,7 @@ class JobPostNotificationViewSet(
                 "city",
             ],
         )
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     def _apply_active_change(self, request, job_post_notification):
         user = request.user

@@ -141,7 +141,7 @@ class PrivateJobPostViewSet(
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=serializer.data)
 
     def update(self, request, *args, **kwargs):
         user = request.user
@@ -162,7 +162,7 @@ class PrivateJobPostViewSet(
                 job_post=self.get_object(),
             )
 
-        return Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     def list(self, request, *args, **kwargs):
         queryset = (
@@ -226,7 +226,7 @@ class PrivateJobPostViewSet(
         result_data = utils.convert_data_with_en_key_to_vn_kew(
             serializer.data, table_export.JOB_POSTS_EXPORT_FIELD
         )
-        return Response(data=result_data)
+        return var_res.response_data(data=result_data)
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -257,7 +257,7 @@ class PrivateJobPostViewSet(
                 "location",
             ],
         )
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
 
 class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
@@ -301,7 +301,7 @@ class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
         cache_key = f'job_list_{query_hash}_{request.user.id if request.user.is_authenticated else 0}'
         cached_res = redis_obj.get_json(cache_key)
         if cached_res:
-            return Response(cached_res)
+            return var_res.response_data(data=cached_res)
 
         queryset = (
             self.filter_queryset(
@@ -394,7 +394,7 @@ class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
                 'views',
             ],
         )
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["get"], detail=False, url_path="job-posts-saved", url_name="job-posts-saved")
     def get_job_posts_saved(self, request):
@@ -458,7 +458,7 @@ class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
             )
             is_saved = True
 
-        return Response(data={"isSaved": is_saved})
+        return var_res.response_data(data={"isSaved": is_saved})
 
 
 class AdminJobPostViewSet(viewsets.ModelViewSet):
@@ -495,7 +495,7 @@ class AdminJobPostViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(detail=True, methods=['patch'], url_path='approve')
     def approve_job(self, request, pk=None):

@@ -147,7 +147,7 @@ class JobSeekerJobPostActivityViewSet(
             job_post_activity=job_post_activity,
         )
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=serializer.data)
 
 
 class EmployerJobPostActivityViewSet(
@@ -289,7 +289,7 @@ class EmployerJobPostActivityViewSet(
             table_export.JOB_POST_ACTIVITY_FIELD,
         )
 
-        return Response(data=result_data)
+        return var_res.response_data(data=result_data)
 
     @action(methods=["put"], detail=True, url_path="application-status", url_name="application-status")
     def change_application_status(self, request, pk):
@@ -375,17 +375,17 @@ class EmployerJobPostActivityViewSet(
         try:
             job_post_activity = self.get_object()
             if job_post_activity.job_post.company != request.user.company:
-                return Response(status=status.HTTP_403_FORBIDDEN)
+                return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
 
             from ..tasks import analyze_resume_ai
 
             job_post_activity.ai_analysis_status = 'processing'
             job_post_activity.save()
             analyze_resume_ai.delay(job_post_activity.id)
-            return Response({"detail": "AI analysis task has been queued."}, status=status.HTTP_202_ACCEPTED)
+            return var_res.response_data(data={"detail": "AI analysis task has been queued."}, status=status.HTTP_202_ACCEPTED)
         except Exception as ex:
             helper.print_log_error("analyze_resume", ex)
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class AdminJobPostActivityViewSet(viewsets.ModelViewSet):

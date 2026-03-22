@@ -12,7 +12,7 @@ import BackdropLoading from '../loading/BackdropLoading';
 import RatingCustom from '../controls/RatingCustom';
 import MultilineTextFieldCustom from '../controls/MultilineTextFieldCustom';
 const DefaultMultilineTextFieldCustom = MultilineTextFieldCustom as any;
-import ProjectService from '../../services/ProjectService';
+import contentService from '../../services/contentService';
 import { FEEDBACK_IMAGES } from '../../configs/constants';
 
 interface FeedbackProps {
@@ -80,7 +80,7 @@ const Feedback = (_props: FeedbackProps) => {
 
       try {
 
-        await ProjectService.createFeedback(data);
+        await contentService.createFeedback(data);
 
         handleClose();
 

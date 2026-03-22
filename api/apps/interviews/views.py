@@ -4,11 +4,12 @@ Interview Module — DRF Views
 
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
-from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.db.models import Count
 from django.core.exceptions import ObjectDoesNotExist
+
+from shared.configs.variable_response import response_data
 
 from .models import (
     Question, QuestionGroup,
@@ -55,7 +56,7 @@ class InterviewStatisticViewSet(viewsets.ViewSet):
             "totalEvaluations": InterviewEvaluation.objects.count(),
         }
 
-        return Response(data)
+        return response_data(data=data)
 
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.select_related('career', 'career__icon', 'company', 'author').all()
@@ -177,13 +178,13 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
                 'candidate', 'job_post', 'created_by', 'question_group'
             ).prefetch_related('questions', 'transcripts', 'evaluations').get(invite_token=invite_token)
         except InterviewSession.DoesNotExist:
-            return Response(
-                {"detail": "Interview session not found."},
-                status=status.HTTP_404_NOT_FOUND
+            return response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                errors={"detail": ["Interview session not found."]},
             )
 
         serializer = InterviewSessionDetailSerializer(session)
-        return Response(serializer.data)
+        return response_data(data=serializer.data)
 
     @action(detail=False, methods=['get'], url_path='invite/(?P<invite_token>[^/.]+)/livekit-token',
             permission_classes=[permissions.AllowAny])
@@ -191,15 +192,15 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         try:
             session = InterviewSession.objects.select_related('candidate').get(invite_token=invite_token)
         except InterviewSession.DoesNotExist:
-            return Response(
-                {"detail": "Interview session not found."},
-                status=status.HTTP_404_NOT_FOUND
+            return response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                errors={"detail": ["Interview session not found."]},
             )
 
         try:
-            return Response(create_livekit_participant_token(session, request))
+            return response_data(data=create_livekit_participant_token(session, request))
         except ValueError as exc:
-            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+            return response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": [str(exc)]})
 
     # GET /sessions/{room_name}/context/ — cho AI Agent
     @action(detail=False, methods=['get'], url_path='(?P<room_name>[^/.]+)/context',
@@ -211,12 +212,12 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
                 'candidate', 'job_post'
             ).prefetch_related('questions').get(room_name=room_name)
         except InterviewSession.DoesNotExist:
-            return Response(
-                {"detail": "Interview session not found."},
-                status=status.HTTP_404_NOT_FOUND
+            return response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                errors={"detail": ["Interview session not found."]},
             )
 
-        return Response(build_interview_context(session))
+        return response_data(data=build_interview_context(session))
 
     # PATCH /sessions/{room_name}/status/ — cập nhật trạng thái
     @action(detail=False, methods=['patch'], url_path='(?P<room_name>[^/.]+)/status',
@@ -226,16 +227,16 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         try:
             session = InterviewSession.objects.get(room_name=room_name)
         except InterviewSession.DoesNotExist:
-            return Response(
-                {"detail": "Interview session not found."},
-                status=status.HTTP_404_NOT_FOUND
+            return response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                errors={"detail": ["Interview session not found."]},
             )
 
         serializer = UpdateStatusSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         new_status = update_interview_status(session, serializer.validated_data['status'])
-        return Response({"status": new_status})
+        return response_data(data={"status": new_status})
 
     # POST /sessions/{room_name}/append-transcription/
     @action(detail=False, methods=['post'], url_path='(?P<room_name>[^/.]+)/append-transcription',
@@ -245,18 +246,18 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         try:
             session = InterviewSession.objects.get(room_name=room_name)
         except InterviewSession.DoesNotExist:
-            return Response(
-                {"detail": "Interview session not found."},
-                status=status.HTTP_404_NOT_FOUND
+            return response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                errors={"detail": ["Interview session not found."]},
             )
 
         serializer = AppendTranscriptSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         transcript = append_transcript(session, serializer.validated_data)
-        return Response(
-            InterviewTranscriptSerializer(transcript).data,
-            status=status.HTTP_201_CREATED
+        return response_data(
+            status=status.HTTP_201_CREATED,
+            data=InterviewTranscriptSerializer(transcript).data,
         )
 
     # POST /sessions/{pk}/evaluate-ai/
@@ -266,7 +267,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         """Manually trigger AI evaluation for this session."""
         session = self.get_object()
         queue_ai_evaluation(session)
-        return Response({"detail": "AI evaluation task has been queued."})
+        return response_data(data={"detail": "AI evaluation task has been queued."})
 
 class InterviewEvaluationViewSet(viewsets.ModelViewSet):
     queryset = InterviewEvaluation.objects.select_related('interview', 'evaluator').all()

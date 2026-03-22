@@ -161,59 +161,153 @@
   box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
 }
 
-/* Markdown Support Styles */
+/* ─── Markdown / Rich Text Styles ─────────────────────────────────────────── */
+
+/* Paragraphs */
 .sq-chatbot__bubble p {
   margin: 0 0 8px 0;
 }
-
 .sq-chatbot__bubble p:last-child {
   margin-bottom: 0;
 }
 
-.sq-chatbot__bubble ul, .sq-chatbot__bubble ol {
-  margin: 8px 0;
-  padding-left: 20px;
+/* Headings */
+.sq-chatbot__bubble h1,
+.sq-chatbot__bubble h2,
+.sq-chatbot__bubble h3,
+.sq-chatbot__bubble h4 {
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 12px 0 6px;
+  color: #1565c0;
+}
+.sq-chatbot__bubble h1 { font-size: 1.05rem; }
+.sq-chatbot__bubble h2 { font-size: 1rem; }
+.sq-chatbot__bubble h3 { font-size: 0.95rem; }
+.sq-chatbot__bubble h4 { font-size: 0.9rem; }
+
+/* Bold & Italic */
+.sq-chatbot__bubble strong,
+.sq-chatbot__bubble b {
+  font-weight: 700;
+  color: #111827;
+}
+.sq-chatbot__bubble em,
+.sq-chatbot__bubble i {
+  font-style: italic;
 }
 
+/* Unordered list */
+.sq-chatbot__bubble ul {
+  margin: 6px 0 8px 0;
+  padding-left: 1.25rem;
+  list-style-type: disc;
+}
+.sq-chatbot__bubble ul ul {
+  list-style-type: circle;
+  margin: 2px 0;
+}
+
+/* Ordered list */
+.sq-chatbot__bubble ol {
+  margin: 6px 0 8px 0;
+  padding-left: 1.4rem;
+  list-style-type: decimal;
+}
+.sq-chatbot__bubble ol ol {
+  list-style-type: lower-alpha;
+  margin: 2px 0;
+}
+
+/* List items */
 .sq-chatbot__bubble li {
   margin-bottom: 4px;
+  line-height: 1.55;
+}
+.sq-chatbot__bubble li:last-child {
+  margin-bottom: 0;
 }
 
-.sq-chatbot__bubble table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 12px 0;
-  font-size: 0.85rem;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.sq-chatbot__bubble th, .sq-chatbot__bubble td {
-  padding: 8px 10px;
-  border: 1px solid rgba(30, 136, 229, 0.1);
-  text-align: left;
-}
-
-.sq-chatbot__bubble th {
+/* Blockquote */
+.sq-chatbot__bubble blockquote {
+  margin: 8px 0;
+  padding: 6px 12px;
+  border-left: 3px solid #1e88e5;
   background: rgba(30, 136, 229, 0.05);
-  font-weight: 600;
+  border-radius: 0 6px 6px 0;
+  color: #374151;
+  font-style: italic;
+}
+
+/* Inline code */
+.sq-chatbot__bubble code {
+  background: rgba(30, 136, 229, 0.08);
+  padding: 2px 5px;
+  border-radius: 4px;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.85em;
   color: #1565c0;
 }
 
-.sq-chatbot__bubble code {
-  background: rgba(30, 136, 229, 0.08);
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-family: monospace;
-}
-
+/* Code block */
 .sq-chatbot__bubble pre {
-  background: #f8fafc;
-  padding: 10px;
+  background: #f1f5f9;
+  border: 1px solid rgba(30, 136, 229, 0.12);
+  padding: 10px 12px;
   border-radius: 8px;
   overflow-x: auto;
+  margin: 8px 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.sq-chatbot__bubble pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: #1e293b;
+  font-size: inherit;
+}
+
+/* Table */
+.sq-chatbot__bubble table {
+  width: 100%;
+  border-collapse: collapse;
   margin: 10px 0;
+  font-size: 0.84rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(30, 136, 229, 0.15);
+}
+.sq-chatbot__bubble th,
+.sq-chatbot__bubble td {
+  padding: 7px 10px;
+  border: 1px solid rgba(30, 136, 229, 0.1);
+  text-align: left;
+}
+.sq-chatbot__bubble th {
+  background: rgba(30, 136, 229, 0.07);
+  font-weight: 600;
+  color: #1565c0;
+}
+.sq-chatbot__bubble tr:nth-child(even) td {
+  background: rgba(30, 136, 229, 0.03);
+}
+
+/* Horizontal rule */
+.sq-chatbot__bubble hr {
+  border: none;
+  border-top: 1px solid rgba(30, 136, 229, 0.15);
+  margin: 10px 0;
+}
+
+/* Links */
+.sq-chatbot__bubble a {
+  color: #1e88e5;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.sq-chatbot__bubble a:hover {
+  color: #1565c0;
 }
 
 .sq-chatbot__message--assistant .sq-chatbot__bubble {
@@ -305,6 +399,32 @@
   padding: 0 16px 12px;
   font-size: 0.75rem;
   color: #b91c1c;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.sq-chatbot__retry-btn {
+  border: 1px solid #b91c1c;
+  background: transparent;
+  color: #b91c1c;
+  border-radius: 999px;
+  padding: 3px 12px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.sq-chatbot__retry-btn:hover {
+  background: #b91c1c;
+  color: #ffffff;
+}
+
+.sq-chatbot__retry-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 @media (max-width: 600px) {

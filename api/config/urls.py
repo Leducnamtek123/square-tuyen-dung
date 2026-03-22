@@ -27,7 +27,7 @@ api_v1_patterns = [
     path("auth/", include("apps.accounts.urls")),
     path("info/", include("apps.profiles.urls")),
     path("job/", include("apps.jobs.urls")),
-    path("Project/", include("apps.content.urls")),
+    path("content/", include("apps.content.urls")),
     path("chatbot/", include("apps.chatbot.urls")),
     path("interview/", include("apps.interviews.urls")),
     path("admin/web/system-settings/", views.SystemSettingsAPIView.as_view()),

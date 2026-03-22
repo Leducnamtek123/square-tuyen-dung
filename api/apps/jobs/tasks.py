@@ -12,6 +12,60 @@ from .models import JobPostActivity
 
 logger = logging.getLogger(__name__)
 
+
+@shared_task(
+    bind=True,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 3},
+    ignore_result=True,
+)
+def es_index_job_post(self, job_post_id: int):
+    """
+    Asynchronously index (create or update) a single JobPost document in Elasticsearch.
+    Called by the post_save signal in signals.py.
+    """
+    try:
+        from .models import JobPost
+        from django_elasticsearch_dsl.registries import registry
+
+        instance = JobPost.objects.get(pk=job_post_id)
+        registry.update(instance)
+        logger.debug("ES: indexed JobPost id=%s", job_post_id)
+    except JobPost.DoesNotExist:
+        logger.warning("ES index skipped: JobPost id=%s not found (deleted?)", job_post_id)
+    except Exception as exc:
+        logger.error("ES index failed for JobPost id=%s: %s", job_post_id, exc)
+        raise  # let Celery retry
+
+
+@shared_task(
+    bind=True,
+    autoretry_for=(Exception,),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 3},
+    ignore_result=True,
+)
+def es_delete_job_post(self, job_post_id: int):
+    """
+    Asynchronously remove a JobPost document from Elasticsearch.
+    Called by the post_delete signal in signals.py.
+    """
+    try:
+        from django_elasticsearch_dsl.registries import registry
+        from .documents import JobPostDocument
+
+        # Build a fake object with just the pk so the registry can remove it
+        class _Stub:
+            pk = job_post_id
+
+        JobPostDocument().delete(doc_id=job_post_id, ignore=404)
+        logger.debug("ES: deleted JobPost id=%s", job_post_id)
+    except Exception as exc:
+        logger.error("ES delete failed for JobPost id=%s: %s", job_post_id, exc)
+        raise
+
+
 def extract_text_from_pdf(file_path):
     """Trích xuất văn bản từ file PDF."""
     text = ""

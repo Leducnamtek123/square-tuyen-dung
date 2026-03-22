@@ -2,32 +2,32 @@ import httpRequest from '../utils/httpRequest';
 
 type AnyRecord = Record<string, unknown>;
 
-const ProjectService = {
+const contentService = {
   getFeedbacks: (): Promise<unknown> => {
-    const url = 'Project/web/feedbacks/';
+    const url = 'content/web/feedbacks/';
     return httpRequest.get(url);
   },
 
   createFeedback: (data: AnyRecord): Promise<unknown> => {
-    const url = 'Project/web/feedbacks/';
+    const url = 'content/web/feedbacks/';
     return httpRequest.post(url, data);
   },
 
   sendSMSDownloadApp: (data: AnyRecord): Promise<unknown> => {
-    const url = 'Project/web/sms-download-app/';
+    const url = 'content/web/sms-download-app/';
     return httpRequest.post(url, data);
   },
 
   getBanners: (params: AnyRecord = {}): Promise<unknown> => {
-    const url = 'Project/web/banner/';
+    const url = 'content/web/banner/';
     return httpRequest.get(url, { params: params });
   },
 
   sendNotificationDemo: (): Promise<unknown> => {
-    const url = 'Project/send-noti-demo/';
+    const url = 'content/send-noti-demo/';
     return httpRequest.post(url);
   },
 };
 
-export default ProjectService;
+export default contentService;
 

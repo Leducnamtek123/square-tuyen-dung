@@ -7,7 +7,7 @@ import { Pagination, Autoplay } from 'swiper/modules';
 import { Box, Link } from "@mui/material";
 import HomeSearch from '../../../../pages/components/defaults/HomeSearch';
 import MuiImageCustom from '../../../../components/MuiImageCustom';
-import ProjectService from '../../../../services/ProjectService';
+import contentService from '../../../../services/contentService';
 import { BANNER_TYPES, IMAGES } from '../../../../configs/constants';
 
 const styles = {
@@ -44,7 +44,7 @@ const TopSlide = () => {
   React.useEffect(() => {
     const getBanners = async () => {
       try {
-        const resData = await ProjectService.getBanners({ type: BANNER_TYPES.HOME });
+        const resData = await contentService.getBanners({ type: BANNER_TYPES.HOME });
         const data = (resData as any)?.data || [];
         setBanners(data);
       } catch (error) {

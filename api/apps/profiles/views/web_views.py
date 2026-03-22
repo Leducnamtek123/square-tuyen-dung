@@ -295,7 +295,7 @@ class PrivateResumeViewSet(viewsets.ViewSet,
 
             instance._prefetched_objects_cache = {}
 
-        return Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["get"], detail=True,
 
@@ -608,7 +608,7 @@ class ResumeViewSet(viewsets.ViewSet,
 
         )
 
-        return Response(data={
+        return var_res.response_data(data={
 
             "isSaved": is_saved
 
@@ -776,7 +776,7 @@ class ResumeViewedAPIView(views.APIView):
 
         serializer = ResumeViewedSerializer(queryset, many=True)
 
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
 class ResumeSavedViewSet(viewsets.ViewSet,
 
@@ -829,7 +829,7 @@ class ResumeSavedViewSet(viewsets.ViewSet,
 
         serializer = ResumeSavedSerializer(queryset, many=True)
 
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["get"], detail=False,
 
@@ -853,7 +853,7 @@ class ResumeSavedViewSet(viewsets.ViewSet,
 
                                                                table_export.RESUMES_EXPORT_FIELD)
 
-        return Response(data=result_data)
+        return var_res.response_data(data=result_data)
 
 class EducationDetailViewSet(viewsets.ViewSet,
 

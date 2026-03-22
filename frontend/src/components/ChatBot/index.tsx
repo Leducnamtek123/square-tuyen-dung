@@ -38,7 +38,9 @@ const ChatBot = () => {
   const [input, setInput] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState("");
+  const [canRetry, setCanRetry] = useState(false);
   const listRef = useRef<HTMLDivElement | null>(null);
+  const lastPayloadRef = useRef<Record<string, unknown> | null>(null);
 
   const fullPathname = window.location.pathname || "/";
   const isEmployerRoute = isEmployerPortalPath(fullPathname);
@@ -67,10 +69,8 @@ const ChatBot = () => {
     }
   }, [currentUser, isAuthenticated, isEmployer]);
 
-  const botMode = botConfig?.MODE || AUTH_CONFIG.BOT_RENDER_MODE;
-  const enableRichRendering = ["dev", "architecture", "docs"].includes(
-    (botMode || "chat").toLowerCase()
-  );
+  // Always enable rich markdown rendering for AI assistant messages
+  const enableRichRendering = true;
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
@@ -93,24 +93,10 @@ const ChatBot = () => {
     };
   };
 
-  const handleSend = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const trimmed = input.trim();
-    if (!trimmed || isSending) return;
-
-    setError("");
-    const userMessage: ChatMessage = {
-      id: makeMessageId("user"),
-      role: "user",
-      content: trimmed,
-    };
-    const nextMessages = [...messages, userMessage];
-    setMessages(nextMessages);
-    setInput("");
-    setIsSending(true);
-
+  const sendChat = async (
+    payload: Record<string, unknown>,
+  ) => {
     try {
-      const payload = buildPayload(nextMessages);
       const response = await chatbotService.chat(payload);
       const reply =
         response?.reply ||
@@ -120,8 +106,11 @@ const ChatBot = () => {
         ...prev,
         { id: makeMessageId("assistant"), role: "assistant", content: reply },
       ]);
+      setError("");
+      setCanRetry(false);
     } catch (err) {
       setError(t('chat:chatbot.error.busy'));
+      setCanRetry(true);
       setMessages((prev) => [
         ...prev,
         {
@@ -133,6 +122,36 @@ const ChatBot = () => {
     } finally {
       setIsSending(false);
     }
+  };
+
+  const handleSend = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const trimmed = input.trim();
+    if (!trimmed || isSending) return;
+
+    setError("");
+    setCanRetry(false);
+    const userMessage: ChatMessage = {
+      id: makeMessageId("user"),
+      role: "user",
+      content: trimmed,
+    };
+    const nextMessages = [...messages, userMessage];
+    setMessages(nextMessages);
+    setInput("");
+    setIsSending(true);
+
+    const payload = buildPayload(nextMessages);
+    lastPayloadRef.current = payload;
+    await sendChat(payload);
+  };
+
+  const handleRetry = async () => {
+    if (!lastPayloadRef.current || isSending) return;
+    setError("");
+    setCanRetry(false);
+    setIsSending(true);
+    await sendChat(lastPayloadRef.current);
   };
 
   if (!botConfig) {
@@ -216,7 +235,21 @@ const ChatBot = () => {
           </button>
         </form>
 
-        {error && <div className="sq-chatbot__error">{error}</div>}
+        {error && (
+          <div className="sq-chatbot__error">
+            <span>{error}</span>
+            {canRetry && (
+              <button
+                type="button"
+                className="sq-chatbot__retry-btn"
+                onClick={handleRetry}
+                disabled={isSending}
+              >
+                {t('chat:chatbot.retry') || 'Thử lại'}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

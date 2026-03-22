@@ -232,7 +232,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
         ])
 
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["get"], detail=False,
 
@@ -308,7 +308,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
             is_saved = True
 
-        return Response(data={
+        return var_res.response_data(data={
 
             "isSaved": is_saved
 
@@ -476,7 +476,7 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
 
         )
 
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=serializer.data)
 
     def list(self, request, *args, **kwargs):
 
@@ -558,7 +558,7 @@ class JobPostNotificationViewSet(viewsets.ViewSet,
 
         ])
 
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     def destroy(self, request, *args, **kwargs):
 
@@ -566,7 +566,7 @@ class JobPostNotificationViewSet(viewsets.ViewSet,
 
         self.perform_destroy(instance)
 
-        return Response(status=status.HTTP_200_OK)
+        return var_res.response_data(status=status.HTTP_200_OK)
 
     def _apply_active_change(self, request, job_post_notification):
         user = request.user

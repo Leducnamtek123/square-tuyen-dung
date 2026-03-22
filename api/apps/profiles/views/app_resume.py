@@ -136,14 +136,14 @@ class PrivateResumeViewSet(
             # forcibly invalidate the prefetch cache on the instance.
             instance._prefetched_objects_cache = {}
 
-        return Response(serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
 
         self.perform_destroy(instance)
 
-        return Response(status=status.HTTP_200_OK)
+        return var_res.response_data(status=status.HTTP_200_OK)
 
     @action(methods=["get"], detail=True, url_path="resume-active", url_name="resume-active")
     def active_resume(self, request, pk):
@@ -334,7 +334,7 @@ class ResumeViewedAPIView(views.APIView):
 
         serializer = ResumeViewedSerializer(queryset, many=True)
 
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
 
 class EducationDetailViewSet(
@@ -349,7 +349,7 @@ class EducationDetailViewSet(
 
         self.perform_destroy(instance)
 
-        return Response(status=status.HTTP_200_OK)
+        return var_res.response_data(status=status.HTTP_200_OK)
 
 
 class ExperienceDetailViewSet(
@@ -364,7 +364,7 @@ class ExperienceDetailViewSet(
 
         self.perform_destroy(instance)
 
-        return Response(status=status.HTTP_200_OK)
+        return var_res.response_data(status=status.HTTP_200_OK)
 
 
 class CertificateDetailViewSet(
@@ -379,7 +379,7 @@ class CertificateDetailViewSet(
 
         self.perform_destroy(instance)
 
-        return Response(status=status.HTTP_200_OK)
+        return var_res.response_data(status=status.HTTP_200_OK)
 
 
 class LanguageSkillViewSet(
@@ -394,7 +394,7 @@ class LanguageSkillViewSet(
 
         self.perform_destroy(instance)
 
-        return Response(status=status.HTTP_200_OK)
+        return var_res.response_data(status=status.HTTP_200_OK)
 
 
 class AdvancedSkillViewSet(
@@ -409,4 +409,4 @@ class AdvancedSkillViewSet(
 
         self.perform_destroy(instance)
 
-        return Response(status=status.HTTP_200_OK)
+        return var_res.response_data(status=status.HTTP_200_OK)

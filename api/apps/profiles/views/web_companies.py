@@ -146,7 +146,7 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
         if not company:
             company = getattr(request.user, "company", None)
         if not company:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
         company_image_url_serializer = LogoCompanySerializer(
 
@@ -154,7 +154,7 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
         if not company_image_url_serializer.is_valid():
 
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
         try:
 
@@ -164,11 +164,11 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
             helper.print_log_error("update_company_image_url", ex)
 
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         else:
 
-            return Response(status=status.HTTP_200_OK, data=company_image_url_serializer.data)
+            return var_res.response_data(status=status.HTTP_200_OK, data=company_image_url_serializer.data)
 
     @action(methods=["put"], detail=False,
 
@@ -184,7 +184,7 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
         if not company:
             company = getattr(request.user, "company", None)
         if not company:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
         company_cover_image_url_serializer = CompanyCoverImageSerializer(
 
@@ -192,7 +192,7 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
         if not company_cover_image_url_serializer.is_valid():
 
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
         try:
 
@@ -202,11 +202,11 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
             helper.print_log_error("update_company_cover_image_url", ex)
 
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         else:
 
-            return Response(status=status.HTTP_200_OK, data=company_cover_image_url_serializer.data)
+            return var_res.response_data(status=status.HTTP_200_OK, data=company_cover_image_url_serializer.data)
 
 
 class CompanyViewSet(viewsets.ViewSet,
@@ -257,7 +257,7 @@ class CompanyViewSet(viewsets.ViewSet,
         cache_key = f'company_list_{query_hash}_{request.user.id if request.user.is_authenticated else 0}'
         cached_res = redis_obj.get_json(cache_key)
         if cached_res:
-            return Response(cached_res)
+            return var_res.response_data(data=cached_res)
 
         queryset = self.filter_queryset(self.get_queryset())
         queryset = queryset.annotate(
@@ -323,7 +323,7 @@ class CompanyViewSet(viewsets.ViewSet,
 
         ])
 
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["get"], detail=False,
 
@@ -352,9 +352,9 @@ class CompanyViewSet(viewsets.ViewSet,
 
             helper.print_log_error("get_top_companies", ex)
 
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
     @action(methods=["post"], detail=True,
 
@@ -412,7 +412,7 @@ class CompanyViewSet(viewsets.ViewSet,
 
         )
 
-        return Response(data={
+        return var_res.response_data(data={
 
             "isFollowed": is_followed
 
@@ -448,7 +448,7 @@ class CompanyFollowedAPIView(views.APIView):
 
         serializer = CompanyFollowedSerializer(queryset, many=True)
 
-        return Response(data=serializer.data)
+        return var_res.response_data(data=serializer.data)
 
 
 class CompanyImageViewSet(viewsets.ViewSet,
@@ -498,7 +498,7 @@ class CompanyImageViewSet(viewsets.ViewSet,
 
         results = serializer.save()
 
-        return Response(results, status=status.HTTP_201_CREATED)
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=results)
 
     def destroy(self, request, *args, **kwargs):
 
@@ -526,11 +526,11 @@ class CompanyImageViewSet(viewsets.ViewSet,
 
             helper.print_log_error("destroy", ex)
 
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         else:
 
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return var_res.response_data(status=status.HTTP_204_NO_CONTENT)
 
 
 class CompanyRoleViewSet(viewsets.ModelViewSet):

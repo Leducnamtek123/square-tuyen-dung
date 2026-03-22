@@ -30,10 +30,20 @@ const DESCRIPTION_LOCATIONS = [
   { value: 4, label: 'Bottom Right' },
 ];
 
+const normalizeList = (res: any): any[] => {
+  if (Array.isArray(res)) return res;
+  if (Array.isArray(res?.results)) return res.results;
+  if (Array.isArray(res?.data)) return res.data;
+  if (Array.isArray(res?.data?.results)) return res.data.results;
+  if (Array.isArray(res?.data?.data)) return res.data.data;
+  return [];
+};
+
 const BannersPage = () => {
   const { t } = useTranslation('admin');
   const [banners, setBanners] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
   const [current, setCurrent] = useState<any>(null);
@@ -60,15 +70,17 @@ const BannersPage = () => {
 
   const fetchBanners = useCallback(async () => {
     setIsLoading(true);
+    setFetchError(null);
     try {
       const res: any = await adminManagementService.getBanners();
-      setBanners(Array.isArray(res) ? res : (res?.results || res?.data || []));
+      setBanners(normalizeList(res));
     } catch (e) {
-      console.error(e);
+      console.error('[BannersPage] fetchBanners error:', e);
+      setFetchError(t('pages.banners.fetchError') || 'Không thể tải danh sách banner. Vui lòng thử lại.');
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => { fetchBanners(); }, [fetchBanners]);
 
@@ -163,9 +175,17 @@ const BannersPage = () => {
       </Box>
 
       <Paper sx={{ p: 2, borderRadius: '12px' }} elevation={0}>
+        {fetchError && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4, gap: 2 }}>
+            <Typography color="error">{fetchError}</Typography>
+            <Button variant="outlined" color="primary" onClick={fetchBanners}>
+              {t('pages.banners.retry') || 'Thử lại'}
+            </Button>
+          </Box>
+        )}
         {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}><CircularProgress /></Box>
-        ) : (
+        ) : !fetchError && (
           <Table size="small">
             <TableHead>
               <TableRow>

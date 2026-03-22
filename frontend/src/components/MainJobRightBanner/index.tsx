@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Button, Stack, styled, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { BANNER_TYPES } from "../../configs/constants";
-import ProjectService from "../../services/ProjectService";
+import contentService from "../../services/contentService";
 
 interface Banner {
   id: string | number;
@@ -42,7 +42,7 @@ const MainJobRightBanner = (_props: MainJobRightBannerProps) => {
   React.useEffect(() => {
     const getRightBanners = async () => {
       try {
-        const resData: any = await ProjectService.getBanners({
+        const resData: any = await contentService.getBanners({
           type: BANNER_TYPES.MAIN_JOB_RIGHT,
         });
         const data = resData?.data || [];

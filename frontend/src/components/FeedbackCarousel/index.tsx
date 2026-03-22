@@ -5,7 +5,7 @@ import { Pagination, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Box } from "@mui/material";
 import FeedbackCard from '../FeedbackCard';
-import ProjectService from '../../services/ProjectService';
+import contentService from '../../services/contentService';
 import NoDataCard from '../NoDataCard';
 
 interface FeedbackCarouselProps {
@@ -64,7 +64,7 @@ const FeedbackCarousel = (_props: FeedbackCarouselProps) => {
     const getFeedbacksList = async () => {
       setIsLoading(true);
       try {
-        const resData: any = await ProjectService.getFeedbacks();
+        const resData: any = await contentService.getFeedbacks();
         setFeedbacks(resData.data || []);
       } catch (error) {
         console.error(error);
