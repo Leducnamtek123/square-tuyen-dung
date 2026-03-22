@@ -64,11 +64,20 @@ const getBaseHostname = (): string => {
 
 const BASE_HOSTNAME = getBaseHostname();
 
+const isProdDomain = (host: string | undefined): host is string => {
+  return !!host && host !== 'localhost' && !/^(\d{1,3}\.){3}\d{1,3}$/.test(host);
+};
+
 const HOST_NAME = {
-  PROJECT: import.meta.env.VITE_PROJECT_HOST_NAME || BASE_HOSTNAME,
-  EMPLOYER_PROJECT:
-    import.meta.env.VITE_EMPLOYER_PROJECT_HOST_NAME || `employer.${BASE_HOSTNAME}`,
-  ADMIN_PROJECT: import.meta.env.VITE_ADMIN_PROJECT_HOST_NAME || `admin.${BASE_HOSTNAME}`,
+  PROJECT: isProdDomain(import.meta.env.VITE_PROJECT_HOST_NAME)
+    ? import.meta.env.VITE_PROJECT_HOST_NAME
+    : BASE_HOSTNAME,
+  EMPLOYER_PROJECT: isProdDomain(import.meta.env.VITE_EMPLOYER_PROJECT_HOST_NAME)
+    ? import.meta.env.VITE_EMPLOYER_PROJECT_HOST_NAME
+    : `employer.${BASE_HOSTNAME}`,
+  ADMIN_PROJECT: isProdDomain(import.meta.env.VITE_ADMIN_PROJECT_HOST_NAME)
+    ? import.meta.env.VITE_ADMIN_PROJECT_HOST_NAME
+    : `admin.${BASE_HOSTNAME}`,
 } as const;
 
 const AUTH_PROVIDER = {
