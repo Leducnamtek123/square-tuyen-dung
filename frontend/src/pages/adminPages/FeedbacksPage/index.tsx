@@ -6,9 +6,11 @@ import {
   Button, Tooltip, Rating
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useTranslation } from 'react-i18next';
 import adminManagementService from '../../../services/adminManagementService';
 
 const FeedbacksPage = () => {
+  const { t } = useTranslation('admin');
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [openDelete, setOpenDelete] = useState(false);
@@ -46,10 +48,10 @@ const FeedbacksPage = () => {
   return (
     <Box>
       <Box sx={{ mb: 3 }}>
-        <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>Quản lý Đánh giá</Typography>
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>{t('pages.feedbacks.title')}</Typography>
         <Breadcrumbs>
-          <Link underline="hover" color="inherit" href="/">Admin</Link>
-          <Typography color="text.primary">Đánh giá</Typography>
+          <Link underline="hover" color="inherit" href="/">{t('pages.feedbacks.breadcrumbAdmin')}</Link>
+          <Typography color="text.primary">{t('pages.feedbacks.breadcrumb')}</Typography>
         </Breadcrumbs>
       </Box>
 
@@ -60,18 +62,18 @@ const FeedbacksPage = () => {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Người dùng</TableCell>
-                <TableCell>Nội dung</TableCell>
-                <TableCell>Đánh giá</TableCell>
-                <TableCell>Trạng thái</TableCell>
-                <TableCell>Ngày tạo</TableCell>
-                <TableCell align="right">Thao tác</TableCell>
+                <TableCell>{t('pages.feedbacks.table.id')}</TableCell>
+                <TableCell>{t('pages.feedbacks.table.user')}</TableCell>
+                <TableCell>{t('pages.feedbacks.table.content')}</TableCell>
+                <TableCell>{t('pages.feedbacks.table.rating')}</TableCell>
+                <TableCell>{t('pages.feedbacks.table.status')}</TableCell>
+                <TableCell>{t('pages.feedbacks.table.createdAt')}</TableCell>
+                <TableCell align="right">{t('pages.feedbacks.table.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {feedbacks.length === 0 ? (
-                <TableRow><TableCell colSpan={7} align="center">Chưa có đánh giá nào</TableCell></TableRow>
+                <TableRow><TableCell colSpan={7} align="center">{t('pages.feedbacks.empty')}</TableCell></TableRow>
               ) : feedbacks.map((fb: any) => (
                 <TableRow key={fb.id} hover>
                   <TableCell>{fb.id}</TableCell>
@@ -100,14 +102,14 @@ const FeedbacksPage = () => {
                       size="small"
                       color="success"
                     />
-                    <Chip label={fb.is_active ? 'Hiện' : 'Ẩn'} size="small"
+                    <Chip label={fb.is_active ? t('pages.feedbacks.show') : t('pages.feedbacks.hide')} size="small"
                       color={fb.is_active ? 'success' : 'default'} sx={{ ml: 0.5 }} />
                   </TableCell>
                   <TableCell>
                     {fb.create_at ? new Date(fb.create_at).toLocaleDateString('vi-VN') : '—'}
                   </TableCell>
                   <TableCell align="right">
-                    <Tooltip title="Xóa">
+                    <Tooltip title={t('pages.feedbacks.table.deleteTooltip')}>
                       <IconButton size="small" color="error" onClick={() => { setCurrent(fb); setOpenDelete(true); }}>
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -122,14 +124,16 @@ const FeedbacksPage = () => {
 
       {/* Delete Dialog */}
       <Dialog open={openDelete} onClose={() => setOpenDelete(false)}>
-        <DialogTitle>Xóa Đánh giá</DialogTitle>
+        <DialogTitle>{t('pages.feedbacks.deleteTitle')}</DialogTitle>
         <DialogContent>
-          <Typography>Bạn có chắc muốn xóa đánh giá của <b>{current?.userDict?.fullName}</b>?</Typography>
+          <Typography>
+            {t('pages.feedbacks.deleteConfirm', { name: current?.userDict?.fullName || 'N/A' })}
+          </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setOpenDelete(false)} color="inherit">Hủy</Button>
+          <Button onClick={() => setOpenDelete(false)} color="inherit">{t('pages.feedbacks.cancel')}</Button>
           <Button onClick={handleDelete} color="error" variant="contained" disabled={isSaving}>
-            {isSaving ? 'Đang xóa...' : 'Xóa'}
+            {isSaving ? t('pages.feedbacks.deleting') : t('pages.feedbacks.delete')}
           </Button>
         </DialogActions>
       </Dialog>

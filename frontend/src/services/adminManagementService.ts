@@ -260,33 +260,33 @@ const adminManagementService = {
 
   // Banners (Admin)
   getBanners: (params: AnyRecord = {}): Promise<unknown> => {
-    const url = 'Project/web/admin/banners/';
+    const url = 'content/web/admin/banners/';
     return withPresign(httpRequest.get(url, { params }));
   },
   createBanner: (data: AnyRecord): Promise<unknown> => {
-    const url = 'Project/web/admin/banners/';
+    const url = 'content/web/admin/banners/';
     return withPresign(httpRequest.post(url, data));
   },
   updateBanner: (id: IdType, data: AnyRecord): Promise<unknown> => {
-    const url = `Project/web/admin/banners/${id}/`;
+    const url = `content/web/admin/banners/${id}/`;
     return withPresign(httpRequest.patch(url, data));
   },
   deleteBanner: (id: IdType): Promise<unknown> => {
-    const url = `Project/web/admin/banners/${id}/`;
+    const url = `content/web/admin/banners/${id}/`;
     return httpRequest.delete(url);
   },
 
   // Feedbacks (Admin)
   getFeedbacks: (params: AnyRecord = {}): Promise<unknown> => {
-    const url = 'Project/web/admin/feedbacks/';
+    const url = 'content/web/admin/feedbacks/';
     return httpRequest.get(url, { params });
   },
   updateFeedback: (id: IdType, data: AnyRecord): Promise<unknown> => {
-    const url = `Project/web/admin/feedbacks/${id}/`;
+    const url = `content/web/admin/feedbacks/${id}/`;
     return httpRequest.patch(url, data);
   },
   deleteFeedback: (id: IdType): Promise<unknown> => {
-    const url = `Project/web/admin/feedbacks/${id}/`;
+    const url = `content/web/admin/feedbacks/${id}/`;
     return httpRequest.delete(url);
   },
 };

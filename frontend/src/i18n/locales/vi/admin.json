@@ -554,6 +554,73 @@
         "database": "Cơ sở dữ liệu",
         "redis": "Redis"
       }
+    },
+    "banners": {
+      "title": "Quản lý Banner",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Banner",
+      "addBtn": "Thêm Banner",
+      "editTitle": "Sửa Banner",
+      "addTitle": "Thêm Banner",
+      "deleteTitle": "Xóa Banner",
+      "deleteConfirm": "Bạn có chắc muốn xóa banner #{{id}}?",
+      "empty": "Chưa có banner nào",
+      "active": "Active",
+      "inactive": "Inactive",
+      "cancel": "Hủy",
+      "save": "Lưu",
+      "saving": "Đang lưu...",
+      "delete": "Xóa",
+      "deleting": "Đang xóa...",
+      "table": {
+        "id": "ID",
+        "webImage": "Ảnh Web",
+        "mobileImage": "Ảnh Mobile",
+        "description": "Mô tả",
+        "platform": "Platform",
+        "type": "Loại",
+        "status": "Trạng thái",
+        "actions": "Thao tác",
+        "edit": "Sửa",
+        "deleteTooltip": "Xóa"
+      },
+      "form": {
+        "description": "Mô tả",
+        "buttonText": "Button Text",
+        "buttonLink": "Button Link",
+        "platform": "Platform",
+        "bannerType": "Loại banner",
+        "descLocation": "Vị trí mô tả",
+        "showButton": "Hiện button",
+        "activeLabel": "Active",
+        "webImageLabel": "Ảnh Web Banner",
+        "mobileImageLabel": "Ảnh Mobile Banner",
+        "chooseWeb": "Chọn ảnh web",
+        "chooseMobile": "Chọn ảnh mobile"
+      }
+    },
+    "feedbacks": {
+      "title": "Quản lý Đánh giá",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Đánh giá",
+      "deleteTitle": "Xóa Đánh giá",
+      "deleteConfirm": "Bạn có chắc muốn xóa đánh giá của {{name}}?",
+      "empty": "Chưa có đánh giá nào",
+      "show": "Hiện",
+      "hide": "Ẩn",
+      "cancel": "Hủy",
+      "delete": "Xóa",
+      "deleting": "Đang xóa...",
+      "table": {
+        "id": "ID",
+        "user": "Người dùng",
+        "content": "Nội dung",
+        "rating": "Đánh giá",
+        "status": "Trạng thái",
+        "createdAt": "Ngày tạo",
+        "actions": "Thao tác",
+        "deleteTooltip": "Xóa"
+      }
     }
   },
   "common": {

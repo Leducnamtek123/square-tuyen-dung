@@ -457,6 +457,7 @@ class AdminStatisticViewSet(viewsets.ViewSet):
         total_users = User.objects.count()
         total_employers = User.objects.filter(role_name=var_sys.EMPLOYER).count()
         total_job_seekers = User.objects.filter(role_name=var_sys.JOB_SEEKER).count()
+        total_admins = User.objects.filter(role_name=var_sys.ADMIN).count()
         total_job_posts = JobPost.objects.count()
         total_job_posts_pending = JobPost.objects.filter(status=var_sys.JobPostStatus.PENDING).count()
         total_applications = JobPostActivity.objects.count()
@@ -466,6 +467,7 @@ class AdminStatisticViewSet(viewsets.ViewSet):
                 "totalUsers": total_users,
                 "totalEmployers": total_employers,
                 "totalJobSeekers": total_job_seekers,
+                "totalAdmins": total_admins,
                 "totalJobPosts": total_job_posts,
                 "totalJobPostsPending": total_job_posts_pending,
                 "totalApplications": total_applications,

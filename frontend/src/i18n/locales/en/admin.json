@@ -554,6 +554,73 @@
         "database": "Database",
         "redis": "Redis"
       }
+    },
+    "banners": {
+      "title": "Banner Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Banners",
+      "addBtn": "Add Banner",
+      "editTitle": "Edit Banner",
+      "addTitle": "Add Banner",
+      "deleteTitle": "Delete Banner",
+      "deleteConfirm": "Are you sure you want to delete banner #{{id}}?",
+      "empty": "No banners yet",
+      "active": "Active",
+      "inactive": "Inactive",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "table": {
+        "id": "ID",
+        "webImage": "Web Image",
+        "mobileImage": "Mobile Image",
+        "description": "Description",
+        "platform": "Platform",
+        "type": "Type",
+        "status": "Status",
+        "actions": "Actions",
+        "edit": "Edit",
+        "deleteTooltip": "Delete"
+      },
+      "form": {
+        "description": "Description",
+        "buttonText": "Button Text",
+        "buttonLink": "Button Link",
+        "platform": "Platform",
+        "bannerType": "Banner Type",
+        "descLocation": "Description Position",
+        "showButton": "Show Button",
+        "activeLabel": "Active",
+        "webImageLabel": "Web Banner Image",
+        "mobileImageLabel": "Mobile Banner Image",
+        "chooseWeb": "Choose web image",
+        "chooseMobile": "Choose mobile image"
+      }
+    },
+    "feedbacks": {
+      "title": "Feedback Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Feedbacks",
+      "deleteTitle": "Delete Feedback",
+      "deleteConfirm": "Are you sure you want to delete feedback from {{name}}?",
+      "empty": "No feedbacks yet",
+      "show": "Show",
+      "hide": "Hide",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "deleting": "Deleting...",
+      "table": {
+        "id": "ID",
+        "user": "User",
+        "content": "Content",
+        "rating": "Rating",
+        "status": "Status",
+        "createdAt": "Created At",
+        "actions": "Actions",
+        "deleteTooltip": "Delete"
+      }
     }
   },
   "common": {

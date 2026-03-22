@@ -10,6 +10,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
+import { useTranslation } from 'react-i18next';
 import adminManagementService from '../../../services/adminManagementService';
 
 const PLATFORM_OPTIONS = [
@@ -30,6 +31,7 @@ const DESCRIPTION_LOCATIONS = [
 ];
 
 const BannersPage = () => {
+  const { t } = useTranslation('admin');
   const [banners, setBanners] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
@@ -148,15 +150,15 @@ const BannersPage = () => {
     <Box>
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <Box>
-          <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>Quản lý Banner</Typography>
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>{t('pages.banners.title')}</Typography>
           <Breadcrumbs>
-            <Link underline="hover" color="inherit" href="/">Admin</Link>
-            <Typography color="text.primary">Banner</Typography>
+            <Link underline="hover" color="inherit" href="/">{t('pages.banners.breadcrumbAdmin')}</Link>
+            <Typography color="text.primary">{t('pages.banners.breadcrumb')}</Typography>
           </Breadcrumbs>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}
           sx={{ borderRadius: '8px', textTransform: 'none' }}>
-          Thêm Banner
+          {t('pages.banners.addBtn')}
         </Button>
       </Box>
 
@@ -167,19 +169,19 @@ const BannersPage = () => {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Ảnh Web</TableCell>
-                <TableCell>Ảnh Mobile</TableCell>
-                <TableCell>Mô tả</TableCell>
-                <TableCell>Platform</TableCell>
-                <TableCell>Loại</TableCell>
-                <TableCell>Trạng thái</TableCell>
-                <TableCell align="right">Thao tác</TableCell>
+                <TableCell>{t('pages.banners.table.id')}</TableCell>
+                <TableCell>{t('pages.banners.table.webImage')}</TableCell>
+                <TableCell>{t('pages.banners.table.mobileImage')}</TableCell>
+                <TableCell>{t('pages.banners.table.description')}</TableCell>
+                <TableCell>{t('pages.banners.table.platform')}</TableCell>
+                <TableCell>{t('pages.banners.table.type')}</TableCell>
+                <TableCell>{t('pages.banners.table.status')}</TableCell>
+                <TableCell align="right">{t('pages.banners.table.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {banners.length === 0 ? (
-                <TableRow><TableCell colSpan={8} align="center">Chưa có banner nào</TableCell></TableRow>
+                <TableRow><TableCell colSpan={8} align="center">{t('pages.banners.empty')}</TableCell></TableRow>
               ) : banners.map((b: any) => (
                 <TableRow key={b.id} hover>
                   <TableCell>{b.id}</TableCell>
@@ -203,12 +205,12 @@ const BannersPage = () => {
                   </TableCell>
                   <TableCell>{TYPE_OPTIONS.find(t => t.value === b.type)?.label || b.type}</TableCell>
                   <TableCell>
-                    <Chip label={b.is_active ? 'Active' : 'Inactive'} size="small"
+                    <Chip label={b.is_active ? t('pages.banners.active') : t('pages.banners.inactive')} size="small"
                       color={b.is_active ? 'success' : 'default'} />
                   </TableCell>
                   <TableCell align="right">
-                    <Tooltip title="Sửa"><IconButton size="small" onClick={() => handleOpenEdit(b)}><EditIcon fontSize="small" /></IconButton></Tooltip>
-                    <Tooltip title="Xóa"><IconButton size="small" color="error" onClick={() => { setCurrent(b); setOpenDelete(true); }}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title={t('pages.banners.table.edit')}><IconButton size="small" onClick={() => handleOpenEdit(b)}><EditIcon fontSize="small" /></IconButton></Tooltip>
+                    <Tooltip title={t('pages.banners.table.deleteTooltip')}><IconButton size="small" color="error" onClick={() => { setCurrent(b); setOpenDelete(true); }}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
                   </TableCell>
                 </TableRow>
               ))}
@@ -219,39 +221,39 @@ const BannersPage = () => {
 
       {/* Add/Edit Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
-        <DialogTitle>{dialogMode === 'add' ? 'Thêm Banner' : 'Sửa Banner'}</DialogTitle>
+        <DialogTitle>{dialogMode === 'add' ? t('pages.banners.addTitle') : t('pages.banners.editTitle')}</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <TextField label="Mô tả" fullWidth value={description} onChange={e => setDescription(e.target.value)} />
-            <TextField label="Button Text" fullWidth value={buttonText} onChange={e => setButtonText(e.target.value)} />
-            <TextField label="Button Link" fullWidth value={buttonLink} onChange={e => setButtonLink(e.target.value)} />
+            <TextField label={t('pages.banners.form.description')} fullWidth value={description} onChange={e => setDescription(e.target.value)} />
+            <TextField label={t('pages.banners.form.buttonText')} fullWidth value={buttonText} onChange={e => setButtonText(e.target.value)} />
+            <TextField label={t('pages.banners.form.buttonLink')} fullWidth value={buttonLink} onChange={e => setButtonLink(e.target.value)} />
             <FormControl fullWidth size="small">
-              <InputLabel>Platform</InputLabel>
-              <Select value={platform} label="Platform" onChange={e => setPlatform(e.target.value)}>
+              <InputLabel>{t('pages.banners.form.platform')}</InputLabel>
+              <Select value={platform} label={t('pages.banners.form.platform')} onChange={e => setPlatform(e.target.value)}>
                 {PLATFORM_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
             </FormControl>
             <FormControl fullWidth size="small">
-              <InputLabel>Loại banner</InputLabel>
-              <Select value={type} label="Loại banner" onChange={e => setType(Number(e.target.value))}>
+              <InputLabel>{t('pages.banners.form.bannerType')}</InputLabel>
+              <Select value={type} label={t('pages.banners.form.bannerType')} onChange={e => setType(Number(e.target.value))}>
                 {TYPE_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
             </FormControl>
             <FormControl fullWidth size="small">
-              <InputLabel>Vị trí mô tả</InputLabel>
-              <Select value={descriptionLocation} label="Vị trí mô tả" onChange={e => setDescriptionLocation(Number(e.target.value))}>
+              <InputLabel>{t('pages.banners.form.descLocation')}</InputLabel>
+              <Select value={descriptionLocation} label={t('pages.banners.form.descLocation')} onChange={e => setDescriptionLocation(Number(e.target.value))}>
                 {DESCRIPTION_LOCATIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
             </FormControl>
-            <FormControlLabel control={<Switch checked={isShowButton} onChange={e => setIsShowButton(e.target.checked)} />} label="Hiện button" />
-            <FormControlLabel control={<Switch checked={isActive} onChange={e => setIsActive(e.target.checked)} color="success" />} label="Active" />
+            <FormControlLabel control={<Switch checked={isShowButton} onChange={e => setIsShowButton(e.target.checked)} />} label={t('pages.banners.form.showButton')} />
+            <FormControlLabel control={<Switch checked={isActive} onChange={e => setIsActive(e.target.checked)} color="success" />} label={t('pages.banners.form.activeLabel')} />
 
             {/* Web Image Upload */}
-            <Typography variant="subtitle2" sx={{ mt: 1 }}>Ảnh Web Banner</Typography>
+            <Typography variant="subtitle2" sx={{ mt: 1 }}>{t('pages.banners.form.webImageLabel')}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <input ref={webInputRef} type="file" accept="image/*" hidden onChange={handleFileChange(setWebImage, setWebPreview)} />
               <Button variant="outlined" startIcon={<UploadFileIcon />} onClick={() => webInputRef.current?.click()}>
-                {webImage ? webImage.name : 'Chọn ảnh web'}
+                {webImage ? webImage.name : t('pages.banners.form.chooseWeb')}
               </Button>
             </Box>
             {webPreview && (
@@ -260,11 +262,11 @@ const BannersPage = () => {
             )}
 
             {/* Mobile Image Upload */}
-            <Typography variant="subtitle2" sx={{ mt: 1 }}>Ảnh Mobile Banner</Typography>
+            <Typography variant="subtitle2" sx={{ mt: 1 }}>{t('pages.banners.form.mobileImageLabel')}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
               <input ref={mobileInputRef} type="file" accept="image/*" hidden onChange={handleFileChange(setMobileImage, setMobilePreview)} />
               <Button variant="outlined" startIcon={<UploadFileIcon />} onClick={() => mobileInputRef.current?.click()}>
-                {mobileImage ? mobileImage.name : 'Chọn ảnh mobile'}
+                {mobileImage ? mobileImage.name : t('pages.banners.form.chooseMobile')}
               </Button>
             </Box>
             {mobilePreview && (
@@ -274,21 +276,21 @@ const BannersPage = () => {
           </Box>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setOpenDialog(false)} color="inherit">Hủy</Button>
+          <Button onClick={() => setOpenDialog(false)} color="inherit">{t('pages.banners.cancel')}</Button>
           <Button onClick={handleSave} variant="contained" disabled={isSaving}>
-            {isSaving ? 'Đang lưu...' : 'Lưu'}
+            {isSaving ? t('pages.banners.saving') : t('pages.banners.save')}
           </Button>
         </DialogActions>
       </Dialog>
 
       {/* Delete Dialog */}
       <Dialog open={openDelete} onClose={() => setOpenDelete(false)}>
-        <DialogTitle>Xóa Banner</DialogTitle>
-        <DialogContent><Typography>Bạn có chắc muốn xóa banner #{current?.id}?</Typography></DialogContent>
+        <DialogTitle>{t('pages.banners.deleteTitle')}</DialogTitle>
+        <DialogContent><Typography>{t('pages.banners.deleteConfirm', { id: current?.id })}</Typography></DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setOpenDelete(false)} color="inherit">Hủy</Button>
+          <Button onClick={() => setOpenDelete(false)} color="inherit">{t('pages.banners.cancel')}</Button>
           <Button onClick={handleDelete} color="error" variant="contained" disabled={isSaving}>
-            {isSaving ? 'Đang xóa...' : 'Xóa'}
+            {isSaving ? t('pages.banners.deleting') : t('pages.banners.delete')}
           </Button>
         </DialogActions>
       </Dialog>

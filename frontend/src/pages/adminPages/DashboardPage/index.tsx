@@ -24,7 +24,7 @@ const DashboardPage = () => {
     ? [
       { name: t('dashboard.roles.employer'), value: stats.totalEmployers || 0 },
       { name: t('dashboard.roles.jobSeeker'), value: stats.totalJobSeekers || 0 },
-      { name: t('dashboard.roles.admin'), value: 5 },
+      { name: t('dashboard.roles.admin'), value: stats.totalAdmins || 0 },
     ]
     : [];
 
