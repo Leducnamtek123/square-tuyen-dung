@@ -62,7 +62,7 @@ const BannersPage = () => {
     setIsLoading(true);
     try {
       const res: any = await adminManagementService.getBanners();
-      setBanners(res?.data || res?.results || res || []);
+      setBanners(Array.isArray(res) ? res : (res?.results || res?.data || []));
     } catch (e) {
       console.error(e);
     } finally {

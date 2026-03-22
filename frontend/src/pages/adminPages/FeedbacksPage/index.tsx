@@ -21,7 +21,7 @@ const FeedbacksPage = () => {
     setIsLoading(true);
     try {
       const res: any = await adminManagementService.getFeedbacks();
-      setFeedbacks(res?.data || res?.results || res || []);
+      setFeedbacks(Array.isArray(res) ? res : (res?.results || res?.data || []));
     } catch (e) { console.error(e); }
     finally { setIsLoading(false); }
   }, []);
