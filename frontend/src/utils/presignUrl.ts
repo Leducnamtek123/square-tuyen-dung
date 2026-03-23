@@ -10,15 +10,23 @@ const isMinioPublicUrl = (url: string | null | undefined): boolean => {
   if (!url || typeof url !== 'string') return false;
   // Nhận diện URL MinIO: có /minio/ trong path, hoặc là MinIO public URL dạng host:port/bucket/
   if (url.includes('/minio/')) return true;
-  // MinIO URL thường có port 9000 hoặc 9001
+
   try {
     const parsed = new URL(url);
+    // MinIO URL thường có port 9000 hoặc 9001
     if (parsed.port === '9000' || parsed.port === '9001') return true;
     // MinIO hostname thường chứa 'minio' trong tên
     if (parsed.hostname.includes('minio')) return true;
+    // Production S3/MinIO: hostname starts with 's3.' (e.g. s3.tuyendung.square.vn)
+    if (parsed.hostname.startsWith('s3.')) return true;
   } catch {
     // ignore invalid URLs
   }
+
+  // Check against VITE_MINIO_PUBLIC_URL env setting
+  const minioPublicUrl = import.meta.env.VITE_MINIO_PUBLIC_URL;
+  if (minioPublicUrl && url.startsWith(minioPublicUrl)) return true;
+
   return false;
 };
 
