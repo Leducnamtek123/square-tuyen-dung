@@ -78,22 +78,9 @@ export default defineConfig({
             return 'react-vendor';
           }
 
-          // --- Streamdown ecosystem ---
-          if (id.includes('@streamdown/mermaid') || id.includes('mermaid') || id.includes('cytoscape')) {
-            return 'mermaid';
-          }
-
-          if (id.includes('@streamdown/code') || id.includes('shiki')) {
-            return 'code';
-          }
-
-          if (id.includes('@streamdown/math')) {
-            return 'math';
-          }
-
-          if (id.includes('@streamdown/cjk') || id.includes('streamdown')) {
-            return 'streamdown';
-          }
+          // --- Streamdown ecosystem: ALL loaded via CDN (Safari compat) ---
+          // Do NOT bundle any streamdown modules - they use ES2018 regex
+          // that crashes Safari iOS < 16.4 at parse time.
 
           // --- PDF: split pdfjs-dist (large) from viewer ---
           if (id.includes('pdfjs-dist')) {
