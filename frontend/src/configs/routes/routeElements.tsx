@@ -7,6 +7,7 @@ import {
   EmployerLayout,
   ChatLayout,
   AdminLayout,
+  AdminLoginLayout,
   FullscreenLayout,
 } from "../../layouts";
 
@@ -105,6 +106,7 @@ export const routeLayouts = {
   EmployerLayout,
   ChatLayout,
   AdminLayout,
+  AdminLoginLayout,
   FullscreenLayout,
 };
 

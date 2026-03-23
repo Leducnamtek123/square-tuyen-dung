@@ -10,4 +10,6 @@ export { default as HomeLayout } from './HomeLayout'
 
 export { default as AdminLayout } from './AdminLayout'
 
+export { default as AdminLoginLayout } from './AdminLoginLayout'
+
 export { default as FullscreenLayout } from './FullscreenLayout'

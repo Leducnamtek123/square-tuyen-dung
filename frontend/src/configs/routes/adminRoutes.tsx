@@ -2,7 +2,7 @@ import { ROUTES } from "../constants";
 import { routeLayouts, routePages } from "./routeElements";
 import type { RouteSettings } from "./routeTypes";
 
-const { AdminLayout, DefaultLayout } = routeLayouts;
+const { AdminLayout, AdminLoginLayout, DefaultLayout } = routeLayouts;
 
 const {
   AdminDashboardPage,
@@ -63,7 +63,7 @@ const adminRoutes = [
     ],
   },
   {
-    layouts: DefaultLayout,
+    layouts: AdminLoginLayout,
     children: [
       {
         path: ROUTES.ADMIN_AUTH.LOGIN,
