@@ -96,6 +96,15 @@
     </div>
   </div>
 
+  <script>
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
+      alert("JS Error: " + msg + "\nLine: " + lineNo + ":" + columnNo);
+      return false;
+    };
+    window.addEventListener('unhandledrejection', function(event) {
+      alert("Promise Error: " + (event.reason ? event.reason.message || event.reason : 'Unknown'));
+    });
+  </script>
   <div id="root"></div>
   <script type="module" src="/src/index.tsx"></script>
 </body>
