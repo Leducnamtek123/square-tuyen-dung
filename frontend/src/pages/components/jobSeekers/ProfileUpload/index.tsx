@@ -106,7 +106,7 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
     };
 
-    getOnlineProfile(currentUser?.jobSeekerProfileId ? String(currentUser.jobSeekerProfileId) : undefined, {
+    getOnlineProfile(currentUser?.jobSeekerProfileId, {
 
       resumeType: CV_TYPES.cvUpload,
 

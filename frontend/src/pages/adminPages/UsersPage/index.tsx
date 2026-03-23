@@ -73,7 +73,7 @@ const UsersPage = () => {
                     loading={isLoading}
                     onToggleStatus={handleToggleStatus}
                     onRoleChange={handleRoleChange}
-                    currentUserId={currentUserId || 0}
+                    currentUserId={currentUserId}
                     disableRoleActions={updateRoleMutation.isLoading}
                 />
 

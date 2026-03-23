@@ -109,7 +109,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
       }
     };
     if (currentUser?.jobSeekerProfileId) {
-      getOnlineProfile(String(currentUser.jobSeekerProfileId), {
+      getOnlineProfile(currentUser.jobSeekerProfileId, {
         resumeType: CV_TYPES.cvWebsite,
       });
     }

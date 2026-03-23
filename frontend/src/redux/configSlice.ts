@@ -3,7 +3,7 @@ import type { SystemConfig } from '../types/models';
 import commonService from '../services/commonService';
 
 interface ConfigState {
-  allConfig: any;
+  allConfig: SystemConfig | null;
 }
 
 const getAllConfig = createAsyncThunk<SystemConfig, void>(

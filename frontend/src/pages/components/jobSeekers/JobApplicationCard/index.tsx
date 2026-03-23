@@ -100,7 +100,7 @@ const JobApplicationCard = () => {
 
 
 
-    getOnlineProfile(currentUser?.jobSeekerProfileId ? String(currentUser.jobSeekerProfileId) : undefined);
+    getOnlineProfile(currentUser?.jobSeekerProfileId);
 
 
 

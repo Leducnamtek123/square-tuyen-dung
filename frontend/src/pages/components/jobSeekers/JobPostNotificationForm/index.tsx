@@ -18,7 +18,7 @@ import RadioCustom from '../../../../components/controls/RadioCustom';
 import { useTranslation } from 'react-i18next';
 
 interface FormValues {
-  frequency: number | string | null;
+  frequency: number | null;
   jobName: string;
   career: number;
   city: number;
@@ -180,7 +180,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-          ? allConfig?.frequencyNotificationOptions![0].id
+          ? allConfig?.frequencyNotificationOptions[0].id
 
 
 
@@ -230,7 +230,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
       reset({
         frequency: (allConfig?.frequencyNotificationOptions || []).length > 0
-          ? allConfig?.frequencyNotificationOptions![0].id
+          ? allConfig?.frequencyNotificationOptions[0].id
           : null,
       });
 
@@ -248,7 +248,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-    <form id="modal-form" onSubmit={handleSubmit(handleAddOrUpdate as any)}>
+    <form id="modal-form" onSubmit={handleSubmit(handleAddOrUpdate)}>
 
 
 

@@ -81,7 +81,7 @@ type TrackDeviceSelectProps = {
   onMediaDeviceError?: (error: unknown) => void;
   onDeviceListChange?: (devices: MediaDeviceInfo[]) => void;
   onActiveDeviceChange?: (deviceId: string) => void;
-} & Omit<ComponentProps<'select'>, 'onChange' | 'value' | 'defaultValue' | 'size'>;
+} & Omit<ComponentProps<'select'>, 'onChange' | 'value' | 'defaultValue'>;
 
 function TrackDeviceSelect({
   kind,
