@@ -524,6 +524,10 @@ def presign_url(request):
     """
     Return a presigned URL for a MinIO object.
     Accepts either `url` (full URL) or `publicId` (object key).
+
+    This endpoint ALWAYS generates a presigned URL, regardless of the
+    MINIO_USE_PRESIGNED setting, because generating a presigned URL is
+    exactly what it is supposed to do.
     """
     url = request.query_params.get("url", None)
     public_id = request.query_params.get("publicId", None)
@@ -543,9 +547,56 @@ def presign_url(request):
         )
 
     target = url or public_id
-    presigned, _ = CloudinaryService.get_url_from_public_id(target, {})
+    bucket = settings.MINIO_BUCKET
+    base_url = getattr(settings, "MINIO_PUBLIC_URL", "").rstrip("/")
+    expires = getattr(settings, "MINIO_PRESIGN_EXPIRES", 3600)
 
-    if not presigned:
+    try:
+        object_path = None
+
+        if isinstance(target, str) and (target.startswith("http://") or target.startswith("https://")):
+            parsed = urlparse(target)
+            # Extract object path from public URL (e.g. https://s3.domain.com/bucket/path)
+            if base_url and target.startswith(f"{base_url}/"):
+                object_path = target[len(base_url) + 1:]
+                if object_path.startswith(f"{bucket}/"):
+                    object_path = object_path[len(bucket) + 1:]
+            else:
+                # Try internal host match
+                internal_host = str(getattr(settings, "MINIO_ENDPOINT", "minio")).replace("http://", "").replace("https://", "").split("/")[0]
+                internal_host = internal_host.split(":")[0] if internal_host else "minio"
+                if parsed.hostname in ("minio", internal_host):
+                    object_path = parsed.path.lstrip("/")
+                    if object_path.startswith(f"{bucket}/"):
+                        object_path = object_path[len(bucket) + 1:]
+        else:
+            # Plain public_id
+            object_path = target.lstrip("/") if target else None
+
+        if not object_path:
+            if url and _is_allowed_public_minio_url(url):
+                return var_res.response_data(data={"url": url})
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["Unable to generate presigned URL."]},
+                data=None,
+            )
+
+        from datetime import timedelta
+        client = CloudinaryService._get_presign_client()
+        presigned = client.presigned_get_object(
+            bucket,
+            object_path,
+            expires=timedelta(seconds=expires),
+        )
+        presigned = CloudinaryService._rewrite_presigned_url(presigned)
+        return var_res.response_data(data={"url": presigned})
+
+    except Exception:
+        # Fallback to original approach
+        presigned, _ = CloudinaryService.get_url_from_public_id(target, {})
+        if presigned:
+            return var_res.response_data(data={"url": presigned})
         if url and _is_allowed_public_minio_url(url):
             return var_res.response_data(data={"url": url})
         return var_res.response_data(
@@ -553,8 +604,6 @@ def presign_url(request):
             errors={"errorMessage": ["Unable to generate presigned URL."]},
             data=None,
         )
-
-    return var_res.response_data(data={"url": presigned})
 
 
 def _is_allowed_public_minio_url(value: str) -> bool:
