@@ -43,7 +43,7 @@ const {
   NotFoundPage,
 } = routePages;
 
-const ProjectRoutes = [
+const projectRoutes = [
   {
     path: ROUTES.JOB_SEEKER.HOME,
     layouts: Outlet,
@@ -130,5 +130,5 @@ const ProjectRoutes = [
   { path: ROUTES.ERROR.NOT_FOUND, element: NotFoundPage },
 ];
 
-export default ProjectRoutes;
+export default projectRoutes;
 
