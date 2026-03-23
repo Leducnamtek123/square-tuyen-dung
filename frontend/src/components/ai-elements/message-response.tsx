@@ -6,6 +6,20 @@ const hasMermaid = (content: string) => /```mermaid[\s\S]*?```/i.test(content);
 const hasCode = (content: string) => /```[\s\S]*?```/.test(content) || /`[^`]+`/.test(content);
 const hasMath = (content: string) => /\$\$[\s\S]*?\$\$/.test(content) || /(^|[^\\])\$(.+?)([^\\])\$/s.test(content);
 
+const supportsAdvancedRegex = () => {
+  try {
+    // Named groups + backreferences
+    new RegExp("(?<a>.)");
+    // Lookbehind
+    new RegExp("(?<=a)b");
+    // Unicode property escapes
+    new RegExp("\\p{P}", "u");
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const STREAMDOWN_CODE_CDN =
   import.meta.env.VITE_STREAMDOWN_CODE_CDN ||
   "https://esm.sh/@streamdown/code@1.1.0";
@@ -30,6 +44,7 @@ const MessageResponseInner = memo(({
   const needsMermaid = useMemo(() => hasMermaid(content), [content]);
   const needsCode = useMemo(() => hasCode(content), [content]);
   const needsMath = useMemo(() => hasMath(content), [content]);
+  const canUseMermaid = useMemo(() => needsMermaid && supportsAdvancedRegex(), [needsMermaid]);
   const [streamdownState, setStreamdownState] = useState<{
     Streamdown: any;
     plugins: any;
@@ -59,7 +74,7 @@ const MessageResponseInner = memo(({
         plugins.math = math;
       }
 
-      if (needsMermaid) {
+      if (canUseMermaid) {
         const { mermaid } = await import(/* @vite-ignore */ STREAMDOWN_MERMAID_CDN);
         plugins.mermaid = mermaid;
       }
@@ -74,7 +89,7 @@ const MessageResponseInner = memo(({
     return () => {
       cancelled = true;
     };
-  }, [needsCode, needsMath, needsMermaid]);
+  }, [needsCode, needsMath, canUseMermaid]);
 
   if (!enableRich) {
     return (
