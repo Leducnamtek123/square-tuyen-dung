@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 
 import adminSettingsService from '../../../../services/adminSettingsService';
 import toastMessages from '../../../../utils/toastMessages';
@@ -19,14 +20,15 @@ export const useSystemSettings = () => {
 };
 
 export const useUpdateSystemSettings = () => {
+    const { t } = useTranslation('admin');
     const queryClient = useQueryClient();
 
     return useMutation({
         mutationFn: (data: any) => adminSettingsService.updateSystemSettings(data),
         onSuccess: () => {
-            toastMessages.success('Cai dat da duoc luu');
+            toastMessages.success(t('pages.settings.toast.saveSuccess'));
             queryClient.invalidateQueries({ queryKey: ['system-settings'] });
         },
-        onError: () => toastMessages.error('Loi khi luu cai dat'),
+        onError: () => toastMessages.error(t('pages.settings.toast.saveError')),
     });
 };

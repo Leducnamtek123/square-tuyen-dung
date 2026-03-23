@@ -553,6 +553,10 @@
         "checking": "Đang kiểm tra...",
         "database": "Cơ sở dữ liệu",
         "redis": "Redis"
+      },
+      "toast": {
+        "saveSuccess": "Cài đặt đã được lưu thành công",
+        "saveError": "Lỗi khi lưu cài đặt"
       }
     },
     "banners": {

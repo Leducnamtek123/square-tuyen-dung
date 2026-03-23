@@ -553,6 +553,10 @@
         "checking": "Checking...",
         "database": "Database",
         "redis": "Redis"
+      },
+      "toast": {
+        "saveSuccess": "Settings saved successfully",
+        "saveError": "Error saving settings"
       }
     },
     "banners": {

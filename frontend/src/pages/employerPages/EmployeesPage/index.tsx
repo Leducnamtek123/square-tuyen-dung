@@ -205,7 +205,7 @@ const EmployeesPage = () => {
         {tab === "roles" && (
           <Box sx={{ mt: 2, overflowX: "auto" }}>
             <Table size="small">
-              <TableHead>
+              <TableHead sx={{ bgcolor: 'grey.50' }}>
                 <TableRow>
                   <TableCell>{t("employees.table.id")}</TableCell>
                   <TableCell>{t("employees.table.code")}</TableCell>
@@ -252,7 +252,7 @@ const EmployeesPage = () => {
         {tab === "members" && (
           <Box sx={{ mt: 2, overflowX: "auto" }}>
             <Table size="small">
-              <TableHead>
+              <TableHead sx={{ bgcolor: 'grey.50' }}>
                 <TableRow>
                   <TableCell>{t("employees.table.id")}</TableCell>
                   <TableCell>{t("employees.table.user")}</TableCell>
