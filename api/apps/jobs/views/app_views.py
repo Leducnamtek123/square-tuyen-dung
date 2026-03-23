@@ -1,5 +1,8 @@
 
 import datetime
+import logging
+
+logger = logging.getLogger(__name__)
 
 from console.jobs import queue_mail
 
@@ -344,7 +347,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
         if not filter_serializer.is_valid():
 
-            print(">> BAD REQUEST >> get_job_posts_around: ", filter_serializer.errors)
+            logger.warning("BAD REQUEST get_job_posts_around: %s", filter_serializer.errors)
 
             return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 

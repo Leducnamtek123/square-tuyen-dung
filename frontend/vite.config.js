@@ -49,7 +49,7 @@ export default defineConfig({
     port: devServerPort,
     host: devServerHost,
     strictPort: true,
-    hmr: false,
+    hmr: true,
     proxy: {
       '/api': {
         target: 'http://backend:8001',
@@ -61,6 +61,11 @@ export default defineConfig({
     outDir: 'build',
     sourcemap: false,
     chunkSizeWarningLimit: 2000,
+    // Strip console.log and debugger in production
+    esbuild: {
+      drop: ['debugger'],
+      pure: ['console.log', 'console.debug', 'console.trace'],
+    },
     rolldownOptions: {
       output: {
         manualChunks(id) {

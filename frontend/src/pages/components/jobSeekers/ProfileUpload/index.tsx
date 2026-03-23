@@ -1,6 +1,7 @@
 import React from "react";
+import { useAppSelector } from '@/redux/hooks';
 
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 import { useTranslation } from "react-i18next";
 
@@ -60,9 +61,9 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
     resume: { isReloadResume },
 
-  } = useSelector((state: any) => state.profile);
+  } = useAppSelector((state) => state.profile);
 
-  const { currentUser } = useSelector((state: any) => state.user);
+  const { currentUser } = useAppSelector((state) => state.user);
 
   const [isLoadingResumes, setIsLoadingResumes] = React.useState(false);
 
@@ -105,7 +106,7 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
     };
 
-    getOnlineProfile(currentUser?.jobSeekerProfileId, {
+    getOnlineProfile(currentUser?.jobSeekerProfileId ? String(currentUser.jobSeekerProfileId) : undefined, {
 
       resumeType: CV_TYPES.cvUpload,
 

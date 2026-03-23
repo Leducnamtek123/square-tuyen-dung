@@ -221,5 +221,15 @@
     "Daily": "Hàng ngày",
     "Every 3 Days": "3 ngày một lần",
     "Weekly": "Hàng tuần"
+  },
+  "feedback": {
+    "button": "Phản hồi",
+    "title": "Phản hồi của bạn",
+    "placeholder": "Chia sẻ trải nghiệm của bạn...",
+    "submit": "Gửi phản hồi",
+    "ratingRequired": "Vui lòng chọn mức đánh giá.",
+    "contentRequired": "Vui lòng nhập nội dung phản hồi.",
+    "contentMax": "Nội dung phản hồi vượt quá độ dài cho phép.",
+    "success": "Gửi phản hồi thành công."
   }
 }

@@ -1,7 +1,8 @@
 import React from 'react';
+import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { InputBase, Paper, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import SearchIcon from '@mui/icons-material/Search';
@@ -17,7 +18,7 @@ const CategoryCard = ({ options, type }: CategoryCardProps) => {
   const { t } = useTranslation('common');
   const dispatch = useDispatch();
   const nav = useNavigate();
-  const { jobPostFilter } = useSelector((state: any) => state.filter);
+  const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [items, setItems] = React.useState(options);
 
   const handleFilterChange = (value: string) => {
@@ -31,13 +32,13 @@ const CategoryCard = ({ options, type }: CategoryCardProps) => {
   const handleFilter = (id: string | number) => {
     switch (type) {
       case 'CARRER':
-        dispatch(searchJobPost({ ...jobPostFilter, careerId: id }));
+        dispatch(searchJobPost({ ...jobPostFilter, careerId: String(id) }));
         break;
       case 'CITY':
-        dispatch(searchJobPost({ ...jobPostFilter, cityId: id }));
+        dispatch(searchJobPost({ ...jobPostFilter, cityId: String(id) }));
         break;
       case 'JOB_TYPE':
-        dispatch(searchJobPost({ ...jobPostFilter, jobTypeId: id }));
+        dispatch(searchJobPost({ ...jobPostFilter, jobTypeId: String(id) }));
         break;
       default:
         break;

@@ -118,6 +118,7 @@ services:
     build:
       context: ./api
       dockerfile: ${BACKEND_DOCKERFILE:-Dockerfile.prod}
+    command: celery -A config worker -l info --concurrency=4
     env_file:
       - .env
     restart: always
@@ -138,6 +139,7 @@ services:
     build:
       context: ./api
       dockerfile: ${BACKEND_DOCKERFILE:-Dockerfile.prod}
+    command: celery -A config beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
     env_file:
       - .env
     restart: always

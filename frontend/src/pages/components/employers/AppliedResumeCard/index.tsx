@@ -1,6 +1,5 @@
 import React from 'react';
-
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '@/redux/hooks';
 
 import { Autocomplete, Box, Button, Divider, IconButton, LinearProgress, Stack, TextField, Tooltip, Typography } from "@mui/material";
 
@@ -68,7 +67,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
   const { t } = useTranslation('employer');
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   const headCells = [
 

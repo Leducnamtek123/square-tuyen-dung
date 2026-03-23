@@ -1,5 +1,6 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppSelector } from '@/redux/hooks';
+import { useDispatch } from "react-redux";
 import { Box, Button, Menu, MenuItem, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 
@@ -15,7 +16,7 @@ interface WorkspaceSwitchMenuProps {
 
 const WorkspaceSwitchMenu = () => {
   const dispatch = useDispatch();
-  const { currentUser, activeWorkspace } = useSelector((state: any) => state.user);
+  const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
   const workspaces = React.useMemo(() => (currentUser?.workspaces as any[]) || [], [currentUser?.workspaces]);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

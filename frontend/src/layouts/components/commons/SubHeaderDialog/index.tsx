@@ -1,12 +1,11 @@
 import * as React from 'react';
+import { useAppSelector } from '@/redux/hooks';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
 import { Alert, Box, Chip, Dialog, Divider, IconButton, Stack, Typography, Container } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import CloseIcon from '@mui/icons-material/Close';
-import { useSelector } from 'react-redux';
-
 interface CareerOption {
   id: string;
   name: string;
@@ -189,7 +188,7 @@ const MobileContent = (
 
 const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderDialogProps) => {
   const { t } = useTranslation('common');
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 

@@ -58,7 +58,7 @@ export const RightSidebar = () => {
         setCount(data.count);
         setJobPostsApplied(data.results);
       } catch (error) {
-        console.log(error);
+        // Error handled silently
       } finally {
         setIsLoading(false);
       }
@@ -300,7 +300,7 @@ export const EmployerSidebar = () => {
         setCount(data.count);
         setJobPostsApplied(data.results);
       } catch (error) {
-        console.log(error);
+        // Error handled silently
       } finally {
         setIsLoading(false);
       }

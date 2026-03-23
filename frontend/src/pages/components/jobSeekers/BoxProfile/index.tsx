@@ -1,5 +1,6 @@
 import * as React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppSelector } from '@/redux/hooks';
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Box, Chip, Stack, Typography, Button, Divider, Tooltip, Skeleton, CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -78,10 +79,10 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
 
   const {
     resume: { isReloadResume },
-  } = useSelector((state: any) => state.profile);
+  } = useAppSelector((state) => state.profile);
 
-  const { currentUser } = useSelector((state: any) => state.user);
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { currentUser } = useAppSelector((state) => state.user);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   const [isLoadingResume, setIsLoadingResume] = React.useState(false);
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
@@ -108,7 +109,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
       }
     };
     if (currentUser?.jobSeekerProfileId) {
-      getOnlineProfile(currentUser.jobSeekerProfileId, {
+      getOnlineProfile(String(currentUser.jobSeekerProfileId), {
         resumeType: CV_TYPES.cvWebsite,
       });
     }

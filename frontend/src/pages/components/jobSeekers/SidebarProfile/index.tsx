@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
 import { Avatar, Box, Chip, Stack, Typography } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
@@ -8,7 +8,7 @@ import MuiImageCustom from "../../../../components/MuiImageCustom";
 
 const SidebarProfile = () => {
   const { t } = useTranslation('auth');
-  const { currentUser } = useSelector((state: any) => state.user);
+  const { currentUser } = useAppSelector((state) => state.user);
 
   return (
     <Box>

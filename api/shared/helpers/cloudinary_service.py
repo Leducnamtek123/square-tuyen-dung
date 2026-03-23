@@ -245,10 +245,14 @@ class CloudinaryService:
         try:
             if not public_id:
                 return None
+
+            use_presigned = getattr(settings, "MINIO_USE_PRESIGNED", False)
+            base_url = getattr(settings, "MINIO_PUBLIC_URL", "").rstrip("/")
+            bucket = settings.MINIO_BUCKET
+
+            # --- Handle full URL public_ids ---
             if isinstance(public_id, str) and (public_id.startswith("http://") or public_id.startswith("https://")):
-                if getattr(settings, "MINIO_USE_PRESIGNED", True):
-                    base_url = getattr(settings, "MINIO_PUBLIC_URL", "").rstrip("/")
-                    bucket = settings.MINIO_BUCKET
+                if use_presigned:
                     parsed = urlparse(public_id)
 
                     # Handle public proxy URLs (https://domain/minio/...)
@@ -280,13 +284,22 @@ class CloudinaryService:
                             expires=timedelta(seconds=expires),
                         )
                         return CloudinaryService._rewrite_presigned_url(url), options_config
+                else:
+                    # Non-presigned: rewrite internal URLs to public base
+                    parsed = urlparse(public_id)
+                    internal_host = str(getattr(settings, "MINIO_ENDPOINT", "minio")).replace("http://", "").replace("https://", "").split("/")[0]
+                    internal_host = internal_host.split(":")[0] if internal_host else "minio"
+                    if parsed.hostname in ("minio", internal_host):
+                        object_path = parsed.path.lstrip("/")
+                        if object_path.startswith(f"{bucket}/"):
+                            object_path = object_path[len(bucket) + 1 :]
+                        return f"{base_url}/{bucket}/{object_path}", options_config
 
                 return public_id, options_config
 
-            client = CloudinaryService._get_presign_client()
-            bucket = settings.MINIO_BUCKET
-
-            if getattr(settings, "MINIO_USE_PRESIGNED", True):
+            # --- Handle plain public_id (not a URL) ---
+            if use_presigned:
+                client = CloudinaryService._get_presign_client()
                 expires = getattr(settings, "MINIO_PRESIGN_EXPIRES", 3600)
                 url = client.presigned_get_object(
                     bucket,
@@ -295,7 +308,7 @@ class CloudinaryService:
                 )
                 return CloudinaryService._rewrite_presigned_url(url), options_config
 
-            base_url = settings.MINIO_PUBLIC_URL.rstrip("/")
+            # Direct URL construction — no network call needed
             url = f"{base_url}/{bucket}/{public_id.lstrip('/')}"
             return url, options_config
             

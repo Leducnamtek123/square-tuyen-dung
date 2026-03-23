@@ -16,6 +16,7 @@ export interface User {
   is_verify_email?: boolean;
   workspaces?: Workspace[];
   canAccessEmployerPortal?: boolean;
+  jobSeekerProfileId?: number | null;
 }
 
 export interface Workspace {
@@ -286,5 +287,13 @@ export interface SystemConfig {
   employeeSizeOptions?: SelectOption[];
   languageOptions?: SelectOption[];
   frequencyNotificationOptions?: SelectOption[];
-  [key: string]: unknown;
+  currencyDict?: Record<string | number, string>;
+  experienceDict?: Record<string | number, string>;
+  typeOfWorkplaceDict?: Record<string | number, string>;
+  jobTypeDict?: Record<string | number, string>;
+  languageDict?: Record<string | number, string>;
+  positionDict?: Record<string | number, string>;
+  academicLevelDict?: Record<string | number, string>;
+  frequencyNotificationDict?: Record<string | number, string>;
+  [key: string]: any;
 }

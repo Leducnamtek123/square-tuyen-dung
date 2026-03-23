@@ -74,13 +74,13 @@ const ChatProvider = ({ children }: ChatProviderProps) => {
         }
 
         const createResult = await createUser('accounts', userData, userId);
-        console.log('CREATE USER TRÊN FILRESTORE: ', createResult);
+        // User created on Firestore
       }
 
       // lay thong tin user hien tai
       const userChat = await getUserAccount('accounts', userId) as unknown as ChatUser;
       setCurrentUserChat(userChat);
-      console.log('userChat: ', userChat);
+      // userChat initialized
     };
 
     createUserChat();

@@ -271,7 +271,7 @@ const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: Employer
 
           onReject={(err) => {
 
-            console.log(err);
+            // Auth error handled by toast
 
           }}
 

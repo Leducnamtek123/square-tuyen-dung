@@ -59,7 +59,7 @@ const CompanyImageCard = () => {
 
       } catch (error) {
 
-        console.log(error);
+        // Error handled silently
 
       }
 

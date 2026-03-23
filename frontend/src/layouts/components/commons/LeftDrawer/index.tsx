@@ -1,10 +1,11 @@
 import { Avatar, Box, Divider, Drawer, List, ListItem, ListItemButton, ListItemText, Stack, useTheme, Button, Typography } from "@mui/material";
+import { useAppSelector } from '@/redux/hooks';
 
 import React from 'react';
 
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { useTranslation } from 'react-i18next';
 
@@ -59,7 +60,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
   const theme = useTheme();
 
-  const { isAuthenticated } = useSelector((state: any) => state.user);
+  const { isAuthenticated } = useAppSelector((state) => state.user);
 
   const container =
 

@@ -1,8 +1,7 @@
 import React from 'react';
+import { useAppSelector } from '@/redux/hooks';
 
 import { useTranslation } from 'react-i18next';
-
-import { useSelector } from 'react-redux';
 
 import { useForm, useWatch } from 'react-hook-form';
 
@@ -46,7 +45,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
 
   const { t } = useTranslation('employer');
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   const [districtOptions, setDistrictOptions] = React.useState<any[]>([]);
 

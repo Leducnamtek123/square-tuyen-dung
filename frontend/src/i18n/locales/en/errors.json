@@ -1,6 +1,14 @@
-﻿{
+{
   "notFoundTitle": "Page not found",
+  "notFoundBody": "The page you're looking for doesn't exist or has been moved.",
+  "notFoundCode": "404",
   "forbiddenTitle": "Access denied",
+  "forbiddenBody": "You don't have permission to access this page. Please contact an administrator if you believe this is an error.",
+  "forbiddenCode": "403",
   "systemErrorTitle": "Something went wrong",
-  "systemErrorBody": "Please try again later."
+  "systemErrorBody": "The system is experiencing issues. Please try again later.",
+  "systemErrorCode": "500",
+  "backHome": "Back to home",
+  "tryAgain": "Try again",
+  "or": "or"
 }

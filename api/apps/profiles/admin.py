@@ -1,5 +1,8 @@
 
 import concurrent.futures
+import logging
+
+logger = logging.getLogger(__name__)
 
 from django.conf import settings
 
@@ -491,7 +494,7 @@ class CompanyAdmin(admin.ModelAdmin):
 
         for a in company_image_files:
 
-            print(a)
+            logger.debug("Company image file: %s", a)
 
         # Update company logo
 
@@ -593,7 +596,7 @@ class CompanyAdmin(admin.ModelAdmin):
 
     def _upload_file(self, file):
 
-        print("UPLOAD: ", file)
+        logger.debug("UPLOAD: %s", file)
 
 class ResumeSavedAdmin(admin.ModelAdmin):
 

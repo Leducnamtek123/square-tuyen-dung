@@ -115,6 +115,7 @@
     "autoprefixer": "^10.4.27",
     "eslint": "^9.31.0",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "jsdom": "^29.0.1",
     "postcss": "^8.5.8",
     "rollup-plugin-visualizer": "^7.0.1",
     "sharp": "^0.34.2",

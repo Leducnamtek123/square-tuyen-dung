@@ -1,8 +1,7 @@
 import * as React from "react";
+import { useAppSelector } from '@/redux/hooks';
 
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
-import { useSelector } from "react-redux";
 
 import { useTranslation } from 'react-i18next';
 
@@ -77,7 +76,7 @@ const Header = (props: HeaderProps) => {
 
   const nav = useNavigate();
 
-  const { currentUser, isAuthenticated } = useSelector((state: any) => state.user);
+  const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
 
@@ -143,6 +142,12 @@ const Header = (props: HeaderProps) => {
 
         onClick={handleOpenUserMenu}
 
+        role="button"
+
+        tabIndex={0}
+
+        onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleOpenUserMenu(e as any); } }}
+
         sx={{
 
           p: 0.5,
@@ -177,7 +182,7 @@ const Header = (props: HeaderProps) => {
 
           <Avatar
             alt="User Avatar"
-            src={currentUser?.avatarUrl}
+            src={currentUser?.avatarUrl ?? undefined}
             sx={{
               width: 36,
               height: 36,
@@ -413,10 +418,8 @@ const Header = (props: HeaderProps) => {
               alignItems="center"
               spacing={{ xs: 0.5, sm: 1, md: 2 }}
             >
-              {/* LanguageSwitcher: ẩn trên xs để đỡ chật */}
-              <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
-                <LanguageSwitcher />
-              </Box>
+              {/* LanguageSwitcher: visible on all screen sizes */}
+              <LanguageSwitcher />
 
               {isAuthenticated && <WorkspaceSwitchMenu />}
 

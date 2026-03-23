@@ -43,7 +43,9 @@ class ProfileView(viewsets.ViewSet):
 
         try:
 
-            profile = JobSeekerProfile.objects.get(user_id__exact=user.id)
+            profile = JobSeekerProfile.objects.select_related(
+                'location', 'location__city'
+            ).get(user_id__exact=user.id)
 
             profile_serializer = JobSeekerProfileSerializer(profile)
 

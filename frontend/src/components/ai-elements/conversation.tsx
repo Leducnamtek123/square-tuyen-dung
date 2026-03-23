@@ -160,9 +160,9 @@ export const ConversationDownload = ({
         className
       )}
       onClick={handleDownload}
-      size="small"
+      size="sm"
       type="button"
-      variant="outlined"
+      variant="outline"
       {...props}>
       {children ?? <DownloadIcon fontSize="small" />}
     </Button>

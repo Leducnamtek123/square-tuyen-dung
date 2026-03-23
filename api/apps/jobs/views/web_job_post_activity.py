@@ -90,18 +90,15 @@ class JobSeekerJobPostActivityViewSet(
         res_data = page
         if page is not None:
             res_data = list(page)
+            # Batch fetch all File objects to avoid N+1
+            logo_ids = [item.get("companyImageId") for item in res_data if item.get("companyImageId")]
+            logos_map = {f.id: f for f in File.objects.filter(id__in=logo_ids)} if logo_ids else {}
             for item in res_data:
                 logo_id = item.pop("companyImageId", None)
-                if logo_id:
-                    try:
-                        logo = File.objects.get(id=logo_id)
-                        item["companyImageUrl"] = (
-                            logo.get_full_url() if logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
-                        )
-                    except File.DoesNotExist:
-                        item["companyImageUrl"] = var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
-                else:
-                    item["companyImageUrl"] = var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+                logo = logos_map.get(logo_id) if logo_id else None
+                item["companyImageUrl"] = (
+                    logo.get_full_url() if logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+                )
 
             return self.get_paginated_response(res_data)
 
@@ -244,17 +241,15 @@ class EmployerJobPostActivityViewSet(
         page = self.paginate_queryset(queryset)
         res_data = page
         if page is not None:
+            # Batch fetch all File objects to avoid N+1
+            avatar_ids = [item['avatarUrl'] for item in res_data if item.get('avatarUrl')]
+            avatars_map = {f.id: f for f in File.objects.filter(id__in=avatar_ids)} if avatar_ids else {}
             for item in res_data:
-                if item['avatarUrl']:
-                    try:
-                        avatar = File.objects.get(id=item['avatarUrl'])
-                        item['avatarUrl'] = (
-                            avatar.get_full_url() if avatar else var_sys.AVATAR_DEFAULT["AVATAR"]
-                        )
-                    except File.DoesNotExist:
-                        item['avatarUrl'] = var_sys.AVATAR_DEFAULT["AVATAR"]
-                else:
-                    item['avatarUrl'] = var_sys.AVATAR_DEFAULT["AVATAR"]
+                avatar_id = item.get('avatarUrl')
+                avatar = avatars_map.get(avatar_id) if avatar_id else None
+                item['avatarUrl'] = (
+                    avatar.get_full_url() if avatar else var_sys.AVATAR_DEFAULT["AVATAR"]
+                )
             return self.get_paginated_response(res_data)
         return var_res.response_data(res_data)
 

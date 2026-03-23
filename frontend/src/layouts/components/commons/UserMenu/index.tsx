@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
+import { useAppSelector } from '@/redux/hooks';
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useTranslation } from 'react-i18next';
 import { Button, Menu, Stack, Typography } from "@mui/material";
 
@@ -33,7 +34,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
   const { t } = useTranslation('common');
   const nav = useNavigate();
   const dispatch = useDispatch();
-  const { currentUser, activeWorkspace } = useSelector((state: any) => state.user);
+  const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
 
   const workspaces = useMemo(() => currentUser?.workspaces || [], [currentUser?.workspaces]);
 

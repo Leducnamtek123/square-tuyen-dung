@@ -1,5 +1,6 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useAppSelector } from '@/redux/hooks';
+import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { Card } from "@mui/material";
@@ -17,7 +18,7 @@ const HomeSearch = () => {
   const { t } = useTranslation(['common']);
   const dispatch = useDispatch();
   const nav = useNavigate();
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   const { control, handleSubmit } = useForm({
     defaultValues: {

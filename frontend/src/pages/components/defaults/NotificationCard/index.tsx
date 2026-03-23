@@ -217,7 +217,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
 
       .catch((error) => {
 
-        console.log("read noti failed: ", error);
+        // Notification read error handled
 
       });
 
@@ -329,7 +329,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
 
       .catch((error) => {
 
-        console.log("deleted noti failed: ", error);
+        // Notification delete error handled
 
       });
 

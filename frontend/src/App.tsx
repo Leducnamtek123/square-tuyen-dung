@@ -2,7 +2,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import "./App.css";
 import * as React from "react";
 import { useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "./redux/hooks";
 import { getUserInfo } from "./redux/userSlice";
 import { getAllConfig } from "./redux/configSlice";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
@@ -19,12 +19,13 @@ import { ROLES_NAME, ROUTES, AUTH_CONFIG } from "./configs/constants";
 import { isAdminPortalPath } from "./configs/portalRouting";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import tokenService from "./services/tokenService";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
-  const dispatch = useDispatch<any>();
+  const dispatch = useAppDispatch();
   const [isInitializing, setIsInitializing] = React.useState(true);
-  const { isAllowVerifyEmail } = useSelector((state: any) => state.auth);
-  const { isAuthenticated, currentUser, activeWorkspace } = useSelector((state: any) => state.user);
+  const { isAllowVerifyEmail } = useAppSelector((state) => state.auth);
+  const { isAuthenticated, currentUser, activeWorkspace } = useAppSelector((state) => state.user);
 
   const isAdminAccount = (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.ADMIN;
   const workspaceType = activeWorkspace?.type || null;
@@ -73,12 +74,29 @@ function App() {
       }}
       aria-busy="true"
     >
-      Loading...
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+        <div
+          style={{
+            width: 36,
+            height: 36,
+            border: "3px solid #e1effe",
+            borderTop: "3px solid #1a407d",
+            borderRadius: "50%",
+            animation: "spin 0.8s linear infinite",
+          }}
+        />
+        <span>Đang tải...</span>
+      </div>
     </div>
   );
 
   React.useEffect(() => {
     const finalizeLoader = () => {
+      // Clear the HTML-level safety timeout (set in index.html)
+      if ((window as any).__loaderSafetyTimer) {
+        clearTimeout((window as any).__loaderSafetyTimer);
+        (window as any).__loaderSafetyTimer = null;
+      }
       const loader = document.getElementById("initial-loader");
       if (loader) {
         setIsInitializing(false);
@@ -115,9 +133,16 @@ function App() {
     initializeApp();
   }, [dispatch, isJobSeekerInterviewRoute]);
 
+  // Throttled global error handler — max 1 toast per 3 seconds
   React.useEffect(() => {
+    let lastErrorToast = 0;
+    const THROTTLE_MS = 3000;
+
     const handleError = (event: ErrorEvent) => {
       if (event.message?.includes("ResizeObserver")) return;
+      const now = Date.now();
+      if (now - lastErrorToast < THROTTLE_MS) return;
+      lastErrorToast = now;
       toast.error(
         <div style={{ textAlign: "left" }}>
           <strong>Đã có lỗi xảy ra.</strong> Vui lòng thử lại sau.
@@ -133,6 +158,9 @@ function App() {
 
     const handleRejection = (event: PromiseRejectionEvent) => {
       console.error("Unhandled Promise Rejection:", event.reason);
+      const now = Date.now();
+      if (now - lastErrorToast < THROTTLE_MS) return;
+      lastErrorToast = now;
       toast.error(
         <div style={{ textAlign: "left" }}>
           <strong>Yêu cầu chưa thể xử lý.</strong> Vui lòng thử lại sau.
@@ -155,7 +183,7 @@ function App() {
   }
 
   return (
-    <>
+    <ErrorBoundary>
       <ThemeProvider theme={theme}>
         <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
           <CssBaseline enableColorScheme />
@@ -172,7 +200,7 @@ function App() {
         </GoogleOAuthProvider>
       </ThemeProvider>
       <ScrollToTop />
-    </>
+    </ErrorBoundary>
   );
 }
 

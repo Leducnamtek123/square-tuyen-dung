@@ -31,7 +31,7 @@ const InterviewsPage = () => {
     };
 
     const handleViewDetail = (interview: any) => {
-        console.log('View interview detail:', interview);
+        // View interview detail
     };
 
     const handleDelete = (id: any) => {

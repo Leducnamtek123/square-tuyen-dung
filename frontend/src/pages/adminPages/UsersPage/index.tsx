@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
+import { useAppSelector } from '@/redux/hooks';
 import { Box, Paper, TablePagination } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-
 import { PAGINATION } from '../../../configs/constants';
 import { useUsers, useToggleUserStatus, useUpdateUserRole } from './hooks/useUsers';
 import UserTable from './components/UserTable';
@@ -14,7 +13,7 @@ const UsersPage = () => {
     const [rowsPerPage, setRowsPerPage] = useState(-1);
     const [search, setSearch] = useState('');
     const [roleFilter, setRoleFilter] = useState('');
-    const currentUserId = useSelector((state: any) => state.user?.currentUser?.id);
+    const currentUserId = useAppSelector((state) => state.user?.currentUser?.id);
     const resolvedPageSize = rowsPerPage === -1 ? PAGINATION.ADMIN_MAX_PAGE_SIZE : rowsPerPage;
 
     const { data: usersData, isLoading } = useUsers({
@@ -74,7 +73,7 @@ const UsersPage = () => {
                     loading={isLoading}
                     onToggleStatus={handleToggleStatus}
                     onRoleChange={handleRoleChange}
-                    currentUserId={currentUserId}
+                    currentUserId={currentUserId || 0}
                     disableRoleActions={updateRoleMutation.isLoading}
                 />
 

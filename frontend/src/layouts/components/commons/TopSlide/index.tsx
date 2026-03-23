@@ -48,7 +48,7 @@ const TopSlide = () => {
         const data = (resData as any)?.data || [];
         setBanners(data);
       } catch (error) {
-        console.log(error);
+        // Error handled silently
       }
     };
     getBanners();

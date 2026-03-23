@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Card, CardHeader, CardContent, Skeleton, Paper, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { useTheme } from "@mui/material/styles";
 import Grid from "@mui/material/Grid2";
 
 import PeopleIcon from '@mui/icons-material/People';
@@ -14,10 +15,19 @@ import StatCard from './components/StatCard';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const COLORS = ['#3f51b5', '#ff9800', '#f44336', '#4caf50', '#00bcd4'];
-
 const DashboardPage = () => {
   const { t } = useTranslation('admin');
+  const theme = useTheme();
+
+  // Brand-aligned colors from theme palette
+  const BRAND_COLORS = [
+    theme.palette.primary.main,     // #1a407d navy
+    (theme.palette as any).info.main,       // #2aa9e1 sky blue
+    (theme.palette as any).secondary.main,  // #10b981 emerald
+    (theme.palette as any).warning.main,    // #f59e0b amber
+    theme.palette.primary.dark,     // #0f397f deep navy
+  ];
+
   const { data: stats, isLoading } = useAdminStats();
 
   const userRoleData = stats
@@ -33,7 +43,7 @@ const DashboardPage = () => {
     datasets: [
       {
         data: userRoleData.map((item) => item.value),
-        backgroundColor: COLORS,
+        backgroundColor: BRAND_COLORS,
         borderWidth: 0,
       },
     ],
@@ -56,73 +66,49 @@ const DashboardPage = () => {
   return (
     <Box>
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 3
-          }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title={t('dashboard.totalUsers')}
             value={stats?.totalUsers}
             loading={isLoading}
             icon={<PeopleIcon sx={{ fontSize: 40 }} />}
-            color="#3f51b5"
+            color={theme.palette.primary.main}
             trend={12}
           />
         </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 3
-          }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title={t('dashboard.jobPosts')}
             value={stats?.totalJobPosts}
             loading={isLoading}
             icon={<WorkIcon sx={{ fontSize: 40 }} />}
-            color="#4caf50"
+            color={(theme.palette as any).secondary.main}
             trend={8}
           />
         </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 3
-          }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title={t('dashboard.pendingApproval')}
             value={stats?.totalJobPostsPending}
             loading={isLoading}
             icon={<QuestionAnswerIcon sx={{ fontSize: 40 }} />}
-            color="#ff9800"
+            color={(theme.palette as any).warning.main}
             trend={-5}
           />
         </Grid>
-        <Grid
-          size={{
-            xs: 12,
-            sm: 6,
-            md: 3
-          }}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <StatCard
             title={t('dashboard.applications')}
             value={stats?.totalApplications}
             loading={isLoading}
             icon={<AssessmentIcon sx={{ fontSize: 40 }} />}
-            color="#00bcd4"
+            color={(theme.palette as any).info.main}
             trend={15}
           />
         </Grid>
       </Grid>
       <Grid container spacing={3}>
-        <Grid
-          size={{
-            xs: 12,
-            md: 8
-          }}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Card sx={{ height: '100%' }}>
             <CardHeader title={t('dashboard.userDistribution')} />
             <CardContent sx={{ height: 350 }}>
@@ -137,13 +123,16 @@ const DashboardPage = () => {
           </Card>
         </Grid>
 
-        <Grid
-          size={{
-            xs: 12,
-            md: 4
-          }}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Stack spacing={3}>
-            <Paper sx={{ p: 3, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
+            <Paper
+              sx={{
+                p: 3,
+                background: (theme) => (theme.palette as any).primary.gradient,
+                color: 'white',
+                borderRadius: 3,
+              }}
+            >
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>{t('dashboard.generalStats')}</Typography>
               <Stack spacing={1}>
                 <Typography variant="body2">{t('dashboard.total')} {stats?.totalUsers || 0} {t('dashboard.users')}</Typography>
@@ -151,7 +140,14 @@ const DashboardPage = () => {
                 <Typography variant="body2">{t('dashboard.jobSeekers')} {stats?.totalJobSeekers || 0}</Typography>
               </Stack>
             </Paper>
-            <Paper sx={{ p: 3, background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)', color: 'white' }}>
+            <Paper
+              sx={{
+                p: 3,
+                background: (theme) => (theme.palette as any).secondary.gradient,
+                color: 'white',
+                borderRadius: 3,
+              }}
+            >
               <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>{t('dashboard.systemInfo')}</Typography>
               <Stack spacing={1}>
                 <Typography variant="body2">{t('dashboard.status')} {t('dashboard.statusActive')}</Typography>

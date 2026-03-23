@@ -1,8 +1,7 @@
 import React from 'react';
+import { useAppSelector } from '@/redux/hooks';
 
 import { useNavigate } from 'react-router-dom';
-
-import { useSelector } from 'react-redux';
 
 import { MenuItem, TableBody, TableCell, TableRow, TextField, Tooltip, Typography, Button, IconButton, Stack, CircularProgress, Chip, Box } from "@mui/material";
 
@@ -215,7 +214,7 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
 
   const { t } = useTranslation('employer');
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   const [applyStatus, setApplyStatus] = React.useState(defaultStatus);
 
@@ -455,7 +454,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
 
   const rowsSafe = Array.isArray(rows) ? rows : [];
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   return (
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '@/redux/hooks';
 import { useNavigate } from 'react-router-dom';
 import { Badge, IconButton } from "@mui/material";
 import ForumIcon from '@mui/icons-material/Forum';
@@ -21,7 +21,7 @@ interface ChatCardProps {
 const chatRoomCollectionRef = collection(db, 'chatRooms');
 
 const ChatCard = (_props: ChatCardProps) => {
-  const { currentUser, activeWorkspace } = useSelector((state: any) => state.user);
+  const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
   const nav = useNavigate();
   const [count, setCount] = React.useState(0);
 
@@ -46,7 +46,7 @@ const ChatCard = (_props: ChatCardProps) => {
         total += unreadCount;
       });
       setCount(total);
-      console.log("TOTAL: ", total);
+      // total unread messages loaded
     });
 
     return () => {

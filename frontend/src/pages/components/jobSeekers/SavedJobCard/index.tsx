@@ -116,7 +116,7 @@ const SavedJobCard = () => {
 
       } catch (error: any) {
 
-        console.log(error);
+        // Error handled silently
 
       } finally {
 

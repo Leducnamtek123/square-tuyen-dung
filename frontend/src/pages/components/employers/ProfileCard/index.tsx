@@ -1,6 +1,6 @@
 import React from 'react';
+import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import { Box, Card, Pagination, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import {} from '../../../../configs/constants';
@@ -34,7 +34,7 @@ const ProfileCard = () => {
 
   const { t } = useTranslation('employer');
 
-  const { resumeFilter } = useSelector((state: any) => state.filter);
+  const { resumeFilter } = useAppSelector((state) => state.filter);
 
   const { pageSize } = resumeFilter;
 

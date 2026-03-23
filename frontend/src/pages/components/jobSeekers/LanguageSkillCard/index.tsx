@@ -1,6 +1,5 @@
 import React from 'react';
-
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '@/redux/hooks';
 
 import { useParams } from 'react-router-dom';
 
@@ -111,7 +110,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
   const { slug: resumeSlug } = useParams<{ slug: string }>();
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   const [openPopup, setOpenPopup] = React.useState(false);
 

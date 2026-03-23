@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '@/redux/hooks';
 import { useNavigate } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { Box, Card, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
@@ -50,7 +50,7 @@ const JobPostAction = ({
 
   const nav = useNavigate();
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   const [parentWidth, setParentWidth] = React.useState(0);
 

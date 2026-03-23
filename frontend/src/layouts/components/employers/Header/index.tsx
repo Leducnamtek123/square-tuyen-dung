@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '@/redux/hooks';
 import { AppBar, Avatar, Box, Card, IconButton, Stack, Toolbar, Typography } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import UserMenu from '../../commons/UserMenu';
@@ -14,7 +14,7 @@ interface HeaderProps {
 }
 
 const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
-  const { currentUser, isAuthenticated } = useSelector((state: any) => state.user);
+  const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -39,7 +39,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
         }}
       >
         <Stack direction="row" justifyContent="center" alignItems="center">
-          <Avatar alt={currentUser?.fullName} src={currentUser?.avatarUrl} />
+          <Avatar alt={currentUser?.fullName ?? undefined} src={currentUser?.avatarUrl ?? undefined} />
           <Typography
             variant="subtitle1"
             sx={{

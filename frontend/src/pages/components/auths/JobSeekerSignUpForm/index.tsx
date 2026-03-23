@@ -392,7 +392,7 @@ const JobSeekerSignUpForm = ({
 
           onReject={(err) => {
 
-            console.log(err);
+            // Auth error handled by toast
 
           }}
 

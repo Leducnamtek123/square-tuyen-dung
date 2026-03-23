@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from '@/redux/hooks';
 import { Box, Button, Divider, IconButton, Pagination, Skeleton, Stack, Switch, Typography } from "@mui/material";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
@@ -267,7 +267,7 @@ const ItemComponent = ({
 
   const { t } = useTranslation(["jobSeeker", "common"]);
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   const [parentWidth, setParentWidth] = React.useState(0);
 
@@ -669,7 +669,7 @@ const pageSize = 12;
 const JobPostNotificationCard = () => {
   const { t } = useTranslation(["jobSeeker", "common"]);
 
-  const { currentUser } = useSelector((state: any) => state.user);
+  const { currentUser } = useAppSelector((state) => state.user);
 
   const [page, setPage] = React.useState(1);
 

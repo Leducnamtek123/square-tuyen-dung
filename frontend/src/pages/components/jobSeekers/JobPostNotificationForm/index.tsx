@@ -1,6 +1,5 @@
 import React from 'react';
-
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '@/redux/hooks';
 
 import { useForm } from 'react-hook-form';
 
@@ -19,7 +18,7 @@ import RadioCustom from '../../../../components/controls/RadioCustom';
 import { useTranslation } from 'react-i18next';
 
 interface FormValues {
-  frequency: number | null;
+  frequency: number | string | null;
   jobName: string;
   career: number;
   city: number;
@@ -41,7 +40,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
 
 
@@ -181,7 +180,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-          ? allConfig?.frequencyNotificationOptions[0].id
+          ? allConfig?.frequencyNotificationOptions![0].id
 
 
 
@@ -231,7 +230,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
       reset({
         frequency: (allConfig?.frequencyNotificationOptions || []).length > 0
-          ? allConfig?.frequencyNotificationOptions[0].id
+          ? allConfig?.frequencyNotificationOptions![0].id
           : null,
       });
 
@@ -249,7 +248,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-    <form id="modal-form" onSubmit={handleSubmit(handleAddOrUpdate)}>
+    <form id="modal-form" onSubmit={handleSubmit(handleAddOrUpdate as any)}>
 
 
 

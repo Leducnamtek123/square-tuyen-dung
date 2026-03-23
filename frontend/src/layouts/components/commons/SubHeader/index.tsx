@@ -1,6 +1,7 @@
 import * as React from 'react';
+import { useAppSelector } from '@/redux/hooks';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -117,7 +118,7 @@ const SubHeader = () => {
 
   const nav = useNavigate();
 
-  const { jobPostFilter } = useSelector((state: any) => state.filter);
+  const { jobPostFilter } = useAppSelector((state) => state.filter);
 
   const [open, setOpen] = React.useState(false);
 

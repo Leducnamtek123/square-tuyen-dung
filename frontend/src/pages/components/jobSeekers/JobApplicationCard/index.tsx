@@ -1,6 +1,5 @@
 import React from "react";
-
-import { useSelector } from "react-redux";
+import { useAppSelector } from '@/redux/hooks';
 
 import { useNavigate } from "react-router-dom";
 
@@ -40,7 +39,7 @@ const JobApplicationCard = () => {
 
 
 
-  const { currentUser } = useSelector((state: any) => state.user);
+  const { currentUser } = useAppSelector((state) => state.user);
 
 
 
@@ -81,7 +80,7 @@ const JobApplicationCard = () => {
 
 
 
-        console.log(error);
+        // Error handled silently
 
 
 
@@ -101,7 +100,7 @@ const JobApplicationCard = () => {
 
 
 
-    getOnlineProfile(currentUser?.jobSeekerProfileId);
+    getOnlineProfile(currentUser?.jobSeekerProfileId ? String(currentUser.jobSeekerProfileId) : undefined);
 
 
 

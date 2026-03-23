@@ -1,8 +1,7 @@
 import React from 'react';
+import { useAppSelector } from '@/redux/hooks';
 
 import { useTranslation } from 'react-i18next';
-
-import { useSelector } from 'react-redux';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -46,7 +45,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
 
   const rowsSafe = Array.isArray(rows) ? rows : [];
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   return (
 

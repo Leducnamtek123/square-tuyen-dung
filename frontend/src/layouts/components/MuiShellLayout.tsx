@@ -1,8 +1,7 @@
 import * as React from 'react';
+import { useAppSelector } from '@/redux/hooks';
 
 import { NavLink, useLocation } from 'react-router-dom';
-
-import { useSelector } from 'react-redux';
 
 import { AppBar, Avatar, Box, Collapse, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from "@mui/material";
 
@@ -64,7 +63,7 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
   const location = useLocation();
 
-  const { currentUser, isAuthenticated } = useSelector((state: any) => state.user);
+  const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -308,7 +307,7 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
             >
 
-              <Avatar src={currentUser?.avatarUrl} />
+              <Avatar src={currentUser?.avatarUrl ?? undefined} />
 
               <Typography variant="subtitle1" sx={{ display: { xs: 'none', sm: 'block' }, color: 'inherit' }}>
 

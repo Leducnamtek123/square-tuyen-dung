@@ -1,6 +1,5 @@
 import React from 'react';
-
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '@/redux/hooks';
 
 import { useForm } from 'react-hook-form';
 
@@ -41,7 +40,7 @@ const LanguageSkillForm = ({
 
   const { t } = useTranslation(['jobSeeker', 'common']);
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   const schema = yup.object().shape({
 

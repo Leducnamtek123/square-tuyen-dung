@@ -1,6 +1,6 @@
 import React from "react";
+import { useAppSelector } from '@/redux/hooks';
 import { alpha, useTheme } from "@mui/material/styles";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 import { Box, Card, Skeleton, Stack, Typography, Tooltip, Divider } from "@mui/material";
@@ -54,7 +54,7 @@ const JobPostLarge = ({
 
   const nav = useNavigate();
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
   const goToDetail = () => {
     nav(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`);
   };

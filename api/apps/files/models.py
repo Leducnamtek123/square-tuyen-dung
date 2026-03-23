@@ -43,6 +43,28 @@ class File(CommonBaseModel):
     metadata = models.JSONField(blank=True, null=True)
 
     def get_full_url(self):
+        from django.conf import settings as django_settings
+
+        # Fast-path: build direct URL without network calls when presigned is disabled
+        if not getattr(django_settings, "MINIO_USE_PRESIGNED", False):
+            if self.public_id:
+                # If public_id is already a full URL, rewrite to public base
+                if self.public_id.startswith("http://") or self.public_id.startswith("https://"):
+                    from urllib.parse import urlparse
+                    parsed = urlparse(self.public_id)
+                    base = django_settings.MINIO_PUBLIC_URL.rstrip("/")
+                    bucket = django_settings.MINIO_BUCKET
+                    path = parsed.path.lstrip("/")
+                    if path.startswith(f"{bucket}/"):
+                        path = path[len(bucket) + 1:]
+                    return f"{base}/{bucket}/{path}"
+                # Plain public_id → direct URL
+                base = django_settings.MINIO_PUBLIC_URL.rstrip("/")
+                bucket = django_settings.MINIO_BUCKET
+                return f"{base}/{bucket}/{self.public_id.lstrip('/')}"
+            return None
+
+        # Fallback: use CloudinaryService for presigned URLs
         from shared.helpers.cloudinary_service import CloudinaryService
 
         url, _ = CloudinaryService.get_url_from_public_id(

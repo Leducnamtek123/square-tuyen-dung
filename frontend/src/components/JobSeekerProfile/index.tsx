@@ -1,4 +1,5 @@
 import React from 'react';
+import { useAppSelector } from '@/redux/hooks';
 import { useNavigate } from 'react-router-dom';
 import { Card, Chip, IconButton, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
@@ -12,7 +13,6 @@ import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlin
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import dayjs from 'dayjs';
 import { salaryString } from '../../utils/customData';
-import { useSelector } from 'react-redux';
 import { CV_TYPES, ROUTES } from '../../configs/constants';
 import { formatRoute } from '../../utils/funcUtils';
 import defaultTheme from '../../themeConfigs/defaultTheme';
@@ -64,7 +64,7 @@ const JobSeekerProfile = ({
 
   const nav = useNavigate();
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
   return (
 

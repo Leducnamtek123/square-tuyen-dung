@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useAppSelector } from '@/redux/hooks';
 import { useNavigate } from 'react-router-dom';
 import { Box, Chip, Divider, Stack } from "@mui/material";
 import GridViewIcon from '@mui/icons-material/GridView';
@@ -13,7 +13,7 @@ interface SidebarHeaderProps {
 }
 
 const SidebarHeader = (_props: SidebarHeaderProps) => {
-  const { activeWorkspace } = useSelector((state: any) => state.user);
+  const { activeWorkspace } = useAppSelector((state) => state.user);
   const nav = useNavigate();
 
   const isEmployer = React.useMemo(() => {

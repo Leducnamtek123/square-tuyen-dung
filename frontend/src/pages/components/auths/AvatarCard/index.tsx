@@ -1,6 +1,7 @@
 import React from 'react';
+import { useAppSelector } from '@/redux/hooks';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { Box, Stack, IconButton, Typography } from "@mui/material";
 
@@ -32,7 +33,7 @@ const AvatarCard = () => {
 
   const dispatch = useDispatch();
 
-  const { currentUser } = useSelector((state: any) => state.user);
+  const { currentUser } = useAppSelector((state) => state.user);
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 

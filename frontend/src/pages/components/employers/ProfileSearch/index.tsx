@@ -1,8 +1,9 @@
 import React from 'react';
+import { useAppSelector } from '@/redux/hooks';
 
 import { useTranslation } from 'react-i18next';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 import { useForm } from 'react-hook-form';
 
@@ -39,9 +40,9 @@ const ProfileSearch: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
 
-  const { resumeFilter } = useSelector((state: any) => state.filter);
+  const { resumeFilter } = useAppSelector((state) => state.filter);
 
   const { control, reset, handleSubmit } = useForm<any>();
 

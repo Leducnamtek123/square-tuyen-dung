@@ -1,7 +1,8 @@
 import "swiper/css";
+import { useAppSelector } from '@/redux/hooks';
 import "swiper/css/pagination";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Pagination, Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -63,7 +64,7 @@ const Loading = (
 const CareerCarousel = () => {
   const dispatch = useDispatch();
   const nav = useNavigate();
-  const { jobPostFilter } = useSelector((state: any) => state.filter);
+  const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [isLoading, setIsLoading] = React.useState(true);
   const [topCareers, setTopCareers] = React.useState<any[]>([]);
   const [parentWidth, setParentWidth] = React.useState(0);

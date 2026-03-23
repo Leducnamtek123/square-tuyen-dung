@@ -1,10 +1,9 @@
 import React, { Suspense, lazy } from "react";
+import { useAppSelector } from '@/redux/hooks';
 
 import { useTranslation } from 'react-i18next';
 
 import { useParams } from "react-router-dom";
-
-import { useSelector } from "react-redux";
 
 import { Avatar, Box, Card, Divider, Rating, Stack, Typography, Button, Skeleton, Chip, CircularProgress, Tooltip } from "@mui/material";
 
@@ -62,7 +61,7 @@ const LazyPdf = lazy(() => import("../../../../components/Pdf"));
 const ProfileDetailCard: React.FC = () => {
   const { t } = useTranslation('employer');
   const { slug } = useParams<{ slug: string }>();
-  const { allConfig } = useSelector((state: any) => state.config);
+  const { allConfig } = useAppSelector((state) => state.config);
   
   const [profileDetail, setProfileDetail] = React.useState<any>(null);
   const [isLoading, setIsLoading] = React.useState(true);

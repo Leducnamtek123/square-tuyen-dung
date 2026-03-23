@@ -141,5 +141,15 @@
       "validation": "Please select an audio file.",
       "error": "Unable to transcribe audio right now."
     }
+  },
+  "feedback": {
+    "button": "Feedback",
+    "title": "Your Feedback",
+    "placeholder": "Share your experience...",
+    "submit": "Submit Feedback",
+    "ratingRequired": "Please select a rating.",
+    "contentRequired": "Please enter your feedback.",
+    "contentMax": "Feedback content exceeds allowed length.",
+    "success": "Feedback submitted successfully."
   }
 }
