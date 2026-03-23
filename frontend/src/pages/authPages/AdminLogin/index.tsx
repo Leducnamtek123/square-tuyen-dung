@@ -54,7 +54,6 @@ const SLIDES = [
 ];
 
 const INTERVAL_MS = 5000;
-const DRAG_THRESHOLD = 50; // px to trigger slide change
 
 /* ────────────── styled components ────────────── */
 const Card = styled(Box)(() => ({
@@ -85,35 +84,18 @@ const RightPanel = styled(Box)(({ theme }) => ({
   flex: '1 1 54%',
   position: 'relative',
   overflow: 'hidden',
-  cursor: 'grab',
-  userSelect: 'none',
-  '&:active': {
-    cursor: 'grabbing',
-  },
   [theme.breakpoints.down('md')]: {
     display: 'none',
   },
 }));
 
-const SlideTrack = styled(Box)({
-  display: 'flex',
-  height: '100%',
-  transition: 'transform .45s cubic-bezier(.4,0,.2,1)',
-  willChange: 'transform',
-});
-
-const SlideItem = styled(Box)({
-  flex: '0 0 100%',
-  position: 'relative',
-  overflow: 'hidden',
-});
-
 const SlideImage = styled('img')({
   width: '100%',
   height: '100%',
   objectFit: 'cover',
-  display: 'block',
-  pointerEvents: 'none',
+  position: 'absolute',
+  inset: 0,
+  transition: 'opacity .8s ease-in-out',
 });
 
 const SlideOverlay = styled(Box)({
@@ -125,14 +107,6 @@ const SlideOverlay = styled(Box)({
   justifyContent: 'flex-end',
   padding: '40px 36px',
   zIndex: 2,
-  pointerEvents: 'none',
-});
-
-const DotsContainer = styled(Stack)({
-  position: 'absolute',
-  bottom: 24,
-  left: 36,
-  zIndex: 3,
 });
 
 const Dot = styled('button')<{ active: boolean }>(({ active }) => ({
@@ -174,12 +148,6 @@ const AdminLogin: React.FC = () => {
   const [currentSlide, setCurrentSlide] = React.useState(0);
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Drag state
-  const isDragging = React.useRef(false);
-  const dragStartX = React.useRef(0);
-  const dragDelta = React.useRef(0);
-  const trackRef = React.useRef<HTMLDivElement>(null);
-
   const resetTimer = React.useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
     timerRef.current = setInterval(() => {
@@ -199,74 +167,7 @@ const AdminLogin: React.FC = () => {
     resetTimer();
   };
 
-  /* ── drag handlers ── */
-  const handleDragStart = (clientX: number) => {
-    isDragging.current = true;
-    dragStartX.current = clientX;
-    dragDelta.current = 0;
-    if (timerRef.current) clearInterval(timerRef.current);
-    // Remove smooth transition during drag
-    if (trackRef.current) {
-      trackRef.current.style.transition = 'none';
-    }
-  };
-
-  const handleDragMove = (clientX: number) => {
-    if (!isDragging.current) return;
-    dragDelta.current = clientX - dragStartX.current;
-    if (trackRef.current) {
-      const baseOffset = -(currentSlide * 100);
-      const containerWidth = trackRef.current.parentElement?.offsetWidth || 1;
-      const dragPercent = (dragDelta.current / containerWidth) * 100;
-      trackRef.current.style.transform = `translateX(${baseOffset + dragPercent}%)`;
-    }
-  };
-
-  const handleDragEnd = () => {
-    if (!isDragging.current) return;
-    isDragging.current = false;
-
-    // Restore smooth transition
-    if (trackRef.current) {
-      trackRef.current.style.transition = 'transform .45s cubic-bezier(.4,0,.2,1)';
-    }
-
-    const delta = dragDelta.current;
-    if (Math.abs(delta) > DRAG_THRESHOLD) {
-      if (delta < 0 && currentSlide < SLIDES.length - 1) {
-        // Dragged left → next slide
-        goToSlide(currentSlide + 1);
-      } else if (delta > 0 && currentSlide > 0) {
-        // Dragged right → prev slide
-        goToSlide(currentSlide - 1);
-      } else {
-        // Snap back
-        goToSlide(currentSlide);
-      }
-    } else {
-      // Snap back
-      goToSlide(currentSlide);
-    }
-    dragDelta.current = 0;
-  };
-
-  // Mouse events
-  const onMouseDown = (e: React.MouseEvent) => {
-    e.preventDefault();
-    handleDragStart(e.clientX);
-  };
-  const onMouseMove = (e: React.MouseEvent) => handleDragMove(e.clientX);
-  const onMouseUp = () => handleDragEnd();
-  const onMouseLeave = () => {
-    if (isDragging.current) handleDragEnd();
-  };
-
-  // Touch events
-  const onTouchStart = (e: React.TouchEvent) => handleDragStart(e.touches[0].clientX);
-  const onTouchMove = (e: React.TouchEvent) => handleDragMove(e.touches[0].clientX);
-  const onTouchEnd = () => handleDragEnd();
-
-  /* ── auth logic (reuse same form handler) ── */
+  /* ── auth logic ── */
   const handleLogin = (data: any) => {
     const getAccessToken = async (email: string, password: any, roleName: string) => {
       setIsLoading(true);
@@ -339,7 +240,6 @@ const AdminLogin: React.FC = () => {
       <Card>
         {/* ─── LEFT: Form ─── */}
         <LeftPanel>
-          {/* Logo */}
           <Box sx={{ mb: 1 }}>
             <img
               src="/square-icons/logo square svg-black.svg"
@@ -389,70 +289,55 @@ const AdminLogin: React.FC = () => {
           </Typography>
         </LeftPanel>
 
-        {/* ─── RIGHT: Draggable Image slider ─── */}
-        <RightPanel
-          onMouseDown={onMouseDown}
-          onMouseMove={onMouseMove}
-          onMouseUp={onMouseUp}
-          onMouseLeave={onMouseLeave}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-        >
-          <SlideTrack
-            ref={trackRef}
-            sx={{
-              transform: `translateX(-${currentSlide * 100}%)`,
-            }}
-          >
-            {SLIDES.map((slide, idx) => (
-              <SlideItem key={idx}>
-                <SlideImage
-                  src={slide.image}
-                  alt={slide.title}
-                  loading={idx === 0 ? 'eager' : 'lazy'}
-                  draggable={false}
-                />
-                <SlideOverlay>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: '#fff',
-                      fontWeight: 700,
-                      mb: 1,
-                      lineHeight: 1.35,
-                      textShadow: '0 2px 8px rgba(0,0,0,.4)',
-                    }}
-                  >
-                    {slide.title}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    sx={{
-                      color: 'rgba(255,255,255,.85)',
-                      mb: 1,
-                      lineHeight: 1.6,
-                      textShadow: '0 1px 4px rgba(0,0,0,.3)',
-                    }}
-                  >
-                    {slide.subtitle}
-                  </Typography>
-                </SlideOverlay>
-              </SlideItem>
-            ))}
-          </SlideTrack>
+        {/* ─── RIGHT: Auto-slide images ─── */}
+        <RightPanel>
+          {SLIDES.map((slide, idx) => (
+            <SlideImage
+              key={idx}
+              src={slide.image}
+              alt={slide.title}
+              sx={{ opacity: idx === currentSlide ? 1 : 0 }}
+              loading={idx === 0 ? 'eager' : 'lazy'}
+            />
+          ))}
 
-          {/* Dots */}
-          <DotsContainer direction="row" spacing={1} alignItems="center">
-            {SLIDES.map((_, idx) => (
-              <Dot
-                key={idx}
-                active={idx === currentSlide}
-                onClick={() => goToSlide(idx)}
-                aria-label={`Slide ${idx + 1}`}
-              />
-            ))}
-          </DotsContainer>
+          <SlideOverlay>
+            <Typography
+              variant="h6"
+              sx={{
+                color: '#fff',
+                fontWeight: 700,
+                mb: 1,
+                lineHeight: 1.35,
+                textShadow: '0 2px 8px rgba(0,0,0,.4)',
+                transition: 'opacity .5s',
+              }}
+            >
+              {SLIDES[currentSlide].title}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'rgba(255,255,255,.85)',
+                mb: 3,
+                lineHeight: 1.6,
+                textShadow: '0 1px 4px rgba(0,0,0,.3)',
+              }}
+            >
+              {SLIDES[currentSlide].subtitle}
+            </Typography>
+
+            <Stack direction="row" spacing={1} alignItems="center">
+              {SLIDES.map((_, idx) => (
+                <Dot
+                  key={idx}
+                  active={idx === currentSlide}
+                  onClick={() => goToSlide(idx)}
+                  aria-label={`Slide ${idx + 1}`}
+                />
+              ))}
+            </Stack>
+          </SlideOverlay>
         </RightPanel>
       </Card>
 
