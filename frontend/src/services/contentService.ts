@@ -1,6 +1,14 @@
 import httpRequest from '../utils/httpRequest';
+import { presignInObject } from '../utils/presignUrl';
 
 type AnyRecord = Record<string, unknown>;
+
+type WithPresignInput = Promise<unknown>;
+
+const withPresign = async (promise: WithPresignInput): Promise<unknown> => {
+  const data = await promise;
+  return presignInObject(data);
+};
 
 const contentService = {
   getFeedbacks: (): Promise<unknown> => {
@@ -20,7 +28,7 @@ const contentService = {
 
   getBanners: (params: AnyRecord = {}): Promise<unknown> => {
     const url = 'content/web/banner/';
-    return httpRequest.get(url, { params: params });
+    return withPresign(httpRequest.get(url, { params: params }));
   },
 
   sendNotificationDemo: (): Promise<unknown> => {
@@ -30,4 +38,3 @@ const contentService = {
 };
 
 export default contentService;
-
