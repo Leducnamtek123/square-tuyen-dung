@@ -95,16 +95,7 @@
       <img src="/loading-spinner.gif" alt="Loading" style="width: 100px; height: auto;">
     </div>
   </div>
-  <script>
-    // Safety timeout: auto-remove loader after 15s if React hasn't mounted
-    window.__loaderSafetyTimer = setTimeout(function () {
-      var loader = document.getElementById('initial-loader');
-      if (loader) {
-        loader.classList.add('fade-out');
-        setTimeout(function () { loader.remove(); }, 600);
-      }
-    }, 15000);
-  </script>
+
   <div id="root"></div>
   <script type="module" src="/src/index.tsx"></script>
 </body>
