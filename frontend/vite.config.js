@@ -59,6 +59,7 @@ export default defineConfig({
     }
   },
   build: {
+    target: 'es2015',
     outDir: 'build',
     sourcemap: false,
     chunkSizeWarningLimit: 2000,

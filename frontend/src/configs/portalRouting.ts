@@ -1,4 +1,4 @@
-﻿type PortalType = 'admin' | 'employer' | 'jobseeker';
+type PortalType = 'admin' | 'employer' | 'jobseeker';
 
 type LanguageCode = 'en' | 'vi';
 
@@ -26,8 +26,14 @@ const EMPLOYER_PREFIXES = ['/employee', '/employer', '/nha-tuyen-dung'] as const
 const ADMIN_PREFIXES = ['/admin', '/quan-tri'] as const;
 
 export const getPreferredLanguage = (): LanguageCode => {
-  const i18nLanguage =
-    typeof window !== 'undefined' ? window.localStorage?.getItem('i18nextLng') : null;
+  let i18nLanguage = null;
+  if (typeof window !== 'undefined') {
+    try {
+      i18nLanguage = window.localStorage?.getItem('i18nextLng');
+    } catch {
+      // Ignore SecurityError if localStorage is blocked
+    }
+  }
   return normalizeLanguage(i18nLanguage || 'vi');
 };
 

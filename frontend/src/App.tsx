@@ -122,7 +122,8 @@ function App() {
         const configPromise = dispatch(getAllConfig());
         const hasAccessToken = !!tokenService.getAccessTokenFromCookie();
         const userPromise = hasAccessToken ? dispatch(getUserInfo()) : null;
-        await Promise.allSettled([configPromise, userPromise].filter(Boolean));
+        const promises = [configPromise, userPromise].filter(Boolean);
+        await Promise.all(promises.map(p => Promise.resolve(p).catch(e => e)));
       } catch (err) {
         console.error("App initialization failed", err);
       } finally {
