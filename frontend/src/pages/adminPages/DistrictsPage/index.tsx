@@ -150,7 +150,7 @@ const DistrictsPage = () => {
                     </Box>
                 ) : (
                     <>
-                        <TableContainer>
+                        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
                             <Table sx={{ minWidth: 650 }}>
                                 <TableHead sx={{ bgcolor: 'grey.50' }}>
                                     <TableRow>

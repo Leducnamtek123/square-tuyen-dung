@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Tooltip, Switch, CircularProgress, Typography, Stack, Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Tooltip, Switch, CircularProgress, Typography, Stack, Select, MenuItem, SelectChangeEvent, Paper } from "@mui/material";
 
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useTranslation } from 'react-i18next';
@@ -56,10 +56,10 @@ const UserTable = ({ users, loading, onToggleStatus, onRoleChange, currentUserId
     }
 
     return (
-        <TableContainer>
-            <Table size="medium">
-                <TableHead>
-                    <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
+            <Table size="medium" sx={{ minWidth: 750 }}>
+                <TableHead sx={{ bgcolor: 'grey.50' }}>
+                    <TableRow>
                         <TableCell>{t('pages.users.table.id')}</TableCell>
                         <TableCell>{t('pages.users.table.fullName')}</TableCell>
                         <TableCell>{t('pages.users.table.email')}</TableCell>

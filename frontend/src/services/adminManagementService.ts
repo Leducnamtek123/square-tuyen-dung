@@ -263,13 +263,17 @@ const adminManagementService = {
     const url = 'content/web/admin/banners/';
     return withPresign(httpRequest.get(url, { params }));
   },
-  createBanner: (data: AnyRecord): Promise<unknown> => {
+  createBanner: (data: AnyRecord | FormData): Promise<unknown> => {
     const url = 'content/web/admin/banners/';
-    return withPresign(httpRequest.post(url, data));
+    return withPresign(
+      httpRequest.post(url, data, adminManagementService.buildMultipartConfig(data))
+    );
   },
-  updateBanner: (id: IdType, data: AnyRecord): Promise<unknown> => {
+  updateBanner: (id: IdType, data: AnyRecord | FormData): Promise<unknown> => {
     const url = `content/web/admin/banners/${id}/`;
-    return withPresign(httpRequest.patch(url, data));
+    return withPresign(
+      httpRequest.patch(url, data, adminManagementService.buildMultipartConfig(data))
+    );
   },
   deleteBanner: (id: IdType): Promise<unknown> => {
     const url = `content/web/admin/banners/${id}/`;

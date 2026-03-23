@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Chip, Tooltip, IconButton, Box, CircularProgress } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Chip, Tooltip, IconButton, Box, CircularProgress, Paper } from "@mui/material";
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -23,14 +23,14 @@ const QuestionTable = ({ questions, loading, onEdit, onDelete }: QuestionTablePr
     }
 
     return (
-        <TableContainer>
-            <Table>
-                <TableHead sx={{ bgcolor: 'grey.100' }}>
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
+            <Table sx={{ minWidth: 750 }}>
+                <TableHead sx={{ bgcolor: 'grey.50' }}>
                     <TableRow>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.questions.table.questionContent')}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.questions.table.field')}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.questions.table.difficulty')}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }} align="right">{t('pages.questions.table.actions')}</TableCell>
+                        <TableCell>{t('pages.questions.table.questionContent')}</TableCell>
+                        <TableCell>{t('pages.questions.table.field')}</TableCell>
+                        <TableCell>{t('pages.questions.table.difficulty')}</TableCell>
+                        <TableCell align="right">{t('pages.questions.table.actions')}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

@@ -59,8 +59,8 @@ const FeedbacksPage = () => {
         {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}><CircularProgress /></Box>
         ) : (
-          <Table size="small">
-            <TableHead>
+          <Table size="small" sx={{ minWidth: 750 }}>
+            <TableHead sx={{ bgcolor: 'grey.50' }}>
               <TableRow>
                 <TableCell>{t('pages.feedbacks.table.id')}</TableCell>
                 <TableCell>{t('pages.feedbacks.table.user')}</TableCell>

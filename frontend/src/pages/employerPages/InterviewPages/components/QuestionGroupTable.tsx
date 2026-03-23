@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Tooltip, IconButton, Box, CircularProgress } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Tooltip, IconButton, Box, CircularProgress, Paper } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -43,14 +43,14 @@ const QuestionGroupTable = ({ data, loading, onEdit, onDelete }: QuestionGroupTa
     }
 
     return (
-        <TableContainer>
-            <Table>
-                <TableHead sx={{ bgcolor: 'grey.100' }}>
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
+            <Table sx={{ minWidth: 750 }}>
+                <TableHead sx={{ bgcolor: 'grey.50' }}>
                     <TableRow>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('questionGroupsCard.label.questiongroupname')}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('questionGroupsCard.label.description')}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('questionGroupsCard.label.questionCount')}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }} align="right">{t('jobPost.table.actions')}</TableCell>
+                        <TableCell>{t('questionGroupsCard.label.questiongroupname')}</TableCell>
+                        <TableCell>{t('questionGroupsCard.label.description')}</TableCell>
+                        <TableCell>{t('questionGroupsCard.label.questionCount')}</TableCell>
+                        <TableCell align="right">{t('jobPost.table.actions')}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

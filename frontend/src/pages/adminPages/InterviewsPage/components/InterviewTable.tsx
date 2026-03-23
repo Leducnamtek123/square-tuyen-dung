@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Chip, Tooltip, IconButton, Box, CircularProgress, Stack } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Chip, Tooltip, IconButton, Box, CircularProgress, Stack, Paper } from "@mui/material";
 
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -57,16 +57,16 @@ const InterviewTable = ({ interviews, loading, onView, onDelete, onUpdateStatus 
     };
 
     return (
-        <TableContainer>
-            <Table>
-                <TableHead sx={{ bgcolor: 'grey.100' }}>
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
+            <Table sx={{ minWidth: 750 }}>
+                <TableHead sx={{ bgcolor: 'grey.50' }}>
                     <TableRow>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('interviewAdminPage.candidateEmployer', { ns: 'interview' })}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('interviewAdminPage.jobPost', { ns: 'interview' })}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('interviewAdminPage.type', { ns: 'interview' })}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('interviewAdminPage.time', { ns: 'interview' })}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('interviewAdminPage.status', { ns: 'interview' })}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }} align="right">{t('interviewAdminPage.actions', { ns: 'interview' })}</TableCell>
+                        <TableCell>{t('interviewAdminPage.candidateEmployer', { ns: 'interview' })}</TableCell>
+                        <TableCell>{t('interviewAdminPage.jobPost', { ns: 'interview' })}</TableCell>
+                        <TableCell>{t('interviewAdminPage.type', { ns: 'interview' })}</TableCell>
+                        <TableCell>{t('interviewAdminPage.time', { ns: 'interview' })}</TableCell>
+                        <TableCell>{t('interviewAdminPage.status', { ns: 'interview' })}</TableCell>
+                        <TableCell align="right">{t('interviewAdminPage.actions', { ns: 'interview' })}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Chip, Tooltip, IconButton, Box, CircularProgress } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Chip, Tooltip, IconButton, Box, CircularProgress, Paper } from "@mui/material";
 
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import EditIcon from '@mui/icons-material/Edit';
@@ -44,15 +44,15 @@ const JobTable = ({ jobs, loading, onView, onEdit, onApprove, onReject, onDelete
     };
 
     return (
-        <TableContainer>
-            <Table>
-                <TableHead sx={{ bgcolor: 'grey.100' }}>
+        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
+            <Table sx={{ minWidth: 750 }}>
+                <TableHead sx={{ bgcolor: 'grey.50' }}>
                     <TableRow>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.jobs.table.jobPostCompany')}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.jobs.table.postDate')}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.jobs.table.deadline')}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }}>{t('pages.jobs.table.statusCol')}</TableCell>
-                        <TableCell sx={{ fontWeight: 'bold' }} align="right">{t('pages.jobs.table.actions')}</TableCell>
+                        <TableCell>{t('pages.jobs.table.jobPostCompany')}</TableCell>
+                        <TableCell>{t('pages.jobs.table.postDate')}</TableCell>
+                        <TableCell>{t('pages.jobs.table.deadline')}</TableCell>
+                        <TableCell>{t('pages.jobs.table.statusCol')}</TableCell>
+                        <TableCell align="right">{t('pages.jobs.table.actions')}</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

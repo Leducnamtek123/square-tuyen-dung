@@ -187,8 +187,8 @@ const BannersPage = () => {
         {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}><CircularProgress /></Box>
         ) : !fetchError && (
-          <Table size="small">
-            <TableHead>
+          <Table size="small" sx={{ minWidth: 750 }}>
+            <TableHead sx={{ bgcolor: 'grey.50' }}>
               <TableRow>
                 <TableCell>{t('pages.banners.table.id')}</TableCell>
                 <TableCell>{t('pages.banners.table.webImage')}</TableCell>
