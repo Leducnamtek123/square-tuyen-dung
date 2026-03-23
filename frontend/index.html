@@ -2,23 +2,6 @@
 <html lang="vi">
 
 <head>
-  <script>
-    window.onerror = function(msg, url, lineNo, columnNo, error) {
-      var h = document.createElement('div');
-      h.style.cssText = 'position:fixed;top:0;left:0;right:0;background:red;color:white;z-index:999999;padding:20px;font-size:14px;word-break:break-all;';
-      h.innerHTML = '<b>FATAL ERROR:</b> ' + msg + '<br><b>URL:</b> ' + url + '<br><b>Line:</b> ' + lineNo + ':' + columnNo;
-      if(document.body) document.body.appendChild(h);
-      else document.documentElement.appendChild(h);
-      return false;
-    };
-    window.addEventListener('unhandledrejection', function(event) {
-      var h = document.createElement('div');
-      h.style.cssText = 'position:fixed;top:0;left:0;right:0;background:orange;color:white;z-index:999999;padding:20px;font-size:14px;word-break:break-all;';
-      h.innerHTML = '<b>UNHANDLED PROMISE:</b> ' + (event.reason ? event.reason.toString() : 'Unknown');
-      if(document.body) document.body.appendChild(h);
-      else document.documentElement.appendChild(h);
-    });
-  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
