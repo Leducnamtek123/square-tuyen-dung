@@ -339,7 +339,7 @@ const Header = (props: HeaderProps) => {
 
         <Container maxWidth="xl">
 
-          <Toolbar disableGutters sx={{ minHeight: { xs: 56, sm: 64 } }}>
+          <Toolbar disableGutters sx={{ minHeight: { xs: 56, sm: 64 }, overflow: 'hidden' }}>
 
             {/* ── Mobile: Hamburger icon TRƯỚC logo (chuẩn MUI) ── */}
             <IconButton
@@ -360,7 +360,9 @@ const Header = (props: HeaderProps) => {
                 display: 'flex',
                 alignItems: 'center',
                 textDecoration: 'none',
-                flexShrink: 0,
+                flexShrink: { xs: 1, md: 0 },
+                minWidth: 0,
+                overflow: 'hidden',
               }}
             >
               <Box
@@ -368,9 +370,12 @@ const Header = (props: HeaderProps) => {
                 src={IMAGES.getTextLogo("light")}
                 alt="Square Logo"
                 sx={{
-                  height: { xs: 26, md: 34 },
+                  height: { xs: 28, md: 34 },
                   width: 'auto',
+                  maxWidth: { xs: 120, sm: 160, md: 'none' },
                   display: 'block',
+                  objectFit: 'contain',
+                  objectPosition: 'left center',
                 }}
               />
             </Box>
@@ -435,8 +440,12 @@ const Header = (props: HeaderProps) => {
                 </Box>
               )}
 
-              {/* Auth buttons */}
-              {!isAdminPortal && authArea}
+              {/* Auth buttons — hide on xs when not authenticated (available in drawer) */}
+              {!isAdminPortal && (
+                <Box sx={{ display: isAuthenticated ? 'flex' : { xs: 'none', sm: 'flex' } }}>
+                  {authArea}
+                </Box>
+              )}
 
               {!isSmall && !isAuthenticated && !isAdminPortal && (
                 <>
