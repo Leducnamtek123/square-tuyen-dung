@@ -150,6 +150,7 @@ class JobSeekerJobPostActivityViewSet(
 class EmployerJobPostActivityViewSet(
     viewsets.ViewSet,
     generics.ListAPIView,
+    generics.RetrieveAPIView,
     generics.UpdateAPIView,
     generics.DestroyAPIView,
 ):
@@ -165,6 +166,26 @@ class EmployerJobPostActivityViewSet(
         ('status', 'status'),
         ('fullName', 'full_name'),
     )
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.job_post.company != request.user.company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+        serializer = self.get_serializer(
+            instance,
+            fields=[
+                "id",
+                "aiAnalysisScore",
+                "aiAnalysisSummary",
+                "aiAnalysisSkills",
+                "aiAnalysisStatus",
+                "aiAnalysisPros",
+                "aiAnalysisCons",
+                "aiAnalysisMatchingSkills",
+                "aiAnalysisMissingSkills",
+            ],
+        )
+        return var_res.response_data(data=serializer.data)
 
     def list(self, request, *args, **kwargs):
         user = request.user

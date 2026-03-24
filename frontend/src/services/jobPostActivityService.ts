@@ -1,4 +1,4 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 
 type AnyRecord = Record<string, unknown>;
 
@@ -51,6 +51,11 @@ const jobPostActivityService = {
   deleteJobPostActivity: (id: IdType): Promise<unknown> => {
     const url = `job/web/employer-job-posts-activity/${id}/`;
     return httpRequest.delete(url);
+  },
+
+  getJobPostActivityDetail: (id: IdType): Promise<unknown> => {
+    const url = `job/web/employer-job-posts-activity/${id}/`;
+    return httpRequest.get(url);
   },
 
   analyzeResume: (id: IdType): Promise<unknown> => {

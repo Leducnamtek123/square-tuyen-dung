@@ -312,11 +312,43 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row }) => {
 
   const [score, setScore] = React.useState(row.aiAnalysisScore);
 
+  const [summary, setSummary] = React.useState(row.aiAnalysisSummary);
+
+  const [skills, setSkills] = React.useState(row.aiAnalysisSkills);
+
+  // Polling when status is 'processing'
+  React.useEffect(() => {
+    if (status !== 'processing') return;
+
+    const intervalId = setInterval(async () => {
+      try {
+        const resData = await jobPostActivityService.getJobPostActivityDetail(row.id);
+        const data = (resData as any)?.data;
+        if (data) {
+          const newStatus = data.aiAnalysisStatus;
+          if (newStatus && newStatus !== 'processing') {
+            setStatus(newStatus);
+            setScore(data.aiAnalysisScore);
+            setSummary(data.aiAnalysisSummary);
+            setSkills(data.aiAnalysisSkills);
+            clearInterval(intervalId);
+          }
+        }
+      } catch {
+        // silently ignore polling errors
+      }
+    }, 10000); // poll every 10 seconds
+
+    return () => clearInterval(intervalId);
+  }, [status, row.id]);
+
   const handleAnalyze = async () => {
 
     try {
 
       setStatus('processing');
+      setSummary(undefined);
+      setSkills(undefined);
 
       await jobPostActivityService.analyzeResume(row.id);
 
@@ -348,7 +380,7 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row }) => {
 
             </Typography>
 
-            <Typography variant="body2">{row.aiAnalysisSummary}</Typography>
+            <Typography variant="body2">{summary}</Typography>
 
             <Typography
 
@@ -362,7 +394,7 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row }) => {
 
             </Typography>
 
-            <Typography variant="body2">{row.aiAnalysisSkills || 'N/A'}</Typography>
+            <Typography variant="body2">{skills || 'N/A'}</Typography>
 
           </Box>
 
@@ -405,6 +437,36 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row }) => {
         <Typography variant="caption">{t('appliedResume.ai.processing')}</Typography>
 
       </Stack>
+
+    );
+
+  }
+
+  if (status === 'failed') {
+
+    return (
+
+      <Tooltip title={summary || t('appliedResume.ai.failed', 'Phân tích thất bại')} arrow>
+
+        <Chip
+
+          icon={<AutoFixHighIcon />}
+
+          label={t('appliedResume.ai.retry', 'Thử lại')}
+
+          color="error"
+
+          size="small"
+
+          onClick={handleAnalyze}
+
+          variant="outlined"
+
+          sx={{ fontWeight: 'bold', cursor: 'pointer' }}
+
+        />
+
+      </Tooltip>
 
     );
 
