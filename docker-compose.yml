@@ -238,6 +238,7 @@ services:
   llama-cpp:
     container_name: tuyendung-studio-llama-cpp
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    init: true
     deploy:
       resources:
         reservations:
@@ -276,6 +277,7 @@ services:
     container_name: tuyendung-studio-whisper
     build:
       context: ./voice-ai/inference/whisper
+    init: true
     deploy:
       resources:
         reservations:
@@ -297,6 +299,7 @@ services:
     container_name: tuyendung-studio-tts
     build:
       context: ./voice-ai/inference/vieneu-text-to-speech
+    init: true
     deploy:
       resources:
         reservations:
