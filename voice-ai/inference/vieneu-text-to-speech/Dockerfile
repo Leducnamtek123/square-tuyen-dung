@@ -25,10 +25,16 @@ WORKDIR /workspace
 
 # Create virtual environment and install packages
 # We use a single stage to ensure no path/symlink issues with the venv
+# NOTE: PyTorch 2.6.0 is required to match the NCCL version in cuda:12.4.1-runtime
+#       PyTorch 2.4.0 was built against an older NCCL, causing:
+#       "undefined symbol: ncclCommWindowDeregister"
 RUN uv venv /opt/venv && \
     uv pip install --no-cache \
-    "torch==2.4.0" "torchaudio==2.4.0" --index-url https://download.pytorch.org/whl/cu124 && \
+    "torch==2.6.0" "torchaudio==2.6.0" --index-url https://download.pytorch.org/whl/cu124 && \
     uv pip install --no-cache "vieneu[gpu]>=1.2.6" "loguru" "fastapi" "uvicorn" "pydantic" "numpy"
+
+# Ensure PyTorch's bundled NCCL takes priority over the system one
+ENV LD_LIBRARY_PATH="/opt/venv/lib/python3.10/site-packages/torch/lib:${LD_LIBRARY_PATH}"
 
 # Copy our bridge script
 COPY api.py ./
