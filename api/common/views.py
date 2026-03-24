@@ -532,13 +532,6 @@ def presign_url(request):
     url = request.query_params.get("url", None)
     public_id = request.query_params.get("publicId", None)
 
-    if not request.user.is_authenticated and not getattr(settings, "MINIO_PRESIGN_PUBLIC", False):
-        return var_res.response_data(
-            status=status.HTTP_401_UNAUTHORIZED,
-            errors={"errorMessage": ["Authentication required."]},
-            data=None,
-        )
-
     if not url and not public_id:
         return var_res.response_data(
             status=status.HTTP_400_BAD_REQUEST,

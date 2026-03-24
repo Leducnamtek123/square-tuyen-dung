@@ -1,8 +1,34 @@
+# Environment
 .env
 .env.*
+!.env.example
+
+# Database dumps
 *.sql
 api/data/*.sql
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Node
 node_modules/
 dist/
+
+# Build output
+frontend/build/
+
+# OS files
 .DS_Store
 Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Temp / debug files
+full_diff.txt
+*.log
+tsc_output*.txt
+tsc_errors*.txt
