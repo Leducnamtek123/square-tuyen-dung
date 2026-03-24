@@ -109,25 +109,61 @@ def analyze_resume_ai(self, activity_id):
         activity.ai_analysis_status = 'processing'
         activity.save()
 
-        resume_url = activity.resume.file.get_full_url()
-        file_format = activity.resume.file.format.lower()
+        file_obj = activity.resume.file
+        file_format = file_obj.format.lower() if file_obj.format else 'pdf'
         
         resume_text = ""
-        with httpx.Client(timeout=30.0) as client:
-            response = client.get(resume_url)
-            if response.status_code == 200:
-                with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
-                    tf.write(response.content)
-                    temp_file = tf.name
-                
-                if file_format == 'pdf':
-                    resume_text = extract_text_from_pdf(temp_file)
-                elif file_format in ['docx', 'doc']:
-                    resume_text = extract_text_from_docx(temp_file)
+        
+        # Strategy 1: Download directly from MinIO (more reliable inside Docker)
+        try:
+            from shared.helpers.cloudinary_service import CloudinaryService
+            from django.conf import settings as django_settings
+            
+            minio_client = CloudinaryService._get_client()
+            bucket = django_settings.MINIO_BUCKET
+            object_name = file_obj.public_id.lstrip('/')
+            
+            # If public_id is a full URL, extract the object path
+            if object_name.startswith("http://") or object_name.startswith("https://"):
+                from urllib.parse import urlparse
+                parsed = urlparse(object_name)
+                object_name = parsed.path.lstrip("/")
+                if object_name.startswith(f"{bucket}/"):
+                    object_name = object_name[len(bucket) + 1:]
+            
+            logger.info(f"Downloading CV from MinIO: bucket={bucket}, object={object_name}")
+            
+            response = minio_client.get_object(bucket, object_name)
+            with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
+                for chunk in response.stream(1024 * 32):
+                    tf.write(chunk)
+                temp_file = tf.name
+            response.close()
+            response.release_conn()
+            
+        except Exception as minio_err:
+            logger.warning(f"MinIO direct download failed: {minio_err}. Falling back to HTTP URL.")
+            # Strategy 2: Fallback to HTTP URL download
+            resume_url = file_obj.get_full_url()
+            logger.info(f"Downloading CV from URL: {resume_url}")
+            with httpx.Client(timeout=30.0) as client:
+                response = client.get(resume_url)
+                if response.status_code == 200:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
+                        tf.write(response.content)
+                        temp_file = tf.name
                 else:
-                    resume_text = response.text
+                    raise Exception(f"Failed to download resume file: HTTP {response.status_code}")
+        
+        # Extract text from the downloaded file
+        if temp_file:
+            if file_format == 'pdf':
+                resume_text = extract_text_from_pdf(temp_file)
+            elif file_format in ['docx', 'doc']:
+                resume_text = extract_text_from_docx(temp_file)
             else:
-                raise Exception(f"Failed to download resume file from {resume_url}")
+                with open(temp_file, 'r', errors='ignore') as f:
+                    resume_text = f.read()
 
         if not resume_text or len(resume_text.strip()) < 50:
             activity.ai_analysis_status = 'failed'
