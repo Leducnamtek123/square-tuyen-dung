@@ -2,6 +2,7 @@
 from shared.configs import variable_system as var_sys
 
 from django.db import models
+from shared.models import CommonBaseModel
 
 from ckeditor.fields import RichTextField
 
@@ -26,17 +27,8 @@ def custom_slugify_function(value, model_instance):
 
     return slug_with_id
 
-class JobPostBaseModel(models.Model):
 
-    class Meta:
-
-        abstract = True
-
-    create_at = models.DateTimeField(auto_now_add=True)
-
-    update_at = models.DateTimeField(auto_now=True)
-
-class JobPost(JobPostBaseModel):
+class JobPost(CommonBaseModel):
 
     job_name = models.CharField(max_length=255)
 
@@ -124,7 +116,7 @@ class JobPost(JobPostBaseModel):
 
         return f"{self.job_name}"
 
-class SavedJobPost(JobPostBaseModel):
+class SavedJobPost(CommonBaseModel):
 
     job_post = models.ForeignKey(JobPost, on_delete=models.CASCADE)
 
@@ -140,7 +132,7 @@ class SavedJobPost(JobPostBaseModel):
 
         return f"{self.user} saved {self.job_post}"
 
-class JobPostActivity(JobPostBaseModel):
+class JobPostActivity(CommonBaseModel):
 
     full_name = models.CharField(max_length=100, null=True)
 
@@ -210,7 +202,7 @@ class JobPostActivity(JobPostBaseModel):
             ),
         ]
 
-class JobPostNotification(JobPostBaseModel):
+class JobPostNotification(CommonBaseModel):
 
     job_name = models.CharField(max_length=255)
 

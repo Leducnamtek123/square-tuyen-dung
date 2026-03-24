@@ -2,6 +2,7 @@
 from shared.configs import variable_system as var_sys
 
 from django.db import models
+from shared.models import CommonBaseModel
 
 from django.utils.text import slugify
 
@@ -15,17 +16,8 @@ from apps.files.models import File
 from apps.locations.models import City, Location
 from common.models import Career
 
-class InfoBaseModel(models.Model):
 
-    class Meta:
-
-        abstract = True
-
-    create_at = models.DateTimeField(auto_now_add=True)
-
-    update_at = models.DateTimeField(auto_now=True)
-
-class JobSeekerProfile(InfoBaseModel):
+class JobSeekerProfile(CommonBaseModel):
     phone = models.CharField(max_length=15, blank=True, null=True)
     birthday = models.DateField(null=True)
     gender = models.CharField(max_length=1, choices=var_sys.GENDER_CHOICES, null=True)
@@ -57,7 +49,7 @@ class JobSeekerProfile(InfoBaseModel):
 
         return f'Job seeker profile of {self.user.email}'
 
-class Resume(InfoBaseModel):
+class Resume(CommonBaseModel):
     title = models.CharField(max_length=200, null=True)
     slug = AutoSlugField(populate_from='title',
                          unique=True,
@@ -111,7 +103,7 @@ class Resume(InfoBaseModel):
 
         return f"{self.title} - {self.user}"
 
-class EducationDetail(InfoBaseModel):
+class EducationDetail(CommonBaseModel):
     degree_name = models.CharField(max_length=200)
     major = models.CharField(max_length=255)
     training_place_name = models.CharField(max_length=255)
@@ -126,7 +118,7 @@ class EducationDetail(InfoBaseModel):
 
         db_table = "project_info_education_detail"
 
-class ExperienceDetail(InfoBaseModel):
+class ExperienceDetail(CommonBaseModel):
     job_name = models.CharField(max_length=200)
     company_name = models.CharField(max_length=255)
     start_date = models.DateField()
@@ -143,7 +135,7 @@ class ExperienceDetail(InfoBaseModel):
 
         db_table = "project_info_experience_detail"
 
-class Certificate(InfoBaseModel):
+class Certificate(CommonBaseModel):
 
     name = models.CharField(max_length=200)
 
@@ -161,7 +153,7 @@ class Certificate(InfoBaseModel):
 
         db_table = "project_info_certificate"
 
-class LanguageSkill(InfoBaseModel):
+class LanguageSkill(CommonBaseModel):
 
     language = models.SmallIntegerField(choices=var_sys.LANGUAGE_CHOICES)
 
@@ -175,7 +167,7 @@ class LanguageSkill(InfoBaseModel):
 
         db_table = "project_info_language_skill"
 
-class AdvancedSkill(InfoBaseModel):
+class AdvancedSkill(CommonBaseModel):
 
     name = models.CharField(max_length=200)
 
@@ -189,7 +181,7 @@ class AdvancedSkill(InfoBaseModel):
 
         db_table = "project_info_advanced_skill"
 
-class CompanyFollowed(InfoBaseModel):
+class CompanyFollowed(CommonBaseModel):
 
     company = models.ForeignKey("Company", on_delete=models.CASCADE)
 
@@ -209,7 +201,7 @@ class CompanyFollowed(InfoBaseModel):
 
         return f"{self.user} followed {self.company}"
 
-class CompanyRole(InfoBaseModel):
+class CompanyRole(CommonBaseModel):
     code = models.SlugField(max_length=50)
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=255, blank=True, null=True)
@@ -229,7 +221,7 @@ class CompanyRole(InfoBaseModel):
     def __str__(self):
         return f"{self.company.company_name} - {self.name}"
 
-class Company(InfoBaseModel):
+class Company(CommonBaseModel):
 
     company_name = models.CharField(max_length=255, unique=True)
 
@@ -289,7 +281,7 @@ class Company(InfoBaseModel):
 
         return f"{self.company_name if self.company_name is not None else '-'}"
 
-class CompanyMember(InfoBaseModel):
+class CompanyMember(CommonBaseModel):
     STATUS_INVITED = "INVITED"
     STATUS_ACTIVE = "ACTIVE"
     STATUS_DISABLED = "DISABLED"
@@ -324,7 +316,7 @@ class CompanyMember(InfoBaseModel):
     def __str__(self):
         return f"{self.company.company_name} - {self.user.email}"
 
-class CompanyImage(InfoBaseModel):
+class CompanyImage(CommonBaseModel):
 
     # ForeignKey
 
@@ -338,7 +330,7 @@ class CompanyImage(InfoBaseModel):
 
         db_table = "project_info_company_image"
 
-class ResumeSaved(InfoBaseModel):
+class ResumeSaved(CommonBaseModel):
 
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
 
@@ -354,7 +346,7 @@ class ResumeSaved(InfoBaseModel):
 
         return f"{self.company} saved {self.resume}"
 
-class ResumeViewed(InfoBaseModel):
+class ResumeViewed(CommonBaseModel):
 
     views = models.BigIntegerField(default=0)
 
@@ -372,7 +364,7 @@ class ResumeViewed(InfoBaseModel):
 
         return f"{self.company} have watching {self.resume}"
 
-class ContactProfile(InfoBaseModel):
+class ContactProfile(CommonBaseModel):
 
     resume = models.ForeignKey(Resume, on_delete=models.CASCADE)
 

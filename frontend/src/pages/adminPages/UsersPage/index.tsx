@@ -10,7 +10,7 @@ import UserFilters from './components/UserFilters';
 const UsersPage = () => {
     const { t } = useTranslation('admin');
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(-1);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
     const [search, setSearch] = useState('');
     const [roleFilter, setRoleFilter] = useState('');
     const currentUserId = useAppSelector((state) => state.user?.currentUser?.id);

@@ -6,21 +6,16 @@ Supports: Question Bank, Interview Sessions, Transcripts, Evaluations.
 """
 
 from django.db import models
+from shared.models import CommonBaseModel
 from apps.accounts.models import User
 from apps.jobs.models import JobPost
 from apps.profiles.models import Resume
 import uuid
 
-class InterviewBaseModel(models.Model):
-    class Meta:
-        abstract = True
-
-    create_at = models.DateTimeField(auto_now_add=True)
-    update_at = models.DateTimeField(auto_now=True)
 
 # Question Bank
 
-class Question(InterviewBaseModel):
+class Question(CommonBaseModel):
     """Ngân hàng câu hỏi phỏng vấn — chỉ cần nội dung text."""
 
     CATEGORY_CHOICES = [
@@ -69,7 +64,7 @@ class Question(InterviewBaseModel):
     def __str__(self):
         return self.text[:80]
 
-class QuestionGroup(InterviewBaseModel):
+class QuestionGroup(CommonBaseModel):
     """Nhóm câu hỏi (cho một vị trí hoặc chủ đề cụ thể)."""
 
     name = models.CharField(max_length=255, verbose_name="Tên nhóm")
@@ -103,7 +98,7 @@ class QuestionGroup(InterviewBaseModel):
     def __str__(self):
         return self.name
 
-class InterviewSession(InterviewBaseModel):
+class InterviewSession(CommonBaseModel):
     """Buổi Phỏng vấn trực tuyến."""
 
     STATUS_CHOICES = [
@@ -116,6 +111,17 @@ class InterviewSession(InterviewBaseModel):
         ('interrupted', 'Bị gián đoạn'),
         ('processing', 'Đang xử lý'),
     ]
+
+    VALID_TRANSITIONS = {
+        'draft': {'scheduled', 'cancelled'},
+        'scheduled': {'calibration', 'cancelled'},
+        'calibration': {'in_progress', 'cancelled'},
+        'in_progress': {'completed', 'interrupted', 'processing'},
+        'processing': {'completed', 'interrupted'},
+        'interrupted': {'processing', 'completed', 'in_progress', 'cancelled'},
+        'completed': set(),
+        'cancelled': set(),
+    }
 
     TYPE_CHOICES = [
         ('technical', 'Kỹ thuật'),
@@ -254,6 +260,17 @@ class InterviewSession(InterviewBaseModel):
         return f"Interview #{self.pk} - {self.candidate.full_name} ({self.get_status_display()})"
 
     def save(self, *args, **kwargs):
+        from django.core.exceptions import ValidationError
+        
+        if self.pk:
+            old_instance = InterviewSession.objects.get(pk=self.pk)
+            if old_instance.status != self.status:
+                allowed_next_states = self.VALID_TRANSITIONS.get(old_instance.status, set())
+                if self.status not in allowed_next_states:
+                    raise ValidationError(
+                        f"Chuyển trạng thái phỏng vấn không hợp lệ: từ '{old_instance.status}' sang '{self.status}'"
+                    )
+
         if not self.room_name:
             self.room_name = f"interview-{uuid.uuid4().hex[:12]}"
         if not self.invite_token:
@@ -296,7 +313,7 @@ class InterviewTranscript(models.Model):
 
 # Interview Evaluation (HR đánh giá)
 
-class InterviewEvaluation(InterviewBaseModel):
+class InterviewEvaluation(CommonBaseModel):
     """Đánh giá kết quả phỏng vấn bởi HR."""
 
     RESULT_CHOICES = [

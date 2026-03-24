@@ -2,7 +2,7 @@
 from shared.configs import variable_system as var_sys
 from shared.configs.messages import ERROR_MESSAGES
 from shared.helpers import helper
-from shared.serializers import DynamicFieldsMixin
+from shared.serializers import DynamicFieldsMixin, PlatformValidationMixin, PasswordConfirmMixin
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.password_validation import validate_password as django_validate_password
@@ -25,38 +25,27 @@ class CheckCredsSerializer(serializers.Serializer):
     roleName = serializers.CharField(required=False, max_length=10,
                                      allow_null=True, allow_blank=True)
 
-class ForgotPasswordSerializer(serializers.Serializer):
+class ForgotPasswordSerializer(PlatformValidationMixin, serializers.Serializer):
     email = serializers.EmailField(required=True, max_length=100)
     platform = serializers.CharField(required=True)
 
-    def validate_platform(self, platform):
-        if platform not in ["WEB", "APP"]:
-            raise serializers.ValidationError(ERROR_MESSAGES['INVALID_PLATFORM'])
-        return platform
 
-class ResendVerifyEmailSerializer(serializers.Serializer):
+
+class ResendVerifyEmailSerializer(PlatformValidationMixin, serializers.Serializer):
     email = serializers.EmailField(required=True, max_length=100)
     platform = serializers.CharField(required=False, max_length=3, default="WEB")
 
-    def validate_platform(self, platform):
-        if platform not in ["WEB", "APP"]:
-            raise serializers.ValidationError(ERROR_MESSAGES['INVALID_PLATFORM'])
-        return platform
 
-class UpdatePasswordSerializer(serializers.Serializer):
+
+class UpdatePasswordSerializer(PasswordConfirmMixin, serializers.Serializer):
     oldPassword = serializers.CharField(required=True, max_length=128)
     newPassword = serializers.CharField(required=True, max_length=128)
     confirmPassword = serializers.CharField(required=True, max_length=128)
 
     def validate(self, attrs):
+        attrs = super().validate(attrs)
         user = self.context['user']
-
         old_pass = attrs.get('oldPassword', '')
-        new_pass = attrs.get('newPassword', '')
-        confirm_pass = attrs.get('confirmPassword', '')
-        if not new_pass == confirm_pass:
-            raise serializers.ValidationError({'confirmPassword': ERROR_MESSAGES['CONFIRM_PASSWORD_MISMATCH']})
-
         if not user.check_password(old_pass):
             raise serializers.ValidationError({'oldPassword': ERROR_MESSAGES['CURRENT_PASSWORD_INCORRECT']})
         return attrs
@@ -67,7 +56,7 @@ class UpdatePasswordSerializer(serializers.Serializer):
 
         return instance
 
-class ResetPasswordSerializer(DynamicFieldsMixin, serializers.Serializer):
+class ResetPasswordSerializer(PlatformValidationMixin, PasswordConfirmMixin, DynamicFieldsMixin, serializers.Serializer):
     newPassword = serializers.CharField(required=True, max_length=128)
     confirmPassword = serializers.CharField(required=True, max_length=128)
     token = serializers.CharField(required=False)
@@ -75,14 +64,8 @@ class ResetPasswordSerializer(DynamicFieldsMixin, serializers.Serializer):
     platform = serializers.CharField(required=True)
 
     def validate(self, attrs):
-        new_pass = attrs.get('newPassword', '')
-        confirm_pass = attrs.get('confirmPassword', '')
-        if not new_pass == confirm_pass:
-            raise serializers.ValidationError({'confirmPassword': ERROR_MESSAGES['CONFIRM_PASSWORD_MISMATCH']})
-
+        attrs = super().validate(attrs)
         platform = attrs.get("platform", "")
-        if platform not in ["APP", "WEB"]:
-            raise serializers.ValidationError({'platform': ERROR_MESSAGES['INVALID_PLATFORM']})
         if platform == "APP":
             if not attrs.get("code", None):
                 raise serializers.ValidationError({'code': ERROR_MESSAGES['CODE_REQUIRED']})
@@ -91,7 +74,7 @@ class ResetPasswordSerializer(DynamicFieldsMixin, serializers.Serializer):
                 raise serializers.ValidationError({'token': ERROR_MESSAGES['TOKEN_REQUIRED']})
         return attrs
 
-class JobSeekerRegisterSerializer(serializers.Serializer):
+class JobSeekerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
     fullName = serializers.CharField(source="full_name", required=True, max_length=100)
     email = serializers.EmailField(required=True, max_length=100,
                                    validators=[UniqueValidator(queryset=User.objects.all(),
@@ -104,10 +87,7 @@ class JobSeekerRegisterSerializer(serializers.Serializer):
         django_validate_password(value)
         return value
 
-    def validate(self, attrs):
-        if not attrs["password"] == attrs["confirmPassword"]:
-            raise serializers.ValidationError({'confirmPassword': ERROR_MESSAGES['CONFIRM_PASSWORD_MISMATCH']})
-        return attrs
+
 
     def create(self, validated_data):
         try:
@@ -166,7 +146,7 @@ class CompanyRegisterSerializer(serializers.ModelSerializer):
                   "websiteUrl", "description",
                   "location")
 
-class EmployerRegisterSerializer(serializers.Serializer):
+class EmployerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
     company = CompanyRegisterSerializer()
     fullName = serializers.CharField(source="full_name", required=True, max_length=100)
     email = serializers.EmailField(required=True, max_length=100,
@@ -179,10 +159,7 @@ class EmployerRegisterSerializer(serializers.Serializer):
         django_validate_password(value)
         return value
 
-    def validate(self, attrs):
-        if not attrs["password"] == attrs["confirmPassword"]:
-            raise serializers.ValidationError({'confirmPassword': ERROR_MESSAGES['CONFIRM_PASSWORD_MISMATCH']})
-        return attrs
+
 
     def create(self, validated_data):
         try:

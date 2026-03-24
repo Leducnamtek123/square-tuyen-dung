@@ -3,6 +3,7 @@ import json
 import logging
 
 import requests
+from django.db import transaction
 
 from datetime import timedelta
 
@@ -74,6 +75,7 @@ class CustomTokenView(TokenView):
 
                     role_name = token.user.role_name
                     allow_login = role_name == role_name_input
+                    
                     if role_name_input == var_sys.EMPLOYER and not allow_login:
                         try:
                             from apps.profiles.models import CompanyMember
@@ -85,9 +87,19 @@ class CustomTokenView(TokenView):
                             ).exists()
                         except Exception:
                             allow_login = False
+                            
+                    # C5 Fix: If a non-admin tries to login as ADMIN, log it and block explicitly
+                    if role_name_input == var_sys.ADMIN and not allow_login:
+                        logger.warning(
+                            "Suspicious ADMIN login attempt from non-admin user ID: %s", 
+                            token.user.id
+                        )
 
                     if not allow_login:
-                        return response_data(status=status.HTTP_400_BAD_REQUEST)
+                        return response_data(
+                            status=status.HTTP_400_BAD_REQUEST,
+                            errors={"errorMessage": ["Tài khoản hoặc mật khẩu không chính xác."]}
+                        )
 
             return response_data(status=stt, data=json.loads(body))
 
@@ -276,10 +288,10 @@ class CustomRevokeTokenView(RevokeTokenView):
                     elif backend == "google-oauth2":
                         self.google_revoke_token(social_access_token)
 
-        url, headers, body, status = self.create_revocation_response(oauth_request)
+        url, headers, body, revoke_status = self.create_revocation_response(oauth_request)
 
         response = Response(
-            data=json.loads(body) if body else "", status=status if body else 200
+            data=json.loads(body) if body else "", status=revoke_status if body else 200
         )
 
         for k, v in headers.items():
@@ -289,6 +301,9 @@ class CustomRevokeTokenView(RevokeTokenView):
 
 
 class FirebaseLoginView(TokenView):
+    # Only these roles are allowed via Firebase phone login
+    ALLOWED_FIREBASE_ROLES = {var_sys.JOB_SEEKER, var_sys.EMPLOYER}
+
     def post(self, request, *args, **kwargs):
         id_token = request.data.get("token")
         role_name = request.data.get("role_name")
@@ -298,7 +313,17 @@ class FirebaseLoginView(TokenView):
         if not id_token or not role_name:
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                errors={"token": ["Token vÃ  role_name lÃ  báº¯t buá»™c."]},
+                errors={"token": ["Token và role_name là bắt buộc."]},
+            )
+
+        # Validate role_name - NEVER allow ADMIN via Firebase login
+        if role_name not in self.ALLOWED_FIREBASE_ROLES:
+            logger.warning(
+                "Firebase login attempt with disallowed role: %s", role_name
+            )
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"role_name": ["Role không hợp lệ."]},
             )
 
         decoded_token = verify_id_token(id_token)
@@ -306,7 +331,7 @@ class FirebaseLoginView(TokenView):
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
                 errors={
-                    "token": ["Token khÃ´ng há»£p lá»‡ hoáº·c Ä‘Ã£ háº¿t háº¡n."]
+                    "token": ["Token không hợp lệ hoặc đã hết hạn."]
                 },
             )
 
@@ -314,24 +339,33 @@ class FirebaseLoginView(TokenView):
         if not phone_number:
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                errors={"token": ["Token khÃ´ng chá»©a sá»‘ Ä‘iá»‡n thoáº¡i."]},
+                errors={"token": ["Token không chứa số điện thoại."]},
             )
 
         # Find or create user
         user = User.objects.filter(phone_number=phone_number).first()
         if not user:
-            # Check if user exists with dummy email
-            dummy_email = f"{phone_number.replace('+', '')}@phone.auth"
+            dummy_email = f"{phone_number.replace('+', '')}" + "@phone.auth"
             user = User.objects.filter(email=dummy_email).first()
             if not user:
-                user = User.objects.create_user_with_role_name(
-                    email=dummy_email,
-                    full_name=f"User {phone_number}",
-                    role_name=role_name,
-                    phone_number=phone_number,
-                    is_active=True,
-                    is_verify_email=True,
-                )
+                with transaction.atomic():
+                    user = User.objects.create_user_with_role_name(
+                        email=dummy_email,
+                        full_name=f"User {phone_number}",
+                        role_name=role_name,
+                        phone_number=phone_number,
+                        is_active=True,
+                        is_verify_email=True,
+                    )
+                    # Create associated profile for JOB_SEEKER
+                    if role_name == var_sys.JOB_SEEKER:
+                        from apps.profiles.models import JobSeekerProfile, Resume
+                        profile = JobSeekerProfile.objects.create(user=user)
+                        Resume.objects.create(
+                            job_seeker_profile=profile,
+                            user=user,
+                            type=var_sys.CV_WEBSITE,
+                        )
 
         # Identify Application
         Application = get_application_model()

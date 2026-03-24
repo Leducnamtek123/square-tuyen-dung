@@ -10,6 +10,7 @@ from shared.serializers import DynamicFieldsMixin
 from rest_framework import serializers
 
 from django.db import transaction
+from django.utils import timezone
 
 from .models import (
 
@@ -181,7 +182,7 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
         deadline = job_post.deadline
 
-        if deadline < datetime.datetime.now().date():
+        if deadline < timezone.localdate():
 
             return True
 
@@ -189,8 +190,28 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
 
 
-    class Meta:
 
+    def validate(self, attrs):
+        errors = {}
+
+        if 'salary_min' in attrs and 'salary_max' in attrs:
+            if attrs['salary_min'] < 0:
+                errors['salaryMin'] = "Lương tối thiểu không được nhỏ hơn 0."
+            if attrs['salary_min'] > attrs['salary_max']:
+                errors['salaryMax'] = "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu."
+
+        if 'quantity' in attrs and attrs['quantity'] <= 0:
+            errors['quantity'] = "Số lượng tuyển dụng phải lớn hơn 0."
+
+        if 'deadline' in attrs and attrs['deadline'] < timezone.localdate():
+            errors['deadline'] = "Hạn nộp hồ sơ không được trong quá khứ."
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return attrs
+
+    class Meta:
         model = JobPost
 
         fields = ('id', 'slug', 'jobName', 'deadline', 'quantity', 'genderRequired',
@@ -208,6 +229,7 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   'isSaved', 'isApplied', 'companyDict', 'mobileCompanyDict', 'locationDict', 'views',
 
                   'isExpired', 'salary', 'city')
+
 
     def create(self, validated_data):
 
@@ -269,6 +291,7 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             helper.print_log_error("update job post", ex)
             raise
 
+
 class JobPostAroundFilterSerializer(serializers.Serializer):
 
     currentLatitude = serializers.FloatField(required=True)
@@ -311,8 +334,22 @@ class JobPostAroundSerializer(serializers.ModelSerializer):
 
                                                          read_only=True)
 
-    class Meta:
 
+    def validate(self, attrs):
+        errors = {}
+
+        if 'salary_min' in attrs and 'salary_max' in attrs:
+            if attrs['salary_min'] < 0:
+                errors['salaryMin'] = "Lương tối thiểu không được nhỏ hơn 0."
+            if attrs['salary_min'] > attrs['salary_max']:
+                errors['salaryMax'] = "Lương tối đa phải lớn hơn hoặc bằng lương tối thiểu."
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return attrs
+
+    class Meta:
         model = JobPost
 
         fields = ('id', "latitude", "longitude",
@@ -362,9 +399,18 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
     ], read_only=True)
 
 
+    def validate(self, attrs):
+        job_post = attrs.get('job_post')
+        if job_post:
+            if job_post.status != var_sys.JobPostStatus.APPROVED:
+                raise serializers.ValidationError({"job_post": "Tin tuyển dụng chưa được duyệt hoặc đã bị khóa."})
+
+            if job_post.deadline < timezone.localdate():
+                raise serializers.ValidationError({"job_post": "Tin tuyển dụng đã hết hạn ứng tuyển."})
+
+        return attrs
 
     class Meta:
-
         model = JobPostActivity
 
         fields = ("id", "job_post", "resume", "fullName", "email", "phone",
@@ -451,8 +497,8 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
 
 
 
-    class Meta:
 
+    class Meta:
         model = JobPostActivity
 
         fields = ("id", "userId", "fullName", "email", "phone", "title", "type",
@@ -502,8 +548,8 @@ class EmployerJobPostActivityExportSerializer(DynamicFieldsMixin, serializers.Mo
 
         return result
 
-    class Meta:
 
+    class Meta:
         model = JobPostActivity
 
         fields = ("title", "fullName", "email", "phone",
@@ -531,8 +577,23 @@ class JobPostNotificationSerializer(DynamicFieldsMixin, serializers.ModelSeriali
 
 
 
-    class Meta:
 
+    def validate(self, attrs):
+        errors = {}
+
+        if 'salary' in attrs and attrs['salary'] is not None:
+            if attrs['salary'] < 0:
+                errors['salary'] = "Mức lương không được nhỏ hơn 0."
+
+        if 'frequency' in attrs and attrs['frequency'] not in [1, 7, 30]:
+            errors['frequency'] = "Tần suất thông báo không hợp lệ."
+
+        if errors:
+            raise serializers.ValidationError(errors)
+
+        return attrs
+
+    class Meta:
         model = JobPostNotification
 
         fields = ("id", "jobName", "position",

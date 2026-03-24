@@ -5,6 +5,7 @@ Following the pattern established in interviews/services.py.
 """
 import datetime
 import logging
+import secrets
 
 import pytz
 from django.conf import settings
@@ -95,7 +96,7 @@ class PasswordResetService:
 
     @staticmethod
     def _send_web_reset(user: User, expired_at) -> None:
-        access_token = urlsafe_base64_encode(force_bytes(user.pk))
+        access_token = secrets.token_urlsafe(32)
 
         if user.role_name == var_sys.JOB_SEEKER:
             domain = settings.DOMAIN_CLIENT["job_seeker"]

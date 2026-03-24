@@ -2,21 +2,13 @@
 from shared.configs import variable_system as var_sys
 
 from django.db import models
+from shared.models import CommonBaseModel
 from django.core.exceptions import ObjectDoesNotExist
 
 from django.contrib.auth.models import (AbstractUser, BaseUserManager)
 
 from apps.files.models import File
 
-class AuthBaseModel(models.Model):
-
-    class Meta:
-
-        abstract = True
-
-    create_at = models.DateTimeField(auto_now_add=True)
-
-    update_at = models.DateTimeField(auto_now=True)
 
 class UserManager(BaseUserManager):
 
@@ -80,7 +72,7 @@ class UserManager(BaseUserManager):
 
         return user
 
-class User(AbstractUser, AuthBaseModel):
+class User(AbstractUser, CommonBaseModel):
 
     # groups = None
 
@@ -156,7 +148,7 @@ class User(AbstractUser, AuthBaseModel):
     def active_company(self):
         return self.get_active_company()
 
-class ForgotPasswordToken(AuthBaseModel):
+class ForgotPasswordToken(CommonBaseModel):
 
     token = models.CharField(max_length=255, null=True)
 
