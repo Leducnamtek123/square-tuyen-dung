@@ -1,4 +1,4 @@
-import datetime
+﻿import datetime
 import logging
 import time
 
@@ -35,6 +35,12 @@ from console.jobs import queue_mail, queue_auth
 
 from .tokens_custom import email_verification_token
 from . import permissions as perms_custom
+from .services import (
+    PasswordResetService,
+    EmailVerificationService,
+    UserNotFoundError,
+    CooldownActiveError,
+)
 
 from .models import User, ForgotPasswordToken
 from apps.profiles.models import CompanyMember
@@ -123,7 +129,7 @@ def check_email_exists(request):
     if not email:
         return response_data(
             status=status.HTTP_400_BAD_REQUEST,
-            errors={"email": ["Email lÃ  báº¯t buá»™c."]},
+            errors={"email": ["Email lÃƒÂ  bÃ¡ÂºÂ¯t buÃ¡Â»â„¢c."]},
         )
     exists = User.objects.filter(email__iexact=email).exists()
     return response_data(status=status.HTTP_200_OK, data={"exists": exists})
@@ -219,242 +225,80 @@ def user_active(request, encoded_data, token):
         return HttpResponseNotFound()
 
     platform = request.GET.get("platform")
-
-    if platform != var_sys.Platform.WEB and platform != var_sys.Platform.APP:
+    if platform not in (var_sys.Platform.WEB, var_sys.Platform.APP):
         return HttpResponseNotFound()
 
     redirect_login = ""
-
     if platform == var_sys.Platform.WEB:
         if "redirectLogin" not in request.GET:
             return HttpResponseNotFound()
-
         redirect_login = request.GET.get("redirectLogin")
-
         if redirect_login != settings.REDIRECT_LOGIN_CLIENT:
             return HttpResponseNotFound()
 
     try:
-        uid, expiration_time = helper.urlsafe_base64_decode_with_encoded_data(
-            encoded_data
-        )
-
-        if uid is None or expiration_time is None:
-            if platform == var_sys.Platform.WEB:
-                domain_type = "job_seeker"
-
-                return HttpResponseRedirect(
-                    helper.get_full_client_url(
-                        f"{redirect_login}/?errorMessage={ERROR_MESSAGES['INVALID_EMAIL_VERIFICATION']}",
-                        domain_type,
-                    )
-                )
-            return response_data(
-                status=status.HTTP_400_BAD_REQUEST,
-                errors={"errorMessage": [ERROR_MESSAGES["INVALID_EMAIL_VERIFICATION"]]},
-            )
-
-        user = User.objects.get(pk=uid)
-
-        if not helper.check_expiration_time(expiration_time):
-            if platform == var_sys.Platform.WEB:
-                domain_type = (
-                    "job_seeker"
-                    if user.role_name == var_sys.JOB_SEEKER
-                    else "employer"
-                )
-
-                return HttpResponseRedirect(
-                    helper.get_full_client_url(
-                        f"{redirect_login}/?errorMessage={ERROR_MESSAGES['EMAIL_VERIFICATION_EXPIRED']}",
-                        domain_type,
-                    )
-                )
-
-            return response_data(
-                status=status.HTTP_400_BAD_REQUEST,
-                errors={
-                    "errorMessage": [ERROR_MESSAGES["EMAIL_VERIFICATION_EXPIRED"]]
-                },
-            )
-
+        user, error_key = EmailVerificationService.verify_user(encoded_data, token)
     except Exception as ex:
-        user = None
-
         helper.print_log_error("user_active", ex)
+        user, error_key = None, "INVALID_EMAIL_VERIFICATION"
 
-    if user is not None and email_verification_token.check_token(user, token):
-        user.is_active = True
+    domain_type = EmailVerificationService.get_domain_type(user)
 
-        user.is_verify_email = True
-
-        user.save()
-
-        noti_title = SYSTEM_MESSAGES["WELCOME_JOBSEEKER"]
-
-        if user.role_name == var_sys.EMPLOYER:
-            noti_title = SYSTEM_MESSAGES["WELCOME_EMPLOYER"]
-
-        # add notification welcome
-        helper.add_system_notifications(
-            "ChÃ o má»«ng báº¡n!",
-            noti_title,
-            [user.id],
-        )
-
+    if error_key:
+        error_msg = ERROR_MESSAGES[error_key]
         if platform == var_sys.Platform.WEB:
-            domain_type = (
-                "job_seeker"
-                if user.role_name == var_sys.JOB_SEEKER
-                else "employer"
-            )
-
             return HttpResponseRedirect(
                 helper.get_full_client_url(
-                    f"{redirect_login}/?successMessage={SUCCESS_MESSAGES['EMAIL_VERIFIED']}",
-                    domain_type,
+                    f"{redirect_login}/?errorMessage={error_msg}", domain_type
                 )
             )
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"errorMessage": [error_msg]},
+        )
 
-        return response_data(status=status.HTTP_200_OK)
-
+    # Success
     if platform == var_sys.Platform.WEB:
-        domain_type = "job_seeker"
-
-        if user:
-            domain_type = (
-                "job_seeker"
-                if user.role_name == var_sys.JOB_SEEKER
-                else "employer"
-            )
-
         return HttpResponseRedirect(
             helper.get_full_client_url(
-                f"{redirect_login}/?errorMessage={ERROR_MESSAGES['INVALID_EMAIL_VERIFICATION']}",
+                f"{redirect_login}/?successMessage={SUCCESS_MESSAGES['EMAIL_VERIFIED']}",
                 domain_type,
             )
         )
+    return response_data(status=status.HTTP_200_OK)
 
-    return response_data(
-        status=status.HTTP_400_BAD_REQUEST,
-        errors={"errorMessage": [ERROR_MESSAGES["INVALID_EMAIL_VERIFICATION"]]},
-    )
+
 
 
 @api_view(http_method_names=["post"])
 @permission_classes([AllowAny])
 def forgot_password(request):
-    data = request.data
-
-    forgot_password_serializer = ForgotPasswordSerializer(data=data)
-
-    if not forgot_password_serializer.is_valid():
+    serializer = ForgotPasswordSerializer(data=request.data)
+    if not serializer.is_valid():
         return response_data(
             status=status.HTTP_400_BAD_REQUEST,
-            errors=forgot_password_serializer.errors,
+            errors=serializer.errors,
         )
 
-    email = forgot_password_serializer.validated_data.get("email")
+    email = serializer.validated_data["email"]
+    platform = serializer.validated_data["platform"]
 
-    platform = forgot_password_serializer.validated_data.get("platform")
-
-    user = User.objects.filter(email=email).first()
-
-    if user:
-        try:
-            now = datetime.datetime.now()
-
-            now = now.astimezone(pytz.utc)
-
-            tokens = ForgotPasswordToken.objects.filter(
-                user=user,
-                is_active=True,
-                platform=platform,
-                expired_at__gte=now,
-            )
-
-            if tokens.exists():
-                token = tokens.first()
-
-                token_created_at = token.create_at
-
-                if (now - token_created_at).total_seconds() < settings.PROJECT_AUTH[
-                    "TIME_REQUIRED_FORGOT_PASSWORD"
-                ]:
-                    return response_data(
-                        status=status.HTTP_400_BAD_REQUEST,
-                        errors={
-                            "errorMessage": [
-                                ERROR_MESSAGES["PASSWORD_RESET_EMAIL_COOLDOWN"]
-                            ]
-                        },
-                    )
-
-            with transaction.atomic():
-                ForgotPasswordToken.objects.filter(
-                    user=user, is_active=True, platform=platform
-                ).update(is_active=False)
-
-                expired_at = now + datetime.timedelta(
-                    seconds=settings.PROJECT_AUTH["RESET_PASSWORD_EXPIRE_SECONDS"]
-                )
-
-                if platform == "WEB":
-                    access_token = urlsafe_base64_encode(force_bytes(user.pk))
-
-                    # Redirect to the domain of the role name
-                    if user.role_name == var_sys.JOB_SEEKER:
-                        domain = settings.DOMAIN_CLIENT["job_seeker"]
-                    else:
-                        domain = settings.DOMAIN_CLIENT["employer"]
-
-                    func = f"cap-nhat-mat-khau/{access_token}"
-
-                    reset_password_url = domain + func
-
-                    ForgotPasswordToken.objects.create(
-                        user=user,
-                        expired_at=expired_at,
-                        token=access_token,
-                        platform=platform,
-                    )
-
-                    # send mail reset password cho website
-                    queue_mail.send_email_reset_password_for_web_task.delay(
-                        to=[user.email],
-                        reset_password_url=reset_password_url,
-                    )
-
-                elif platform == "APP":
-                    totp = TOTP(settings.SECRET_KEY.encode())
-
-                    code = totp.token()
-
-                    new_token = ForgotPasswordToken.objects.create(
-                        user=user,
-                        expired_at=expired_at,
-                        code=code,
-                        platform=platform,
-                    )
-
-                    # send mail reset password cho app
-                    queue_mail.send_email_reset_password_for_app_task.delay(
-                        to=[user.email],
-                        full_name=user.full_name,
-                        code=new_token.code,
-                    )
-
-        except Exception as ex:
-            helper.print_log_error("forgot_password", ex)
-
-            return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+    try:
+        PasswordResetService.request_reset(email, platform)
         return response_data()
-
-    return response_data(
-        status=status.HTTP_400_BAD_REQUEST,
-        errors={"errorMessage": [ERROR_MESSAGES["EMAIL_NOT_REGISTERED"]]},
-    )
+    except UserNotFoundError:
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"errorMessage": [ERROR_MESSAGES["EMAIL_NOT_REGISTERED"]]},
+        )
+    except CooldownActiveError:
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"errorMessage": [ERROR_MESSAGES["PASSWORD_RESET_EMAIL_COOLDOWN"]]},
+        )
+    except Exception as ex:
+        helper.print_log_error("forgot_password", ex)
+        return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(http_method_names=["post"])
@@ -882,7 +726,7 @@ class UserViewSet(
                 return response_data(
                     status=status.HTTP_400_BAD_REQUEST,
                     errors={
-                        "detail": "Báº¡n khÃ´ng thá»ƒ tá»± khÃ³a tÃ i khoáº£n cá»§a chÃ­nh mÃ¬nh."
+                        "detail": "BÃ¡ÂºÂ¡n khÃƒÂ´ng thÃ¡Â»Æ’ tÃ¡Â»Â± khÃƒÂ³a tÃƒÂ i khoÃ¡ÂºÂ£n cÃ¡Â»Â§a chÃƒÂ­nh mÃƒÂ¬nh."
                     },
                 )
 

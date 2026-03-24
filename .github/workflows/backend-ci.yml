@@ -92,16 +92,21 @@ jobs:
         working-directory: api
         env:
           DJANGO_SETTINGS_MODULE: config.settings
-          SERVICE_MYSQL_HOST: 127.0.0.1
-          SERVICE_MYSQL_PORT: 3306
-          SERVICE_MYSQL_DB_NAME: test_db
-          SERVICE_MYSQL_USER: root
-          SERVICE_MYSQL_PASSWORD: testpass
+          DB_ENGINE: django.db.backends.mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_NAME: test_db
+          DB_USER: root
+          DB_PASSWORD: testpass
           SERVICE_REDIS_HOST: 127.0.0.1
           SERVICE_REDIS_PORT: 6379
           SERVICE_REDIS_DB: 0
           SECRET_KEY: test-secret-key-ci
           DEBUG: 'True'
+          EMAIL_HOST: localhost
+          EMAIL_PORT: 25
+          EMAIL_HOST_USER: ci@test.com
+          EMAIL_HOST_PASSWORD: ci
         run: |
           pytest --cov=apps --cov-report=xml --cov-report=term-missing -v
 

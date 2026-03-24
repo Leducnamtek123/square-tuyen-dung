@@ -1,5 +1,6 @@
 
 from rest_framework import serializers
+from shared.serializers import DynamicFieldsMixin
 
 from .models import (
 
@@ -11,7 +12,7 @@ from .models import (
 
 from apps.accounts import serializers as auth_serializers
 
-class FeedbackSerializer(serializers.ModelSerializer):
+class FeedbackSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     content = serializers.CharField(max_length=255)
 
@@ -25,21 +26,6 @@ class FeedbackSerializer(serializers.ModelSerializer):
 
                                                read_only=True)
 
-    def __init__(self, *args, **kwargs):
-
-        fields = kwargs.pop('fields', None)
-
-        super().__init__(*args, **kwargs)
-
-        if fields is not None:
-
-            allowed = set(fields)
-
-            existing = set(self.fields)
-
-            for field_name in existing - allowed:
-
-                self.fields.pop(field_name)
 
     def create(self, validated_data):
 
@@ -55,7 +41,7 @@ class FeedbackSerializer(serializers.ModelSerializer):
 
         fields = ('id', 'content', 'rating', 'isActive', 'userDict')
 
-class BannerSerializer(serializers.ModelSerializer):
+class BannerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     imageUrl = serializers.SerializerMethodField(method_name='get_image_url', read_only=True)
 
@@ -73,21 +59,6 @@ class BannerSerializer(serializers.ModelSerializer):
 
     descriptionLocation = serializers.IntegerField(source='description_location', read_only=True)
 
-    def __init__(self, *args, **kwargs):
-
-        fields = kwargs.pop('fields', None)
-
-        super().__init__(*args, **kwargs)
-
-        if fields is not None:
-
-            allowed = set(fields)
-
-            existing = set(self.fields)
-
-            for field_name in existing - allowed:
-
-                self.fields.pop(field_name)
 
     def get_image_url(self, banner):
 
@@ -118,7 +89,7 @@ class BannerSerializer(serializers.ModelSerializer):
                   'isActive', 'descriptionLocation')
 
 
-class AdminBannerSerializer(serializers.ModelSerializer):
+class AdminBannerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """Full admin serializer for Banner CRUD."""
     imageUrl = serializers.SerializerMethodField(read_only=True)
     imageMobileUrl = serializers.SerializerMethodField(read_only=True)
@@ -160,7 +131,7 @@ class AdminBannerSerializer(serializers.ModelSerializer):
         return None
 
 
-class AdminFeedbackSerializer(serializers.ModelSerializer):
+class AdminFeedbackSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     """Full admin serializer for Feedback management."""
     userDict = auth_serializers.UserSerializer(
         source="user",

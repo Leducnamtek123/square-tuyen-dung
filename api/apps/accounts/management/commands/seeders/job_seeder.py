@@ -1,3 +1,4 @@
+import logging
 from faker import Faker
 from apps.jobs.models import JobPost
 from apps.profiles.models import Company, Resume, JobSeekerProfile
@@ -7,13 +8,16 @@ from common.models import Career
 import random
 from datetime import date, timedelta
 
+
+logger = logging.getLogger(__name__)
+
 fake = Faker('vi_VN')
 
 def seed_jobs():
     """
     Seed job posts and resumes for the portal using Faker
     """
-    print("Bắt đầu sinh dữ liệu tin tuyển dụng và CV...")
+    logger.info("Bắt đầu sinh dữ liệu tin tuyển dụng và CV...")
     
     # 1. Lấy context dữ liệu
     companies = Company.objects.all()
@@ -22,7 +26,7 @@ def seed_jobs():
     candidates = User.objects.filter(role_name='JOB_SEEKER')
 
     if not companies.exists() or not careers.exists():
-        print("Lỗi: Cần chạy seed_accounts và seed_careers trước.")
+        logger.error(f"Lỗi: Cần chạy seed_accounts và seed_careers trước.")
         return
 
     # 2. Tạo tin tuyển dụng mẫu (Jobs)
@@ -74,4 +78,4 @@ def seed_jobs():
             )
             resume_count += 1
 
-    print(f"Thành công! Đã tạo {job_count} tin tuyển dụng và {resume_count} hồ sơ ứng viên.")
+    logger.info(f"Thành công! Đã tạo {job_count} tin tuyển dụng và {resume_count} hồ sơ ứng viên.")

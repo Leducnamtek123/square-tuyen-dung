@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import transaction
 from shared.helpers import helper
 from shared.helpers.cloudinary_service import CloudinaryService
+from shared.serializers import DynamicFieldsMixin
 
 from apps.files.models import File
 from apps.locations.models import City, District, Location, Ward
@@ -33,7 +34,7 @@ class WardSerializer(serializers.ModelSerializer):
 
         fields = ('id', 'name', 'code', 'district')
 
-class CareerSerializer(serializers.ModelSerializer):
+class CareerSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     name = serializers.CharField(max_length=150)
 
@@ -51,21 +52,7 @@ class CareerSerializer(serializers.ModelSerializer):
 
     jobPostTotal = serializers.SerializerMethodField(method_name='get_job_post_total')
 
-    def __init__(self, *args, **kwargs):
 
-        fields = kwargs.pop('fields', None)
-
-        super().__init__(*args, **kwargs)
-
-        if fields is not None:
-
-            allowed = set(fields)
-
-            existing = set(self.fields)
-
-            for field_name in existing - allowed:
-
-                self.fields.pop(field_name)
 
     def get_icon_url(self, career):
         try:
@@ -173,7 +160,7 @@ class ProfileLocationSerializer(serializers.ModelSerializer):
 
         fields = ('city', 'districtDict', 'wardDict', 'address', 'district', 'ward')
 
-class LocationSerializer(serializers.ModelSerializer):
+class LocationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     address = serializers.CharField(required=True, max_length=255)
 
@@ -181,21 +168,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
     lng = serializers.FloatField(required=False, allow_null=True)
 
-    def __init__(self, *args, **kwargs):
 
-        fields = kwargs.pop('fields', None)
-
-        super().__init__(*args, **kwargs)
-
-        if fields is not None:
-
-            allowed = set(fields)
-
-            existing = set(self.fields)
-
-            for field_name in existing - allowed:
-
-                self.fields.pop(field_name)
 
     class Meta:
 

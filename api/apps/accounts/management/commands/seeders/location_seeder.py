@@ -1,7 +1,10 @@
 import json
+import logging
 from pathlib import Path
 
 from apps.locations.models import City, District, Ward
+
+logger = logging.getLogger(__name__)
 
 def seed_locations():
     """
@@ -22,10 +25,10 @@ def seed_locations():
             break
 
     if not json_path:
-        print(f"Không tìm thấy file dữ liệu JSON tại các đường dẫn: {paths_to_try}")
+        logger.error(f"Không tìm thấy file dữ liệu JSON tại các đường dẫn: {paths_to_try}")
         return
 
-    print(f"Bắt đầu nạp dữ liệu tỉnh thành từ: {json_path}")
+    logger.info(f"Bắt đầu nạp dữ liệu tỉnh thành từ: {json_path}")
     
     try:
         with open(json_path, 'r', encoding='utf-8') as f:
@@ -86,8 +89,8 @@ def seed_locations():
                     if created:
                         ward_count += 1
 
-        print(f"Thành công! Đã nạp xong: {city_count} tỉnh thành mới, {district_count} quận huyện mới, {ward_count} phường xã mới.")
-        print(f"Tổng cộng hiện có: {City.objects.count()} tỉnh thành, {District.objects.count()} quận huyện, {Ward.objects.count()} phường xã.")
+        logger.info(f"Thành công! Đã nạp xong: {city_count} tỉnh thành mới, {district_count} quận huyện mới, {ward_count} phường xã mới.")
+        logger.info(f"Tổng cộng hiện có: {City.objects.count()} tỉnh thành, {District.objects.count()} quận huyện, {Ward.objects.count()} phường xã.")
         
     except Exception as e:
-        print(f"Lỗi khi nạp dữ liệu: {str(e)}")
+        logger.error(f"Lỗi khi nạp dữ liệu: {str(e)}")

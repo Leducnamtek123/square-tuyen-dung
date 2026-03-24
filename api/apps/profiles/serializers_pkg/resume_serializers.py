@@ -5,6 +5,7 @@ Extracted from the monolithic serializers.py.
 from django.conf import settings
 from django.db import transaction
 from rest_framework import serializers
+from shared.serializers import DynamicFieldsMixin
 
 from shared.configs import variable_system as var_sys
 from shared.configs.messages import ERROR_MESSAGES
@@ -24,21 +25,13 @@ from .profile_serializers import JobSeekerProfileSerializer
 from .company_serializers import CompanySerializer
 
 
-class CvSerializer(serializers.ModelSerializer):
+class CvSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     title = serializers.CharField(required=True, max_length=200)
     fileUrl = serializers.SerializerMethodField(
         method_name="get_cv_file_url", read_only=True)
     file = serializers.FileField(required=True, write_only=True)
     updateAt = serializers.DateTimeField(source='update_at', read_only=True)
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     class Meta:
         model = Resume
@@ -73,7 +66,7 @@ class CvSerializer(serializers.ModelSerializer):
         return instance
 
 
-class ResumeSerializer(serializers.ModelSerializer):
+class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     title = serializers.CharField(required=True, max_length=200)
     description = serializers.CharField(
         required=False, allow_null=True, allow_blank=True)
@@ -128,14 +121,6 @@ class ResumeSerializer(serializers.ModelSerializer):
     advancedSkills = serializers.SerializerMethodField(
         method_name="get_advanced_skills", read_only=True)
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     def get_fields(self, *args, **kwargs):
         fields = super(ResumeSerializer, self).get_fields(*args, **kwargs)
@@ -297,7 +282,7 @@ class ResumeSerializer(serializers.ModelSerializer):
             return resume
 
 
-class ExperiencePdfSerializer(serializers.ModelSerializer):
+class ExperiencePdfSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     jobName = serializers.CharField(source='job_name', read_only=True)
     companyName = serializers.CharField(source='company_name', read_only=True)
     startDate = serializers.DateField(source='start_date', read_only=True)
@@ -312,7 +297,7 @@ class ExperiencePdfSerializer(serializers.ModelSerializer):
                   'description', 'lastSalary', 'leaveReason')
 
 
-class EducationPdfSerializer(serializers.ModelSerializer):
+class EducationPdfSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     degreeName = serializers.CharField(source='degree_name', read_only=True)
     major = serializers.CharField(read_only=True)
     trainingPlaceName = serializers.CharField(source='training_place_name', read_only=True)
@@ -327,7 +312,7 @@ class EducationPdfSerializer(serializers.ModelSerializer):
                   'startDate', 'completedDate', 'description', 'gradeOrRank')
 
 
-class CertificatePdfSerializer(serializers.ModelSerializer):
+class CertificatePdfSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     name = serializers.CharField(read_only=True)
     trainingPlace = serializers.CharField(source='training_place', read_only=True)
     startDate = serializers.DateField(source='start_date', read_only=True)
@@ -338,7 +323,7 @@ class CertificatePdfSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'trainingPlace', 'startDate', 'expirationDate')
 
 
-class LanguageSkillPdfSerializer(serializers.ModelSerializer):
+class LanguageSkillPdfSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     language = serializers.IntegerField(read_only=True)
     level = serializers.IntegerField(read_only=True)
 
@@ -347,7 +332,7 @@ class LanguageSkillPdfSerializer(serializers.ModelSerializer):
         fields = ('id', 'language', 'level')
 
 
-class AdvancedSkillPdfSerializer(serializers.ModelSerializer):
+class AdvancedSkillPdfSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     name = serializers.CharField(read_only=True)
     level = serializers.IntegerField(read_only=True)
 
@@ -356,7 +341,7 @@ class AdvancedSkillPdfSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'level')
 
 
-class ResumePdfViewSerializer(serializers.ModelSerializer):
+class ResumePdfViewSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     title = serializers.CharField(read_only=True)
     description = serializers.CharField(read_only=True)
     salaryMin = serializers.IntegerField(source="salary_min", read_only=True)
@@ -385,7 +370,7 @@ class ResumePdfViewSerializer(serializers.ModelSerializer):
                   "languageSkills", "advancedSkills")
 
 
-class ResumeViewedSerializer(serializers.ModelSerializer):
+class ResumeViewedSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     resume = ResumeSerializer(fields=["id", "title"])
     company = CompanySerializer(fields=['id', 'slug', 'companyName', 'companyImageUrl'])
     createAt = serializers.DateTimeField(source='create_at', read_only=True)
@@ -401,7 +386,7 @@ class ResumeViewedSerializer(serializers.ModelSerializer):
         fields = ('id', 'views', 'createAt', 'resume', 'company', 'isSavedResume')
 
 
-class ResumeSavedSerializer(serializers.ModelSerializer):
+class ResumeSavedSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     resume = ResumeSerializer(fields=[
         "id", "slug", "title", "salaryMin", "salaryMax",
         "experience", "city", "userDict", "jobSeekerProfileDict", "type"
@@ -409,21 +394,13 @@ class ResumeSavedSerializer(serializers.ModelSerializer):
     createAt = serializers.DateTimeField(source='create_at', read_only=True)
     updateAt = serializers.DateTimeField(source='update_at', read_only=True)
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     class Meta:
         model = ResumeSaved
         fields = ("id", "resume", "createAt", "updateAt")
 
 
-class ResumeSavedExportSerializer(serializers.ModelSerializer):
+class ResumeSavedExportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     title = serializers.PrimaryKeyRelatedField(source="resume.title", read_only=True)
     fullName = serializers.PrimaryKeyRelatedField(source="resume.user.full_name", read_only=True)
     email = serializers.PrimaryKeyRelatedField(source="resume.user.email", read_only=True)
@@ -433,14 +410,6 @@ class ResumeSavedExportSerializer(serializers.ModelSerializer):
     address = serializers.PrimaryKeyRelatedField(source="resume.job_seeker_profile.location.city.name", read_only=True)
     createAt = serializers.DateTimeField(source='create_at', read_only=True)
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     class Meta:
         model = ResumeSaved
@@ -448,7 +417,7 @@ class ResumeSavedExportSerializer(serializers.ModelSerializer):
                   "gender", "birthday", "address", "createAt")
 
 
-class EducationSerializer(serializers.ModelSerializer):
+class EducationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     degreeName = serializers.CharField(source='degree_name', required=True, max_length=200)
     major = serializers.CharField(required=True, max_length=255)
     trainingPlaceName = serializers.CharField(source='training_place_name', required=True, max_length=255)
@@ -464,14 +433,6 @@ class EducationSerializer(serializers.ModelSerializer):
     resume = serializers.SlugRelatedField(required=False, slug_field="slug", queryset=Resume.objects.all())
     resumeId = serializers.PrimaryKeyRelatedField(source='resume', queryset=Resume.objects.all(), required=False)
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     def validate(self, attrs):
         if EducationDetail.objects.count() >= 10:
@@ -485,7 +446,7 @@ class EducationSerializer(serializers.ModelSerializer):
                   'startDate', 'completedDate', 'description', 'gradeOrRank', 'resume', 'resumeId')
 
 
-class ExperienceSerializer(serializers.ModelSerializer):
+class ExperienceSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     jobName = serializers.CharField(source='job_name', required=True, max_length=200)
     companyName = serializers.CharField(source='company_name', required=True, max_length=255)
     startDate = serializers.DateField(source='start_date', required=True,
@@ -501,14 +462,6 @@ class ExperienceSerializer(serializers.ModelSerializer):
     resume = serializers.SlugRelatedField(required=False, slug_field="slug", queryset=Resume.objects.all())
     resumeId = serializers.PrimaryKeyRelatedField(source='resume', queryset=Resume.objects.all(), required=False)
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     def validate(self, attrs):
         if ExperienceDetail.objects.count() >= 10:
@@ -522,7 +475,7 @@ class ExperienceSerializer(serializers.ModelSerializer):
                   'description', 'lastSalary', 'leaveReason', 'resume', 'resumeId')
 
 
-class CertificateSerializer(serializers.ModelSerializer):
+class CertificateSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     name = serializers.CharField(required=True, max_length=200)
     trainingPlace = serializers.CharField(source='training_place', required=True, max_length=255)
     startDate = serializers.DateField(source='start_date', required=True,
@@ -534,14 +487,6 @@ class CertificateSerializer(serializers.ModelSerializer):
     resume = serializers.SlugRelatedField(required=False, slug_field="slug", queryset=Resume.objects.all())
     resumeId = serializers.PrimaryKeyRelatedField(source='resume', queryset=Resume.objects.all(), required=False)
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     def validate(self, attrs):
         if Certificate.objects.count() >= 10:
@@ -554,40 +499,24 @@ class CertificateSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'trainingPlace', 'startDate', 'expirationDate', 'resume', 'resumeId')
 
 
-class LanguageSkillSerializer(serializers.ModelSerializer):
+class LanguageSkillSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     language = serializers.IntegerField(required=True)
     level = serializers.IntegerField(required=True)
     resume = serializers.SlugRelatedField(required=False, slug_field="slug", queryset=Resume.objects.all())
     resumeId = serializers.PrimaryKeyRelatedField(source='resume', queryset=Resume.objects.all(), required=False)
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     class Meta:
         model = LanguageSkill
         fields = ('id', 'language', 'level', 'resume', 'resumeId')
 
 
-class AdvancedSkillSerializer(serializers.ModelSerializer):
+class AdvancedSkillSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     name = serializers.CharField(required=True, max_length=200)
     level = serializers.IntegerField(required=True)
     resume = serializers.SlugRelatedField(required=False, slug_field="slug", queryset=Resume.objects.all())
     resumeId = serializers.PrimaryKeyRelatedField(source='resume', queryset=Resume.objects.all(), required=False)
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     def validate(self, attrs):
         if AdvancedSkill.objects.count() >= 15:
@@ -600,7 +529,7 @@ class AdvancedSkillSerializer(serializers.ModelSerializer):
         fields = ('id', 'name', 'level', 'resume', "resumeId")
 
 
-class ResumeDetailSerializer(serializers.ModelSerializer):
+class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     title = serializers.CharField(required=True, max_length=200)
     description = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     salaryMin = serializers.IntegerField(source="salary_min", required=True)

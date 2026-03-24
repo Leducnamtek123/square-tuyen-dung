@@ -3,6 +3,7 @@ Banner Seeder
 Tạo dữ liệu mẫu cho Banner ngành Xây dựng & Thiết kế.
 Ảnh thật được upload lên MinIO từ local file — không cần URL ngoài.
 """
+import logging
 import os
 from datetime import datetime, timezone
 
@@ -10,6 +11,9 @@ from apps.content.models import Banner
 from apps.files.models import File
 from shared.configs import variable_system as var_sys
 from shared.helpers.cloudinary_service import CloudinaryService
+
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Đường dẫn thư mục chứa ảnh seed (relative to manage.py / BASE_DIR)
@@ -98,7 +102,7 @@ BANNERS_DATA = [
 def _upload_local_image(filepath: str, folder: str, object_name: str, file_type: str) -> "File | None":
     """Upload ảnh từ local file lên MinIO, trả về File instance."""
     if not filepath:
-        print(f"  ⚠  Không tìm thấy file ảnh: {filepath}")
+        logger.warning(f"  ⚠  Không tìm thấy file ảnh: {filepath}")
         return None
     try:
         result = CloudinaryService.upload_image(filepath, folder, public_id=object_name)
@@ -114,13 +118,13 @@ def _upload_local_image(filepath: str, folder: str, object_name: str, file_type:
             metadata=result,
         )
     except Exception as e:
-        print(f"  ⚠  Upload thất bại ({object_name}): {e}")
+        logger.warning(f"  ⚠  Upload thất bại ({object_name}): {e}")
         return None
 
 
 def seed_banners():
     """Seed dữ liệu Banner ngành Xây dựng & Thiết kế với ảnh thật từ local."""
-    print("Bắt đầu nạp dữ liệu Banner (xây dựng & thiết kế)...")
+    logger.info("Bắt đầu nạp dữ liệu Banner (xây dựng & thiết kế)...")
     created_count = 0
     updated_count = 0
 
@@ -140,11 +144,11 @@ def seed_banners():
             existing.is_active = data["is_active"]
             existing.save()
             updated_count += 1
-            print(f"  ↻ Cập nhật Banner #{bid}: {data['description'][:60]}")
+            logger.info(f"  ↻ Cập nhật Banner #{bid}: {data['description'][:60]}")
             continue
 
         # Tạo mới — upload ảnh trước
-        print(f"  ↑ Đang upload ảnh cho Banner #{bid}...")
+        logger.info(f"  ↑ Đang upload ảnh cho Banner #{bid}...")
         web_path = _img("banners", data["web_img"])
         mobile_path = _img("banners", data["mobile_img"])
 
@@ -173,8 +177,8 @@ def seed_banners():
             image_mobile=mobile_file,
         )
         created_count += 1
-        print(f"  ✓ Tạo Banner #{bid}: {data['description'][:60]}")
+        logger.info(f"  ✓ Tạo Banner #{bid}: {data['description'][:60]}")
 
-    print(
+    logger.info(
         f"Thành công! Đã tạo {created_count} banner mới, cập nhật {updated_count} banner."
     )

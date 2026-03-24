@@ -7,6 +7,7 @@ import datetime
 from django.conf import settings
 from django.db import transaction
 from rest_framework import serializers
+from shared.serializers import DynamicFieldsMixin
 from rest_framework.validators import UniqueValidator
 
 from shared.configs import variable_system as var_sys
@@ -25,21 +26,13 @@ from apps.accounts import serializers as auth_serializers
 from common import serializers as common_serializers
 
 
-class CompanyImageSerializer(serializers.ModelSerializer):
+class CompanyImageSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     imageUrl = serializers.SerializerMethodField(
         method_name='get_image_url', read_only=True)
 
     files = serializers.ListField(required=True, write_only=True)
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     def get_image_url(self, company_image):
         try:
@@ -117,7 +110,7 @@ class CompanyImageSerializer(serializers.ModelSerializer):
         fields = ('id', 'imageUrl', 'files')
 
 
-class CompanySerializer(serializers.ModelSerializer):
+class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     taxCode = serializers.CharField(source="tax_code", required=True, max_length=30,
                                     validators=[UniqueValidator(Company.objects.all(),
@@ -185,14 +178,6 @@ class CompanySerializer(serializers.ModelSerializer):
     mobileUserDict = auth_serializers.UserSerializer(source='user', read_only=True,
                                                      fields=["id", "fullName", "email"])
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     def get_company_logo_url(self, company):
         try:
@@ -289,7 +274,7 @@ class CompanySerializer(serializers.ModelSerializer):
             raise
 
 
-class CompanyFollowedSerializer(serializers.ModelSerializer):
+class CompanyFollowedSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     company = CompanySerializer(fields=['id', 'slug', 'companyName', 'companyImageUrl',
                                         'fieldOperation', 'followNumber', 'jobPostNumber',
@@ -300,7 +285,7 @@ class CompanyFollowedSerializer(serializers.ModelSerializer):
         fields = ('id', 'company',)
 
 
-class CompanyRoleSerializer(serializers.ModelSerializer):
+class CompanyRoleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     companyId = serializers.IntegerField(source="company_id", read_only=True)
     createAt = serializers.DateTimeField(source="create_at", read_only=True)
     updateAt = serializers.DateTimeField(source="update_at", read_only=True)
@@ -314,7 +299,7 @@ class CompanyRoleSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "companyId", "is_system", "createAt", "updateAt")
 
 
-class CompanyMemberSerializer(serializers.ModelSerializer):
+class CompanyMemberSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     roleId = serializers.IntegerField(source="role_id", required=True)
     role = CompanyRoleSerializer(read_only=True)
     userId = serializers.IntegerField(source="user_id", required=True)
@@ -334,7 +319,7 @@ class CompanyMemberSerializer(serializers.ModelSerializer):
         read_only_fields = ("id", "companyId", "userDict", "role", "invitedById", "createAt", "updateAt")
 
 
-class LogoCompanySerializer(serializers.ModelSerializer):
+class LogoCompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     file = serializers.FileField(required=True, write_only=True)
 
@@ -381,7 +366,7 @@ class LogoCompanySerializer(serializers.ModelSerializer):
             raise
 
 
-class CompanyCoverImageSerializer(serializers.ModelSerializer):
+class CompanyCoverImageSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     file = serializers.FileField(required=True, write_only=True)
 

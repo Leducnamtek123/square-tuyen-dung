@@ -3,12 +3,16 @@ Career Seeder
 Giữ toàn bộ 40 ngành nghề gốc (đa ngành) + bổ sung thêm các ngành
 chuyên biệt cho lĩnh vực Xây dựng & Thiết kế từ ID 41 trở đi.
 """
+import logging
+
 from common.models import Career
+
+logger = logging.getLogger(__name__)
 
 
 def seed_careers():
     """Seed danh mục ngành nghề: giữ nguyên 40 ngành gốc + thêm xây dựng/thiết kế."""
-    print("Bắt đầu nạp danh mục ngành nghề...")
+    logger.info("Bắt đầu nạp danh mục ngành nghề...")
 
     careers_data = [
         # ── 40 ngành gốc (giữ nguyên) ──────────────────────────────────────
@@ -84,7 +88,7 @@ def seed_careers():
         else:
             updated_count += 1
 
-    print(
+    logger.info(
         "Thành công! "
         f"Đã tạo mới {created_count} ngành nghề, cập nhật {updated_count} ngành nghề."
     )

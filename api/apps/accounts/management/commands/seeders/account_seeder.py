@@ -3,6 +3,7 @@ Account Seeder
 Tạo tài khoản Admin, Employer (Square Construction & Design), và 20 ứng viên mẫu
 trong ngành Xây dựng & Thiết kế — mỗi ứng viên có avatar thật upload lên MinIO.
 """
+import logging
 import os
 import random
 from datetime import date
@@ -18,6 +19,9 @@ from apps.locations.models import City, Location
 from apps.profiles.models import Company, JobSeekerProfile
 from shared.configs import variable_system as var_sys
 from shared.helpers.cloudinary_service import CloudinaryService
+
+
+logger = logging.getLogger(__name__)
 
 fake = Faker("vi_VN")
 
@@ -90,7 +94,7 @@ def _upload_avatar(avatar_filename: str, username_slug: str) -> "File | None":
             metadata=result,
         )
     except Exception as e:
-        print(f"  ⚠  Upload avatar thất bại ({avatar_filename}): {e}")
+        logger.warning(f"  ⚠  Upload avatar thất bại ({avatar_filename}): {e}")
         return None
 
 
@@ -99,7 +103,7 @@ def seed_accounts():
     Seed tài khoản hệ thống: Admin, Employer (Square Construction & Design),
     và 20 ứng viên mẫu ngành xây dựng/thiết kế với avatar thật.
     """
-    print("Bắt đầu sinh dữ liệu tài khoản và cấu hình OAuth2...")
+    logger.info("Bắt đầu sinh dữ liệu tài khoản và cấu hình OAuth2...")
 
     # 0. OAuth2 Application
     client_id = config("CLIENT_ID", default="qDZFCwY3yuN5mVNHqVVz8cAcREy5iQuGOTtQthjS")
@@ -117,11 +121,11 @@ def seed_accounts():
         },
     )
     if created:
-        print(f"Đã tạo OAuth2 Application: {client_id}")
+        logger.info(f"Đã tạo OAuth2 Application: {client_id}")
     else:
         app.client_secret = client_secret
         app.save()
-        print(f"Đã cập nhật OAuth2 Application: {client_id}")
+        logger.info(f"Đã cập nhật OAuth2 Application: {client_id}")
 
     # 1. Đảm bảo City & Location
     city = City.objects.first()
@@ -147,7 +151,7 @@ def seed_accounts():
     )
     admin_user.set_password("Squaretuyendung@2026")
     admin_user.save()
-    print("Đã cấu hình Admin: admin@gmail.com / Squaretuyendung@2026")
+    logger.info("Đã cấu hình Admin: admin@gmail.com / Squaretuyendung@2026")
 
     # 3. Employer — Square Construction & Design
     employer_user, _ = User.objects.get_or_create(
@@ -161,7 +165,7 @@ def seed_accounts():
     )
     employer_user.set_password("Squaretuyendung@2026")
     employer_user.save()
-    print("Đã cấu hình Employer: ceohub.hostmaster@gmail.com / Squaretuyendung@2026")
+    logger.info("Đã cấu hình Employer: ceohub.hostmaster@gmail.com / Squaretuyendung@2026")
 
     company, created = Company.objects.update_or_create(
         user=employer_user,
@@ -174,7 +178,7 @@ def seed_accounts():
             "field_operation": "Xây dựng và Thiết kế nội thất",
         },
     )
-    print(f"{'Tạo mới' if created else 'Cập nhật'} công ty: {company.company_name}")
+    logger.info(f"{'Tạo mới' if created else 'Cập nhật'} công ty: {company.company_name}")
 
     # 4. Ứng viên mẫu với tên thật & avatar thật
     candidate_count = 0
@@ -204,9 +208,9 @@ def seed_accounts():
             if avatar_file:
                 user.avatar = avatar_file
                 user.save()
-                print(f"  ✓ Tạo ứng viên: {name} — avatar: {avatar_filename}")
+                logger.info(f"  ✓ Tạo ứng viên: {name} — avatar: {avatar_filename}")
             else:
-                print(f"  ✓ Tạo ứng viên: {name} (không có avatar)")
+                logger.info(f"  ✓ Tạo ứng viên: {name} (không có avatar)")
 
             birthday = fake.date_of_birth(minimum_age=min_age, maximum_age=max_age)
             JobSeekerProfile.objects.create(
@@ -218,7 +222,7 @@ def seed_accounts():
             )
             candidate_count += 1
 
-    print(
+    logger.info(
         f"\nThành công! Tạo công ty '{company.company_name}' "
         f"và {candidate_count} ứng viên ngành xây dựng & thiết kế."
     )

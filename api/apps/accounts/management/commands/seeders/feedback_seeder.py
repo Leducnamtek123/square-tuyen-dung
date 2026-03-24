@@ -2,12 +2,16 @@
 Feedback Seeder
 Tạo dữ liệu đánh giá mẫu từ các ứng viên (Job Seeker) ngành Xây dựng & Thiết kế.
 """
+import logging
 import random
 
 from apps.accounts.models import User
 from apps.content.models import Feedback
 from shared.configs import variable_system as var_sys
 
+
+
+logger = logging.getLogger(__name__)
 
 FEEDBACK_CONTENTS = [
     "Tìm được việc kỹ sư xây dựng phù hợp chỉ trong 1 tuần. Nền tảng rất tốt!",
@@ -32,14 +36,14 @@ RATINGS = [5, 5, 5, 4, 5, 4, 5, 4, 5, 4, 5, 5, 4, 3, 4]
 
 def seed_feedbacks():
     """Seed dữ liệu Feedback ngành xây dựng & thiết kế từ Job Seekers hiện có."""
-    print("Bắt đầu nạp dữ liệu Feedback (xây dựng & thiết kế)...")
+    logger.info("Bắt đầu nạp dữ liệu Feedback (xây dựng & thiết kế)...")
 
     job_seekers = list(
         User.objects.filter(role_name=var_sys.JOB_SEEKER, is_active=True)
     )
 
     if not job_seekers:
-        print("  ⚠  Không có Job Seeker nào. Hãy chạy seed accounts trước.")
+        logger.warning(f"  ⚠  Không có Job Seeker nào. Hãy chạy seed accounts trước.")
         return
 
     created_count = 0
@@ -65,7 +69,7 @@ def seed_feedbacks():
         )
         created_count += 1
 
-    print(
+    logger.info(
         f"Thành công! Đã tạo {created_count} feedback mới"
         + (f", bỏ qua {skipped_count} feedback đã có." if skipped_count else ".")
     )

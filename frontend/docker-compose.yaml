@@ -1,4 +1,9 @@
-version: '3.8'
+# =============================================================================
+# frontend/docker-compose.yaml — STANDALONE frontend dev server
+# NOTE: Prefer the root docker-compose.yml for full-stack development.
+#       This file is kept for frontend-only development.
+#       Config is loaded from root .env (single source of truth).
+# =============================================================================
 
 services:
   frontend_dev:
@@ -14,7 +19,7 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
     env_file:
-      - .env
+      - ../.env
     networks:
       - project-network
 
@@ -23,7 +28,7 @@ services:
     container_name: project-frontend-nginx-container
     restart: unless-stopped
     env_file:
-      - .env
+      - ../.env
     networks:
       - project-network
     ports:
@@ -36,4 +41,4 @@ services:
 
 networks:
   project-network:
-    name: project-network
+    name: project-network

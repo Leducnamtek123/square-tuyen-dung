@@ -5,6 +5,8 @@ from shared.configs import variable_system as var_sys
 
 from shared.helpers import helper
 
+from shared.serializers import DynamicFieldsMixin
+
 from rest_framework import serializers
 
 from django.db import transaction
@@ -27,7 +29,7 @@ from apps.profiles import serializers as info_serializers
 
 from apps.accounts import serializers as auth_serializers
 
-class JobPostSerializer(serializers.ModelSerializer):
+class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     jobName = serializers.CharField(source="job_name", required=True, max_length=255)
 
@@ -185,21 +187,7 @@ class JobPostSerializer(serializers.ModelSerializer):
 
         return False
 
-    def __init__(self, *args, **kwargs):
 
-        fields = kwargs.pop('fields', None)
-
-        super().__init__(*args, **kwargs)
-
-        if fields is not None:
-
-            allowed = set(fields)
-
-            existing = set(self.fields)
-
-            for field_name in existing - allowed:
-
-                self.fields.pop(field_name)
 
     class Meta:
 
@@ -260,57 +248,23 @@ class JobPostSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         try:
-            instance.job_name = validated_data.get('job_name', instance.job_name)
+            location_data = validated_data.pop("location", None)
 
-            instance.deadline = validated_data.get('deadline', instance.deadline)
-
-            instance.quantity = validated_data.get('quantity', instance.quantity)
-
-            instance.gender_required = validated_data.get('gender_required', instance.gender_required)
-
-            instance.job_description = validated_data.get('job_description', instance.job_description)
-
-            instance.job_requirement = validated_data.get('job_requirement', instance.job_requirement)
-
-            instance.benefits_enjoyed = validated_data.get('benefits_enjoyed', instance.benefits_enjoyed)
-
-            instance.position = validated_data.get('position', instance.position)
-
-            instance.type_of_workplace = validated_data.get('type_of_workplace', instance.type_of_workplace)
-
-            instance.experience = validated_data.get('experience', instance.experience)
-
-            instance.academic_level = validated_data.get('academic_level', instance.academic_level)
-
-            instance.job_type = validated_data.get('job_type', instance.job_type)
-
-            instance.salary_min = validated_data.get('salary_min', instance.salary_min)
-
-            instance.salary_max = validated_data.get('salary_max', instance.salary_max)
-
-            instance.is_urgent = validated_data.get('is_urgent', instance.is_urgent)
-
-            instance.contact_person_name = validated_data.get('contact_person_name', instance.contact_person_name)
-
-            instance.contact_person_phone = validated_data.get('contact_person_phone', instance.contact_person_phone)
-
-            instance.contact_person_email = validated_data.get('contact_person_email', instance.contact_person_email)
-
-            instance.status = var_sys.JobPostStatus.PENDING
-
-            location_obj = instance.location
-            location_data = validated_data.get("location")
+            # Only reset status to PENDING if sensitive fields changed
+            SENSITIVE_FIELDS = {
+                'job_name', 'job_description', 'job_requirement',
+                'salary_min', 'salary_max', 'benefits_enjoyed',
+                'quantity', 'position', 'experience', 'academic_level',
+            }
+            if set(validated_data.keys()) & SENSITIVE_FIELDS:
+                validated_data['status'] = var_sys.JobPostStatus.PENDING
 
             with transaction.atomic():
-                if location_data and location_obj:
-                    location_obj.city = location_data.get("city", location_obj.city)
-                    location_obj.district = location_data.get("district", location_obj.district)
-                    location_obj.address = location_data.get("address", location_obj.address)
-                    location_obj.lat = location_data.get("lat", location_obj.lat)
-                    location_obj.lng = location_data.get("lng", location_obj.lng)
-                    location_obj.save()
-                instance.save()
-                return instance
+                if location_data and instance.location:
+                    for key, val in location_data.items():
+                        setattr(instance.location, key, val)
+                    instance.location.save()
+                return super().update(instance, validated_data)
         except Exception as ex:
             helper.print_log_error("update job post", ex)
             raise
@@ -367,7 +321,7 @@ class JobPostAroundSerializer(serializers.ModelSerializer):
 
                   "mobileCompanyDict", "locationDict")
 
-class JobSeekerJobPostActivitySerializer(serializers.ModelSerializer):
+class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     fullName = serializers.CharField(source="full_name", required=True, max_length=100)
 
@@ -407,21 +361,7 @@ class JobSeekerJobPostActivitySerializer(serializers.ModelSerializer):
 
     ], read_only=True)
 
-    def __init__(self, *args, **kwargs):
 
-        fields = kwargs.pop('fields', None)
-
-        super().__init__(*args, **kwargs)
-
-        if fields is not None:
-
-            allowed = set(fields)
-
-            existing = set(self.fields)
-
-            for field_name in existing - allowed:
-
-                self.fields.pop(field_name)
 
     class Meta:
 
@@ -441,7 +381,7 @@ class JobSeekerJobPostActivitySerializer(serializers.ModelSerializer):
             helper.print_log_error("create job post activity", ex)
             raise
 
-class EmployerJobPostActivitySerializer(serializers.ModelSerializer):
+class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     userId = serializers.IntegerField(source="user.id", read_only=True)
 
@@ -509,21 +449,7 @@ class EmployerJobPostActivitySerializer(serializers.ModelSerializer):
             "slug": company.slug,
         }
 
-    def __init__(self, *args, **kwargs):
 
-        fields = kwargs.pop('fields', None)
-
-        super().__init__(*args, **kwargs)
-
-        if fields is not None:
-
-            allowed = set(fields)
-
-            existing = set(self.fields)
-
-            for field_name in existing - allowed:
-
-                self.fields.pop(field_name)
 
     class Meta:
 
@@ -536,7 +462,7 @@ class EmployerJobPostActivitySerializer(serializers.ModelSerializer):
                   "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus", "aiAnalysisPros", "aiAnalysisCons", "aiAnalysisMatchingSkills", "aiAnalysisMissingSkills",
                   "userDict", "jobPostDict", "companyDict")
 
-class EmployerJobPostActivityExportSerializer(serializers.ModelSerializer):
+class EmployerJobPostActivityExportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     title = serializers.ReadOnlyField(source="resume.title")
 
@@ -558,21 +484,7 @@ class EmployerJobPostActivityExportSerializer(serializers.ModelSerializer):
 
     statusApply = serializers.SerializerMethodField(method_name="get_status_apply")
 
-    def __init__(self, *args, **kwargs):
 
-        fields = kwargs.pop('fields', None)
-
-        super().__init__(*args, **kwargs)
-
-        if fields is not None:
-
-            allowed = set(fields)
-
-            existing = set(self.fields)
-
-            for field_name in existing - allowed:
-
-                self.fields.pop(field_name)
 
     def get_status_apply(self, job_post_activity):
 
@@ -600,7 +512,7 @@ class EmployerJobPostActivityExportSerializer(serializers.ModelSerializer):
 
                   "jobName", "createAt", "statusApply")
 
-class JobPostNotificationSerializer(serializers.ModelSerializer):
+class JobPostNotificationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     jobName = serializers.CharField(source="job_name", required=True, max_length=255)
 
@@ -617,21 +529,7 @@ class JobPostNotificationSerializer(serializers.ModelSerializer):
     userDict = auth_serializers.UserSerializer(source='user', read_only=True,
                                                 fields=['id', 'fullName', 'email', 'avatarUrl'])
 
-    def __init__(self, *args, **kwargs):
 
-        fields = kwargs.pop('fields', None)
-
-        super().__init__(*args, **kwargs)
-
-        if fields is not None:
-
-            allowed = set(fields)
-
-            existing = set(self.fields)
-
-            for field_name in existing - allowed:
-
-                self.fields.pop(field_name)
 
     class Meta:
 

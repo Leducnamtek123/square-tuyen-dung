@@ -1,15 +1,19 @@
+import logging
 import requests
 from bs4 import BeautifulSoup
 from apps.interviews.models import Question, QuestionGroup
 from apps.accounts.models import User
 import random
 
+
+logger = logging.getLogger(__name__)
+
 def seed_interviews():
     """
     Crawl AI Interview question sets from TopCV and seed them
     """
     url = "https://www.topcv.vn/bo-cau-hoi-phong-van-xin-viec"
-    print(f"Bắt đầu crawl bộ câu hỏi từ: {url}")
+    logger.info(f"Bắt đầu crawl bộ câu hỏi từ: {url}")
     
     # 1. Lấy user admin/employer để gán author
     author = User.objects.filter(role_name='EMPLOYER').first()
@@ -63,7 +67,7 @@ def seed_interviews():
 
         # Nếu crawl không ra gì (do cấu trúc web đổi), nạp bộ câu hỏi fallback
         if group_count == 0:
-            print("Crawl không tìm thấy data, đang nạp bộ câu hỏi dự phòng...")
+            logger.warning(f"Crawl không tìm thấy data, đang nạp bộ câu hỏi dự phòng...")
             fallback_questions = [
                 "Giới thiệu bản thân và kinh nghiệm làm việc của bạn?",
                 "Tại sao bạn lại ứng tuyển vào vị trí này tại Square Group?",
@@ -82,7 +86,7 @@ def seed_interviews():
             group.questions.set(qs)
             group_count = 1
 
-        print(f"Thành công! Đã nạp {group_count} bộ câu hỏi phỏng vấn AI.")
+        logger.info(f"Thành công! Đã nạp {group_count} bộ câu hỏi phỏng vấn AI.")
         
     except Exception as e:
-        print(f"Lỗi khi crawl câu hỏi: {str(e)}")
+        logger.error(f"Lỗi khi crawl câu hỏi: {str(e)}")

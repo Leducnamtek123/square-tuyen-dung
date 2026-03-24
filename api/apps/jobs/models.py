@@ -202,6 +202,13 @@ class JobPostActivity(JobPostBaseModel):
             models.Index(fields=["job_post", "status"], name="job_act_post_stt_idx"),
             models.Index(fields=["create_at"], name="job_act_create_idx"),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'job_post'],
+                condition=models.Q(is_deleted=False),
+                name='unique_active_application',
+            ),
+        ]
 
 class JobPostNotification(JobPostBaseModel):
 

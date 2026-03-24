@@ -338,7 +338,8 @@ MINIO_PRESIGN_PUBLIC = config('MINIO_PRESIGN_PUBLIC', default=False, cast=bool)
 FILE_STORAGE_BACKEND = config("FILE_STORAGE_BACKEND", default="minio")
 FILE_STORAGE_PUBLIC_URL = config("FILE_STORAGE_PUBLIC_URL", default="")
 
-# Reuse existing setting names for compatibility across the codebase.
+# Legacy naming kept for backward compatibility.
+# New code should use STORAGE_BASE_URL / STORAGE_DIRECTORIES.
 CLOUDINARY_PATH = f"{MINIO_PUBLIC_URL.rstrip('/')}/{MINIO_BUCKET}/"
 
 CLOUDINARY_DIRECTORY = {
@@ -354,6 +355,10 @@ CLOUDINARY_DIRECTORY = {
     "icons": "icons/",
     "about_us": "about_us/"
 }
+
+# Modern aliases — prefer these in new code
+STORAGE_BASE_URL = CLOUDINARY_PATH
+STORAGE_DIRECTORIES = CLOUDINARY_DIRECTORY
 
 REDIRECT_LOGIN_CLIENT = "dang-nhap"
 
@@ -486,3 +491,4 @@ if APP_ENVIRONMENT == 'production':
 
 # === Database Connection Persistence ===
 CONN_MAX_AGE = 600  # Keep DB connections alive for 10 minutes
+CONN_HEALTH_CHECKS = True  # Verify connections before reuse (Django 4.1+)

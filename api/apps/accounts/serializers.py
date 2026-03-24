@@ -2,8 +2,10 @@
 from shared.configs import variable_system as var_sys
 from shared.configs.messages import ERROR_MESSAGES
 from shared.helpers import helper
+from shared.serializers import DynamicFieldsMixin
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from django.contrib.auth.password_validation import validate_password as django_validate_password
 from django.conf import settings
 from django.db import transaction
 from console.jobs import queue_auth
@@ -65,23 +67,12 @@ class UpdatePasswordSerializer(serializers.Serializer):
 
         return instance
 
-class ResetPasswordSerializer(serializers.Serializer):
+class ResetPasswordSerializer(DynamicFieldsMixin, serializers.Serializer):
     newPassword = serializers.CharField(required=True, max_length=128)
     confirmPassword = serializers.CharField(required=True, max_length=128)
     token = serializers.CharField(required=False)
     code = serializers.CharField(required=False)
     platform = serializers.CharField(required=True)
-
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-
-        super().__init__(*args, **kwargs)
-
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     def validate(self, attrs):
         new_pass = attrs.get('newPassword', '')
@@ -108,6 +99,10 @@ class JobSeekerRegisterSerializer(serializers.Serializer):
     password = serializers.CharField(required=True, max_length=100)
     confirmPassword = serializers.CharField(required=True, max_length=100)
     platform = serializers.CharField(required=True, max_length=3)
+
+    def validate_password(self, value):
+        django_validate_password(value)
+        return value
 
     def validate(self, attrs):
         if not attrs["password"] == attrs["confirmPassword"]:
@@ -180,6 +175,10 @@ class EmployerRegisterSerializer(serializers.Serializer):
     confirmPassword = serializers.CharField(required=True, max_length=100)
     platform = serializers.CharField(required=True, max_length=3)
 
+    def validate_password(self, value):
+        django_validate_password(value)
+        return value
+
     def validate(self, attrs):
         if not attrs["password"] == attrs["confirmPassword"]:
             raise serializers.ValidationError({'confirmPassword': ERROR_MESSAGES['CONFIRM_PASSWORD_MISMATCH']})
@@ -209,7 +208,7 @@ class EmployerRegisterSerializer(serializers.Serializer):
         model = User
         fields = ("fullName", "email", "password", "confirmPassword", "company", "platform")
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     fullName = serializers.CharField(source="full_name", required=False, allow_blank=True)
     email = serializers.EmailField(read_only=True)
     avatarUrl = serializers.SerializerMethodField(method_name="get_avatar_url", read_only=True)
@@ -384,16 +383,7 @@ class UserSerializer(serializers.ModelSerializer):
 
         return workspaces
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
 
-        super().__init__(*args, **kwargs)
-
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     def update(self, user, validated_data):
         if "full_name" in validated_data:

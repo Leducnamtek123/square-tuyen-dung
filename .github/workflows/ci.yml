@@ -39,3 +39,51 @@ jobs:
           pip install -r requirements.txt
       - name: Check missing migrations
         run: python manage.py makemigrations --check --dry-run
+
+  frontend-lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Lint
+        run: npm run lint
+      - name: Type check
+        run: npm run typecheck
+
+  frontend-build:
+    runs-on: ubuntu-latest
+    needs: frontend-lint
+    defaults:
+      run:
+        working-directory: frontend
+    env:
+      VITE_NODE_ENV: production
+      VITE_PROJECT_HOST_NAME: ci.test
+      VITE_PROJECT_SERVER_CLIENT_ID: ci-client-id
+      VITE_PROJECT_SERVER_CLIENT_SECRET: ci-secret
+      VITE_GOOGLE_CLIENT_ID: ci-google-id
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Build
+        run: npm run build
+      - name: Verify build output
+        run: |
+          test -d build && echo "Build directory exists"
+          test -f build/index.html && echo "index.html exists"
+

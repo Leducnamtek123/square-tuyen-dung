@@ -6,6 +6,7 @@ from datetime import date
 
 from django.db import transaction
 from rest_framework import serializers
+from shared.serializers import DynamicFieldsMixin
 
 from shared.configs import variable_system as var_sys
 from console.jobs import queue_auth
@@ -16,7 +17,7 @@ from apps.accounts import serializers as auth_serializers
 from common import serializers as common_serializers
 
 
-class JobSeekerProfileSerializer(serializers.ModelSerializer):
+class JobSeekerProfileSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     phone = serializers.CharField(required=True, max_length=15)
     birthday = serializers.DateField(required=True,
                                      input_formats=[var_sys.DATE_TIME_FORMAT["ISO8601"],
@@ -51,14 +52,6 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
 
     old = serializers.SerializerMethodField(method_name="get_old", read_only=True)
 
-    def __init__(self, *args, **kwargs):
-        fields = kwargs.pop('fields', None)
-        super().__init__(*args, **kwargs)
-        if fields is not None:
-            allowed = set(fields)
-            existing = set(self.fields)
-            for field_name in existing - allowed:
-                self.fields.pop(field_name)
 
     def get_user_dict(self, profile):
         user = profile.user
@@ -128,7 +121,7 @@ class JobSeekerProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
-class SendMailToJobSeekerSerializer(serializers.Serializer):
+class SendMailToJobSeekerSerializer(DynamicFieldsMixin, serializers.Serializer):
     fullName = serializers.CharField(max_length=100, required=True)
     title = serializers.CharField(max_length=200, required=True)
     content = serializers.CharField(required=True)
