@@ -590,6 +590,6 @@ const Loading = () => (
 
 );
 
-Company.Loading = Loading;
+const MemoizedCompany = Object.assign(React.memo(Company), { Loading });
 
-export default Company;
+export default MemoizedCompany;

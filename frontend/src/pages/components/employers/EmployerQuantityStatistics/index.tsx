@@ -6,7 +6,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
-import statisticService from '../../../../services/statisticService';
+import { useEmployerGeneralStatistics } from '../hooks/useEmployerQueries';
 
 interface StatisticsData {
   totalJobPost: number;
@@ -77,37 +77,7 @@ const EmployerQuantityStatistics = () => {
 
   const { t } = useTranslation('employer');
 
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  const [data, setData] = React.useState<StatisticsData | null>(null);
-
-  React.useEffect(() => {
-
-    const statistics = async () => {
-
-      setIsLoading(true);
-
-      try {
-
-        const resData = await statisticService.employerGeneralStatistics();
-
-        setData(resData.data);
-
-      } catch (error) {
-
-        console.error('Error: ', error);
-
-      } finally {
-
-        setIsLoading(false);
-
-      }
-
-    };
-
-    statistics();
-
-  }, []);
+  const { data, isLoading } = useEmployerGeneralStatistics();
 
   return (
 

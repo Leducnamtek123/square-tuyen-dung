@@ -12,9 +12,9 @@ import NoDataCard from "../../../../components/NoDataCard";
 import MuiImageCustom from "../../../../components/MuiImageCustom";
 import FormPopup from "../../../../components/controls/FormPopup";
 import JobPostNotificationForm from "../JobPostNotificationForm";
-
 import ItemLoading from "./ItemLoading";
 import ItemComponent from "./ItemComponent";
+import { useJobPostNotifications, useJobPostNotificationMutations } from "../hooks/useJobSeekerQueries";
 
 interface JobPostNotification {
   id: number;
@@ -33,49 +33,31 @@ const JobPostNotificationCard = () => {
   const { currentUser } = useAppSelector((state) => state.user);
 
   const [page, setPage] = React.useState(1);
-  const [count, setCount] = React.useState(0);
   const [openPopup, setOpenPopup] = React.useState(false);
-  const [isSuccess, setIsSuccess] = React.useState(false);
-  const [isLoadingJobPostNotifications, setIsLoadingJobPostNotifications] = React.useState(true);
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-  const [jobPostNotifications, setJobPostNotifications] = React.useState<JobPostNotification[]>([]);
   const [editData, setEditData] = React.useState<any>(null);
 
-  React.useEffect(() => {
-    const loadJobPostNotification = async (params: any) => {
-      setIsLoadingJobPostNotifications(true);
-      try {
-        const resData = await jobPostNotificationService.getJobPostNotifications(params) as any;
-        const data = resData.data;
-        setCount(data.count);
-        setJobPostNotifications(data.results);
-      } catch (error: any) {
-        errorHandling(error);
-      } finally {
-        setIsLoadingJobPostNotifications(false);
-      }
-    };
-    loadJobPostNotification({ page: page, pageSize: pageSize });
-  }, [isSuccess, page]);
+  const { data, isLoading } = useJobPostNotifications({ page, pageSize });
+  const jobPostNotifications: JobPostNotification[] = data?.results || [];
+  const count = data?.count || 0;
+
+  const { addMutation, updateMutation, deleteMutation } = useJobPostNotificationMutations();
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleShowUpdate = (id: number) => {
-    const loadJobPostNotificationDetailById = async (id: number) => {
-      setIsFullScreenLoading(true);
-      try {
-        const resData = await jobPostNotificationService.getJobPostNotificationDetailById(id) as any;
-        setEditData(resData.data);
-        setOpenPopup(true);
-      } catch (error: any) {
-        errorHandling(error);
-      } finally {
-        setIsFullScreenLoading(false);
-      }
-    };
-    loadJobPostNotificationDetailById(id);
+  const handleShowUpdate = async (id: number) => {
+    setIsFullScreenLoading(true);
+    try {
+      const resData = await jobPostNotificationService.getJobPostNotificationDetailById(id) as any;
+      setEditData(resData.data);
+      setOpenPopup(true);
+    } catch (error: any) {
+      errorHandling(error);
+    } finally {
+      setIsFullScreenLoading(false);
+    }
   };
 
   const handleShowAdd = () => {
@@ -83,60 +65,38 @@ const JobPostNotificationCard = () => {
     setOpenPopup(true);
   };
 
-  const handleAddOrUpdate = (data: any) => {
-    const create = async (postData: any) => {
-      setIsFullScreenLoading(true);
-      try {
-        await jobPostNotificationService.addJobPostNotification(postData);
-        setOpenPopup(false);
-        setIsSuccess(!isSuccess);
-        toastMessages.success(t("jobSeeker:jobManagement.notifications.addedSuccess"));
-      } catch (error: any) {
-        errorHandling(error);
-      } finally {
-        setIsFullScreenLoading(false);
-      }
-    };
-    const update = async (postData: any) => {
-      setIsFullScreenLoading(true);
-      try {
-        await jobPostNotificationService.updateJobPostNotificationById(postData.id, postData);
-        setOpenPopup(false);
-        setIsSuccess(!isSuccess);
-        toastMessages.success(t("jobSeeker:jobManagement.notifications.updatedSuccess"));
-      } catch (error: any) {
-        errorHandling(error);
-      } finally {
-        setIsFullScreenLoading(false);
-      }
-    };
-    if ("id" in data && data.id) {
-      update(data);
+  const handleAddOrUpdate = (formData: any) => {
+    if ("id" in formData && formData.id) {
+      updateMutation.mutate(formData, {
+        onSuccess: () => {
+          setOpenPopup(false);
+          toastMessages.success(t("jobSeeker:jobManagement.notifications.updatedSuccess"));
+        },
+      });
     } else {
-      create(data);
+      addMutation.mutate(formData, {
+        onSuccess: () => {
+          setOpenPopup(false);
+          toastMessages.success(t("jobSeeker:jobManagement.notifications.addedSuccess"));
+        },
+      });
     }
   };
 
   const handleDeleteJobPostNotification = (id: number) => {
-    const del = async (targetId: number) => {
-      setIsFullScreenLoading(true);
-      try {
-        await jobPostNotificationService.deleteJobPostNotificationDetailById(targetId);
-        setIsSuccess(!isSuccess);
-        toastMessages.success(t("jobSeeker:jobManagement.notifications.deletedSuccess"));
-      } catch (error: any) {
-        errorHandling(error);
-      } finally {
-        setIsFullScreenLoading(false);
-      }
-    };
     confirmModal(
-      () => del(id),
+      () => deleteMutation.mutate(id, {
+        onSuccess: () => {
+          toastMessages.success(t("jobSeeker:jobManagement.notifications.deletedSuccess"));
+        },
+      }),
       t("jobSeeker:jobManagement.notifications.deleteTitle"),
       t("jobSeeker:jobManagement.notifications.deleteWarning"),
       "warning"
     );
   };
+
+  const isMutating = addMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
 
   return (
     <>
@@ -177,7 +137,7 @@ const JobPostNotificationCard = () => {
         </Box>
         <Divider sx={{ my: 3 }} />
         <Box>
-          {isLoadingJobPostNotifications ? (
+          {isLoading ? (
             <Stack spacing={4}>
               {Array.from(Array(5).keys()).map((value) => (
                 <ItemLoading key={value} />
@@ -260,7 +220,7 @@ const JobPostNotificationCard = () => {
         <JobPostNotificationForm handleAddOrUpdate={handleAddOrUpdate} editData={editData} />
       </FormPopup>
 
-      {isFullScreenLoading && <BackdropLoading />}
+      {(isFullScreenLoading || isMutating) && <BackdropLoading />}
     </>
   );
 };

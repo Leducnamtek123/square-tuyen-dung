@@ -3,37 +3,18 @@ import { Box, Stack, Pagination, Chip } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 import NoDataCard from '../../../../components/NoDataCard';
 import CompanyAction from '../../../../components/CompanyAction';
-import resumeViewedService from '../../../../services/resumeViewedService';
+import { useResumeViewed } from '../hooks/useJobSeekerQueries';
 import { useTranslation } from 'react-i18next';
 
 const pageSize = 10;
 
 const CompanyViewedCard = () => {
   const { t } = useTranslation(['jobSeeker']);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [resumesViewed, setResumesViewed] = React.useState<any[]>([]);
   const [page, setPage] = React.useState(1);
-  const [count, setCount] = React.useState(0);
 
-  React.useEffect(() => {
-    const getResumeViewed = async (params: any) => {
-      setIsLoading(true);
-      try {
-        const resData = await resumeViewedService.getResumeViewed(params);
-        const data = (resData as any).data;
-        setCount(data.count);
-        setResumesViewed(data.results);
-      } catch (error: any) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    getResumeViewed({
-      pageSize: pageSize,
-      page: page,
-    });
-  }, [page]);
+  const { data, isLoading } = useResumeViewed({ pageSize, page });
+  const resumesViewed = data?.results || [];
+  const count = data?.count || 0;
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
@@ -55,7 +36,7 @@ const CompanyViewedCard = () => {
           ></NoDataCard>
         ) : (
           <Stack spacing={2}>
-            {resumesViewed.map((value) => (
+            {resumesViewed.map((value: any) => (
               <CompanyAction
                 key={value.id}
                 id={value.id}

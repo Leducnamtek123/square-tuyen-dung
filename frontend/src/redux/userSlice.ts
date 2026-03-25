@@ -1,4 +1,4 @@
-﻿import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { NormalizedWorkspace, User, Workspace } from '../types/models';
 import authService from '../services/authService';
 import tokenService from '../services/tokenService';
@@ -133,6 +133,7 @@ const resolveActiveWorkspace = (
   if ((currentUser?.roleName || currentUser?.role_name) === 'EMPLOYER') {
     const firstCompany = workspaceList.find((workspace) => workspace.type === 'company');
     if (firstCompany) return normalizeWorkspace(firstCompany);
+    return null; // Do not fallback to job_seeker if they are explicitly an EMPLOYER
   }
 
   const firstJobSeeker = workspaceList.find((workspace) => workspace.type === 'job_seeker');

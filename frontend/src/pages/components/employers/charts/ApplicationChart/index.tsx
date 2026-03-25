@@ -19,7 +19,7 @@ import {
 } from 'chart.js';
 import dayjs from 'dayjs';
 import RangePickerCustom from '../../../../../components/controls/RangePickerCustom';
-import statisticService from '../../../../../services/statisticService';
+import { useEmployerApplicationStatistics } from '../../hooks/useEmployerQueries';
 import { useTheme } from '@mui/material/styles';
 
 interface ApplicationChartProps {
@@ -106,26 +106,14 @@ const ApplicationChart = ({ title }: ApplicationChartProps) => {
     dayjs(new Date()),
   ]);
 
-  const [data, setData] = React.useState<ApplicationChartData | null>(null);
+  const queryParams = React.useMemo(() => ({
+    startDate: dayjs(selectedDateRange[0]).format('YYYY-MM-DD'),
+    endDate: dayjs(selectedDateRange[1]).format('YYYY-MM-DD'),
+  }), [selectedDateRange]);
 
-  React.useEffect(() => {
-    const statistics = async (params: any) => {
-      setIsLoading(true);
-      try {
-        const resData: any = await statisticService.employerApplicationStatistics(params);
-        setData(resData.data);
-      } catch (error) {
-        console.error('Error: ', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const { data, isLoading: queryLoading } = useEmployerApplicationStatistics(queryParams);
 
-    statistics({
-      startDate: dayjs(selectedDateRange[0]).format('YYYY-MM-DD').toString(),
-      endDate: dayjs(selectedDateRange[1]).format('YYYY-MM-DD').toString(),
-    });
-  }, [allowSubmit, selectedDateRange]);
+  React.useEffect(() => { setIsLoading(queryLoading); }, [queryLoading]);
 
   const dataOptions = React.useMemo<ChartData<'bar' | 'line'>>(() => {
     const title2 = String(data?.title2 ?? '');

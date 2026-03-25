@@ -10,6 +10,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import ProfileSearch from '../ProfileSearch';
 import JobSeekerProfile from '../../../../components/JobSeekerProfile';
 import resumeService from '../../../../services/resumeService';
+import { useEmployerResumes, useToggleSaveResumeOptimistic } from '../hooks/useEmployerQueries';
 
 interface ResumeItem {
   id: number;
@@ -40,49 +41,16 @@ const ProfileCard = () => {
 
   const [page, setPage] = React.useState(1);
 
-  const [count, setCount] = React.useState(0);
+  const queryParams = React.useMemo(() => ({
+    ...resumeFilter,
+    page,
+  }), [resumeFilter, page]);
 
-  const [isLoading, setIsLoading] = React.useState(false);
+  const { data: queryData, isLoading } = useEmployerResumes(queryParams);
+  const resumes: ResumeItem[] = queryData?.results || [];
+  const count = queryData?.count || 0;
 
-  const [resumes, setResumes] = React.useState<ResumeItem[]>([]);
-
-  React.useEffect(() => {
-
-    const getResumes = async () => {
-
-      setIsLoading(true);
-
-      try {
-
-        const resData: any = await resumeService.getResumes({
-
-          ...resumeFilter,
-
-          page: page,
-
-        });
-
-        const data = resData.data;
-
-        setCount(data.count);
-
-        setResumes(data?.results || []);
-
-      } catch (error: any) {
-
-        errorHandling(error);
-
-      } finally {
-
-        setIsLoading(false);
-
-      }
-
-    };
-
-    getResumes();
-
-  }, [resumeFilter, page]);
+  const saveMutation = useToggleSaveResumeOptimistic();
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
 
@@ -91,61 +59,14 @@ const ProfileCard = () => {
   };
 
   const handleSave = (slug: string) => {
-
-    const save = async (slugResume: string) => {
-
-      try {
-
-        const resData: any = await resumeService.saveResume(slugResume);
-
+    saveMutation.mutate(slug, {
+      onSuccess: (resData: any) => {
         const isSaved = resData.data.isSaved;
-
-        let resumesNew = [];
-
-        const currentResume = resumes.find(
-
-          (value) => value.slug === slugResume
-
-        );
-
-        for (let i = 0; i < resumes.length && currentResume; i++) {
-
-          if (resumes[i].slug === slugResume) {
-
-            resumesNew.push({
-
-              ...currentResume,
-
-              isSaved: isSaved,
-
-            });
-
-          } else {
-
-            resumesNew.push(resumes[i]);
-
-          }
-
-        }
-
-        setResumes(resumesNew);
-
         toastMessages.success(
-
           isSaved ? t('profileCard.messages.saveSuccess') : t('profileCard.messages.unsaveSuccess')
-
         );
-
-      } catch (error: any) {
-
-        errorHandling(error);
-
-      }
-
-    };
-
-    save(slug);
-
+      },
+    });
   };
 
   return (

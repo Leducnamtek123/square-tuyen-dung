@@ -29,6 +29,7 @@ interface NotificationCardProps {
 }
 
 const PAGE_SIZE = 5;
+const MAX_NOTIFICATIONS = 50;
 
 const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
@@ -199,7 +200,9 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
     });
 
-    setNotifications([...notifications, ...nextNotificationList]);
+    const combined = [...notifications, ...nextNotificationList];
+    // Cap total notifications to prevent unbounded memory growth
+    setNotifications(combined.slice(0, MAX_NOTIFICATIONS));
 
     setLastKey(lastVisible);
 

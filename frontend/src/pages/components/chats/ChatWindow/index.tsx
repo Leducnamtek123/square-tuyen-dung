@@ -28,6 +28,7 @@ import {
   updateDoc,
   getDocs,
   startAfter,
+  getCountFromServer,
   QueryDocumentSnapshot,
   DocumentData,
 } from 'firebase/firestore';
@@ -135,15 +136,18 @@ const ChatWindow = () => {
     }
   }, [selectedRoomId]);
 
-  // Load total message count
+  // Load total message count (without downloading all docs)
   React.useEffect(() => {
     if (selectedRoomId) {
       const q = query(
         messageCollectionRef,
         where('chatRoomId', '==', selectedRoomId)
       );
-      getDocs(q).then((snapshot) => {
-        setCount(snapshot.size);
+      getCountFromServer(q).then((snap) => {
+        setCount(snap.data().count);
+      }).catch(() => {
+        // Fallback: use getDocs if getCountFromServer not available
+        getDocs(q).then((s) => setCount(s.size));
       });
     }
   }, [selectedRoomId]);

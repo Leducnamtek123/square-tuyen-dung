@@ -33,7 +33,7 @@ import AppliedResumeTable from '../AppliedResumeTable';
 
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 
-import jobService from '../../../../services/jobService';
+import { useAppliedResumes, useJobPostOptions, useDeleteJobPostActivity } from '../hooks/useEmployerQueries';
 
 interface AppliedResumeCardProps {
   title: string;
@@ -173,21 +173,13 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
   const [openPopup, setOpenPopup] = React.useState(false);
 
-  const [isSuccess, setIsSuccess] = React.useState(false);
-
   const [page, setPage] = React.useState(0);
-
-  const [count, setCount] = React.useState(0);
 
   const [rowsPerPage, setRowsPerPage] = React.useState(pageSize);
 
   const [filterData, setFilterData] = React.useState(defaultFilterData);
 
-  const [isLoading, setIsLoading] = React.useState(true);
-
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-
-  const [jobPostOptions, setJobPostOptions] = React.useState<any[]>([]);
 
   const [jobPostIdSelect, setJobPostIdSelect] = React.useState('');
 
@@ -195,125 +187,37 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
     React.useState('');
 
-  const [resumes, retResumes] = React.useState([]);
+  // TanStack Query hooks
+  const { data: jobPostOptions = [] } = useJobPostOptions();
+
+  const queryParams = React.useMemo(() => ({
+    page: page + 1,
+    pageSize: rowsPerPage,
+    ...filterData,
+    jobPostId: jobPostIdSelect,
+    status: applicationStatusSelect,
+  }), [page, rowsPerPage, filterData, jobPostIdSelect, applicationStatusSelect]);
+
+  const { data: queryData, isLoading } = useAppliedResumes(queryParams);
+  const resumes = queryData?.results || [];
+  const count = queryData?.count || 0;
+
+  const deleteMutation = useDeleteJobPostActivity();
 
   let numbersFilter = React.useMemo(() => {
-
-    let count = 0;
-
+    let cnt = 0;
     let keys = Object.keys(filterData) as Array<keyof typeof filterData>;
-
     for (let i = 0; i < keys.length; i++) {
-
-        if (
-
-            keys[i] !== ('jobPostId' as any) &&
-
-            keys[i] !== ('pageSize' as any) &&
-
-            (filterData as any)[keys[i]] !== ''
-
-        ) {
-
-            count = count + 1;
-
-        }
-
+      if (
+        keys[i] !== ('jobPostId' as any) &&
+        keys[i] !== ('pageSize' as any) &&
+        (filterData as any)[keys[i]] !== ''
+      ) {
+        cnt = cnt + 1;
+      }
     }
-
-    return count;
-
+    return cnt;
   }, [filterData]);
-
-  React.useEffect(() => {
-
-    const loadJobPostOptions = async (params?: any) => {
-
-      try {
-
-        const resData = await (jobService as any).getJobPostOptions() as any;
-
-        setJobPostOptions(Array.isArray(resData?.data) ? resData.data : []);
-
-      } catch (error) {
-
-        console.error(error);
-
-      }
-
-    };
-
-    loadJobPostOptions();
-
-  }, []);
-
-  React.useEffect(() => {
-
-    const loadJobPostActivity = async (params: any) => {
-
-      setIsLoading(true);
-
-      try {
-
-        const resData = await jobPostActivityService.getAppliedResume(params) as any;
-
-        const data = resData?.data;
-
-        const rawResumes = Array.isArray(data?.results)
-
-          ? data.results
-
-          : Array.isArray(data)
-
-          ? data
-
-          : [];
-
-        setCount(typeof data?.count === 'number' ? data.count : rawResumes.length);
-
-        retResumes(rawResumes);
-
-      } catch (error: any) {
-
-        errorHandling(error);
-
-      } finally {
-
-        setIsLoading(false);
-
-      }
-
-    };
-
-    loadJobPostActivity({
-
-      page: page + 1,
-
-      pageSize: rowsPerPage,
-
-      ...filterData,
-
-      jobPostId: jobPostIdSelect,
-
-      status: applicationStatusSelect,
-
-    });
-
-  }, [
-
-    page,
-
-    rowsPerPage,
-
-    filterData,
-
-    jobPostIdSelect,
-
-    applicationStatusSelect,
-
-    isSuccess,
-
-  ]);
 
   const handleFilter = (data: any) => {
 
@@ -415,31 +319,11 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
   const handleDelete = (id: string) => {
 
-    const del = async (id: string) => {
-
-      try {
-
-        await jobPostActivityService.deleteJobPostActivity(id);
-
-        setIsSuccess(!isSuccess);
-
-        toastMessages.success(t('appliedResume.delete.success'));
-
-      } catch (error: any) {
-
-        errorHandling(error);
-
-      } finally {
-
-        setIsFullScreenLoading(false);
-
-      }
-
-    };
-
     confirmModal(
 
-      () => del(id),
+      () => deleteMutation.mutate(id, {
+        onSuccess: () => toastMessages.success(t('appliedResume.delete.success')),
+      }),
 
       t('appliedResume.delete.title'),
 

@@ -735,6 +735,6 @@ const Loading = () => (
 
 );
 
-JobPostLarge.Loading = Loading;
+const MemoizedJobPostLarge = Object.assign(React.memo(JobPostLarge), { Loading });
 
-export default JobPostLarge;
+export default MemoizedJobPostLarge;

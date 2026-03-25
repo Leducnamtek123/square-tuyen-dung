@@ -4,8 +4,8 @@ import { AppBar, Avatar, Box, Card, IconButton, Stack, Toolbar, Typography } fro
 import MenuIcon from '@mui/icons-material/Menu';
 import UserMenu from '../../commons/UserMenu';
 import AccountSwitchMenu from '../../commons/AccountSwitchMenu';
-import NotificationCard from '../../../../components/NotificationCard';
-import ChatCard from '../../../../components/ChatCard';
+const NotificationCard = React.lazy(() => import('../../../../components/NotificationCard'));
+const ChatCard = React.lazy(() => import('../../../../components/ChatCard'));
 import LanguageSwitcher from '../../commons/LanguageSwitcher';
 
 interface HeaderProps {
@@ -39,7 +39,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
         }}
       >
         <Stack direction="row" justifyContent="center" alignItems="center">
-          <Avatar alt={currentUser?.fullName} src={currentUser?.avatarUrl} />
+          <Avatar alt={currentUser?.fullName} src={currentUser?.avatarUrl ?? undefined} />
           <Typography
             variant="subtitle1"
             sx={{
@@ -83,8 +83,16 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
         </Toolbar>
         <Toolbar>
           <LanguageSwitcher />
-          {isAuthenticated && <NotificationCard />}
-          {isAuthenticated && <ChatCard />}
+          {isAuthenticated && (
+            <React.Suspense fallback={<Box width={40} />}>
+              <NotificationCard />
+            </React.Suspense>
+          )}
+          {isAuthenticated && (
+            <React.Suspense fallback={<Box width={40} />}>
+              <ChatCard />
+            </React.Suspense>
+          )}
           {authArea}
         </Toolbar>
       </Stack>

@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import db from '../configs/firebase-config';
 import {
   collection,
@@ -6,6 +6,7 @@ import {
   query,
   where,
   orderBy,
+  limit as fbLimit,
   type OrderByDirection,
   type WhereFilterOp,
 } from 'firebase/firestore';
@@ -21,14 +22,15 @@ type Condition = {
 const useFirebaseFireStore = (
   collectionName: string,
   condition?: Condition,
-  sort: OrderByDirection = 'desc'
+  sort: OrderByDirection = 'desc',
+  limitNum: number = 50
 ): AnyRecord[] => {
   const [docs, setDocs] = React.useState<AnyRecord[]>([]);
 
   React.useEffect(() => {
     const collectionRef = collection(db, collectionName);
 
-    let q = query(collectionRef, orderBy('createdAt', sort));
+    let q = query(collectionRef, orderBy('createdAt', sort), fbLimit(limitNum));
 
     if (condition) {
       if (!condition.compareValue) {

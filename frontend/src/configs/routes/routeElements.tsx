@@ -92,9 +92,9 @@ const AdminBannersPage = lazy(() => import("../../pages/adminPages/BannersPage")
 const AdminFeedbacksPage = lazy(() => import("../../pages/adminPages/FeedbacksPage"));
 const AdminChatPage = lazy(() => import("../../pages/adminPages/ChatPage"));
 
-const JobSeekerInterviewLoginPage = lazy(() => import("../../pages/candidatePages/CandidateLoginPage"));
-const InterviewRoomPage = lazy(() => import("../../pages/candidatePages/InterviewRoomPage"));
-const VoiceAiInterviewRedirectPage = lazy(() => import("../../pages/candidatePages/VoiceAiInterviewRedirectPage"));
+const JobSeekerInterviewLoginPage = lazy(() => import("../../pages/jobSeekerPages/CandidateLoginPage"));
+const InterviewRoomPage = lazy(() => import("../../pages/jobSeekerPages/InterviewRoomPage"));
+const VoiceAiInterviewRedirectPage = lazy(() => import("../../pages/jobSeekerPages/VoiceAiInterviewRedirectPage"));
 
 const EmployerJobPostRedirect = ({ path }: { path: string }) => <Navigate to={path} replace />;
 

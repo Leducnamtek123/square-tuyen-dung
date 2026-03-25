@@ -3,10 +3,10 @@ import { useParams } from "react-router-dom";
 import { Box, Card, Stack, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import BackdropLoading from "../../../../components/loading/BackdropLoading";
-import resumeService from "../../../../services/resumeService";
-import errorHandling from "../../../../utils/errorHandling";
 import { CV_TYPES } from "../../../../configs/constants";
 import FormPopup from "../../../../components/controls/FormPopup";
+import { useQuery } from '@tanstack/react-query';
+import resumeService from "../../../../services/resumeService";
 
 import PersonalInfoSection from './PersonalInfoSection';
 import GeneralInfoSection from './GeneralInfoSection';
@@ -23,26 +23,15 @@ const ProfileDetailCard: React.FC = () => {
   const { t } = useTranslation('employer');
   const { slug } = useParams<{ slug: string }>();
   
-  const [profileDetail, setProfileDetail] = React.useState<any>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const { data: profileDetail, isLoading } = useQuery({
+    queryKey: ['resumeDetail', slug],
+    queryFn: async () => {
+      const resData = await resumeService.getResumeDetail(slug as string) as any;
+      return resData.data;
+    },
+    enabled: !!slug,
+  });
   const [openPopup, setOpenPopup] = React.useState(false);
-
-  React.useEffect(() => {
-    const getProfileDetail = async () => {
-      setIsLoading(true);
-      try {
-        const resData = await resumeService.getResumeDetail(slug as string) as any;
-        setProfileDetail(resData.data);
-      } catch (error: any) {
-        errorHandling(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    if (slug) {
-      getProfileDetail();
-    }
-  }, [slug]);
 
   if (isLoading) return <BackdropLoading open={true} />;
   if (!profileDetail) return null;

@@ -31,7 +31,7 @@ import dayjs from 'dayjs';
 
 import RangePickerCustom from '../../../../../components/controls/RangePickerCustom';
 
-import statisticService from '../../../../../services/statisticService';
+import { useEmployerRecruitmentByRank } from '../../hooks/useEmployerQueries';
 
 import { useTheme } from '@mui/material/styles';
 
@@ -116,41 +116,14 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
     dayjs(new Date()),
   ]);
 
-  const [data, setData] = React.useState<HiringAcademicData | null>(null);
+  const queryParams = React.useMemo(() => ({
+    startDate: dayjs(selectedDateRange[0]).format('YYYY-MM-DD'),
+    endDate: dayjs(selectedDateRange[1]).format('YYYY-MM-DD'),
+  }), [selectedDateRange]);
 
-  React.useEffect(() => {
+  const { data, isLoading: queryLoading } = useEmployerRecruitmentByRank(queryParams);
 
-    const statistics = async (params: any) => {
-
-      setIsLoading(true);
-
-      try {
-
-        const resData = await statisticService.employerRecruitmentStatisticsByRank(params);
-
-        setData((resData as any).data);
-
-      } catch (error) {
-
-        console.error('Error: ', error);
-
-      } finally {
-
-        setIsLoading(false);
-
-      }
-
-    };
-
-    statistics({
-
-      startDate: dayjs(selectedDateRange[0]).format('YYYY-MM-DD').toString(),
-
-      endDate: dayjs(selectedDateRange[1]).format('YYYY-MM-DD').toString(),
-
-    });
-
-  }, [allowSubmit, selectedDateRange]);
+  React.useEffect(() => { setIsLoading(queryLoading); }, [queryLoading]);
 
   const dataOptions = React.useMemo(() => {
     const labels = data?.labels?.map((label: string) => {

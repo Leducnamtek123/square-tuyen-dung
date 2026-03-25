@@ -3,9 +3,9 @@ import { Pagination, Stack } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { ROLES_NAME } from "../../../../configs/constants";
 import NoDataCard from "../../../../components/NoDataCard";
-import jobService from "../../../../services/jobService";
 import JobPost from "../../../../components/JobPost";
 import { useAppSelector } from "../../../../hooks/useAppStore";
+import { useSuggestedJobPosts } from "../MainJobPostCard/hooks/useJobPosts";
 
 interface SuggestedJobPostCardProps {
   pageSize?: number;
@@ -16,105 +16,42 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 
 
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
 
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  const [jobPosts, setJobPosts] = React.useState<any[]>([]);
-
   const [page, setPage] = React.useState(1);
 
-  const [count, setCount] = React.useState(0);
-
-  const [parentWidth, setParentWidth] = React.useState(0);
+  const containerRef = React.useRef<HTMLDivElement>(null);
 
   const [col, setCol] = React.useState(12);
 
+  const isJobSeeker = isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
+
+  // Use ResizeObserver instead of document.getElementById + window resize
   React.useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
 
-    const handleResize = () => {
-
-      const element = document.getElementById("suggested-job-post-card");
-
-      if (element) {
-        setParentWidth(element.offsetWidth);
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0].contentRect.width;
+      if (width < 600) {
+        setCol(12);
+      } else if (width < 900) {
+        setCol(6);
+      } else {
+        setCol(fullWidth ? 6 : 4);
       }
+    });
 
-    };
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [fullWidth]);
 
-    handleResize();
+  const { data, isLoading } = useSuggestedJobPosts(
+    { pageSize, page },
+    isJobSeeker
+  );
 
-    window.addEventListener("resize", handleResize);
-
-    return () => window.removeEventListener("resize", handleResize);
-
-  }, []);
-
-  React.useEffect(() => {
-
-    if (parentWidth < 600) {
-
-      setCol(12);
-
-    } else if (parentWidth < 900) {
-
-      setCol(6);
-
-    } else if (parentWidth < 1200) {
-
-      setCol(6);
-
-    } else {
-
-      setCol(4);
-
-    }
-
-  }, [parentWidth]);
-
-  React.useEffect(() => {
-
-    const getJobPosts = async () => {
-
-      setIsLoading(true);
-
-      try {
-
-        const resData = await jobService.getSuggestedJobPosts({
-
-          pageSize: pageSize,
-
-          page: page,
-
-        }) as any;
-
-        const data = resData.data;
-
-        setCount(data.count);
-
-        setJobPosts(data.results);
-
-      } catch (error) {
-
-      } finally {
-
-        setIsLoading(false);
-
-      }
-
-    };
-
-    if (isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER) {
-
-      getJobPosts();
-
-    } else {
-
-      setIsLoading(false);
-
-    }
-
-     
-
-  }, [page, currentUser?.roleName, isAuthenticated, pageSize]);
+  const jobPosts = isJobSeeker ? (data?.results || []) : [];
+  const count = isJobSeeker ? (data?.count || 0) : 0;
+  const showLoading = isJobSeeker && isLoading;
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
 
@@ -124,11 +61,11 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 
 
   return (
 
-    <div id="suggested-job-post-card">
+    <div ref={containerRef}>
 
       <Stack>
 
-        {isLoading ? (
+        {showLoading ? (
 
           <Grid container spacing={2}>
 
@@ -154,7 +91,7 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 
 
             <Grid container spacing={2}>
 
-              {jobPosts.map((value) => (
+              {jobPosts.map((value: any) => (
 
                 <Grid key={value.id} size={col}>
 

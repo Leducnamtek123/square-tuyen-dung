@@ -2,29 +2,13 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { Avatar, Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
-import statisticService from "../../../../services/statisticService";
+import { useJobSeekerTotalView } from "../hooks/useJobSeekerQueries";
 import { ROUTES } from "../../../../configs/constants";
 
 const SidebarViewTotal = () => {
   const { t } = useTranslation('jobSeeker');
   const nav = useNavigate();
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [data, setData] = React.useState<any>(null);
-
-  React.useEffect(() => {
-    const statistics = async () => {
-      setIsLoading(true);
-      try {
-        const resData = await statisticService.jobSeekerTotalView();
-        setData(resData.data);
-      } catch (error) {
-        console.error("Error: ", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    statistics();
-  }, []);
+  const { data, isLoading } = useJobSeekerTotalView();
 
   return (
     <Box>

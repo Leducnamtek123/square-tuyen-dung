@@ -15,11 +15,13 @@ import xlsxUtils from '../../../../utils/xlsxUtils';
 
 import SavedResumeTable from '../SavedResumeTable';
 
+import { useSavedResumes, useToggleSaveResume } from '../hooks/useEmployerQueries';
+
 import resumeSavedService from '../../../../services/resumeSavedService';
 
 import SavedResumeFilterForm from '../SavedResumeFilterForm';
 
-import resumeService from '../../../../services/resumeService';
+
 
 import toastMessages from '../../../../utils/toastMessages';
 
@@ -96,7 +98,6 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
   const headCells = React.useMemo(() => getHeadCells(t), [t]);
 
   const [page, setPage] = React.useState(0);
-  const [count, setCount] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(pageSize);
   const [filterData, setFilterData] = React.useState({
     kw: '',
@@ -104,10 +105,19 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
     experienceId: '',
     cityId: '',
   });
-  const [isSuccess, setIsSuccess] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true);
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-  const [resumes, retResumes] = React.useState([]);
+
+  const queryParams = React.useMemo(() => ({
+    page: page + 1,
+    pageSize: rowsPerPage,
+    ...filterData,
+  }), [page, rowsPerPage, filterData]);
+
+  const { data: queryData, isLoading } = useSavedResumes(queryParams);
+  const resumes = queryData?.results || [];
+  const count = queryData?.count || 0;
+
+  const toggleSave = useToggleSaveResume();
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -118,33 +128,6 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
     setPage(0);
   };
 
-  React.useEffect(() => {
-    const loadResumes = async (params: any) => {
-      setIsLoading(true);
-      try {
-        const resData = await resumeSavedService.getResumesSaved(params) as any;
-        const data = resData?.data;
-        const rawResumes = Array.isArray(data?.results)
-          ? data.results
-          : Array.isArray(data)
-          ? data
-          : [];
-        setCount(typeof data?.count === "number" ? data.count : rawResumes.length);
-        retResumes(rawResumes);
-      } catch (error: any) {
-        errorHandling(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadResumes({
-      page: page + 1,
-      pageSize: rowsPerPage,
-      ...filterData,
-    });
-  }, [page, rowsPerPage, filterData, isSuccess]);
-
   const handleFilter = (data: any) => {
     setFilterData({
       ...data,
@@ -154,16 +137,11 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
   };
 
   const handleSave = (slug: string) => {
-    const save = async (slugResume: string) => {
-      try {
-        await resumeService.saveResume(slugResume);
-        setIsSuccess(!isSuccess);
+    toggleSave.mutate(slug, {
+      onSuccess: () => {
         toastMessages.success(t('savedResume.messages.unsaveSuccess'));
-      } catch (error: any) {
-        errorHandling(error);
-      }
-    };
-    save(slug);
+      },
+    });
   };
 
   const handleExport = () => {

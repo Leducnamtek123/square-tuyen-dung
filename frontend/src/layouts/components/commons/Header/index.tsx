@@ -20,9 +20,8 @@ import LeftDrawer from "../LeftDrawer";
 import AccountSwitchMenu from "../AccountSwitchMenu";
 import WorkspaceSwitchMenu from "../WorkspaceSwitchMenu";
 
-import NotificationCard from "../../../../components/NotificationCard";
-
-import ChatCard from "../../../../components/ChatCard";
+const NotificationCard = React.lazy(() => import("../../../../components/NotificationCard"));
+const ChatCard = React.lazy(() => import("../../../../components/ChatCard"));
 
 import LanguageSwitcher from "../LanguageSwitcher";
 import { isAdminPortalPath, isEmployerPortalPath } from "../../../../configs/portalRouting";
@@ -430,14 +429,18 @@ const Header = (props: HeaderProps) => {
 
               {/* Notification + Chat: chỉ hiện từ sm trở lên trên mobile */}
               {isAuthenticated && (
-                <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
-                  <NotificationCard />
-                </Box>
+                <React.Suspense fallback={<Box width={40} height={40} />}>
+                  <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
+                    <NotificationCard />
+                  </Box>
+                </React.Suspense>
               )}
               {isAuthenticated && (
-                <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
-                  <ChatCard />
-                </Box>
+                <React.Suspense fallback={<Box width={40} height={40} />}>
+                  <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
+                    <ChatCard />
+                  </Box>
+                </React.Suspense>
               )}
 
               {/* Auth buttons — hide on xs when not authenticated (available in drawer) */}

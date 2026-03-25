@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   collection,
   onSnapshot,
@@ -9,9 +9,10 @@ import {
   type OrderByDirection,
   type WhereFilterOp,
   type QueryConstraint,
+  getDocs,
+  documentId,
 } from 'firebase/firestore';
 import db from '../configs/firebase-config';
-import { getUserAccount } from '../services/firebaseService';
 
 type AnyRecord = Record<string, unknown>;
 
@@ -53,40 +54,61 @@ const useFireStoreGetChatRoom = (
     }
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-      const chatRoomsData: AnyRecord[] = [];
+      // Collect all partner IDs first
+      const roomsData: { docId: string; data: AnyRecord; partnerId: string }[] = [];
+      const partnerIds = new Set<string>();
 
-      const promises = querySnapshot.docs.map(async (doc) => {
-        try {
-          let partnerId = '';
-
-          const chatRoomData = doc.data() as AnyRecord;
-
-          if (chatRoomData?.userId1 === `${userId}`) {
-            partnerId = chatRoomData?.userId2 as string;
-          } else {
-            partnerId = chatRoomData?.userId1 as string;
-          }
-
-          const userAccount = await getUserAccount('accounts', `${partnerId}`);
-
-          chatRoomsData.push({
-            ...chatRoomData,
-            id: doc.id,
-            user: userAccount,
-          });
-        } catch (error) {
-          console.error(error);
+      querySnapshot.docs.forEach((doc) => {
+        const chatRoomData = doc.data() as AnyRecord;
+        let partnerId = '';
+        if (chatRoomData?.userId1 === `${userId}`) {
+          partnerId = chatRoomData?.userId2 as string;
+        } else {
+          partnerId = chatRoomData?.userId1 as string;
         }
+        partnerIds.add(partnerId);
+        roomsData.push({ docId: doc.id, data: chatRoomData, partnerId });
       });
 
-      await Promise.all(promises);
+      // Batch fetch all partner accounts in one query (max 30 per `in` query)
+      const userMap = new Map<string, AnyRecord>();
+      const idArray = Array.from(partnerIds).filter(Boolean);
+
+      if (idArray.length > 0) {
+        const accountsRef = collection(db, 'accounts');
+        // Firestore `in` supports max 30 items, chunk if needed
+        const chunks: string[][] = [];
+        for (let i = 0; i < idArray.length; i += 30) {
+          chunks.push(idArray.slice(i, i + 30));
+        }
+
+        await Promise.all(
+          chunks.map(async (chunk) => {
+            try {
+              const snap = await getDocs(
+                query(accountsRef, where(documentId(), 'in', chunk))
+              );
+              snap.forEach((doc) => {
+                userMap.set(doc.id, { ...doc.data(), id: doc.id });
+              });
+            } catch (error) {
+              console.error('Error batch fetching accounts:', error);
+            }
+          })
+        );
+      }
+
+      // Merge rooms with user data
+      const chatRoomsData: AnyRecord[] = roomsData.map((room) => ({
+        ...room.data,
+        id: room.docId,
+        user: userMap.get(room.partnerId) || null,
+      }));
 
       setDocs(chatRoomsData);
     });
 
     return unsubscribe;
-
-     
   }, [condition, sort, limitNum, userId]);
 
   return docs;

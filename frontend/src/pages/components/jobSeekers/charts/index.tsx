@@ -12,7 +12,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import statisticService from "../../../../services/statisticService";
+import { useJobSeekerActivityStatistics } from "../hooks/useJobSeekerQueries";
 import defaultTheme from '../../../../themeConfigs/defaultTheme';
 import { useTranslation } from "react-i18next";
 
@@ -65,23 +65,7 @@ export const options = {
 
 const ActivityChart = () => {
   const { t } = useTranslation("jobSeeker");
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [data, setData] = React.useState<any>([]);
-
-  React.useEffect(() => {
-    const statistics = async () => {
-      setIsLoading(true);
-      try {
-        const resData = await statisticService.jobSeekerActivityStatistics();
-        setData(resData.data);
-      } catch (error) {
-        console.error("Error: ", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    statistics();
-  }, []);
+  const { data, isLoading } = useJobSeekerActivityStatistics();
 
   const dataOptions = React.useMemo(() => {
     const d = {
@@ -139,7 +123,7 @@ const ActivityChart = () => {
         >
           {isLoading ? (
             <CircularProgress sx={{ color: "primary.main" }} />
-          ) : data.length === 0 ? (
+          ) : !data || (Array.isArray(data) && data.length === 0) ? (
             <Stack alignItems="center" spacing={1}>
               <InsertChartOutlinedIcon sx={{ fontSize: 42, color: "text.secondary" }} />
               <Typography variant="body2" color="text.secondary">

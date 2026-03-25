@@ -49,7 +49,7 @@ import dayjs, { Dayjs } from "dayjs";
 
 import RangePickerCustom from "../../../../../components/controls/RangePickerCustom";
 
-import statisticService from "../../../../../services/statisticService";
+import { useEmployerRecruitmentStatistics } from '../../hooks/useEmployerQueries';
 
 interface Props {
   [key: string]: any;
@@ -216,45 +216,14 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
     dayjs(new Date()),
   ]);
 
-  const [data, setData] = React.useState<RecruitmentDataItem[]>([]);
+  const queryParams = React.useMemo(() => ({
+    startDate: dayjs(selectedDateRange[0]).format('YYYY-MM-DD'),
+    endDate: dayjs(selectedDateRange[1]).format('YYYY-MM-DD'),
+  }), [selectedDateRange]);
 
-  React.useEffect(() => {
+  const { data, isLoading: queryLoading } = useEmployerRecruitmentStatistics(queryParams);
 
-    const statistics = async (data: any) => {
-
-      setIsLoading(true);
-
-      try {
-
-        const resData = await statisticService.employerRecruitmentStatistics(
-
-          data
-
-        );
-
-        setData((resData as any).data);
-
-      } catch (error) {
-
-        console.error("Error: ", error);
-
-      } finally {
-
-        setIsLoading(false);
-
-      }
-
-    };
-
-    statistics({
-
-      startDate: dayjs(selectedDateRange[0]).format("YYYY-MM-DD").toString(),
-
-      endDate: dayjs(selectedDateRange[1]).format("YYYY-MM-DD").toString(),
-
-    });
-
-  }, [allowSubmit, selectedDateRange]);
+  React.useEffect(() => { setIsLoading(queryLoading); }, [queryLoading]);
 
   const dataOptions = React.useMemo<ChartData<'bar'>>(() => {
     const safeData = Array.isArray(data) ? data : [];

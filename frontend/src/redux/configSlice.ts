@@ -6,9 +6,25 @@ interface ConfigState {
   allConfig: SystemConfig | null;
 }
 
+const CONFIG_CACHE_KEY = 'sq_allConfig_cache';
+const CONFIG_CACHE_TTL = 10 * 60 * 1000; // 10 minutes
+
 const getAllConfig = createAsyncThunk<SystemConfig, void>(
   'config/getAllConfig',
   async () => {
+    // Check localStorage cache first
+    try {
+      const cached = localStorage.getItem(CONFIG_CACHE_KEY);
+      if (cached) {
+        const { data, ts } = JSON.parse(cached);
+        if (Date.now() - ts < CONFIG_CACHE_TTL) {
+          return data as SystemConfig;
+        }
+      }
+    } catch {
+      // Cache parse error — ignore and fetch fresh
+    }
+
     // Fire both requests in parallel instead of sequentially
     const [resData, careersRes] = await Promise.all([
       commonService.getConfigs(),
@@ -26,6 +42,16 @@ const getAllConfig = createAsyncThunk<SystemConfig, void>(
           name: career.name,
         })),
       };
+    }
+
+    // Persist to localStorage
+    try {
+      localStorage.setItem(
+        CONFIG_CACHE_KEY,
+        JSON.stringify({ data: merged, ts: Date.now() })
+      );
+    } catch {
+      // Storage full — silently ignore
     }
 
     return merged as SystemConfig;

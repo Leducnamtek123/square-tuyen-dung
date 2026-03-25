@@ -6,3 +6,6 @@ export { default as ProjectPage } from './ProjectPage';
 export { default as OnlineProfilePage } from './OnlineProfilePage';
 export { default as ProfilePage } from './ProfilePage';
 export { default as MyInterviewsPage } from './MyInterviewsPage';
+export { default as JobSeekerInterviewLoginPage } from './CandidateLoginPage';
+export { default as InterviewRoomPage } from './InterviewRoomPage';
+export { default as VoiceAiInterviewRedirectPage } from './VoiceAiInterviewRedirectPage';

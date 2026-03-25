@@ -653,6 +653,6 @@ const Loading = () => (
 
 );
 
-JobPost.Loading = Loading;
+const MemoizedJobPost = Object.assign(React.memo(JobPost), { Loading });
 
-export default JobPost;
+export default MemoizedJobPost;

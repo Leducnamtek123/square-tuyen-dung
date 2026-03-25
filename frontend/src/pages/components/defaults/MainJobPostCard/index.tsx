@@ -3,41 +3,22 @@ import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import JobPostLarge from '../../../../components/JobPostLarge';
 import NoDataCard from '../../../../components/NoDataCard';
-import jobService from '../../../../services/jobService';
 import { useAppSelector } from '../../../../hooks/useAppStore';
+import { useJobPosts } from './hooks/useJobPosts';
 
 const MainJobPostCard = () => {
   const { t } = useTranslation('public');
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const { pageSize } = jobPostFilter;
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [jobPosts, setJobPosts] = React.useState<any[]>([]);
   const [page, setPage] = React.useState(1);
-  const [count, setCount] = React.useState(0);
 
   React.useEffect(() => {
     setPage(1);
   }, [jobPostFilter]);
 
-  React.useEffect(() => {
-    const getJobPosts = async () => {
-      setIsLoading(true);
-      try {
-        const resData = await jobService.getJobPosts({
-          ...jobPostFilter,
-          page: page,
-        });
-        const data = resData.data;
-        setCount(data.count);
-        setJobPosts(data?.results || []);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    getJobPosts();
-  }, [jobPostFilter, page]);
+  const { data, isLoading } = useJobPosts(jobPostFilter, page);
+  const jobPosts = data?.results || [];
+  const count = data?.count || 0;
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
@@ -98,7 +79,7 @@ const MainJobPostCard = () => {
 
           <>
 
-            {jobPosts.map((value) => (
+            {jobPosts.map((value: any) => (
 
               <JobPostLarge
 
