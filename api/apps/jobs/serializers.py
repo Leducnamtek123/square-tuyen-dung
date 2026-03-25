@@ -465,6 +465,13 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
 
     aiAnalysisMissingSkills = serializers.JSONField(source='ai_analysis_missing_skills', read_only=True)
 
+    resumeFileUrl = serializers.SerializerMethodField(method_name='get_resume_file_url', read_only=True)
+
+    def get_resume_file_url(self, activity):
+        if activity.resume and activity.resume.file:
+            return activity.resume.file.get_full_url()
+        return None
+
     userDict = serializers.SerializerMethodField(method_name="get_user_dict", read_only=True)
 
     def get_user_dict(self, activity):
@@ -506,7 +513,7 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
                   "resumeSlug", "jobName", "status", "createAt", "isSentEmail",
 
                   "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus", "aiAnalysisPros", "aiAnalysisCons", "aiAnalysisMatchingSkills", "aiAnalysisMissingSkills",
-                  "userDict", "jobPostDict", "companyDict")
+                  "resumeFileUrl", "userDict", "jobPostDict", "companyDict")
 
 class EmployerJobPostActivityExportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
