@@ -13,6 +13,7 @@ import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useTranslation } from 'react-i18next';
 import adminManagementService from '../../../services/adminManagementService';
 import { IMAGES } from '../../../configs/constants';
+import { compressImageFile } from '../../../utils/imageCompression';
 
 const PLATFORM_OPTIONS = [
   { value: 'WEB', label: 'Web' },
@@ -152,11 +153,12 @@ const BannersPage = () => {
   };
 
   const handleFileChange = (setter: (f: File | null) => void, previewSetter: (s: string) => void) =>
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const f = e.target.files?.[0];
       if (!f) return;
-      setter(f);
-      previewSetter(URL.createObjectURL(f));
+      const compressed = await compressImageFile(f);
+      setter(compressed);
+      previewSetter(URL.createObjectURL(compressed));
     };
 
   return (

@@ -20,6 +20,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import MuiImageCustom from '../../../../components/MuiImageCustom';
 
 import { deleteAvatar, updateAvatar } from '../../../../redux/userSlice';
+import { compressImageFile } from '../../../../utils/imageCompression';
 
 interface AvatarCardProps {
   [key: string]: any;
@@ -113,13 +114,15 @@ const AvatarCard = () => {
 
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
 
     const file = event.target.files?.[0];
 
     if (!file) return;
 
-    handleUpload(file);
+    const compressed = await compressImageFile(file);
+
+    handleUpload(compressed);
 
     event.target.value = '';
 

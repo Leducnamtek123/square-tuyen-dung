@@ -17,6 +17,7 @@ import BackdropLoading from '../../../../components/loading/BackdropLoading';
 import companyImageService from '../../../../services/companyImageService';
 
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
+import { compressImageFiles } from '../../../../utils/imageCompression';
 
 interface FileItem {
   uid: number | string;
@@ -73,9 +74,11 @@ const CompanyImageCard = () => {
 
     if (!files?.length) return;
 
+    const compressedFiles = await compressImageFiles(files);
+
     const formData = new FormData();
 
-    files.forEach((file: File) => {
+    compressedFiles.forEach((file: File) => {
 
       formData.append('files', file);
 

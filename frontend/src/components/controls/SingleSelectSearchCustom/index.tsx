@@ -14,6 +14,7 @@ interface Props {
   control: Control<any>;
   placeholder?: string;
   options?: any[];
+  noOptionsText?: string;
 }
 
 const SingleSelectSearchCustom = ({
@@ -21,6 +22,7 @@ const SingleSelectSearchCustom = ({
   name,
   control,
   options = [],
+  noOptionsText,
 }: Props) => {
 
   const theme = useTheme();
@@ -43,6 +45,8 @@ const SingleSelectSearchCustom = ({
           id={field.name}
 
           options={options}
+
+          {...(noOptionsText ? { noOptionsText } : {})}
 
           autoHighlight={false}
 

@@ -62,6 +62,8 @@
     "allJobTypes": "Tất cả hình thức",
     "allWorkplaces": "Tất cả nơi làm việc",
     "allGenders": "Tất cả giới tính",
+    "selectCityFirst": "Vui lòng chọn tỉnh/thành trước",
+    "selectDistrictFirst": "Vui lòng chọn quận/huyện trước",
     "searchResults": "Kết quả tìm kiếm",
     "posts": "tin tuyển dụng",
     "noJobsFound": "Không tìm thấy việc làm phù hợp với tiêu chí của bạn",

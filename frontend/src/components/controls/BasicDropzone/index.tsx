@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { useDropzone, Accept } from 'react-dropzone';
+import { compressImageFiles } from '../../../utils/imageCompression';
 
 import { Control, Controller } from 'react-hook-form';
 
@@ -18,11 +19,16 @@ interface FileDropzoneProps {
 
 const FileDropzone = ({ accept, onDrop, values }: FileDropzoneProps) => {
 
+  const handleDrop = async (files: File[]) => {
+    const compressed = await compressImageFiles(files);
+    onDrop(compressed);
+  };
+
   const { getRootProps, getInputProps } = useDropzone({
 
     accept,
 
-    onDrop,
+    onDrop: handleDrop,
 
   });
 

@@ -55,27 +55,27 @@ const JobPostSearch = () => {
   );
 
   const localizedJobTypeOptions = React.useMemo(
-    () => localizeOptions(allConfig?.jobTypeOptions, 'jobSearch.jobTypeOptions'),
+    () => localizeOptions(allConfig?.jobTypeOptions || [], 'jobSearch.jobTypeOptions'),
     [allConfig?.jobTypeOptions, localizeOptions]
   );
 
   const localizedTypeOfWorkplaceOptions = React.useMemo(
-    () => localizeOptions(allConfig?.typeOfWorkplaceOptions, 'jobSearch.workplaceOptions'),
+    () => localizeOptions(allConfig?.typeOfWorkplaceOptions || [], 'jobSearch.workplaceOptions'),
     [allConfig?.typeOfWorkplaceOptions, localizeOptions]
   );
 
   const localizedPositionOptions = React.useMemo(
-    () => localizeOptions(allConfig?.positionOptions, 'jobSearch.positionOptions'),
+    () => localizeOptions(allConfig?.positionOptions || [], 'jobSearch.positionOptions'),
     [allConfig?.positionOptions, localizeOptions]
   );
 
   const localizedExperienceOptions = React.useMemo(
-    () => localizeOptions(allConfig?.experienceOptions, 'jobSearch.experienceOptions'),
+    () => localizeOptions(allConfig?.experienceOptions || [], 'jobSearch.experienceOptions'),
     [allConfig?.experienceOptions, localizeOptions]
   );
 
   const localizedGenderOptions = React.useMemo(
-    () => localizeOptions(allConfig?.genderOptions, 'jobSearch.genderOptions'),
+    () => localizeOptions(allConfig?.genderOptions || [], 'jobSearch.genderOptions'),
     [allConfig?.genderOptions, localizeOptions]
   );
 
@@ -353,6 +353,7 @@ const JobPostSearch = () => {
               placeholder={t('jobSearch.allDistricts')}
               control={control}
               options={districtOptions}
+              noOptionsText={!cityId ? t('jobSearch.selectCityFirst') : undefined}
             />
           </Grid>
           <Grid
@@ -368,6 +369,7 @@ const JobPostSearch = () => {
               placeholder={t('jobSearch.allWards')}
               control={control}
               options={wardOptions}
+              noOptionsText={!districtId ? t('jobSearch.selectDistrictFirst') : undefined}
             />
           </Grid>
           <Grid
