@@ -22,6 +22,7 @@ import bannerExplore from '../../../assets/images/banner-explore.webp';
 import bannerExplorePc from '../../../assets/images/banner-explore-pc.webp';
 import { useAppSelector } from "../../../hooks/useAppStore";
 import type { SvgIconComponent } from "@mui/icons-material";
+import LazyLoadSection from "../../../components/LazyLoadSection";
 
 /** Reusable section for career-filtered job listings */
 const CareerJobSection = ({
@@ -134,7 +135,9 @@ export default function HomePage() {
         <Typography variant="h5" sx={{ mb: 3 }} gutterBottom>
           {t('home.keyCareers')}
         </Typography>
-        <CareerCarousel />
+        <LazyLoadSection minHeight="200px" rootMargin="200px">
+          <CareerCarousel />
+        </LazyLoadSection>
       </Box>
 
       {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
@@ -161,7 +164,9 @@ export default function HomePage() {
             />
             <CardContent sx={{ backgroundColor: "primary.background" }}>
               <Box sx={{ p: { xs: 0, sm: 0, md: 0, lg: 2, xl: 2 } }}>
-                <SuggestedJobPostCard />
+                <LazyLoadSection minHeight="400px">
+                  <SuggestedJobPostCard />
+                </LazyLoadSection>
               </Box>
             </CardContent>
           </Card>
@@ -205,7 +210,9 @@ export default function HomePage() {
       {/* Career Job Sections — deduplicated via map */}
       {HOME_FILTER_CAREER.map((career, index) => (
         <Box sx={{ mt: index === 0 ? 6 : 10 }} key={career.id}>
-          <CareerJobSection career={career} t={t} />
+          <LazyLoadSection minHeight="400px" rootMargin="300px">
+            <CareerJobSection career={career} t={t} />
+          </LazyLoadSection>
         </Box>
       ))}
 
@@ -214,13 +221,17 @@ export default function HomePage() {
         <Typography variant="h5" sx={{ mb: 3 }} gutterBottom>
           {t('home.userFeedback')}
         </Typography>
-        <FeedbackCarousel />
+        <LazyLoadSection minHeight="300px" rootMargin="300px">
+          <FeedbackCarousel />
+        </LazyLoadSection>
       </Box>
 
       <Box sx={{ mt: 10 }}>
         {/* Job by Category */}
         <Box sx={{ backgroundColor: "background.paper", borderRadius: 2 }}>
-          <JobByCategory />
+          <LazyLoadSection minHeight="500px" rootMargin="400px">
+            <JobByCategory />
+          </LazyLoadSection>
         </Box>
       </Box>
     </>
