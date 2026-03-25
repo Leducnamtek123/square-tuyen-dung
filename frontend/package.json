@@ -58,6 +58,7 @@
     "react-dom": "^18.2.0",
     "react-draft-wysiwyg": "^1.15.0",
     "react-dropzone": "^14.2.3",
+    "react-easy-crop": "^5.5.7",
     "react-geolocated": "^4.0.3",
     "react-hook-form": "^7.43.4",
     "react-i18next": "^14.1.3",

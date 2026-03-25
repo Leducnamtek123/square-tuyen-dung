@@ -17,33 +17,11 @@ interface MainJobRightBannerProps {
   [key: string]: any;
 }
 
-
-
-const BannerImageContainer = styled("div")({
-  position: "relative",
+const StyledBannerImage = styled("img")({
   width: "100%",
-  overflow: "hidden",
+  height: "auto",
   borderRadius: "12px",
-  aspectRatio: "1 / 1",
-});
-
-const BannerBlurBg = styled("img")({
-  position: "absolute",
-  inset: 0,
-  width: "100%",
-  height: "100%",
-  objectFit: "cover",
-  filter: "blur(16px) brightness(0.75)",
-  transform: "scale(1.15)",
-  pointerEvents: "none",
-});
-
-const BannerMainImage = styled("img")({
-  position: "relative",
-  width: "100%",
-  height: "100%",
-  objectFit: "contain",
-  zIndex: 1,
+  display: "block",
 });
 
 const StyledBannerLink = styled("a")({
@@ -90,18 +68,11 @@ const MainJobRightBanner = (_props: MainJobRightBannerProps) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <BannerImageContainer>
-              <BannerBlurBg
-                src={banner.imageUrl}
-                alt=""
-                aria-hidden="true"
-              />
-              <BannerMainImage
-                src={banner.imageUrl}
-                alt={banner.description || "Banner"}
-                loading="lazy"
-              />
-            </BannerImageContainer>
+            <StyledBannerImage
+              src={banner.imageUrl}
+              alt={banner.description || "Banner"}
+              loading="lazy"
+            />
           </StyledBannerLink>
           {banner.isShowButton && banner.buttonLink && (
             <Box 
@@ -151,4 +122,3 @@ const MainJobRightBanner = (_props: MainJobRightBannerProps) => {
 };
 
 export default MainJobRightBanner;
-

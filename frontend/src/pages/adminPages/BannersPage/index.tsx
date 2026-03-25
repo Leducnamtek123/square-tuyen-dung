@@ -14,6 +14,13 @@ import { useTranslation } from 'react-i18next';
 import adminManagementService from '../../../services/adminManagementService';
 import { IMAGES } from '../../../configs/constants';
 import { compressImageFile } from '../../../utils/imageCompression';
+import ImageCropDialog from '../../../components/ImageCropDialog';
+
+/** Aspect ratios per banner type */
+const ASPECT_RATIOS: Record<number, { ratio: number; label: string }> = {
+  1: { ratio: 16 / 5, label: '16:5' },  // Home banner (wide)
+  2: { ratio: 1 / 1, label: '1:1' },     // Main Job Right (square)
+};
 
 const PLATFORM_OPTIONS = [
   { value: 'WEB', label: 'Web' },
@@ -69,6 +76,12 @@ const BannersPage = () => {
   const [mobilePreview, setMobilePreview] = useState('');
   const webInputRef = useRef<HTMLInputElement>(null);
   const mobileInputRef = useRef<HTMLInputElement>(null);
+
+  // Crop dialog state
+  const [cropOpen, setCropOpen] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState('');
+  const [cropFileName, setCropFileName] = useState('');
+  const [cropTarget, setCropTarget] = useState<'web' | 'mobile'>('web');
 
   const fetchBanners = useCallback(async () => {
     setIsLoading(true);
@@ -152,14 +165,39 @@ const BannersPage = () => {
     finally { setIsSaving(false); }
   };
 
-  const handleFileChange = (setter: (f: File | null) => void, previewSetter: (s: string) => void) =>
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (target: 'web' | 'mobile') =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const f = e.target.files?.[0];
       if (!f) return;
-      const compressed = await compressImageFile(f);
-      setter(compressed);
-      previewSetter(URL.createObjectURL(compressed));
+      setCropTarget(target);
+      setCropFileName(f.name);
+      setCropImageSrc(URL.createObjectURL(f));
+      setCropOpen(true);
+      e.target.value = '';
     };
+
+  const handleCropConfirm = async (croppedFile: File, previewUrl: string) => {
+    const compressed = await compressImageFile(croppedFile);
+    const finalPreview = URL.createObjectURL(compressed);
+    if (cropTarget === 'web') {
+      setWebImage(compressed);
+      setWebPreview(finalPreview);
+    } else {
+      setMobileImage(compressed);
+      setMobilePreview(finalPreview);
+    }
+    URL.revokeObjectURL(previewUrl);
+    setCropOpen(false);
+    setCropImageSrc('');
+  };
+
+  const handleCropCancel = () => {
+    setCropOpen(false);
+    if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
+    setCropImageSrc('');
+  };
+
+  const cropAspect = ASPECT_RATIOS[type] || ASPECT_RATIOS[1];
 
   return (
     <Box>
@@ -284,7 +322,7 @@ const BannersPage = () => {
             {/* Web Image Upload */}
             <Typography variant="subtitle2" sx={{ mt: 1, fontWeight: 600 }}>{t('pages.banners.form.webImageLabel')}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <input ref={webInputRef} type="file" accept="image/*" hidden onChange={handleFileChange(setWebImage, setWebPreview)} />
+              <input ref={webInputRef} type="file" accept="image/*" hidden onChange={handleFileSelect('web')} />
               <Button variant="outlined" startIcon={<UploadFileIcon />} onClick={() => webInputRef.current?.click()}>
                 {webImage ? webImage.name : t('pages.banners.form.chooseWeb')}
               </Button>
@@ -311,7 +349,7 @@ const BannersPage = () => {
             {/* Mobile Image Upload */}
             <Typography variant="subtitle2" sx={{ mt: 1, fontWeight: 600 }}>{t('pages.banners.form.mobileImageLabel')}</Typography>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <input ref={mobileInputRef} type="file" accept="image/*" hidden onChange={handleFileChange(setMobileImage, setMobilePreview)} />
+              <input ref={mobileInputRef} type="file" accept="image/*" hidden onChange={handleFileSelect('mobile')} />
               <Button variant="outlined" startIcon={<UploadFileIcon />} onClick={() => mobileInputRef.current?.click()}>
                 {mobileImage ? mobileImage.name : t('pages.banners.form.chooseMobile')}
               </Button>
@@ -355,6 +393,17 @@ const BannersPage = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Crop Dialog */}
+      <ImageCropDialog
+        open={cropOpen}
+        imageSrc={cropImageSrc}
+        fileName={cropFileName}
+        aspectRatio={cropAspect.ratio}
+        aspectLabel={cropAspect.label}
+        onConfirm={handleCropConfirm}
+        onCancel={handleCropCancel}
+      />
     </Box>
   );
 };
