@@ -15,6 +15,7 @@ import {
 import SendIcon from '@mui/icons-material/Send';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import {
   collection,
   onSnapshot,
@@ -216,13 +217,21 @@ const ChatWindow = () => {
         sx={{ 
           height: '100%', 
           display: 'flex', 
+          flexDirection: 'column',
           alignItems: 'center', 
           justifyContent: 'center',
-          bgcolor: 'background.default'
+          bgcolor: 'background.default',
+          borderLeft: 1,
+          borderRight: 1,
+          borderColor: 'divider',
         }}
       >
-        <Typography color="text.secondary">
-          {t('selectConversation')}
+        <ChatBubbleOutlineIcon sx={{ fontSize: 64, mb: 2, color: 'text.disabled' }} />
+        <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
+          {t('noConversationSelected')}
+        </Typography>
+        <Typography variant="body2" color="text.disabled" sx={{ mt: 1 }}>
+          Chọn một cuộc hội thoại ở danh sách bên trái để bắt đầu nhắn tin
         </Typography>
       </Box>
     );
@@ -307,11 +316,20 @@ const ChatWindow = () => {
         />
         <IconButton 
           type="submit" 
-          color="primary" 
           disabled={!inputValue.trim()}
-          sx={{ ml: 1 }}
+          sx={{ 
+            ml: 1,
+            bgcolor: inputValue.trim() ? 'primary.main' : 'action.hover',
+            color: inputValue.trim() ? 'white' : 'action.disabled',
+            '&:hover': {
+              bgcolor: inputValue.trim() ? 'primary.dark' : 'action.hover'
+            },
+            transition: 'all 0.2s',
+            width: 40,
+            height: 40,
+          }}
         >
-          <SendIcon fontSize="small" />
+          <SendIcon fontSize="small" sx={{ transform: 'translateX(2px)' }} />
         </IconButton>
       </Paper>
     </Stack>

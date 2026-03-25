@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Chip, Pagination, Skeleton, Stack, Tooltip, Typography, Theme } from "@mui/material";
+import { Box, Chip, Pagination, Skeleton, Stack, Tooltip, Typography, Theme, Button } from "@mui/material";
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import MuiImageCustom from '../../../../components/MuiImageCustom';
 import { useRightSidebarData } from './useRightSidebarData';
@@ -159,21 +159,27 @@ const RightSidebarRenderer = ({ titleKey, noDataKey, fetchData, mapDataToUI }: R
                       </Tooltip>
                     </Stack>
                     <Box>
-                      <Chip
-                        label={t('sendMessage')}
-                        color="primary"
+                      <Button
+                        variant="contained"
                         size="small"
-                        variant="outlined"
+                        disableElevation
                         onClick={() => handleAddRoom(mapped.partnerId, mapped.userDataWrapper)}
                         sx={{
-                          borderRadius: 1,
+                          borderRadius: 2,
+                          textTransform: 'none',
+                          fontWeight: 600,
+                          px: 2,
+                          py: 0.5,
+                          fontSize: '0.8125rem',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
                           '&:hover': {
-                            bgcolor: 'primary.main',
-                            color: 'white',
-                            borderColor: 'primary.main'
+                            transform: 'translateY(-1px)',
+                            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
                           }
                         }}
-                      />
+                      >
+                        {t('sendMessage')}
+                      </Button>
                     </Box>
                   </Stack>
                 </Box>

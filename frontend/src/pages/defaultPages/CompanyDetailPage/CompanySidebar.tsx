@@ -81,7 +81,7 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageLis
             {t("companyDetail.map")}
           </Typography>
           <Box sx={{ borderRadius: 2, overflow: "hidden", border: "1px solid", borderColor: "grey.200" }}>
-            <Map title={companyDetail?.companyName} subTitle={companyDetail?.address} latitude={companyDetail?.lat} longitude={companyDetail?.lng} />
+            <Map title={companyDetail?.companyName} subTitle={companyDetail?.location?.address} latitude={companyDetail?.location?.lat} longitude={companyDetail?.location?.lng} />
           </Box>
         </Box>
         {/* Image Gallery */}

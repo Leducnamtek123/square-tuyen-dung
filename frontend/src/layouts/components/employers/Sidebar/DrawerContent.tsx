@@ -30,8 +30,8 @@ const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
   };
 
   return (
-    <div>
-      <Toolbar sx={{ px: 2, py: 1.5 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      <Toolbar sx={{ px: 2, py: 1.5, flexShrink: 0 }}>
         <Box
           component={Link}
           to={`/${isAdmin ? ROUTES.ADMIN.DASHBOARD : ROUTES.EMPLOYER.DASHBOARD}`}
@@ -49,8 +49,8 @@ const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
           />
         </Box>
       </Toolbar>
-      <Divider sx={{ borderColor: 'grey.500' }} />
-      <Box sx={{ px: 1.5, py: 1.5 }}>
+      <Divider sx={{ borderColor: 'grey.500', flexShrink: 0 }} />
+      <Box sx={{ px: 1.5, py: 1.5, flexGrow: 1, overflowY: 'auto' }}>
         <List component="nav" disablePadding>
           {isAdmin ? (
             <AdminMenu t={t} location={location} expandedItems={expandedItems} handleExpand={handleExpand} />
@@ -60,7 +60,7 @@ const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
           <Divider sx={{ my: 2, borderColor: 'grey.300' }} />
         </List>
       </Box>
-    </div>
+    </Box>
   );
 };
 

@@ -79,7 +79,8 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
           >
             <MenuIcon />
           </IconButton>
-          <AccountSwitchMenu />
+          {/* <AccountSwitchMenu /> Remove or conditionally render this */}
+          {!isAuthenticated && <AccountSwitchMenu />}
         </Toolbar>
         <Toolbar>
           <LanguageSwitcher />

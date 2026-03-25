@@ -46,7 +46,7 @@ const removeUserInfo = createAsyncThunk<void, RemoveUserInfoPayload>(
      * Khong revoktoken
      * RevokToken -> token app -> chet theo
      */
-    await authService.revokToken(data.accessToken, data.backend as any);
+    // await authService.revokToken(data.accessToken, data.backend as any);
     const removeResult = tokenService.removeAccessTokenAndRefreshTokenFromCookie();
     if (!removeResult) {
       return Promise.reject("Can't remove token in Cookie");
