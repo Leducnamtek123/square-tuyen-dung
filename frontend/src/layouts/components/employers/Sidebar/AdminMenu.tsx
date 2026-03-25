@@ -4,7 +4,7 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-import { ROUTES } from '../../../../../configs/constants';
+import { ROUTES } from '@/configs/constants';
 import MenuItem from './MenuItem';
 
 interface AdminMenuProps {

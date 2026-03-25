@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Avatar, Box, Divider, List, Toolbar, useTheme } from "@mui/material";
-import { IMAGES, ROUTES } from '../../../../../configs/constants';
+import { IMAGES, ROUTES } from '@/configs/constants';
 import AdminMenu from './AdminMenu';
 import EmployerMenu from './EmployerMenu';
 

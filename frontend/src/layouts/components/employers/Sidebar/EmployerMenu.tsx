@@ -6,7 +6,7 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
-import { ROUTES, APP_NAME } from '../../../../../configs/constants';
+import { ROUTES, APP_NAME } from '@/configs/constants';
 import MenuItem from './MenuItem';
 
 interface EmployerMenuProps {
