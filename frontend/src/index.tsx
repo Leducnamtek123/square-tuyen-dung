@@ -43,9 +43,9 @@ const queryClient = new QueryClient({
 
       retry: 1,
 
-      staleTime: 30_000,       // 30s — data considered fresh, skip refetch
+      staleTime: 5 * 60_000,  // 5min — data considered fresh, skip refetch
 
-      gcTime: 5 * 60_000,     // 5min — garbage collect unused cache entries
+      gcTime: 10 * 60_000,   // 10min — garbage collect unused cache entries
 
     },
 

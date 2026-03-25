@@ -1,6 +1,7 @@
 import 'swiper/css';
 import 'swiper/css/pagination';
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Pagination, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Box } from "@mui/material";
@@ -33,10 +34,17 @@ const styles: any = {
 };
 
 const FeedbackCarousel = (_props: FeedbackCarouselProps) => {
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [feedbacks, setFeedbacks] = React.useState<any[]>([]);
   const [parentWidth, setParentWidth] = React.useState(0);
   const [col, setCol] = React.useState(5);
+
+  const { data: feedbacks = [], isLoading } = useQuery({
+    queryKey: ['feedbacks'],
+    queryFn: async () => {
+      const resData: any = await contentService.getFeedbacks();
+      return resData.data || [];
+    },
+    staleTime: 10 * 60_000, // feedbacks change rarely, cache 10 min
+  });
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -59,21 +67,6 @@ const FeedbackCarousel = (_props: FeedbackCarouselProps) => {
       setCol(4);
     }
   }, [parentWidth]);
-
-  React.useEffect(() => {
-    const getFeedbacksList = async () => {
-      setIsLoading(true);
-      try {
-        const resData: any = await contentService.getFeedbacks();
-        setFeedbacks(resData.data || []);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    getFeedbacksList();
-  }, []);
 
   return (
     <div id="feed-back-carousel">
@@ -112,7 +105,7 @@ const FeedbackCarousel = (_props: FeedbackCarouselProps) => {
             }}
             modules={[Pagination, Autoplay]}
           >
-            {feedbacks.map((value) => (
+            {feedbacks.map((value: any) => (
               <SwiperSlide key={value.id}>
                 <FeedbackCard
                   avatarUrl={value?.userDict?.avatarUrl}

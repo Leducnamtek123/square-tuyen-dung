@@ -47,7 +47,7 @@ const MuiImageCustom = (props: MuiImageCustomProps) => {
 
       fit="contain"
 
-      duration={500}
+      duration={150}
 
       easing="ease-in"
 

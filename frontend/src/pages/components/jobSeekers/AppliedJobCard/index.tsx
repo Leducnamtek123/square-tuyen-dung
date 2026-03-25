@@ -2,10 +2,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Box, Stack, Button, Pagination, Chip, Typography } from "@mui/material";
 import DoneIcon from '@mui/icons-material/Done';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {CV_TYPES, ROUTES} from '../../../../configs/constants';
 import NoDataCard from '../../../../components/NoDataCard';
 import JobPostAction from '../../../../components/JobPostAction';
-import errorHandling from '../../../../utils/errorHandling';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
@@ -16,30 +16,27 @@ const pageSize = 10;
 
 const AppliedJobCard = () => {
   const { t } = useTranslation(['jobSeeker', 'common']);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [jobPostsApplied, setJobPostsApplied] = React.useState<any[]>([]);
   const [page, setPage] = React.useState(1);
-  const [count, setCount] = React.useState(0);
 
-  React.useEffect(() => {
-    const getJobPosts = async () => {
-      setIsLoading(true);
-      try {
-        const resData = await jobPostActivityService.getJobPostActivity({
-          pageSize: pageSize,
-          page: page,
-        });
-        const data = (resData as any).data;
-        setCount(data.count);
-        setJobPostsApplied(data.results);
-      } catch (error: any) {
-        errorHandling(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    getJobPosts();
-  }, [page]);
+  const { data, isLoading } = useQuery({
+    queryKey: ['applied-jobs', page],
+    queryFn: async () => {
+      const resData = await jobPostActivityService.getJobPostActivity({
+        pageSize: pageSize,
+        page: page,
+      });
+      const result = (resData as any).data;
+      return {
+        results: result.results || [],
+        count: result.count || 0,
+      };
+    },
+    staleTime: 2 * 60_000,
+    placeholderData: keepPreviousData,
+  });
+
+  const jobPostsApplied = data?.results || [];
+  const count = data?.count || 0;
 
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
@@ -48,7 +45,7 @@ const AppliedJobCard = () => {
   return (
     <>
       <Box>
-        {isLoading ? (
+        {isLoading && !data ? (
           <Stack spacing={2}>
             {Array.from(Array(5).keys()).map((value) => (
               <JobPostAction.Loading key={value} />
@@ -71,7 +68,7 @@ const AppliedJobCard = () => {
           </NoDataCard>
         ) : (
           <Stack spacing={2}>
-            {jobPostsApplied.map((value) => (
+            {jobPostsApplied.map((value: any) => (
               <JobPostAction
                 key={value.id}
                 id={value?.jobPostDict.id}

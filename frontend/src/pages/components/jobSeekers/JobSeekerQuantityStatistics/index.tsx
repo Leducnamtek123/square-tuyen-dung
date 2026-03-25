@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent, Stack, Typography, Skeleton } from "@mui/material";
 import Grid from "@mui/material/Grid2";
+import { useQuery } from '@tanstack/react-query';
 import AssignmentTurnedInOutlinedIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
 import BookmarkOutlinedIcon from '@mui/icons-material/BookmarkOutlined';
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
@@ -47,23 +48,15 @@ const StatItem = ({ title, value, color, background, Icon, loading }: StatItemPr
 
 const JobSeekerQuantityStatistics = () => {
   const { t } = useTranslation('jobSeeker');
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [data, setData] = React.useState<any>(null);
 
-  React.useEffect(() => {
-    const statistics = async () => {
-      setIsLoading(true);
-      try {
-        const resData = await statisticService.jobSeekerGeneralStatistics();
-        setData(resData.data);
-      } catch (error) {
-        console.error('Error: ', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    statistics();
-  }, []);
+  const { data, isLoading } = useQuery({
+    queryKey: ['job-seeker-statistics'],
+    queryFn: async () => {
+      const resData = await statisticService.jobSeekerGeneralStatistics();
+      return resData.data;
+    },
+    staleTime: 3 * 60_000, // stats change infrequently
+  });
 
   return (
     <Grid container spacing={3}>

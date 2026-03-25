@@ -4,6 +4,7 @@ import "swiper/css/pagination";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from '@tanstack/react-query';
 import { Pagination, Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Box, Card, Skeleton, Stack, Typography } from "@mui/material";
@@ -65,10 +66,17 @@ const CareerCarousel = () => {
   const dispatch = useDispatch();
   const nav = useNavigate();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [topCareers, setTopCareers] = React.useState<any[]>([]);
   const [parentWidth, setParentWidth] = React.useState(0);
   const [col, setCol] = React.useState(5);
+
+  const { data: topCareers = [], isLoading } = useQuery({
+    queryKey: ['top-careers'],
+    queryFn: async () => {
+      const resData = await commonService.getTop10Careers();
+      return resData.data || [];
+    },
+    staleTime: 5 * 60_000,
+  });
 
   React.useEffect(() => {
     const handleResize = () => {
@@ -94,21 +102,6 @@ const CareerCarousel = () => {
     }
   }, [parentWidth]);
 
-  React.useEffect(() => {
-    const getTopCarreers = async () => {
-      setIsLoading(true);
-      try {
-        const resData = await commonService.getTop10Careers();
-        setTopCareers(resData.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    getTopCarreers();
-  }, []);
-
   const handleFilter = (id: any) => {
     dispatch(searchJobPost({ ...jobPostFilter, careerId: id }));
     nav(`/${ROUTES.JOB_SEEKER.JOBS}`);
@@ -133,7 +126,7 @@ const CareerCarousel = () => {
             ? Array.from(Array(10).keys()).map((value) => (
                 <SwiperSlide key={value}>{Loading}</SwiperSlide>
               ))
-            : topCareers.map((value) => (
+            : topCareers.map((value: any) => (
                 <SwiperSlide key={value.id}>
                   <Card
                     sx={{
