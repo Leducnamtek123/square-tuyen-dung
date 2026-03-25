@@ -23,7 +23,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 
 function App() {
   const dispatch = useAppDispatch();
-  const [isInitializing, setIsInitializing] = React.useState(true);
+  const hasCachedConfig = useAppSelector((state) => !!state.config.allConfig);
+  const [isInitializing, setIsInitializing] = React.useState(!hasCachedConfig);
   const { isAllowVerifyEmail } = useAppSelector((state) => state.auth);
   const { isAuthenticated, currentUser, activeWorkspace } = useAppSelector((state) => state.user);
 
@@ -104,7 +105,7 @@ function App() {
           loader.classList.add("fade-out");
           setTimeout(() => {
             loader.remove();
-          }, 500);
+          }, 300);
         });
       } else {
         setIsInitializing(false);
@@ -117,8 +118,13 @@ function App() {
         return;
       }
 
+      // If we have cached config, render immediately — refresh in background
+      if (hasCachedConfig) {
+        finalizeLoader();
+      }
+
       try {
-        // Fire both requests truly in parallel (don't wait for one to start the other)
+        // Fire both requests truly in parallel
         const configPromise = dispatch(getAllConfig());
         const hasAccessToken = !!tokenService.getAccessTokenFromCookie();
         const userPromise = hasAccessToken ? dispatch(getUserInfo()) : null;
@@ -127,12 +133,15 @@ function App() {
       } catch (err) {
         console.error("App initialization failed", err);
       } finally {
-        finalizeLoader();
+        // If no cached config, we were blocking — now unblock
+        if (!hasCachedConfig) {
+          finalizeLoader();
+        }
       }
     };
 
     initializeApp();
-  }, [dispatch, isJobSeekerInterviewRoute]);
+  }, [dispatch, isJobSeekerInterviewRoute, hasCachedConfig]);
 
   // Throttled global error handler — max 1 toast per 3 seconds
   React.useEffect(() => {

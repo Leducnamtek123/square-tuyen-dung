@@ -58,9 +58,25 @@ const getAllConfig = createAsyncThunk<SystemConfig, void>(
   }
 );
 
+// Hydrate initial state from localStorage to avoid blank screen
+const getInitialConfig = (): SystemConfig | null => {
+  try {
+    const cached = localStorage.getItem(CONFIG_CACHE_KEY);
+    if (cached) {
+      const { data, ts } = JSON.parse(cached);
+      if (Date.now() - ts < CONFIG_CACHE_TTL) {
+        return data as SystemConfig;
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return null;
+};
+
 export const configSlice = createSlice({
   name: 'config',
-  initialState: { allConfig: null } as ConfigState,
+  initialState: { allConfig: getInitialConfig() } as ConfigState,
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(getAllConfig.fulfilled, (state, action) => {
