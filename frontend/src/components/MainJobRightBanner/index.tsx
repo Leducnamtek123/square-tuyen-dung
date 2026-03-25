@@ -19,10 +19,31 @@ interface MainJobRightBannerProps {
 
 
 
-const StyledBannerImage = styled("img")({
+const BannerImageContainer = styled("div")({
+  position: "relative",
   width: "100%",
-  height: "auto",
-  borderRadius: "12px"
+  overflow: "hidden",
+  borderRadius: "12px",
+  aspectRatio: "1 / 1",
+});
+
+const BannerBlurBg = styled("img")({
+  position: "absolute",
+  inset: 0,
+  width: "100%",
+  height: "100%",
+  objectFit: "cover",
+  filter: "blur(16px) brightness(0.75)",
+  transform: "scale(1.15)",
+  pointerEvents: "none",
+});
+
+const BannerMainImage = styled("img")({
+  position: "relative",
+  width: "100%",
+  height: "100%",
+  objectFit: "contain",
+  zIndex: 1,
 });
 
 const StyledBannerLink = styled("a")({
@@ -69,11 +90,18 @@ const MainJobRightBanner = (_props: MainJobRightBannerProps) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <StyledBannerImage
-              src={banner.imageUrl}
-              alt={banner.description || "Banner"}
-              loading="lazy"
-            />
+            <BannerImageContainer>
+              <BannerBlurBg
+                src={banner.imageUrl}
+                alt=""
+                aria-hidden="true"
+              />
+              <BannerMainImage
+                src={banner.imageUrl}
+                alt={banner.description || "Banner"}
+                loading="lazy"
+              />
+            </BannerImageContainer>
           </StyledBannerLink>
           {banner.isShowButton && banner.buttonLink && (
             <Box 

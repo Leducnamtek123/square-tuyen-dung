@@ -26,15 +26,47 @@ const styles = {
 
 const RenderItem = ({ item }: { item: any }) => {
   return (
-    <MuiImageCustom
-      width="100%"
-      height="100%"
-      src={item.imageUrl}
+    <Box
       sx={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
         borderRadius: 1.5,
       }}
-      fit="cover"
-    />
+    >
+      {/* Blurred background layer — fills empty space beautifully */}
+      <Box
+        component="img"
+        src={item.imageUrl}
+        alt=""
+        aria-hidden
+        sx={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          filter: 'blur(20px) brightness(0.7)',
+          transform: 'scale(1.15)',
+          pointerEvents: 'none',
+        }}
+      />
+      {/* Main image — fully visible, never cropped */}
+      <Box
+        component="img"
+        src={item.imageUrl}
+        alt={item.description || 'Banner'}
+        loading="lazy"
+        sx={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          objectFit: 'contain',
+          zIndex: 1,
+        }}
+      />
+    </Box>
   );
 };
 
