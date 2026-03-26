@@ -22,6 +22,8 @@ import CompanyForm from "../CompanyForm";
 
 import companyService from "../../../../services/companyService";
 
+import { compressImageFile } from "../../../../utils/imageCompression";
+
 import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
 
 const CompanyCard = () => {
@@ -137,79 +139,71 @@ const CompanyCard = () => {
 
   };
 
-  const handleUpdateCompanyImageUrl = (file: File) => {
+  const handleUpdateCompanyImageUrl = async (file: File) => {
 
-    const update = async (formData: FormData) => {
+    setIsFullScreenLoading(true);
 
-      setIsFullScreenLoading(true);
+    try {
 
-      try {
+      const compressed = await compressImageFile(file);
 
-        const resData = await companyService.updateCompanyImageUrl(formData) as any;
+      const formData = new FormData();
 
-        const data = resData;
+      formData.append("file", compressed);
 
-        toastMessages.success(t("companyProfile.success.logoUpdate", "Company logo updated successfully."));
+      const resData = await companyService.updateCompanyImageUrl(formData) as any;
 
-        setCompanyImageUrl(data?.companyImageUrl);
+      const data = resData;
 
-      } catch (error: any) {
+      toastMessages.success(t("companyProfile.success.logoUpdate", "Company logo updated successfully."));
 
-        errorHandling(error);
+      setCompanyImageUrl(data?.companyImageUrl);
 
-      } finally {
+    } catch (error: any) {
 
-        setIsFullScreenLoading(false);
+      errorHandling(error);
 
-      }
+    } finally {
 
-    };
+      setIsFullScreenLoading(false);
 
-    var formData = new FormData();
-
-    formData.append("file", file);
-
-    update(formData);
+    }
 
   };
 
-  const handleUpdateCompanyCoverImageUrl = (file: File) => {
+  const handleUpdateCompanyCoverImageUrl = async (file: File) => {
 
-    const update = async (formData: FormData) => {
+    setIsFullScreenLoading(true);
 
-      setIsFullScreenLoading(true);
+    try {
 
-      try {
+      const compressed = await compressImageFile(file);
 
-        const resData = await companyService.updateCompanyCoverImageUrl(
+      const formData = new FormData();
 
-          formData
+      formData.append("file", compressed);
 
-        ) as any;
+      const resData = await companyService.updateCompanyCoverImageUrl(
 
-        const data = resData;
+        formData
 
-        toastMessages.success(t("companyProfile.success.coverUpdate", "Company cover image updated successfully."));
+      ) as any;
 
-        setCompanyCoverImageUrl(data?.companyCoverImageUrl);
+      const data = resData;
 
-      } catch (error: any) {
+      toastMessages.success(t("companyProfile.success.coverUpdate", "Company cover image updated successfully."));
 
-        errorHandling(error);
+      setCompanyCoverImageUrl(data?.companyCoverImageUrl);
 
-      } finally {
+    } catch (error: any) {
 
-        setIsFullScreenLoading(false);
+      errorHandling(error);
 
-      }
+    } finally {
 
-    };
+      setIsFullScreenLoading(false);
 
-    var formData = new FormData();
-
-    formData.append("file", file);
-
-    update(formData);
+    }
 
   };
 
