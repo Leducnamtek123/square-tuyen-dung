@@ -15,11 +15,12 @@ import {
   searchJobPost,
 } from '../../../../redux/filterSlice';
 import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppStore';
+import { useConfig } from '@/hooks/useConfig';
 
 const JobPostSearch = () => {
   const { t } = useTranslation(['public', 'common']);
   const dispatch = useAppDispatch();
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [showAdvanceFilter, setShowAdvanceFilter] = React.useState(false);
   const [districtOptions, setDistrictOptions] = React.useState<any[]>([]);

@@ -1,6 +1,5 @@
-﻿import { configureStore } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './userSlice';
-import configReducer from './configSlice';
 import authReducer from './authSlice';
 import filterReducer from './filterSlice';
 import profileReducer from './profileSlice';
@@ -9,7 +8,6 @@ const store = configureStore({
   reducer: {
     auth: authReducer,
     user: userReducer,
-    config: configReducer,
     filter: filterReducer,
     profile: profileReducer,
   },

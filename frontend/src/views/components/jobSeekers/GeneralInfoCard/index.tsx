@@ -25,6 +25,7 @@ import resumeService from '../../../../services/resumeService';
 
 import { salaryString } from '../../../../utils/customData';
 import { tConfig } from '../../../../utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
 
 interface ResumeDetail {
   description: string | null;
@@ -142,7 +143,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
     const { slug: resumeSlug } = useParams<{ slug: string }>();
 
-    const { allConfig } = useAppSelector((state) => state.config);
+    const { allConfig } = useConfig();
 
     const [openPopup, setOpenPopup] = React.useState(false);
 

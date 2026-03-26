@@ -16,6 +16,7 @@ import SingleSelectCustom from '../../../../components/Common/Controls/SingleSel
 import RadioCustom from '../../../../components/Common/Controls/RadioCustom';
 
 import { useTranslation } from 'react-i18next';
+import { useConfig } from '@/hooks/useConfig';
 
 interface FormValues {
   frequency: number | null;
@@ -40,7 +41,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
 
 

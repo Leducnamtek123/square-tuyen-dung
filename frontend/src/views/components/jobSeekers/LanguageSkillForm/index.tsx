@@ -14,6 +14,7 @@ import Grid from "@mui/material/Grid2";
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 
 import RatingCustom from '../../../../components/Common/Controls/RatingCustom';
+import { useConfig } from '@/hooks/useConfig';
 
 interface FormValues {
   language: number | string;
@@ -40,7 +41,7 @@ const LanguageSkillForm = ({
 
   const { t } = useTranslation(['jobSeeker', 'common']);
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const schema = yup.object().shape({
 

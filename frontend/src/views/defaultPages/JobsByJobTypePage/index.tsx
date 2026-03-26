@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import CategoryCard from '../../components/defaults/CategoryCard';
 import { useAppSelector } from '../../../hooks/useAppStore';
 import useSEO from '../../../hooks/useSEO';
+import { useConfig } from '@/hooks/useConfig';
 
 
 
@@ -17,7 +18,7 @@ const JobsByJobTypePage = () => {
     keywords: 'việc làm toàn thời gian, việc làm bán thời gian, thực tập, hợp đồng, remote',
   });
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   return (
 

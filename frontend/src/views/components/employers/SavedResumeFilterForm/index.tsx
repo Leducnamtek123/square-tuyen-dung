@@ -16,6 +16,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
+import { useConfig } from '@/hooks/useConfig';
 
 interface SavedResumeFilterFormProps {
   handleFilter: (data: any) => void;
@@ -25,7 +26,7 @@ const SavedResumeFilterForm: React.FC<SavedResumeFilterFormProps> = ({ handleFil
 
   const { t } = useTranslation('employer');
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const {
 

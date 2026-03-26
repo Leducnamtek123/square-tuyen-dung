@@ -19,6 +19,7 @@ import { formatRoute } from "@/utils/funcUtils";
 import { ROUTES, IMAGES } from "@/configs/constants";
 import TimeAgo from '@/components/Common/TimeAgo';
 import { tConfig } from '@/utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
 
 interface JobPostLargeProps {
   id: string | number;
@@ -54,7 +55,7 @@ const JobPostLarge = ({
 
   const nav = useRouter();
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
   const goToDetail = () => {
     nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`);
   };

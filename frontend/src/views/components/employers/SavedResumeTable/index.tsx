@@ -27,6 +27,7 @@ import { faFile, faFilePdf } from '@fortawesome/free-regular-svg-icons';
 
 import { formatRoute } from '../../../../utils/funcUtils';
 import { tConfig } from '../../../../utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
 
 interface SavedResumeTableProps {
   rows: any[];
@@ -45,7 +46,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
 
   const rowsSafe = Array.isArray(rows) ? rows : [];
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   return (
 

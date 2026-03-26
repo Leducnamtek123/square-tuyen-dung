@@ -5,7 +5,7 @@ import * as React from "react";
 import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getUserInfo } from "../redux/userSlice";
-import { getAllConfig } from "../redux/configSlice";
+import { useConfig } from "@/hooks/useConfig";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Feedback from "../components/Features/Feedback";
@@ -20,8 +20,9 @@ import ErrorBoundary from "../components/ErrorBoundary";
 export default function ClientAppRoot({ children }: { children: React.ReactNode }) {
   const [hasMounted, setHasMounted] = React.useState(false);
   const dispatch = useAppDispatch();
-  const hasCachedConfig = useAppSelector((state) => !!state.config.allConfig);
-  const [isInitializing, setIsInitializing] = React.useState(!hasCachedConfig);
+  const { allConfig, isLoadingConfig } = useConfig();
+  const hasCachedConfig = !!allConfig;
+  const [isInitializing, setIsInitializing] = React.useState(isLoadingConfig);
   const { isAuthenticated, currentUser, activeWorkspace } = useAppSelector((state) => state.user);
 
   // Prevent hydration mismatch: render nothing until client has mounted
@@ -62,15 +63,15 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
         setIsInitializing(false);
       }
       try {
-        const configPromise = dispatch(getAllConfig());
         const hasAccessToken = !!tokenService.getAccessTokenFromCookie();
-        const userPromise = hasAccessToken ? dispatch(getUserInfo()) : null;
-        const promises = [configPromise, userPromise].filter(Boolean);
-        await Promise.all(promises.map(p => Promise.resolve(p).catch(e => e)));
-      } catch (err) {
-        console.error("App initialization failed", err);
+        if (hasAccessToken) {
+          await dispatch(getUserInfo()).unwrap();
+        }
+        if (hasAccessToken) {
+          // ignore error for now, let it fail silently
+        }
       } finally {
-        if (!hasCachedConfig && !unmounted) {
+        if (!hasCachedConfig && !unmounted && !isLoadingConfig) {
           setIsInitializing(false);
         }
       }

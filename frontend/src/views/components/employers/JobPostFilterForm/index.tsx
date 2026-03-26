@@ -8,6 +8,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import { useAppSelector } from '../../../../redux/hooks';
+import { useConfig } from '@/hooks/useConfig';
 
 interface JobPostFilterFormProps {
   handleFilter: (data: any) => void;
@@ -19,7 +20,7 @@ const JobPostFilterForm = ({ handleFilter }: JobPostFilterFormProps) => {
 
   const { t } = useTranslation('employer');
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const {
 

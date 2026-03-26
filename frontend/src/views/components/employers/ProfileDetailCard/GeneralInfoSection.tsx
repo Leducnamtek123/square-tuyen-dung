@@ -6,6 +6,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { tConfig } from '../../../../utils/tConfig';
 import { salaryString } from '../../../../utils/customData';
 import InfoItem from './InfoItem';
+import { useConfig } from '@/hooks/useConfig';
 
 interface GeneralInfoSectionProps {
   profileDetail: any;
@@ -13,7 +14,7 @@ interface GeneralInfoSectionProps {
 
 const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }) => {
   const { t } = useTranslation('employer');
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   return (
     <Box>

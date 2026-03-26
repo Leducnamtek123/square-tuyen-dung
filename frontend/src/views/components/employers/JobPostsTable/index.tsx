@@ -7,6 +7,7 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DataTable from '../../../../components/Common/DataTable';
 import { JOB_POST_STATUS_BG_COLOR } from '../../../../configs/constants';
 import { useAppSelector } from '../../../../redux/hooks';
+import { useConfig } from '@/hooks/useConfig';
 
 interface JobPost {
   id: number;
@@ -56,7 +57,7 @@ const JobPostsTable = ({
 
   const { t } = useTranslation('employer');
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const columns = React.useMemo(() => [
 

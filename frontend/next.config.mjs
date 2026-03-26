@@ -1,11 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  typescript: {
-    // StaticImageData vs string mismatches from Vite→Next.js migration
-    // These are runtime-safe and should be fixed incrementally
-    ignoreBuildErrors: true,
-  },
+  // TypeScript is now fully typed and strict
   output: 'standalone',
   serverExternalPackages: ['pdfjs-dist', '@react-pdf-viewer/core', '@react-pdf-viewer/get-file', '@react-pdf-viewer/zoom'],
   transpilePackages: [
@@ -82,6 +78,7 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/phong-van-truc-tiep/:id', destination: '/employer/interviews/:id' },
       { source: '/nha-tuyen-dung/len-lich-phong-van', destination: '/employer/interviews/create' },
       { source: '/nha-tuyen-dung/chi-tiet-phong-van/:id', destination: '/employer/interviews/:id' },
+      { source: '/nha-tuyen-dung/:path*', destination: '/employer/:path*' },
 
       { source: '/admin/bang-dieu-khien', destination: '/admin/dashboard' },
       { source: '/quan-tri/bang-dieu-khien', destination: '/admin/dashboard' },

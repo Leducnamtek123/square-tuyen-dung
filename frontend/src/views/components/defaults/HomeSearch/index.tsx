@@ -13,12 +13,13 @@ import {
   searchJobPost,
 } from '../../../../redux/filterSlice';
 import { ROUTES } from '../../../../configs/constants';
+import { useConfig } from '@/hooks/useConfig';
 
 const HomeSearch = () => {
   const { t } = useTranslation(['common']);
   const dispatch = useDispatch();
   const nav = useRouter();
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const { control, handleSubmit } = useForm({
     defaultValues: {

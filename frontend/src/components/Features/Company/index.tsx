@@ -23,6 +23,7 @@ import errorHandling from '@/utils/errorHandling';
 import { formatRoute } from '@/utils/funcUtils';
 import { RootState } from '@/redux/store';
 import { tConfig } from '@/utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
 
 interface FollowProps {
   slug: string;
@@ -161,7 +162,7 @@ const Company = ({
   isFollowed,
 }: CompanyProps) => {
   const theme = useTheme();
-  const { allConfig } = useSelector((state: RootState) => state.config);
+  const { allConfig } = useConfig();
   const { isAuthenticated, currentUser } = useSelector((state: RootState) => state.user);
 
   return (

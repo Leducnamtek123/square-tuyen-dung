@@ -14,6 +14,7 @@ import jobSeekerProfileService from "../../../../services/jobSeekerProfileServic
 import { getUserInfo } from "../../../../redux/userSlice";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import { tConfig } from '../../../../utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
 
 interface PersonalInfoCardProps {
   title: string;
@@ -47,7 +48,7 @@ const PersonalInfoCard = ({ title, sx }: PersonalInfoCardProps) => {
     const { t } = useTranslation(['jobSeeker', 'common']);
 
     const dispatch = useAppDispatch();
-    const { allConfig } = useAppSelector((state) => state.config);
+    const { allConfig } = useConfig();
 
     const [openPopup, setOpenPopup] = React.useState(false);
 

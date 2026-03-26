@@ -15,6 +15,7 @@ import goongService from '../../../../services/goongService';
 
 import CompanyFormLoading from './CompanyFormLoading';
 import CompanyFormFields from './CompanyFormFields';
+import { useConfig } from '@/hooks/useConfig';
 
 interface CompanyFormProps {
   handleUpdate: (data: any) => void;
@@ -24,7 +25,7 @@ interface CompanyFormProps {
 
 const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFormProps) => {
   const { t } = useTranslation('employer');
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
   const [districtOptions, setDistrictOptions] = React.useState<any[]>([]);
   const [locationOptions, setLocationOptions] = React.useState<any[]>([]);
 

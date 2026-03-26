@@ -228,7 +228,7 @@ OAUTH2_PROVIDER = {
     },
     'CLIENT_ID_GENERATOR_CLASS': 'oauth2_provider.generators.ClientIdGenerator',
     'ACCESS_TOKEN_EXPIRE_SECONDS': 3600,  # 1 hour
-    'REFRESH_TOKEN_EXPIRE_SECONDS': 86400,  # 24 hours
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 604800,  # 7 days
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -271,6 +271,33 @@ SERVICE_REDIS_PORT = config('SERVICE_REDIS_PORT', default=6379, cast=int)
 SERVICE_REDIS_USERNAME = config('SERVICE_REDIS_USERNAME', default='')
 SERVICE_REDIS_PASSWORD = config('SERVICE_REDIS_PASSWORD', default='')
 SERVICE_REDIS_DB = config('SERVICE_REDIS_DB', default=0, cast=int)
+
+# --- Cache Framework (Redis-backed) ---
+_REDIS_URL_BASE = f"redis://{SERVICE_REDIS_USERNAME}:{SERVICE_REDIS_PASSWORD}@{SERVICE_REDIS_HOST}:{SERVICE_REDIS_PORT}" if SERVICE_REDIS_PASSWORD else f"redis://{SERVICE_REDIS_HOST}:{SERVICE_REDIS_PORT}"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"{_REDIS_URL_BASE}/1",
+        "TIMEOUT": 900,  # 15 minutes default TTL
+        "OPTIONS": {
+            "db": 1,
+        },
+        "KEY_PREFIX": "sq",
+    },
+    "sessions": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"{_REDIS_URL_BASE}/2",
+        "TIMEOUT": 86400,  # 1 day
+        "KEY_PREFIX": "sq_sess",
+    },
+    "api_responses": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": f"{_REDIS_URL_BASE}/3",
+        "TIMEOUT": 300,  # 5 minutes — for cacheable API responses
+        "KEY_PREFIX": "sq_api",
+    },
+}
 
 # Facebook configuration
 SOCIAL_AUTH_FACEBOOK_DIALOG_URL = 'https://www.facebook.com/v15.0/dialog/oauth/'

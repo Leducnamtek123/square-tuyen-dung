@@ -17,6 +17,7 @@ import { CV_TYPES, ROUTES } from '@/configs/constants';
 import { formatRoute } from '@/utils/funcUtils';
 import defaultTheme from '@/themeConfigs/defaultTheme';
 import { tConfig } from '@/utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
 
 interface JobSeekerProfileProps {
   id: string | number;
@@ -64,7 +65,7 @@ const JobSeekerProfile = ({
 
   const nav = useRouter();
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   return (
 

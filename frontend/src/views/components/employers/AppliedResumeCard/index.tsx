@@ -34,6 +34,7 @@ import AppliedResumeTable from '../AppliedResumeTable';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 
 import { useAppliedResumes, useJobPostOptions, useDeleteJobPostActivity } from '../hooks/useEmployerQueries';
+import { useConfig } from '@/hooks/useConfig';
 
 interface AppliedResumeCardProps {
   title: string;
@@ -67,7 +68,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
   const { t } = useTranslation('employer');
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const headCells = [
 

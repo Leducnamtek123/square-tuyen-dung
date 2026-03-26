@@ -16,6 +16,7 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 import MultilineTextFieldCustom from '../../../../components/Common/Controls/MultilineTextFieldCustom';
 
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
+import { useConfig } from '@/hooks/useConfig';
 
 interface FormValues {
   title: string;
@@ -44,7 +45,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
   const { t } = useTranslation(['jobSeeker']);
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const schema = yup.object().shape({
 

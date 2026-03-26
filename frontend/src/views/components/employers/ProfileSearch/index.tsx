@@ -33,6 +33,7 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 
 import { resetSearchResume, searchResume } from '../../../../redux/filterSlice';
+import { useConfig } from '@/hooks/useConfig';
 
 const ProfileSearch: React.FC = () => {
 
@@ -40,7 +41,7 @@ const ProfileSearch: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const { resumeFilter } = useAppSelector((state) => state.filter);
 

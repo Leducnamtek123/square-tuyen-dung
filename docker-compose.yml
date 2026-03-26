@@ -238,6 +238,7 @@ services:
   llama-cpp:
     container_name: tuyendung-studio-llama-cpp
     image: ghcr.io/ggml-org/llama.cpp:server-cuda
+    profiles: ["gpu"]
     init: true
     deploy:
       resources:
@@ -277,6 +278,7 @@ services:
     container_name: tuyendung-studio-whisper
     build:
       context: ./voice-ai/inference/whisper
+    profiles: ["gpu"]
     init: true
     deploy:
       resources:
@@ -299,6 +301,7 @@ services:
     container_name: tuyendung-studio-tts
     build:
       context: ./voice-ai/inference/vieneu-text-to-speech
+    profiles: ["gpu"]
     init: true
     deploy:
       resources:
@@ -322,6 +325,7 @@ services:
     container_name: tuyendung-studio-livekit-agent
     build:
       context: ./voice-ai/livekit_agent
+    profiles: ["gpu"]
     env_file:
       - .env
     environment:

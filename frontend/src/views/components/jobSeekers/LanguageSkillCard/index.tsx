@@ -31,6 +31,7 @@ import resumeService from '../../../../services/resumeService';
 
 import languageSkillService from '../../../../services/languageSkillService';
 import { tConfig } from '../../../../utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
 
 interface LanguageSkill {
   id: string | number;
@@ -110,7 +111,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
   const { slug: resumeSlug } = useParams<{ slug: string }>();
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const [openPopup, setOpenPopup] = React.useState(false);
 

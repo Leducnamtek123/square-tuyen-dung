@@ -9,6 +9,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { convertMoney } from "../../../../utils/customData";
 import { tConfig } from '../../../../utils/tConfig';
 import ActiveButtonComponent from "./ActiveButtonComponent";
+import { useConfig } from '@/hooks/useConfig';
 
 interface ItemComponentProps {
   id: number;
@@ -34,7 +35,7 @@ const ItemComponent = ({
   handleDelete,
 }: ItemComponentProps) => {
   const { t } = useTranslation(["jobSeeker", "common"]);
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
   const [parentWidth, setParentWidth] = React.useState(0);
   const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>("column");
 

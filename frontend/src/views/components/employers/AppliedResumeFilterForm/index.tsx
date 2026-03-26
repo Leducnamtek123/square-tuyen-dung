@@ -34,6 +34,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
+import { useConfig } from '@/hooks/useConfig';
 
 interface AppliedResumeFilterFormProps {
   handleFilter: (data: any) => void;
@@ -44,7 +45,7 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
 
   const { t } = useTranslation('common');
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const { control, handleSubmit, reset } = useForm<any>();
 

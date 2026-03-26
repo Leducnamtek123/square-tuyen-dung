@@ -18,6 +18,7 @@ import MultilineTextFieldCustom from '../../../../components/Common/Controls/Mul
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 
 import FileUploadCustom from '../../../../components/Common/Controls/FileUploadCustom';
+import { useConfig } from '@/hooks/useConfig';
 
 interface FormValues {
   file: any;
@@ -46,7 +47,7 @@ const ProfileUploadForm = ({ handleAdd }: ProfileUploadFormProps) => {
 
   const { t } = useTranslation(['jobSeeker']);
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const schema = yup.object().shape({
 

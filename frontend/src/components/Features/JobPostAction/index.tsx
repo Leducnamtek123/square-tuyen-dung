@@ -15,6 +15,7 @@ import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import { ROUTES } from '@/configs/constants';
 import { formatRoute } from '@/utils/funcUtils';
 import { tConfig } from '@/utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
 
 interface JobPostActionProps {
   id: string | number;
@@ -50,7 +51,7 @@ const JobPostAction = ({
 
   const nav = useRouter();
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const [parentWidth, setParentWidth] = React.useState(0);
 

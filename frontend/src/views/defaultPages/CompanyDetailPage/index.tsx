@@ -19,6 +19,7 @@ import useStructuredData from "../../../hooks/useStructuredData";
 import CompanyHeader from "./CompanyHeader";
 import CompanyAbout from "./CompanyAbout";
 import CompanySidebar from "./CompanySidebar";
+import { useConfig } from '@/hooks/useConfig';
 
 const sanitizeCompanyDescription = (rawHtml: string | undefined) => {
   if (!rawHtml || typeof rawHtml !== "string") return "";
@@ -40,7 +41,7 @@ const sanitizeCompanyDescription = (rawHtml: string | undefined) => {
 const CompanyDetailPage = () => {
   const { t } = useTranslation("public");
   const { slug } = useParams();
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
 
   const [openSharePopup, setOpenSharePopup] = React.useState(false);

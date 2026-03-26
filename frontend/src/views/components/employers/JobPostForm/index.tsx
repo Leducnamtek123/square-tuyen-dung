@@ -10,6 +10,7 @@ import goongService from '../../../../services/goongService';
 import { useAppSelector } from '../../../../redux/hooks';
 import { JobPostFormValues, getJobPostSchema } from './JobPostSchema';
 import JobPostFormFields from './JobPostFormFields';
+import { useConfig } from '@/hooks/useConfig';
 
 interface JobPostFormProps {
   handleAddOrUpdate: (data: any) => void;
@@ -19,7 +20,7 @@ interface JobPostFormProps {
 
 const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormProps) => {
   const { t } = useTranslation('employer');
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
   
   const [districtOptions, setDistrictOptions] = React.useState<any[]>([]);
   const [locationOptions, setLocationOptions] = React.useState<any[]>([]);

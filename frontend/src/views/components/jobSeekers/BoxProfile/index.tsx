@@ -35,6 +35,7 @@ import { formatRoute } from "../../../../utils/funcUtils";
 import ColorPickerDialog from '../../../../components/Common/ColorPickerDialog';
 import { useTranslation } from "react-i18next";
 import { tConfig } from '../../../../utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
 
 const Loading = () => {
   return (
@@ -82,7 +83,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
   } = useAppSelector((state) => state.profile);
 
   const { currentUser } = useAppSelector((state) => state.user);
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const [isLoadingResume, setIsLoadingResume] = React.useState(false);
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);

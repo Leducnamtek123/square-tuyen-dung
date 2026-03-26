@@ -18,6 +18,7 @@ import { formatRoute } from '../../../../utils/funcUtils';
 import SendEmailComponent from './SendEmailComponent';
 import AppliedStatusComponent from './AppliedStatusComponent';
 import AIAnalysisComponent from './AIAnalysisComponent';
+import { useConfig } from '@/hooks/useConfig';
 
 interface AppliedResumeTableProps {
   rows: any[];
@@ -32,7 +33,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
   const nav = useRouter();
   const { rows, isLoading, handleChangeApplicationStatus, handleDelete } = props;
   const rowsSafe = Array.isArray(rows) ? rows : [];
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
   const [openDrawerId, setOpenDrawerId] = React.useState<string | number | null>(null);
 
   const selectedActivityInfo = React.useMemo(() => {

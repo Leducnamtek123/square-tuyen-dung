@@ -21,12 +21,13 @@ import { ROLES_NAME, ROUTES } from "../../../configs/constants";
 import { useAppSelector } from "../../../hooks/useAppStore";
 import useSEO from "../../../hooks/useSEO";
 import useStructuredData from "../../../hooks/useStructuredData";
+import { useConfig } from '@/hooks/useConfig';
 
 const JobDetailPage = () => {
   const { slug } = useParams();
   const nav = useRouter();
   const { t } = useTranslation(["public"]);
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
 
   const [openSharePopup, setOpenSharePopup] = React.useState(false);

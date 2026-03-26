@@ -6,6 +6,7 @@ import { useAppSelector } from '@/redux/hooks';
 import TimeAgo from '../../../../components/Common/TimeAgo';
 import { tConfig } from '../../../../utils/tConfig';
 import InfoItem from './InfoItem';
+import { useConfig } from '@/hooks/useConfig';
 
 interface PersonalInfoSectionProps {
   profileDetail: any;
@@ -13,7 +14,7 @@ interface PersonalInfoSectionProps {
 
 const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail }) => {
   const { t } = useTranslation('employer');
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   return (
     <Box>

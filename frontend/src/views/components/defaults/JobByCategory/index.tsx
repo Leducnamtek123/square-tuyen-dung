@@ -16,6 +16,7 @@ import { searchJobPost } from "../../../../redux/filterSlice";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/useAppStore";
 
 import { ROUTES } from "../../../../configs/constants";
+import { useConfig } from '@/hooks/useConfig';
 
 interface Option {
   id: string | number;
@@ -28,7 +29,7 @@ const maxItem = 6;
 
 const JobByCategory = () => {
   const { t } = useTranslation('public');
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const dispatch = useAppDispatch();
 

@@ -22,6 +22,7 @@ import SingleSelectCustom from '../../../../components/Common/Controls/SingleSel
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
 
 import commonService from '../../../../services/commonService';
+import { useConfig } from '@/hooks/useConfig';
 
 interface FormValues {
   user: {
@@ -58,7 +59,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
   const { t } = useTranslation(['jobSeeker']);
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const schema = yup.object().shape({
 

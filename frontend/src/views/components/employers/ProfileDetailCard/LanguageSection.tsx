@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid2';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/redux/hooks';
 import { tConfig } from '../../../../utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
 
 interface LanguageSectionProps {
   profileDetail: any;
@@ -11,7 +12,7 @@ interface LanguageSectionProps {
 
 const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
   const { t } = useTranslation('employer');
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   if (!(profileDetail?.languageSkills?.length > 0)) return null;
 

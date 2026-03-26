@@ -6,6 +6,7 @@ import { useTheme } from '@mui/material/styles';
 import { Alert, Box, Chip, Dialog, Divider, IconButton, Stack, Typography, Container } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import CloseIcon from '@mui/icons-material/Close';
+import { useConfig } from '@/hooks/useConfig';
 interface CareerOption {
   id: string;
   name: string;
@@ -188,7 +189,7 @@ const MobileContent = (
 
 const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderDialogProps) => {
   const { t } = useTranslation('common');
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 

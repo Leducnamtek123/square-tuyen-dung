@@ -19,6 +19,7 @@ import { formatRoute } from '@/utils/funcUtils';
 import { ROUTES, IMAGES } from '@/configs/constants';
 import { useAppSelector } from '@/hooks/useAppStore';
 import { tConfig } from '@/utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
 
 interface JobPostProps {
   id: number;
@@ -51,7 +52,7 @@ const JobPost = ({
   const myRef = React.useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = React.useState<string | number>("95%")
   const nav = useRouter();
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
   const theme = useTheme();
 
   React.useEffect(() => {

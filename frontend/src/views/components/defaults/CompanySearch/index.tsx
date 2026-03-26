@@ -11,12 +11,13 @@ import {
   searchCompany,
 } from '../../../../redux/filterSlice';
 import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppStore';
+import { useConfig } from '@/hooks/useConfig';
 
 const CompanySearch = () => {
   const { t } = useTranslation('public');
   const dispatch = useAppDispatch();
 
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
 
   const { companyFilter } = useAppSelector((state) => state.filter);
 

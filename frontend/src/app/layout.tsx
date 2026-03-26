@@ -1,9 +1,18 @@
 import type { Metadata, Viewport } from 'next';
+import { Open_Sans } from 'next/font/google';
 import ThemeRegistry from '../components/ThemeRegistry/ThemeRegistry';
 import { Providers } from './providers';
 import ClientAppRoot from './ClientAppRoot';
 import './globals.css';           // Global CSS (Tailwind + design tokens)
 import './app-overrides.css';     // App-level overrides
+
+const openSans = Open_Sans({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+  variable: '--font-open-sans',
+});
 
 export const metadata: Metadata = {
   title: 'Square | Tìm việc nhanh, tuyển dụng hiệu quả',
@@ -29,17 +38,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" suppressHydrationWarning>
+    <html lang="vi" className={openSans.variable} suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap"
-          rel="stylesheet"
-        />
         <link rel="icon" type="image/svg+xml" href="/square-icons/icon.svg" />
       </head>
-      <body suppressHydrationWarning>
+      <body style={{ fontFamily: 'var(--font-open-sans), sans-serif' }} suppressHydrationWarning>
         <ThemeRegistry>
           <Providers>
             <ClientAppRoot>
@@ -51,3 +54,4 @@ export default function RootLayout({
     </html>
   );
 }
+

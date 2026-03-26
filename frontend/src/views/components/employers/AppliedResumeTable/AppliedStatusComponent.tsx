@@ -5,6 +5,7 @@ import { useAppSelector } from '@/redux/hooks';
 
 import { confirmModal, errorModal } from '../../../../utils/sweetalert2Modal';
 import { tConfig } from '../../../../utils/tConfig';
+import { useConfig } from '@/hooks/useConfig';
 
 export interface AppliedStatusComponentProps {
   options: any[];
@@ -20,7 +21,7 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
   handleChangeApplicationStatus,
 }) => {
   const { t } = useTranslation('employer');
-  const { allConfig } = useAppSelector((state) => state.config);
+  const { allConfig } = useConfig();
   const [applyStatus, setApplyStatus] = React.useState(defaultStatus);
 
   const handleChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
