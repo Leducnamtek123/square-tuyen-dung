@@ -116,12 +116,12 @@ const AUTH_CONFIG = {
   JOB_SEEKER_BOT: {
     AGENT_ID: process.env.NEXT_PUBLIC_JOB_SEEKER_BOT_AGENT_ID || '',
     CHAT_TITLE: 'Square AI',
-    CHAT_ICON: jobSeekerChatbotIcon,
+    CHAT_ICON: imgSrc(jobSeekerChatbotIcon),
   },
   EMPLOYER_BOT: {
     AGENT_ID: process.env.NEXT_PUBLIC_EMPLOYER_BOT_AGENT_ID || '',
     CHAT_TITLE: 'Square AI',
-    CHAT_ICON: employerChatbotIcon,
+    CHAT_ICON: imgSrc(employerChatbotIcon),
   },
   BOT_RENDER_MODE: process.env.NEXT_PUBLIC_BOT_RENDER_MODE || 'chat',
 } as const;

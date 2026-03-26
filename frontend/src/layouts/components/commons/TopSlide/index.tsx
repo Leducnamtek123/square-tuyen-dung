@@ -31,6 +31,7 @@ const RenderItem = ({ item }: { item: any }) => {
       src={item.imageUrl}
       alt={item.description || 'Banner'}
       loading="lazy"
+      onError={(e: any) => { e.target.src = IMAGES.coverImageDefault; e.target.onerror = null; }}
       sx={{
         width: '100%',
         height: '100%',

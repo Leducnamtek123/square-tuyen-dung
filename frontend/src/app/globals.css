@@ -1,6 +1,13 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 /* @import "@livekit/components-styles"; -- loaded in interview pages only */
+
+/* Swiper carousel CSS */
+@import 'swiper/css';
+@import 'swiper/css/navigation';
+@import 'swiper/css/pagination';
+@import 'swiper/css/autoplay';
+@import 'swiper/css/grid';
 @font-face {
   font-family: 'Geist Variable';
   font-style: normal;

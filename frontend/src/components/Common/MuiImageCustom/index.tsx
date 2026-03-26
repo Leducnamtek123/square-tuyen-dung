@@ -48,33 +48,21 @@ const MuiImageCustom = (props: MuiImageCustomProps) => {
   );
 
   return (
-
     <ImageWithLoading
-
+      key={imageSrc || 'empty-src'}
       loading={loading}
-
       fit="contain"
-
       duration={150}
-
       easing="ease-in"
-
       showLoading={false}
-
       errorIcon={true}
-
       shift={null}
-
       distance="100px"
-
       shiftDuration={600}
       src={imageSrc}
       onError={handleError}
-
       {...rest}
-
     />
-
   );
 
 };
