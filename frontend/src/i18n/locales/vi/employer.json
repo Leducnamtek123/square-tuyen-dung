@@ -668,6 +668,20 @@
     },
     "title": "Thông tin công ty"
   },
+  "companyProfile": {
+    "success": {
+      "update": "Cập nhật thông tin công ty thành công.",
+      "logoUpdate": "Cập nhật logo công ty thành công.",
+      "coverUpdate": "Cập nhật ảnh bìa công ty thành công."
+    },
+    "labels": {
+      "logo": "Logo công ty",
+      "changeLogo": "Thay đổi logo",
+      "cover": "Ảnh bìa công ty",
+      "changeCover": "Thay đổi ảnh bìa",
+      "update": "Cập nhật"
+    }
+  },
   "pricing": {
     "heroTitle": "Giải pháp Đầu tư Nhân sự",
     "heroSubtitle": "Lựa chọn gói dịch vụ tối ưu để tiếp cận nguồn lực tài năng chất lượng cao và nâng cao hiệu suất tuyển dụng của doanh nghiệp.",

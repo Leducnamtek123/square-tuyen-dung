@@ -8,6 +8,10 @@
     "exploreHeading": "Bạn cần tìm công việc phù hợp với mình?",
     "startExploring": "Bắt đầu khám phá",
     "userFeedback": "Đánh giá từ người dùng",
+    "noFeedbacks": "Chưa có người dùng nào đánh giá",
+    "noCompaniesFound": "Hiện chưa tìm công ty phù hợp với tiêu chí của bạn",
+    "jobsCount": "{{count}} Việc Làm",
+    "companiesCount": "{{count}} công ty",
     "jobsIn": "Việc làm {{careerName}}"
   },
   "jobDetail": {

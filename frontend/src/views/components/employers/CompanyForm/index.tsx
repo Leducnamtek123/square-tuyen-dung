@@ -30,20 +30,20 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   const [locationOptions, setLocationOptions] = React.useState<any[]>([]);
 
   const schema = yup.object().shape({
-    companyName: yup.string().required('Company name is required.').max(255, 'Company name exceeded allowed length.'),
-    taxCode: yup.string().required('Tax code is required.').max(30, 'Tax code exceeded allowed length.'),
-    employeeSize: yup.number().required('Company size is required.').typeError('Company size is required.'),
-    fieldOperation: yup.string().required('Field of operation is required.').max(255, 'Field of operation exceeded allowed length.'),
+    companyName: yup.string().required(t('jobPostForm.validation.jobnameisrequired', 'Company name is required.')).max(255, t('jobPostForm.validation.jobnameexceededallowedlength', 'Company name exceeded allowed length.')),
+    taxCode: yup.string().required(t('companyForm.placeholder.entercompanytaxcode', 'Tax code is required.')).max(30, t('jobPostForm.validation.jobnameexceededallowedlength', 'Tax code exceeded allowed length.')),
+    employeeSize: yup.number().required(t('companyForm.placeholder.selectcompanysize', 'Company size is required.')).typeError(t('companyForm.placeholder.selectcompanysize', 'Company size is required.')),
+    fieldOperation: yup.string().required(t('companyForm.placeholder.entercompanyfieldofoperation', 'Field of operation is required.')).max(255, t('jobPostForm.validation.jobnameexceededallowedlength', 'Field of operation exceeded allowed length.')),
     location: yup.object().shape({
-      city: yup.number().required('City/Province is required.').typeError('City/Province is required.'),
-      district: yup.number().required('District is required.').typeError('District is required.'),
-      address: yup.string().required('Address is required.').max(255, 'Address exceeded allowed length.'),
-      lat: yup.number().required('Latitude is required.').typeError('Invalid latitude.'),
-      lng: yup.number().required('Longitude is required.').typeError('Invalid longitude.'),
+      city: yup.number().required(t('jobPostForm.validation.cityprovinceisrequired', 'City/Province is required.')).typeError(t('jobPostForm.validation.cityprovinceisrequired', 'City/Province is required.')),
+      district: yup.number().required(t('jobPostForm.validation.districtisrequired', 'District is required.')).typeError(t('jobPostForm.validation.districtisrequired', 'District is required.')),
+      address: yup.string().required(t('jobPostForm.validation.addressisrequired', 'Address is required.')).max(255, t('jobPostForm.validation.addressexceededallowedlength', 'Address exceeded allowed length.')),
+      lat: yup.number().required(t('jobPostForm.validation.latitudeisrequired', 'Latitude is required.')).typeError(t('jobPostForm.validation.invalidlatitude', 'Invalid latitude.')),
+      lng: yup.number().required(t('jobPostForm.validation.longitudeisrequired', 'Longitude is required.')).typeError(t('jobPostForm.validation.invalidlongitude', 'Invalid longitude.')),
     }),
     since: yup.date().nullable(),
-    companyEmail: yup.string().required('Company email is required.').email('Invalid email.').max(100, 'Company email exceeded allowed length.'),
-    companyPhone: yup.string().required('Company phone is required.').matches(REGEX_VALIDATE.phoneRegExp, 'Invalid phone number.').max(15, 'Company phone exceeded allowed length.'),
+    companyEmail: yup.string().required(t('jobPostForm.validation.contactpersonemailisrequired', 'Company email is required.')).email(t('jobPostForm.validation.invalidemail', 'Invalid email.')).max(100, t('jobPostForm.validation.jobnameexceededallowedlength', 'Company email exceeded allowed length.')),
+    companyPhone: yup.string().required(t('jobPostForm.validation.contactpersonphoneisrequired', 'Company phone is required.')).matches(REGEX_VALIDATE.phoneRegExp, t('jobPostForm.validation.invalidphonenumber', 'Invalid phone number.')).max(15, t('jobPostForm.validation.jobnameexceededallowedlength', 'Company phone exceeded allowed length.')),
   });
 
   const { control, reset, setValue, setError, handleSubmit } = useForm({

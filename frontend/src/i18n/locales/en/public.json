@@ -8,6 +8,10 @@
     "exploreHeading": "Need to find the right job for you?",
     "startExploring": "Start exploring",
     "userFeedback": "User Feedback",
+    "noFeedbacks": "No user reviews yet",
+    "noCompaniesFound": "No companies match your criteria",
+    "jobsCount": "{{count}} Jobs",
+    "companiesCount": "{{count}} companies",
     "jobsIn": "{{careerName}} Jobs"
   },
   "jobDetail": {

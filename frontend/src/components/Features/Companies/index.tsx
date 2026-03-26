@@ -1,6 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Box, Pagination, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import Grid from "@mui/material/Grid2";
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import NoDataCard from "@/components/Common/NoDataCard";
@@ -13,6 +14,7 @@ interface Props {
 }
 
 const Companies = (_props: Props) => {
+  const { t } = useTranslation('public');
   const { companyFilter } = useSelector((state: RootState) => state.filter);
   const { pageSize } = companyFilter;
   const [page, setPage] = React.useState(1);
@@ -77,7 +79,7 @@ const Companies = (_props: Props) => {
               gap: 1,
             }}
           >
-            Công ty nổi bật
+            {t("home.topCompanies", "Công ty nổi bật")}
             <Box
               component="span"
               sx={{
@@ -89,7 +91,7 @@ const Companies = (_props: Props) => {
                 fontSize: "0.9em",
               }}
             >
-              {count} công ty
+              {t("home.companiesCount", { count: count, defaultValue: "{{count}} công ty" })}
             </Box>
           </Typography>
         </Box>
@@ -113,7 +115,7 @@ const Companies = (_props: Props) => {
           </Grid>
         ) : companies.length === 0 ? (
           <NoDataCard
-            title="Hiện chưa tìm công ty phù hợp với tiêu chí của bạn"
+            title={t("home.noCompaniesFound", "Hiện chưa tìm công ty phù hợp với tiêu chí của bạn")}
             svgKey="ImageSvg4"
           />
         ) : (

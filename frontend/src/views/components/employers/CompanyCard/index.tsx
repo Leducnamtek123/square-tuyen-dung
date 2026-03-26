@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Box, Button, Stack, Typography, Paper } from "@mui/material";
+import { useTranslation } from "react-i18next";
 
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 
@@ -24,6 +25,7 @@ import companyService from "../../../../services/companyService";
 import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
 
 const CompanyCard = () => {
+  const { t } = useTranslation("employer");
 
   const [isSuccess, setIsSuccess] = React.useState(false);
 
@@ -109,7 +111,7 @@ const CompanyCard = () => {
 
         if (serverErrors !== null) setServerErrors(null);
 
-        toastMessages.success("Company information updated successfully.");
+        toastMessages.success(t("companyProfile.success.update", "Company information updated successfully."));
 
       } catch (error: any) {
 
@@ -147,7 +149,7 @@ const CompanyCard = () => {
 
         const data = resData;
 
-        toastMessages.success("Company logo updated successfully.");
+        toastMessages.success(t("companyProfile.success.logoUpdate", "Company logo updated successfully."));
 
         setCompanyImageUrl(data?.companyImageUrl);
 
@@ -187,7 +189,7 @@ const CompanyCard = () => {
 
         const data = resData;
 
-        toastMessages.success("Company cover image updated successfully.");
+        toastMessages.success(t("companyProfile.success.coverUpdate", "Company cover image updated successfully."));
 
         setCompanyCoverImageUrl(data?.companyCoverImageUrl);
 
@@ -235,7 +237,7 @@ const CompanyCard = () => {
 
           >
 
-            Company Logo
+            {t("companyProfile.labels.logo", "Company Logo")}
 
           </Typography>
 
@@ -285,7 +287,7 @@ const CompanyCard = () => {
 
               >
 
-                Change Logo
+                {t("companyProfile.labels.changeLogo", "Change Logo")}
 
               </Button>
 
@@ -313,7 +315,7 @@ const CompanyCard = () => {
 
           >
 
-            Company Cover Image
+            {t("companyProfile.labels.cover", "Company Cover Image")}
 
           </Typography>
 
@@ -365,7 +367,7 @@ const CompanyCard = () => {
 
               >
 
-                Change Cover
+                {t("companyProfile.labels.changeCover", "Change Cover")}
 
               </Button>
 
@@ -433,7 +435,7 @@ const CompanyCard = () => {
 
                 >
 
-                  Update
+                  {t("companyProfile.labels.update", "Update")}
 
                 </Button>
 

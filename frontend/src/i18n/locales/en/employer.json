@@ -667,6 +667,20 @@
     },
     "title": "Company Information"
   },
+  "companyProfile": {
+    "success": {
+      "update": "Company information updated successfully.",
+      "logoUpdate": "Company logo updated successfully.",
+      "coverUpdate": "Company cover image updated successfully."
+    },
+    "labels": {
+      "logo": "Company Logo",
+      "changeLogo": "Change Logo",
+      "cover": "Company Cover Image",
+      "changeCover": "Change Cover",
+      "update": "Update"
+    }
+  },
   "pricing": {
     "heroTitle": "HR Investment Solutions",
     "heroSubtitle": "Choose the optimal service package to reach high-quality talent and improve your business recruitment performance.",

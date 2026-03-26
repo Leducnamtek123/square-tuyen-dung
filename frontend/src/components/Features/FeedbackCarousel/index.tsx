@@ -5,6 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Pagination, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Box } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import FeedbackCard from '@/components/Features/FeedbackCard';
 import contentService from '@/services/contentService';
 import NoDataCard from '@/components/Common/NoDataCard';
@@ -34,6 +35,7 @@ const styles: any = {
 };
 
 const FeedbackCarousel = (_props: FeedbackCarouselProps) => {
+  const { t } = useTranslation('public');
   const [parentWidth, setParentWidth] = React.useState(0);
   const [col, setCol] = React.useState(5);
 
@@ -91,7 +93,7 @@ const FeedbackCarousel = (_props: FeedbackCarouselProps) => {
             ))}
           </Swiper>
         ) : feedbacks.length === 0 ? (
-          <NoDataCard title="Chưa có người dùng nào đánh giá" />
+          <NoDataCard title={t("home.noFeedbacks", "Chưa có người dùng nào đánh giá")} />
         ) : (
           <Swiper
             slidesPerView={col}

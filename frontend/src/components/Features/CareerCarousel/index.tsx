@@ -8,6 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Pagination, Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Box, Card, Skeleton, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import commonService from "@/services/commonService";
 import MuiImageCustom from "@/components/Common/MuiImageCustom";
 import { searchJobPost } from "@/redux/filterSlice";
@@ -63,6 +64,7 @@ const Loading = (
 );
 
 const CareerCarousel = () => {
+  const { t } = useTranslation('public');
   const dispatch = useDispatch();
   const nav = useRouter();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
@@ -206,7 +208,7 @@ const CareerCarousel = () => {
                       fontSize: "0.75rem",
                     }}
                   >
-                    {value.jobPostTotal} Việc Làm
+                    {t("home.jobsCount", { count: value.jobPostTotal, defaultValue: "{{count}} Việc Làm" })}
                   </Typography>
                 </Card>
               </SwiperSlide>
