@@ -115,6 +115,7 @@ class JobSeekerJobPostActivityViewSet(
                 from ..tasks import analyze_resume_ai
 
                 job_post_activity.ai_analysis_status = 'processing'
+                job_post_activity.ai_analysis_progress = 5
                 job_post_activity.save()
                 analyze_resume_ai.delay(job_post_activity.id)
             except Exception as ex:
@@ -184,6 +185,7 @@ class EmployerJobPostActivityViewSet(
                 "aiAnalysisSummary",
                 "aiAnalysisSkills",
                 "aiAnalysisStatus",
+                "aiAnalysisProgress",
                 "aiAnalysisPros",
                 "aiAnalysisCons",
                 "aiAnalysisMatchingSkills",
@@ -224,6 +226,7 @@ class EmployerJobPostActivityViewSet(
                     "aiAnalysisSummary",
                     "aiAnalysisSkills",
                     "aiAnalysisStatus",
+                    "aiAnalysisProgress",
                 ],
             )
             return self.get_paginated_response(serializer.data)
@@ -402,6 +405,7 @@ class EmployerJobPostActivityViewSet(
             from ..tasks import analyze_resume_ai
 
             job_post_activity.ai_analysis_status = 'processing'
+            job_post_activity.ai_analysis_progress = 5
             job_post_activity.save()
             analyze_resume_ai.delay(job_post_activity.id)
             return var_res.response_data(data={"detail": "AI analysis task has been queued."}, status=status.HTTP_202_ACCEPTED)

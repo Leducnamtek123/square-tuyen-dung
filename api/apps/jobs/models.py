@@ -183,6 +183,7 @@ class JobPostActivity(CommonBaseModel):
         ('failed', 'Failed')
 
     ], default='pending')
+    ai_analysis_progress = models.PositiveSmallIntegerField(default=0)
 
     class Meta:
 

@@ -456,6 +456,7 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
     aiAnalysisSkills = serializers.CharField(source='ai_analysis_skills', read_only=True)
 
     aiAnalysisStatus = serializers.CharField(source='ai_analysis_status', read_only=True)
+    aiAnalysisProgress = serializers.IntegerField(source='ai_analysis_progress', read_only=True)
 
     aiAnalysisPros = serializers.CharField(source='ai_analysis_pros', read_only=True)
 
@@ -512,7 +513,7 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
 
                   "resumeSlug", "jobName", "status", "createAt", "isSentEmail",
 
-                  "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus", "aiAnalysisPros", "aiAnalysisCons", "aiAnalysisMatchingSkills", "aiAnalysisMissingSkills",
+                  "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus", "aiAnalysisProgress", "aiAnalysisPros", "aiAnalysisCons", "aiAnalysisMatchingSkills", "aiAnalysisMissingSkills",
                   "resumeFileUrl", "userDict", "jobPostDict", "companyDict")
 
 class EmployerJobPostActivityExportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):

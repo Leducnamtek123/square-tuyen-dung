@@ -99,6 +99,7 @@ export interface JobPostActivity {
   aiAnalysisScore?: number | null;
   aiAnalysisSummary?: string | null;
   aiAnalysisStatus?: 'pending' | 'processing' | 'completed' | 'failed';
+  aiAnalysisProgress?: number;
 }
 
 /* Resume & Profile */

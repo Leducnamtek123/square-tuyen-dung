@@ -88,7 +88,6 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
   const [data, setData] = React.useState<any>(initialData || null);
   const [loading, setLoading] = React.useState(false);
   const [analyzing, setAnalyzing] = React.useState(false);
-  const [scanProgress, setScanProgress] = React.useState(0);
   const [scanLinePosition, setScanLinePosition] = React.useState(-12);
 
   React.useEffect(() => {
@@ -104,7 +103,6 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
       try {
         const res = await jobPostActivityService.getJobPostActivityDetail(activityId);
         setData((res as any)?.data || null);
-        setScanProgress(0);
       } catch {
         // use initial data if fetch fails
       } finally {
@@ -139,42 +137,6 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
   }, [open, activityId, data?.aiAnalysisStatus]);
 
   React.useEffect(() => {
-    if (!open) return;
-
-    if (data?.aiAnalysisStatus === 'processing') {
-      let isActive = true;
-      let rafId = 0;
-      const startAt = performance.now();
-      const durationMs = 22000;
-
-      const animateProgress = (now: number) => {
-        if (!isActive) return;
-        const elapsed = now - startAt;
-        const target = Math.min(95, (elapsed / durationMs) * 95);
-        setScanProgress((prev) => (target > prev ? target : prev));
-        if (target < 95) {
-          rafId = requestAnimationFrame(animateProgress);
-        }
-      };
-
-      setScanProgress((prev) => Math.max(prev, 4));
-      rafId = requestAnimationFrame(animateProgress);
-
-      return () => {
-        isActive = false;
-        cancelAnimationFrame(rafId);
-      };
-    }
-
-    if (data?.aiAnalysisStatus === 'completed') {
-      setScanProgress(100);
-      return;
-    }
-
-    setScanProgress(0);
-  }, [open, data?.aiAnalysisStatus]);
-
-  React.useEffect(() => {
     if (!open || data?.aiAnalysisStatus !== 'processing') {
       if (data?.aiAnalysisStatus !== 'completed') {
         setScanLinePosition(-12);
@@ -206,8 +168,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
     if (!activityId) return;
     try {
       setAnalyzing(true);
-      setData((prev: any) => ({ ...(prev || {}), aiAnalysisStatus: 'processing' }));
-      setScanProgress(4);
+      setData((prev: any) => ({ ...(prev || {}), aiAnalysisStatus: 'processing', aiAnalysisProgress: 5 }));
       await jobPostActivityService.analyzeResume(activityId);
       toastMessages.success(t('appliedResume.ai.analysisStarted'));
     } catch (err: any) {
@@ -221,6 +182,14 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
   const isCompleted = status === 'completed';
   const isProcessing = status === 'processing';
   const isFailed = status === 'failed';
+  const scanProgress = React.useMemo(() => {
+    if (isCompleted) return 100;
+    const progress = Number(data?.aiAnalysisProgress);
+    if (Number.isFinite(progress)) {
+      return Math.max(0, Math.min(100, Math.round(progress)));
+    }
+    return isProcessing ? 0 : 0;
+  }, [data?.aiAnalysisProgress, isCompleted, isProcessing]);
 
   const resumeFileUrl = typeof data?.resumeFileUrl === 'string' ? data.resumeFileUrl : '';
   const canEmbedResume = React.useMemo(() => canEmbedUrl(resumeFileUrl), [resumeFileUrl]);

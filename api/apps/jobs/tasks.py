@@ -102,11 +102,13 @@ def analyze_resume_ai(self, activity_id):
         
         if not activity.resume or not activity.resume.file:
             activity.ai_analysis_status = 'failed'
+            activity.ai_analysis_progress = 0
             activity.ai_analysis_summary = "Không tìm thấy file CV để phân tích."
             activity.save()
             return
 
         activity.ai_analysis_status = 'processing'
+        activity.ai_analysis_progress = 5
         activity.save()
 
         file_obj = activity.resume.file
@@ -140,6 +142,8 @@ def analyze_resume_ai(self, activity_id):
                 temp_file = tf.name
             response.close()
             response.release_conn()
+            activity.ai_analysis_progress = 25
+            activity.save(update_fields=['ai_analysis_progress', 'update_at'])
             
         except Exception as minio_err:
             logger.warning(f"MinIO direct download failed: {minio_err}. Falling back to HTTP URL.")
@@ -152,6 +156,8 @@ def analyze_resume_ai(self, activity_id):
                     with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
                         tf.write(response.content)
                         temp_file = tf.name
+                    activity.ai_analysis_progress = 25
+                    activity.save(update_fields=['ai_analysis_progress', 'update_at'])
                 else:
                     raise Exception(f"Failed to download resume file: HTTP {response.status_code}")
         
@@ -164,9 +170,12 @@ def analyze_resume_ai(self, activity_id):
             else:
                 with open(temp_file, 'r', errors='ignore') as f:
                     resume_text = f.read()
+            activity.ai_analysis_progress = 45
+            activity.save(update_fields=['ai_analysis_progress', 'update_at'])
 
         if not resume_text or len(resume_text.strip()) < 50:
             activity.ai_analysis_status = 'failed'
+            activity.ai_analysis_progress = 0
             activity.ai_analysis_summary = "Không thể đọc được nội dung CV (File có thể là ảnh hoặc bị lỗi)."
             activity.save()
             return
@@ -220,6 +229,8 @@ def analyze_resume_ai(self, activity_id):
             "temperature": 0.2,
             "response_format": {"type": "json_object"},
         }
+        activity.ai_analysis_progress = 70
+        activity.save(update_fields=['ai_analysis_progress', 'update_at'])
 
         with httpx.Client(timeout=httpx.Timeout(timeout=120.0, connect=10.0)) as client:
             resp = client.post(f"{llama_url}/chat/completions", json=payload)
@@ -244,6 +255,7 @@ def analyze_resume_ai(self, activity_id):
                 activity.ai_analysis_missing_skills = result.get('missing_skills', [])
                 
                 activity.ai_analysis_status = 'completed'
+                activity.ai_analysis_progress = 100
                 activity.save()
                 
                 logger.info(f"AI Analysis completed for Activity {activity_id}. Score: {activity.ai_analysis_score}")
@@ -258,6 +270,7 @@ def analyze_resume_ai(self, activity_id):
         try:
             activity = JobPostActivity.objects.get(id=activity_id)
             activity.ai_analysis_status = 'failed'
+            activity.ai_analysis_progress = 0
             activity.ai_analysis_summary = str(e)[:500]
             activity.save()
         except Exception:
@@ -269,3 +282,4 @@ def analyze_resume_ai(self, activity_id):
                 os.unlink(temp_file)
             except OSError:
                 pass
+
