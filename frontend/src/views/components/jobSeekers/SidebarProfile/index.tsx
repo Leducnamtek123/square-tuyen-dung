@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar, Box, Chip, Stack, Typography } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
 import ClearIcon from "@mui/icons-material/Clear";
-import MuiImageCustom from "../../../../components/MuiImageCustom";
+import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
 
 const SidebarProfile = () => {
   const { t } = useTranslation('auth');

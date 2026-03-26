@@ -2,8 +2,8 @@ import React from "react";
 import { Pagination, Stack } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { ROLES_NAME } from "../../../../configs/constants";
-import NoDataCard from "../../../../components/NoDataCard";
-import JobPost from "../../../../components/JobPost";
+import NoDataCard from "../../../../components/Common/NoDataCard";
+import JobPost from "../../../../components/Features/JobPost";
 import { useAppSelector } from "../../../../hooks/useAppStore";
 import { useSuggestedJobPosts } from "../MainJobPostCard/hooks/useJobPosts";
 

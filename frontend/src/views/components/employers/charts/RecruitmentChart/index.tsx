@@ -47,7 +47,7 @@ import { Bar } from "react-chartjs-2";
 
 import dayjs, { Dayjs } from "dayjs";
 
-import RangePickerCustom from "../../../../../components/controls/RangePickerCustom";
+import RangePickerCustom from "../../../../../components/Common/Controls/RangePickerCustom";
 
 import { useEmployerRecruitmentStatistics } from '../../hooks/useEmployerQueries';
 

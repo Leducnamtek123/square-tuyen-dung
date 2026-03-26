@@ -7,8 +7,8 @@ import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useTranslation } from 'react-i18next';
-import InputBaseSearchHomeCustom from '../../../../components/controls/InputBaseSearchHomeCustom';
-import SingleSelectSearchCustom from '../../../../components/controls/SingleSelectSearchCustom';
+import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
+import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
 import commonService from '../../../../services/commonService';
 import {
   resetSearchJobPostFilter,

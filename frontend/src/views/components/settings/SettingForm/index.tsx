@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Grid from "@mui/material/Grid2";
-import CheckboxCustom from '../../../../components/controls/CheckboxCustom';
+import CheckboxCustom from '../../../../components/Common/Controls/CheckboxCustom';
 
 interface FormValues {
   emailNotificationActive: boolean;

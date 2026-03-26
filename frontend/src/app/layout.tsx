@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import ThemeRegistry from '../components/ThemeRegistry/ThemeRegistry';
 import { Providers } from './providers';
 import ClientAppRoot from './ClientAppRoot';
-import '../index.css';         // Global CSS
-import '../App.css';           // App CSS
+import './globals.css';           // Global CSS (Tailwind + design tokens)
+import './app-overrides.css';     // App-level overrides
 
 export const metadata: Metadata = {
   title: 'Square | Tìm việc nhanh, tuyển dụng hiệu quả',

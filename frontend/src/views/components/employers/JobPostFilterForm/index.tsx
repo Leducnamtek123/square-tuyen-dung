@@ -5,8 +5,8 @@ import { Button, Stack, Tooltip, IconButton } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
-import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
+import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
+import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import { useAppSelector } from '../../../../redux/hooks';
 
 interface JobPostFilterFormProps {

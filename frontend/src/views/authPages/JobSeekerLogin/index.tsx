@@ -27,7 +27,7 @@ import {
 
 import toastMessages from '../../../utils/toastMessages';
 
-import BackdropLoading from '../../../components/loading/BackdropLoading';
+import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
 
 import { updateVerifyEmail } from '../../../redux/authSlice';
 

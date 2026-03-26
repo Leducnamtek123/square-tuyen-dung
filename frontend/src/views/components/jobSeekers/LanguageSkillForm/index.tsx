@@ -11,9 +11,9 @@ import { useTranslation } from 'react-i18next';
 
 import Grid from "@mui/material/Grid2";
 
-import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
+import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 
-import RatingCustom from '../../../../components/controls/RatingCustom';
+import RatingCustom from '../../../../components/Common/Controls/RatingCustom';
 
 interface FormValues {
   language: number | string;

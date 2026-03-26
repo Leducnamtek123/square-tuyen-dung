@@ -10,8 +10,8 @@ import {
   faClockFour,
 } from "@fortawesome/free-solid-svg-icons";
 
-import QRCodeBox from "../../../../components/QRCodeBox";
-import MuiImageCustom from "../../../../components/MuiImageCustom";
+import QRCodeBox from "../../../../components/Common/QRCodeBox";
+import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
 import { salaryString } from "../../../../utils/customData";
 import { ROUTES } from "../../../../configs/constants";
 import { formatRoute } from "../../../../utils/funcUtils";

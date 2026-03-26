@@ -13,9 +13,9 @@ import {
 } from "../../../configs/constants";
 import useSEO from "../../../hooks/useSEO";
 import useStructuredData from "../../../hooks/useStructuredData";
-import TopCompanyCarousel from "../../../components/TopCompanyCarousel";
-import CareerCarousel from "../../../components/CareerCarousel";
-import FeedbackCarousel from "../../../components/FeedbackCarousel";
+import TopCompanyCarousel from "../../../components/Features/TopCompanyCarousel";
+import CareerCarousel from "../../../components/Features/CareerCarousel";
+import FeedbackCarousel from "../../../components/Features/FeedbackCarousel";
 import JobByCategory from "../../components/defaults/JobByCategory";
 import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
 import SuggestedJobPostCard from "../../components/defaults/SuggestedJobPostCard";
@@ -23,7 +23,7 @@ import bannerExploreImport from '../../../assets/images/banner-explore.webp';
 import bannerExplorePcImport from '../../../assets/images/banner-explore-pc.webp';
 import { useAppSelector } from "../../../hooks/useAppStore";
 import type { SvgIconComponent } from "@mui/icons-material";
-import LazyLoadSection from "../../../components/LazyLoadSection";
+import LazyLoadSection from "../../../components/Common/LazyLoadSection";
 
 // Next.js image imports return objects; extract string src
 const toSrc = (img: any): string => typeof img === 'string' ? img : img?.src || img?.default?.src || '';

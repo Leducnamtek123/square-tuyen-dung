@@ -1,10 +1,10 @@
 import React from 'react';
 import Grid from "@mui/material/Grid2";
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
-import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
-import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
-import TextFieldAutoCompleteCustom from '../../../../components/controls/TextFieldAutoCompleteCustom';
-import RichTextEditorCustom from '../../../../components/controls/RichTextEditorCustom';
+import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
+import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
+import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
+import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/TextFieldAutoCompleteCustom';
+import RichTextEditorCustom from '../../../../components/Common/Controls/RichTextEditorCustom';
 
 interface CompanyFormFieldsProps {
   control: any;

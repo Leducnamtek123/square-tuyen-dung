@@ -6,7 +6,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import { Box, Link } from "@mui/material";
 import HomeSearch from '../../../../views/components/defaults/HomeSearch';
-import MuiImageCustom from '../../../../components/MuiImageCustom';
+import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 import contentService from '../../../../services/contentService';
 import { BANNER_TYPES, IMAGES } from '../../../../configs/constants';
 

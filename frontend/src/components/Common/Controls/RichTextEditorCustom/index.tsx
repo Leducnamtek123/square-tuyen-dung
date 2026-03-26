@@ -1,0 +1,178 @@
+// import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+
+import React from 'react';
+
+import { Control, Controller } from 'react-hook-form';
+
+import { EditorState } from 'draft-js';
+
+import { Editor } from 'react-draft-wysiwyg';
+
+import { Typography } from "@mui/material";
+
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
+
+interface Props {
+  control: Control<any>;
+  name: string;
+  title?: string;
+  showRequired?: boolean;
+}
+
+const RichTextEditorCustom = ({
+  control,
+  name,
+  title = '',
+  showRequired = false,
+}: Props) => {
+
+  return (
+
+    <div>
+
+      {title && (
+
+        <Typography variant="subtitle2" gutterBottom>
+
+          {title} {showRequired && <span style={{ color: 'red' }}>*</span>}
+
+        </Typography>
+
+      )}
+
+      <Controller
+
+        control={control}
+
+        name={name}
+
+        defaultValue={EditorState.createEmpty()}
+
+        render={({ field, fieldState }) => {
+          const safeEditorState = field.value?.getCurrentContent
+            ? field.value
+            : typeof field.value === 'string'
+            ? createEditorStateFromHTMLString(field.value)
+            : EditorState.createEmpty();
+          return (
+
+          <>
+
+            <Editor
+
+              editorStyle={{
+                border: '1px solid',
+                borderColor: '#e0e0e0',
+                marginTop: -1,
+                minHeight: 200,
+                borderBottomLeftRadius: 4,
+                borderBottomRightRadius: 4,
+              } as any}
+
+              editorState={safeEditorState}
+
+              onEditorStateChange={field.onChange}
+
+              toolbar={{
+
+                options: ['inline', 'list', 'history'],
+
+                inline: {
+
+                  inDropdown: false,
+
+                  className: undefined,
+
+                  component: undefined,
+
+                  dropdownClassName: undefined,
+
+                  options: [
+
+                    'bold',
+
+                    'italic',
+
+                    'underline',
+
+                    'superscript',
+
+                    'subscript',
+
+                  ],
+
+                },
+
+                list: {
+
+                  inDropdown: false,
+
+                  className: undefined,
+
+                  component: undefined,
+
+                  dropdownClassName: undefined,
+
+                  options: ['unordered', 'ordered', 'indent', 'outdent'],
+
+                },
+
+                history: {
+
+                  inDropdown: false,
+
+                  className: undefined,
+
+                  component: undefined,
+
+                  dropdownClassName: undefined,
+
+                  options: ['undo', 'redo'],
+
+                },
+
+              }}
+
+            />
+
+            {fieldState.invalid && (
+
+              <span
+
+                style={{
+
+                  color: 'red',
+
+                  fontSize: 13,
+
+                  marginTop: 1,
+
+                  marginLeft: 1,
+
+                }}
+
+              >
+
+                <ErrorOutlineIcon fontSize="small" />{' '}
+
+                {fieldState.error?.message}
+
+              </span>
+
+            )}
+
+          </>
+
+        );
+        }}
+
+      />
+
+    </div>
+
+  );
+
+};
+
+export default RichTextEditorCustom;

@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import adminManagementService from '../../../services/adminManagementService';
 import { IMAGES } from '../../../configs/constants';
 import { compressImageFile } from '../../../utils/imageCompression';
-import ImageCropDialog from '../../../components/ImageCropDialog';
+import ImageCropDialog from '../../../components/Common/ImageCropDialog';
 
 /** Aspect ratios per banner type */
 const ASPECT_RATIOS: Record<number, { ratio: number; label: string }> = {

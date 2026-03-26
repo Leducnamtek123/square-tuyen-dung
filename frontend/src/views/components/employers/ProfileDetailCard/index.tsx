@@ -2,9 +2,9 @@ import React, { Suspense, lazy } from "react";
 import { useParams } from 'next/navigation';
 import { Box, Card, Stack, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import BackdropLoading from "../../../../components/loading/BackdropLoading";
+import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
 import { CV_TYPES } from "../../../../configs/constants";
-import FormPopup from "../../../../components/controls/FormPopup";
+import FormPopup from "../../../../components/Common/Controls/FormPopup";
 import { useQuery } from '@tanstack/react-query';
 import resumeService from "../../../../services/resumeService";
 
@@ -17,7 +17,7 @@ import CertificateSection from './CertificateSection';
 import LanguageSection from './LanguageSection';
 import AdvancedSkillSection from './AdvancedSkillSection';
 
-const LazyPdf = lazy(() => import("../../../../components/Pdf"));
+const LazyPdf = lazy(() => import("../../../../components/Common/Pdf"));
 
 const ProfileDetailCard: React.FC = () => {
   const { t } = useTranslation('employer');

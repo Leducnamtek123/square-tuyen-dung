@@ -9,8 +9,8 @@ import ShareIcon from "@mui/icons-material/Share";
 import dayjs from "dayjs";
 
 import { IMAGES, ROLES_NAME } from "../../../configs/constants";
-import QRCodeBox from "../../../components/QRCodeBox";
-import MuiImageCustom from "../../../components/MuiImageCustom";
+import QRCodeBox from "../../../components/Common/QRCodeBox";
+import MuiImageCustom from "../../../components/Common/MuiImageCustom";
 import { tConfig } from '../../../utils/tConfig';
 
 interface CompanyHeaderProps {

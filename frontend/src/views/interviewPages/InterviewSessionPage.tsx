@@ -8,8 +8,8 @@ import {
   ConnectionStateToast,
 } from "@livekit/components-react";
 
-import InterviewAgentView from "../../components/interviewAi/InterviewAgentView";
-import { AgentAudioVisualizerAura, StartAudioButton } from "../../components/agents-ui";
+import InterviewAgentView from "../../components/Features/InterviewAi/InterviewAgentView";
+import { AgentAudioVisualizerAura, StartAudioButton } from "../../components/Features/AgentsUi";
 import Button from "@mui/material/Button";
 
 import interviewService from "../../services/interviewService";

@@ -29,7 +29,7 @@ import { Pie } from 'react-chartjs-2';
 
 import dayjs from 'dayjs';
 
-import RangePickerCustom from '../../../../../components/controls/RangePickerCustom';
+import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 
 import { useEmployerRecruitmentByRank } from '../../hooks/useEmployerQueries';
 

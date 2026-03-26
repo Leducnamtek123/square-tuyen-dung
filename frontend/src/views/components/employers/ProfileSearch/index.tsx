@@ -28,9 +28,9 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import RefreshIcon from '@mui/icons-material/Refresh';
 
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
+import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 
-import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
+import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 
 import { resetSearchResume, searchResume } from '../../../../redux/filterSlice';
 

@@ -10,7 +10,7 @@ import { Box, Button, Stack } from "@mui/material";
 
 import { useTranslation } from 'react-i18next';
 
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
+import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 
 interface ForgotPasswordFormData {
   email: string;

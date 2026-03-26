@@ -1,7 +1,7 @@
 import React from 'react';
 import { Stack } from "@mui/material";
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
-import PasswordTextFieldCustom from '../../../../components/controls/PasswordTextFieldCustom';
+import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
+import PasswordTextFieldCustom from '../../../../components/Common/Controls/PasswordTextFieldCustom';
 
 interface AccountInfoStepProps {
   control: any;

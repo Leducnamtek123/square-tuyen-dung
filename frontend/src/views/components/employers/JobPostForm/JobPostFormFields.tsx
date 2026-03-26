@@ -1,12 +1,12 @@
 import React from 'react';
 import { Alert, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
-import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
-import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
-import CheckboxCustom from '../../../../components/controls/CheckboxCustom';
-import RichTextEditorCustom from '../../../../components/controls/RichTextEditorCustom';
-import TextFieldAutoCompleteCustom from '../../../../components/controls/TextFieldAutoCompleteCustom';
+import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
+import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
+import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
+import CheckboxCustom from '../../../../components/Common/Controls/CheckboxCustom';
+import RichTextEditorCustom from '../../../../components/Common/Controls/RichTextEditorCustom';
+import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/TextFieldAutoCompleteCustom';
 import { DATE_OPTIONS } from '../../../../configs/constants';
 
 interface JobPostFormFieldsProps {

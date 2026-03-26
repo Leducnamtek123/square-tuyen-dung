@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 
 import EditIcon from "@mui/icons-material/Edit";
 
-import FormPopup from '../../../../components/controls/FormPopup';
+import FormPopup from '../../../../components/Common/Controls/FormPopup';
 
 import GeneralInfoForm from '../GeneralInfoForm';
 
@@ -19,7 +19,7 @@ import toastMessages from '../../../../utils/toastMessages';
 
 import errorHandling from '../../../../utils/errorHandling';
 
-import BackdropLoading from '../../../../components/loading/BackdropLoading';
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 
 import resumeService from '../../../../services/resumeService';
 

@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
 import { ROLES_NAME, ROUTES } from '../../../configs/constants';
 import toastMessages from '../../../utils/toastMessages';
-import BackdropLoading from '../../../components/loading/BackdropLoading';
+import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
 import { updateVerifyEmail } from '../../../redux/authSlice';
 import { getUserInfo } from '../../../redux/userSlice';
 import AdminLoginForm from '../../components/auths/JobSeekerLoginForm';

@@ -10,9 +10,9 @@ import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined
 
 import AIAnalysisDrawer from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
-import DataTableCustom from '../../../../components/DataTableCustom';
+import DataTableCustom from '../../../../components/Common/DataTableCustom';
 import { faFile, faFilePdf } from '@fortawesome/free-regular-svg-icons';
-import NoDataCard from '../../../../components/NoDataCard';
+import NoDataCard from '../../../../components/Common/NoDataCard';
 import { formatRoute } from '../../../../utils/funcUtils';
 
 import SendEmailComponent from './SendEmailComponent';

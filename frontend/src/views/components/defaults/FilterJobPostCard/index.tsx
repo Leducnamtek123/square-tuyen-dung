@@ -3,8 +3,8 @@ import { Pagination, Stack } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import jobService from '../../../../services/jobService';
-import JobPost from '../../../../components/JobPost';
-import NoDataCard from '../../../../components/NoDataCard';
+import JobPost from '../../../../components/Features/JobPost';
+import NoDataCard from '../../../../components/Common/NoDataCard';
 
 interface FilterJobPostCardProps {
   params?: any;

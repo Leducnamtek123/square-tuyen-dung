@@ -17,7 +17,7 @@ import { PLATFORM, ROLES_NAME, ROUTES, AUTH_CONFIG, AUTH_PROVIDER } from '../../
 
 import errorHandling from '../../../utils/errorHandling';
 
-import BackdropLoading from '../../../components/loading/BackdropLoading';
+import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
 
 import { updateVerifyEmail } from '../../../redux/authSlice';
 

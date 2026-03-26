@@ -18,7 +18,7 @@ import {
   Legend,
 } from 'chart.js';
 import dayjs from 'dayjs';
-import RangePickerCustom from '../../../../../components/controls/RangePickerCustom';
+import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerApplicationStatistics } from '../../hooks/useEmployerQueries';
 import { useTheme } from '@mui/material/styles';
 

@@ -17,9 +17,9 @@ import toastMessages from "../../../../utils/toastMessages";
 
 import errorHandling from "../../../../utils/errorHandling";
 
-import BackdropLoading from "../../../../components/loading/BackdropLoading";
+import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
 
-import FormPopup from "../../../../components/controls/FormPopup";
+import FormPopup from "../../../../components/Common/Controls/FormPopup";
 
 import ProfileUploadForm from "../ProfileUploadForm";
 
@@ -27,11 +27,11 @@ import jobSeekerProfileService from "../../../../services/jobSeekerProfileServic
 
 import resumeService from "../../../../services/resumeService";
 
-import ProfileUploadCard from "../../../../components/ProfileUploadCard";
+import ProfileUploadCard from "../../../../components/Common/ProfileUploadCard";
 
 import { confirmModal } from "../../../../utils/sweetalert2Modal";
 
-import NoDataCard from "../../../../components/NoDataCard";
+import NoDataCard from "../../../../components/Common/NoDataCard";
 
 import { reloadResume } from "../../../../redux/profileSlice";
 

@@ -21,8 +21,8 @@ import LeftDrawer from "../LeftDrawer";
 import AccountSwitchMenu from "../AccountSwitchMenu";
 import WorkspaceSwitchMenu from "../WorkspaceSwitchMenu";
 
-const NotificationCard = React.lazy(() => import("../../../../components/NotificationCard"));
-const ChatCard = React.lazy(() => import("../../../../components/ChatCard"));
+const NotificationCard = React.lazy(() => import("../../../../components/Features/NotificationCard"));
+const ChatCard = React.lazy(() => import("../../../../components/Features/ChatCard"));
 
 import LanguageSwitcher from "../LanguageSwitcher";
 import { isAdminPortalPath, isEmployerPortalPath } from "../../../../configs/portalRouting";

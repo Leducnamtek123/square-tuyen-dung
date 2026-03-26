@@ -10,9 +10,9 @@ import {
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
-import BackdropLoading from '../../../../components/loading/BackdropLoading';
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 import xlsxUtils from '../../../../utils/xlsxUtils';
-import FormPopup from '../../../../components/controls/FormPopup';
+import FormPopup from '../../../../components/Common/Controls/FormPopup';
 import JobPostFilterForm from '../JobPostFilterForm';
 import JobPostForm from '../JobPostForm';
 import jobService from '../../../../services/jobService';

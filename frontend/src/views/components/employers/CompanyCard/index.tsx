@@ -15,13 +15,13 @@ import toastMessages from "../../../../utils/toastMessages";
 
 import errorHandling from "../../../../utils/errorHandling";
 
-import BackdropLoading from "../../../../components/loading/BackdropLoading";
+import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
 
 import CompanyForm from "../CompanyForm";
 
 import companyService from "../../../../services/companyService";
 
-import MuiImageCustom from "../../../../components/MuiImageCustom";
+import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
 
 const CompanyCard = () => {
 

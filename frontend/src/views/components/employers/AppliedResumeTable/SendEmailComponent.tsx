@@ -6,7 +6,7 @@ import MarkEmailReadRoundedIcon from '@mui/icons-material/MarkEmailReadRounded';
 
 import { convertEditorStateToHTMLString } from '../../../../utils/editorUtils';
 import SendMailCard from '../SendMailCard';
-import BackdropLoading from '../../../../components/loading/BackdropLoading';
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';

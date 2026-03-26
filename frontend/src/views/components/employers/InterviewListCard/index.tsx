@@ -6,7 +6,7 @@ import Link from 'next/link';
 import interviewService from '../../../../services/interviewService';
 import { transformInterviewSession } from '../../../../utils/transformers';
 import { ROUTES } from '../../../../configs/constants';
-import DataTable from '../../../../components/DataTable';
+import DataTable from '../../../../components/Common/DataTable';
 import { useTranslation } from 'react-i18next';
 
 interface InterviewListCardProps {

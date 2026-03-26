@@ -3,8 +3,8 @@ import { Box, Card, Stack, Typography, Link, IconButton } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGlobe, faEnvelope, faPhoneVolume, faHashtag, faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { ICONS } from "../../../configs/constants";
-import Map from "../../../components/Map";
-import ImageGalleryCustom from "../../../components/ImageGalleryCustom";
+import Map from "../../../components/Common/Map";
+import ImageGalleryCustom from "../../../components/Common/ImageGalleryCustom";
 
 interface CompanySidebarProps {
   companyDetail: any;

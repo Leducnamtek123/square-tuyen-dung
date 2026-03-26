@@ -22,7 +22,7 @@ import Grid from '@mui/material/Grid2';
 
 import { ICONS, LINKS, ROUTES, APP_NAME, IMAGES } from '../../../../configs/constants';
 
-import MuiImageCustom from '../../../../components/MuiImageCustom';
+import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 import { buildPortalPath, getPreferredLanguage } from '../../../../configs/portalRouting';
 
 const Footer = () => {

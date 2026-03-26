@@ -7,7 +7,7 @@ import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import { useTranslation } from "react-i18next";
 import { TabTitle } from "../../../utils/generalFunction";
-import MuiImageCustom from "../../../components/MuiImageCustom";
+import MuiImageCustom from "../../../components/Common/MuiImageCustom";
 import { ABOUT_IMAGES, APP_NAME } from "../../../configs/constants";
 
 

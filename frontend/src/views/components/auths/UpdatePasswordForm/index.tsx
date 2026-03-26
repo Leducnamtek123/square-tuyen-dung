@@ -10,7 +10,7 @@ import Grid from "@mui/material/Grid2";
 
 import { useTranslation } from 'react-i18next';
 
-import PasswordTextFieldCustom from '../../../../components/controls/PasswordTextFieldCustom';
+import PasswordTextFieldCustom from '../../../../components/Common/Controls/PasswordTextFieldCustom';
 
 interface UpdatePasswordFormData {
   oldPassword?: string;

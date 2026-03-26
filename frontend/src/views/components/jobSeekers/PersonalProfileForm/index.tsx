@@ -15,11 +15,11 @@ import errorHandling from '../../../../utils/errorHandling';
 
 import { DATE_OPTIONS, REGEX_VALIDATE } from '../../../../configs/constants';
 
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
+import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 
-import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
+import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 
-import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
+import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
 
 import commonService from '../../../../services/commonService';
 

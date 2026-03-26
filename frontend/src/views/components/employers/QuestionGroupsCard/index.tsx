@@ -14,7 +14,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import { useQuestionGroups } from '../../../employerPages/InterviewPages/hooks/useQuestionGroups';
 
-import DataTable from '../../../../components/DataTable';
+import DataTable from '../../../../components/Common/DataTable';
 
 import questionService from '../../../../services/questionService';
 

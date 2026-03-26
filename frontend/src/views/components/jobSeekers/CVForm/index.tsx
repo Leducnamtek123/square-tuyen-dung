@@ -8,7 +8,7 @@ import * as yup from 'yup';
 
 import Grid from "@mui/material/Grid2";
 
-import BasicDropzone from '../../../../components/controls/BasicDropzone';
+import BasicDropzone from '../../../../components/Common/Controls/BasicDropzone';
 
 import { useTranslation } from 'react-i18next';
 

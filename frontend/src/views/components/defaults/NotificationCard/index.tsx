@@ -5,9 +5,9 @@ import ClearIcon from "@mui/icons-material/Clear";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import { IMAGES, ROUTES } from "../../../../configs/constants";
-import MuiImageCustom from "../../../../components/MuiImageCustom";
-import NoDataCard from "../../../../components/NoDataCard";
-import TimeAgo from "../../../../components/TimeAgo";
+import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
+import NoDataCard from "../../../../components/Common/NoDataCard";
+import TimeAgo from "../../../../components/Common/TimeAgo";
 import { formatRoute } from "../../../../utils/funcUtils";
 import { useNotifications } from "../../../../hooks/useNotifications";
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Stack, Pagination, Chip } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
-import NoDataCard from '../../../../components/NoDataCard';
-import CompanyAction from '../../../../components/CompanyAction';
+import NoDataCard from '../../../../components/Common/NoDataCard';
+import CompanyAction from '../../../../components/Features/CompanyAction';
 import { useResumeViewed } from '../hooks/useJobSeekerQueries';
 import { useTranslation } from 'react-i18next';
 

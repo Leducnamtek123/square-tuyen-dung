@@ -1,6 +1,6 @@
 import React from "react";
 import { Switch } from "@mui/material";
-import BackdropLoading from "../../../../components/loading/BackdropLoading";
+import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
 import jobPostNotificationService from "../../../../services/jobPostNotificationService";
 import errorHandling from "../../../../utils/errorHandling";
 

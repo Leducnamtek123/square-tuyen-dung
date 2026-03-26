@@ -12,7 +12,7 @@ import toastMessages from '../../../../utils/toastMessages';
 
 import errorHandling from '../../../../utils/errorHandling';
 
-import BackdropLoading from '../../../../components/loading/BackdropLoading';
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 
 import companyImageService from '../../../../services/companyImageService';
 

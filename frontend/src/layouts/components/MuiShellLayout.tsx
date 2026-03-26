@@ -16,9 +16,9 @@ import AccountSwitchMenu from './commons/AccountSwitchMenu';
 
 import UserMenu from './commons/UserMenu';
 
-import NotificationCard from '../../components/NotificationCard';
+import NotificationCard from '../../components/Features/NotificationCard';
 
-import ChatCard from '../../components/ChatCard';
+import ChatCard from '../../components/Features/ChatCard';
 
 import LanguageSwitcher from './commons/LanguageSwitcher';
 

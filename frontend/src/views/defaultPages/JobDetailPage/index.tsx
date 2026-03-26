@@ -2,7 +2,7 @@ import React from "react";
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
-import { Button } from "@/ui/button";
+import { Button } from "@/components/ui/button";
 
 import JobDetailLoading from "./components/JobDetailLoading";
 import JobDetailHeaderCard from "./components/JobDetailHeaderCard";
@@ -12,11 +12,11 @@ import JobDetailSidebar from "./components/JobDetailSidebar";
 
 import toastMessages from "../../../utils/toastMessages";
 import errorHandling from "../../../utils/errorHandling";
-import NoDataCard from "../../../components/NoDataCard";
+import NoDataCard from "../../../components/Common/NoDataCard";
 import jobService from "../../../services/jobService";
 import companyService from "../../../services/companyService";
-import ApplyCard from "../../../components/ApplyCard";
-import SocialNetworkSharingPopup from "../../../components/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
+import ApplyCard from "../../../components/Features/ApplyCard";
+import SocialNetworkSharingPopup from "../../../components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
 import { ROLES_NAME, ROUTES } from "../../../configs/constants";
 import { useAppSelector } from "../../../hooks/useAppStore";
 import useSEO from "../../../hooks/useSEO";

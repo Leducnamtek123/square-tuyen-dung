@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Card, Typography, Container } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import CompanySearch from '../../components/defaults/CompanySearch';
-import Companies from '../../../components/Companies';
+import Companies from '../../../components/Features/Companies';
 import useSEO from '../../../hooks/useSEO';
 
 

@@ -7,8 +7,8 @@ import LoginIcon from "@mui/icons-material/Login";
 import GoogleIcon from "@mui/icons-material/Google";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useTranslation } from 'react-i18next';
-import TextFieldCustom from "../../../../components/controls/TextFieldCustom";
-import PasswordTextFieldCustom from "../../../../components/controls/PasswordTextFieldCustom";
+import TextFieldCustom from "../../../../components/Common/Controls/TextFieldCustom";
+import PasswordTextFieldCustom from "../../../../components/Common/Controls/PasswordTextFieldCustom";
 
 interface EmployerLoginFormData {
   email: string;

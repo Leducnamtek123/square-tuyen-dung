@@ -12,7 +12,7 @@ import jobService from '../../../../services/jobService';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 import { ROUTES } from '../../../../configs/constants';
 import { transformQuestion, transformJobPost, transformAppliedResume, transformQuestionGroup } from '../../../../utils/transformers';
-import DateTimePickerCustom from '../../../../components/controls/DateTimePickerCustom';
+import DateTimePickerCustom from '../../../../components/Common/Controls/DateTimePickerCustom';
 
 interface JobPost {
   jobName: string;

@@ -12,3 +12,10 @@
 
 .agent
 *.tsbuildinfo
+
+# build/debug logs
+*.log
+build.log
+docker_build*.log
+ts_errors.log
+typecheck*.log

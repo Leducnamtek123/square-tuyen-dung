@@ -19,20 +19,20 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CV_TYPES, ROUTES, APP_NAME } from "../../../../configs/constants";
-import BackdropLoading from "../../../../components/loading/BackdropLoading";
+import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
 import toastMessages from "../../../../utils/toastMessages";
 import errorHandling from "../../../../utils/errorHandling";
-import MuiImageCustom from "../../../../components/MuiImageCustom";
+import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
 import toSlug, { salaryString } from "../../../../utils/customData";
-import NoDataCard from "../../../../components/NoDataCard";
+import NoDataCard from "../../../../components/Common/NoDataCard";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 const PDFDownloadLinkAny = PDFDownloadLink as any;
-import CVDoc from "../../../../components/CVDoc";
+import CVDoc from "../../../../components/Features/CVDoc";
 import { reloadResume } from "../../../../redux/profileSlice";
 import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
 import resumeService from "../../../../services/resumeService";
 import { formatRoute } from "../../../../utils/funcUtils";
-import ColorPickerDialog from '../../../../components/ColorPickerDialog';
+import ColorPickerDialog from '../../../../components/Common/ColorPickerDialog';
 import { useTranslation } from "react-i18next";
 import { tConfig } from '../../../../utils/tConfig';
 

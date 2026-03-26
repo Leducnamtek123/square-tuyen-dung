@@ -15,7 +15,7 @@ import questionService from '../../../../services/questionService';
 
 import { transformQuestion } from '../../../../utils/transformers';
 
-import DataTable from '../../../../components/DataTable';
+import DataTable from '../../../../components/Common/DataTable';
 
 interface QuestionBankCardProps {
   title?: string;

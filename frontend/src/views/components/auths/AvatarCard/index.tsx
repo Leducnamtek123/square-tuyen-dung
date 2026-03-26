@@ -13,11 +13,11 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
 
-import BackdropLoading from '../../../../components/loading/BackdropLoading';
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 
 import toastMessages from '../../../../utils/toastMessages';
 
-import MuiImageCustom from '../../../../components/MuiImageCustom';
+import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 
 import { deleteAvatar, updateAvatar } from '../../../../redux/userSlice';
 import { compressImageFile } from '../../../../utils/imageCompression';

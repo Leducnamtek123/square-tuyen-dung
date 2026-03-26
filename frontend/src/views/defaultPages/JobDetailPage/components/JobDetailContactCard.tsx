@@ -6,7 +6,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import PhoneIcon from "@mui/icons-material/Phone";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
-import Map from "../../../../components/Map";
+import Map from "../../../../components/Common/Map";
 
 interface JobDetailContactCardProps {
   jobPostDetail: any;

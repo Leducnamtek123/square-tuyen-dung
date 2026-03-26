@@ -36,11 +36,11 @@ import toastMessages from '../../../../utils/toastMessages';
 
 import errorHandling from '../../../../utils/errorHandling';
 
-import BackdropLoading from '../../../../components/loading/BackdropLoading';
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 
-import EmptyCard from '../../../../components/EmptyCard';
+import EmptyCard from '../../../../components/Common/EmptyCard';
 
-import FormPopup from '../../../../components/controls/FormPopup';
+import FormPopup from '../../../../components/Common/Controls/FormPopup';
 
 import EducationDetaiForm from '../EducationDetailForm';
 
@@ -48,7 +48,7 @@ import resumeService from '../../../../services/resumeService';
 
 import educationDetailService from '../../../../services/educationDetailService';
 
-import TimeAgo from '../../../../components/TimeAgo';
+import TimeAgo from '../../../../components/Common/TimeAgo';
 
 import { useTranslation } from 'react-i18next';
 

@@ -4,7 +4,7 @@ import { Box, Chip, IconButton, Tooltip } from "@mui/material";
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 import dayjs from 'dayjs';
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
-import DataTable from '../../../../components/DataTable';
+import DataTable from '../../../../components/Common/DataTable';
 import { JOB_POST_STATUS_BG_COLOR } from '../../../../configs/constants';
 import { useAppSelector } from '../../../../redux/hooks';
 

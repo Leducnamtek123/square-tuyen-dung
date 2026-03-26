@@ -11,7 +11,7 @@ import { RootState } from '../../../redux/store';
 import RightSidebar from '../../components/chats/RightSidebar';
 import ChatWindow from '../../components/chats/ChatWindow';
 import LeftSidebar from '../../components/chats/LeftSidebar';
-import SidebarHeader from '../../../components/chats/SidebarHeader';
+import SidebarHeader from '../../../components/Features/Chats/SidebarHeader';
 
 const ChatPage = () => {
   const theme = useTheme();

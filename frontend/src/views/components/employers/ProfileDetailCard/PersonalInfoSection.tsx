@@ -3,7 +3,7 @@ import { Box, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/redux/hooks';
-import TimeAgo from '../../../../components/TimeAgo';
+import TimeAgo from '../../../../components/Common/TimeAgo';
 import { tConfig } from '../../../../utils/tConfig';
 import InfoItem from './InfoItem';
 

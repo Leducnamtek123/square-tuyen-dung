@@ -9,11 +9,11 @@ import * as yup from 'yup';
 
 import Grid from "@mui/material/Grid2";
 
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
+import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 
-import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
+import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 
-import RadioCustom from '../../../../components/controls/RadioCustom';
+import RadioCustom from '../../../../components/Common/Controls/RadioCustom';
 
 import { useTranslation } from 'react-i18next';
 

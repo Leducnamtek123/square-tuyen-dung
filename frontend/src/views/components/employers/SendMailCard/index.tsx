@@ -14,13 +14,13 @@ import SendIcon from '@mui/icons-material/Send';
 
 import { EditorState } from 'draft-js';
 
-import FormPopup from '../../../../components/controls/FormPopup';
+import FormPopup from '../../../../components/Common/Controls/FormPopup';
 
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
+import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 
-import RichTextEditorCustom from '../../../../components/controls/RichTextEditorCustom';
+import RichTextEditorCustom from '../../../../components/Common/Controls/RichTextEditorCustom';
 
-import CheckboxCustom from '../../../../components/controls/CheckboxCustom';
+import CheckboxCustom from '../../../../components/Common/Controls/CheckboxCustom';
 
 interface SendMailCardProps {
   openPopup: boolean;

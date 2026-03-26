@@ -18,9 +18,9 @@ import { useTranslation } from "react-i18next";
 
 
 
-const LazyPdf = lazy(() => import("../../../../components/Pdf"));
+const LazyPdf = lazy(() => import("../../../../components/Common/Pdf"));
 
-import BackdropLoading from "../../../../components/loading/BackdropLoading";
+import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
 
 
 
@@ -28,7 +28,7 @@ import errorHandling from "../../../../utils/errorHandling";
 
 
 
-import FormPopup from "../../../../components/controls/FormPopup";
+import FormPopup from "../../../../components/Common/Controls/FormPopup";
 
 
 

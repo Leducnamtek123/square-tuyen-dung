@@ -12,11 +12,11 @@ import { useTranslation } from 'react-i18next';
 
 import { DATE_OPTIONS } from '../../../../configs/constants';
 
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
+import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 
-import MultilineTextFieldCustom from '../../../../components/controls/MultilineTextFieldCustom';
+import MultilineTextFieldCustom from '../../../../components/Common/Controls/MultilineTextFieldCustom';
 
-import DatePickerCustom from '../../../../components/controls/DatePickerCustom';
+import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
 
 interface FormValues {
   jobName: string;

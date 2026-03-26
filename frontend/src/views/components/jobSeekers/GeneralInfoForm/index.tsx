@@ -11,11 +11,11 @@ import Grid from "@mui/material/Grid2";
 
 import { useTranslation } from 'react-i18next';
 
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
+import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 
-import MultilineTextFieldCustom from '../../../../components/controls/MultilineTextFieldCustom';
+import MultilineTextFieldCustom from '../../../../components/Common/Controls/MultilineTextFieldCustom';
 
-import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
+import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 
 interface FormValues {
   title: string;

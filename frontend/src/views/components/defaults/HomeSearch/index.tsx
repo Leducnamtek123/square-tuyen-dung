@@ -5,8 +5,8 @@ import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { Card } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import InputBaseSearchHomeCustom from '../../../../components/controls/InputBaseSearchHomeCustom';
-import SingleSelectSearchCustom from '../../../../components/controls/SingleSelectSearchCustom';
+import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
+import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
 import { useTranslation } from 'react-i18next';
 import {
   resetSearchJobPostFilter,

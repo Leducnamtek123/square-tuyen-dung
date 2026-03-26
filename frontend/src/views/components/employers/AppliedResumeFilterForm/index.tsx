@@ -33,7 +33,7 @@ import {
 
 } from '@fortawesome/free-solid-svg-icons';
 
-import SingleSelectCustom from '../../../../components/controls/SingleSelectCustom';
+import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 
 interface AppliedResumeFilterFormProps {
   handleFilter: (data: any) => void;

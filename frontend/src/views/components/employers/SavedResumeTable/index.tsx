@@ -17,9 +17,9 @@ import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 
 import {CV_TYPES, ROUTES} from '../../../../configs/constants';
 
-import NoDataCard from '../../../../components/NoDataCard';
+import NoDataCard from '../../../../components/Common/NoDataCard';
 
-import DataTableCustom from '../../../../components/DataTableCustom';
+import DataTableCustom from '../../../../components/Common/DataTableCustom';
 
 import { salaryString } from '../../../../utils/customData';
 

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import { TabTitle } from '../../../utils/generalFunction';
 
-import BackdropLoading from '../../../components/loading/BackdropLoading';
+import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
 
 import authService from '../../../services/authService';
 

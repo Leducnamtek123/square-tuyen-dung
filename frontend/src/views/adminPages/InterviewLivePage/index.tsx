@@ -4,9 +4,9 @@ import { Box, Typography, Chip, Stack, Divider, LinearProgress } from "@mui/mate
 
 import interviewService from '../../../services/interviewService';
 import { transformInterviewSession } from '../../../utils/transformers';
-import DataTable from '../../../components/DataTable';
-import AIToolsCard from '../../../components/AIToolsCard';
-import AIServiceHealthBanner from '../../../components/AIServiceHealthBanner';
+import DataTable from '../../../components/Common/DataTable';
+import AIToolsCard from '../../../components/Features/AIToolsCard';
+import AIServiceHealthBanner from '../../../components/Features/AIServiceHealthBanner';
 
 const ACTIVE_STATUSES = ['in_progress', 'calibration', 'processing', 'connecting', 'active'];
 

@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Box, Button, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import PasswordTextFieldCustom from '../../../../components/controls/PasswordTextFieldCustom';
+import PasswordTextFieldCustom from '../../../../components/Common/Controls/PasswordTextFieldCustom';
 
 interface ResetPasswordFormData {
   newPassword?: string;

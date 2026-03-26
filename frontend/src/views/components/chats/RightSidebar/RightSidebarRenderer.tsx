@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Chip, Pagination, Skeleton, Stack, Tooltip, Typography, Theme, Button } from "@mui/material";
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
-import MuiImageCustom from '../../../../components/MuiImageCustom';
+import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 import { useRightSidebarData } from './useRightSidebarData';
 
 const LoadingComponentItem = () => (

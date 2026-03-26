@@ -17,7 +17,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 
 import errorHandling from '../../../../utils/errorHandling';
 
-import BackdropLoading from '../../../../components/loading/BackdropLoading';
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 
 import xlsxUtils from '../../../../utils/xlsxUtils';
 
@@ -25,7 +25,7 @@ import toastMessages from '../../../../utils/toastMessages';
 
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
 
-import FormPopup from '../../../../components/controls/FormPopup';
+import FormPopup from '../../../../components/Common/Controls/FormPopup';
 
 import AppliedResumeFilterForm from '../AppliedResumeFilterForm';
 

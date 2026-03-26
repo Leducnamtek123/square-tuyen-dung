@@ -4,8 +4,8 @@ import { useTranslation } from 'react-i18next';
 import { Card, Button, Stack, IconButton, Box } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import InputBaseSearchCompanyCustom from '../../../../components/controls/InputBaseSearchCompanyCustom';
-import SingleSelectSearchCustom from '../../../../components/controls/SingleSelectSearchCustom';
+import InputBaseSearchCompanyCustom from '../../../../components/Common/Controls/InputBaseSearchCompanyCustom';
+import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
 import {
   resetSearchCompany,
   searchCompany,

@@ -10,9 +10,9 @@ import { useTranslation } from 'react-i18next';
 
 import Grid from "@mui/material/Grid2";
 
-import TextFieldCustom from '../../../../components/controls/TextFieldCustom';
+import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 
-import RatingCustom from '../../../../components/controls/RatingCustom';
+import RatingCustom from '../../../../components/Common/Controls/RatingCustom';
 
 interface FormValues {
   name: string;

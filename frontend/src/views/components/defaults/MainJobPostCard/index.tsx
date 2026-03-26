@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import JobPostLarge from '../../../../components/JobPostLarge';
-import NoDataCard from '../../../../components/NoDataCard';
+import JobPostLarge from '../../../../components/Features/JobPostLarge';
+import NoDataCard from '../../../../components/Common/NoDataCard';
 import { useAppSelector } from '../../../../hooks/useAppStore';
 import { useJobPosts } from './hooks/useJobPosts';
 

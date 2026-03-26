@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
 import { PLATFORM, ROLES_NAME, ROUTES } from '../../../configs/constants';
 import errorHandling from '../../../utils/errorHandling';
-import BackdropLoading from '../../../components/loading/BackdropLoading';
+import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
 import { updateVerifyEmail } from '../../../redux/authSlice';
 import authService from '../../../services/authService';
 import EmployerSignUpForm from '../../components/auths/EmployerSignUpForm';

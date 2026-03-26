@@ -4,8 +4,8 @@ import { AppBar, Avatar, Box, Card, IconButton, Stack, Toolbar, Typography } fro
 import MenuIcon from '@mui/icons-material/Menu';
 import UserMenu from '../../commons/UserMenu';
 import AccountSwitchMenu from '../../commons/AccountSwitchMenu';
-const NotificationCard = React.lazy(() => import('../../../../components/NotificationCard'));
-const ChatCard = React.lazy(() => import('../../../../components/ChatCard'));
+const NotificationCard = React.lazy(() => import('../../../../components/Features/NotificationCard'));
+const ChatCard = React.lazy(() => import('../../../../components/Features/ChatCard'));
 import LanguageSwitcher from '../../commons/LanguageSwitcher';
 
 interface HeaderProps {

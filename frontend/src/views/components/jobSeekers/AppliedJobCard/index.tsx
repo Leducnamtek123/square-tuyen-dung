@@ -4,8 +4,8 @@ import { Box, Stack, Button, Pagination, Chip, Typography } from "@mui/material"
 import DoneIcon from '@mui/icons-material/Done';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import {CV_TYPES, ROUTES} from '../../../../configs/constants';
-import NoDataCard from '../../../../components/NoDataCard';
-import JobPostAction from '../../../../components/JobPostAction';
+import NoDataCard from '../../../../components/Common/NoDataCard';
+import JobPostAction from '../../../../components/Features/JobPostAction';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import jobPostActivityService from '../../../../services/jobPostActivityService';

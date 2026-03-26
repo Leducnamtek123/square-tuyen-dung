@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, Card, Divider } from '@mui/material';
 import Grid from '@mui/material/Grid2';
 import { useTranslation } from 'react-i18next';
-import TimeAgo from '../../../../components/TimeAgo';
+import TimeAgo from '../../../../components/Common/TimeAgo';
 
 interface ExperienceSectionProps {
   profileDetail: any;
