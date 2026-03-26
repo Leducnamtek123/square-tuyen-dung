@@ -8,6 +8,7 @@
 @import 'swiper/css/pagination';
 @import 'swiper/css/autoplay';
 @import 'swiper/css/grid';
+@import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 @font-face {
   font-family: 'Geist Variable';
   font-style: normal;
