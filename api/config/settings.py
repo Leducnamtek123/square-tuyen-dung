@@ -52,11 +52,11 @@ SECRET_KEY = config('SECRET_KEY')
 DEBUG = config('DEBUG', default=False, cast=bool)
 APPEND_SLASH = config('APPEND_SLASH', default=True, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
 
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all origins in Debug mode
-CORS_ALLOWED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default=','.join(CSRF_TRUSTED_ORIGINS), cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
 INTERNAL_IPS = ('127.0.0.1')
 
 # Application definition

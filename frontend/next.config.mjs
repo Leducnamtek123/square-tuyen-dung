@@ -110,14 +110,19 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: '**',
-      },
-      {
-        protocol: 'http',
-        hostname: '**',
-      },
+      // MinIO / S3 object storage
+      { protocol: 'https', hostname: 's3.tuyendung.square.vn' },
+      { protocol: 'http',  hostname: 'minio' },
+      { protocol: 'http',  hostname: 'localhost', port: '9000' },
+      // Main site
+      { protocol: 'https', hostname: 'tuyendung.square.vn' },
+      // Firebase storage
+      { protocol: 'https', hostname: '*.firebasestorage.app' },
+      { protocol: 'https', hostname: 'firebasestorage.googleapis.com' },
+      // Google user avatars
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
+      // Cloudinary (legacy)
+      { protocol: 'https', hostname: 'res.cloudinary.com' },
     ],
   },
 };
