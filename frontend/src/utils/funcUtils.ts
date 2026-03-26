@@ -1,5 +1,6 @@
-﻿import toSlug from './customData';
+import toSlug from './customData';
 import { APP_NAME } from '../configs/constants';
+import { localizeRoutePath } from '../configs/routeLocalization';
 
 const downloadPdf = async (url: string, fileName?: string): Promise<void> => {
   const fileDownloadName = `${APP_NAME}_CV-${toSlug(fileName || 'mytitle')}`;
@@ -22,7 +23,14 @@ export const formatRoute = (
   paramKey = ':slug'
 ): string => {
   const regex = new RegExp(`${paramKey}`, 'g');
-  return route.replace(regex, value);
+  const builtRoute = route.replace(regex, value);
+
+  if (typeof window === 'undefined') {
+    return builtRoute;
+  }
+
+  const language = window.localStorage?.getItem('i18nextLng') || 'vi';
+  return localizeRoutePath(builtRoute, language);
 };
 
 export const buildURL = (hostname: string): string => {

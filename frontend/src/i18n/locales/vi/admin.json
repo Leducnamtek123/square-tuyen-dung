@@ -1,4 +1,12 @@
 {
+  "login": {
+    "slide1Title": "TÌM KIẾM NHÂN TÀI SÁNG GIÁ NHẤT CHO DOANH NGHIỆP CỦA BẠN",
+    "slide1Subtitle": "Tìm kiếm ứng viên tài năng từ hàng ngàn hồ sơ xin việc trong cơ sở dữ liệu trực tuyến.",
+    "slide2Title": "QUẢN LÝ TUYỂN DỤNG THÔNG MINH VÀ HIỆU QUẢ",
+    "slide2Subtitle": "Tối ưu quy trình tuyển dụng với hệ thống quản lý hiện đại và trực quan.",
+    "slide3Title": "HỆ THỐNG QUẢN TRỊ TUYỂN DỤNG TIÊN TIẾN",
+    "slide3Subtitle": "Ứng dụng AI để phân tích, đánh giá và kết nối ứng viên phù hợp nhất."
+  },
   "dashboard": {
     "totalUsers": "Tổng người dùng",
     "jobPosts": "Tin tuyển dụng",

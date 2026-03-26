@@ -22,6 +22,7 @@ import AdminLoginForm from '../../components/auths/JobSeekerLoginForm';
 import authService from '../../../services/authService';
 import tokenService from '../../../services/tokenService';
 import type { RoleName } from '../../../types/auth';
+import { getPreferredLanguage, buildPortalPath } from '../../../configs/portalRouting';
 
 /* ────────────── animations ────────────── */
 const fadeIn = keyframes`
@@ -33,25 +34,6 @@ const slideProgress = keyframes`
   from { width: 0%; }
   to   { width: 100%; }
 `;
-
-/* ────────────── slide data ────────────── */
-const SLIDES = [
-  {
-    image: '/images/admin-login/slide-1.png',
-    title: 'TÌM KIẾM NHÂN TÀI SÁNG GIÁ NHẤT CHO DOANH NGHIỆP CỦA BẠN',
-    subtitle: 'Tìm kiếm ứng viên tài năng từ hàng ngàn hồ sơ xin việc trong cơ sở dữ liệu trực tuyến.',
-  },
-  {
-    image: '/images/admin-login/slide-2.png',
-    title: 'QUẢN LÝ TUYỂN DỤNG THÔNG MINH VÀ HIỆU QUẢ',
-    subtitle: 'Tối ưu quy trình tuyển dụng với hệ thống quản lý hiện đại và trực quan.',
-  },
-  {
-    image: '/images/admin-login/slide-3.png',
-    title: 'HỆ THỐNG QUẢN TRỊ TUYỂN DỤNG TIÊN TIẾN',
-    subtitle: 'Ứng dụng AI để phân tích, đánh giá và kết nối ứng viên phù hợp nhất.',
-  },
-];
 
 const INTERVAL_MS = 5000;
 
@@ -136,13 +118,32 @@ const Dot = styled('button')<{ active: boolean }>(({ active }) => ({
 
 /* ────────────── component ────────────── */
 const AdminLogin: React.FC = () => {
-  const { t } = useTranslation('auth');
-  TabTitle(t('login.adminTitle'));
+  const { t } = useTranslation(['auth', 'admin']);
+  TabTitle(t('auth:login.adminTitle'));
   const dispatch = useDispatch() as any;
   const nav = useRouter();
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
+  /* ── slider data ── */
+  const SLIDES = [
+    {
+      image: '/images/admin-login/slide-1.png',
+      title: t('admin:login.slide1Title', 'TÌM KIẾM NHÂN TÀI SÁNG GIÁ NHẤT CHO DOANH NGHIỆP CỦA BẠN'),
+      subtitle: t('admin:login.slide1Subtitle', 'Tìm kiếm ứng viên tài năng từ hàng ngàn hồ sơ xin việc trong cơ sở dữ liệu trực tuyến.'),
+    },
+    {
+      image: '/images/admin-login/slide-2.png',
+      title: t('admin:login.slide2Title', 'QUẢN LÝ TUYỂN DỤNG THÔNG MINH VÀ HIỆU QUẢ'),
+      subtitle: t('admin:login.slide2Subtitle', 'Tối ưu quy trình tuyển dụng với hệ thống quản lý hiện đại và trực quan.'),
+    },
+    {
+      image: '/images/admin-login/slide-3.png',
+      title: t('admin:login.slide3Title', 'HỆ THỐNG QUẢN TRỊ TUYỂN DỤNG TIÊN TIẾN'),
+      subtitle: t('admin:login.slide3Subtitle', 'Ứng dụng AI để phân tích, đánh giá và kết nối ứng viên phù hợp nhất.'),
+    },
+  ];
 
   /* ── slider state ── */
   const [currentSlide, setCurrentSlide] = React.useState(0);
@@ -153,7 +154,7 @@ const AdminLogin: React.FC = () => {
     timerRef.current = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % SLIDES.length);
     }, INTERVAL_MS);
-  }, []);
+  }, [SLIDES.length]);
 
   React.useEffect(() => {
     resetTimer();
@@ -184,10 +185,14 @@ const AdminLogin: React.FC = () => {
         if (saved) {
           dispatch(getUserInfo())
             .unwrap()
-            .then(() => nav.push('/'))
-            .catch(() => toastMessages.error(t('messages.loginError')));
+            .then(() => {
+              const lang = getPreferredLanguage();
+              const dashboardPath = buildPortalPath('admin', '/dashboard', lang);
+              nav.push(dashboardPath);
+            })
+            .catch(() => toastMessages.error(t('auth:messages.loginError')));
         } else {
-          toastMessages.error(t('messages.loginError'));
+          toastMessages.error(t('auth:messages.loginError'));
         }
       } catch (error: any) {
         const res = error?.response;
@@ -196,7 +201,7 @@ const AdminLogin: React.FC = () => {
           if (errors && 'errorMessage' in errors) {
             setErrorMessage(errors.errorMessage.join(' '));
           } else {
-            toastMessages.error(t('messages.tryAgain'));
+            toastMessages.error(t('auth:messages.tryAgain'));
           }
         }
       } finally {
@@ -221,12 +226,12 @@ const AdminLogin: React.FC = () => {
           nav.push(`/${ROUTES.AUTH.LOGIN}`);
           return;
         } else if (exists === false) {
-          setErrorMessage(t('messages.noAdminAccount'));
+          setErrorMessage(t('auth:messages.noAdminAccount'));
           return;
         }
         getAccessToken(resEmail, password, roleName);
       } catch (error) {
-        toastMessages.error(t('messages.loginError'));
+        toastMessages.error(t('auth:messages.loginError'));
       } finally {
         setIsLoading(false);
       }
@@ -257,19 +262,19 @@ const AdminLogin: React.FC = () => {
               letterSpacing: '-.3px',
             }}
           >
-            Đăng Nhập Quản Trị
+            {t('auth:login.headingAdmin', 'Đăng Nhập Quản Trị')}
           </Typography>
 
           <Typography
             variant="body2"
             sx={{ color: 'text.secondary', mb: 3, lineHeight: 1.6 }}
           >
-            Chào mừng bạn trở lại hệ thống quản trị tuyển dụng
+            {t('auth:login.welcomeBack', 'Chào mừng bạn trở lại hệ thống quản trị tuyển dụng')}
           </Typography>
 
           {errorMessage && (
             <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
-              <AlertTitle sx={{ fontWeight: 600 }}>Lỗi đăng nhập</AlertTitle>
+              <AlertTitle sx={{ fontWeight: 600 }}>{t('auth:login.errorTitle', 'Lỗi đăng nhập')}</AlertTitle>
               {errorMessage}
             </Alert>
           )}

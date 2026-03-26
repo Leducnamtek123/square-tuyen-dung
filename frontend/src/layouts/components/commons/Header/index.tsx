@@ -26,6 +26,7 @@ const ChatCard = React.lazy(() => import("../../../../components/Features/ChatCa
 
 import LanguageSwitcher from "../LanguageSwitcher";
 import { isAdminPortalPath, isEmployerPortalPath } from "../../../../configs/portalRouting";
+import { localizeRoutePath } from "../../../../configs/routeLocalization";
 
 interface HeaderProps {
   [key: string]: any;
@@ -33,14 +34,14 @@ interface HeaderProps {
 
 const Header = (props: HeaderProps) => {
 
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
 
   const pages = React.useMemo(() => ({
 
     [HOST_NAME.PROJECT]: [
-      { id: '1', label: t('nav.jobs'), path: `/${ROUTES.JOB_SEEKER.JOBS}` },
-      { id: '2', label: t('nav.companies'), path: `/${ROUTES.JOB_SEEKER.COMPANY}` },
-      { id: '3', label: t('nav.aboutUs'), path: `/${ROUTES.JOB_SEEKER.ABOUT_US}` },
+      { id: '1', label: t('nav.jobs'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language) },
+      { id: '2', label: t('nav.companies'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, i18n.language) },
+      { id: '3', label: t('nav.aboutUs'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.ABOUT_US}`, i18n.language) },
     ],
     [HOST_NAME.EMPLOYER_PROJECT]: [
       { id: '1', label: t('nav.introduction'), path: `/${ROUTES.EMPLOYER.INTRODUCE}` },
@@ -49,8 +50,7 @@ const Header = (props: HeaderProps) => {
       { id: '4', label: t('nav.support'), path: `/${ROUTES.EMPLOYER.SUPPORT}` },
       { id: '5', label: t('nav.blog'), path: `/${ROUTES.EMPLOYER.BLOG}` },
     ],
-
-  }), [t]);
+  }), [t, i18n.language]);
 
   const theme = useTheme();
 
