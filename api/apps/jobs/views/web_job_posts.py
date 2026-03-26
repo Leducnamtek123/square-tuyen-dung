@@ -38,7 +38,7 @@ class PrivateJobPostViewSet(
         'career',
     ).annotate(
         applied_total=Count('peoples_applied', distinct=True),
-    )
+    ).order_by("-create_at", "-update_at", "-id")
     serializer_class = JobPostSerializer
     renderer_classes = [renderers.MyJSONRenderer]
     pagination_class = paginations.CustomPagination
@@ -272,7 +272,7 @@ class JobPostViewSet(viewsets.GenericViewSet, generics.ListAPIView, generics.Ret
     ).filter(
         status=var_sys.JobPostStatus.APPROVED,
         deadline__gte=datetime.datetime.now().date(),
-    )
+    ).order_by("-create_at", "-update_at", "-id")
     serializer_class = JobPostSerializer
     renderer_classes = [renderers.MyJSONRenderer]
     pagination_class = paginations.CustomPagination
@@ -465,7 +465,9 @@ class JobPostViewSet(viewsets.GenericViewSet, generics.ListAPIView, generics.Ret
 
 
 class AdminJobPostViewSet(viewsets.ModelViewSet):
-    queryset = JobPost.objects.select_related('user', 'company', 'career', 'location').all()
+    queryset = JobPost.objects.select_related('user', 'company', 'career', 'location').all().order_by(
+        "-create_at", "-update_at", "-id"
+    )
     serializer_class = JobPostSerializer
     permission_classes = [perms_custom.IsAdminUser]
     filter_backends = [DjangoFilterBackend, AliasedOrderingFilter, SearchFilter]
