@@ -15,13 +15,13 @@ const languages = [
     code: 'en',
     label: 'English',
     shortLabel: 'EN',
-    flag: 'https://cdn-icons-png.flaticon.com/512/197/197374.png'
+    flag: 'US'
   },
   {
     code: 'vi',
     label: 'Tiếng Việt',
     shortLabel: 'VI',
-    flag: 'https://cdn-icons-png.flaticon.com/512/197/197473.png'
+    flag: 'VN'
   }
 ];
 
@@ -213,9 +213,10 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
         }}
         startIcon={
           <Avatar 
-            src={currentLanguage.flag} 
-            sx={{ width: 20, height: 20, border: `1px solid ${color === 'white' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)'}` }} 
-          />
+            sx={{ width: 20, height: 20, fontSize: 10, bgcolor: 'transparent', border: `1px solid ${color === 'white' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)'}` }}
+          >
+            {currentLanguage.flag}
+          </Avatar>
         }
         endIcon={<KeyboardArrowDownIcon />}
       >
@@ -264,7 +265,7 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
             }}
           >
             <Stack direction="row" spacing={2} alignItems="center">
-              <Avatar src={lang.flag} sx={{ width: 20, height: 20 }} />
+              <Avatar sx={{ width: 20, height: 20, fontSize: 10, bgcolor: 'transparent' }}>{lang.flag}</Avatar>
               <Typography variant="body2" sx={{ fontWeight: currentLangCode === lang.code ? 600 : 400 }}>
                 {lang.label}
               </Typography>
