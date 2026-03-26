@@ -17,6 +17,14 @@ const nextConfig = {
     'react-toastify',
     'sweetalert2',
   ],
+  async redirects() {
+    return [
+      { source: '/admin/bang-dieu-khien', destination: '/admin/dashboard', permanent: false },
+      { source: '/quan-tri/dashboard', destination: '/quan-tri/bang-dieu-khien', permanent: false },
+      { source: '/employer/bang-dieu-khien', destination: '/employer/dashboard', permanent: false },
+      { source: '/nha-tuyen-dung/dashboard', destination: '/nha-tuyen-dung/bang-dieu-khien', permanent: false },
+    ];
+  },
   async rewrites() {
     return [
       { source: '/dang-nhap', destination: '/login' },
