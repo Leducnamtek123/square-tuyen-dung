@@ -1,4 +1,4 @@
-// import "leaflet/dist/leaflet.css";
+import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import markerShadowImport from "leaflet/dist/images/marker-shadow.png";
 import markerIconRetinaImport from "leaflet/dist/images/marker-icon-2x.png";
