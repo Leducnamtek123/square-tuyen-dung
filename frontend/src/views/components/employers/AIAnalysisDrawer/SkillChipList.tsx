@@ -4,7 +4,7 @@ import { Typography, Box, Chip } from '@mui/material';
 export const SkillChipList: React.FC<{
   skills: string[] | string | null | undefined;
   color: 'success' | 'error' | 'default' | 'primary';
-  icon?: React.ReactElement;
+  icon?: React.ReactElement | null;
 }> = ({ skills, color, icon }) => {
   if (!skills) return <Typography variant="body2" sx={{ color: '#94a3b8', fontStyle: 'italic' }}>Không có dữ liệu</Typography>;
 
@@ -25,7 +25,7 @@ export const SkillChipList: React.FC<{
           size="small"
           color={color}
           variant="outlined"
-          icon={icon}
+          icon={icon || undefined}
           sx={{ fontSize: '0.75rem', fontWeight: 500 }}
         />
       ))}

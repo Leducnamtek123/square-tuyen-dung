@@ -10,11 +10,15 @@ export interface AIAnalysisComponentProps {
 }
 
 const renderIcon = (
-  IconComponent: React.ElementType | undefined,
+  IconComponent: any,
   props?: Record<string, any>,
-) : React.ReactElement | undefined => {
-  if (!IconComponent) return undefined;
-  return <IconComponent {...props} />;
+): React.ReactElement | null => {
+  if (!IconComponent) return null;
+  const Component = IconComponent.default || IconComponent;
+  if (typeof Component !== 'function' && typeof Component !== 'string' && typeof Component?.render !== 'function') {
+    return null;
+  }
+  return <Component {...props} />;
 };
 
 const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDrawer }) => {
@@ -37,7 +41,7 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
         placement="top"
       >
         <Chip
-          icon={renderIcon(PsychologyIcon)}
+          icon={renderIcon(PsychologyIcon) || undefined}
           label={`${row.aiAnalysisScore || 0}/100`}
           color={getScoreColor((row.aiAnalysisScore as number) || 0)}
           size="small"
@@ -68,7 +72,7 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
     return (
       <Tooltip title="Phân tích lỗi. Bấm để xem chi tiết" arrow>
         <Chip
-          icon={renderIcon(AutoFixHighIcon)}
+          icon={renderIcon(AutoFixHighIcon) || undefined}
           label={t('appliedResume.ai.retry', 'Thử lại')}
           color="error"
           size="small"

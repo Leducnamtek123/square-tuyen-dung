@@ -39,11 +39,17 @@ interface AIAnalysisDrawerProps {
 }
 
 const renderIcon = (
-  IconComponent: React.ElementType | undefined,
+  IconComponent: any,
   props?: Record<string, any>,
-): React.ReactElement | undefined => {
-  if (!IconComponent) return undefined;
-  return <IconComponent {...props} />;
+): React.ReactElement | null => {
+  if (!IconComponent) return null;
+  // Handle ESM default export interop
+  const Component = IconComponent.default || IconComponent;
+  // Final check to prevent Error #130 if Component is still invalid
+  if (typeof Component !== 'function' && typeof Component !== 'string' && typeof Component?.render !== 'function') {
+    return null;
+  }
+  return <Component {...props} />;
 };
 
 const DRAWER_WIDTH = 520;
@@ -482,11 +488,11 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
               </SectionCard>
 
               <SectionCard title="Ky nang phu hop voi JD" icon={renderIcon(CheckCircleIcon, { fontSize: 'small' })} iconColor="#22c55e">
-                <SkillChipList skills={data?.aiAnalysisMatchingSkills} color="success" icon={renderIcon(CheckCircleIcon)} />
+                <SkillChipList skills={data?.aiAnalysisMatchingSkills} color="success" icon={renderIcon(CheckCircleIcon) || undefined} />
               </SectionCard>
 
               <SectionCard title="Ky nang con thieu" icon={renderIcon(CancelIcon, { fontSize: 'small' })} iconColor="#f97316">
-                <SkillChipList skills={data?.aiAnalysisMissingSkills} color="error" icon={renderIcon(CancelIcon)} />
+                <SkillChipList skills={data?.aiAnalysisMissingSkills} color="error" icon={renderIcon(CancelIcon) || undefined} />
               </SectionCard>
 
               <SectionCard title="Tat ca ky nang" icon={renderIcon(AutoFixHighIcon, { fontSize: 'small' })} iconColor="#3b82f6">
