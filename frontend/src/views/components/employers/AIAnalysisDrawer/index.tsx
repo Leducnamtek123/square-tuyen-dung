@@ -89,6 +89,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
   const [loading, setLoading] = React.useState(false);
   const [analyzing, setAnalyzing] = React.useState(false);
   const [scanProgress, setScanProgress] = React.useState(0);
+  const [scanLinePosition, setScanLinePosition] = React.useState(-12);
 
   React.useEffect(() => {
     setData(initialData || null);
@@ -141,14 +142,28 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
     if (!open) return;
 
     if (data?.aiAnalysisStatus === 'processing') {
-      const interval = setInterval(() => {
-        setScanProgress((prev) => {
-          if (prev >= 95) return 95;
-          const next = prev + Math.floor(Math.random() * 8) + 3;
-          return next > 95 ? 95 : next;
-        });
-      }, 700);
-      return () => clearInterval(interval);
+      let isActive = true;
+      let rafId = 0;
+      const startAt = performance.now();
+      const durationMs = 22000;
+
+      const animateProgress = (now: number) => {
+        if (!isActive) return;
+        const elapsed = now - startAt;
+        const target = Math.min(95, (elapsed / durationMs) * 95);
+        setScanProgress((prev) => (target > prev ? target : prev));
+        if (target < 95) {
+          rafId = requestAnimationFrame(animateProgress);
+        }
+      };
+
+      setScanProgress((prev) => Math.max(prev, 4));
+      rafId = requestAnimationFrame(animateProgress);
+
+      return () => {
+        isActive = false;
+        cancelAnimationFrame(rafId);
+      };
     }
 
     if (data?.aiAnalysisStatus === 'completed') {
@@ -157,6 +172,34 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
     }
 
     setScanProgress(0);
+  }, [open, data?.aiAnalysisStatus]);
+
+  React.useEffect(() => {
+    if (!open || data?.aiAnalysisStatus !== 'processing') {
+      if (data?.aiAnalysisStatus !== 'completed') {
+        setScanLinePosition(-12);
+      }
+      return;
+    }
+
+    let isActive = true;
+    let rafId = 0;
+    const startAt = performance.now();
+    const cycleMs = 2600;
+
+    const animateScanLine = (now: number) => {
+      if (!isActive) return;
+      const phase = ((now - startAt) % cycleMs) / cycleMs;
+      setScanLinePosition(-12 + phase * 124);
+      rafId = requestAnimationFrame(animateScanLine);
+    };
+
+    rafId = requestAnimationFrame(animateScanLine);
+
+    return () => {
+      isActive = false;
+      cancelAnimationFrame(rafId);
+    };
   }, [open, data?.aiAnalysisStatus]);
 
   const handleAnalyze = async () => {
@@ -293,12 +336,11 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                       position: 'absolute',
                       left: 0,
                       right: 0,
-                      top: `calc(${scanProgress}% - 18px)`,
+                      top: `calc(${scanLinePosition}% - 18px)`,
                       height: 34,
                       background:
                         'linear-gradient(180deg, rgba(34,211,238,0) 0%, rgba(34,211,238,0.58) 45%, rgba(34,211,238,0) 100%)',
                       boxShadow: '0 0 22px rgba(34,211,238,0.68), 0 0 46px rgba(34,211,238,0.32)',
-                      transition: 'top 0.65s cubic-bezier(0.2, 0.8, 0.2, 1)',
                       pointerEvents: 'none',
                     }}
                   />
