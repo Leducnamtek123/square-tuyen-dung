@@ -1,4 +1,8 @@
 /** @type {import('next').NextConfig} */
+// ────────────────────────────────────────────────────────────────────────────
+// Rewrite & redirect rules below mirror the canonical route definitions in
+//   src/configs/routeConfig.ts — keep both files in sync.
+// ────────────────────────────────────────────────────────────────────────────
 const nextConfig = {
   reactStrictMode: true,
   // TypeScript is now fully typed and strict
@@ -23,6 +27,7 @@ const nextConfig = {
   },
   async rewrites() {
     return [
+      // ── Job Seeker (root level) ──
       { source: '/dang-nhap', destination: '/login' },
       { source: '/dang-ky', destination: '/register' },
       { source: '/quen-mat-khau', destination: '/forgot-password' },
@@ -47,6 +52,7 @@ const nextConfig = {
       { source: '/tai-khoan', destination: '/account' },
       { source: '/ket-noi-voi-nha-tuyen-dung', destination: '/chat' },
 
+      // ── Employer (/nha-tuyen-dung → /employer) ──
       { source: '/nha-tuyen-dung/login', destination: '/employer/login' },
       { source: '/nha-tuyen-dung/register', destination: '/employer/register' },
       { source: '/nha-tuyen-dung/forgot-password', destination: '/employer/forgot-password' },
@@ -73,13 +79,13 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/ngan-hang-cau-hoi', destination: '/employer/question-bank' },
       { source: '/nha-tuyen-dung/bo-cau-hoi', destination: '/employer/question-groups' },
       { source: '/nha-tuyen-dung/xac-thuc-nha-tuyen-dung', destination: '/employer/verification' },
-
       { source: '/nha-tuyen-dung/phong-van-ung-vien-truc-tiep', destination: '/employer/interviews/live' },
       { source: '/nha-tuyen-dung/phong-van-truc-tiep/:id', destination: '/employer/interviews/:id' },
       { source: '/nha-tuyen-dung/len-lich-phong-van', destination: '/employer/interviews/create' },
       { source: '/nha-tuyen-dung/chi-tiet-phong-van/:id', destination: '/employer/interviews/:id' },
       { source: '/nha-tuyen-dung/:path*', destination: '/employer/:path*' },
 
+      // ── Admin (/quan-tri → /admin) ──
       { source: '/admin/bang-dieu-khien', destination: '/admin/dashboard' },
       { source: '/quan-tri/bang-dieu-khien', destination: '/admin/dashboard' },
       { source: '/quan-tri/quan-ly-nguoi-dung', destination: '/admin/users' },
@@ -98,9 +104,10 @@ const nextConfig = {
       { source: '/quan-tri/nhat-ky-tin-tuyen-dung', destination: '/admin/job-activity' },
       { source: '/quan-tri/thong-bao-viec-lam', destination: '/admin/job-notifications' },
       { source: '/quan-tri/phong-van-cong-ty-truc-tiep', destination: '/admin/interviews/live' },
-
       { source: '/quan-tri', destination: '/admin/dashboard' },
       { source: '/quan-tri/:path*', destination: '/admin/:path*' },
+
+      // ── Candidate Interview ──
       { source: '/phong-van/room/:id', destination: '/interview/:id' },
       { source: '/phong-van/:path*', destination: '/interview/:path*' },
     ];

@@ -1,4 +1,4 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 
 type AnyRecord = Record<string, unknown>;
 
@@ -42,10 +42,6 @@ const interviewService = {
     return httpRequest.get(url);
   },
 
-  getLiveKitTokenByInviteToken: (inviteToken: string): Promise<unknown> => {
-    const url = `interview/web/sessions/invite/${inviteToken}/livekit-token/`;
-    return httpRequest.get(url);
-  },
 
   triggerAiEvaluation: (id: IdType): Promise<unknown> => {
     const url = `interview/web/sessions/${id}/evaluate-ai/`;

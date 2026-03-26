@@ -1,23 +1,19 @@
-import axios from 'axios';
+import httpRequest from '../utils/httpRequest';
 
 type AnyRecord = Record<string, unknown>;
-
-const baseURL = process.env.NEXT_PUBLIC_API_BASE || '/api/';
 
 const aiService = {
   tts: async (payload: AnyRecord): Promise<Blob> => {
     const url = 'ai/tts/';
-    const response = await axios.post(url, payload, {
-      baseURL,
+    const response = await httpRequest.post(url, payload, {
       responseType: 'arraybuffer',
       headers: {
         'Content-Type': 'application/json',
       },
-      withCredentials: true,
     });
-    const contentType =
-      response.headers?.['content-type'] || 'audio/mpeg';
-    return new Blob([response.data], { type: contentType });
+    // httpRequest interceptor unwraps .data, so response IS the arraybuffer
+    const raw = response as unknown as ArrayBuffer;
+    return new Blob([raw], { type: 'audio/mpeg' });
   },
 
   transcribe: async (file: File, params: AnyRecord = {}): Promise<AnyRecord> => {
@@ -26,14 +22,12 @@ const aiService = {
     formData.append('audio', file);
     if (params.model) formData.append('model', String(params.model));
     if (params.language) formData.append('language', String(params.language));
-    const response = await axios.post(url, formData, {
-      baseURL,
-      withCredentials: true,
+    const response = await httpRequest.post(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return response.data?.data ?? response.data;
+    return (response as unknown as AnyRecord) ?? {};
   },
 };
 

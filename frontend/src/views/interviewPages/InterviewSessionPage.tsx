@@ -95,7 +95,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         throw new Error(t("errors.tokenMissing"));
       }
 
-      const tokenData = await interviewService.getLiveKitTokenByInviteToken(inviteToken) as any;
+      const tokenData = await interviewService.getLiveKitToken(inviteToken) as any;
       const mappedSession = transformInterviewSession(detailRaw);
 
       if (!tokenData?.token) {
