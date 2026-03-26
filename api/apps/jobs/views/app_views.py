@@ -78,7 +78,7 @@ class JobPostViewSet(viewsets.ViewSet,
     queryset = JobPost.objects.select_related(
         'company', 'company__logo', 'company__cover_image', 'company__user',
         'location', 'location__city', 'career'
-    ).all()
+    ).all().order_by("-create_at", "-update_at", "-id")
 
     serializer_class = JobPostSerializer
 
