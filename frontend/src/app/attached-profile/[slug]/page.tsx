@@ -1,6 +1,6 @@
 'use client';
 
-
+import DefaultLayout from '@/layouts/DefaultLayout';
 import dynamic from 'next/dynamic';
 
 const AttachedProfilePage = dynamic(
@@ -9,5 +9,9 @@ const AttachedProfilePage = dynamic(
 );
 
 export default function Page() {
-  return <AttachedProfilePage />;
+  return (
+    <DefaultLayout>
+      <AttachedProfilePage />
+    </DefaultLayout>
+  );
 }

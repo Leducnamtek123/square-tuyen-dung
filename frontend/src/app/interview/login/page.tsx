@@ -1,7 +1,12 @@
 'use client';
 
+import DefaultLayout from '@/layouts/DefaultLayout';
 import CandidateLoginPage from '@/views/jobSeekerPages/CandidateLoginPage';
 
 export default function Page() {
-  return <CandidateLoginPage />;
+  return (
+    <DefaultLayout>
+      <CandidateLoginPage />
+    </DefaultLayout>
+  );
 }
