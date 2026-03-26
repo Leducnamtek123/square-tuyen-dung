@@ -172,7 +172,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
       try {
         const resData = await goongService.getPlaces(input) as any;
         if (resData.predictions) setLocationOptions(resData.predictions);
-      } catch (error) {}
+      } catch (error) { }
     };
     loadLocation(addressDebounce);
   }, [addressDebounce]);
@@ -210,7 +210,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
       if (!resData?.result?.geometry?.location) return;
       setValue('company.location.lat', resData?.result?.geometry.location.lat?.toString() || '');
       setValue('company.location.lng', resData?.result?.geometry.location.lng?.toString() || '');
-    } catch (error) {}
+    } catch (error) { }
   };
 
   React.useEffect(() => {
@@ -218,7 +218,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
       try {
         const resData = await commonService.getDistrictsByCityId(cityId) as any;
         if (districtOptions.length > 0) setValue('company.location.district', '' as any);
-        setDistrictOptions(resData.data);
+        setDistrictOptions(resData);
       } catch (error) {
         errorHandling(error as AxiosError<any>, undefined);
       }

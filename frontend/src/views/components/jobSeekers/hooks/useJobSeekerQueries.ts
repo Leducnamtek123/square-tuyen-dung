@@ -18,7 +18,7 @@ export const useSavedJobs = (params: AnyRecord) => {
         queryKey: ['savedJobs', params],
         queryFn: async () => {
             const response = await jobService.getJobPostsSaved(params) as any;
-            return response.data;
+            return response;
         },
         placeholderData: keepPreviousData,
     });
@@ -41,7 +41,7 @@ export const useCompaniesFollowed = (params: AnyRecord) => {
         queryKey: ['companiesFollowed', params],
         queryFn: async () => {
             const response = await companyFollowed.getCompaniesFollowed(params) as any;
-            return response.data;
+            return response;
         },
         placeholderData: keepPreviousData,
     });
@@ -64,7 +64,7 @@ export const useResumeViewed = (params: AnyRecord) => {
         queryKey: ['resumeViewed', params],
         queryFn: async () => {
             const response = await resumeViewedService.getResumeViewed(params) as any;
-            return response.data;
+            return response;
         },
         placeholderData: keepPreviousData,
     });
@@ -76,7 +76,7 @@ export const useJobSeekerTotalView = () => {
         queryKey: ['jobSeekerTotalView'],
         queryFn: async () => {
             const response = await statisticService.jobSeekerTotalView();
-            return response.data;
+            return response;
         },
     });
 };
@@ -86,7 +86,7 @@ export const useJobSeekerActivityStatistics = () => {
         queryKey: ['jobSeekerActivityStatistics'],
         queryFn: async () => {
             const response = await statisticService.jobSeekerActivityStatistics();
-            return response.data;
+            return response;
         },
     });
 };
@@ -109,7 +109,7 @@ export const useJobPostNotifications = (params: AnyRecord) => {
         queryKey: ['jobPostNotifications', params],
         queryFn: async () => {
             const response = await jobPostNotificationService.getJobPostNotifications(params) as any;
-            return response.data;
+            return response;
         },
         placeholderData: keepPreviousData,
     });
@@ -146,7 +146,7 @@ export const useUserSettings = (enabled: boolean = true) => {
         queryKey: ['userSettings'],
         queryFn: async () => {
             const response = await authService.getUserSettings() as any;
-            return response.data;
+            return response;
         },
         enabled,
     });
@@ -157,7 +157,7 @@ export const useUpdateUserSettings = () => {
     return useMutation({
         mutationFn: (data: any) => authService.updateUserSettings(data),
         onSuccess: (response: any) => {
-            queryClient.setQueryData(['userSettings'], response.data);
+            queryClient.setQueryData(['userSettings'], response);
             toastMessages.success("Settings updated successfully.");
         },
         onError: () => {

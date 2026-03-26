@@ -11,7 +11,7 @@ import Grid from "@mui/material/Grid2";
 
 import PublishIcon from "@mui/icons-material/Publish";
 
-import {CV_TYPES} from "../../../../configs/constants";
+import { CV_TYPES } from "../../../../configs/constants";
 
 import toastMessages from "../../../../utils/toastMessages";
 
@@ -92,7 +92,7 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
         ) as any;
 
-        setResumes(resData.data);
+        setResumes(resData);
 
       } catch (error: any) {
 

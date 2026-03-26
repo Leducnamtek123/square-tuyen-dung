@@ -249,7 +249,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
         if (districtOptions.length > 0) setValue('location.district', '');
 
-        setDistrictOptions(resData.data); 
+        setDistrictOptions(resData);
 
       } catch (error: any) {
 
@@ -267,7 +267,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
     }
 
-     
+
 
   }, [cityId, setValue, districtOptions.length]);
 

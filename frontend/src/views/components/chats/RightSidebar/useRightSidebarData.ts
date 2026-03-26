@@ -21,7 +21,7 @@ export const useRightSidebarData = (fetchData: (params: any) => Promise<any>, pa
       setIsLoading(true);
       try {
         const resData = (await fetchData({ page, pageSize })) as any;
-        const data = resData.data;
+        const data = resData;
         setCount(data.count);
         setDataList(data.results);
       } catch (error) {

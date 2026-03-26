@@ -63,7 +63,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
       try {
         const resData = await commonService.getDistrictsByCityId(cityId);
         if (districtOptions.length > 0) setValue('location.district', '');
-        setDistrictOptions(resData.data);
+        setDistrictOptions(resData);
       } catch (error: any) {
         errorHandling(error);
       }

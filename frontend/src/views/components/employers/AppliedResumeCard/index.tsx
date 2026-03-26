@@ -250,7 +250,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
         ) as any;
 
-        const data = resData.data;
+        const data = resData;
 
         xlsxUtils.exportToXLSX(data, 'AppliedProfilesList');
 
@@ -362,21 +362,21 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
   return (
 
-    <Box sx={{ 
+    <Box sx={{
 
-      px: { xs: 1, sm: 2 }, 
+      px: { xs: 1, sm: 2 },
 
-      py: { xs: 2, sm: 2 }, 
+      py: { xs: 2, sm: 2 },
 
-      backgroundColor: 'background.paper', 
+      backgroundColor: 'background.paper',
 
-      borderRadius: 2 
+      borderRadius: 2
 
     }}>
 
       {/* Header Section */}
 
-      <Stack 
+      <Stack
 
         direction={{ xs: 'column', sm: 'row' }}
 
@@ -390,11 +390,11 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
       >
 
-        <Typography 
+        <Typography
 
-          variant="h5" 
+          variant="h5"
 
-          sx={{ 
+          sx={{
 
             fontWeight: 600,
 
@@ -450,11 +450,11 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
       <Box sx={{ mb: 3 }}>
 
-        <Typography 
+        <Typography
 
-          variant="subtitle1" 
+          variant="subtitle1"
 
-          sx={{ 
+          sx={{
 
             color: 'text.secondary',
 
@@ -502,9 +502,9 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
               renderInput={(params) => (
 
-                <TextField 
+                <TextField
 
-                  {...params} 
+                  {...params}
 
                   placeholder={t('appliedResume.allJobPosts')}
 
@@ -616,7 +616,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
               <Tooltip title={t('common:reset')} arrow>
 
-                <IconButton 
+                <IconButton
 
                   onClick={handleResetFilterData}
 
@@ -690,7 +690,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
         <Box sx={{ width: '100%', mb: 2 }}>
 
-          <LinearProgress 
+          <LinearProgress
 
             color="primary"
 

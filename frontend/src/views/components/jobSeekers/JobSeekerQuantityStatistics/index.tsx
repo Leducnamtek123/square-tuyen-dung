@@ -53,7 +53,7 @@ const JobSeekerQuantityStatistics = () => {
     queryKey: ['job-seeker-statistics'],
     queryFn: async () => {
       const resData = await statisticService.jobSeekerGeneralStatistics();
-      return resData.data;
+      return resData;
     },
     staleTime: 3 * 60_000, // stats change infrequently
   });

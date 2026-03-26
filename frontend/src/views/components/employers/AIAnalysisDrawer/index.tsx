@@ -112,7 +112,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
       setLoading(true);
       try {
         const res = await jobPostActivityService.getJobPostActivityDetail(activityId);
-        setData((res as any)?.data || null);
+        setData(res || null);
       } catch {
         // use initial data if fetch fails
       } finally {
@@ -130,7 +130,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
     const interval = setInterval(async () => {
       try {
         const res = await jobPostActivityService.getJobPostActivityDetail(activityId);
-        const newData = (res as any)?.data;
+        const newData = res as any;
         if (newData) {
           setData(newData);
         }

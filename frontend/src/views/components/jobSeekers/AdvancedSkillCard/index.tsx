@@ -88,11 +88,11 @@ const Loading = (
 
         .fill(0)
 
-        .map((_, index) => (          <Box sx={{ py: 0.5 }} key={index}>
+        .map((_, index) => (<Box sx={{ py: 0.5 }} key={index}>
 
-            <Skeleton height={30} />
+          <Skeleton height={30} />
 
-          </Box>
+        </Box>
 
         ))}
 
@@ -135,7 +135,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
         const resData = await resumeService.getAdvancedSkills(slug) as any;
 
-        setAdvancedSkills(resData.data);
+        setAdvancedSkills(resData);
 
       } catch (error: any) {
 
@@ -165,7 +165,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
         const resData = await advancedSkillService.getAdvancedSkillById(skillId) as any;
 
-        setEditData(resData.data);
+        setEditData(resData);
 
         setOpenPopup(true);
 
@@ -381,7 +381,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
             </Box>
 
-            <Divider sx={{ my: 0, borderColor: 'grey.500' }}/>
+            <Divider sx={{ my: 0, borderColor: 'grey.500' }} />
 
             <Box>
 
@@ -397,7 +397,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
               ) : (
 
-                <TableContainer 
+                <TableContainer
 
                   sx={{
 
@@ -415,7 +415,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
                       <TableRow>
 
-                        <TableCell 
+                        <TableCell
 
                           align="left"
 
@@ -439,7 +439,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
                         </TableCell>
 
-                        <TableCell 
+                        <TableCell
 
                           align="left"
 
@@ -463,7 +463,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
                         </TableCell>
 
-                        <TableCell 
+                        <TableCell
 
                           align="right"
 
@@ -515,7 +515,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
                         >
 
-                          <TableCell 
+                          <TableCell
 
                             align="left"
 

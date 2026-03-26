@@ -135,9 +135,9 @@ const Loading = (
 
 const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
-    const { t } = useTranslation(['jobSeeker', 'common']);
+  const { t } = useTranslation(['jobSeeker', 'common']);
 
-    const { slug: resumeSlug } = useParams<{ slug: string }>();
+  const { slug: resumeSlug } = useParams<{ slug: string }>();
 
   const [openPopup, setOpenPopup] = React.useState(false);
 
@@ -164,7 +164,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
         const resData = await resumeService.getExperiencesDetail(slug) as any;
 
-        setExperiencesDetail(resData.data);
+        setExperiencesDetail(resData);
 
       } catch (error: any) {
 
@@ -196,7 +196,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
         ) as any;
 
-        setEditData(resData.data);
+        setEditData(resData);
 
         setOpenPopup(true);
 
@@ -508,13 +508,13 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
                           >
 
-                            <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY"/>{" "}
+                            <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY" />{" "}
 
                             -{" "}
 
                             {value.endDate ? (
 
-                              <TimeAgo date={value.endDate} type="format" format="DD/MM/YYYY"/>
+                              <TimeAgo date={value.endDate} type="format" format="DD/MM/YYYY" />
 
                             ) : (
 

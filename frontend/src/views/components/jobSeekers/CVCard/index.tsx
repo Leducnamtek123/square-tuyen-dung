@@ -102,7 +102,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-        setCv(resData.data);
+        setCv(resData);
 
 
 
@@ -387,7 +387,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-        <Divider sx={{ my: 3, borderColor: 'grey.500' }}/>
+        <Divider sx={{ my: 3, borderColor: 'grey.500' }} />
 
 
 

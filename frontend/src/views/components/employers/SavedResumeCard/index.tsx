@@ -149,7 +149,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
       setIsFullScreenLoading(true);
       try {
         const resData = await resumeSavedService.exportResumesSaved(params) as any;
-        const data = resData.data;
+        const data = resData;
         xlsxUtils.exportToXLSX(data, 'SavedResumesList');
       } catch (error: any) {
         errorHandling(error);
@@ -165,23 +165,23 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
   };
 
   return (
-    <Box sx={{ 
-      px: { xs: 1, sm: 2 }, 
-      py: { xs: 2, sm: 2 }, 
-      backgroundColor: 'background.paper', 
-      borderRadius: 2 
+    <Box sx={{
+      px: { xs: 1, sm: 2 },
+      py: { xs: 2, sm: 2 },
+      backgroundColor: 'background.paper',
+      borderRadius: 2
     }}>
       {/* Header Section */}
-      <Stack 
+      <Stack
         direction={{ xs: 'column', sm: 'row' }}
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         justifyContent="space-between"
         spacing={{ xs: 2, sm: 0 }}
         mb={4}
       >
-        <Typography 
-          variant="h5" 
-          sx={{ 
+        <Typography
+          variant="h5"
+          sx={{
             fontWeight: 600,
             background: 'primary.main',
             WebkitBackgroundClip: 'text',
@@ -210,9 +210,9 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
 
       {/* Filter Section */}
       <Box sx={{ mb: 3 }}>
-        <Typography 
-          variant="subtitle1" 
-          sx={{ 
+        <Typography
+          variant="subtitle1"
+          sx={{
             color: 'text.secondary',
             fontWeight: 600,
             mb: 2
@@ -225,7 +225,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
           borderRadius: 2,
           width: '100%'
         }}>
-          <SavedResumeFilterForm 
+          <SavedResumeFilterForm
             handleFilter={handleFilter}
           />
         </Box>
@@ -237,7 +237,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
 
         <Box sx={{ width: '100%', mb: 2 }}>
 
-          <LinearProgress 
+          <LinearProgress
 
             color="primary"
 

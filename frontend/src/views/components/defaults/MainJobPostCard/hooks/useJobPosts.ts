@@ -11,7 +11,7 @@ export const useJobPosts = (params: AnyRecord, page: number) => {
                 ...params,
                 page,
             });
-            return response.data;
+            return response;
         },
         placeholderData: keepPreviousData,
     });
@@ -22,7 +22,7 @@ export const useSuggestedJobPosts = (params: AnyRecord, enabled: boolean = true)
         queryKey: ['suggestedJobPosts', params],
         queryFn: async () => {
             const response = await jobService.getSuggestedJobPosts(params);
-            return response.data;
+            return response;
         },
         placeholderData: keepPreviousData,
         enabled,

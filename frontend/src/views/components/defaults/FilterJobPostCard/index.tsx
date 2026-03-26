@@ -63,8 +63,8 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
         page: page,
       }) as any;
       return {
-        results: resData.data.results || [],
-        count: resData.data.count || 0,
+        results: resData?.results || [],
+        count: resData?.count || 0,
       };
     },
     staleTime: 5 * 60_000,
@@ -114,7 +114,7 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
                 </Grid>
               ))}
             </Grid>
-            <Stack sx={{mt: 4}}>
+            <Stack sx={{ mt: 4 }}>
               {Math.ceil(count / pageSize) > 1 && (
                 <Pagination
                   color="primary"

@@ -165,7 +165,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
         const resData = await resumeService.getEducationsDetail(slug) as any;
 
-        setEducationsDetail(resData.data);
+        setEducationsDetail(resData);
 
       } catch (error: any) {
 
@@ -193,7 +193,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
         const resData = await educationDetailService.getEducationDetailById(eduId) as any;
 
-        setEditData(resData.data);
+        setEditData(resData);
 
         setOpenPopup(true);
 
@@ -425,7 +425,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
             </Box>
 
-            <Divider sx={{ my: 0, borderColor: 'grey.500' }}/>
+            <Divider sx={{ my: 0, borderColor: 'grey.500' }} />
 
             <Box>
 
@@ -465,7 +465,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                       <TimelineSeparator>
 
-                        <TimelineDot 
+                        <TimelineDot
 
                           sx={{
 
@@ -485,7 +485,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                         <Box sx={{ p: 1 }}>
 
-                          <Typography 
+                          <Typography
 
                             variant="body2"
 
@@ -495,13 +495,13 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                           >
 
-                            <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY"/>{' '}
+                            <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY" />{' '}
 
                             -{' '}
 
                             {value.completedDate ? (
 
-                              <TimeAgo date={value.completedDate} type="format" format="DD/MM/YYYY"/>
+                              <TimeAgo date={value.completedDate} type="format" format="DD/MM/YYYY" />
 
                             ) : (
 
@@ -517,7 +517,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                             gutterBottom
 
-                            sx={{ 
+                            sx={{
 
                               fontWeight: 'bold',
 
@@ -531,11 +531,11 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                           </Typography>
 
-                          <Typography 
+                          <Typography
 
                             variant="body1"
 
-                            sx={{ 
+                            sx={{
 
                               color: 'text.secondary',
 
@@ -549,11 +549,11 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                           </Typography>
 
-                          <Typography 
+                          <Typography
 
                             variant="body2"
 
-                            sx={{ 
+                            sx={{
 
                               color: 'text.secondary',
 
@@ -629,9 +629,9 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                           </Stack>
 
-                          <Accordion 
+                          <Accordion
 
-                            sx={{ 
+                            sx={{
 
                               boxShadow: 'none',
 
@@ -651,9 +651,9 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                               expandIcon={
 
-                                <ExpandMoreIcon 
+                                <ExpandMoreIcon
 
-                                  sx={{ 
+                                  sx={{
 
                                     color: 'primary.main',
 
@@ -667,7 +667,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                             >
 
-                              <Typography 
+                              <Typography
 
                                 variant="body2"
 

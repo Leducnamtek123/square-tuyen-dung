@@ -3,7 +3,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
 import { Box, Card, Pagination, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import {} from '../../../../configs/constants';
+import { } from '../../../../configs/constants';
 import NoDataCard from '../../../../components/Common/NoDataCard';
 import errorHandling from '../../../../utils/errorHandling';
 import toastMessages from '../../../../utils/toastMessages';
@@ -61,7 +61,7 @@ const ProfileCard = () => {
   const handleSave = (slug: string) => {
     saveMutation.mutate(slug, {
       onSuccess: (resData: any) => {
-        const isSaved = resData.data.isSaved;
+        const isSaved = resData.isSaved;
         toastMessages.success(
           isSaved ? t('profileCard.messages.saveSuccess') : t('profileCard.messages.unsaveSuccess')
         );

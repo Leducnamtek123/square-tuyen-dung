@@ -22,12 +22,12 @@ const LazyPdf = lazy(() => import("../../../../components/Common/Pdf"));
 const ProfileDetailCard: React.FC = () => {
   const { t } = useTranslation('employer');
   const { slug } = useParams<{ slug: string }>();
-  
+
   const { data: profileDetail, isLoading } = useQuery({
     queryKey: ['resumeDetail', slug],
     queryFn: async () => {
       const resData = await resumeService.getResumeDetail(slug as string) as any;
-      return resData.data;
+      return resData;
     },
     enabled: !!slug,
   });

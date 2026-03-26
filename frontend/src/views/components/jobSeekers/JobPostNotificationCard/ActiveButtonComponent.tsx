@@ -18,7 +18,7 @@ const ActiveButtonComponent = ({ id, isActive }: ActiveButtonComponentProps) => 
       setIsFullScreenLoading(true);
       try {
         const resData = await jobPostNotificationService.active(id) as any;
-        const data = resData.data;
+        const data = resData;
         setChecked(data.isActive);
       } catch (error: any) {
         errorHandling(error);

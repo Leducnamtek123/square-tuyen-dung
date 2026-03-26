@@ -46,7 +46,7 @@ const SavedJobCard = () => {
   const handleSave = (slug: string) => {
     toggleSave.mutate(slug, {
       onSuccess: (resData: any) => {
-        const isSaved = resData.data.isSaved;
+        const isSaved = resData.isSaved;
         toastMessages.success(
           isSaved ? t('jobSeeker:jobManagement.messages.saved') : t('jobSeeker:jobManagement.messages.unsaved')
         );

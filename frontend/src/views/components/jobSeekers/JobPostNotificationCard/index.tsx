@@ -51,7 +51,7 @@ const JobPostNotificationCard = () => {
     setIsFullScreenLoading(true);
     try {
       const resData = await jobPostNotificationService.getJobPostNotificationDetailById(id) as any;
-      setEditData(resData.data);
+      setEditData(resData);
       setOpenPopup(true);
     } catch (error: any) {
       errorHandling(error);

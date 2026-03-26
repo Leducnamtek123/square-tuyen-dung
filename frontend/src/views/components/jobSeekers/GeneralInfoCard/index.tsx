@@ -139,75 +139,75 @@ const Loading = (
 
 const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
-    const { t } = useTranslation(['jobSeeker', 'common']);
+  const { t } = useTranslation(['jobSeeker', 'common']);
 
-    const { slug: resumeSlug } = useParams<{ slug: string }>();
+  const { slug: resumeSlug } = useParams<{ slug: string }>();
 
-    const { allConfig } = useConfig();
+  const { allConfig } = useConfig();
 
-    const [openPopup, setOpenPopup] = React.useState(false);
+  const [openPopup, setOpenPopup] = React.useState(false);
 
-    const [isSuccess, setIsSuccess] = React.useState(false);
+  const [isSuccess, setIsSuccess] = React.useState(false);
 
-    const [isLoadingResumeDetail, setIsLoadingResumeDetail] =
+  const [isLoadingResumeDetail, setIsLoadingResumeDetail] =
 
-        React.useState(true);
+    React.useState(true);
 
-    const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
+  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-    const [resumeDetail, setResumeDetail] = React.useState<ResumeDetail | null>(null);
+  const [resumeDetail, setResumeDetail] = React.useState<ResumeDetail | null>(null);
 
-    const renderItem = (itemTitle: string, value: string | number | null) => {
+  const renderItem = (itemTitle: string, value: string | number | null) => {
 
-        return (
+    return (
 
-            <Box sx={{
+      <Box sx={{
 
-                p: 1,
+        p: 1,
 
-                backgroundColor: 'background.paper',
+        backgroundColor: 'background.paper',
 
-            }}>
+      }}>
 
-                <Typography
+        <Typography
 
-                    sx={{
+          sx={{
 
-                        fontWeight: 600,
+            fontWeight: 600,
 
-                        color: 'primary.main',
+            color: 'primary.main',
 
-                        fontSize: '0.875rem',
+            fontSize: '0.875rem',
 
-                        mb: 1
+            mb: 1
 
-                    }}
+          }}
 
-                >
+        >
 
-                    {itemTitle}
+          {itemTitle}
 
-                </Typography>
+        </Typography>
 
-                <Typography sx={{
+        <Typography sx={{
 
-                    color: value ? 'text.primary' : 'text.disabled',
+          color: value ? 'text.primary' : 'text.disabled',
 
-                    fontStyle: value ? 'normal' : 'italic',
+          fontStyle: value ? 'normal' : 'italic',
 
-                    fontSize: value ? '1rem' : '0.875rem',
+          fontSize: value ? '1rem' : '0.875rem',
 
-                }}>
+        }}>
 
-                    {value || t('common:noData')}
+          {value || t('common:noData')}
 
-                </Typography>
+        </Typography>
 
-            </Box>
+      </Box>
 
-        );
+    );
 
-    };
+  };
 
   React.useEffect(() => {
 
@@ -218,7 +218,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
         const resData = await resumeService.getResumeOwner(slug) as any;
 
-        setResumeDetail(resData.data);
+        setResumeDetail(resData);
 
       } catch (error: any) {
 
@@ -271,9 +271,9 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
   return (
 
-    <Box sx={{ 
+    <Box sx={{
 
-      backgroundColor: 'background.paper', 
+      backgroundColor: 'background.paper',
 
       borderRadius: 3,
 
@@ -313,11 +313,11 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
               >
 
-                <Typography 
+                <Typography
 
                   variant="h5"
 
-                  sx={{ 
+                  sx={{
 
                     fontWeight: 600,
 
@@ -363,7 +363,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
             </Box>
 
-            <Divider sx={{ my: 0, borderColor: 'grey.500' }}/>
+            <Divider sx={{ my: 0, borderColor: 'grey.500' }} />
 
             <Stack sx={{ px: 1 }}>
 

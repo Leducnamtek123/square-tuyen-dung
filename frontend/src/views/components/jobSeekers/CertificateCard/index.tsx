@@ -163,7 +163,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
         const resData = await resumeService.getCertificates(slug) as any;
 
-        setCertificates(resData.data);
+        setCertificates(resData);
 
       } catch (error: any) {
 
@@ -193,7 +193,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
         const resData = await certificateService.getCertificateById(certId) as any;
 
-        setEditData(resData.data);
+        setEditData(resData);
 
         setOpenPopup(true);
 
@@ -427,7 +427,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
             </Box>
 
-            <Divider sx={{ my: 0, borderColor: 'grey.500' }}/>
+            <Divider sx={{ my: 0, borderColor: 'grey.500' }} />
 
             <Box>
 
@@ -467,7 +467,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
                       <TimelineSeparator>
 
-                        <TimelineDot 
+                        <TimelineDot
 
                           sx={{
 
@@ -487,7 +487,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
                         <Box sx={{ p: 1 }}>
 
-                          <Typography 
+                          <Typography
 
                             variant="body2"
 
@@ -497,13 +497,13 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
                           >
 
-                            <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY"/>{' '}
+                            <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY" />{' '}
 
                             -{' '}
 
                             {value.expirationDate ? (
 
-                              <TimeAgo date={value.expirationDate} type="format" format="DD/MM/YYYY"/>
+                              <TimeAgo date={value.expirationDate} type="format" format="DD/MM/YYYY" />
 
                             ) : (
 
@@ -519,7 +519,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
                             gutterBottom
 
-                            sx={{ 
+                            sx={{
 
                               fontWeight: 'bold',
 
@@ -533,11 +533,11 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
                           </Typography>
 
-                          <Typography 
+                          <Typography
 
                             variant="body1"
 
-                            sx={{ 
+                            sx={{
 
                               color: 'text.secondary',
 

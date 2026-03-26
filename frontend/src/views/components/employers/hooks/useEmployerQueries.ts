@@ -15,7 +15,7 @@ export const useEmployerGeneralStatistics = () => {
     queryKey: ['employerGeneralStatistics'],
     queryFn: async () => {
       const response = await statisticService.employerGeneralStatistics();
-      return response.data;
+      return response;
     },
   });
 };
@@ -25,7 +25,7 @@ export const useEmployerApplicationStatistics = (params: AnyRecord) => {
     queryKey: ['employerApplicationStatistics', params],
     queryFn: async () => {
       const response: any = await statisticService.employerApplicationStatistics(params);
-      return response.data;
+      return response;
     },
   });
 };
@@ -35,7 +35,7 @@ export const useEmployerCandidateStatistics = (params: AnyRecord) => {
     queryKey: ['employerCandidateStatistics', params],
     queryFn: async () => {
       const response = await statisticService.employerCandidateStatistics(params);
-      return (response as any).data;
+      return response;
     },
   });
 };
@@ -45,7 +45,7 @@ export const useEmployerRecruitmentStatistics = (params: AnyRecord) => {
     queryKey: ['employerRecruitmentStatistics', params],
     queryFn: async () => {
       const response = await statisticService.employerRecruitmentStatistics(params);
-      return (response as any).data;
+      return response;
     },
   });
 };
@@ -55,7 +55,7 @@ export const useEmployerRecruitmentByRank = (params: AnyRecord) => {
     queryKey: ['employerRecruitmentByRank', params],
     queryFn: async () => {
       const response = await statisticService.employerRecruitmentStatisticsByRank(params);
-      return (response as any).data;
+      return response;
     },
   });
 };
@@ -66,7 +66,7 @@ export const useSavedResumes = (params: AnyRecord) => {
     queryKey: ['savedResumes', params],
     queryFn: async () => {
       const response = await resumeSavedService.getResumesSaved(params) as any;
-      const data = response?.data;
+      const data = response;
       const results = Array.isArray(data?.results)
         ? data.results
         : Array.isArray(data) ? data : [];
@@ -96,7 +96,7 @@ export const useAppliedResumes = (params: AnyRecord) => {
     queryKey: ['appliedResumes', params],
     queryFn: async () => {
       const response = await jobPostActivityService.getAppliedResume(params) as any;
-      const data = response?.data;
+      const data = response;
       const results = Array.isArray(data?.results)
         ? data.results
         : Array.isArray(data) ? data : [];
@@ -114,7 +114,7 @@ export const useJobPostOptions = () => {
     queryKey: ['jobPostOptions'],
     queryFn: async () => {
       const response = await (jobService as any).getJobPostOptions() as any;
-      return Array.isArray(response?.data) ? response.data : [];
+      return Array.isArray(response) ? response : [];
     },
     staleTime: 5 * 60_000, // options rarely change
   });
@@ -137,7 +137,7 @@ export const useEmployerResumes = (params: AnyRecord) => {
     queryKey: ['employerResumes', params],
     queryFn: async () => {
       const response: any = await resumeService.getResumes(params);
-      return response.data;
+      return response;
     },
     placeholderData: keepPreviousData,
   });

@@ -53,7 +53,7 @@ const CompanyCard = () => {
 
         const resData = await companyService.getCompany() as any;
 
-        var data = resData.data;
+        var data = resData;
 
         data = {
 
@@ -91,7 +91,7 @@ const CompanyCard = () => {
 
     loadCompany();
 
-     
+
 
   }, [isSuccess, companyCoverImageUrl, companyImageUrl]);
 
@@ -145,7 +145,7 @@ const CompanyCard = () => {
 
         const resData = await companyService.updateCompanyImageUrl(formData) as any;
 
-        const data = resData.data;
+        const data = resData;
 
         toastMessages.success("Company logo updated successfully.");
 
@@ -185,7 +185,7 @@ const CompanyCard = () => {
 
         ) as any;
 
-        const data = resData.data;
+        const data = resData;
 
         toastMessages.success("Company cover image updated successfully.");
 

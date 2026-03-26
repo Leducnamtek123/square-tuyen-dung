@@ -11,7 +11,7 @@ import AddIcon from '@mui/icons-material/Add';
 
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
 
-import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';  
+import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
 
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
 
@@ -91,11 +91,11 @@ const Loading = (
 
         .fill(0)
 
-        .map((_, index) => (          <Box sx={{ py: 0.5 }} key={index}>
+        .map((_, index) => (<Box sx={{ py: 0.5 }} key={index}>
 
-            <Skeleton height={30} />
+          <Skeleton height={30} />
 
-          </Box>
+        </Box>
 
         ))}
 
@@ -140,7 +140,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
         const resData = await resumeService.getLanguageSkills(slug) as any;
 
-        setLanguageSkills(resData.data);
+        setLanguageSkills(resData);
 
       } catch (error: any) {
 
@@ -170,7 +170,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
         const resData = await languageSkillService.getLanguageSkillById(skillId) as any;
 
-        setEditData(resData.data);
+        setEditData(resData);
 
         setOpenPopup(true);
 
@@ -386,7 +386,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
             </Box>
 
-            <Divider sx={{ my: 0, borderColor: 'grey.500' }}/>
+            <Divider sx={{ my: 0, borderColor: 'grey.500' }} />
 
             <Box>
 
@@ -402,7 +402,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
               ) : (
 
-                <TableContainer 
+                <TableContainer
 
                   sx={{
 
@@ -420,7 +420,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
                       <TableRow>
 
-                        <TableCell 
+                        <TableCell
 
                           align="left"
 
@@ -444,7 +444,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
                         </TableCell>
 
-                        <TableCell 
+                        <TableCell
 
                           align="left"
 
@@ -468,7 +468,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
                         </TableCell>
 
-                        <TableCell 
+                        <TableCell
 
                           align="right"
 
@@ -520,7 +520,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
                         >
 
-                          <TableCell 
+                          <TableCell
 
                             align="left"
 
