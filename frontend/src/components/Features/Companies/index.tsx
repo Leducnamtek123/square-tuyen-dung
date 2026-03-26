@@ -2,7 +2,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import NoDataCard from "@/components/Common/NoDataCard";
 import Company from "@/components/Features/Company";

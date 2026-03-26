@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import { Card } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
 import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
 import { useTranslation } from 'react-i18next';

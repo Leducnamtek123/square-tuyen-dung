@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Card, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import PersonPinOutlinedIcon from '@mui/icons-material/PersonPinOutlined';
 import WorkOutlineOutlinedIcon from '@mui/icons-material/WorkOutlineOutlined';
 import ReceiptLongOutlinedIcon from '@mui/icons-material/ReceiptLongOutlined';

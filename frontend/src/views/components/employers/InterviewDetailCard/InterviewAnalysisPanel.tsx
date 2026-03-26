@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Divider, Paper, Typography } from '@mui/material';
-import Grid from '@mui/material/Grid2';
+import { Grid2 as Grid } from "@mui/material";
 import { InterviewSession } from './index';
 
 interface InterviewAnalysisPanelProps {

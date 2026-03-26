@@ -7,7 +7,7 @@ import { getFilePlugin } from '@react-pdf-viewer/get-file';
 import { SpecialZoomLevel } from '@react-pdf-viewer/core';
 import Button from '@mui/material/Button';
 import { Box, Chip, IconButton, Stack } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import ZoomOutOutlinedIcon from '@mui/icons-material/ZoomOutOutlined';
 import ZoomInOutlinedIcon from '@mui/icons-material/ZoomInOutlined';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';

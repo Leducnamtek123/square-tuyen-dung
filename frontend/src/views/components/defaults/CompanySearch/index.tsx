@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Card, Button, Stack, IconButton, Box } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import InputBaseSearchCompanyCustom from '../../../../components/Common/Controls/InputBaseSearchCompanyCustom';
 import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';

@@ -7,7 +7,7 @@ import { useTranslation } from "react-i18next";
 
 import { Box, Button, Divider, Stack, Typography } from "@mui/material";
 
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 
 import PublishIcon from "@mui/icons-material/Publish";
 

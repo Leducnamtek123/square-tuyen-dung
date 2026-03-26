@@ -1,6 +1,6 @@
 import React from "react";
 import { Pagination, Stack } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import { ROLES_NAME } from "../../../../configs/constants";
 import NoDataCard from "../../../../components/Common/NoDataCard";
 import JobPost from "../../../../components/Features/JobPost";

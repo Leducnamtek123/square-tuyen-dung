@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Card, Stack, Typography } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import LocationOnOutlinedIcon from '@mui/icons-material/LocationOnOutlined';

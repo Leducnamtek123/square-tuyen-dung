@@ -2,7 +2,7 @@ import React from "react";
 import Link from 'next/link';
 import { Box, Card, Divider, Stack, Typography, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import { TabTitle } from "../../../utils/generalFunction";
 import { APP_NAME, ROUTES } from "../../../configs/constants";
 import BoxProfile from "../../components/jobSeekers/BoxProfile";

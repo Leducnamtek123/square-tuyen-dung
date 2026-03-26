@@ -5,7 +5,7 @@ import { Autocomplete, Box, Button, Divider, IconButton, LinearProgress, Stack, 
 
 import { useTranslation } from 'react-i18next';
 
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 

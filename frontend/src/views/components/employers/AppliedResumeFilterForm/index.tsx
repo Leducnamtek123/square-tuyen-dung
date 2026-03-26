@@ -7,7 +7,7 @@ import { Box, Stack, Typography } from "@mui/material";
 
 import { useTranslation } from 'react-i18next';
 
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 

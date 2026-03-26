@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import TimeAgo from '@/components/Common/TimeAgo';
 import { Badge, Box, IconButton, Menu, Stack, Typography } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ClearIcon from '@mui/icons-material/Clear';
 import {
@@ -252,7 +252,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
     })
 
-      .then(() => {})
+      .then(() => { })
 
       .catch((error) => {
 
@@ -437,25 +437,26 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
                 display: 'block',
                 position: 'absolute',
 
-              top: 0,
+                top: 0,
 
-              right: 14,
+                right: 14,
 
-              width: 10,
+                width: 10,
 
-              height: 10,
+                height: 10,
 
-              bgcolor: 'background.paper',
+                bgcolor: 'background.paper',
 
-              transform: 'translateY(-50%) rotate(45deg)',
+                transform: 'translateY(-50%) rotate(45deg)',
 
-              zIndex: 0,
+                zIndex: 0,
+
+              },
 
             },
 
-          },
-
-        }}}
+          }
+        }}
 
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
 
@@ -471,11 +472,11 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
               {notifications.length === 0 ? (
 
-                <Typography 
+                <Typography
 
-                  textAlign="center" 
+                  textAlign="center"
 
-                  variant="body2" 
+                  variant="body2"
 
                   color="text.secondary"
 
@@ -589,17 +590,17 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
                         </Typography>
 
-                        <Typography 
+                        <Typography
 
-                          variant="body2" 
+                          variant="body2"
 
                           color="text.secondary"
 
-                          sx={{ 
+                          sx={{
 
                             fontSize: '0.875rem',
 
-                            lineHeight: 1.4 
+                            lineHeight: 1.4
 
                           }}
 
@@ -609,9 +610,9 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
                         </Typography>
 
-                        <Stack 
+                        <Stack
 
-                          direction="row" 
+                          direction="row"
 
                           justifyContent="space-between"
 
@@ -621,9 +622,9 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
                           <Typography variant="caption" color="text.disabled">
 
-                            <TimeAgo 
+                            <TimeAgo
 
-                              date={value?.time?.seconds * 1000} 
+                              date={value?.time?.seconds * 1000}
 
                               type="fromNow"
 
@@ -631,7 +632,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
                           </Typography>
 
-                          <Typography 
+                          <Typography
 
                             variant="caption"
 

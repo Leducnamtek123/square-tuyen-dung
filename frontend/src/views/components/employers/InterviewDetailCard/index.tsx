@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Chip, CircularProgress, Stack, Typography } from '@mui/material';
-import Grid from '@mui/material/Grid2';
+import { Grid2 as Grid } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter, useParams } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';

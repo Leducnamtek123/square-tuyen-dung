@@ -2,7 +2,7 @@ import * as React from 'react';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Box, Card, Stack, Tab, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import { TabTitle } from '../../../utils/generalFunction';
 import CompanyViewedCard from '../../components/jobSeekers/CompanyViewedCard';
 import CompanyFollowedCard from '../../components/jobSeekers/CompanyFollowedCard';

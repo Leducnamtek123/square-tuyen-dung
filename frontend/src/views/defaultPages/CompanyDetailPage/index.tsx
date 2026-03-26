@@ -3,7 +3,7 @@ import { useParams } from 'next/navigation';
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import { Box, Card, Stack, Typography } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import errorHandling from "../../../utils/errorHandling";
 import toastMessages from "../../../utils/toastMessages";
 import SocialNetworkSharingPopup from "../../../components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup";

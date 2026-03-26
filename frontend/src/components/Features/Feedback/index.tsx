@@ -4,7 +4,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, Stack, Typography, Box } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import SentimentVerySatisfiedIcon from '@mui/icons-material/SentimentVerySatisfied';
 import errorHandling from '@/utils/errorHandling';

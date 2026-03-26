@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Card, Stack, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import { TabTitle } from '../../../utils/generalFunction';
 import JobSeekerQuantityStatistics from '../../components/jobSeekers/JobSeekerQuantityStatistics';
 import SidebarProfile from '../../components/jobSeekers/SidebarProfile';
@@ -126,7 +126,7 @@ const DashboardPage = () => {
 
             </Card>
 
-            <Card sx={{p: { xs: 1, sm: 1, md: 2, lg: 2, xl: 2 }  }}>
+            <Card sx={{ p: { xs: 1, sm: 1, md: 2, lg: 2, xl: 2 } }}>
 
               <Stack>
 

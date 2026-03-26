@@ -2,7 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import CheckboxCustom from '../../../../components/Common/Controls/CheckboxCustom';
 
 interface FormValues {

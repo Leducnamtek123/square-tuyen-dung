@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Button, Divider, Skeleton, Stack, Typography, SxProps, Theme } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import SettingForm from "../SettingForm";
 import { useUserSettings, useUpdateUserSettings } from "../../jobSeekers/hooks/useJobSeekerQueries";

@@ -18,7 +18,7 @@ import {
   useTheme,
 } from '@mui/material';
 
-import Grid from '@mui/material/Grid2';
+import { Grid2 as Grid } from "@mui/material";
 
 import { ICONS, LINKS, ROUTES, APP_NAME, IMAGES } from '../../../../configs/constants';
 

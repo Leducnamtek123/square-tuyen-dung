@@ -4,7 +4,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '@mui/material/styles';
 import { Alert, Box, Chip, Dialog, Divider, IconButton, Stack, Typography, Container } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import { useConfig } from '@/hooks/useConfig';
 interface CareerOption {

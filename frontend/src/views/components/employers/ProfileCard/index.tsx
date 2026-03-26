@@ -2,7 +2,7 @@ import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
 import { Box, Card, Pagination, Stack, Typography } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import { } from '../../../../configs/constants';
 import NoDataCard from '../../../../components/Common/NoDataCard';
 import errorHandling from '../../../../utils/errorHandling';

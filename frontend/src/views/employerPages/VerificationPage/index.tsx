@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Box, Card, Typography, Divider, TextField, Button, Chip, Alert, Snackbar, Stack } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 
 import { TabTitle } from "../../../utils/generalFunction";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";

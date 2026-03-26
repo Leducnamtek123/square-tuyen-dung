@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { InputBase, Paper, Typography } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { searchJobPost } from '../../../../redux/filterSlice';
 import { ROUTES } from '../../../../configs/constants';

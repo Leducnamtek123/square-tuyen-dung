@@ -3,7 +3,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { useDispatch } from "react-redux";
 import { useRouter } from 'next/navigation';
 import { Box, Chip, Stack, Typography, Button, Divider, Tooltip, Skeleton, CircularProgress } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import dayjs from "dayjs";
 import HelpIcon from "@mui/icons-material/Help";
 import StarOutlineIcon from "@mui/icons-material/StarOutline";

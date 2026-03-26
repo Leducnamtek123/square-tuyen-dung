@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 
 import { Box, Divider, Fab, Skeleton, Stack, Typography } from "@mui/material";
 
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 
 import { useTranslation } from 'react-i18next';
 

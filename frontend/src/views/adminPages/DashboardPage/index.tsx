@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, Card, CardHeader, CardContent, Skeleton, Paper, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from "@mui/material/styles";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 
 import PeopleIcon from '@mui/icons-material/People';
 import WorkIcon from '@mui/icons-material/Work';

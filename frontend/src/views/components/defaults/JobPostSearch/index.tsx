@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { Box, Button, Card, IconButton, Stack, Typography } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';

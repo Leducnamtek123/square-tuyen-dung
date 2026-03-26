@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import Grid from '@mui/material/Grid2';
+import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/redux/hooks';
 import TimeAgo from '../../../../components/Common/TimeAgo';

@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Avatar, Box, Card, Container, Typography, styled } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';

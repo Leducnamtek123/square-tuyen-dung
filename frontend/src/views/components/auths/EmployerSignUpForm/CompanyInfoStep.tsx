@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';

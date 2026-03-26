@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Card, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 
 import FactCheckOutlinedIcon from "@mui/icons-material/FactCheckOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";

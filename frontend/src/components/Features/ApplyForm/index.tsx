@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Button, Card, CircularProgress, FormControlLabel, Link, Radio, RadioGroup, Stack, Typography } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faFile, faFilePdf } from "@fortawesome/free-regular-svg-icons";
 import { useTranslation } from "react-i18next";

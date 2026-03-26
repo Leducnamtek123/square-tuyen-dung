@@ -2,7 +2,7 @@ import React from "react";
 import dayjs from "dayjs";
 import { useTranslation } from "react-i18next";
 import { Box, Divider, Fab, Skeleton, Stack, Typography, SxProps, Theme } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import NoDataCard from "../../../../components/Common/NoDataCard";
 import toastMessages from "../../../../utils/toastMessages";

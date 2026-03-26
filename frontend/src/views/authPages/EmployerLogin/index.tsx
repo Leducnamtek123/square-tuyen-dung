@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Alert, AlertTitle, Avatar, Box, Card, Container, Typography, styled } from '@mui/material';
-import Grid from '@mui/material/Grid2';
+import { Grid2 as Grid } from "@mui/material";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Link from 'next/link';
 import { useTranslation } from 'react-i18next';

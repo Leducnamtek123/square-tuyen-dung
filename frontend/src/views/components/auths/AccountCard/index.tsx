@@ -2,7 +2,7 @@ import React from "react";
 import { useRouter } from 'next/navigation';
 import { Box, Button, Divider, Stack, Typography, SxProps, Theme } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import { ROUTES } from "../../../../configs/constants";
 import toastMessages from "../../../../utils/toastMessages";

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Card, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 
 import SupportAgentOutlinedIcon from "@mui/icons-material/SupportAgentOutlined";
 import LibraryBooksOutlinedIcon from "@mui/icons-material/LibraryBooksOutlined";

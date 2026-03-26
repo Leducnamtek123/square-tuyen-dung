@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Box, Stack, Typography, Drawer, IconButton, useTheme, useMediaQuery, Theme } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import GroupIcon from '@mui/icons-material/Group';
 import { ROLES_NAME } from '../../../configs/constants';

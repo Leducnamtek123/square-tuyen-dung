@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Card, Typography, Button, Avatar, Chip, CircularProgress, useTheme } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 
 import { TabTitle } from '../../../utils/generalFunction';
 import { useMyInterviews } from './hooks/useMyInterviews';

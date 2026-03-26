@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Button, Paper, TextField, MenuItem, FormControl, InputLabel, Select, OutlinedInput, Chip, CircularProgress, Stack, Divider, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import { toast } from 'react-toastify';

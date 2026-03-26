@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
-import Grid from "@mui/material/Grid2";
+import { Grid2 as Grid } from "@mui/material";
 import { DATE_OPTIONS } from '../../../../configs/constants';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
