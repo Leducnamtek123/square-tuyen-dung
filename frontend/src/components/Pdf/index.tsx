@@ -1,9 +1,9 @@
 import React from 'react';
 import { Viewer, Worker } from '@react-pdf-viewer/core';
-import '@react-pdf-viewer/core/lib/styles/index.css';
+// import '@react-pdf-viewer/core/lib/styles/index.css';
 import { zoomPlugin } from '@react-pdf-viewer/zoom';
 import { getFilePlugin } from '@react-pdf-viewer/get-file';
-import '@react-pdf-viewer/zoom/lib/styles/index.css';
+// import '@react-pdf-viewer/zoom/lib/styles/index.css';
 import { SpecialZoomLevel } from '@react-pdf-viewer/core';
 import Button from '@mui/material/Button';
 import { Box, Chip, IconButton, Stack } from "@mui/material";

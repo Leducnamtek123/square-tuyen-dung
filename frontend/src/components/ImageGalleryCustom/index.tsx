@@ -1,5 +1,5 @@
 import React from 'react';
-import 'react-image-gallery/styles/css/image-gallery.css';
+// import 'react-image-gallery/styles/css/image-gallery.css';
 // @ts-ignore
 import ImageGallery from 'react-image-gallery';
 

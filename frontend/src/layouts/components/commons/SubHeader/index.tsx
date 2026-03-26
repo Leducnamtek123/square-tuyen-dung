@@ -3,7 +3,7 @@ import { useAppSelector } from '@/redux/hooks';
 
 import { useDispatch } from 'react-redux';
 
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 import { Container, Stack, useMediaQuery } from "@mui/material";
 
@@ -116,7 +116,7 @@ const SubHeader = () => {
 
   const dispatch = useDispatch();
 
-  const nav = useNavigate();
+  const nav = useRouter();
 
   const { jobPostFilter } = useAppSelector((state) => state.filter);
 
@@ -153,7 +153,7 @@ const SubHeader = () => {
 
     dispatch(searchJobPost({ ...jobPostFilter, careerId: id }));
 
-    nav(`/${ROUTES.JOB_SEEKER.JOBS}`);
+    nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
 
   };
 

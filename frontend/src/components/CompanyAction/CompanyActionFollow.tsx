@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Box, Card, Stack, Tooltip, Typography, Skeleton } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -14,7 +14,7 @@ export interface CompanyActionFollowProps {
 }
 
 const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) => {
-  const nav = useNavigate();
+  const nav = useRouter();
   const followRef = React.useRef<HTMLDivElement>(null);
   const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>('column');
   const theme = useTheme();
@@ -75,7 +75,7 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                           color: theme.palette.primary.dark
                         }
                       }}
-                      onClick={() => nav(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug)}`)}
+                      onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug)}`)}
                     >
                       {company?.companyName}
                     </Typography>

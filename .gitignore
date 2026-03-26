@@ -18,6 +18,8 @@ dist/
 
 # Build output
 frontend/build/
+frontend/.next/
+frontend/tsconfig.tsbuildinfo
 
 # OS files
 .DS_Store

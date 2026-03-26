@@ -68,7 +68,7 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
     return agentParticipant?.getTrackPublication("microphone")?.audioTrack;
   }, [agentParticipant]);
 
-  const visualizerVariant = (import.meta.env.VITE_LIVEKIT_VISUALIZER || "aura")
+  const visualizerVariant = (process.env.NEXT_PUBLIC_LIVEKIT_VISUALIZER || "aura")
     .toString()
     .toLowerCase();
 

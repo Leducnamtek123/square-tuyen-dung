@@ -1,5 +1,8 @@
+'use client';
+
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Box, ListItemIcon, ListItemText, ListItemButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
@@ -16,7 +19,7 @@ export interface MenuItemProps {
   isChild?: boolean;
 }
 
-const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementType; to?: string }>(({ theme }) => ({
+const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementType; href?: string }>(({ theme }) => ({
   borderRadius: '8px',
   marginBottom: '2px',
   color: theme.palette.text.secondary,
@@ -54,12 +57,15 @@ const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementT
 }));
 
 const MenuItem = ({ icon: Icon, text, to, onClick, isSelected, isExpanded, hasChildren, isChild }: MenuItemProps) => {
+  const pathname = usePathname();
+  const isActive = to ? pathname === to || pathname.startsWith(to + '/') : false;
+
   return (
     <StyledListItemButton
-      component={(to ? NavLink : 'div') as any}
-      to={to}
+      component={(to ? Link : 'div') as any}
+      href={to}
       onClick={onClick}
-      selected={isSelected}
+      selected={isSelected || isActive}
       sx={{
         pl: isChild ? 3 : 2,
         ...(hasChildren ? {} : { '& .MuiListItemIcon-root': { ml: 0 } })

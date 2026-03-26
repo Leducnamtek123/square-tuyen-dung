@@ -1,11 +1,10 @@
 import React from "react";
-import { Outlet } from "react-router-dom";
 import { Box } from "@mui/material";
 
-const FullscreenLayout = () => {
+const FullscreenLayout = ({ children }: { children?: React.ReactNode }) => {
   return (
     <Box sx={{ minHeight: "100vh", width: "100%" }}>
-      <Outlet />
+      {children}
     </Box>
   );
 };

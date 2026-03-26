@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { useAppSelector } from '@/redux/hooks';
-import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/navigation';
 import { useDispatch } from "react-redux";
 import { useTranslation } from 'react-i18next';
 import { Button, Menu, Stack, Typography } from "@mui/material";
@@ -32,7 +32,7 @@ interface UserMenuProps {
 
 const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) => {
   const { t } = useTranslation('common');
-  const nav = useNavigate();
+  const nav = useRouter();
   const dispatch = useDispatch();
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
 
@@ -85,7 +85,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
         dispatch(resetSearchCompany());
         dispatch(resetSearchResume());
 
-        nav(`/${ROUTES.AUTH.LOGIN}`);
+        nav.push(`/${ROUTES.AUTH.LOGIN}`);
       })
       .catch((error: any) => {
         errorHandling(error);

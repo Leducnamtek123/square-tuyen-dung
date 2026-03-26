@@ -1,7 +1,5 @@
 import * as React from 'react';
 
-import { Outlet } from 'react-router-dom';
-
 import PropTypes from 'prop-types';
 
 import { Box } from "@mui/material";
@@ -12,6 +10,7 @@ import Sidebar from '../components/employers/Sidebar';
 
 interface AdminLayoutProps {
   window?: () => Window;
+  children?: React.ReactNode;
 }
 
 
@@ -20,7 +19,7 @@ const drawerWidth = 240;
 
 const AdminLayout = (props: AdminLayoutProps) => {
 
-  const { window } = props;
+  const { window, children } = props;
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -136,7 +135,7 @@ const AdminLayout = (props: AdminLayoutProps) => {
 
         >
 
-          <Outlet />
+          {children}
 
         </Box>
 

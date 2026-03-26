@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Card, Chip, IconButton, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
 import CheckCircleRoundedIcon from '@mui/icons-material/CheckCircleRounded';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -62,7 +62,7 @@ const JobSeekerProfile = ({
   handleSave,
 }: JobSeekerProfileProps) => {
 
-  const nav = useNavigate();
+  const nav = useRouter();
 
   const { allConfig } = useAppSelector((state) => state.config);
 
@@ -150,7 +150,7 @@ const JobSeekerProfile = ({
 
                 style={{ cursor: 'pointer' }}
 
-                onClick={() => nav(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, slug)}`)}
+                onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, slug)}`)}
 
               >
 
@@ -274,7 +274,7 @@ const JobSeekerProfile = ({
 
             }}
 
-            onClick={() => nav(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, slug)}`)}
+            onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, slug)}`)}
 
           >
 
@@ -480,7 +480,7 @@ const JobSeekerProfile = ({
 
                 size="small"
 
-                onClick={() => nav(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, slug)}`)}
+                onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, slug)}`)}
 
                 sx={{
 

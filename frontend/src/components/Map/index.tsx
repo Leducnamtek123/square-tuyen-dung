@@ -1,12 +1,17 @@
-import "leaflet/dist/leaflet.css";
+// import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
-import markerIconRetina from "leaflet/dist/images/marker-icon-2x.png";
+import markerShadowImport from "leaflet/dist/images/marker-shadow.png";
+import markerIconRetinaImport from "leaflet/dist/images/marker-icon-2x.png";
 import * as React from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { Box, Typography, Paper } from "@mui/material";
 import { ICONS } from "../../configs/constants";
+
+// Next.js image imports return objects; extract string src
+const toSrc = (img: any): string => typeof img === 'string' ? img : img?.src || img?.default?.src || '';
+const markerShadow = toSrc(markerShadowImport);
+const markerIconRetina = toSrc(markerIconRetinaImport);
 
 interface Props {
   title?: string;

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -14,8 +14,10 @@ import { useTranslation } from 'react-i18next';
 import { ROUTES, APP_NAME } from "../../../../configs/constants";
 
 const TabBar = () => {
-  const location = useLocation();
-  const nav = useNavigate();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const location = { pathname, search: searchParams.toString(), state: null, key: '' };
+  const nav = useRouter();
   const { t } = useTranslation(['jobSeeker', 'common']);
 
   const tabItems = [
@@ -24,37 +26,37 @@ const TabBar = () => {
       id: 2,
       label: t('jobSeeker:nav.profile'),
       icon: <AssignmentIndIcon />,
-      path: `/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.PROFILE}`,
+      path: `/${ROUTES.JOB_SEEKER.PROFILE}`,
     },
     {
       id: 3,
       label: t('jobSeeker:nav.jobs'),
       icon: <WorkIcon />,
-      path: `/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.MY_JOB}`,
+      path: `/${ROUTES.JOB_SEEKER.MY_JOB}`,
     },
     {
       id: 4,
       label: t('jobSeeker:nav.myCompany'),
       icon: <ApartmentIcon />,
-      path: `/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.MY_COMPANY}`,
+      path: `/${ROUTES.JOB_SEEKER.MY_COMPANY}`,
     },
     {
       id: 5,
       label: t('jobSeeker:nav.myInterviews'),
       icon: <VideoCameraFrontIcon />,
-      path: `/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.MY_INTERVIEWS}`,
+      path: `/${ROUTES.JOB_SEEKER.MY_INTERVIEWS}`,
     },
     {
       id: 6,
       label: t('jobSeeker:nav.notifications'),
       icon: <CircleNotificationsIcon />,
-      path: `/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.NOTIFICATION}`,
+      path: `/${ROUTES.JOB_SEEKER.NOTIFICATION}`,
     },
     {
       id: 7,
       label: t('jobSeeker:nav.accountSettings'),
       icon: <ManageAccountsOutlinedIcon />,
-      path: `/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.ACCOUNT}`,
+      path: `/${ROUTES.JOB_SEEKER.ACCOUNT}`,
     },
   ];
 
@@ -109,7 +111,7 @@ const TabBar = () => {
       >
         {tabItems.map((tab) => (
           <Tab
-            onClick={() => nav(tab.path)}
+            onClick={() => nav.push(tab.path)}
             key={tab.id}
             icon={tab.icon}
             iconPosition="start"

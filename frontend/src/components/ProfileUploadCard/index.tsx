@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import { Box, IconButton, Typography, Stack, Chip, Skeleton, Tooltip } from "@mui/material";
 import HelpIcon from '@mui/icons-material/Help';
@@ -36,7 +36,7 @@ const ProfileUploadCard = ({
   handleActive,
 }: ProfileUploadCardProps) => {
 
-  const nav = useNavigate();
+  const nav = useRouter();
 
   return (
 
@@ -241,7 +241,7 @@ const ProfileUploadCard = ({
 
                 size="small"
 
-                onClick={() => nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}/${formatRoute(ROUTES.JOB_SEEKER.ATTACHED_PROFILE, slug)}`)}
+                onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.ATTACHED_PROFILE, slug)}`)}
 
               >
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Badge, IconButton } from "@mui/material";
 import ForumIcon from '@mui/icons-material/Forum';
 import {
@@ -22,7 +22,7 @@ const chatRoomCollectionRef = collection(db, 'chatRooms');
 
 const ChatCard = (_props: ChatCardProps) => {
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
-  const nav = useNavigate();
+  const nav = useRouter();
   const [count, setCount] = React.useState(0);
 
   const isEmployer = React.useMemo(() => {
@@ -56,9 +56,9 @@ const ChatCard = (_props: ChatCardProps) => {
 
   const handleRedirect = () => {
     if (isEmployer) {
-      nav(`/${ROUTES.EMPLOYER.CHAT}`);
+      nav.push(`/${ROUTES.EMPLOYER.CHAT}`);
     } else {
-      nav(`/${ROUTES.JOB_SEEKER.CHAT}`);
+      nav.push(`/${ROUTES.JOB_SEEKER.CHAT}`);
     }
   };
 

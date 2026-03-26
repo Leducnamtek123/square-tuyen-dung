@@ -1,9 +1,9 @@
-import "swiper/css";
+// import 'swiper/css";
 import { useAppSelector } from '@/redux/hooks';
-import "swiper/css/pagination";
+// import 'swiper/css/pagination";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Pagination, Autoplay } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -64,7 +64,7 @@ const Loading = (
 
 const CareerCarousel = () => {
   const dispatch = useDispatch();
-  const nav = useNavigate();
+  const nav = useRouter();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [parentWidth, setParentWidth] = React.useState(0);
   const [col, setCol] = React.useState(5);
@@ -104,7 +104,7 @@ const CareerCarousel = () => {
 
   const handleFilter = (id: any) => {
     dispatch(searchJobPost({ ...jobPostFilter, careerId: id }));
-    nav(`/${ROUTES.JOB_SEEKER.JOBS}`);
+    nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
   };
 
   return (

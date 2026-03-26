@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { useAppSelector } from '@/redux/hooks';
 
-import { NavLink, useLocation } from 'react-router-dom';
+import { usePathname, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 import { AppBar, Avatar, Box, Collapse, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from "@mui/material";
 
@@ -61,7 +62,9 @@ const createInitialExpanded = (items: NavItem[]) => {
 
 const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
-  const location = useLocation();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const location = { pathname, search: searchParams.toString(), state: null, key: '' };
 
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
 
@@ -193,9 +196,9 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
           <ListItemButton
 
-            component={item.to ? NavLink : 'div'}
+            component={item.to ? Link : 'div'}
 
-            to={item.to || ''}
+            href={item.to || ''}
 
             selected={Boolean(item.to && location.pathname === item.to)}
 

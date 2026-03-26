@@ -1,9 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Box, Button, Card, Stack, Typography } from "@mui/material";
 import { ABOUT_IMAGES, HOST_NAME, ROUTES } from '../../configs/constants';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import MuiImageCustom from '../MuiImageCustom';
 
 interface AppIntroductionCardProps {
@@ -12,7 +12,7 @@ interface AppIntroductionCardProps {
 
 const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
   const { t } = useTranslation('common');
-  const nav = useNavigate();
+  const nav = useRouter();
 
   return (
     <Card sx={{ p: 4, position: 'relative', overflow: 'hidden' }}>
@@ -33,7 +33,7 @@ const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
             variant="contained"
             color="primary"
             size="large"
-            onClick={() => nav(`/${ROUTES.JOB_SEEKER.JOBS}`)}
+            onClick={() => nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`)}
             sx={{ borderRadius: 2, px: 4 }}
           >
             Tìm việc ngay

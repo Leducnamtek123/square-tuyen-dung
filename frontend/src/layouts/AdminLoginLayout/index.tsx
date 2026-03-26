@@ -1,12 +1,11 @@
 import * as React from 'react';
-import { Outlet } from 'react-router-dom';
 import { Box } from '@mui/material';
 
 /**
  * AdminLoginLayout – A standalone layout for the admin login page.
  * No Header/Footer, full-screen gradient background.
  */
-const AdminLoginLayout: React.FC = () => {
+const AdminLoginLayout = ({ children }: { children?: React.ReactNode }) => {
   return (
     <Box
       sx={{
@@ -18,7 +17,7 @@ const AdminLoginLayout: React.FC = () => {
         p: { xs: 0, sm: 2, md: 4 },
       }}
     >
-      <Outlet />
+      {children}
     </Box>
   );
 };

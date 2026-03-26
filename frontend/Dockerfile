@@ -9,7 +9,7 @@ WORKDIR /project_web_app
 COPY package*.json ./
 
 ENV NPM_CONFIG_INCLUDE_OPTIONAL=true
-RUN npm ci --include=optional --no-audit --no-fund
+RUN npm ci --include=optional --no-audit --no-fund --legacy-peer-deps
 
 # Copy application code
 COPY . .
@@ -19,6 +19,6 @@ RUN chown -R node:node /project_web_app
 
 USER node
 
-EXPOSE 3000
+EXPOSE 80
 
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]

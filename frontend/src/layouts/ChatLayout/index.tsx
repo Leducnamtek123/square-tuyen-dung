@@ -1,9 +1,8 @@
 import * as React from 'react';
-import { Outlet } from 'react-router-dom';
 import { Box } from "@mui/material";
 import ChatProvider from '../../context/ChatProvider';
 
-const ChatLayout = () => {
+const ChatLayout = ({ children }: { children?: React.ReactNode }) => {
 
   return (
 
@@ -21,7 +20,7 @@ const ChatLayout = () => {
 
         <section>
 
-          <Outlet />
+          {children}
 
         </section>
 

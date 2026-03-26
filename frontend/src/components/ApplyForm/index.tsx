@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/navigation';
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Button, Card, CircularProgress, FormControlLabel, Link, Radio, RadioGroup, Stack, Typography } from "@mui/material";
@@ -31,7 +31,7 @@ interface ApplyFormValues {
 const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
   const { t } = useTranslation("public");
   const theme = useTheme();
-  const nav = useNavigate();
+  const nav = useRouter();
   const { currentUser } = useAppSelector((state) => state.user);
   const [isLoadingResumes, setIsLoadingResumes] = React.useState(false);
   const [resumes, setResumes] = React.useState<Resume[]>([]);
@@ -110,7 +110,7 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
                     variant="contained"
                     color="primary"
                     size="small"
-                    onClick={() => nav(`/${ROUTES.JOB_SEEKER.DASHBOARD}/${ROUTES.JOB_SEEKER.PROFILE}`)}
+                    onClick={() => nav.push(`/${ROUTES.JOB_SEEKER.PROFILE}`)}
                     sx={{ textTransform: "none" }}
                   >
                     {t("applyForm.resume.createNow", { defaultValue: "Tạo hồ sơ ngay" })}
@@ -186,8 +186,8 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
                             target="_blank"
                             href={
                               value.type === CV_TYPES.cvWebsite
-                                ? `/${ROUTES.JOB_SEEKER.DASHBOARD}/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, value.slug)}`
-                                : `/${ROUTES.JOB_SEEKER.DASHBOARD}/${formatRoute(ROUTES.JOB_SEEKER.ATTACHED_PROFILE, value.slug)}`
+                                ? `/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, value.slug)}`
+                                : `/${formatRoute(ROUTES.JOB_SEEKER.ATTACHED_PROFILE, value.slug)}`
                             }
                             sx={{
                               textDecoration: "none",

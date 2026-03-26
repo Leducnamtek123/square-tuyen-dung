@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Button, Menu, MenuItem, Stack, Typography, useTheme, Avatar } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { localizeRoutePath } from '../../../../configs/routeLocalization';
@@ -27,8 +27,10 @@ const languages = [
 
 const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
   const { i18n } = useTranslation();
-  const location = useLocation();
-  const navigate = useNavigate();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const location = { pathname, search: searchParams.toString() ? `?${searchParams.toString()}` : '', hash: typeof window !== 'undefined' ? window.location.hash : '' };
+  const navigate = useRouter();
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -52,7 +54,7 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
         window.location.assign(`${nextFullPath}${location.search}${location.hash}`);
       }
     } else if (localizedPath !== location.pathname) {
-      navigate(`${localizedPath}${location.search}${location.hash}`, { replace: true });
+      navigate.replace(`${localizedPath}${location.search}${location.hash}`);
     }
     i18n.changeLanguage(lng);
     handleClose();

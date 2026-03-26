@@ -6,7 +6,9 @@
 
 # production
 /build
+/.next
 /idea
 /.idea
 
 .agent
+*.tsbuildinfo

@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTheme } from '@mui/material/styles';
 import defaultTheme from '../../themeConfigs/defaultTheme';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { Avatar, Box, Card, Skeleton, Stack, Typography } from "@mui/material";
 import { LoadingButton } from '@mui/lab';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -263,7 +263,7 @@ const Company = ({
 
               component={Link}
 
-              to={`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, slug)}`}
+              href={`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, slug)}`}
 
             >
 
@@ -344,7 +344,7 @@ const Company = ({
 
                 component={Link}
 
-                to={`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, slug)}`}
+                href={`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, slug)}`}
 
                 sx={{
 

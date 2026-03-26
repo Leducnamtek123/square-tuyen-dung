@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { useDispatch } from 'react-redux';
 
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 import { useTheme } from '@mui/material/styles';
 
@@ -53,7 +53,7 @@ const InputBaseSearchHomeCustom = ({
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const inputSearchRef = React.useRef<HTMLDivElement | null>(null);
 
-  const nav = useNavigate();
+  const nav = useRouter();
 
   const dispatch = useDispatch();
 
@@ -102,7 +102,7 @@ const InputBaseSearchHomeCustom = ({
 
       case 'HOME':
 
-        nav(`/${ROUTES.JOB_SEEKER.JOBS}`);
+        nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
 
         break;
 

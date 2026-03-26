@@ -23,15 +23,15 @@ const isMinioPublicUrl = (url: string | null | undefined): boolean => {
     // ignore invalid URLs
   }
 
-  // Check against VITE_MINIO_PUBLIC_URL env setting
-  const minioPublicUrl = import.meta.env.VITE_MINIO_PUBLIC_URL;
+  // Check against NEXT_PUBLIC_MINIO_PUBLIC_URL env setting
+  const minioPublicUrl = process.env.NEXT_PUBLIC_MINIO_PUBLIC_URL;
   if (minioPublicUrl && url.startsWith(minioPublicUrl)) return true;
 
   return false;
 };
 
 const getBaseUrl = (): string => {
-  return import.meta.env.VITE_API_BASE || '/api/';
+  return process.env.NEXT_PUBLIC_API_BASE || '/api/';
 };
 
 const unwrapResponse = (response: { data?: { data?: unknown } }): unknown =>

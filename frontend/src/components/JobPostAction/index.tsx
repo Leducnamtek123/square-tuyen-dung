@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import { Box, Card, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
@@ -48,7 +48,7 @@ const JobPostAction = ({
   children,
 }: JobPostActionProps) => {
 
-  const nav = useNavigate();
+  const nav = useRouter();
 
   const { allConfig } = useAppSelector((state) => state.config);
 
@@ -194,7 +194,7 @@ const JobPostAction = ({
 
                       }}
 
-                      onClick={() => nav(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`)}
+                      onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`)}
 
                       noWrap
 

@@ -1,7 +1,7 @@
-import 'swiper/css';
-import 'swiper/css/pagination';
+// import 'swiper/css';
+// import 'swiper/css/pagination';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Pagination, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -79,7 +79,7 @@ const Loading = (_props: Props) => {
 };
 
 const TopCompanyCarousel = () => {
-  const nav = useNavigate();
+  const nav = useRouter();
   const [parentWidth, setParentWidth] = React.useState(0);
   const [col, setCol] = React.useState(5);
 
@@ -162,7 +162,7 @@ const TopCompanyCarousel = () => {
                         }
                       },
                     }}
-                    onClick={() => nav(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, value.slug)}`)}
+                    onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, value.slug)}`)}
                   >
                     <Stack direction="row" justifyContent="center" sx={{ py: 1 }}>
                       <Box

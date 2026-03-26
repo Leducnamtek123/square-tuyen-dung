@@ -1,8 +1,16 @@
 import httpRequest from '../utils/httpRequest';
+import { presignInObject } from '../utils/presignUrl';
 
 type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number;
+
+type WithPresignInput = Promise<unknown>;
+
+const withPresign = async (promise: WithPresignInput): Promise<unknown> => {
+  const data = await promise;
+  return presignInObject(data);
+};
 
 const jobPostActivityService = {
   // job seeker
@@ -30,17 +38,17 @@ const jobPostActivityService = {
 
   getAppliedResume: (params: AnyRecord = {}): Promise<unknown> => {
     const url = 'job/web/employer-job-posts-activity/';
-    return httpRequest.get(url, { params: params });
+    return withPresign(httpRequest.get(url, { params: params }));
   },
 
   getAppliedResumeChat: (params: AnyRecord = {}): Promise<unknown> => {
     const url = 'job/web/employer-job-posts-activity/chat/';
-    return httpRequest.get(url, { params: params });
+    return withPresign(httpRequest.get(url, { params: params }));
   },
 
   exportAppliedResume: (params: AnyRecord = {}): Promise<unknown> => {
     const url = 'job/web/employer-job-posts-activity/export/';
-    return httpRequest.get(url, { params: params });
+    return withPresign(httpRequest.get(url, { params: params }));
   },
 
   changeApplicationStatus: (id: IdType, data: AnyRecord): Promise<unknown> => {
@@ -55,7 +63,7 @@ const jobPostActivityService = {
 
   getJobPostActivityDetail: (id: IdType): Promise<unknown> => {
     const url = `job/web/employer-job-posts-activity/${id}/`;
-    return httpRequest.get(url);
+    return withPresign(httpRequest.get(url));
   },
 
   analyzeResume: (id: IdType): Promise<unknown> => {

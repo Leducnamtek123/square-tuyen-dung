@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import { Box, Card, Divider, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
@@ -50,7 +50,7 @@ const JobPost = ({
 
   const myRef = React.useRef<HTMLDivElement | null>(null);
   const [width, setWidth] = React.useState<string | number>("95%")
-  const nav = useNavigate();
+  const nav = useRouter();
   const { allConfig } = useAppSelector((state) => state.config);
   const theme = useTheme();
 
@@ -62,7 +62,7 @@ const JobPost = ({
   }, []);
 
   const goToDetail = () => {
-    nav(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`);
+    nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`);
   };
 
   const handleCardKeyDown = (event: React.KeyboardEvent) => {

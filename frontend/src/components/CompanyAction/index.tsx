@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import { Box, Card, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
@@ -28,7 +28,7 @@ interface CompanyActionProps {
 
 const CompanyAction = ({ id, views, createAt, resume, company, children }: CompanyActionProps) => {
 
-  const nav = useNavigate();
+  const nav = useRouter();
 
   const parentRef = React.useRef<HTMLDivElement>(null);
 
@@ -146,7 +146,7 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
                   noWrap
 
-                  onClick={() => nav(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug)}`)}
+                  onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug)}`)}
 
                 >
 

@@ -1,7 +1,7 @@
 import React from "react";
 import { useAppSelector } from '@/redux/hooks';
 import { alpha, useTheme } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from 'next/navigation';
 import dayjs from "dayjs";
 import { Box, Card, Skeleton, Stack, Typography, Tooltip, Divider } from "@mui/material";
 import {
@@ -52,11 +52,11 @@ const JobPostLarge = ({
 
   const theme = useTheme();
 
-  const nav = useNavigate();
+  const nav = useRouter();
 
   const { allConfig } = useAppSelector((state) => state.config);
   const goToDetail = () => {
-    nav(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`);
+    nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`);
   };
 
   const handleCardKeyDown = (event: React.KeyboardEvent) => {

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 import Link from '@mui/material/Link';
 
@@ -28,7 +28,7 @@ import { buildPortalPath, getPreferredLanguage } from '../../../../configs/porta
 const Footer = () => {
 
   const { t } = useTranslation('common');
-  const nav = useNavigate();
+  const nav = useRouter();
   const language = getPreferredLanguage();
   const employerPrefix = buildPortalPath('employer', '', language);
 
@@ -85,7 +85,7 @@ const Footer = () => {
                   width={150}
                   src={IMAGES.getTextLogo(theme.palette.mode === 'light' ? 'dark' : 'light')}
                   sx={{ display: 'block', cursor: 'pointer' }}
-                  onClick={() => nav('/')}
+                  onClick={() => nav.push('/')}
                 />
 
               </ListItem>
@@ -98,7 +98,7 @@ const Footer = () => {
                 <ListItem key={item.label} sx={{ pl: 0, py: 0.5 }}>
                   <ListItemText
                     sx={linkSx}
-                    onClick={() => nav(item.route)}
+                    onClick={() => nav.push(item.route)}
                     primary={item.label}
                     slotProps={{ primary: { variant: 'body2' } }}
                   />
@@ -134,7 +134,7 @@ const Footer = () => {
                 <ListItem key={item.label} sx={{ pl: 0, py: 0.5 }}>
                   <ListItemText
                     sx={linkSx}
-                    onClick={() => nav(item.route)}
+                    onClick={() => nav.push(item.route)}
                     primary={item.label}
                     slotProps={{ primary: { variant: 'body2' } }}
                   />
@@ -170,7 +170,7 @@ const Footer = () => {
                 <ListItem key={item.label} sx={{ pl: 0, py: 0.5 }}>
                   <ListItemText
                     sx={linkSx}
-                    onClick={() => nav(item.route)}
+                    onClick={() => nav.push(item.route)}
                     primary={item.label}
                     slotProps={{ primary: { variant: 'body2' } }}
                   />

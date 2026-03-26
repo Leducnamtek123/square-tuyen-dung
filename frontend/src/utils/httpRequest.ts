@@ -24,7 +24,7 @@ const prefix = 'api'
 
 // Use relative path to work with nginx proxy, allow override via env if needed
 
-const baseURL = import.meta.env.VITE_API_BASE || `/${prefix}/`;
+const baseURL = process.env.NEXT_PUBLIC_API_BASE || `/${prefix}/`;
 
 const httpRequest = axios.create({
   baseURL,

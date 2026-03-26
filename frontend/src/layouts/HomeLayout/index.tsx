@@ -1,12 +1,11 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
 import { Box, Container } from "@mui/material";
 import Header from '../components/commons/Header';
 import SubHeader from '../components/commons/SubHeader';
 import TopSlide from '../components/commons/TopSlide';
 import Footer from '../components/commons/Footer';
 
-const HomeLayout = () => {
+const HomeLayout = ({ children }: { children?: React.ReactNode }) => {
 
   return (
 
@@ -42,7 +41,7 @@ const HomeLayout = () => {
 
         <section>
 
-          <Outlet />
+          {children}
 
         </section>
 

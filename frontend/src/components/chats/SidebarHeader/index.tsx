@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { Box, Chip, Divider, Stack } from "@mui/material";
 import GridViewIcon from '@mui/icons-material/GridView';
 import HomeIcon from '@mui/icons-material/Home';
@@ -14,7 +14,7 @@ interface SidebarHeaderProps {
 
 const SidebarHeader = (_props: SidebarHeaderProps) => {
   const { activeWorkspace } = useAppSelector((state) => state.user);
-  const nav = useNavigate();
+  const nav = useRouter();
 
   const isEmployer = React.useMemo(() => {
     return activeWorkspace?.type === "company";
@@ -22,9 +22,9 @@ const SidebarHeader = (_props: SidebarHeaderProps) => {
 
   const handleRedirect = () => {
     if (isEmployer) {
-      nav(`/${ROUTES.EMPLOYER.DASHBOARD}`);
+      nav.push(`/${ROUTES.EMPLOYER.DASHBOARD}`);
     } else {
-      nav(`/${ROUTES.JOB_SEEKER.HOME}`);
+      nav.push(`/${ROUTES.JOB_SEEKER.HOME}`);
     }
   };
 

@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Avatar, Box, Divider, List, Toolbar, useTheme } from "@mui/material";
 import { IMAGES, ROUTES } from '@/configs/constants';
+import Link from 'next/link';
 import AdminMenu from './AdminMenu';
 import EmployerMenu from './EmployerMenu';
 
 const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
   const { t } = useTranslation(['admin', 'employer']);
-  const location = useLocation();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const location = { pathname, search: searchParams.toString(), state: null, key: '' };
   const theme = useTheme();
 
   const [expandedItems, setExpandedItems] = useState({
@@ -34,7 +37,7 @@ const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
       <Toolbar sx={{ px: 2, py: 1.5, flexShrink: 0 }}>
         <Box
           component={Link}
-          to={`/${isAdmin ? ROUTES.ADMIN.DASHBOARD : ROUTES.EMPLOYER.DASHBOARD}`}
+          href={`/${isAdmin ? ROUTES.ADMIN.DASHBOARD : ROUTES.EMPLOYER.DASHBOARD}`}
           sx={{
             width: '100%',
             display: 'flex',

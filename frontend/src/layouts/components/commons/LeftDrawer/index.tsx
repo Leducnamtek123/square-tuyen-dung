@@ -3,7 +3,8 @@ import { useAppSelector } from '@/redux/hooks';
 
 import React from 'react';
 
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 import { useDispatch } from 'react-redux';
 
@@ -56,7 +57,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
   const dispatch = useDispatch();
 
-  const nav = useNavigate();
+  const nav = useRouter();
 
   const theme = useTheme();
 
@@ -83,7 +84,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
         dispatch(resetSearchResume());
 
-        nav(`/${ROUTES.AUTH.LOGIN}`);
+        nav.push(`/${ROUTES.AUTH.LOGIN}`);
 
       })
 
@@ -107,7 +108,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
       {/* ---- HEADER: Logo ---- */}
       <Box
         component={Link}
-        to="/"
+        href="/"
         onClick={handleDrawerToggle}
         sx={{
           display: 'flex',
@@ -154,9 +155,11 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
               key={page.id}
 
-              component={NavLink}
+              component={Link}
 
-              to={page.path}
+              href={page.path}
+              
+              className={pathname.startsWith(page.path) ? 'active' : ''}
 
               disablePadding
 
@@ -342,7 +345,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
               }}
 
-              onClick={() => { nav(`/${loginRoute}`); handleDrawerToggle(); }}
+              onClick={() => { nav.push(`/${loginRoute}`); handleDrawerToggle(); }}
 
             >
 
@@ -372,7 +375,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
               }}
 
-              onClick={() => { nav(`/${registerRoute}`); handleDrawerToggle(); }}
+              onClick={() => { nav.push(`/${registerRoute}`); handleDrawerToggle(); }}
 
             >
 

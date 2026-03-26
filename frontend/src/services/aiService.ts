@@ -2,7 +2,7 @@ import axios from 'axios';
 
 type AnyRecord = Record<string, unknown>;
 
-const baseURL = import.meta.env.VITE_API_BASE || '/api/';
+const baseURL = process.env.NEXT_PUBLIC_API_BASE || '/api/';
 
 const aiService = {
   tts: async (payload: AnyRecord): Promise<Blob> => {

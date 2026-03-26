@@ -52,7 +52,17 @@ import star3 from '../assets/images/feedbacks/3star.gif';
 import star4 from '../assets/images/feedbacks/4star.gif';
 import star5 from '../assets/images/feedbacks/5star.gif';
 
-const ENV = import.meta.env.VITE_NODE_ENV || 'development';
+// Next.js static image imports return { src, width, height } objects.
+// This helper extracts the string URL for use in regular <img> tags.
+const imgSrc = (img: any): string => {
+  if (typeof img === 'string') return img;
+  if (img && typeof img === 'object' && typeof img.src === 'string') return img.src;
+  if (img && typeof img === 'object' && typeof img.default === 'object') return img.default.src;
+  if (img && typeof img === 'object' && typeof img.default === 'string') return img.default;
+  return String(img ?? '');
+};
+
+const ENV = process.env.NEXT_PUBLIC_NODE_ENV || 'development';
 const PLATFORM = 'WEB';
 const APP_NAME = 'Square';
 
@@ -69,14 +79,14 @@ const isProdDomain = (host: string | undefined): host is string => {
 };
 
 const HOST_NAME = {
-  PROJECT: isProdDomain(import.meta.env.VITE_PROJECT_HOST_NAME)
-    ? import.meta.env.VITE_PROJECT_HOST_NAME
+  PROJECT: isProdDomain(process.env.NEXT_PUBLIC_PROJECT_HOST_NAME)
+    ? process.env.NEXT_PUBLIC_PROJECT_HOST_NAME
     : BASE_HOSTNAME,
-  EMPLOYER_PROJECT: isProdDomain(import.meta.env.VITE_EMPLOYER_PROJECT_HOST_NAME)
-    ? import.meta.env.VITE_EMPLOYER_PROJECT_HOST_NAME
+  EMPLOYER_PROJECT: isProdDomain(process.env.NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME)
+    ? process.env.NEXT_PUBLIC_EMPLOYER_PROJECT_HOST_NAME
     : `employer.${BASE_HOSTNAME}`,
-  ADMIN_PROJECT: isProdDomain(import.meta.env.VITE_ADMIN_PROJECT_HOST_NAME)
-    ? import.meta.env.VITE_ADMIN_PROJECT_HOST_NAME
+  ADMIN_PROJECT: isProdDomain(process.env.NEXT_PUBLIC_ADMIN_PROJECT_HOST_NAME)
+    ? process.env.NEXT_PUBLIC_ADMIN_PROJECT_HOST_NAME
     : `admin.${BASE_HOSTNAME}`,
 } as const;
 
@@ -87,8 +97,8 @@ const AUTH_PROVIDER = {
 
 const AUTH_CONFIG = {
   // BACKEND
-  CLIENT_ID: import.meta.env.VITE_PROJECT_SERVER_CLIENT_ID,
-  CLIENT_SECRET: import.meta.env.VITE_PROJECT_SERVER_CLIENT_SECRET,
+  CLIENT_ID: process.env.NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID,
+  CLIENT_SECRET: process.env.NEXT_PUBLIC_PROJECT_SERVER_CLIENT_SECRET,
   BACKEND_KEY: 'backend',
   ACCESS_TOKEN_KEY: 'access_token',
   REFRESH_TOKEN_KEY: 'refresh_token',
@@ -96,24 +106,24 @@ const AUTH_CONFIG = {
   PASSWORD_KEY: 'password',
   CONVERT_TOKEN_KEY: 'convert_token',
   // FACEBOOK AUTH
-  FACEBOOK_CLIENT_ID: import.meta.env.VITE_FACEBOOK_CLIENT_ID,
-  FACEBOOK_CLIENT_SECRET: import.meta.env.VITE_FACEBOOK_CLIENT_SECRET,
+  FACEBOOK_CLIENT_ID: process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID,
+  FACEBOOK_CLIENT_SECRET: process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_SECRET,
   // GOOGLE AUTH
-  GOOGLE_CLIENT_ID: import.meta.env.VITE_GOOGLE_CLIENT_ID || 'dummy-google-client-id',
-  GOOGLE_CLIENT_SECRET: import.meta.env.VITE_GOOGLE_CLIENT_SECRET,
-  GOONGAPI_KEY: import.meta.env.VITE_GOONGAPI_KEY,
+  GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'dummy-google-client-id',
+  GOOGLE_CLIENT_SECRET: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET,
+  GOONGAPI_KEY: process.env.NEXT_PUBLIC_GOONGAPI_KEY,
   // Dialogflow chatbot
   JOB_SEEKER_BOT: {
-    AGENT_ID: import.meta.env.VITE_JOB_SEEKER_BOT_AGENT_ID || '',
+    AGENT_ID: process.env.NEXT_PUBLIC_JOB_SEEKER_BOT_AGENT_ID || '',
     CHAT_TITLE: 'Square AI',
     CHAT_ICON: jobSeekerChatbotIcon,
   },
   EMPLOYER_BOT: {
-    AGENT_ID: import.meta.env.VITE_EMPLOYER_BOT_AGENT_ID || '',
+    AGENT_ID: process.env.NEXT_PUBLIC_EMPLOYER_BOT_AGENT_ID || '',
     CHAT_TITLE: 'Square AI',
     CHAT_ICON: employerChatbotIcon,
   },
-  BOT_RENDER_MODE: import.meta.env.VITE_BOT_RENDER_MODE || 'chat',
+  BOT_RENDER_MODE: process.env.NEXT_PUBLIC_BOT_RENDER_MODE || 'chat',
 } as const;
 
 const ROLES_NAME = {
@@ -169,36 +179,36 @@ const IMAGES = {
       ? '/square-icons/logo square svg-white.svg'
       : '/square-icons/logo square svg-black.svg';
   },
-  coverImageDefault,
-  chPlayDownload,
-  appStoreDownload,
-  notificationImageDefault,
-  companyLogoDefault,
-  companyCoverDefault,
+  coverImageDefault: imgSrc(coverImageDefault),
+  chPlayDownload: imgSrc(chPlayDownload),
+  appStoreDownload: imgSrc(appStoreDownload),
+  notificationImageDefault: imgSrc(notificationImageDefault),
+  companyLogoDefault: imgSrc(companyLogoDefault),
+  companyCoverDefault: imgSrc(companyCoverDefault),
 } as const;
 
 const ABOUT_IMAGES = {
-  AROUND_JOB_POST: aroundJobPost,
-  JOB_POST_NOTIFICATION: jobPostNotification,
-  JOB_POST: jobPostImg,
-  PROFILE: profileImg,
-  LIVE_INTERVIEW: liveInterviewImg,
-  CANDIDATE_CRM: candidateCrmImg,
-  COMPANY_VERIFICATION: companyVerificationImg,
-  AI_SKILLS: aiSkillsImg,
+  AROUND_JOB_POST: imgSrc(aroundJobPost),
+  JOB_POST_NOTIFICATION: imgSrc(jobPostNotification),
+  JOB_POST: imgSrc(jobPostImg),
+  PROFILE: imgSrc(profileImg),
+  LIVE_INTERVIEW: imgSrc(liveInterviewImg),
+  CANDIDATE_CRM: imgSrc(candidateCrmImg),
+  COMPANY_VERIFICATION: imgSrc(companyVerificationImg),
+  AI_SKILLS: imgSrc(aiSkillsImg),
 } as const;
 
 const ICONS = {
-  INSTAGRAM: instagramIcon,
-  FACEBOOK: facebookIcon,
-  FACEBOOK_MESSENGER: facebookMessengerIcon,
-  LINKEDIN: linkedinIcon,
-  TWITTER: twitterIcon,
-  YOUTUBE: youtubeIcon,
-  WEBSITE: websiteIcon,
-  LOCATION_MARKER: locationMarker,
-  JOB_SEEKER_CHATBOT_ICON: jobSeekerChatbotIcon,
-  EMPLOYER_CHATBOT_ICON: employerChatbotIcon,
+  INSTAGRAM: imgSrc(instagramIcon),
+  FACEBOOK: imgSrc(facebookIcon),
+  FACEBOOK_MESSENGER: imgSrc(facebookMessengerIcon),
+  LINKEDIN: imgSrc(linkedinIcon),
+  TWITTER: imgSrc(twitterIcon),
+  YOUTUBE: imgSrc(youtubeIcon),
+  WEBSITE: imgSrc(websiteIcon),
+  LOCATION_MARKER: imgSrc(locationMarker),
+  JOB_SEEKER_CHATBOT_ICON: imgSrc(jobSeekerChatbotIcon),
+  EMPLOYER_CHATBOT_ICON: imgSrc(employerChatbotIcon),
 } as const;
 
 const LINKS = {
@@ -215,15 +225,15 @@ const LINKS = {
 } as const;
 
 const LOADING_IMAGES = {
-  LOADING_SPINNER: loadingSpinner,
+  LOADING_SPINNER: imgSrc(loadingSpinner),
 } as const;
 
 const FEEDBACK_IMAGES = {
-  '1star': star1,
-  '2star': star2,
-  '3star': star3,
-  '4star': star4,
-  '5star': star5,
+  '1star': imgSrc(star1),
+  '2star': imgSrc(star2),
+  '3star': imgSrc(star3),
+  '4star': imgSrc(star4),
+  '5star': imgSrc(star5),
 } as const;
 
 const LOGO_IMAGES = {
@@ -244,21 +254,21 @@ const JOB_POST_STATUS_BG_COLOR = {
 const ROUTES = {
   AUTH: {
     EMAIL_VERIFICATION: 'email-verification-required',
-    LOGIN: 'dang-nhap',
-    REGISTER: 'dang-ky',
-    FORGOT_PASSWORD: 'quen-mat-khau',
-    RESET_PASSWORD: 'cap-nhat-mat-khau/:token',
-  },
-  EMPLOYER_AUTH: {
     LOGIN: 'login',
     REGISTER: 'register',
     FORGOT_PASSWORD: 'forgot-password',
-    RESET_PASSWORD: 'reset-password/:token',
+    RESET_PASSWORD: 'reset-password',
+  },
+  EMPLOYER_AUTH: {
+    LOGIN: 'employer/login',
+    REGISTER: 'employer/register',
+    FORGOT_PASSWORD: 'employer/forgot-password',
+    RESET_PASSWORD: 'employer/reset-password',
   },
   ADMIN_AUTH: {
-    LOGIN: 'login',
-    FORGOT_PASSWORD: 'forgot-password',
-    RESET_PASSWORD: 'reset-password/:token',
+    LOGIN: 'admin/login',
+    FORGOT_PASSWORD: 'admin/forgot-password',
+    RESET_PASSWORD: 'admin/reset-password',
   },
   ERROR: {
     NOT_FOUND: '*',
@@ -266,112 +276,112 @@ const ROUTES = {
   },
   JOB_SEEKER: {
     HOME: '',
-    JOBS: 'viec-lam',
-    JOB_DETAIL: 'viec-lam/:slug',
-    COMPANY: 'cong-ty',
-    COMPANY_DETAIL: 'cong-ty/:slug',
-    ABOUT_US: 've-chung-toi',
-    JOBS_BY_CAREER: 'viec-lam-theo-nganh-nghe',
-    JOBS_BY_CITY: 'viec-lam-theo-tinh-thanh',
-    JOBS_BY_TYPE: 'viec-lam-theo-hinh-thuc-lam-viec',
-    DASHBOARD: 'bang-dieu-khien',
-    PROFILE: 'ho-so',
-    STEP_PROFILE: 'ho-so-tung-buoc/:slug',
-    ATTACHED_PROFILE: 'ho-so-dinh-kem/:slug',
-    MY_JOB: 'viec-lam-cua-toi',
-    MY_COMPANY: 'cong-ty-cua-toi',
-    MY_INTERVIEWS: 'phong-van-cua-toi',
-    NOTIFICATION: 'thong-bao',
-    ACCOUNT: 'tai-khoan',
-    CHAT: 'ket-noi-voi-nha-tuyen-dung',
-    CONTACT: 'lien-he',
-    FAQ: 'cau-hoi-thuong-gap',
-    TERMS_OF_SERVICE: 'dieu-khoan-dich-vu',
-    PRIVACY_POLICY: 'chinh-sach-bao-mat',
+    JOBS: 'jobs',
+    JOB_DETAIL: 'jobs/:slug',
+    COMPANY: 'companies',
+    COMPANY_DETAIL: 'companies/:slug',
+    ABOUT_US: 'about-us',
+    JOBS_BY_CAREER: 'jobs-by-career',
+    JOBS_BY_CITY: 'jobs-by-city',
+    JOBS_BY_TYPE: 'jobs-by-type',
+    DASHBOARD: 'dashboard',
+    PROFILE: 'profile',
+    STEP_PROFILE: 'online-profile/:slug',
+    ATTACHED_PROFILE: 'attached-profile/:slug',
+    MY_JOB: 'my-jobs',
+    MY_COMPANY: 'my-company',
+    MY_INTERVIEWS: 'my-interviews',
+    NOTIFICATION: 'notifications',
+    ACCOUNT: 'account',
+    CHAT: 'chat',
+    CONTACT: 'contact',
+    FAQ: 'faq',
+    TERMS_OF_SERVICE: 'terms-of-service',
+    PRIVACY_POLICY: 'privacy-policy',
   },
   EMPLOYER: {
-    INTRODUCE: 'gioi-thieu',
-    SERVICE: 'dich-vu',
-    PRICING: 'bao-gia',
-    SUPPORT: 'ho-tro',
-    BLOG: 'blog-tuyen-dung',
-    DASHBOARD: '',
-    JOB_POST: 'tin-tuyen-dung',
-    APPLIED_PROFILE: 'ho-so-ung-tuyen',
-    SAVED_PROFILE: 'ho-so-da-luu',
-    PROFILE: 'danh-sach-ung-vien',
-    PROFILE_DETAIL: 'chi-tiet-ung-vien/:slug',
-    COMPANY: 'cong-ty',
-    EMPLOYEES: 'nhan-su-va-vai-tro',
-    NOTIFICATION: 'thong-bao',
-    ACCOUNT: 'tai-khoan',
-    SETTING: 'cai-dat',
-    CHAT: 'ket-noi-voi-ung-vien',
-    INTERVIEW_LIST: 'danh-sach-phong-van',
-    INTERVIEW_LIVE: 'phong-van-ung-vien-truc-tiep',
-    INTERVIEW_SESSION: 'phong-van-truc-tiep/:id',
-    INTERVIEW_CREATE: 'len-lich-phong-van',
-    INTERVIEW_DETAIL: 'chi-tiet-phong-van/:id',
-    QUESTION_BANK: 'ngan-hang-cau-hoi',
-    QUESTION_GROUPS: 'bo-cau-hoi',
-    VERIFICATION: 'xac-thuc-nha-tuyen-dung',
-    CONTACT: 'lien-he',
-    FAQ: 'cau-hoi-thuong-gap',
-    TERMS_OF_SERVICE: 'dieu-khoan-dich-vu',
-    PRIVACY_POLICY: 'chinh-sach-bao-mat',
+    INTRODUCE: 'employer/introduce',
+    SERVICE: 'employer/service',
+    PRICING: 'employer/pricing',
+    SUPPORT: 'employer/support',
+    BLOG: 'employer/blog',
+    DASHBOARD: 'employer/dashboard',
+    JOB_POST: 'employer/job-posts',
+    APPLIED_PROFILE: 'employer/applied-profiles',
+    SAVED_PROFILE: 'employer/saved-profiles',
+    PROFILE: 'employer/candidates',
+    PROFILE_DETAIL: 'employer/candidates/:slug',
+    COMPANY: 'employer/company',
+    EMPLOYEES: 'employer/employees',
+    NOTIFICATION: 'employer/notifications',
+    ACCOUNT: 'employer/account',
+    SETTING: 'employer/settings',
+    CHAT: 'employer/chat',
+    INTERVIEW_LIST: 'employer/interviews',
+    INTERVIEW_LIVE: 'employer/interviews/live',
+    INTERVIEW_SESSION: 'employer/interviews/session/:id',
+    INTERVIEW_CREATE: 'employer/interviews/create',
+    INTERVIEW_DETAIL: 'employer/interviews/:id',
+    QUESTION_BANK: 'employer/question-bank',
+    QUESTION_GROUPS: 'employer/question-groups',
+    VERIFICATION: 'employer/verification',
+    CONTACT: 'employer/contact',
+    FAQ: 'employer/faq',
+    TERMS_OF_SERVICE: 'employer/terms-of-service',
+    PRIVACY_POLICY: 'employer/privacy-policy',
   },
   JOBSEEKER_INTERVIEW: {
-    LOGIN: 'phong-van/dang-nhap',
-    INTERVIEW: 'phong-van/:id',
-    INTERVIEW_ROOM: 'phong-van/room/:id',
+    LOGIN: 'interview/login',
+    INTERVIEW: 'interview/:id',
+    INTERVIEW_ROOM: 'interview/room/:id',
   },
   CANDIDATE: {
-    LOGIN: 'phong-van/dang-nhap',
-    INTERVIEW: 'phong-van/:id',
-    INTERVIEW_ROOM: 'phong-van/room/:id',
+    LOGIN: 'interview/login',
+    INTERVIEW: 'interview/:id',
+    INTERVIEW_ROOM: 'interview/room/:id',
   },
   ADMIN: {
-    DASHBOARD: '',
-    USERS: 'quan-ly-nguoi-dung',
-    JOBS: 'quan-ly-tin-tuyen-dung',
-    QUESTIONS: 'kho-cau-hoi',
-    QUESTION_GROUPS: 'quan-ly-bo-cau-hoi',
-    INTERVIEWS: 'quan-ly-phong-van',
-    SETTINGS: 'cai-dat-he-thong',
-    CAREERS: 'quan-ly-nganh-nghe',
-    CITIES: 'quan-ly-tinh-thanh',
-    DISTRICTS: 'quan-ly-quan-huyen',
-    WARDS: 'quan-ly-phuong-xa',
-    COMPANIES: 'quan-ly-cong-ty',
-    PROFILES: 'quan-ly-ho-so-ung-vien',
-    RESUMES: 'quan-ly-cv-resume',
-    JOB_ACTIVITY: 'nhat-ky-tin-tuyen-dung',
-    JOB_NOTIFICATIONS: 'thong-bao-viec-lam',
-    INTERVIEW_LIVE: 'phong-van-cong-ty-truc-tiep',
-    INTERVIEW_SESSION: 'phong-van-truc-tiep/:id',
-    BANNERS: 'quan-ly-banner',
-    FEEDBACKS: 'quan-ly-danh-gia',
-    CHAT: 'ket-noi-voi-nha-tuyen-dung',
+    DASHBOARD: 'admin/dashboard',
+    USERS: 'admin/users',
+    JOBS: 'admin/jobs',
+    QUESTIONS: 'admin/questions',
+    QUESTION_GROUPS: 'admin/question-groups',
+    INTERVIEWS: 'admin/interviews',
+    SETTINGS: 'admin/settings',
+    CAREERS: 'admin/careers',
+    CITIES: 'admin/cities',
+    DISTRICTS: 'admin/districts',
+    WARDS: 'admin/wards',
+    COMPANIES: 'admin/companies',
+    PROFILES: 'admin/profiles',
+    RESUMES: 'admin/resumes',
+    JOB_ACTIVITY: 'admin/job-activity',
+    JOB_NOTIFICATIONS: 'admin/job-notifications',
+    INTERVIEW_LIVE: 'admin/interviews/live',
+    INTERVIEW_SESSION: 'admin/interviews/session/:id',
+    BANNERS: 'admin/banners',
+    FEEDBACKS: 'admin/feedbacks',
+    CHAT: 'admin/chat',
   },
 };
 
 // SVG components
 const SVG_IMAGES = {
-  ImageSvg1: emptyDataSvg,
-  ImageSvg2: onlineGallerySvg,
-  ImageSvg3: emptyStreetSvg,
-  ImageSvg4: dreamerSvg,
-  ImageSvg5: smallTownSvg,
-  ImageSvg6: workingRemotelySvg,
-  ImageSvg7: countrySideSvg,
-  ImageSvg8: thoughtsSvg,
-  ImageSvg9: browsingOnlineSvg,
-  ImageSvg10: noteListSvg,
-  ImageSvg11: profileDataSvg,
-  ImageSvg12: myDocumentsSvg,
-  ImageSvg13: opinionSvg,
-  ImageSvg14: letterSvg,
-  ImageSvg15: sadSvg,
+  ImageSvg1: imgSrc(emptyDataSvg),
+  ImageSvg2: imgSrc(onlineGallerySvg),
+  ImageSvg3: imgSrc(emptyStreetSvg),
+  ImageSvg4: imgSrc(dreamerSvg),
+  ImageSvg5: imgSrc(smallTownSvg),
+  ImageSvg6: imgSrc(workingRemotelySvg),
+  ImageSvg7: imgSrc(countrySideSvg),
+  ImageSvg8: imgSrc(thoughtsSvg),
+  ImageSvg9: imgSrc(browsingOnlineSvg),
+  ImageSvg10: imgSrc(noteListSvg),
+  ImageSvg11: imgSrc(profileDataSvg),
+  ImageSvg12: imgSrc(myDocumentsSvg),
+  ImageSvg13: imgSrc(opinionSvg),
+  ImageSvg14: imgSrc(letterSvg),
+  ImageSvg15: imgSrc(sadSvg),
 } as const;
 
 export type HostNameConfig = typeof HOST_NAME;

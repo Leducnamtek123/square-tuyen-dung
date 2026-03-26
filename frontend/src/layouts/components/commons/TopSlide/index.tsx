@@ -1,11 +1,11 @@
-import 'swiper/css';
-import 'swiper/css/grid';
-import 'swiper/css/pagination';
+// import 'swiper/css';
+// import 'swiper/css/grid';
+// import 'swiper/css/pagination';
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import { Box, Link } from "@mui/material";
-import HomeSearch from '../../../../pages/components/defaults/HomeSearch';
+import HomeSearch from '../../../../views/components/defaults/HomeSearch';
 import MuiImageCustom from '../../../../components/MuiImageCustom';
 import contentService from '../../../../services/contentService';
 import { BANNER_TYPES, IMAGES } from '../../../../configs/constants';

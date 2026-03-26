@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import TimeAgo from '../TimeAgo';
 import { Badge, Box, IconButton, Menu, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
@@ -33,7 +33,7 @@ const MAX_NOTIFICATIONS = 50;
 
 const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
-  const nav = useNavigate();
+  const nav = useRouter();
 
   const { currentUser } = useAppSelector((state) => state.user);
 
@@ -318,7 +318,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
         handleRead(item.key);
 
-        nav('/');
+        nav.push('/');
 
         break;
 
@@ -326,7 +326,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
         handleRead(item.key);
 
-        nav(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`);
+        nav.push(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`);
 
         break;
 
@@ -334,7 +334,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
         handleRead(item.key);
 
-        nav(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`);
+        nav.push(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`);
 
         break;
 
@@ -342,7 +342,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
         handleRead(item.key);
 
-        nav(`/${ROUTES.JOB_SEEKER.MY_JOB}`);
+        nav.push(`/${ROUTES.JOB_SEEKER.MY_JOB}`);
 
         break;
 
@@ -350,7 +350,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
         handleRead(item.key);
 
-        nav(`/${ROUTES.EMPLOYER.PROFILE}`);
+        nav.push(`/${ROUTES.EMPLOYER.PROFILE}`);
 
         break;
 
@@ -358,7 +358,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
         handleRead(item.key);
 
-        nav(`/${ROUTES.EMPLOYER.JOB_POST}`);
+        nav.push(`/${ROUTES.EMPLOYER.JOB_POST}`);
 
         break;
 
@@ -366,7 +366,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
         handleRead(item.key);
 
-        nav(
+        nav.push(
 
           `/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, item['APPLY_JOB']?.resume_slug)}`
 

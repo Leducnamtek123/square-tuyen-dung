@@ -38,19 +38,19 @@ const supportsAdvancedRegex = (): boolean => {
  * Safari / older browsers never parse the ES2018 regex in node_modules.
  * --------------------------------------------------------------------------- */
 const STREAMDOWN_CDN =
-  import.meta.env.VITE_STREAMDOWN_CDN ||
+  process.env.NEXT_PUBLIC_STREAMDOWN_CDN ||
   "https://esm.sh/streamdown@2.4.0";
 const STREAMDOWN_CJK_CDN =
-  import.meta.env.VITE_STREAMDOWN_CJK_CDN ||
+  process.env.NEXT_PUBLIC_STREAMDOWN_CJK_CDN ||
   "https://esm.sh/@streamdown/cjk@1.0.2";
 const STREAMDOWN_CODE_CDN =
-  import.meta.env.VITE_STREAMDOWN_CODE_CDN ||
+  process.env.NEXT_PUBLIC_STREAMDOWN_CODE_CDN ||
   "https://esm.sh/@streamdown/code@1.1.0";
 const STREAMDOWN_MATH_CDN =
-  import.meta.env.VITE_STREAMDOWN_MATH_CDN ||
+  process.env.NEXT_PUBLIC_STREAMDOWN_MATH_CDN ||
   "https://esm.sh/@streamdown/math@1.0.2";
 const STREAMDOWN_MERMAID_CDN =
-  import.meta.env.VITE_STREAMDOWN_MERMAID_CDN ||
+  process.env.NEXT_PUBLIC_STREAMDOWN_MERMAID_CDN ||
   "https://esm.sh/@streamdown/mermaid@1.0.2";
 
 /* ---------------------------------------------------------------------------

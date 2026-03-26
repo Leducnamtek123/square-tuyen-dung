@@ -1,7 +1,8 @@
 import * as React from "react";
 import { useAppSelector } from '@/redux/hooks';
 
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 import { useTranslation } from 'react-i18next';
 
@@ -55,7 +56,9 @@ const Header = (props: HeaderProps) => {
 
   const isSmall = useMediaQuery(theme.breakpoints.down("md"));
 
-  const location = useLocation();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const location = { pathname, search: searchParams.toString(), state: null, key: '' };
 
   const hostName = window.location.hostname;
 
@@ -73,7 +76,7 @@ const Header = (props: HeaderProps) => {
       ? HOST_NAME.EMPLOYER_PROJECT
       : HOST_NAME.PROJECT;
 
-  const nav = useNavigate();
+  const nav = useRouter();
 
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
 
@@ -109,14 +112,14 @@ const Header = (props: HeaderProps) => {
 
   const handleLogin = () => {
     if (isAdminPortal) {
-      nav(`/${ROUTES.ADMIN_AUTH.LOGIN}`);
+      nav.push(`/${ROUTES.ADMIN_AUTH.LOGIN}`);
       return;
     }
     if (isEmployerPortal) {
-      nav(`/${ROUTES.EMPLOYER_AUTH.LOGIN}`);
+      nav.push(`/${ROUTES.EMPLOYER_AUTH.LOGIN}`);
       return;
     }
-    nav(`/${ROUTES.AUTH.LOGIN}`);
+    nav.push(`/${ROUTES.AUTH.LOGIN}`);
 
   };
 
@@ -124,10 +127,10 @@ const Header = (props: HeaderProps) => {
 
     if (isAdminPortal) return;
     if (isEmployerPortal) {
-      nav(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`);
+      nav.push(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`);
       return;
     }
-    nav(`/${ROUTES.AUTH.REGISTER}`);
+    nav.push(`/${ROUTES.AUTH.REGISTER}`);
 
   };
 
@@ -354,7 +357,7 @@ const Header = (props: HeaderProps) => {
             {/* ── Logo ── */}
             <Box
               component={Link}
-              to="/"
+              href="/"
               sx={{
                 display: 'flex',
                 alignItems: 'center',
@@ -393,7 +396,7 @@ const Header = (props: HeaderProps) => {
             {/* ── Desktop: nav links (flex grow) ── */}
             <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               {(pages[currentPortalHost] || []).map((page) => (
-                <Link to={page.path} key={page.id} onClick={handleCloseNavMenu}>
+                <Link href={page.path} key={page.id} onClick={handleCloseNavMenu}>
                   <Button
                     color="primary"
                     sx={{

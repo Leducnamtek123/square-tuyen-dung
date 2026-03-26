@@ -1,15 +1,22 @@
 import React from 'react';
 import Image from 'mui-image';
+import type { StaticImageData } from 'next/image';
 
 interface MuiImageCustomProps {
   loading?: 'lazy' | 'eager';
-  src: string | null | undefined;
-  fallbackSrc?: string;
+  src: string | StaticImageData | null | undefined;
+  fallbackSrc?: string | StaticImageData;
   onError?: (event: any) => void;
   [key: string]: any;
 }
 
 const ImageWithLoading = Image as any;
+
+const resolveSrc = (src: string | StaticImageData | null | undefined): string => {
+  if (!src) return '';
+  if (typeof src === 'string') return src;
+  return src.src; // StaticImageData
+};
 
 const MuiImageCustom = (props: MuiImageCustomProps) => {
 
@@ -21,16 +28,17 @@ const MuiImageCustom = (props: MuiImageCustomProps) => {
     ...rest
   } = props;
 
-  const [imageSrc, setImageSrc] = React.useState(src || fallbackSrc || '');
+  const resolvedFallback = resolveSrc(fallbackSrc);
+  const [imageSrc, setImageSrc] = React.useState(resolveSrc(src) || resolvedFallback || '');
 
   React.useEffect(() => {
-    setImageSrc(src || fallbackSrc || '');
-  }, [src, fallbackSrc]);
+    setImageSrc(resolveSrc(src) || resolvedFallback || '');
+  }, [src, resolvedFallback]);
 
   const handleError = React.useCallback(
     (event: any) => {
-      if (fallbackSrc && imageSrc !== fallbackSrc) {
-        setImageSrc(fallbackSrc);
+      if (resolvedFallback && imageSrc !== resolvedFallback) {
+        setImageSrc(resolvedFallback);
       }
       if (onError) {
         onError(event);
