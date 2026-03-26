@@ -244,62 +244,67 @@ class CompanyViewSet(viewsets.ViewSet,
         return [perms_sys.AllowAny()]
 
     def list(self, request, *args, **kwargs):
-        from shared.helpers.redis_service import RedisService
-        import hashlib
-        from urllib.parse import parse_qsl, urlencode
+        try:
+            from shared.helpers.redis_service import RedisService
+            import hashlib
+            from urllib.parse import parse_qsl, urlencode
 
-        redis_obj = RedisService()
-        raw_query_str = request.GET.urlencode()
-        filtered_query = [(k, v) for k, v in parse_qsl(raw_query_str, keep_blank_values=False) if v != ""]
-        filtered_query.sort()
-        query_str = urlencode(filtered_query)
-        query_hash = hashlib.md5(query_str.encode("utf-8")).hexdigest()
-        cache_key = f'company_list_{query_hash}_{request.user.id if request.user.is_authenticated else 0}'
-        cached_res = redis_obj.get_json(cache_key)
-        if cached_res:
-            return var_res.response_data(data=cached_res)
+            redis_obj = RedisService()
+            raw_query_str = request.GET.urlencode()
+            filtered_query = [(k, v) for k, v in parse_qsl(raw_query_str, keep_blank_values=False) if v != ""]
+            filtered_query.sort()
+            query_str = urlencode(filtered_query)
+            query_hash = hashlib.md5(query_str.encode("utf-8")).hexdigest()
+            cache_key = f'company_list_{query_hash}_{request.user.id if request.user.is_authenticated else 0}'
+            cached_res = redis_obj.get_json(cache_key)
+            if cached_res:
+                return var_res.response_data(data=cached_res)
 
-        queryset = self.filter_queryset(self.get_queryset())
-        queryset = queryset.annotate(
-            follow_count=Count('companyfollowed_set', distinct=True),
-            active_job_post_count=Count(
-                'job_posts',
-                filter=Q(
-                    job_posts__deadline__gte=timezone.now().date(),
-                    job_posts__status=var_sys.JobPostStatus.APPROVED
+            queryset = self.filter_queryset(self.get_queryset())
+            queryset = queryset.annotate(
+                follow_count=Count('companyfollowed_set', distinct=True),
+                active_job_post_count=Count(
+                    'job_posts',
+                    filter=Q(
+                        job_posts__deadline__gte=timezone.now().date(),
+                        job_posts__status=var_sys.JobPostStatus.APPROVED
+                    ),
+                    distinct=True
                 ),
-                distinct=True
-            ),
-        )
-        if request.user.is_authenticated:
-            queryset = queryset.prefetch_related(
-                Prefetch('companyfollowed_set', queryset=CompanyFollowed.objects.filter(user=request.user))
             )
-        queryset = queryset.order_by('-id', 'update_at', 'create_at')
+            if request.user.is_authenticated:
+                queryset = queryset.prefetch_related(
+                    Prefetch('companyfollowed_set', queryset=CompanyFollowed.objects.filter(user=request.user))
+                )
+            queryset = queryset.order_by('-id', 'update_at', 'create_at')
 
-        page = self.paginate_queryset(queryset)
+            page = self.paginate_queryset(queryset)
 
-        if page is not None:
+            if page is not None:
 
-            serializer = self.get_serializer(page, many=True, fields=[
+                serializer = self.get_serializer(page, many=True, fields=[
 
-                'id', 'slug', 'companyName', 'companyImageUrl',
+                    'id', 'slug', 'companyName', 'companyImageUrl',
 
-                'companyCoverImageUrl',
+                    'companyCoverImageUrl',
 
-                'fieldOperation', 'employeeSize', 'locationDict',
+                    'fieldOperation', 'employeeSize', 'locationDict',
 
-                'followNumber', 'jobPostNumber', 'isFollowed'
+                    'followNumber', 'jobPostNumber', 'isFollowed'
 
-            ])
+                ])
 
-            paginated_response = self.get_paginated_response(serializer.data)
-            redis_obj.set_json(cache_key, paginated_response.data, 300)
-            return paginated_response
+                paginated_response = self.get_paginated_response(serializer.data)
+                redis_obj.set_json(cache_key, paginated_response.data, 300)
+                return paginated_response
 
-        serializer = self.get_serializer(queryset, many=True)
+            serializer = self.get_serializer(queryset, many=True)
 
-        return var_res.response_data(data=serializer.data)
+            return var_res.response_data(data=serializer.data)
+
+        except Exception as ex:
+            helper.print_log_error("CompanyViewSet__list", ex)
+            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def retrieve(self, request, *args, **kwargs):
 
