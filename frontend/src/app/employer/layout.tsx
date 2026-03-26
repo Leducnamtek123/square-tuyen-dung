@@ -15,17 +15,29 @@ import { getPreferredLanguage, getPortalPrefix } from '@/configs/portalRouting';
 // Pages that use DefaultLayout instead of EmployerLayout
 const DEFAULT_LAYOUT_PATHS = [
   '/employer/login',
+  '/nha-tuyen-dung/login',
   '/employer/forgot-password',
+  '/nha-tuyen-dung/quen-mat-khau',
+  '/nha-tuyen-dung/forgot-password',
   '/employer/reset-password',
+  '/nha-tuyen-dung/cap-nhat-mat-khau',
+  '/nha-tuyen-dung/reset-password',
   '/employer/register',
+  '/nha-tuyen-dung/dang-ky',
+  '/nha-tuyen-dung/register',
   '/employer/introduce',
+  '/nha-tuyen-dung/gioi-thieu',
   '/employer/service',
+  '/nha-tuyen-dung/dich-vu',
   '/employer/pricing',
+  '/nha-tuyen-dung/bao-gia',
   '/employer/support',
+  '/nha-tuyen-dung/ho-tro',
   '/employer/blog',
+  '/nha-tuyen-dung/blog-tuyen-dung',
 ];
 
-const CHAT_LAYOUT_PATHS = ['/employer/chat'];
+const CHAT_LAYOUT_PATHS = ['/employer/chat', '/nha-tuyen-dung/ket-noi-voi-ung-vien', '/nha-tuyen-dung/chat'];
 
 export default function EmployerSectionLayout({
   children,
