@@ -333,12 +333,12 @@ const ROUTES = {
   JOBSEEKER_INTERVIEW: {
     LOGIN: 'interview/login',
     INTERVIEW: 'interview/:id',
-    INTERVIEW_ROOM: 'interview/room/:id',
+    INTERVIEW_ROOM: 'interview/:id',
   },
   CANDIDATE: {
     LOGIN: 'interview/login',
     INTERVIEW: 'interview/:id',
-    INTERVIEW_ROOM: 'interview/room/:id',
+    INTERVIEW_ROOM: 'interview/:id',
   },
   ADMIN: {
     DASHBOARD: 'admin/dashboard',

@@ -14,7 +14,6 @@ import { removeUserInfo } from "../../../../redux/userSlice";
 import { setActiveWorkspace } from "../../../../redux/userSlice";
 
 import { HOST_NAME, ROUTES } from "../../../../configs/constants";
-import { buildPortalPath, getPreferredLanguage } from "../../../../configs/portalRouting";
 import tokenService from "../../../../services/tokenService";
 import {
   resetSearchCompany,
@@ -42,7 +41,9 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
     const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
     const protocol = window.location.protocol;
     const port = window.location.port ? `:${window.location.port}` : "";
-    const targetPath = toEmployer ? buildPortalPath("employer", normalizedPath, getPreferredLanguage()) : normalizedPath;
+    const targetPath = toEmployer
+      ? normalizedPath || `/${ROUTES.EMPLOYER.DASHBOARD}`
+      : normalizedPath;
     window.location.href = `${protocol}//${HOST_NAME.PROJECT}${port}${targetPath}`;
   };
 

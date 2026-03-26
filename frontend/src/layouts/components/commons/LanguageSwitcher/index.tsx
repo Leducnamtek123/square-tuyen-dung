@@ -4,7 +4,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Button, Menu, MenuItem, Stack, Typography, useTheme, Avatar } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { localizeRoutePath } from '../../../../configs/routeLocalization';
-import { buildPortalPath, detectPortalFromPath } from '../../../../configs/portalRouting';
+import { detectPortalFromPath } from '../../../../configs/portalRouting';
 
 interface LanguageSwitcherProps {
   color?: string;
@@ -48,10 +48,9 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
     const localizedPath = localizeRoutePath(location.pathname, lng);
     const portal = detectPortalFromPath(window.location.pathname || '/');
     if (portal !== 'jobseeker') {
-      const nextFullPath = buildPortalPath(portal, localizedPath, lng);
       const currentFullPath = window.location.pathname || '/';
-      if (nextFullPath !== currentFullPath) {
-        window.location.assign(`${nextFullPath}${location.search}${location.hash}`);
+      if (localizedPath !== currentFullPath) {
+        window.location.assign(`${localizedPath}${location.search}${location.hash}`);
       }
     } else if (localizedPath !== location.pathname) {
       navigate.replace(`${localizedPath}${location.search}${location.hash}`);

@@ -43,13 +43,13 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
       </Collapse>
 
       <ListItem disablePadding>
-        <MenuItem icon={BusinessOutlinedIcon} text="Quản lý nội dung" hasChildren isExpanded={expandedItems.content} onClick={() => handleExpand('content')} />
+        <MenuItem icon={BusinessOutlinedIcon} text={t('admin:sidebar.contentManagement')} hasChildren isExpanded={expandedItems.content} onClick={() => handleExpand('content')} />
       </ListItem>
       <Collapse in={expandedItems.content} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <MenuItem text="Quản lý Banner" to={`/${ROUTES.ADMIN.BANNERS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.BANNERS}`} isChild />
-          <MenuItem text="Quản lý Đánh giá" to={`/${ROUTES.ADMIN.FEEDBACKS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.FEEDBACKS}`} isChild />
-          <MenuItem text="Kết nối với nhà tuyển dụng" to={`/${ROUTES.ADMIN.CHAT}`} isSelected={location.pathname === `/${ROUTES.ADMIN.CHAT}`} isChild />
+          <MenuItem text={t('admin:sidebar.bannersManagement')} to={`/${ROUTES.ADMIN.BANNERS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.BANNERS}`} isChild />
+          <MenuItem text={t('admin:sidebar.feedbacksManagement')} to={`/${ROUTES.ADMIN.FEEDBACKS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.FEEDBACKS}`} isChild />
+          <MenuItem text={t('admin:sidebar.chatWithEmployers')} to={`/${ROUTES.ADMIN.CHAT}`} isSelected={location.pathname === `/${ROUTES.ADMIN.CHAT}`} isChild />
         </List>
       </Collapse>
 

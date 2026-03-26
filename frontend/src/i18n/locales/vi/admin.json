@@ -41,7 +41,11 @@
     "interviewQuestionSets": "Bộ câu hỏi",
     "interviewSchedule": "Lịch phỏng vấn",
     "interviewLive": "Phỏng vấn Live",
-    "jobNotifications": "Thông báo việc làm"
+    "jobNotifications": "Thông báo việc làm",
+    "contentManagement": "Quản lý nội dung",
+    "bannersManagement": "Quản lý Banner",
+    "feedbacksManagement": "Quản lý Đánh giá",
+    "chatWithEmployers": "Kết nối với nhà tuyển dụng"
   },
   "pages": {
     "careers": {

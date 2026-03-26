@@ -53,6 +53,7 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/ho-tro', destination: '/employer/support' },
       { source: '/nha-tuyen-dung/blog-tuyen-dung', destination: '/employer/blog' },
       { source: '/nha-tuyen-dung', destination: '/employer/dashboard' },
+      { source: '/nha-tuyen-dung/bang-dieu-khien', destination: '/employer/dashboard' },
       { source: '/nha-tuyen-dung/tin-tuyen-dung', destination: '/employer/job-posts' },
       { source: '/nha-tuyen-dung/ho-so-ung-tuyen', destination: '/employer/applied-profiles' },
       { source: '/nha-tuyen-dung/ho-so-da-luu', destination: '/employer/saved-profiles' },
@@ -69,12 +70,13 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/bo-cau-hoi', destination: '/employer/question-groups' },
       { source: '/nha-tuyen-dung/xac-thuc-nha-tuyen-dung', destination: '/employer/verification' },
 
-      { source: '/nha-tuyen-dung/phong-van-ung-vien-truc-tiep', destination: '/employer/interviews-live' },
+      { source: '/nha-tuyen-dung/phong-van-ung-vien-truc-tiep', destination: '/employer/interviews/live' },
       { source: '/nha-tuyen-dung/phong-van-truc-tiep/:id', destination: '/employer/interviews/:id' },
       { source: '/nha-tuyen-dung/len-lich-phong-van', destination: '/employer/interviews/create' },
       { source: '/nha-tuyen-dung/chi-tiet-phong-van/:id', destination: '/employer/interviews/:id' },
       { source: '/quan-tri', destination: '/admin/dashboard' },
       { source: '/quan-tri/:path*', destination: '/admin/:path*' },
+      { source: '/phong-van/room/:id', destination: '/interview/:id' },
       { source: '/phong-van/:path*', destination: '/interview/:path*' },
     ];
   },

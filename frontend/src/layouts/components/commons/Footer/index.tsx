@@ -23,14 +23,11 @@ import Grid from '@mui/material/Grid2';
 import { ICONS, LINKS, ROUTES, APP_NAME, IMAGES } from '../../../../configs/constants';
 
 import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
-import { buildPortalPath, getPreferredLanguage } from '../../../../configs/portalRouting';
 
 const Footer = () => {
 
   const { t } = useTranslation('common');
   const nav = useRouter();
-  const language = getPreferredLanguage();
-  const employerPrefix = buildPortalPath('employer', '', language);
 
   const theme = useTheme();
 
@@ -127,9 +124,9 @@ const Footer = () => {
               </ListItem>
 
               {[
-                { label: t('footer.postJob'),          route: `${employerPrefix}/${ROUTES.EMPLOYER.JOB_POST}` },
-                { label: t('footer.searchResumes'),    route: `${employerPrefix}/${ROUTES.EMPLOYER.PROFILE}` },
-                { label: t('footer.employerDashboard'),route: `${employerPrefix}/` },
+                { label: t('footer.postJob'),          route: `/${ROUTES.EMPLOYER.JOB_POST}` },
+                { label: t('footer.searchResumes'),    route: `/${ROUTES.EMPLOYER.PROFILE}` },
+                { label: t('footer.employerDashboard'),route: `/${ROUTES.EMPLOYER.DASHBOARD}` },
               ].map((item) => (
                 <ListItem key={item.label} sx={{ pl: 0, py: 0.5 }}>
                   <ListItemText
