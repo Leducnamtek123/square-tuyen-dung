@@ -42,9 +42,6 @@ const DESCRIPTION_LOCATIONS = [
 const normalizeList = (res: any): any[] => {
   if (Array.isArray(res)) return res;
   if (Array.isArray(res?.results)) return res.results;
-  if (Array.isArray(res?.data)) return res.data;
-  if (Array.isArray(res?.data?.results)) return res.data.results;
-  if (Array.isArray(res?.data?.data)) return res.data.data;
   return [];
 };
 

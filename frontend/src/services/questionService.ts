@@ -4,9 +4,6 @@ type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number;
 
-const unwrapData = (response: { data?: unknown } | unknown): unknown =>
-  (response as { data?: unknown })?.data ?? response;
-
 const normalizeParams = (params: AnyRecord = {}): AnyRecord => {
   const normalized: AnyRecord = { ...params };
 
@@ -28,35 +25,32 @@ const normalizeParams = (params: AnyRecord = {}): AnyRecord => {
 const questionService = {
   getQuestions: (params: AnyRecord = {}): Promise<unknown> => {
     return httpRequest
-      .get('interview/web/questions/', { params: normalizeParams(params) })
-      .then(unwrapData);
+      .get('interview/web/questions/', { params: normalizeParams(params) });
   },
 
   // Alias for better clarity in Admin contexts
 
   getAllQuestions: (params: AnyRecord = {}): Promise<unknown> => {
     return httpRequest
-      .get('interview/web/questions/', { params: normalizeParams(params) })
-      .then(unwrapData);
+      .get('interview/web/questions/', { params: normalizeParams(params) });
   },
 
   getQuestionDetail: (id: IdType): Promise<unknown> => {
-    return httpRequest.get(`interview/web/questions/${id}/`).then(unwrapData);
+    return httpRequest.get(`interview/web/questions/${id}/`);
   },
 
   createQuestion: (data: AnyRecord): Promise<unknown> => {
-    return httpRequest.post('interview/web/questions/', data).then(unwrapData);
+    return httpRequest.post('interview/web/questions/', data);
   },
 
   updateQuestion: (id: IdType, data: AnyRecord): Promise<unknown> => {
     // Using PATCH for more flexible partial updates
     return httpRequest
-      .patch(`interview/web/questions/${id}/`, data)
-      .then(unwrapData);
+      .patch(`interview/web/questions/${id}/`, data);
   },
 
   deleteQuestion: (id: IdType): Promise<unknown> => {
-    return httpRequest.delete(`interview/web/questions/${id}/`).then(unwrapData);
+    return httpRequest.delete(`interview/web/questions/${id}/`);
   },
 };
 

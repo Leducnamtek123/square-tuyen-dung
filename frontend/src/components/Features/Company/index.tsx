@@ -44,7 +44,7 @@ const FollowComponent = ({ slug, isFollowed }: FollowProps) => {
 
         const resData = (await companyService.followCompany(slugCompany)) as any;
 
-        const isFollowed = resData.data.isFollowed;
+        const isFollowed = resData.isFollowed;
 
         setFollowed(isFollowed);
 

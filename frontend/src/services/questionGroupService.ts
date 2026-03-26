@@ -4,9 +4,6 @@ type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number;
 
-const unwrapData = (response: { data?: unknown } | unknown): unknown =>
-  (response as { data?: unknown })?.data ?? response;
-
 const normalizeParams = (params: AnyRecord = {}): AnyRecord => {
   const normalized: AnyRecord = { ...params };
 
@@ -33,28 +30,23 @@ const normalizeParams = (params: AnyRecord = {}): AnyRecord => {
 const questionGroupService = {
   getQuestionGroups: (params: AnyRecord = {}): Promise<unknown> => {
     return httpRequest
-      .get('interview/web/question-groups/', { params: normalizeParams(params) })
-      .then(unwrapData);
+      .get('interview/web/question-groups/', { params: normalizeParams(params) });
   },
   getQuestionGroupDetail: (id: IdType): Promise<unknown> => {
     return httpRequest
-      .get(`interview/web/question-groups/${id}/`)
-      .then(unwrapData);
+      .get(`interview/web/question-groups/${id}/`);
   },
   createQuestionGroup: (data: AnyRecord): Promise<unknown> => {
     return httpRequest
-      .post('interview/web/question-groups/', data)
-      .then(unwrapData);
+      .post('interview/web/question-groups/', data);
   },
   updateQuestionGroup: (id: IdType, data: AnyRecord): Promise<unknown> => {
     return httpRequest
-      .patch(`interview/web/question-groups/${id}/`, data)
-      .then(unwrapData);
+      .patch(`interview/web/question-groups/${id}/`, data);
   },
   deleteQuestionGroup: (id: IdType): Promise<unknown> => {
     return httpRequest
-      .delete(`interview/web/question-groups/${id}/`)
-      .then(unwrapData);
+      .delete(`interview/web/question-groups/${id}/`);
   },
 };
 

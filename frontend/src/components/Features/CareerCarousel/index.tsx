@@ -73,7 +73,7 @@ const CareerCarousel = () => {
     queryKey: ['top-careers'],
     queryFn: async () => {
       const resData = await commonService.getTop10Careers();
-      return resData.data || [];
+      return resData || [];
     },
     staleTime: 5 * 60_000,
   });
@@ -124,93 +124,93 @@ const CareerCarousel = () => {
         >
           {isLoading
             ? Array.from(Array(10).keys()).map((value) => (
-                <SwiperSlide key={value}>{Loading}</SwiperSlide>
-              ))
+              <SwiperSlide key={value}>{Loading}</SwiperSlide>
+            ))
             : topCareers.map((value: any) => (
-                <SwiperSlide key={value.id}>
-                  <Card
+              <SwiperSlide key={value.id}>
+                <Card
+                  sx={{
+                    alignItems: "center",
+                    p: 2,
+                    mb: 0.5,
+                    cursor: "pointer",
+                    boxShadow: 0,
+                    backgroundColor: (theme) => theme.palette.background.paper,
+                    borderRadius: "16px",
+                    transition: "all 0.3s ease",
+                    "&:hover": {
+                      transform: "translateY(-4px)",
+                      boxShadow: (theme: any) => theme.customShadows.medium,
+                      "& .career-icon": {
+                        transform: "scale(1.05)",
+                      },
+                      "& .career-name": {
+                        color: (theme: any) => theme.palette.primary.main,
+                      },
+                    },
+                  }}
+                  onClick={() => handleFilter(value.id)}
+                >
+                  <Stack
+                    direction="row"
+                    justifyContent="center"
                     sx={{
-                      alignItems: "center",
                       p: 2,
-                      mb: 0.5,
-                      cursor: "pointer",
-                      boxShadow: 0,
-                      backgroundColor: (theme) => theme.palette.background.paper,
-                      borderRadius: "16px",
-                      transition: "all 0.3s ease",
-                      "&:hover": {
-                        transform: "translateY(-4px)",
-                        boxShadow: (theme: any) => theme.customShadows.medium,
-                        "& .career-icon": {
-                          transform: "scale(1.05)",
-                        },
-                        "& .career-name": {
-                          color: (theme: any) => theme.palette.primary.main,
-                        },
+                      "& .career-icon": {
+                        transition: "transform 0.3s ease",
                       },
                     }}
-                    onClick={() => handleFilter(value.id)}
                   >
-                    <Stack
-                      direction="row"
-                      justifyContent="center"
+                    <MuiImageCustom
+                      width={72}
+                      height={72}
+                      src={value?.iconUrl}
+                      fallbackSrc={IMAGES.companyLogoDefault}
+                      className="career-icon"
                       sx={{
-                        p: 2,
-                        "& .career-icon": {
-                          transition: "transform 0.3s ease",
-                        },
-                      }}
-                    >
-                      <MuiImageCustom
-                        width={72}
-                        height={72}
-                        src={value?.iconUrl}
-                        fallbackSrc={IMAGES.companyLogoDefault}
-                        className="career-icon"
-                        sx={{
-                          borderRadius: "12px",
-                          p: 1,
-                          backgroundColor: (theme: any) => theme.palette.primary.background,
-                        }}
-                      />
-                    </Stack>
-                    <Typography
-                      className="career-name"
-                      variant="h6"
-                      component="h6"
-                      gutterBottom={true}
-                      sx={{
-                        textAlign: "center",
-                        fontWeight: "bold",
-                        fontSize: "1rem",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        transition: "color 0.3s ease",
-                        px: 1,
-                      }}
-                    >
-                      {value?.name}
-                    </Typography>
-                    <Typography
-                      variant="caption"
-                      display="block"
-                      gutterBottom
-                      sx={{
-                        textAlign: "center",
-                        color: (theme: any) => theme.palette.text.secondary,
+                        borderRadius: "12px",
+                        p: 1,
                         backgroundColor: (theme: any) => theme.palette.primary.background,
-                        px: 2,
-                        py: 0.5,
-                        borderRadius: "20px",
-                        fontSize: "0.75rem",
                       }}
-                    >
-                      {value.jobPostTotal} Việc Làm
-                    </Typography>
-                  </Card>
-                </SwiperSlide>
-              ))}
+                    />
+                  </Stack>
+                  <Typography
+                    className="career-name"
+                    variant="h6"
+                    component="h6"
+                    gutterBottom={true}
+                    sx={{
+                      textAlign: "center",
+                      fontWeight: "bold",
+                      fontSize: "1rem",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      transition: "color 0.3s ease",
+                      px: 1,
+                    }}
+                  >
+                    {value?.name}
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    display="block"
+                    gutterBottom
+                    sx={{
+                      textAlign: "center",
+                      color: (theme: any) => theme.palette.text.secondary,
+                      backgroundColor: (theme: any) => theme.palette.primary.background,
+                      px: 2,
+                      py: 0.5,
+                      borderRadius: "20px",
+                      fontSize: "0.75rem",
+                    }}
+                  >
+                    {value.jobPostTotal} Việc Làm
+                  </Typography>
+                </Card>
+              </SwiperSlide>
+            ))}
         </Swiper>
       </Box>
     </div>

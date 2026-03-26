@@ -46,7 +46,7 @@ const listItems = (items: CareerItem[], handleFilter: (id: string) => void) => (
 
     alignContent="center"
 
-    sx={{ 
+    sx={{
       overflowX: 'auto',
       scrollbarWidth: 'none',
       msOverflowStyle: 'none',
@@ -135,7 +135,7 @@ const SubHeader = () => {
 
         const resData = await commonService.getTop10Careers();
 
-        setTopCareers(resData.data);
+        setTopCareers(resData);
 
       } catch (error) {
 
@@ -208,7 +208,7 @@ const SubHeader = () => {
 
               <Box
 
-                sx={{ 
+                sx={{
 
                   cursor: 'pointer',
 
@@ -246,7 +246,7 @@ const SubHeader = () => {
 
                   fontSize={20}
 
-                  style={{ 
+                  style={{
 
                     color: theme.palette.primary.main
 

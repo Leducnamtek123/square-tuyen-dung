@@ -41,7 +41,7 @@ const FeedbackCarousel = (_props: FeedbackCarouselProps) => {
     queryKey: ['feedbacks'],
     queryFn: async () => {
       const resData: any = await contentService.getFeedbacks();
-      return resData.data || [];
+      return resData || [];
     },
     staleTime: 10 * 60_000, // feedbacks change rarely, cache 10 min
   });

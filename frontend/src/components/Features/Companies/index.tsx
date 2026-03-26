@@ -32,8 +32,8 @@ const Companies = (_props: Props) => {
         page: page,
       })) as any;
       return {
-        results: resData.data?.results || [],
-        count: resData.data.count || 0,
+        results: resData?.results || [],
+        count: resData?.count || 0,
       };
     },
     staleTime: 3 * 60_000,
