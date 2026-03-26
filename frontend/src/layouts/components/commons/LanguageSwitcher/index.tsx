@@ -4,7 +4,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Button, Menu, MenuItem, Stack, Typography, useTheme, Avatar } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import { localizeRoutePath } from '../../../../configs/routeLocalization';
-import { detectPortalFromPath } from '../../../../configs/portalRouting';
+import { buildPortalPath, detectPortalFromPath, stripPortalPrefix } from '../../../../configs/portalRouting';
 
 interface LanguageSwitcherProps {
   color?: string;
@@ -45,12 +45,15 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
 
   const changeLanguage = (lng: string) => {
     window.localStorage?.setItem('i18nextLng', lng);
+    const currentPath = window.location.pathname || '/';
     const localizedPath = localizeRoutePath(location.pathname, lng);
-    const portal = detectPortalFromPath(window.location.pathname || '/');
+    const portal = detectPortalFromPath(currentPath);
     if (portal !== 'jobseeker') {
-      const currentFullPath = window.location.pathname || '/';
-      if (localizedPath !== currentFullPath) {
-        window.location.assign(`${localizedPath}${location.search}${location.hash}`);
+      const childPath = stripPortalPrefix(currentPath);
+      const localizedChildPath = localizeRoutePath(childPath, lng);
+      const nextFullPath = buildPortalPath(portal, localizedChildPath, lng);
+      if (nextFullPath !== currentPath) {
+        window.location.assign(`${nextFullPath}${location.search}${location.hash}`);
       }
     } else if (localizedPath !== location.pathname) {
       navigate.replace(`${localizedPath}${location.search}${location.hash}`);

@@ -74,6 +74,7 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/phong-van-truc-tiep/:id', destination: '/employer/interviews/:id' },
       { source: '/nha-tuyen-dung/len-lich-phong-van', destination: '/employer/interviews/create' },
       { source: '/nha-tuyen-dung/chi-tiet-phong-van/:id', destination: '/employer/interviews/:id' },
+      { source: '/admin/bang-dieu-khien', destination: '/admin/dashboard' },
       { source: '/quan-tri', destination: '/admin/dashboard' },
       { source: '/quan-tri/:path*', destination: '/admin/:path*' },
       { source: '/phong-van/room/:id', destination: '/interview/:id' },
