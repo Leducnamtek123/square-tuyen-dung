@@ -38,6 +38,14 @@ interface AIAnalysisDrawerProps {
   initialData?: any;
 }
 
+const renderIcon = (
+  IconComponent: React.ElementType | undefined,
+  props?: Record<string, any>,
+) : React.ReactElement | undefined => {
+  if (!IconComponent) return undefined;
+  return <IconComponent {...props} />;
+};
+
 const DRAWER_WIDTH = 520;
 const EMBEDDABLE_HOSTS = new Set([
   'tuyendung.square.vn',
@@ -208,7 +216,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
         }}
       >
         <Stack direction="row" spacing={1.5} alignItems="center">
-          <PsychologyIcon sx={{ color: '#06b6d4', fontSize: 28 }} />
+          {renderIcon(PsychologyIcon, { sx: { color: '#06b6d4', fontSize: 28 } })}
           <Box>
             <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#1e293b', lineHeight: 1.2 }}>
               Phan tich AI
@@ -221,7 +229,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
           </Box>
         </Stack>
         <IconButton onClick={onClose} size="small">
-          <CloseIcon />
+          {renderIcon(CloseIcon)}
         </IconButton>
       </Box>
 
@@ -235,7 +243,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
       ) : (
         <Box sx={{ p: 2.5, overflowY: 'auto', flex: 1 }}>
           {resumeFileUrl && (
-            <SectionCard title="Ho so ung vien" icon={<DescriptionIcon fontSize="small" />} iconColor="#22d3ee">
+            <SectionCard title="Ho so ung vien" icon={renderIcon(DescriptionIcon, { fontSize: 'small' })} iconColor="#22d3ee">
               <Box
                 sx={{
                   border: '1px solid rgba(34,211,238,0.28)',
@@ -264,7 +272,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                     justifyContent="center"
                     sx={{ height: '100%', px: 2.5, textAlign: 'center', color: '#cbd5e1', gap: 1.5 }}
                   >
-                    <DescriptionIcon sx={{ fontSize: 36, color: '#67e8f9' }} />
+                    {renderIcon(DescriptionIcon, { sx: { fontSize: 36, color: '#67e8f9' } })}
                     <Typography variant="body2">
                       Khong the hien thi CV trong frame do chinh sach bao mat.
                     </Typography>
@@ -306,7 +314,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                   target="_blank"
                   variant="text"
                   size="small"
-                  startIcon={<OpenInNewIcon fontSize="small" />}
+                  startIcon={renderIcon(OpenInNewIcon, { fontSize: 'small' })}
                   sx={{ textTransform: 'none', fontSize: '0.75rem' }}
                 >
                   Mo file CV
@@ -353,7 +361,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
 
           {isFailed && (
             <Paper elevation={0} sx={{ p: 3, mb: 1.5, border: '1px solid #fecaca', borderRadius: 2, bgcolor: '#fef2f2', textAlign: 'center' }}>
-              <CancelIcon sx={{ fontSize: 36, color: '#ef4444', mb: 1 }} />
+              {renderIcon(CancelIcon, { sx: { fontSize: 36, color: '#ef4444', mb: 1 } })}
               <Typography variant="body1" sx={{ fontWeight: 600, color: '#991b1b' }}>
                 Phan tich that bai
               </Typography>
@@ -366,7 +374,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                 variant="outlined"
                 color="error"
                 size="small"
-                startIcon={<RefreshIcon />}
+                startIcon={renderIcon(RefreshIcon)}
                 onClick={handleAnalyze}
                 disabled={analyzing}
                 sx={{ mt: 2, textTransform: 'none' }}
@@ -388,7 +396,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                 background: 'linear-gradient(135deg, #f8fafc 0%, #ecfeff 100%)',
               }}
             >
-              <AutoFixHighIcon sx={{ fontSize: 40, color: '#0891b2', mb: 1 }} />
+              {renderIcon(AutoFixHighIcon, { sx: { fontSize: 40, color: '#0891b2', mb: 1 } })}
               <Typography variant="body1" sx={{ fontWeight: 700, color: '#0f172a', mb: 0.5 }}>
                 Idle - chua phan tich AI
               </Typography>
@@ -397,7 +405,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
               </Typography>
               <Button
                 variant="contained"
-                startIcon={<AutoFixHighIcon />}
+                startIcon={renderIcon(AutoFixHighIcon)}
                 onClick={handleAnalyze}
                 disabled={analyzing}
                 sx={{
@@ -427,7 +435,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
               >
                 <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ flexWrap: 'wrap', rowGap: 1 }}>
                   <Stack direction="row" spacing={1} alignItems="center">
-                    <CheckCircleIcon sx={{ color: '#0e7490' }} />
+                    {renderIcon(CheckCircleIcon, { sx: { color: '#0e7490' } })}
                     <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#134e4a' }}>
                       Complete - ket qua scan da san sang
                     </Typography>
@@ -444,29 +452,29 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                 <ScoreGauge score={data?.aiAnalysisScore || 0} />
               </Paper>
 
-              <SectionCard title="Tong quan danh gia" icon={<PsychologyIcon fontSize="small" />} iconColor="#6366f1">
+              <SectionCard title="Tong quan danh gia" icon={renderIcon(PsychologyIcon, { fontSize: 'small' })} iconColor="#6366f1">
                 <Typography variant="body2" sx={{ color: '#334155', lineHeight: 1.7 }}>
                   {data?.aiAnalysisSummary || 'Chua co danh gia'}
                 </Typography>
               </SectionCard>
 
-              <SectionCard title="Diem manh" icon={<ThumbUpAltIcon fontSize="small" />} iconColor="#22c55e">
+              <SectionCard title="Diem manh" icon={renderIcon(ThumbUpAltIcon, { fontSize: 'small' })} iconColor="#22c55e">
                 <SkillChipList skills={data?.aiAnalysisPros} color="success" />
               </SectionCard>
 
-              <SectionCard title="Diem yeu / Can luu y" icon={<ThumbDownAltIcon fontSize="small" />} iconColor="#ef4444">
+              <SectionCard title="Diem yeu / Can luu y" icon={renderIcon(ThumbDownAltIcon, { fontSize: 'small' })} iconColor="#ef4444">
                 <SkillChipList skills={data?.aiAnalysisCons} color="error" />
               </SectionCard>
 
-              <SectionCard title="Ky nang phu hop voi JD" icon={<CheckCircleIcon fontSize="small" />} iconColor="#22c55e">
-                <SkillChipList skills={data?.aiAnalysisMatchingSkills} color="success" icon={<CheckCircleIcon />} />
+              <SectionCard title="Ky nang phu hop voi JD" icon={renderIcon(CheckCircleIcon, { fontSize: 'small' })} iconColor="#22c55e">
+                <SkillChipList skills={data?.aiAnalysisMatchingSkills} color="success" icon={renderIcon(CheckCircleIcon)} />
               </SectionCard>
 
-              <SectionCard title="Ky nang con thieu" icon={<CancelIcon fontSize="small" />} iconColor="#f97316">
-                <SkillChipList skills={data?.aiAnalysisMissingSkills} color="error" icon={<CancelIcon />} />
+              <SectionCard title="Ky nang con thieu" icon={renderIcon(CancelIcon, { fontSize: 'small' })} iconColor="#f97316">
+                <SkillChipList skills={data?.aiAnalysisMissingSkills} color="error" icon={renderIcon(CancelIcon)} />
               </SectionCard>
 
-              <SectionCard title="Tat ca ky nang" icon={<AutoFixHighIcon fontSize="small" />} iconColor="#3b82f6">
+              <SectionCard title="Tat ca ky nang" icon={renderIcon(AutoFixHighIcon, { fontSize: 'small' })} iconColor="#3b82f6">
                 <SkillChipList skills={data?.aiAnalysisSkills} color="primary" />
               </SectionCard>
 
@@ -475,7 +483,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                 <Button
                   variant="outlined"
                   size="small"
-                  startIcon={<RefreshIcon />}
+                  startIcon={renderIcon(RefreshIcon)}
                   onClick={handleAnalyze}
                   disabled={analyzing}
                   sx={{ textTransform: 'none' }}
