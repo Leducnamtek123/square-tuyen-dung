@@ -209,11 +209,11 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
 
                       fontSize: "0.9rem",
 
-                      background: (theme: any) => (theme.palette.primary as any).gradient,
+                      background: (theme: any) => (theme.palette.primary as any).main,
 
                       "&:hover": {
 
-                        background: (theme: any) => (theme.palette.primary as any).gradient,
+                        background: (theme: any) => (theme.palette.primary as any).main,
 
                         opacity: 0.9,
 

@@ -27,7 +27,7 @@ const SettingPage = () => {
                   variant="h5"
                   sx={{
                     fontWeight: 600,
-                    background: (theme: any) => theme.palette.primary.gradient,
+                    background: (theme: any) => theme.palette.primary.main,
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     fontSize: { xs: "1.25rem", sm: "1.5rem" },

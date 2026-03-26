@@ -181,11 +181,11 @@ const Popup = ({
 
                 minWidth: 120,
 
-                background: theme.palette.primary.gradient,
+                background: theme.palette.primary.main,
 
                 '&:hover': {
 
-                  background: theme.palette.primary.gradient,
+                  background: theme.palette.primary.main,
 
                   opacity: 0.9,
 

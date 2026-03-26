@@ -50,7 +50,7 @@ const PricingPage = () => {
           variant="h3"
           sx={{
             mb: 2,
-            background: (theme: any) => theme.palette.primary.gradient,
+            background: (theme: any) => theme.palette.primary.main,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 700,

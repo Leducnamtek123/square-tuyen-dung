@@ -190,7 +190,7 @@ const InterviewLivePage = () => {
           variant="h5"
           sx={{
             fontWeight: 600,
-            background: (theme: any) => theme.palette.primary.gradient || theme.palette.primary.main,
+            background: (theme: any) => theme.palette.primary.main || theme.palette.primary.main,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             fontSize: { xs: '1.25rem', sm: '1.5rem' },
@@ -208,7 +208,7 @@ const InterviewLivePage = () => {
           sx={{
             borderRadius: 2,
             px: 3,
-            background: (theme: any) => theme.palette.primary.gradient,
+            background: (theme: any) => theme.palette.primary.main,
             boxShadow: (theme: any) => theme.customShadows?.small || 1,
             '&:hover': {
               boxShadow: (theme: any) => theme.customShadows?.medium || 2,

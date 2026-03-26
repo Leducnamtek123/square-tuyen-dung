@@ -443,7 +443,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title }) => {
 
                         fontWeight: 600,
 
-                        background: (theme) => theme.palette.primary.gradient || theme.palette.primary.main,
+                        background: (theme) => theme.palette.primary.main || theme.palette.primary.main,
 
                         WebkitBackgroundClip: 'text',
 
@@ -803,7 +803,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title }) => {
 
                                         px: 4,
 
-                                        background: (theme) => theme.palette.primary.gradient
+                                        background: (theme) => theme.palette.primary.main
 
                                     }}
 

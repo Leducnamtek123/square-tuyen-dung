@@ -183,7 +183,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
           variant="h5" 
           sx={{ 
             fontWeight: 600,
-            background: 'primary.gradient',
+            background: 'primary.main',
             WebkitBackgroundClip: 'text',
             fontSize: { xs: '1.25rem', sm: '1.5rem' }
           }}

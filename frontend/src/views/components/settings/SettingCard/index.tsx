@@ -94,9 +94,9 @@ const SettingCard = ({ title, sx }: SettingCardProps) => {
                       px: 4,
                       py: 1,
                       fontSize: "0.9rem",
-                      background: (theme) => theme.palette.primary.gradient,
+                      background: (theme) => theme.palette.primary.main,
                       "&:hover": {
-                        background: (theme) => theme.palette.primary.gradient,
+                        background: (theme) => theme.palette.primary.main,
                         opacity: 0.9,
                         boxShadow: (theme) => theme.customShadows.medium,
                       },

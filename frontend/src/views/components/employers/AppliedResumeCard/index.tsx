@@ -398,7 +398,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
             fontWeight: 600,
 
-            background: 'primary.gradient',
+            background: 'primary.main',
 
             WebkitBackgroundClip: 'text',
 
@@ -658,7 +658,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
                   borderRadius: 2,
 
-                  background: 'primary.gradient',
+                  background: 'primary.main',
 
                   boxShadow: 'custom.small',
 

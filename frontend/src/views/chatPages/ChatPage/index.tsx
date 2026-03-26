@@ -143,7 +143,7 @@ const ChatPage = () => {
                 fontWeight={600}
                 sx={{
                   flex: 1,
-                  background: (theme: Theme) => (theme.palette.primary as any).gradient,
+                  background: (theme: Theme) => (theme.palette.primary as any).main,
                   backgroundClip: 'text',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',

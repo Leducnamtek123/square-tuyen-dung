@@ -44,7 +44,7 @@ const SidebarViewTotal = () => {
               sx={{
                 width: 80,
                 height: 80,
-                background: (theme: any) => (theme.palette.primary as any).gradient,
+                background: (theme: any) => (theme.palette.primary as any).main,
                 fontSize: "1.75rem",
                 fontWeight: 700,
               }}
@@ -71,10 +71,10 @@ const SidebarViewTotal = () => {
           size="medium"
           onClick={() => nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`)}
           sx={{
-            background: (theme: any) => (theme.palette.primary as any).gradient,
+            background: (theme: any) => (theme.palette.primary as any).main,
             px: 3,
             "&:hover": {
-              background: (theme: any) => (theme.palette.primary as any).gradient,
+              background: (theme: any) => (theme.palette.primary as any).main,
               opacity: 0.9,
               transform: "translateY(-1px)",
               transition: "all 0.2s",

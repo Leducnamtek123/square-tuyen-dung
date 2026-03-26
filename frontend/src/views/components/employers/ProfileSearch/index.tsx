@@ -207,7 +207,7 @@ const ProfileSearch: React.FC = () => {
 
                   boxShadow: 'none',
 
-                  background: (theme: any) => theme.palette.secondary.gradient,
+                  background: (theme: any) => theme.palette.secondary.main,
 
                   '&:hover': {
 

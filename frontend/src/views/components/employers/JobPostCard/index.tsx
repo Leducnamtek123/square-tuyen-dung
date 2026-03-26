@@ -509,7 +509,7 @@ const JobPostCard = () => {
 
             fontWeight: 600,
 
-            background: 'primary.gradient',
+            background: 'primary.main',
 
             WebkitBackgroundClip: 'text',
 
@@ -580,7 +580,7 @@ const JobPostCard = () => {
 
               px: 3,
 
-              background: 'primary.gradient',
+              background: 'primary.main',
 
               boxShadow: 'custom.small',
 

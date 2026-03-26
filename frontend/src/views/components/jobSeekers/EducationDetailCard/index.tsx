@@ -469,7 +469,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                           sx={{
 
-                            background: (theme: any) => theme.palette.primary.gradient,
+                            background: (theme: any) => theme.palette.primary.main,
 
                             boxShadow: (theme: any) => theme.customShadows.small,
 

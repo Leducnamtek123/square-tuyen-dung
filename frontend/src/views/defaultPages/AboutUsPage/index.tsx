@@ -58,7 +58,7 @@ const AboutUsPage = () => {
 
             mb: 2,
 
-            background: (theme: any) => theme.palette.primary.gradient,
+            background: (theme: any) => theme.palette.primary.main,
 
             WebkitBackgroundClip: "text",
 
@@ -259,7 +259,7 @@ const AboutUsPage = () => {
 
           textAlign: "center",
 
-          background: (theme: any) => theme.palette.primary.gradient,
+          background: (theme: any) => theme.palette.primary.main,
 
           WebkitBackgroundClip: "text",
 

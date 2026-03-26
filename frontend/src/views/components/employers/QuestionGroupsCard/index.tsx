@@ -380,7 +380,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                             fontWeight: 600,
 
-                            background: (theme) => theme.palette.primary.gradient || theme.palette.primary.main,
+                            background: (theme) => theme.palette.primary.main || theme.palette.primary.main,
 
                             WebkitBackgroundClip: 'text',
 
@@ -430,7 +430,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                         px: 3,
 
-                        background: (theme: any) => theme.palette.primary.gradient,
+                        background: (theme: any) => theme.palette.primary.main,
 
                         boxShadow: (theme: any) => theme.customShadows?.small || 1,
 

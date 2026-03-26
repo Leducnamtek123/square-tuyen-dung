@@ -259,7 +259,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                       height: 130,
                       padding: "4px",
                       borderRadius: "50%",
-                      background: (theme: any) => theme.palette.primary.gradient,
+                      background: (theme: any) => theme.palette.primary.main,
                       boxShadow: (theme: any) => theme.customShadows?.medium,
                       transition: "transform 0.2s ease-in-out",
                       "&:hover": { transform: "scale(1.02)" },
@@ -336,8 +336,8 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                     onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, resume.slug)}`)}
                     sx={{
                       px: 4, py: 1, fontSize: "1rem",
-                      background: (theme: any) => theme.palette.primary.gradient,
-                      "&:hover": { background: (theme: any) => theme.palette.primary.gradient, opacity: 0.9, boxShadow: (theme: any) => theme.customShadows?.medium }
+                      background: (theme: any) => theme.palette.primary.main,
+                      "&:hover": { background: (theme: any) => theme.palette.primary.main, opacity: 0.9, boxShadow: (theme: any) => theme.customShadows?.medium }
                     }}
                   >
                     {t("jobSeeker:profile.actions.editProfile")}

@@ -152,7 +152,7 @@ const AttachedProfilePage = () => {
 
                                 p: 3,
 
-                                background: (theme) => theme.palette.primary.gradient,
+                                background: (theme) => theme.palette.primary.main,
 
                                 color: 'white',
 

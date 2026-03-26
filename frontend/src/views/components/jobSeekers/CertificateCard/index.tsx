@@ -471,7 +471,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
                           sx={{
 
-                            background: (theme: any) => theme.palette.primary.gradient,
+                            background: (theme: any) => theme.palette.primary.main,
 
                             boxShadow: (theme: any) => theme.customShadows.small,
 

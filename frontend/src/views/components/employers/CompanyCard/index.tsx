@@ -417,11 +417,11 @@ const CompanyCard = () => {
 
                     fontSize: "0.9rem",
 
-                    background: (theme) => theme.palette.primary.gradient,
+                    background: (theme) => theme.palette.primary.main,
 
                     "&:hover": {
 
-                      background: (theme) => theme.palette.primary.gradient,
+                      background: (theme) => theme.palette.primary.main,
 
                       opacity: 0.9,
 

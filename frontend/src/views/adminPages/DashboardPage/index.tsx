@@ -128,7 +128,7 @@ const DashboardPage = () => {
             <Paper
               sx={{
                 p: 3,
-                background: (theme) => (theme.palette as any).primary.gradient,
+                background: (theme) => (theme.palette as any).primary.main,
                 color: 'white',
                 borderRadius: 3,
               }}
@@ -143,7 +143,7 @@ const DashboardPage = () => {
             <Paper
               sx={{
                 p: 3,
-                background: (theme) => (theme.palette as any).secondary.gradient,
+                background: (theme) => (theme.palette as any).secondary.main,
                 color: 'white',
                 borderRadius: 3,
               }}

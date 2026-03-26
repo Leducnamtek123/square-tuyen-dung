@@ -474,7 +474,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
                             background: (theme: any) =>
 
-                              theme.palette.primary.gradient,
+                              theme.palette.primary.main,
 
                             boxShadow: (theme: any) => theme.customShadows.small,
 

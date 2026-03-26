@@ -165,7 +165,7 @@ const Feedback = (_props: FeedbackProps) => {
               component="div"
               sx={{
                 fontWeight: 700,
-                background: (theme: any) => theme.palette.secondary.gradient,
+                background: (theme: any) => theme.palette.secondary.main,
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -270,10 +270,10 @@ const Feedback = (_props: FeedbackProps) => {
             sx={{
               py: 1.5,
               borderRadius: '12px',
-              background: (theme: any) => (theme.palette as any).feedback.button.gradient,
+              background: (theme: any) => (theme.palette as any).feedback.button.background,
               boxShadow: (theme: any) => theme.customShadows.feedback,
               '&:hover': {
-                background: (theme: any) => (theme.palette as any).feedback.button.gradient,
+                background: (theme: any) => (theme.palette as any).feedback.button.background,
                 transform: 'translateY(-1px)',
                 boxShadow: (theme: any) => `0 8px 24px ${(theme.palette as any).feedback.button.shadow}`,
               }
