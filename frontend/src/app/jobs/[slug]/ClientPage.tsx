@@ -1,7 +1,12 @@
 'use client';
 
+import DefaultLayout from '@/layouts/DefaultLayout';
 import JobDetailPage from '@/views/defaultPages/JobDetailPage';
 
 export default function JobDetailClientPage() {
-  return <JobDetailPage />;
+  return (
+    <DefaultLayout>
+      <JobDetailPage />
+    </DefaultLayout>
+  );
 }
