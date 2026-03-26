@@ -27,7 +27,7 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
               <React.Fragment key={value.id || index}>
                 <Grid size={12}>
                   <Typography sx={{ fontSize: 17.5, fontWeight: "bold", mb: 0.5 }}>
-                    {tConfig(allConfig?.languageDict[value?.language])}
+                    {tConfig((allConfig as any)?.languageDict?.[value?.language])}
                   </Typography>
                   <Typography sx={{ fontWeight: "bold", fontSize: 13, color: "gray" }}>
                     {t('profileDetailCard.label.proficiency')}

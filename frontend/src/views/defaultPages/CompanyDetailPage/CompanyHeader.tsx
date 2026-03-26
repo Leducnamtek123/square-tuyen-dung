@@ -113,7 +113,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
             </Stack>
           </Box>
           <Box sx={{ pt: 1 }}>
-            <QRCodeBox value={window.location.href || "-"} size={80} label={t("companyDetail.shareWithQr")} />
+            <QRCodeBox value={(typeof window !== 'undefined' ? window.location.href : '') || "-"} size={80} label={t("companyDetail.shareWithQr")} />
           </Box>
           <Stack spacing={1.5} justifyContent="center">
             {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (

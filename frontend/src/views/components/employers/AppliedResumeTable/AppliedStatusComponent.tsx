@@ -29,8 +29,8 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
       errorModal(
         t('appliedResume.status.errorTitle'),
         t('appliedResume.status.errorMsg', {
-          fromStatus: tConfig(allConfig?.applicationStatusDict[applyStatus]) || '---',
-          toStatus: tConfig(allConfig?.applicationStatusDict[e.target.value]) || '---',
+          fromStatus: tConfig((allConfig as any)?.applicationStatusDict?.[applyStatus]) || '---',
+          toStatus: tConfig((allConfig as any)?.applicationStatusDict?.[e.target.value]) || '---',
         })
       );
     } else {
@@ -42,7 +42,7 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
             }
           }),
         t('appliedResume.status.updateTitle'),
-        t('appliedResume.status.updateConfirm', { statusName: tConfig(allConfig?.applicationStatusDict[e.target.value]) || '---' }),
+        t('appliedResume.status.updateConfirm', { statusName: tConfig((allConfig as any)?.applicationStatusDict?.[e.target.value]) || '---' }),
         'question'
       );
     }

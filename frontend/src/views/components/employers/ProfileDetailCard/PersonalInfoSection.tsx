@@ -40,7 +40,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <InfoItem 
             label={t('profileDetailCard.label.gender')} 
-            value={tConfig(allConfig?.genderDict[profileDetail?.jobSeekerProfile?.gender])} 
+            value={tConfig((allConfig as any)?.genderDict?.[profileDetail?.jobSeekerProfile?.gender])} 
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
@@ -52,13 +52,13 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <InfoItem 
             label={t('profileDetailCard.label.maritalStatus')} 
-            value={tConfig(allConfig?.maritalStatusDict[profileDetail?.jobSeekerProfile?.maritalStatus])} 
+            value={tConfig((allConfig as any)?.maritalStatusDict?.[profileDetail?.jobSeekerProfile?.maritalStatus])} 
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <InfoItem 
             label={t('profileDetailCard.label.cityProvince')} 
-            value={tConfig(allConfig?.cityDict[profileDetail?.jobSeekerProfile?.location?.city])} 
+            value={tConfig((allConfig as any)?.cityDict?.[profileDetail?.jobSeekerProfile?.location?.city])} 
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>

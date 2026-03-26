@@ -42,7 +42,7 @@ const ChatBot = () => {
   const listRef = useRef<HTMLDivElement | null>(null);
   const lastPayloadRef = useRef<Record<string, unknown> | null>(null);
 
-  const fullPathname = window.location.pathname || "/";
+  const fullPathname = typeof window !== 'undefined' ? window.location.pathname : "/";
   const isEmployerRoute = isEmployerPortalPath(fullPathname);
   const isEmployer = activeWorkspace?.type === "company" || isEmployerRoute;
 

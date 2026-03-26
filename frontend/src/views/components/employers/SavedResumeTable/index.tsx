@@ -177,7 +177,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
 
               <TableCell align="left">
 
-                {tConfig(allConfig?.experienceDict[row?.resume?.experience]) || (
+                {tConfig((allConfig as any)?.experienceDict?.[row?.resume?.experience]) || (
 
                   <span
 
@@ -203,7 +203,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
 
               <TableCell align="left">
 
-                {tConfig(allConfig?.cityDict[row?.resume?.city]) || (
+                {tConfig((allConfig as any)?.cityDict?.[row?.resume?.city]) || (
 
                   <span
 

@@ -356,7 +356,7 @@ const JobSeekerProfile = ({
 
               label={
 
-                tConfig(allConfig.experienceDict[experience]) || (
+                tConfig(allConfig?.experienceDict?.[experience as keyof typeof allConfig.experienceDict] as any) || (
 
                   <Typography component="span" sx={(defaultTheme.palette.text as any).italic}>
 
@@ -386,7 +386,7 @@ const JobSeekerProfile = ({
 
               label={
 
-                tConfig(allConfig.cityDict[city]) || (
+                tConfig(allConfig?.cityDict?.[city as keyof typeof allConfig.cityDict] as any) || (
 
                   <Typography component="span" sx={(defaultTheme.palette.text as any).italic}>
 

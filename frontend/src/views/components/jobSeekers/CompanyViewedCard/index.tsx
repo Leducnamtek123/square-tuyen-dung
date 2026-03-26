@@ -3,6 +3,7 @@ import { Box, Stack, Pagination, Chip } from "@mui/material";
 import CheckIcon from '@mui/icons-material/Check';
 import NoDataCard from '../../../../components/Common/NoDataCard';
 import CompanyAction from '../../../../components/Features/CompanyAction';
+import CompanyActionLoading from '../../../../components/Features/CompanyAction/Loading';
 import { useResumeViewed } from '../hooks/useJobSeekerQueries';
 import { useTranslation } from 'react-i18next';
 
@@ -26,7 +27,7 @@ const CompanyViewedCard = () => {
         {isLoading ? (
           <Stack spacing={2}>
             {Array.from(Array(5).keys()).map((value) => (
-              <CompanyAction.Loading key={value} />
+              <CompanyActionLoading key={value} />
             ))}
           </Stack>
         ) : resumesViewed.length === 0 ? (

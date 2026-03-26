@@ -60,9 +60,9 @@ const Header = (props: HeaderProps) => {
   const searchParams = useSearchParams();
   const location = { pathname, search: searchParams.toString(), state: null, key: '' };
 
-  const hostName = window.location.hostname;
+  const hostName = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
 
-  const fullPathname = window.location.pathname;
+  const fullPathname = typeof window !== 'undefined' ? window.location.pathname : '/';
   const isAdminPortal =
     isAdminPortalPath(fullPathname) ||
     hostName === HOST_NAME.ADMIN_PROJECT;

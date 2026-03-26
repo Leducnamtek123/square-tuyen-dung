@@ -67,7 +67,7 @@ const JobDetailPage = () => {
         setIsLoading(false);
       }
     };
-    getJobPostDetail(slug);
+    getJobPostDetail(slug as string);
   }, [slug]);
 
   // --- Dynamic SEO ---
@@ -80,7 +80,7 @@ const JobDetailPage = () => {
       ? `Tuyển dụng: ${jobPostDetail.jobName} tại ${jobPostDetail.companyName || 'công ty uy tín'}. ${stripHtml(jobDescription)}`
       : undefined,
     image: jobPostDetail?.companyImageUrl || undefined,
-    url: window.location.href,
+    url: (typeof window !== 'undefined' ? window.location.href : ''),
     type: 'article',
     keywords: jobPostDetail
       ? `${jobPostDetail.jobName}, ${jobPostDetail.companyName || ''}, tuyển dụng, việc làm`
@@ -96,7 +96,7 @@ const JobDetailPage = () => {
             description: jobDescription,
             companyName: jobPostDetail.companyName,
             companyUrl: jobPostDetail.companySlug
-              ? `${window.location.origin}/cong-ty/${jobPostDetail.companySlug}`
+              ? `${(typeof window !== 'undefined' ? window.location.origin : '')}/cong-ty/${jobPostDetail.companySlug}`
               : undefined,
             companyLogoUrl: jobPostDetail.companyImageUrl,
             location: jobPostDetail.locationName || jobPostDetail.location,
@@ -108,14 +108,14 @@ const JobDetailPage = () => {
             jobType: jobPostDetail.jobTypeName || jobPostDetail.jobType,
             datePosted: jobPostDetail.createAt || jobPostDetail.createdAt,
             validThrough: jobPostDetail.deadline,
-            url: window.location.href,
+            url: (typeof window !== 'undefined' ? window.location.href : ''),
           },
           {
             type: 'BreadcrumbList' as const,
             items: [
-              { name: 'Trang chủ', url: window.location.origin },
-              { name: 'Việc làm', url: `${window.location.origin}/viec-lam` },
-              { name: jobPostDetail.jobName, url: window.location.href },
+              { name: 'Trang chủ', url: (typeof window !== 'undefined' ? window.location.origin : '') },
+              { name: 'Việc làm', url: `${(typeof window !== 'undefined' ? window.location.origin : '')}/viec-lam` },
+              { name: jobPostDetail.jobName, url: (typeof window !== 'undefined' ? window.location.href : '') },
             ],
           },
         ]
@@ -222,26 +222,26 @@ const JobDetailPage = () => {
           setOpenPopup: setOpenSharePopup,
           open: openSharePopup,
           facebook: {
-            url: window.location.href,
+            url: (typeof window !== 'undefined' ? window.location.href : ''),
             quote: jobPostDetail?.jobName,
             hashtag: "#Project",
           },
           facebookMessenger: {
-            url: window.location.href,
+            url: (typeof window !== 'undefined' ? window.location.href : ''),
           },
           linkedin: {
-            url: window.location.href,
+            url: (typeof window !== 'undefined' ? window.location.href : ''),
             title: jobPostDetail?.jobName,
             summary: jobPostDetail?.jobDescription,
             source: "Project",
           },
           twitter: {
-            url: window.location.href,
+            url: (typeof window !== 'undefined' ? window.location.href : ''),
             title: jobPostDetail?.jobName,
             hashtags: ["Project", "tuyendung"],
           },
           email: {
-            url: window.location.href,
+            url: (typeof window !== 'undefined' ? window.location.href : ''),
             subject: jobPostDetail?.jobName,
             body: jobPostDetail?.jobDescription,
           },

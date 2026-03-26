@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { Box, Stack, Pagination, Button } from "@mui/material";
 import { ROUTES } from '../../../../configs/constants';
 import NoDataCard from '../../../../components/Common/NoDataCard';
-import CompanyAction from '../../../../components/Features/CompanyAction';
+import CompanyActionFollow from '../../../../components/Features/CompanyAction/CompanyActionFollow';
+import CompanyActionLoading from '../../../../components/Features/CompanyAction/Loading';
 import toastMessages from '../../../../utils/toastMessages';
 import { useTranslation } from 'react-i18next';
 import { useCompaniesFollowed, useToggleFollowCompany } from '../hooks/useJobSeekerQueries';
@@ -38,7 +39,7 @@ const CompanyFollowedCard = () => {
         {isLoading ? (
           <Stack spacing={2}>
             {Array.from(Array(5).keys()).map((value) => (
-              <CompanyAction.Loading key={value} />
+              <CompanyActionLoading key={value} />
             ))}
           </Stack>
         ) : companies.length === 0 ? (
@@ -58,9 +59,8 @@ const CompanyFollowedCard = () => {
         ) : (
           <Stack spacing={2}>
             {companies.map((value: any) => (
-              <CompanyAction.CompanyActionFollow
+              <CompanyActionFollow
                 key={value.id}
-                id={value.id}
                 company={value.company}
               >
                 <Button
@@ -72,7 +72,7 @@ const CompanyFollowedCard = () => {
                 >
                   {t('jobSeeker:myCompany.actions.unfollow')}
                 </Button>
-              </CompanyAction.CompanyActionFollow>
+              </CompanyActionFollow>
             ))}
             <Stack sx={{ pt: 2 }} alignItems="center">
               {Math.ceil(count / pageSize) > 1 && (

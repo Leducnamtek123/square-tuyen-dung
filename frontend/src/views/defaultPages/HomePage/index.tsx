@@ -72,7 +72,7 @@ export default function HomePage() {
   useSEO({
     title: 'Tìm việc nhanh, tuyển dụng hiệu quả',
     description: 'Square - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, ứng tuyển nhanh chóng và kết nối với nhà tuyển dụng uy tín.',
-    url: window.location.origin + '/',
+    url: (typeof window !== 'undefined' ? window.location.origin : '') + '/',
     keywords: 'tìm việc, tuyển dụng, việc làm, ứng tuyển, nhà tuyển dụng, Square',
   });
 
@@ -80,14 +80,14 @@ export default function HomePage() {
     {
       type: 'WebSite',
       name: 'Square Tuyển Dụng',
-      url: window.location.origin,
-      searchUrl: `${window.location.origin}/viec-lam?keyword={search_term_string}`,
+      url: (typeof window !== 'undefined' ? window.location.origin : ''),
+      searchUrl: `${(typeof window !== 'undefined' ? window.location.origin : '')}/viec-lam?keyword={search_term_string}`,
     },
     {
       type: 'Organization',
       name: 'Square',
-      url: window.location.origin,
-      logoUrl: `${window.location.origin}/square-icons/logo.svg`,
+      url: (typeof window !== 'undefined' ? window.location.origin : ''),
+      logoUrl: `${(typeof window !== 'undefined' ? window.location.origin : '')}/square-icons/logo.svg`,
       description: 'Nền tảng tuyển dụng trực tuyến hàng đầu Việt Nam',
       sameAs: [
         'https://www.facebook.com/square.vn',

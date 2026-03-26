@@ -489,7 +489,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
               getOptionLabel={(option) => option.jobName}
 
-              value={jobPostOptions.find((o) => o.id === jobPostIdSelect) || null}
+              value={jobPostOptions.find((o: any) => o.id === jobPostIdSelect) || null}
 
               onChange={(e, value) => setJobPostIdSelect(value?.id || '')}
 
@@ -547,7 +547,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
               value={
 
-                allConfig?.applicationStatusOptions.find(
+                (allConfig?.applicationStatusOptions as any[])?.find(
 
                   (o: any) => o.id === applicationStatusSelect
 
@@ -561,7 +561,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
               size="small"
 
-              options={allConfig?.applicationStatusOptions || []}
+              options={(allConfig?.applicationStatusOptions as any[]) || []}
 
               renderInput={(params) => (
 

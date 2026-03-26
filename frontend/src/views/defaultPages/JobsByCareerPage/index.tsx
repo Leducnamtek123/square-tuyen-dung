@@ -13,7 +13,7 @@ const JobsByCareerPage = () => {
   useSEO({
     title: t('jobsByCategoryPage.careerTitle'),
     description: 'Khám phá việc làm theo ngành nghề tại Square. Chọn ngành nghề bạn yêu thích và tìm công việc phù hợp ngay hôm nay.',
-    url: `${window.location.origin}/viec-lam-theo-nganh-nghe`,
+    url: `${(typeof window !== 'undefined' ? window.location.origin : '')}/viec-lam-theo-nganh-nghe`,
     keywords: 'việc làm theo ngành nghề, ngành IT, ngành kế toán, ngành marketing, tuyển dụng',
   });
 

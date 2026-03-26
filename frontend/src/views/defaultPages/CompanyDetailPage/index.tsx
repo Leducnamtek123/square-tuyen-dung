@@ -62,7 +62,7 @@ const CompanyDetailPage = () => {
         setIsLoading(false);
       }
     };
-    getCompanyDetail(slug);
+    getCompanyDetail(slug as string);
   }, [slug]);
 
   const stripHtml = (html: string) => (html || '').replace(/<[^>]*>/g, '').slice(0, 160);
@@ -71,7 +71,7 @@ const CompanyDetailPage = () => {
     title: companyDetail?.companyName,
     description: companyDetail ? `${companyDetail.companyName} - ${companyDetail.fieldOperation || 'Công ty tuyển dụng'}. ${stripHtml(companyDetail.description || '')} Xem việc làm đang tuyển.` : undefined,
     image: companyDetail?.companyImageUrl || undefined,
-    url: window.location.href,
+    url: (typeof window !== 'undefined' ? window.location.href : ''),
     type: 'article',
     keywords: companyDetail ? `${companyDetail.companyName}, tuyển dụng, việc làm, ${companyDetail.fieldOperation || ''}` : undefined,
   });
@@ -81,7 +81,7 @@ const CompanyDetailPage = () => {
       {
         type: 'Organization' as const,
         name: companyDetail.companyName,
-        url: companyDetail.websiteUrl || window.location.href,
+        url: companyDetail.websiteUrl || (typeof window !== 'undefined' ? window.location.href : ''),
         logoUrl: companyDetail.companyImageUrl,
         description: companyDetail.description,
         email: companyDetail.email,
@@ -96,9 +96,9 @@ const CompanyDetailPage = () => {
       {
         type: 'BreadcrumbList' as const,
         items: [
-          { name: 'Trang chủ', url: window.location.origin },
-          { name: 'Công ty', url: `${window.location.origin}/cong-ty` },
-          { name: companyDetail.companyName, url: window.location.href },
+          { name: 'Trang chủ', url: (typeof window !== 'undefined' ? window.location.origin : '') },
+          { name: 'Công ty', url: `${(typeof window !== 'undefined' ? window.location.origin : '')}/cong-ty` },
+          { name: companyDetail.companyName, url: (typeof window !== 'undefined' ? window.location.href : '') },
         ],
       },
     ] : []
@@ -153,11 +153,11 @@ const CompanyDetailPage = () => {
         {...({
           open: openSharePopup,
           setOpenPopup: setOpenSharePopup,
-          facebook: { url: window.location.href },
-          facebookMessenger: { url: window.location.href },
-          linkedin: { url: window.location.href, source: window.location.href, title: companyDetail?.companyName, summary: companyDetail?.description },
-          twitter: { url: window.location.href, title: companyDetail?.companyName },
-          email: { url: window.location.href, subject: companyDetail?.companyName, body: companyDetail?.description },
+          facebook: { url: (typeof window !== 'undefined' ? window.location.href : '') },
+          facebookMessenger: { url: (typeof window !== 'undefined' ? window.location.href : '') },
+          linkedin: { url: (typeof window !== 'undefined' ? window.location.href : ''), source: (typeof window !== 'undefined' ? window.location.href : ''), title: companyDetail?.companyName, summary: companyDetail?.description },
+          twitter: { url: (typeof window !== 'undefined' ? window.location.href : ''), title: companyDetail?.companyName },
+          email: { url: (typeof window !== 'undefined' ? window.location.href : ''), subject: companyDetail?.companyName, body: companyDetail?.description },
         } as any)}
       />
     </>

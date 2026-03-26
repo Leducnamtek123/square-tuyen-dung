@@ -535,7 +535,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
                           >
 
-                            {tConfig(allConfig.languageDict[value?.language ?? ''])}
+                            {tConfig((allConfig as any)?.languageDict?.[value?.language ?? ''])}
 
                           </TableCell>
 

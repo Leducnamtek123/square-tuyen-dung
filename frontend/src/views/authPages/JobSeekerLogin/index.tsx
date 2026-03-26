@@ -279,7 +279,7 @@ const JobSeekerLogin = () => {
     token: string
 
   ) => {
-    const redirectUri = window.location.origin;
+    const redirectUri = (typeof window !== 'undefined' ? window.location.origin : '');
 
     setIsFullScreenLoading(true);
 
@@ -393,9 +393,9 @@ const JobSeekerLogin = () => {
 
       handleSocialLogin(
 
-        AUTH_CONFIG.CLIENT_ID,
+        AUTH_CONFIG.CLIENT_ID || '',
 
-        AUTH_CONFIG.CLIENT_SECRET,
+        AUTH_CONFIG.CLIENT_SECRET || '',
 
         AUTH_PROVIDER.GOOGLE as AuthProvider,
 

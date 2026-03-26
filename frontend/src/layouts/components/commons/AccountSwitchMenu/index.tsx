@@ -29,8 +29,8 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
 
   const { t } = useTranslation('common');
 
-  const hostName = window.location.hostname;
-  const pathname = window.location.pathname || "/";
+  const hostName = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
   const isEmployerPortal = isEmployerPortalPath(pathname) || hostName.startsWith("employer.");
 
   const openPortal = (toEmployer = false, path = "") => {

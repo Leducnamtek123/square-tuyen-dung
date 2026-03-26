@@ -180,7 +180,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-          ? allConfig?.frequencyNotificationOptions[0].id
+          ? (allConfig?.frequencyNotificationOptions?.[0]?.id as any)
 
 
 
@@ -230,7 +230,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
       reset({
         frequency: (allConfig?.frequencyNotificationOptions || []).length > 0
-          ? allConfig?.frequencyNotificationOptions[0].id
+          ? (allConfig?.frequencyNotificationOptions?.[0]?.id as any)
           : null,
       });
 
@@ -248,7 +248,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-    <form id="modal-form" onSubmit={handleSubmit(handleAddOrUpdate)}>
+    <form id="modal-form" onSubmit={handleSubmit(handleAddOrUpdate as any)}>
 
 
 

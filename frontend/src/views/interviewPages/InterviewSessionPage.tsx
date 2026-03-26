@@ -16,7 +16,7 @@ import interviewService from "../../services/interviewService";
 import { transformInterviewSession } from "../../utils/transformers";
 
 const getSafeLiveKitUrl = () => {
-  const defaultUrl = `${window.location.protocol}//${window.location.host}/livekit`;
+  const defaultUrl = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.host}/livekit` : '';
   const rawUrl = (process.env.NEXT_PUBLIC_LIVEKIT_URL || defaultUrl).trim();
 
   if (!rawUrl) return defaultUrl;

@@ -209,9 +209,9 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
 
   const careersSource = React.useMemo(() => {
     if (Array.isArray(allConfig?.careers) && allConfig.careers.length > 0) {
-      return allConfig.careers;
+      return allConfig.careers as unknown as CareerOption[];
     }
-    return allConfig?.careerOptions || [];
+    return (allConfig?.careerOptions || []) as unknown as CareerOption[];
   }, [allConfig?.careers, allConfig?.careerOptions]);
 
   const careers = React.useMemo(

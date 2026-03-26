@@ -216,7 +216,7 @@ const JobSeekerSignUpForm = ({
 
     flow: "auth-code",
     ux_mode: "popup",
-    redirect_uri: window.location.origin,
+    redirect_uri: (typeof window !== 'undefined' ? window.location.origin : ''),
 
   });
 

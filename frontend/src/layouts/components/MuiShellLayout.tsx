@@ -310,7 +310,7 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
             >
 
-              <Avatar src={currentUser?.avatarUrl} />
+              <Avatar src={currentUser?.avatarUrl || undefined} />
 
               <Typography variant="subtitle1" sx={{ display: { xs: 'none', sm: 'block' }, color: 'inherit' }}>
 

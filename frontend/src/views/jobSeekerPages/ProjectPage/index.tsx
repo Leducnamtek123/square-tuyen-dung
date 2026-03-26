@@ -16,7 +16,7 @@ const ProjectPage = () => {
 
     TabTitle(t("jobManagement.title"));
 
-    const [searchParams] = useSearchParams();
+    const searchParams = useSearchParams();
 
     const [value, setValue] = React.useState(searchParams.get("tab") || "1");
 

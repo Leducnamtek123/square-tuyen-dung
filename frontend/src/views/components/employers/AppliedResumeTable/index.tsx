@@ -109,7 +109,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                 </TableCell>
                 <TableCell align="right">
                   <AppliedStatusComponent
-                    options={allConfig?.applicationStatusOptions || []}
+                    options={(allConfig?.applicationStatusOptions as any[]) || []}
                     defaultStatus={row?.status}
                     id={row?.id}
                     handleChangeApplicationStatus={handleChangeApplicationStatus}

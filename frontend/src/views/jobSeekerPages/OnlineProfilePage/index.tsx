@@ -64,7 +64,7 @@ const OnlineProfilePage = () => {
 
                         <Card
 
-                            ref={(el) => (refs.current[0] = el)}
+                            ref={(el) => { refs.current[0] = el; }}
 
                             sx={{
 
@@ -86,37 +86,37 @@ const OnlineProfilePage = () => {
 
                         </Card>
 
-                        <Card ref={(el) => (refs.current[1] = el)}>
+                        <Card ref={(el) => { refs.current[2] = el; }}>
 
                             <GeneralInfoCard title={t('onlineProfile.sections.general')} />
 
                         </Card>
 
-                        <Card ref={(el) => (refs.current[2] = el)}>
+                        <Card ref={(el) => { refs.current[3] = el; }}>
 
                             <ExperienceDetailCard title={t('onlineProfile.sections.experience')} />
 
                         </Card>
 
-                        <Card ref={(el) => (refs.current[3] = el)}>
+                        <Card ref={(el) => { refs.current[4] = el; }}>
 
                             <EducationDetailCard title={t('onlineProfile.sections.education')} />
 
                         </Card>
 
-                        <Card ref={(el) => (refs.current[4] = el)}>
+                        <Card ref={(el) => { refs.current[5] = el; }}>
 
                             <CertificateCard title={t('onlineProfile.sections.certificates')} />
 
                         </Card>
 
-                        <Card ref={(el) => (refs.current[5] = el)}>
+                        <Card ref={(el) => { refs.current[6] = el; }}>
 
                             <LanguageSkillCard title={t('onlineProfile.sections.language')} />
 
                         </Card>
 
-                        <Card ref={(el) => (refs.current[6] = el)}>
+                        <Card ref={(el) => { refs.current[1] = el; }}>
 
                             <AdvancedSkillCard title={t('onlineProfile.sections.advanced')} />
 

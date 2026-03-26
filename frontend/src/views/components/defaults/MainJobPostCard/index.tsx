@@ -16,7 +16,7 @@ const MainJobPostCard = () => {
     setPage(1);
   }, [jobPostFilter]);
 
-  const { data, isLoading } = useJobPosts(jobPostFilter, page);
+  const { data, isLoading } = useJobPosts(jobPostFilter as Record<string, any>, page);
   const jobPosts = data?.results || [];
   const count = data?.count || 0;
 

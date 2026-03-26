@@ -403,33 +403,25 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
                     {renderItem(
 
                       t('jobSeeker:profile.fields.desiredLevel'),
-
-                      tConfig(allConfig.positionDict[resumeDetail?.position ?? ''])
-
+                      tConfig((allConfig as any)?.positionDict?.[resumeDetail?.position ?? ''])
                     )}
 
                     {renderItem(
 
                       t('jobSeeker:profile.fields.academicLevel'),
-
-                      tConfig(allConfig.academicLevelDict[resumeDetail?.academicLevel ?? ''])
-
+                      tConfig((allConfig as any)?.academicLevelDict?.[resumeDetail?.academicLevel ?? ''])
                     )}
 
                     {renderItem(
 
                       t('jobSeeker:profile.fields.experience'),
-
-                      tConfig(allConfig.experienceDict[resumeDetail?.experience ?? ''])
-
+                      tConfig((allConfig as any)?.experienceDict?.[resumeDetail?.experience ?? ''])
                     )}
 
                     {renderItem(
 
                       t('jobSeeker:profile.fields.career'),
-
-                      tConfig(allConfig.careerDict[resumeDetail?.career ?? ''])
-
+                      tConfig((allConfig as any)?.careerDict?.[resumeDetail?.career ?? ''])
                     )}
 
                   </Stack>
@@ -443,7 +435,6 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
                     xs: 12,
 
                     sm: 6
-
                   }}>
 
                   <Stack spacing={1.5}>
@@ -451,9 +442,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
                     {renderItem(
 
                       t('jobSeeker:profile.fields.workLocation'),
-
-                      tConfig(allConfig.cityDict[resumeDetail?.city ?? ''])
-
+                      tConfig((allConfig as any)?.cityDict?.[resumeDetail?.city ?? ''])
                     )}
 
                     {renderItem(
@@ -485,21 +474,15 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
                     {renderItem(
 
                       t('jobSeeker:profile.fields.workplaceType'),
-
-                      tConfig(allConfig.typeOfWorkplaceDict[
-
+                      tConfig((allConfig as any)?.typeOfWorkplaceDict?.[
                         resumeDetail?.typeOfWorkplace ?? ''
-
                       ])
-
                     )}
 
                     {renderItem(
 
                       t('jobSeeker:profile.fields.jobType'),
-
-                      tConfig(allConfig.jobTypeDict[resumeDetail?.jobType ?? ''])
-
+                      tConfig((allConfig as any)?.jobTypeDict?.[resumeDetail?.jobType ?? ''])
                     )}
 
                   </Stack>

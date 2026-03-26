@@ -155,7 +155,7 @@ const EmployerLogin = () => {
   };
 
   const handleSocialLogin = async (clientId: string, clientSecrect: string, provider: AuthProvider, token: string) => {
-    const redirectUri = window.location.origin;
+    const redirectUri = (typeof window !== 'undefined' ? window.location.origin : '');
     setIsFullScreenLoading(true);
 
     try {
@@ -207,8 +207,8 @@ const EmployerLogin = () => {
 
     if (code) {
       handleSocialLogin(
-        AUTH_CONFIG.CLIENT_ID,
-        AUTH_CONFIG.CLIENT_SECRET,
+        AUTH_CONFIG.CLIENT_ID || '',
+        AUTH_CONFIG.CLIENT_SECRET || '',
         AUTH_PROVIDER.GOOGLE as AuthProvider,
         code
       );

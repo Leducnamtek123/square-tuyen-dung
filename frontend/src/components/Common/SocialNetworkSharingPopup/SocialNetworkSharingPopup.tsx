@@ -190,8 +190,6 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
 
                 redirectUri={facebookMessenger?.url || ''}
 
-                href={facebookMessenger?.to || ''}
-
               >
 
                 <FacebookMessengerIcon 

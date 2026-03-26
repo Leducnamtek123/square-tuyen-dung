@@ -108,8 +108,12 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
         setIsLoadingResume(false);
       }
     };
-    if (currentUser?.jobSeekerProfileId) {
-      getOnlineProfile(currentUser.jobSeekerProfileId, {
+    if ((currentUser as any)?.jobSeekerProfile?.id) {
+      getOnlineProfile((currentUser as any).jobSeekerProfile.id, {
+        resumeType: CV_TYPES.cvWebsite,
+      });
+    } else if ((currentUser as any)?.jobSeekerProfileId) {
+      getOnlineProfile((currentUser as any).jobSeekerProfileId, {
         resumeType: CV_TYPES.cvWebsite,
       });
     }
@@ -296,8 +300,8 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                   <Grid size={12}>
                     <Stack spacing={2}>
                       {[
-                        { icon: faMagicWandSparkles, label: t("jobSeeker:profile.summary.experience"), value: tConfig(allConfig.experienceDict[resume.experience]) },
-                        { icon: faUser, label: t("jobSeeker:profile.summary.position"), value: tConfig(allConfig.positionDict[resume.position]) },
+                        { icon: faMagicWandSparkles, label: t("jobSeeker:profile.summary.experience"), value: tConfig((allConfig as any)?.experienceDict?.[resume.experience]) },
+                        { icon: faUser, label: t("jobSeeker:profile.summary.position"), value: tConfig((allConfig as any)?.positionDict?.[resume.position]) },
                         { icon: faDollarSign, label: t("jobSeeker:profile.summary.desiredSalary"), value: salaryString(resume.salaryMin, resume.salaryMax) },
                         { icon: faCalendar, label: t("jobSeeker:profile.summary.lastUpdated"), value: dayjs(resume.updateAt).format("DD/MM/YYYY HH:mm:ss") }
                       ].map((item, idx) => (

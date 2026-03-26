@@ -37,31 +37,31 @@ const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <InfoItem 
             label={t('profileDetailCard.label.desiredLevel')} 
-            value={tConfig(allConfig?.positionDict[profileDetail?.position])} 
+            value={tConfig((allConfig as any)?.positionDict?.[profileDetail?.position])} 
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <InfoItem 
             label={t('profileDetailCard.label.educationLevel')} 
-            value={tConfig(allConfig?.academicLevelDict[profileDetail?.academicLevel])} 
+            value={tConfig((allConfig as any)?.academicLevelDict?.[profileDetail?.academicLevel])} 
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <InfoItem 
             label={t('profileDetailCard.label.experience')} 
-            value={tConfig(allConfig?.experienceDict[profileDetail?.experience])} 
+            value={tConfig((allConfig as any)?.experienceDict?.[profileDetail?.experience])} 
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <InfoItem 
             label={t('profileDetailCard.label.career')} 
-            value={tConfig(allConfig?.careerDict[profileDetail?.career])} 
+            value={tConfig((allConfig as any)?.careerDict?.[profileDetail?.career])} 
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <InfoItem 
             label={t('profileDetailCard.label.workLocation')} 
-            value={tConfig(allConfig?.cityDict[profileDetail?.city])} 
+            value={tConfig((allConfig as any)?.cityDict?.[profileDetail?.city])} 
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
@@ -73,13 +73,13 @@ const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <InfoItem 
             label={t('profileDetailCard.label.workplaceType')} 
-            value={tConfig(allConfig?.typeOfWorkplaceDict[profileDetail?.typeOfWorkplace])} 
+            value={tConfig((allConfig as any)?.typeOfWorkplaceDict?.[profileDetail?.typeOfWorkplace])} 
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
           <InfoItem 
             label={t('profileDetailCard.label.jobType')} 
-            value={tConfig(allConfig?.jobTypeDict[profileDetail?.jobType])} 
+            value={tConfig((allConfig as any)?.jobTypeDict?.[profileDetail?.jobType])} 
           />
         </Grid>
       </Grid>

@@ -32,13 +32,13 @@ const CategoryCard = ({ options, type }: CategoryCardProps) => {
   const handleFilter = (id: string | number) => {
     switch (type) {
       case 'CARRER':
-        dispatch(searchJobPost({ ...jobPostFilter, careerId: id }));
+        dispatch(searchJobPost({ ...jobPostFilter, careerId: id as string }));
         break;
       case 'CITY':
-        dispatch(searchJobPost({ ...jobPostFilter, cityId: id }));
+        dispatch(searchJobPost({ ...jobPostFilter, cityId: id as string }));
         break;
       case 'JOB_TYPE':
-        dispatch(searchJobPost({ ...jobPostFilter, jobTypeId: id }));
+        dispatch(searchJobPost({ ...jobPostFilter, jobTypeId: id as string }));
         break;
       default:
         break;

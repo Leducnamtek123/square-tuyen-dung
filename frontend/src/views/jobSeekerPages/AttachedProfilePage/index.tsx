@@ -52,7 +52,7 @@ const AttachedProfilePage = () => {
 
                         <Card
 
-                            ref={(el) => (refs.current[0] = el)}
+                            ref={(el) => { refs.current[0] = el; }}
 
                             sx={{
 
@@ -78,7 +78,7 @@ const AttachedProfilePage = () => {
 
                         </Card>
 
-                        <Card ref={(el) => (refs.current[1] = el)}>
+                        <Card ref={(el) => { refs.current[1] = el; }}>
 
                             {/* Start: General info */}
 
@@ -88,7 +88,7 @@ const AttachedProfilePage = () => {
 
                         </Card>
 
-                        <Card ref={(el) => (refs.current[2] = el)}>
+                        <Card ref={(el) => { refs.current[2] = el; }}>
 
                             {/* Start: Cv card */}
 
