@@ -22,7 +22,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
   const dispatch = useAppDispatch();
   const { allConfig, isLoadingConfig } = useConfig();
   const hasCachedConfig = !!allConfig;
-  const [isInitializing, setIsInitializing] = React.useState(isLoadingConfig);
+  const [isInitializing, setIsInitializing] = React.useState(true);
   const { isAuthenticated, currentUser, activeWorkspace } = useAppSelector((state) => state.user);
 
   // Prevent hydration mismatch: render nothing until client has mounted
@@ -53,33 +53,25 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
   const canShowChatBot = !isAdminPortal && !isChatPage && !isInterviewPage;
 
   React.useEffect(() => {
-    const initializeApp = async () => {
-      let unmounted = false;
-      if (isJobSeekerInterviewRoute) {
-        setIsInitializing(false);
-        return;
-      }
-      if (hasCachedConfig) {
-        setIsInitializing(false);
-      }
-      try {
-        const hasAccessToken = !!tokenService.getAccessTokenFromCookie();
-        if (hasAccessToken) {
-          await dispatch(getUserInfo()).unwrap();
-        }
-        if (hasAccessToken) {
-          // ignore error for now, let it fail silently
-        }
-      } finally {
-        if (!hasCachedConfig && !unmounted && !isLoadingConfig) {
-          setIsInitializing(false);
-        }
-      }
-      return () => { unmounted = true; };
-    };
+    if (!hasMounted) return;
+    if (isJobSeekerInterviewRoute) {
+      setIsInitializing(false);
+      return;
+    }
+    if (hasCachedConfig || !isLoadingConfig) {
+      setIsInitializing(false);
+    }
+  }, [hasMounted, hasCachedConfig, isLoadingConfig, isJobSeekerInterviewRoute]);
 
-    initializeApp();
-  }, [dispatch, isJobSeekerInterviewRoute, hasCachedConfig]);
+  React.useEffect(() => {
+    if (!hasMounted || isJobSeekerInterviewRoute) return;
+    const hasAccessToken = !!tokenService.getAccessTokenFromCookie();
+    if (!hasAccessToken) return;
+
+    dispatch(getUserInfo()).unwrap().catch(() => {
+      // Ignore stale/invalid token errors at bootstrap.
+    });
+  }, [dispatch, hasMounted, isJobSeekerInterviewRoute]);
 
   React.useEffect(() => {
     let lastErrorToast = 0;

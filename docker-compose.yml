@@ -79,7 +79,7 @@ services:
     restart: always
     environment:
       - DEBUG=${DEBUG:-False}
-      - AUTO_MIGRATE=${AUTO_MIGRATE:-0}
+      - AUTO_MIGRATE=${AUTO_MIGRATE:-1}
     deploy:
       resources:
         limits:

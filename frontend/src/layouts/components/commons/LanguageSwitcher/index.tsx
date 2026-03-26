@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Button, Menu, MenuItem, Stack, Typography, useTheme, Avatar } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import LanguageIcon from '@mui/icons-material/Language';
 import { localizeRoutePath } from '../../../../configs/routeLocalization';
 import { buildPortalPath, detectPortalFromPath, stripPortalPrefix } from '../../../../configs/portalRouting';
 
@@ -211,13 +212,7 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
             backgroundColor: color === 'white' ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
           }
         }}
-        startIcon={
-          <Avatar 
-            sx={{ width: 20, height: 20, fontSize: 10, bgcolor: 'transparent', border: `1px solid ${color === 'white' ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.1)'}` }}
-          >
-            {currentLanguage.flag}
-          </Avatar>
-        }
+        startIcon={<LanguageIcon sx={{ fontSize: 18 }} />}
         endIcon={<KeyboardArrowDownIcon />}
       >
         <Typography variant="body2" sx={{ fontWeight: 600, display: { xs: 'none', sm: 'block' } }}>
@@ -278,3 +273,4 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
 };
 
 export default LanguageSwitcher;
+

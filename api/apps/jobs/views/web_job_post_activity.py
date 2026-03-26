@@ -1,9 +1,13 @@
 from django.conf import settings
+from django.db import connection
+from django.db.utils import OperationalError, ProgrammingError
 from django.db.models import Case, CharField, F, When
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+import logging
+from functools import lru_cache
 
 from apps.accounts import permissions as perms_custom
 from apps.files.models import File
@@ -24,6 +28,22 @@ from ..serializers import (
     EmployerJobPostActivitySerializer,
     JobSeekerJobPostActivitySerializer,
 )
+
+logger = logging.getLogger(__name__)
+
+
+@lru_cache(maxsize=1)
+def has_ai_analysis_progress_column() -> bool:
+    try:
+        with connection.cursor() as cursor:
+            columns = {
+                col.name if hasattr(col, "name") else col[0]
+                for col in connection.introspection.get_table_description(cursor, JobPostActivity._meta.db_table)
+            }
+            return "ai_analysis_progress" in columns
+    except (OperationalError, ProgrammingError):
+        logger.exception("Could not introspect ai_analysis_progress column.")
+        return False
 
 
 class JobSeekerJobPostActivityViewSet(
@@ -168,29 +188,37 @@ class EmployerJobPostActivityViewSet(
         ('fullName', 'full_name'),
     )
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if not has_ai_analysis_progress_column():
+            return queryset.defer('ai_analysis_progress')
+        return queryset
+
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance.job_post.company != request.user.company:
             return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+        fields = [
+            "id",
+            "fullName",
+            "email",
+            "title",
+            "jobName",
+            "resumeFileUrl",
+            "aiAnalysisScore",
+            "aiAnalysisSummary",
+            "aiAnalysisSkills",
+            "aiAnalysisStatus",
+            "aiAnalysisPros",
+            "aiAnalysisCons",
+            "aiAnalysisMatchingSkills",
+            "aiAnalysisMissingSkills",
+        ]
+        if has_ai_analysis_progress_column():
+            fields.append("aiAnalysisProgress")
         serializer = self.get_serializer(
             instance,
-            fields=[
-                "id",
-                "fullName",
-                "email",
-                "title",
-                "jobName",
-                "resumeFileUrl",
-                "aiAnalysisScore",
-                "aiAnalysisSummary",
-                "aiAnalysisSkills",
-                "aiAnalysisStatus",
-                "aiAnalysisProgress",
-                "aiAnalysisPros",
-                "aiAnalysisCons",
-                "aiAnalysisMatchingSkills",
-                "aiAnalysisMissingSkills",
-            ],
+            fields=fields,
         )
         return var_res.response_data(data=serializer.data)
 
@@ -206,28 +234,30 @@ class EmployerJobPostActivityViewSet(
 
         page = self.paginate_queryset(queryset)
         if page is not None:
+            fields = [
+                "id",
+                "userId",
+                "fullName",
+                "email",
+                "title",
+                "resumeSlug",
+                "type",
+                "jobName",
+                "status",
+                "createAt",
+                "isSentEmail",
+                "resumeFileUrl",
+                "aiAnalysisScore",
+                "aiAnalysisSummary",
+                "aiAnalysisSkills",
+                "aiAnalysisStatus",
+            ]
+            if has_ai_analysis_progress_column():
+                fields.append("aiAnalysisProgress")
             serializer = self.get_serializer(
                 page,
                 many=True,
-                fields=[
-                    "id",
-                    "userId",
-                    "fullName",
-                    "email",
-                    "title",
-                    "resumeSlug",
-                    "type",
-                    "jobName",
-                    "status",
-                    "createAt",
-                    "isSentEmail",
-                    "resumeFileUrl",
-                    "aiAnalysisScore",
-                    "aiAnalysisSummary",
-                    "aiAnalysisSkills",
-                    "aiAnalysisStatus",
-                    "aiAnalysisProgress",
-                ],
+                fields=fields,
             )
             return self.get_paginated_response(serializer.data)
 
@@ -398,6 +428,11 @@ class EmployerJobPostActivityViewSet(
     @action(methods=["post"], detail=True, url_path="analyze-resume", url_name="analyze-resume")
     def analyze_resume(self, request, pk):
         try:
+            if not has_ai_analysis_progress_column():
+                return var_res.response_data(
+                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                    errors={"errorMessage": ["Database schema is outdated. Please run migrations first."]},
+                )
             job_post_activity = self.get_object()
             if job_post_activity.job_post.company != request.user.company:
                 return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
