@@ -117,7 +117,7 @@ export const presignInObject = async <T>(
   if (locations.length === 0) return value;
 
   // Phase 2: Presign ALL URLs in parallel (instead of sequential!)
-  const presigned = await Promise.all(
+  const presignedResults = await Promise.all(
     locations.map((loc) =>
       ensurePresignedUrl(loc.url).then((result) => ({
         ...loc,
@@ -126,12 +126,20 @@ export const presignInObject = async <T>(
     )
   );
 
-  // Phase 3: Apply presigned URLs back to the original object
-  for (const item of presigned) {
+  // Phase 3: Apply presigned URLs to a clone of the original object
+  // to avoid mutating the original object which might be in TanStack Query cache.
+  // Note: This only shallow clones the top level or the parent of the URL.
+  // In a real project, we might want a recursive clone, but here we just
+  // want to avoid direct mutation of the 'value' passed in if it's the parent.
+  const resultObject = Array.isArray(value) ? [...value] : { ...value } as any;
+
+  for (const item of presignedResults) {
     if (typeof item.presigned === 'string') {
-      (item.parent as any)[item.key] = item.presigned;
+      const targetParent = item.parent === value ? resultObject : item.parent;
+      (targetParent as any)[item.key] = item.presigned;
     }
   }
 
-  return value;
+  return resultObject as T;
 };
+

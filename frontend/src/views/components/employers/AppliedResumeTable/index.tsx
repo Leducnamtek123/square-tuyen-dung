@@ -79,7 +79,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                     <Tooltip title={t('appliedResume.table.attachedResume')} arrow>
                       <FontAwesomeIcon
                         icon={faFilePdf}
-                        style={{ marginRight: 1 }}
+                        style={{ marginRight: 8 }}
                         color="red"
                       />
                     </Tooltip>

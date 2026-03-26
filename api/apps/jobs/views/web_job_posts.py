@@ -260,7 +260,7 @@ class PrivateJobPostViewSet(
         return var_res.response_data(data=serializer.data)
 
 
-class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAPIView):
+class JobPostViewSet(viewsets.GenericViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = JobPost.objects.select_related(
         'company',
         'company__logo',
@@ -269,7 +269,10 @@ class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
         'location',
         'location__city',
         'career',
-    ).all()
+    ).filter(
+        status=var_sys.JobPostStatus.APPROVED,
+        deadline__gte=datetime.datetime.now().date(),
+    )
     serializer_class = JobPostSerializer
     renderer_classes = [renderers.MyJSONRenderer]
     pagination_class = paginations.CustomPagination
@@ -285,7 +288,7 @@ class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
     )
 
     def list(self, request, *args, **kwargs):
-        # Cache check
+        # Cache logic
         from shared.helpers.redis_service import RedisService
         import hashlib
         from urllib.parse import parse_qsl, urlencode
@@ -299,32 +302,29 @@ class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
         query_str = urlencode(filtered_query)
         query_hash = hashlib.md5(query_str.encode("utf-8")).hexdigest()
         cache_key = f'job_list_{query_hash}_{request.user.id if request.user.is_authenticated else 0}'
-        cached_res = redis_obj.get_json(cache_key)
-        if cached_res:
-            return var_res.response_data(data=cached_res)
 
-        queryset = (
-            self.filter_queryset(
-                self.get_queryset()
-                .filter(
-                    status=var_sys.JobPostStatus.APPROVED,
-                    deadline__gte=datetime.datetime.now().date(),
-                )
-                .prefetch_related(
-                    Prefetch(
-                        'savedjobpost_set',
-                        queryset=SavedJobPost.objects.filter(user=request.user)
-                        if request.user.is_authenticated
-                        else SavedJobPost.objects.none(),
-                    ),
-                    Prefetch(
-                        'jobpostactivity_set',
-                        queryset=JobPostActivity.objects.filter(user=request.user)
-                        if request.user.is_authenticated
-                        else JobPostActivity.objects.none(),
-                    ),
-                )
-                .order_by('-update_at', '-create_at')
+        try:
+            cached_res = redis_obj.get_json(cache_key)
+            if cached_res:
+                return var_res.response_data(data=cached_res)
+        except Exception as e:
+            helper.print_log_error("Get cache list job post", e)
+
+        queryset = self.filter_queryset(
+            self.get_queryset()
+            .prefetch_related(
+                Prefetch(
+                    'savedjobpost_set',
+                    queryset=SavedJobPost.objects.filter(user=request.user)
+                    if request.user.is_authenticated
+                    else SavedJobPost.objects.none(),
+                ),
+                Prefetch(
+                    'jobpostactivity_set',
+                    queryset=JobPostActivity.objects.filter(user=request.user)
+                    if request.user.is_authenticated
+                    else JobPostActivity.objects.none(),
+                ),
             )
         )
 
@@ -349,7 +349,10 @@ class JobPostViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
                 ],
             )
             paginated_response = self.get_paginated_response(serializer.data)
-            redis_obj.set_json(cache_key, paginated_response.data, 300)
+            try:
+                redis_obj.set_json(cache_key, paginated_response.data, 300)
+            except Exception as e:
+                helper.print_log_error("Set cache list job post", e)
             return paginated_response
 
         serializer = self.get_serializer(queryset, many=True)

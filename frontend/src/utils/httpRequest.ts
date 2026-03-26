@@ -134,6 +134,20 @@ httpRequest.interceptors.response.use(
   async (error) => {
     const originalConfig = error.config as RetryAxiosRequestConfig;
     const status = error.response?.status;
+    const method = String(originalConfig?.method || 'get').toLowerCase();
+
+    if (
+      originalConfig &&
+      method === 'get' &&
+      typeof status === 'number' &&
+      status >= 500 &&
+      status < 600 &&
+      !originalConfig._serverRetry
+    ) {
+      originalConfig._serverRetry = true;
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return httpRequest(originalConfig);
+    }
 
     if (status !== 401 || !originalConfig) {
       return Promise.reject(error);

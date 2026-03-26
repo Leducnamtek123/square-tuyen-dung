@@ -41,7 +41,7 @@ interface AIAnalysisDrawerProps {
 const renderIcon = (
   IconComponent: React.ElementType | undefined,
   props?: Record<string, any>,
-) : React.ReactElement | undefined => {
+): React.ReactElement | undefined => {
   if (!IconComponent) return undefined;
   return <IconComponent {...props} />;
 };
@@ -90,9 +90,13 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
   const [analyzing, setAnalyzing] = React.useState(false);
   const [scanLinePosition, setScanLinePosition] = React.useState(-12);
 
+  // Synchronize with initialData ONLY when drawer opens or initialData changes ID.
+  // This prevents infinite re-render loops if initialData changes due to parent cache updates.
   React.useEffect(() => {
-    setData(initialData || null);
-  }, [initialData, open]);
+    if (open && initialData && (!data || initialData.id !== data.id)) {
+      setData(initialData);
+    }
+  }, [initialData, open, data?.id]);
 
   // Fetch full detail when drawer opens
   React.useEffect(() => {
