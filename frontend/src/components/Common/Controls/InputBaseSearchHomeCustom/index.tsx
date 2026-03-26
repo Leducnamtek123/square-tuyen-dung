@@ -332,9 +332,8 @@ const InputBaseSearchHomeCustom = ({
 
       >
 
+        <div ref={inputSearchRef}>
         <Box
-
-          ref={inputSearchRef}
 
           sx={{
 
@@ -465,6 +464,7 @@ const InputBaseSearchHomeCustom = ({
           )}
 
         </Box>
+        </div>
 
       </Tippy>
 
