@@ -21,6 +21,7 @@ const nextConfig = {
     'react-image-gallery',
     'react-toastify',
     'sweetalert2',
+    'react-easy-crop',
   ],
   async redirects() {
     return [

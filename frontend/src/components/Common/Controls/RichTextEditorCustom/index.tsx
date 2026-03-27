@@ -11,7 +11,10 @@ import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
 const DraftEditor = dynamic(
   async () => {
     const mod = await import('react-draft-wysiwyg');
-    return mod.Editor;
+    // Handle ESM/CJS interop: in production builds the named export
+    // "Editor" may live under mod.default.Editor or just mod.default
+    const Editor = mod.Editor || (mod as any).default?.Editor || (mod as any).default || mod;
+    return Editor;
   },
   { ssr: false }
 );

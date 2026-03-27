@@ -10,25 +10,29 @@ interface ErrorBoundaryProps {
 interface ErrorBoundaryState {
   hasError: boolean;
   error: Error | null;
+  componentStack: string | null;
 }
 
 class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, componentStack: null };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     return { hasError: true, error };
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+    const stack = errorInfo?.componentStack || null;
+    this.setState({ componentStack: stack });
     // Log to error reporting service (Sentry, etc.)
-    console.error('[ErrorBoundary] Caught error:', error, errorInfo);
+    console.error('[ErrorBoundary] Caught error:', error);
+    if (stack) console.error('[ErrorBoundary] Component stack:', stack);
   }
 
   handleReset = (): void => {
-    this.setState({ hasError: false, error: null });
+    this.setState({ hasError: false, error: null, componentStack: null });
   };
 
   handleReload = (): void => {
@@ -78,6 +82,11 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                 <Typography variant="caption" component="pre" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                   {this.state.error.message}
                 </Typography>
+                {this.state.componentStack && (
+                  <Typography variant="caption" component="pre" sx={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', mt: 1, pt: 1, borderTop: '1px solid #ddd', color: 'text.secondary', fontSize: '0.65rem', maxHeight: 200, overflow: 'auto' }}>
+                    Component Stack:{this.state.componentStack}
+                  </Typography>
+                )}
               </Box>
             )}
             <Stack direction="row" spacing={2}>
@@ -88,7 +97,8 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                   onClick={() => {
                     const errMsg = this.state.error?.message || 'Unknown error';
                     const errStack = this.state.error?.stack || '';
-                    navigator.clipboard.writeText(`Error: ${errMsg}\n${errStack}`);
+                    const compStack = this.state.componentStack || '';
+                    navigator.clipboard.writeText(`Error: ${errMsg}\n${errStack}\n\nComponent Stack:${compStack}`);
                   }}
                 >
                   Copy lỗi
