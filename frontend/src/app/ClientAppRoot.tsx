@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { getUserInfo } from "../redux/userSlice";
 import { useConfig } from "@/hooks/useConfig";
-import { toast, ToastContainer } from "react-toastify";
+import { toast, ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Feedback from "../components/Features/Feedback";
 import ChatBot from "../components/Features/ChatBot";
@@ -125,7 +125,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     <ErrorBoundary>
       <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
           {children}
-          <ToastContainer autoClose={1300} />
+          <ToastContainer autoClose={1300} transition={Bounce} />
           {!isChatPage && !isInterviewPage && (
             <>
               {isAuthenticated && <Feedback />}
