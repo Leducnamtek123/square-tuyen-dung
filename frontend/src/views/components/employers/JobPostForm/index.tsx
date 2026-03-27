@@ -59,7 +59,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
       try {
         const resData = await commonService.getDistrictsByCityId(cityId);
         if (districtOptions.length > 0) setValue('location.district', '');
-        setDistrictOptions((resData as any).data || []);
+        setDistrictOptions(Array.isArray(resData) ? resData : ((resData as any)?.results || (resData as any)?.data || []));
       } catch (error: any) {
         errorHandling(error);
       }

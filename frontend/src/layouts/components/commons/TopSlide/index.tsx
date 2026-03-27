@@ -50,7 +50,7 @@ const TopSlide = () => {
     const getBanners = async () => {
       try {
         const resData = await contentService.getBanners({ type: BANNER_TYPES.HOME });
-        const data = (resData as any)?.data || [];
+        const data = Array.isArray(resData) ? resData : ((resData as any)?.results || (resData as any)?.data || []);
         setBanners(data);
       } catch (error) {
         // Error handled silently
