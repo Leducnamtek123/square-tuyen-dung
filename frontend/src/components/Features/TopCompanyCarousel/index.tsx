@@ -10,6 +10,8 @@ import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import companyService from '@/services/companyService';
 import { ROUTES, IMAGES } from '@/configs/constants';
 import { formatRoute } from '@/utils/funcUtils';
+import { localizeRoutePath } from '@/configs/routeLocalization';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   [key: string]: any;
@@ -80,6 +82,7 @@ const Loading = (_props: Props) => {
 
 const TopCompanyCarousel = () => {
   const nav = useRouter();
+  const { i18n } = useTranslation();
   const [parentWidth, setParentWidth] = React.useState(0);
   const [col, setCol] = React.useState(5);
 
@@ -87,7 +90,7 @@ const TopCompanyCarousel = () => {
     queryKey: ['top-companies'],
     queryFn: async () => {
       const resData: any = await companyService.getTopCompanies();
-      return resData?.data || [];
+      return resData?.data || resData?.results || (Array.isArray(resData) ? resData : []);
     },
     staleTime: 5 * 60_000,
   });
@@ -162,7 +165,7 @@ const TopCompanyCarousel = () => {
                         }
                       },
                     }}
-                    onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, value.slug)}`)}
+                    onClick={() => nav.push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, value.slug)}`, i18n.language))}
                   >
                     <Stack direction="row" justifyContent="center" sx={{ py: 1 }}>
                       <Box

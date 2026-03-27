@@ -16,10 +16,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { salaryString } from "@/utils/customData";
 import MuiImageCustom from "@/components/Common/MuiImageCustom";
 import { formatRoute } from "@/utils/funcUtils";
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import { ROUTES, IMAGES } from "@/configs/constants";
 import TimeAgo from '@/components/Common/TimeAgo';
 import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
+import { useTranslation } from 'react-i18next';
 
 interface JobPostLargeProps {
   id: string | number;
@@ -56,8 +58,9 @@ const JobPostLarge = ({
   const nav = useRouter();
 
   const { allConfig } = useConfig();
+  const { t, i18n } = useTranslation('public');
   const goToDetail = () => {
-    nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`);
+    nav.push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language));
   };
 
   const handleCardKeyDown = (event: React.KeyboardEvent) => {
@@ -676,7 +679,7 @@ const JobPostLarge = ({
 
           >
 
-            Còn{" "}
+            {t('jobPost.remaining', 'Còn')}{" "}
 
             <TimeAgo date={deadline} type="fromNow" />
 

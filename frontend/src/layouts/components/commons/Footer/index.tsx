@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from '@mui/material/Link';
 
 import { useTranslation } from 'react-i18next';
+import { localizeRoutePath } from '../../../../configs/routeLocalization';
 
 import {
   Box,
@@ -26,8 +27,9 @@ import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 
 const Footer = () => {
 
-  const { t } = useTranslation('common');
+  const { t, i18n } = useTranslation('common');
   const nav = useRouter();
+  const lang = i18n.language;
 
   const theme = useTheme();
 
@@ -88,9 +90,9 @@ const Footer = () => {
               </ListItem>
 
               {[
-                { label: t('footer.aboutApp', { appName: APP_NAME }), route: `/${ROUTES.JOB_SEEKER.ABOUT_US}` },
-                { label: t('nav.jobs'),  route: `/${ROUTES.JOB_SEEKER.JOBS}` },
-                { label: t('nav.companies'), route: `/${ROUTES.JOB_SEEKER.COMPANY}` },
+                { label: t('footer.aboutApp', { appName: APP_NAME }), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.ABOUT_US}`, lang) },
+                { label: t('nav.jobs'),  route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, lang) },
+                { label: t('nav.companies'), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, lang) },
               ].map((item) => (
                 <ListItem key={item.label} sx={{ pl: 0, py: 0.5 }}>
                   <ListItemText
@@ -160,9 +162,9 @@ const Footer = () => {
               </ListItem>
 
               {[
-                { label: t('nav.jobs'),                   route: `/${ROUTES.JOB_SEEKER.JOBS}` },
-                { label: t('nav.companies'),              route: `/${ROUTES.JOB_SEEKER.COMPANY}` },
-                { label: t('footer.candidateDashboard'),  route: `/${ROUTES.JOB_SEEKER.DASHBOARD}` },
+                { label: t('nav.jobs'),                   route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, lang) },
+                { label: t('nav.companies'),              route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.COMPANY}`, lang) },
+                { label: t('footer.candidateDashboard'),  route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.DASHBOARD}`, lang) },
               ].map((item) => (
                 <ListItem key={item.label} sx={{ pl: 0, py: 0.5 }}>
                   <ListItemText

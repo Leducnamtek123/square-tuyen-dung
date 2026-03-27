@@ -21,9 +21,11 @@ import companyService from '@/services/companyService';
 import toastMessages from '@/utils/toastMessages';
 import errorHandling from '@/utils/errorHandling';
 import { formatRoute } from '@/utils/funcUtils';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import { RootState } from '@/redux/store';
 import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
+import { useTranslation } from 'react-i18next';
 
 interface FollowProps {
   slug: string;
@@ -31,6 +33,7 @@ interface FollowProps {
 }
 
 const FollowComponent = ({ slug, isFollowed }: FollowProps) => {
+  const { t } = useTranslation('public');
   const { isAuthenticated, currentUser } = useSelector((state: RootState) => state.user);
   const [isLoadingFollow, setIsLoadingFollow] = React.useState(false);
   const [followed, setFollowed] = React.useState(isFollowed);
@@ -112,11 +115,11 @@ const FollowComponent = ({ slug, isFollowed }: FollowProps) => {
 
               {followed ? (
 
-                <span style={{ color: 'white' }}>Đang theo dõi</span>
+                <span style={{ color: 'white' }}>{t('company.following', 'Đang theo dõi')}</span>
 
               ) : (
 
-                'Theo dõi'
+                t('company.follow', 'Theo dõi')
 
               )}
 
@@ -162,6 +165,7 @@ const Company = ({
   isFollowed,
 }: CompanyProps) => {
   const theme = useTheme();
+  const { t, i18n } = useTranslation('public');
   const { allConfig } = useConfig();
   const { isAuthenticated, currentUser } = useSelector((state: RootState) => state.user);
 
@@ -264,7 +268,7 @@ const Company = ({
 
               component={Link}
 
-              href={`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, slug)}`}
+              href={localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, slug)}`, i18n.language)}
 
             >
 
@@ -327,7 +331,7 @@ const Company = ({
 
                 />
 
-                {followNumber} lượt theo dõi
+                {followNumber} {t('company.followers', 'lượt theo dõi')}
 
               </Typography>
 
@@ -345,7 +349,7 @@ const Company = ({
 
                 component={Link}
 
-                href={`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, slug)}`}
+                href={localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, slug)}`, i18n.language)}
 
                 sx={{
 
@@ -388,7 +392,7 @@ const Company = ({
 
                   <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
 
-                    Chưa cập nhật
+                    {t('company.notUpdated', 'Chưa cập nhật')}
 
                   </span>
 
@@ -407,7 +411,7 @@ const Company = ({
 
                   <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
 
-                    Chưa cập nhật
+                    {t('company.notUpdated', 'Chưa cập nhật')}
 
                   </span>
 
@@ -426,7 +430,7 @@ const Company = ({
 
                   <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
 
-                    Chưa cập nhật
+                    {t('company.notUpdated', 'Chưa cập nhật')}
 
                   </span>
 
@@ -459,7 +463,7 @@ const Company = ({
                   style={{ width: 16, color: defaultTheme.palette.primary.main }}
                 />
 
-                {jobPostNumber} việc làm
+                {jobPostNumber} {t('company.jobCount', 'việc làm')}
 
               </Typography>
 

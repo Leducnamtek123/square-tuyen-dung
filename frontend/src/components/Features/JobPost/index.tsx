@@ -16,10 +16,12 @@ import TimeAgo from '@/components/Common/TimeAgo';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import { salaryString } from '@/utils/customData';
 import { formatRoute } from '@/utils/funcUtils';
+import { localizeRoutePath } from '@/configs/routeLocalization';
 import { ROUTES, IMAGES } from '@/configs/constants';
 import { useAppSelector } from '@/hooks/useAppStore';
 import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
+import { useTranslation } from 'react-i18next';
 
 interface JobPostProps {
   id: number;
@@ -53,6 +55,7 @@ const JobPost = ({
   const [width, setWidth] = React.useState<string | number>("95%")
   const nav = useRouter();
   const { allConfig } = useConfig();
+  const { t, i18n } = useTranslation('public');
   const theme = useTheme();
 
   React.useEffect(() => {
@@ -63,7 +66,7 @@ const JobPost = ({
   }, []);
 
   const goToDetail = () => {
-    nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`);
+    nav.push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language));
   };
 
   const handleCardKeyDown = (event: React.KeyboardEvent) => {
@@ -572,7 +575,7 @@ const JobPost = ({
 
           >
 
-            Còn <TimeAgo date={deadline} type="fromNow" />
+            {t('jobPost.remaining', 'Còn')} <TimeAgo date={deadline} type="fromNow" />
 
           </Typography>
 
