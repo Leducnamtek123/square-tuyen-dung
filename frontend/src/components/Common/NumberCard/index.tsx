@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Card, Typography } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 interface NumberCardProps {
   color?: string;
@@ -7,6 +8,7 @@ interface NumberCardProps {
 }
 
 const NumberCard = ({ color, backgroundColor }: NumberCardProps) => {
+  const { t } = useTranslation('common');
 
   return (
 
@@ -30,7 +32,7 @@ const NumberCard = ({ color, backgroundColor }: NumberCardProps) => {
 
       <Box>
 
-        <Typography variant="button">Nhà tuyển dụng xem hồ sơ</Typography>
+        <Typography variant="button">{t('employerViewedProfile')}</Typography>
 
       </Box>
 

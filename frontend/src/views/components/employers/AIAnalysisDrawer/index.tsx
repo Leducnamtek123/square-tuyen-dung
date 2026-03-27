@@ -241,7 +241,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
           {renderIcon(PsychologyIcon, { sx: { color: '#06b6d4', fontSize: 28 } })}
           <Box>
             <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#1e293b', lineHeight: 1.2 }}>
-              Phan tich AI
+              {t('appliedResume.ai.drawerTitle')}
             </Typography>
             {data?.fullName && (
               <Typography variant="caption" sx={{ color: '#64748b' }}>
@@ -259,13 +259,13 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
         <Box sx={{ p: 4, textAlign: 'center' }}>
           <CircularProgress />
           <Typography variant="body2" sx={{ mt: 2, color: '#64748b' }}>
-            Dang tai du lieu...
+            {t('appliedResume.ai.loading')}
           </Typography>
         </Box>
       ) : (
         <Box sx={{ p: 2.5, overflowY: 'auto', flex: 1 }}>
           {resumeFileUrl && (
-            <SectionCard title="Ho so ung vien" icon={renderIcon(DescriptionIcon, { fontSize: 'small' })} iconColor="#22d3ee">
+            <SectionCard title={t('appliedResume.ai.resumeTitle')} icon={renderIcon(DescriptionIcon, { fontSize: 'small' })} iconColor="#22d3ee">
               <Box
                 sx={{
                   border: '1px solid rgba(34,211,238,0.28)',
@@ -296,10 +296,10 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                   >
                     {renderIcon(DescriptionIcon, { sx: { fontSize: 36, color: '#67e8f9' } })}
                     <Typography variant="body2">
-                      Khong the hien thi CV trong frame do chinh sach bao mat.
+                      {t('appliedResume.ai.cannotEmbed')}
                     </Typography>
                     <Typography variant="caption" sx={{ color: '#94a3b8' }}>
-                      Ban van co the mo file CV trong tab moi.
+                      {t('appliedResume.ai.cannotEmbedHint')}
                     </Typography>
                   </Stack>
                 )}
@@ -328,7 +328,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
 
               <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 1.25 }}>
                 <Typography variant="caption" sx={{ color: '#64748b' }}>
-                  {isProcessing ? 'Scanning...' : isCompleted ? 'Scan complete' : 'Idle'}
+                  {isProcessing ? t('appliedResume.ai.scanStatusScanning') : isCompleted ? t('appliedResume.ai.scanStatusComplete') : t('appliedResume.ai.scanStatusIdle')}
                 </Typography>
                 <Button
                   href={resumeFileUrl}
@@ -338,7 +338,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                   startIcon={renderIcon(OpenInNewIcon, { fontSize: 'small' })}
                   sx={{ textTransform: 'none', fontSize: '0.75rem' }}
                 >
-                  Mo file CV
+                  {t('appliedResume.ai.openCV')}
                 </Button>
               </Stack>
             </SectionCard>
@@ -357,7 +357,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
             >
               <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.2 }}>
                 <Typography variant="subtitle2" sx={{ color: '#a5f3fc', fontWeight: 700 }}>
-                  Scanning CV with AI
+                  {t('appliedResume.ai.scanning')}
                 </Typography>
                 <Chip size="small" label={`${scanProgress}%`} sx={{ color: '#0f172a', bgcolor: '#67e8f9', fontWeight: 700 }} />
               </Stack>
@@ -375,7 +375,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                 }}
               />
               <Typography variant="caption" sx={{ color: '#bae6fd', mt: 1, display: 'block' }}>
-                Dang quet thong tin, ky nang va muc do phu hop voi JD...
+                {t('appliedResume.ai.scanProgress')}
               </Typography>
             </Paper>
           )}
@@ -384,7 +384,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
             <Paper elevation={0} sx={{ p: 3, mb: 1.5, border: '1px solid #fecaca', borderRadius: 2, bgcolor: '#fef2f2', textAlign: 'center' }}>
               {renderIcon(CancelIcon, { sx: { fontSize: 36, color: '#ef4444', mb: 1 } })}
               <Typography variant="body1" sx={{ fontWeight: 600, color: '#991b1b' }}>
-                Phan tich that bai
+                {t('appliedResume.ai.failedTitle')}
               </Typography>
               {data?.aiAnalysisSummary && (
                 <Typography variant="body2" sx={{ color: '#b91c1c', mt: 0.5, fontSize: '0.8rem' }}>
@@ -400,7 +400,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                 disabled={analyzing}
                 sx={{ mt: 2, textTransform: 'none' }}
               >
-                Thu lai
+                {t('appliedResume.ai.retry')}
               </Button>
             </Paper>
           )}
@@ -419,10 +419,10 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
             >
               {renderIcon(AutoFixHighIcon, { sx: { fontSize: 40, color: '#0891b2', mb: 1 } })}
               <Typography variant="body1" sx={{ fontWeight: 700, color: '#0f172a', mb: 0.5 }}>
-                Idle - chua phan tich AI
+                {t('appliedResume.ai.idleTitle')}
               </Typography>
               <Typography variant="caption" sx={{ color: '#475569', display: 'block', mb: 2 }}>
-                Bam nut ben duoi de bat dau scan CV va tao danh gia tu AI.
+                {t('appliedResume.ai.idleHint')}
               </Typography>
               <Button
                 variant="contained"
@@ -437,7 +437,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                   '&:hover': { background: 'linear-gradient(90deg, #0e7490 0%, #06b6d4 100%)' },
                 }}
               >
-                Bat dau scan CV
+                {t('appliedResume.ai.startScan')}
               </Button>
             </Paper>
           )}
@@ -458,7 +458,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                   <Stack direction="row" spacing={1} alignItems="center">
                     {renderIcon(CheckCircleIcon, { sx: { color: '#0e7490' } })}
                     <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#134e4a' }}>
-                      Complete - ket qua scan da san sang
+                      {t('appliedResume.ai.completeTitle')}
                     </Typography>
                   </Stack>
                   <Stack direction="row" spacing={1}>
@@ -473,29 +473,29 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                 <ScoreGauge score={data?.aiAnalysisScore || 0} />
               </Paper>
 
-              <SectionCard title="Tong quan danh gia" icon={renderIcon(PsychologyIcon, { fontSize: 'small' })} iconColor="#6366f1">
+              <SectionCard title={t('appliedResume.ai.overviewTitle')} icon={renderIcon(PsychologyIcon, { fontSize: 'small' })} iconColor="#6366f1">
                 <Typography variant="body2" sx={{ color: '#334155', lineHeight: 1.7 }}>
-                  {data?.aiAnalysisSummary || 'Chua co danh gia'}
+                  {data?.aiAnalysisSummary || t('appliedResume.ai.noEvaluation')}
                 </Typography>
               </SectionCard>
 
-              <SectionCard title="Diem manh" icon={renderIcon(ThumbUpAltIcon, { fontSize: 'small' })} iconColor="#22c55e">
+              <SectionCard title={t('appliedResume.ai.prosTitle')} icon={renderIcon(ThumbUpAltIcon, { fontSize: 'small' })} iconColor="#22c55e">
                 <SkillChipList skills={data?.aiAnalysisPros} color="success" />
               </SectionCard>
 
-              <SectionCard title="Diem yeu / Can luu y" icon={renderIcon(ThumbDownAltIcon, { fontSize: 'small' })} iconColor="#ef4444">
+              <SectionCard title={t('appliedResume.ai.consTitle')} icon={renderIcon(ThumbDownAltIcon, { fontSize: 'small' })} iconColor="#ef4444">
                 <SkillChipList skills={data?.aiAnalysisCons} color="error" />
               </SectionCard>
 
-              <SectionCard title="Ky nang phu hop voi JD" icon={renderIcon(CheckCircleIcon, { fontSize: 'small' })} iconColor="#22c55e">
+              <SectionCard title={t('appliedResume.ai.matchingSkillsTitle')} icon={renderIcon(CheckCircleIcon, { fontSize: 'small' })} iconColor="#22c55e">
                 <SkillChipList skills={data?.aiAnalysisMatchingSkills} color="success" icon={renderIcon(CheckCircleIcon) || undefined} />
               </SectionCard>
 
-              <SectionCard title="Ky nang con thieu" icon={renderIcon(CancelIcon, { fontSize: 'small' })} iconColor="#f97316">
+              <SectionCard title={t('appliedResume.ai.missingSkillsTitle')} icon={renderIcon(CancelIcon, { fontSize: 'small' })} iconColor="#f97316">
                 <SkillChipList skills={data?.aiAnalysisMissingSkills} color="error" icon={renderIcon(CancelIcon) || undefined} />
               </SectionCard>
 
-              <SectionCard title="Tat ca ky nang" icon={renderIcon(AutoFixHighIcon, { fontSize: 'small' })} iconColor="#3b82f6">
+              <SectionCard title={t('appliedResume.ai.allSkillsTitle')} icon={renderIcon(AutoFixHighIcon, { fontSize: 'small' })} iconColor="#3b82f6">
                 <SkillChipList skills={data?.aiAnalysisSkills} color="primary" />
               </SectionCard>
 
@@ -509,7 +509,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                   disabled={analyzing}
                   sx={{ textTransform: 'none' }}
                 >
-                  Phan tich lai
+                  {t('appliedResume.ai.reanalyze')}
                 </Button>
               </Box>
             </>

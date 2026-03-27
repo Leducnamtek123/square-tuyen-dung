@@ -49,7 +49,11 @@
     "interviewQuestionSets": "Interview Question Sets",
     "interviewSchedule": "Interview Schedule",
     "interviewLive": "Direct Company Interviews",
-    "jobNotifications": "Job Notifications"
+    "jobNotifications": "Job Notifications",
+    "contentManagement": "Content Management",
+    "bannersManagement": "Banners Management",
+    "feedbacksManagement": "Feedbacks Management",
+    "chatWithEmployers": "Chat with Employers"
   },
   "pages": {
     "careers": {
@@ -657,5 +661,36 @@
     "na": "N/A",
     "system": "System",
     "hot": "Hot"
+  },
+  "chat": {
+    "title": "Chat with Employers",
+    "breadcrumb": "Admin",
+    "stats": {
+      "totalConversations": "Total conversations",
+      "candidatesJoined": "Candidates joined",
+      "employersJoined": "Employers joined"
+    },
+    "search": {
+      "placeholder": "Search candidate or employer..."
+    },
+    "table": {
+      "candidate": "Candidate",
+      "employer": "Employer",
+      "lastMessage": "Last message",
+      "status": "Status",
+      "time": "Time",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "ended": "Ended"
+    },
+    "empty": {
+      "noConversations": "No conversations yet",
+      "noResults": "No matching results"
+    },
+    "tooltip": {
+      "viewDetail": "View detail"
+    }
   }
 }

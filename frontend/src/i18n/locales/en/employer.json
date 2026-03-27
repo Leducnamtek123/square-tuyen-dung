@@ -28,7 +28,33 @@
       "processing": "Processing...",
       "analyze": "Analyze",
       "summary": "AI Summary:",
-      "skills": "Skills:"
+      "skills": "Skills:",
+      "drawerTitle": "AI Analysis",
+      "loading": "Loading data...",
+      "scanning": "Scanning CV with AI",
+      "scanProgress": "Scanning info, skills and JD match...",
+      "scanStatusScanning": "Scanning...",
+      "scanStatusComplete": "Scan complete",
+      "scanStatusIdle": "Idle",
+      "openCV": "Open CV",
+      "cannotEmbed": "Cannot display CV in frame due to security policy.",
+      "cannotEmbedHint": "You can still open the CV in a new tab.",
+      "idleTitle": "Idle - not analyzed yet",
+      "idleHint": "Press the button below to start scanning CV and generate AI evaluation.",
+      "startScan": "Start CV scan",
+      "failedTitle": "Analysis failed",
+      "retry": "Try again",
+      "reanalyze": "Re-analyze",
+      "completeTitle": "Complete - scan results ready",
+      "overviewTitle": "Evaluation overview",
+      "noEvaluation": "No evaluation yet",
+      "prosTitle": "Strengths",
+      "consTitle": "Weaknesses / Notes",
+      "matchingSkillsTitle": "Skills matching JD",
+      "missingSkillsTitle": "Missing skills",
+      "allSkillsTitle": "All skills",
+      "noData": "No data",
+      "resumeTitle": "Candidate resume"
     },
     "email": {
       "sentSuccess": "Email sent successfully.",
@@ -261,7 +287,8 @@
       "selectinterviewquestions": "Select Interview Questions"
     },
     "helperText": {
-      "selectaquestiongrouptoautomaticallyfillTheQuestionsBelow": "Select a question group to automatically fill the questions below"
+      "selectaquestiongrouptoautomaticallyfillTheQuestionsBelow": "Select a question group to automatically fill the questions below",
+      "selectaquestiongrouptoautomaticallyfillthequestionsbelow": "Select a question group to automatically fill the questions below"
     },
     "validation": {
       "selectJobPost": "Please select a job post",
@@ -296,7 +323,13 @@
       "schedule": "SCHEDULE",
       "liveMonitoring": "LIVE MONITORING",
       "aiInterviewer": "AI Interviewer",
-      "candidateSmall": "Candidate"
+      "candidateSmall": "Candidate",
+      "technicalScore": "Technical Score",
+      "communicationScore": "Communication Score",
+      "detailedAnalysis": "Detailed AI Analysis",
+      "strengths": "Strengths",
+      "weaknesses": "Weaknesses",
+      "feedback": "Detailed Feedback"
     },
     "messages": {
       "notFound": "Interview session information not found",
@@ -308,7 +341,21 @@
     "actions": {
       "backToList": "Back to list",
       "viewReport": "View detailed report",
-      "openRecording": "Open recording"
+      "openRecording": "Open recording",
+      "retryAi": "Re-analyze with AI",
+      "questionList": "Interview Questions List",
+      "hrEvaluation": "HR Evaluation",
+      "attitudeScore": "Attitude Score",
+      "professionalScore": "Professional Score",
+      "overallScore": "Overall Score",
+      "resultLabel": "Final Result",
+      "comments": "Detailed Comments",
+      "proposedSalary": "Proposed Salary (VND)",
+      "submitEvaluation": "Submit Final Evaluation",
+      "evalSuccess": "Evaluation submitted successfully!",
+      "passed": "Accepted (Pass)",
+      "failed": "Rejected (Fail)",
+      "pending": "Pending Review"
     }
   },
   "jobPostFilterForm": {
@@ -384,7 +431,8 @@
       "contactpersonname": "Contact Person Name",
       "contactpersonphone": "Contact Person Phone",
       "contactpersonemail": "Contact Person Email",
-      "urgent": "Urgent"
+      "urgent": "Urgent",
+      "contactinformation": "Contact Information"
     },
     "placeholder": {
       "enterjobtitle": "Enter job title",
@@ -409,6 +457,9 @@
     },
     "helperText": {
       "automaticallyfilledifyouchooseasuggestedaddress": "Automatically filled if you choose a suggested address."
+    },
+    "label": {
+      "isUrgent": "Urgent Hiring"
     }
   },
   "profileCard": {

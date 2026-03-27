@@ -12,6 +12,7 @@ import {
   LinkedinIcon,
 } from 'react-share';
 import CloseIcon from '@mui/icons-material/Close';
+import { useTranslation } from 'react-i18next';
 
 interface SocialNetworkSharingPopupProps {
   setOpenPopup: (open: boolean) => void;
@@ -24,6 +25,7 @@ interface SocialNetworkSharingPopupProps {
 }
 
 const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
+  const { t } = useTranslation('common');
 
   const {
 
@@ -95,7 +97,7 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
 
         >
 
-          <Typography variant="h5" sx={{ fontWeight: 600 }}>Chia sẻ qua</Typography>
+          <Typography variant="h5" sx={{ fontWeight: 600 }}>{t('shareVia')}</Typography>
 
           <IconButton
 

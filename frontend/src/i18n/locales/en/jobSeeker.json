@@ -24,7 +24,8 @@
       "skills": "Professional Skills",
       "certificates": "Certificates",
       "language": "Language",
-      "resume": "Resume Information"
+      "resume": "Resume Information",
+      "advancedSkills": "Advanced Skills"
     },
     "fields": {
       "fullName": "Full Name",
@@ -67,7 +68,18 @@
       "cvFile": "Choose your CV file",
       "salaryMin": "Minimum Salary",
       "salaryMax": "Maximum Salary",
-      "skillName": "Skill Name"
+      "skillName": "Skill Name",
+      "jobTitle": "Job Title",
+      "companyName": "Company Name",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "additionalDescription": "Additional Description",
+      "lastSalary": "Last Salary",
+      "leaveReason": "Reason for Leaving",
+      "degreeName": "Degree Name",
+      "major": "Major",
+      "completedDate": "Completion Date",
+      "gradeOrRank": "Grade / Rank"
     },
     "placeholders": {
       "fullName": "Enter full name",
@@ -88,7 +100,27 @@
       "selectLanguage": "Select language",
       "skillName": "Enter skill name",
       "salaryMin": "Enter minimum salary",
-      "salaryMax": "Enter maximum salary"
+      "salaryMax": "Enter maximum salary",
+      "address": "Enter address",
+      "desiredPosition": "Enter desired position",
+      "selectLevel": "Select level",
+      "selectAcademicLevel": "Select academic level",
+      "selectExperience": "Select experience",
+      "selectCareer": "Select career",
+      "expectedSalary": "Enter expected salary",
+      "selectWorkplaceType": "Select workplace type",
+      "selectJobType": "Select job type",
+      "objective": "Enter career objective",
+      "skillsSummary": "Describe your skills",
+      "jobTitle": "Enter job title",
+      "companyName": "Enter company name",
+      "additionalDescription": "Enter additional description",
+      "lastSalary": "Enter last salary",
+      "leaveReason": "Enter reason for leaving",
+      "degreeName": "Enter degree name",
+      "major": "Enter major",
+      "trainingPlace": "Enter training institution",
+      "gradeOrRank": "Enter grade or rank"
     },
     "validation": {
       "fullNameRequired": "Full name is required.",
@@ -384,5 +416,7 @@
         }
       }
     }
-  }
+  },
+  "presenterationPlaceholder": "Enter your self-introduction",
+  "notUpdatedzePlaceholder": "Not updated"
 }

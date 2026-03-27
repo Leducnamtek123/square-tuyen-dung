@@ -661,5 +661,36 @@
     "na": "N/A",
     "system": "Hệ thống",
     "hot": "Hot"
+  },
+  "chat": {
+    "title": "Kết nối với nhà tuyển dụng",
+    "breadcrumb": "Quản trị",
+    "stats": {
+      "totalConversations": "Tổng cuộc hội thoại",
+      "candidatesJoined": "Ứng viên tham gia",
+      "employersJoined": "Nhà tuyển dụng tham gia"
+    },
+    "search": {
+      "placeholder": "Tìm kiếm ứng viên hoặc nhà tuyển dụng..."
+    },
+    "table": {
+      "candidate": "Ứng viên",
+      "employer": "Nhà tuyển dụng",
+      "lastMessage": "Tin nhắn gần nhất",
+      "status": "Trạng thái",
+      "time": "Thời gian",
+      "actions": "Hành động"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "ended": "Đã kết thúc"
+    },
+    "empty": {
+      "noConversations": "Chưa có cuộc hội thoại nào",
+      "noResults": "Không tìm thấy kết quả phù hợp"
+    },
+    "tooltip": {
+      "viewDetail": "Xem chi tiết"
+    }
   }
 }

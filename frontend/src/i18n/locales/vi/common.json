@@ -231,5 +231,6 @@
     "contentRequired": "Vui lòng nhập nội dung phản hồi.",
     "contentMax": "Nội dung phản hồi vượt quá độ dài cho phép.",
     "success": "Gửi phản hồi thành công."
-  }
+  },
+  "employerViewedProfile": "Nhà tuyển dụng xem hồ sơ"
 }

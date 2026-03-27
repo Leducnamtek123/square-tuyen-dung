@@ -262,9 +262,19 @@ def analyze_resume_ai(self, activity_id):
             else:
                 raise Exception(f"LLM API failed with status {resp.status_code}")
 
-    except (httpx.TimeoutException, httpx.ConnectError):
-        # Let Celery autoretry handle these
-        raise
+    except (httpx.TimeoutException, httpx.ConnectError) as exc:
+        # On final retry, update DB so status doesn't stay stuck at 'processing'
+        max_r = 3  # matches retry_kwargs['max_retries']
+        if (self.request.retries or 0) >= max_r:
+            try:
+                act = JobPostActivity.objects.get(id=activity_id)
+                act.ai_analysis_status = 'failed'
+                act.ai_analysis_progress = 0
+                act.ai_analysis_summary = f"LLM không phản hồi sau nhiều lần thử: {str(exc)[:300]}"
+                act.save()
+            except Exception:
+                logger.error(f"Failed to update activity {activity_id} after final retry")
+        raise  # Let Celery autoretry handle
     except Exception as e:
         logger.error(f"Error in analyze_resume_ai for activity {activity_id}: {e}")
         try:

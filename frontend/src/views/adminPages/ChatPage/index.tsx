@@ -63,21 +63,21 @@ const AdminChatPage = () => {
 
   const stats = [
     {
-      label: 'Tổng cuộc hội thoại',
+      label: t('chat.stats.totalConversations'),
       value: conversations.length,
       icon: <ChatBubbleOutlineIcon sx={{ fontSize: 32, color: 'primary.main' }} />,
       color: 'primary.main',
       bg: 'primary.50',
     },
     {
-      label: 'Ứng viên tham gia',
+      label: t('chat.stats.candidatesJoined'),
       value: new Set(conversations.map((c) => c.jobSeekerId)).size,
       icon: <PeopleAltIcon sx={{ fontSize: 32, color: 'success.main' }} />,
       color: 'success.main',
       bg: 'success.50',
     },
     {
-      label: 'Nhà tuyển dụng tham gia',
+      label: t('chat.stats.employersJoined'),
       value: new Set(conversations.map((c) => c.employerId || c.companyId)).size,
       icon: <BusinessCenterIcon sx={{ fontSize: 32, color: 'warning.main' }} />,
       color: 'warning.main',
@@ -90,13 +90,13 @@ const AdminChatPage = () => {
       {/* Header */}
       <Box sx={{ mb: 3 }}>
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
-          Kết nối với nhà tuyển dụng
+          {t('chat.title')}
         </Typography>
         <Breadcrumbs>
           <Link underline="hover" color="inherit" href="/">
-            Quản trị
+            {t('chat.breadcrumb')}
           </Link>
-          <Typography color="text.primary">Kết nối với nhà tuyển dụng</Typography>
+          <Typography color="text.primary">{t('chat.title')}</Typography>
         </Breadcrumbs>
       </Box>
 
@@ -148,7 +148,7 @@ const AdminChatPage = () => {
         <Box sx={{ mb: 2 }}>
           <TextField
             size="small"
-            placeholder="Tìm kiếm ứng viên hoặc nhà tuyển dụng..."
+            placeholder={t('chat.search.placeholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             InputProps={{
@@ -171,12 +171,12 @@ const AdminChatPage = () => {
             <TableHead>
               <TableRow>
                 <TableCell>#</TableCell>
-                <TableCell>Ứng viên</TableCell>
-                <TableCell>Nhà tuyển dụng</TableCell>
-                <TableCell>Tin nhắn gần nhất</TableCell>
-                <TableCell>Trạng thái</TableCell>
-                <TableCell>Thời gian</TableCell>
-                <TableCell align="right">Hành động</TableCell>
+                <TableCell>{t('chat.table.candidate')}</TableCell>
+                <TableCell>{t('chat.table.employer')}</TableCell>
+                <TableCell>{t('chat.table.lastMessage')}</TableCell>
+                <TableCell>{t('chat.table.status')}</TableCell>
+                <TableCell>{t('chat.table.time')}</TableCell>
+                <TableCell align="right">{t('chat.table.actions')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -187,8 +187,8 @@ const AdminChatPage = () => {
                       <ChatBubbleOutlineIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
                       <Typography color="text.secondary">
                         {conversations.length === 0
-                          ? 'Chưa có cuộc hội thoại nào'
-                          : 'Không tìm thấy kết quả phù hợp'}
+                          ? t('chat.empty.noConversations')
+                          : t('chat.empty.noResults')}
                       </Typography>
                     </Box>
                   </TableCell>
@@ -265,7 +265,7 @@ const AdminChatPage = () => {
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={isActive ? 'Hoạt động' : 'Đã kết thúc'}
+                          label={isActive ? t('chat.status.active') : t('chat.status.ended')}
                           size="small"
                           color={isActive ? 'success' : 'default'}
                         />
@@ -276,7 +276,7 @@ const AdminChatPage = () => {
                           : '—'}
                       </TableCell>
                       <TableCell align="right">
-                        <Tooltip title="Xem chi tiết">
+                        <Tooltip title={t('chat.tooltip.viewDetail')}>
                           <IconButton size="small" color="primary">
                             <VisibilityIcon fontSize="small" />
                           </IconButton>
