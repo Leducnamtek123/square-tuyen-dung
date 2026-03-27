@@ -262,7 +262,7 @@ class CompanyViewSet(viewsets.ViewSet,
 
             queryset = self.filter_queryset(self.get_queryset())
             queryset = queryset.annotate(
-                follow_count=Count('companyfollowed_set', distinct=True),
+                follow_count=Count('companyfollowed', distinct=True),
                 active_job_post_count=Count(
                     'job_posts',
                     filter=Q(

@@ -16,13 +16,13 @@ const languages = [
     code: 'en',
     label: 'English',
     shortLabel: 'EN',
-    flag: 'US'
+    flag: '🇺🇸'
   },
   {
     code: 'vi',
     label: 'Tiếng Việt',
     shortLabel: 'VI',
-    flag: 'VN'
+    flag: '🇻🇳'
   }
 ];
 
