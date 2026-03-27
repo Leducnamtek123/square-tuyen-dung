@@ -90,7 +90,9 @@ const TopCompanyCarousel = () => {
     queryKey: ['top-companies'],
     queryFn: async () => {
       const resData: any = await companyService.getTopCompanies();
-      return resData?.data || resData?.results || (Array.isArray(resData) ? resData : []);
+      // httpRequest interceptor already unwraps response.data.data
+      // so resData is the companies array directly
+      return Array.isArray(resData) ? resData : (resData?.data || resData?.results || []);
     },
     staleTime: 5 * 60_000,
   });

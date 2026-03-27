@@ -94,8 +94,7 @@ httpRequest.interceptors.request.use(
     return Promise.reject(error);
 
   }
-
-);
+);
 
 httpRequest.interceptors.response.use(
 
@@ -106,26 +105,6 @@ httpRequest.interceptors.response.use(
     // Return payload directly; fall back to raw response for legacy endpoints.
 
     const payload = response.data?.data ?? response.data;
-
-    if (payload && typeof payload === 'object' && !('data' in payload)) {
-
-      try {
-
-        Object.defineProperty(payload, 'data', {
-
-          value: payload,
-
-          enumerable: false,
-
-        });
-
-      } catch {
-
-        // ignore if payload is non-extensible
-
-      }
-
-    }
 
     return payload;
 

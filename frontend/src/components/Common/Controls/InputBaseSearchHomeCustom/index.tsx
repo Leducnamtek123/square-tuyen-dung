@@ -74,7 +74,7 @@ const InputBaseSearchHomeCustom = ({
       }
       try {
         const resData = await jobService.searchJobSuggestTitle(kw);
-        const data = resData?.data;
+        const data = Array.isArray(resData) ? resData : (resData?.data || []);
         setSearchResult(data.flat());
       } catch (error) {
         console.error('Search failed: ', error);

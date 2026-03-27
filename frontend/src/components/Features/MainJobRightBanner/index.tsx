@@ -44,7 +44,7 @@ const MainJobRightBanner = (_props: MainJobRightBannerProps) => {
         const resData: any = await contentService.getBanners({
           type: BANNER_TYPES.MAIN_JOB_RIGHT,
         });
-        const data = resData?.data || [];
+        const data = Array.isArray(resData) ? resData : (resData?.data || []);
         setRightBanners(data);
       } catch (error) {}
     };

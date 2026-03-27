@@ -63,7 +63,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 400 }}>
               Ứng dụng gặp sự cố không mong muốn. Vui lòng thử lại hoặc tải lại trang.
             </Typography>
-            {process.env.NODE_ENV === 'development' && this.state.error && (
+            {this.state.error && (
               <Box
                 sx={{
                   mb: 3,
@@ -81,6 +81,19 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
               </Box>
             )}
             <Stack direction="row" spacing={2}>
+              {this.state.error && (
+                <Button
+                  variant="text"
+                  size="small"
+                  onClick={() => {
+                    const errMsg = this.state.error?.message || 'Unknown error';
+                    const errStack = this.state.error?.stack || '';
+                    navigator.clipboard.writeText(`Error: ${errMsg}\n${errStack}`);
+                  }}
+                >
+                  Copy lỗi
+                </Button>
+              )}
               <Button variant="outlined" onClick={this.handleReset}>
                 Thử lại
               </Button>

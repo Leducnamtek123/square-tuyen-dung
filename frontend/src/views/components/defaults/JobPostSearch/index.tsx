@@ -101,7 +101,7 @@ const JobPostSearch = () => {
     const loadDistricts = async () => {
       try {
         const resData = (await commonService.getDistrictsByCityId(cityId)) as any;
-        setDistrictOptions(resData?.data || []);
+        setDistrictOptions(Array.isArray(resData) ? resData : (resData?.data || []));
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
           setValue('districtId', '');
           setValue('wardId', '');
@@ -127,7 +127,7 @@ const JobPostSearch = () => {
     const loadWards = async () => {
       try {
         const resData = (await commonService.getWardsByDistrictId(districtId)) as any;
-        setWardOptions(resData?.data || []);
+        setWardOptions(Array.isArray(resData) ? resData : (resData?.data || []));
       } catch (error) {
         setWardOptions([]);
       }
