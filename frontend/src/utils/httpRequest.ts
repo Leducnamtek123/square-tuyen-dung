@@ -91,9 +91,8 @@ httpRequest.interceptors.request.use(
     const accessToken = tokenService.getAccessTokenFromCookie();
 
     if (accessToken && !isPublicEndpoint(config.url)) {
-      const headers = (config.headers ?? {}) as Record<string, string>;
-      headers.Authorization = `Bearer ${accessToken}`;
-      config.headers = headers;
+      config.headers = config.headers ?? {};
+      config.headers.set('Authorization', `Bearer ${accessToken}`);
     }
     return config;
   },

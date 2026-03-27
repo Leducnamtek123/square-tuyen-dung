@@ -101,18 +101,18 @@ const AdminLogin: React.FC = () => {
   const SLIDES = [
     {
       image: '/images/admin-login/slide-1.png',
-      title: t('admin:login.slide1Title', 'TÌM KIẾM NHÂN TÀI SÁNG GIÁ NHẤT CHO DOANH NGHIỆP CỦA BẠN'),
-      subtitle: t('admin:login.slide1Subtitle', 'Tìm kiếm ứng viên tài năng từ hàng ngàn hồ sơ xin việc trong cơ sở dữ liệu trực tuyến.'),
+      title: t('admin:login.slide1Title'),
+      subtitle: t('admin:login.slide1Subtitle'),
     },
     {
       image: '/images/admin-login/slide-2.png',
-      title: t('admin:login.slide2Title', 'QUẢN LÝ TUYỂN DỤNG THÔNG MINH VÀ HIỆU QUẢ'),
-      subtitle: t('admin:login.slide2Subtitle', 'Tối ưu quy trình tuyển dụng với hệ thống quản lý hiện đại và trực quan.'),
+      title: t('admin:login.slide2Title'),
+      subtitle: t('admin:login.slide2Subtitle'),
     },
     {
       image: '/images/admin-login/slide-3.png',
-      title: t('admin:login.slide3Title', 'HỆ THỐNG QUẢN TRỊ TUYỂN DỤNG TIÊN TIẾN'),
-      subtitle: t('admin:login.slide3Subtitle', 'Ứng dụng AI để phân tích, đánh giá và kết nối ứng viên phù hợp nhất.'),
+      title: t('admin:login.slide3Title'),
+      subtitle: t('admin:login.slide3Subtitle'),
     },
   ];
 
@@ -233,19 +233,19 @@ const AdminLogin: React.FC = () => {
               letterSpacing: '-.3px',
             }}
           >
-            {t('auth:login.headingAdmin', 'Đăng Nhập Quản Trị')}
+            {t('auth:login.headingAdmin')}
           </Typography>
 
           <Typography
             variant="body2"
             sx={{ color: 'text.secondary', mb: 3, lineHeight: 1.6 }}
           >
-            {t('auth:login.welcomeBack', 'Chào mừng bạn trở lại hệ thống quản trị tuyển dụng')}
+            {t('auth:login.welcomeBack')}
           </Typography>
 
           {errorMessage && (
             <Alert severity="error" sx={{ mb: 2, borderRadius: 2 }}>
-              <AlertTitle sx={{ fontWeight: 600 }}>{t('auth:login.errorTitle', 'Lỗi đăng nhập')}</AlertTitle>
+              <AlertTitle sx={{ fontWeight: 600 }}>{t('auth:login.errorTitle')}</AlertTitle>
               {errorMessage}
             </Alert>
           )}
@@ -258,7 +258,7 @@ const AdminLogin: React.FC = () => {
             variant="caption"
             sx={{ mt: 4, textAlign: 'center', color: 'text.disabled' }}
           >
-            Vào trang&nbsp;
+            {t('auth:login.visitPage')}&nbsp;
             <Link href="https://square.vn" target="_blank" sx={{ color: '#1a73e8' }}>
               www.square.vn
             </Link>

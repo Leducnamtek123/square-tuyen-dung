@@ -1,4 +1,12 @@
 {
+  "login": {
+    "slide1Title": "FIND THE BRIGHTEST TALENTS FOR YOUR BUSINESS",
+    "slide1Subtitle": "Search talented candidates from thousands of online resumes in our database.",
+    "slide2Title": "SMART AND EFFICIENT RECRUITMENT MANAGEMENT",
+    "slide2Subtitle": "Optimize your hiring process with a modern and intuitive management system.",
+    "slide3Title": "ADVANCED RECRUITMENT MANAGEMENT SYSTEM",
+    "slide3Subtitle": "Leverage AI to analyze, evaluate, and connect the most suitable candidates."
+  },
   "dashboard": {
     "totalUsers": "Total Users",
     "jobPosts": "Job Posts",
