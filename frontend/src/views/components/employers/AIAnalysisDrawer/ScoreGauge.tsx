@@ -1,7 +1,9 @@
 import React from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 export const ScoreGauge: React.FC<{ score: number }> = ({ score }) => {
+  const { t } = useTranslation('employer');
   const getColor = () => {
     if (score >= 80) return '#22c55e';
     if (score >= 60) return '#f59e0b';
@@ -10,10 +12,10 @@ export const ScoreGauge: React.FC<{ score: number }> = ({ score }) => {
   };
 
   const getLabel = () => {
-    if (score >= 80) return 'Rất phù hợp';
-    if (score >= 60) return 'Phù hợp';
-    if (score >= 40) return 'Tạm được';
-    return 'Chưa phù hợp';
+    if (score >= 80) return t('scoreGauge.excellent');
+    if (score >= 60) return t('scoreGauge.good');
+    if (score >= 40) return t('scoreGauge.fair');
+    return t('scoreGauge.poor');
   };
 
   return (

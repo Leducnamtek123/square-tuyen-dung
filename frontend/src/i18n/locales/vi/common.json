@@ -232,5 +232,12 @@
     "contentMax": "Nội dung phản hồi vượt quá độ dài cho phép.",
     "success": "Gửi phản hồi thành công."
   },
-  "employerViewedProfile": "Nhà tuyển dụng xem hồ sơ"
+  "employerViewedProfile": "Nhà tuyển dụng xem hồ sơ",
+  "errorBoundary": {
+    "title": "Đã xảy ra lỗi",
+    "message": "Ứng dụng gặp sự cố không mong muốn. Vui lòng thử lại hoặc tải lại trang.",
+    "copyError": "Copy lỗi",
+    "retry": "Thử lại",
+    "reload": "Tải lại trang"
+  }
 }

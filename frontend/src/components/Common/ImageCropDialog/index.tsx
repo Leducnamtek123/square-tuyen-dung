@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import CropperImport, { Area } from 'react-easy-crop';
 
 // Handle ESM/CJS interop: in production builds the default import can resolve
@@ -90,6 +91,7 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const { t } = useTranslation('employer');
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
@@ -117,14 +119,14 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
     <Dialog open={open} onClose={onCancel} maxWidth="md" fullWidth>
       <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <CropIcon fontSize="small" />
-        Cắt ảnh
+        {t('imageCrop.title')}
         {aspectLabel && (
           <Typography
             component="span"
             variant="body2"
             sx={{ color: 'text.secondary', ml: 1 }}
           >
-            (Tỉ lệ: {aspectLabel})
+            ({t('imageCrop.ratio')}: {aspectLabel})
           </Typography>
         )}
       </DialogTitle>
@@ -172,14 +174,14 @@ const ImageCropDialog: React.FC<ImageCropDialogProps> = ({
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2 }}>
         <Button onClick={onCancel} color="inherit">
-          Hủy
+          {t('imageCrop.cancel')}
         </Button>
         <Button
           onClick={handleConfirm}
           variant="contained"
           disabled={isCropping}
         >
-          {isCropping ? 'Đang cắt...' : 'Xác nhận'}
+          {isCropping ? t('imageCrop.cropping') : t('imageCrop.confirm')}
         </Button>
       </DialogActions>
     </Dialog>

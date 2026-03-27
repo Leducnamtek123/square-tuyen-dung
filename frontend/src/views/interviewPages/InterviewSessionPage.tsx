@@ -62,9 +62,13 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
   const [serverUrl, setServerUrl] = useState("");
   const [participantToken, setParticipantToken] = useState("");
   const [session, setSession] = useState<any>(null);
+  const [inviteTokenRef, setInviteTokenRef] = useState<string>("");
 
   const liveKitUrl = serverUrl || getSafeLiveKitUrl();
   const roomName = session?.room_name || session?.roomName;
+
+  const JOINABLE_STATUSES = ["scheduled", "calibration", "in_progress"];
+  const isJoinable = session && JOINABLE_STATUSES.includes(session.status);
 
   const sessionTitle = useMemo(() => {
     if (normalizedRole === "jobseeker") {
@@ -73,7 +77,8 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
     return t("interviewDetail.title", { ns: "employer", defaultValue: "Interview session" });
   }, [normalizedRole, t]);
 
-  const resolveSessionAndToken = useCallback(async () => {
+  // Step 1: Load session detail on page mount (no LiveKit token yet)
+  const loadSessionDetail = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -91,22 +96,9 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         inviteToken = detailRaw?.invite_token || detailRaw?.inviteToken;
       }
 
-      if (!inviteToken) {
-        throw new Error(t("errors.tokenMissing"));
-      }
-
-      const tokenData = await interviewService.getLiveKitToken(inviteToken) as any;
       const mappedSession = transformInterviewSession(detailRaw);
-
-      if (!tokenData?.token) {
-        throw new Error(t("errors.tokenMissing"));
-      }
-
       setSession(mappedSession);
-      setParticipantToken(tokenData.token);
-      if (tokenData.server_url) {
-        setServerUrl(tokenData.server_url);
-      }
+      setInviteTokenRef(inviteToken || "");
     } catch (err: any) {
       setError(err?.message || t("errors.invalidSession"));
     } finally {
@@ -115,22 +107,40 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
   }, [normalizedRole, routeId, t]);
 
   useEffect(() => {
-    resolveSessionAndToken();
-  }, [resolveSessionAndToken]);
+    loadSessionDetail();
+  }, [loadSessionDetail]);
 
+  // Step 2: Fetch LiveKit token + start interview when user clicks Start
   const handleStartInterview = useCallback(async () => {
     try {
       setStarting(true);
-      if (roomName) {
-        await interviewService.updateSessionStatus(roomName, "in_progress");
+      setError("");
+
+      // Fetch LiveKit token at start time (not page load)
+      if (!participantToken && inviteTokenRef) {
+        const tokenData = await interviewService.getLiveKitToken(inviteTokenRef) as any;
+        if (!tokenData?.token) {
+          throw new Error(t("errors.tokenMissing", { defaultValue: "Cannot get connection token. Please try again." }));
+        }
+        setParticipantToken(tokenData.token);
+        if (tokenData.serverUrl || tokenData.server_url) {
+          setServerUrl(tokenData.serverUrl || tokenData.server_url);
+        }
       }
-    } catch (err) {
-      console.error("Cannot update interview status before start:", err);
-    } finally {
+
+      if (roomName) {
+        await interviewService.updateSessionStatus(roomName, "in_progress").catch((err: unknown) => {
+          console.error("Cannot update interview status before start:", err);
+        });
+      }
+
       setConnectRoom(true);
+    } catch (err: any) {
+      setError(err?.message || t("errors.invalidSession", { defaultValue: "Cannot start interview. Please try again." }));
+    } finally {
       setStarting(false);
     }
-  }, [roomName]);
+  }, [roomName, participantToken, inviteTokenRef, t]);
 
   const handleEndInterview = useCallback(async () => {
     setConnectRoom(false);
@@ -154,7 +164,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
     );
   }
 
-  if (error) {
+  if (error && !session) {
     return (
       <main className="grid min-h-screen place-items-center bg-slate-950 px-6">
         <section className="w-full max-w-lg rounded-2xl border border-rose-400/30 bg-rose-500/10 p-6 text-rose-100">
@@ -194,9 +204,11 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                 {t("common:actions.back", { defaultValue: "Back" })}
               </Button>
               {!connectRoom ? (
-                <Button onClick={handleStartInterview} disabled={starting}>
+                <Button onClick={handleStartInterview} disabled={starting || !isJoinable}>
                   {starting
                     ? t("loading", { defaultValue: "Connecting..." })
+                    : !isJoinable
+                    ? t("sessionNotJoinable", { defaultValue: "Session unavailable" })
                     : t("startInterview", { defaultValue: "Start interview" })}
                 </Button>
               ) : (
@@ -238,13 +250,23 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                   />
                   <div className="space-y-2">
                     <h2 className="text-2xl font-semibold tracking-tight">
-                      {t("readyTitle", { defaultValue: "Ready to start interview" })}
+                      {isJoinable
+                        ? t("readyTitle", { defaultValue: "Ready to start interview" })
+                        : t("sessionEnded", { defaultValue: "Interview session is no longer available" })}
                     </h2>
+                    {error && (
+                      <p className="text-sm text-rose-300">{error}</p>
+                    )}
                     <p className="text-sm text-slate-300">
-                      {t("readyBody", {
-                        defaultValue:
-                          "Click start to join the interview room with camera and microphone.",
-                      })}
+                      {isJoinable
+                        ? t("readyBody", {
+                            defaultValue:
+                              "Click start to join the interview room with camera and microphone.",
+                          })
+                        : t("sessionEndedBody", {
+                            defaultValue:
+                              "This interview session has already ended or been cancelled.",
+                          })}
                     </p>
                   </div>
                   <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
@@ -253,15 +275,24 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                       variant="outline"
                       className="sm:min-w-[170px]"
                     />
-                    <Button
-                      onClick={handleStartInterview}
-                      disabled={starting}
-                      className="sm:min-w-[170px]"
-                    >
-                      {starting
-                        ? t("loading", { defaultValue: "Connecting..." })
-                        : t("startInterview", { defaultValue: "Start interview" })}
-                    </Button>
+                    {isJoinable ? (
+                      <Button
+                        onClick={handleStartInterview}
+                        disabled={starting}
+                        className="sm:min-w-[170px]"
+                      >
+                        {starting
+                          ? t("loading", { defaultValue: "Connecting..." })
+                          : t("startInterview", { defaultValue: "Start interview" })}
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => navigate.push("/")}
+                        className="sm:min-w-[170px]"
+                      >
+                        {t("common:actions.backHome", { defaultValue: "Back home" })}
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Button, Container, Stack } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import i18next from 'i18next';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -62,10 +63,10 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
               sx={{ fontSize: 80, color: 'error.main', mb: 2, opacity: 0.8 }}
             />
             <Typography variant="h5" gutterBottom fontWeight={600}>
-              Đã xảy ra lỗi
+              {i18next.t('common:errorBoundary.title', 'Đã xảy ra lỗi')}
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3, maxWidth: 400 }}>
-              Ứng dụng gặp sự cố không mong muốn. Vui lòng thử lại hoặc tải lại trang.
+              {i18next.t('common:errorBoundary.message', 'Ứng dụng gặp sự cố không mong muốn. Vui lòng thử lại hoặc tải lại trang.')}
             </Typography>
             {this.state.error && (
               <Box
@@ -101,14 +102,14 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                     navigator.clipboard.writeText(`Error: ${errMsg}\n${errStack}\n\nComponent Stack:${compStack}`);
                   }}
                 >
-                  Copy lỗi
+                  {i18next.t('common:errorBoundary.copyError', 'Copy lỗi')}
                 </Button>
               )}
               <Button variant="outlined" onClick={this.handleReset}>
-                Thử lại
+                {i18next.t('common:errorBoundary.retry', 'Thử lại')}
               </Button>
               <Button variant="contained" onClick={this.handleReload}>
-                Tải lại trang
+                {i18next.t('common:errorBoundary.reload', 'Tải lại trang')}
               </Button>
             </Stack>
           </Box>

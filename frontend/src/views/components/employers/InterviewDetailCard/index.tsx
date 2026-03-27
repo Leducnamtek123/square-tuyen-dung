@@ -174,28 +174,32 @@ const InterviewDetailCard = () => {
             <Stack
                 direction={{ xs: 'column', sm: 'row' }}
                 justifyContent="space-between"
-                alignItems={{ xs: 'flex-start', sm: 'flex-start' }}
+                alignItems={{ xs: 'flex-start', sm: 'center' }}
                 spacing={2}
                 mb={4}
             >
                 <Box>
-                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
-                        {t('interviewDetail.title')}
-                    </Typography>
+                    <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
+                        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                            {t('interviewDetail.title')}
+                        </Typography>
+                        <Chip
+                            label={t(`interviewLive.statuses.${session.status}`, { defaultValue: session.status?.replaceAll('_', ' ')?.toUpperCase() })}
+                            color={getStatusColor(session.status)}
+                            size="small"
+                            sx={{
+                                fontWeight: 700,
+                                fontSize: '0.75rem',
+                                height: 26,
+                                borderRadius: '6px',
+                                letterSpacing: '0.5px',
+                            }}
+                        />
+                    </Stack>
                     <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.8 }}>
                         {t('interviewDetail.label.roomCode')}: <Box component="span" sx={{ fontWeight: 600, color: 'primary.main' }}>{session.room_name}</Box> | ID: {session.id}
                     </Typography>
                 </Box>
-                <Chip
-                    label={t(`interviewLive.statuses.${session.status}`, { defaultValue: session.status?.replaceAll('_', ' ')?.toUpperCase() })}
-                    color={getStatusColor(session.status)}
-                    sx={{
-                        fontWeight: 700,
-                        px: 1,
-                        borderRadius: 1.5,
-                        boxShadow: (theme) => theme.shadows[1]
-                    }}
-                />
                 <Button
                     variant="contained"
                     disabled={!canJoinLiveRoom}

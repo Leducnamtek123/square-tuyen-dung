@@ -232,5 +232,12 @@
     "Every 3 Days": "Every 3 Days",
     "Weekly": "Weekly"
   },
-  "employerViewedProfile": "Employers viewed your profile"
+  "employerViewedProfile": "Employers viewed your profile",
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "message": "The application encountered an unexpected error. Please try again or reload the page.",
+    "copyError": "Copy error",
+    "retry": "Retry",
+    "reload": "Reload page"
+  }
 }

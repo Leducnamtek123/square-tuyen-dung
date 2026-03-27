@@ -930,5 +930,27 @@
       "deleteMemberSuccess": "Member removed from company",
       "deleteMemberError": "Failed to remove member"
     }
+  },
+  "companyImage": {
+    "title": "Company Photo Gallery",
+    "uploadSuccess": "Image uploaded successfully.",
+    "deleteSuccess": "Image deleted successfully.",
+    "deleteTitle": "Delete Image",
+    "deleteConfirm": "This image will be permanently deleted and cannot be restored. Are you sure?",
+    "upload": "Upload",
+    "preview": "Preview"
+  },
+  "imageCrop": {
+    "title": "Crop Image",
+    "ratio": "Ratio",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "cropping": "Cropping..."
+  },
+  "scoreGauge": {
+    "excellent": "Excellent match",
+    "good": "Good match",
+    "fair": "Fair",
+    "poor": "Not a match"
   }
 }

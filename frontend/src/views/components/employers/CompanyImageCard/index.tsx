@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Box, Dialog, DialogContent, DialogTitle, IconButton, Stack, Typography } from "@mui/material";
 
@@ -25,6 +26,7 @@ interface FileItem {
 }
 
 const CompanyImageCard = () => {
+  const { t } = useTranslation('employer');
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
@@ -117,7 +119,7 @@ const CompanyImageCard = () => {
 
       setFileList((prev) => [...prev, ...newResults]);
 
-      toastMessages.success('Tai anh len thanh cong.');
+      toastMessages.success(t('companyImage.uploadSuccess'));
 
     } catch (error: any) {
 
@@ -143,7 +145,7 @@ const CompanyImageCard = () => {
 
         setFileList((prev) => prev.filter((item) => item.uid !== file.uid));
 
-        toastMessages.success('Xoa hinh anh thanh cong.');
+        toastMessages.success(t('companyImage.deleteSuccess'));
 
       } catch (error: any) {
 
@@ -161,9 +163,9 @@ const CompanyImageCard = () => {
 
       () => deleteCompanyImage(file.uid),
 
-      'Xoa hinh anh',
+      t('companyImage.deleteTitle'),
 
-      'Hinh anh nay se bi xoa vinh vien va khong the khoi phuc. Ban co chac chan?',
+      t('companyImage.deleteConfirm'),
 
       'warning'
 
@@ -216,7 +218,7 @@ const CompanyImageCard = () => {
 
       >
 
-        Thu vien anh cong ty
+        {t('companyImage.title')}
 
       </Typography>
 
@@ -368,7 +370,7 @@ const CompanyImageCard = () => {
 
             <Typography variant="body2" color="text.secondary">
 
-              Tai len
+              {t('companyImage.upload')}
 
             </Typography>
 
@@ -388,7 +390,7 @@ const CompanyImageCard = () => {
 
       <Dialog open={previewVisible} onClose={() => setPreviewVisible(false)} maxWidth="md" fullWidth>
 
-        <DialogTitle>Preview</DialogTitle>
+        <DialogTitle>{t('companyImage.preview')}</DialogTitle>
 
         <DialogContent>
 

@@ -930,5 +930,27 @@
       "deleteMemberSuccess": "Đã xóa nhân viên khỏi công ty",
       "deleteMemberError": "Không thể xóa nhân viên"
     }
+  },
+  "companyImage": {
+    "title": "Thư viện ảnh công ty",
+    "uploadSuccess": "Tải ảnh lên thành công.",
+    "deleteSuccess": "Xóa hình ảnh thành công.",
+    "deleteTitle": "Xóa hình ảnh",
+    "deleteConfirm": "Hình ảnh này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn?",
+    "upload": "Tải lên",
+    "preview": "Xem trước"
+  },
+  "imageCrop": {
+    "title": "Cắt ảnh",
+    "ratio": "Tỉ lệ",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "cropping": "Đang cắt..."
+  },
+  "scoreGauge": {
+    "excellent": "Rất phù hợp",
+    "good": "Phù hợp",
+    "fair": "Tạm được",
+    "poor": "Chưa phù hợp"
   }
 }
