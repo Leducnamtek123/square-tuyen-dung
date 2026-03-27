@@ -182,7 +182,7 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
         handleClose();
         return;
       }
-      navigate.replace(`${localizedPath}${location.search}${location.hash}`);
+      window.location.assign(`${localizedPath}${location.search}${location.hash}`);
     }
     i18n.changeLanguage(lng);
     handleClose();
@@ -260,7 +260,7 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
             }}
           >
             <Stack direction="row" spacing={2} alignItems="center">
-              <Avatar sx={{ width: 20, height: 20, fontSize: 10, bgcolor: 'transparent' }}>{lang.flag}</Avatar>
+              <span style={{ fontSize: 18, lineHeight: 1 }}>{lang.flag}</span>
               <Typography variant="body2" sx={{ fontWeight: currentLangCode === lang.code ? 600 : 400 }}>
                 {lang.label}
               </Typography>
