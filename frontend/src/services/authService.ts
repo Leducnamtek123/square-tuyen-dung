@@ -18,12 +18,12 @@ const authService = {
   ): Promise<TokenResponse> => {
     const url = 'auth/token/';
     const data = {
-      grantType: AUTH_CONFIG.PASSWORD_KEY,
-      clientId: AUTH_CONFIG.CLIENT_ID,
-      clientSecret: AUTH_CONFIG.CLIENT_SECRET,
+      grant_type: AUTH_CONFIG.PASSWORD_KEY,
+      client_id: AUTH_CONFIG.CLIENT_ID,
+      client_secret: AUTH_CONFIG.CLIENT_SECRET,
       username: email,
       password,
-      roleName,
+      role_name: roleName,
     };
     return httpRequest.post(url, data);
   },
@@ -37,14 +37,14 @@ const authService = {
   ): Promise<TokenResponse> => {
     const url = 'auth/convert-token/';
     const data: AnyRecord = {
-      grantType: AUTH_CONFIG.CONVERT_TOKEN_KEY,
-      clientId,
-      clientSecret,
+      grant_type: AUTH_CONFIG.CONVERT_TOKEN_KEY,
+      client_id: clientId,
+      client_secret: clientSecret,
       backend: provider,
       token,
     };
     if (redirectUri) {
-      data.redirectUri = redirectUri;
+      data.redirect_uri = redirectUri;
     }
     return httpRequest.post(url, data);
   },
@@ -52,11 +52,11 @@ const authService = {
   firebaseLogin: (idToken: string, roleName: RoleName): Promise<TokenResponse> => {
     const url = 'auth/firebase-login/';
     const data = {
-      grantType: 'convert_token',
-      clientId: AUTH_CONFIG.CLIENT_ID,
-      clientSecret: AUTH_CONFIG.CLIENT_SECRET,
+      grant_type: 'convert_token',
+      client_id: AUTH_CONFIG.CLIENT_ID,
+      client_secret: AUTH_CONFIG.CLIENT_SECRET,
       token: idToken,
-      roleName,
+      role_name: roleName,
     };
     return httpRequest.post(url, data);
   },
@@ -64,8 +64,8 @@ const authService = {
   revokeToken: (accessToken: string, backend?: AuthProvider): Promise<unknown> => {
     const url = 'auth/revoke-token/';
     const data = {
-      clientId: AUTH_CONFIG.CLIENT_ID,
-      clientSecret: AUTH_CONFIG.CLIENT_SECRET,
+      client_id: AUTH_CONFIG.CLIENT_ID,
+      client_secret: AUTH_CONFIG.CLIENT_SECRET,
       token: accessToken,
       backend,
     };
@@ -74,7 +74,7 @@ const authService = {
 
   checkCreds: (email: string, roleName: RoleName): Promise<unknown> => {
     const url = 'auth/check-creds/';
-    return httpRequest.post(url, { email, roleName });
+    return httpRequest.post(url, { email, role_name: roleName });
   },
 
   emailExists: (email: string): Promise<unknown> => {
