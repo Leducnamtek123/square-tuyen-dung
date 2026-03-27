@@ -16,13 +16,13 @@ const languages = [
     code: 'en',
     label: 'English',
     shortLabel: 'EN',
-    flag: '🇺🇸'
+    flagUrl: 'https://flagcdn.com/w40/us.png'
   },
   {
     code: 'vi',
     label: 'Tiếng Việt',
     shortLabel: 'VI',
-    flag: '🇻🇳'
+    flagUrl: 'https://flagcdn.com/w40/vn.png'
   }
 ];
 
@@ -260,7 +260,7 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
             }}
           >
             <Stack direction="row" spacing={2} alignItems="center">
-              <span style={{ fontSize: 18, lineHeight: 1 }}>{lang.flag}</span>
+              <img src={lang.flagUrl} alt={lang.label} width={20} height={15} style={{ borderRadius: 2, objectFit: 'cover' }} />
               <Typography variant="body2" sx={{ fontWeight: currentLangCode === lang.code ? 600 : 400 }}>
                 {lang.label}
               </Typography>
