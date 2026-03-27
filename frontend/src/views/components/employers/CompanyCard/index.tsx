@@ -67,7 +67,7 @@ function useCompanyData() {
           ...formData,
           description: convertEditorStateToHTMLString(formData.description),
         };
-        await companyService.updateCompany(dataCustom?.id, dataCustom);
+        await companyService.updateCompany(dataCustom?.id!, dataCustom);
         setServerErrors(null);
         toastMessages.success(
           t('companyProfile.success.update', 'Company information updated successfully.'),
