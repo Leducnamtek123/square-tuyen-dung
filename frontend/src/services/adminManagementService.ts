@@ -294,13 +294,6 @@ const adminManagementService = {
     return httpRequest.delete(url);
   },
 
-  // ⚠️ WARNING: Backend has no URL for 'chat/web/admin/conversations/'.
-  // chatbot/urls.py is empty. This endpoint will always return 404.
-  // TODO: Either implement backend endpoint or remove this dead code.
-  getConversations: (params: AnyRecord = {}): Promise<unknown> => {
-    const url = 'chat/web/admin/conversations/';
-    return httpRequest.get(url, { params });
-  },
 };
 
 export default adminManagementService;

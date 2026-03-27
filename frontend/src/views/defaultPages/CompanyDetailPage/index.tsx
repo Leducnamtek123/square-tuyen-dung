@@ -124,7 +124,7 @@ const CompanyDetailPage = () => {
 
   return isLoading ? <CompanyDetailLoading /> : companyDetail === null ? <NoDataCard /> : (
     <>
-      <Box>
+      <Box sx={{ mt: 2 }}>
         <Stack spacing={2}>
           <CompanyHeader companyDetail={companyDetail} allConfig={allConfig} isAuthenticated={isAuthenticated} currentUser={currentUser} isLoadingFollow={isLoadingFollow} handleFollow={handleFollow} setOpenSharePopup={setOpenSharePopup} t={t} />
           <Box>

@@ -1,5 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import Cropper, { Area } from 'react-easy-crop';
+import CropperImport, { Area } from 'react-easy-crop';
+
+// Handle ESM/CJS interop: in production builds the default import can resolve
+// to the module wrapper object instead of the component function.
+const Cropper = (CropperImport as any).default || CropperImport;
 import {
   Dialog,
   DialogTitle,

@@ -282,7 +282,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                 {canEmbedResume ? (
                   <iframe
                     src={resumeFileUrl}
-                    title="CV Preview"
+                    title={t('appliedResume.ai.resumeTitle')}
                     width="100%"
                     height="100%"
                     style={{ border: 'none', opacity: isProcessing ? 0.85 : 1 }}

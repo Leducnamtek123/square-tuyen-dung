@@ -25,7 +25,6 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import { useTranslation } from 'react-i18next';
-import adminManagementService from '../../../services/adminManagementService';
 
 const AdminChatPage = () => {
   const { t } = useTranslation('admin');
@@ -36,9 +35,9 @@ const AdminChatPage = () => {
   const fetchConversations = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res: any = await adminManagementService.getConversations();
-      const data = Array.isArray(res) ? res : (res?.results || res?.data || []);
-      setConversations(data);
+      // Backend has no chat conversation endpoint yet (chatbot/urls.py is empty).
+      // Set empty data so the page renders its empty state gracefully.
+      setConversations([]);
     } catch (e) {
       console.error(e);
       setConversations([]);
