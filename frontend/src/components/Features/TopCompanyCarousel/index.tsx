@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Pagination, Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Box, Card, Skeleton, Stack, Typography } from "@mui/material";
+import { Box, Card, Skeleton, Stack, Typography, Button } from "@mui/material";
+import StarIcon from '@mui/icons-material/Star';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import companyService from '@/services/companyService';
 import { ROUTES, IMAGES } from '@/configs/constants';
@@ -46,34 +47,33 @@ const Loading = (_props: Props) => {
       <div id="top-company-carousel-loading">
         <Card
           sx={{
-            alignItems: 'center',
             boxShadow: 0,
-            p: 2,
+            p: 2.5,
             mb: 0.5,
-            minHeight: 165,
+            minHeight: 220,
             borderRadius: 3,
             bgcolor: 'background.paper',
+            border: '1px solid',
+            borderColor: 'grey.200',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
-          <Stack direction="row" justifyContent="center">
-            <Skeleton
-              variant="rounded"
-              width={100}
-              height={100}
-              style={{ margin: '0 auto' }}
-            />
+          <Box sx={{ mb: 2 }}>
+            <Skeleton variant="rounded" width={64} height={64} sx={{ borderRadius: 2 }} />
+          </Box>
+          <Skeleton variant="text" width="80%" height={28} sx={{ mb: 1 }} />
+          <Skeleton variant="text" width="100%" height={20} />
+          <Skeleton variant="text" width="90%" height={20} sx={{ mb: 3 }} />
+          
+          <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 'auto', width: '100%' }}>
+            <Stack direction="row" spacing={0.5}>
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Skeleton key={i} variant="circular" width={20} height={20} />
+              ))}
+            </Stack>
+            <Skeleton variant="rounded" width={110} height={36} sx={{ borderRadius: 2 }} />
           </Stack>
-          <Typography
-            variant="h6"
-            component="h6"
-            gutterBottom={true}
-            sx={{
-              textAlign: 'center',
-              mt: 1,
-            }}
-          >
-            <Skeleton />
-          </Typography>
         </Card>
       </div>
     </>
@@ -147,17 +147,18 @@ const TopCompanyCarousel = () => {
                   <Card
                     sx={{
                       boxShadow: 0,
-                      alignItems: 'center',
-                      p: 2,
+                      p: 2.5,
                       mb: 0.5,
                       mt: 1,
                       cursor: 'pointer',
-                      minHeight: 200,
+                      minHeight: 220,
                       borderRadius: 3,
                       transition: 'all 0.3s ease',
                       border: '1px solid',
                       borderColor: 'grey.200',
                       bgcolor: 'background.paper',
+                      display: 'flex',
+                      flexDirection: 'column',
                       '&:hover': {
                         transform: 'translateY(-4px)',
                         boxShadow: (theme: any) => theme.customShadows.medium,
@@ -169,59 +170,100 @@ const TopCompanyCarousel = () => {
                     }}
                     onClick={() => nav.push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, value.slug)}`, i18n.language))}
                   >
-                    <Stack direction="row" justifyContent="center" sx={{ py: 1 }}>
-                      <Box
-                        sx={{
-                          width: 120,
-                          height: 120,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          borderRadius: 3,
-                          border: '2px solid',
-                          borderColor: 'grey.100',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-                          overflow: 'hidden',
-                          backgroundColor: 'white',
-                          transition: 'all 0.3s ease',
-                          '&:hover': {
-                            borderColor: 'primary.light',
-                            boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-                          },
+                    <Box
+                      sx={{
+                        width: 64,
+                        height: 64,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: 2,
+                        border: '1px solid',
+                        borderColor: 'grey.100',
+                        overflow: 'hidden',
+                        backgroundColor: 'white',
+                        mb: 2,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <MuiImageCustom
+                        width="100%"
+                        height="100%"
+                        src={value?.companyImageUrl}
+                        fallbackSrc={IMAGES.companyLogoDefault}
+                        duration={200}
+                        sx={{ 
+                          objectFit: 'contain',
                         }}
-                      >
-                        <MuiImageCustom
-                          width={100}
-                          height={100}
-                          src={value?.companyImageUrl}
-                          fallbackSrc={IMAGES.companyLogoDefault}
-                          duration={200}
-                          sx={{ 
-                            margin: '0 auto',
-                            borderRadius: 2,
-                            objectFit: 'contain',
-                          }}
-                        />
-                      </Box>
-                    </Stack>
+                      />
+                    </Box>
                     <Typography
                       variant="h6"
                       component="h6"
                       className="company-name"
                       sx={{
-                        textAlign: 'center',
                         fontWeight: 600,
-                        fontSize: 15,
-                        mt: 2,
-                        color: 'grey.800',
-                        whiteSpace: 'nowrap',
+                        fontSize: '1.05rem',
+                        lineHeight: 1.3,
+                        mb: 1,
+                        color: 'grey.900',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 1,
+                        WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
-                        textOverflow: 'ellipsis',
+                        textAlign: 'left',
                         transition: 'color 0.3s ease',
                       }}
                     >
                       {value?.companyName}
                     </Typography>
+
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: 'text.secondary',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textAlign: 'left',
+                        mb: 3,
+                        lineHeight: 1.5,
+                        height: 42, 
+                      }}
+                    >
+                      {value?.shortDescription || "Môi trường làm việc năng động, sáng tạo với nhiều cơ hội thăng tiến và phát triển sự nghiệp..."}
+                    </Typography>
+
+                    <Stack 
+                      direction="row" 
+                      alignItems="center" 
+                      justifyContent="space-between" 
+                      sx={{ 
+                        mt: 'auto', 
+                        width: '100%',
+                        pt: 1,
+                      }}
+                    >
+                      <Stack direction="row" spacing={0.3}>
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <StarIcon key={i} sx={{ color: 'primary.main', fontSize: 18 }} />
+                        ))}
+                      </Stack>
+                      <Button 
+                        variant="contained" 
+                        size="small" 
+                        disableElevation
+                        sx={{ 
+                          borderRadius: 2, 
+                          textTransform: 'none', 
+                          fontWeight: 600,
+                          fontSize: '0.85rem',
+                        }}
+                      >
+                        {i18n.language === 'en' ? 'View details' : 'Xem chi tiết'}
+                      </Button>
+                    </Stack>
                   </Card>
                 </SwiperSlide>
               ))}
