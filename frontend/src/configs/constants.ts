@@ -161,7 +161,8 @@ export type HostNameConfig = typeof HOST_NAME;
 export type AuthProviderConfig = typeof AUTH_PROVIDER;
 export type AuthConfig = typeof AUTH_CONFIG;
 export type RolesNameConfig = typeof ROLES_NAME;
-export type Routes = typeof ROUTES;
+// Routes type is now defined in routeConfig.ts
+// export type Routes = typeof ROUTES;
 export type RegexConfig = typeof REGEX_VALIDATE;
 
 export {
