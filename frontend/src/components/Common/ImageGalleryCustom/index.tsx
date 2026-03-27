@@ -1,5 +1,5 @@
 import React from 'react';
-// import 'react-image-gallery/styles/css/image-gallery.css';
+import 'react-image-gallery/styles/css/image-gallery.css';
 // @ts-ignore
 import ImageGallery from 'react-image-gallery';
 
@@ -8,7 +8,19 @@ interface ImageGalleryCustomProps {
 }
 
 const ImageGalleryCustom = ({ images }: ImageGalleryCustomProps) => {
-  return <ImageGallery showPlayButton={false} items={images} />;
+  if (!images || images.length === 0) return null;
+
+  return (
+    <ImageGallery
+      items={images}
+      showPlayButton={false}
+      showFullscreenButton={true}
+      showThumbnails={images.length > 1}
+      showNav={images.length > 1}
+      lazyLoad={true}
+      slideDuration={300}
+    />
+  );
 };
 
 export default ImageGalleryCustom;
