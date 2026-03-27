@@ -74,7 +74,7 @@ const authService = {
 
   checkCreds: (email: string, roleName: RoleName): Promise<unknown> => {
     const url = 'auth/check-creds/';
-    return httpRequest.post(url, { email, role_name: roleName });
+    return httpRequest.post(url, { email, roleName });
   },
 
   emailExists: (email: string): Promise<unknown> => {
