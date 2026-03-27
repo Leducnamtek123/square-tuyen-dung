@@ -25,6 +25,7 @@ import companyService from "../../../../services/companyService";
 import { compressImageFile } from "../../../../utils/imageCompression";
 
 import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
+import ImageCropDialog from "../../../../components/Common/ImageCropDialog";
 
 const CompanyCard = () => {
   const { t } = useTranslation("employer");
@@ -46,6 +47,36 @@ const CompanyCard = () => {
   const logoInputRef = React.useRef<HTMLInputElement>(null);
 
   const coverInputRef = React.useRef<HTMLInputElement>(null);
+
+  const [cropOpen, setCropOpen] = React.useState(false);
+  const [cropImageSrc, setCropImageSrc] = React.useState("");
+  const [cropFileName, setCropFileName] = React.useState("");
+  const [cropTarget, setCropTarget] = React.useState<'logo' | 'cover'>('logo');
+
+  const handleFileSelect = (target: 'logo' | 'cover') => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setCropTarget(target);
+    setCropFileName(file.name);
+    setCropImageSrc(URL.createObjectURL(file));
+    setCropOpen(true);
+    event.target.value = "";
+  };
+
+  const handleCropConfirm = async (croppedFile: File, previewUrl: string) => {
+    setCropOpen(false);
+    if (cropTarget === 'logo') {
+      await handleUpdateCompanyImageUrl(croppedFile);
+    } else {
+      await handleUpdateCompanyCoverImageUrl(croppedFile);
+    }
+  };
+
+  const handleCropCancel = () => {
+    setCropOpen(false);
+    if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
+    setCropImageSrc('');
+  };
 
   React.useEffect(() => {
 
@@ -444,55 +475,32 @@ const CompanyCard = () => {
       </Stack>
 
       <input
-
         ref={logoInputRef}
-
         type="file"
-
         accept="image/*"
-
         style={{ display: "none" }}
-
-        onChange={(event) => {
-
-          const file = event.target.files?.[0];
-
-          if (!file) return;
-
-          handleUpdateCompanyImageUrl(file);
-
-          event.target.value = "";
-
-        }}
-
+        onChange={handleFileSelect('logo')}
       />
 
       <input
-
         ref={coverInputRef}
-
         type="file"
-
         accept="image/*"
-
         style={{ display: "none" }}
-
-        onChange={(event) => {
-
-          const file = event.target.files?.[0];
-
-          if (!file) return;
-
-          handleUpdateCompanyCoverImageUrl(file);
-
-          event.target.value = "";
-
-        }}
-
+        onChange={handleFileSelect('cover')}
       />
 
       {isFullScreenLoading && <BackdropLoading />}
 
+      <ImageCropDialog
+        open={cropOpen}
+        imageSrc={cropImageSrc}
+        fileName={cropFileName}
+        aspectRatio={cropTarget === 'logo' ? 1 : 16 / 9}
+        aspectLabel={cropTarget === 'logo' ? '1:1' : '16:9'}
+        onConfirm={handleCropConfirm}
+        onCancel={handleCropCancel}
+      />
     </Paper>
 
   );

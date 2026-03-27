@@ -15,9 +15,9 @@ import errorHandling from '../../../../utils/errorHandling';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 
 import companyImageService from '../../../../services/companyImageService';
-
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
 import { compressImageFiles } from '../../../../utils/imageCompression';
+import ImageCropDialog from '../../../../components/Common/ImageCropDialog';
 
 interface FileItem {
   uid: number | string;
@@ -35,6 +35,21 @@ const CompanyImageCard = () => {
   const [previewImage, setPreviewImage] = useState('');
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const [cropOpen, setCropOpen] = React.useState(false);
+  const [cropImageSrc, setCropImageSrc] = React.useState('');
+  const [cropFileName, setCropFileName] = React.useState('');
+
+  const handleCropConfirm = async (croppedFile: File, previewUrl: string) => {
+    setCropOpen(false);
+    await handleUploadFiles([croppedFile]);
+  };
+
+  const handleCropCancel = () => {
+    setCropOpen(false);
+    if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
+    setCropImageSrc('');
+  };
 
   React.useEffect(() => {
 
@@ -171,15 +186,14 @@ const CompanyImageCard = () => {
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-
     const files = Array.from(event.target.files || []) as File[];
-
     if (files.length === 0) return;
 
-    handleUploadFiles(files);
-
+    const file = files[0];
+    setCropFileName(file.name);
+    setCropImageSrc(URL.createObjectURL(file));
+    setCropOpen(true);
     event.target.value = '';
-
   };
 
   return (
@@ -365,19 +379,11 @@ const CompanyImageCard = () => {
       </Box>
 
       <input
-
         ref={fileInputRef}
-
         type="file"
-
         accept="image/*"
-
-        multiple
-
         style={{ display: 'none' }}
-
         onChange={handleFileChange}
-
       />
 
       <Dialog open={previewVisible} onClose={() => setPreviewVisible(false)} maxWidth="md" fullWidth>
@@ -404,6 +410,15 @@ const CompanyImageCard = () => {
 
       {isFullScreenLoading && <BackdropLoading />}
 
+      <ImageCropDialog
+        open={cropOpen}
+        imageSrc={cropImageSrc}
+        fileName={cropFileName}
+        aspectRatio={16 / 9}
+        aspectLabel="16:9"
+        onConfirm={handleCropConfirm}
+        onCancel={handleCropCancel}
+      />
     </Box>
 
   );

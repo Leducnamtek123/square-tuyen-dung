@@ -7,6 +7,7 @@ import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useCareers } from './hooks/useCareers';
 import CareerTable from './components/CareerTable';
+import ImageCropDialog from '../../../components/Common/ImageCropDialog';
 
 const CareersPage = () => {
     const { t } = useTranslation('admin');
@@ -25,6 +26,23 @@ const CareersPage = () => {
     const iconInputRef = useRef<HTMLInputElement>(null);
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+    const [cropOpen, setCropOpen] = useState(false);
+    const [cropImageSrc, setCropImageSrc] = useState('');
+    const [cropFileName, setCropFileName] = useState('');
+
+    const handleCropConfirm = (croppedFile: File, previewUrl: string) => {
+        setCropOpen(false);
+        setIconFile(croppedFile);
+        setIconPreviewUrl(previewUrl);
+        if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
+    };
+
+    const handleCropCancel = () => {
+        setCropOpen(false);
+        if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
+        setCropImageSrc('');
+    };
 
     const {
         data,
@@ -82,8 +100,10 @@ const CareersPage = () => {
     const handleIconFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
         if (!selectedFile) return;
-        setIconFile(selectedFile);
-        setIconPreviewUrl(URL.createObjectURL(selectedFile));
+        setCropFileName(selectedFile.name);
+        setCropImageSrc(URL.createObjectURL(selectedFile));
+        setCropOpen(true);
+        e.target.value = '';
     };
 
     const handleSave = async () => {
@@ -282,6 +302,15 @@ const CareersPage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            <ImageCropDialog
+                open={cropOpen}
+                imageSrc={cropImageSrc}
+                fileName={cropFileName}
+                aspectRatio={1}
+                aspectLabel="1:1"
+                onConfirm={handleCropConfirm}
+                onCancel={handleCropCancel}
+            />
         </Box>
     );
 };

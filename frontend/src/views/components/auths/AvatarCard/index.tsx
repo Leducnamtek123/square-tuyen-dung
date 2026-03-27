@@ -21,6 +21,7 @@ import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 
 import { deleteAvatar, updateAvatar } from '../../../../redux/userSlice';
 import { compressImageFile } from '../../../../utils/imageCompression';
+import ImageCropDialog from '../../../../components/Common/ImageCropDialog';
 
 interface AvatarCardProps {
   [key: string]: any;
@@ -39,6 +40,22 @@ const AvatarCard = () => {
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const [cropOpen, setCropOpen] = React.useState(false);
+  const [cropImageSrc, setCropImageSrc] = React.useState('');
+  const [cropFileName, setCropFileName] = React.useState('');
+
+  const handleCropConfirm = async (croppedFile: File, previewUrl: string) => {
+    setCropOpen(false);
+    const compressed = await compressImageFile(croppedFile);
+    await handleUpload(compressed);
+  };
+
+  const handleCropCancel = () => {
+    setCropOpen(false);
+    if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
+    setCropImageSrc('');
+  };
 
   const handleUpload = async (file: File) => {
 
@@ -115,17 +132,13 @@ const AvatarCard = () => {
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-
     const file = event.target.files?.[0];
-
     if (!file) return;
 
-    const compressed = await compressImageFile(file);
-
-    handleUpload(compressed);
-
+    setCropFileName(file.name);
+    setCropImageSrc(URL.createObjectURL(file));
+    setCropOpen(true);
     event.target.value = '';
-
   };
 
   return (
@@ -277,23 +290,25 @@ const AvatarCard = () => {
       </Stack>
 
       <input
-
         ref={fileInputRef}
-
         type="file"
-
         accept="image/*"
-
         style={{ display: 'none' }}
-
         onChange={handleFileChange}
-
       />
 
       {isFullScreenLoading && <BackdropLoading />}
 
+      <ImageCropDialog
+        open={cropOpen}
+        imageSrc={cropImageSrc}
+        fileName={cropFileName}
+        aspectRatio={1}
+        aspectLabel="1:1"
+        onConfirm={handleCropConfirm}
+        onCancel={handleCropCancel}
+      />
     </>
-
   );
 
 };
