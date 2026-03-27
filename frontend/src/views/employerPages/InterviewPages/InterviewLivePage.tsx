@@ -83,6 +83,9 @@ const InterviewLivePage = () => {
   };
 
   const getLink = useCallback((path: string) => {
+    if (path.startsWith(ROUTES.EMPLOYER.DASHBOARD) || path.startsWith('employer/')) {
+        return `/${path}`;
+    }
     const base = ROUTES.EMPLOYER.DASHBOARD ? `/${ROUTES.EMPLOYER.DASHBOARD}/` : '/';
     return `${base}${path}`;
   }, []);

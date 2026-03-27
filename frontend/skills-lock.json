@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "expect": {
+      "source": "millionco/expect",
+      "sourceType": "github",
+      "computedHash": "be066bc66b779d39887448479bf4e46e55039b607358d32651661dd80d6f0efd"
+    }
+  }
+}

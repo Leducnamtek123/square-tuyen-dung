@@ -19,6 +19,7 @@ import errorHandling from "../../../../utils/errorHandling";
 import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
 
 import CompanyForm from "../CompanyForm";
+import CompanyFormLoading from "../CompanyForm/CompanyFormLoading";
 
 import companyService from "../../../../services/companyService";
 
@@ -406,7 +407,7 @@ const CompanyCard = () => {
 
           {isLoadingCompany ? (
 
-            <CompanyForm.Loading />
+            <CompanyFormLoading />
 
           ) : (
 

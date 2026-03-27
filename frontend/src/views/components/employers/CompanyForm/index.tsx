@@ -137,6 +137,4 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   );
 };
 
-CompanyForm.Loading = CompanyFormLoading;
-
 export default CompanyForm;

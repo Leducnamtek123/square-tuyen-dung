@@ -1,0 +1,100 @@
+{
+  "name": "expect-cli",
+  "version": "0.0.15",
+  "description": "Let agents test your code in a real browser",
+  "keywords": [
+    "agents",
+    "ai",
+    "browser-automation",
+    "cli",
+    "git-diff",
+    "playwright",
+    "session-recording",
+    "test-plan",
+    "testing"
+  ],
+  "homepage": "https://expect.dev",
+  "license": "FSL-1.1-MIT",
+  "author": "Million Software <founders@million.dev>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/millionco/expect",
+    "directory": "apps/cli"
+  },
+  "bin": {
+    "expect": "./dist/index.js",
+    "expect-agent": "./dist/index.js",
+    "expect-cli": "./dist/index.js",
+    "testie": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@effect/atom-react": "4.0.0-beta.35",
+    "@effect/platform-node": "4.0.0-beta.35",
+    "@hono/node-server": "^1.19.11",
+    "@tanstack/react-query": "^5.80.7",
+    "@zed-industries/claude-agent-acp": "^0.22.2",
+    "@zed-industries/codex-acp": "^0.10.0",
+    "cli-truncate": "^5.2.0",
+    "commander": "^13.1.0",
+    "detect-terminal": "^2.0.0",
+    "effect": "4.0.0-beta.35",
+    "figures": "^6.1.0",
+    "hono": "^4.12.9",
+    "ink": "^6.0.0",
+    "ink-link": "^5.0.0",
+    "ink-spinner": "^5.0.0",
+    "node-notifier": "^10.0.1",
+    "ora": "^9.3.0",
+    "picocolors": "^1.1.1",
+    "playwright": "^1.52.0",
+    "pretty-ms": "^9.3.0",
+    "prompts": "^2.4.2",
+    "react": "^19.2.4",
+    "string-width": "^8.2.0",
+    "supports-terminal-graphics": "^0.1.0",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@types/node-notifier": "^8.0.5",
+    "@types/prompts": "^2.4.9",
+    "@types/react": "^19.2.14",
+    "babel-plugin-react-compiler": "^1.0.0",
+    "typescript": "^5.7.0",
+    "@expect/agent": "0.0.15",
+    "@expect/supervisor": "0.0.15",
+    "@expect/shared": "0.0.15"
+  },
+  "optionalDependencies": {
+    "oxc-resolver": "^11.19.1"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "dev": "vp pack --watch",
+    "link-global": "pnpm build && pnpm link --global",
+    "unlink-global": "pnpm unlink --global",
+    "lint": "vp lint && tsc --noEmit",
+    "format": "vp fmt",
+    "format:check": "vp fmt --check",
+    "check": "vp check",
+    "test": "vp test",
+    "typecheck": "tsgo --noEmit"
+  }
+}
