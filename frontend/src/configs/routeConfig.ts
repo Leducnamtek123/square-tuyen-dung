@@ -200,6 +200,7 @@ export const ROUTES = {
     INTERVIEW: 'interview/:id',
     INTERVIEW_ROOM: 'interview/:id',
   },
+  // CANDIDATE is an alias for JOBSEEKER_INTERVIEW (backward compatibility)
   CANDIDATE: {
     LOGIN: 'interview/login',
     INTERVIEW: 'interview/:id',

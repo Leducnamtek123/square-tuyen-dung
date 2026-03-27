@@ -38,7 +38,7 @@ const JobDetailPage = () => {
   const [jobPostDetail, setJobPostDetail] = React.useState<any>(null);
   const canApply =
     !isAuthenticated ||
-    (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.JOB_SEEKER;
+    currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
 
   React.useEffect(() => {
     const getJobPostDetail = async (jobPostSlug: string | undefined) => {

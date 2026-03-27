@@ -28,7 +28,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
   // Prevent hydration mismatch: render nothing until client has mounted
   React.useEffect(() => { setHasMounted(true); }, []);
 
-  const isAdminAccount = (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.ADMIN;
+  const isAdminAccount = currentUser?.roleName === ROLES_NAME.ADMIN;
   const workspaceType = activeWorkspace?.type || null;
   const isEmployerWorkspace = workspaceType === "company";
   const isJobSeekerWorkspace = workspaceType === "job_seeker";

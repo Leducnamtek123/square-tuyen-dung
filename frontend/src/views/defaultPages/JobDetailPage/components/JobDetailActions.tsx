@@ -34,7 +34,7 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
   const nav = useRouter();
   const canApply =
     !isAuthenticated ||
-    (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.JOB_SEEKER;
+    currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
 
   const handleApplyClick = () => {
     if (!isAuthenticated) {

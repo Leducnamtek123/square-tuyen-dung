@@ -36,6 +36,6 @@ export interface AuthConfigShape {
 export interface BotConfig {
   AGENT_ID: string;
   CHAT_TITLE: string;
-  CHAT_ICON: string;
+  CHAT_ICON?: string;
   MODE?: string;
 }

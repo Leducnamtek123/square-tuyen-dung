@@ -8,22 +8,17 @@ const isPresigned = (url: string | null | undefined): boolean => {
 
 const isMinioPublicUrl = (url: string | null | undefined): boolean => {
   if (!url || typeof url !== 'string') return false;
-  // Nhận diện URL MinIO: có /minio/ trong path, hoặc là MinIO public URL dạng host:port/bucket/
   if (url.includes('/minio/')) return true;
 
   try {
     const parsed = new URL(url);
-    // MinIO URL thường có port 9000 hoặc 9001
     if (parsed.port === '9000' || parsed.port === '9001') return true;
-    // MinIO hostname thường chứa 'minio' trong tên
     if (parsed.hostname.includes('minio')) return true;
-    // Production S3/MinIO: hostname starts with 's3.' (e.g. s3.tuyendung.square.vn)
     if (parsed.hostname.startsWith('s3.')) return true;
   } catch {
     // ignore invalid URLs
   }
 
-  // Check against NEXT_PUBLIC_MINIO_PUBLIC_URL env setting
   const minioPublicUrl = process.env.NEXT_PUBLIC_MINIO_PUBLIC_URL;
   if (minioPublicUrl && url.startsWith(minioPublicUrl)) return true;
 
@@ -50,7 +45,7 @@ const requestPresign = async (url: string): Promise<string | null> => {
 };
 
 export const ensurePresignedUrl = async (
-  url: string | null | undefined
+  url: string | null | undefined,
 ): Promise<string | null | undefined> => {
   if (!url || !isMinioPublicUrl(url) || isPresigned(url)) {
     return url;
@@ -65,116 +60,82 @@ export const ensurePresignedUrl = async (
 };
 
 interface UrlLocation {
-  parent: Record<string, unknown> | unknown[];
-  key: string | number;
+  path: (string | number)[];
   url: string;
 }
 
 /**
- * Collect all MinIO URLs that need presigning, then presign them
- * ALL IN PARALLEL instead of one-by-one sequentially.
+ * Simplified presignInObject: single-walk approach.
+ *
+ * 1. Deep clone the object first (safe — no cache mutation)
+ * 2. Walk the clone once, collecting + replacing in-place
+ *
+ * This eliminates the fragile double-walk where clone tree order
+ * had to match original tree order exactly.
  */
 export const presignInObject = async <T>(
   value: T,
-  maxItems = 200
+  maxItems = 200,
 ): Promise<T> => {
-  const locations: UrlLocation[] = [];
+  if (!value || typeof value !== 'object') return value;
 
-  // Phase 1: Collect all MinIO URLs that need presigning (synchronous walk)
+  // Phase 1: Deep clone to avoid mutating original/cached data
+  let clone: T;
+  try {
+    clone = structuredClone(value);
+  } catch {
+    clone = (Array.isArray(value) ? [...value] : { ...value }) as T;
+  }
+
+  // Phase 2: Single walk — collect all MinIO URL locations
+  const locations: UrlLocation[] = [];
   const visited = new WeakSet();
-  const collect = (node: unknown): void => {
+
+  const walk = (node: unknown, path: (string | number)[]): void => {
     if (!node || locations.length >= maxItems) return;
-    if (typeof node === 'string') return; // strings are handled by parent
     if (typeof node !== 'object') return;
-    if (visited.has(node as object)) return; // prevent circular reference loops
+    if (visited.has(node as object)) return;
     visited.add(node as object);
 
-    if (Array.isArray(node)) {
-      for (let i = 0; i < node.length; i += 1) {
-        if (locations.length >= maxItems) break;
-        const item = node[i];
-        if (typeof item === 'string' && isMinioPublicUrl(item) && !isPresigned(item)) {
-          locations.push({ parent: node, key: i, url: item });
-        } else {
-          collect(item);
-        }
-      }
-      return;
-    }
-    if (typeof node === 'object') {
-      const record = node as Record<string, unknown>;
-      const keys = Object.keys(record);
-      for (let i = 0; i < keys.length; i += 1) {
-        if (locations.length >= maxItems) break;
-        const key = keys[i];
-        const val = record[key];
-        if (typeof val === 'string' && isMinioPublicUrl(val) && !isPresigned(val)) {
-          locations.push({ parent: record, key, url: val });
-        } else {
-          collect(val);
-        }
+    const entries = Array.isArray(node)
+      ? node.map((v, i) => [i, v] as const)
+      : Object.entries(node as Record<string, unknown>);
+
+    for (const [key, val] of entries) {
+      if (locations.length >= maxItems) break;
+      if (typeof val === 'string' && isMinioPublicUrl(val) && !isPresigned(val)) {
+        locations.push({ path: [...path, key], url: val });
+      } else if (val && typeof val === 'object') {
+        walk(val, [...path, key]);
       }
     }
   };
 
-  collect(value);
+  walk(clone, []);
 
-  if (locations.length === 0) return value;
+  if (locations.length === 0) return clone;
 
-  // Phase 2: Presign ALL URLs in parallel (instead of sequential!)
+  // Phase 3: Presign ALL URLs in parallel
   const presignedResults = await Promise.all(
     locations.map((loc) =>
       ensurePresignedUrl(loc.url).then((result) => ({
-        ...loc,
+        path: loc.path,
         presigned: result,
-      }))
-    )
+      })),
+    ),
   );
 
-  // Phase 3: Deep clone to avoid mutating TanStack Query cache
-  let resultObject: any;
-  try {
-    resultObject = structuredClone(value);
-  } catch {
-    // Fallback to shallow clone if structuredClone fails (e.g. non-cloneable values)
-    resultObject = Array.isArray(value) ? [...value] : { ...value } as any;
+  // Phase 4: Apply presigned URLs directly on the clone (safe — it's our copy)
+  for (const { path, presigned } of presignedResults) {
+    if (typeof presigned !== 'string') continue;
+
+    let target: unknown = clone;
+    for (let i = 0; i < path.length - 1; i++) {
+      target = (target as Record<string | number, unknown>)[path[i]];
+    }
+    const lastKey = path[path.length - 1];
+    (target as Record<string | number, unknown>)[lastKey] = presigned;
   }
 
-  // Re-collect locations on the cloned object so we apply presigned URLs to the clone
-  const clonedLocations: UrlLocation[] = [];
-  const collectCloned = (node: unknown): void => {
-    if (!node || typeof node !== 'object') return;
-    if (Array.isArray(node)) {
-      for (let i = 0; i < node.length; i += 1) {
-        const item = node[i];
-        if (typeof item === 'string' && isMinioPublicUrl(item) && !isPresigned(item)) {
-          clonedLocations.push({ parent: node, key: i, url: item });
-        } else if (typeof item === 'object' && item) {
-          collectCloned(item);
-        }
-      }
-      return;
-    }
-    const record = node as Record<string, unknown>;
-    for (const key of Object.keys(record)) {
-      const val = record[key];
-      if (typeof val === 'string' && isMinioPublicUrl(val) && !isPresigned(val)) {
-        clonedLocations.push({ parent: record, key, url: val });
-      } else if (typeof val === 'object' && val) {
-        collectCloned(val);
-      }
-    }
-  };
-  collectCloned(resultObject);
-
-  // Apply presigned URLs to the cloned object
-  for (let i = 0; i < Math.min(clonedLocations.length, presignedResults.length); i += 1) {
-    const presigned = presignedResults[i].presigned;
-    if (typeof presigned === 'string') {
-      (clonedLocations[i].parent as any)[clonedLocations[i].key] = presigned;
-    }
-  }
-
-  return resultObject as T;
+  return clone;
 };
-

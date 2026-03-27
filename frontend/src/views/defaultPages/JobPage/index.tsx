@@ -18,7 +18,7 @@ const JobPage = () => {
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
   const isJobSeekerLoggedIn =
     isAuthenticated &&
-    (currentUser?.roleName || currentUser?.role_name) === ROLES_NAME.JOB_SEEKER;
+    currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
 
   useSEO({
     title: t("jobSearch.tabTitle"),

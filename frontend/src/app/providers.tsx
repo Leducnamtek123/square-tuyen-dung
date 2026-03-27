@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Provider } from 'react-redux';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LocalizationProvider } from '@mui/x-date-pickers';
@@ -22,24 +22,17 @@ function makeQueryClient() {
   });
 }
 
-let browserQueryClient: QueryClient | undefined;
-
-function getQueryClient() {
-  if (typeof window === 'undefined') {
-    // Server: always make a new query client
-    return makeQueryClient();
-  }
-  // Browser: reuse existing client
-  if (!browserQueryClient) browserQueryClient = makeQueryClient();
-  return browserQueryClient;
-}
-
 export function Providers({ children }: { children: React.ReactNode }) {
-  const queryClient = getQueryClient();
+  // Use useRef instead of module-level singleton to avoid shared state
+  // between SSR requests in Next.js App Router.
+  const queryClientRef = React.useRef<QueryClient | null>(null);
+  if (!queryClientRef.current) {
+    queryClientRef.current = makeQueryClient();
+  }
 
   return (
     <Provider store={store}>
-      <QueryClientProvider client={queryClient}>
+      <QueryClientProvider client={queryClientRef.current}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en">
           {children}
         </LocalizationProvider>
@@ -47,4 +40,3 @@ export function Providers({ children }: { children: React.ReactNode }) {
     </Provider>
   );
 }
-

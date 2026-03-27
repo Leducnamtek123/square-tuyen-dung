@@ -109,7 +109,7 @@ const CertificateForm = ({
             control={control}
             title={t('jobSeeker:profile.fields.startDate')}
             showRequired={true}
-            maxDate={DATE_OPTIONS.yesterday}
+            maxDate={DATE_OPTIONS.yesterday()}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
@@ -117,7 +117,7 @@ const CertificateForm = ({
             name="expirationDate"
             control={control}
             title={t('jobSeeker:profile.fields.expirationDate')}
-            maxDate={DATE_OPTIONS.today}
+            maxDate={DATE_OPTIONS.today()}
           />
         </Grid>
       </Grid>

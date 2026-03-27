@@ -72,7 +72,7 @@ export default function EmployerSectionLayout({
             }
           }
 
-          const role = user?.roleName || user?.role_name;
+          const role = user?.roleName;
           const isAuthPage =
             pathname.endsWith('/login') ||
             pathname.endsWith('/register') ||
@@ -104,7 +104,7 @@ export default function EmployerSectionLayout({
         }
       }
 
-      const role = user?.roleName || user?.role_name;
+      const role = user?.roleName;
       if (role !== ROLES_NAME.EMPLOYER) {
         router.replace('/');
         return;

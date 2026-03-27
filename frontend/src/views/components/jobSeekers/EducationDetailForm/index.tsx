@@ -185,7 +185,7 @@ const EducationDetailForm = ({ handleAddOrUpdate, editData }: EducationDetailFor
 
             showRequired={true}
 
-            maxDate={DATE_OPTIONS.yesterday}
+            maxDate={DATE_OPTIONS.yesterday()}
 
           />
 
@@ -209,7 +209,7 @@ const EducationDetailForm = ({ handleAddOrUpdate, editData }: EducationDetailFor
 
             title={t('jobSeeker:profile.fields.completedDate')}
 
-            maxDate={DATE_OPTIONS.today}
+            maxDate={DATE_OPTIONS.today()}
 
           />
 

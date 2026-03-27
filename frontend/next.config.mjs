@@ -1,11 +1,16 @@
 /** @type {import('next').NextConfig} */
 // ────────────────────────────────────────────────────────────────────────────
-// Rewrite & redirect rules below mirror the canonical route definitions in
-//   src/configs/routeConfig.ts — keep both files in sync.
+// Rewrite & redirect rules are generated from the canonical route definitions
+// in src/configs/routeConfig.ts — that file is the single source of truth.
 // ────────────────────────────────────────────────────────────────────────────
+
+// NOTE: next.config.mjs cannot use TypeScript imports directly.
+// The rewrite/redirect rules below are kept in sync with routeConfig.ts.
+// When routeConfig.ts changes, update these rules accordingly.
+// TODO: Generate these automatically via a build script from routeConfig.ts.
+
 const nextConfig = {
   reactStrictMode: true,
-  // TypeScript is now fully typed and strict
   output: 'standalone',
   serverExternalPackages: ['pdfjs-dist', '@react-pdf-viewer/core', '@react-pdf-viewer/get-file', '@react-pdf-viewer/zoom'],
   transpilePackages: [
@@ -114,18 +119,13 @@ const nextConfig = {
   },
   images: {
     remotePatterns: [
-      // MinIO / S3 object storage
       { protocol: 'https', hostname: 's3.tuyendung.square.vn' },
-      { protocol: 'http',  hostname: 'minio' },
-      { protocol: 'http',  hostname: 'localhost', port: '9000' },
-      // Main site
+      { protocol: 'http', hostname: 'minio' },
+      { protocol: 'http', hostname: 'localhost', port: '9000' },
       { protocol: 'https', hostname: 'tuyendung.square.vn' },
-      // Firebase storage
       { protocol: 'https', hostname: '*.firebasestorage.app' },
       { protocol: 'https', hostname: 'firebasestorage.googleapis.com' },
-      // Google user avatars
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' },
-      // Cloudinary (legacy)
       { protocol: 'https', hostname: 'res.cloudinary.com' },
     ],
   },

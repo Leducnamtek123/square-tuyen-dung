@@ -14,37 +14,37 @@ const authService = {
   getToken: (
     email: string,
     password: string,
-    role_name: RoleName
+    roleName: RoleName,
   ): Promise<TokenResponse> => {
     const url = 'auth/token/';
     const data = {
-      grant_type: AUTH_CONFIG.PASSWORD_KEY,
-      client_id: AUTH_CONFIG.CLIENT_ID,
-      client_secret: AUTH_CONFIG.CLIENT_SECRET,
+      grantType: AUTH_CONFIG.PASSWORD_KEY,
+      clientId: AUTH_CONFIG.CLIENT_ID,
+      clientSecret: AUTH_CONFIG.CLIENT_SECRET,
       username: email,
-      password: password,
-      role_name: role_name,
+      password,
+      roleName,
     };
     return httpRequest.post(url, data);
   },
 
   convertToken: (
     clientId: string,
-    clientSecrect: string,
+    clientSecret: string,
     provider: AuthProvider,
     token: string,
-    redirectUri?: string
+    redirectUri?: string,
   ): Promise<TokenResponse> => {
     const url = 'auth/convert-token/';
     const data: AnyRecord = {
-      grant_type: AUTH_CONFIG.CONVERT_TOKEN_KEY,
-      client_id: clientId,
-      client_secret: clientSecrect,
+      grantType: AUTH_CONFIG.CONVERT_TOKEN_KEY,
+      clientId,
+      clientSecret,
       backend: provider,
-      token: token,
+      token,
     };
     if (redirectUri) {
-      data.redirect_uri = redirectUri;
+      data.redirectUri = redirectUri;
     }
     return httpRequest.post(url, data);
   },
@@ -52,33 +52,29 @@ const authService = {
   firebaseLogin: (idToken: string, roleName: RoleName): Promise<TokenResponse> => {
     const url = 'auth/firebase-login/';
     const data = {
-      grant_type: 'convert_token',
-      client_id: AUTH_CONFIG.CLIENT_ID,
-      client_secret: AUTH_CONFIG.CLIENT_SECRET,
+      grantType: 'convert_token',
+      clientId: AUTH_CONFIG.CLIENT_ID,
+      clientSecret: AUTH_CONFIG.CLIENT_SECRET,
       token: idToken,
-      role_name: roleName,
+      roleName,
     };
     return httpRequest.post(url, data);
   },
 
-  revokToken: (accessToken: string, backend?: AuthProvider): Promise<unknown> => {
+  revokeToken: (accessToken: string, backend?: AuthProvider): Promise<unknown> => {
     const url = 'auth/revoke-token/';
     const data = {
-      client_id: AUTH_CONFIG.CLIENT_ID,
-      client_secret: AUTH_CONFIG.CLIENT_SECRET,
+      clientId: AUTH_CONFIG.CLIENT_ID,
+      clientSecret: AUTH_CONFIG.CLIENT_SECRET,
       token: accessToken,
-      backend: backend,
+      backend,
     };
     return httpRequest.post(url, data);
   },
 
   checkCreds: (email: string, roleName: RoleName): Promise<unknown> => {
     const url = 'auth/check-creds/';
-    const data = {
-      email: email,
-      roleName: roleName,
-    };
-    return httpRequest.post(url, data);
+    return httpRequest.post(url, { email, roleName });
   },
 
   emailExists: (email: string): Promise<unknown> => {
@@ -98,11 +94,7 @@ const authService = {
 
   sendVerifyEmail: (email: string, platform = 'WEB'): Promise<unknown> => {
     const url = 'auth/send-verify-email/';
-    const data = {
-      email: email,
-      platform: platform,
-    };
-    return httpRequest.post(url, data);
+    return httpRequest.post(url, { email, platform });
   },
 
   getUserInfo: async (): Promise<UserResponse> => {

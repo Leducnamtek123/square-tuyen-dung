@@ -17,9 +17,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const companyName = company.companyName || company.company_name || 'Công ty';
-  const fieldOperation = company.fieldOperation || company.field_operation || '';
-  const employeeSize = company.employeeSize || company.employee_size || '';
+  const companyName = company.companyName || 'Công ty';
+  const fieldOperation = company.fieldOperation || '';
+  const employeeSize = company.employeeSize || '';
 
   const title = `${companyName} - Tuyển dụng & Việc làm | Square`;
 

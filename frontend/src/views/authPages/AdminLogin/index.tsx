@@ -9,7 +9,6 @@ import {
   Stack,
   Typography,
   styled,
-  keyframes,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
@@ -24,17 +23,6 @@ import tokenService from '../../../services/tokenService';
 import type { RoleName } from '../../../types/auth';
 import { getPreferredLanguage, buildPortalPath } from '../../../configs/portalRouting';
 
-/* ────────────── animations ────────────── */
-const fadeIn = keyframes`
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-`;
-
-const slideProgress = keyframes`
-  from { width: 0%; }
-  to   { width: 100%; }
-`;
-
 const INTERVAL_MS = 5000;
 
 /* ────────────── styled components ────────────── */
@@ -46,7 +34,6 @@ const Card = styled(Box)(() => ({
   borderRadius: 20,
   overflow: 'hidden',
   boxShadow: '0 24px 64px rgba(0,0,0,.35)',
-  animation: `${fadeIn} .6s ease-out`,
 }));
 
 const LeftPanel = styled(Box)(({ theme }) => ({
@@ -77,7 +64,6 @@ const SlideImage = styled('img')({
   objectFit: 'cover',
   position: 'absolute',
   inset: 0,
-  transition: 'opacity .8s ease-in-out',
 });
 
 const SlideOverlay = styled(Box)({
@@ -98,22 +84,7 @@ const Dot = styled('button')<{ active: boolean }>(({ active }) => ({
   borderRadius: 4,
   background: active ? '#fff' : 'rgba(255,255,255,.45)',
   cursor: 'pointer',
-  transition: 'all .35s ease',
   padding: 0,
-  position: 'relative',
-  overflow: 'hidden',
-  '&::after': active
-    ? {
-        content: '""',
-        position: 'absolute' as const,
-        left: 0,
-        top: 0,
-        height: '100%',
-        background: 'rgba(255,255,255,.7)',
-        borderRadius: 4,
-        animation: `${slideProgress} ${INTERVAL_MS}ms linear`,
-      }
-    : {},
 }));
 
 /* ────────────── component ────────────── */
@@ -294,14 +265,17 @@ const AdminLogin: React.FC = () => {
           </Typography>
         </LeftPanel>
 
-        {/* ─── RIGHT: Auto-slide images ─── */}
+        {/* ─── RIGHT: Image slides (no animation) ─── */}
         <RightPanel>
           {SLIDES.map((slide, idx) => (
             <SlideImage
               key={idx}
               src={slide.image}
               alt={slide.title}
-              sx={{ opacity: idx === currentSlide ? 1 : 0 }}
+              sx={{
+                opacity: idx === currentSlide ? 1 : 0,
+                zIndex: idx === currentSlide ? 1 : 0,
+              }}
               loading={idx === 0 ? 'eager' : 'lazy'}
             />
           ))}
@@ -315,7 +289,6 @@ const AdminLogin: React.FC = () => {
                 mb: 1,
                 lineHeight: 1.35,
                 textShadow: '0 2px 8px rgba(0,0,0,.4)',
-                transition: 'opacity .5s',
               }}
             >
               {SLIDES[currentSlide].title}

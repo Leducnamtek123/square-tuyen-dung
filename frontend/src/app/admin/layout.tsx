@@ -74,7 +74,7 @@ export default function AdminSectionLayout({
     if (currentUser) {
       const lang = getPreferredLanguage();
       const adminPrefix = getPortalPrefix('admin', lang);
-      const userRole = currentUser.roleName || (currentUser as any).role_name;
+      const userRole = currentUser.roleName;
 
       if (userRole !== ROLES_NAME.ADMIN) {
         // Not an admin: if on an admin page, redirect away

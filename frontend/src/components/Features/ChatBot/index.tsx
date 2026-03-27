@@ -4,6 +4,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import SmartToyOutlinedIcon from "@mui/icons-material/SmartToyOutlined";
 import { AUTH_CONFIG } from "@/configs/constants";
+import { CHATBOT_ICONS } from "@/configs/images";
 import { isEmployerPortalPath } from "@/configs/portalRouting";
 import chatbotService from "@/services/chatbotService";
 import { MessageResponse } from "@/components/Features/AiElements/message";
@@ -166,7 +167,7 @@ const ChatBot = () => {
         onClick={() => setIsOpen((prev) => !prev)}
         aria-label={t('chat:chatbot.launcherAria')}
       >
-        <img src={botConfig.CHAT_ICON} alt="Square AI" />
+        <img src={isEmployer ? CHATBOT_ICONS.EMPLOYER : CHATBOT_ICONS.JOB_SEEKER} alt="Square AI" />
         <span className="sq-chatbot__launcher-ring" />
       </button>
 

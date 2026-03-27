@@ -67,7 +67,7 @@ const JobPostFormFields = ({
         <SingleSelectCustom name="academicLevel" control={control} options={(allConfig?.academicLevelOptions || []) as any[]} title={t('jobPostForm.title.academiclevel', 'Academic Level')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectacademiclevel', 'Select academic level')} />
       </Grid>
       <Grid size={6}>
-        <DatePickerCustom name="deadline" control={control} showRequired={true} title={t('jobPostForm.title.applicationdeadline', 'Application Deadline')} minDate={DATE_OPTIONS.tomorrow} />
+        <DatePickerCustom name="deadline" control={control} showRequired={true} title={t('jobPostForm.title.applicationdeadline', 'Application Deadline')} minDate={DATE_OPTIONS.tomorrow()} />
       </Grid>
       <Grid size={12}>
         <RichTextEditorCustom name="jobDescription" control={control} title={t('jobPostForm.title.jobdescription', 'Job Description')} showRequired={true} />

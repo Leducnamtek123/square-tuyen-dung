@@ -53,8 +53,8 @@ const AdminChatPage = () => {
 
   const filtered = conversations.filter((conv) => {
     const q = search.toLowerCase();
-    const jobSeeker = conv.jobSeekerName || conv.job_seeker_name || '';
-    const employer = conv.employerName || conv.employer_name || conv.companyName || conv.company_name || '';
+    const jobSeeker = conv.jobSeekerName || '';
+    const employer = conv.employerName || conv.companyName || '';
     return (
       jobSeeker.toLowerCase().includes(q) ||
       employer.toLowerCase().includes(q)
@@ -71,14 +71,14 @@ const AdminChatPage = () => {
     },
     {
       label: 'Ứng viên tham gia',
-      value: new Set(conversations.map((c) => c.jobSeekerId || c.job_seeker_id)).size,
+      value: new Set(conversations.map((c) => c.jobSeekerId)).size,
       icon: <PeopleAltIcon sx={{ fontSize: 32, color: 'success.main' }} />,
       color: 'success.main',
       bg: 'success.50',
     },
     {
       label: 'Nhà tuyển dụng tham gia',
-      value: new Set(conversations.map((c) => c.employerId || c.employer_id || c.companyId || c.company_id)).size,
+      value: new Set(conversations.map((c) => c.employerId || c.companyId)).size,
       icon: <BusinessCenterIcon sx={{ fontSize: 32, color: 'warning.main' }} />,
       color: 'warning.main',
       bg: 'warning.50',
@@ -197,30 +197,22 @@ const AdminChatPage = () => {
                 filtered.map((conv: any, index: number) => {
                   const jobSeekerName =
                     conv.jobSeekerName ||
-                    conv.job_seeker_name ||
                     conv.jobSeeker?.fullName ||
-                    conv.job_seeker?.full_name ||
                     'N/A';
                   const employerName =
                     conv.employerName ||
-                    conv.employer_name ||
                     conv.companyName ||
-                    conv.company_name ||
                     conv.employer?.companyName ||
-                    conv.employer?.company_name ||
                     'N/A';
                   const lastMessage =
                     conv.lastMessage ||
-                    conv.last_message ||
                     conv.latestMessage ||
-                    conv.latest_message ||
                     '—';
-                  const isActive = conv.is_active ?? conv.isActive ?? true;
+                  const isActive = conv.isActive ?? true;
                   const createdAt =
-                    conv.create_at ||
-                    conv.created_at ||
-                    conv.updatedAt ||
-                    conv.updated_at;
+                    conv.createAt ||
+                    conv.createdAt ||
+                    conv.updatedAt;
 
                   return (
                     <TableRow key={conv.id || index} hover>
@@ -228,7 +220,7 @@ const AdminChatPage = () => {
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Avatar
-                            src={conv.jobSeekerAvatar || conv.job_seeker_avatar}
+                            src={conv.jobSeekerAvatar}
                             sx={{ width: 32, height: 32, fontSize: 12 }}
                           >
                             {jobSeekerName.charAt(0)}
@@ -238,7 +230,7 @@ const AdminChatPage = () => {
                               {jobSeekerName}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
-                              {conv.jobSeekerEmail || conv.job_seeker_email || ''}
+                              {conv.jobSeekerEmail || ''}
                             </Typography>
                           </Box>
                         </Box>
@@ -246,7 +238,7 @@ const AdminChatPage = () => {
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Avatar
-                            src={conv.employerLogo || conv.employer_logo}
+                            src={conv.employerLogo}
                             variant="rounded"
                             sx={{ width: 32, height: 32, fontSize: 12 }}
                           >

@@ -130,7 +130,7 @@ const resolveActiveWorkspace = (
   const defaultWorkspace = workspaceList.find((workspace) => workspace.isDefault);
   if (defaultWorkspace) return normalizeWorkspace(defaultWorkspace);
 
-  if ((currentUser?.roleName || currentUser?.role_name) === 'EMPLOYER') {
+  if (currentUser?.roleName === 'EMPLOYER') {
     const firstCompany = workspaceList.find((workspace) => workspace.type === 'company');
     if (firstCompany) return normalizeWorkspace(firstCompany);
     return null; // Do not fallback to job_seeker if they are explicitly an EMPLOYER

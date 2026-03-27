@@ -6,14 +6,10 @@ export interface User {
   id: number;
   email: string;
   fullName?: string;
-  full_name?: string;
   roleName?: RoleName;
-  role_name?: RoleName;
   avatarUrl?: string | null;
   hasCompany?: boolean;
-  has_company?: boolean;
   isVerifyEmail?: boolean;
-  is_verify_email?: boolean;
   workspaces?: Workspace[];
   canAccessEmployerPortal?: boolean;
 }
@@ -36,7 +32,6 @@ export interface NormalizedWorkspace {
 export interface Company {
   id: number;
   companyName: string;
-  company_name?: string;
   slug: string;
   companyEmail?: string;
   companyPhone?: string;
@@ -57,7 +52,6 @@ export interface Company {
 export interface JobPost {
   id: number;
   jobName: string;
-  job_name?: string;
   slug: string;
   deadline: string;
   quantity: number;

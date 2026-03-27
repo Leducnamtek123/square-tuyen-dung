@@ -87,13 +87,12 @@ const InterviewLivePage = () => {
     () => [
       {
         header: t('pages.interviewLive.table.company'),
-        accessorKey: 'company_name',
+        accessorKey: 'companyName',
         cell: ({ row }: any) => (
           <Typography variant="body2">
             {row.original.companyName ||
-              row.original.company_name ||
               row.original.companyDict?.companyName ||
-              row.original.job_post_dict?.companyName ||
+              row.original.jobPostDict?.companyName ||
               t('common.na')}
           </Typography>
         ),
@@ -119,10 +118,10 @@ const InterviewLivePage = () => {
       },
       {
         header: t('pages.interviewLive.table.room'),
-        accessorKey: 'room_name',
+        accessorKey: 'roomName',
         cell: ({ row }: any) => (
           <Typography variant="body2">
-            {row.original.room_name || row.original.roomName || row.original.room || t('common.na')}
+            {row.original.roomName || row.original.room || t('common.na')}
           </Typography>
         ),
       },

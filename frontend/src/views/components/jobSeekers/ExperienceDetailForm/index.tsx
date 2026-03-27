@@ -65,7 +65,7 @@ const ExperienceDetailForm = ({ handleAddOrUpdate, editData }: ExperienceDetailF
 
       .typeError(t('jobSeeker:profile.validation.startDateRequired'))
 
-      .max(DATE_OPTIONS.yesterday, t('jobSeeker:profile.validation.startDateYesterday'))
+      .max(DATE_OPTIONS.yesterday(), t('jobSeeker:profile.validation.startDateYesterday'))
 
       .test(
 
@@ -92,7 +92,7 @@ const ExperienceDetailForm = ({ handleAddOrUpdate, editData }: ExperienceDetailF
 
       .max(
 
-        DATE_OPTIONS.today,
+        DATE_OPTIONS.today(),
 
         t('jobSeeker:profile.validation.endDateToday')
 
@@ -207,7 +207,7 @@ const ExperienceDetailForm = ({ handleAddOrUpdate, editData }: ExperienceDetailF
 
             showRequired={true}
 
-            maxDate={DATE_OPTIONS.yesterday}
+            maxDate={DATE_OPTIONS.yesterday()}
 
           />
 
@@ -233,7 +233,7 @@ const ExperienceDetailForm = ({ handleAddOrUpdate, editData }: ExperienceDetailF
 
             showRequired={true}
 
-            maxDate={DATE_OPTIONS.today}
+            maxDate={DATE_OPTIONS.today()}
 
           />
 

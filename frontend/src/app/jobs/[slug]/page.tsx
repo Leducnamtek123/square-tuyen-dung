@@ -17,8 +17,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const jobTitle = job.jobName || job.job_name || 'Việc làm';
-  const companyName = job.company?.companyName || job.company?.company_name || '';
+  const jobTitle = job.jobName || 'Việc làm';
+  const companyName = job.company?.companyName || '';
   const location = job.city?.name || '';
   const salary = job.salaryMin && job.salaryMax
     ? `${job.salaryMin} - ${job.salaryMax} triệu`

@@ -35,7 +35,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
   t
 }) => {
   return (
-    <Card sx={{ overflow: "visible", boxShadow: (theme: any) => theme.customShadows?.medium || 2 }}>
+    <Card sx={{ overflow: "visible", boxShadow: (theme: any) => theme.customShadows?.medium || 2, mt: 3 }}>
       <Box>
         <MuiImageCustom
           src={companyDetail?.companyCoverImageUrl || IMAGES.companyCoverDefault || IMAGES.coverImageDefault}

@@ -105,7 +105,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
       .typeError(t('jobSeeker:profile.validation.birthdayInvalid'))
 
-      .max(DATE_OPTIONS.yesterday, t('jobSeeker:profile.validation.birthdayInvalid')),
+      .max(DATE_OPTIONS.yesterday(), t('jobSeeker:profile.validation.birthdayInvalid')),
 
     gender: yup
 
@@ -332,7 +332,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
             showRequired={true}
 
-            maxDate={DATE_OPTIONS.yesterday}
+            maxDate={DATE_OPTIONS.yesterday()}
 
           />
 
@@ -510,7 +510,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
             title={t('jobSeeker:profile.fields.idCardIssueDate')}
 
-            maxDate={DATE_OPTIONS.today}
+            maxDate={DATE_OPTIONS.today()}
 
           />
 
