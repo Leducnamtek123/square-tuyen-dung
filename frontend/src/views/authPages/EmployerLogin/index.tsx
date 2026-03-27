@@ -76,11 +76,7 @@ const EmployerLogin = () => {
 
       try {
         const resData = await authService.getToken(email, password, roleName);
-        const {
-          access_token: accessToken,
-          refresh_token: refreshToken,
-          backend,
-        } = resData as any;
+        const { accessToken, refreshToken, backend } = resData as any;
 
         const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
           accessToken,
@@ -123,9 +119,9 @@ const EmployerLogin = () => {
 
       try {
         const resData = await authService.checkCreds(email, roleName) as any;
-        const { exists, email: resEmail, email_verified } = resData;
+        const { exists, email: resEmail, emailVerified } = resData;
 
-        if (exists === true && email_verified === false) {
+        if (exists === true && emailVerified === false) {
           dispatch(
             updateVerifyEmail({
               isAllowVerifyEmail: true,
@@ -160,11 +156,7 @@ const EmployerLogin = () => {
 
     try {
       const resData = await authService.convertToken(clientId, clientSecrect, provider, token, redirectUri) as any;
-      const {
-        access_token: accessToken,
-        refresh_token: refreshToken,
-        backend,
-      } = resData;
+      const { accessToken, refreshToken, backend } = resData;
 
       const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
         accessToken,

@@ -145,7 +145,7 @@ const AdminLogin: React.FC = () => {
       setIsLoading(true);
       try {
         const resData = await authService.getToken(email, password, roleName as RoleName);
-        const { access_token: accessToken, refresh_token: refreshToken, backend } = resData;
+        const { accessToken, refreshToken, backend } = resData as any;
 
         const saved = tokenService.saveAccessTokenAndRefreshTokenToCookie(
           accessToken,
@@ -184,9 +184,9 @@ const AdminLogin: React.FC = () => {
       setIsLoading(true);
       try {
         const resData = await authService.checkCreds(email, roleName as RoleName);
-        const { exists, email: resEmail, email_verified } = resData as any;
+        const { exists, email: resEmail, emailVerified } = resData as any;
 
-        if (exists === true && email_verified === false) {
+        if (exists === true && emailVerified === false) {
           dispatch(
             updateVerifyEmail({
               isAllowVerifyEmail: true,

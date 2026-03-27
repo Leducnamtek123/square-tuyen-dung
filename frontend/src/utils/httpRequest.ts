@@ -5,7 +5,7 @@ import { AUTH_CONFIG } from '../configs/constants';
 import type { RetryAxiosRequestConfig } from '../types/api';
 import type { TokenPair } from '../types/auth';
 import { cleanParams } from './params';
-import { camelizeKeys, snakizeKeys } from './camelCase';
+import { camelizeKeys } from './camelCase';
 
 // API endpoints that do not require authentication
 const notAuthenticationURL = [
@@ -77,16 +77,10 @@ httpRequest.interceptors.request.use(
       retryConfig.params = cleanParams(retryConfig.params as Record<string, unknown>);
     }
 
-    // Auto-transform camelCase → snake_case for request body
-    // Skip FormData (file uploads) and non-object bodies
-    if (isPlainObject(config.data)) {
-      config.data = snakizeKeys(config.data);
-    }
-
-    // Also transform query params
-    if (isPlainObject(config.params)) {
-      config.params = snakizeKeys(config.params);
-    }
+    // NOTE: Do NOT auto-convert to snake_case here.
+    // The Django backend serializers use camelCase field names with explicit
+    // source= mappings (e.g. companyName → source="company_name").
+    // Converting to snake_case breaks the API (400 Bad Request).
 
     const accessToken = tokenService.getAccessTokenFromCookie();
 

@@ -115,7 +115,7 @@ const EmployerSignUp = () => {
         if (res?.status === 400 && hasEmailExists) {
           try {
             const resData = await authService.checkCreds(data?.email, ROLES_NAME.EMPLOYER as RoleName) as any;
-            if (resData?.exists === true && resData?.email_verified === false) {
+            if (resData?.exists === true && resData?.emailVerified === false) {
               dispatch(
                 updateVerifyEmail({
                   isAllowVerifyEmail: true,
@@ -163,9 +163,9 @@ const EmployerSignUp = () => {
 
       const resData = await authService.checkCreds(email, roleName) as any;
 
-      const { exists, email_verified } = resData;
+      const { exists, emailVerified } = resData;
 
-      if (exists === true && email_verified === false) {
+      if (exists === true && emailVerified === false) {
         dispatch(
           updateVerifyEmail({
             isAllowVerifyEmail: true,
