@@ -491,7 +491,7 @@ const CompanyCard = () => {
         onChange={handleFileSelect('cover')}
       />
 
-      {isFullScreenLoading && <BackdropLoading />}
+      <BackdropLoading open={isFullScreenLoading} />
 
       <ImageCropDialog
         open={cropOpen}

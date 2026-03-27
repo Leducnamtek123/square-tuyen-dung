@@ -28,8 +28,7 @@ const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: Backdr
         zIndex: 9999,
       }}
       open={open}
-      slots={{ transition: Fade }}
-      slotProps={{ transition: { timeout: 100 } }}
+      transitionDuration={100}
     >
 
       <img 

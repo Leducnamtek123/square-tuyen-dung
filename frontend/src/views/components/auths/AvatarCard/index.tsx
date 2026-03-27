@@ -297,7 +297,7 @@ const AvatarCard = () => {
         onChange={handleFileChange}
       />
 
-      {isFullScreenLoading && <BackdropLoading />}
+      <BackdropLoading open={isFullScreenLoading} />
 
       <ImageCropDialog
         open={cropOpen}

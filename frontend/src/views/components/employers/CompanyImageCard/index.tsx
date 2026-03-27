@@ -408,7 +408,7 @@ const CompanyImageCard = () => {
 
       </Dialog>
 
-      {isFullScreenLoading && <BackdropLoading />}
+      <BackdropLoading open={isFullScreenLoading} />
 
       <ImageCropDialog
         open={cropOpen}
