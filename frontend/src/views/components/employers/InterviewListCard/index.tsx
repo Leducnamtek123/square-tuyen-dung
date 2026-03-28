@@ -1,3 +1,4 @@
+'use client';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box, Typography, Button, Chip, IconButton, Stack, Divider, LinearProgress, CircularProgress } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
