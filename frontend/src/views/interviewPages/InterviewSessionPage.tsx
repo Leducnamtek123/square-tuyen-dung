@@ -167,9 +167,9 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
   if (error && !session) {
     return (
       <main className="grid min-h-screen place-items-center bg-slate-950 px-6">
-        <section className="w-full max-w-lg rounded-2xl border border-rose-400/30 bg-rose-500/10 p-6 text-rose-100">
-          <p className="text-sm">{error}</p>
-          <Button className="mt-4" onClick={() => navigate.push("/")}>
+        <section className="w-full max-w-lg rounded-2xl border border-rose-400/30 bg-rose-500/10 p-8 text-center text-rose-100">
+          <p className="mb-6 text-lg font-medium">{error}</p>
+          <Button variant="contained" className="bg-rose-600 hover:bg-rose-700" onClick={() => navigate.push("/")}>
             {t("common:actions.backHome", { defaultValue: "Back home" })}
           </Button>
         </section>
@@ -196,23 +196,33 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                 {session?.jobName || "Interview"} | {session?.candidateName || "Candidate"}
               </p>
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-medium capitalize ${statusClass}`}>
+            <div className="flex items-center gap-3">
+              <span className={`inline-flex items-center rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${statusClass}`}>
                 {statusText}
               </span>
-              <Button variant="outlined" onClick={() => navigate.back()}>
+              <div className="hidden h-6 w-[1px] bg-white/10 md:block" />
+              <Button 
+                variant="text" 
+                color="inherit" 
+                onClick={() => navigate.back()} 
+                className="hidden text-slate-300 hover:text-white md:inline-flex"
+              >
                 {t("common:actions.back", { defaultValue: "Back" })}
               </Button>
-              {!connectRoom ? (
-                <Button onClick={handleStartInterview} disabled={starting || !isJoinable}>
+              {!connectRoom && isJoinable && (
+                <Button 
+                  variant="contained" 
+                  onClick={handleStartInterview} 
+                  disabled={starting}
+                  className="bg-cyan-500 font-semibold shadow-lg shadow-cyan-500/20 hover:bg-cyan-600"
+                >
                   {starting
                     ? t("loading", { defaultValue: "Connecting..." })
-                    : !isJoinable
-                    ? t("sessionNotJoinable", { defaultValue: "Session unavailable" })
                     : t("startInterview", { defaultValue: "Start interview" })}
                 </Button>
-              ) : (
-                <Button variant="contained" color="error" onClick={handleEndInterview}>
+              )}
+              {connectRoom && (
+                <Button variant="contained" color="error" onClick={handleEndInterview} className="font-semibold shadow-lg shadow-rose-500/20">
                   {t("controls.end", { defaultValue: "End call" })}
                 </Button>
               )}
@@ -220,7 +230,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
           </div>
         </header>
 
-        <section className="relative h-[calc(100vh-170px)] min-h-[560px] overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70 shadow-2xl shadow-black/30">
+        <section className="relative h-[72vh] min-h-[500px] overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70 shadow-2xl shadow-black/30">
           <LiveKitRoom
             token={participantToken}
             serverUrl={liveKitUrl}
@@ -277,9 +287,10 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                     />
                     {isJoinable ? (
                       <Button
+                        variant="contained"
                         onClick={handleStartInterview}
                         disabled={starting}
-                        className="sm:min-w-[170px]"
+                        className="bg-cyan-500 px-8 py-2.5 font-bold shadow-xl shadow-cyan-500/20 hover:bg-cyan-600 sm:min-w-[200px]"
                       >
                         {starting
                           ? t("loading", { defaultValue: "Connecting..." })
@@ -287,8 +298,9 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                       </Button>
                     ) : (
                       <Button
+                        variant="contained"
                         onClick={() => navigate.push("/")}
-                        className="sm:min-w-[170px]"
+                        className="bg-slate-700 px-8 py-2.5 font-bold shadow-xl shadow-slate-900/40 hover:bg-slate-600 sm:min-w-[200px]"
                       >
                         {t("common:actions.backHome", { defaultValue: "Back home" })}
                       </Button>
