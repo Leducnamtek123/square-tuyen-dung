@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 import i18next from 'i18next';
 
 export const useWards = (params: any) => {
@@ -20,10 +20,10 @@ export const useWards = (params: any) => {
         mutationFn: (data: any) => adminManagementService.createWard(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-wards'] });
-            toast.success(i18next.t('admin:pages.wards.toast.addSuccess'));
+            toastMessages.success(i18next.t('admin:pages.wards.toast.addSuccess'));
         },
         onError: (err: any) => {
-            toast.error(i18next.t('admin:pages.wards.toast.addError'));
+            toastMessages.error(i18next.t('admin:pages.wards.toast.addError'));
             console.error(err);
         }
     });
@@ -32,10 +32,10 @@ export const useWards = (params: any) => {
         mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateWard(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-wards'] });
-            toast.success(i18next.t('admin:pages.wards.toast.updateSuccess'));
+            toastMessages.success(i18next.t('admin:pages.wards.toast.updateSuccess'));
         },
         onError: (err: any) => {
-            toast.error(i18next.t('admin:pages.wards.toast.updateError'));
+            toastMessages.error(i18next.t('admin:pages.wards.toast.updateError'));
             console.error(err);
         }
     });
@@ -44,10 +44,10 @@ export const useWards = (params: any) => {
         mutationFn: (id: any) => adminManagementService.deleteWard(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-wards'] });
-            toast.success(i18next.t('admin:pages.wards.toast.deleteSuccess'));
+            toastMessages.success(i18next.t('admin:pages.wards.toast.deleteSuccess'));
         },
         onError: (err: any) => {
-            toast.error(i18next.t('admin:pages.wards.toast.deleteError'));
+            toastMessages.error(i18next.t('admin:pages.wards.toast.deleteError'));
             console.error(err);
         }
     });

@@ -4,7 +4,7 @@ import { Box, Typography, Button, Paper, TextField, MenuItem, FormControl, Input
 import { Grid2 as Grid } from "@mui/material";
 import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 import { useTranslation } from 'react-i18next';
 import interviewService from '../../../../services/interviewService';
 import questionService from '../../../../services/questionService';
@@ -181,7 +181,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
                 console.error('Error fetching initial data', error);
 
-                toast.error(t('interviewCreateCard.messages.loadDataError'));
+                toastMessages.error(t('interviewCreateCard.messages.loadDataError'));
 
             } finally {
 
@@ -212,7 +212,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                 })
                 .catch(err => {
                     console.error('Error fetching session detail', err);
-                    toast.error(t('interviewCreateCard.messages.loadDataError'));
+                    toastMessages.error(t('interviewCreateCard.messages.loadDataError'));
                 });
         }
     }, [sessionId, reset, t]);
@@ -254,7 +254,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                 })
                 .catch(err => {
                     console.error('Error fetching candidates', err);
-                    toast.error(t('interviewCreateCard.messages.loadCandidateError'));
+                    toastMessages.error(t('interviewCreateCard.messages.loadCandidateError'));
                 });
         } else {
             setCandidates([]);
@@ -281,7 +281,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
         if (selected.length !== 1) {
 
-            toast.error(t('interview:employer.questions.editSelectionError'));
+            toastMessages.error(t('interview:employer.questions.editSelectionError'));
 
             return;
 
@@ -291,7 +291,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
         if (!q) {
 
-            toast.error(t('interview:employer.questions.editSelectionError'));
+            toastMessages.error(t('interview:employer.questions.editSelectionError'));
 
             return;
 
@@ -311,7 +311,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
         if (!trimmed) {
 
-            toast.error(t('interview:employer.questions.textRequired'));
+            toastMessages.error(t('interview:employer.questions.textRequired'));
 
             return;
 
@@ -325,13 +325,13 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
                 await questionService.updateQuestion(editingQuestionId, { text: trimmed });
 
-                toast.success(t('interview:employer.questions.updateSuccess'));
+                toastMessages.success(t('interview:employer.questions.updateSuccess'));
 
             } else {
 
                 const newQuestion = (await questionService.createQuestion({ text: trimmed })) as any;
 
-                toast.success(t('interview:employer.questions.createSuccess'));
+                toastMessages.success(t('interview:employer.questions.createSuccess'));
 
                 const createdId = newQuestion?.id || newQuestion?.data?.id || newQuestion?.results?.id;
 
@@ -353,7 +353,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
             console.error('Question save error:', error);
 
-            toast.error(t('interview:employer.questions.saveError'));
+            toastMessages.error(t('interview:employer.questions.saveError'));
 
         } finally {
 
@@ -375,16 +375,16 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
             if (sessionId) {
                 await interviewService.updateSession(sessionId, payload);
-                toast.success(t('interviewCreateCard.messages.updateSuccess', { defaultValue: 'Cập nhật thành công' }));
+                toastMessages.success(t('interviewCreateCard.messages.updateSuccess', { defaultValue: 'Cập nhật thành công' }));
             } else {
                 await interviewService.scheduleSession(payload);
-                toast.success(t('interviewCreateCard.messages.scheduleSuccess'));
+                toastMessages.success(t('interviewCreateCard.messages.scheduleSuccess'));
             }
 
             navigate.push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`);
         } catch (error) {
             console.error('Submit error:', error);
-            toast.error(sessionId ? t('interviewCreateCard.messages.updateError', { defaultValue: 'Cập nhật thất bại' }) : t('interviewCreateCard.messages.scheduleError'));
+            toastMessages.error(sessionId ? t('interviewCreateCard.messages.updateError', { defaultValue: 'Cập nhật thất bại' }) : t('interviewCreateCard.messages.scheduleError'));
         }
     };
 

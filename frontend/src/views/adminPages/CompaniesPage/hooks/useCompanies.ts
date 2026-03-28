@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 
 export const useCompanies = (params: any) => {
     const queryClient = useQueryClient();
@@ -18,10 +18,10 @@ export const useCompanies = (params: any) => {
         mutationFn: (data: any) => adminManagementService.createCompany(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] });
-            toast.success('Company added successfully');
+            toastMessages.success('Company added successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while adding the company');
+            toastMessages.error('An error occurred while adding the company');
             console.error(err);
         }
     });
@@ -30,10 +30,10 @@ export const useCompanies = (params: any) => {
         mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateCompany(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] });
-            toast.success('Company updated successfully');
+            toastMessages.success('Company updated successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while updating the company');
+            toastMessages.error('An error occurred while updating the company');
             console.error(err);
         }
     });
@@ -42,10 +42,10 @@ export const useCompanies = (params: any) => {
         mutationFn: (id: any) => adminManagementService.deleteCompany(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] });
-            toast.success('Company deleted successfully');
+            toastMessages.success('Company deleted successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while deleting the company');
+            toastMessages.error('An error occurred while deleting the company');
             console.error(err);
         }
     });

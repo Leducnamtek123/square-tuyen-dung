@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 
 export const useJobActivities = (params: any) => {
     const queryClient = useQueryClient();
@@ -18,10 +18,10 @@ export const useJobActivities = (params: any) => {
         mutationFn: (data: any) => adminManagementService.createJobActivity(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-activities'] });
-            toast.success('Activity added successfully');
+            toastMessages.success('Activity added successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while adding the activity');
+            toastMessages.error('An error occurred while adding the activity');
             console.error(err);
         }
     });
@@ -30,10 +30,10 @@ export const useJobActivities = (params: any) => {
         mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateJobActivity(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-activities'] });
-            toast.success('Activity updated successfully');
+            toastMessages.success('Activity updated successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while updating the activity');
+            toastMessages.error('An error occurred while updating the activity');
             console.error(err);
         }
     });
@@ -42,10 +42,10 @@ export const useJobActivities = (params: any) => {
         mutationFn: (id: any) => adminManagementService.deleteJobActivity(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-activities'] });
-            toast.success('Activity deleted successfully');
+            toastMessages.success('Activity deleted successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while deleting the activity');
+            toastMessages.error('An error occurred while deleting the activity');
             console.error(err);
         }
     });

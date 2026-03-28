@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 
 export const useJobNotifications = (params: any) => {
     const queryClient = useQueryClient();
@@ -18,10 +18,10 @@ export const useJobNotifications = (params: any) => {
         mutationFn: (data: any) => adminManagementService.createJobNotification(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-notifications'] });
-            toast.success('Notification created successfully');
+            toastMessages.success('Notification created successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while creating the notification');
+            toastMessages.error('An error occurred while creating the notification');
             console.error(err);
         }
     });
@@ -30,10 +30,10 @@ export const useJobNotifications = (params: any) => {
         mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateJobNotification(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-notifications'] });
-            toast.success('Notification updated successfully');
+            toastMessages.success('Notification updated successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while updating the notification');
+            toastMessages.error('An error occurred while updating the notification');
             console.error(err);
         }
     });
@@ -42,10 +42,10 @@ export const useJobNotifications = (params: any) => {
         mutationFn: (id: any) => adminManagementService.deleteJobNotification(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-notifications'] });
-            toast.success('Notification deleted successfully');
+            toastMessages.success('Notification deleted successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while deleting the notification');
+            toastMessages.error('An error occurred while deleting the notification');
             console.error(err);
         }
     });

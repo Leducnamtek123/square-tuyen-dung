@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 
 export const useProfiles = (params: any) => {
     const queryClient = useQueryClient();
@@ -18,10 +18,10 @@ export const useProfiles = (params: any) => {
         mutationFn: (data: any) => adminManagementService.createProfile(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
-            toast.success('Candidate profile added successfully');
+            toastMessages.success('Candidate profile added successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while adding the candidate profile');
+            toastMessages.error('An error occurred while adding the candidate profile');
             console.error(err);
         }
     });
@@ -30,10 +30,10 @@ export const useProfiles = (params: any) => {
         mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateProfile(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
-            toast.success('Candidate profile updated successfully');
+            toastMessages.success('Candidate profile updated successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while updating the candidate profile');
+            toastMessages.error('An error occurred while updating the candidate profile');
             console.error(err);
         }
     });
@@ -42,10 +42,10 @@ export const useProfiles = (params: any) => {
         mutationFn: (id: any) => adminManagementService.deleteProfile(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
-            toast.success('Candidate profile deleted successfully');
+            toastMessages.success('Candidate profile deleted successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while deleting the candidate profile');
+            toastMessages.error('An error occurred while deleting the candidate profile');
             console.error(err);
         }
     });

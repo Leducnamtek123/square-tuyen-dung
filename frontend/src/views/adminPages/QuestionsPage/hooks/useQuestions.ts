@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import questionService from '../../../../services/questionService';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 
 export const useQuestions = (params: any) => {
     return useQuery({
@@ -19,10 +19,10 @@ export const useCreateQuestion = () => {
     return useMutation({
         mutationFn: (data: any) => questionService.createQuestion(data),
         onSuccess: () => {
-            toast.success('Question added successfully');
+            toastMessages.success('Question added successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-questions'] });
         },
-        onError: () => toast.error('Error adding question'),
+        onError: () => toastMessages.error('Error adding question'),
     });
 };
 
@@ -31,10 +31,10 @@ export const useUpdateQuestion = () => {
     return useMutation({
         mutationFn: ({ id, data }: { id: any; data: any }) => questionService.updateQuestion(id, data),
         onSuccess: () => {
-            toast.success('Question updated successfully');
+            toastMessages.success('Question updated successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-questions'] });
         },
-        onError: () => toast.error('Error updating question'),
+        onError: () => toastMessages.error('Error updating question'),
     });
 };
 
@@ -43,9 +43,9 @@ export const useDeleteQuestion = () => {
     return useMutation({
         mutationFn: (id: any) => questionService.deleteQuestion(id),
         onSuccess: () => {
-            toast.success('Question deleted successfully');
+            toastMessages.success('Question deleted successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-questions'] });
         },
-        onError: () => toast.error('Error deleting question'),
+        onError: () => toastMessages.error('Error deleting question'),
     });
 };

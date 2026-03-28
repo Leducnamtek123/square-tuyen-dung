@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 
 import AddIcon from '@mui/icons-material/Add';
 
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 
 import { useTranslation } from 'react-i18next';
 
@@ -111,7 +111,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
     if (!payload.text) {
 
-      toast.error(t('employer.questionBank.textRequired'));
+      toastMessages.error(t('employer.questionBank.textRequired'));
 
       return;
 
@@ -123,13 +123,13 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
         await questionService.updateQuestion(currentQuestion.id, payload);
 
-        toast.success(t('employer.questionBank.updateSuccess'));
+        toastMessages.success(t('employer.questionBank.updateSuccess'));
 
       } else {
 
         await questionService.createQuestion(payload);
 
-        toast.success(t('employer.questionBank.createSuccess'));
+        toastMessages.success(t('employer.questionBank.createSuccess'));
 
       }
 
@@ -139,7 +139,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
     } catch (error: any) {
 
-      toast.error(t('employer.questionBank.saveError'));
+      toastMessages.error(t('employer.questionBank.saveError'));
 
     }
 
@@ -149,10 +149,10 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
     if (window.confirm(t('employer.questionBank.deleteConfirm'))) {
       try {
         await questionService.deleteQuestion(id);
-        toast.success(t('employer.questionBank.deleteSuccess'));
+        toastMessages.success(t('employer.questionBank.deleteSuccess'));
         fetchQuestions();
       } catch (error: any) {
-        toast.error(t('employer.questionBank.deleteError'));
+        toastMessages.error(t('employer.questionBank.deleteError'));
       }
     }
   }, [fetchQuestions, t]);

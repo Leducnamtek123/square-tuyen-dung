@@ -7,7 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import BlockIcon from '@mui/icons-material/Block';
 import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 import Link from 'next/link';
 import interviewService from '../../../../services/interviewService';
 import { transformInterviewSession } from '../../../../utils/transformers';
@@ -120,12 +120,12 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
         setIsProcessing(true);
         try {
             await interviewService.deleteSession(deleteDialog.id);
-            toast.success(t('interviewListCard.messages.deleteSuccess'));
+            toastMessages.success(t('interviewListCard.messages.deleteSuccess'));
             setDeleteDialog({ open: false, id: null });
             fetchSessions();
         } catch (error) {
             console.error('Error deleting session', error);
-            toast.error(t('interviewListCard.messages.deleteError'));
+            toastMessages.error(t('interviewListCard.messages.deleteError'));
         } finally {
             setIsProcessing(false);
         }
@@ -136,12 +136,12 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
         setIsProcessing(true);
         try {
             await interviewService.updateSessionStatus(cancelDialog.roomName, 'cancelled');
-            toast.success(t('interviewListCard.messages.cancelSuccess'));
+            toastMessages.success(t('interviewListCard.messages.cancelSuccess'));
             setCancelDialog({ open: false, id: null, roomName: null });
             fetchSessions();
         } catch (error) {
             console.error('Error cancelling session', error);
-            toast.error(t('interviewListCard.messages.cancelError'));
+            toastMessages.error(t('interviewListCard.messages.cancelError'));
         } finally {
             setIsProcessing(false);
         }

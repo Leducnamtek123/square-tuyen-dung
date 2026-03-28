@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 
 export const useQuestionGroups = (params: any) => {
     const queryClient = useQueryClient();
@@ -19,10 +19,10 @@ export const useQuestionGroups = (params: any) => {
         mutationFn: (data: any) => adminManagementService.createQuestionGroup(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-question-groups'] });
-            toast.success('Question group added successfully');
+            toastMessages.success('Question group added successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while adding the question group');
+            toastMessages.error('An error occurred while adding the question group');
             console.error(err);
         }
     });
@@ -31,10 +31,10 @@ export const useQuestionGroups = (params: any) => {
         mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateQuestionGroup(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-question-groups'] });
-            toast.success('Question group updated successfully');
+            toastMessages.success('Question group updated successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while updating the question group');
+            toastMessages.error('An error occurred while updating the question group');
             console.error(err);
         }
     });
@@ -43,10 +43,10 @@ export const useQuestionGroups = (params: any) => {
         mutationFn: (id: any) => adminManagementService.deleteQuestionGroup(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-question-groups'] });
-            toast.success('Question group deleted successfully');
+            toastMessages.success('Question group deleted successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while deleting the question group');
+            toastMessages.error('An error occurred while deleting the question group');
             console.error(err);
         }
     });

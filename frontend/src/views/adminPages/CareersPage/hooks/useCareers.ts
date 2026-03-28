@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 
 export const useCareers = (params: any) => {
     const queryClient = useQueryClient();
@@ -18,10 +18,10 @@ export const useCareers = (params: any) => {
         mutationFn: (data: any) => adminManagementService.createCareer(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
-            toast.success('Career added successfully');
+            toastMessages.success('Career added successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while adding the career');
+            toastMessages.error('An error occurred while adding the career');
             console.error(err);
         }
     });
@@ -30,10 +30,10 @@ export const useCareers = (params: any) => {
         mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateCareer(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
-            toast.success('Career updated successfully');
+            toastMessages.success('Career updated successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while updating the career');
+            toastMessages.error('An error occurred while updating the career');
             console.error(err);
         }
     });
@@ -42,10 +42,10 @@ export const useCareers = (params: any) => {
         mutationFn: (id: any) => adminManagementService.deleteCareer(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
-            toast.success('Career deleted successfully');
+            toastMessages.success('Career deleted successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while deleting the career');
+            toastMessages.error('An error occurred while deleting the career');
             console.error(err);
         }
     });

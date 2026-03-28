@@ -125,7 +125,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     <ErrorBoundary>
       <GoogleOAuthProvider clientId={AUTH_CONFIG.GOOGLE_CLIENT_ID}>
           {children}
-          <ToastContainer autoClose={1300} transition={Bounce} position="top-right" />
+          <ToastContainer autoClose={1300} transition={Bounce} position="top-right" theme="colored" />
           {!isChatPage && !isInterviewPage && (
             <>
               {isAuthenticated && <Feedback />}

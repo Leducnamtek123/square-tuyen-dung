@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 
 export const useCities = (params: any = {}) => {
     const queryClient = useQueryClient();
@@ -18,10 +18,10 @@ export const useCities = (params: any = {}) => {
         mutationFn: (data: any) => adminManagementService.createCity(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-cities'] });
-            toast.success('City added successfully');
+            toastMessages.success('City added successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while adding the city');
+            toastMessages.error('An error occurred while adding the city');
             console.error(err);
         }
     });
@@ -30,10 +30,10 @@ export const useCities = (params: any = {}) => {
         mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateCity(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-cities'] });
-            toast.success('City updated successfully');
+            toastMessages.success('City updated successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while updating the city');
+            toastMessages.error('An error occurred while updating the city');
             console.error(err);
         }
     });
@@ -42,10 +42,10 @@ export const useCities = (params: any = {}) => {
         mutationFn: (id: any) => adminManagementService.deleteCity(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-cities'] });
-            toast.success('City deleted successfully');
+            toastMessages.success('City deleted successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while deleting the city');
+            toastMessages.error('An error occurred while deleting the city');
             console.error(err);
         }
     });

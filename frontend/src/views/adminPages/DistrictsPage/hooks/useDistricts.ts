@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 
 export const useDistricts = (params: any) => {
     const queryClient = useQueryClient();
@@ -19,10 +19,10 @@ export const useDistricts = (params: any) => {
         mutationFn: (data: any) => adminManagementService.createDistrict(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-districts'] });
-            toast.success('District added successfully');
+            toastMessages.success('District added successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while adding the district');
+            toastMessages.error('An error occurred while adding the district');
             console.error(err);
         }
     });
@@ -31,10 +31,10 @@ export const useDistricts = (params: any) => {
         mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateDistrict(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-districts'] });
-            toast.success('District updated successfully');
+            toastMessages.success('District updated successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while updating the district');
+            toastMessages.error('An error occurred while updating the district');
             console.error(err);
         }
     });
@@ -43,10 +43,10 @@ export const useDistricts = (params: any) => {
         mutationFn: (id: any) => adminManagementService.deleteDistrict(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-districts'] });
-            toast.success('District deleted successfully');
+            toastMessages.success('District deleted successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while deleting the district');
+            toastMessages.error('An error occurred while deleting the district');
             console.error(err);
         }
     });

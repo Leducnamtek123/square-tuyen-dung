@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import questionGroupService from '../../../../services/questionGroupService';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 
 export const useQuestionGroups = (params: any) => {
     const { t } = useTranslation('employer');
@@ -18,10 +18,10 @@ export const useQuestionGroups = (params: any) => {
         mutationFn: (data: any) => questionGroupService.createQuestionGroup(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
-            toast.success(t('questionGroupsCard.messages.addSuccess'));
+            toastMessages.success(t('questionGroupsCard.messages.addSuccess'));
         },
         onError: (err) => {
-            toast.error(t('questionGroupsCard.messages.addError'));
+            toastMessages.error(t('questionGroupsCard.messages.addError'));
             console.error(err);
         }
     });
@@ -30,10 +30,10 @@ export const useQuestionGroups = (params: any) => {
         mutationFn: ({ id, data }: { id: string | number, data: any }) => questionGroupService.updateQuestionGroup(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
-            toast.success(t('questionGroupsCard.messages.updateSuccess'));
+            toastMessages.success(t('questionGroupsCard.messages.updateSuccess'));
         },
         onError: (err) => {
-            toast.error(t('questionGroupsCard.messages.updateError'));
+            toastMessages.error(t('questionGroupsCard.messages.updateError'));
             console.error(err);
         }
     });
@@ -42,10 +42,10 @@ export const useQuestionGroups = (params: any) => {
         mutationFn: (id: string | number) => questionGroupService.deleteQuestionGroup(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
-            toast.success(t('questionGroupsCard.messages.deleteSuccess'));
+            toastMessages.success(t('questionGroupsCard.messages.deleteSuccess'));
         },
         onError: (err) => {
-            toast.error(t('questionGroupsCard.messages.deleteError'));
+            toastMessages.error(t('questionGroupsCard.messages.deleteError'));
             console.error(err);
         }
     });

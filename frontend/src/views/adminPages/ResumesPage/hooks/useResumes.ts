@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
-import { toast } from 'react-toastify';
+import toastMessages from '../../../../utils/toastMessages';
 
 export const useResumes = (params: any) => {
     const queryClient = useQueryClient();
@@ -18,10 +18,10 @@ export const useResumes = (params: any) => {
         mutationFn: (data: any) => adminManagementService.createResume(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-resumes'] });
-            toast.success('Resume added successfully');
+            toastMessages.success('Resume added successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while adding the resume');
+            toastMessages.error('An error occurred while adding the resume');
             console.error(err);
         }
     });
@@ -30,10 +30,10 @@ export const useResumes = (params: any) => {
         mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateResume(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-resumes'] });
-            toast.success('Resume updated successfully');
+            toastMessages.success('Resume updated successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while updating the resume');
+            toastMessages.error('An error occurred while updating the resume');
             console.error(err);
         }
     });
@@ -42,10 +42,10 @@ export const useResumes = (params: any) => {
         mutationFn: (id: any) => adminManagementService.deleteResume(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-resumes'] });
-            toast.success('Resume deleted successfully');
+            toastMessages.success('Resume deleted successfully');
         },
         onError: (err: any) => {
-            toast.error('An error occurred while deleting the resume');
+            toastMessages.error('An error occurred while deleting the resume');
             console.error(err);
         }
     });
