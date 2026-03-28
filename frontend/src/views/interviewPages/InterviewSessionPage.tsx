@@ -9,7 +9,7 @@ import {
 } from "@livekit/components-react";
 
 import InterviewAgentView from "../../components/Features/InterviewAi/InterviewAgentView";
-import { AgentAudioVisualizerAura, AuraShader, StartAudioButton } from "../../components/Features/AgentsUi";
+import { AgentAudioVisualizerAura, AuraShader } from "../../components/Features/AgentsUi";
 import Button from "@mui/material/Button";
 
 import interviewService from "../../services/interviewService";
@@ -239,17 +239,17 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         </header>
 
         <section className="relative h-[72vh] min-h-[500px] overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70 shadow-2xl shadow-black/30">
-          <LiveKitRoom
-            token={participantToken}
-            serverUrl={liveKitUrl}
-            connect={connectRoom}
-            video={false}
-            audio={true}
-            data-lk-theme="default"
-            onDisconnected={connectRoom ? handleEndInterview : undefined}
-            className="h-full"
-          >
-            {connectRoom ? (
+          {connectRoom && participantToken ? (
+            <LiveKitRoom
+              token={participantToken}
+              serverUrl={liveKitUrl}
+              connect={connectRoom}
+              video={false}
+              audio={true}
+              data-lk-theme="default"
+              onDisconnected={handleEndInterview}
+              className="h-full"
+            >
               <InterviewAgentView
                 onDisconnect={handleEndInterview}
                 sessionInfo={{
@@ -257,72 +257,67 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                   candidateName: session?.candidateName,
                 }}
               />
-            ) : (
-              <div className="relative flex h-full items-center justify-center px-6">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.22),transparent_52%)]" />
-                <div className="relative flex w-full max-w-lg flex-col items-center gap-6 text-center">
-                  <AgentAudioVisualizerAura
-                    size="md"
-                    state="listening"
-                    isStatic={true}
-                    className="h-[220px] w-[220px] md:h-[280px] md:w-[280px]"
-                  />
-                  <div className="space-y-2">
-                    <h2 className="text-2xl font-semibold tracking-tight">
-                      {isJoinable
-                        ? (normalizedRole === "jobseeker"
-                          ? t("readyBody", { defaultValue: "Press start to connect. Camera and microphone will only turn on when you select them on the toolbar." })
-                          : t("readyTitle", { defaultValue: "Ready to start interview" }))
-                        : t("sessionNotJoinable", { defaultValue: "This interview session has already ended or been cancelled." })}
-                    </h2>
-                    {error && (
-                      <p className="text-sm text-rose-300">{error}</p>
-                    )}
-                    <p className="text-sm text-slate-300">
-                      {isJoinable
-                        ? t("readyBody", {
-                            defaultValue:
-                              "Click start to join the interview room with camera and microphone.",
-                          })
-                        : t("sessionNotJoinableBody", {
-                            defaultValue:
-                              "This interview session has already ended or been cancelled.",
-                          })}
-                    </p>
-                  </div>
-                  <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
-                    <StartAudioButton
-                      label={t("controls.enableAudio", { defaultValue: "Enable audio" })}
-                      variant="outline"
-                      className="sm:min-w-[170px]"
-                    />
-                    {isJoinable ? (
-                      <Button
-                        variant="contained"
-                        onClick={handleStartInterview}
-                        disabled={starting}
-                        className="bg-cyan-500 px-8 py-2.5 font-bold shadow-xl shadow-cyan-500/20 hover:bg-cyan-600 sm:min-w-[200px]"
-                      >
-                        {starting
-                          ? t("loading", { defaultValue: "Connecting..." })
-                          : t("startInterview", { defaultValue: "Start interview" })}
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="contained"
-                        onClick={() => navigate.push("/")}
-                        className="bg-slate-700 px-8 py-2.5 font-bold shadow-xl shadow-slate-900/40 hover:bg-slate-600 sm:min-w-[200px]"
-                      >
-                        {t("common:actions.backHome", { defaultValue: "Back home" })}
-                      </Button>
-                    )}
-                  </div>
+              <RoomAudioRenderer />
+              <ConnectionStateToast />
+            </LiveKitRoom>
+          ) : (
+            <div className="relative flex h-full items-center justify-center px-6">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.22),transparent_52%)]" />
+              <div className="relative flex w-full max-w-lg flex-col items-center gap-6 text-center">
+                <AgentAudioVisualizerAura
+                  size="md"
+                  state="listening"
+                  isStatic={true}
+                  className="h-[220px] w-[220px] md:h-[280px] md:w-[280px]"
+                />
+                <div className="space-y-2">
+                  <h2 className="text-2xl font-semibold tracking-tight">
+                    {isJoinable
+                      ? (normalizedRole === "jobseeker"
+                        ? t("readyBody", { defaultValue: "Press start to connect. Camera and microphone will only turn on when you select them on the toolbar." })
+                        : t("readyTitle", { defaultValue: "Ready to start interview" }))
+                      : t("sessionNotJoinable", { defaultValue: "This interview session has already ended or been cancelled." })}
+                  </h2>
+                  {error && (
+                    <p className="text-sm text-rose-300">{error}</p>
+                  )}
+                  <p className="text-sm text-slate-300">
+                    {isJoinable
+                      ? t("readyBody", {
+                          defaultValue:
+                            "Click start to join the interview room with camera and microphone.",
+                        })
+                      : t("sessionNotJoinableBody", {
+                          defaultValue:
+                            "This interview session has already ended or been cancelled.",
+                        })}
+                  </p>
+                </div>
+                <div className="flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
+                  {isJoinable ? (
+                    <Button
+                      variant="contained"
+                      onClick={handleStartInterview}
+                      disabled={starting}
+                      className="bg-cyan-500 px-8 py-2.5 font-bold shadow-xl shadow-cyan-500/20 hover:bg-cyan-600 sm:min-w-[200px]"
+                    >
+                      {starting
+                        ? t("loading", { defaultValue: "Connecting..." })
+                        : t("startInterview", { defaultValue: "Start interview" })}
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      onClick={() => navigate.push("/")}
+                      className="bg-slate-700 px-8 py-2.5 font-bold shadow-xl shadow-slate-900/40 hover:bg-slate-600 sm:min-w-[200px]"
+                    >
+                      {t("common:actions.backHome", { defaultValue: "Back home" })}
+                    </Button>
+                  )}
                 </div>
               </div>
-            )}
-            <RoomAudioRenderer />
-            <ConnectionStateToast />
-          </LiveKitRoom>
+            </div>
+          )}
         </section>
 
         {formattedSchedule && (
