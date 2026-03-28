@@ -58,7 +58,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
   const columns = React.useMemo<ColumnDef<any>[]>(() => [
     {
       accessorKey: 'fullName',
-      header: t('appliedResume.table.candidate') as string,
+      header: t('appliedResume.table.profileName') as string,
       enableSorting: true,
       cell: (info) => (
         <Box>
@@ -84,18 +84,18 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     },
     {
       accessorKey: 'jobName',
-      header: t('appliedResume.table.jobName') as string,
+      header: t('appliedResume.table.appliedPosition') as string,
       enableSorting: true,
     },
     {
       accessorKey: 'createAt',
-      header: t('appliedResume.table.applyDate') as string,
+      header: t('appliedResume.table.appliedDate') as string,
       enableSorting: true,
       cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
     },
     {
       accessorKey: 'type',
-      header: t('appliedResume.table.resumeType') as string,
+      header: t('appliedResume.table.profileType') as string,
       cell: (info) => info.getValue() === CV_TYPES.cvWebsite
         ? t('appliedResume.table.onlineResume')
         : t('appliedResume.table.attachedResume'),

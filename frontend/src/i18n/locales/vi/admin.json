@@ -668,7 +668,10 @@
     "breadcrumb": "Đường dẫn",
     "table": {
       "noData": "Không có dữ liệu",
-      "loading": "Đang tải dữ liệu..."
+      "loading": "Đang tải dữ liệu...",
+      "sortTooltip": "Nhấn để sắp xếp",
+      "ascTooltip": "Sắp xếp tăng dần",
+      "descTooltip": "Sắp xếp giảm dần"
     },
     "status": {
       "completed": "Đã hoàn thành",

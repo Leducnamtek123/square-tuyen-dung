@@ -46,7 +46,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
   const columns = React.useMemo<ColumnDef<any>[]>(() => [
     {
       accessorKey: 'resume.title',
-      header: (t('savedResumeTable.title.onlineattachedresume') || 'Resume') as string,
+      header: (t('savedResumeTable.label.resumeTitle') || 'Resume') as string,
       enableSorting: true,
       cell: (info) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -71,39 +71,39 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
     },
     {
       accessorKey: 'resume.userDict.fullName',
-      header: (t('savedResumeTable.title.candidateName') || 'Candidate') as string,
+      header: (t('savedResumeTable.label.candidateName') || 'Candidate') as string,
       enableSorting: true,
     },
     {
       id: 'salary',
-      header: (t('savedResumeTable.title.expectedSalary') || 'Salary') as string,
+      header: (t('savedResumeTable.label.salary') || 'Salary') as string,
       cell: (info) => salaryString(info.row.original.resume?.salaryMin, info.row.original.resume?.salaryMax) || (
         <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common.notUpdated')}</span>
       ),
     },
     {
       accessorKey: 'resume.experience',
-      header: (t('savedResumeTable.title.experience') || 'Experience') as string,
+      header: (t('savedResumeTable.label.experience') || 'Experience') as string,
       cell: (info) => tConfig((allConfig as any)?.experienceDict?.[info.getValue() as string]) || (
         <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common.notUpdated')}</span>
       ),
     },
     {
       accessorKey: 'resume.city',
-      header: (t('savedResumeTable.title.location') || 'Location') as string,
+      header: (t('savedResumeTable.label.cityProvince') || 'Location') as string,
       cell: (info) => tConfig((allConfig as any)?.cityDict?.[info.getValue() as string]) || (
         <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common.notUpdated')}</span>
       ),
     },
     {
       accessorKey: 'createAt',
-      header: (t('savedResumeTable.title.savedAt') || 'Saved At') as string,
+      header: (t('savedResumeTable.label.savedDate') || 'Saved At') as string,
       enableSorting: true,
       cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
     },
     {
       id: 'actions',
-      header: (t('savedResumeTable.title.actions') || 'Actions') as string,
+      header: (t('savedResumeTable.label.actions') || 'Actions') as string,
       meta: { align: 'right' },
       cell: (info) => (
         <Stack direction="row" spacing={1} justifyContent="flex-end">

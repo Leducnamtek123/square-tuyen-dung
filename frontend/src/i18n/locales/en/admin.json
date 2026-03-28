@@ -668,7 +668,10 @@
     "breadcrumb": "Breadcrumb",
     "table": {
       "noData": "No data available",
-      "loading": "Loading data..."
+      "loading": "Loading data...",
+      "sortTooltip": "Click to sort",
+      "ascTooltip": "Sort ascending",
+      "descTooltip": "Sort descending"
     },
     "status": {
       "completed": "Completed",
