@@ -6,7 +6,9 @@ import {
   LiveKitRoom,
   RoomAudioRenderer,
   ConnectionStateToast,
+  useRoomContext,
 } from "@livekit/components-react";
+import { Room } from "livekit-client";
 
 import InterviewAgentView from "../../components/Features/InterviewAi/InterviewAgentView";
 import { AgentAudioVisualizerAura, AuraShader } from "../../components/Features/AgentsUi";
@@ -76,6 +78,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
   const [session, setSession] = useState<any>(null);
   const [inviteTokenRef, setInviteTokenRef] = useState<string>("");
 
+  const interviewRoom = useMemo(() => new Room(), []);
   const liveKitUrl = serverUrl || getSafeLiveKitUrl();
   const roomName = session?.room_name || session?.roomName;
 
@@ -263,6 +266,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         <section className="relative h-[72vh] min-h-[500px] overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70 shadow-2xl shadow-black/30">
           {connectRoom && participantToken ? (
             <LiveKitRoom
+              room={interviewRoom}
               token={participantToken}
               serverUrl={liveKitUrl}
               connect={connectRoom}
@@ -272,15 +276,13 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
               onDisconnected={handleEndInterview}
               className="h-full"
             >
-              <InterviewAgentView
+              <InterviewRoomContent
                 onDisconnect={handleEndInterview}
                 sessionInfo={{
                   jobName: session?.jobName,
                   candidateName: session?.candidateName,
                 }}
               />
-              <RoomAudioRenderer />
-              <ConnectionStateToast />
             </LiveKitRoom>
           ) : (
             <div className="relative flex h-full items-center justify-center px-6">
@@ -349,6 +351,23 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         )}
       </div>
     </main>
+  );
+};
+
+const InterviewRoomContent = ({ onDisconnect, sessionInfo }: { onDisconnect: () => void, sessionInfo: any }) => {
+  const room = useRoomContext();
+  
+  if (!room) return null;
+
+  return (
+    <>
+      <InterviewAgentView
+        onDisconnect={onDisconnect}
+        sessionInfo={sessionInfo}
+      />
+      <RoomAudioRenderer />
+      <ConnectionStateToast />
+    </>
   );
 };
 
