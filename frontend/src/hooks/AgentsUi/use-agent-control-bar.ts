@@ -24,7 +24,7 @@ const trackSourceToProtocol = (source: Track.Source): number => {
 };
 
 /**
- * Hook to check if the local participant has permissions to publish a specific source.
+ * Hook to manage publishing permissions (unified access to MIC/CAM/SCREEN permissions).
  */
 export function usePublishPermissions() {
   const localPermissions = useLocalParticipantPermissions();
@@ -32,10 +32,11 @@ export function usePublishPermissions() {
   const canPublishSource = useCallback(
     (source: Track.Source): boolean => {
       if (!localPermissions) return false;
+      const protocolSource = trackSourceToProtocol(source);
       return (
         !!localPermissions.canPublish &&
         (localPermissions.canPublishSources.length === 0 ||
-          localPermissions.canPublishSources.includes(trackSourceToProtocol(source)))
+          localPermissions.canPublishSources.includes(protocolSource))
       );
     },
     [localPermissions]
@@ -66,107 +67,49 @@ export function useInputControls(
     room?: any;
   } = {}
 ) {
-  console.log("useInputControls: starting hook execution");
-  
-  let localParticipantHook: any;
-  try {
-    localParticipantHook = useLocalParticipant({ room });
-    console.log("useInputControls: useLocalParticipant hook successful, output exists:", !!localParticipantHook);
-  } catch (e) {
-    console.error("useInputControls: useLocalParticipant hook failed!", e);
-  }
+  // 1. Core Hooks
+  const localParticipantHook = useLocalParticipant({ room });
+  const { microphoneTrack } = localParticipantHook || {};
 
-  const { localParticipant, microphoneTrack } = localParticipantHook ?? {};
-
+  // 2. Error Handlers
   const handleMicError = useCallback(
-    (error: unknown) => {
-      console.log("useInputControls: handleMicError triggered", error);
-      onDeviceError?.({ source: Track.Source.Microphone, error });
-    },
+    (error: unknown) => onDeviceError?.({ source: Track.Source.Microphone, error }),
+    [onDeviceError]
+  );
+  const handleCamError = useCallback(
+    (error: unknown) => onDeviceError?.({ source: Track.Source.Camera, error }),
+    [onDeviceError]
+  );
+  const handleScreenError = useCallback(
+    (error: unknown) => onDeviceError?.({ source: Track.Source.ScreenShare, error }),
     [onDeviceError]
   );
 
+  // 3. Memoized Hook Options
   const microphoneToggleOptions = useMemo(
-    () => ({
-      source: Track.Source.Microphone as any,
-      onDeviceError: handleMicError,
-      room,
-    }),
+    () => ({ source: Track.Source.Microphone as any, onDeviceError: handleMicError, room }),
     [handleMicError, room]
   );
-
-  let microphoneToggle: any;
-  try {
-    microphoneToggle = useTrackToggle(microphoneToggleOptions);
-    console.log("useInputControls: useTrackToggle (mic) hook successful, type of toggle:", typeof microphoneToggle?.toggle);
-  } catch (e) {
-    console.error("useInputControls: useTrackToggle (mic) hook failed!", e);
-  }
-
-  const handleCamError = useCallback(
-    (error: unknown) => {
-      console.log("useInputControls: handleCamError triggered", error);
-      onDeviceError?.({ source: Track.Source.Camera, error });
-    },
-    [onDeviceError]
-  );
-
   const cameraToggleOptions = useMemo(
-    () => ({
-      source: Track.Source.Camera as any,
-      onDeviceError: handleCamError,
-      room,
-    }),
+    () => ({ source: Track.Source.Camera as any, onDeviceError: handleCamError, room }),
     [handleCamError, room]
   );
-
-  let cameraToggle: any;
-  try {
-    cameraToggle = useTrackToggle(cameraToggleOptions);
-    console.log("useInputControls: useTrackToggle (cam) hook successful, type of toggle:", typeof cameraToggle?.toggle);
-  } catch (e) {
-    console.error("useInputControls: useTrackToggle (cam) hook failed!", e);
-  }
-
-  const handleScreenError = useCallback(
-    (error: unknown) => {
-      console.log("useInputControls: handleScreenError triggered", error);
-      onDeviceError?.({ source: Track.Source.ScreenShare, error });
-    },
-    [onDeviceError]
-  );
-
   const screenShareToggleOptions = useMemo(
-    () => ({
-      source: Track.Source.ScreenShare as any,
-      onDeviceError: handleScreenError,
-      room,
-    }),
+    () => ({ source: Track.Source.ScreenShare as any, onDeviceError: handleScreenError, room }),
     [handleScreenError, room]
   );
-
-  let screenShareToggle: any;
-  try {
-    screenShareToggle = useTrackToggle(screenShareToggleOptions);
-    console.log("useInputControls: useTrackToggle (screen) hook successful");
-  } catch (e) {
-    console.error("useInputControls: useTrackToggle (screen) hook failed!", e);
-  }
-
   const persistentChoicesOptions = useMemo(
     () => ({ preventSave: !saveUserChoices }),
     [saveUserChoices]
   );
 
-  let persistentChoices: any;
-  try {
-    console.log("useInputControls: calling usePersistentUserChoices");
-    persistentChoices = usePersistentUserChoices(persistentChoicesOptions);
-    console.log("useInputControls: usePersistentUserChoices successful, output exists:", !!persistentChoices);
-  } catch (e) {
-    console.error("useInputControls: usePersistentUserChoices failed!", e);
-  }
+  // 4. LiveKit Interaction Hooks
+  const microphoneToggle = useTrackToggle(microphoneToggleOptions);
+  const cameraToggle = useTrackToggle(cameraToggleOptions);
+  const screenShareToggle = useTrackToggle(screenShareToggleOptions);
+  const persistentChoices = usePersistentUserChoices(persistentChoicesOptions);
 
+  // 5. Destruction of persistent setters
   const {
     saveAudioInputEnabled,
     saveVideoInputEnabled,
@@ -174,16 +117,11 @@ export function useInputControls(
     saveVideoInputDeviceId,
   } = (persistentChoices || {}) as any;
 
-  console.log("useInputControls: destructured persistent setters, typeof saveAudioInputDeviceId:", typeof saveAudioInputDeviceId);
-
+  // 6. Callbacks
   const handleAudioDeviceChange = useCallback(
     (deviceId: string | null | undefined) => {
-      try {
-        if (typeof saveAudioInputDeviceId === 'function') {
-          saveAudioInputDeviceId(deviceId ?? 'default');
-        }
-      } catch (e) {
-        console.error("useInputControls: handleAudioDeviceChange failed", e);
+      if (typeof saveAudioInputDeviceId === 'function') {
+        saveAudioInputDeviceId(deviceId ?? 'default');
       }
     },
     [saveAudioInputDeviceId]
@@ -191,12 +129,8 @@ export function useInputControls(
 
   const handleVideoDeviceChange = useCallback(
     (deviceId: string | null | undefined) => {
-      try {
-        if (typeof saveVideoInputDeviceId === 'function') {
-          saveVideoInputDeviceId(deviceId ?? 'default');
-        }
-      } catch (e) {
-        console.error("useInputControls: handleVideoDeviceChange failed", e);
+      if (typeof saveVideoInputDeviceId === 'function') {
+        saveVideoInputDeviceId(deviceId ?? 'default');
       }
     },
     [saveVideoInputDeviceId]
@@ -204,19 +138,14 @@ export function useInputControls(
 
   const handleToggleCamera = useCallback(
     async (enabled: boolean) => {
-      console.log("useInputControls: handleToggleCamera", enabled);
-      try {
-        if (screenShareToggle?.enabled && typeof screenShareToggle?.toggle === 'function') {
-          await screenShareToggle.toggle(false);
+      if (screenShareToggle?.enabled && typeof screenShareToggle.toggle === 'function') {
+        await screenShareToggle.toggle(false);
+      }
+      if (typeof cameraToggle?.toggle === 'function') {
+        await cameraToggle.toggle(enabled);
+        if (typeof saveVideoInputEnabled === 'function') {
+          saveVideoInputEnabled(enabled);
         }
-        if (cameraToggle?.toggle && typeof cameraToggle?.toggle === 'function') {
-          await cameraToggle.toggle(enabled);
-          if (typeof saveVideoInputEnabled === 'function') {
-            saveVideoInputEnabled(!cameraToggle.enabled);
-          }
-        }
-      } catch (e) {
-        console.error("useInputControls: handleToggleCamera process failed", e);
       }
     },
     [cameraToggle, screenShareToggle, saveVideoInputEnabled]
@@ -224,16 +153,11 @@ export function useInputControls(
 
   const handleToggleMicrophone = useCallback(
     async (enabled: boolean) => {
-      console.log("useInputControls: handleToggleMicrophone", enabled);
-      try {
-        if (microphoneToggle?.toggle && typeof microphoneToggle?.toggle === 'function') {
-          await microphoneToggle.toggle(enabled);
-          if (typeof saveAudioInputEnabled === 'function') {
-            saveAudioInputEnabled(!microphoneToggle.enabled);
-          }
+      if (typeof microphoneToggle?.toggle === 'function') {
+        await microphoneToggle.toggle(enabled);
+        if (typeof saveAudioInputEnabled === 'function') {
+          saveAudioInputEnabled(enabled);
         }
-      } catch (e) {
-        console.error("useInputControls: handleToggleMicrophone process failed", e);
       }
     },
     [microphoneToggle, saveAudioInputEnabled]
@@ -241,62 +165,53 @@ export function useInputControls(
 
   const handleToggleScreenShare = useCallback(
     async (enabled: boolean) => {
-      console.log("useInputControls: handleToggleScreenShare", enabled);
-      try {
-        if (cameraToggle?.enabled && typeof cameraToggle?.toggle === 'function') {
-          await cameraToggle.toggle(false);
-        }
-        if (screenShareToggle?.toggle && typeof screenShareToggle?.toggle === 'function') {
-          await screenShareToggle.toggle(enabled);
-        }
-      } catch (e) {
-        console.error("useInputControls: handleToggleScreenShare process failed", e);
+      if (cameraToggle?.enabled && typeof cameraToggle.toggle === 'function') {
+        await cameraToggle.toggle(false);
+      }
+      if (typeof screenShareToggle?.toggle === 'function') {
+        await screenShareToggle.toggle(enabled);
       }
     },
     [cameraToggle, screenShareToggle]
   );
 
   const handleMicrophoneDeviceSelectError = useCallback(
-    (error: unknown) => {
-      console.log("useInputControls: microphone device select error", error);
-      onDeviceError?.({ source: Track.Source.Microphone, error });
-    },
+    (error: unknown) => onDeviceError?.({ source: Track.Source.Microphone, error }),
     [onDeviceError]
   );
 
   const handleCameraDeviceSelectError = useCallback(
-    (error: unknown) => {
-      console.log("useInputControls: camera device select error", error);
-      onDeviceError?.({ source: Track.Source.Camera, error });
-    },
+    (error: unknown) => onDeviceError?.({ source: Track.Source.Camera, error }),
     [onDeviceError]
   );
 
-  console.log("useInputControls: final memo creation");
-
+  // 7. Final Memoized Return
   return useMemo(
-    () => {
-      console.log("useInputControls: generating final memo object");
-      return {
-        microphoneTrack,
-        cameraToggle: {
-          ...cameraToggle,
-          toggle: handleToggleCamera,
-        },
-        microphoneToggle: {
-          ...microphoneToggle,
-          toggle: handleToggleMicrophone,
-        },
-        screenShareToggle: {
-          ...screenShareToggle,
-          toggle: handleToggleScreenShare,
-        },
-        handleAudioDeviceChange,
-        handleVideoDeviceChange,
-        handleMicrophoneDeviceSelectError,
-        handleCameraDeviceSelectError,
-      };
-    },
+    () => ({
+      microphoneTrack,
+      cameraToggle: {
+        ...cameraToggle,
+        enabled: cameraToggle?.enabled ?? false,
+        pending: cameraToggle?.pending ?? false,
+        toggle: handleToggleCamera,
+      },
+      microphoneToggle: {
+        ...microphoneToggle,
+        enabled: microphoneToggle?.enabled ?? false,
+        pending: microphoneToggle?.pending ?? false,
+        toggle: handleToggleMicrophone,
+      },
+      screenShareToggle: {
+        ...screenShareToggle,
+        enabled: screenShareToggle?.enabled ?? false,
+        pending: screenShareToggle?.pending ?? false,
+        toggle: handleToggleScreenShare,
+      },
+      handleAudioDeviceChange,
+      handleVideoDeviceChange,
+      handleMicrophoneDeviceSelectError,
+      handleCameraDeviceSelectError,
+    }),
     [
       microphoneTrack,
       cameraToggle,
