@@ -51,12 +51,15 @@ export function useInputControls(
     onDeviceError?: DeviceErrorHandler;
   } = {}
 ) {
-  const { microphoneTrack } = useLocalParticipant();
+  console.log("useInputControls: starting hook execution");
+  const { localParticipant, microphoneTrack } = useLocalParticipant();
+  console.log("useInputControls: useLocalParticipant hook successful, identity:", localParticipant?.identity);
 
   const microphoneToggle = useTrackToggle({
     source: Track.Source.Microphone,
     onDeviceError: (error) => onDeviceError?.({ source: Track.Source.Microphone, error }),
   });
+  console.log("useInputControls: useTrackToggle (mic) hook successful");
 
   const cameraToggle = useTrackToggle({
     source: Track.Source.Camera,
@@ -68,12 +71,14 @@ export function useInputControls(
     onDeviceError: (error) => onDeviceError?.({ source: Track.Source.ScreenShare, error }),
   });
 
+  console.log("useInputControls: before usePersistentUserChoices");
   const {
     saveAudioInputEnabled,
     saveVideoInputEnabled,
     saveAudioInputDeviceId,
     saveVideoInputDeviceId,
   } = usePersistentUserChoices({ preventSave: !saveUserChoices });
+  console.log("useInputControls: after usePersistentUserChoices");
 
   const handleAudioDeviceChange = useCallback(
     (deviceId: string | null | undefined) => {

@@ -159,9 +159,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         });
       }
 
-      // Small delay to ensure state and DOM transitions are smooth
-      await new Promise(resolve => setTimeout(resolve, 100));
-
+      console.log("Starting interview with URL:", liveKitUrl, "and token exists:", !!participantToken);
       setConnectRoom(true);
     } catch (err: any) {
       setError(err?.message || t("errors.invalidSession", { defaultValue: "Cannot start interview. Please try again." }));
@@ -356,8 +354,12 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
 
 const InterviewRoomContent = ({ onDisconnect, sessionInfo }: { onDisconnect: () => void, sessionInfo: any }) => {
   const room = useRoomContext();
+  console.log("InterviewRoomContent rendering, room context exists:", !!room);
   
-  if (!room) return null;
+  if (!room) {
+    console.warn("Room context is NOT ready in InterviewRoomContent");
+    return null;
+  }
 
   return (
     <>

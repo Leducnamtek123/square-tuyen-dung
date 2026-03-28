@@ -27,11 +27,15 @@ interface InterviewAgentViewProps {
 
 const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewProps) => {
   const { t } = useTranslation("interview");
+  console.log("InterviewAgentView: starting render");
   const room = useRoomContext();
+  console.log("InterviewAgentView: room context", !!room);
   const agent = useAgent() as any;
+  console.log("InterviewAgentView: agent hook successful, state:", agent?.state);
   const state = agent?.state || 'connecting';
   const agentParticipant = agent?.agentParticipant;
   const { chatMessages } = useChat({ room });
+  console.log("InterviewAgentView: chat hook successful, messages:", chatMessages?.length);
   const [isChatOpen, setIsChatOpen] = useState(false);
   
   // Parse metadata for interview stage and progress
