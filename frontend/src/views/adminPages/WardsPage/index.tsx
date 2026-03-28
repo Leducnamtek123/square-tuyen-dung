@@ -6,13 +6,6 @@ import {
     Link,
     Button,
     Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    CircularProgress,
     IconButton,
     Tooltip,
     MenuItem,
@@ -20,10 +13,11 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogActions,
-    TablePagination
+    DialogActions
 } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
 
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -83,6 +77,48 @@ const WardsPage = () => {
         });
         return result;
     }, [districts]);
+
+    const columns = useMemo<ColumnDef<any>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: t('pages.wards.table.id') as string,
+            size: 80,
+        },
+        {
+            accessorKey: 'name',
+            header: t('pages.wards.table.wardName') as string,
+            cell: (info) => <Typography sx={{ fontWeight: 500 }}>{info.getValue() as string}</Typography>,
+        },
+        {
+            accessorKey: 'code',
+            header: t('pages.wards.table.wardCode') as string,
+            cell: (info) => info.getValue() || '---',
+        },
+        {
+            accessorKey: 'district',
+            header: t('pages.wards.table.districtName') as string,
+            cell: (info) => districtNameById[info.getValue() as string | number] || '---',
+        },
+        {
+            id: 'actions',
+            header: t('pages.wards.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                    <Tooltip title={t('pages.wards.table.edit')}>
+                        <IconButton size="small" color="primary" onClick={() => handleOpenEdit(info.row.original)}>
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.wards.table.delete')}>
+                        <IconButton size="small" color="error" onClick={() => handleOpenDelete(info.row.original)}>
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Box>
+            ),
+        },
+    ], [t, districtNameById]);
 
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
@@ -212,79 +248,22 @@ const WardsPage = () => {
                     </TextField>
                 </Box>
 
-                {isLoadingWards ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-                        <CircularProgress size={40} />
-                    </Box>
-                ) : (
-                    <>
-                        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-                            <Table sx={{ minWidth: 650 }}>
-                                <TableHead sx={{ bgcolor: 'grey.50' }}>
-                                    <TableRow>
-                                        <TableCell width={80}>{t('pages.wards.table.id')}</TableCell>
-                                        <TableCell>{t('pages.wards.table.wardName')}</TableCell>
-                                        <TableCell>{t('pages.wards.table.code')}</TableCell>
-                                        <TableCell>{t('pages.wards.table.districtName')}</TableCell>
-                                        <TableCell align="right">{t('pages.wards.table.actions')}</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {wards?.map((row: any) => (
-                                        <TableRow key={row.id} hover>
-                                            <TableCell>{row.id}</TableCell>
-                                            <TableCell sx={{ fontWeight: 500 }}>{row.name}</TableCell>
-                                            <TableCell>{row.code || '---'}</TableCell>
-                                            <TableCell>{districtNameById[row.district] || '---'}</TableCell>
-                                            <TableCell align="right">
-                                                <Tooltip title={t('pages.wards.table.edit')}>
-                                                    <IconButton size="small" color="primary" onClick={() => handleOpenEdit(row)}>
-                                                        <EditIcon fontSize="small" />
-                                                    </IconButton>
-                                                </Tooltip>
-                                                <Tooltip title={t('pages.wards.table.delete')}>
-                                                    <IconButton size="small" color="error" onClick={() => handleOpenDelete(row)}>
-                                                        <DeleteIcon fontSize="small" />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                    {(!wards || wards.length === 0) && selectedDistrict && (
-                                        <TableRow>
-                                            <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
-                                                {t('pages.wards.table.noData')}
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                    {!selectedDistrict && (
-                                        <TableRow>
-                                            <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
-                                                {t('pages.wards.table.noDistrictSelected')}
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <TablePagination
-                            rowsPerPageOptions={[5, 10, 25]}
-                            component="div"
-                            count={wardsData?.count || 0}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onPageChange={(e, v) => setPage(v)}
-                            onRowsPerPageChange={(e) => {
-                                setRowsPerPage(parseInt(e.target.value, 10));
-                                setPage(0);
-                            }}
-                            labelRowsPerPage={t('common.pagination.rowsPerPage')}
-                            labelDisplayedRows={({ from, to, count }) =>
-                                t('common.pagination.displayedRows', { from, to, count })
-                            }
-                        />
-                    </>
-                )}
+
+                <DataTable
+                    columns={columns}
+                    data={wards || []}
+                    isLoading={isLoadingWards}
+                    rowCount={wardsData?.count || 0}
+                    pagination={{
+                        pageIndex: page,
+                        pageSize: rowsPerPage,
+                    }}
+                    onPaginationChange={(pagination) => {
+                        setPage(pagination.pageIndex);
+                        setRowsPerPage(pagination.pageSize);
+                    }}
+                    emptyMessage={!selectedDistrict ? t('pages.wards.table.noDistrictSelected') : t('pages.wards.table.noData')}
+                />
             </Paper>
 
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="xs">

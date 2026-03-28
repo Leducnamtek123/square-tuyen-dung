@@ -5,7 +5,8 @@ import { useParams } from 'next/navigation';
 
 import { useTranslation } from "react-i18next";
 
-import { Box, Divider, Fab, IconButton, Rating, Skeleton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Divider, Fab, IconButton, Rating, Skeleton, Stack, Typography } from "@mui/material";
+import DataTable from '../../../../components/Common/DataTable';
 
 import AddIcon from '@mui/icons-material/Add';
 
@@ -390,237 +391,63 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
             <Box>
 
-              {languageSkills.length === 0 ? (
-
-                <EmptyCard
-
-                  content={t('jobSeeker:profile.messages.noLanguageData')}
-
-                  onClick={handleShowAdd}
-
-                />
-
-              ) : (
-
-                <TableContainer
-
-                  sx={{
-
-                    boxShadow: 'none',
-
-                    bgcolor: 'transparent',
-
-                  }}
-
-                >
-
-                  <Table aria-label={t("jobSeeker:profile.aria.languageSkillsTable")} size="medium">
-
-                    <TableHead>
-
-                      <TableRow>
-
-                        <TableCell
-
-                          align="left"
-
-                          sx={{
-
-                            color: 'text.secondary',
-
-                            fontWeight: 600,
-
-                            fontSize: '0.875rem',
-
-                            borderBottom: '2px solid',
-
-                            borderColor: 'primary.light',
-
-                          }}
-
-                        >
-
-                          {t('jobSeeker:profile.fields.language')}
-
-                        </TableCell>
-
-                        <TableCell
-
-                          align="left"
-
-                          sx={{
-
-                            color: 'text.secondary',
-
-                            fontWeight: 600,
-
-                            fontSize: '0.875rem',
-
-                            borderBottom: '2px solid',
-
-                            borderColor: 'primary.light',
-
-                          }}
-
-                        >
-
-                          {t('jobSeeker:profile.fields.level')}
-
-                        </TableCell>
-
-                        <TableCell
-
-                          align="right"
-
-                          sx={{
-
-                            color: 'text.secondary',
-
-                            fontWeight: 600,
-
-                            fontSize: '0.875rem',
-
-                            borderBottom: '2px solid',
-
-                            borderColor: 'primary.light',
-
-                          }}
-
-                        >
-
-                          {t('jobSeeker:profile.fields.actions')}
-
-                        </TableCell>
-
-                      </TableRow>
-
-                    </TableHead>
-
-                    <TableBody>
-
-                      {languageSkills.map((value) => (
-
-                        <TableRow
-
-                          key={value.id}
-
-                          sx={{
-
-                            '&:last-child td, &:last-child th': { border: 0 },
-
-                            '&:hover': {
-
-                              bgcolor: 'primary.background',
-
-                            },
-
-                            transition: 'background-color 0.2s ease-in-out',
-
-                          }}
-
-                        >
-
-                          <TableCell
-
-                            align="left"
-
+                <DataTable
+                  columns={[
+                    {
+                      header: t('jobSeeker:profile.fields.language'),
+                      accessorKey: 'language',
+                      cell: (info) => tConfig((allConfig as any)?.languageDict?.[info.getValue() as string ?? '']),
+                    },
+                    {
+                      header: t('jobSeeker:profile.fields.level'),
+                      accessorKey: 'level',
+                      cell: (info) => (
+                        <Rating name="level-read-only" value={info.getValue() as number || 0} size="large" readOnly />
+                      ),
+                    },
+                    {
+                      header: t('jobSeeker:profile.fields.actions'),
+                      id: 'actions',
+                      meta: { align: 'right' },
+                      cell: (info) => (
+                        <Stack direction="row" spacing={1} justifyContent="flex-end">
+                          <IconButton
+                            size="small"
                             sx={{
-
-                              color: 'text.primary',
-
-                              fontWeight: 500,
-
-                              fontSize: '0.875rem',
-
+                              color: 'secondary.main',
+                              bgcolor: 'secondary.background',
+                              '&:hover': {
+                                bgcolor: 'secondary.light',
+                                color: 'white',
+                              },
                             }}
-
+                            onClick={() => handleShowUpdate(info.row.original.id)}
                           >
-
-                            {tConfig((allConfig as any)?.languageDict?.[value?.language ?? ''])}
-
-                          </TableCell>
-
-                          <TableCell align="left">
-
-                            <Rating name="level-read-only" value={value?.level || 0} size="large" readOnly />
-
-                          </TableCell>
-
-                          <TableCell align="right">
-
-                            <Stack direction="row" spacing={1} justifyContent="flex-end">
-
-                              <IconButton
-
-                                size="small"
-
-                                sx={{
-
-                                  color: 'secondary.main',
-
-                                  bgcolor: 'secondary.background',
-
-                                  '&:hover': {
-
-                                    bgcolor: 'secondary.light',
-
-                                    color: 'white',
-
-                                  },
-
-                                }}
-
-                                onClick={() => handleShowUpdate(value.id)}
-
-                              >
-
-                                <ModeEditOutlineOutlinedIcon fontSize="small" />
-
-                              </IconButton>
-
-                              <IconButton
-
-                                size="small"
-
-                                sx={{
-
-                                  color: 'error.main',
-
-                                  bgcolor: 'error.background',
-
-                                  '&:hover': {
-
-                                    bgcolor: 'error.main',
-
-                                    color: 'white',
-
-                                  },
-
-                                }}
-
-                                onClick={() => handleDeleteLanguageSkill(value.id)}
-
-                              >
-
-                                <DeleteOutlineOutlinedIcon fontSize="small" />
-
-                              </IconButton>
-
-                            </Stack>
-
-                          </TableCell>
-
-                        </TableRow>
-
-                      ))}
-
-                    </TableBody>
-
-                  </Table>
-
-                </TableContainer>
-
-              )}
+                            <ModeEditOutlineOutlinedIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            sx={{
+                              color: 'error.main',
+                              bgcolor: 'error.background',
+                              '&:hover': {
+                                bgcolor: 'error.main',
+                                color: 'white',
+                              },
+                            }}
+                            onClick={() => handleDeleteLanguageSkill(info.row.original.id)}
+                          >
+                            <DeleteOutlineOutlinedIcon fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                      ),
+                    },
+                  ]}
+                  data={languageSkills}
+                  isLoading={isLoadingLanguageSkills}
+                  hidePagination
+                  emptyMessage={t('jobSeeker:profile.messages.noLanguageData')}
+                />
 
             </Box>
 

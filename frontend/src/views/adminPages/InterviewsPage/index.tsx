@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Card, CardHeader, CardContent, Typography, TablePagination } from "@mui/material";
+import { Box, Card, CardHeader, CardContent, Typography, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
@@ -7,14 +7,23 @@ import { transformInterviewSession } from '../../../utils/transformers';
 import InterviewTable from './components/InterviewTable';
 import { useDeleteInterview, useUpdateInterviewStatus, useInterviews } from './hooks/useInterviews';
 
+import { SortingState, RowSelectionState } from '@tanstack/react-table';
+
 const InterviewsPage = () => {
     const { t } = useTranslation(['interview', 'admin']);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [sorting, setSorting] = useState<SortingState>([]);
+    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+    const ordering = sorting.length > 0 
+        ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}`
+        : undefined;
 
     const { data: interviewsData, isLoading } = useInterviews({
         page: page + 1,
         pageSize: rowsPerPage,
+        ordering,
     }) as any;
 
     const interviews = ((interviewsData as any)?.results || []).map(transformInterviewSession);
@@ -53,25 +62,45 @@ const InterviewsPage = () => {
             <Card>
                 <CardHeader title={t('interviewAdminPage.cardTitle', { ns: 'interview' })} />
                 <CardContent>
+                    {Object.keys(rowSelection).length > 0 && (
+                        <Box sx={{ mb: 2, p: 2, bgcolor: 'primary.light', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Typography variant="subtitle2" color="primary.contrastText">
+                                {t('pages.interviews.bulkSelect.selectedCount', { ns: 'admin', count: Object.keys(rowSelection).length })}
+                            </Typography>
+                            <Button 
+                                variant="contained" 
+                                color="error" 
+                                size="small"
+                                onClick={() => {
+                                    if (window.confirm(t('pages.interviews.bulkSelect.deleteConfirm', { ns: 'admin' }))) {
+                                        // Handle bulk delete here
+                                        console.log('Bulk delete interviews:', Object.keys(rowSelection));
+                                    }
+                                }}
+                            >
+                                {t('pages.interviews.bulkSelect.deleteBtn', { ns: 'admin' })}
+                            </Button>
+                        </Box>
+                    )}
                     <InterviewTable
                         interviews={interviews}
                         loading={isLoading}
+                        rowCount={(interviewsData as any)?.count || 0}
+                        pagination={{
+                            pageIndex: page,
+                            pageSize: rowsPerPage,
+                        }}
+                        onPaginationChange={(pagination) => {
+                            setPage(pagination.pageIndex);
+                            setRowsPerPage(pagination.pageSize);
+                        }}
+                        sorting={sorting}
+                        onSortingChange={setSorting}
+                        rowSelection={rowSelection}
+                        onRowSelectionChange={setRowSelection}
                         onView={handleViewDetail}
                         onDelete={handleDelete}
                         onUpdateStatus={handleUpdateStatus}
-                    />
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
-                        component="div"
-                        count={(interviewsData as any)?.count || 0}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        labelRowsPerPage={t('common.pagination.rowsPerPage', { ns: 'admin' })}
-                        labelDisplayedRows={({ from, to, count }) => 
-                            t('common.pagination.displayedRows', { ns: 'admin', from, to, count })
-                        }
                     />
                 </CardContent>
             </Card>

@@ -558,15 +558,17 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                     isLoading={isLoading}
 
-                    count={typeof (data as any)?.count === 'number' ? (data as any).count : transformedData.length}
+                    rowCount={typeof (data as any)?.count === 'number' ? (data as any).count : transformedData.length}
 
-                    page={page}
+                    pagination={{
+                        pageIndex: page,
+                        pageSize: rowsPerPage,
+                    }}
 
-                    rowsPerPage={rowsPerPage}
-
-                    onPageChange={handleChangePage}
-
-                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    onPaginationChange={(pagination) => {
+                        setPage(pagination.pageIndex);
+                        setRowsPerPage(pagination.pageSize);
+                    }}
 
                 />
 

@@ -25,6 +25,8 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
 
 const AdminChatPage = () => {
   const { t } = useTranslation('admin');
@@ -161,133 +163,104 @@ const AdminChatPage = () => {
           />
         </Box>
 
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-            <CircularProgress />
-          </Box>
-        ) : (
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell>#</TableCell>
-                <TableCell>{t('chat.table.candidate')}</TableCell>
-                <TableCell>{t('chat.table.employer')}</TableCell>
-                <TableCell>{t('chat.table.lastMessage')}</TableCell>
-                <TableCell>{t('chat.table.status')}</TableCell>
-                <TableCell>{t('chat.table.time')}</TableCell>
-                <TableCell align="right">{t('chat.table.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={7} align="center">
-                    <Box sx={{ py: 4 }}>
-                      <ChatBubbleOutlineIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 1 }} />
-                      <Typography color="text.secondary">
-                        {conversations.length === 0
-                          ? t('chat.empty.noConversations')
-                          : t('chat.empty.noResults')}
-                      </Typography>
+        <DataTable
+          columns={[
+            {
+              header: '#',
+              id: 'index',
+              size: 50,
+              cell: (info: any) => info.row.index + 1,
+            },
+            {
+              header: t('chat.table.candidate'),
+              accessorKey: 'jobSeekerName',
+              cell: (info: any) => {
+                const conv = info.row.original;
+                const name = conv.jobSeekerName || conv.jobSeeker?.fullName || 'N/A';
+                return (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Avatar src={conv.jobSeekerAvatar} sx={{ width: 32, height: 32, fontSize: 12 }}>
+                      {name.charAt(0)}
+                    </Avatar>
+                    <Box>
+                      <Typography variant="body2" fontWeight={600}>{name}</Typography>
+                      <Typography variant="caption" color="text.secondary">{conv.jobSeekerEmail || ''}</Typography>
                     </Box>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filtered.map((conv: any, index: number) => {
-                  const jobSeekerName =
-                    conv.jobSeekerName ||
-                    conv.jobSeeker?.fullName ||
-                    'N/A';
-                  const employerName =
-                    conv.employerName ||
-                    conv.companyName ||
-                    conv.employer?.companyName ||
-                    'N/A';
-                  const lastMessage =
-                    conv.lastMessage ||
-                    conv.latestMessage ||
-                    '—';
-                  const isActive = conv.isActive ?? true;
-                  const createdAt =
-                    conv.createAt ||
-                    conv.createdAt ||
-                    conv.updatedAt;
-
-                  return (
-                    <TableRow key={conv.id || index} hover>
-                      <TableCell>{index + 1}</TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Avatar
-                            src={conv.jobSeekerAvatar}
-                            sx={{ width: 32, height: 32, fontSize: 12 }}
-                          >
-                            {jobSeekerName.charAt(0)}
-                          </Avatar>
-                          <Box>
-                            <Typography variant="body2" fontWeight={600}>
-                              {jobSeekerName}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                              {conv.jobSeekerEmail || ''}
-                            </Typography>
-                          </Box>
-                        </Box>
-                      </TableCell>
-                      <TableCell>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Avatar
-                            src={conv.employerLogo}
-                            variant="rounded"
-                            sx={{ width: 32, height: 32, fontSize: 12 }}
-                          >
-                            {employerName.charAt(0)}
-                          </Avatar>
-                          <Typography variant="body2" fontWeight={600}>
-                            {employerName}
-                          </Typography>
-                        </Box>
-                      </TableCell>
-                      <TableCell
-                        sx={{
-                          maxWidth: 200,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        <Typography variant="body2" color="text.secondary">
-                          {typeof lastMessage === 'string'
-                            ? lastMessage
-                            : lastMessage?.content || '—'}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={isActive ? t('chat.status.active') : t('chat.status.ended')}
-                          size="small"
-                          color={isActive ? 'success' : 'default'}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        {createdAt
-                          ? new Date(createdAt).toLocaleDateString('vi-VN')
-                          : '—'}
-                      </TableCell>
-                      <TableCell align="right">
-                        <Tooltip title={t('chat.tooltip.viewDetail')}>
-                          <IconButton size="small" color="primary">
-                            <VisibilityIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        )}
+                  </Box>
+                );
+              },
+            },
+            {
+              header: t('chat.table.employer'),
+              accessorKey: 'employerName',
+              cell: (info: any) => {
+                const conv = info.row.original;
+                const name = conv.employerName || conv.companyName || conv.employer?.companyName || 'N/A';
+                return (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Avatar src={conv.employerLogo} variant="rounded" sx={{ width: 32, height: 32, fontSize: 12 }}>
+                      {name.charAt(0)}
+                    </Avatar>
+                    <Typography variant="body2" fontWeight={600}>{name}</Typography>
+                  </Box>
+                );
+              },
+            },
+            {
+              header: t('chat.table.lastMessage'),
+              accessorKey: 'lastMessage',
+              cell: (info: any) => {
+                const msg = info.getValue();
+                const content = typeof msg === 'string' ? msg : msg?.content || '—';
+                return (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+                  >
+                    {content}
+                  </Typography>
+                );
+              },
+            },
+            {
+              header: t('chat.table.status'),
+              accessorKey: 'isActive',
+              cell: (info: any) => (
+                <Chip
+                  label={info.getValue() !== false ? t('chat.status.active') : t('chat.status.ended')}
+                  size="small"
+                  color={info.getValue() !== false ? 'success' : 'default'}
+                />
+              ),
+            },
+            {
+              header: t('chat.table.time'),
+              accessorKey: 'createAt',
+              cell: (info: any) => (
+                info.getValue() 
+                  ? new Date(info.getValue() as string).toLocaleDateString('vi-VN') 
+                  : '—'
+              ),
+            },
+            {
+              header: '',
+              id: 'actions',
+              meta: { align: 'right' },
+              cell: () => (
+                <Tooltip title={t('chat.tooltip.viewDetail')}>
+                  <IconButton size="small" color="primary">
+                    <VisibilityIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              ),
+            },
+          ] as ColumnDef<any>[]}
+          data={filtered}
+          isLoading={isLoading}
+          hidePagination
+          emptyMessage={conversations.length === 0 ? t('chat.empty.noConversations') : t('chat.empty.noResults')}
+        />
       </Paper>
     </Box>
   );

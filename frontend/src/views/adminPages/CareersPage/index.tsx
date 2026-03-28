@@ -1,18 +1,21 @@
 import React, { useRef, useState } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Pagination, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Switch } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, FormControlLabel, Switch, Avatar, Chip, Tooltip, IconButton } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useCareers } from './hooks/useCareers';
-import CareerTable from './components/CareerTable';
 import ImageCropDialog from '../../../components/Common/ImageCropDialog';
 
 const CareersPage = () => {
     const { t } = useTranslation('admin');
     const PAGE_SIZE = 10;
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
 
     const [openDialog, setOpenDialog] = useState(false);
@@ -52,14 +55,14 @@ const CareersPage = () => {
         deleteCareer,
         isMutating
     } = useCareers({
-        page,
+        page: page + 1,
         pageSize: PAGE_SIZE,
         kw: searchTerm
     }) as any;
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-        setPage(1);
+        setPage(0);
     };
 
     const handleOpenAdd = () => {
@@ -138,6 +141,71 @@ const CareersPage = () => {
         }
     };
 
+    const columns = React.useMemo<ColumnDef<any>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: t('pages.careers.table.id') as string,
+            size: 80,
+        },
+        {
+            accessorKey: 'iconUrl',
+            header: t('pages.careers.table.symbol') as string,
+            cell: (info) => (
+                <Avatar
+                    src={info.getValue() as string}
+                    variant="rounded"
+                    sx={{ width: 32, height: 32, bgcolor: 'primary.light' }}
+                >
+                    {info.row.original.name.charAt(0)}
+                </Avatar>
+            ),
+            size: 80,
+        },
+        {
+            accessorKey: 'name',
+            header: t('pages.careers.table.careerName') as string,
+            cell: (info) => <Typography sx={{ fontWeight: 500 }}>{info.getValue() as string}</Typography>,
+        },
+        {
+            accessorKey: 'appIconName',
+            header: t('pages.careers.iconLabel') as string,
+            cell: (info) => info.getValue() || '---',
+        },
+        {
+            accessorKey: 'isHot',
+            header: t('pages.careers.keyCareerLabel') as string,
+            meta: { align: 'center' },
+            cell: (info) => info.getValue() ? (
+                <Chip label={t('pages.careers.keyCareerBadge')} size="small" color="warning" />
+            ) : '---',
+        },
+        {
+            accessorKey: 'jobPostTotal',
+            header: t('pages.careers.table.totalPosts') as string,
+            meta: { align: 'center' },
+            cell: (info) => info.getValue() || 0,
+        },
+        {
+            id: 'actions',
+            header: t('pages.careers.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                    <Tooltip title={t('pages.careers.table.edit')}>
+                        <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.careers.table.delete')}>
+                        <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Box>
+            ),
+        },
+    ], [t]);
+
     return (
         <Box>
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -182,29 +250,20 @@ const CareersPage = () => {
                     />
                 </Box>
 
-                {isLoading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-                        <CircularProgress size={40} />
-                    </Box>
-                ) : (
-                    <>
-                        <CareerTable
-                            data={(data as any)?.results || data}
-                            onEdit={handleOpenEdit}
-                            onDelete={handleOpenDelete}
-                        />
-                        {(data as any)?.count > 0 && (
-                            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-                                <Pagination
-                                    count={Math.ceil((data as any).count / PAGE_SIZE)}
-                                    page={page}
-                                    onChange={(e, v) => setPage(v)}
-                                    color="primary"
-                                />
-                            </Box>
-                        )}
-                    </>
-                )}
+
+                <DataTable
+                    columns={columns}
+                    data={(data as any)?.results || []}
+                    isLoading={isLoading}
+                    rowCount={(data as any)?.count || 0}
+                    pagination={{
+                        pageIndex: page,
+                        pageSize: PAGE_SIZE,
+                    }}
+                    onPaginationChange={(pagination) => {
+                        setPage(pagination.pageIndex);
+                    }}
+                />
             </Paper>
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="xs">

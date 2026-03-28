@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { Box, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography } from "@mui/material";
+import { Box, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Avatar, Chip, Tooltip, IconButton } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from "@mui/material";
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useCompanies } from './hooks/useCompanies';
-import CompanyTable from './components/CompanyTable';
 
 const CompaniesPage = () => {
     const { t } = useTranslation('admin');
     const PAGE_SIZE = 10;
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
 
     const {
@@ -22,7 +26,7 @@ const CompaniesPage = () => {
         deleteCompany,
         isMutating
     } = useCompanies({
-        page,
+        page: page + 1,
         pageSize: PAGE_SIZE,
         kw: searchTerm
     }) as any;
@@ -44,7 +48,7 @@ const CompaniesPage = () => {
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-        setPage(1);
+        setPage(0);
     };
 
     const handleOpenAdd = () => {
@@ -125,8 +129,87 @@ const CompaniesPage = () => {
         }
     };
 
+    const columns = React.useMemo<ColumnDef<any>[]>(() => [
+        {
+            accessorKey: 'companyImageUrl',
+            header: t('pages.companies.table.logo') as string,
+            cell: (info) => (
+                <Avatar
+                    src={info.getValue() as string}
+                    variant="rounded"
+                    sx={{ width: 48, height: 48, border: '1px solid', borderColor: 'divider' }}
+                />
+            ),
+        },
+        {
+            accessorKey: 'companyName',
+            header: t('pages.companies.table.companyName') as string,
+            cell: (info) => (
+                <Box>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        {info.getValue() as string}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                        Slug: {info.row.original.slug}
+                    </Typography>
+                </Box>
+            ),
+        },
+        {
+            accessorKey: 'employeeSize',
+            header: t('pages.companies.table.scale') as string,
+            cell: (info) => info.getValue() || '---',
+        },
+        {
+            accessorKey: 'fieldOperation',
+            header: t('pages.companies.table.field') as string,
+            cell: (info) => info.getValue() || '---',
+        },
+        {
+            accessorKey: 'locationDict.city',
+            header: t('pages.companies.table.location') as string,
+            cell: (info) => info.getValue() || '---',
+        },
+        {
+            accessorKey: 'jobPostNumber',
+            header: t('pages.companies.table.jobPosts') as string,
+            meta: { align: 'center' },
+            cell: (info) => <Chip label={String(info.getValue() || 0)} size="small" variant="outlined" />,
+        },
+        {
+            accessorKey: 'followNumber',
+            header: t('pages.companies.table.followers') as string,
+            meta: { align: 'center' },
+            cell: (info) => <Chip label={String(info.getValue() || 0)} size="small" />,
+        },
+        {
+            id: 'actions',
+            header: t('pages.companies.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                    <Tooltip title={t('pages.companies.table.viewDetails')}>
+                        <IconButton size="small">
+                            <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.companies.table.edit')}>
+                        <IconButton size="small" color="primary" onClick={() => handleOpenEdit(info.row.original)}>
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.companies.table.delete')}>
+                        <IconButton size="small" color="error" onClick={() => handleOpenDelete(info.row.original)}>
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Box>
+            ),
+        },
+    ], [t]);
+
     return (
-        <>
+        <Box>
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
                 <Button
                     variant="contained"
@@ -157,29 +240,20 @@ const CompaniesPage = () => {
                     />
                 </Box>
 
-                {isLoading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-                        <CircularProgress size={40} />
-                    </Box>
-                ) : (
-                    <>
-                        <CompanyTable
-                            data={((data as any)?.results || data) as any[]}
-                            onEdit={handleOpenEdit}
-                            onDelete={handleOpenDelete}
-                        />
-                        {(data as any)?.count > 0 && (
-                            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-                                <Pagination
-                                    count={Math.ceil((data as any).count / PAGE_SIZE)}
-                                    page={page}
-                                    onChange={(e, v) => setPage(v)}
-                                    color="primary"
-                                />
-                            </Box>
-                        )}
-                    </>
-                )}
+
+                <DataTable
+                    columns={columns}
+                    data={((data as any)?.results || data) as any[]}
+                    isLoading={isLoading}
+                    rowCount={(data as any)?.count || 0}
+                    pagination={{
+                        pageIndex: page,
+                        pageSize: PAGE_SIZE,
+                    }}
+                    onPaginationChange={(pagination) => {
+                        setPage(pagination.pageIndex);
+                    }}
+                />
             </Paper>
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
@@ -289,7 +363,7 @@ const CompaniesPage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </>
+        </Box>
     );
 };
 

@@ -1,7 +1,5 @@
-import React from 'react';
-
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Chip, Tooltip, IconButton, Box, CircularProgress, Paper } from "@mui/material";
-
+import React, { useMemo } from 'react';
+import { Typography, Chip, Tooltip, IconButton, Stack } from "@mui/material";
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -9,10 +7,19 @@ import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import dayjs from '../../../../configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
+import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
+import DataTable from '../../../../components/Common/DataTable';
 
 interface JobTableProps {
     jobs: any[];
     loading: boolean;
+    rowCount?: number;
+    pagination?: { pageIndex: number; pageSize: number };
+    onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
+    sorting?: SortingState;
+    onSortingChange?: OnChangeFn<SortingState>;
+    rowSelection?: RowSelectionState;
+    onRowSelectionChange?: OnChangeFn<RowSelectionState>;
     onView: (job: any) => void;
     onEdit: (job: any) => void;
     onApprove: (id: any) => void;
@@ -20,15 +27,23 @@ interface JobTableProps {
     onDelete: (id: any) => void;
 }
 
-const JobTable = ({ jobs, loading, onView, onEdit, onApprove, onReject, onDelete }: JobTableProps) => {
+const JobTable = ({ 
+    jobs, 
+    loading, 
+    rowCount, 
+    pagination, 
+    onPaginationChange, 
+    sorting,
+    onSortingChange,
+    rowSelection,
+    onRowSelectionChange,
+    onView, 
+    onEdit, 
+    onApprove, 
+    onReject, 
+    onDelete 
+}: JobTableProps) => {
     const { t } = useTranslation('admin');
-    if (loading && jobs.length === 0) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
-                <CircularProgress />
-            </Box>
-        );
-    }
 
     const getStatusChip = (status: number) => {
         switch (status) {
@@ -43,68 +58,95 @@ const JobTable = ({ jobs, loading, onView, onEdit, onApprove, onReject, onDelete
         }
     };
 
+    const columns = useMemo<ColumnDef<any>[]>(() => [
+        {
+            accessorKey: 'jobName',
+            header: t('pages.jobs.table.jobPostCompany') as string,
+            enableSorting: true,
+            cell: (info) => (
+                <Stack>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
+                        {info.getValue() as string}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                        {info.row.original.companyDict?.companyName}
+                    </Typography>
+                </Stack>
+            ),
+        },
+        {
+            accessorKey: 'createAt',
+            header: t('pages.jobs.table.postDate') as string,
+            enableSorting: true,
+            cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
+        },
+        {
+            accessorKey: 'deadline',
+            header: t('pages.jobs.table.deadline') as string,
+            enableSorting: true,
+            cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
+        },
+        {
+            accessorKey: 'status',
+            header: t('pages.jobs.table.statusCol') as string,
+            cell: (info) => getStatusChip(info.getValue() as number),
+        },
+        {
+            id: 'actions',
+            header: t('pages.jobs.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                    <Tooltip title={t('pages.jobs.table.viewDetails')}>
+                        <IconButton size="small" onClick={() => onView(info.row.original)} color="primary">
+                            <VisibilityOutlinedIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.jobs.table.edit')}>
+                        <IconButton size="small" onClick={() => onEdit(info.row.original)} color="secondary">
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    {info.row.original.status === 1 && (
+                        <>
+                            <Tooltip title={t('pages.jobs.table.approveAction')}>
+                                <IconButton size="small" onClick={() => onApprove(info.row.original.id)} color="success">
+                                    <CheckCircleOutlineIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('pages.jobs.table.rejectAction')}>
+                                <IconButton size="small" onClick={() => onReject(info.row.original.id)} color="error">
+                                    <HighlightOffIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        </>
+                    )}
+                    <Tooltip title={t('pages.jobs.table.delete')}>
+                        <IconButton size="small" onClick={() => onDelete(info.row.original.id)} color="error">
+                            <DeleteOutlineIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            ),
+        },
+    ], [t, onView, onEdit, onApprove, onReject, onDelete]);
+
     return (
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-            <Table sx={{ minWidth: 750 }}>
-                <TableHead sx={{ bgcolor: 'grey.50' }}>
-                    <TableRow>
-                        <TableCell>{t('pages.jobs.table.jobPostCompany')}</TableCell>
-                        <TableCell>{t('pages.jobs.table.postDate')}</TableCell>
-                        <TableCell>{t('pages.jobs.table.deadline')}</TableCell>
-                        <TableCell>{t('pages.jobs.table.statusCol')}</TableCell>
-                        <TableCell align="right">{t('pages.jobs.table.actions')}</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {jobs.map((job) => (
-                        <TableRow key={job.id} hover>
-                            <TableCell>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 'bold' }}>
-                                    {job.jobName}
-                                </Typography>
-                                <Typography variant="caption" color="textSecondary">
-                                    {job.companyDict?.companyName}
-                                </Typography>
-                            </TableCell>
-                            <TableCell>{dayjs(job.createAt).format('DD/MM/YYYY')}</TableCell>
-                            <TableCell>{dayjs(job.deadline).format('DD/MM/YYYY')}</TableCell>
-                            <TableCell>{getStatusChip(job.status)}</TableCell>
-                            <TableCell align="right">
-                                <Tooltip title={t('pages.jobs.table.viewDetails')}>
-                                    <IconButton size="small" onClick={() => onView(job)} color="primary">
-                                        <VisibilityOutlinedIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('pages.jobs.table.edit')}>
-                                    <IconButton size="small" onClick={() => onEdit(job)} color="secondary">
-                                        <EditIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                                {job.status === 1 && (
-                                    <>
-                                        <Tooltip title={t('pages.jobs.table.approveAction')}>
-                                            <IconButton size="small" onClick={() => onApprove(job.id)} color="success">
-                                                <CheckCircleOutlineIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title={t('pages.jobs.table.rejectAction')}>
-                                            <IconButton size="small" onClick={() => onReject(job.id)} color="error">
-                                                <HighlightOffIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                    </>
-                                )}
-                                <Tooltip title={t('pages.jobs.table.delete')}>
-                                    <IconButton size="small" onClick={() => onDelete(job.id)} color="error">
-                                        <DeleteOutlineIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+        <DataTable
+            columns={columns}
+            data={jobs || []}
+            isLoading={loading}
+            rowCount={rowCount}
+            pagination={pagination}
+            onPaginationChange={onPaginationChange}
+            enableSorting
+            sorting={sorting}
+            onSortingChange={onSortingChange}
+            enableRowSelection
+            rowSelection={rowSelection}
+            onRowSelectionChange={onRowSelectionChange}
+            emptyMessage={t('common.table.noData')}
+        />
     );
 };
 

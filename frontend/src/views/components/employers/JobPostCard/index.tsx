@@ -203,7 +203,7 @@ const JobPostCard = () => {
 
     try {
 
-      const resData: any = await jobService.getJobPosts(params);
+      const resData: any = await jobService.getEmployerJobPost(params);
 
       setJobPosts(resData.results);
 
@@ -712,17 +712,17 @@ const JobPostCard = () => {
 
           orderBy={orderBy}
 
-          page={page}
-
-          rowsPerPage={rowsPerPage}
-
-          count={count}
+          rowCount={count}
+          pagination={{
+            pageIndex: page,
+            pageSize: rowsPerPage,
+          }}
+          onPaginationChange={(pagination) => {
+            setPage(pagination.pageIndex);
+            setRowsPerPage(pagination.pageSize);
+          }}
 
           handleRequestSort={handleRequestSort}
-
-          handleChangePage={handleChangePage}
-
-          handleChangeRowsPerPage={handleChangeRowsPerPage}
 
           handleDelete={handleDelete}
 

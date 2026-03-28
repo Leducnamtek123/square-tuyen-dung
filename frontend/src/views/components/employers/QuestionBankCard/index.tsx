@@ -390,15 +390,17 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
           isLoading={loading}
 
-          count={count}
+          rowCount={count}
 
-          page={page}
+          pagination={{
+            pageIndex: page,
+            pageSize: rowsPerPage,
+          }}
 
-          rowsPerPage={rowsPerPage}
-
-          onPageChange={handleChangePage}
-
-          onRowsPerPageChange={handleChangeRowsPerPage}
+          onPaginationChange={(pagination) => {
+            setPage(pagination.pageIndex);
+            setRowsPerPage(pagination.pageSize);
+          }}
 
         />
 

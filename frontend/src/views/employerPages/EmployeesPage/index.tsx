@@ -29,9 +29,11 @@ import {
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { ColumnDef } from '@tanstack/react-table';
 
 import companyTeamService from "../../../services/companyTeamService";
 import toastMessages from "../../../utils/toastMessages";
+import DataTable from "../../../components/Common/DataTable";
 
 const COMPANY_PERMISSION_OPTIONS = [
   { key: "manage_company_profile", label: "Company profile" },
@@ -173,6 +175,107 @@ const EmployeesPage = () => {
     });
   };
 
+  const roleColumns = useMemo<ColumnDef<any>[]>(() => [
+    { accessorKey: 'id', header: t('employees.table.id') as string },
+    { accessorKey: 'code', header: t('employees.table.code') as string },
+    { accessorKey: 'name', header: t('employees.table.roleName') as string },
+    {
+      accessorKey: 'permissions',
+      header: t('employees.table.permissions') as string,
+      cell: (info: { getValue: () => any; row: { original: any } }) => (
+        <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
+          {(info.getValue() as string[] || []).length === 0 && <Chip size="small" label={t("employees.table.noPermissions")} />}
+          {(info.getValue() as string[] || []).map((p: any) => (
+            <Chip size="small" key={`${info.row.original.id}-${p}`} label={p} />
+          ))}
+        </Stack>
+      ),
+    },
+    {
+      accessorKey: 'is_system',
+      header: t('employees.table.system') as string,
+      cell: (info: { getValue: () => any }) => info.getValue() ? t("employees.table.yes") : t("employees.table.no"),
+    },
+    {
+      id: 'actions',
+      header: t('employees.table.actions') as string,
+      meta: { align: 'right' },
+      cell: (info: { row: { original: any } }) => (
+        <Button
+          color="error"
+          size="small"
+          startIcon={<DeleteOutlineIcon />}
+          disabled={info.row.original.is_system || deleteRoleMutation.isPending}
+          onClick={() => deleteRoleMutation.mutate(info.row.original.id)}
+        >
+          {t("employees.table.delete")}
+        </Button>
+      ),
+    },
+  ], [t, deleteRoleMutation.isPending]);
+
+  const memberColumns = useMemo<ColumnDef<any>[]>(() => [
+    { accessorKey: 'id', header: t('employees.table.id') as string },
+    { accessorKey: 'userDict.fullName', header: t('employees.table.user') as string, cell: (info: { getValue: () => any }) => info.getValue() || "-" },
+    {
+      id: 'email',
+      header: t('employees.table.email') as string,
+      cell: (info: { row: { original: any } }) => info.row.original.userDict?.email || info.row.original.invited_email || "-",
+    },
+    {
+      accessorKey: 'roleId',
+      header: t('employees.table.role') as string,
+      cell: (info: { getValue: () => any; row: { original: any } }) => (
+        <FormControl size="small" fullWidth sx={{ minWidth: 200 }}>
+          <Select
+            value={(info.getValue() || info.row.original.role?.id || "").toString()}
+            onChange={(e: SelectChangeEvent) => {
+              const nextRoleId = Number(e.target.value);
+              if (!nextRoleId || nextRoleId === (info.getValue() || info.row.original.role?.id)) return;
+              updateMemberMutation.mutate({
+                id: info.row.original.id,
+                data: { roleId: nextRoleId },
+              });
+            }}
+          >
+            {roles.map((role: any) => (
+              <MenuItem key={role.id} value={role.id.toString()}>
+                {role.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      ),
+    },
+    {
+      accessorKey: 'status',
+      header: t('employees.table.status') as string,
+      cell: (info: { getValue: () => any }) => (
+        <Chip
+          size="small"
+          label={info.getValue() as string || "UNKNOWN"}
+          color={info.getValue() === "ACTIVE" ? "success" : "default"}
+        />
+      ),
+    },
+    {
+      id: 'actions',
+      header: t('employees.table.actions') as string,
+      meta: { align: 'right' },
+      cell: (info: { row: { original: any } }) => (
+        <Button
+          color="error"
+          size="small"
+          startIcon={<DeleteOutlineIcon />}
+          disabled={deleteMemberMutation.isPending}
+          onClick={() => deleteMemberMutation.mutate(info.row.original.id)}
+        >
+          {t("employees.table.delete")}
+        </Button>
+      ),
+    },
+  ], [t, roles, deleteMemberMutation.isPending, updateMemberMutation]);
+
   return (
     <Box>
       <Paper sx={{ p: 3 }}>
@@ -203,115 +306,24 @@ const EmployeesPage = () => {
         </Tabs>
 
         {tab === "roles" && (
-          <Box sx={{ mt: 2, overflowX: "auto" }}>
-            <Table size="small">
-              <TableHead sx={{ bgcolor: 'grey.50' }}>
-                <TableRow>
-                  <TableCell>{t("employees.table.id")}</TableCell>
-                  <TableCell>{t("employees.table.code")}</TableCell>
-                  <TableCell>{t("employees.table.roleName")}</TableCell>
-                  <TableCell>{t("employees.table.permissions")}</TableCell>
-                  <TableCell>{t("employees.table.system")}</TableCell>
-                  <TableCell align="right">{t("employees.table.actions")}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {!rolesLoading &&
-                  roles.map((role: any) => (
-                    <TableRow key={role.id}>
-                      <TableCell>{role.id}</TableCell>
-                      <TableCell>{role.code}</TableCell>
-                      <TableCell>{role.name}</TableCell>
-                      <TableCell>
-                        <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
-                          {(role.permissions || []).length === 0 && <Chip size="small" label={t("employees.table.noPermissions")} />}
-                          {(role.permissions || []).map((p: any) => (
-                            <Chip size="small" key={`${role.id}-${p}`} label={p} />
-                          ))}
-                        </Stack>
-                      </TableCell>
-                      <TableCell>{role.is_system ? t("employees.table.yes") : t("employees.table.no")}</TableCell>
-                      <TableCell align="right">
-                        <Button
-                          color="error"
-                          size="small"
-                          startIcon={<DeleteOutlineIcon />}
-                          disabled={role.is_system || deleteRoleMutation.isPending}
-                          onClick={() => deleteRoleMutation.mutate(role.id)}
-                        >
-                          {t("employees.table.delete")}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
+          <Box sx={{ mt: 2 }}>
+            <DataTable
+              columns={roleColumns}
+              data={roles}
+              isLoading={rolesLoading}
+              hidePagination
+            />
           </Box>
         )}
 
         {tab === "members" && (
-          <Box sx={{ mt: 2, overflowX: "auto" }}>
-            <Table size="small">
-              <TableHead sx={{ bgcolor: 'grey.50' }}>
-                <TableRow>
-                  <TableCell>{t("employees.table.id")}</TableCell>
-                  <TableCell>{t("employees.table.user")}</TableCell>
-                  <TableCell>{t("employees.table.email")}</TableCell>
-                  <TableCell>{t("employees.table.role")}</TableCell>
-                  <TableCell>{t("employees.table.status")}</TableCell>
-                  <TableCell align="right">{t("employees.table.actions")}</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {!membersLoading &&
-                  members.map((member: any) => (
-                    <TableRow key={member.id}>
-                      <TableCell>{member.id}</TableCell>
-                      <TableCell>{member.userDict?.fullName || "-"}</TableCell>
-                      <TableCell>{member.userDict?.email || member.invited_email || "-"}</TableCell>
-                      <TableCell sx={{ minWidth: 220 }}>
-                        <FormControl size="small" fullWidth>
-                          <Select
-                            value={(member.roleId || member.role?.id || "").toString()}
-                            onChange={(e: SelectChangeEvent) => {
-                              const nextRoleId = Number(e.target.value);
-                              if (!nextRoleId || nextRoleId === (member.roleId || member.role?.id)) return;
-                              updateMemberMutation.mutate({
-                                id: member.id,
-                                data: { roleId: nextRoleId },
-                              });
-                            }}
-                          >
-                            {roles.map((role: any) => (
-                              <MenuItem key={role.id} value={role.id.toString()}>
-                                {role.name}
-                              </MenuItem>
-                            ))}
-                          </Select>
-                        </FormControl>
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          size="small"
-                          label={member.status || "UNKNOWN"}
-                          color={member.status === "ACTIVE" ? "success" : "default"}
-                        />
-                      </TableCell>
-                      <TableCell align="right">
-                        <Button
-                          color="error"
-                          size="small"
-                          startIcon={<DeleteOutlineIcon />}
-                          disabled={deleteMemberMutation.isPending}
-                          onClick={() => deleteMemberMutation.mutate(member.id)}
-                        >
-                          {t("employees.table.delete")}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
+          <Box sx={{ mt: 2 }}>
+            <DataTable
+              columns={memberColumns}
+              data={members}
+              isLoading={membersLoading}
+              hidePagination
+            />
           </Box>
         )}
       </Paper>

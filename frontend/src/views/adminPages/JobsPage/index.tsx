@@ -7,20 +7,30 @@ import JobTable from './components/JobTable';
 import JobFilters from './components/JobFilters';
 import dayjs from '../../../configs/moment-config';
 
+import { SortingState, RowSelectionState } from '@tanstack/react-table';
+
 const JobsPage = () => {
     const { t } = useTranslation('admin');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [searchTerm, setSearchTerm] = useState('');
+    const [sorting, setSorting] = useState<SortingState>([]);
+    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+    
     const [selectedJob, setSelectedJob] = useState<any>(null);
     const [openDetail, setOpenDetail] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const [editJob, setEditJob] = useState({ jobName: '', deadline: '' });
 
+    const ordering = sorting.length > 0 
+        ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}`
+        : undefined;
+
     const { data: jobsData, isLoading } = useJobs({
         page: page + 1,
         pageSize: rowsPerPage,
         search: searchTerm,
+        ordering,
     }) as any;
 
     const approveMutation = useApproveJob() as any;
@@ -71,30 +81,49 @@ const JobsPage = () => {
             <Card>
                 <CardHeader
                     title={`${t('pages.jobs.title')} (${(jobsData as any)?.count || 0} ${t('pages.jobs.total')})`}
-                    subheader={jobsData ? `${t('common.pagination.displayedRows', { from: page * rowsPerPage + 1, to: Math.min(page * rowsPerPage + rowsPerPage, (jobsData as any).count), count: (jobsData as any).count })}` : ''}
                 />
                 <CardContent>
+                    {Object.keys(rowSelection).length > 0 && (
+                        <Box sx={{ mb: 2, p: 2, bgcolor: 'primary.light', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Typography variant="subtitle2" color="primary.contrastText">
+                                {t('pages.jobs.bulkSelect.selectedCount', { count: Object.keys(rowSelection).length })}
+                            </Typography>
+                            <Button 
+                                variant="contained" 
+                                color="error" 
+                                size="small"
+                                onClick={() => {
+                                    if (window.confirm(t('pages.jobs.bulkSelect.deleteConfirm'))) {
+                                        // Handle bulk delete here
+                                        console.log('Bulk delete jobs:', Object.keys(rowSelection));
+                                    }
+                                }}
+                            >
+                                {t('pages.jobs.bulkSelect.deleteBtn')}
+                            </Button>
+                        </Box>
+                    )}
                     <JobTable
                         jobs={(jobsData as any)?.results || []}
                         loading={isLoading}
+                        rowCount={(jobsData as any)?.count || 0}
+                        pagination={{
+                            pageIndex: page,
+                            pageSize: rowsPerPage,
+                        }}
+                        onPaginationChange={(pagination) => {
+                            setPage(pagination.pageIndex);
+                            setRowsPerPage(pagination.pageSize);
+                        }}
+                        sorting={sorting}
+                        onSortingChange={setSorting}
+                        rowSelection={rowSelection}
+                        onRowSelectionChange={setRowSelection}
                         onView={handleViewDetail}
                         onEdit={handleEdit}
                         onApprove={(id) => approveMutation.mutate(id)}
                         onReject={(id) => rejectMutation.mutate(id)}
                         onDelete={handleDelete}
-                    />
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
-                        component="div"
-                        count={(jobsData as any)?.count || 0}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        labelRowsPerPage={t('common.pagination.rowsPerPage')}
-                        labelDisplayedRows={({ from, to, count }) => 
-                            t('common.pagination.displayedRows', { from, to, count })
-                        }
                     />
                 </CardContent>
             </Card>

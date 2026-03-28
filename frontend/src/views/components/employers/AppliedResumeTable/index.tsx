@@ -1,18 +1,18 @@
 import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';
-import { TableBody, TableCell, TableRow, Tooltip, Typography, IconButton, Stack } from "@mui/material";
+import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { ColumnDef } from '@tanstack/react-table';
 
 import AIAnalysisDrawer from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
-import DataTableCustom from '../../../../components/Common/DataTableCustom';
+import DataTable from '../../../../components/Common/DataTable';
 import { faFile, faFilePdf } from '@fortawesome/free-regular-svg-icons';
-import NoDataCard from '../../../../components/Common/NoDataCard';
 import { formatRoute } from '../../../../utils/funcUtils';
 
 import SendEmailComponent from './SendEmailComponent';
@@ -41,6 +41,102 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     return rowsSafe.find(r => r.id === openDrawerId);
   }, [openDrawerId, rowsSafe]);
 
+  const columns = React.useMemo<ColumnDef<any>[]>(() => [
+    {
+      accessorKey: 'fullName',
+      header: t('appliedResume.table.candidate') as string,
+      cell: (info) => (
+        <Box>
+          <Typography sx={{ fontWeight: 'bold' }}>
+            {info.getValue() as string}
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            {info.row.original.type === CV_TYPES.cvWebsite ? (
+              <Tooltip title={t('appliedResume.table.onlineResume')} arrow>
+                <FontAwesomeIcon icon={faFile} color="#441da0" size="xs" />
+              </Tooltip>
+            ) : (
+              <Tooltip title={t('appliedResume.table.attachedResume')} arrow>
+                <FontAwesomeIcon icon={faFilePdf} color="red" size="xs" />
+              </Tooltip>
+            )}
+            <Typography variant="caption" color="text.secondary">
+              {info.row.original.title || t('appliedResume.table.notUpdated')}
+            </Typography>
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      accessorKey: 'jobName',
+      header: t('appliedResume.table.jobName') as string,
+    },
+    {
+      accessorKey: 'createAt',
+      header: t('appliedResume.table.applyDate') as string,
+      cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
+    },
+    {
+      accessorKey: 'type',
+      header: t('appliedResume.table.resumeType') as string,
+      cell: (info) => info.getValue() === CV_TYPES.cvWebsite
+        ? t('appliedResume.table.onlineResume')
+        : t('appliedResume.table.attachedResume'),
+    },
+    {
+      id: 'aiAnalysis',
+      header: t('appliedResume.table.aiAnalysis') as string,
+      meta: { align: 'center' },
+      cell: (info) => <AIAnalysisComponent row={info.row.original} onOpenDrawer={() => setOpenDrawerId(info.row.original.id)} />,
+    },
+    {
+      accessorKey: 'status',
+      header: t('appliedResume.table.status') as string,
+      meta: { align: 'right' },
+      cell: (info) => (
+        <AppliedStatusComponent
+          options={(allConfig?.applicationStatusOptions as any[]) || []}
+          defaultStatus={Number(info.getValue())}
+          id={info.row.original.id}
+          handleChangeApplicationStatus={handleChangeApplicationStatus}
+        />
+      ),
+    },
+    {
+      id: 'actions',
+      header: t('appliedResume.table.actions') as string,
+      meta: { align: 'right' },
+      cell: (info) => (
+        <Stack direction="row" spacing={1} justifyContent="flex-end">
+          <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
+            <IconButton
+              color="primary"
+              size="small"
+              onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug)}`)}
+            >
+              <RemoveRedEyeOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
+            <IconButton
+              size="small"
+              color="error"
+              onClick={() => handleDelete(info.row.original.id)}
+            >
+              <DeleteOutlineOutlinedIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <SendEmailComponent
+            jobPostActivityId={info.row.original.id}
+            isSentEmail={info.row.original.isSentEmail}
+            email={info.row.original.email}
+            fullName={info.row.original.fullName}
+          />
+        </Stack>
+      ),
+    },
+  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, nav]);
+
   return (
     <>
       <AIAnalysisDrawer
@@ -49,115 +145,26 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         activityId={openDrawerId}
         initialData={selectedActivityInfo}
       />
-      <DataTableCustom {...props}>
-        <TableBody>
-          {!isLoading && rowsSafe.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={8}>
-                <NoDataCard
-                  title={t('appliedResume.table.noCandidates')}
-                  svgKey="ImageSvg13"
-                />
-              </TableCell>
-            </TableRow>
-          ) : (
-            rowsSafe.map((row: any) => (
-              <TableRow key={row.id}>
-                <TableCell component="th" scope="row" padding="none">
-                  <Typography sx={{ fontWeight: 'bold' }}>
-                    {row?.fullName}
-                  </Typography>
-                  {row?.type === CV_TYPES.cvWebsite ? (
-                    <Tooltip title={t('appliedResume.table.onlineResume')} arrow>
-                      <FontAwesomeIcon
-                        icon={faFile}
-                        style={{ marginRight: 1 }}
-                        color="#441da0"
-                      />
-                    </Tooltip>
-                  ) : (
-                    <Tooltip title={t('appliedResume.table.attachedResume')} arrow>
-                      <FontAwesomeIcon
-                        icon={faFilePdf}
-                        style={{ marginRight: 8 }}
-                        color="red"
-                      />
-                    </Tooltip>
-                  )}{' '}
-                  {row?.title || (
-                    <span
-                      style={{
-                        color: '#e0e0e0',
-                        fontStyle: 'italic',
-                        fontSize: 13,
-                      }}
-                    >
-                      {t('appliedResume.table.notUpdated')}
-                    </span>
-                  )}{' '}
-                </TableCell>
-                <TableCell align="left">{row?.jobName}</TableCell>
-                <TableCell align="left">
-                  {dayjs(row?.createAt).format('DD/MM/YYYY')}
-                </TableCell>
-                <TableCell align="left">
-                  {row?.type === CV_TYPES.cvWebsite
-                    ? t('appliedResume.table.onlineResume')
-                    : t('appliedResume.table.attachedResume')}
-                </TableCell>
-                <TableCell align="center">
-                  <AIAnalysisComponent row={row} onOpenDrawer={() => setOpenDrawerId(row.id)} />
-                </TableCell>
-                <TableCell align="right">
-                  <AppliedStatusComponent
-                    options={(allConfig?.applicationStatusOptions as any[]) || []}
-                    defaultStatus={row?.status}
-                    id={row?.id}
-                    handleChangeApplicationStatus={handleChangeApplicationStatus}
-                  />
-                </TableCell>
-                <TableCell align="right">
-                  <Stack direction="row" spacing={1} justifyContent="flex-end">
-                    <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
-                      <IconButton
-                        color="primary"
-                        aria-label={t('sendEmailComponent.label.view', 'view')}
-                        size="small"
-                        onClick={() =>
-                          nav.push(
-                            `/${formatRoute(
-                              ROUTES.EMPLOYER.PROFILE_DETAIL,
-                              row?.resumeSlug
-                            )}`
-                          )
-                        }
-                      >
-                        <RemoveRedEyeOutlinedIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
-                      <IconButton
-                        size="small"
-                        color="error"
-                        aria-label={t('sendEmailComponent.label.delete', 'delete')}
-                        onClick={() => handleDelete(row?.id)}
-                      >
-                        <DeleteOutlineOutlinedIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                    <SendEmailComponent
-                      jobPostActivityId={row.id}
-                      isSentEmail={row?.isSentEmail}
-                      email={row?.email}
-                      fullName={row?.fullName}
-                    />
-                  </Stack>
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </DataTableCustom>
+      <DataTable
+        columns={columns}
+        data={rowsSafe}
+        isLoading={isLoading}
+        rowCount={props.count || 0}
+        pagination={{
+          pageIndex: props.page || 0,
+          pageSize: props.rowsPerPage || 10,
+        }}
+        onPaginationChange={(pagination) => {
+          if (props.handleChangePage && pagination.pageIndex !== props.page) {
+            props.handleChangePage(null, pagination.pageIndex);
+          }
+          if (props.handleChangeRowsPerPage && pagination.pageSize !== props.rowsPerPage) {
+            const event = { target: { value: String(pagination.pageSize) } } as React.ChangeEvent<HTMLInputElement>;
+            props.handleChangeRowsPerPage(event);
+          }
+        }}
+        emptyMessage={t('appliedResume.table.noCandidates')}
+      />
     </>
   );
 };

@@ -1,9 +1,10 @@
-import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Tooltip, IconButton, Box, CircularProgress, Paper } from "@mui/material";
-
+import React, { useMemo } from 'react';
+import { Typography, Tooltip, IconButton, Stack } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../../components/Common/DataTable';
 
 interface QuestionGroupTableProps {
     data: any[];
@@ -14,68 +15,64 @@ interface QuestionGroupTableProps {
 
 const QuestionGroupTable = ({ data, loading, onEdit, onDelete }: QuestionGroupTableProps) => {
     const { t } = useTranslation('admin');
-    if (loading && (!data || data.length === 0)) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
-                <CircularProgress />
-            </Box>
-        );
-    }
 
-    if (!data || data.length === 0) {
-        return (
-            <Box sx={{ p: 5, textAlign: 'center' }}>
-                <Typography color="text.secondary">{t('pages.questionGroups.table.noData')}</Typography>
-            </Box>
-        );
-    }
+    const columns = useMemo<ColumnDef<any>[]>(() => [
+        {
+            accessorKey: 'name',
+            header: t('pages.questionGroups.table.groupName') as string,
+            cell: (info) => (
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {info.getValue() as string}
+                </Typography>
+            ),
+        },
+        {
+            accessorKey: 'description',
+            header: t('pages.questionGroups.table.description') as string,
+            cell: (info) => (
+                <Typography variant="body2" color="text.secondary">
+                    {info.getValue() as string || '---'}
+                </Typography>
+            ),
+        },
+        {
+            accessorKey: 'questions',
+            header: t('pages.questionGroups.table.questionCount') as string,
+            cell: (info) => (
+                <Typography variant="body2">
+                    {(info.getValue() as any[])?.length || 0}
+                </Typography>
+            ),
+        },
+        {
+            id: 'actions',
+            header: t('pages.questionGroups.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <Tooltip title={t('pages.questionGroups.table.edit')}>
+                        <IconButton size="small" onClick={() => onEdit(info.row.original)} color="primary">
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.questionGroups.table.delete')}>
+                        <IconButton size="small" onClick={() => onDelete(info.row.original)} color="error">
+                            <DeleteOutlineIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            ),
+        },
+    ], [t, onEdit, onDelete]);
 
     return (
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-            <Table sx={{ minWidth: 750 }}>
-                <TableHead sx={{ bgcolor: 'grey.50' }}>
-                    <TableRow>
-                        <TableCell>{t('pages.questionGroups.table.groupName')}</TableCell>
-                        <TableCell>{t('pages.questionGroups.table.description')}</TableCell>
-                        <TableCell>{t('pages.questionGroups.table.questionCount')}</TableCell>
-                        <TableCell align="right">{t('pages.questionGroups.table.actions')}</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {data.map((item) => (
-                        <TableRow key={item.id} hover>
-                            <TableCell>
-                                <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                                    {item.name}
-                                </Typography>
-                            </TableCell>
-                            <TableCell>
-                                <Typography variant="body2" color="text.secondary">
-                                    {item.description || '---'}
-                                </Typography>
-                            </TableCell>
-                            <TableCell>
-                                <Typography variant="body2">
-                                    {item.questions?.length || 0}
-                                </Typography>
-                            </TableCell>
-                            <TableCell align="right">
-                                <Tooltip title={t('pages.questionGroups.table.edit')}>
-                                    <IconButton size="small" onClick={() => onEdit(item)} color="primary">
-                                        <EditIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('pages.questionGroups.table.delete')}>
-                                    <IconButton size="small" onClick={() => onDelete(item)} color="error">
-                                        <DeleteOutlineIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+        <DataTable
+            columns={columns}
+            data={data || []}
+            isLoading={loading}
+            hidePagination
+            emptyMessage={t('pages.questionGroups.table.noData')}
+        />
     );
 };
 

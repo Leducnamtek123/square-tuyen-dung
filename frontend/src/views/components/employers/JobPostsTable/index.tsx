@@ -26,11 +26,12 @@ interface JobPost {
 interface JobPostsTableProps {
   rows: any[];
   isLoading: boolean;
-  count: number;
-  page: number;
-  rowsPerPage: number;
-  handleChangePage: (event: unknown, newPage: number) => void;
-  handleChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  rowCount: number;
+  pagination: {
+    pageIndex: number;
+    pageSize: number;
+  };
+  onPaginationChange: (pagination: { pageIndex: number; pageSize: number }) => void;
   handleDelete: (slugOrId: string | number) => void;
   handleUpdate: (slugOrId: string | number) => void;
   handleRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
@@ -42,11 +43,9 @@ interface JobPostsTableProps {
 const JobPostsTable = ({
   rows,
   isLoading,
-  count,
-  page,
-  rowsPerPage,
-  handleChangePage,
-  handleChangeRowsPerPage,
+  rowCount,
+  pagination,
+  onPaginationChange,
   handleDelete,
   handleUpdate,
   handleRequestSort,
@@ -223,15 +222,11 @@ const JobPostsTable = ({
 
       isLoading={isLoading}
 
-      count={count}
+      rowCount={rowCount}
 
-      page={page}
+      pagination={pagination}
 
-      rowsPerPage={rowsPerPage}
-
-      onPageChange={handleChangePage}
-
-      onRowsPerPageChange={handleChangeRowsPerPage}
+      onPaginationChange={onPaginationChange}
 
       emptyMessage={t('jobPost.noData')}
 
@@ -240,5 +235,6 @@ const JobPostsTable = ({
   );
 
 };
+;
 
 export default JobPostsTable;

@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, TextField, TablePagination } from "@mui/material";
+import React, { useState, useMemo } from 'react';
+import { Box, Typography, Breadcrumbs, Link, Button, IconButton, Tooltip, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useCities } from './hooks/useCities';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
 
 const CitiesPage = () => {
     const { t } = useTranslation('admin');
@@ -80,6 +81,47 @@ const CitiesPage = () => {
 
     const displayData = data?.results || data || [];
 
+    const columns = useMemo<ColumnDef<any>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: t('pages.cities.table.id') as string,
+            size: 80,
+        },
+        {
+            accessorKey: 'name',
+            header: t('pages.cities.table.cityName') as string,
+            cell: (info) => (
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {info.getValue() as string}
+                </Typography>
+            ),
+        },
+        {
+            accessorKey: 'code',
+            header: t('pages.cities.table.code') as string,
+            cell: (info) => info.getValue() as string || '---',
+        },
+        {
+            id: 'actions',
+            header: t('pages.cities.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Box>
+                    <Tooltip title={t('pages.cities.table.edit')}>
+                        <IconButton size="small" color="primary" onClick={() => handleOpenEdit(info.row.original)}>
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.cities.table.delete')}>
+                        <IconButton size="small" color="error" onClick={() => handleOpenDelete(info.row.original)}>
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Box>
+            ),
+        },
+    ], [t]);
+
     return (
         <Box>
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -105,72 +147,21 @@ const CitiesPage = () => {
                 </Button>
             </Box>
 
-            <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
-                {isLoading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-                        <CircularProgress size={40} />
-                    </Box>
-                ) : (
-                    <>
-                        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-                            <Table sx={{ minWidth: 650 }}>
-                                <TableHead sx={{ bgcolor: 'grey.50' }}>
-                                    <TableRow>
-                                        <TableCell width={80}>{t('pages.cities.table.id')}</TableCell>
-                                        <TableCell>{t('pages.cities.table.cityName')}</TableCell>
-                                        <TableCell>{t('pages.cities.table.code')}</TableCell>
-                                        <TableCell align="right">{t('pages.cities.table.actions')}</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {displayData.map((row: any) => (
-                                        <TableRow key={row.id} hover>
-                                            <TableCell>{row.id}</TableCell>
-                                            <TableCell sx={{ fontWeight: 500 }}>{row.name}</TableCell>
-                                            <TableCell>{row.code || '---'}</TableCell>
-                                            <TableCell align="right">
-                                                <Tooltip title={t('pages.cities.table.edit')}>
-                                                    <IconButton size="small" color="primary" onClick={() => handleOpenEdit(row)}>
-                                                        <EditIcon fontSize="small" />
-                                                    </IconButton>
-                                                </Tooltip>
-                                                <Tooltip title={t('pages.cities.table.delete')}>
-                                                    <IconButton size="small" color="error" onClick={() => handleOpenDelete(row)}>
-                                                        <DeleteIcon fontSize="small" />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                    {displayData.length === 0 && (
-                                        <TableRow>
-                                            <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
-                                                {t('pages.cities.table.noData')}
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <TablePagination
-                            rowsPerPageOptions={[5, 10, 25]}
-                            component="div"
-                            count={data?.count || 0}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onPageChange={(e, v) => setPage(v)}
-                            onRowsPerPageChange={(e) => {
-                                setRowsPerPage(parseInt(e.target.value, 10));
-                                setPage(0);
-                            }}
-                            labelRowsPerPage={t('common.pagination.rowsPerPage')}
-                            labelDisplayedRows={({ from, to, count }) =>
-                                t('common.pagination.displayedRows', { from, to, count })
-                            }
-                        />
-                    </>
-                )}
-            </Paper>
+            <DataTable
+                columns={columns}
+                data={displayData}
+                isLoading={isLoading}
+                rowCount={data?.count || 0}
+                pagination={{
+                    pageIndex: page,
+                    pageSize: rowsPerPage,
+                }}
+                onPaginationChange={(pagination) => {
+                    setPage(pagination.pageIndex);
+                    setRowsPerPage(pagination.pageSize);
+                }}
+                emptyMessage={t('pages.cities.table.noData')}
+            />
 
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="xs">

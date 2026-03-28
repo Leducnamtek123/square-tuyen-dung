@@ -1,10 +1,11 @@
-import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Tooltip, Avatar, Typography } from "@mui/material";
-
+import React, { useMemo } from 'react';
+import { IconButton, Tooltip, Avatar, Typography, Stack } from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../../components/Common/DataTable';
 
 interface ProfileTableProps {
     data: any[];
@@ -15,67 +16,80 @@ interface ProfileTableProps {
 
 const ProfileTable = ({ data, onView, onEdit, onDelete }: ProfileTableProps) => {
     const { t } = useTranslation('admin');
+
+    const columns = useMemo<ColumnDef<any>[]>(() => [
+        {
+            id: 'avatar',
+            header: t('pages.profiles.table.avatar') as string,
+            cell: (info) => (
+                <Avatar
+                    src={info.row.original.userDict?.avatar}
+                    sx={{ width: 40, height: 40 }}
+                />
+            ),
+        },
+        {
+            accessorKey: 'userDict.fullName',
+            header: t('pages.profiles.table.fullName') as string,
+            cell: (info) => (
+                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                    {info.getValue() as string || '---'}
+                </Typography>
+            ),
+        },
+        {
+            accessorKey: 'userDict.email',
+            header: t('pages.profiles.table.email') as string,
+            cell: (info) => info.getValue() as string || '---',
+        },
+        {
+            accessorKey: 'userDict.phone',
+            header: t('pages.profiles.table.phone') as string,
+            cell: (info) => info.getValue() as string || '---',
+        },
+        {
+            accessorKey: 'userDict.gender',
+            header: t('pages.profiles.table.gender') as string,
+            cell: (info) => info.getValue() as string || '---',
+        },
+        {
+            accessorKey: 'userDict.birthday',
+            header: t('pages.profiles.table.dob') as string,
+            cell: (info) => info.getValue() as string || '---',
+        },
+        {
+            id: 'actions',
+            header: t('pages.profiles.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <Tooltip title={t('pages.profiles.table.viewDetails')}>
+                        <IconButton size="small" onClick={() => onView?.(info.row.original)}>
+                            <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.profiles.table.edit')}>
+                        <IconButton size="small" onClick={() => onEdit?.(info.row.original)} color="primary">
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.profiles.table.delete')}>
+                        <IconButton size="small" onClick={() => onDelete?.(info.row.original)} color="error">
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            ),
+        },
+    ], [t, onView, onEdit, onDelete]);
+
     return (
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-            <Table sx={{ minWidth: 800 }}>
-                <TableHead sx={{ bgcolor: 'grey.50' }}>
-                    <TableRow>
-                        <TableCell width={80}>{t('pages.profiles.table.avatar')}</TableCell>
-                        <TableCell>{t('pages.profiles.table.fullName')}</TableCell>
-                        <TableCell>{t('pages.profiles.table.email')}</TableCell>
-                        <TableCell>{t('pages.profiles.table.phone')}</TableCell>
-                        <TableCell>{t('pages.profiles.table.gender')}</TableCell>
-                        <TableCell>{t('pages.profiles.table.dob')}</TableCell>
-                        <TableCell align="right">{t('pages.profiles.table.actions')}</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {data?.map((row) => (
-                        <TableRow key={row.id} hover>
-                            <TableCell>
-                                <Avatar
-                                    src={row.userDict?.avatar}
-                                    sx={{ width: 40, height: 40 }}
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                                    {row.userDict?.fullName || '---'}
-                                </Typography>
-                            </TableCell>
-                            <TableCell>{row.userDict?.email || '---'}</TableCell>
-                            <TableCell>{row.userDict?.phone || '---'}</TableCell>
-                            <TableCell>{row.userDict?.gender || '---'}</TableCell>
-                            <TableCell>{row.userDict?.birthday || '---'}</TableCell>
-                            <TableCell align="right">
-                                <Tooltip title={t('pages.profiles.table.viewDetails')}>
-                                    <IconButton size="small" onClick={() => onView?.(row)}>
-                                        <VisibilityIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('pages.profiles.table.edit')}>
-                                    <IconButton size="small" onClick={() => onEdit?.(row)} color="primary">
-                                        <EditIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('pages.profiles.table.delete')}>
-                                    <IconButton size="small" onClick={() => onDelete?.(row)} color="error">
-                                        <DeleteIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                    {(!data || data.length === 0) && (
-                        <TableRow>
-                            <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
-                                {t('pages.profiles.table.noData')}
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
-        </TableContainer>
+        <DataTable
+            columns={columns}
+            data={data || []}
+            hidePagination
+            emptyMessage={t('pages.profiles.table.noData')}
+        />
     );
 };
 

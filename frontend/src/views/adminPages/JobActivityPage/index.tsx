@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Chip } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import dayjs from '../../../configs/dayjs-config';
 
 import SearchIcon from '@mui/icons-material/Search';
 import { useJobActivities } from './hooks/useJobActivities';
-import JobActivityTable from './components/JobActivityTable';
 
 const JobActivityPage = () => {
     const { t } = useTranslation('admin');
     const PAGE_SIZE = 10;
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
 
     const {
@@ -19,7 +23,7 @@ const JobActivityPage = () => {
         deleteJobActivity,
         isMutating
     } = useJobActivities({
-        page,
+        page: page + 1,
         pageSize: PAGE_SIZE,
         kw: searchTerm
     }) as any;
@@ -32,7 +36,7 @@ const JobActivityPage = () => {
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-        setPage(1);
+        setPage(0);
     };
 
     const handleOpenEdit = (activity: any) => {
@@ -72,6 +76,70 @@ const JobActivityPage = () => {
         }
     };
 
+    const columns = React.useMemo<ColumnDef<any>[]>(() => [
+        {
+            accessorKey: 'userDict.fullName',
+            header: t('pages.jobActivity.table.candidate') as string,
+            cell: (info) => (
+                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                    {info.getValue() as string || '---'}
+                </Typography>
+            ),
+        },
+        {
+            accessorKey: 'jobPostDict.jobName',
+            header: t('pages.jobActivity.table.jobPost') as string,
+            cell: (info) => info.getValue() || '---',
+        },
+        {
+            accessorKey: 'companyDict.companyName',
+            header: t('pages.jobActivity.table.company') as string,
+            cell: (info) => info.getValue() || '---',
+        },
+        {
+            accessorKey: 'status',
+            header: t('pages.jobActivity.table.status') as string,
+            cell: (info) => {
+                const status = info.getValue() as string;
+                return (
+                    <Chip
+                        label={status || '---'}
+                        size="small"
+                        color={
+                            status === 'APPLIED' ? 'primary' :
+                                status === 'ACCEPTED' ? 'success' :
+                                    status === 'REJECTED' ? 'error' : 'default'
+                        }
+                    />
+                );
+            },
+        },
+        {
+            accessorKey: 'updateAt',
+            header: t('pages.jobActivity.table.updatedAt') as string,
+            cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm'),
+        },
+        {
+            id: 'actions',
+            header: t('pages.jobActivity.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                    <Tooltip title={t('pages.jobActivity.table.updateStatus')}>
+                        <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.jobActivity.table.delete')}>
+                        <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Box>
+            ),
+        },
+    ], [t]);
+
     return (
         <Box>
             <Box sx={{ mb: 3 }}>
@@ -106,29 +174,20 @@ const JobActivityPage = () => {
                     />
                 </Box>
 
-                {isLoading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-                        <CircularProgress size={40} />
-                    </Box>
-                ) : (
-                    <>
-                        <JobActivityTable
-                            data={(data as any)?.results || data}
-                            onEdit={handleOpenEdit}
-                            onDelete={handleOpenDelete}
-                        />
-                        {(data as any)?.count > 0 && (
-                            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-                                <Pagination
-                                    count={Math.ceil((data as any).count / PAGE_SIZE)}
-                                    page={page}
-                                    onChange={(e, v) => setPage(v)}
-                                    color="primary"
-                                />
-                            </Box>
-                        )}
-                    </>
-                )}
+
+                <DataTable
+                    columns={columns}
+                    data={(data as any)?.results || []}
+                    isLoading={isLoading}
+                    rowCount={(data as any)?.count || 0}
+                    pagination={{
+                        pageIndex: page,
+                        pageSize: PAGE_SIZE,
+                    }}
+                    onPaginationChange={(pagination) => {
+                        setPage(pagination.pageIndex);
+                    }}
+                />
             </Paper>
             {/* Edit Status Dialog */}
             <Dialog open={openEditDialog} onClose={handleCloseDialogs} fullWidth maxWidth="xs">

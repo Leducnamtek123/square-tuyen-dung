@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
-  Box, Typography, Breadcrumbs, Link, Paper, CircularProgress,
-  Table, TableHead, TableRow, TableCell, TableBody, IconButton,
+  Box, Typography, Breadcrumbs, Link, Paper, IconButton,
   Chip, Switch, Dialog, DialogTitle, DialogContent, DialogActions,
-  Button, Tooltip, Rating
+  Button, Tooltip, Rating, Stack
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
 import adminManagementService from '../../../services/adminManagementService';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
 
 const FeedbacksPage = () => {
   const { t } = useTranslation('admin');
@@ -36,6 +37,7 @@ const FeedbacksPage = () => {
   };
 
   const handleDelete = async () => {
+    if (!current) return;
     setIsSaving(true);
     try {
       await adminManagementService.deleteFeedback(current.id);
@@ -44,6 +46,76 @@ const FeedbacksPage = () => {
     } catch (e) { console.error(e); }
     finally { setIsSaving(false); }
   };
+
+  const columns = useMemo<ColumnDef<any>[]>(() => [
+    {
+      accessorKey: 'id',
+      header: t('pages.feedbacks.table.id') as string,
+    },
+    {
+      accessorKey: 'userDict.fullName',
+      header: t('pages.feedbacks.table.user') as string,
+      cell: (info) => (
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          {info.row.original.userDict?.avatarUrl && (
+            <Box component="img" src={info.row.original.userDict.avatarUrl} alt=""
+              sx={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
+          )}
+          <Box>
+            <Typography variant="body2" fontWeight={600}>{info.getValue() as string || 'N/A'}</Typography>
+            <Typography variant="caption" color="text.secondary">{info.row.original.userDict?.email || ''}</Typography>
+          </Box>
+        </Box>
+      ),
+    },
+    {
+      accessorKey: 'content',
+      header: t('pages.feedbacks.table.content') as string,
+      cell: (info) => (
+        <Typography variant="body2" sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {info.getValue() as string}
+        </Typography>
+      ),
+    },
+    {
+      accessorKey: 'rating',
+      header: t('pages.feedbacks.table.rating') as string,
+      cell: (info) => <Rating value={info.getValue() as number} readOnly size="small" />,
+    },
+    {
+      accessorKey: 'is_active',
+      header: t('pages.feedbacks.table.status') as string,
+      cell: (info) => (
+        <Stack direction="row" spacing={0.5} alignItems="center">
+          <Switch
+            checked={!!info.getValue()}
+            onChange={() => handleToggleActive(info.row.original)}
+            size="small"
+            color="success"
+          />
+          <Chip label={info.getValue() ? t('pages.feedbacks.show') : t('pages.feedbacks.hide')} size="small"
+            color={info.getValue() ? 'success' : 'default'} />
+        </Stack>
+      ),
+    },
+    {
+      accessorKey: 'create_at',
+      header: t('pages.feedbacks.table.createdAt') as string,
+      cell: (info) => info.getValue() ? new Date(info.getValue() as string).toLocaleDateString('vi-VN') : '—',
+    },
+    {
+      id: 'actions',
+      header: t('pages.feedbacks.table.actions') as string,
+      meta: { align: 'right' },
+      cell: (info) => (
+        <Tooltip title={t('pages.feedbacks.table.deleteTooltip')}>
+          <IconButton size="small" color="error" onClick={() => { setCurrent(info.row.original); setOpenDelete(true); }}>
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      ),
+    },
+  ], [t, handleToggleActive]);
 
   return (
     <Box>
@@ -55,74 +127,14 @@ const FeedbacksPage = () => {
         </Breadcrumbs>
       </Box>
 
-      <Paper sx={{ p: 2, borderRadius: '12px' }} elevation={0}>
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}><CircularProgress /></Box>
-        ) : (
-          <Table size="small" sx={{ minWidth: 750 }}>
-            <TableHead sx={{ bgcolor: 'grey.50' }}>
-              <TableRow>
-                <TableCell>{t('pages.feedbacks.table.id')}</TableCell>
-                <TableCell>{t('pages.feedbacks.table.user')}</TableCell>
-                <TableCell>{t('pages.feedbacks.table.content')}</TableCell>
-                <TableCell>{t('pages.feedbacks.table.rating')}</TableCell>
-                <TableCell>{t('pages.feedbacks.table.status')}</TableCell>
-                <TableCell>{t('pages.feedbacks.table.createdAt')}</TableCell>
-                <TableCell align="right">{t('pages.feedbacks.table.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {feedbacks.length === 0 ? (
-                <TableRow><TableCell colSpan={7} align="center">{t('pages.feedbacks.empty')}</TableCell></TableRow>
-              ) : feedbacks.map((fb: any) => (
-                <TableRow key={fb.id} hover>
-                  <TableCell>{fb.id}</TableCell>
-                  <TableCell>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                      {fb.userDict?.avatarUrl && (
-                        <Box component="img" src={fb.userDict.avatarUrl} alt=""
-                          sx={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover' }} />
-                      )}
-                      <Box>
-                        <Typography variant="body2" fontWeight={600}>{fb.userDict?.fullName || 'N/A'}</Typography>
-                        <Typography variant="caption" color="text.secondary">{fb.userDict?.email || ''}</Typography>
-                      </Box>
-                    </Box>
-                  </TableCell>
-                  <TableCell sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {fb.content}
-                  </TableCell>
-                  <TableCell>
-                    <Rating value={fb.rating} readOnly size="small" />
-                  </TableCell>
-                  <TableCell>
-                    <Switch
-                      checked={!!fb.is_active}
-                      onChange={() => handleToggleActive(fb)}
-                      size="small"
-                      color="success"
-                    />
-                    <Chip label={fb.is_active ? t('pages.feedbacks.show') : t('pages.feedbacks.hide')} size="small"
-                      color={fb.is_active ? 'success' : 'default'} sx={{ ml: 0.5 }} />
-                  </TableCell>
-                  <TableCell>
-                    {fb.create_at ? new Date(fb.create_at).toLocaleDateString('vi-VN') : '—'}
-                  </TableCell>
-                  <TableCell align="right">
-                    <Tooltip title={t('pages.feedbacks.table.deleteTooltip')}>
-                      <IconButton size="small" color="error" onClick={() => { setCurrent(fb); setOpenDelete(true); }}>
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Paper>
+      <DataTable
+        columns={columns}
+        data={feedbacks || []}
+        isLoading={isLoading}
+        hidePagination
+        emptyMessage={t('pages.feedbacks.empty')}
+      />
 
-      {/* Delete Dialog */}
       <Dialog open={openDelete} onClose={() => setOpenDelete(false)}>
         <DialogTitle>{t('pages.feedbacks.deleteTitle')}</DialogTitle>
         <DialogContent>

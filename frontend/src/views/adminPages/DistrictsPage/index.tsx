@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, CircularProgress, IconButton, Tooltip, MenuItem, TextField, Dialog, DialogTitle, DialogContent, DialogActions, TablePagination } from "@mui/material";
+import React, { useState, useEffect, useMemo } from 'react';
+import { Box, Typography, Breadcrumbs, Link, Button, IconButton, Tooltip, MenuItem, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Paper } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useDistricts } from './hooks/useDistricts';
 import { useCities } from '../CitiesPage/hooks/useCities';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
 
 const DistrictsPage = () => {
     const { t } = useTranslation('admin');
@@ -97,6 +98,47 @@ const DistrictsPage = () => {
         }
     };
 
+    const columns = useMemo<ColumnDef<any>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: t('pages.districts.table.id') as string,
+            size: 80,
+        },
+        {
+            accessorKey: 'name',
+            header: t('pages.districts.table.districtName') as string,
+            cell: (info) => (
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {info.getValue() as string}
+                </Typography>
+            ),
+        },
+        {
+            accessorKey: 'code',
+            header: t('pages.districts.table.code') as string,
+            cell: (info) => info.getValue() as string || '---',
+        },
+        {
+            id: 'actions',
+            header: t('pages.districts.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Box>
+                    <Tooltip title={t('pages.districts.table.edit')}>
+                        <IconButton size="small" color="primary" onClick={() => handleOpenEdit(info.row.original)}>
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.districts.table.delete')}>
+                        <IconButton size="small" color="error" onClick={() => handleOpenDelete(info.row.original)}>
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Box>
+            ),
+        },
+    ], [t]);
+
     return (
         <Box>
             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -144,77 +186,21 @@ const DistrictsPage = () => {
                     </TextField>
                 </Box>
 
-                {isLoadingDistricts ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-                        <CircularProgress size={40} />
-                    </Box>
-                ) : (
-                    <>
-                        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-                            <Table sx={{ minWidth: 650 }}>
-                                <TableHead sx={{ bgcolor: 'grey.50' }}>
-                                    <TableRow>
-                                        <TableCell width={80}>{t('pages.districts.table.id')}</TableCell>
-                                        <TableCell>{t('pages.districts.table.districtName')}</TableCell>
-                                        <TableCell>{t('pages.districts.table.code')}</TableCell>
-                                        <TableCell align="right">{t('pages.districts.table.actions')}</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {districts?.map((row: any) => (
-                                        <TableRow key={row.id} hover>
-                                            <TableCell>{row.id}</TableCell>
-                                            <TableCell sx={{ fontWeight: 500 }}>{row.name}</TableCell>
-                                            <TableCell>{row.code || '---'}</TableCell>
-                                            <TableCell align="right">
-                                                <Tooltip title={t('pages.districts.table.edit')}>
-                                                    <IconButton size="small" color="primary" onClick={() => handleOpenEdit(row)}>
-                                                        <EditIcon fontSize="small" />
-                                                    </IconButton>
-                                                </Tooltip>
-                                                <Tooltip title={t('pages.districts.table.delete')}>
-                                                    <IconButton size="small" color="error" onClick={() => handleOpenDelete(row)}>
-                                                        <DeleteIcon fontSize="small" />
-                                                    </IconButton>
-                                                </Tooltip>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-                                    {(!districts || districts.length === 0) && selectedCity && (
-                                        <TableRow>
-                                            <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
-                                                {t('pages.districts.table.noData')}
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                    {!selectedCity && (
-                                        <TableRow>
-                                            <TableCell colSpan={4} align="center" sx={{ py: 3 }}>
-                                                {t('pages.districts.table.noCitySelected')}
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                        <TablePagination
-                            rowsPerPageOptions={[5, 10, 25]}
-                            component="div"
-                            count={districtsData?.count || 0}
-                            rowsPerPage={rowsPerPage}
-                            page={page}
-                            onPageChange={(e, v) => setPage(v)}
-                            onRowsPerPageChange={(e) => {
-                                setRowsPerPage(parseInt(e.target.value, 10));
-                                setPage(0);
-                            }}
-                            labelRowsPerPage={t('common.pagination.rowsPerPage')}
-                            labelDisplayedRows={({ from, to, count }) =>
-                                t('common.pagination.displayedRows', { from, to, count })
-                            }
-                        />
-                    </>
-                )}
+                <DataTable
+                    columns={columns}
+                    data={districts || []}
+                    isLoading={isLoadingDistricts}
+                    rowCount={districtsData?.count || 0}
+                    pagination={{
+                        pageIndex: page,
+                        pageSize: rowsPerPage,
+                    }}
+                    onPaginationChange={(pagination) => {
+                        setPage(pagination.pageIndex);
+                        setRowsPerPage(pagination.pageSize);
+                    }}
+                    emptyMessage={!selectedCity ? t('pages.districts.table.noCitySelected') : t('pages.districts.table.noData')}
+                />
             </Paper>
 
             {/* Add/Edit Dialog */}

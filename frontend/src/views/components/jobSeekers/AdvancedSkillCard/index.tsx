@@ -4,7 +4,8 @@ import { useParams } from 'next/navigation';
 
 import { useTranslation } from "react-i18next";
 
-import { Box, Divider, Fab, IconButton, Rating, Skeleton, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Divider, Fab, IconButton, Rating, Skeleton, Stack, Typography } from "@mui/material";
+import DataTable from '../../../../components/Common/DataTable';
 
 import AddIcon from '@mui/icons-material/Add';
 
@@ -385,237 +386,62 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
             <Box>
 
-              {advancedSkills.length === 0 ? (
-
-                <EmptyCard
-
-                  content={t('jobSeeker:profile.messages.noSkillData')}
-
-                  onClick={handleShowAdd}
-
-                />
-
-              ) : (
-
-                <TableContainer
-
-                  sx={{
-
-                    boxShadow: 'none',
-
-                    bgcolor: 'transparent',
-
-                  }}
-
-                >
-
-                  <Table aria-label={t("jobSeeker:profile.aria.advancedSkillsTable")} size="medium">
-
-                    <TableHead>
-
-                      <TableRow>
-
-                        <TableCell
-
-                          align="left"
-
-                          sx={{
-
-                            color: 'text.secondary',
-
-                            fontWeight: 600,
-
-                            fontSize: '0.875rem',
-
-                            borderBottom: '2px solid',
-
-                            borderColor: 'primary.light',
-
-                          }}
-
-                        >
-
-                          {t('jobSeeker:profile.fields.skill')}
-
-                        </TableCell>
-
-                        <TableCell
-
-                          align="left"
-
-                          sx={{
-
-                            color: 'text.secondary',
-
-                            fontWeight: 600,
-
-                            fontSize: '0.875rem',
-
-                            borderBottom: '2px solid',
-
-                            borderColor: 'primary.light',
-
-                          }}
-
-                        >
-
-                          {t('jobSeeker:profile.fields.level')}
-
-                        </TableCell>
-
-                        <TableCell
-
-                          align="right"
-
-                          sx={{
-
-                            color: 'text.secondary',
-
-                            fontWeight: 600,
-
-                            fontSize: '0.875rem',
-
-                            borderBottom: '2px solid',
-
-                            borderColor: 'primary.light',
-
-                          }}
-
-                        >
-
-                          {t('jobSeeker:profile.fields.actions')}
-
-                        </TableCell>
-
-                      </TableRow>
-
-                    </TableHead>
-
-                    <TableBody>
-
-                      {advancedSkills.map((value) => (
-
-                        <TableRow
-
-                          key={value.id}
-
-                          sx={{
-
-                            '&:last-child td, &:last-child th': { border: 0 },
-
-                            '&:hover': {
-
-                              bgcolor: 'primary.background',
-
-                            },
-
-                            transition: 'background-color 0.2s ease-in-out',
-
-                          }}
-
-                        >
-
-                          <TableCell
-
-                            align="left"
-
+                <DataTable
+                  columns={[
+                    {
+                      header: t('jobSeeker:profile.fields.skill'),
+                      accessorKey: 'name',
+                    },
+                    {
+                      header: t('jobSeeker:profile.fields.level'),
+                      accessorKey: 'level',
+                      cell: (info: any) => (
+                        <Rating name="level-read-only" value={info.getValue() as number || 0} size="large" readOnly />
+                      ),
+                    },
+                    {
+                      header: t('jobSeeker:profile.fields.actions'),
+                      id: 'actions',
+                      meta: { align: 'right' },
+                      cell: (info: any) => (
+                        <Stack direction="row" spacing={1} justifyContent="flex-end">
+                          <IconButton
+                            size="small"
                             sx={{
-
-                              color: 'text.primary',
-
-                              fontWeight: 500,
-
-                              fontSize: '0.875rem',
-
+                              color: 'secondary.main',
+                              bgcolor: 'secondary.background',
+                              '&:hover': {
+                                bgcolor: 'secondary.light',
+                                color: 'white',
+                              },
                             }}
-
+                            onClick={() => handleShowUpdate(info.row.original.id)}
                           >
-
-                            {value?.name}
-
-                          </TableCell>
-
-                          <TableCell align="left">
-
-                            <Rating name="level-read-only" value={value?.level || 0} size="large" readOnly />
-
-                          </TableCell>
-
-                          <TableCell align="right">
-
-                            <Stack direction="row" spacing={1} justifyContent="flex-end">
-
-                              <IconButton
-
-                                size="small"
-
-                                sx={{
-
-                                  color: 'secondary.main',
-
-                                  bgcolor: 'secondary.background',
-
-                                  '&:hover': {
-
-                                    bgcolor: 'secondary.light',
-
-                                    color: 'white',
-
-                                  },
-
-                                }}
-
-                                onClick={() => handleShowUpdate(value.id)}
-
-                              >
-
-                                <ModeEditOutlineOutlinedIcon fontSize="small" />
-
-                              </IconButton>
-
-                              <IconButton
-
-                                size="small"
-
-                                sx={{
-
-                                  color: 'error.main',
-
-                                  bgcolor: 'error.background',
-
-                                  '&:hover': {
-
-                                    bgcolor: 'error.main',
-
-                                    color: 'white',
-
-                                  },
-
-                                }}
-
-                                onClick={() => handleDeleteAdvancedSkill(value.id)}
-
-                              >
-
-                                <DeleteOutlineOutlinedIcon fontSize="small" />
-
-                              </IconButton>
-
-                            </Stack>
-
-                          </TableCell>
-
-                        </TableRow>
-
-                      ))}
-
-                    </TableBody>
-
-                  </Table>
-
-                </TableContainer>
-
-              )}
+                            <ModeEditOutlineOutlinedIcon fontSize="small" />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            sx={{
+                              color: 'error.main',
+                              bgcolor: 'error.background',
+                              '&:hover': {
+                                bgcolor: 'error.main',
+                                color: 'white',
+                              },
+                            }}
+                            onClick={() => handleDeleteAdvancedSkill(info.row.original.id)}
+                          >
+                            <DeleteOutlineOutlinedIcon fontSize="small" />
+                          </IconButton>
+                        </Stack>
+                      ),
+                    },
+                  ]}
+                  data={advancedSkills}
+                  isLoading={isLoadingAdvancedSkills}
+                  hidePagination
+                  emptyMessage={t('jobSeeker:profile.messages.noSkillData')}
+                />
 
             </Box>
 

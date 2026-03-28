@@ -234,6 +234,7 @@ class PrivateJobPostViewSet(
             instance,
             fields=[
                 "id",
+                "slug",
                 "jobName",
                 "academicLevel",
                 "deadline",

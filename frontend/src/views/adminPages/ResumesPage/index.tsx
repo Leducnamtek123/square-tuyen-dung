@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
-import { Box, Typography, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Box, Typography, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, Chip, Tooltip, IconButton } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from "@mui/material";
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import DeleteIcon from '@mui/icons-material/Delete';
+import dayjs from '../../../configs/dayjs-config';
 
 import SearchIcon from '@mui/icons-material/Search';
 import { useResumes } from './hooks/useResumes';
-import ResumeTable from './components/ResumeTable';
 
 const ResumesPage = () => {
     const { t } = useTranslation('admin');
     const PAGE_SIZE = 10;
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState(0);
     const [searchTerm, setSearchTerm] = useState('');
 
     const {
@@ -20,7 +24,7 @@ const ResumesPage = () => {
         deleteResume,
         isMutating
     } = useResumes({
-        page,
+        page: page + 1,
         pageSize: PAGE_SIZE,
         kw: searchTerm
     }) as any;
@@ -38,7 +42,7 @@ const ResumesPage = () => {
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-        setPage(1);
+        setPage(0);
     };
 
     const handleOpenEdit = (resume: any) => {
@@ -91,6 +95,81 @@ const ResumesPage = () => {
         }
     };
 
+    const columns = React.useMemo<ColumnDef<any>[]>(() => [
+        {
+            accessorKey: 'title',
+            header: t('pages.resumes.table.resumeTitle') as string,
+            cell: (info) => (
+                <Box>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                        {info.getValue() as string}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                        Slug: {info.row.original.slug}
+                    </Typography>
+                </Box>
+            ),
+        },
+        {
+            accessorKey: 'userDict.fullName',
+            header: t('pages.resumes.table.candidate') as string,
+            cell: (info) => info.getValue() || '---',
+        },
+        {
+            accessorKey: 'type',
+            header: t('pages.resumes.table.resumeType') as string,
+            cell: (info) => (
+                <Chip
+                    label={info.getValue() === 'UPLOAD' ? t('pages.resumes.table.uploadedFile') : t('pages.resumes.table.onlineProfile')}
+                    size="small"
+                    variant="outlined"
+                    color={info.getValue() === 'UPLOAD' ? 'primary' : 'secondary'}
+                />
+            ),
+        },
+        {
+            accessorKey: 'experience',
+            header: t('pages.resumes.table.experience') as string,
+            cell: (info) => info.getValue() || '---',
+        },
+        {
+            accessorKey: 'updateAt',
+            header: t('pages.resumes.table.lastUpdate') as string,
+            cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm'),
+        },
+        {
+            accessorKey: 'isActive',
+            header: t('pages.resumes.table.status') as string,
+            meta: { align: 'center' },
+            cell: (info) => (
+                <Chip
+                    label={info.getValue() ? t('pages.resumes.table.active') : t('pages.resumes.table.inactive')}
+                    size="small"
+                    color={info.getValue() ? 'success' : 'default'}
+                />
+            ),
+        },
+        {
+            id: 'actions',
+            header: t('pages.resumes.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                    <Tooltip title={t('pages.resumes.table.viewDetails')}>
+                        <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)}>
+                            <VisibilityIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.resumes.table.delete')}>
+                        <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Box>
+            ),
+        },
+    ], [t]);
+
     return (
         <Box sx={{ p: 2 }}>
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
@@ -113,29 +192,20 @@ const ResumesPage = () => {
                     />
                 </Box>
 
-                {isLoading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-                        <CircularProgress size={40} />
-                    </Box>
-                ) : (
-                    <>
-                        <ResumeTable
-                            data={data?.results || data}
-                            onEdit={handleOpenEdit}
-                            onDelete={handleOpenDelete}
-                        />
-                        {data?.count > 0 && (
-                            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-                                <Pagination
-                                    count={Math.ceil(data.count / PAGE_SIZE)}
-                                    page={page}
-                                    onChange={(_, v) => setPage(v)}
-                                    color="primary"
-                                />
-                            </Box>
-                        )}
-                    </>
-                )}
+
+                <DataTable
+                    columns={columns}
+                    data={data?.results || []}
+                    isLoading={isLoading}
+                    rowCount={data?.count || 0}
+                    pagination={{
+                        pageIndex: page,
+                        pageSize: PAGE_SIZE,
+                    }}
+                    onPaginationChange={(pagination) => {
+                        setPage(pagination.pageIndex);
+                    }}
+                />
             </Paper>
             {/* Edit Dialog */}
             <Dialog open={openEditDialog} onClose={handleCloseDialogs} fullWidth maxWidth="xs">

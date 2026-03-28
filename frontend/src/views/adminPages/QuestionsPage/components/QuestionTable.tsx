@@ -1,73 +1,112 @@
-import React from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, Chip, Tooltip, IconButton, Box, CircularProgress, Paper } from "@mui/material";
-
+import React, { useMemo } from 'react';
+import { Typography, Chip, Tooltip, IconButton, Stack } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useTranslation } from 'react-i18next';
+import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
+import DataTable from '../../../../components/Common/DataTable';
 
 interface QuestionTableProps {
     questions: any[];
     loading?: boolean;
+    rowCount?: number;
+    pagination?: { pageIndex: number; pageSize: number };
+    onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
+    sorting?: SortingState;
+    onSortingChange?: OnChangeFn<SortingState>;
+    rowSelection?: RowSelectionState;
+    onRowSelectionChange?: OnChangeFn<RowSelectionState>;
     onEdit: (question: any) => void;
     onDelete: (id: string | number) => void;
 }
 
-const QuestionTable = ({ questions, loading, onEdit, onDelete }: QuestionTableProps) => {
+const QuestionTable = ({ 
+    questions, 
+    loading, 
+    rowCount, 
+    pagination, 
+    onPaginationChange, 
+    sorting,
+    onSortingChange,
+    rowSelection,
+    onRowSelectionChange,
+    onEdit, 
+    onDelete 
+}: QuestionTableProps) => {
     const { t } = useTranslation('admin');
-    if (loading && questions.length === 0) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', p: 5 }}>
-                <CircularProgress />
-            </Box>
-        );
-    }
+
+    const columns = useMemo<ColumnDef<any>[]>(() => [
+        {
+            accessorKey: 'questionText',
+            header: t('pages.questions.table.questionContent') as string,
+            enableSorting: true,
+            cell: (info) => (
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {info.getValue() as string}
+                </Typography>
+            ),
+        },
+        {
+            accessorKey: 'careerDict.name',
+            id: 'career',
+            header: t('pages.questions.table.field') as string,
+            enableSorting: true,
+            cell: (info) => (
+                <Chip label={info.getValue() as string || t('pages.questions.table.general')} size="small" variant="outlined" />
+            ),
+        },
+        {
+            accessorKey: 'difficulty',
+            header: t('pages.questions.table.difficulty') as string,
+            enableSorting: true,
+            cell: (info) => {
+                const difficulty = info.getValue() as number;
+                return (
+                    <Chip
+                        label={difficulty === 1 ? t('pages.questions.difficulty.easy') : difficulty === 2 ? t('pages.questions.difficulty.medium') : t('pages.questions.difficulty.hard')}
+                        size="small"
+                        color={difficulty === 1 ? 'success' : difficulty === 2 ? 'warning' : 'error'}
+                    />
+                );
+            },
+        },
+        {
+            id: 'actions',
+            header: t('pages.questions.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <Tooltip title={t('pages.questions.table.edit')}>
+                        <IconButton size="small" onClick={() => onEdit(info.row.original)} color="primary">
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.questions.table.delete')}>
+                        <IconButton size="small" onClick={() => onDelete(info.row.original.id)} color="error">
+                            <DeleteOutlineIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            ),
+        },
+    ], [t, onEdit, onDelete]);
 
     return (
-        <TableContainer component={Paper} elevation={0} sx={{ border: '1px solid', borderColor: 'divider' }}>
-            <Table sx={{ minWidth: 750 }}>
-                <TableHead sx={{ bgcolor: 'grey.50' }}>
-                    <TableRow>
-                        <TableCell>{t('pages.questions.table.questionContent')}</TableCell>
-                        <TableCell>{t('pages.questions.table.field')}</TableCell>
-                        <TableCell>{t('pages.questions.table.difficulty')}</TableCell>
-                        <TableCell align="right">{t('pages.questions.table.actions')}</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {questions.map((q) => (
-                        <TableRow key={q.id} hover>
-                            <TableCell>
-                                <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                    {q.questionText}
-                                </Typography>
-                            </TableCell>
-                            <TableCell>
-                                <Chip label={q.careerDict?.name || t('pages.questions.table.general')} size="small" variant="outlined" />
-                            </TableCell>
-                            <TableCell>
-                                <Chip
-                                    label={q.difficulty === 1 ? t('pages.questions.difficulty.easy') : q.difficulty === 2 ? t('pages.questions.difficulty.medium') : t('pages.questions.difficulty.hard')}
-                                    size="small"
-                                    color={q.difficulty === 1 ? 'success' : q.difficulty === 2 ? 'warning' : 'error'}
-                                />
-                            </TableCell>
-                            <TableCell align="right">
-                                <Tooltip title={t('pages.questions.table.edit')}>
-                                    <IconButton size="small" onClick={() => onEdit(q)} color="primary">
-                                        <EditIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                                <Tooltip title={t('pages.questions.table.delete')}>
-                                    <IconButton size="small" onClick={() => onDelete(q.id)} color="error">
-                                        <DeleteOutlineIcon fontSize="small" />
-                                    </IconButton>
-                                </Tooltip>
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+        <DataTable
+            columns={columns}
+            data={questions || []}
+            isLoading={loading}
+            rowCount={rowCount}
+            pagination={pagination}
+            onPaginationChange={onPaginationChange}
+            enableSorting
+            sorting={sorting}
+            onSortingChange={onSortingChange}
+            enableRowSelection
+            rowSelection={rowSelection}
+            onRowSelectionChange={onRowSelectionChange}
+            emptyMessage={t('common.table.noData')}
+        />
     );
 };
 

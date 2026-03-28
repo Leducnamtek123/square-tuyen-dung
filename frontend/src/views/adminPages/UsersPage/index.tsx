@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
-import { Box, Paper, TablePagination } from "@mui/material";
+import { Box, Paper, Typography, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { PAGINATION } from '../../../configs/constants';
 import { useUsers, useToggleUserStatus, useUpdateUserRole } from './hooks/useUsers';
 import UserTable from './components/UserTable';
 import UserFilters from './components/UserFilters';
+
+import { SortingState, RowSelectionState } from '@tanstack/react-table';
 
 const UsersPage = () => {
     const { t } = useTranslation('admin');
@@ -13,14 +15,23 @@ const UsersPage = () => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [search, setSearch] = useState('');
     const [roleFilter, setRoleFilter] = useState('');
+    const [sorting, setSorting] = useState<SortingState>([]);
+    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+    
     const currentUserId = useAppSelector((state) => state.user?.currentUser?.id);
     const resolvedPageSize = rowsPerPage === -1 ? PAGINATION.ADMIN_MAX_PAGE_SIZE : rowsPerPage;
+
+    // Convert sorting state to API format (e.g., "fullName" or "-fullName")
+    const ordering = sorting.length > 0 
+        ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}`
+        : undefined;
 
     const { data: usersData, isLoading } = useUsers({
         page: page + 1,
         pageSize: resolvedPageSize,
         search: search || undefined,
         roleName: roleFilter || undefined,
+        ordering,
     }) as any;
 
     const toggleStatusMutation = useToggleUserStatus() as any;
@@ -68,32 +79,47 @@ const UsersPage = () => {
                     onRoleChange={handleRoleFilterChange}
                 />
 
+                {Object.keys(rowSelection).length > 0 && (
+                    <Box sx={{ mb: 2, p: 2, bgcolor: 'primary.light', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Typography variant="subtitle2" color="primary.contrastText">
+                            {t('pages.users.bulkSelect.selectedCount', { count: Object.keys(rowSelection).length })}
+                        </Typography>
+                        <Button 
+                            variant="contained" 
+                            color="error" 
+                            size="small"
+                            onClick={() => {
+                                if (window.confirm(t('pages.users.bulkSelect.deleteConfirm'))) {
+                                    // Handle bulk delete here
+                                    console.log('Bulk delete:', Object.keys(rowSelection));
+                                }
+                            }}
+                        >
+                            {t('pages.users.bulkSelect.deleteBtn')}
+                        </Button>
+                    </Box>
+                )}
+
                 <UserTable
                     users={users}
                     loading={isLoading}
+                    rowCount={totalUsers}
+                    pagination={{
+                        pageIndex: page,
+                        pageSize: rowsPerPage,
+                    }}
+                    onPaginationChange={(pagination) => {
+                        setPage(pagination.pageIndex);
+                        setRowsPerPage(pagination.pageSize);
+                    }}
+                    sorting={sorting}
+                    onSortingChange={setSorting}
+                    rowSelection={rowSelection}
+                    onRowSelectionChange={setRowSelection}
                     onToggleStatus={handleToggleStatus}
                     onRoleChange={handleRoleChange}
                     currentUserId={currentUserId || ''}
                     disableRoleActions={updateRoleMutation.isLoading}
-                />
-
-                <TablePagination
-                    rowsPerPageOptions={[
-                        5,
-                        10,
-                        25,
-                        { label: t('common.pagination.all'), value: -1 }
-                    ]}
-                    component="div"
-                    count={totalUsers}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    labelRowsPerPage={t('common.pagination.rowsPerPage')}
-                    labelDisplayedRows={({ from, to, count }) => 
-                        t('common.pagination.displayedRows', { from, to, count })
-                    }
                 />
             </Paper>
         </Box>

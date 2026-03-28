@@ -7,10 +7,15 @@ import { useQuestions, useCreateQuestion, useUpdateQuestion, useDeleteQuestion }
 import { useCareers } from '../CareersPage/hooks/useCareers';
 import QuestionTable from './components/QuestionTable';
 
+import { SortingState, RowSelectionState } from '@tanstack/react-table';
+
 const QuestionsPage = () => {
     const { t } = useTranslation('admin');
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [sorting, setSorting] = useState<SortingState>([]);
+    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+    
     const [openDialog, setOpenDialog] = useState(false);
     const [editingQuestion, setEditingQuestion] = useState<any>(null);
     const [formData, setFormData] = useState({
@@ -19,9 +24,14 @@ const QuestionsPage = () => {
         career: '',
     });
 
+    const ordering = sorting.length > 0 
+        ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}`
+        : undefined;
+
     const { data: questionsData, isLoading } = useQuestions({
         page: page + 1,
         pageSize: rowsPerPage,
+        ordering,
     }) as any;
 
     const { data: careersData } = useCareers({ pageSize: 100 }) as any;
@@ -87,28 +97,48 @@ const QuestionsPage = () => {
             <Card sx={{ borderRadius: '12px', boxShadow: (theme) => (theme as any).customShadows.card }} elevation={0}>
                 <CardHeader title={t('pages.questions.listTitle')} sx={{ pb: 0 }} />
                 <CardContent>
+                    {Object.keys(rowSelection).length > 0 && (
+                        <Box sx={{ mb: 2, p: 2, bgcolor: 'primary.light', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Typography variant="subtitle2" color="primary.contrastText">
+                                {t('pages.questions.bulkSelect.selectedCount', { count: Object.keys(rowSelection).length })}
+                            </Typography>
+                            <Button 
+                                variant="contained" 
+                                color="error" 
+                                size="small"
+                                onClick={() => {
+                                    if (window.confirm(t('pages.questions.bulkSelect.deleteConfirm'))) {
+                                        // Handle bulk delete here
+                                        console.log('Bulk delete questions:', Object.keys(rowSelection));
+                                    }
+                                }}
+                            >
+                                {t('pages.questions.bulkSelect.deleteBtn')}
+                            </Button>
+                        </Box>
+                    )}
                     <QuestionTable
                         questions={questionsData?.results || []}
                         loading={isLoading}
+                        rowCount={questionsData?.count || 0}
+                        pagination={{
+                            pageIndex: page,
+                            pageSize: rowsPerPage,
+                        }}
+                        onPaginationChange={(pagination) => {
+                            setPage(pagination.pageIndex);
+                            setRowsPerPage(pagination.pageSize);
+                        }}
+                        sorting={sorting}
+                        onSortingChange={setSorting}
+                        rowSelection={rowSelection}
+                        onRowSelectionChange={setRowSelection}
                         onEdit={handleOpenEdit}
                         onDelete={(id: string | number) => {
                             if (window.confirm(t('pages.questions.deleteConfirm'))) {
                                 deleteMutation.mutate(id);
                             }
                         }}
-                    />
-                    <TablePagination
-                        rowsPerPageOptions={[5, 10, 25]}
-                        component="div"
-                        count={questionsData?.count || 0}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        labelRowsPerPage={t('common.pagination.rowsPerPage')}
-                        labelDisplayedRows={({ from, to, count }) => 
-                            t('common.pagination.displayedRows', { from, to, count })
-                        }
                     />
                 </CardContent>
             </Card>

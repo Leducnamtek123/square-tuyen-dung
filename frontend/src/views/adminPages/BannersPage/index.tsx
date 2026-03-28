@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import {
   Box, Typography, Breadcrumbs, Link, Button, Paper, CircularProgress,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField,
   FormControlLabel, Switch, Select, MenuItem, InputLabel, FormControl,
-  Table, TableHead, TableRow, TableCell, TableBody, IconButton, Chip,
-  Tooltip
+  Chip, Tooltip, IconButton, Stack
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -15,6 +14,8 @@ import adminManagementService from '../../../services/adminManagementService';
 import { IMAGES } from '../../../configs/constants';
 import { compressImageFile } from '../../../utils/imageCompression';
 import ImageCropDialog from '../../../components/Common/ImageCropDialog';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
 
 /** Aspect ratios per banner type */
 const ASPECT_RATIOS: Record<number, { ratio: number; label: string }> = {
@@ -196,6 +197,91 @@ const BannersPage = () => {
 
   const cropAspect = ASPECT_RATIOS[type] || ASPECT_RATIOS[1];
 
+  const columns = useMemo<ColumnDef<any>[]>(() => [
+    {
+      accessorKey: 'id',
+      header: t('pages.banners.table.id') as string,
+    },
+    {
+      accessorKey: 'imageUrl',
+      header: t('pages.banners.table.webImage') as string,
+      cell: (info) => (
+        info.getValue() ? (
+          <Box
+            component="img"
+            src={info.getValue() as string}
+            alt="web banner"
+            onError={(e: any) => { e.currentTarget.src = IMAGES.companyLogoDefault; }}
+            sx={{ width: 120, height: 60, objectFit: 'cover', borderRadius: 1 }}
+          />
+        ) : '—'
+      ),
+    },
+    {
+      accessorKey: 'imageMobileUrl',
+      header: t('pages.banners.table.mobileImage') as string,
+      cell: (info) => (
+        info.getValue() ? (
+          <Box
+            component="img"
+            src={info.getValue() as string}
+            alt="mobile banner"
+            onError={(e: any) => { e.currentTarget.src = IMAGES.companyLogoDefault; }}
+            sx={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 1 }}
+          />
+        ) : '—'
+      ),
+    },
+    {
+      accessorKey: 'description',
+      header: t('pages.banners.table.description') as string,
+      cell: (info) => (
+        <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+          {info.getValue() as string || '—'}
+        </Typography>
+      ),
+    },
+    {
+      accessorKey: 'platform',
+      header: t('pages.banners.table.platform') as string,
+      cell: (info) => (
+        <Chip label={info.getValue() as string} size="small" color={info.getValue() === 'WEB' ? 'primary' : 'secondary'} />
+      ),
+    },
+    {
+      accessorKey: 'type',
+      header: t('pages.banners.table.type') as string,
+      cell: (info) => TYPE_OPTIONS.find(t => t.value === info.getValue())?.label || (info.getValue() as string),
+    },
+    {
+      accessorKey: 'is_active',
+      header: t('pages.banners.table.status') as string,
+      cell: (info) => (
+        <Chip label={info.getValue() ? t('pages.banners.active') : t('pages.banners.inactive')} size="small"
+          color={info.getValue() ? 'success' : 'default'} />
+      ),
+    },
+    {
+      id: 'actions',
+      header: t('pages.banners.table.actions') as string,
+      meta: { align: 'right' },
+      cell: (info) => (
+        <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+          <Tooltip title={t('pages.banners.table.edit')}>
+            <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)}>
+              <EditIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title={t('pages.banners.table.deleteTooltip')}>
+            <IconButton size="small" color="error" onClick={() => { setCurrent(info.row.original); setOpenDelete(true); }}>
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
+        </Stack>
+      ),
+    },
+  ], [t]);
+
   return (
     <Box>
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -212,80 +298,24 @@ const BannersPage = () => {
         </Button>
       </Box>
 
-      <Paper sx={{ p: 2, borderRadius: '12px' }} elevation={0}>
-        {fetchError && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4, gap: 2 }}>
-            <Typography color="error">{fetchError}</Typography>
-            <Button variant="outlined" color="primary" onClick={fetchBanners}>
-              {t('pages.banners.retry') || 'Thử lại'}
-            </Button>
-          </Box>
-        )}
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}><CircularProgress /></Box>
-        ) : !fetchError && (
-          <Table size="small" sx={{ minWidth: 750 }}>
-            <TableHead sx={{ bgcolor: 'grey.50' }}>
-              <TableRow>
-                <TableCell>{t('pages.banners.table.id')}</TableCell>
-                <TableCell>{t('pages.banners.table.webImage')}</TableCell>
-                <TableCell>{t('pages.banners.table.mobileImage')}</TableCell>
-                <TableCell>{t('pages.banners.table.description')}</TableCell>
-                <TableCell>{t('pages.banners.table.platform')}</TableCell>
-                <TableCell>{t('pages.banners.table.type')}</TableCell>
-                <TableCell>{t('pages.banners.table.status')}</TableCell>
-                <TableCell align="right">{t('pages.banners.table.actions')}</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {banners.length === 0 ? (
-                <TableRow><TableCell colSpan={8} align="center">{t('pages.banners.empty')}</TableCell></TableRow>
-              ) : banners.map((b: any) => (
-                <TableRow key={b.id} hover>
-                  <TableCell>{b.id}</TableCell>
-                  <TableCell>
-                    {b.imageUrl ? (
-                      <Box
-                        component="img"
-                        src={b.imageUrl}
-                        alt="web banner"
-                        onError={(e: any) => { e.currentTarget.src = IMAGES.companyLogoDefault; }}
-                        sx={{ width: 120, height: 60, objectFit: 'cover', borderRadius: 1 }}
-                      />
-                    ) : '—'}
-                  </TableCell>
-                  <TableCell>
-                    {b.imageMobileUrl ? (
-                      <Box
-                        component="img"
-                        src={b.imageMobileUrl}
-                        alt="mobile banner"
-                        onError={(e: any) => { e.currentTarget.src = IMAGES.companyLogoDefault; }}
-                        sx={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 1 }}
-                      />
-                    ) : '—'}
-                  </TableCell>
-                  <TableCell sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {b.description || '—'}
-                  </TableCell>
-                  <TableCell>
-                    <Chip label={b.platform} size="small" color={b.platform === 'WEB' ? 'primary' : 'secondary'} />
-                  </TableCell>
-                  <TableCell>{TYPE_OPTIONS.find(t => t.value === b.type)?.label || b.type}</TableCell>
-                  <TableCell>
-                    <Chip label={b.is_active ? t('pages.banners.active') : t('pages.banners.inactive')} size="small"
-                      color={b.is_active ? 'success' : 'default'} />
-                  </TableCell>
-                  <TableCell align="right">
-                    <Tooltip title={t('pages.banners.table.edit')}><IconButton size="small" onClick={() => handleOpenEdit(b)}><EditIcon fontSize="small" /></IconButton></Tooltip>
-                    <Tooltip title={t('pages.banners.table.deleteTooltip')}><IconButton size="small" color="error" onClick={() => { setCurrent(b); setOpenDelete(true); }}><DeleteIcon fontSize="small" /></IconButton></Tooltip>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </Paper>
+      {fetchError && (
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4, gap: 2 }}>
+          <Typography color="error">{fetchError}</Typography>
+          <Button variant="outlined" color="primary" onClick={fetchBanners}>
+            {t('pages.banners.retry') || 'Thử lại'}
+          </Button>
+        </Box>
+      )}
+
+      {!fetchError && (
+        <DataTable
+          columns={columns}
+          data={banners || []}
+          isLoading={isLoading}
+          hidePagination
+          emptyMessage={t('pages.banners.empty')}
+        />
+      )}
 
       {/* Add/Edit Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
