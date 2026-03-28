@@ -277,6 +277,11 @@
       "cancel": "Hủy",
       "save": "Lưu",
       "deleteConfirm": "Bạn có chắc chắn muốn xóa tin tuyển dụng này không?",
+      "bulkSelect": {
+        "selectedCount": "Đã chọn {{count}} tin tuyển dụng",
+        "deleteConfirm": "Bạn có chắc chắn muốn xóa các tin tuyển dụng đã chọn không? Hành động này không thể hoàn tác.",
+        "deleteBtn": "Xóa mục đã chọn"
+      },
       "table": {
         "status": {
           "pending": "Đang chờ",
@@ -407,6 +412,11 @@
       }
     },
     "users": {
+      "bulkSelect": {
+        "selectedCount": "Đã chọn {{count}} người dùng",
+        "deleteConfirm": "Bạn có chắc chắn muốn xóa các người dùng đã chọn không? Hành động này không thể hoàn tác.",
+        "deleteBtn": "Xóa mục đã chọn"
+      },
       "table": {
         "id": "ID",
         "fullName": "Họ và tên",
@@ -468,6 +478,11 @@
       "cancelBtn": "Hủy",
       "saveBtn": "Lưu",
       "savingBtn": "Đang lưu...",
+      "bulkSelect": {
+        "selectedCount": "Đã chọn {{count}} câu hỏi",
+        "deleteConfirm": "Bạn có chắc chắn muốn xóa các câu hỏi đã chọn không? Hành động này không thể hoàn tác.",
+        "deleteBtn": "Xóa mục đã chọn"
+      },
       "difficulty": {
         "easy": "Dễ",
         "medium": "Trung bình",
@@ -529,6 +544,11 @@
       }
     },
     "interviews": {
+      "bulkSelect": {
+        "selectedCount": "Đã chọn {{count}} cuộc phỏng vấn",
+        "deleteConfirm": "Bạn có chắc chắn muốn xóa các cuộc phỏng vấn đã chọn không? Hành động này không thể hoàn tác.",
+        "deleteBtn": "Xóa mục đã chọn"
+      },
       "type": {
         "vetting": "Vetting",
         "recruitment": "Tuyển dụng"

@@ -137,8 +137,9 @@ const DataTable = <TData,>({
         columns: finalColumns,
         state: {
             sorting,
-            rowSelection,
+            rowSelection: rowSelection ?? {},
         },
+        enableRowSelection,
         enableSorting,
         onSortingChange,
         onRowSelectionChange,
