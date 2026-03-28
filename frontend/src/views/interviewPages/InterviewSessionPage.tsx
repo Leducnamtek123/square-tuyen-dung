@@ -213,6 +213,11 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
   const jobLabel = session?.jobName || t("common:labels.job", { defaultValue: "Job" });
   const candidateLabel = session?.candidateName || t("interviewListCard.candidate", { defaultValue: "Candidate" });
 
+  const sessionInfo = useMemo(() => ({
+    jobName: session?.jobName,
+    candidateName: session?.candidateName,
+  }), [session?.jobName, session?.candidateName]);
+
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-4 text-slate-100 md:px-8 md:py-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
@@ -276,10 +281,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
             >
               <InterviewRoomContent
                 onDisconnect={handleEndInterview}
-                sessionInfo={{
-                  jobName: session?.jobName,
-                  candidateName: session?.candidateName,
-                }}
+                sessionInfo={sessionInfo}
               />
             </LiveKitRoom>
           ) : (

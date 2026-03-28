@@ -1,5 +1,5 @@
 'use client';;
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { HTMLAttributes, KeyboardEvent } from 'react';
 import { useChat, useRoomContext } from '@livekit/components-react';
 import { Track } from 'livekit-client';
@@ -104,7 +104,7 @@ function AgentChatInput({
   const [message, setMessage] = useState('');
   const isDisabled = isSending || message.trim().length === 0;
 
-  const handleSend = async () => {
+  const handleSend = useCallback(async () => {
     if (isDisabled) {
       return;
     }
@@ -118,22 +118,22 @@ function AgentChatInput({
     } finally {
       setIsSending(false);
     }
-  };
+  }, [isDisabled, message, onSend]);
 
-  const handleKeyDown = async (e: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = useCallback(async (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
-  };
+  }, [handleSend]);
 
-  const handleButtonClick = async () => {
+  const handleButtonClick = useCallback(async () => {
     if (isDisabled) return;
     await handleSend();
-  };
+  }, [isDisabled, handleSend]);
 
   useEffect(() => {
-    if (chatOpen) return;
+    if (!chatOpen) return;
     // when not disabled refocus on input
     inputRef.current?.focus();
   }, [chatOpen]);
@@ -207,6 +207,8 @@ export function AgentControlBar({
   const { send } = useChat({ room });
   const publishPermissions = usePublishPermissions();
   const [isChatOpenUncontrolled, setIsChatOpenUncontrolled] = useState(isChatOpen);
+  
+  const inputControls = useInputControls({ onDeviceError, saveUserChoices, room });
   const {
     microphoneTrack,
     cameraToggle,
@@ -216,19 +218,21 @@ export function AgentControlBar({
     handleVideoDeviceChange,
     handleMicrophoneDeviceSelectError,
     handleCameraDeviceSelectError,
-  } = useInputControls({ onDeviceError, saveUserChoices, room });
+  } = inputControls;
 
-  const handleSendMessage = async (message: string) => {
-    await send(message);
-  };
+  const handleSendMessage = useCallback(async (message: string) => {
+    if (typeof send === 'function') {
+      await send(message);
+    }
+  }, [send]);
 
-  const visibleControls = {
+  const visibleControls = useMemo(() => ({
     leave: controls?.leave ?? true,
     microphone: controls?.microphone ?? publishPermissions.microphone,
     screenShare: controls?.screenShare ?? publishPermissions.screenShare,
     camera: controls?.camera ?? publishPermissions.camera,
     chat: controls?.chat ?? publishPermissions.data,
-  };
+  }), [controls, publishPermissions]);
 
   const isEmpty = Object.values(visibleControls).every((value) => !value);
 
@@ -236,6 +240,12 @@ export function AgentControlBar({
     console.warn('AgentControlBar: `visibleControls` contains only false values.');
     return null;
   }
+
+  const handleChatToggle = useCallback(() => {
+    const nextState = !(isChatOpen || isChatOpenUncontrolled);
+    if (!onIsChatOpenChange) setIsChatOpenUncontrolled(nextState);
+    else onIsChatOpenChange(nextState);
+  }, [isChatOpen, isChatOpenUncontrolled, onIsChatOpenChange]);
 
   return (
     <div
@@ -314,11 +324,7 @@ export function AgentControlBar({
               type="button"
               aria-pressed={isChatOpen || isChatOpenUncontrolled}
               aria-label="Toggle transcript"
-              onClick={() => {
-                const nextState = !(isChatOpen || isChatOpenUncontrolled);
-                if (!onIsChatOpenChange) setIsChatOpenUncontrolled(nextState);
-                else onIsChatOpenChange(nextState);
-              }}
+              onClick={handleChatToggle}
               data-state={(isChatOpen || isChatOpenUncontrolled) ? 'on' : 'off'}
               className={agentTrackToggleVariants({
                 variant: variant === 'outline' ? 'outline' : 'default',

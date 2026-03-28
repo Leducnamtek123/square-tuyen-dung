@@ -1,4 +1,5 @@
 'use client';;
+import { useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useRoomContext } from '@livekit/components-react';
 import CallEndIcon from '@mui/icons-material/CallEnd';
@@ -25,12 +26,13 @@ export function AgentDisconnectButton({
   ...props
 }: AgentDisconnectButtonProps) {
   const room = useRoomContext();
-  const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
+  const handleClick = useCallback((event: MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
     if (typeof room?.disconnect === 'function') {
       void room.disconnect();
     }
-  };
+  }, [onClick, room]);
+
   const buttonVariant = variant === 'outline' ? 'outline' : variant === 'destructive' ? 'destructive' : 'default';
   const buttonSize = size === 'sm' || size === 'xs' ? 'sm' : size === 'lg' ? 'lg' : 'default';
 
