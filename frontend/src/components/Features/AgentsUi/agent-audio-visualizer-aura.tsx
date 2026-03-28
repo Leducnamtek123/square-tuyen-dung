@@ -216,7 +216,7 @@ const toNum = (val: number | number[] | undefined, fallback: number): number => 
   return Array.isArray(val) ? val[0] : val;
 };
 
-function AuraShader({
+export function AuraShader({
   shape = 1.0,
   speed = 1.0,
   amplitude = 0.5,

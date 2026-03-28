@@ -9,7 +9,7 @@ import {
 } from "@livekit/components-react";
 
 import InterviewAgentView from "../../components/Features/InterviewAi/InterviewAgentView";
-import { AgentAudioVisualizerAura, StartAudioButton } from "../../components/Features/AgentsUi";
+import { AgentAudioVisualizerAura, AuraShader, StartAudioButton } from "../../components/Features/AgentsUi";
 import Button from "@mui/material/Button";
 
 import interviewService from "../../services/interviewService";
@@ -261,9 +261,12 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
               <div className="relative flex h-full items-center justify-center px-6">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.22),transparent_52%)]" />
                 <div className="relative flex w-full max-w-lg flex-col items-center gap-6 text-center">
-                  <AudioVisualizerAura
-                    size="md"
-                    state="listening"
+                  <AuraShader
+                    speed={20}
+                    scale={0.3}
+                    amplitude={1.0}
+                    frequency={0.7}
+                    brightness={1.5}
                     className="h-[220px] w-[220px] md:h-[280px] md:w-[280px]"
                   />
                   <div className="space-y-2">

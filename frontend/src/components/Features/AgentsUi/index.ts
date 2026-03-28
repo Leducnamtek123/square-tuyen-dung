@@ -1,4 +1,5 @@
 export * from './agent-audio-visualizer-aura';
+export { AuraShader } from './agent-audio-visualizer-aura';
 export * from './agent-audio-visualizer-bar';
 export * from './agent-audio-visualizer-grid';
 export * from './agent-audio-visualizer-radial';
