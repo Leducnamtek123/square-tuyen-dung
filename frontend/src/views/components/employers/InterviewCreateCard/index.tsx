@@ -100,8 +100,10 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
     });
 
     const selectedJobPostId = watch('job_post');
-
     const selectedGroupId = watch('selected_group');
+
+    const prevJobIdRef = React.useRef<any>(null);
+    const prevGroupIdRef = React.useRef<any>(null);
 
     const fetchQuestions = async () => {
 
@@ -215,70 +217,52 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
         }
     }, [sessionId, reset, t]);
 
-    // Effect to auto-fill questions when a group is selected
-
     useEffect(() => {
-
         if (selectedGroupId) {
-
             const group = questionGroups.find((g) => String(g.id) === String(selectedGroupId));
-
             if (group && group.questions) {
-
                 const questionIds = group.questions.map(q => q.id);
-
-                setValue('selected_questions', questionIds);
-
+                // Only update questions if the group ID has actually changed (user interaction)
+                if (prevGroupIdRef.current !== null && prevGroupIdRef.current !== selectedGroupId) {
+                    setValue('selected_questions', questionIds);
+                }
             }
-
         } else {
-
-            setValue('selected_questions', []);
-
+            // Only clear questions if the group was manually reset to empty
+            if (prevGroupIdRef.current !== null && prevGroupIdRef.current !== selectedGroupId) {
+                setValue('selected_questions', []);
+            }
         }
-
+        prevGroupIdRef.current = selectedGroupId || null;
     }, [selectedGroupId, questionGroups, setValue]);
 
     useEffect(() => {
-
         if (selectedJobPostId) {
-
             jobPostActivityService.getAppliedResume({ jobPostId: selectedJobPostId, pageSize: 100 })
-
                 .then((res: any) => {
-
                     const rawCandidates = Array.isArray(res?.results)
-
                         ? res.results
-
                         : Array.isArray(res)
-
                             ? res
-
                                     : [];
-
                     setCandidates(rawCandidates.map(transformAppliedResume).filter(Boolean));
-
-                    setValue('candidate', '');
-
+                    
+                    // Only clear candidate if the job post ID has actually changed (user interaction)
+                    if (prevJobIdRef.current !== null && prevJobIdRef.current !== selectedJobPostId) {
+                        setValue('candidate', '');
+                    }
                 })
-
                 .catch(err => {
-
                     console.error('Error fetching candidates', err);
-
                     toast.error(t('interviewCreateCard.messages.loadCandidateError'));
-
                 });
-
         } else {
-
             setCandidates([]);
-
-            setValue('candidate', '');
-
+            if (prevJobIdRef.current !== null && prevJobIdRef.current !== selectedJobPostId) {
+                setValue('candidate', '');
+            }
         }
-
+        prevJobIdRef.current = selectedJobPostId || null;
     }, [selectedJobPostId, setValue, t]);
 
     const openCreateQuestionDialog = () => {
