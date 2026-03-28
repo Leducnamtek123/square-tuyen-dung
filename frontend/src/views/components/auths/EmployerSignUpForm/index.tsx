@@ -213,18 +213,24 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
     } catch (error) { }
   };
 
+  const prevCityIdRef = React.useRef<any>(null);
   React.useEffect(() => {
     const loadDistricts = async (cityId: number) => {
       try {
         const resData = await commonService.getDistrictsByCityId(cityId) as any;
-        if (districtOptions.length > 0) setValue('company.location.district', '' as any);
+        // Only clear district if the cityId has actually changed (user interaction)
+        // and it's not the initial load (prevCityIdRef.current is not null).
+        if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
+          setValue('company.location.district', '' as any);
+        }
         setDistrictOptions(resData);
+        prevCityIdRef.current = cityId;
       } catch (error) {
         errorHandling(error as AxiosError<any>, undefined);
       }
     };
     if (cityId) loadDistricts(cityId as unknown as number);
-  }, [cityId, setValue, districtOptions.length]);
+  }, [cityId, setValue]);
 
   const handleSubmtNextSuccess = (data: any) => handleNext(data.email);
 

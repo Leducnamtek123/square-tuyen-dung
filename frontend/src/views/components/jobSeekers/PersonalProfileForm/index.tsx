@@ -239,37 +239,26 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
   }, [editData, reset]);
 
+  const prevCityIdRef = React.useRef<any>(null);
   React.useEffect(() => {
-
     const loadDistricts = async (id: number | string) => {
-
       try {
-
         const resData = await commonService.getDistrictsByCityId(id) as any;
-
-        if (districtOptions.length > 0) setValue('location.district', '');
-
+        // Only clear district if the cityId has actually changed (user interaction)
+        // and it's not the initial load (prevCityIdRef.current is not null).
+        if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
+          setValue('location.district', '');
+        }
         setDistrictOptions(resData);
-
+        prevCityIdRef.current = id;
       } catch (error: any) {
-
         errorHandling(error);
-
-      } finally {
-
       }
-
     };
-
     if (cityId) {
-
       loadDistricts(cityId);
-
     }
-
-
-
-  }, [cityId, setValue, districtOptions.length]);
+  }, [cityId, setValue]);
 
   return (
 
