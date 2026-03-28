@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { Track } from 'livekit-client';
 import {
   useTrackToggle,
@@ -7,7 +7,7 @@ import {
   useLocalParticipant,
 } from '@livekit/components-react';
 
-type DeviceErrorHandler = (payload: { source: Track.Source; error: unknown }) => void;
+export type DeviceErrorHandler = (error: { source: Track.Source; error: unknown }) => void;
 
 const trackSourceToProtocol = (source: Track.Source): number => {
   // NOTE: this mapping avoids importing the protocol package as that leads to a significant bundle size increase
@@ -23,25 +23,38 @@ const trackSourceToProtocol = (source: Track.Source): number => {
   }
 };
 
+/**
+ * Hook to check if the local participant has permissions to publish a specific source.
+ */
 export function usePublishPermissions() {
   const localPermissions = useLocalParticipantPermissions();
 
-  const canPublishSource = (source: Track.Source): boolean => {
-    return (
-      !!localPermissions?.canPublish &&
-      (localPermissions.canPublishSources.length === 0 ||
-        localPermissions.canPublishSources.includes(trackSourceToProtocol(source)))
-    );
-  };
+  const canPublishSource = useCallback(
+    (source: Track.Source): boolean => {
+      if (!localPermissions) return false;
+      return (
+        !!localPermissions.canPublish &&
+        (localPermissions.canPublishSources.length === 0 ||
+          localPermissions.canPublishSources.includes(trackSourceToProtocol(source)))
+      );
+    },
+    [localPermissions]
+  );
 
-  return {
-    camera: canPublishSource(Track.Source.Camera),
-    microphone: canPublishSource(Track.Source.Microphone),
-    screenShare: canPublishSource(Track.Source.ScreenShare),
-    data: localPermissions?.canPublishData ?? false,
-  };
+  return useMemo(
+    () => ({
+      camera: canPublishSource(Track.Source.Camera),
+      microphone: canPublishSource(Track.Source.Microphone),
+      screenShare: canPublishSource(Track.Source.ScreenShare),
+      data: localPermissions?.canPublishData ?? false,
+    }),
+    [canPublishSource, localPermissions]
+  );
 }
 
+/**
+ * Hook to manage input controls (mic, camera, screen share) with persistence and error handling.
+ */
 export function useInputControls(
   {
     saveUserChoices = true,
@@ -53,82 +66,128 @@ export function useInputControls(
     room?: any;
   } = {}
 ) {
-  console.log("useInputControls: starting hook execution");
-  const { localParticipant, microphoneTrack } = useLocalParticipant({ room });
-  console.log("useInputControls: useLocalParticipant hook successful, identity:", localParticipant?.identity);
+  const localParticipantHook = useLocalParticipant({ room });
+  const { localParticipant, microphoneTrack } = localParticipantHook ?? {};
 
-  const microphoneToggle = useTrackToggle({
-    source: Track.Source.Microphone,
-    onDeviceError: (error) => onDeviceError?.({ source: Track.Source.Microphone, error }),
-    room,
-  });
-  console.log("useInputControls: useTrackToggle (mic) hook successful");
+  const handleMicError = useCallback(
+    (error: unknown) => onDeviceError?.({ source: Track.Source.Microphone, error }),
+    [onDeviceError]
+  );
 
-  const cameraToggle = useTrackToggle({
-    source: Track.Source.Camera,
-    onDeviceError: (error) => onDeviceError?.({ source: Track.Source.Camera, error }),
-    room,
-  });
+  const microphoneToggleOptions = useMemo(
+    () => ({
+      source: Track.Source.Microphone as any,
+      onDeviceError: handleMicError,
+      room,
+    }),
+    [handleMicError, room]
+  );
 
-  const screenShareToggle = useTrackToggle({
-    source: Track.Source.ScreenShare,
-    onDeviceError: (error) => onDeviceError?.({ source: Track.Source.ScreenShare, error }),
-    room,
-  });
+  const microphoneToggle = useTrackToggle(microphoneToggleOptions);
 
-  console.log("useInputControls: before usePersistentUserChoices");
+  const handleCamError = useCallback(
+    (error: unknown) => onDeviceError?.({ source: Track.Source.Camera, error }),
+    [onDeviceError]
+  );
+
+  const cameraToggleOptions = useMemo(
+    () => ({
+      source: Track.Source.Camera as any,
+      onDeviceError: handleCamError,
+      room,
+    }),
+    [handleCamError, room]
+  );
+
+  const cameraToggle = useTrackToggle(cameraToggleOptions);
+
+  const handleScreenError = useCallback(
+    (error: unknown) => onDeviceError?.({ source: Track.Source.ScreenShare, error }),
+    [onDeviceError]
+  );
+
+  const screenShareToggleOptions = useMemo(
+    () => ({
+      source: Track.Source.ScreenShare as any,
+      onDeviceError: handleScreenError,
+      room,
+    }),
+    [handleScreenError, room]
+  );
+
+  const screenShareToggle = useTrackToggle(screenShareToggleOptions);
+
+  const persistentChoicesOptions = useMemo(
+    () => ({ preventSave: !saveUserChoices }),
+    [saveUserChoices]
+  );
+
+  const persistentChoices = usePersistentUserChoices(persistentChoicesOptions);
+
   const {
     saveAudioInputEnabled,
     saveVideoInputEnabled,
     saveAudioInputDeviceId,
     saveVideoInputDeviceId,
-  } = usePersistentUserChoices({ preventSave: !saveUserChoices });
-  console.log("useInputControls: after usePersistentUserChoices");
+  } = (persistentChoices || {}) as any;
 
   const handleAudioDeviceChange = useCallback(
     (deviceId: string | null | undefined) => {
-      saveAudioInputDeviceId(deviceId ?? 'default');
+      if (typeof saveAudioInputDeviceId === 'function') {
+        saveAudioInputDeviceId(deviceId ?? 'default');
+      }
     },
     [saveAudioInputDeviceId]
   );
 
   const handleVideoDeviceChange = useCallback(
     (deviceId: string | null | undefined) => {
-      saveVideoInputDeviceId(deviceId ?? 'default');
+      if (typeof saveVideoInputDeviceId === 'function') {
+        saveVideoInputDeviceId(deviceId ?? 'default');
+      }
     },
     [saveVideoInputDeviceId]
   );
 
   const handleToggleCamera = useCallback(
     async (enabled: boolean) => {
-      if (screenShareToggle.enabled) {
-        screenShareToggle.toggle(false);
+      if (screenShareToggle?.enabled && typeof screenShareToggle?.toggle === 'function') {
+        await screenShareToggle.toggle(false);
       }
-      await cameraToggle.toggle(enabled);
-      // persist video input enabled preference
-      saveVideoInputEnabled(!cameraToggle.enabled);
+      if (cameraToggle?.toggle && typeof cameraToggle?.toggle === 'function') {
+        await cameraToggle.toggle(enabled);
+        if (typeof saveVideoInputEnabled === 'function') {
+          saveVideoInputEnabled(!cameraToggle.enabled);
+        }
+      }
     },
     [cameraToggle, screenShareToggle, saveVideoInputEnabled]
   );
 
   const handleToggleMicrophone = useCallback(
     async (enabled: boolean) => {
-      await microphoneToggle.toggle(enabled);
-      // persist audio input enabled preference
-      saveAudioInputEnabled(!microphoneToggle.enabled);
+      if (microphoneToggle?.toggle && typeof microphoneToggle?.toggle === 'function') {
+        await microphoneToggle.toggle(enabled);
+        if (typeof saveAudioInputEnabled === 'function') {
+          saveAudioInputEnabled(!microphoneToggle.enabled);
+        }
+      }
     },
     [microphoneToggle, saveAudioInputEnabled]
   );
 
   const handleToggleScreenShare = useCallback(
     async (enabled: boolean) => {
-      if (cameraToggle.enabled) {
-        cameraToggle.toggle(false);
+      if (cameraToggle?.enabled && typeof cameraToggle?.toggle === 'function') {
+        await cameraToggle.toggle(false);
       }
-      await screenShareToggle.toggle(enabled);
+      if (screenShareToggle?.toggle && typeof screenShareToggle?.toggle === 'function') {
+        await screenShareToggle.toggle(enabled);
+      }
     },
     [cameraToggle, screenShareToggle]
   );
+
   const handleMicrophoneDeviceSelectError = useCallback(
     (error: unknown) => onDeviceError?.({ source: Track.Source.Microphone, error }),
     [onDeviceError]
@@ -139,23 +198,39 @@ export function useInputControls(
     [onDeviceError]
   );
 
-  return {
-    microphoneTrack,
-    cameraToggle: {
-      ...cameraToggle,
-      toggle: handleToggleCamera,
-    },
-    microphoneToggle: {
-      ...microphoneToggle,
-      toggle: handleToggleMicrophone,
-    },
-    screenShareToggle: {
-      ...screenShareToggle,
-      toggle: handleToggleScreenShare,
-    },
-    handleAudioDeviceChange,
-    handleVideoDeviceChange,
-    handleMicrophoneDeviceSelectError,
-    handleCameraDeviceSelectError,
-  };
+  return useMemo(
+    () => ({
+      microphoneTrack,
+      cameraToggle: {
+        ...cameraToggle,
+        toggle: handleToggleCamera,
+      },
+      microphoneToggle: {
+        ...microphoneToggle,
+        toggle: handleToggleMicrophone,
+      },
+      screenShareToggle: {
+        ...screenShareToggle,
+        toggle: handleToggleScreenShare,
+      },
+      handleAudioDeviceChange,
+      handleVideoDeviceChange,
+      handleMicrophoneDeviceSelectError,
+      handleCameraDeviceSelectError,
+    }),
+    [
+      microphoneTrack,
+      cameraToggle,
+      handleToggleCamera,
+      microphoneToggle,
+      handleToggleMicrophone,
+      screenShareToggle,
+      handleToggleScreenShare,
+      handleAudioDeviceChange,
+      handleVideoDeviceChange,
+      handleMicrophoneDeviceSelectError,
+      handleCameraDeviceSelectError,
+    ]
+  );
 }
+

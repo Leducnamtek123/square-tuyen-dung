@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { 
   AgentAudioVisualizerAura,
   AgentAudioVisualizerBar,
@@ -77,6 +77,10 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
       message: msg.message
     }));
   }, [chatMessages]);
+
+  const handleDeviceError = useCallback((error: any) => {
+    console.error("Device error in InterviewAgentView:", error);
+  }, []);
 
   const agentAudioTrack = useMemo(() => {
     return agentParticipant?.getTrackPublication("microphone")?.audioTrack;
@@ -243,7 +247,7 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
             isChatOpen={isChatOpen}
             onIsChatOpenChange={setIsChatOpen}
             onDisconnect={onDisconnect}
-            onDeviceError={(err) => console.error(err)}
+            onDeviceError={handleDeviceError}
             controls={{ microphone: true, camera: false, chat: true, screenShare: false, leave: true }}
             className="shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-white/10 bg-black/40 backdrop-blur-3xl p-4 rounded-full"
           />
