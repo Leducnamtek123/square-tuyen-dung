@@ -25,13 +25,27 @@ interface AppliedResumeTableProps {
   isLoading: boolean;
   handleChangeApplicationStatus: (id: string, value: any, callback: (result: boolean) => void) => void;
   handleDelete: (id: string) => void;
-  [key: string]: any;
+  rowCount: number;
+  pagination: any;
+  onPaginationChange: (pagination: any) => void;
+  sorting: any;
+  onSortingChange: (sorting: any) => void;
 }
 
 const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
   const { t } = useTranslation(['employer', 'common']);
   const nav = useRouter();
-  const { rows, isLoading, handleChangeApplicationStatus, handleDelete } = props;
+  const { 
+    rows, 
+    isLoading, 
+    handleChangeApplicationStatus, 
+    handleDelete,
+    rowCount,
+    pagination,
+    onPaginationChange,
+    sorting,
+    onSortingChange
+  } = props;
   const rowsSafe = Array.isArray(rows) ? rows : [];
   const { allConfig } = useConfig();
   const [openDrawerId, setOpenDrawerId] = React.useState<string | number | null>(null);
@@ -45,6 +59,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     {
       accessorKey: 'fullName',
       header: t('appliedResume.table.candidate') as string,
+      enableSorting: true,
       cell: (info) => (
         <Box>
           <Typography sx={{ fontWeight: 'bold' }}>
@@ -70,10 +85,12 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     {
       accessorKey: 'jobName',
       header: t('appliedResume.table.jobName') as string,
+      enableSorting: true,
     },
     {
       accessorKey: 'createAt',
       header: t('appliedResume.table.applyDate') as string,
+      enableSorting: true,
       cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
     },
     {
@@ -149,20 +166,12 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         columns={columns}
         data={rowsSafe}
         isLoading={isLoading}
-        rowCount={props.count || 0}
-        pagination={{
-          pageIndex: props.page || 0,
-          pageSize: props.rowsPerPage || 10,
-        }}
-        onPaginationChange={(pagination) => {
-          if (props.handleChangePage && pagination.pageIndex !== props.page) {
-            props.handleChangePage(null, pagination.pageIndex);
-          }
-          if (props.handleChangeRowsPerPage && pagination.pageSize !== props.rowsPerPage) {
-            const event = { target: { value: String(pagination.pageSize) } } as React.ChangeEvent<HTMLInputElement>;
-            props.handleChangeRowsPerPage(event);
-          }
-        }}
+        rowCount={rowCount}
+        pagination={pagination}
+        onPaginationChange={onPaginationChange}
+        enableSorting
+        sorting={sorting}
+        onSortingChange={onSortingChange}
         emptyMessage={t('appliedResume.table.noCandidates')}
       />
     </>

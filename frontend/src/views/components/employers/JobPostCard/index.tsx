@@ -17,6 +17,7 @@ import JobPostFilterForm from '../JobPostFilterForm';
 import JobPostForm from '../JobPostForm';
 import jobService from '../../../../services/jobService';
 import JobPostsTable from '../JobPostsTable';
+import { useDataTable } from '../../../../hooks';
 
 interface JobPost {
   id: number;
@@ -141,22 +142,24 @@ const JobPostCard = () => {
 
   ], [t]);
 
-  const [order, setOrder] = React.useState<'asc' | 'desc'>('asc');
-
-  const [orderBy, setOrderBy] = React.useState<string>('createAt');
-
-  const [page, setPage] = React.useState<number>(0);
+  const {
+    page,
+    pageSize: rowsPerPage,
+    sorting,
+    onSortingChange,
+    ordering,
+    pagination,
+    onPaginationChange,
+  } = useDataTable({ 
+    initialSorting: [{ id: 'createAt', desc: true }],
+    initialPageSize: pageSize
+  });
 
   const [count, setCount] = React.useState<number>(0);
 
-  const [rowsPerPage, setRowsPerPage] = React.useState<number>(pageSize);
-
   const [filterData, setFilterData] = React.useState<any>({
-
     kw: '',
-
     isUrgent: '',
-
   });
 
   const [openPopup, setOpenPopup] = React.useState<boolean>(false);
@@ -174,27 +177,15 @@ const JobPostCard = () => {
   const [serverErrors, setServerErrors] = React.useState<any>(null);
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
-
-    const isAsc = orderBy === property && order === 'asc';
-
-    setOrder(isAsc ? 'desc' : 'asc');
-
-    setOrderBy(property);
-
+    // legacy handler, no longer needed if we use DataTable's onSortingChange
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
-
-    setPage(newPage);
-
+    onPaginationChange({ pageIndex: newPage, pageSize: rowsPerPage });
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-
-    setRowsPerPage(parseInt(event.target.value, 10));
-
-    setPage(0);
-
+    onPaginationChange({ pageIndex: 0, pageSize: parseInt(event.target.value, 10) });
   };
 
   const loadJobPosts = React.useCallback(async (params: any) => {
@@ -224,18 +215,12 @@ const JobPostCard = () => {
   React.useEffect(() => {
 
     loadJobPosts({
-
       page: page + 1,
-
       pageSize: rowsPerPage,
-
-      ordering: `${order === 'desc' ? '-' : ''}${orderBy}`,
-
+      ordering,
       ...filterData,
-
     });
-
-  }, [loadJobPosts, isSuccess, page, rowsPerPage, order, orderBy, filterData]);
+  }, [loadJobPosts, isSuccess, page, rowsPerPage, ordering, filterData]);
 
   const handleShowUpdate = async (slugOrId: string | number) => {
 
@@ -422,19 +407,11 @@ const JobPostCard = () => {
   };
 
   const handleFilter = (data: { kw: string, isUrgent: number | string }) => {
-
     setFilterData({
-
       ...data,
-
       isUrgent: data.isUrgent === 1 ? true : data.isUrgent === 2 ? false : '',
-
-      pageSize: rowsPerPage,
-
     });
-
-    setPage(0);
-
+    onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
   };
 
   const handleExport = async () => {
@@ -446,11 +423,8 @@ const JobPostCard = () => {
       const params = {
 
         page: page + 1,
-
         pageSize: rowsPerPage,
-
-        ordering: `${order === 'desc' ? '-' : ''}${orderBy}`,
-
+        ordering,
         ...filterData,
 
       };
@@ -701,33 +675,15 @@ const JobPostCard = () => {
       }}>
 
         <JobPostsTable
-
-          headCells={headCells}
-
           rows={JobPosts}
-
           isLoading={isLoadingJobPost}
-
-          order={order}
-
-          orderBy={orderBy}
-
           rowCount={count}
-          pagination={{
-            pageIndex: page,
-            pageSize: rowsPerPage,
-          }}
-          onPaginationChange={(pagination) => {
-            setPage(pagination.pageIndex);
-            setRowsPerPage(pagination.pageSize);
-          }}
-
-          handleRequestSort={handleRequestSort}
-
+          pagination={pagination}
+          onPaginationChange={onPaginationChange}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
           handleDelete={handleDelete}
-
           handleUpdate={handleShowUpdate}
-
         />
 
       </Box>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { useDataTable } from '../../../hooks';
 
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
@@ -9,9 +10,18 @@ import JobNotificationTable from './components/JobNotificationTable';
 
 const JobNotificationsPage = () => {
     const { t } = useTranslation('admin');
-    const PAGE_SIZE = 10;
-    const [page, setPage] = useState(1);
-    const [searchTerm, setSearchTerm] = useState('');
+    
+    const {
+        page,
+        pageSize,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange,
+        searchTerm,
+        onSearchChange,
+    } = useDataTable();
 
     const {
         data,
@@ -21,9 +31,10 @@ const JobNotificationsPage = () => {
         deleteJobNotification,
         isMutating
     } = useJobNotifications({
-        page,
-        pageSize: PAGE_SIZE,
-        kw: searchTerm
+        page: page + 1,
+        pageSize: pageSize,
+        kw: searchTerm,
+        ordering,
     }) as any;
 
     const [openDialog, setOpenDialog] = useState(false);
@@ -38,8 +49,7 @@ const JobNotificationsPage = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
-        setPage(1);
+        onSearchChange(e.target.value);
     };
 
     const handleOpenAdd = () => {
@@ -147,29 +157,17 @@ const JobNotificationsPage = () => {
                     />
                 </Box>
 
-                {isLoading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-                        <CircularProgress size={40} />
-                    </Box>
-                ) : (
-                    <>
-                        <JobNotificationTable
-                            data={(data as any)?.results || data}
-                            onEdit={handleOpenEdit}
-                            onDelete={handleOpenDelete}
-                        />
-                        {(data as any)?.count > 0 && (
-                            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-                                <Pagination
-                                    count={Math.ceil((data as any).count / PAGE_SIZE)}
-                                    page={page}
-                                    onChange={(e, v) => setPage(v)}
-                                    color="primary"
-                                />
-                            </Box>
-                        )}
-                    </>
-                )}
+                <JobNotificationTable
+                    data={(data as any)?.results || data}
+                    isLoading={isLoading}
+                    rowCount={(data as any)?.count || 0}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
+                    onEdit={handleOpenEdit}
+                    onDelete={handleOpenDelete}
+                />
             </Paper>
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">

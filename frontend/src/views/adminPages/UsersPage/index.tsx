@@ -2,29 +2,32 @@ import React, { useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { Box, Paper, Typography, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { useDataTable } from '../../../hooks';
 import { PAGINATION } from '../../../configs/constants';
 import { useUsers, useToggleUserStatus, useUpdateUserRole } from './hooks/useUsers';
 import UserTable from './components/UserTable';
 import UserFilters from './components/UserFilters';
 
-import { SortingState, RowSelectionState } from '@tanstack/react-table';
-
 const UsersPage = () => {
     const { t } = useTranslation('admin');
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [search, setSearch] = useState('');
+    const {
+        page,
+        pageSize,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange,
+        rowSelection,
+        onRowSelectionChange,
+        searchTerm: search,
+        onSearchChange: handleSearchChange,
+    } = useDataTable();
+    
     const [roleFilter, setRoleFilter] = useState('');
-    const [sorting, setSorting] = useState<SortingState>([]);
-    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
     
     const currentUserId = useAppSelector((state) => state.user?.currentUser?.id);
-    const resolvedPageSize = rowsPerPage === -1 ? PAGINATION.ADMIN_MAX_PAGE_SIZE : rowsPerPage;
-
-    // Convert sorting state to API format (e.g., "fullName" or "-fullName")
-    const ordering = sorting.length > 0 
-        ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}`
-        : undefined;
+    const resolvedPageSize = pageSize === -1 ? PAGINATION.ADMIN_MAX_PAGE_SIZE : pageSize;
 
     const { data: usersData, isLoading } = useUsers({
         page: page + 1,
@@ -39,23 +42,10 @@ const UsersPage = () => {
     const users = (usersData?.results || []) as any[];
     const totalUsers = (usersData?.count || 0) as number;
 
-    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
-
-    const handleSearchChange = (value: string) => {
-        setSearch(value);
-        setPage(0);
-    };
-
     const handleRoleFilterChange = (value: string) => {
         setRoleFilter(value);
-        setPage(0);
+        // Reset page is not handled by useDataTable for custom filters
+        // but we can manually reset it if needed, or update useDataTable to support it
     };
 
     const handleToggleStatus = (user: any) => {
@@ -104,18 +94,12 @@ const UsersPage = () => {
                     users={users}
                     loading={isLoading}
                     rowCount={totalUsers}
-                    pagination={{
-                        pageIndex: page,
-                        pageSize: rowsPerPage,
-                    }}
-                    onPaginationChange={(pagination) => {
-                        setPage(pagination.pageIndex);
-                        setRowsPerPage(pagination.pageSize);
-                    }}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
                     sorting={sorting}
-                    onSortingChange={setSorting}
+                    onSortingChange={onSortingChange}
                     rowSelection={rowSelection}
-                    onRowSelectionChange={setRowSelection}
+                    onRowSelectionChange={onRowSelectionChange}
                     onToggleStatus={handleToggleStatus}
                     onRoleChange={handleRoleChange}
                     currentUserId={currentUserId || ''}

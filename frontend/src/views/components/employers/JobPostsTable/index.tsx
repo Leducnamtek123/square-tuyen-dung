@@ -34,10 +34,8 @@ interface JobPostsTableProps {
   onPaginationChange: (pagination: { pageIndex: number; pageSize: number }) => void;
   handleDelete: (slugOrId: string | number) => void;
   handleUpdate: (slugOrId: string | number) => void;
-  handleRequestSort: (event: React.MouseEvent<unknown>, property: string) => void;
-  headCells: any[];
-  order: 'asc' | 'desc';
-  orderBy: string;
+  sorting: any;
+  onSortingChange: (sorting: any) => void;
 }
 
 const JobPostsTable = ({
@@ -48,10 +46,8 @@ const JobPostsTable = ({
   onPaginationChange,
   handleDelete,
   handleUpdate,
-  handleRequestSort,
-  headCells,
-  order,
-  orderBy,
+  sorting,
+  onSortingChange,
 }: JobPostsTableProps) => {
 
   const { t } = useTranslation('employer');
@@ -63,8 +59,8 @@ const JobPostsTable = ({
     {
 
       header: t('jobPost.table.jobTitle'),
-
       accessorKey: 'jobName',
+      enableSorting: true,
 
       cell: ({ row }: { row: { original: JobPost } }) => (
 
@@ -99,8 +95,8 @@ const JobPostsTable = ({
     {
 
       header: t('jobPost.table.postDate'),
-
       accessorKey: 'createAt',
+      enableSorting: true,
 
       cell: ({ getValue }: { getValue: () => unknown }) => dayjs(getValue() as any).format('DD/MM/YYYY'),
 
@@ -109,8 +105,8 @@ const JobPostsTable = ({
     {
 
       header: t('jobPost.table.deadline'),
-
       accessorKey: 'deadline',
+      enableSorting: true,
 
       cell: ({ row }: { row: { original: JobPost } }) => (
 
@@ -127,16 +123,16 @@ const JobPostsTable = ({
     {
 
       header: t('jobPost.table.applications'),
-
       accessorKey: 'appliedNumber',
+      enableSorting: true,
 
     },
 
     {
 
       header: t('jobPost.table.views'),
-
       accessorKey: 'views',
+      enableSorting: true,
 
     },
 
@@ -225,11 +221,11 @@ const JobPostsTable = ({
       rowCount={rowCount}
 
       pagination={pagination}
-
       onPaginationChange={onPaginationChange}
-
+      enableSorting
+      sorting={sorting}
+      onSortingChange={onSortingChange}
       emptyMessage={t('jobPost.noData')}
-
     />
 
   );

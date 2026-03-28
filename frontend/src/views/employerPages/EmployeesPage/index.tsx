@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useDataTable } from "../../../hooks";
 import {
   Box,
   Button,
@@ -60,8 +61,18 @@ const normalizeListPayload = (payload: any) => {
 };
 
 const EmployeesPage = () => {
-  const { t } = useTranslation("employer");
-  const queryClient = useQueryClient();
+    const { t } = useTranslation("employer");
+    const {
+        sorting: roleSorting,
+        onSortingChange: onRoleSortingChange,
+    } = useDataTable();
+    
+    const {
+        sorting: memberSorting,
+        onSortingChange: onMemberSortingChange,
+    } = useDataTable();
+
+    const queryClient = useQueryClient();
   const [tab, setTab] = useState("roles");
   const [openRoleDialog, setOpenRoleDialog] = useState(false);
   const [openMemberDialog, setOpenMemberDialog] = useState(false);
@@ -176,9 +187,9 @@ const EmployeesPage = () => {
   };
 
   const roleColumns = useMemo<ColumnDef<any>[]>(() => [
-    { accessorKey: 'id', header: t('employees.table.id') as string },
-    { accessorKey: 'code', header: t('employees.table.code') as string },
-    { accessorKey: 'name', header: t('employees.table.roleName') as string },
+    { accessorKey: 'id', header: t('employees.table.id') as string, enableSorting: true },
+    { accessorKey: 'code', header: t('employees.table.code') as string, enableSorting: true },
+    { accessorKey: 'name', header: t('employees.table.roleName') as string, enableSorting: true },
     {
       accessorKey: 'permissions',
       header: t('employees.table.permissions') as string,
@@ -215,8 +226,8 @@ const EmployeesPage = () => {
   ], [t, deleteRoleMutation.isPending]);
 
   const memberColumns = useMemo<ColumnDef<any>[]>(() => [
-    { accessorKey: 'id', header: t('employees.table.id') as string },
-    { accessorKey: 'userDict.fullName', header: t('employees.table.user') as string, cell: (info: { getValue: () => any }) => info.getValue() || "-" },
+    { accessorKey: 'id', header: t('employees.table.id') as string, enableSorting: true },
+    { accessorKey: 'userDict.fullName', header: t('employees.table.user') as string, enableSorting: true, cell: (info: { getValue: () => any }) => info.getValue() || "-" },
     {
       id: 'email',
       header: t('employees.table.email') as string,
@@ -312,6 +323,9 @@ const EmployeesPage = () => {
               data={roles}
               isLoading={rolesLoading}
               hidePagination
+              enableSorting
+              sorting={roleSorting}
+              onSortingChange={onRoleSortingChange}
             />
           </Box>
         )}
@@ -323,6 +337,9 @@ const EmployeesPage = () => {
               data={members}
               isLoading={membersLoading}
               hidePagination
+              enableSorting
+              sorting={memberSorting}
+              onSortingChange={onMemberSortingChange}
             />
           </Box>
         )}

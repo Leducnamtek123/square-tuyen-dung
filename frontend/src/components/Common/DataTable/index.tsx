@@ -22,7 +22,8 @@ import {
     Typography, 
     CircularProgress,
     Checkbox,
-    TableSortLabel
+    TableSortLabel,
+    Tooltip
 } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 
@@ -172,16 +173,18 @@ const DataTable = <TData,>({
                                         >
                                             {header.isPlaceholder ? null : (
                                                 canSort ? (
-                                                    <TableSortLabel
-                                                        active={!!header.column.getIsSorted()}
-                                                        direction={header.column.getIsSorted() || 'asc'}
-                                                        onClick={header.column.getToggleSortingHandler()}
-                                                    >
-                                                        {flexRender(
-                                                            header.column.columnDef.header,
-                                                            header.getContext()
-                                                        )}
-                                                    </TableSortLabel>
+                                                    <Tooltip title={t('common.table.sortTooltip')}>
+                                                        <TableSortLabel
+                                                            active={!!header.column.getIsSorted()}
+                                                            direction={header.column.getIsSorted() || 'asc'}
+                                                            onClick={header.column.getToggleSortingHandler()}
+                                                        >
+                                                            {flexRender(
+                                                                header.column.columnDef.header,
+                                                                header.getContext()
+                                                            )}
+                                                        </TableSortLabel>
+                                                    </Tooltip>
                                                 ) : (
                                                     flexRender(
                                                         header.column.columnDef.header,

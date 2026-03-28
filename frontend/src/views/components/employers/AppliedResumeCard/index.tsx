@@ -34,6 +34,7 @@ import AppliedResumeTable from '../AppliedResumeTable';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 
 import { useAppliedResumes, useJobPostOptions, useDeleteJobPostActivity } from '../hooks/useEmployerQueries';
+import { useDataTable } from '../../../../hooks';
 import { useConfig } from '@/hooks/useConfig';
 
 interface AppliedResumeCardProps {
@@ -172,13 +173,22 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
   ];
 
-  const [openPopup, setOpenPopup] = React.useState(false);
-
-  const [page, setPage] = React.useState(0);
-
-  const [rowsPerPage, setRowsPerPage] = React.useState(pageSize);
+  const {
+    page,
+    pageSize: rowsPerPage,
+    sorting,
+    onSortingChange,
+    ordering,
+    pagination,
+    onPaginationChange,
+  } = useDataTable({ 
+    initialSorting: [{ id: 'createAt', desc: true }],
+    initialPageSize: pageSize
+  });
 
   const [filterData, setFilterData] = React.useState(defaultFilterData);
+
+  const [openPopup, setOpenPopup] = React.useState(false);
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
@@ -194,10 +204,11 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   const queryParams = React.useMemo(() => ({
     page: page + 1,
     pageSize: rowsPerPage,
+    ordering,
     ...filterData,
     jobPostId: jobPostIdSelect,
     status: applicationStatusSelect,
-  }), [page, rowsPerPage, filterData, jobPostIdSelect, applicationStatusSelect]);
+  }), [page, rowsPerPage, ordering, filterData, jobPostIdSelect, applicationStatusSelect]);
 
   const { data: queryData, isLoading } = useAppliedResumes(queryParams);
   const resumes = queryData?.results || [];
@@ -225,15 +236,9 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     setOpenPopup(false);
 
     setFilterData({
-
       ...data,
-
-      pageSize: pageSize,
-
     });
-
-    setPage(0);
-
+    onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
   };
 
   const handleExport = () => {
@@ -267,19 +272,13 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     };
 
     exportJobPostsActivity({
-
       page: page + 1,
-
       pageSize: rowsPerPage,
-
+      ordering,
       ...filterData,
-
       jobPostId: jobPostIdSelect,
-
       status: applicationStatusSelect,
-
     });
-
   };
 
   const handleChangeApplicationStatus = (id: string, value: any, callback: (result: boolean) => void) => {
@@ -337,27 +336,18 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
-
-    setPage(newPage);
-
+    onPaginationChange({ pageIndex: newPage, pageSize: rowsPerPage });
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-
-    setRowsPerPage(parseInt(event.target.value, 10));
-
-    setPage(0);
-
+    onPaginationChange({ pageIndex: 0, pageSize: parseInt(event.target.value, 10) });
   };
 
   const handleResetFilterData = () => {
-
     setFilterData(defaultFilterData);
-
     setJobPostIdSelect('');
-
     setApplicationStatusSelect('');
-
+    onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
   };
 
   return (
@@ -737,27 +727,15 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
       }}>
 
         <AppliedResumeTable
-
-          headCells={headCells}
-
           rows={resumes}
-
           isLoading={isLoading}
-
-          page={page}
-
-          rowsPerPage={rowsPerPage}
-
-          count={count}
-
+          rowCount={count}
+          pagination={pagination}
+          onPaginationChange={onPaginationChange}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
           handleChangeApplicationStatus={handleChangeApplicationStatus}
-
-          handleChangePage={handleChangePage}
-
-          handleChangeRowsPerPage={handleChangeRowsPerPage}
-
           handleDelete={handleDelete}
-
         />
 
       </Box>

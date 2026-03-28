@@ -18,6 +18,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
+import { useDataTable } from '../../../hooks';
 
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -33,8 +34,16 @@ const WardsPage = () => {
 
     const [selectedCity, setSelectedCity] = useState<string | number>('');
     const [selectedDistrict, setSelectedDistrict] = useState<string | number>('');
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const {
+        page,
+        pageSize: rowsPerPage,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange
+    } = useDataTable({ initialPageSize: 10 });
 
     useEffect(() => {
         if (cities && cities.length > 0 && !selectedCity) {
@@ -67,7 +76,7 @@ const WardsPage = () => {
         updateWard,
         deleteWard,
         isMutating
-    } = useWards({ district: selectedDistrict, page: page + 1, pageSize: rowsPerPage }) as any;
+    } = useWards({ district: selectedDistrict, page: page + 1, pageSize: rowsPerPage, ordering }) as any;
     const wards = (wardsData?.results || wardsData) as any[];
 
     const districtNameById = useMemo(() => {
@@ -83,15 +92,18 @@ const WardsPage = () => {
             accessorKey: 'id',
             header: t('pages.wards.table.id') as string,
             size: 80,
+            enableSorting: true,
         },
         {
             accessorKey: 'name',
             header: t('pages.wards.table.wardName') as string,
+            enableSorting: true,
             cell: (info) => <Typography sx={{ fontWeight: 500 }}>{info.getValue() as string}</Typography>,
         },
         {
             accessorKey: 'code',
             header: t('pages.wards.table.wardCode') as string,
+            enableSorting: true,
             cell: (info) => info.getValue() || '---',
         },
         {
@@ -218,7 +230,7 @@ const WardsPage = () => {
                         value={selectedCity}
                         onChange={(e) => {
                             setSelectedCity(e.target.value);
-                            setPage(0);
+                            onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
                         }}
                         disabled={isLoadingCities}
                     >
@@ -236,7 +248,7 @@ const WardsPage = () => {
                         value={selectedDistrict}
                         onChange={(e) => {
                             setSelectedDistrict(e.target.value);
-                            setPage(0);
+                            onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
                         }}
                         disabled={isLoadingDistricts || !(districts && districts.length > 0)}
                     >
@@ -254,14 +266,11 @@ const WardsPage = () => {
                     data={wards || []}
                     isLoading={isLoadingWards}
                     rowCount={wardsData?.count || 0}
-                    pagination={{
-                        pageIndex: page,
-                        pageSize: rowsPerPage,
-                    }}
-                    onPaginationChange={(pagination) => {
-                        setPage(pagination.pageIndex);
-                        setRowsPerPage(pagination.pageSize);
-                    }}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    enableSorting
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
                     emptyMessage={!selectedDistrict ? t('pages.wards.table.noDistrictSelected') : t('pages.wards.table.noData')}
                 />
             </Paper>

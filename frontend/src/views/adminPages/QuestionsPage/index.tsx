@@ -1,20 +1,26 @@
 import React, { useState } from 'react';
-import { Box, Card, CardHeader, CardContent, Typography, Button, TablePagination, Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem } from "@mui/material";
+import { Box, Card, CardHeader, CardContent, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { useDataTable } from '../../../hooks';
 
 import AddIcon from '@mui/icons-material/Add';
 import { useQuestions, useCreateQuestion, useUpdateQuestion, useDeleteQuestion } from './hooks/useQuestions';
 import { useCareers } from '../CareersPage/hooks/useCareers';
 import QuestionTable from './components/QuestionTable';
 
-import { SortingState, RowSelectionState } from '@tanstack/react-table';
-
 const QuestionsPage = () => {
     const { t } = useTranslation('admin');
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [sorting, setSorting] = useState<SortingState>([]);
-    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+    const {
+        page,
+        pageSize,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange,
+        rowSelection,
+        onRowSelectionChange,
+    } = useDataTable();
     
     const [openDialog, setOpenDialog] = useState(false);
     const [editingQuestion, setEditingQuestion] = useState<any>(null);
@@ -24,13 +30,9 @@ const QuestionsPage = () => {
         career: '',
     });
 
-    const ordering = sorting.length > 0 
-        ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}`
-        : undefined;
-
     const { data: questionsData, isLoading } = useQuestions({
         page: page + 1,
-        pageSize: rowsPerPage,
+        pageSize: pageSize,
         ordering,
     }) as any;
 
@@ -40,15 +42,6 @@ const QuestionsPage = () => {
     const createMutation = useCreateQuestion() as any;
     const updateMutation = useUpdateQuestion() as any;
     const deleteMutation = useDeleteQuestion() as any;
-
-    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
 
     const handleOpenAdd = () => {
         setEditingQuestion(null);
@@ -121,18 +114,12 @@ const QuestionsPage = () => {
                         questions={questionsData?.results || []}
                         loading={isLoading}
                         rowCount={questionsData?.count || 0}
-                        pagination={{
-                            pageIndex: page,
-                            pageSize: rowsPerPage,
-                        }}
-                        onPaginationChange={(pagination) => {
-                            setPage(pagination.pageIndex);
-                            setRowsPerPage(pagination.pageSize);
-                        }}
+                        pagination={pagination}
+                        onPaginationChange={onPaginationChange}
                         sorting={sorting}
-                        onSortingChange={setSorting}
+                        onSortingChange={onSortingChange}
                         rowSelection={rowSelection}
-                        onRowSelectionChange={setRowSelection}
+                        onRowSelectionChange={onRowSelectionChange}
                         onEdit={handleOpenEdit}
                         onDelete={(id: string | number) => {
                             if (window.confirm(t('pages.questions.deleteConfirm'))) {

@@ -3,6 +3,7 @@ import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdor
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
+import { useDataTable } from '../../../hooks';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 
@@ -14,9 +15,17 @@ import ImageCropDialog from '../../../components/Common/ImageCropDialog';
 
 const CareersPage = () => {
     const { t } = useTranslation('admin');
-    const PAGE_SIZE = 10;
-    const [page, setPage] = useState(0);
-    const [searchTerm, setSearchTerm] = useState('');
+    const {
+        page,
+        pageSize,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange,
+        searchTerm,
+        onSearchChange,
+    } = useDataTable({ initialPageSize: 10 });
 
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add'); // 'add' or 'edit'
@@ -56,13 +65,13 @@ const CareersPage = () => {
         isMutating
     } = useCareers({
         page: page + 1,
-        pageSize: PAGE_SIZE,
-        kw: searchTerm
+        pageSize: pageSize,
+        kw: searchTerm,
+        ordering,
     }) as any;
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
-        setPage(0);
+        onSearchChange(e.target.value);
     };
 
     const handleOpenAdd = () => {
@@ -145,6 +154,7 @@ const CareersPage = () => {
         {
             accessorKey: 'id',
             header: t('pages.careers.table.id') as string,
+            enableSorting: true,
             size: 80,
         },
         {
@@ -164,6 +174,7 @@ const CareersPage = () => {
         {
             accessorKey: 'name',
             header: t('pages.careers.table.careerName') as string,
+            enableSorting: true,
             cell: (info) => <Typography sx={{ fontWeight: 500 }}>{info.getValue() as string}</Typography>,
         },
         {
@@ -174,6 +185,7 @@ const CareersPage = () => {
         {
             accessorKey: 'isHot',
             header: t('pages.careers.keyCareerLabel') as string,
+            enableSorting: true,
             meta: { align: 'center' },
             cell: (info) => info.getValue() ? (
                 <Chip label={t('pages.careers.keyCareerBadge')} size="small" color="warning" />
@@ -182,6 +194,7 @@ const CareersPage = () => {
         {
             accessorKey: 'jobPostTotal',
             header: t('pages.careers.table.totalPosts') as string,
+            enableSorting: true,
             meta: { align: 'center' },
             cell: (info) => info.getValue() || 0,
         },
@@ -256,13 +269,11 @@ const CareersPage = () => {
                     data={(data as any)?.results || []}
                     isLoading={isLoading}
                     rowCount={(data as any)?.count || 0}
-                    pagination={{
-                        pageIndex: page,
-                        pageSize: PAGE_SIZE,
-                    }}
-                    onPaginationChange={(pagination) => {
-                        setPage(pagination.pageIndex);
-                    }}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    enableSorting
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
                 />
             </Paper>
             {/* Add/Edit Dialog */}

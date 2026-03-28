@@ -10,11 +10,21 @@ import dayjs from '../../../configs/dayjs-config';
 
 import SearchIcon from '@mui/icons-material/Search';
 import { useResumes } from './hooks/useResumes';
+import { useDataTable } from '../../../hooks';
 
 const ResumesPage = () => {
     const { t } = useTranslation('admin');
-    const PAGE_SIZE = 10;
-    const [page, setPage] = useState(0);
+    
+    const {
+        page,
+        pageSize: rowsPerPage,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange
+    } = useDataTable({ initialPageSize: 10 });
+
     const [searchTerm, setSearchTerm] = useState('');
 
     const {
@@ -25,8 +35,9 @@ const ResumesPage = () => {
         isMutating
     } = useResumes({
         page: page + 1,
-        pageSize: PAGE_SIZE,
-        kw: searchTerm
+        pageSize: rowsPerPage,
+        kw: searchTerm,
+        ordering
     }) as any;
 
     const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -42,7 +53,7 @@ const ResumesPage = () => {
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-        setPage(0);
+        onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
     };
 
     const handleOpenEdit = (resume: any) => {
@@ -99,6 +110,7 @@ const ResumesPage = () => {
         {
             accessorKey: 'title',
             header: t('pages.resumes.table.resumeTitle') as string,
+            enableSorting: true,
             cell: (info) => (
                 <Box>
                     <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
@@ -113,6 +125,7 @@ const ResumesPage = () => {
         {
             accessorKey: 'userDict.fullName',
             header: t('pages.resumes.table.candidate') as string,
+            enableSorting: true,
             cell: (info) => info.getValue() || '---',
         },
         {
@@ -130,11 +143,13 @@ const ResumesPage = () => {
         {
             accessorKey: 'experience',
             header: t('pages.resumes.table.experience') as string,
+            enableSorting: true,
             cell: (info) => info.getValue() || '---',
         },
         {
             accessorKey: 'updateAt',
             header: t('pages.resumes.table.lastUpdate') as string,
+            enableSorting: true,
             cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm'),
         },
         {
@@ -198,13 +213,11 @@ const ResumesPage = () => {
                     data={data?.results || []}
                     isLoading={isLoading}
                     rowCount={data?.count || 0}
-                    pagination={{
-                        pageIndex: page,
-                        pageSize: PAGE_SIZE,
-                    }}
-                    onPaginationChange={(pagination) => {
-                        setPage(pagination.pageIndex);
-                    }}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    enableSorting
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
                 />
             </Paper>
             {/* Edit Dialog */}

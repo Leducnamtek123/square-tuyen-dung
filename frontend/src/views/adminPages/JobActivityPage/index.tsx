@@ -9,11 +9,21 @@ import dayjs from '../../../configs/dayjs-config';
 
 import SearchIcon from '@mui/icons-material/Search';
 import { useJobActivities } from './hooks/useJobActivities';
+import { useDataTable } from '../../../hooks';
 
 const JobActivityPage = () => {
     const { t } = useTranslation('admin');
-    const PAGE_SIZE = 10;
-    const [page, setPage] = useState(0);
+    
+    const {
+        page,
+        pageSize: rowsPerPage,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange
+    } = useDataTable({ initialPageSize: 10 });
+
     const [searchTerm, setSearchTerm] = useState('');
 
     const {
@@ -24,8 +34,9 @@ const JobActivityPage = () => {
         isMutating
     } = useJobActivities({
         page: page + 1,
-        pageSize: PAGE_SIZE,
-        kw: searchTerm
+        pageSize: rowsPerPage,
+        kw: searchTerm,
+        ordering
     }) as any;
 
     const [openEditDialog, setOpenEditDialog] = useState(false);
@@ -36,7 +47,7 @@ const JobActivityPage = () => {
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-        setPage(0);
+        onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
     };
 
     const handleOpenEdit = (activity: any) => {
@@ -80,6 +91,7 @@ const JobActivityPage = () => {
         {
             accessorKey: 'userDict.fullName',
             header: t('pages.jobActivity.table.candidate') as string,
+            enableSorting: true,
             cell: (info) => (
                 <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                     {info.getValue() as string || '---'}
@@ -89,16 +101,19 @@ const JobActivityPage = () => {
         {
             accessorKey: 'jobPostDict.jobName',
             header: t('pages.jobActivity.table.jobPost') as string,
+            enableSorting: true,
             cell: (info) => info.getValue() || '---',
         },
         {
             accessorKey: 'companyDict.companyName',
             header: t('pages.jobActivity.table.company') as string,
+            enableSorting: true,
             cell: (info) => info.getValue() || '---',
         },
         {
-            accessorKey: 'status',
+            accessorKey: status,
             header: t('pages.jobActivity.table.status') as string,
+            enableSorting: true,
             cell: (info) => {
                 const status = info.getValue() as string;
                 return (
@@ -117,6 +132,7 @@ const JobActivityPage = () => {
         {
             accessorKey: 'updateAt',
             header: t('pages.jobActivity.table.updatedAt') as string,
+            enableSorting: true,
             cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm'),
         },
         {
@@ -180,13 +196,11 @@ const JobActivityPage = () => {
                     data={(data as any)?.results || []}
                     isLoading={isLoading}
                     rowCount={(data as any)?.count || 0}
-                    pagination={{
-                        pageIndex: page,
-                        pageSize: PAGE_SIZE,
-                    }}
-                    onPaginationChange={(pagination) => {
-                        setPage(pagination.pageIndex);
-                    }}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    enableSorting
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
                 />
             </Paper>
             {/* Edit Status Dialog */}

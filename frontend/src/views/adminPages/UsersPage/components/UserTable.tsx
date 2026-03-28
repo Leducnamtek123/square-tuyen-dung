@@ -62,6 +62,7 @@ const UserTable = ({
         {
             accessorKey: 'id',
             header: t('pages.users.table.id') as string,
+            enableSorting: true,
         },
         {
             accessorKey: 'fullName',
@@ -76,6 +77,7 @@ const UserTable = ({
         {
             accessorKey: 'roleName',
             header: t('pages.users.table.role') as string,
+            enableSorting: true,
             cell: (info) => (
                 <Select
                     value={info.getValue() as string || ''}
@@ -111,6 +113,7 @@ const UserTable = ({
         {
             accessorKey: 'isActive',
             header: t('pages.users.table.status') as string,
+            enableSorting: true,
             cell: (info) => (
                 <Chip
                     label={info.getValue() ? t('pages.users.table.active') : t('pages.users.table.blocked')}

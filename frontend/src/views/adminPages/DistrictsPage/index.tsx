@@ -8,6 +8,7 @@ import { useDistricts } from './hooks/useDistricts';
 import { useCities } from '../CitiesPage/hooks/useCities';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
+import { useDataTable } from '../../../hooks';
 
 const DistrictsPage = () => {
     const { t } = useTranslation('admin');
@@ -15,8 +16,16 @@ const DistrictsPage = () => {
     const cities = (citiesData?.results || citiesData) as any[];
 
     const [selectedCity, setSelectedCity] = useState<string | number>('');
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+
+    const {
+        page,
+        pageSize: rowsPerPage,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange
+    } = useDataTable({ initialPageSize: 10 });
 
     useEffect(() => {
         if (cities && cities.length > 0 && !selectedCity) {
@@ -31,7 +40,7 @@ const DistrictsPage = () => {
         updateDistrict,
         deleteDistrict,
         isMutating
-    } = useDistricts({ city: selectedCity, page: page + 1, pageSize: rowsPerPage }) as any;
+    } = useDistricts({ city: selectedCity, page: page + 1, pageSize: rowsPerPage, ordering }) as any;
 
     const districts = (districtsData?.results || districtsData) as any[];
 
@@ -103,10 +112,12 @@ const DistrictsPage = () => {
             accessorKey: 'id',
             header: t('pages.districts.table.id') as string,
             size: 80,
+            enableSorting: true,
         },
         {
             accessorKey: 'name',
             header: t('pages.districts.table.districtName') as string,
+            enableSorting: true,
             cell: (info) => (
                 <Typography variant="body2" sx={{ fontWeight: 500 }}>
                     {info.getValue() as string}
@@ -116,6 +127,7 @@ const DistrictsPage = () => {
         {
             accessorKey: 'code',
             header: t('pages.districts.table.code') as string,
+            enableSorting: true,
             cell: (info) => info.getValue() as string || '---',
         },
         {
@@ -174,7 +186,7 @@ const DistrictsPage = () => {
                         value={selectedCity}
                         onChange={(e) => {
                             setSelectedCity(e.target.value);
-                            setPage(0);
+                            onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
                         }}
                         disabled={isLoadingCities}
                     >
@@ -191,14 +203,11 @@ const DistrictsPage = () => {
                     data={districts || []}
                     isLoading={isLoadingDistricts}
                     rowCount={districtsData?.count || 0}
-                    pagination={{
-                        pageIndex: page,
-                        pageSize: rowsPerPage,
-                    }}
-                    onPaginationChange={(pagination) => {
-                        setPage(pagination.pageIndex);
-                        setRowsPerPage(pagination.pageSize);
-                    }}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    enableSorting
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
                     emptyMessage={!selectedCity ? t('pages.districts.table.noCitySelected') : t('pages.districts.table.noData')}
                 />
             </Paper>

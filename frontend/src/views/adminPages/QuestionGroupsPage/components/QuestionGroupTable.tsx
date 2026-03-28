@@ -3,23 +3,39 @@ import { Typography, Tooltip, IconButton, Stack } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useTranslation } from 'react-i18next';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
 interface QuestionGroupTableProps {
     data: any[];
     loading?: boolean;
+    rowCount?: number;
+    pagination?: { pageIndex: number; pageSize: number };
+    onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
+    sorting?: SortingState;
+    onSortingChange?: OnChangeFn<SortingState>;
     onEdit: (group: any) => void;
     onDelete: (group: any) => void;
 }
 
-const QuestionGroupTable = ({ data, loading, onEdit, onDelete }: QuestionGroupTableProps) => {
+const QuestionGroupTable = ({ 
+    data, 
+    loading, 
+    rowCount,
+    pagination,
+    onPaginationChange,
+    sorting,
+    onSortingChange,
+    onEdit, 
+    onDelete 
+}: QuestionGroupTableProps) => {
     const { t } = useTranslation('admin');
 
     const columns = useMemo<ColumnDef<any>[]>(() => [
         {
             accessorKey: 'name',
             header: t('pages.questionGroups.table.groupName') as string,
+            enableSorting: true,
             cell: (info) => (
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     {info.getValue() as string}
@@ -70,7 +86,12 @@ const QuestionGroupTable = ({ data, loading, onEdit, onDelete }: QuestionGroupTa
             columns={columns}
             data={data || []}
             isLoading={loading}
-            hidePagination
+            rowCount={rowCount}
+            pagination={pagination}
+            onPaginationChange={onPaginationChange}
+            enableSorting
+            sorting={sorting}
+            onSortingChange={onSortingChange}
             emptyMessage={t('pages.questionGroups.table.noData')}
         />
     );

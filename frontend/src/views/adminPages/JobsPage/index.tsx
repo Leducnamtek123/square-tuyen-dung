@@ -1,34 +1,37 @@
 import React, { useState } from 'react';
-import { Box, Card, CardHeader, CardContent, Typography, TablePagination, Dialog, DialogTitle, DialogContent, DialogActions, Button, Divider, TextField } from "@mui/material";
+import { Box, Card, CardHeader, CardContent, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button, Divider, TextField } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { useDataTable } from '../../../hooks';
 
 import { useJobs, useApproveJob, useRejectJob, useUpdateJob, useDeleteJob } from './hooks/useJobs';
 import JobTable from './components/JobTable';
 import JobFilters from './components/JobFilters';
 import dayjs from '../../../configs/moment-config';
 
-import { SortingState, RowSelectionState } from '@tanstack/react-table';
-
 const JobsPage = () => {
     const { t } = useTranslation('admin');
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [sorting, setSorting] = useState<SortingState>([]);
-    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+    const {
+        page,
+        pageSize,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange,
+        rowSelection,
+        onRowSelectionChange,
+        searchTerm,
+        onSearchChange,
+    } = useDataTable();
     
     const [selectedJob, setSelectedJob] = useState<any>(null);
     const [openDetail, setOpenDetail] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const [editJob, setEditJob] = useState({ jobName: '', deadline: '' });
 
-    const ordering = sorting.length > 0 
-        ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}`
-        : undefined;
-
     const { data: jobsData, isLoading } = useJobs({
         page: page + 1,
-        pageSize: rowsPerPage,
+        pageSize: pageSize,
         search: searchTerm,
         ordering,
     }) as any;
@@ -38,18 +41,8 @@ const JobsPage = () => {
     const updateMutation = useUpdateJob() as any;
     const deleteMutation = useDeleteJob() as any;
 
-    const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
-
     const handleSearchChange = (value: string) => {
-        setSearchTerm(value);
-        setPage(0);
+        onSearchChange(value);
     };
 
     const handleViewDetail = (job: any) => {
@@ -106,19 +99,12 @@ const JobsPage = () => {
                     <JobTable
                         jobs={(jobsData as any)?.results || []}
                         loading={isLoading}
-                        rowCount={(jobsData as any)?.count || 0}
-                        pagination={{
-                            pageIndex: page,
-                            pageSize: rowsPerPage,
-                        }}
-                        onPaginationChange={(pagination) => {
-                            setPage(pagination.pageIndex);
-                            setRowsPerPage(pagination.pageSize);
-                        }}
+                        pagination={pagination}
+                        onPaginationChange={onPaginationChange}
                         sorting={sorting}
-                        onSortingChange={setSorting}
+                        onSortingChange={onSortingChange}
                         rowSelection={rowSelection}
-                        onRowSelectionChange={setRowSelection}
+                        onRowSelectionChange={onRowSelectionChange}
                         onView={handleViewDetail}
                         onEdit={handleEdit}
                         onApprove={(id) => approveMutation.mutate(id)}

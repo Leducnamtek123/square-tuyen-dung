@@ -6,15 +6,25 @@ import { Grid2 as Grid } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useProfiles } from './hooks/useProfiles';
+import { useDataTable } from '../../../hooks';
 import { useCities } from '../CitiesPage/hooks/useCities';
 import { useDistricts } from '../DistrictsPage/hooks/useDistricts';
 import ProfileTable from './components/ProfileTable';
 
 const ProfilesPage = () => {
     const { t } = useTranslation('admin');
-    const PAGE_SIZE = 10;
-    const [page, setPage] = useState(1);
-    const [searchTerm, setSearchTerm] = useState('');
+    
+    const {
+        page,
+        pageSize,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange,
+        searchTerm,
+        onSearchChange,
+    } = useDataTable();
 
     const {
         data,
@@ -24,9 +34,10 @@ const ProfilesPage = () => {
         deleteProfile,
         isMutating
     } = useProfiles({
-        page,
-        pageSize: PAGE_SIZE,
-        kw: searchTerm
+        page: page + 1,
+        pageSize: pageSize,
+        kw: searchTerm,
+        ordering,
     }) as any;
 
     const { data: citiesData } = useCities() as any;
@@ -54,8 +65,7 @@ const ProfilesPage = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
-        setPage(1);
+        onSearchChange(e.target.value);
     };
 
     const handleOpenAdd = () => {
@@ -175,29 +185,17 @@ const ProfilesPage = () => {
                     />
                 </Box>
 
-                {isLoading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-                        <CircularProgress size={40} />
-                    </Box>
-                ) : (
-                    <>
-                        <ProfileTable
-                            data={(data as any)?.results || data}
-                            onEdit={handleOpenEdit}
-                            onDelete={handleOpenDelete}
-                        />
-                        {(data as any)?.count > 0 && (
-                            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-                                <Pagination
-                                    count={Math.ceil((data as any).count / PAGE_SIZE)}
-                                    page={page}
-                                    onChange={(e, v) => setPage(v)}
-                                    color="primary"
-                                />
-                            </Box>
-                        )}
-                    </>
-                )}
+                <ProfileTable
+                    data={(data as any)?.results || data}
+                    isLoading={isLoading}
+                    rowCount={(data as any)?.count || 0}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
+                    onEdit={handleOpenEdit}
+                    onDelete={handleOpenDelete}
+                />
             </Paper>
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">

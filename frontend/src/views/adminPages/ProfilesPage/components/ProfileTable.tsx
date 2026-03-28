@@ -4,17 +4,34 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
 interface ProfileTableProps {
     data: any[];
+    isLoading?: boolean;
+    rowCount?: number;
+    pagination?: { pageIndex: number; pageSize: number };
+    onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
+    sorting?: SortingState;
+    onSortingChange?: OnChangeFn<SortingState>;
     onView?: (profile: any) => void;
     onEdit: (profile: any) => void;
     onDelete: (profile: any) => void;
 }
 
-const ProfileTable = ({ data, onView, onEdit, onDelete }: ProfileTableProps) => {
+const ProfileTable = ({ 
+    data, 
+    isLoading,
+    rowCount,
+    pagination,
+    onPaginationChange,
+    sorting,
+    onSortingChange,
+    onView, 
+    onEdit, 
+    onDelete 
+}: ProfileTableProps) => {
     const { t } = useTranslation('admin');
 
     const columns = useMemo<ColumnDef<any>[]>(() => [
@@ -31,6 +48,7 @@ const ProfileTable = ({ data, onView, onEdit, onDelete }: ProfileTableProps) => 
         {
             accessorKey: 'userDict.fullName',
             header: t('pages.profiles.table.fullName') as string,
+            enableSorting: true,
             cell: (info) => (
                 <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
                     {info.getValue() as string || '---'}
@@ -40,6 +58,7 @@ const ProfileTable = ({ data, onView, onEdit, onDelete }: ProfileTableProps) => 
         {
             accessorKey: 'userDict.email',
             header: t('pages.profiles.table.email') as string,
+            enableSorting: true,
             cell: (info) => info.getValue() as string || '---',
         },
         {
@@ -87,7 +106,13 @@ const ProfileTable = ({ data, onView, onEdit, onDelete }: ProfileTableProps) => 
         <DataTable
             columns={columns}
             data={data || []}
-            hidePagination
+            isLoading={isLoading}
+            rowCount={rowCount}
+            pagination={pagination}
+            onPaginationChange={onPaginationChange}
+            enableSorting
+            sorting={sorting}
+            onSortingChange={onSortingChange}
             emptyMessage={t('pages.profiles.table.noData')}
         />
     );

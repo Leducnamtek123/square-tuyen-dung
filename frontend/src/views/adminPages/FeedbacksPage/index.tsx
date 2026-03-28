@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import adminManagementService from '../../../services/adminManagementService';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
+import { useDataTable } from '../../../hooks';
 
 const FeedbacksPage = () => {
   const { t } = useTranslation('admin');
@@ -18,14 +19,20 @@ const FeedbacksPage = () => {
   const [current, setCurrent] = useState<any>(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  const {
+    sorting,
+    onSortingChange,
+    ordering,
+  } = useDataTable();
+
   const fetchFeedbacks = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res: any = await adminManagementService.getFeedbacks();
+      const res: any = await adminManagementService.getFeedbacks({ ordering });
       setFeedbacks(Array.isArray(res) ? res : (res?.results || res?.data || []));
     } catch (e) { console.error(e); }
     finally { setIsLoading(false); }
-  }, []);
+  }, [ordering]);
 
   useEffect(() => { fetchFeedbacks(); }, [fetchFeedbacks]);
 
@@ -51,10 +58,12 @@ const FeedbacksPage = () => {
     {
       accessorKey: 'id',
       header: t('pages.feedbacks.table.id') as string,
+      enableSorting: true,
     },
     {
       accessorKey: 'userDict.fullName',
       header: t('pages.feedbacks.table.user') as string,
+      enableSorting: true,
       cell: (info) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {info.row.original.userDict?.avatarUrl && (
@@ -80,6 +89,7 @@ const FeedbacksPage = () => {
     {
       accessorKey: 'rating',
       header: t('pages.feedbacks.table.rating') as string,
+      enableSorting: true,
       cell: (info) => <Rating value={info.getValue() as number} readOnly size="small" />,
     },
     {
@@ -101,6 +111,7 @@ const FeedbacksPage = () => {
     {
       accessorKey: 'create_at',
       header: t('pages.feedbacks.table.createdAt') as string,
+      enableSorting: true,
       cell: (info) => info.getValue() ? new Date(info.getValue() as string).toLocaleDateString('vi-VN') : '—',
     },
     {
@@ -132,6 +143,9 @@ const FeedbacksPage = () => {
         data={feedbacks || []}
         isLoading={isLoading}
         hidePagination
+        enableSorting
+        sorting={sorting}
+        onSortingChange={onSortingChange}
         emptyMessage={t('pages.feedbacks.empty')}
       />
 

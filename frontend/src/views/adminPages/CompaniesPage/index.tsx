@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from "@mui/material";
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
+import { useDataTable } from '../../../hooks';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -14,9 +15,17 @@ import { useCompanies } from './hooks/useCompanies';
 
 const CompaniesPage = () => {
     const { t } = useTranslation('admin');
-    const PAGE_SIZE = 10;
-    const [page, setPage] = useState(0);
-    const [searchTerm, setSearchTerm] = useState('');
+    const {
+        page,
+        pageSize,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange,
+        searchTerm,
+        onSearchChange,
+    } = useDataTable({ initialPageSize: 10 });
 
     const {
         data,
@@ -27,8 +36,9 @@ const CompaniesPage = () => {
         isMutating
     } = useCompanies({
         page: page + 1,
-        pageSize: PAGE_SIZE,
-        kw: searchTerm
+        pageSize: pageSize,
+        kw: searchTerm,
+        ordering,
     }) as any;
 
     const [openDialog, setOpenDialog] = useState(false);
@@ -47,8 +57,7 @@ const CompaniesPage = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
-        setPage(0);
+        onSearchChange(e.target.value);
     };
 
     const handleOpenAdd = () => {
@@ -144,6 +153,7 @@ const CompaniesPage = () => {
         {
             accessorKey: 'companyName',
             header: t('pages.companies.table.companyName') as string,
+            enableSorting: true,
             cell: (info) => (
                 <Box>
                     <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
@@ -158,11 +168,13 @@ const CompaniesPage = () => {
         {
             accessorKey: 'employeeSize',
             header: t('pages.companies.table.scale') as string,
+            enableSorting: true,
             cell: (info) => info.getValue() || '---',
         },
         {
             accessorKey: 'fieldOperation',
             header: t('pages.companies.table.field') as string,
+            enableSorting: true,
             cell: (info) => info.getValue() || '---',
         },
         {
@@ -246,13 +258,11 @@ const CompaniesPage = () => {
                     data={((data as any)?.results || data) as any[]}
                     isLoading={isLoading}
                     rowCount={(data as any)?.count || 0}
-                    pagination={{
-                        pageIndex: page,
-                        pageSize: PAGE_SIZE,
-                    }}
-                    onPaginationChange={(pagination) => {
-                        setPage(pagination.pageIndex);
-                    }}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    enableSorting
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
                 />
             </Paper>
             {/* Add/Edit Dialog */}

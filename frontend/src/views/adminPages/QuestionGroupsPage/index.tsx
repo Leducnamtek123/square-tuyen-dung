@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Pagination, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip, SelectChangeEvent } from "@mui/material";
+import React, { useState, useEffect } from 'react';
+import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip, SelectChangeEvent } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { useDataTable } from '../../../hooks';
 
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
@@ -11,9 +12,18 @@ import { transformQuestion, transformQuestionGroup } from '../../../utils/transf
 
 const QuestionGroupsPage = () => {
     const { t } = useTranslation('admin');
-    const PAGE_SIZE = 10;
-    const [page, setPage] = useState(1);
-    const [searchTerm, setSearchTerm] = useState('');
+    
+    const {
+        page,
+        pageSize,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange,
+        searchTerm,
+        onSearchChange,
+    } = useDataTable();
 
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
@@ -37,9 +47,10 @@ const QuestionGroupsPage = () => {
         deleteQuestionGroup,
         isMutating
     } = useQuestionGroups({
-        page,
-        pageSize: PAGE_SIZE,
-        kw: searchTerm
+        page: page + 1,
+        pageSize: pageSize,
+        kw: searchTerm,
+        ordering,
     }) as any;
 
     React.useEffect(() => {
@@ -78,8 +89,7 @@ const QuestionGroupsPage = () => {
     };
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
-        setPage(1);
+        onSearchChange(e.target.value);
     };
 
     const handleOpenAdd = () => {
@@ -188,29 +198,17 @@ const QuestionGroupsPage = () => {
                     />
                 </Box>
 
-                {isLoading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 5 }}>
-                        <CircularProgress size={40} />
-                    </Box>
-                ) : (
-                    <>
-                        <QuestionGroupTable
-                            data={(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : []).map(transformQuestionGroup).filter(Boolean)}
-                            onEdit={handleOpenEdit}
-                            onDelete={handleOpenDelete}
-                        />
-                        {(data as any)?.count > 0 && (
-                            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center' }}>
-                                <Pagination
-                                    count={Math.ceil((data as any).count / PAGE_SIZE)}
-                                    page={page}
-                                    onChange={(e, v) => setPage(v)}
-                                    color="primary"
-                                />
-                            </Box>
-                        )}
-                    </>
-                )}
+                <QuestionGroupTable
+                    data={(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : []).map(transformQuestionGroup).filter(Boolean)}
+                    loading={isLoading}
+                    rowCount={(data as any)?.count || 0}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
+                    onEdit={handleOpenEdit}
+                    onDelete={handleOpenDelete}
+                />
             </Paper>
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="xs">

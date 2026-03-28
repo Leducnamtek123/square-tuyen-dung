@@ -7,11 +7,20 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useCities } from './hooks/useCities';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
+import { useDataTable } from '../../../hooks';
 
 const CitiesPage = () => {
     const { t } = useTranslation('admin');
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
+    
+    const {
+        page,
+        pageSize: rowsPerPage,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange
+    } = useDataTable({ initialPageSize: 10 });
 
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
@@ -28,7 +37,7 @@ const CitiesPage = () => {
         updateCity,
         deleteCity,
         isMutating
-    } = useCities({ page: page + 1, pageSize: rowsPerPage }) as any;
+    } = useCities({ page: page + 1, pageSize: rowsPerPage, ordering }) as any;
 
     const handleOpenAdd = () => {
         setDialogMode('add');
@@ -86,10 +95,12 @@ const CitiesPage = () => {
             accessorKey: 'id',
             header: t('pages.cities.table.id') as string,
             size: 80,
+            enableSorting: true,
         },
         {
             accessorKey: 'name',
             header: t('pages.cities.table.cityName') as string,
+            enableSorting: true,
             cell: (info) => (
                 <Typography variant="body2" sx={{ fontWeight: 500 }}>
                     {info.getValue() as string}
@@ -99,6 +110,7 @@ const CitiesPage = () => {
         {
             accessorKey: 'code',
             header: t('pages.cities.table.code') as string,
+            enableSorting: true,
             cell: (info) => info.getValue() as string || '---',
         },
         {
@@ -152,14 +164,11 @@ const CitiesPage = () => {
                 data={displayData}
                 isLoading={isLoading}
                 rowCount={data?.count || 0}
-                pagination={{
-                    pageIndex: page,
-                    pageSize: rowsPerPage,
-                }}
-                onPaginationChange={(pagination) => {
-                    setPage(pagination.pageIndex);
-                    setRowsPerPage(pagination.pageSize);
-                }}
+                pagination={pagination}
+                onPaginationChange={onPaginationChange}
+                enableSorting
+                sorting={sorting}
+                onSortingChange={onSortingChange}
                 emptyMessage={t('pages.cities.table.noData')}
             />
 

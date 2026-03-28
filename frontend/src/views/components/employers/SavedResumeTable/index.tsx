@@ -20,18 +20,26 @@ interface SavedResumeTableProps {
   rows: any[];
   isLoading: boolean;
   handleUnsave: (slug: string) => void;
-  count?: number;
-  page?: number;
-  rowsPerPage?: number;
-  handleChangePage?: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
-  handleChangeRowsPerPage?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  [key: string]: any;
+  rowCount: number;
+  pagination: any;
+  onPaginationChange: (pagination: any) => void;
+  sorting: any;
+  onSortingChange: (sorting: any) => void;
 }
 
 const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
   const { t } = useTranslation('employer');
   const nav = useRouter();
-  const { rows, isLoading, handleUnsave } = props;
+  const { 
+    rows, 
+    isLoading, 
+    handleUnsave,
+    rowCount,
+    pagination,
+    onPaginationChange,
+    sorting,
+    onSortingChange
+  } = props;
   const rowsSafe = React.useMemo(() => Array.isArray(rows) ? rows : [], [rows]);
   const { allConfig } = useConfig();
 
@@ -39,6 +47,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
     {
       accessorKey: 'resume.title',
       header: (t('savedResumeTable.title.onlineattachedresume') || 'Resume') as string,
+      enableSorting: true,
       cell: (info) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {info.row.original.resume?.type === CV_TYPES.cvWebsite ? (
@@ -63,6 +72,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
     {
       accessorKey: 'resume.userDict.fullName',
       header: (t('savedResumeTable.title.candidateName') || 'Candidate') as string,
+      enableSorting: true,
     },
     {
       id: 'salary',
@@ -88,6 +98,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
     {
       accessorKey: 'createAt',
       header: (t('savedResumeTable.title.savedAt') || 'Saved At') as string,
+      enableSorting: true,
       cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
     },
     {
@@ -120,24 +131,16 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
   ], [allConfig, handleUnsave, nav, t]);
 
   return (
-    <DataTable
+      <DataTable
       columns={columns}
       data={rowsSafe}
       isLoading={isLoading}
-      rowCount={props.count || 0}
-      pagination={{
-        pageIndex: props.page || 0,
-        pageSize: props.rowsPerPage || 10,
-      }}
-      onPaginationChange={(pagination) => {
-        if (props.handleChangePage && pagination.pageIndex !== props.page) {
-          props.handleChangePage(null, pagination.pageIndex);
-        }
-        if (props.handleChangeRowsPerPage && pagination.pageSize !== props.rowsPerPage) {
-          const event = { target: { value: String(pagination.pageSize) } } as React.ChangeEvent<HTMLInputElement>;
-          props.handleChangeRowsPerPage?.(event);
-        }
-      }}
+      rowCount={rowCount}
+      pagination={pagination}
+      onPaginationChange={onPaginationChange}
+      enableSorting
+      sorting={sorting}
+      onSortingChange={onSortingChange}
       emptyMessage={t('savedResumeTable.title.youhaventsavedanycandidatesyet')}
     />
   );

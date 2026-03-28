@@ -20,9 +20,7 @@ import { useSavedResumes, useToggleSaveResume } from '../hooks/useEmployerQuerie
 import resumeSavedService from '../../../../services/resumeSavedService';
 
 import SavedResumeFilterForm from '../SavedResumeFilterForm';
-
-
-
+import { useDataTable } from '../../../../hooks';
 import toastMessages from '../../../../utils/toastMessages';
 
 interface SavedResumeCardProps {
@@ -97,8 +95,19 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
 
   const headCells = React.useMemo(() => getHeadCells(t), [t]);
 
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(pageSize);
+  const {
+    page,
+    pageSize: rowsPerPage,
+    sorting,
+    onSortingChange,
+    ordering,
+    pagination,
+    onPaginationChange,
+  } = useDataTable({ 
+    initialSorting: [{ id: 'createAt', desc: true }],
+    initialPageSize: pageSize
+  });
+
   const [filterData, setFilterData] = React.useState({
     kw: '',
     salaryMax: '',
@@ -110,8 +119,9 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
   const queryParams = React.useMemo(() => ({
     page: page + 1,
     pageSize: rowsPerPage,
+    ordering,
     ...filterData,
-  }), [page, rowsPerPage, filterData]);
+  }), [page, rowsPerPage, ordering, filterData]);
 
   const { data: queryData, isLoading } = useSavedResumes(queryParams);
   const resumes = queryData?.results || [];
@@ -120,20 +130,18 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
   const toggleSave = useToggleSaveResume();
 
   const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
+    onPaginationChange({ pageIndex: newPage, pageSize: rowsPerPage });
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
+    onPaginationChange({ pageIndex: 0, pageSize: parseInt(event.target.value, 10) });
   };
 
   const handleFilter = (data: any) => {
     setFilterData({
       ...data,
-      pageSize: pageSize,
     });
-    setPage(0);
+    onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
   };
 
   const handleSave = (slug: string) => {
@@ -160,6 +168,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
     exportResumes({
       page: page + 1,
       pageSize: rowsPerPage,
+      ordering,
       ...filterData,
     });
   };
@@ -284,25 +293,14 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
       }}>
 
         <SavedResumeTable
-
-          headCells={headCells}
-
           isLoading={isLoading}
-
           rows={resumes}
-
-          page={page}
-
-          rowsPerPage={rowsPerPage}
-
-          count={count}
-
+          rowCount={count}
+          pagination={pagination}
+          onPaginationChange={onPaginationChange}
+          sorting={sorting}
+          onSortingChange={onSortingChange}
           handleUnsave={handleSave}
-
-          handleChangePage={handleChangePage}
-
-          handleChangeRowsPerPage={handleChangeRowsPerPage}
-
         />
 
       </Box>

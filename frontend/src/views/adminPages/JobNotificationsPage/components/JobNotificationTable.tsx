@@ -4,22 +4,39 @@ import { useTranslation } from 'react-i18next';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import dayjs from '../../../../configs/dayjs-config';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
 interface JobNotificationTableProps {
     data: any[];
+    isLoading?: boolean;
+    rowCount?: number;
+    pagination?: { pageIndex: number; pageSize: number };
+    onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
+    sorting?: SortingState;
+    onSortingChange?: OnChangeFn<SortingState>;
     onEdit?: (row: any) => void;
     onDelete?: (row: any) => void;
 }
 
-const JobNotificationTable = ({ data, onEdit, onDelete }: JobNotificationTableProps) => {
+const JobNotificationTable = ({ 
+    data, 
+    isLoading,
+    rowCount,
+    pagination,
+    onPaginationChange,
+    sorting,
+    onSortingChange,
+    onEdit, 
+    onDelete 
+}: JobNotificationTableProps) => {
     const { t } = useTranslation('admin');
 
     const columns = useMemo<ColumnDef<any>[]>(() => [
         {
             accessorKey: 'title',
             header: t('pages.jobNotifications.table.title') as string,
+            enableSorting: true,
             cell: (info) => (
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
                     {info.getValue() as string}
@@ -43,6 +60,7 @@ const JobNotificationTable = ({ data, onEdit, onDelete }: JobNotificationTablePr
         {
             accessorKey: 'createAt',
             header: t('pages.jobNotifications.table.sentAt') as string,
+            enableSorting: true,
             cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm'),
         },
         {
@@ -70,7 +88,13 @@ const JobNotificationTable = ({ data, onEdit, onDelete }: JobNotificationTablePr
         <DataTable
             columns={columns}
             data={data || []}
-            hidePagination
+            isLoading={isLoading}
+            rowCount={rowCount}
+            pagination={pagination}
+            onPaginationChange={onPaginationChange}
+            enableSorting
+            sorting={sorting}
+            onSortingChange={onSortingChange}
             emptyMessage={t('pages.jobNotifications.table.noData')}
         />
     );

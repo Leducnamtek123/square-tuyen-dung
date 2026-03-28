@@ -1,43 +1,36 @@
 import React, { useState } from 'react';
 import { Box, Card, CardHeader, CardContent, Typography, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { useDataTable } from '../../../hooks';
 
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import { transformInterviewSession } from '../../../utils/transformers';
 import InterviewTable from './components/InterviewTable';
 import { useDeleteInterview, useUpdateInterviewStatus, useInterviews } from './hooks/useInterviews';
 
-import { SortingState, RowSelectionState } from '@tanstack/react-table';
-
 const InterviewsPage = () => {
     const { t } = useTranslation(['interview', 'admin']);
-    const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [sorting, setSorting] = useState<SortingState>([]);
-    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-
-    const ordering = sorting.length > 0 
-        ? `${sorting[0].desc ? '-' : ''}${sorting[0].id}`
-        : undefined;
+    const {
+        page,
+        pageSize,
+        sorting,
+        onSortingChange,
+        ordering,
+        pagination,
+        onPaginationChange,
+        rowSelection,
+        onRowSelectionChange,
+    } = useDataTable();
 
     const { data: interviewsData, isLoading } = useInterviews({
         page: page + 1,
-        pageSize: rowsPerPage,
+        pageSize: pageSize,
         ordering,
     }) as any;
 
     const interviews = ((interviewsData as any)?.results || []).map(transformInterviewSession);
     const deleteMutation = useDeleteInterview() as any;
     const updateStatusMutation = useUpdateInterviewStatus() as any;
-
-    const handleChangePage = (event: any, newPage: number) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
-    };
 
     const handleViewDetail = (interview: any) => {
         // View interview detail
@@ -86,18 +79,12 @@ const InterviewsPage = () => {
                         interviews={interviews}
                         loading={isLoading}
                         rowCount={(interviewsData as any)?.count || 0}
-                        pagination={{
-                            pageIndex: page,
-                            pageSize: rowsPerPage,
-                        }}
-                        onPaginationChange={(pagination) => {
-                            setPage(pagination.pageIndex);
-                            setRowsPerPage(pagination.pageSize);
-                        }}
+                        pagination={pagination}
+                        onPaginationChange={onPaginationChange}
                         sorting={sorting}
-                        onSortingChange={setSorting}
+                        onSortingChange={onSortingChange}
                         rowSelection={rowSelection}
-                        onRowSelectionChange={setRowSelection}
+                        onRowSelectionChange={onRowSelectionChange}
                         onView={handleViewDetail}
                         onDelete={handleDelete}
                         onUpdateStatus={handleUpdateStatus}

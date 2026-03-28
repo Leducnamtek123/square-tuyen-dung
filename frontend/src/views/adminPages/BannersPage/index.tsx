@@ -16,6 +16,7 @@ import { compressImageFile } from '../../../utils/imageCompression';
 import ImageCropDialog from '../../../components/Common/ImageCropDialog';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
+import { useDataTable } from '../../../hooks';
 
 /** Aspect ratios per banner type */
 const ASPECT_RATIOS: Record<number, { ratio: number; label: string }> = {
@@ -57,6 +58,12 @@ const BannersPage = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  const {
+    sorting,
+    onSortingChange,
+    ordering,
+  } = useDataTable();
+
   // Form fields
   const [description, setDescription] = useState('');
   const [buttonText, setButtonText] = useState('');
@@ -85,7 +92,7 @@ const BannersPage = () => {
     setIsLoading(true);
     setFetchError(null);
     try {
-      const res: any = await adminManagementService.getBanners();
+      const res: any = await adminManagementService.getBanners({ ordering });
       setBanners(normalizeList(res));
     } catch (e) {
       console.error('[BannersPage] fetchBanners error:', e);
@@ -93,7 +100,7 @@ const BannersPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [t]);
+  }, [t, ordering]);
 
   useEffect(() => { fetchBanners(); }, [fetchBanners]);
 
@@ -201,6 +208,7 @@ const BannersPage = () => {
     {
       accessorKey: 'id',
       header: t('pages.banners.table.id') as string,
+      enableSorting: true,
     },
     {
       accessorKey: 'imageUrl',
@@ -235,6 +243,7 @@ const BannersPage = () => {
     {
       accessorKey: 'description',
       header: t('pages.banners.table.description') as string,
+      enableSorting: true,
       cell: (info) => (
         <Typography variant="body2" sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {info.getValue() as string || '—'}
@@ -244,6 +253,7 @@ const BannersPage = () => {
     {
       accessorKey: 'platform',
       header: t('pages.banners.table.platform') as string,
+      enableSorting: true,
       cell: (info) => (
         <Chip label={info.getValue() as string} size="small" color={info.getValue() === 'WEB' ? 'primary' : 'secondary'} />
       ),
@@ -251,6 +261,7 @@ const BannersPage = () => {
     {
       accessorKey: 'type',
       header: t('pages.banners.table.type') as string,
+      enableSorting: true,
       cell: (info) => TYPE_OPTIONS.find(t => t.value === info.getValue())?.label || (info.getValue() as string),
     },
     {
@@ -313,6 +324,9 @@ const BannersPage = () => {
           data={banners || []}
           isLoading={isLoading}
           hidePagination
+          enableSorting
+          sorting={sorting}
+          onSortingChange={onSortingChange}
           emptyMessage={t('pages.banners.empty')}
         />
       )}
