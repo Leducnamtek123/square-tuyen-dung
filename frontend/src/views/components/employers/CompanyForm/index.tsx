@@ -58,12 +58,19 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   const address = useWatch({ control, name: 'location.address' });
   const addressDebounce = useDebounce(address, 500);
 
+  const prevCityIdRef = React.useRef<any>(null);
+
   React.useEffect(() => {
     const loadDistricts = async (cityId: any) => {
       try {
         const resData = await commonService.getDistrictsByCityId(cityId);
-        if (districtOptions.length > 0) setValue('location.district', '');
+        // Only clear district if the cityId has actually changed (user interaction)
+        // and it's not the initial load (prevCityIdRef.current is not null).
+        if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
+          setValue('location.district', '');
+        }
         setDistrictOptions(resData);
+        prevCityIdRef.current = cityId;
       } catch (error: any) {
         errorHandling(error);
       }
@@ -71,7 +78,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
     if (cityId) {
       loadDistricts(cityId);
     }
-  }, [cityId, setValue, districtOptions.length]);
+  }, [cityId, setValue]);
 
   React.useEffect(() => {
     const loadLocation = async (input: string) => {

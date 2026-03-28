@@ -63,9 +63,9 @@ const SingleSelectCustom = ({
 
               getOptionLabel={(option) => typeof option.name === 'string' ? t(`choices.${option.name}`, option.name) : option.name}
 
-              value={options.find((o) => o.id === field.value) || null}
+              value={options.find((o) => o.id == field.value) || null}
 
-              onChange={(e, value) => field.onChange(value?.id || null)}
+              onChange={(e, value) => field.onChange(value?.id ?? null)}
 
               renderInput={(params) => (
 
