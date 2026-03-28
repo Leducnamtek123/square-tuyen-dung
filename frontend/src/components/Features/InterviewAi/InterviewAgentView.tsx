@@ -28,7 +28,9 @@ interface InterviewAgentViewProps {
 const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewProps) => {
   const { t } = useTranslation("interview");
   const room = useRoomContext();
-  const { state, agentParticipant } = useAgent() as any;
+  const agent = useAgent() as any;
+  const state = agent?.state || 'connecting';
+  const agentParticipant = agent?.agentParticipant;
   const { chatMessages } = useChat({ room });
   const [isChatOpen, setIsChatOpen] = useState(false);
   

@@ -16,18 +16,30 @@ import interviewService from "../../services/interviewService";
 import { transformInterviewSession } from "../../utils/transformers";
 
 const getSafeLiveKitUrl = () => {
-  const defaultUrl = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.host}/livekit` : '';
-  const rawUrl = (process.env.NEXT_PUBLIC_LIVEKIT_URL || defaultUrl).trim();
+  if (typeof window === 'undefined') return '';
+  
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const host = window.location.host;
+  const defaultUrl = `${protocol}//${host}/livekit`;
+  
+  const rawUrl = (process.env.NEXT_PUBLIC_LIVEKIT_URL || "").trim();
 
   if (!rawUrl) return defaultUrl;
 
-  try {
-    const normalized = new URL(rawUrl);
-    normalized.protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-    return normalized.toString().replace(/\/$/, "");
-  } catch {
-    return defaultUrl;
+  // Handle absolute URLs
+  if (rawUrl.startsWith('http') || rawUrl.startsWith('ws')) {
+    try {
+      const url = new URL(rawUrl);
+      url.protocol = protocol;
+      return url.toString().replace(/\/$/, "");
+    } catch {
+      return defaultUrl;
+    }
   }
+  
+  // Handle relative or protocol-less URLs
+  const cleanPath = rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`;
+  return `${protocol}//${host}${cleanPath}`.replace(/\/$/, "");
 };
 
 const normalizeRole = (role: string) => {
@@ -49,7 +61,6 @@ type InterviewSessionPageProps = {
 };
 
 const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps) => {
-  const AudioVisualizerAura = AgentAudioVisualizerAura as any;
   const normalizedRole = normalizeRole(role);
   const { id: routeId } = useParams<{ id?: string }>();
   const navigate = useRouter();
@@ -127,7 +138,14 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         }
         setParticipantToken(tokenData.token);
         if (tokenData.serverUrl || tokenData.server_url) {
-          setServerUrl(tokenData.serverUrl || tokenData.server_url);
+          const rawServerUrl = tokenData.serverUrl || tokenData.server_url;
+          try {
+            const url = new URL(rawServerUrl);
+            url.protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+            setServerUrl(url.toString().replace(/\/$/, ""));
+          } catch {
+            setServerUrl(rawServerUrl);
+          }
         }
       }
 
