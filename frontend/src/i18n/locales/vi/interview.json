@@ -4,6 +4,9 @@
   "redirectCta": "Nếu bạn không được tự động chuyển hướng, hãy nhấn vào đây",
   "readyTitle": "Sẵn sàng bắt đầu phỏng vấn",
   "readyBody": "Nhấn bắt đầu để kết nối. Camera và microphone sẽ chỉ bật lên khi bạn chọn chúng trên thanh công cụ.",
+  "unavailableTitle": "Phỏng vấn không khả dụng",
+  "sessionNotJoinable": "Buổi phỏng vấn này đã kết thúc hoặc đã bị hủy.",
+  "sessionNotJoinableBody": "Buổi phỏng vấn này đã kết thúc hoặc đã bị hủy. Vui lòng liên hệ nhà tuyển dụng để biết thêm chi tiết.",
   "startInterview": "Bắt đầu phỏng vấn",
   "transcriptTitle": "Bản ghi âm",
   "noMessages": "Chưa có tin nhắn nào.",
@@ -19,7 +22,17 @@
     "camera": "Camera",
     "share": "Chia sẻ",
     "chat": "Chat",
-    "end": "Kết thúc"
+    "end": "Kết thúc",
+    "enableAudio": "Bật âm thanh"
+  },
+  "agentView": {
+    "technicalInterview": "Phỏng vấn chuyên môn",
+    "candidate": "Ứng viên",
+    "agentSpeaking": "AI đang nói",
+    "agentThinking": "AI đang suy nghĩ",
+    "listening": "Đang lắng nghe",
+    "ready": "Sẵn sàng",
+    "transcript": "Bản ghi cuộc hội thoại"
   },
   "voiceAi": {
     "pageTitle": "Trợ lý Phỏng vấn Voice AI",
@@ -78,6 +91,7 @@
   "loading": "Đang kết nối đến phòng phỏng vấn...",
   "errors": {
     "missingInvite": "Thiếu mã mời phỏng vấn.",
+    "missingSessionId": "Thiếu ID phiên phỏng vấn.",
     "tokenMissing": "Không thể lấy token để tham gia phỏng vấn.",
     "invalidSession": "Lỗi kết nối hoặc phiên phỏng vấn không hợp lệ."
   },

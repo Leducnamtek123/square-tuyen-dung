@@ -71,11 +71,14 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
   const isJoinable = session && JOINABLE_STATUSES.includes(session.status);
 
   const sessionTitle = useMemo(() => {
+    if (!isJoinable) {
+      return t("unavailableTitle", { defaultValue: "Session Unavailable" });
+    }
     if (normalizedRole === "jobseeker") {
       return t("readyTitle", { defaultValue: "Ready to start interview" });
     }
     return t("interviewDetail.title", { ns: "employer", defaultValue: "Interview session" });
-  }, [normalizedRole, t]);
+  }, [normalizedRole, t, isJoinable]);
 
   // Step 1: Load session detail on page mount (no LiveKit token yet)
   const loadSessionDetail = useCallback(async () => {
@@ -91,7 +94,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         if (!inviteToken) throw new Error(t("errors.missingInvite"));
         detailRaw = await interviewService.getSessionDetailByInviteToken(inviteToken) as any;
       } else {
-        if (!routeId) throw new Error("Missing session id.");
+        if (!routeId) throw new Error(t("errors.missingSessionId", { defaultValue: "Missing session ID." }));
         detailRaw = await interviewService.getSessionDetail(routeId) as any;
         inviteToken = detailRaw?.invite_token || detailRaw?.inviteToken;
       }
@@ -177,12 +180,15 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
     );
   }
 
-  const statusText = (session?.status || "scheduled").replaceAll("_", " ");
   const statusKey = (session?.status || "scheduled").toLowerCase();
+  const statusText = t(`interviewListCard.statuses.${statusKey}`, { defaultValue: statusKey.replaceAll("_", " ") });
   const statusClass = statusClassMap[statusKey] || "border-white/15 bg-white/10 text-slate-200";
   const formattedSchedule =
     session?.scheduledAt &&
     new Date(session.scheduledAt).toLocaleString(i18n.language === "vi" ? "vi-VN" : "en-US");
+
+  const jobLabel = session?.jobName || t("common:labels.job", { defaultValue: "Job" });
+  const candidateLabel = session?.candidateName || t("interviewListCard.candidate", { defaultValue: "Candidate" });
 
   return (
     <main className="min-h-screen bg-slate-950 px-4 py-4 text-slate-100 md:px-8 md:py-6">
@@ -190,10 +196,12 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70 p-4 backdrop-blur-xl md:p-5">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.2),transparent_45%)]" />
           <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="space-y-1">
-              <h1 className="text-xl font-semibold tracking-tight md:text-2xl">{sessionTitle}</h1>
-              <p className="text-sm text-slate-300">
-                {session?.jobName || "Interview"} | {session?.candidateName || "Candidate"}
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-white md:text-2xl">
+                {sessionTitle}
+              </h1>
+              <p className="mt-1 text-sm font-medium text-slate-400">
+                {jobLabel} | {candidateLabel}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -261,8 +269,10 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                   <div className="space-y-2">
                     <h2 className="text-2xl font-semibold tracking-tight">
                       {isJoinable
-                        ? t("readyTitle", { defaultValue: "Ready to start interview" })
-                        : t("sessionEnded", { defaultValue: "Interview session is no longer available" })}
+                        ? (normalizedRole === "jobseeker"
+                          ? t("readyBody", { defaultValue: "Press start to connect. Camera and microphone will only turn on when you select them on the toolbar." })
+                          : t("readyTitle", { defaultValue: "Ready to start interview" }))
+                        : t("sessionNotJoinable", { defaultValue: "This interview session has already ended or been cancelled." })}
                     </h2>
                     {error && (
                       <p className="text-sm text-rose-300">{error}</p>
@@ -273,7 +283,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                             defaultValue:
                               "Click start to join the interview room with camera and microphone.",
                           })
-                        : t("sessionEndedBody", {
+                        : t("sessionNotJoinableBody", {
                             defaultValue:
                               "This interview session has already ended or been cancelled.",
                           })}

@@ -30,9 +30,13 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
 
 def _build_public_livekit_url(request) -> str:
     explicit = getattr(settings, "LIVEKIT_PUBLIC_URL", "") or ""
-    if not explicit:
-        raise ValueError("LIVEKIT_PUBLIC_URL is required.")
-    return explicit.rstrip("/")
+    if explicit:
+        return explicit.rstrip("/")
+
+    # Fallback: construct from request host (standard Nginx proxy /livekit -> LiveKit)
+    host = request.get_host()
+    scheme = "https" if request.is_secure() else "http"
+    return f"{scheme}://{host}/livekit"
 
 
 def create_livekit_participant_token(session: InterviewSession, request) -> Dict[str, str]:

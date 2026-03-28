@@ -4,6 +4,9 @@
   "redirectCta": "If you are not redirected, click here",
   "readyTitle": "Ready to start the interview",
   "readyBody": "Click start to connect. Camera and microphone will only turn on when you choose them in the toolbar.",
+  "unavailableTitle": "Session Unavailable",
+  "sessionNotJoinable": "This interview session has already ended or been cancelled.",
+  "sessionNotJoinableBody": "This interview session has already ended or been cancelled. Please contact the employer for details.",
   "startInterview": "Start interview",
   "transcriptTitle": "Transcript",
   "noMessages": "No messages yet.",
@@ -19,7 +22,17 @@
     "camera": "Camera",
     "share": "Share",
     "chat": "Chat",
-    "end": "End call"
+    "end": "End call",
+    "enableAudio": "Enable audio"
+  },
+  "agentView": {
+    "technicalInterview": "Technical Interview",
+    "candidate": "Candidate",
+    "agentSpeaking": "AI is speaking",
+    "agentThinking": "AI is thinking",
+    "listening": "Listening",
+    "ready": "Ready",
+    "transcript": "Chat Transcript"
   },
   "voiceAi": {
     "pageTitle": "LiveKit Voice Agent",
@@ -78,6 +91,7 @@
   "loading": "Connecting to interview room...",
   "errors": {
     "missingInvite": "Missing interview invite code.",
+    "missingSessionId": "Missing interview session ID.",
     "tokenMissing": "Unable to fetch token to join the interview.",
     "invalidSession": "Connection error or invalid interview session."
   },
