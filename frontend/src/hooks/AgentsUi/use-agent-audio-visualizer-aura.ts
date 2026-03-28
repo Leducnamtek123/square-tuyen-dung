@@ -53,10 +53,23 @@ export function useAgentAudioVisualizerAura(
   const { value: frequency, animate: animateFrequency } = useAnimatedValue(DEFAULT_FREQUENCY);
   const { value: brightness, animate: animateBrightness } = useAnimatedValue(DEFAULT_BRIGHTNESS);
 
-  const volume = useTrackVolume(audioTrack as any, {
+  const [volume, setVolume] = useState(0);
+  
+  // Note: We can't call hooks conditionally, so we expect the caller 
+  // to ensure context or handle the error if this hook is used outside of Room.
+  // However, we'll try to be safe by checking if audioTrack exists.
+  const trackVolume = useTrackVolume(audioTrack as any, {
     fftSize: 512,
     smoothingTimeConstant: 0.55,
   });
+
+  useEffect(() => {
+    if (audioTrack) {
+      setVolume(trackVolume);
+    } else {
+      setVolume(0);
+    }
+  }, [audioTrack, trackVolume]);
 
   useEffect(() => {
     switch (state) {

@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Box, Typography, Button, Chip, IconButton, Stack, Divider, LinearProgress } from "@mui/material";
+import { Box, Typography, Button, Chip, IconButton, Stack, Divider, LinearProgress, CircularProgress } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import BlockIcon from '@mui/icons-material/Block';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { toast } from 'react-toastify';
 import Link from 'next/link';
 import interviewService from '../../../../services/interviewService';
 import { transformInterviewSession } from '../../../../utils/transformers';
@@ -28,6 +33,10 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const [loading, setLoading] = useState(true);
+
+    const [deleteDialog, setDeleteDialog] = useState<{ open: boolean, id: string | number | null }>({ open: false, id: null });
+    const [cancelDialog, setCancelDialog] = useState<{ open: boolean, id: string | number | null, roomName: string | null }>({ open: false, id: null, roomName: null });
+    const [isProcessing, setIsProcessing] = useState(false);
 
     const fetchSessions = useCallback(async () => {
 
@@ -101,10 +110,40 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
     const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
 
-        setRowsPerPage(parseInt(event.target.value, 10));
-
         setPage(0);
 
+    };
+
+    const handleDelete = async () => {
+        if (!deleteDialog.id) return;
+        setIsProcessing(true);
+        try {
+            await interviewService.deleteSession(deleteDialog.id);
+            toast.success(t('interviewListCard.messages.deleteSuccess'));
+            setDeleteDialog({ open: false, id: null });
+            fetchSessions();
+        } catch (error) {
+            console.error('Error deleting session', error);
+            toast.error(t('interviewListCard.messages.deleteError'));
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    const handleCancel = async () => {
+        if (!cancelDialog.roomName) return;
+        setIsProcessing(true);
+        try {
+            await interviewService.updateSessionStatus(cancelDialog.roomName, 'cancelled');
+            toast.success(t('interviewListCard.messages.cancelSuccess'));
+            setCancelDialog({ open: false, id: null, roomName: null });
+            fetchSessions();
+        } catch (error) {
+            console.error('Error cancelling session', error);
+            toast.error(t('interviewListCard.messages.cancelError'));
+        } finally {
+            setIsProcessing(false);
+        }
     };
 
     const getStatusColor = (status: string): "success" | "primary" | "info" | "error" | "default" => {
@@ -244,37 +283,58 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             id: 'actions',
 
             cell: ({ row }: { row: { original: any } }) => (
-
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-
+                <Stack direction="row" spacing={1} justifyContent="flex-end">
                     <IconButton
-
                         component={Link}
-
                         href={getLink(ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', row.original.id))}
-
                         {...({} as any)}
-
                         color="primary"
-
                         size="small"
-
-                        sx={{
-
-                            bgcolor: 'primary.background',
-
-                            '&:hover': { bgcolor: 'primary.backgroundHover' }
-
-                        }}
-
+                        title={t('common:view')}
+                        sx={{ bgcolor: 'primary.background', '&:hover': { bgcolor: 'primary.backgroundHover' } }}
                     >
-
                         <VisibilityIcon fontSize="small" />
-
                     </IconButton>
 
-                </Box>
+                    {/* Edit Option - Only if not completed/cancelled */}
+                    {['draft', 'scheduled'].includes(row.original.status) && (
+                        <IconButton
+                            component={Link}
+                            href={getLink(ROUTES.EMPLOYER.INTERVIEW_EDIT.replace(':id', row.original.id))}
+                            {...({} as any)}
+                            color="info"
+                            size="small"
+                            title={t('interviewListCard.editInterview')}
+                            sx={{ bgcolor: 'info.background', '&:hover': { bgcolor: 'info.backgroundHover' } }}
+                        >
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    )}
 
+                    {/* Cancel Option - Only if scheduled */}
+                    {row.original.status === 'scheduled' && (
+                        <IconButton
+                            onClick={() => setCancelDialog({ open: true, id: row.original.id, roomName: row.original.roomName })}
+                            color="warning"
+                            size="small"
+                            title={t('interviewListCard.cancelInterview')}
+                            sx={{ bgcolor: 'warning.background', '&:hover': { bgcolor: 'warning.backgroundHover' } }}
+                        >
+                            <BlockIcon fontSize="small" />
+                        </IconButton>
+                    )}
+
+                    {/* Delete Option - Always allowed for now or based on status */}
+                    <IconButton
+                        onClick={() => setDeleteDialog({ open: true, id: row.original.id })}
+                        color="error"
+                        size="small"
+                        title={t('interviewListCard.deleteInterview')}
+                        sx={{ bgcolor: 'error.background', '&:hover': { bgcolor: 'error.backgroundHover' } }}
+                    >
+                        <DeleteIcon fontSize="small" />
+                    </IconButton>
+                </Stack>
             ),
 
         },
@@ -451,6 +511,36 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
             </Box>
 
+            {/* Confirmation Dialogs */}
+            <Dialog open={deleteDialog.open} onClose={() => !isProcessing && setDeleteDialog({ open: false, id: null })}>
+                <DialogTitle>{t('interviewListCard.confirmDeleteTitle')}</DialogTitle>
+                <DialogContent>
+                    <Typography>{t('interviewListCard.confirmDeleteMessage')}</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setDeleteDialog({ open: false, id: null })} disabled={isProcessing}>
+                        {t('common:cancel')}
+                    </Button>
+                    <Button onClick={handleDelete} color="error" variant="contained" disabled={isProcessing}>
+                        {isProcessing ? <CircularProgress size={24} /> : t('common:confirm')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={cancelDialog.open} onClose={() => !isProcessing && setCancelDialog({ open: false, id: null, roomName: null })}>
+                <DialogTitle>{t('interviewListCard.confirmCancelTitle')}</DialogTitle>
+                <DialogContent>
+                    <Typography>{t('interviewListCard.confirmCancelMessage')}</Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setCancelDialog({ open: false, id: null, roomName: null })} disabled={isProcessing}>
+                        {t('common:cancel')}
+                    </Button>
+                    <Button onClick={handleCancel} color="warning" variant="contained" disabled={isProcessing}>
+                        {isProcessing ? <CircularProgress size={24} /> : t('common:confirm')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
 
     );

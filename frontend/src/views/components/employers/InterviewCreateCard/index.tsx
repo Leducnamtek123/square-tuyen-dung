@@ -53,9 +53,10 @@ interface FormValues {
 
 interface InterviewCreateCardProps {
   title?: string;
+  sessionId?: string | number;
 }
 
-const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title }) => {
+const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessionId }) => {
 
     const navigate = useRouter();
 
@@ -79,7 +80,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title }) => {
 
     const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
 
-    const { control, handleSubmit, watch, setValue, formState: { errors } } = useForm<FormValues>({
+    const { control, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<FormValues>({
 
         defaultValues: {
 
@@ -190,6 +191,28 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title }) => {
         fetchData();
 
     }, [t]);
+
+    // Fetch existing session if editing
+    useEffect(() => {
+        if (sessionId) {
+            interviewService.getSessionDetail(sessionId)
+                .then((session: any) => {
+                    if (session) {
+                        reset({
+                            job_post: session.job_post || '',
+                            candidate: session.candidate || '',
+                            scheduled_at: session.scheduled_at || '',
+                            selected_group: session.question_group || '',
+                            selected_questions: session.questions?.map((q: any) => q.id) || []
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching session detail', err);
+                    toast.error(t('interviewCreateCard.messages.loadDataError'));
+                });
+        }
+    }, [sessionId, reset, t]);
 
     // Effect to auto-fill questions when a group is selected
 
@@ -356,39 +379,28 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title }) => {
     };
 
     const onSubmit = async (data: FormValues) => {
-
         try {
-
             const payload = {
-
                 job_post: data.job_post,
-
                 candidate: data.candidate,
-
                 scheduled_at: data.scheduled_at,
-
                 question_ids: data.selected_questions,
-
                 type: 'mixed'
-
             };
 
-            await interviewService.scheduleSession(payload);
-
-            toast.success(t('interviewCreateCard.messages.scheduleSuccess'));
-
-            // Fix double slash and ensure correct route
+            if (sessionId) {
+                await interviewService.updateSession(sessionId, payload);
+                toast.success(t('interviewCreateCard.messages.updateSuccess', { defaultValue: 'Cập nhật thành công' }));
+            } else {
+                await interviewService.scheduleSession(payload);
+                toast.success(t('interviewCreateCard.messages.scheduleSuccess'));
+            }
 
             navigate.push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`);
-
         } catch (error) {
-
             console.error('Submit error:', error);
-
-            toast.error(t('interviewCreateCard.messages.scheduleError'));
-
+            toast.error(sessionId ? t('interviewCreateCard.messages.updateError', { defaultValue: 'Cập nhật thất bại' }) : t('interviewCreateCard.messages.scheduleError'));
         }
-
     };
 
     if (isLoadingData) {

@@ -66,6 +66,7 @@ export const SEGMENT_MAP = {
   'phong-van-truc-tiep': 'interviews',
   'len-lich-phong-van': 'interviews/create',
   'chi-tiet-phong-van': 'interviews',
+  'sua-lich-phong-van': 'interviews/:id/edit',
   'ngan-hang-cau-hoi': 'question-bank',
   'bo-cau-hoi': 'question-groups',
   'xac-thuc-nha-tuyen-dung': 'verification',
@@ -187,6 +188,7 @@ export const ROUTES = {
     INTERVIEW_SESSION: 'employer/interviews/session/:id',
     INTERVIEW_CREATE: 'employer/interviews/create',
     INTERVIEW_DETAIL: 'employer/interviews/:id',
+    INTERVIEW_EDIT: 'employer/interviews/:id/edit',
     QUESTION_BANK: 'employer/question-bank',
     QUESTION_GROUPS: 'employer/question-groups',
     VERIFICATION: 'employer/verification',
@@ -306,6 +308,7 @@ export function generateRewrites(): RewriteRule[] {
     ['/nha-tuyen-dung/phong-van-truc-tiep/:id', '/employer/interviews/:id'],
     ['/nha-tuyen-dung/len-lich-phong-van', '/employer/interviews/create'],
     ['/nha-tuyen-dung/chi-tiet-phong-van/:id', '/employer/interviews/:id'],
+    ['/nha-tuyen-dung/sua-lich-phong-van/:id', '/employer/interviews/:id/edit'],
     // Catch-all for employer (must be last)
     ['/nha-tuyen-dung/:path*', '/employer/:path*'],
   ];

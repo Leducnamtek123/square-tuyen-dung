@@ -27,6 +27,16 @@ const interviewService = {
     return httpRequest.post(url, data);
   },
 
+  updateSession: (id: IdType, data: AnyRecord): Promise<unknown> => {
+    const url = `interview/web/sessions/${id}/`;
+    return httpRequest.patch(url, data);
+  },
+
+  deleteSession: (id: IdType): Promise<unknown> => {
+    const url = `interview/web/sessions/${id}/`;
+    return httpRequest.delete(url);
+  },
+
   updateSessionStatus: (roomName: RoomNameLike, status: string): Promise<unknown> => {
     const target =
       typeof roomName === 'object' && roomName ? roomName.roomName : roomName;

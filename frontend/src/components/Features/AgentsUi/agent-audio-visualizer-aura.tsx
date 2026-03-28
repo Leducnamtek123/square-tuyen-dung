@@ -293,6 +293,8 @@ interface AgentAudioVisualizerAuraProps {
   themeMode?: 'dark' | 'light';
   className?: string;
   ref?: any;
+  /** If true, skip the LiveKit hook and use static values based on the 'state' prop. */
+  isStatic?: boolean;
   [key: string]: any;
 }
 
@@ -312,12 +314,12 @@ interface AgentAudioVisualizerAuraProps {
  * />
  * ```
  */
-export function AgentAudioVisualizerAura({
-  size = 'lg',
-  state = 'connecting',
-  color = DEFAULT_COLOR,
-  colorShift = 0.05,
+function LiveAgentAudioVisualizerAura({
+  state,
   audioTrack,
+  size,
+  color,
+  colorShift,
   themeMode,
   className,
   ref,
@@ -339,6 +341,72 @@ export function AgentAudioVisualizerAura({
       frequency={frequency}
       brightness={brightness}
       className={cn(AgentAudioVisualizerAuraVariants({ size }), className)}
+      {...props} />
+  );
+}
+
+/**
+ * An shader-based audio visualizer that responds to agent state and audio levels.
+ * Displays an animated elliptical aura that reacts to the current agent state (connecting, thinking, speaking, etc.)
+ * and audio volume when speaking.
+ */
+export function AgentAudioVisualizerAura({
+  size = 'lg',
+  state = 'connecting',
+  color = DEFAULT_COLOR,
+  colorShift = 0.05,
+  audioTrack,
+  themeMode,
+  className,
+  ref,
+  isStatic,
+  ...props
+}: AgentAudioVisualizerAuraProps) {
+  if (isStatic) {
+    // Determine static values based on state
+    let staticValues = { speed: 10, scale: 0.2, amplitude: 1.2, frequency: 0.4, brightness: 1.0 };
+    switch (state) {
+      case 'listening':
+      case 'pre-connect-buffering':
+        staticValues = { speed: 20, scale: 0.3, amplitude: 1.0, frequency: 0.7, brightness: 1.5 };
+        break;
+      case 'thinking':
+      case 'connecting':
+      case 'initializing':
+        staticValues = { speed: 30, scale: 0.3, amplitude: 0.5, frequency: 1.0, brightness: 1.5 };
+        break;
+      case 'speaking':
+        staticValues = { speed: 70, scale: 0.3, amplitude: 0.75, frequency: 1.25, brightness: 1.5 };
+        break;
+    }
+
+    return (
+      <AuraShader
+        ref={ref}
+        blur={0.2}
+        color={color}
+        colorShift={colorShift}
+        speed={staticValues.speed}
+        scale={staticValues.scale}
+        themeMode={themeMode}
+        amplitude={staticValues.amplitude}
+        frequency={staticValues.frequency}
+        brightness={staticValues.brightness}
+        className={cn(AgentAudioVisualizerAuraVariants({ size }), className)}
+        {...props} />
+    );
+  }
+
+  return (
+    <LiveAgentAudioVisualizerAura
+      size={size}
+      state={state}
+      color={color}
+      colorShift={colorShift}
+      audioTrack={audioTrack}
+      themeMode={themeMode}
+      className={className}
+      ref={ref}
       {...props} />
   );
 }
