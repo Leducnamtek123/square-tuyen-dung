@@ -171,6 +171,8 @@ class InterviewSessionCreateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         question_ids = validated_data.pop('question_ids', [])
+        # Set status to scheduled by default for new interviews created via this serializer
+        validated_data.setdefault('status', 'scheduled')
         session = InterviewSession.objects.create(**validated_data)
         if question_ids:
             session.questions.set(question_ids)
