@@ -1,7 +1,7 @@
 'use client';;
 import { useEffect, useRef, useState } from 'react';
 import type { HTMLAttributes, KeyboardEvent } from 'react';
-import { useChat } from '@livekit/components-react';
+import { useChat, useRoomContext } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import SendIcon from '@mui/icons-material/Send';
@@ -203,7 +203,8 @@ export function AgentControlBar({
   className,
   ...props
 }: AgentControlBarProps) {
-  const { send } = useChat();
+  const room = useRoomContext();
+  const { send } = useChat({ room });
   const publishPermissions = usePublishPermissions();
   const [isChatOpenUncontrolled, setIsChatOpenUncontrolled] = useState(isChatOpen);
   const {
@@ -215,7 +216,7 @@ export function AgentControlBar({
     handleVideoDeviceChange,
     handleMicrophoneDeviceSelectError,
     handleCameraDeviceSelectError,
-  } = useInputControls({ onDeviceError, saveUserChoices });
+  } = useInputControls({ onDeviceError, saveUserChoices, room });
 
   const handleSendMessage = async (message: string) => {
     await send(message);

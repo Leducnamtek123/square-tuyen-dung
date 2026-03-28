@@ -30,7 +30,15 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
   console.log("InterviewAgentView: starting render");
   const room = useRoomContext();
   console.log("InterviewAgentView: room context", !!room);
-  const agent = useAgent() as any;
+  
+  // Construct a SessionStub to pass to useAgent, bypassing the SessionContext requirement.
+  // SessionStub needs: connectionState, room, internal
+  const sessionStub = useMemo(() => ({
+    connectionState: room?.state ?? 'disconnected',
+    room,
+    internal: { agentDispatch: undefined },
+  }), [room, room?.state]);
+  const agent = useAgent(sessionStub as any) as any;
   console.log("InterviewAgentView: agent hook successful, state:", agent?.state);
   const state = agent?.state || 'connecting';
   const agentParticipant = agent?.agentParticipant;

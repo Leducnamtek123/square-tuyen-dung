@@ -46,29 +46,34 @@ export function useInputControls(
   {
     saveUserChoices = true,
     onDeviceError,
+    room,
   }: {
     saveUserChoices?: boolean;
     onDeviceError?: DeviceErrorHandler;
+    room?: any;
   } = {}
 ) {
   console.log("useInputControls: starting hook execution");
-  const { localParticipant, microphoneTrack } = useLocalParticipant();
+  const { localParticipant, microphoneTrack } = useLocalParticipant({ room });
   console.log("useInputControls: useLocalParticipant hook successful, identity:", localParticipant?.identity);
 
   const microphoneToggle = useTrackToggle({
     source: Track.Source.Microphone,
     onDeviceError: (error) => onDeviceError?.({ source: Track.Source.Microphone, error }),
+    room,
   });
   console.log("useInputControls: useTrackToggle (mic) hook successful");
 
   const cameraToggle = useTrackToggle({
     source: Track.Source.Camera,
     onDeviceError: (error) => onDeviceError?.({ source: Track.Source.Camera, error }),
+    room,
   });
 
   const screenShareToggle = useTrackToggle({
     source: Track.Source.ScreenShare,
     onDeviceError: (error) => onDeviceError?.({ source: Track.Source.ScreenShare, error }),
+    room,
   });
 
   console.log("useInputControls: before usePersistentUserChoices");
