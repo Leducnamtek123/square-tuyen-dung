@@ -13,6 +13,7 @@ import { AgentAudioVisualizerAura, AuraShader } from "../../components/Features/
 import Button from "@mui/material/Button";
 
 import interviewService from "../../services/interviewService";
+import tokenService from "../../services/tokenService";
 import { transformInterviewSession } from "../../utils/transformers";
 
 const getSafeLiveKitUrl = () => {
@@ -149,11 +150,14 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         }
       }
 
-      if (roomName) {
+      if (roomName && tokenService.getAccessTokenFromCookie()) {
         await interviewService.updateSessionStatus(roomName, "in_progress").catch((err: unknown) => {
           console.error("Cannot update interview status before start:", err);
         });
       }
+
+      // Small delay to ensure state and DOM transitions are smooth
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       setConnectRoom(true);
     } catch (err: any) {
