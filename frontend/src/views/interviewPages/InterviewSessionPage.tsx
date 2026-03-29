@@ -256,7 +256,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         <section className="relative h-[75vh] min-h-[600px] overflow-hidden rounded-[2rem] border border-white/10 bg-[#020617] shadow-[0_0_100px_rgba(0,0,0,0.5)] transition-all duration-1000">
           {connectRoom && connectionDetails ? (
             <VoiceAssistantApp
-              appConfig={{ ...APP_CONFIG_DEFAULTS, agentName: "Agent" }}
+              appConfig={{ ...APP_CONFIG_DEFAULTS }}
               connectionDetails={connectionDetails}
               onDisconnect={terminateInterviewSession}
             />

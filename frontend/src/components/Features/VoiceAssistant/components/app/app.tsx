@@ -19,8 +19,8 @@ const IN_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 
 function AppSetup() {
   useDebugMode({ enabled: IN_DEVELOPMENT });
-  useAgentErrors();
-
+  // useAgentErrors(); // Disabled to prevent premature disconnects if backend doesn't emit valid agent RPC states
+  
   return null;
 }
 
