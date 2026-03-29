@@ -131,7 +131,7 @@ async def entrypoint(ctx: JobContext):
 
         # 6.5. Attach transcript listeners for history persistence
         # This ensures every turn is saved to the backend database.
-        async def _on_history_added(item):
+        def _on_history_added(item):
             # item is a ConversationItem (user or assistant)
             role = "candidate" if item.role == "user" else "ai_agent"
             if item.content and item.content.strip():
