@@ -272,6 +272,12 @@ export interface SystemConfig {
   cities?: City[];
   cityDict: Record<number | string, string>;
   careerDict: Record<number, string>;
+  experienceDict?: Record<number | string, string>;
+  positionDict?: Record<number | string, string>;
+  jobTypeDict?: Record<number | string, string>;
+  typeOfWorkplaceDict?: Record<number | string, string>;
+  academicLevelDict?: Record<number | string, string>;
+  employeeSizeDict?: Record<number | string, string>;
   genderDict?: Record<string | number, string>;
   maritalStatusDict?: Record<string | number, string>;
   jobPostStatusDict?: Record<string | number, string>;
@@ -290,4 +296,6 @@ export interface SystemConfig {
   employeeSizeOptions?: SelectOption[];
   languageOptions?: SelectOption[];
   frequencyNotificationOptions?: SelectOption[];
+  applicationStatusOptions?: SelectOption[];
+  jobPostStatusOptions?: SelectOption[];
 }
