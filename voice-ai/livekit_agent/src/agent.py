@@ -21,13 +21,16 @@ from .preemptive_policy import should_enable_preemptive
 
 logger = logging.getLogger("agent")
 
+# Global HTTP client for connection pooling
+# This avoids the overhead of creating/closing connections for every API call.
+HTTP_CLIENT = httpx.AsyncClient(timeout=httpx.Timeout(10.0, connect=5.0))
+
 async def _update_backend_status(room_name: str, status: str):
     try:
-        async with httpx.AsyncClient() as client:
-            url = f"{config.BACKEND_API_URL}/interviews/{room_name}/status"
-            resp = await client.patch(url, json={"status": status}, timeout=5.0)
-            if resp.status_code == 200:
-                logger.info("Successfully updated backend status to '%s'", status)
+        url = f"{config.BACKEND_API_URL}/interviews/{room_name}/status"
+        resp = await HTTP_CLIENT.patch(url, json={"status": status})
+        resp.raise_for_status()
+        logger.info("Successfully updated backend status to '%s'", status)
     except Exception as e:
         logger.error("Error updating backend status: %s", e)
 
@@ -58,12 +61,11 @@ async def entrypoint(ctx: JobContext):
         # 2. Fetch context from backend
         interview_context = None
         try:
-            async with httpx.AsyncClient() as client:
-                context_url = f"{config.BACKEND_API_URL}/interviews/{ctx.room.name}/context"
-                resp = await client.get(context_url, timeout=10.0)
-                if resp.status_code == 200:
-                    interview_context = resp.json()
-                    logger.info("Fetched context for candidate: %s", interview_context.get("candidateName"))
+            context_url = f"{config.BACKEND_API_URL}/interviews/{ctx.room.name}/context"
+            resp = await HTTP_CLIENT.get(context_url)
+            resp.raise_for_status()
+            interview_context = resp.json()
+            logger.info("Fetched context for candidate: %s", interview_context.get("candidateName"))
         except Exception as e:
             logger.warning("Could not fetch interview context: %s", e)
 
@@ -104,8 +106,8 @@ async def entrypoint(ctx: JobContext):
         )
 
         # 5. Create AgentSession following 1.4.x / LIVIKIT_AGENTS_DOCS.md style
-        # Load VAD here instead of prewarm for better stability
-        vad_model = silero.VAD.load()
+        # Load VAD here via asyncio.to_thread to prevent blocking the event loop
+        vad_model = await asyncio.to_thread(silero.VAD.load)
         
         try:
             device_turn_detector = MultilingualModel()
@@ -184,9 +186,10 @@ async def entrypoint(ctx: JobContext):
         except Exception as e:
             logger.warning("Could not set agent state to listening: %s", e)
 
-        # 8. Keep alive while room is connected
-        while ctx.room.isconnected:
-            await asyncio.sleep(1)
+        # 8. Keep alive while room is connected without polling
+        disconnect_event = asyncio.Event()
+        ctx.room.on("disconnected", disconnect_event.set)
+        await disconnect_event.wait()
         
     except Exception as e:
         logger.error("CRITICAL ERROR in interview_agent: %s", e, exc_info=True)

@@ -14,12 +14,17 @@ import { transformInterviewSession } from "../../utils/transformers";
 const getSafeLiveKitUrl = () => {
   if (typeof window === 'undefined') return '';
   
+  const envUrl = (process.env.NEXT_PUBLIC_LIVEKIT_URL || "").trim();
+  
+  // If envUrl is set and specifies wss://, we MUST respect it regardless of local protocol
+  if (envUrl.startsWith('wss://')) {
+    return envUrl.replace(/\/$/, "");
+  }
+
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   const host = window.location.host;
   
-  const envUrl = (process.env.NEXT_PUBLIC_LIVEKIT_URL || "").trim();
-  
-  // If envUrl is set and is absolute, use it (ensuring correct protocol)
+  // If envUrl is set and is absolute, use it (ensuring consistent protocol otherwise)
   if (envUrl && (envUrl.startsWith('http') || envUrl.startsWith('ws'))) {
     try {
       const url = new URL(envUrl);
@@ -127,7 +132,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
       setStarting(true);
       setError("");
 
-      const tokenData = await interviewService.getLiveKitToken(sessionInviteToken) as any;
+      const tokenData = await interviewService.getLiveKitToken(sessionInviteToken);
       if (!tokenData?.token) {
         throw new Error(t("errors.tokenMissing", { defaultValue: "Connection token missing. Please try again." }));
       }
@@ -168,12 +173,46 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
     setConnectionDetails(undefined);
     try {
       if (roomName) {
+        console.log("[InterviewSessionPage] Terminating session:", roomName);
         await interviewService.updateSessionStatus(roomName, "completed");
       }
     } catch (err) {
-      // Non-blocking
+      console.warn("[InterviewSessionPage] Error during termination:", err);
     }
   }, [roomName]);
+
+  // Lifecycle Management: Graceful Cleanup & Tab Close
+  useEffect(() => {
+    if (!connectRoom) return;
+
+    // 1. Handle browser/tab closure
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (roomName) {
+        // Use fetch with keepalive to ensure the request is sent even after the page is closed
+        const apiUrl = `${process.env.NEXT_PUBLIC_BASE_API_URL || ""}/interview/web/sessions/${roomName}/status/`;
+        fetch(apiUrl, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${tokenService.getAccessTokenFromCookie()}`
+          },
+          body: JSON.stringify({ status: "completed" }),
+          keepalive: true,
+        }).catch(err => console.error("Keepalive update failed:", err));
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    // 2. Handle component unmounting (navigation away)
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      // We don't call terminateInterviewSession here immediately if we want to allow page navigation 
+      // without necessarily ending the call, but if the user wants it at "unmount", this is the place.
+      // Based on proposed changes: "Gắn event useEffect return cleanup để gọi terminateInterviewSession()"
+      terminateInterviewSession();
+    };
+  }, [connectRoom, roomName, terminateInterviewSession]);
 
   const sessionInfo = useMemo(() => ({
     jobName: session?.jobName,

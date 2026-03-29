@@ -24,19 +24,25 @@ function AppSetup() {
   return null;
 }
 
-function AutoConnect() {
+function AutoConnect({ onError }: { onError?: (err: any) => void }) {
   const { isConnected, start } = useSessionContext();
   const hasStarted = useRef(false);
+  const connectionAttempted = useRef(false);
   
   useEffect(() => {
-    if (!isConnected && !hasStarted.current) {
+    // Only attempt to start once per mount
+    if (!isConnected && !hasStarted.current && !connectionAttempted.current) {
       console.log('[VoiceAssistantApp] AutoConnect: calling start()');
-      hasStarted.current = true;
-      start().catch(err => {
+      connectionAttempted.current = true;
+      
+      start().then(() => {
+        hasStarted.current = true;
+      }).catch(err => {
         console.error('[VoiceAssistantApp] AutoConnect failed:', err);
+        if (onError) onError(err);
       });
     }
-  }, [isConnected, start]);
+  }, [isConnected, start, onError]);
 
   return null;
 }
@@ -63,7 +69,7 @@ export function App({ appConfig, connectionDetails, onDisconnect }: AppProps) {
   return (
     <SessionProvider session={session}>
       <AppSetup />
-      <AutoConnect />
+      <AutoConnect onError={onDisconnect} />
       <main className="grid h-full grid-cols-1 place-content-center">
         {session.isConnected ? (
           <SessionView appConfig={appConfig} className="w-full h-full" onDisconnect={onDisconnect} />

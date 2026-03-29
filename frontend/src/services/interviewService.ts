@@ -39,7 +39,9 @@ export interface SubmitEvaluationInput {
 
 export interface LiveKitTokenResponse {
   token: string;
-  url: string;
+  url?: string;
+  serverUrl?: string;
+  server_url?: string;
   roomName: string;
 }
 
