@@ -23,7 +23,7 @@ logger = logging.getLogger("agent")
 
 # Global HTTP client for connection pooling
 # This avoids the overhead of creating/closing connections for every API call.
-HTTP_CLIENT = httpx.AsyncClient(timeout=httpx.Timeout(10.0, connect=5.0))
+HTTP_CLIENT = httpx.AsyncClient(timeout=httpx.Timeout(60.0, connect=5.0))
 
 async def _update_backend_status(room_name: str, status: str):
     try:
@@ -96,6 +96,7 @@ async def entrypoint(ctx: JobContext):
             base_url=config.LLAMA_BASE_URL,
             api_key="no-key-needed",
             model=config.LLAMA_MODEL, 
+            http_client=httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0))
         )
         tts_model = openai.TTS(
             base_url=config.TTS_BASE_URL, 
@@ -133,8 +134,9 @@ async def entrypoint(ctx: JobContext):
 
         # 6.5. Attach transcript listeners for history persistence
         # This ensures every turn is saved to the backend database.
-        def _on_history_added(item):
-            # item is a ConversationItem (user or assistant)
+        def _on_history_added(ev):
+            # ev is a ConversationItemAddedEvent which contains the 'item'
+            item = ev.item
             role = "candidate" if item.role == "user" else "ai_agent"
             if item.content and item.content.strip():
                 # We use the interviewer instance's method to append transcript
