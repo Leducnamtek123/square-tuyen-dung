@@ -155,14 +155,6 @@ declare module 'mui-image' {
   export default Image;
 }
 
-declare module '@hookform/resolvers/yup' {
-  import type { Resolver } from 'react-hook-form';
-  import type { ObjectSchema, AnyObject } from 'yup';
-  export function yupResolver<T extends AnyObject>(
-    schema: ObjectSchema<T>,
-    options?: Record<string, unknown>,
-  ): Resolver<T>;
-}
 
 declare module '@fortawesome/react-fontawesome' {
   import type { ComponentType } from 'react';
