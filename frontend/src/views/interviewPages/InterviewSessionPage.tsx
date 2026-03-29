@@ -138,12 +138,12 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
       }
 
       let urlToUse = getSafeLiveKitUrl();
-      if (tokenData.serverUrl || tokenData.server_url) {
-        const rawServerUrl = tokenData.serverUrl || tokenData.server_url;
-        const isInternal = rawServerUrl.includes('localhost') || rawServerUrl.includes('127.0.0.1') || rawServerUrl.includes('livekit:');
+      const returnedUrl = tokenData.serverUrl || tokenData.server_url || tokenData.url;
+      if (returnedUrl) {
+        const isInternal = returnedUrl.includes('localhost') || returnedUrl.includes('127.0.0.1') || returnedUrl.includes('livekit:');
         if (!isInternal) {
           try {
-            const url = new URL(rawServerUrl);
+            const url = new URL(returnedUrl);
             url.protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
             urlToUse = url.toString().replace(/\/$/, "");
           } catch {}
