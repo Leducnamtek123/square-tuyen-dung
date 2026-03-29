@@ -18,7 +18,7 @@ const ANIMATION_TRANSITION = {
   stiffness: 675,
   damping: 75,
   mass: 1,
-};
+} as const;
 
 const classNames = {
   // GRID
@@ -123,8 +123,8 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                     delay: animationDelay,
                   }}
                   className={cn(
-                    'bg-background aspect-square h-[90px] rounded-md border border-transparent transition-[border,drop-shadow]',
-                    chatOpen && 'border-input/50 drop-shadow-lg/10 delay-200'
+                    'bg-slate-800/60 backdrop-blur-md aspect-square h-[90px] rounded-2xl border border-white/5 transition-[border,drop-shadow]',
+                    chatOpen && 'border-white/10 shadow-2xl shadow-black/50 delay-200'
                   )}
                 >
                   <BarVisualizer
@@ -136,9 +136,9 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                   >
                     <span
                       className={cn([
-                        'bg-muted min-h-2.5 w-2.5 rounded-full',
+                        'bg-slate-700 min-h-2.5 w-2.5 rounded-full',
                         'origin-center transition-colors duration-250 ease-linear',
-                        'data-[lk-highlighted=true]:bg-foreground data-[lk-muted=true]:bg-muted',
+                        'data-[lk-highlighted=true]:bg-cyan-400 data-[lk-muted=true]:bg-slate-700',
                       ])}
                     />
                   </BarVisualizer>
@@ -225,7 +225,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                     trackRef={cameraTrack || screenShareTrack}
                     width={(cameraTrack || screenShareTrack)?.publication.dimensions?.width ?? 0}
                     height={(cameraTrack || screenShareTrack)?.publication.dimensions?.height ?? 0}
-                    className="bg-muted aspect-square w-[90px] rounded-md object-cover"
+                    className="bg-slate-800/60 backdrop-blur-md aspect-square w-[90px] rounded-2xl border border-white/10 object-cover shadow-2xl shadow-black/50"
                   />
                 </MotionContainer>
               )}

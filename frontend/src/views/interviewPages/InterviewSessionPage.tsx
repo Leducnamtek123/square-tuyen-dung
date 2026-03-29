@@ -254,10 +254,10 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
   const candidateLabel = session?.candidateName || t("interviewListCard.candidate", { defaultValue: "Candidate" });
 
   return (
-    <main className="min-h-screen bg-slate-950 px-4 py-4 text-slate-100 md:px-8 md:py-6">
+    <main className="dark min-h-screen bg-slate-950 px-4 py-4 text-slate-100 md:px-8 md:py-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
-        <header className="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/70 p-4 backdrop-blur-xl md:p-5">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.2),transparent_45%)]" />
+        <header className="relative overflow-hidden rounded-3xl border border-white/5 bg-slate-900/40 p-4 backdrop-blur-2xl md:p-5 shadow-2xl shadow-black/50">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.1),transparent_60%)]" />
           <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-xl font-bold tracking-tight text-white md:text-2xl">

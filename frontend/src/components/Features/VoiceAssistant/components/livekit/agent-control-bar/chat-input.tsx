@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { PaperPlaneRightIcon, SpinnerIcon } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/Features/VoiceAssistant/components/livekit/button';
+import { cn } from '@/lib/utils';
 
 const MOTION_PROPS = {
   variants: {
@@ -21,7 +22,7 @@ const MOTION_PROPS = {
     duration: 0.3,
     ease: 'easeOut',
   },
-};
+} as const;
 
 interface ChatInputProps {
   chatOpen: boolean;
@@ -77,9 +78,11 @@ export function ChatInput({
           type="text"
           value={message}
           disabled={!chatOpen}
-          placeholder="Type something..."
+          placeholder="Type a message..."
           onChange={(e) => setMessage(e.target.value)}
-          className="h-8 flex-1 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+          className={cn(
+            'h-10 flex-1 bg-transparent px-2 text-slate-100 placeholder:text-slate-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+          )}
         />
         <Button
           size="icon"
