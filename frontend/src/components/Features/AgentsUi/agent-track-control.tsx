@@ -1,4 +1,4 @@
-'use client';;
+'use client';
 import { useEffect, useMemo, useState } from 'react';
 import type { ComponentProps } from 'react';
 import { cva } from 'class-variance-authority';
@@ -7,8 +7,6 @@ import { Track } from 'livekit-client';
 import { AgentAudioVisualizerBar } from '@/components/Features/AgentsUi/agent-audio-visualizer-bar';
 import { AgentTrackToggle } from '@/components/Features/AgentsUi/agent-track-toggle';
 import { cn } from '@/lib/utils';
-
-const AudioVisualizerBar = AgentAudioVisualizerBar as any;
 
 const selectVariants = cva([
   'rounded-l-none shadow-none pl-2 ',
@@ -196,7 +194,7 @@ export function AgentTrackControl({
         onPressedChange={onPressedChange}
         className="peer/track group/track focus:z-10 has-[.audiovisualizer]:w-auto has-[.audiovisualizer]:px-3 has-[~_button]:rounded-r-none has-[~_button]:border-r-0 has-[~_button]:pr-2 has-[~_button]:pl-3">
         {audioTrack && (
-          <AudioVisualizerBar
+          <AgentAudioVisualizerBar
             size="icon"
             barCount={3}
             state={pressed ? 'speaking' : 'disconnected'}
@@ -208,7 +206,7 @@ export function AgentTrackControl({
                 'group-data-[state=on]/track:bg-foreground group-data-[state=off]/track:bg-destructive',
                 'data-lk-muted:bg-muted',
               ])} />
-          </AudioVisualizerBar>
+          </AgentAudioVisualizerBar>
         )}
       </AgentTrackToggle>
       {kind && (

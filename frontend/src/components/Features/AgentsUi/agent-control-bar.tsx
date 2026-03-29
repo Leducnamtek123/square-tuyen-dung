@@ -1,4 +1,4 @@
-'use client';;
+'use client';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { HTMLAttributes, KeyboardEvent } from 'react';
 import { useChat, useRoomContext } from '@livekit/components-react';
@@ -47,17 +47,17 @@ const resolveButtonVariant = (variant: string | undefined) => {
   }
 };
 
-const LK_TOGGLE_VARIANT_1 = [
+const LK_TOGGLE_VARIANT_1 = cn(
   'data-[state=off]:bg-accent data-[state=off]:hover:bg-foreground/10',
   'data-[state=off]:[&_~_button]:bg-accent data-[state=off]:[&_~_button]:hover:bg-foreground/10',
   'data-[state=off]:border-border data-[state=off]:hover:border-foreground/12',
   'data-[state=off]:[&_~_button]:border-border data-[state=off]:[&_~_button]:hover:border-foreground/12',
   'data-[state=off]:text-destructive data-[state=off]:hover:text-destructive data-[state=off]:focus:text-destructive',
   'data-[state=off]:focus-visible:ring-foreground/12 data-[state=off]:focus-visible:border-ring',
-  'dark:data-[state=off]:[&_~_button]:bg-accent dark:data-[state=off]:[&_~_button]:hover:bg-foreground/10',
-];
+  'dark:data-[state=off]:[&_~_button]:bg-accent dark:data-[state=off]:[&_~_button]:hover:bg-foreground/10'
+);
 
-const LK_TOGGLE_VARIANT_2 = [
+const LK_TOGGLE_VARIANT_2 = cn(
   'data-[state=off]:bg-accent data-[state=off]:hover:bg-foreground/10',
   'data-[state=off]:border-border data-[state=off]:hover:border-foreground/12',
   'data-[state=off]:focus-visible:border-ring data-[state=off]:focus-visible:ring-foreground/12',
@@ -65,8 +65,8 @@ const LK_TOGGLE_VARIANT_2 = [
   'data-[state=on]:bg-blue-500/20 data-[state=on]:hover:bg-blue-500/30',
   'data-[state=on]:border-blue-700/10 data-[state=on]:text-blue-700 data-[state=on]:ring-blue-700/30',
   'data-[state=on]:focus-visible:border-blue-700/50',
-  'dark:data-[state=on]:bg-blue-500/20 dark:data-[state=on]:text-blue-300',
-];
+  'dark:data-[state=on]:bg-blue-500/20 dark:data-[state=on]:text-blue-300'
+);
 
 const MOTION_PROPS: HTMLMotionProps<'div'> = {
   variants: {
@@ -113,8 +113,8 @@ function AgentChatInput({
       setIsSending(true);
       await onSend(message.trim());
       setMessage('');
-    } catch (error) {
-      console.error(error);
+    } catch {
+      // Non-blocking error
     } finally {
       setIsSending(false);
     }
@@ -241,11 +241,7 @@ export function AgentControlBar({
   }, [isChatOpen, isChatOpenUncontrolled, onIsChatOpenChange]);
 
   const isEmpty = Object.values(visibleControls).every((value) => !value);
-
-  if (isEmpty) {
-    console.warn('AgentControlBar: `visibleControls` contains only false values.');
-    return null;
-  }
+  if (isEmpty) return null;
 
   return (
     <div

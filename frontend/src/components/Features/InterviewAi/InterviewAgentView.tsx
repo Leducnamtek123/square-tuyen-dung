@@ -28,16 +28,12 @@ interface InterviewAgentViewProps {
 
 const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewProps) => {
   const { t } = useTranslation("interview");
-  console.log("InterviewAgentView: starting render");
   const room = useRoomContext();
-  console.log("InterviewAgentView: room context", !!room);
   
   const { state, audioTrack: agentAudioTrack } = useVoiceAssistant();
   const agentParticipant = agentAudioTrack?.participant;
-  console.log("InterviewAgentView: agent hook successful, state:", state);
   const { chatMessages } = useChat({ room });
-  console.log("InterviewAgentView: chat hook successful, messages:", chatMessages?.length);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [isTranscriptVisible, setIsTranscriptVisible] = useState(false);
   
   // Parse metadata for interview stage and progress
   const { stage, currentQuestion, totalQuestions } = useMemo(() => {
@@ -61,8 +57,8 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
   const stages = ["INTRODUCTION", "EXPERIENCE", "TECHNICAL", "BEHAVIORAL", "CLOSING"];
   const currentStageIndex = stages.indexOf(stage);
 
-  // Format messages for AgentChatTranscript
-  const formattedMessages = useMemo(() => {
+  // Parse chat messages for the transcript component
+  const transcriptMessages = useMemo(() => {
     return chatMessages.map(msg => ({
       id: msg.id,
       timestamp: msg.timestamp,
@@ -200,7 +196,7 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
       </div>
 
       <AnimatePresence>
-        {isChatOpen && (
+        {isTranscriptVisible && (
           <motion.div 
             initial={{ opacity: 0, scale: 0.95, x: 20 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
@@ -215,7 +211,7 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
                   <h3 className="font-bold text-sm uppercase tracking-widest opacity-80">{t('agentView.transcript')}</h3>
                 </div>
                 <button 
-                  onClick={() => setIsChatOpen(false)} 
+                  onClick={() => setIsTranscriptVisible(false)} 
                   className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors opacity-60 hover:opacity-100"
                 >
                    X
@@ -224,7 +220,7 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
               <div className="flex-1 overflow-hidden p-6">
                 <AgentChatTranscript 
                   agentState={state} 
-                  messages={formattedMessages} 
+                  messages={transcriptMessages} 
                   className="h-full"
                 />
               </div>
@@ -238,8 +234,8 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
           <AgentControlBar 
             variant="livekit"
             isConnected={true}
-            isChatOpen={isChatOpen}
-            onIsChatOpenChange={setIsChatOpen}
+            isChatOpen={isTranscriptVisible}
+            onIsChatOpenChange={setIsTranscriptVisible}
             onDisconnect={onDisconnect}
             onDeviceError={handleDeviceError}
             controls={{ microphone: true, camera: false, chat: true, screenShare: false, leave: true }}

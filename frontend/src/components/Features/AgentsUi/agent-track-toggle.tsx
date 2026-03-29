@@ -60,21 +60,17 @@ const PendingIcon = ({ className }: { className?: string }) => (
   />
 );
 
-function getSourceIcon(source: Track.Source, enabled: boolean, pending = false) {
-  if (pending) {
-    return PendingIcon;
-  }
+const SOURCE_ICONS: Record<string, { enabled: ComponentType<{ className?: string }>; disabled: ComponentType<{ className?: string }> }> = {
+  [Track.Source.Microphone]: { enabled: MicIcon, disabled: MicOffIcon },
+  [Track.Source.Camera]: { enabled: VideocamIcon, disabled: VideocamOffIcon },
+  [Track.Source.ScreenShare]: { enabled: ScreenShareIcon, disabled: StopScreenShareIcon },
+};
 
-  switch (source) {
-    case Track.Source.Microphone:
-      return enabled ? MicIcon : MicOffIcon;
-    case Track.Source.Camera:
-      return enabled ? VideocamIcon : VideocamOffIcon;
-    case Track.Source.ScreenShare:
-      return enabled ? ScreenShareIcon : StopScreenShareIcon;
-    default:
-      return Fragment;
-  }
+function getSourceIcon(source: Track.Source, enabled: boolean, pending = false) {
+  if (pending) return PendingIcon;
+  const icons = SOURCE_ICONS[source];
+  if (!icons) return Fragment;
+  return enabled ? icons.enabled : icons.disabled;
 }
 
 /**

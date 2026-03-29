@@ -9,21 +9,18 @@ const DEFAULT_COLOR = '#1FD5F9';
 
 function hexToRgb(hexColor: string): number[] {
   try {
-    const rgbColor = hexColor.match(/^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/);
-
-    if (rgbColor) {
-      const [, r, g, b] = rgbColor;
-      const color = [r, g, b].map((c = '00') => parseInt(c, 16) / 255);
-
-      return color;
+    const rgbMatch = hexColor.match(/^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/);
+    if (rgbMatch) {
+      const [, r, g, b] = rgbMatch;
+      return [r, g, b].map((c = '00') => parseInt(c, 16) / 255);
     }
-  } catch (error) {
-    console.error(
-      `Invalid hex color '${hexColor}'.\nFalling back to default color '${DEFAULT_COLOR}'.`
-    );
+  } catch {
+    // Fallback to default
   }
 
-  return hexToRgb(DEFAULT_COLOR);
+  const defaultMatch = DEFAULT_COLOR.match(/^#([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/);
+  const [, dr, dg, db] = defaultMatch!;
+  return [dr, dg, db].map((c) => parseInt(c, 16) / 255);
 }
 
 const shaderSource = `
@@ -256,12 +253,8 @@ export function AuraShader({
           uColor: { type: '3fv', value: rgbColor ?? [0, 0.7, 1] },
         }}
         onDoneLoadingTextures={() => {}}
-        onError={(error) => {
-          console.error('Shader error:', error);
-        }}
-        onWarning={(warning) => {
-          console.warn('Shader warning:', warning);
-        }}
+        onError={() => {}}
+        onWarning={() => {}}
         style={{ width: '100%', height: '100%' }} />
     </div>
   );
@@ -364,21 +357,17 @@ export function AgentAudioVisualizerAura({
 }: AgentAudioVisualizerAuraProps) {
   if (isStatic) {
     // Determine static values based on state
-    let staticValues = { speed: 10, scale: 0.2, amplitude: 1.2, frequency: 0.4, brightness: 1.0 };
-    switch (state) {
-      case 'listening':
-      case 'pre-connect-buffering':
-        staticValues = { speed: 20, scale: 0.3, amplitude: 1.0, frequency: 0.7, brightness: 1.5 };
-        break;
-      case 'thinking':
-      case 'connecting':
-      case 'initializing':
-        staticValues = { speed: 30, scale: 0.3, amplitude: 0.5, frequency: 1.0, brightness: 1.5 };
-        break;
-      case 'speaking':
-        staticValues = { speed: 70, scale: 0.3, amplitude: 0.75, frequency: 1.25, brightness: 1.5 };
-        break;
-    }
+    const staticValues = { speed: 10, scale: 0.2, amplitude: 1.2, frequency: 0.4, brightness: 1.0 };
+    const staticConfig: Record<string, typeof staticValues> = {
+      listening: { speed: 20, scale: 0.3, amplitude: 1.0, frequency: 0.7, brightness: 1.5 },
+      'pre-connect-buffering': { speed: 20, scale: 0.3, amplitude: 1.0, frequency: 0.7, brightness: 1.5 },
+      thinking: { speed: 30, scale: 0.3, amplitude: 0.5, frequency: 1.0, brightness: 1.5 },
+      connecting: { speed: 30, scale: 0.3, amplitude: 0.5, frequency: 1.0, brightness: 1.5 },
+      initializing: { speed: 30, scale: 0.3, amplitude: 0.5, frequency: 1.0, brightness: 1.5 },
+      speaking: { speed: 70, scale: 0.3, amplitude: 0.75, frequency: 1.25, brightness: 1.5 },
+    };
+
+    const config = staticConfig[state as string] || staticValues;
 
     return (
       <AuraShader
@@ -386,12 +375,12 @@ export function AgentAudioVisualizerAura({
         blur={0.2}
         color={color}
         colorShift={colorShift}
-        speed={staticValues.speed}
-        scale={staticValues.scale}
+        speed={config.speed}
+        scale={config.scale}
         themeMode={themeMode}
-        amplitude={staticValues.amplitude}
-        frequency={staticValues.frequency}
-        brightness={staticValues.brightness}
+        amplitude={config.amplitude}
+        frequency={config.frequency}
+        brightness={config.brightness}
         className={cn(AgentAudioVisualizerAuraVariants({ size }), className)}
         {...props} />
     );

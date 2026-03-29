@@ -43,18 +43,20 @@ export function AgentChatTranscript({
   className,
   ...props
 }: AgentChatTranscriptProps) {
+  const locale = typeof navigator !== 'undefined' ? navigator.language : 'en-US';
+  const timeOptions: Intl.DateTimeFormatOptions = { timeStyle: 'short' };
+
   return (
     <Conversation className={className} {...props}>
       <ConversationContent>
         {messages.map((receivedMessage) => {
           const { id, timestamp, from, message } = receivedMessage;
-          const locale = navigator?.language ?? 'en-US';
-          const messageOrigin = from?.isLocal ? 'user' : 'assistant';
+          const role = from?.isLocal ? 'user' : 'assistant';
           const time = new Date(timestamp);
-          const title = time.toLocaleTimeString(locale, { timeStyle: 'full' });
+          const formattedTime = time.toLocaleTimeString(locale, timeOptions);
 
           return (
-            <Message key={id} title={title} from={messageOrigin}>
+            <Message key={id} title={formattedTime} from={role}>
               <MessageContent>
                 <MessageResponse>{message}</MessageResponse>
               </MessageContent>

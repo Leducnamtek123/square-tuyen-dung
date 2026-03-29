@@ -6,12 +6,9 @@ import {
   LiveKitRoom,
   RoomAudioRenderer,
   ConnectionStateToast,
-  useRoomContext,
 } from "@livekit/components-react";
-import { Room } from "livekit-client";
-
 import InterviewAgentView from "../../components/Features/InterviewAi/InterviewAgentView";
-import { AgentAudioVisualizerAura, AuraShader } from "../../components/Features/AgentsUi";
+import { AgentAudioVisualizerAura } from "../../components/Features/AgentsUi";
 import { cn } from "@/lib/utils";
 import Button from "@mui/material/Button";
 
@@ -73,14 +70,15 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState("");
   const [connectRoom, setConnectRoom] = useState(false);
-  const [serverUrl, setServerUrl] = useState("");
-  const [participantToken, setParticipantToken] = useState("");
+  const [connectionDetails, setConnectionDetails] = useState<{
+    token: string;
+    serverUrl: string;
+  } | undefined>(undefined);
+  
   const [session, setSession] = useState<any>(null);
-  const [inviteTokenRef, setInviteTokenRef] = useState<string>("");
+  const [sessionInviteToken, setSessionInviteToken] = useState<string>("");
 
-  const interviewRoom = useMemo(() => new Room(), []);
-  const liveKitUrl = serverUrl || getSafeLiveKitUrl();
-  const roomName = session?.room_name || session?.roomName;
+  const roomName = session?.roomName || session?.room_name;
 
   const JOINABLE_STATUSES = ["scheduled", "calibration", "in_progress"];
   const isJoinable = session && JOINABLE_STATUSES.includes(session.status);
@@ -95,8 +93,8 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
     return t("interviewDetail.title", { ns: "employer", defaultValue: "Interview session" });
   }, [normalizedRole, t, isJoinable]);
 
-  // Step 1: Load session detail on page mount (no LiveKit token yet)
-  const loadSessionDetail = useCallback(async () => {
+  // Load initial session data
+  const fetchSessionDetails = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
@@ -114,9 +112,9 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         inviteToken = detailRaw?.invite_token || detailRaw?.inviteToken;
       }
 
-      const mappedSession = transformInterviewSession(detailRaw);
+      const mappedSession = transformInterviewSession(detailRaw as any);
       setSession(mappedSession);
-      setInviteTokenRef(inviteToken || "");
+      setSessionInviteToken(inviteToken || "");
     } catch (err: any) {
       setError(err?.message || t("errors.invalidSession"));
     } finally {
@@ -125,62 +123,60 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
   }, [normalizedRole, routeId, t]);
 
   useEffect(() => {
-    loadSessionDetail();
-  }, [loadSessionDetail]);
+    fetchSessionDetails();
+  }, [fetchSessionDetails]);
 
-  // Step 2: Fetch LiveKit token + start interview when user clicks Start
-  const handleStartInterview = useCallback(async () => {
+  // Handle interview session initialization
+  const initiateInterviewSession = useCallback(async () => {
     try {
       setStarting(true);
       setError("");
 
-      // Fetch LiveKit token at start time (not page load)
-      if (!participantToken && inviteTokenRef) {
-        const tokenData = await interviewService.getLiveKitToken(inviteTokenRef) as any;
-        if (!tokenData?.token) {
-          throw new Error(t("errors.tokenMissing", { defaultValue: "Cannot get connection token. Please try again." }));
-        }
-        setParticipantToken(tokenData.token);
-        if (tokenData.serverUrl || tokenData.server_url) {
-          const rawServerUrl = tokenData.serverUrl || tokenData.server_url;
-          // Only trust the serverUrl from backend if it contains the current host or is absolute and not internal
-          const isInternal = rawServerUrl.includes('localhost') || rawServerUrl.includes('127.0.0.1') || rawServerUrl.includes('livekit:');
-          
-          if (!isInternal) {
-            try {
-              const url = new URL(rawServerUrl);
-              url.protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-              setServerUrl(url.toString().replace(/\/$/, ""));
-            } catch {
-              // Ignore invalid URLs from backend
-            }
-          }
+      const tokenData = await interviewService.getLiveKitToken(sessionInviteToken) as any;
+      if (!tokenData?.token) {
+        throw new Error(t("errors.tokenMissing", { defaultValue: "Connection token missing. Please try again." }));
+      }
+
+      let urlToUse = getSafeLiveKitUrl();
+      if (tokenData.serverUrl || tokenData.server_url) {
+        const rawServerUrl = tokenData.serverUrl || tokenData.server_url;
+        const isInternal = rawServerUrl.includes('localhost') || rawServerUrl.includes('127.0.0.1') || rawServerUrl.includes('livekit:');
+        if (!isInternal) {
+          try {
+            const url = new URL(rawServerUrl);
+            url.protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+            urlToUse = url.toString().replace(/\/$/, "");
+          } catch {}
         }
       }
 
       if (roomName && tokenService.getAccessTokenFromCookie()) {
-        await interviewService.updateSessionStatus(roomName, "in_progress").catch((err: unknown) => {
-          console.error("Cannot update interview status before start:", err);
+        await interviewService.updateSessionStatus(roomName, "in_progress").catch((err) => {
+          // Non-blocking error
         });
       }
 
-      console.log("Starting interview with URL:", liveKitUrl, "and token exists:", !!participantToken);
+      setConnectionDetails({
+        token: tokenData.token,
+        serverUrl: urlToUse
+      });
       setConnectRoom(true);
     } catch (err: any) {
-      setError(err?.message || t("errors.invalidSession", { defaultValue: "Cannot start interview. Please try again." }));
+      setError(err?.message || t("errors.invalidSession", { defaultValue: "Cannot start interview." }));
     } finally {
       setStarting(false);
     }
-  }, [roomName, participantToken, inviteTokenRef, t]);
+  }, [roomName, sessionInviteToken, t]);
 
-  const handleEndInterview = useCallback(async () => {
+  const terminateInterviewSession = useCallback(async () => {
     setConnectRoom(false);
+    setConnectionDetails(undefined);
     try {
       if (roomName) {
         await interviewService.updateSessionStatus(roomName, "completed");
       }
     } catch (err) {
-      console.error("Cannot update interview status to completed:", err);
+      // Non-blocking
     }
   }, [roomName]);
 
@@ -251,7 +247,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                   <Button 
                     variant="contained" 
                     color="error" 
-                    onClick={handleEndInterview} 
+                    onClick={terminateInterviewSession} 
                     className="h-9 rounded-xl px-4 text-xs font-black uppercase tracking-widest shadow-lg shadow-rose-500/20 hover:bg-rose-600 transition-all active:scale-95"
                   >
                     {t("controls.end", { defaultValue: "End call" })}
@@ -263,22 +259,23 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         </header>
 
         <section className="relative h-[75vh] min-h-[600px] overflow-hidden rounded-[2rem] border border-white/10 bg-[#020617] shadow-[0_0_100px_rgba(0,0,0,0.5)] transition-all duration-1000">
-          {connectRoom && participantToken ? (
+          {connectRoom && connectionDetails ? (
             <LiveKitRoom
-              room={interviewRoom}
-              token={participantToken}
-              serverUrl={liveKitUrl}
-              connect={connectRoom}
+              token={connectionDetails.token}
+              serverUrl={connectionDetails.serverUrl}
+              connect={true}
               video={false}
               audio={true}
               data-lk-theme="default"
-              onDisconnected={handleEndInterview}
+              onDisconnected={terminateInterviewSession}
               className="h-full"
             >
-              <InterviewRoomContent
-                onDisconnect={handleEndInterview}
+              <InterviewAgentView
+                onDisconnect={terminateInterviewSession}
                 sessionInfo={sessionInfo}
               />
+              <RoomAudioRenderer />
+              <ConnectionStateToast />
             </LiveKitRoom>
           ) : (
             <div className="relative flex h-full items-center justify-center px-6">
@@ -319,7 +316,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                     <>
                       <Button
                         variant="contained"
-                        onClick={handleStartInterview}
+                        onClick={initiateInterviewSession}
                         disabled={starting}
                         className="h-14 rounded-2xl bg-cyan-500 px-12 text-sm font-black uppercase tracking-[0.2em] shadow-2xl shadow-cyan-500/20 hover:bg-cyan-400 hover:shadow-cyan-400/30 transition-all active:scale-[0.98] disabled:opacity-50"
                       >
@@ -352,32 +349,11 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
 
         {formattedSchedule && (
           <p className="text-xs text-slate-300">
-            {t("common:labels.time", { defaultValue: "Time" })}: {formattedSchedule}
+            {t("common:labels.time", { defaultValue: "Time" })} • {formattedSchedule}
           </p>
         )}
       </div>
     </main>
-  );
-};
-
-const InterviewRoomContent = ({ onDisconnect, sessionInfo }: { onDisconnect: () => void, sessionInfo: any }) => {
-  const room = useRoomContext();
-  console.log("InterviewRoomContent rendering, room context exists:", !!room);
-  
-  if (!room) {
-    console.warn("Room context is NOT ready in InterviewRoomContent");
-    return null;
-  }
-
-  return (
-    <>
-      <InterviewAgentView
-        onDisconnect={onDisconnect}
-        sessionInfo={sessionInfo}
-      />
-      <RoomAudioRenderer />
-      <ConnectionStateToast />
-    </>
   );
 };
 
