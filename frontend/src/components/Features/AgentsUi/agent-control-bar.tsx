@@ -234,18 +234,18 @@ export function AgentControlBar({
     chat: controls?.chat ?? publishPermissions.data,
   }), [controls, publishPermissions]);
 
+  const handleChatToggle = useCallback(() => {
+    const nextState = !(isChatOpen || isChatOpenUncontrolled);
+    if (!onIsChatOpenChange) setIsChatOpenUncontrolled(nextState);
+    else onIsChatOpenChange(nextState);
+  }, [isChatOpen, isChatOpenUncontrolled, onIsChatOpenChange]);
+
   const isEmpty = Object.values(visibleControls).every((value) => !value);
 
   if (isEmpty) {
     console.warn('AgentControlBar: `visibleControls` contains only false values.');
     return null;
   }
-
-  const handleChatToggle = useCallback(() => {
-    const nextState = !(isChatOpen || isChatOpenUncontrolled);
-    if (!onIsChatOpenChange) setIsChatOpenUncontrolled(nextState);
-    else onIsChatOpenChange(nextState);
-  }, [isChatOpen, isChatOpenUncontrolled, onIsChatOpenChange]);
 
   return (
     <div
