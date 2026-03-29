@@ -55,8 +55,6 @@ export function useAgentAudioVisualizerAura(
 
   const [volume, setVolume] = useState(0);
   
-  console.log("useAgentAudioVisualizerAura: starting hook, state:", state, "audioTrack exists:", !!audioTrack);
-  
   // Note: We can't call hooks conditionally, so we expect the caller 
   // to ensure context or handle the error if this hook is used outside of Room.
   // However, we'll try to be safe by checking if audioTrack exists.
@@ -64,7 +62,6 @@ export function useAgentAudioVisualizerAura(
     fftSize: 512,
     smoothingTimeConstant: 0.55,
   });
-  console.log("useAgentAudioVisualizerAura: useTrackVolume hook successful, volume:", trackVolume);
 
   useEffect(() => {
     if (audioTrack) {

@@ -1,22 +1,97 @@
-import React, { useState, useMemo, useCallback } from "react";
-import { 
-  AgentAudioVisualizerAura,
-  AgentAudioVisualizerBar,
-  AgentAudioVisualizerGrid,
-  AgentAudioVisualizerRadial,
-  AgentAudioVisualizerWave,
-  AgentChatTranscript,
-  AgentControlBar,
-} from "@/components/Features/AgentsUi";
-import { 
-  useVoiceAssistant, 
+'use client';
+
+import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
+import { Track } from 'livekit-client';
+import { AnimatePresence, motion } from 'motion/react';
+import {
+  useVoiceAssistant,
+  useTracks,
+  useLocalParticipant,
   useChat,
   useRoomContext,
-  AudioTrack,
-} from "@livekit/components-react";
-import { AnimatePresence, motion } from "motion/react";
-import { cn } from "@/lib/utils";
-import { useTranslation } from "react-i18next";
+  type TrackReference,
+  VideoTrack,
+} from '@livekit/components-react';
+import {
+  AgentAudioVisualizerAura,
+  AgentChatTranscript,
+  AgentControlBar,
+} from '@/components/Features/AgentsUi';
+import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
+
+const MotionContainer = motion.create('div');
+const MotionBottom = motion.create('div');
+
+const ANIMATION_TRANSITION = {
+  type: 'spring',
+  stiffness: 675,
+  damping: 75,
+  mass: 1,
+} as const;
+
+const BOTTOM_VIEW_MOTION_PROPS = {
+  variants: {
+    visible: {
+      opacity: 1,
+      translateY: '0%',
+    },
+    hidden: {
+      opacity: 0,
+      translateY: '100%',
+    },
+  },
+  initial: 'hidden',
+  animate: 'visible',
+  exit: 'hidden',
+  transition: {
+    duration: 0.3,
+    delay: 0.5,
+    ease: 'easeOut',
+  },
+} as const;
+
+const classNames = {
+  grid: [
+    'h-full w-full',
+    'grid gap-x-2 place-content-center',
+    'grid-cols-[1fr_1fr] grid-rows-[90px_1fr_90px]',
+  ],
+  agentChatOpenWithSecondTile: ['col-start-1 row-start-1', 'self-center justify-self-end'],
+  agentChatOpenWithoutSecondTile: ['col-start-1 row-start-1', 'col-span-2', 'place-content-center'],
+  agentChatClosed: ['col-start-1 row-start-1', 'col-span-2 row-span-3', 'place-content-center'],
+  secondTileChatOpen: ['col-start-2 row-start-1', 'self-center justify-self-start'],
+  secondTileChatClosed: ['col-start-2 row-start-3', 'place-content-end'],
+};
+
+interface FadeProps {
+  top?: boolean;
+  bottom?: boolean;
+  className?: string;
+}
+
+function Fade({ top = false, bottom = false, className }: FadeProps) {
+  return (
+    <div
+      className={cn(
+        'from-slate-950 pointer-events-none bg-gradient-to-b to-transparent',
+        top && 'bg-gradient-to-b',
+        bottom && 'bg-gradient-to-t',
+        className
+      )}
+    />
+  );
+}
+
+function useLocalTrackRef(source: Track.Source) {
+  const { localParticipant } = useLocalParticipant();
+  const publication = localParticipant.getTrackPublication(source);
+  const trackRef = useMemo<TrackReference | undefined>(
+    () => (publication ? { source, participant: localParticipant, publication } : undefined),
+    [source, publication, localParticipant]
+  );
+  return trackRef;
+}
 
 interface InterviewAgentViewProps {
   onDisconnect: () => void;
@@ -27,225 +102,209 @@ interface InterviewAgentViewProps {
 }
 
 const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewProps) => {
-  const { t } = useTranslation("interview");
+  const { t } = useTranslation('interview');
   const room = useRoomContext();
-  
-  const { state, audioTrack: agentAudioTrack } = useVoiceAssistant();
-  const agentParticipant = agentAudioTrack?.participant;
+  const { state: agentState, audioTrack: agentAudioTrack, videoTrack: agentVideoTrack } = useVoiceAssistant();
   const { chatMessages } = useChat({ room });
   const [isTranscriptVisible, setIsTranscriptVisible] = useState(false);
-  
-  // Parse metadata for interview stage and progress
-  const { stage, currentQuestion, totalQuestions } = useMemo(() => {
-    const metadata = agentParticipant?.metadata;
-    if (!metadata || !metadata.startsWith("STAGE:")) {
-      return { stage: "INTRODUCTION", currentQuestion: 0, totalQuestions: 0 };
-    }
-    const content = metadata.replace("STAGE:", "");
-    // Format can be "STAGE:TECHNICAL|1/5" or just "STAGE:INTRODUCTION"
-    const [stageName, progress] = content.split("|");
-    let current = 0;
-    let total = 0;
-    if (progress && progress.includes("/")) {
-      const [c, t] = progress.split("/").map(Number);
-      current = c;
-      total = t;
-    }
-    return { stage: stageName, currentQuestion: current, totalQuestions: total };
-  }, [agentParticipant?.metadata]);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  const stages = ["INTRODUCTION", "EXPERIENCE", "TECHNICAL", "BEHAVIORAL", "CLOSING"];
-  const currentStageIndex = stages.indexOf(stage);
+  const [screenShareTrack] = useTracks([Track.Source.ScreenShare]);
+  const cameraTrack = useLocalTrackRef(Track.Source.Camera);
 
-  // Parse chat messages for the transcript component
+  const isCameraEnabled = cameraTrack && !cameraTrack.publication.isMuted;
+  const isScreenShareEnabled = screenShareTrack && !screenShareTrack.publication.isMuted;
+  const hasSecondTile = isCameraEnabled || isScreenShareEnabled;
+
+  const animationDelay = isTranscriptVisible ? 0 : 0.15;
+  const isAvatar = agentVideoTrack !== undefined;
+
+  // Transcript messages conversion
   const transcriptMessages = useMemo(() => {
-    return chatMessages.map(msg => ({
+    return chatMessages.map((msg) => ({
       id: msg.id,
       timestamp: msg.timestamp,
       from: msg.from,
-      message: msg.message
+      message: msg.message,
     }));
   }, [chatMessages]);
 
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
+
   const handleDeviceError = useCallback((error: any) => {
-    console.error("Device error in InterviewAgentView:", error);
+    console.error('Device error in InterviewAgentView:', error);
   }, []);
 
-
-  const visualizerVariant = (process.env.NEXT_PUBLIC_LIVEKIT_VISUALIZER || "aura")
-    .toString()
-    .toLowerCase();
-
-  const renderVisualizer = () => {
-    const commonProps = {
-      state,
-      audioTrack: agentAudioTrack,
-      className: "relative transition-all duration-700",
-    };
-
-    switch (visualizerVariant) {
-      case "bar":
-        return <AgentAudioVisualizerBar {...commonProps} size="lg" className="h-[180px] w-[300px]" />;
-      case "grid":
-        return <AgentAudioVisualizerGrid {...commonProps} size="lg" rowCount={7} columnCount={7} />;
-      case "radial":
-        return <AgentAudioVisualizerRadial {...commonProps} size="lg" barCount={24} />;
-      case "wave":
-        return <AgentAudioVisualizerWave {...commonProps} size="lg" className="h-[160px] w-[420px]" />;
-      default:
-        return (
-          <AgentAudioVisualizerAura
-            {...commonProps}
-            size="xl"
-            className="drop-shadow-[0_0_30px_rgba(31,213,249,0.2)]"
-          />
-        );
-    }
-  };
-
   return (
-    <section className="relative h-full w-full overflow-hidden bg-slate-950 text-white flex flex-col items-center justify-center">
-      {/* Explicit Agent Audio Track */}
-      {agentAudioTrack && <AudioTrack trackRef={agentAudioTrack} />}
-
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 left-1/2 h-64 w-[40rem] -translate-x-1/2 rounded-full bg-sky-500/20 blur-3xl opacity-50" />
-        <div className="absolute -bottom-32 right-[-8%] h-80 w-[36rem] rounded-full bg-indigo-500/15 blur-3xl opacity-40" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.4),rgba(2,6,23,1))]" />
+    <section className="bg-slate-950 relative z-10 h-full w-full overflow-hidden text-white">
+      {/* Background decoration */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-24 left-1/2 h-64 w-[40rem] -translate-x-1/2 rounded-full bg-sky-500/10 blur-3xl opacity-30" />
+        <div className="absolute -bottom-32 right-[-8%] h-80 w-[36rem] rounded-full bg-indigo-500/10 blur-3xl opacity-20" />
       </div>
 
-      {/* Stage Progress Bar */}
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 z-20 w-full max-w-2xl px-6 hidden md:block">
-        <div className="flex items-center justify-between gap-4">
-          {stages.map((s, idx) => (
-            <div key={s} className="flex flex-col gap-2 flex-1">
-              <div className={cn(
-                "h-1.5 w-full rounded-full transition-all duration-700 shadow-[0_0_10px_rgba(34,211,238,0.1)]",
-                idx <= currentStageIndex ? "bg-gradient-to-r from-cyan-500 to-blue-500 shadow-cyan-500/20" : "bg-white/5"
-              )} />
-              <span className={cn(
-                "text-[9px] uppercase font-black tracking-[0.2em] transition-all duration-500 text-center",
-                idx <= currentStageIndex ? "text-cyan-400 opacity-100" : "text-white/20 opacity-50"
-              )}>
-                {t(`stages.${s}`)}
-              </span>
+      {/* Chat Transcript Layer */}
+      <div
+        className={cn(
+          'fixed inset-0 z-20 grid grid-cols-1 grid-rows-1 transition-opacity duration-300',
+          !isTranscriptVisible && 'pointer-events-none opacity-0'
+        )}
+      >
+        <Fade top className="absolute inset-x-4 top-0 h-40 z-30" />
+        <div 
+          ref={scrollAreaRef}
+          className="overflow-y-auto px-4 pt-40 pb-[150px] md:px-6 md:pb-[200px] [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:display-none"
+        >
+          <div className="mx-auto max-w-2xl">
+             <AgentChatTranscript 
+                agentState={agentState} 
+                messages={transcriptMessages} 
+                className="space-y-3"
+              />
+          </div>
+        </div>
+      </div>
+
+      {/* Main Layout (Tile Layout) */}
+      <div className="pointer-events-none fixed inset-x-0 top-8 bottom-32 z-10 md:top-12 md:bottom-40">
+        <div className="relative mx-auto h-full max-w-2xl px-4 md:px-0">
+          <div className={cn(classNames.grid)}>
+            {/* Agent Tile */}
+            <div
+              className={cn([
+                'grid',
+                !isTranscriptVisible && classNames.agentChatClosed,
+                isTranscriptVisible && hasSecondTile && classNames.agentChatOpenWithSecondTile,
+                isTranscriptVisible && !hasSecondTile && classNames.agentChatOpenWithoutSecondTile,
+              ])}
+            >
+              <AnimatePresence mode="popLayout">
+                {!isAvatar && (
+                  <MotionContainer
+                    key="agent-audio"
+                    layoutId="agent"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{
+                      opacity: 1,
+                      scale: isTranscriptVisible ? 1 : 4.5, // Scaled up when transcript hidden
+                    }}
+                    transition={{
+                      ...ANIMATION_TRANSITION,
+                      delay: animationDelay,
+                    }}
+                    className={cn(
+                      'aspect-square h-[90px] w-[90px] rounded-md transition-all duration-300 flex items-center justify-center',
+                      isTranscriptVisible && 'bg-white/[0.03] border border-white/10 shadow-lg'
+                    )}
+                  >
+                    <AgentAudioVisualizerAura
+                      state={agentState}
+                      audioTrack={agentAudioTrack}
+                      size="md"
+                      className="w-full h-full"
+                    />
+                  </MotionContainer>
+                )}
+
+                {isAvatar && agentVideoTrack && (
+                  <MotionContainer
+                    key="agent-video"
+                    layoutId="avatar"
+                    initial={{
+                      scale: 1,
+                      opacity: 0,
+                      filter: 'blur(20px)',
+                    }}
+                    animate={{
+                       opacity: 1,
+                       filter: 'blur(0px)',
+                       borderRadius: isTranscriptVisible ? 8 : 24,
+                    }}
+                    transition={{
+                      ...ANIMATION_TRANSITION,
+                      delay: animationDelay,
+                      filter: { duration: 1 },
+                    }}
+                    className={cn(
+                      'overflow-hidden bg-black shadow-2xl',
+                      isTranscriptVisible ? 'h-[90px] w-[90px]' : 'h-full w-full'
+                    )}
+                  >
+                    <VideoTrack
+                      trackRef={agentVideoTrack}
+                      className={cn(isTranscriptVisible && 'size-[90px] object-cover')}
+                    />
+                  </MotionContainer>
+                )}
+              </AnimatePresence>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Question Counter for Technical Stage */}
-      {stage === "TECHNICAL" && totalQuestions > 0 && (
-        <div className="absolute top-28 left-1/2 -translate-x-1/2 z-20">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, y: -10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="px-5 py-2 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.3)]"
-          >
-            <span className="text-[10px] font-black text-cyan-400 uppercase tracking-[0.25em]">
-              {t("stages.currentQuestion", { current: currentQuestion, total: totalQuestions })}
-            </span>
-          </motion.div>
-        </div>
-      )}
-
-      <div className="relative z-10 flex flex-col items-center justify-center">
-        <div className="relative flex flex-col items-center">
-          <div className="relative group">
-            <div className={cn(
-               "absolute inset-0 blur-[100px] rounded-full transition-all duration-1000 opacity-30 scale-150",
-               state === 'speaking' ? "bg-cyan-500 animate-pulse" : 
-               state === 'thinking' ? "bg-blue-500 animate-pulse" : "bg-transparent"
-            )} />
-
-            <div className="relative z-10 transform scale-110 md:scale-125 transition-transform duration-700">
-              {renderVisualizer()}
+            {/* Second Tile (Camera / Screen Share) */}
+            <div
+              className={cn([
+                'grid',
+                isTranscriptVisible && classNames.secondTileChatOpen,
+                !isTranscriptVisible && classNames.secondTileChatClosed,
+              ])}
+            >
+              <AnimatePresence>
+                {((cameraTrack && isCameraEnabled) || (screenShareTrack && isScreenShareEnabled)) && (
+                  <MotionContainer
+                    key="local-video"
+                    layout="position"
+                    layoutId="camera"
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    transition={{
+                      ...ANIMATION_TRANSITION,
+                      delay: animationDelay,
+                    }}
+                    className="shadow-xl"
+                  >
+                    <VideoTrack
+                      trackRef={cameraTrack || screenShareTrack!}
+                      className="bg-slate-900 aspect-square w-[90px] rounded-md object-cover border border-white/10"
+                    />
+                  </MotionContainer>
+                )}
+              </AnimatePresence>
             </div>
           </div>
-          
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-16 px-8 py-3.5 rounded-2xl bg-white/[0.03] border border-white/[0.08] backdrop-blur-3xl shadow-[0_20px_50px_rgba(0,0,0,0.4)] transition-all duration-500 group hover:border-white/[0.15]"
-          >
-             <div className="flex items-center gap-4">
-                <div className="relative">
-                  <div className={cn(
-                    "w-3 h-3 rounded-full transition-all duration-500",
-                    state === 'speaking' ? "bg-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.8)]" : 
-                    state === 'thinking' ? "bg-blue-400 shadow-[0_0_15px_rgba(96,165,250,0.8)]" : 
-                    state === 'listening' ? "bg-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.8)]" : "bg-white/10"
-                  )} />
-                  {state !== 'idle' && (
-                    <div className={cn(
-                      "absolute inset-0 rounded-full animate-ping opacity-40",
-                      state === 'speaking' ? "bg-cyan-400" : 
-                      state === 'thinking' ? "bg-blue-400" : 
-                      state === 'listening' ? "bg-emerald-400" : ""
-                    )} />
-                  )}
-                </div>
-                <span className="text-[11px] font-black uppercase tracking-[0.3em] text-white/80">
-                  {state === 'speaking' ? t('agentView.agentSpeaking') : 
-                   state === 'thinking' ? t('agentView.agentThinking') : 
-                   state === 'listening' ? t('agentView.listening') : t('agentView.ready')}
-                </span>
-             </div>
-          </motion.div>
         </div>
       </div>
 
-      <AnimatePresence>
-        {isTranscriptVisible && (
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95, x: 20 }}
-            animate={{ opacity: 1, scale: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.95, x: 20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="pointer-events-none fixed bottom-32 right-6 top-6 z-40 flex w-80 flex-col md:w-[400px]"
-          >
-            <div className="pointer-events-auto flex flex-1 flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0f172a]/80 shadow-2xl backdrop-blur-2xl">
-              <div className="flex items-center justify-between border-b border-white/5 bg-white/5 px-6 py-5">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-cyan-400" />
-                  <h3 className="font-bold text-sm uppercase tracking-widest opacity-80">{t('agentView.transcript')}</h3>
-                </div>
-                <button 
-                  onClick={() => setIsTranscriptVisible(false)} 
-                  className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors opacity-60 hover:opacity-100"
-                >
-                   X
-                </button>
-              </div>
-              <div className="flex-1 overflow-hidden p-6">
-                <AgentChatTranscript 
-                  agentState={state} 
-                  messages={transcriptMessages} 
-                  className="h-full"
-                />
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="fixed inset-x-4 bottom-0 z-30 flex justify-center pb-8 md:inset-x-12 md:pb-10">
-        <div className="w-full max-w-3xl">
-          <AgentControlBar 
+      {/* Bottom Control Bar Area */}
+      <MotionBottom
+        {...BOTTOM_VIEW_MOTION_PROPS}
+        className="fixed inset-x-3 bottom-0 z-50 md:inset-x-12"
+      >
+        <div className="relative mx-auto max-w-2xl pb-3 md:pb-12">
+          <Fade bottom className="absolute inset-x-0 top-0 h-4 -translate-y-full" />
+          <AgentControlBar
             variant="livekit"
+            controls={{
+              microphone: true,
+              camera: true,
+              chat: true,
+              screenShare: true,
+              leave: true,
+            }}
             isConnected={true}
             isChatOpen={isTranscriptVisible}
             onIsChatOpenChange={setIsTranscriptVisible}
             onDisconnect={onDisconnect}
             onDeviceError={handleDeviceError}
-            controls={{ microphone: true, camera: false, chat: true, screenShare: false, leave: true }}
-            className="shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-white/10 bg-black/40 backdrop-blur-3xl p-4 rounded-full"
+            className="shadow-2xl border-white/10 bg-black/40 backdrop-blur-3xl"
           />
         </div>
-      </div>
+      </MotionBottom>
     </section>
   );
 };
 
 export default InterviewAgentView;
-
