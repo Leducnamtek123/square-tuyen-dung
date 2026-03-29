@@ -2,13 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslation } from "react-i18next";
 
-import {
-  LiveKitRoom,
-  RoomAudioRenderer,
-  ConnectionStateToast,
-} from "@livekit/components-react";
-import InterviewAgentView from "../../components/Features/InterviewAi/InterviewAgentView";
-import { AgentAudioVisualizerAura } from "../../components/Features/AgentsUi";
+import { App as VoiceAssistantApp } from "../../components/Features/VoiceAssistant/components/app/app";
+import { APP_CONFIG_DEFAULTS } from "../../components/Features/VoiceAssistant/app-config";
 import { cn } from "@/lib/utils";
 import Button from "@mui/material/Button";
 
@@ -260,35 +255,20 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
 
         <section className="relative h-[75vh] min-h-[600px] overflow-hidden rounded-[2rem] border border-white/10 bg-[#020617] shadow-[0_0_100px_rgba(0,0,0,0.5)] transition-all duration-1000">
           {connectRoom && connectionDetails ? (
-            <LiveKitRoom
-              token={connectionDetails.token}
-              serverUrl={connectionDetails.serverUrl}
-              connect={true}
-              video={false}
-              audio={true}
-              data-lk-theme="default"
-              onDisconnected={terminateInterviewSession}
-              className="h-full"
-            >
-              <InterviewAgentView
-                onDisconnect={terminateInterviewSession}
-                sessionInfo={sessionInfo}
-              />
-              <RoomAudioRenderer />
-              <ConnectionStateToast />
-            </LiveKitRoom>
+            <VoiceAssistantApp
+              appConfig={{ ...APP_CONFIG_DEFAULTS, agentName: "Agent" }}
+              connectionDetails={connectionDetails}
+              onDisconnect={terminateInterviewSession}
+            />
           ) : (
             <div className="relative flex h-full items-center justify-center px-6">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.22),transparent_52%)]" />
               <div className="relative flex w-full max-w-2xl flex-col items-center gap-10 text-center">
                 <div className="relative group">
                   <div className="absolute inset-0 blur-[80px] rounded-full bg-cyan-500/10 group-hover:bg-cyan-500/20 transition-all duration-1000" />
-                  <AgentAudioVisualizerAura
-                    size="md"
-                    state="listening"
-                    isStatic={true}
-                    className="h-[220px] w-[220px] md:h-[320px] md:w-[320px] relative z-10 opacity-70 transition-all duration-1000 group-hover:opacity-100"
-                  />
+                  <div className="h-[220px] w-[220px] md:h-[320px] md:w-[320px] relative z-10 opacity-70 transition-all duration-1000 group-hover:opacity-100 flex items-center justify-center">
+                     <span className="text-6xl">🤖</span>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
