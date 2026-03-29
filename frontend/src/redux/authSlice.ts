@@ -1,10 +1,5 @@
-﻿import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { RoleName } from '../types/auth';
-
-interface VerifyState {
-  email: string;
-  roleName: RoleName | '';
-}
 
 interface AuthState {
   isAllowVerifyEmail: boolean;
@@ -13,17 +8,19 @@ interface AuthState {
 }
 
 interface VerifyEmailPayload {
-  isAllowVerifyEmail?: boolean;
-  email?: string;
+  isAllowVerifyEmail: boolean;
+  email: string;
   roleName?: RoleName | '';
 }
 
-const loadVerifyState = (): VerifyState | null => {
+const VERIFY_STORAGE_KEY = 'verifyEmail';
+
+const loadVerifyState = (): Partial<AuthState> | null => {
   if (typeof window === 'undefined') return null;
   try {
-    const raw = sessionStorage.getItem('verifyEmail');
+    const raw = sessionStorage.getItem(VERIFY_STORAGE_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<VerifyState>;
+    const parsed = JSON.parse(raw) as Partial<AuthState>;
     if (!parsed?.email) return null;
     return {
       email: parsed.email,
@@ -34,33 +31,23 @@ const loadVerifyState = (): VerifyState | null => {
   }
 };
 
-const persistVerifyState = (state: AuthState): void => {
-  if (typeof window === 'undefined') return;
-  if (state?.isAllowVerifyEmail && state?.email) {
-    sessionStorage.setItem(
-      'verifyEmail',
-      JSON.stringify({ email: state.email, roleName: state.roleName || '' })
-    );
-  } else {
-    sessionStorage.removeItem('verifyEmail');
-  }
-};
-
 const storedVerify = loadVerifyState();
+
+const initialState: AuthState = {
+  isAllowVerifyEmail: !!storedVerify?.email,
+  email: storedVerify?.email || '',
+  roleName: storedVerify?.roleName || '',
+};
 
 export const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    isAllowVerifyEmail: !!storedVerify?.email,
-    email: storedVerify?.email || '',
-    roleName: storedVerify?.roleName || '',
-  } as AuthState,
+  initialState,
   reducers: {
     updateVerifyEmail: (state, action: PayloadAction<VerifyEmailPayload>) => {
-      state.isAllowVerifyEmail = action.payload?.isAllowVerifyEmail as boolean;
-      state.email = action.payload?.email as string;
-      state.roleName = action.payload?.roleName as RoleName | '';
-      persistVerifyState(state);
+      const { isAllowVerifyEmail, email, roleName = '' } = action.payload;
+      state.isAllowVerifyEmail = isAllowVerifyEmail;
+      state.email = email;
+      state.roleName = roleName;
     },
   },
 });

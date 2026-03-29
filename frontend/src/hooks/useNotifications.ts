@@ -11,6 +11,8 @@ import {
   updateDoc,
   doc,
   writeBatch,
+  type DocumentSnapshot,
+  type QueryDocumentSnapshot,
 } from 'firebase/firestore';
 import db from '../configs/firebase-config';
 import { useAppSelector } from './useAppStore';
@@ -18,12 +20,41 @@ import { useAppSelector } from './useAppStore';
 const PAGE_SIZE = 10;
 const MAX_NOTIFICATIONS = 50;
 
-export const useNotifications = () => {
+/* ── Types ────────────────────────────────────────────────────────────── */
+
+export interface AppNotification {
+  key: string;
+  title?: string;
+  content?: string;
+  imageUrl?: string | null;
+  type?: string;
+  is_read?: boolean;
+  is_deleted?: boolean;
+  time?: unknown; // Firestore Timestamp
+  link?: string;
+  [field: string]: unknown;
+}
+
+interface UseNotificationsReturn {
+  count: number;
+  isLoading: boolean;
+  notifications: AppNotification[];
+  loadMore: () => Promise<void>;
+  hasMore: boolean;
+  handleRead: (key: string) => Promise<void>;
+  handleRemove: (key: string) => Promise<void>;
+  handleMakeAllRead: () => Promise<void>;
+  handleRemoveAll: () => Promise<void>;
+}
+
+/* ── Hook ─────────────────────────────────────────────────────────────── */
+
+export const useNotifications = (): UseNotificationsReturn => {
   const { currentUser } = useAppSelector((state) => state.user);
   const [count, setCount] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [notifications, setNotifications] = React.useState<any[]>([]);
-  const [lastKey, setLastKey] = React.useState<any>(null);
+  const [notifications, setNotifications] = React.useState<AppNotification[]>([]);
+  const [lastKey, setLastKey] = React.useState<DocumentSnapshot | null>(null);
 
   const getCollectionRef = React.useCallback(() => {
     if (!currentUser?.id) return null;
@@ -51,17 +82,17 @@ export const useNotifications = () => {
     );
 
     const unsubscribe = onSnapshot(first, (querySnapshot) => {
-      const notificationList: any[] = [];
-      querySnapshot.forEach((docSnap) => {
+      const notificationList: AppNotification[] = [];
+      querySnapshot.forEach((docSnap: QueryDocumentSnapshot) => {
         notificationList.push({
-          ...docSnap.data(),
+          ...(docSnap.data() as Omit<AppNotification, 'key'>),
           key: docSnap.id,
         });
       });
       setNotifications(notificationList);
       setLastKey(querySnapshot.docs[querySnapshot.docs.length - 1] || null);
       setIsLoading(false);
-    }, (error) => {
+    }, () => {
       setIsLoading(false);
     });
 
@@ -83,10 +114,10 @@ export const useNotifications = () => {
     const nextQuerySnapshot = await getDocs(nextQuery);
     const lastVisible = nextQuerySnapshot.docs[nextQuerySnapshot.docs.length - 1];
 
-    const nextNotificationList: any[] = [];
-    nextQuerySnapshot.forEach((docSnap) => {
+    const nextNotificationList: AppNotification[] = [];
+    nextQuerySnapshot.forEach((docSnap: QueryDocumentSnapshot) => {
       nextNotificationList.push({
-        ...docSnap.data(),
+        ...(docSnap.data() as Omit<AppNotification, 'key'>),
         key: docSnap.id,
       });
     });
@@ -102,7 +133,7 @@ export const useNotifications = () => {
       await updateDoc(doc(db, 'users', `${currentUser.id}`, 'notifications', key), {
         is_read: true,
       });
-    } catch (error) {
+    } catch {
       // Ignored
     }
   };
@@ -114,7 +145,7 @@ export const useNotifications = () => {
         is_deleted: true,
       });
       setNotifications((prev) => prev.filter((val) => val.key !== key));
-    } catch (error) {
+    } catch {
       // Ignored
     }
   };

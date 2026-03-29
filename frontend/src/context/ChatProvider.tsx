@@ -12,21 +12,47 @@ interface ChatProviderProps {
   children: React.ReactNode;
 }
 
-interface ChatUser {
+export interface ChatUser {
   userId: string;
   name: string;
   email: string;
   avatarUrl?: string;
-  company?: any;
+  company?: ChatCompany | null;
 }
 
-interface ChatContextValue {
+export interface ChatCompany {
+  companyId?: number;
+  slug?: string;
+  companyName?: string;
+  imageUrl?: string;
+}
+
+export interface ChatContextValue {
   currentUserChat: ChatUser | null;
   selectedRoomId: string;
   setSelectedRoomId: (id: string) => void;
 }
 
 export const ChatContext = React.createContext<ChatContextValue | undefined>(undefined);
+
+/** Type-safe hook to consume ChatContext */
+export const useChatContext = (): ChatContextValue => {
+  const ctx = React.useContext(ChatContext);
+  if (!ctx) {
+    throw new Error('useChatContext must be used within a ChatProvider');
+  }
+  return ctx;
+};
+
+/** Extends User with optional company data that the backend may return */
+interface UserWithCompany extends User {
+  company?: {
+    id?: number;
+    slug?: string;
+    companyName?: string;
+    imageUrl?: string;
+  };
+}
 
 const ChatProvider = ({ children }: ChatProviderProps) => {
   const { currentUser, activeWorkspace } = useSelector((state: RootState) => state.user);
@@ -39,61 +65,69 @@ const ChatProvider = ({ children }: ChatProviderProps) => {
   React.useEffect(() => {
     if (!currentUser || !userId) return;
 
+    let cancelled = false;
+
     const createUserChat = async () => {
-      const isExists = await checkExists('accounts', userId);
+      try {
+        const isExists = await checkExists('accounts', userId);
 
-      if (!isExists) {
-        // tao moi user tren firestore.
-        let userData = null;
+        if (!isExists) {
+          let userData: Record<string, unknown>;
 
-        if (activeWorkspace?.type !== "company") {
-          userData = {
-            userId: userId,
-            name: currentUser?.fullName,
-            email: currentUser?.email,
-            avatarUrl: currentUser?.avatarUrl,
-            company: null,
-          };
-        } else {
-          // Narrowing type for company access if needed, 
-          // but currentUser type in models.ts has optional company related fields or we can cast
-          const userWithCompany = currentUser as User & { company?: { imageUrl?: string; id?: number; slug?: string; companyName?: string } };
-          
-          userData = {
-            userId: userId,
-            name: currentUser?.fullName,
-            email: currentUser?.email,
-            avatarUrl: userWithCompany.company?.imageUrl || currentUser?.avatarUrl,
-            company: {
-              companyId: userWithCompany.company?.id,
-              slug: userWithCompany.company?.slug,
-              companyName: userWithCompany.company?.companyName,
-              imageUrl: userWithCompany.company?.imageUrl,
-            },
-          };
+          if (activeWorkspace?.type !== 'company') {
+            userData = {
+              userId,
+              name: currentUser.fullName ?? '',
+              email: currentUser.email,
+              avatarUrl: currentUser.avatarUrl ?? null,
+              company: null,
+            };
+          } else {
+            const userWithCompany = currentUser as UserWithCompany;
+            userData = {
+              userId,
+              name: currentUser.fullName ?? '',
+              email: currentUser.email,
+              avatarUrl: (userWithCompany.company?.imageUrl || currentUser.avatarUrl) ?? null,
+              company: {
+                companyId: userWithCompany.company?.id,
+                slug: userWithCompany.company?.slug,
+                companyName: userWithCompany.company?.companyName,
+                imageUrl: userWithCompany.company?.imageUrl,
+              },
+            };
+          }
+
+          await createUser('accounts', userData, userId);
         }
 
-        const createResult = await createUser('accounts', userData, userId);
-        // User created on Firestore
+        const userChat = (await getUserAccount('accounts', userId)) as unknown as ChatUser;
+        if (!cancelled) {
+          setCurrentUserChat(userChat);
+        }
+      } catch {
+        // Silently fail for chat initialization
       }
-
-      // lay thong tin user hien tai
-      const userChat = await getUserAccount('accounts', userId) as unknown as ChatUser;
-      setCurrentUserChat(userChat);
-      // userChat initialized
     };
 
     createUserChat();
+
+    return () => {
+      cancelled = true;
+    };
   }, [activeWorkspace, currentUser, userId]);
 
+  const contextValue = React.useMemo<ChatContextValue>(
+    () => ({
+      currentUserChat,
+      selectedRoomId,
+      setSelectedRoomId,
+    }),
+    [currentUserChat, selectedRoomId]
+  );
+
   return (
-    <ChatContext.Provider
-      value={{
-        currentUserChat,
-        selectedRoomId,
-        setSelectedRoomId,
-      }}
-    >
+    <ChatContext.Provider value={contextValue}>
       {children}
     </ChatContext.Provider>
   );

@@ -1,21 +1,29 @@
-﻿import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 interface ProfileState {
   resume: {
-    isReloadResume: boolean;
+    /** Incremented to signal that resume data should be refetched. */
+    reloadCounter: number;
   };
 }
 
+const initialState: ProfileState = {
+  resume: {
+    reloadCounter: 0,
+  },
+};
+
 export const profileSlice = createSlice({
   name: 'profile',
-  initialState: {
-    resume: {
-      isReloadResume: false,
-    },
-  } as ProfileState,
+  initialState,
   reducers: {
+    /**
+     * Increment a counter instead of toggling a boolean.
+     * Components should use this value as a React Query / useEffect dependency
+     * to trigger a refetch when it changes.
+     */
     reloadResume: (state) => {
-      state.resume.isReloadResume = !state.resume.isReloadResume;
+      state.resume.reloadCounter += 1;
     },
   },
 });

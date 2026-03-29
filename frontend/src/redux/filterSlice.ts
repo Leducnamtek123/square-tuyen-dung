@@ -1,4 +1,4 @@
-﻿import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 interface JobPostFilter {
   kw: string;
@@ -80,7 +80,7 @@ const initialResumeFilter: ResumeFilter = {
   pageSize: 10,
 };
 
-export const userSlice = createSlice({
+export const filterSlice = createSlice({
   name: 'filter',
   initialState: {
     jobPostFilter: initialJobPostFilter,
@@ -115,7 +115,7 @@ export const userSlice = createSlice({
   },
 });
 
-const { reducer } = userSlice;
+const { reducer } = filterSlice;
 const {
   searchJobPost,
   searchJobPostWithKeyword,
@@ -124,7 +124,7 @@ const {
   resetSearchCompany,
   searchResume,
   resetSearchResume,
-} = userSlice.actions;
+} = filterSlice.actions;
 
 export default reducer;
 export {

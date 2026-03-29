@@ -41,12 +41,7 @@ const updateUserInfo = createAsyncThunk<User, Record<string, unknown>>(
 
 const removeUserInfo = createAsyncThunk<void, RemoveUserInfoPayload>(
   'user/removeUserInfo',
-  async (data) => {
-    /**
-     * Khong revoktoken
-     * RevokToken -> token app -> chet theo
-     */
-    // await authService.revokToken(data.accessToken, data.backend as any);
+  async () => {
     const removeResult = tokenService.removeAccessTokenAndRefreshTokenFromCookie();
     if (!removeResult) {
       return Promise.reject("Can't remove token in Cookie");
@@ -72,30 +67,15 @@ const deleteAvatar = createAsyncThunk<User, void>(
 
 const ACTIVE_WORKSPACE_STORAGE_KEY = 'active_workspace';
 
-type StoredWorkspace = NormalizedWorkspace | null;
-
 type AnyWorkspace = Workspace | NormalizedWorkspace | null | undefined;
 
-const loadActiveWorkspace = (): StoredWorkspace => {
+const loadActiveWorkspace = (): NormalizedWorkspace | null => {
   if (typeof window === 'undefined') return null;
   try {
     const raw = localStorage.getItem(ACTIVE_WORKSPACE_STORAGE_KEY);
     return raw ? (JSON.parse(raw) as NormalizedWorkspace) : null;
   } catch {
     return null;
-  }
-};
-
-const persistActiveWorkspace = (workspace: StoredWorkspace): void => {
-  if (typeof window === 'undefined') return;
-  try {
-    if (workspace) {
-      localStorage.setItem(ACTIVE_WORKSPACE_STORAGE_KEY, JSON.stringify(workspace));
-    } else {
-      localStorage.removeItem(ACTIVE_WORKSPACE_STORAGE_KEY);
-    }
-  } catch {
-    // ignore storage errors
   }
 };
 
@@ -110,7 +90,7 @@ const normalizeWorkspace = (workspace: AnyWorkspace): NormalizedWorkspace | null
 
 const resolveActiveWorkspace = (
   workspaces: Workspace[] | null | undefined,
-  preferred: StoredWorkspace,
+  preferred: NormalizedWorkspace | null,
   currentUser: User | null | undefined
 ): NormalizedWorkspace | null => {
   const workspaceList = Array.isArray(workspaces) ? workspaces : [];
@@ -133,7 +113,7 @@ const resolveActiveWorkspace = (
   if (currentUser?.roleName === 'EMPLOYER') {
     const firstCompany = workspaceList.find((workspace) => workspace.type === 'company');
     if (firstCompany) return normalizeWorkspace(firstCompany);
-    return null; // Do not fallback to job_seeker if they are explicitly an EMPLOYER
+    return null;
   }
 
   const firstJobSeeker = workspaceList.find((workspace) => workspace.type === 'job_seeker');
@@ -144,17 +124,19 @@ const resolveActiveWorkspace = (
 
 const storedWorkspace = loadActiveWorkspace();
 
+const initialState: UserState = {
+  isAuthenticated: false,
+  currentUser: null,
+  activeWorkspace: storedWorkspace,
+};
+
 export const userSlice = createSlice({
   name: 'user',
-  initialState: {
-    isAuthenticated: false,
-    currentUser: null,
-    activeWorkspace: storedWorkspace,
-  } as UserState,
+  initialState,
   reducers: {
     setActiveWorkspace: (state, action: PayloadAction<AnyWorkspace>) => {
       state.activeWorkspace = normalizeWorkspace(action.payload);
-      persistActiveWorkspace(state.activeWorkspace);
+      // Persistence is handled by listenerMiddleware in store.ts
     },
   },
   extraReducers: (builder) => {
@@ -167,7 +149,6 @@ export const userSlice = createSlice({
           state.activeWorkspace || storedWorkspace,
           action.payload
         );
-        persistActiveWorkspace(state.activeWorkspace);
       }
     });
 
@@ -179,12 +160,11 @@ export const userSlice = createSlice({
         state.activeWorkspace || storedWorkspace,
         action.payload
       );
-      persistActiveWorkspace(state.activeWorkspace);
     });
 
     builder.addCase(getUserWorkspaces.fulfilled, (state, action) => {
-      const nextUser = {
-        ...(state.currentUser || {}),
+      const nextUser: User = {
+        ...(state.currentUser as User),
         ...(action.payload || {}),
       } as User;
       state.currentUser = nextUser;
@@ -193,31 +173,24 @@ export const userSlice = createSlice({
         state.activeWorkspace || storedWorkspace,
         nextUser
       );
-      persistActiveWorkspace(state.activeWorkspace);
     });
 
     builder.addCase(removeUserInfo.fulfilled, (state) => {
       state.isAuthenticated = false;
       state.currentUser = null;
       state.activeWorkspace = null;
-      persistActiveWorkspace(null);
     });
 
     builder.addCase(updateAvatar.fulfilled, (state, action) => {
-      return {
-        ...state,
-        currentUser: {
-          ...(state.currentUser as User),
-          avatarUrl: action.payload?.avatarUrl || null,
-        },
-      };
+      if (state.currentUser) {
+        state.currentUser.avatarUrl = action.payload?.avatarUrl || null;
+      }
     });
 
     builder.addCase(deleteAvatar.fulfilled, (state, action) => {
-      state.currentUser = {
-        ...(state.currentUser as User),
-        avatarUrl: action.payload?.avatarUrl || null,
-      };
+      if (state.currentUser) {
+        state.currentUser.avatarUrl = action.payload?.avatarUrl || null;
+      }
     });
   },
 });

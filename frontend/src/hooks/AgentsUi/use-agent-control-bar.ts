@@ -1,11 +1,14 @@
 import { useCallback, useMemo } from 'react';
-import { Track } from 'livekit-client';
+import { Track, Room } from 'livekit-client';
 import {
   useTrackToggle,
   usePersistentUserChoices,
   useLocalParticipantPermissions,
   useLocalParticipant,
 } from '@livekit/components-react';
+
+/** Local type matching the expected toggle sources for useTrackToggle */
+type ToggleSource = Track.Source.Camera | Track.Source.Microphone | Track.Source.ScreenShare;
 
 export type DeviceErrorHandler = (error: { source: Track.Source; error: unknown }) => void;
 
@@ -64,7 +67,7 @@ export function useInputControls(
   }: {
     saveUserChoices?: boolean;
     onDeviceError?: DeviceErrorHandler;
-    room?: any;
+    room?: Room;
   } = {}
 ) {
   // 1. Core Hooks
@@ -87,15 +90,15 @@ export function useInputControls(
 
   // 3. Memoized Hook Options
   const microphoneToggleOptions = useMemo(
-    () => ({ source: Track.Source.Microphone as any, onDeviceError: handleMicError, room }),
+    () => ({ source: Track.Source.Microphone as ToggleSource, onDeviceError: handleMicError, room }),
     [handleMicError, room]
   );
   const cameraToggleOptions = useMemo(
-    () => ({ source: Track.Source.Camera as any, onDeviceError: handleCamError, room }),
+    () => ({ source: Track.Source.Camera as ToggleSource, onDeviceError: handleCamError, room }),
     [handleCamError, room]
   );
   const screenShareToggleOptions = useMemo(
-    () => ({ source: Track.Source.ScreenShare as any, onDeviceError: handleScreenError, room }),
+    () => ({ source: Track.Source.ScreenShare as ToggleSource, onDeviceError: handleScreenError, room }),
     [handleScreenError, room]
   );
   const persistentChoicesOptions = useMemo(
@@ -109,13 +112,19 @@ export function useInputControls(
   const screenShareToggle = useTrackToggle(screenShareToggleOptions);
   const persistentChoices = usePersistentUserChoices(persistentChoicesOptions);
 
-  // 5. Destruction of persistent setters
-  const {
-    saveAudioInputEnabled,
-    saveVideoInputEnabled,
-    saveAudioInputDeviceId,
-    saveVideoInputDeviceId,
-  } = (persistentChoices || {}) as any;
+  const persistentData = persistentChoices || {} as Record<string, unknown>;
+  const saveAudioInputEnabled = 'saveAudioInputEnabled' in persistentData
+    ? (persistentData as { saveAudioInputEnabled: (v: boolean) => void }).saveAudioInputEnabled
+    : undefined;
+  const saveVideoInputEnabled = 'saveVideoInputEnabled' in persistentData
+    ? (persistentData as { saveVideoInputEnabled: (v: boolean) => void }).saveVideoInputEnabled
+    : undefined;
+  const saveAudioInputDeviceId = 'saveAudioInputDeviceId' in persistentData
+    ? (persistentData as { saveAudioInputDeviceId: (v: string) => void }).saveAudioInputDeviceId
+    : undefined;
+  const saveVideoInputDeviceId = 'saveVideoInputDeviceId' in persistentData
+    ? (persistentData as { saveVideoInputDeviceId: (v: string) => void }).saveVideoInputDeviceId
+    : undefined;
 
   // 6. Callbacks
   const handleAudioDeviceChange = useCallback(

@@ -1,6 +1,15 @@
 import type { RoleName } from './auth';
 
-/* User & Auth */
+/* Job Post Status */
+export type JobPostStatus = 'draft' | 'active' | 'expired';
+
+/** Maps legacy numeric status to semantic status */
+export const JOB_POST_STATUS_MAP: Record<number, JobPostStatus> = {
+  1: 'draft',
+  2: 'active',
+  3: 'expired',
+} as const;
+
 
 export interface User {
   id: number;
@@ -59,7 +68,7 @@ export interface JobPost {
   salaryMax: number;
   isHot?: boolean;
   isUrgent?: boolean;
-  status: 1 | 2 | 3;
+  status: JobPostStatus | 1 | 2 | 3;
   views?: number;
   position?: number;
   experience?: number;
@@ -281,5 +290,4 @@ export interface SystemConfig {
   employeeSizeOptions?: SelectOption[];
   languageOptions?: SelectOption[];
   frequencyNotificationOptions?: SelectOption[];
-  [key: string]: unknown;
 }

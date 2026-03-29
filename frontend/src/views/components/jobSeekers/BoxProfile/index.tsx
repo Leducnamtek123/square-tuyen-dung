@@ -79,7 +79,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
   const nav = useRouter();
 
   const {
-    resume: { isReloadResume },
+    resume: { reloadCounter },
   } = useAppSelector((state) => state.profile);
 
   const { currentUser } = useAppSelector((state) => state.user);
@@ -118,7 +118,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
         resumeType: CV_TYPES.cvWebsite,
       });
     }
-  }, [currentUser, isReloadResume]);
+  }, [currentUser, reloadCounter]);
 
   const handleActive = (slug: string) => {
     const activeResume = async (resumeSlug: string) => {

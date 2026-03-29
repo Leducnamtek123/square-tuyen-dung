@@ -1,79 +1,136 @@
 import httpRequest from '../utils/httpRequest';
 import { cleanParams } from '../utils/params';
+import type { JobPost } from '../types/models';
+import type { PaginatedResponse } from '../types/api';
 
-type AnyRecord = Record<string, unknown>;
+type IdType = string | number;
+
+/* ── Request DTOs ─────────────────────────────────────────────────────── */
+
+export interface GetJobPostsParams {
+  kw?: string;
+  careerId?: string | number;
+  cityId?: string | number;
+  districtId?: string | number;
+  wardId?: string | number;
+  positionId?: string | number;
+  experienceId?: string | number;
+  typeOfWorkplaceId?: string | number;
+  jobTypeId?: string | number;
+  genderId?: string | number;
+  page?: number;
+  pageSize?: number;
+  ordering?: string;
+  isUrgent?: boolean;
+  isHot?: boolean;
+  status?: number | string;
+}
+
+export interface JobPostInput {
+  jobName: string;
+  deadline: string;
+  quantity: number;
+  salaryMin: number;
+  salaryMax: number;
+  isHot?: boolean;
+  isUrgent?: boolean;
+  status?: number;
+  careerId?: number;
+  position?: number;
+  experience?: number;
+  academicLevel?: number;
+  jobType?: number;
+  typeOfWorkplace?: number;
+  genderRequired?: string;
+  jobDescription?: string;
+  jobRequirement?: string;
+  benefitsEnjoyed?: string;
+  contactPersonName?: string;
+  contactPersonPhone?: string;
+  contactPersonEmail?: string;
+  cityId?: number;
+  districtId?: number;
+  address?: string;
+}
+
+/* ── Response Types ───────────────────────────────────────────────────── */
+
+export interface SuggestTitleResponse {
+  results: string[];
+}
+
+export interface JobPostOptionsResponse {
+  statusOptions?: { id: number; name: string }[];
+  [key: string]: unknown;
+}
+
+/* ── Service ──────────────────────────────────────────────────────────── */
 
 const jobService = {
-  searchJobSuggestTitle: (kw: string): Promise<any> => {
+  searchJobSuggestTitle: (kw: string): Promise<SuggestTitleResponse> => {
     const url = 'job/web/search/job-suggest-title/';
-    return httpRequest.get(url, { params: { q: kw } });
+    return httpRequest.get(url, { params: { q: kw } }) as Promise<SuggestTitleResponse>;
   },
 
-  getEmployerJobPost: (params: AnyRecord = {}): Promise<any> => {
+  getEmployerJobPost: (params: GetJobPostsParams = {}): Promise<PaginatedResponse<JobPost>> => {
     const url = 'job/web/private-job-posts/';
-    return httpRequest.get(url, { params: cleanParams(params) });
+    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<JobPost>>;
   },
 
-  exportEmployerJobPosts: (params: AnyRecord = {}): Promise<any> => {
+  exportEmployerJobPosts: (params: GetJobPostsParams = {}): Promise<Blob> => {
     const url = 'job/web/private-job-posts/export/';
-    return httpRequest.get(url, { params: cleanParams(params) });
+    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<Blob>;
   },
 
-  getEmployerJobPostDetailById: (slug: string | number): Promise<any> => {
+  getEmployerJobPostDetailById: (slug: IdType): Promise<JobPost> => {
     const url = `job/web/private-job-posts/${slug}/`;
-    return httpRequest.get(url);
+    return httpRequest.get(url) as Promise<JobPost>;
   },
 
-  addJobPost: (data: AnyRecord): Promise<any> => {
+  addJobPost: (data: JobPostInput): Promise<JobPost> => {
     const url = 'job/web/private-job-posts/';
-    return httpRequest.post(url, data);
+    return httpRequest.post(url, data) as Promise<JobPost>;
   },
 
-  updateJobPostById: (slug: string | number, data: AnyRecord): Promise<any> => {
+  updateJobPostById: (slug: IdType, data: Partial<JobPostInput>): Promise<JobPost> => {
     const url = `job/web/private-job-posts/${slug}/`;
-    return httpRequest.put(url, data);
+    return httpRequest.put(url, data) as Promise<JobPost>;
   },
 
-  deleteJobPostById: (slug: string | number): Promise<any> => {
+  deleteJobPostById: (slug: IdType): Promise<void> => {
     const url = `job/web/private-job-posts/${slug}/`;
-    return httpRequest.delete(url);
+    return httpRequest.delete(url) as Promise<void>;
   },
 
-  getJobPostOptions: (): Promise<any> => {
+  getJobPostOptions: (): Promise<JobPostOptionsResponse> => {
     const url = 'job/web/private-job-posts/job-posts-options/';
-    return httpRequest.get(url);
+    return httpRequest.get(url) as Promise<JobPostOptionsResponse>;
   },
 
-  getJobPosts: (params: AnyRecord = {}): Promise<any> => {
+  getJobPosts: (params: GetJobPostsParams = {}): Promise<PaginatedResponse<JobPost>> => {
     const url = 'job/web/job-posts/';
-    return httpRequest.get(url, {
-      params: cleanParams(params),
-    });
+    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<JobPost>>;
   },
 
-  getJobPostDetailById: (slug: string | number): Promise<any> => {
+  getJobPostDetailById: (slug: IdType): Promise<JobPost> => {
     const url = `job/web/job-posts/${slug}/`;
-    return httpRequest.get(url);
+    return httpRequest.get(url) as Promise<JobPost>;
   },
 
-  getSuggestedJobPosts: (params: AnyRecord = {}): Promise<any> => {
+  getSuggestedJobPosts: (params: GetJobPostsParams = {}): Promise<PaginatedResponse<JobPost>> => {
     const url = 'job/web/private-job-posts/suggested-job-posts/';
-    return httpRequest.get(url, {
-      params: cleanParams(params),
-    });
+    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<JobPost>>;
   },
 
-  getJobPostsSaved: (params: AnyRecord = {}): Promise<any> => {
+  getJobPostsSaved: (params: GetJobPostsParams = {}): Promise<PaginatedResponse<JobPost>> => {
     const url = `job/web/job-posts/job-posts-saved/`;
-    return httpRequest.get(url, { params: cleanParams(params) });
+    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<JobPost>>;
   },
 
-  saveJobPost: (slug: string | number): Promise<any> => {
+  saveJobPost: (slug: IdType): Promise<{ saved: boolean }> => {
     const url = `job/web/job-posts/${slug}/save/`;
-    return httpRequest.post(url);
+    return httpRequest.post(url) as Promise<{ saved: boolean }>;
   },
 };
 
 export default jobService;
-
-

@@ -59,7 +59,7 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
   const {
 
-    resume: { isReloadResume },
+    resume: { reloadCounter },
 
   } = useAppSelector((state) => state.profile);
 
@@ -112,7 +112,7 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
     });
 
-  }, [currentUser, isSuccess, isReloadResume]);
+  }, [currentUser, isSuccess, reloadCounter]);
 
   const handleAdd = (data: any) => {
 
