@@ -9,7 +9,7 @@ import {
   AgentControlBar,
 } from "@/components/Features/AgentsUi";
 import { 
-  useAgent, 
+  useVoiceAssistant, 
   useChat,
   useRoomContext,
 } from "@livekit/components-react";
@@ -31,17 +31,9 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
   const room = useRoomContext();
   console.log("InterviewAgentView: room context", !!room);
   
-  // Construct a SessionStub to pass to useAgent, bypassing the SessionContext requirement.
-  // SessionStub needs: connectionState, room, internal
-  const sessionStub = useMemo(() => ({
-    connectionState: room?.state ?? 'disconnected',
-    room,
-    internal: { agentDispatch: undefined },
-  }), [room, room?.state]);
-  const agent = useAgent(sessionStub as any) as any;
-  console.log("InterviewAgentView: agent hook successful, state:", agent?.state);
-  const state = agent?.state || 'connecting';
-  const agentParticipant = agent?.agentParticipant;
+  const { state, audioTrack: agentAudioTrack } = useVoiceAssistant();
+  const agentParticipant = agentAudioTrack?.participant;
+  console.log("InterviewAgentView: agent hook successful, state:", state);
   const { chatMessages } = useChat({ room });
   console.log("InterviewAgentView: chat hook successful, messages:", chatMessages?.length);
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -82,9 +74,6 @@ const InterviewAgentView = ({ onDisconnect, sessionInfo }: InterviewAgentViewPro
     console.error("Device error in InterviewAgentView:", error);
   }, []);
 
-  const agentAudioTrack = useMemo(() => {
-    return agentParticipant?.getTrackPublication("microphone")?.audioTrack;
-  }, [agentParticipant]);
 
   const visualizerVariant = (process.env.NEXT_PUBLIC_LIVEKIT_VISUALIZER || "aura")
     .toString()

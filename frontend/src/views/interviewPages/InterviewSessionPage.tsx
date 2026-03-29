@@ -23,25 +23,24 @@ const getSafeLiveKitUrl = () => {
   
   const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
   const host = window.location.host;
-  const defaultUrl = `${protocol}//${host}/livekit`;
   
-  const rawUrl = (process.env.NEXT_PUBLIC_LIVEKIT_URL || "").trim();
-
-  if (!rawUrl) return defaultUrl;
-
-  // Handle absolute URLs
-  if (rawUrl.startsWith('http') || rawUrl.startsWith('ws')) {
+  const envUrl = (process.env.NEXT_PUBLIC_LIVEKIT_URL || "").trim();
+  
+  // If envUrl is set and is absolute, use it (ensuring correct protocol)
+  if (envUrl && (envUrl.startsWith('http') || envUrl.startsWith('ws'))) {
     try {
-      const url = new URL(rawUrl);
+      const url = new URL(envUrl);
       url.protocol = protocol;
       return url.toString().replace(/\/$/, "");
     } catch {
-      return defaultUrl;
+      // Fallback below
     }
   }
+
+  // If envUrl is a relative path or empty, default to /livekit proxy
+  const path = envUrl && envUrl.startsWith('/') ? envUrl : (envUrl || "/livekit");
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
   
-  // Handle relative or protocol-less URLs
-  const cleanPath = rawUrl.startsWith('/') ? rawUrl : `/${rawUrl}`;
   return `${protocol}//${host}${cleanPath}`.replace(/\/$/, "");
 };
 
@@ -143,12 +142,17 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         setParticipantToken(tokenData.token);
         if (tokenData.serverUrl || tokenData.server_url) {
           const rawServerUrl = tokenData.serverUrl || tokenData.server_url;
-          try {
-            const url = new URL(rawServerUrl);
-            url.protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-            setServerUrl(url.toString().replace(/\/$/, ""));
-          } catch {
-            setServerUrl(rawServerUrl);
+          // Only trust the serverUrl from backend if it contains the current host or is absolute and not internal
+          const isInternal = rawServerUrl.includes('localhost') || rawServerUrl.includes('127.0.0.1') || rawServerUrl.includes('livekit:');
+          
+          if (!isInternal) {
+            try {
+              const url = new URL(rawServerUrl);
+              url.protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+              setServerUrl(url.toString().replace(/\/$/, ""));
+            } catch {
+              // Ignore invalid URLs from backend
+            }
           }
         }
       }
