@@ -21,7 +21,9 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 WORKDIR /app
 
 # Install vox-box using pip to avoid wheel metadata issues with uv
-RUN pip3 install --no-cache-dir "setuptools<82.0" wheel \
+# We must upgrade pip first to fix the resolvelib AssertionError bug in old pip versions
+RUN pip3 install --no-cache-dir --upgrade pip \
+    && pip3 install --no-cache-dir "setuptools<82.0" wheel \
     && pip3 install --no-cache-dir vox-box
 
 ENV DATA_DIR=/data
