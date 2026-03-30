@@ -5,15 +5,18 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
 import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/TextFieldAutoCompleteCustom';
+import type { Control } from 'react-hook-form';
+import type { TFunction } from 'i18next';
+import type { EmployerSignUpFormData } from './index';
 
 interface CompanyInfoStepProps {
-  control: any;
-  t: any;
+  control: Control<EmployerSignUpFormData>;
+  t: TFunction<string | string[], undefined>;
   show: boolean;
-  allConfig: any;
-  districtOptions: any[];
-  locationOptions: any[];
-  handleSelectLocation: (e: any, value: any) => void;
+  allConfig: { employeeSizeOptions?: Record<string, unknown>[]; cityOptions?: Record<string, unknown>[] } | null;
+  districtOptions: Record<string, unknown>[];
+  locationOptions: Record<string, unknown>[];
+  handleSelectLocation: (e: React.SyntheticEvent, value: Record<string, unknown> | null) => void;
 }
 
 const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({

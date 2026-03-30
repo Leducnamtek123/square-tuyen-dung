@@ -1,5 +1,7 @@
 import React from "react";
 import { useRouter } from 'next/navigation';
+import { AxiosError } from 'axios';
+import { ApiError } from '@/types/api';
 import { Box, Button, Divider, Stack, Typography, SxProps, Theme } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from "@mui/material";
@@ -10,7 +12,7 @@ import errorHandling from "../../../../utils/errorHandling";
 import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
 import FormPopup from "../../../../components/Common/Controls/FormPopup";
 import AccountForm from "../AccountForm";
-import UpdatePasswordForm from "../UpdatePasswordForm";
+import UpdatePasswordForm, { UpdatePasswordFormData } from "../UpdatePasswordForm";
 import { updateUserInfo, removeUserInfo } from "../../../../redux/userSlice";
 import authService from "../../../../services/authService";
 import tokenService from "../../../../services/tokenService";
@@ -46,16 +48,16 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
       .then(() =>
         toastMessages.success(t('account.updateSuccess'))
       )
-      .catch((error: any) => {
-        errorHandling(error, setServerErrors as any);
+      .catch((error: unknown) => {
+        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as unknown as (errors: Record<string, unknown>) => void);
       });
   };
 
-  const handleUpdatePassword = (data: any) => {
-    const update = async (data: any) => {
+  const handleUpdatePassword = (data: UpdatePasswordFormData) => {
+    const update = async (data: UpdatePasswordFormData) => {
       setIsFullScreenLoading(true);
       try {
-        await authService.changePassword(data);
+        await authService.changePassword(data as unknown as Record<string, unknown>);
         setOpenPopup(false);
         toastMessages.success(t('account.passwordChangeSuccess'));
         let path = ROUTES.AUTH.LOGIN;
@@ -66,11 +68,11 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
           .then(() => {
             nav.push(path);
           })
-          .catch((err: any) => {
+          .catch((err: unknown) => {
             toastMessages.error(t('messages.genericError'));
           });
-      } catch (error: any) {
-        errorHandling(error, setServerErrors as any);
+      } catch (error: unknown) {
+        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as unknown as (errors: Record<string, unknown>) => void);
       } finally {
         setIsFullScreenLoading(false);
       }
@@ -90,7 +92,7 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
 
           borderRadius: 3,
 
-          boxShadow: (theme: any) => theme.customShadows?.card,
+          boxShadow: (theme: Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.card,
 
           p: 3,
 
@@ -209,15 +211,15 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
 
                       fontSize: "0.9rem",
 
-                      background: (theme: any) => (theme.palette.primary as any).main,
+                      background: (theme: Theme) => theme.palette.primary.main,
 
                       "&:hover": {
 
-                        background: (theme: any) => (theme.palette.primary as any).main,
+                        background: (theme: Theme) => theme.palette.primary.main,
 
                         opacity: 0.9,
 
-                        boxShadow: (theme: any) => theme.customShadows?.medium,
+                        boxShadow: (theme: Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.medium,
 
                       },
 

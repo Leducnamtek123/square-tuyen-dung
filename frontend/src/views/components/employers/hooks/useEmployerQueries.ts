@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import statisticService from '../../../../services/statisticService';
 import resumeSavedService from '../../../../services/resumeSavedService';
 import resumeService from '../../../../services/resumeService';
@@ -8,6 +9,7 @@ import errorHandling from '../../../../utils/errorHandling';
 import toastMessages from '../../../../utils/toastMessages';
 
 type AnyRecord = Record<string, unknown>;
+import { PaginatedResponse } from '@/types/api';
 
 // ─── Employer Statistics ─────────────────────────────────────
 export const useEmployerGeneralStatistics = () => {
@@ -65,11 +67,8 @@ export const useSavedResumes = (params: AnyRecord) => {
   return useQuery({
     queryKey: ['savedResumes', params],
     queryFn: async () => {
-      const response = await resumeSavedService.getResumesSaved(params) as any;
-      const data = response;
-      const results = Array.isArray(data?.results)
-        ? data.results
-        : Array.isArray(data) ? data : [];
+      const data = await resumeSavedService.getResumesSaved(params) as unknown as PaginatedResponse<Record<string, unknown>>;
+      const results = data.results || [];
       return {
         results,
         count: typeof data?.count === 'number' ? data.count : results.length,
@@ -95,11 +94,8 @@ export const useAppliedResumes = (params: AnyRecord) => {
   return useQuery({
     queryKey: ['appliedResumes', params],
     queryFn: async () => {
-      const response = await jobPostActivityService.getAppliedResume(params) as any;
-      const data = response;
-      const results = Array.isArray(data?.results)
-        ? data.results
-        : Array.isArray(data) ? data : [];
+      const data = await jobPostActivityService.getAppliedResume(params) as unknown as PaginatedResponse<Record<string, unknown>>;
+      const results = data.results || [];
       return {
         results,
         count: typeof data?.count === 'number' ? data.count : results.length,
@@ -109,12 +105,18 @@ export const useAppliedResumes = (params: AnyRecord) => {
   });
 };
 
+export interface JobPostOption {
+  id: string | number;
+  jobName: string;
+  [key: string]: unknown;
+}
+
 export const useJobPostOptions = () => {
   return useQuery({
     queryKey: ['jobPostOptions'],
-    queryFn: async () => {
-      const response = await (jobService as any).getJobPostOptions() as any;
-      return Array.isArray(response) ? response : [];
+    queryFn: async (): Promise<JobPostOption[]> => {
+      const response = await (jobService as unknown as Record<string, () => Promise<unknown>>).getJobPostOptions();
+      return (response as JobPostOption[]) || [];
     },
     staleTime: 5 * 60_000, // options rarely change
   });
@@ -127,7 +129,7 @@ export const useDeleteJobPostActivity = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
     },
-    onError: (error: any) => errorHandling(error),
+    onError: (error: Error | unknown) => errorHandling(error as AxiosError<Record<string, unknown>>),
   });
 };
 

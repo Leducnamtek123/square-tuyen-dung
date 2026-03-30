@@ -11,7 +11,7 @@ import errorHandling from '../../../utils/errorHandling';
 import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
 import { updateVerifyEmail } from '../../../redux/authSlice';
 import authService from '../../../services/authService';
-import EmployerSignUpForm from '../../components/auths/EmployerSignUpForm';
+import EmployerSignUpForm, { EmployerSignUpFormData } from '../../components/auths/EmployerSignUpForm';
 import { useAppDispatch } from '../../../hooks/useAppStore';
 import type { RoleName } from '../../../types/auth';
 import type { AxiosError } from 'axios';
@@ -78,11 +78,11 @@ const EmployerSignUp = () => {
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const [serverErrors, setServerErrors] = React.useState({});
+  const [serverErrors, setServerErrors] = React.useState<Record<string, string[]>>({});
 
-  const handleRegister = (data: any) => {
+  const handleRegister = (data: EmployerSignUpFormData) => {
 
-    const register = async (data: any, roleName: RoleName) => {
+    const register = async (data: Record<string, unknown>, roleName: RoleName) => {
 
       setIsFullScreenLoading(true);
 
@@ -96,7 +96,7 @@ const EmployerSignUp = () => {
 
             isAllowVerifyEmail: true,
 
-            email: data?.email,
+            email: (data?.email as string) || '',
 
             roleName: roleName,
 
@@ -108,18 +108,18 @@ const EmployerSignUp = () => {
 
       } catch (error) {
 
-        const axiosError = error as AxiosError<any>;
+        const axiosError = error as AxiosError<{ errors?: Record<string, string[]> }>;
         const res = axiosError?.response;
         const errors = res?.data?.errors;
         const hasEmailExists = !!errors?.email;
         if (res?.status === 400 && hasEmailExists) {
           try {
-            const resData = await authService.checkCreds(data?.email, ROLES_NAME.EMPLOYER as RoleName) as any;
+            const resData = await authService.checkCreds((data?.email as string) || '', ROLES_NAME.EMPLOYER as RoleName) as { exists?: boolean; emailVerified?: boolean; };
             if (resData?.exists === true && resData?.emailVerified === false) {
               dispatch(
                 updateVerifyEmail({
                   isAllowVerifyEmail: true,
-                  email: data?.email,
+                  email: (data?.email as string) || '',
                   roleName: ROLES_NAME.EMPLOYER as RoleName,
                 })
               );
@@ -131,7 +131,7 @@ const EmployerSignUp = () => {
           }
         }
 
-        errorHandling(error as AxiosError<any>, setServerErrors as React.Dispatch<React.SetStateAction<any>>);
+        errorHandling(error as AxiosError<{ errors?: Record<string, string[]> }>, (errs) => setServerErrors(errs as Record<string, string[]>));
 
       } finally {
 

@@ -37,6 +37,7 @@ const colors = {
     main: '#dc2626',
     light: '#ef4444',
     dark: '#b91c1c',
+    background: 'rgba(220, 38, 38, 0.06)',
   },
   warning: {
     main: '#f59e0b',
@@ -65,6 +66,8 @@ const colors = {
     primary: '#0f397f',
     secondary: '#3f6fc6',
     disabled: '#a4cafe',
+    placeholder: '#a4cafe',
+    italic: { fontStyle: 'italic' },
   },
   background: {
     default: '#f0f7ff',

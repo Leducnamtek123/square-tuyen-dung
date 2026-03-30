@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, PaginationState, SortingState } from '@tanstack/react-table';
 
 import AIAnalysisDrawer from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
@@ -20,16 +20,30 @@ import AppliedStatusComponent from './AppliedStatusComponent';
 import AIAnalysisComponent from './AIAnalysisComponent';
 import { useConfig } from '@/hooks/useConfig';
 
+export type AppliedResumeRow = {
+  id: string | number;
+  fullName: string;
+  type: string | number;
+  title?: string;
+  jobName?: string;
+  createAt?: string;
+  status?: string | number;
+  resumeSlug?: string;
+  isSentEmail?: boolean;
+  email?: string;
+  [key: string]: unknown;
+};
+
 interface AppliedResumeTableProps {
-  rows: any[];
+  rows: AppliedResumeRow[];
   isLoading: boolean;
-  handleChangeApplicationStatus: (id: string, value: any, callback: (result: boolean) => void) => void;
-  handleDelete: (id: string) => void;
+  handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;
+  handleDelete: (id: string | number) => void;
   rowCount: number;
-  pagination: any;
-  onPaginationChange: (pagination: any) => void;
-  sorting: any;
-  onSortingChange: (sorting: any) => void;
+  pagination: PaginationState;
+  onPaginationChange: import('@tanstack/react-table').OnChangeFn<PaginationState>;
+  sorting: SortingState;
+  onSortingChange: import('@tanstack/react-table').OnChangeFn<SortingState>;
 }
 
 const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
@@ -46,16 +60,15 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     sorting,
     onSortingChange
   } = props;
-  const rowsSafe = Array.isArray(rows) ? rows : [];
   const { allConfig } = useConfig();
   const [openDrawerId, setOpenDrawerId] = React.useState<string | number | null>(null);
 
   const selectedActivityInfo = React.useMemo(() => {
     if (!openDrawerId) return null;
-    return rowsSafe.find(r => r.id === openDrawerId);
-  }, [openDrawerId, rowsSafe]);
+    return rows.find(r => r.id === openDrawerId);
+  }, [openDrawerId, rows]);
 
-  const columns = React.useMemo<ColumnDef<any>[]>(() => [
+  const columns = React.useMemo<ColumnDef<AppliedResumeRow>[]>(() => [
     {
       accessorKey: 'fullName',
       header: t('appliedResume.table.profileName') as string,
@@ -112,9 +125,9 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       meta: { align: 'right' },
       cell: (info) => (
         <AppliedStatusComponent
-          options={(allConfig?.applicationStatusOptions as any[]) || []}
+          options={allConfig?.applicationStatusOptions || []}
           defaultStatus={Number(info.getValue())}
-          id={info.row.original.id}
+          id={String(info.row.original.id)}
           handleChangeApplicationStatus={handleChangeApplicationStatus}
         />
       ),
@@ -129,7 +142,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             <IconButton
               color="primary"
               size="small"
-              onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug)}`)}
+              onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || '')}`)}
             >
               <RemoveRedEyeOutlinedIcon fontSize="small" />
             </IconButton>
@@ -144,9 +157,9 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             </IconButton>
           </Tooltip>
           <SendEmailComponent
-            jobPostActivityId={info.row.original.id}
-            isSentEmail={info.row.original.isSentEmail}
-            email={info.row.original.email}
+            jobPostActivityId={String(info.row.original.id)}
+            isSentEmail={info.row.original.isSentEmail || false}
+            email={info.row.original.email || ''}
             fullName={info.row.original.fullName}
           />
         </Stack>
@@ -164,7 +177,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       />
       <DataTable
         columns={columns}
-        data={rowsSafe}
+        data={rows}
         isLoading={isLoading}
         rowCount={rowCount}
         pagination={pagination}

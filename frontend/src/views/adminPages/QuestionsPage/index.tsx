@@ -7,6 +7,14 @@ import AddIcon from '@mui/icons-material/Add';
 import { useQuestions, useCreateQuestion, useUpdateQuestion, useDeleteQuestion } from './hooks/useQuestions';
 import { useCareers } from '../CareersPage/hooks/useCareers';
 import QuestionTable from './components/QuestionTable';
+import { Question, Career } from '../../../types/models';
+import { PaginatedResponse } from '../../../types/api';
+import { Theme } from '@mui/material/styles';
+
+type QuestionExt = Question & {
+    difficulty?: number;
+    career?: string | number;
+};
 
 const QuestionsPage = () => {
     const { t } = useTranslation('admin');
@@ -23,7 +31,7 @@ const QuestionsPage = () => {
     } = useDataTable();
     
     const [openDialog, setOpenDialog] = useState(false);
-    const [editingQuestion, setEditingQuestion] = useState<any>(null);
+    const [editingQuestion, setEditingQuestion] = useState<QuestionExt | null>(null);
     const [formData, setFormData] = useState({
         questionText: '',
         difficulty: 1,
@@ -34,14 +42,14 @@ const QuestionsPage = () => {
         page: page + 1,
         pageSize: pageSize,
         ordering,
-    }) as any;
+    });
 
-    const { data: careersData } = useCareers({ pageSize: 100 }) as any;
-    const careers = (careersData?.results || []) as any[];
+    const { data: careersData } = useCareers({ pageSize: 100 });
+    const careers = (careersData as unknown as PaginatedResponse<Career>)?.results || [];
 
-    const createMutation = useCreateQuestion() as any;
-    const updateMutation = useUpdateQuestion() as any;
-    const deleteMutation = useDeleteQuestion() as any;
+    const createMutation = useCreateQuestion();
+    const updateMutation = useUpdateQuestion();
+    const deleteMutation = useDeleteQuestion();
 
     const handleOpenAdd = () => {
         setEditingQuestion(null);
@@ -49,12 +57,12 @@ const QuestionsPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (question: any) => {
+    const handleOpenEdit = (question: QuestionExt) => {
         setEditingQuestion(question);
         setFormData({
-            questionText: question.questionText,
-            difficulty: question.difficulty,
-            career: question.career || '',
+            questionText: String(question.questionText || ''),
+            difficulty: Number(question.difficulty || 1),
+            career: String(question.career || ''),
         });
         setOpenDialog(true);
     };
@@ -87,7 +95,7 @@ const QuestionsPage = () => {
                 </Button>
             </Box>
 
-            <Card sx={{ borderRadius: '12px', boxShadow: (theme) => (theme as any).customShadows.card }} elevation={0}>
+            <Card sx={{ borderRadius: '12px', boxShadow: (theme: Theme) => (theme as unknown as Record<string, Record<string, number>>).customShadows?.card || 1 }} elevation={0}>
                 <CardHeader title={t('pages.questions.listTitle')} sx={{ pb: 0 }} />
                 <CardContent>
                     {Object.keys(rowSelection).length > 0 && (
@@ -149,7 +157,7 @@ const QuestionsPage = () => {
                             select
                             label={t('pages.questions.difficultyLabel')}
                             value={formData.difficulty}
-                            onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as any })}
+                            onChange={(e) => setFormData({ ...formData, difficulty: Number(e.target.value) })}
                         >
                             <MenuItem value={1}>{t('pages.questions.difficulty.easy')}</MenuItem>
                             <MenuItem value={2}>{t('pages.questions.difficulty.medium')}</MenuItem>

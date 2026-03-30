@@ -22,9 +22,9 @@ interface ResumeItem {
   updateAt: string;
   isSaved: boolean;
   viewEmployerNumber: number;
-  userDict: object;
+  userDict: Record<string, unknown> & { fullName?: string };
   city: number;
-  jobSeekerProfileDict: object;
+  jobSeekerProfileDict: Record<string, unknown> & { old?: string | number };
   type: number;
   lastViewedDate: string | null;
 }
@@ -211,7 +211,7 @@ const ProfileCard = () => {
 
                               salaryMax={value.salaryMax ?? undefined}
 
-                              experience={value.experience ?? undefined}
+                              experience={value.experience ?? 0}
 
                               updateAt={value.updateAt}
 

@@ -12,13 +12,10 @@ import toastMessages from '@/utils/toastMessages';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import RatingCustom from '@/components/Common/Controls/RatingCustom';
 import MultilineTextFieldCustom from '@/components/Common/Controls/MultilineTextFieldCustom';
-const DefaultMultilineTextFieldCustom = MultilineTextFieldCustom as any;
 import contentService from '@/services/contentService';
 import { FEEDBACK_IMAGES } from '@/configs/constants';
 
-interface FeedbackProps {
-  [key: string]: any;
-}
+interface FeedbackProps {}
 
 const Feedback = (_props: FeedbackProps) => {
   const { t } = useTranslation('common');
@@ -53,15 +50,21 @@ const Feedback = (_props: FeedbackProps) => {
     setOpen(false);
   };
 
-  const handleSendFeedback = (data: any) => {
-    const sendFeedback = async (data: any) => {
+  interface FeedbackData {
+    rating: number;
+    content: string;
+  }
+
+  const handleSendFeedback = (data: FeedbackData) => {
+    const sendFeedback = async (payload: FeedbackData) => {
       setIsFullScreenLoading(true);
       try {
-        await contentService.createFeedback(data);
+        await contentService.createFeedback(payload as unknown as Record<string, unknown>);
         handleClose();
         toastMessages.success(t('feedback.success'));
-      } catch (error: any) {
-        errorHandling(error);
+      } catch (error) {
+        // We use any here because errorHandling implicitly expects AxiosError but catching produces unknown.
+        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
       } finally {
         setIsFullScreenLoading(false);
       }
@@ -83,17 +86,17 @@ const Feedback = (_props: FeedbackProps) => {
           textTransform: 'none',
           color: 'white',
           zIndex: 1250,
-          boxShadow: (theme: any) => theme.customShadows.feedback,
+          boxShadow: (theme) => theme.customShadows.feedback,
           backdropFilter: 'blur(8px)',
-          backgroundColor: (theme: any) => theme.palette.feedback.button.background,
+          backgroundColor: (theme) => theme.palette.feedback.button.background,
           borderRadius: '20px 20px 20px 4px',
           fontSize: '0.95rem',
           fontWeight: 600,
           letterSpacing: '0.2px',
           '&:hover': {
-            backgroundColor: (theme: any) => theme.palette.feedback.button.hover,
+            backgroundColor: (theme) => theme.palette.feedback.button.hover,
             transform: 'translateY(-2px)',
-            boxShadow: (theme: any) => `0 12px 24px ${theme.palette.feedback.button.shadow}`,
+            boxShadow: (theme) => `0 12px 24px ${theme.palette.feedback.button.shadow}`,
           },
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           animation: 'feedbackIn 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -147,8 +150,8 @@ const Feedback = (_props: FeedbackProps) => {
           paper: {
             sx: {
               borderRadius: '24px',
-              boxShadow: (theme: any) => theme.customShadows.large,
-              border: (theme: any) => `1px solid ${theme.palette.feedback.dialog.border}`,
+              boxShadow: (theme) => theme.customShadows.large,
+              border: (theme) => `1px solid ${theme.palette.feedback.dialog.border}`,
             }
           }
         }}
@@ -165,7 +168,7 @@ const Feedback = (_props: FeedbackProps) => {
               component="div"
               sx={{
                 fontWeight: 700,
-                background: (theme: any) => theme.palette.secondary.main,
+                background: (theme) => theme.palette.secondary.main,
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
@@ -232,15 +235,15 @@ const Feedback = (_props: FeedbackProps) => {
                       transform: 'scale(1.2)',
                     }
                   }}
-                  onChangeActive={(_event: any, newHover: number | null) => {
-                    setHover(newHover as number);
+                  onChangeActive={(_event: React.SyntheticEvent, newHover: number | null) => {
+                    setHover(newHover !== null ? newHover : -1);
                   }}
                 />
               </Box>
             </Grid>
 
             <Grid size={12}>
-              <DefaultMultilineTextFieldCustom
+              <MultilineTextFieldCustom
                 name="content"
                 placeholder={t('feedback.placeholder')}
                 control={control}
@@ -249,14 +252,14 @@ const Feedback = (_props: FeedbackProps) => {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: '16px',
-                    backgroundColor: (theme: any) => theme.palette.grey[50],
+                    backgroundColor: (theme) => theme.palette.grey[50],
                     transition: 'all 0.2s ease-in-out',
                     '&:hover, &.Mui-focused': {
                       backgroundColor: '#fff',
-                      boxShadow: (theme: any) => theme.customShadows.small,
+                      boxShadow: (theme) => theme.customShadows.small,
                     }
                   }
-                } as any}
+                }}
               />
             </Grid>
           </Grid>
@@ -270,12 +273,12 @@ const Feedback = (_props: FeedbackProps) => {
             sx={{
               py: 1.5,
               borderRadius: '12px',
-              background: (theme: any) => (theme.palette as any).feedback.button.background,
-              boxShadow: (theme: any) => theme.customShadows.feedback,
+              background: (theme) => theme.palette.feedback.button.background,
+              boxShadow: (theme) => theme.customShadows.feedback,
               '&:hover': {
-                background: (theme: any) => (theme.palette as any).feedback.button.background,
+                background: (theme) => theme.palette.feedback.button.background,
                 transform: 'translateY(-1px)',
-                boxShadow: (theme: any) => `0 8px 24px ${(theme.palette as any).feedback.button.shadow}`,
+                boxShadow: (theme) => `0 8px 24px ${theme.palette.feedback.button.shadow}`,
               }
             }}
           >

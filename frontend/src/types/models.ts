@@ -233,6 +233,26 @@ export interface Location {
 
 /* Interview */
 
+export interface Question {
+  id: number;
+  text: string;
+  category?: string;
+  questionType?: string;
+  // Fallbacks for raw API response or transformer mapped fields
+  content?: string;
+  questionText?: string;
+  type?: string;
+}
+
+export interface QuestionGroup {
+  id: number;
+  name: string;
+  description?: string;
+  questions?: Question[];
+  questionIds?: number[];
+  question_ids?: number[]; // Raw API payload field
+}
+
 export interface InterviewSession {
   id: number;
   roomName: string;
@@ -292,7 +312,7 @@ export interface Banner {
   bannerType: number;
 }
 
-interface SelectOption {
+export interface SelectOption {
   id: number | string;
   name: string;
 }

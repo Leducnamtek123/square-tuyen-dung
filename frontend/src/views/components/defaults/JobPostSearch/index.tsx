@@ -9,13 +9,17 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { useTranslation } from 'react-i18next';
 import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
 import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
+import formatAmount from '../../../../utils/funcUtils';
+import { PaginatedResponse } from '@/types/api';
 import commonService from '../../../../services/commonService';
 import {
   resetSearchJobPostFilter,
   searchJobPost,
+  JobPostFilter,
 } from '../../../../redux/filterSlice';
 import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppStore';
 import { useConfig } from '@/hooks/useConfig';
+import { SelectOption } from '../../../../types/models';
 
 const JobPostSearch = () => {
   const { t } = useTranslation(['public', 'common']);
@@ -23,10 +27,10 @@ const JobPostSearch = () => {
   const { allConfig } = useConfig();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [showAdvanceFilter, setShowAdvanceFilter] = React.useState(false);
-  const [districtOptions, setDistrictOptions] = React.useState<any[]>([]);
-  const [wardOptions, setWardOptions] = React.useState<any[]>([]);
-  const prevCityIdRef = React.useRef<any>(null);
-  const prevDistrictIdRef = React.useRef<any>(null);
+  const [districtOptions, setDistrictOptions] = React.useState<SelectOption[]>([]);
+  const [wardOptions, setWardOptions] = React.useState<SelectOption[]>([]);
+  const prevCityIdRef = React.useRef<string | number | null>(null);
+  const prevDistrictIdRef = React.useRef<string | number | null>(null);
   const { control, handleSubmit, reset, setValue } = useForm({
     defaultValues: {
       kw: '',
@@ -43,7 +47,7 @@ const JobPostSearch = () => {
   });
 
   const localizeOptions = React.useCallback(
-    (options: any[], prefix: string) => {
+    (options: SelectOption[], prefix: string) => {
       return (options || []).map((option) => ({
         ...option,
         name:
@@ -100,8 +104,8 @@ const JobPostSearch = () => {
   React.useEffect(() => {
     const loadDistricts = async () => {
       try {
-        const resData = (await commonService.getDistrictsByCityId(cityId)) as any;
-        setDistrictOptions(Array.isArray(resData) ? resData : (resData?.results || resData?.data || []));
+        const resData = await commonService.getDistrictsByCityId(cityId) as unknown as PaginatedResponse<Record<string, unknown>>;
+        setDistrictOptions((resData?.results as unknown as SelectOption[]) || []);
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
           setValue('districtId', '');
           setValue('wardId', '');
@@ -126,8 +130,8 @@ const JobPostSearch = () => {
   React.useEffect(() => {
     const loadWards = async () => {
       try {
-        const resData = (await commonService.getWardsByDistrictId(districtId)) as any;
-        setWardOptions(Array.isArray(resData) ? resData : (resData?.results || resData?.data || []));
+        const resData = await commonService.getWardsByDistrictId(districtId) as unknown as PaginatedResponse<Record<string, unknown>>;
+        setWardOptions((resData?.results as unknown as SelectOption[]) || []);
       } catch (error) {
         setWardOptions([]);
       }
@@ -183,11 +187,11 @@ const JobPostSearch = () => {
     }
   };
 
-  const handleFilter = (data: any) => {
+  const handleFilter = (data: Partial<JobPostFilter> & Record<string, unknown>) => {
 
     handleSaveKeywordLocalStorage(data?.kw);
 
-    dispatch(searchJobPost(data));
+      dispatch(searchJobPost(data as JobPostFilter));
 
   };
 

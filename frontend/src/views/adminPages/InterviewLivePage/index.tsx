@@ -2,15 +2,26 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Typography, Chip, Stack, Divider, LinearProgress } from "@mui/material";
 
+import { ColumnDef } from '@tanstack/react-table';
+import { Theme } from '@mui/material/styles';
+import { PaginatedResponse } from '@/types/api';
+
 import interviewService from '../../../services/interviewService';
 import { transformInterviewSession } from '../../../utils/transformers';
 import DataTable from '../../../components/Common/DataTable';
 import AIToolsCard from '../../../components/Features/AIToolsCard';
 import AIServiceHealthBanner from '../../../components/Features/AIServiceHealthBanner';
+import { InterviewSession } from '../../../types/models';
+
+type InterviewSessionExt = InterviewSession & {
+  companyDict?: { companyName?: string };
+  jobPostDict?: { companyName?: string };
+  room?: string;
+};
 
 const ACTIVE_STATUSES = ['in_progress', 'calibration', 'processing', 'connecting', 'active'];
 
-const getStatusColor = (status: string): any => {
+const getStatusColor = (status: string): "success" | "primary" | "info" | "error" | "default" => {
   switch (status) {
     case 'completed':
       return 'success';
@@ -31,7 +42,7 @@ const getStatusColor = (status: string): any => {
 
 const InterviewLivePage = () => {
   const { t } = useTranslation('admin');
-  const [sessions, setSessions] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<InterviewSessionExt[]>([]);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -43,11 +54,11 @@ const InterviewLivePage = () => {
       const res = await interviewService.getSessions({
         page: page + 1,
         pageSize: rowsPerPage,
-      }) as any;
+      }) as unknown as PaginatedResponse<Record<string, unknown>>;
       const data = res;
       const rawSessions = data.results || data || [];
       const mapped = rawSessions.map(transformInterviewSession);
-      setSessions(mapped);
+      setSessions(mapped.filter(Boolean) as InterviewSessionExt[]);
       setCount(data.count || rawSessions.length);
     } catch (error) {
       console.error('Error fetching realtime sessions', error);
@@ -61,13 +72,13 @@ const InterviewLivePage = () => {
   }, [fetchSessions]);
 
   useEffect(() => {
-    const hasActiveSession = sessions.some((session) => ACTIVE_STATUSES.includes(session.status));
+    const hasActiveSession = sessions.some((session) => ACTIVE_STATUSES.includes(String(session.status)));
     if (!hasActiveSession) return undefined;
     const interval = setInterval(fetchSessions, 5000);
     return () => clearInterval(interval);
   }, [sessions, fetchSessions]);
 
-  const handleChangePage = (event: any, newPage: number) => {
+  const handleChangePage = (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => {
     setPage(newPage);
   };
 
@@ -83,61 +94,70 @@ const InterviewLivePage = () => {
     return { active, scheduled, completed };
   }, [sessions]);
 
-  const columns = useMemo(
+  const columns = useMemo<ColumnDef<InterviewSessionExt>[]>(
     () => [
       {
         header: t('pages.interviewLive.table.company'),
         accessorKey: 'companyName',
-        cell: ({ row }: any) => (
-          <Typography variant="body2">
-            {row.original.companyName ||
-              row.original.companyDict?.companyName ||
-              row.original.jobPostDict?.companyName ||
-              t('common.na')}
-          </Typography>
-        ),
+        cell: ({ row }) => {
+          const original = row.original;
+          return (
+            <Typography variant="body2">
+              {original.companyName ||
+                original.companyDict?.companyName ||
+                original.jobPostDict?.companyName ||
+                t('common.na')}
+            </Typography>
+          );
+        },
       },
       {
         header: t('pages.interviewLive.table.candidate'),
         accessorKey: 'candidateName',
-        cell: ({ row }: any) => (
-          <Box>
-            <Typography variant="body2" sx={{ fontWeight: 500 }}>
-              {row.original.candidateName || t('common.na')}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {row.original.candidateEmail || t('common.na')}
-            </Typography>
-          </Box>
-        ),
+        cell: ({ row }) => {
+          const original = row.original;
+          return (
+            <Box>
+              <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                {original.candidateName || t('common.na')}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {original.candidateEmail || t('common.na')}
+              </Typography>
+            </Box>
+          );
+        },
       },
       {
         header: t('pages.interviewLive.table.position'),
         accessorKey: 'jobName',
-        cell: ({ getValue }: any) => <Typography variant="body2">{getValue() || t('common.na')}</Typography>,
+        cell: ({ getValue }) => <Typography variant="body2">{String(getValue() || '') || t('common.na')}</Typography>,
       },
       {
         header: t('pages.interviewLive.table.room'),
         accessorKey: 'roomName',
-        cell: ({ row }: any) => (
-          <Typography variant="body2">
-            {row.original.roomName || row.original.room || t('common.na')}
-          </Typography>
-        ),
+        cell: ({ row }) => {
+          const original = row.original;
+          return (
+            <Typography variant="body2">
+              {original.roomName || original.room || t('common.na')}
+            </Typography>
+          );
+        },
       },
       {
         header: t('pages.interviewLive.table.time'),
         accessorKey: 'scheduledAt',
-        cell: ({ getValue }: any) => (
+        cell: ({ getValue }) => (
           <Typography variant="body2">
-            {getValue() ? new Date(getValue()).toLocaleString() : t('common.na')}
+            {getValue() ? new Date(getValue() as string).toLocaleString() : t('common.na')}
           </Typography>
         ),
       },
       {
         header: t('pages.interviewLive.table.status'),
         accessorKey: 'status',
-        cell: ({ getValue }: any) => {
+        cell: ({ getValue }) => {
           const rawStatus = getValue();
           const status = String(rawStatus ?? '').toLowerCase();
           let label = rawStatus;
@@ -148,7 +168,7 @@ const InterviewLivePage = () => {
           
           return (
             <Chip
-              label={label}
+              label={label as React.ReactNode}
               color={getStatusColor(status)}
               size="small"
               sx={{ fontWeight: 'bold' }}
@@ -209,7 +229,7 @@ const InterviewLivePage = () => {
         sx={{
           backgroundColor: 'background.paper',
           borderRadius: 2,
-          boxShadow: (theme: any) => theme.customShadows?.card || 1,
+          boxShadow: (theme: Theme) => (theme as unknown as Record<string, Record<string, number>>).customShadows?.card || 1,
           overflow: 'hidden',
           width: '100%',
           '& .MuiTableContainer-root': {

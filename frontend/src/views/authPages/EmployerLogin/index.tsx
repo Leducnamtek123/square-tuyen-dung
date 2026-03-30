@@ -11,7 +11,7 @@ import toastMessages from '../../../utils/toastMessages';
 import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
 import { updateVerifyEmail } from '../../../redux/authSlice';
 import { getUserInfo } from '../../../redux/userSlice';
-import EmployerLoginForm from '../../components/auths/EmployerLoginForm';
+import EmployerLoginForm, { EmployerLoginFormData } from '../../components/auths/EmployerLoginForm';
 import authService from '../../../services/authService';
 import tokenService from '../../../services/tokenService';
 import { useAppDispatch } from '../../../hooks/useAppStore';
@@ -70,13 +70,13 @@ const EmployerLogin = () => {
     setErrorMessage(errorMsg);
   }, [searchParams]);
 
-  const handleLogin = (data: any) => {
+  const handleLogin = (data: EmployerLoginFormData) => {
     const getAccessToken = async (email: string, password: string, roleName: RoleName) => {
       setIsFullScreenLoading(true);
 
       try {
         const resData = await authService.getToken(email, password, roleName);
-        const { accessToken, refreshToken, backend } = resData as any;
+        const { accessToken, refreshToken, backend } = resData as unknown as { accessToken: string; refreshToken: string; backend: string };
 
         const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
           accessToken,
@@ -97,7 +97,7 @@ const EmployerLogin = () => {
           toastMessages.error(t('messages.loginError'));
         }
       } catch (error) {
-        const axiosError = error as AxiosError<any>;
+        const axiosError = error as AxiosError<{ errors?: Record<string, string[]> }>;
         const res = axiosError?.response;
 
         if (res?.status === 400) {
@@ -118,7 +118,7 @@ const EmployerLogin = () => {
       setIsFullScreenLoading(true);
 
       try {
-        const resData = await authService.checkCreds(email, roleName) as any;
+        const resData = await authService.checkCreds(email, roleName) as { exists?: boolean; email: string; emailVerified?: boolean; };
         const { exists, email: resEmail, emailVerified } = resData;
 
         if (exists === true && emailVerified === false) {
@@ -147,7 +147,7 @@ const EmployerLogin = () => {
       }
     };
 
-    checkCreds(data.email, data.password, ROLES_NAME.EMPLOYER as RoleName);
+    checkCreds(data.email || '', data.password || '', ROLES_NAME.EMPLOYER as RoleName);
   };
 
   const handleSocialLogin = async (clientId: string, clientSecrect: string, provider: AuthProvider, token: string) => {
@@ -155,7 +155,7 @@ const EmployerLogin = () => {
     setIsFullScreenLoading(true);
 
     try {
-      const resData = await authService.convertToken(clientId, clientSecrect, provider, token, redirectUri) as any;
+      const resData = await authService.convertToken(clientId, clientSecrect, provider, token, redirectUri) as unknown as { accessToken: string; refreshToken: string; backend: string };
       const { accessToken, refreshToken, backend } = resData;
 
       const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
@@ -194,8 +194,8 @@ const EmployerLogin = () => {
     }
   };
 
-  const handleGoogleLogin = (result: any) => {
-    const code = result?.code;
+  const handleGoogleLogin = (result: Record<string, unknown>) => {
+    const code = result?.code as string;
 
     if (code) {
       handleSocialLogin(

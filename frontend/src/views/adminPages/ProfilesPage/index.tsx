@@ -10,6 +10,13 @@ import { useDataTable } from '../../../hooks';
 import { useCities } from '../CitiesPage/hooks/useCities';
 import { useDistricts } from '../DistrictsPage/hooks/useDistricts';
 import ProfileTable from './components/ProfileTable';
+import { JobSeekerProfile } from '../../../types/models';
+import { PaginatedResponse } from '../../../types/api';
+
+type JobSeekerProfileExt = JobSeekerProfile & {
+  userDict?: { fullName?: string };
+  location?: { city?: string | number; district?: string | number; address?: string };
+};
 
 const ProfilesPage = () => {
     const { t } = useTranslation('admin');
@@ -38,14 +45,14 @@ const ProfilesPage = () => {
         pageSize: pageSize,
         kw: searchTerm,
         ordering,
-    }) as any;
+    });
 
-    const { data: citiesData } = useCities() as any;
-    const cities = (citiesData?.results || citiesData) as any[];
+    const { data: citiesData } = useCities();
+    const cities = (citiesData as unknown as PaginatedResponse<{ id: number; name: string }>)?.results || citiesData as unknown as { id: number; name: string }[];
 
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-    const [currentProfile, setCurrentProfile] = useState<any>(null);
+    const [currentProfile, setCurrentProfile] = useState<JobSeekerProfileExt | null>(null);
     const [formData, setFormData] = useState({
         user: { fullName: '' },
         phone: '',
@@ -53,14 +60,14 @@ const ProfilesPage = () => {
         gender: 'M',
         maritalStatus: 'S',
         location: {
-            city: '',
-            district: '',
+            city: '' as string | number,
+            district: '' as string | number,
             address: ''
         }
     });
 
-    const { data: districtsData } = useDistricts({ city: formData.location.city }) as any;
-    const districts = (districtsData?.results || districtsData) as any[];
+    const { data: districtsData } = useDistricts({ city: formData.location.city });
+    const districts = (districtsData as unknown as PaginatedResponse<{ id: number; name: string }>)?.results || districtsData as unknown as { id: number; name: string }[];
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -86,7 +93,7 @@ const ProfilesPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (profile: any) => {
+    const handleOpenEdit = (profile: JobSeekerProfileExt) => {
         setDialogMode('edit');
         setCurrentProfile(profile);
         setFormData({
@@ -96,15 +103,15 @@ const ProfilesPage = () => {
             gender: profile.gender || 'M',
             maritalStatus: profile.maritalStatus || 'S',
             location: {
-                city: profile.location?.city || '',
-                district: profile.location?.district || '',
+                city: (typeof profile.location?.city === 'object' ? (profile.location?.city as { id?: number }).id : profile.location?.city) || '',
+                district: (typeof profile.location?.district === 'object' ? (profile.location?.district as { id?: number }).id : profile.location?.district) || '',
                 address: profile.location?.address || ''
             }
         });
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (profile: any) => {
+    const handleOpenDelete = (profile: JobSeekerProfileExt) => {
         setCurrentProfile(profile);
         setOpenDeleteDialog(true);
     };
@@ -124,7 +131,7 @@ const ProfilesPage = () => {
                 location: { ...prev.location, [locField]: value }
             }));
         } else {
-            setFormData(prev => ({ ...prev, [name]: value as any }));
+            setFormData(prev => ({ ...prev, [name]: value }));
         }
     };
 
@@ -132,7 +139,7 @@ const ProfilesPage = () => {
         try {
             if (dialogMode === 'add') {
                 await createProfile(formData);
-            } else {
+            } else if (currentProfile?.id) {
                 await updateProfile({
                     id: currentProfile.id,
                     data: formData
@@ -145,6 +152,7 @@ const ProfilesPage = () => {
     };
 
     const handleDelete = async () => {
+        if (!currentProfile?.id) return;
         try {
             await deleteProfile(currentProfile.id);
             setOpenDeleteDialog(false);
@@ -186,9 +194,9 @@ const ProfilesPage = () => {
                 </Box>
 
                 <ProfileTable
-                    data={(data as any)?.results || data}
+                    data={(data as unknown as PaginatedResponse<JobSeekerProfileExt>)?.results || data}
                     isLoading={isLoading}
-                    rowCount={(data as any)?.count || 0}
+                    rowCount={(data as unknown as PaginatedResponse<JobSeekerProfileExt>)?.count || 0}
                     pagination={pagination}
                     onPaginationChange={onPaginationChange}
                     sorting={sorting}

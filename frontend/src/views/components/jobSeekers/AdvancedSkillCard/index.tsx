@@ -30,6 +30,9 @@ import AdvancedSkillForm from '../AdvancedSkillForm';
 import resumeService from '../../../../services/resumeService';
 
 import advancedSkillService from '../../../../services/advancedSkillService';
+import { Theme } from '@mui/material/styles';
+import { AxiosError } from 'axios';
+import { ApiError } from '@/types/api';
 
 interface AdvancedSkill {
   id: string | number;
@@ -123,7 +126,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
   const [editData, setEditData] = React.useState<AdvancedSkill | null>(null);
 
-  const [serverErrors, setServerErrors] = React.useState<any>(null);
+  const [serverErrors, setServerErrors] = React.useState<Record<string, unknown> | null>(null);
 
   React.useEffect(() => {
 
@@ -134,13 +137,13 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       try {
 
-        const resData = await resumeService.getAdvancedSkills(slug) as any;
+        const resData = await resumeService.getAdvancedSkills(slug) as unknown as AdvancedSkill[];
 
         setAdvancedSkills(resData);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -164,15 +167,15 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       try {
 
-        const resData = await advancedSkillService.getAdvancedSkillById(skillId) as any;
+        const resData = await advancedSkillService.getAdvancedSkillById(skillId) as unknown as AdvancedSkill;
 
         setEditData(resData);
 
         setOpenPopup(true);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -196,9 +199,9 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
   };
 
-  const handleAddOrUpdate = (data: any) => {
+  const handleAddOrUpdate = (data: Record<string, unknown>) => {
 
-    const create = async (payload: any) => {
+    const create = async (payload: Record<string, unknown>) => {
 
       setIsFullScreenLoading(true);
 
@@ -212,9 +215,9 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.skillAddSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error, setServerErrors);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors);
 
       } finally {
 
@@ -224,13 +227,13 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
     };
 
-    const update = async (payload: any) => {
+    const update = async (payload: Record<string, unknown>) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await advancedSkillService.updateAdvancedSkillById(payload.id, payload);
+        await advancedSkillService.updateAdvancedSkillById(payload.id as string | number, payload);
 
         setOpenPopup(false);
 
@@ -238,9 +241,9 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.skillUpdateSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -284,9 +287,9 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.skillDeleteSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -324,7 +327,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
           p: 3,
 
-          boxShadow: (theme: any) => theme.customShadows.card,
+          boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
 
         }}
 
@@ -360,7 +363,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: any) => theme.customShadows.medium,
+                    boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -395,7 +398,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
                     {
                       header: t('jobSeeker:profile.fields.level'),
                       accessorKey: 'level',
-                      cell: (info: any) => (
+                      cell: (info: { getValue: () => unknown }) => (
                         <Rating name="level-read-only" value={info.getValue() as number || 0} size="large" readOnly />
                       ),
                     },
@@ -403,7 +406,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
                       header: t('jobSeeker:profile.fields.actions'),
                       id: 'actions',
                       meta: { align: 'right' },
-                      cell: (info: any) => (
+                      cell: (info: { row: { original: AdvancedSkill } }) => (
                         <Stack direction="row" spacing={1} justifyContent="flex-end">
                           <IconButton
                             size="small"

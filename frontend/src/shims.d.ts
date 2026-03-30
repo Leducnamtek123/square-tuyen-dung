@@ -3,9 +3,29 @@ import '@mui/material/styles';
 declare module '@mui/material/styles' {
   interface Palette {
     hot: Palette['primary'];
+    feedback: {
+      button: {
+        background: string;
+        shadow: string;
+        hover: string;
+      };
+      dialog: {
+        border: string;
+      };
+    };
   }
   interface PaletteOptions {
     hot?: PaletteOptions['primary'];
+    feedback?: {
+      button: {
+        background: string;
+        shadow: string;
+        hover: string;
+      };
+      dialog: {
+        border: string;
+      };
+    };
   }
   interface PaletteColor {
     background?: string;
@@ -17,12 +37,17 @@ declare module '@mui/material/styles' {
     backgroundHover?: string;
     gradient?: string;
   }
+  interface TypeText {
+    placeholder?: string;
+    italic?: React.CSSProperties | Record<string, unknown>;
+  }
   interface Theme {
     customShadows: {
       small: string;
       medium: string;
       large: string;
       card: string;
+      feedback: string;
     };
   }
   interface ThemeOptions {
@@ -31,6 +56,7 @@ declare module '@mui/material/styles' {
       medium?: string;
       large?: string;
       card?: string;
+      feedback?: string;
     };
   }
 }

@@ -10,6 +10,7 @@ import { convertMoney } from "../../../../utils/customData";
 import { tConfig } from '../../../../utils/tConfig';
 import ActiveButtonComponent from "./ActiveButtonComponent";
 import { useConfig } from '@/hooks/useConfig';
+import type { Theme } from "@mui/material/styles";
 
 interface ItemComponentProps {
   id: number;
@@ -69,7 +70,7 @@ const ItemComponent = ({
           bgcolor: "background.paper",
           boxShadow: 0,
           "&:hover": {
-            boxShadow: (theme: any) => theme.customShadows?.medium || 2,
+            boxShadow: (theme: Theme) => (theme as Theme & { customShadows?: { medium?: number } }).customShadows?.medium || 2,
             transform: "translateY(-2px)",
             transition: "all 0.3s ease-in-out",
           },
@@ -124,9 +125,9 @@ const ItemComponent = ({
                 </Box>
                 <Box className="info-item">
                   <FontAwesomeIcon icon={faLocationDot} />
-                  {tConfig((allConfig as any)?.cityDict?.[city]) ? (
+                  {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.cityDict?.[String(city)]) ? (
                     <Typography component="span" fontSize="14px">
-                      {tConfig((allConfig as any)?.cityDict?.[city])}
+                      {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.cityDict?.[String(city)])}
                     </Typography>
                   ) : (
                     <Typography component="span" fontSize="13px" fontStyle="italic" color="grey.400">
@@ -136,9 +137,9 @@ const ItemComponent = ({
                 </Box>
                 <Box className="info-item">
                   <FontAwesomeIcon icon={faBriefcase} />
-                  {tConfig((allConfig as any)?.careerDict?.[career]) ? (
+                  {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.careerDict?.[String(career)]) ? (
                     <Typography component="span" fontSize="14px">
-                      {tConfig((allConfig as any)?.careerDict?.[career])}
+                      {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.careerDict?.[String(career)])}
                     </Typography>
                   ) : (
                     <Typography component="span" fontSize="13px" fontStyle="italic" color="grey.400">
@@ -148,9 +149,9 @@ const ItemComponent = ({
                 </Box>
                 <Box className="info-item">
                   <FontAwesomeIcon icon={faCalendarAlt} />
-                  {tConfig((allConfig as any)?.frequencyNotificationDict?.[frequency]) ? (
+                  {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.frequencyNotificationDict?.[String(frequency)]) ? (
                     <Typography component="span" fontSize="14px">
-                      {tConfig((allConfig as any)?.frequencyNotificationDict?.[frequency])}
+                      {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.frequencyNotificationDict?.[String(frequency)])}
                     </Typography>
                   ) : (
                     <Typography component="span" fontSize="13px" fontStyle="italic" color="grey.400">

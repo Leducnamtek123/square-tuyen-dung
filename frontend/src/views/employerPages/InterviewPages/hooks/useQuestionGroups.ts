@@ -2,19 +2,21 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import questionGroupService from '../../../../services/questionGroupService';
 import toastMessages from '../../../../utils/toastMessages';
+import type { QuestionGroup } from '../../../../types/models';
+import type { PaginatedResponse } from '../../../../types/api';
 
 export const useQuestionGroups = (params: Record<string, unknown>) => {
     const { t } = useTranslation('employer');
     const queryClient = useQueryClient();
 
-    const query = useQuery({
+    const query = useQuery<PaginatedResponse<QuestionGroup>>({
         queryKey: ['employer-question-groups', params],
         queryFn: () => questionGroupService.getQuestionGroups(params),
         placeholderData: keepPreviousData,
         retry: false,
     });
 
-    const createMutation = useMutation({
+    const createMutation = useMutation<QuestionGroup, Error, Record<string, unknown>>({
         mutationFn: (data: Record<string, unknown>) => questionGroupService.createQuestionGroup(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
@@ -26,7 +28,7 @@ export const useQuestionGroups = (params: Record<string, unknown>) => {
         }
     });
 
-    const updateMutation = useMutation({
+    const updateMutation = useMutation<QuestionGroup, Error, { id: string | number, data: Record<string, unknown> }>({
         mutationFn: ({ id, data }: { id: string | number, data: Record<string, unknown> }) => questionGroupService.updateQuestionGroup(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
@@ -38,7 +40,7 @@ export const useQuestionGroups = (params: Record<string, unknown>) => {
         }
     });
 
-    const deleteMutation = useMutation({
+    const deleteMutation = useMutation<void, Error, string | number>({
         mutationFn: (id: string | number) => questionGroupService.deleteQuestionGroup(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });

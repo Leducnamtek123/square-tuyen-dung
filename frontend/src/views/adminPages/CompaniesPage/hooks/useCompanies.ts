@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
+import { Company } from '../../../../types/models';
 
-export const useCompanies = (params: any) => {
+export const useCompanies = (params?: Record<string, unknown>) => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -15,36 +16,36 @@ export const useCompanies = (params: any) => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: any) => adminManagementService.createCompany(data),
+        mutationFn: (data: Partial<Company> | Record<string, unknown>) => adminManagementService.createCompany(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] });
             toastMessages.success('Company added successfully');
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error('An error occurred while adding the company');
             console.error(err);
         }
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateCompany(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<Company> | Record<string, unknown> }) => adminManagementService.updateCompany(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] });
             toastMessages.success('Company updated successfully');
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error('An error occurred while updating the company');
             console.error(err);
         }
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id: any) => adminManagementService.deleteCompany(id),
+        mutationFn: (id: string | number) => adminManagementService.deleteCompany(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] });
             toastMessages.success('Company deleted successfully');
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error('An error occurred while deleting the company');
             console.error(err);
         }
@@ -56,5 +57,5 @@ export const useCompanies = (params: any) => {
         updateCompany: updateMutation.mutateAsync,
         deleteCompany: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    } as any;
+    };
 };

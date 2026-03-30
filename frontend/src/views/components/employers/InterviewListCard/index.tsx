@@ -14,6 +14,9 @@ import { transformInterviewSession } from '../../../../utils/transformers';
 import { ROUTES } from '../../../../configs/constants';
 import DataTable from '../../../../components/Common/DataTable';
 import { useTranslation } from 'react-i18next';
+import { InterviewSession } from '@/types/models';
+import { PaginatedResponse } from '@/types/api';
+import { Theme } from '@mui/material/styles';
 
 interface InterviewListCardProps {
   title?: string;
@@ -25,7 +28,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
     const displayTitle = title || t('interviewListCard.title');
 
-    const [sessions, setSessions] = useState<any[]>([]);
+    const [sessions, setSessions] = useState<InterviewSession[]>([]);
 
     const [count, setCount] = useState(0);
 
@@ -45,28 +48,13 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
         try {
 
-            const res: any = await interviewService.getSessions({
-
+            const res = await interviewService.getSessions({
                 page: page + 1,
-
                 pageSize: rowsPerPage
-
             });
-
-            const data = res;
-
-            const rawSessions = Array.isArray(data?.results)
-
-                ? data.results
-
-                : Array.isArray(data)
-
-                    ? data
-
-                    : [];
-
-            setSessions(rawSessions.map(transformInterviewSession).filter(Boolean));
-
+            const data = res as unknown as PaginatedResponse<Record<string, unknown>>;
+            const rawSessions = data?.results || [];
+            setSessions(rawSessions.map((s) => transformInterviewSession(s) as InterviewSession).filter(Boolean));
             setCount(typeof data?.count === 'number' ? data.count : rawSessions.length);
 
         } catch (error) {
@@ -89,7 +77,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
     useEffect(() => {
 
-        const hasActiveSession = sessions.some((session: any) => ['in_progress', 'calibration', 'processing'].includes(session.status));
+        const hasActiveSession = sessions.some((session) => ['in_progress', 'calibration', 'processing'].includes(session.status));
 
         if (!hasActiveSession) {
 
@@ -185,13 +173,13 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
             accessorKey: 'candidateName',
 
-            cell: ({ row }: { row: { original: any } }) => (
+            cell: ({ row }: { row: { original: InterviewSession } }) => (
 
                 <Box>
 
                     <Typography variant="body2" sx={{ fontWeight: 500 }}>{row.original.candidateName}</Typography>
 
-                    <Typography variant="caption" color="text.secondary">{row.original.candidateEmail || row.original.candidate_email || '---'}</Typography>
+                    <Typography variant="caption" color="text.secondary">{row.original.candidateEmail || (row.original as unknown as Record<string, unknown>).candidate_email as string || '---'}</Typography>
 
                 </Box>
 
@@ -205,7 +193,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
             accessorKey: 'jobName',
 
-            cell: ({ getValue }: { getValue: () => any }) => <Typography variant="body2">{getValue() || 'N/A'}</Typography>,
+            cell: ({ getValue }: { getValue: () => unknown }) => <Typography variant="body2">{String(getValue() || 'N/A')}</Typography>,
 
         },
 
@@ -215,7 +203,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
             accessorKey: 'scheduledAt',
 
-            cell: ({ getValue }: { getValue: () => any }) => (
+            cell: ({ getValue }: { getValue: () => string | number | Date }) => (
 
                 <Typography variant="body2">
 
@@ -233,7 +221,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
             accessorKey: 'status',
 
-            cell: ({ getValue }: { getValue: () => any }) => (
+            cell: ({ getValue }: { getValue: () => string }) => (
 
                 <Chip
 
@@ -257,7 +245,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
             accessorKey: 'ai_overall_score',
 
-            cell: ({ row }: { row: { original: any } }) => (
+            cell: ({ row }: { row: { original: InterviewSession & { ai_overall_score?: number } } }) => (
 
                 row.original.ai_overall_score ? (
 
@@ -283,12 +271,12 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
             id: 'actions',
 
-            cell: ({ row }: { row: { original: any } }) => (
+            cell: ({ row }: { row: { original: InterviewSession } }) => (
                 <Stack direction="row" spacing={1} justifyContent="flex-end">
                     <IconButton
                         component={Link}
-                        href={getLink(ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', row.original.id))}
-                        {...({} as any)}
+                        href={getLink(ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', String(row.original.id)))}
+                        {...({} as Record<string, unknown>)}
                         color="primary"
                         size="small"
                         title={t('common:view')}
@@ -301,8 +289,8 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
                     {['draft', 'scheduled'].includes(row.original.status) && (
                         <IconButton
                             component={Link}
-                            href={getLink(ROUTES.EMPLOYER.INTERVIEW_EDIT.replace(':id', row.original.id))}
-                            {...({} as any)}
+                            href={getLink(ROUTES.EMPLOYER.INTERVIEW_EDIT.replace(':id', String(row.original.id)))}
+                            {...({} as Record<string, unknown>)}
                             color="info"
                             size="small"
                             title={t('interviewListCard.editInterview')}
@@ -380,7 +368,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
                         fontWeight: 600,
 
-                        background: (theme: any) => theme.palette.primary.main || theme.palette.primary.main,
+                        background: (theme: Theme) => theme.palette.primary.main,
 
                         WebkitBackgroundClip: 'text',
 
@@ -416,13 +404,13 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
                         px: 3,
 
-                        background: (theme: any) => theme.palette.primary.main,
+                        background: (theme: Theme) => theme.palette.primary.main,
 
-                        boxShadow: (theme: any) => theme.customShadows?.small || 1,
+                        boxShadow: (theme: Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.small || 1,
 
                         '&:hover': {
 
-                            boxShadow: (theme: any) => theme.customShadows?.medium || 2
+                            boxShadow: (theme: Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.medium || 2
 
                         }
 
@@ -474,7 +462,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
 
                 borderRadius: 2,
 
-                boxShadow: (theme: any) => theme.customShadows?.card || 1,
+                boxShadow: (theme: Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.card || 1,
 
                 overflow: 'hidden',
 

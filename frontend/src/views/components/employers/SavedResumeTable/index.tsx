@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, PaginationState, SortingState } from '@tanstack/react-table';
 
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
 import DataTable from '../../../../components/Common/DataTable';
@@ -16,15 +16,33 @@ import { formatRoute } from '../../../../utils/funcUtils';
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 
+export type SavedResumeRow = {
+  resume: {
+    title?: string;
+    type?: string | number;
+    salaryMin?: number;
+    salaryMax?: number;
+    experience?: string | number;
+    city?: string | number;
+    slug?: string;
+    userDict?: {
+      fullName?: string;
+    };
+    [key: string]: unknown;
+  };
+  createAt?: string;
+  [key: string]: unknown;
+};
+
 interface SavedResumeTableProps {
-  rows: any[];
+  rows: SavedResumeRow[];
   isLoading: boolean;
   handleUnsave: (slug: string) => void;
   rowCount: number;
-  pagination: any;
-  onPaginationChange: (pagination: any) => void;
-  sorting: any;
-  onSortingChange: (sorting: any) => void;
+  pagination: PaginationState;
+  onPaginationChange: import('@tanstack/react-table').OnChangeFn<PaginationState>;
+  sorting: SortingState;
+  onSortingChange: import('@tanstack/react-table').OnChangeFn<SortingState>;
 }
 
 const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
@@ -40,10 +58,9 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
     sorting,
     onSortingChange
   } = props;
-  const rowsSafe = React.useMemo(() => Array.isArray(rows) ? rows : [], [rows]);
   const { allConfig } = useConfig();
 
-  const columns = React.useMemo<ColumnDef<any>[]>(() => [
+  const columns = React.useMemo<ColumnDef<SavedResumeRow>[]>(() => [
     {
       accessorKey: 'resume.title',
       header: (t('savedResumeTable.label.resumeTitle') || 'Resume') as string,
@@ -84,14 +101,14 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
     {
       accessorKey: 'resume.experience',
       header: (t('savedResumeTable.label.experience') || 'Experience') as string,
-      cell: (info) => tConfig((allConfig as any)?.experienceDict?.[info.getValue() as string]) || (
+      cell: (info) => tConfig(allConfig?.experienceDict?.[info.getValue() as number]) || (
         <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common.notUpdated')}</span>
       ),
     },
     {
       accessorKey: 'resume.city',
       header: (t('savedResumeTable.label.cityProvince') || 'Location') as string,
-      cell: (info) => tConfig((allConfig as any)?.cityDict?.[info.getValue() as string]) || (
+      cell: (info) => tConfig(allConfig?.cityDict?.[info.getValue() as number]) || (
         <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common.notUpdated')}</span>
       ),
     },
@@ -110,7 +127,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
           <Tooltip title={t('savedResumeTable.title.viewprofile')} arrow>
             <IconButton
               size="small"
-              onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resume?.slug)}`)}
+              onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resume?.slug || '')}`)}
             >
               <RemoveRedEyeOutlinedIcon fontSize="small" color="primary" />
             </IconButton>
@@ -121,7 +138,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
             color="error"
             sx={{ textTransform: 'inherit', minWidth: 100 }}
             startIcon={<FavoriteIcon fontSize="small" />}
-            onClick={() => handleUnsave(info.row.original.resume?.slug)}
+            onClick={() => handleUnsave(info.row.original.resume?.slug || '')}
           >
             {t('savedResumeTable.label.unsave')}
           </Button>
@@ -133,7 +150,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
   return (
       <DataTable
       columns={columns}
-      data={rowsSafe}
+      data={rows}
       isLoading={isLoading}
       rowCount={rowCount}
       pagination={pagination}

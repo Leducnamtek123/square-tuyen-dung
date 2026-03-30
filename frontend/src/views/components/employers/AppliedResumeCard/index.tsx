@@ -221,9 +221,13 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     let keys = Object.keys(filterData) as Array<keyof typeof filterData>;
     for (let i = 0; i < keys.length; i++) {
       if (
-        keys[i] !== ('jobPostId' as any) &&
-        keys[i] !== ('pageSize' as any) &&
-        (filterData as any)[keys[i]] !== ''
+
+        (keys[i] as string) !== 'jobPostId' &&
+
+        (keys[i] as string) !== 'pageSize' &&
+
+        filterData[keys[i]] !== ''
+
       ) {
         cnt = cnt + 1;
       }
@@ -231,7 +235,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     return cnt;
   }, [filterData]);
 
-  const handleFilter = (data: any) => {
+  const handleFilter = (data: typeof defaultFilterData) => {
 
     setOpenPopup(false);
 
@@ -243,7 +247,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
   const handleExport = () => {
 
-    const exportJobPostsActivity = async (params: any) => {
+    const exportJobPostsActivity = async (params: Record<string, unknown>) => {
 
       setIsFullScreenLoading(true);
 
@@ -253,15 +257,15 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
           params
 
-        ) as any;
+        ) as unknown as Record<string, unknown>[];
 
         const data = resData;
 
         xlsxUtils.exportToXLSX(data, 'AppliedProfilesList');
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
 
       } finally {
 
@@ -281,9 +285,9 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     });
   };
 
-  const handleChangeApplicationStatus = (id: string, value: any, callback: (result: boolean) => void) => {
+  const handleChangeApplicationStatus = (id: string | number, value: string | number, callback: (result: boolean) => void) => {
 
-    const changeStatus = async (id: string, data: any) => {
+    const changeStatus = async (id: string, data: Record<string, unknown>) => {
 
       setIsFullScreenLoading(true);
 
@@ -297,11 +301,11 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
         callback(true);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
         // Failed
 
-        errorHandling(error);
+        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
 
         callback(false);
 
@@ -313,15 +317,15 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
     };
 
-    changeStatus(id, { status: value });
+    changeStatus(id as string, { status: value });
 
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string | number) => {
 
     confirmModal(
 
-      () => deleteMutation.mutate(id, {
+      () => deleteMutation.mutate(id as string, {
         onSuccess: () => toastMessages.success(t('appliedResume.delete.success')),
       }),
 
@@ -480,9 +484,9 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
               getOptionLabel={(option) => option.jobName}
 
-              value={jobPostOptions.find((o: any) => o.id === jobPostIdSelect) || null}
+              value={jobPostOptions.find((o) => String(o.id) === jobPostIdSelect) || null}
 
-              onChange={(e, value) => setJobPostIdSelect(value?.id || '')}
+              onChange={(e, value) => setJobPostIdSelect(value?.id ? String(value.id) : '')}
 
               disablePortal
 
@@ -538,21 +542,21 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
               value={
 
-                (allConfig?.applicationStatusOptions as any[])?.find(
+                (allConfig?.applicationStatusOptions as Array<{ id: string | number; name: string }>)?.find(
 
-                  (o: any) => o.id === applicationStatusSelect
+                  (o: { id: string | number }) => o.id === applicationStatusSelect
 
                 ) || null
 
               }
 
-              onChange={(e, value) => setApplicationStatusSelect(value?.id || '')}
+              onChange={(e, value) => setApplicationStatusSelect(value?.id ? String(value.id) : '')}
 
               disablePortal
 
               size="small"
 
-              options={(allConfig?.applicationStatusOptions as any[]) || []}
+              options={(allConfig?.applicationStatusOptions as Array<{ id: string | number; name: string }>) || []}
 
               renderInput={(params) => (
 
@@ -727,13 +731,13 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
       }}>
 
         <AppliedResumeTable
-          rows={resumes}
+          rows={resumes as unknown as import('../AppliedResumeTable').AppliedResumeRow[]}
           isLoading={isLoading}
           rowCount={count}
           pagination={pagination}
-          onPaginationChange={onPaginationChange}
+          onPaginationChange={onPaginationChange as import('@tanstack/react-table').OnChangeFn<import('@tanstack/react-table').PaginationState>}
           sorting={sorting}
-          onSortingChange={onSortingChange}
+          onSortingChange={onSortingChange as import('@tanstack/react-table').OnChangeFn<import('@tanstack/react-table').SortingState>}
           handleChangeApplicationStatus={handleChangeApplicationStatus}
           handleDelete={handleDelete}
         />

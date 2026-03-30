@@ -8,7 +8,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import WorkIcon from '@mui/icons-material/Work';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import AssessmentIcon from '@mui/icons-material/Assessment';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, ChartOptions, TooltipItem } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 import { useAdminStats } from './hooks/useAdminStats';
 import StatCard from './components/StatCard';
@@ -22,9 +22,9 @@ const DashboardPage = () => {
   // Brand-aligned colors from theme palette
   const BRAND_COLORS = [
     theme.palette.primary.main,     // #1a407d navy
-    (theme.palette as any).info.main,       // #2aa9e1 sky blue
-    (theme.palette as any).secondary.main,  // #10b981 emerald
-    (theme.palette as any).warning.main,    // #f59e0b amber
+    theme.palette.info.main,       // #2aa9e1 sky blue
+    theme.palette.secondary.main,  // #10b981 emerald
+    theme.palette.warning.main,    // #f59e0b amber
     theme.palette.primary.dark,     // #0f397f deep navy
   ];
 
@@ -49,14 +49,14 @@ const DashboardPage = () => {
     ],
   };
 
-  const pieOptions: any = {
+  const pieOptions: ChartOptions<'pie'> = {
     plugins: {
       legend: {
         position: 'bottom',
       },
       tooltip: {
         callbacks: {
-          label: (context: any) => `${context.label}: ${context.parsed}`,
+          label: (context: TooltipItem<'pie'>) => `${context.label}: ${context.parsed}`,
         },
       },
     },
@@ -82,7 +82,7 @@ const DashboardPage = () => {
             value={stats?.totalJobPosts}
             loading={isLoading}
             icon={<WorkIcon sx={{ fontSize: 40 }} />}
-            color={(theme.palette as any).secondary.main}
+            color={theme.palette.secondary.main}
             trend={8}
           />
         </Grid>
@@ -92,7 +92,7 @@ const DashboardPage = () => {
             value={stats?.totalJobPostsPending}
             loading={isLoading}
             icon={<QuestionAnswerIcon sx={{ fontSize: 40 }} />}
-            color={(theme.palette as any).warning.main}
+            color={theme.palette.warning.main}
             trend={-5}
           />
         </Grid>
@@ -102,7 +102,7 @@ const DashboardPage = () => {
             value={stats?.totalApplications}
             loading={isLoading}
             icon={<AssessmentIcon sx={{ fontSize: 40 }} />}
-            color={(theme.palette as any).info.main}
+            color={theme.palette.info.main}
             trend={15}
           />
         </Grid>
@@ -128,7 +128,7 @@ const DashboardPage = () => {
             <Paper
               sx={{
                 p: 3,
-                background: (theme) => (theme.palette as any).primary.main,
+                background: (theme) => theme.palette.primary.main,
                 color: 'white',
                 borderRadius: 3,
               }}
@@ -143,7 +143,7 @@ const DashboardPage = () => {
             <Paper
               sx={{
                 p: 3,
-                background: (theme) => (theme.palette as any).secondary.main,
+                background: (theme) => theme.palette.secondary.main,
                 color: 'white',
                 borderRadius: 3,
               }}

@@ -12,16 +12,20 @@ import { IMAGES, ROLES_NAME } from "../../../configs/constants";
 import QRCodeBox from "../../../components/Common/QRCodeBox";
 import MuiImageCustom from "../../../components/Common/MuiImageCustom";
 import { tConfig } from '../../../utils/tConfig';
+import { Theme } from "@mui/material/styles";
+import type { TFunction } from "i18next";
+import type { CompanyDetailProps } from "./index";
+import type { SystemConfig, User } from '@/types/models';
 
 interface CompanyHeaderProps {
-  companyDetail: any;
-  allConfig: any;
+  companyDetail: CompanyDetailProps;
+  allConfig: SystemConfig | null;
   isAuthenticated: boolean;
-  currentUser: any;
+  currentUser: User | null;
   isLoadingFollow: boolean;
   handleFollow: () => void;
   setOpenSharePopup: (val: boolean) => void;
-  t: any;
+  t: TFunction;
 }
 
 const CompanyHeader: React.FC<CompanyHeaderProps> = ({
@@ -35,10 +39,10 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
   t
 }) => {
   return (
-    <Card sx={{ overflow: "visible", boxShadow: (theme: any) => theme.customShadows?.medium || 2, mt: 8 }}>
+    <Card sx={{ overflow: "visible", boxShadow: (theme: Theme) => (theme as Theme & { customShadows?: { medium?: number } }).customShadows?.medium || 2, mt: 8 }}>
       <Box>
         <MuiImageCustom
-          src={companyDetail?.companyCoverImageUrl || IMAGES.companyCoverDefault || IMAGES.coverImageDefault}
+          src={(companyDetail?.companyCoverImageUrl || IMAGES.companyCoverDefault || IMAGES.coverImageDefault) as string}
           sx={{ maxHeight: 250, minHeight: 200 }}
           duration={1500}
           width="100%"
@@ -53,13 +57,13 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
         >
           <Box>
             <MuiImageCustom
-              src={companyDetail.companyImageUrl || IMAGES.companyLogoDefault}
+              src={(companyDetail?.companyImageUrl || IMAGES.companyLogoDefault) as string}
               sx={{
                 borderRadius: 2,
                 mt: -7,
                 p: 1,
                 bgcolor: "white",
-                boxShadow: (theme: any) => theme.customShadows?.small || 1,
+                boxShadow: (theme: Theme) => (theme as Theme & { customShadows?: { small?: number } }).customShadows?.small || 1,
                 border: "2px solid #fff",
               }}
               duration={1500}
@@ -100,7 +104,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               </Typography>
               <Typography variant="subtitle1">
                 <FontAwesomeIcon icon={faUsers} />
-                {tConfig((allConfig as any)?.employeeSizeDict?.[companyDetail.employeeSize]) || (
+                {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.employeeSizeDict?.[String(companyDetail.employeeSize)]) || (
                   <span style={{ color: "#e0e0e0", fontStyle: "italic", fontSize: 13 }}>
                     {t("companyDetail.notUpdated")}
                   </span>

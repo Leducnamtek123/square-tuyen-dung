@@ -10,8 +10,8 @@ import { useTranslation } from 'react-i18next';
 import TextFieldCustom from "../../../../components/Common/Controls/TextFieldCustom";
 import PasswordTextFieldCustom from "../../../../components/Common/Controls/PasswordTextFieldCustom";
 
-interface EmployerLoginFormData {
-  email: string;
+export interface EmployerLoginFormData {
+  email?: string;
   password?: string;
 }
 

@@ -17,12 +17,14 @@ import { ROUTES } from "../../../../configs/constants";
 import { formatRoute } from "../../../../utils/funcUtils";
 import JobDetailActions from "./JobDetailActions";
 import JobDetailInfoItem from "./JobDetailInfoItem";
+import type { JobPost, SystemConfig, User } from '../../../../types/models';
 
 interface JobDetailHeaderCardProps {
-  jobPostDetail: any;
-  allConfig: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  jobPostDetail: JobPost | any;
+  allConfig: SystemConfig | null;
   isAuthenticated: boolean;
-  currentUser: any;
+  currentUser: User | null;
   isLoadingSave: boolean;
   onSave: () => void;
   onShowApplyForm: () => void;

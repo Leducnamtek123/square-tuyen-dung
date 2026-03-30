@@ -1,4 +1,6 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
+import type { PaginatedResponse } from '../types/api';
+import type { Question } from '../types/models';
 
 type AnyRecord = Record<string, unknown>;
 
@@ -23,33 +25,33 @@ const normalizeParams = (params: AnyRecord = {}): AnyRecord => {
 };
 
 const questionService = {
-  getQuestions: (params: AnyRecord = {}): Promise<unknown> => {
+  getQuestions: (params: AnyRecord = {}): Promise<PaginatedResponse<Question>> => {
     return httpRequest
       .get('interview/web/questions/', { params: normalizeParams(params) });
   },
 
   // Alias for better clarity in Admin contexts
 
-  getAllQuestions: (params: AnyRecord = {}): Promise<unknown> => {
+  getAllQuestions: (params: AnyRecord = {}): Promise<PaginatedResponse<Question>> => {
     return httpRequest
       .get('interview/web/questions/', { params: normalizeParams(params) });
   },
 
-  getQuestionDetail: (id: IdType): Promise<unknown> => {
+  getQuestionDetail: (id: IdType): Promise<Question> => {
     return httpRequest.get(`interview/web/questions/${id}/`);
   },
 
-  createQuestion: (data: AnyRecord): Promise<unknown> => {
+  createQuestion: (data: AnyRecord): Promise<Question> => {
     return httpRequest.post('interview/web/questions/', data);
   },
 
-  updateQuestion: (id: IdType, data: AnyRecord): Promise<unknown> => {
+  updateQuestion: (id: IdType, data: AnyRecord): Promise<Question> => {
     // Using PATCH for more flexible partial updates
     return httpRequest
       .patch(`interview/web/questions/${id}/`, data);
   },
 
-  deleteQuestion: (id: IdType): Promise<unknown> => {
+  deleteQuestion: (id: IdType): Promise<void> => {
     return httpRequest.delete(`interview/web/questions/${id}/`);
   },
 };

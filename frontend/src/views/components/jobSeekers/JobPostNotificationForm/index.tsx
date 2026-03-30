@@ -18,7 +18,7 @@ import RadioCustom from '../../../../components/Common/Controls/RadioCustom';
 import { useTranslation } from 'react-i18next';
 import { useConfig } from '@/hooks/useConfig';
 
-interface FormValues {
+export interface JobPostNotificationFormValues {
   frequency: number | null;
   jobName: string;
   career: number;
@@ -29,8 +29,8 @@ interface FormValues {
 }
 
 interface JobPostNotificationFormProps {
-  handleAddOrUpdate: (data: FormValues) => void;
-  editData: Partial<FormValues> | null;
+  handleAddOrUpdate: (data: JobPostNotificationFormValues) => void;
+  editData: Partial<JobPostNotificationFormValues> | null;
 }
 
 
@@ -165,7 +165,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-  } = useForm<FormValues>({
+  } = useForm<JobPostNotificationFormValues>({
 
 
 
@@ -209,7 +209,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-      reset((formValues) => ({
+      reset((formValues: JobPostNotificationFormValues) => ({
 
 
 

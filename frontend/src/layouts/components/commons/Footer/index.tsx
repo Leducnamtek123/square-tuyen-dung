@@ -21,7 +21,8 @@ import {
 
 import { Grid2 as Grid } from "@mui/material";
 
-import { ICONS, LINKS, ROUTES, APP_NAME, IMAGES } from '../../../../configs/constants';
+import { LINKS, ROUTES, APP_NAME, IMAGES } from '../../../../configs/constants';
+import { FacebookIcon, WebsiteIcon } from '../../../../components/Common/SocialIcons';
 
 import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 
@@ -202,8 +203,8 @@ const Footer = () => {
                 <Stack direction="row" spacing={1} sx={{ flexWrap: 'wrap', gap: 0.5 }}>
 
                   {[
-                    { icon: ICONS.WEBSITE,  link: LINKS.WEBSITE_LINK },
-                    { icon: ICONS.FACEBOOK, link: LINKS.FACEBOOK_LINK },
+                    { Icon: WebsiteIcon,  link: LINKS.WEBSITE_LINK },
+                    { Icon: FacebookIcon, link: LINKS.FACEBOOK_LINK },
                   ].map((social, index) => (
 
                     <Link
@@ -222,12 +223,11 @@ const Footer = () => {
                         '&:hover': {
                           backgroundColor: brandSky,
                           transform: 'scale(1.1)',
-                          '& img': { filter: 'brightness(10)' },
                         },
                       }}
                     >
 
-                      <img height={22} width={22} src={social.icon} alt="" />
+                      <social.Icon size={22} />
 
                     </Link>
 

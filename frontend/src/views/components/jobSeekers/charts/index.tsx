@@ -123,7 +123,7 @@ const ActivityChart = () => {
         >
           {isLoading ? (
             <CircularProgress sx={{ color: "primary.main" }} />
-          ) : !data || (Array.isArray(data) && data.length === 0) ? (
+          ) : (!data) ? (
             <Stack alignItems="center" spacing={1}>
               <InsertChartOutlinedIcon sx={{ fontSize: 42, color: "text.secondary" }} />
               <Typography variant="body2" color="text.secondary">

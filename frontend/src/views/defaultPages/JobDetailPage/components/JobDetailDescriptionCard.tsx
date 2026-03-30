@@ -3,9 +3,12 @@ import { useTranslation } from "react-i18next";
 
 import JobDetailInfoItem from "./JobDetailInfoItem";
 
+import type { JobPost, SystemConfig } from '../../../../types/models';
+
 interface JobDetailDescriptionCardProps {
-  jobPostDetail: any;
-  allConfig: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  jobPostDetail: JobPost | any;
+  allConfig: SystemConfig | null;
 }
 
 const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ jobPostDetail, allConfig }) => {
@@ -59,20 +62,20 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
           <div className="grid gap-4 sm:grid-cols-2">
             <JobDetailInfoItem
               title={t("jobDetail.career")}
-              value={(allConfig?.careerDict as any)?.[jobPostDetail?.career]}
+              value={(allConfig?.careerDict as unknown as Record<string, string>)?.[String(jobPostDetail?.career)]}
             />
             <JobDetailInfoItem
               title={t("jobDetail.workplaceType")}
               value={
-                (allConfig?.typeOfWorkplaceDict as any)?.[
-                  jobPostDetail?.typeOfWorkplace
+                (allConfig?.typeOfWorkplaceDict as unknown as Record<string, string>)?.[
+                  String(jobPostDetail?.typeOfWorkplace)
                 ]
               }
             />
             <JobDetailInfoItem
               title={t("jobDetail.academicLevel")}
               value={
-                (allConfig?.academicLevelDict as any)?.[jobPostDetail?.academicLevel]
+                (allConfig?.academicLevelDict as unknown as Record<string, string>)?.[String(jobPostDetail?.academicLevel)]
               }
             />
             <JobDetailInfoItem
@@ -81,11 +84,11 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
             />
             <JobDetailInfoItem
               title={t("jobDetail.location")}
-              value={(allConfig?.cityDict as any)?.[jobPostDetail?.location?.city]}
+              value={(allConfig?.cityDict as unknown as Record<string, string>)?.[String(jobPostDetail?.location?.city)]}
             />
             <JobDetailInfoItem
               title={t("jobDetail.genderRequired")}
-              value={(allConfig?.genderDict as any)?.[jobPostDetail?.genderRequired]}
+              value={(allConfig?.genderDict as unknown as Record<string, string>)?.[String(jobPostDetail?.genderRequired)]}
             />
           </div>
         </div>

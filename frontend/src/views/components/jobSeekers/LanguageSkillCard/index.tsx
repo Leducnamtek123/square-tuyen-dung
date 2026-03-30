@@ -36,7 +36,7 @@ import { useConfig } from '@/hooks/useConfig';
 
 interface LanguageSkill {
   id: string | number;
-  language: string;
+  language: string | number;
   level: number;
 }
 
@@ -128,7 +128,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
   const [editData, setEditData] = React.useState<LanguageSkill | null>(null);
 
-  const [serverErrors, setServerErrors] = React.useState<any>(null);
+  const [serverErrors, setServerErrors] = React.useState<Record<string, string[]> | null>(null);
 
   React.useEffect(() => {
 
@@ -139,13 +139,13 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       try {
 
-        const resData = await resumeService.getLanguageSkills(slug) as any;
+        const resData = await resumeService.getLanguageSkills(slug) as LanguageSkill[];
 
         setLanguageSkills(resData);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
 
       } finally {
 
@@ -169,15 +169,15 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       try {
 
-        const resData = await languageSkillService.getLanguageSkillById(skillId) as any;
+        const resData = await languageSkillService.getLanguageSkillById(skillId) as LanguageSkill;
 
         setEditData(resData);
 
         setOpenPopup(true);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
 
       } finally {
 
@@ -201,9 +201,9 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
   };
 
-  const handleAddOrUpdate = (data: any) => {
+  const handleAddOrUpdate = (data: LanguageSkill | Record<string, unknown>) => {
 
-    const create = async (payload: any) => {
+    const create = async (payload: Record<string, unknown>) => {
 
       setIsFullScreenLoading(true);
 
@@ -217,9 +217,9 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.languageAddSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error, setServerErrors);
+        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>, setServerErrors as unknown as Parameters<typeof errorHandling>[1]);
 
       } finally {
 
@@ -229,13 +229,13 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
     };
 
-    const update = async (payload: any) => {
+    const update = async (payload: LanguageSkill | Record<string, unknown>) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await languageSkillService.updateLanguageSkillById(payload.id, payload);
+        await languageSkillService.updateLanguageSkillById((payload as LanguageSkill).id, payload as unknown as Record<string, unknown>);
 
         setOpenPopup(false);
 
@@ -243,9 +243,9 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.languageUpdateSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
 
       } finally {
 
@@ -289,9 +289,9 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.languageDeleteSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
 
       } finally {
 
@@ -329,7 +329,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
           p: 3,
 
-          boxShadow: (theme: any) => theme.customShadows.card,
+          boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
 
         }}
 
@@ -365,7 +365,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: any) => theme.customShadows.medium,
+                    boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -396,7 +396,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
                     {
                       header: t('jobSeeker:profile.fields.language'),
                       accessorKey: 'language',
-                      cell: (info) => tConfig((allConfig as any)?.languageDict?.[info.getValue() as string ?? '']),
+                      cell: (info) => tConfig((allConfig as { languageDict?: Record<string, unknown> })?.languageDict?.[info.getValue() as string ?? ''] as string),
                     },
                     {
                       header: t('jobSeeker:profile.fields.level'),

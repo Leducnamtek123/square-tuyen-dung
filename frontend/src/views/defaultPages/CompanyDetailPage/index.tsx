@@ -20,6 +20,27 @@ import CompanyHeader from "./CompanyHeader";
 import CompanyAbout from "./CompanyAbout";
 import CompanySidebar from "./CompanySidebar";
 import { useConfig } from '@/hooks/useConfig';
+import { Theme } from "@mui/material/styles";
+
+export type CompanyDetailProps = {
+  id?: number | string;
+  companyName?: string;
+  description?: string;
+  fieldOperation?: string;
+  companyImageUrl?: string;
+  websiteUrl?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  cityName?: string;
+  since?: string;
+  employeeSize?: number;
+  facebookUrl?: string;
+  linkedinUrl?: string;
+  followNumber?: number;
+  isFollowed?: boolean;
+  [key: string]: unknown;
+};
 
 const sanitizeCompanyDescription = (rawHtml: string | undefined) => {
   if (!rawHtml || typeof rawHtml !== "string") return "";
@@ -47,17 +68,17 @@ const CompanyDetailPage = () => {
   const [openSharePopup, setOpenSharePopup] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isLoadingFollow, setIsLoadingFollow] = React.useState(false);
-  const [companyDetail, setCompanyDetail] = React.useState<any>(null);
-  const [imageList, setImageList] = React.useState<any[]>([]);
+  const [companyDetail, setCompanyDetail] = React.useState<CompanyDetailProps | null>(null);
+  const [imageList, setImageList] = React.useState<{ original: string, thumbnail: string }[]>([]);
 
   const safeDescriptionHtml = React.useMemo(() => sanitizeCompanyDescription(companyDetail?.description), [companyDetail?.description]);
 
   React.useEffect(() => {
     const getCompanyDetail = async (companySlug: string | undefined) => {
       try {
-        const resData = await companyService.getCompanyDetailById(companySlug as string) as any;
+        const resData = await companyService.getCompanyDetailById(companySlug as string) as unknown as { companyImages?: { imageUrl: string }[] } & CompanyDetailProps;
         setCompanyDetail(resData);
-        setImageList((resData?.companyImages || []).map((img: any) => ({ original: img.imageUrl, thumbnail: img.imageUrl })));
+        setImageList((resData?.companyImages || []).map((img: { imageUrl: string }) => ({ original: img.imageUrl, thumbnail: img.imageUrl })));
       } catch (error) {
       } finally {
         setIsLoading(false);
@@ -81,25 +102,25 @@ const CompanyDetailPage = () => {
     companyDetail ? [
       {
         type: 'Organization' as const,
-        name: companyDetail.companyName,
+        name: companyDetail.companyName || '',
         url: companyDetail.websiteUrl || (typeof window !== 'undefined' ? window.location.href : ''),
-        logoUrl: companyDetail.companyImageUrl,
-        description: companyDetail.description,
+        logoUrl: companyDetail.companyImageUrl || '',
+        description: companyDetail.description || '',
         email: companyDetail.email,
         phone: companyDetail.phone,
         address: companyDetail.address,
         city: companyDetail.cityName,
         country: 'VN',
         foundingDate: companyDetail.since ? dayjs(companyDetail.since).format('YYYY') : undefined,
-        numberOfEmployees: companyDetail.employeeSize,
-        sameAs: [companyDetail.facebookUrl, companyDetail.linkedinUrl, companyDetail.websiteUrl].filter(Boolean),
+        numberOfEmployees: companyDetail.employeeSize ? String(companyDetail.employeeSize) : undefined,
+        sameAs: [companyDetail.facebookUrl, companyDetail.linkedinUrl, companyDetail.websiteUrl].filter((url): url is string => Boolean(url)),
       },
       {
         type: 'BreadcrumbList' as const,
         items: [
           { name: 'Trang chủ', url: (typeof window !== 'undefined' ? window.location.origin : '') },
           { name: 'Công ty', url: `${(typeof window !== 'undefined' ? window.location.origin : '')}/cong-ty` },
-          { name: companyDetail.companyName, url: (typeof window !== 'undefined' ? window.location.href : '') },
+          { name: companyDetail.companyName || '', url: (typeof window !== 'undefined' ? window.location.href : '') },
         ],
       },
     ] : []
@@ -109,12 +130,12 @@ const CompanyDetailPage = () => {
     const follow = async () => {
       setIsLoadingFollow(true);
       try {
-        const resData = await companyService.followCompany(slug as string) as any;
+        const resData = await companyService.followCompany(slug as string) as unknown as { isFollowed: boolean };
         const isFollowed = resData.isFollowed;
-        setCompanyDetail({ ...companyDetail, isFollowed, followNumber: isFollowed ? companyDetail.followNumber + 1 : companyDetail.followNumber - 1 });
+        setCompanyDetail({ ...companyDetail, isFollowed, followNumber: isFollowed ? (companyDetail?.followNumber || 0) + 1 : (companyDetail?.followNumber || 0) - 1 });
         toastMessages.success(isFollowed ? t("companyDetail.followedSuccessfully") : t("companyDetail.unfollowedSuccessfully"));
       } catch (error) {
-        errorHandling(error as AxiosError<any>);
+        errorHandling(error as AxiosError<Record<string, unknown>>);
       } finally {
         setIsLoadingFollow(false);
       }
@@ -130,7 +151,7 @@ const CompanyDetailPage = () => {
           <Box>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 8 }}>
-                <Card sx={{ p: 3, boxShadow: (theme: any) => theme.customShadows?.small || 1 }}>
+                <Card sx={{ p: 3, boxShadow: (theme: Theme) => (theme as unknown as { customShadows?: Record<string, string> }).customShadows?.small || 1 }}>
                   <Stack spacing={4}>
                     <CompanyAbout companyDetail={companyDetail} safeDescriptionHtml={safeDescriptionHtml} t={t} />
                     <Box>
@@ -159,7 +180,7 @@ const CompanyDetailPage = () => {
           linkedin: { url: (typeof window !== 'undefined' ? window.location.href : ''), source: (typeof window !== 'undefined' ? window.location.href : ''), title: companyDetail?.companyName, summary: companyDetail?.description },
           twitter: { url: (typeof window !== 'undefined' ? window.location.href : ''), title: companyDetail?.companyName },
           email: { url: (typeof window !== 'undefined' ? window.location.href : ''), subject: companyDetail?.companyName, body: companyDetail?.description },
-        } as any)}
+        } as React.ComponentProps<typeof SocialNetworkSharingPopup>)}
       />
     </>
   );

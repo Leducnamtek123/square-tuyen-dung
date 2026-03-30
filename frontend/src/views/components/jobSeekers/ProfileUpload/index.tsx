@@ -13,6 +13,12 @@ import PublishIcon from "@mui/icons-material/Publish";
 
 import { CV_TYPES } from "../../../../configs/constants";
 
+import { Theme } from "@mui/material/styles";
+
+import { AxiosError } from "axios";
+
+import { PaginatedResponse } from "../../../../types/api";
+
 import toastMessages from "../../../../utils/toastMessages";
 
 import errorHandling from "../../../../utils/errorHandling";
@@ -77,26 +83,26 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
   React.useEffect(() => {
 
-    const getOnlineProfile = async (jobSeekerProfileId: string | number | undefined, params: any) => {
+    const getOnlineProfile = async (jobSeekerProfileId: string | number | undefined, params: Record<string, unknown>) => {
       if (!jobSeekerProfileId) return;
 
       setIsLoadingResumes(true);
 
       try {
 
-        const resData = await jobSeekerProfileService.getResumes(
+        const resData = (await jobSeekerProfileService.getResumes(
 
           jobSeekerProfileId,
 
           params
 
-        ) as any;
+        )) as PaginatedResponse<Resume>;
 
-        setResumes(resData);
+        setResumes(resData?.results || []);
 
-      } catch (error: any) {
+      } catch (error: Error | unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<Record<string, unknown>>);
 
       } finally {
 
@@ -106,7 +112,8 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
     };
 
-    getOnlineProfile((currentUser as any)?.jobSeekerProfile?.id || (currentUser as any)?.jobSeekerProfileId, {
+    const user = currentUser as unknown as Record<string, any>;
+    getOnlineProfile(user?.jobSeekerProfile?.id || user?.jobSeekerProfileId, {
 
       resumeType: CV_TYPES.cvUpload,
 
@@ -114,7 +121,7 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
   }, [currentUser, isSuccess, reloadCounter]);
 
-  const handleAdd = (data: any) => {
+  const handleAdd = (data: Record<string, string | Blob>) => {
 
     const addResumeUpload = async (formData: FormData) => {
 
@@ -130,9 +137,9 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.resumeUploadSuccess'));
 
-      } catch (error: any) {
+      } catch (error: Error | unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<Record<string, unknown>>);
 
       } finally {
 
@@ -166,9 +173,9 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.resumeDeleteSuccess'));
 
-      } catch (error: any) {
+      } catch (error: Error | unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<Record<string, unknown>>);
 
       } finally {
 
@@ -206,9 +213,9 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.profileStatusUpdateSuccess'));
 
-      } catch (error: any) {
+      } catch (error: Error | unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<Record<string, unknown>>);
 
       } finally {
 
@@ -350,11 +357,11 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
                   py: 1.5,
 
-                  background: (theme: any) => theme.palette.primary.main,
+                  background: (theme: Theme) => theme.palette.primary.main,
 
                   "&:hover": {
 
-                    background: (theme: any) => theme.palette.primary.main,
+                    background: (theme: Theme) => theme.palette.primary.main,
 
                     opacity: 0.9,
 

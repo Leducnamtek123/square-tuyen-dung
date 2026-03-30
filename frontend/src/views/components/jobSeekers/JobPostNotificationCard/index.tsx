@@ -11,7 +11,7 @@ import BackdropLoading from "../../../../components/Common/Loading/BackdropLoadi
 import NoDataCard from "../../../../components/Common/NoDataCard";
 import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
 import FormPopup from "../../../../components/Common/Controls/FormPopup";
-import JobPostNotificationForm from "../JobPostNotificationForm";
+import JobPostNotificationForm, { JobPostNotificationFormValues } from "../JobPostNotificationForm";
 import ItemLoading from "./ItemLoading";
 import ItemComponent from "./ItemComponent";
 import { useJobPostNotifications, useJobPostNotificationMutations } from "../hooks/useJobSeekerQueries";
@@ -35,10 +35,10 @@ const JobPostNotificationCard = () => {
   const [page, setPage] = React.useState(1);
   const [openPopup, setOpenPopup] = React.useState(false);
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-  const [editData, setEditData] = React.useState<any>(null);
+  const [editData, setEditData] = React.useState<Partial<JobPostNotificationFormValues> & { id?: number } | null>(null);
 
   const { data, isLoading } = useJobPostNotifications({ page, pageSize });
-  const jobPostNotifications: JobPostNotification[] = data?.results || [];
+  const jobPostNotifications: JobPostNotification[] = (data?.results as unknown as JobPostNotification[]) || [];
   const count = data?.count || 0;
 
   const { addMutation, updateMutation, deleteMutation } = useJobPostNotificationMutations();
@@ -50,11 +50,11 @@ const JobPostNotificationCard = () => {
   const handleShowUpdate = async (id: number) => {
     setIsFullScreenLoading(true);
     try {
-      const resData = await jobPostNotificationService.getJobPostNotificationDetailById(id) as any;
+      const resData = await jobPostNotificationService.getJobPostNotificationDetailById(id) as Partial<JobPostNotificationFormValues> & { id?: number };
       setEditData(resData);
       setOpenPopup(true);
-    } catch (error: any) {
-      errorHandling(error);
+    } catch (error) {
+      errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
     } finally {
       setIsFullScreenLoading(false);
     }
@@ -65,16 +65,16 @@ const JobPostNotificationCard = () => {
     setOpenPopup(true);
   };
 
-  const handleAddOrUpdate = (formData: any) => {
+  const handleAddOrUpdate = (formData: JobPostNotificationFormValues & { id?: number }) => {
     if ("id" in formData && formData.id) {
-      updateMutation.mutate(formData, {
+      updateMutation.mutate(formData as unknown as Record<string, unknown> & { id: number }, {
         onSuccess: () => {
           setOpenPopup(false);
           toastMessages.success(t("jobSeeker:jobManagement.notifications.updatedSuccess"));
         },
       });
     } else {
-      addMutation.mutate(formData, {
+      addMutation.mutate(formData as unknown as Record<string, unknown>, {
         onSuccess: () => {
           setOpenPopup(false);
           toastMessages.success(t("jobSeeker:jobManagement.notifications.addedSuccess"));

@@ -9,11 +9,18 @@ import { useCities } from '../CitiesPage/hooks/useCities';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
 import { useDataTable } from '../../../hooks';
+import { City, District } from '../../../types/models';
+import { PaginatedResponse } from '../../../types/api';
+
+type DistrictExt = Omit<District, 'city'> & {
+    code?: string;
+    city?: number | string | City;
+};
 
 const DistrictsPage = () => {
     const { t } = useTranslation('admin');
-    const { data: citiesData, isLoading: isLoadingCities } = useCities() as any;
-    const cities = (citiesData?.results || citiesData) as any[];
+    const { data: citiesData, isLoading: isLoadingCities } = useCities();
+    const cities = (citiesData as unknown as PaginatedResponse<City>)?.results || citiesData as unknown as City[];
 
     const [selectedCity, setSelectedCity] = useState<string | number>('');
 
@@ -40,13 +47,13 @@ const DistrictsPage = () => {
         updateDistrict,
         deleteDistrict,
         isMutating
-    } = useDistricts({ city: selectedCity, page: page + 1, pageSize: rowsPerPage, ordering }) as any;
+    } = useDistricts({ city: selectedCity, page: page + 1, pageSize: rowsPerPage, ordering });
 
-    const districts = (districtsData?.results || districtsData) as any[];
+    const districts = (districtsData as unknown as PaginatedResponse<District>)?.results || districtsData as unknown as District[];
 
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-    const [currentDistrict, setCurrentDistrict] = useState<any>(null);
+    const [currentDistrict, setCurrentDistrict] = useState<DistrictExt | null>(null);
     const [districtName, setDistrictName] = useState('');
     const [districtCode, setDistrictCode] = useState('');
     const [targetCityId, setTargetCityId] = useState<string | number>('');
@@ -62,16 +69,16 @@ const DistrictsPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (district: any) => {
+    const handleOpenEdit = (district: DistrictExt) => {
         setDialogMode('edit');
         setCurrentDistrict(district);
-        setDistrictName(district.name);
-        setDistrictCode(district.code || '');
-        setTargetCityId(district.city);
+        setDistrictName(String(district.name || ''));
+        setDistrictCode(String(district.code || ''));
+        setTargetCityId(typeof district.city === 'object' ? district.city?.id || '' : Number(district.city));
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (district: any) => {
+    const handleOpenDelete = (district: DistrictExt) => {
         setCurrentDistrict(district);
         setOpenDeleteDialog(true);
     };
@@ -86,7 +93,7 @@ const DistrictsPage = () => {
         try {
             if (dialogMode === 'add') {
                 await createDistrict({ name: districtName, code: districtCode || null, city: targetCityId });
-            } else {
+            } else if (currentDistrict?.id) {
                 await updateDistrict({
                     id: currentDistrict.id,
                     data: { name: districtName, code: districtCode || null, city: targetCityId }
@@ -99,6 +106,7 @@ const DistrictsPage = () => {
     };
 
     const handleDelete = async () => {
+        if (!currentDistrict?.id) return;
         try {
             await deleteDistrict(currentDistrict.id);
             setOpenDeleteDialog(false);
@@ -107,7 +115,7 @@ const DistrictsPage = () => {
         }
     };
 
-    const columns = useMemo<ColumnDef<any>[]>(() => [
+    const columns = useMemo<ColumnDef<DistrictExt>[]>(() => [
         {
             accessorKey: 'id',
             header: t('pages.districts.table.id') as string,
@@ -190,7 +198,7 @@ const DistrictsPage = () => {
                         }}
                         disabled={isLoadingCities}
                     >
-                        {cities?.map((city: any) => (
+                        {cities?.map((city: City) => (
                             <MenuItem key={city.id} value={city.id}>
                                 {city.name}
                             </MenuItem>
@@ -227,7 +235,7 @@ const DistrictsPage = () => {
                             onChange={(e) => setTargetCityId(e.target.value)}
                             required
                         >
-                            {cities?.map((city: any) => (
+                            {cities?.map((city: City) => (
                                 <MenuItem key={city.id} value={city.id}>
                                     {city.name}
                                 </MenuItem>

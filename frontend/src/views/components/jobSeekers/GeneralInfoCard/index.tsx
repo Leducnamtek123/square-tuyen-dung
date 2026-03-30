@@ -26,6 +26,10 @@ import resumeService from '../../../../services/resumeService';
 import { salaryString } from '../../../../utils/customData';
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
+import { Theme } from '@mui/material/styles';
+import { AxiosError } from 'axios';
+import { ApiError } from '@/types/api';
+import { FormValues } from '../GeneralInfoForm';
 
 interface ResumeDetail {
   description: string | null;
@@ -144,6 +148,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
   const { slug: resumeSlug } = useParams<{ slug: string }>();
 
   const { allConfig } = useConfig();
+  const configDicts = allConfig as Record<string, Record<string | number, string>> | null;
 
   const [openPopup, setOpenPopup] = React.useState(false);
 
@@ -216,13 +221,13 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
       try {
 
-        const resData = await resumeService.getResumeOwner(slug) as any;
+        const resData = await resumeService.getResumeOwner(slug) as unknown as ResumeDetail;
 
         setResumeDetail(resData);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -236,16 +241,16 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
   }, [isSuccess, resumeSlug]);
 
-  const handleUpdateResumeDetail = (data: any) => {
+  const handleUpdateResumeDetail = (data: FormValues) => {
 
-    const updateResume = async (slug: string | undefined, payload: any) => {
+    const updateResume = async (slug: string | undefined, payload: FormValues) => {
       if (!slug) return;
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await resumeService.updateResume(slug, payload);
+        await resumeService.updateResume(slug, payload as unknown as Record<string, unknown>);
 
         setIsSuccess(!isSuccess);
 
@@ -253,9 +258,9 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.profileUpdateSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -279,7 +284,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
       p: 3,
 
-      boxShadow: (theme: any) => theme.customShadows.card,
+      boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
 
     }}>
 
@@ -341,7 +346,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: any) => theme.customShadows.medium,
+                    boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
 
                     '&:hover': {
 
@@ -404,25 +409,25 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
                     {renderItem(
 
                       t('jobSeeker:profile.fields.desiredLevel'),
-                      tConfig((allConfig as any)?.positionDict?.[resumeDetail?.position ?? ''])
+                      tConfig(configDicts?.positionDict?.[resumeDetail?.position ?? ''])
                     )}
 
                     {renderItem(
 
                       t('jobSeeker:profile.fields.academicLevel'),
-                      tConfig((allConfig as any)?.academicLevelDict?.[resumeDetail?.academicLevel ?? ''])
+                      tConfig(configDicts?.academicLevelDict?.[resumeDetail?.academicLevel ?? ''])
                     )}
 
                     {renderItem(
 
                       t('jobSeeker:profile.fields.experience'),
-                      tConfig((allConfig as any)?.experienceDict?.[resumeDetail?.experience ?? ''])
+                      tConfig(configDicts?.experienceDict?.[resumeDetail?.experience ?? ''])
                     )}
 
                     {renderItem(
 
                       t('jobSeeker:profile.fields.career'),
-                      tConfig((allConfig as any)?.careerDict?.[resumeDetail?.career ?? ''])
+                      tConfig(configDicts?.careerDict?.[resumeDetail?.career ?? ''])
                     )}
 
                   </Stack>
@@ -443,7 +448,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
                     {renderItem(
 
                       t('jobSeeker:profile.fields.workLocation'),
-                      tConfig((allConfig as any)?.cityDict?.[resumeDetail?.city ?? ''])
+                      tConfig(configDicts?.cityDict?.[resumeDetail?.city ?? ''])
                     )}
 
                     {renderItem(
@@ -475,7 +480,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
                     {renderItem(
 
                       t('jobSeeker:profile.fields.workplaceType'),
-                      tConfig((allConfig as any)?.typeOfWorkplaceDict?.[
+                      tConfig(configDicts?.typeOfWorkplaceDict?.[
                         resumeDetail?.typeOfWorkplace ?? ''
                       ])
                     )}
@@ -483,7 +488,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
                     {renderItem(
 
                       t('jobSeeker:profile.fields.jobType'),
-                      tConfig((allConfig as any)?.jobTypeDict?.[resumeDetail?.jobType ?? ''])
+                      tConfig(configDicts?.jobTypeDict?.[resumeDetail?.jobType ?? ''])
                     )}
 
                   </Stack>
@@ -514,7 +519,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
         <GeneralInfoForm
 
-          handleUpdate={handleUpdateResumeDetail}
+          handleUpdate={handleUpdateResumeDetail as unknown as (data: Record<string, unknown>) => void}
 
           editData={resumeDetail}
 

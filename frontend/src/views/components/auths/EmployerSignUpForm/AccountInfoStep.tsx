@@ -3,9 +3,13 @@ import { Stack } from "@mui/material";
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import PasswordTextFieldCustom from '../../../../components/Common/Controls/PasswordTextFieldCustom';
 
+import type { Control } from 'react-hook-form';
+import type { TFunction } from 'i18next';
+import type { EmployerSignUpFormData } from './index';
+
 interface AccountInfoStepProps {
-  control: any;
-  t: any;
+  control: Control<EmployerSignUpFormData>;
+  t: TFunction<string | string[], undefined>;
   show: boolean;
 }
 

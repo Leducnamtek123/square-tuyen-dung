@@ -131,7 +131,7 @@ const JobSeekerLogin = () => {
 
   }, [searchParams]);
 
-  const handleLogin = (data: any) => {
+  const handleLogin = (data: { email: string; password?: string }) => {
 
     const getAccessToken = async (email: string, password: string, roleName: RoleName) => {
 
@@ -141,7 +141,7 @@ const JobSeekerLogin = () => {
 
         const resData = await authService.getToken(email, password, roleName);
 
-        const { accessToken, refreshToken, backend } = resData as any;
+        const { accessToken, refreshToken, backend } = resData as unknown as { accessToken: string; refreshToken: string; backend: string };
 
         const isSaveTokenToCookie =
 
@@ -181,14 +181,14 @@ const JobSeekerLogin = () => {
 
       } catch (error) {
 
-        const axiosError = error as AxiosError<any>;
+        const axiosError = error as AxiosError<{ errors?: { errorMessage?: string[] } }>;
         const res = axiosError?.response;
 
         if (res?.status === 400) {
 
           const errors = res?.data?.errors;
 
-          if (errors && 'errorMessage' in errors) {
+          if (errors?.errorMessage) {
 
             setErrorMessage(errors.errorMessage.join(' '));
 
@@ -214,7 +214,7 @@ const JobSeekerLogin = () => {
 
       try {
 
-        const resData = await authService.checkCreds(email, roleName) as any;
+        const resData = await authService.checkCreds(email, roleName) as { exists: boolean; email: string; emailVerified: boolean };
 
         const { exists, email: resEmail, emailVerified } = resData;
 
@@ -260,7 +260,7 @@ const JobSeekerLogin = () => {
 
     };
 
-    checkCreds(data.email, data.password, ROLES_NAME.JOB_SEEKER as RoleName);
+    checkCreds(data.email, data.password || '', ROLES_NAME.JOB_SEEKER as RoleName);
 
   };
 
@@ -290,9 +290,10 @@ const JobSeekerLogin = () => {
         provider,
 
         token,
+
         redirectUri
 
-      ) as any;
+      ) as unknown as { accessToken: string; refreshToken: string; backend: string };
 
       const { accessToken, refreshToken, backend } = resData;
 
@@ -333,11 +334,11 @@ const JobSeekerLogin = () => {
       }
 
     } catch (error) {
-      const axiosError = error as AxiosError<any>;
+      const axiosError = error as AxiosError<{ errors?: { errorMessage?: string[] } }>;
       const res = axiosError?.response;
       if (res?.status === 400) {
         const errors = res?.data?.errors;
-        if (errors && 'errorMessage' in errors) {
+        if (errors?.errorMessage) {
           setErrorMessage(errors.errorMessage.join(' '));
         } else {
           toastMessages.error(t('messages.tryAgain'));
@@ -373,7 +374,7 @@ const JobSeekerLogin = () => {
 
   // };
 
-  const handleGoogleLogin = (result: any) => {
+  const handleGoogleLogin = (result: { code?: string }) => {
 
     const code = result?.code;
 
@@ -399,7 +400,7 @@ const JobSeekerLogin = () => {
     setIsFullScreenLoading(true);
     try {
       const resData = await authService.firebaseLogin(idToken, ROLES_NAME.JOB_SEEKER as RoleName);
-      const { accessToken, refreshToken, backend } = resData as any;
+      const { accessToken, refreshToken, backend } = resData as unknown as { accessToken: string; refreshToken: string; backend: string };
 
       const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
         accessToken,
@@ -420,13 +421,13 @@ const JobSeekerLogin = () => {
         toastMessages.error(t('messages.loginError'));
       }
     } catch (error) {
-      const axiosError = error as AxiosError<any>;
+      const axiosError = error as AxiosError<{ errors?: { errorMessage?: string[], token?: string[] } }>;
       const res = axiosError?.response;
       if (res?.status === 400) {
         const errors = res?.data?.errors;
-        if (errors && 'errorMessage' in errors) {
+        if (errors?.errorMessage) {
           setErrorMessage(errors.errorMessage.join(' '));
-        } else if (errors && 'token' in errors) {
+        } else if (errors?.token) {
            setErrorMessage(errors.token.join(' '));
         } else {
           toastMessages.error(t('messages.tryAgain'));

@@ -49,6 +49,10 @@ import TimeAgo from '../../../../components/Common/TimeAgo';
 import resumeService from '../../../../services/resumeService';
 
 import certificateService from '../../../../services/certificateService';
+import { Theme } from '@mui/material/styles';
+import { AxiosError } from 'axios';
+import { ApiError } from '@/types/api';
+import { FormValues } from '../CertificateForm';
 
 interface Certificate {
   id: string | number;
@@ -150,7 +154,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
   const [editData, setEditData] = React.useState<Certificate | null>(null);
 
-  const [serverErrors, setServerErrors] = React.useState<any>(null);
+  const [serverErrors, setServerErrors] = React.useState<Record<string, unknown> | null>(null);
 
   React.useEffect(() => {
 
@@ -161,13 +165,13 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       try {
 
-        const resData = await resumeService.getCertificates(slug) as any;
+        const resData = await resumeService.getCertificates(slug) as unknown as Certificate[];
 
         setCertificates(resData);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -191,15 +195,15 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       try {
 
-        const resData = await certificateService.getCertificateById(certId) as any;
+        const resData = await certificateService.getCertificateById(certId) as unknown as Certificate;
 
         setEditData(resData);
 
         setOpenPopup(true);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -223,15 +227,15 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
   };
 
-  const handleAddOrUpdate = (data: any) => {
+  const handleAddOrUpdate = (data: FormValues | (FormValues & { id: string | number })) => {
 
-    const create = async (payload: any) => {
+    const create = async (payload: FormValues & { resume?: string }) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await certificateService.addCertificates(payload);
+        await certificateService.addCertificates(payload as unknown as Record<string, unknown>);
 
         setOpenPopup(false);
 
@@ -239,9 +243,9 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.certificateAddSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error, setServerErrors);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors);
 
       } finally {
 
@@ -251,13 +255,13 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
     };
 
-    const update = async (payload: any) => {
+    const update = async (payload: FormValues & { id?: string | number }) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await certificateService.updateCertificateById(payload.id, payload);
+        await certificateService.updateCertificateById(payload.id as string | number, payload as unknown as Record<string, unknown>);
 
         setOpenPopup(false);
 
@@ -265,9 +269,9 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.certificateUpdateSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -311,9 +315,9 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.certificateDeleteSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -351,7 +355,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
           p: 3,
 
-          boxShadow: (theme: any) => theme.customShadows.card,
+          boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
 
         }}
 
@@ -405,7 +409,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: any) => theme.customShadows.medium,
+                    boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -471,9 +475,9 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
                           sx={{
 
-                            background: (theme: any) => theme.palette.primary.main,
+                            background: (theme: Theme) => theme.palette.primary.main,
 
-                            boxShadow: (theme: any) => theme.customShadows.small,
+                            boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.small,
 
                           }}
 
@@ -645,7 +649,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
         <CertificateForm
 
-          handleAddOrUpdate={handleAddOrUpdate}
+          handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
 
           editData={editData}
 

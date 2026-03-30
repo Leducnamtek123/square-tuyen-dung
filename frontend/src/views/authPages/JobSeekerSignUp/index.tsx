@@ -35,7 +35,9 @@ import type { AxiosError } from 'axios';
 
 import tokenService from '../../../services/tokenService';
 
+import { JobSeekerSignUpFormData } from '../../components/auths/JobSeekerSignUpForm';
 
+type AnyRecord = Record<string, unknown>;
 
 const StyledCard = styled(Card)(({ theme }) => ({
 
@@ -99,15 +101,15 @@ const JobSeekerSignUp = () => {
 
   const [serverErrors, setServerErrors] = React.useState<Record<string, string[]>>({});
 
-  const handleRegister = (data: any) => {
+  const handleRegister = (data: JobSeekerSignUpFormData) => {
 
-    const register = async (data: any, roleName: RoleName) => {
+    const register = async (payload: AnyRecord, roleName: RoleName) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await authService.jobSeekerRegister(data);
+        await authService.jobSeekerRegister(payload);
 
         dispatch(
 
@@ -115,7 +117,7 @@ const JobSeekerSignUp = () => {
 
             isAllowVerifyEmail: true,
 
-            email: data?.email,
+            email: payload?.email as string,
 
             roleName: roleName,
 
@@ -127,13 +129,13 @@ const JobSeekerSignUp = () => {
 
       } catch (error) {
 
-        const axiosError = error as AxiosError<any>;
+        const axiosError = error as AxiosError<Record<string, unknown>>;
         const res = axiosError?.response;
-        const errors = res?.data?.errors;
+        const errors = res?.data?.errors as Record<string, unknown> | undefined;
         const hasEmailExists = !!errors?.email;
         if (res?.status === 400 && hasEmailExists) {
           try {
-            const resData = await authService.checkCreds(data?.email, ROLES_NAME.JOB_SEEKER as RoleName) as any;
+            const resData = (await authService.checkCreds(data?.email, ROLES_NAME.JOB_SEEKER as RoleName)) as { exists: boolean; emailVerified: boolean };
             if (resData?.exists === true && resData?.emailVerified === false) {
               dispatch(
                 updateVerifyEmail({
@@ -181,7 +183,7 @@ const JobSeekerSignUp = () => {
 
     try {
 
-      const resData = await authService.convertToken(
+      const resData = (await authService.convertToken(
 
         clientId,
 
@@ -192,7 +194,7 @@ const JobSeekerSignUp = () => {
         token,
         redirectUri
 
-      ) as any;
+      )) as unknown as { accessToken: string; refreshToken: string; backend: string };
 
       const { accessToken, refreshToken, backend } = resData;
 
@@ -222,7 +224,7 @@ const JobSeekerSignUp = () => {
 
           .catch(() => {
 
-            errorHandling({ response: null } as unknown as AxiosError<any>);
+            errorHandling({ response: null } as unknown as AxiosError<Record<string, unknown>>);
 
           });
 
@@ -230,7 +232,7 @@ const JobSeekerSignUp = () => {
 
     } catch (error) {
 
-      errorHandling(error as AxiosError<any>);
+      errorHandling(error as AxiosError<Record<string, unknown>>);
 
     } finally {
 
@@ -240,7 +242,7 @@ const JobSeekerSignUp = () => {
 
   };
 
-  const handleFacebookRegister = (result: any) => {
+  const handleFacebookRegister = (result: Record<string, any>) => {
 
     const accessToken = result?.data?.accessToken;
 
@@ -262,9 +264,9 @@ const JobSeekerSignUp = () => {
 
   };
 
-  const handleGoogleRegister = (result: any) => {
+  const handleGoogleRegister = (result: Record<string, unknown>) => {
 
-    const code = result?.code;
+    const code = result?.code as string;
 
     if (code) {
 
@@ -288,7 +290,7 @@ const JobSeekerSignUp = () => {
 
     try {
 
-      const resData = await authService.checkCreds(email, roleName) as any;
+      const resData = (await authService.checkCreds(email, roleName)) as { exists: boolean; emailVerified: boolean };
 
       const { exists, emailVerified } = resData;
 
@@ -320,7 +322,7 @@ const JobSeekerSignUp = () => {
 
     } catch (error) {
 
-      errorHandling(error as AxiosError<any>);
+      errorHandling(error as AxiosError<Record<string, unknown>>);
 
       return false;
 

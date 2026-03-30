@@ -16,6 +16,7 @@ import questionService from '../../../../services/questionService';
 import { transformQuestion } from '../../../../utils/transformers';
 
 import DataTable from '../../../../components/Common/DataTable';
+import { PaginatedResponse } from '@/types/api';
 
 interface QuestionBankCardProps {
   title?: string;
@@ -27,7 +28,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
   const resolvedTitle = title || t('employer.questionBank.title');
 
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState<import('@/types/models').Question[]>([]);
 
   const [count, setCount] = useState(0);
 
@@ -39,7 +40,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
   const [open, setOpen] = useState(false);
 
-  const [currentQuestion, setCurrentQuestion] = useState<any>({ text: '', id: null });
+  const [currentQuestion, setCurrentQuestion] = useState<{ text?: string; id?: number | null }>({ text: '', id: null });
 
   const [isEdit, setIsEdit] = useState(false);
 
@@ -48,21 +49,15 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
     try {
 
       const data = await questionService.getQuestions({
-
         page: page + 1,
-
         pageSize: rowsPerPage,
-      }) as any;
+      });
 
-      const rawQuestions = Array.isArray(data?.results)
-        ? data.results
-        : Array.isArray(data)
-        ? data
-        : [];
-      setQuestions(rawQuestions.map(transformQuestion).filter(Boolean));
+      const rawQuestions = (data as unknown as PaginatedResponse<Record<string, unknown>>)?.results || [];
+      setQuestions(rawQuestions.map((q: Record<string, unknown>) => transformQuestion(q) as import('@/types/models').Question).filter(Boolean));
       setCount(typeof data?.count === 'number' ? data.count : rawQuestions.length);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
 
       console.error('Error fetching questions', error);
 
@@ -89,7 +84,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
   };
 
-  const handleOpen = useCallback((q: any = { text: '' }) => { // Changed q type to any
+  const handleOpen = useCallback((q: { text?: string; id?: number | null } = { text: '' }) => {
     setCurrentQuestion(q);
     setIsEdit(!!q.id);
     setOpen(true);
@@ -121,7 +116,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
       if (isEdit) {
 
-        await questionService.updateQuestion(currentQuestion.id, payload);
+        await questionService.updateQuestion(currentQuestion.id as number, payload);
 
         toastMessages.success(t('employer.questionBank.updateSuccess'));
 
@@ -137,7 +132,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
       handleClose();
 
-    } catch (error: any) {
+    } catch (error: unknown) {
 
       toastMessages.error(t('employer.questionBank.saveError'));
 
@@ -145,13 +140,13 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
   };
 
-  const handleDelete = useCallback(async (id: string) => { // Changed id type to string
+  const handleDelete = useCallback(async (id: string | number) => {
     if (window.confirm(t('employer.questionBank.deleteConfirm'))) {
       try {
         await questionService.deleteQuestion(id);
         toastMessages.success(t('employer.questionBank.deleteSuccess'));
         fetchQuestions();
-      } catch (error: any) {
+      } catch (error: unknown) {
         toastMessages.error(t('employer.questionBank.deleteError'));
       }
     }
@@ -165,7 +160,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
         accessorKey: 'text',
 
-        cell: ({ getValue }: any) => ( // Added type for getValue
+        cell: ({ getValue }: { getValue: () => unknown }) => (
 
           <Typography
 
@@ -187,7 +182,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
           >
 
-            {getValue()}
+            {String(getValue() ?? '')}
 
           </Typography>
 
@@ -201,7 +196,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
         id: 'actions',
 
-        cell: ({ row }: any) => ( // Added type for row
+        cell: ({ row }: { row: { original: { id: number; text?: string } } }) => (
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
 
             <IconButton
@@ -282,9 +277,8 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
             fontWeight: 600,
 
-            background: (theme: any) =>
-
-              theme.palette.primary.main || theme.palette.primary.main,
+            background: (theme: import('@mui/material/styles').Theme) =>
+              theme.palette.primary.main,
 
             WebkitBackgroundClip: 'text',
 
@@ -316,14 +310,10 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
             px: 3,
 
-            background: (theme: any) => theme.palette.primary.main,
-
-            boxShadow: (theme: any) => theme.customShadows?.small || 1,
-
+            background: (theme: import('@mui/material/styles').Theme) => theme.palette.primary.main,
+            boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.small || 1,
             '&:hover': {
-
-              boxShadow: (theme: any) => theme.customShadows?.medium || 2,
-
+              boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.medium || 2,
             },
 
           }}
@@ -366,7 +356,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
 
           borderRadius: 2,
 
-          boxShadow: (theme: any) => theme.customShadows?.card || 1,
+          boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.card || 1,
 
           overflow: 'hidden',
 

@@ -7,6 +7,18 @@ import { useCallback } from "react";
 import { StickToBottom, useStickToBottomContext } from "use-stick-to-bottom";
 import type { ComponentProps, ReactNode, HTMLAttributes } from "react";
 
+export type ConversationMessagePart = {
+  type?: string;
+  text?: string;
+  [key: string]: unknown;
+};
+
+export type ConversationMessage = {
+  role: string;
+  parts?: ConversationMessagePart[];
+  [key: string]: unknown;
+};
+
 type ConversationProps = ComponentProps<typeof StickToBottom> & {
   className?: string;
   children?: ReactNode;
@@ -108,26 +120,26 @@ export const ConversationScrollButton = ({
   ));
 };
 
-const getMessageText = (message: any) => (message?.parts || [])
-  .filter((part: any) => part.type === "text")
-  .map((part: any) => part.text || "")
+const getMessageText = (message: ConversationMessage) => (message?.parts || [])
+  .filter((part: ConversationMessagePart) => part.type === "text")
+  .map((part: ConversationMessagePart) => part.text || "")
   .join("");
 
-const defaultFormatMessage = (message: { role: string }) => {
+const defaultFormatMessage = (message: ConversationMessage) => {
   const roleLabel =
     message.role.charAt(0).toUpperCase() + message.role.slice(1);
   return `**${roleLabel}:** ${getMessageText(message)}`;
 };
 
 export const messagesToMarkdown = (
-  messages: Array<any>,
-  formatMessage: (message: any, index: number) => string = defaultFormatMessage
+  messages: Array<ConversationMessage>,
+  formatMessage: (message: ConversationMessage, index: number) => string = defaultFormatMessage
 ) => messages.map((msg, i) => formatMessage(msg, i)).join("\n\n");
 
 type ConversationDownloadProps = {
-  messages: Array<any>;
+  messages: Array<ConversationMessage>;
   filename?: string;
-  formatMessage?: (message: any, index: number) => string;
+  formatMessage?: (message: ConversationMessage, index: number) => string;
   className?: string;
   children?: ReactNode;
 } & ComponentProps<typeof Button>;

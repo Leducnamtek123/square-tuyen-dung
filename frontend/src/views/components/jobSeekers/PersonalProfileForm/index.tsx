@@ -24,7 +24,7 @@ import DatePickerCustom from '../../../../components/Common/Controls/DatePickerC
 import commonService from '../../../../services/commonService';
 import { useConfig } from '@/hooks/useConfig';
 
-interface FormValues {
+export interface PersonalProfileFormValues {
   user: {
     fullName: string;
   };
@@ -49,8 +49,9 @@ interface FormValues {
 }
 
 interface PersonalProfileFormProps {
-  handleUpdateProfile: (data: any) => void;
-  editData: any;
+  handleUpdateProfile: (data: PersonalProfileFormValues) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  editData: Partial<PersonalProfileFormValues> | any | null;
 }
 
 
@@ -171,11 +172,11 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
   });
 
-  const [districtOptions, setDistrictOptions] = React.useState<any[]>([]);
+  const [districtOptions, setDistrictOptions] = React.useState<Record<string, unknown>[]>([]);
 
-  const { control, setValue, reset, handleSubmit } = useForm<FormValues>({
+  const { control, setValue, reset, handleSubmit } = useForm<PersonalProfileFormValues>({
 
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<PersonalProfileFormValues>,
 
   });
 
@@ -195,7 +196,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
       phone: editData?.phone || '',
 
-      birthday: editData?.birthday,
+      birthday: editData?.birthday === undefined ? null : editData.birthday,
 
       gender: editData?.gender || '',
 
@@ -203,17 +204,17 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
       user: {
 
-        fullName: editData.user?.fullName || '',
+        fullName: editData?.user?.fullName || '',
 
       },
 
       location: {
 
-        city: editData.location?.city || '',
+        city: editData?.location?.city || '',
 
-        district: editData.location?.district || '',
+        district: editData?.location?.district || '',
 
-        address: editData.location?.address || '',
+        address: editData?.location?.address || '',
 
       },
 
@@ -239,11 +240,11 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
   }, [editData, reset]);
 
-  const prevCityIdRef = React.useRef<any>(null);
+  const prevCityIdRef = React.useRef<string | number | null>(null);
   React.useEffect(() => {
     const loadDistricts = async (id: number | string) => {
       try {
-        const resData = await commonService.getDistrictsByCityId(id) as any;
+        const resData = await commonService.getDistrictsByCityId(id) as unknown as Record<string, unknown>[];
         // Only clear district if the cityId has actually changed (user interaction)
         // and it's not the initial load (prevCityIdRef.current is not null).
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
@@ -251,8 +252,8 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
         }
         setDistrictOptions(resData);
         prevCityIdRef.current = id;
-      } catch (error: any) {
-        errorHandling(error);
+      } catch (error) {
+        errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
       }
     };
     if (cityId) {

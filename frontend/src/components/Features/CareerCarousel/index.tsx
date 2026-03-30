@@ -13,6 +13,8 @@ import commonService from "@/services/commonService";
 import MuiImageCustom from "@/components/Common/MuiImageCustom";
 import { searchJobPost } from "@/redux/filterSlice";
 import { IMAGES, ROUTES } from "@/configs/constants";
+import { Theme } from "@mui/material/styles";
+import { Career } from "@/types/models";
 
 const styles = {
   ".swiper-pagination": {
@@ -25,7 +27,7 @@ const styles = {
     width: 8,
     height: 8,
     opacity: 0.5,
-    backgroundColor: (theme: any) => theme.palette.primary.main,
+    backgroundColor: (theme: Theme) => theme.palette.primary.main,
     transition: "all 0.3s ease",
   },
   ".swiper-pagination-bullet-active": {
@@ -104,8 +106,8 @@ const CareerCarousel = () => {
     }
   }, [parentWidth]);
 
-  const handleFilter = (id: any) => {
-    dispatch(searchJobPost({ ...jobPostFilter, careerId: id }));
+  const handleFilter = (id: string | number) => {
+    dispatch(searchJobPost({ ...jobPostFilter, careerId: String(id) }));
     nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
   };
 
@@ -128,7 +130,7 @@ const CareerCarousel = () => {
             ? Array.from(Array(10).keys()).map((value) => (
               <SwiperSlide key={value}>{Loading}</SwiperSlide>
             ))
-            : topCareers.map((value: any) => (
+            : topCareers.map((value: Career & { jobPostTotal?: number }) => (
               <SwiperSlide key={value.id}>
                 <Card
                   sx={{
@@ -142,12 +144,12 @@ const CareerCarousel = () => {
                     transition: "all 0.3s ease",
                     "&:hover": {
                       transform: "translateY(-4px)",
-                      boxShadow: (theme: any) => theme.customShadows.medium,
+                      boxShadow: (theme: Theme) => (theme as unknown as { customShadows: Record<string, string> }).customShadows.medium,
                       "& .career-icon": {
                         transform: "scale(1.05)",
                       },
                       "& .career-name": {
-                        color: (theme: any) => theme.palette.primary.main,
+                        color: (theme: Theme) => theme.palette.primary.main,
                       },
                     },
                   }}
@@ -172,7 +174,7 @@ const CareerCarousel = () => {
                       sx={{
                         borderRadius: "12px",
                         p: 1,
-                        backgroundColor: (theme: any) => theme.palette.primary.background,
+                        backgroundColor: (theme: Theme) => theme.palette.primary.background,
                       }}
                     />
                   </Stack>
@@ -200,8 +202,8 @@ const CareerCarousel = () => {
                     gutterBottom
                     sx={{
                       textAlign: "center",
-                      color: (theme: any) => theme.palette.text.secondary,
-                      backgroundColor: (theme: any) => theme.palette.primary.background,
+                      color: (theme: Theme) => theme.palette.text.secondary,
+                      backgroundColor: (theme: Theme) => theme.palette.primary.background,
                       px: 2,
                       py: 0.5,
                       borderRadius: "20px",

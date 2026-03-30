@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import questionService from '../../../../services/questionService';
 import toastMessages from '../../../../utils/toastMessages';
+import { Question } from '../../../../types/models';
 
-export const useQuestions = (params: any) => {
+export const useQuestions = (params: Record<string, unknown>) => {
     return useQuery({
         queryKey: ['admin-questions', params],
         queryFn: async () => {
@@ -17,7 +18,7 @@ export const useQuestions = (params: any) => {
 export const useCreateQuestion = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: any) => questionService.createQuestion(data),
+        mutationFn: (data: Partial<Question> | Record<string, unknown>) => questionService.createQuestion(data),
         onSuccess: () => {
             toastMessages.success('Question added successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-questions'] });
@@ -29,7 +30,7 @@ export const useCreateQuestion = () => {
 export const useUpdateQuestion = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, data }: { id: any; data: any }) => questionService.updateQuestion(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<Question> | Record<string, unknown> }) => questionService.updateQuestion(id, data),
         onSuccess: () => {
             toastMessages.success('Question updated successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-questions'] });
@@ -41,7 +42,7 @@ export const useUpdateQuestion = () => {
 export const useDeleteQuestion = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (id: any) => questionService.deleteQuestion(id),
+        mutationFn: (id: string | number) => questionService.deleteQuestion(id),
         onSuccess: () => {
             toastMessages.success('Question deleted successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-questions'] });

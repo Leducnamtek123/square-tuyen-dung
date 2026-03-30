@@ -45,10 +45,13 @@ import FormPopup from '../../../../components/Common/Controls/FormPopup';
 import EducationDetaiForm from '../EducationDetailForm';
 
 import resumeService from '../../../../services/resumeService';
-
 import educationDetailService from '../../../../services/educationDetailService';
 
 import TimeAgo from '../../../../components/Common/TimeAgo';
+import { Theme } from '@mui/material/styles';
+import { AxiosError } from 'axios';
+import { ApiError } from '@/types/api';
+import { FormValues } from '../EducationDetailForm';
 
 import { useTranslation } from 'react-i18next';
 
@@ -163,13 +166,13 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       try {
 
-        const resData = await resumeService.getEducationsDetail(slug) as any;
+        const resData = await resumeService.getEducationsDetail(slug) as unknown as EducationDetail[];
 
         setEducationsDetail(resData);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -191,15 +194,15 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       try {
 
-        const resData = await educationDetailService.getEducationDetailById(eduId) as any;
+        const resData = await educationDetailService.getEducationDetailById(eduId) as unknown as EducationDetail;
 
         setEditData(resData);
 
         setOpenPopup(true);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -221,15 +224,15 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
   };
 
-  const handleAddOrUpdate = (data: any) => {
+  const handleAddOrUpdate = (data: FormValues | (FormValues & { id: string | number })) => {
 
-    const create = async (payload: any) => {
+    const create = async (payload: FormValues & { resume?: string }) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await educationDetailService.addEducationsDetail(payload);
+        await educationDetailService.addEducationsDetail(payload as unknown as Record<string, unknown>);
 
         setOpenPopup(false);
 
@@ -237,9 +240,9 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
         toastMessages.success(t('profile.messages.educationAddSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -249,13 +252,13 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
     };
 
-    const update = async (payload: any) => {
+    const update = async (payload: FormValues & { id?: string | number }) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await educationDetailService.updateEducationDetailById(payload.id, payload);
+        await educationDetailService.updateEducationDetailById(payload.id as string | number, payload as unknown as Record<string, unknown>);
 
         setOpenPopup(false);
 
@@ -263,9 +266,9 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
         toastMessages.success(t('profile.messages.educationUpdateSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -309,9 +312,9 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
         toastMessages.success(t('profile.messages.educationDeleteSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -349,7 +352,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
           p: 3,
 
-          boxShadow: (theme: any) => theme.customShadows.card,
+          boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
 
         }}
 
@@ -403,7 +406,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: any) => theme.customShadows.medium,
+                    boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -469,9 +472,9 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                           sx={{
 
-                            background: (theme: any) => theme.palette.primary.main,
+                            background: (theme: Theme) => theme.palette.primary.main,
 
-                            boxShadow: (theme: any) => theme.customShadows.small,
+                            boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.small,
 
                           }}
 
@@ -745,7 +748,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
         <EducationDetaiForm
 
-          handleAddOrUpdate={handleAddOrUpdate}
+          handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
 
           editData={editData}
 

@@ -16,18 +16,34 @@ import goongService from '../../../../services/goongService';
 import CompanyFormLoading from './CompanyFormLoading';
 import CompanyFormFields from './CompanyFormFields';
 import { useConfig } from '@/hooks/useConfig';
+import type { AxiosError } from 'axios';
+import type { ApiError } from '../../../../types/api';
+import type { Resolver } from 'react-hook-form';
+import type { SelectOption } from '../../../../types/models';
+
+export interface CompanyFormValues {
+  companyName: string;
+  taxCode: string;
+  employeeSize: number;
+  fieldOperation: string;
+  location: { city: number; district: number; address: string; lat: number; lng: number };
+  since?: Date | null;
+  companyEmail: string;
+  companyPhone: string;
+  description?: EditorState;
+}
 
 interface CompanyFormProps {
-  handleUpdate: (data: any) => void;
-  editData: any;
-  serverErrors?: any;
+  handleUpdate: (data: CompanyFormValues) => void;
+  editData: Partial<CompanyFormValues> | null;
+  serverErrors?: Record<string, string[]> | null;
 }
 
 const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFormProps) => {
   const { t } = useTranslation('employer');
   const { allConfig } = useConfig();
-  const [districtOptions, setDistrictOptions] = React.useState<any[]>([]);
-  const [locationOptions, setLocationOptions] = React.useState<any[]>([]);
+  const [districtOptions, setDistrictOptions] = React.useState<SelectOption[]>([]);
+  const [locationOptions, setLocationOptions] = React.useState<Record<string, unknown>[]>([]);
 
   const schema = yup.object().shape({
     companyName: yup.string().required(t('jobPostForm.validation.jobnameisrequired', 'Company name is required.')).max(255, t('jobPostForm.validation.jobnameexceededallowedlength', 'Company name exceeded allowed length.')),
@@ -47,8 +63,8 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
     description: yup.mixed().notRequired(),
   });
 
-  const { control, reset, setValue, setError, handleSubmit } = useForm({
-    resolver: yupResolver(schema),
+  const { control, reset, setValue, setError, clearErrors, handleSubmit } = useForm<CompanyFormValues>({
+    resolver: yupResolver(schema) as unknown as Resolver<CompanyFormValues>,
     defaultValues: {
       description: EditorState.createEmpty(),
       location: { city: '' as unknown as number, district: '' as unknown as number, address: '', lat: '' as unknown as number, lng: '' as unknown as number },
@@ -59,10 +75,10 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   const address = useWatch({ control, name: 'location.address' });
   const addressDebounce = useDebounce(address, 500);
 
-  const prevCityIdRef = React.useRef<any>(null);
+  const prevCityIdRef = React.useRef<number | string | null>(null);
 
   React.useEffect(() => {
-    const loadDistricts = async (cityId: any) => {
+    const loadDistricts = async (cityId: number | string) => {
       try {
         const resData = await commonService.getDistrictsByCityId(cityId);
         // Only clear district if the cityId has actually changed (user interaction)
@@ -70,10 +86,10 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
           setValue('location.district', '' as unknown as number);
         }
-        setDistrictOptions(resData?.data || []);
+        setDistrictOptions((resData as unknown as { data: SelectOption[] })?.data || []);
         prevCityIdRef.current = cityId;
-      } catch (error: any) {
-        errorHandling(error);
+      } catch (error) {
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
       }
     };
     if (cityId) {
@@ -89,9 +105,9 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
       }
       try {
         const resData = await goongService.getPlaces(input);
-        if (resData.predictions) setLocationOptions(resData.predictions as any[]);
-      } catch (error: any) {
-        errorHandling(error);
+        if ((resData as Record<string, unknown>).predictions) setLocationOptions((resData as Record<string, unknown>).predictions as Record<string, unknown>[]);
+      } catch (error) {
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
       }
     };
     loadLocation(addressDebounce);
@@ -99,7 +115,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
 
   React.useEffect(() => {
     if (editData !== null) {
-      reset((formValues) => ({ ...formValues, ...editData }));
+      reset((formValues) => ({ ...formValues, ...(editData as unknown as Partial<CompanyFormValues>) }));
     } else {
       reset();
     }
@@ -108,22 +124,25 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   React.useEffect(() => {
     if (serverErrors !== null) {
       for (let err in serverErrors) {
-        setError(err as any, { type: 400 as any, message: serverErrors[err]?.join(' ') });
+        setError(err as keyof CompanyFormValues, { type: 'manual', message: serverErrors[err]?.join(' ') });
       }
     } else {
-      (setError as any)();
+      clearErrors();
     }
-  }, [serverErrors, setError]);
+  }, [serverErrors, setError, clearErrors]);
 
-  const handleSelectLocation = async (e: any, value: any) => {
+  const handleSelectLocation = async (e: React.SyntheticEvent, value: Record<string, unknown> | null) => {
     if (!value || typeof value !== 'object' || !value.place_id) return;
     try {
-      const resData = await goongService.getPlaceDetailByPlaceId(value.place_id) as any;
-      if (!resData?.result?.geometry?.location) return;
-      setValue('location.lat', resData?.result?.geometry.location.lat || '');
-      setValue('location.lng', resData?.result?.geometry.location.lng || '');
-    } catch (error: any) {
-      errorHandling(error);
+      const resData = await goongService.getPlaceDetailByPlaceId(value.place_id as string);
+      const resultObj = (resData as Record<string, unknown>)?.result as Record<string, unknown> | undefined;
+      const geometryObj = resultObj?.geometry as Record<string, unknown> | undefined;
+      if (!geometryObj?.location) return;
+      const location = geometryObj.location as Record<string, unknown>;
+      setValue('location.lat', location.lat as number);
+      setValue('location.lng', location.lng as number);
+    } catch (error) {
+      errorHandling(error as AxiosError<{ errors?: ApiError }>);
     }
   };
 

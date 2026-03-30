@@ -34,7 +34,7 @@ const SavedJobCard = () => {
   const [page, setPage] = React.useState(1);
 
   const { data, isLoading } = useSavedJobs({ pageSize, page });
-  const jobPosts: JobPost[] = data?.results || [];
+  const jobPosts: JobPost[] = (data?.results as unknown as JobPost[]) || [];
   const count = data?.count || 0;
 
   const toggleSave = useToggleSaveJob();

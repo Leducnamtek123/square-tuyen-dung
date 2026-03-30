@@ -3,7 +3,7 @@ import adminManagementService from '../../../../services/adminManagementService'
 import toastMessages from '../../../../utils/toastMessages';
 import i18next from 'i18next';
 
-export const useWards = (params: any) => {
+export const useWards = (params?: Record<string, unknown>) => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -17,36 +17,36 @@ export const useWards = (params: any) => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: any) => adminManagementService.createWard(data),
+        mutationFn: (data: Record<string, unknown>) => adminManagementService.createWard(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-wards'] });
             toastMessages.success(i18next.t('admin:pages.wards.toast.addSuccess'));
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error(i18next.t('admin:pages.wards.toast.addError'));
             console.error(err);
         }
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateWard(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> }) => adminManagementService.updateWard(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-wards'] });
             toastMessages.success(i18next.t('admin:pages.wards.toast.updateSuccess'));
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error(i18next.t('admin:pages.wards.toast.updateError'));
             console.error(err);
         }
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id: any) => adminManagementService.deleteWard(id),
+        mutationFn: (id: string | number) => adminManagementService.deleteWard(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-wards'] });
             toastMessages.success(i18next.t('admin:pages.wards.toast.deleteSuccess'));
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error(i18next.t('admin:pages.wards.toast.deleteError'));
             console.error(err);
         }
@@ -58,5 +58,5 @@ export const useWards = (params: any) => {
         updateWard: updateMutation.mutateAsync,
         deleteWard: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    } as any;
+    };
 };

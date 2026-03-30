@@ -18,7 +18,7 @@ import MultilineTextFieldCustom from '../../../../components/Common/Controls/Mul
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import { useConfig } from '@/hooks/useConfig';
 
-interface FormValues {
+export interface FormValues {
   title: string;
   position: string | number;
   academicLevel: string | number;

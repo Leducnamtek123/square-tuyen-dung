@@ -7,9 +7,26 @@ import { tConfig } from '../../../../utils/tConfig';
 import { salaryString } from '../../../../utils/customData';
 import InfoItem from './InfoItem';
 import { useConfig } from '@/hooks/useConfig';
+import { JobSeekerProfile } from '../../../../types/models';
+import { Theme } from '@mui/material';
+
+type ConfigDict = Record<string, string>;
+
+export interface GeneralInfoProfileExt extends Partial<JobSeekerProfile> {
+  title?: string;
+  position?: string;
+  academicLevel?: string;
+  experience?: string;
+  career?: string;
+  city?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  typeOfWorkplace?: string;
+  jobType?: string;
+}
 
 interface GeneralInfoSectionProps {
-  profileDetail: any;
+  profileDetail: GeneralInfoProfileExt;
 }
 
 const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }) => {
@@ -22,9 +39,9 @@ const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }
         variant="h5"
         sx={{
           mb: 2,
-          color: (theme: any) => theme.palette.primary.main,
+          color: (theme: Theme) => theme.palette.primary.main,
           borderBottom: "2px solid",
-          borderColor: (theme: any) => theme.palette.primary.light,
+          borderColor: (theme: Theme) => theme.palette.primary.light,
           pb: 1,
           fontSize: { xs: "1.25rem", sm: "1.5rem" },
         }}
@@ -33,54 +50,54 @@ const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }
       </Typography>
       <Grid container>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem label={t('profileDetailCard.label.desiredPosition')} value={profileDetail?.title} />
+          <InfoItem label={t('profileDetailCard.label.desiredPosition')} value={profileDetail?.title as string} />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.desiredLevel')} 
-            value={tConfig((allConfig as any)?.positionDict?.[profileDetail?.position])} 
+          <InfoItem
+            label={t('profileDetailCard.label.desiredLevel')}
+            value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.positionDict?.[profileDetail?.position as string])}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.educationLevel')} 
-            value={tConfig((allConfig as any)?.academicLevelDict?.[profileDetail?.academicLevel])} 
+          <InfoItem
+            label={t('profileDetailCard.label.educationLevel')}
+            value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.academicLevelDict?.[profileDetail?.academicLevel as string])} 
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.experience')} 
-            value={tConfig((allConfig as any)?.experienceDict?.[profileDetail?.experience])} 
+          <InfoItem
+            label={t('profileDetailCard.label.experience')}
+            value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.experienceDict?.[profileDetail?.experience as string])}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.career')} 
-            value={tConfig((allConfig as any)?.careerDict?.[profileDetail?.career])} 
+          <InfoItem
+            label={t('profileDetailCard.label.career')}
+            value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.careerDict?.[profileDetail?.career as string])}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.workLocation')} 
-            value={tConfig((allConfig as any)?.cityDict?.[profileDetail?.city])} 
+          <InfoItem
+            label={t('profileDetailCard.label.workLocation')}
+            value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.cityDict?.[profileDetail?.city as string])}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.desiredSalary')} 
-            value={salaryString(profileDetail?.salaryMin, profileDetail?.salaryMax)} 
+          <InfoItem
+            label={t('profileDetailCard.label.desiredSalary')}
+            value={salaryString(profileDetail?.salaryMin as number, profileDetail?.salaryMax as number)}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.workplaceType')} 
-            value={tConfig((allConfig as any)?.typeOfWorkplaceDict?.[profileDetail?.typeOfWorkplace])} 
+          <InfoItem
+            label={t('profileDetailCard.label.workplaceType')}
+            value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.typeOfWorkplaceDict?.[profileDetail?.typeOfWorkplace as string])}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.jobType')} 
-            value={tConfig((allConfig as any)?.jobTypeDict?.[profileDetail?.jobType])} 
+          <InfoItem
+            label={t('profileDetailCard.label.jobType')}
+            value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.jobTypeDict?.[profileDetail?.jobType as string])}
           />
         </Grid>
       </Grid>

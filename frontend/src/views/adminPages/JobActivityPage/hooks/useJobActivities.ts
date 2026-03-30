@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
+import { JobPostActivity } from '../../../../types/models';
 
-export const useJobActivities = (params: any) => {
+export const useJobActivities = (params?: Record<string, unknown>) => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -15,36 +16,36 @@ export const useJobActivities = (params: any) => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: any) => adminManagementService.createJobActivity(data),
+        mutationFn: (data: Partial<JobPostActivity> | Record<string, unknown>) => adminManagementService.createJobActivity(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-activities'] });
             toastMessages.success('Activity added successfully');
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error('An error occurred while adding the activity');
             console.error(err);
         }
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateJobActivity(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPostActivity> | Record<string, unknown> }) => adminManagementService.updateJobActivity(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-activities'] });
             toastMessages.success('Activity updated successfully');
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error('An error occurred while updating the activity');
             console.error(err);
         }
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id: any) => adminManagementService.deleteJobActivity(id),
+        mutationFn: (id: string | number) => adminManagementService.deleteJobActivity(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-activities'] });
             toastMessages.success('Activity deleted successfully');
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error('An error occurred while deleting the activity');
             console.error(err);
         }
@@ -56,5 +57,5 @@ export const useJobActivities = (params: any) => {
         updateJobActivity: updateMutation.mutateAsync,
         deleteJobActivity: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    } as any;
+    };
 };

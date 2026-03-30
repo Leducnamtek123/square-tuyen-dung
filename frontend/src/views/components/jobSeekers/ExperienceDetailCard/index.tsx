@@ -51,6 +51,10 @@ import TimeAgo from '../../../../components/Common/TimeAgo';
 import resumeService from "../../../../services/resumeService";
 
 import experienceDetailService from "../../../../services/experienceDetailService";
+import { Theme } from '@mui/material/styles';
+import { AxiosError } from 'axios';
+import { ApiError } from '@/types/api';
+import { FormValues } from '../ExperienceDetailForm';
 
 interface ExperienceDetail {
   id: string | number;
@@ -162,13 +166,13 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
       try {
 
-        const resData = await resumeService.getExperiencesDetail(slug) as any;
+        const resData = await resumeService.getExperiencesDetail(slug) as unknown as ExperienceDetail[];
 
         setExperiencesDetail(resData);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -194,15 +198,15 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
           experienceId
 
-        ) as any;
+        ) as unknown as ExperienceDetail;
 
         setEditData(resData);
 
         setOpenPopup(true);
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -224,15 +228,15 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
   };
 
-  const handleAddOrUpdate = (data: any) => {
+  const handleAddOrUpdate = (data: FormValues | (FormValues & { id: string | number })) => {
 
-    const create = async (payload: any) => {
+    const create = async (payload: FormValues & { resume?: string }) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await experienceDetailService.addExperienceDetail(payload);
+        await experienceDetailService.addExperienceDetail(payload as unknown as Record<string, unknown>);
 
         setOpenPopup(false);
 
@@ -240,9 +244,9 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.experienceAddSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -252,13 +256,13 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
     };
 
-    const update = async (payload: any) => {
+    const update = async (payload: FormValues & { id?: string | number }) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await experienceDetailService.updateExperienceDetailById(payload.id, payload);
+        await experienceDetailService.updateExperienceDetailById(payload.id as string | number, payload as unknown as Record<string, unknown>);
 
         setOpenPopup(false);
 
@@ -266,9 +270,9 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.experienceUpdateSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -312,9 +316,9 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.experienceDeleteSuccess'));
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -352,7 +356,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
           p: 3,
 
-          boxShadow: (theme: any) => theme.customShadows.card,
+          boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
 
         }}
 
@@ -406,7 +410,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: any) => theme.customShadows.medium,
+                    boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -472,11 +476,11 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
                           sx={{
 
-                            background: (theme: any) =>
+                            background: (theme: Theme) =>
 
                               theme.palette.primary.main,
 
-                            boxShadow: (theme: any) => theme.customShadows.small,
+                            boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.small,
 
                           }}
 
@@ -750,7 +754,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
         <ExperienceDetaiForm
 
-          handleAddOrUpdate={handleAddOrUpdate}
+          handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
 
           editData={editData}
 

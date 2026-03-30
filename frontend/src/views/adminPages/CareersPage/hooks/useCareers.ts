@@ -1,8 +1,10 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
+import { Career } from '../../../../types/models';
+import { PaginatedResponse } from '../../../../types/api';
 
-export const useCareers = (params: any) => {
+export const useCareers = (params?: Record<string, unknown>) => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -15,36 +17,36 @@ export const useCareers = (params: any) => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: any) => adminManagementService.createCareer(data),
+        mutationFn: (data: Partial<Career> | Record<string, unknown>) => adminManagementService.createCareer(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
             toastMessages.success('Career added successfully');
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error('An error occurred while adding the career');
             console.error(err);
         }
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateCareer(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<Career> | Record<string, unknown> }) => adminManagementService.updateCareer(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
             toastMessages.success('Career updated successfully');
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error('An error occurred while updating the career');
             console.error(err);
         }
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id: any) => adminManagementService.deleteCareer(id),
+        mutationFn: (id: string | number) => adminManagementService.deleteCareer(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
             toastMessages.success('Career deleted successfully');
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error('An error occurred while deleting the career');
             console.error(err);
         }
@@ -56,5 +58,5 @@ export const useCareers = (params: any) => {
         updateCareer: updateMutation.mutateAsync,
         deleteCareer: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    } as any;
+    };
 };

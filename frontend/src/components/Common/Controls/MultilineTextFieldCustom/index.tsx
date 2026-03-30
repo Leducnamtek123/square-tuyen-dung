@@ -5,18 +5,21 @@ import { Control, Controller } from 'react-hook-form';
 import { TextField, Typography } from "@mui/material";
 import ValidationError from '../ValidationError';
 
-interface Props {
+import type { SxProps, Theme } from '@mui/material/styles';
+
+interface Props<T extends Record<string, unknown>> {
   name: string;
-  control: Control<any>;
+  control: Control<T | any>;
   title?: string | null;
   showRequired?: boolean;
   placeholder?: string;
   disabled?: boolean;
   maxRows?: number;
   minRows?: number;
+  sx?: SxProps<Theme>;
 }
 
-const MultilineTextFieldCustom = ({
+const MultilineTextFieldCustom = <T extends Record<string, unknown>>({
   name,
   control,
   title = null,
@@ -24,8 +27,9 @@ const MultilineTextFieldCustom = ({
   placeholder = '',
   disabled = false,
   maxRows = 10,
-  minRows = 4
-}: Props) => {
+  minRows = 4,
+  sx
+}: Props<T>) => {
 
   return (
 
@@ -75,6 +79,8 @@ const MultilineTextFieldCustom = ({
               minRows={minRows}
 
               variant="outlined"
+
+              sx={sx}
 
             />
 

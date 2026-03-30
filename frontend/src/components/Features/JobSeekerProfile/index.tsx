@@ -25,18 +25,18 @@ interface JobSeekerProfileProps {
   title: string;
   salaryMin?: number;
   salaryMax?: number;
-  experience: any;
+  experience: number;
   updateAt: string | Date;
   isSaved?: boolean;
   viewEmployerNumber?: number;
-  city: any;
+  city: number | string;
   user?: {
     fullName?: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   jobSeekerProfile?: {
     old?: number | string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
   type?: string;
   lastViewedDate?: string | Date;
@@ -163,11 +163,9 @@ const JobSeekerProfile = ({
 
                     sx={{
 
-                      color: (defaultTheme.palette.text as any).placeholder,
+                      color: defaultTheme.palette.text.placeholder,
 
-                      fontStyle: 'italic',
-
-                      ...(defaultTheme.palette.text as any).italic
+                      ...defaultTheme.palette.text.italic
 
                     }}
 
@@ -199,7 +197,7 @@ const JobSeekerProfile = ({
 
                   {jobSeekerProfile?.old || (
 
-                    <span style={(defaultTheme.palette.text as any).italic}>
+                    <span style={defaultTheme.palette.text.italic as React.CSSProperties}>
 
                       Chưa cập nhật
 
@@ -237,7 +235,7 @@ const JobSeekerProfile = ({
 
                   borderRadius: '6px',
 
-                  backgroundColor: (defaultTheme.palette.success as any).background,
+                  backgroundColor: defaultTheme.palette.success.background,
 
                   borderColor: defaultTheme.palette.success.light,
 
@@ -299,7 +297,7 @@ const JobSeekerProfile = ({
 
                 component="span"
 
-                sx={(defaultTheme.palette.text as any).italic}
+                sx={defaultTheme.palette.text.italic as import('@mui/material').SxProps<import('@mui/material').Theme>}
 
               >
 
@@ -323,7 +321,7 @@ const JobSeekerProfile = ({
 
                 salaryString(salaryMin, salaryMax) || (
 
-                  <Typography component="span" sx={(defaultTheme.palette.text as any).italic}>
+                  <Typography component="span" sx={defaultTheme.palette.text.italic as import('@mui/material').SxProps<import('@mui/material').Theme>}>
 
                     Chưa cập nhật
 
@@ -335,13 +333,13 @@ const JobSeekerProfile = ({
 
               sx={{
 
-                backgroundColor: (defaultTheme.palette.secondary as any).background,
+                backgroundColor: defaultTheme.palette.secondary.background,
 
                 color: defaultTheme.palette.secondary.dark,
 
                 '&:hover': {
 
-                  backgroundColor: (defaultTheme.palette.secondary as any).backgroundHover,
+                  backgroundColor: defaultTheme.palette.secondary.backgroundHover,
 
                 }
 
@@ -357,9 +355,9 @@ const JobSeekerProfile = ({
 
               label={
 
-                tConfig(allConfig?.experienceDict?.[experience as keyof typeof allConfig.experienceDict] as any) || (
+                tConfig(allConfig?.experienceDict?.[experience] as unknown as string) || (
 
-                  <Typography component="span" sx={(defaultTheme.palette.text as any).italic}>
+                  <Typography component="span" sx={defaultTheme.palette.text.italic as import('@mui/material').SxProps<import('@mui/material').Theme>}>
 
                     Chưa cập nhật
 
@@ -371,7 +369,7 @@ const JobSeekerProfile = ({
 
               sx={{
 
-                backgroundColor: (defaultTheme.palette.primary as any).background,
+                backgroundColor: defaultTheme.palette.primary.background,
 
                 color: defaultTheme.palette.primary.main,
 
@@ -387,9 +385,9 @@ const JobSeekerProfile = ({
 
               label={
 
-                tConfig(allConfig?.cityDict?.[city as keyof typeof allConfig.cityDict] as any) || (
+                tConfig(allConfig?.cityDict?.[city] as unknown as string) || (
 
-                  <Typography component="span" sx={(defaultTheme.palette.text as any).italic}>
+                  <Typography component="span" sx={defaultTheme.palette.text.italic as import('@mui/material').SxProps<import('@mui/material').Theme>}>
 
                     Chưa cập nhật
 
@@ -401,7 +399,7 @@ const JobSeekerProfile = ({
 
               sx={{
 
-                backgroundColor: (defaultTheme.palette.info as any).background,
+                backgroundColor: defaultTheme.palette.info.background,
 
                 color: defaultTheme.palette.info.main,
 
@@ -451,7 +449,7 @@ const JobSeekerProfile = ({
 
                   '&:hover': {
 
-                    backgroundColor: (defaultTheme.palette.error as any).background,
+                    backgroundColor: defaultTheme.palette.error.background,
 
                   }
 
@@ -489,7 +487,7 @@ const JobSeekerProfile = ({
 
                   '&:hover': {
 
-                    backgroundColor: (defaultTheme.palette.primary as any).background,
+                    backgroundColor: defaultTheme.palette.primary.background,
 
                   }
 

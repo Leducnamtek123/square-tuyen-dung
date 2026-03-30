@@ -41,20 +41,16 @@ const DESCRIPTION_LOCATIONS = [
   { value: 4, label: 'Bottom Right' },
 ];
 
-const normalizeList = (res: any): any[] => {
-  if (Array.isArray(res)) return res;
-  if (Array.isArray(res?.results)) return res.results;
-  return [];
-};
+import { PaginatedResponse } from '@/types/api';
 
 const BannersPage = () => {
   const { t } = useTranslation('admin');
-  const [banners, setBanners] = useState<any[]>([]);
+  const [banners, setBanners] = useState<Record<string, unknown>[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-  const [current, setCurrent] = useState<any>(null);
+  const [current, setCurrent] = useState<Record<string, unknown> | null>(null);
   const [openDelete, setOpenDelete] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -92,8 +88,8 @@ const BannersPage = () => {
     setIsLoading(true);
     setFetchError(null);
     try {
-      const res: any = await adminManagementService.getBanners({ ordering });
-      setBanners(normalizeList(res));
+      const res = await adminManagementService.getBanners({ ordering }) as PaginatedResponse<Record<string, unknown>>;
+      setBanners(res.results || []);
     } catch (e) {
       console.error('[BannersPage] fetchBanners error:', e);
       setFetchError(t('pages.banners.fetchError') || 'Không thể tải danh sách banner. Vui lòng thử lại.');
@@ -117,19 +113,19 @@ const BannersPage = () => {
     setOpenDialog(true);
   };
 
-  const handleOpenEdit = (banner: any) => {
+  const handleOpenEdit = (banner: Record<string, unknown>) => {
     setDialogMode('edit'); setCurrent(banner);
-    setDescription(banner.description || '');
-    setButtonText(banner.button_text || '');
-    setButtonLink(banner.button_link || '');
+    setDescription(banner.description as string || '');
+    setButtonText(banner.button_text as string || '');
+    setButtonLink(banner.button_link as string || '');
     setIsShowButton(!!banner.is_show_button);
     setIsActive(!!banner.is_active);
-    setPlatform(banner.platform || 'WEB');
-    setType(banner.type ?? 1);
-    setDescriptionLocation(banner.description_location ?? 3);
+    setPlatform(banner.platform as string || 'WEB');
+    setType(banner.type as number ?? 1);
+    setDescriptionLocation(banner.description_location as number ?? 3);
     setWebImage(null); setMobileImage(null);
-    setWebPreview(banner.imageUrl || '');
-    setMobilePreview(banner.imageMobileUrl || '');
+    setWebPreview(banner.imageUrl as string || '');
+    setMobilePreview(banner.imageMobileUrl as string || '');
     setOpenDialog(true);
   };
 
@@ -150,9 +146,9 @@ const BannersPage = () => {
 
     try {
       if (dialogMode === 'add') {
-        await adminManagementService.createBanner(formData as any);
+        await adminManagementService.createBanner(formData as unknown as Record<string, unknown>);
       } else {
-        await adminManagementService.updateBanner(current.id, formData as any);
+        await adminManagementService.updateBanner(current!.id as string | number, formData as unknown as Record<string, unknown>);
       }
       setOpenDialog(false);
       fetchBanners();
@@ -163,7 +159,7 @@ const BannersPage = () => {
   const handleDelete = async () => {
     setIsSaving(true);
     try {
-      await adminManagementService.deleteBanner(current.id);
+      await adminManagementService.deleteBanner(current!.id as string | number);
       setOpenDelete(false);
       fetchBanners();
     } catch (e) { console.error(e); }
@@ -204,7 +200,7 @@ const BannersPage = () => {
 
   const cropAspect = ASPECT_RATIOS[type] || ASPECT_RATIOS[1];
 
-  const columns = useMemo<ColumnDef<any>[]>(() => [
+  const columns = useMemo<ColumnDef<Record<string, unknown>>[]>(() => [
     {
       accessorKey: 'id',
       header: t('pages.banners.table.id') as string,
@@ -219,7 +215,7 @@ const BannersPage = () => {
             component="img"
             src={info.getValue() as string}
             alt="web banner"
-            onError={(e: any) => { e.currentTarget.src = IMAGES.companyLogoDefault; }}
+            onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { e.currentTarget.src = IMAGES.companyLogoDefault; }}
             sx={{ width: 120, height: 60, objectFit: 'cover', borderRadius: 1 }}
           />
         ) : '—'
@@ -234,7 +230,7 @@ const BannersPage = () => {
             component="img"
             src={info.getValue() as string}
             alt="mobile banner"
-            onError={(e: any) => { e.currentTarget.src = IMAGES.companyLogoDefault; }}
+            onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { e.currentTarget.src = IMAGES.companyLogoDefault; }}
             sx={{ width: 60, height: 60, objectFit: 'cover', borderRadius: 1 }}
           />
         ) : '—'
@@ -374,7 +370,7 @@ const BannersPage = () => {
                   component="img"
                   src={webPreview}
                   alt="Web preview"
-                  onError={(e: any) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement)?.style && ((e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'); }}
+                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement)?.style && ((e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'); }}
                   sx={{ width: '100%', maxHeight: 150, objectFit: 'contain', borderRadius: 1, border: '1px solid', borderColor: 'divider', display: 'block' }}
                 />
                 <Box sx={{ display: 'none', width: '100%', height: 80, borderRadius: 1, border: '1px dashed', borderColor: 'divider', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontSize: 13 }}>
@@ -401,7 +397,7 @@ const BannersPage = () => {
                   component="img"
                   src={mobilePreview}
                   alt="Mobile preview"
-                  onError={(e: any) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement)?.style && ((e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'); }}
+                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement)?.style && ((e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'); }}
                   sx={{ width: 200, maxHeight: 150, objectFit: 'contain', borderRadius: 1, border: '1px solid', borderColor: 'divider', display: 'block' }}
                 />
                 <Box sx={{ display: 'none', width: 200, height: 80, borderRadius: 1, border: '1px dashed', borderColor: 'divider', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontSize: 13 }}>

@@ -9,6 +9,7 @@ import { useQuestionGroups } from './hooks/useQuestionGroups';
 import QuestionGroupTable from './components/QuestionGroupTable';
 import questionService from '../../../services/questionService';
 import { transformQuestion, transformQuestionGroup } from '../../../utils/transformers';
+import { PaginatedResponse } from '@/types/api';
 
 const QuestionGroupsPage = () => {
     const { t } = useTranslation('admin');
@@ -56,8 +57,8 @@ const QuestionGroupsPage = () => {
     React.useEffect(() => {
         const fetchQuestions = async () => {
             try {
-                const res = await questionService.getAllQuestions({ pageSize: 1000 }) as any;
-                const rawQuestions = Array.isArray(res?.results) ? res.results : Array.isArray(res) ? res : [];
+                const res = await questionService.getAllQuestions({ pageSize: 1000 });
+                const rawQuestions = res.results || [];
                 setAllQuestions(rawQuestions.map(transformQuestion).filter(Boolean));
             } catch (error) {
                 console.error("Error fetching questions", error);
@@ -199,9 +200,9 @@ const QuestionGroupsPage = () => {
                 </Box>
 
                 <QuestionGroupTable
-                    data={(Array.isArray(data?.results) ? data.results : Array.isArray(data) ? data : []).map(transformQuestionGroup).filter(Boolean)}
+                    data={(data?.results || []).map(transformQuestionGroup).filter(Boolean)}
                     loading={isLoading}
-                    rowCount={(data as any)?.count || 0}
+                    rowCount={data?.count || 0}
                     pagination={pagination}
                     onPaginationChange={onPaginationChange}
                     sorting={sorting}

@@ -9,13 +9,24 @@ import dayjs from "dayjs";
 import { CV_TYPES, ROUTES } from "../../../../configs/constants";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { useResumes } from "../hooks/useJobSeekerQueries";
+import { Theme } from "@mui/material/styles";
+import { Resume } from "../../../../types/models";
+
+interface JobApplicationExt extends Omit<Resume, 'type'> {
+  isActive?: boolean;
+  type?: number | string;
+  updateAt?: string;
+}
 
 const JobApplicationCard = () => {
   const { t } = useTranslation(['jobSeeker', 'common']);
   const nav = useRouter();
   const { currentUser } = useAppSelector((state) => state.user);
+  
+  const user = currentUser as unknown as Record<string, any>;
+  const profileId = user?.jobSeekerProfile?.id || user?.jobSeekerProfileId;
 
-  const { data, isLoading } = useResumes((currentUser as any)?.jobSeekerProfile?.id || (currentUser as any)?.jobSeekerProfileId);
+  const { data, isLoading } = useResumes(profileId);
 
   return (
     <Box
@@ -41,8 +52,8 @@ const JobApplicationCard = () => {
           }
           sx={{
             "&:hover": {
-              backgroundColor: (theme: any) => theme.palette.primary.background,
-              color: (theme: any) => theme.palette.primary.main,
+              backgroundColor: (theme: Theme) => theme.palette.primary.light,
+              color: (theme: Theme) => theme.palette.primary.main,
             },
           }}
         >
@@ -58,19 +69,19 @@ const JobApplicationCard = () => {
           </Stack>
         ) : (
           <List disablePadding>
-            {(data || []).map((item: any) => (
+            {(data as unknown as JobApplicationExt[] || []).map((item: JobApplicationExt) => (
               <ListItem
                 key={item?.id || item?.title}
                 sx={{
                   p: 2,
                   mb: 1,
-                  background: (theme: any) => theme.palette.grey[50],
+                  background: (theme: Theme) => theme.palette.grey[50],
                   borderRadius: 2,
                   cursor: "pointer",
                   transition: "all 0.2s ease-in-out",
                   "&:hover": {
                     transform: "translateY(-2px)",
-                    boxShadow: (theme: any) => theme.customShadows.small,
+                    boxShadow: (theme: Theme) => theme.shadows[2],
                   },
                 }}
               >
@@ -79,7 +90,7 @@ const JobApplicationCard = () => {
                     <Tooltip title={t('jobSeeker:jobApplication.onlineProfile')}>
                       <Avatar
                         sx={{
-                          bgcolor: (theme: any) => theme.palette.primary.main,
+                          bgcolor: (theme: Theme) => theme.palette.primary.main,
                           width: 45,
                           height: 45,
                         }}
@@ -91,7 +102,7 @@ const JobApplicationCard = () => {
                     <Tooltip title={t('jobSeeker:jobApplication.attachedResume')}>
                       <Avatar
                         sx={{
-                          bgcolor: (theme: any) => theme.palette.hot.main,
+                          bgcolor: (theme: Theme) => theme.palette.error.main,
                           width: 45,
                           height: 45,
                         }}
@@ -118,8 +129,8 @@ const JobApplicationCard = () => {
                         variant="body2"
                         sx={{
                           color: item?.isActive
-                            ? (theme: any) => theme.palette.success.main
-                            : (theme: any) => theme.palette.hot.main,
+                            ? (theme: Theme) => theme.palette.success.main
+                            : (theme: Theme) => theme.palette.error.main,
                           fontWeight: 500,
                         }}
                       >

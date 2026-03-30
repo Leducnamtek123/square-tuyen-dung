@@ -12,25 +12,17 @@ import errorHandling from '../../../../utils/errorHandling';
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 import xlsxUtils from '../../../../utils/xlsxUtils';
+import type { AxiosError } from 'axios';
 import FormPopup from '../../../../components/Common/Controls/FormPopup';
 import JobPostFilterForm from '../JobPostFilterForm';
 import JobPostForm from '../JobPostForm';
 import jobService from '../../../../services/jobService';
 import JobPostsTable from '../JobPostsTable';
 import { useDataTable } from '../../../../hooks';
+import type { JobPost } from '../../../../types/models';
+import type { ApiError } from '../../../../types/api';
 
-interface JobPost {
-  id: number;
-  slug?: string;
-  jobName: string;
-  createAt: string;
-  deadline: string;
-  appliedTotal: number;
-  viewedTotal: number;
-  isVerify: boolean;
-  isUrgent: boolean;
-  [key: string]: any;
-}
+
 
 
 
@@ -157,7 +149,7 @@ const JobPostCard = () => {
 
   const [count, setCount] = React.useState<number>(0);
 
-  const [filterData, setFilterData] = React.useState<any>({
+  const [filterData, setFilterData] = React.useState<{ kw: string; isUrgent: boolean | '' }>({
     kw: '',
     isUrgent: '',
   });
@@ -172,9 +164,9 @@ const JobPostCard = () => {
 
   const [JobPosts, setJobPosts] = React.useState<JobPost[]>([]);
 
-  const [editData, setEditData] = React.useState<any>(null);
+  const [editData, setEditData] = React.useState<Record<string, unknown> | null>(null);
 
-  const [serverErrors, setServerErrors] = React.useState<any>(null);
+  const [serverErrors, setServerErrors] = React.useState<Record<string, string[]> | null>(null);
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
     // legacy handler, no longer needed if we use DataTable's onSortingChange
@@ -188,21 +180,21 @@ const JobPostCard = () => {
     onPaginationChange({ pageIndex: 0, pageSize: parseInt(event.target.value, 10) });
   };
 
-  const loadJobPosts = React.useCallback(async (params: any) => {
+  const loadJobPosts = React.useCallback(async (params: Record<string, unknown>) => {
 
     setIsLoadingJobPost(true);
 
     try {
 
-      const resData: any = await jobService.getEmployerJobPost(params);
+      const resData = await jobService.getEmployerJobPost(params) as { results: JobPost[], count?: number };
 
       setJobPosts(resData.results);
 
       setCount(resData.count || resData.results?.length || 0);
 
-    } catch (error: any) {
+    } catch (error) {
 
-      errorHandling(error);
+      errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
     } finally {
 
@@ -230,11 +222,11 @@ const JobPostCard = () => {
 
       try {
 
-        const resData: any = await jobService.getEmployerJobPostDetailById(
+        const resData = await jobService.getEmployerJobPostDetailById(
 
           jobPostId
 
-        );
+        ) as unknown as Record<string, unknown>;
 
         let data = resData;
 
@@ -244,31 +236,31 @@ const JobPostCard = () => {
 
           jobDescription: createEditorStateFromHTMLString(
 
-            data?.jobDescription || ''
+            (data as Record<string, unknown>)?.jobDescription as string || ''
 
           ),
 
           jobRequirement: createEditorStateFromHTMLString(
 
-            data?.jobRequirement || ''
+            (data as Record<string, unknown>)?.jobRequirement as string || ''
 
           ),
 
           benefitsEnjoyed: createEditorStateFromHTMLString(
 
-            (data as any)?.benefitsEnjoyed || ''
+            (data as Record<string, unknown>)?.benefitsEnjoyed as string || ''
 
           ),
 
         };
 
-        setEditData(data as any);
+        setEditData(data as Record<string, unknown>);
 
         setOpenPopup(true);
 
-      } catch (error: any) {
+      } catch (error) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -290,9 +282,9 @@ const JobPostCard = () => {
 
   };
 
-  const handleAddOrUpdate = async (data: any) => {
+  const handleAddOrUpdate = async (data: import('../JobPostForm/JobPostSchema').JobPostFormValues) => {
 
-    const dataCustom = {
+    const dataCustom: Record<string, unknown> = {
 
       ...data,
 
@@ -304,13 +296,13 @@ const JobPostCard = () => {
 
     };
 
-    const handleAdd = async (data: any) => {
+    const handleAdd = async (payload: Record<string, unknown>) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await jobService.addJobPost(data);
+        await jobService.addJobPost(payload as unknown as Parameters<typeof jobService.addJobPost>[0]);
 
         setOpenPopup(false);
 
@@ -318,9 +310,9 @@ const JobPostCard = () => {
 
         toastMessages.success(t('jobPost.messages.addSuccess'));
 
-      } catch (error: any) {
+      } catch (error) {
 
-        errorHandling(error, setServerErrors);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as unknown as Parameters<typeof errorHandling>[1]);
 
       } finally {
 
@@ -330,13 +322,13 @@ const JobPostCard = () => {
 
     };
 
-    const update = async (data: any) => {
+    const update = async (payload: Record<string, unknown>) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await jobService.updateJobPostById(data.slug || data.id, data);
+        await jobService.updateJobPostById(payload.slug as string || payload.id as string, payload as unknown as Parameters<typeof jobService.updateJobPostById>[1]);
 
         setOpenPopup(false);
 
@@ -344,9 +336,9 @@ const JobPostCard = () => {
 
         toastMessages.success(t('jobPost.messages.updateSuccess'));
 
-      } catch (error: any) {
+      } catch (error) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -380,9 +372,9 @@ const JobPostCard = () => {
 
         toastMessages.success(t('jobPost.delete.success'));
 
-      } catch (error: any) {
+      } catch (error) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -408,7 +400,7 @@ const JobPostCard = () => {
 
   const handleFilter = (data: { kw: string, isUrgent: number | string }) => {
     setFilterData({
-      ...data,
+      kw: data.kw,
       isUrgent: data.isUrgent === 1 ? true : data.isUrgent === 2 ? false : '',
     });
     onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
@@ -425,17 +417,18 @@ const JobPostCard = () => {
         page: page + 1,
         pageSize: rowsPerPage,
         ordering,
-        ...filterData,
-
+        kw: filterData.kw,
+        // Drop empty string to pass undefined to satisfy api get params type
+        isUrgent: filterData.isUrgent === '' ? undefined : filterData.isUrgent,
       };
 
-      const resData: any = await jobService.exportEmployerJobPosts(params);
+      const resData = await jobService.exportEmployerJobPosts(params as any);
 
-      xlsxUtils.exportToXLSX(resData, 'JobList');
+      xlsxUtils.exportToXLSX(resData as unknown as Record<string, unknown>[], 'JobList');
 
-    } catch (error: any) {
+    } catch (error) {
 
-      errorHandling(error);
+      errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
     } finally {
 

@@ -32,7 +32,7 @@ export interface JobPostFormValues {
   isUrgent?: boolean;
 }
 
-export const getJobPostSchema = (t: any) => 
+export const getJobPostSchema = (t: import('i18next').TFunction<string | string[], undefined>) => 
   yup.object().shape({
     jobName: yup.string().required(t('jobPostForm.validation.jobnameisrequired', 'Job name is required.')).max(200, t('jobPostForm.validation.jobnameexceededallowedlength', 'Job name exceeded allowed length.')),
     career: yup.number().required(t('jobPostForm.validation.careerisrequired', 'Career is required.')).typeError(t('jobPostForm.validation.careerisrequired', 'Career is required.')),
@@ -46,9 +46,9 @@ export const getJobPostSchema = (t: any) =>
     salaryMax: yup.number().required(t('jobPostForm.validation.maximumsalaryisrequired', 'Maximum salary is required.')).typeError(t('jobPostForm.validation.invalidmaximumsalary', 'Invalid maximum salary.')).min(0, t('jobPostForm.validation.invalidmaximumsalary', 'Invalid maximum salary.')).test('maximum-wage-comparison', t('jobPostForm.validation.maxSalaryGreater', 'Maximum salary must be greater than minimum salary.'), function (value) { return !(value <= this.parent.salaryMin); }),
     academicLevel: yup.number().required(t('jobPostForm.validation.academiclevelisrequired', 'Academic level is required.')).typeError(t('jobPostForm.validation.academiclevelisrequired', 'Academic level is required.')),
     deadline: yup.date().required(t('jobPostForm.validation.applicationdeadlineisrequired', 'Application deadline is required.')).typeError(t('jobPostForm.validation.invalidapplicationdeadline', 'Invalid application deadline.')).min(dayjs().add(1, 'day').toDate(), t('jobPostForm.validation.deadlinemustbeaftertoday', 'Deadline must be after today.')),
-    jobDescription: yup.mixed().test('editorContent', t('jobPostForm.validation.jobDescRequired', 'Job description is required.'), (value: any) => value?.getCurrentContent?.()?.hasText?.()),
-    jobRequirement: yup.mixed().test('editorContent', t('jobPostForm.validation.jobReqRequired', 'Job requirement is required.'), (value: any) => value?.getCurrentContent?.()?.hasText?.()),
-    benefitsEnjoyed: yup.mixed().test('editorContent', t('jobPostForm.validation.benefitsRequired', 'Benefits are required.'), (value: any) => value?.getCurrentContent?.()?.hasText?.()),
+    jobDescription: yup.mixed().test('editorContent', t('jobPostForm.validation.jobDescRequired', 'Job description is required.'), (value) => (value as EditorState)?.getCurrentContent?.()?.hasText?.()),
+    jobRequirement: yup.mixed().test('editorContent', t('jobPostForm.validation.jobReqRequired', 'Job requirement is required.'), (value) => (value as EditorState)?.getCurrentContent?.()?.hasText?.()),
+    benefitsEnjoyed: yup.mixed().test('editorContent', t('jobPostForm.validation.benefitsRequired', 'Benefits are required.'), (value) => (value as EditorState)?.getCurrentContent?.()?.hasText?.()),
     location: yup.object().shape({
       city: yup.number().required(t('jobPostForm.validation.cityprovinceisrequired', 'City/Province is required.')).typeError(t('jobPostForm.validation.cityprovinceisrequired', 'City/Province is required.')),
       district: yup.number().required(t('jobPostForm.validation.districtisrequired', 'District is required.')).typeError(t('jobPostForm.validation.districtisrequired', 'District is required.')),

@@ -3,6 +3,7 @@ import React, { Suspense, lazy } from "react";
 import { useParams } from 'next/navigation';
 
 import { Box, Divider, Stack, Typography, Fab } from "@mui/material";
+import { Theme } from "@mui/material/styles";
 
 
 
@@ -98,7 +99,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-        const resData = await resumeService.getCv(slug) as any;
+        const resData = await resumeService.getCv(slug) as CVData;
 
 
 
@@ -106,11 +107,11 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
 
 
-        errorHandling(error);
+        errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
 
 
 
@@ -138,11 +139,11 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-  const handleUpdate = (data: any) => {
+  const handleUpdate = (data: { files: FileList | File[] }) => {
 
 
 
-    const updateCV = async (slug: string | undefined, payloadData: any) => {
+    const updateCV = async (slug: string | undefined, payloadData: { files: FileList | File[] }) => {
       if (!slug) return;
 
 
@@ -179,11 +180,11 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-      } catch (error: any) {
+      } catch (error: unknown) {
 
 
 
-        errorHandling(error);
+        errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
 
 
 
@@ -239,7 +240,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-          boxShadow: (theme: any) => theme.customShadows.card,
+          boxShadow: (theme: Theme) => (theme as unknown as { customShadows: Record<string, string> }).customShadows.card,
 
 
 
@@ -247,7 +248,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-            boxShadow: (theme: any) => theme.customShadows.medium,
+            boxShadow: (theme: Theme) => (theme as unknown as { customShadows: Record<string, string> }).customShadows.medium,
 
 
 
@@ -343,7 +344,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-                boxShadow: (theme: any) => theme.customShadows.medium,
+                boxShadow: (theme: Theme) => (theme as unknown as { customShadows: Record<string, string> }).customShadows.medium,
 
 
 
@@ -543,7 +544,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-                  boxShadow: (theme: any) => theme.customShadows.small,
+          boxShadow: (theme: Theme) => (theme as unknown as { customShadows: Record<string, string> }).customShadows.small,
 
 
 

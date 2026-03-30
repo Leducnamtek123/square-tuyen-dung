@@ -8,7 +8,7 @@ import { DATE_OPTIONS } from '../../../../configs/constants';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
 
-interface FormValues {
+export interface FormValues {
   name: string;
   trainingPlace: string;
   startDate: Date | null;

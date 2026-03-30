@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Card, Stack, Typography, Link, IconButton } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGlobe, faEnvelope, faPhoneVolume, faHashtag, faLocationDot } from "@fortawesome/free-solid-svg-icons";
-import { ICONS } from "../../../configs/constants";
+import { FacebookIcon, YoutubeIcon, LinkedinIcon } from "../../../components/Common/SocialIcons";
 import Map from "../../../components/Common/Map";
 import ImageGalleryCustom from "../../../components/Common/ImageGalleryCustom";
 
@@ -39,18 +39,18 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageLis
           </Typography>
           <Stack direction="row" spacing={1} sx={{ "& .MuiIconButton-root": { bgcolor: "grey.50", transition: "all 0.2s", "&:hover": { transform: "translateY(-2px)" } } }}>
             {companyDetail?.facebookUrl && (
-              <IconButton color="primary" aria-label="facebook">
-                <img width="30" src={ICONS.FACEBOOK} alt="" />
+              <IconButton color="primary" aria-label="facebook" href={companyDetail.facebookUrl} target="_blank">
+                <FacebookIcon size={30} />
               </IconButton>
             )}
             {companyDetail?.youtubeUrl && (
-              <IconButton color="primary" aria-label="youtube">
-                <img width="30" src={ICONS.YOUTUBE} alt="" />
+              <IconButton color="primary" aria-label="youtube" href={companyDetail.youtubeUrl} target="_blank">
+                <YoutubeIcon size={30} />
               </IconButton>
             )}
             {companyDetail?.linkedinUrl && (
-              <IconButton color="primary" aria-label="linked">
-                <img width="30" src={ICONS.LINKEDIN} alt="" />
+              <IconButton color="primary" aria-label="linkedin" href={companyDetail.linkedinUrl} target="_blank">
+                <LinkedinIcon size={30} />
               </IconButton>
             )}
           </Stack>

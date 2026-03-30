@@ -7,8 +7,8 @@ import { useTranslation } from 'react-i18next';
 import PasswordTextFieldCustom from '../../../../components/Common/Controls/PasswordTextFieldCustom';
 
 interface ResetPasswordFormData {
-  newPassword?: string;
-  confirmPassword?: string;
+  newPassword: string;
+  confirmPassword: string;
 }
 
 interface ResetPasswordFormProps {
@@ -57,12 +57,12 @@ const ResetPasswordForm = ({ handleResetPassword, serverErrors = {} }: ResetPass
       newPassword: '',
       confirmPassword: '',
     },
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema),
   });
 
   React.useEffect(() => {
     for (const err in serverErrors) {
-      setError(err as any, { type: 'manual', message: serverErrors[err]?.join(' ') });
+      setError(err as keyof ResetPasswordFormData, { type: 'manual', message: serverErrors[err]?.join(' ') });
     }
   }, [serverErrors, setError]);
 
@@ -110,7 +110,7 @@ const ResetPasswordForm = ({ handleResetPassword, serverErrors = {} }: ResetPass
 
         sx={{ mt: 3, mb: 2 }}
 
-        onClick={handleSubmit(handleResetPassword as any)}
+        onClick={handleSubmit(handleResetPassword)}
 
       >
 

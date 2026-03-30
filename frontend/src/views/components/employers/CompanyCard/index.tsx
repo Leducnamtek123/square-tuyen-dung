@@ -9,6 +9,9 @@ import {
 } from '@/utils/editorUtils';
 import toastMessages from '@/utils/toastMessages';
 import errorHandling from '@/utils/errorHandling';
+import type { AxiosError } from 'axios';
+import type { ApiError } from '@/types/api';
+import type { CompanyFormValues } from '../CompanyForm';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import CompanyForm from '../CompanyForm';
 import CompanyFormLoading from '../CompanyForm/CompanyFormLoading';
@@ -20,8 +23,8 @@ import ImageCropDialog from '@/components/Common/ImageCropDialog';
 // ─── Custom hooks extracted from monolithic component ───
 
 interface CompanyData {
-  id?: number;
-  description?: any;
+  id?: number | string;
+  description?: unknown;
   companyImageUrl?: string;
   companyCoverImageUrl?: string;
   [key: string]: unknown;
@@ -42,13 +45,13 @@ function useCompanyData() {
       const resData = (await companyService.getCompany()) as unknown as CompanyData;
       const data: CompanyData = {
         ...resData,
-        description: createEditorStateFromHTMLString(resData?.description || ''),
+        description: createEditorStateFromHTMLString((resData?.description as string) || ''),
       };
       setEditData(data);
-      setCompanyImageUrl((prev) => prev ?? data?.companyImageUrl ?? null);
-      setCompanyCoverImageUrl((prev) => prev ?? data?.companyCoverImageUrl ?? null);
+      setCompanyImageUrl((prev) => prev ?? (data?.companyImageUrl as string) ?? null);
+      setCompanyCoverImageUrl((prev) => prev ?? (data?.companyCoverImageUrl as string) ?? null);
     } catch (error: unknown) {
-      errorHandling(error as any);
+      errorHandling(error as AxiosError<{ errors?: ApiError }>);
     } finally {
       setIsLoading(false);
     }
@@ -60,14 +63,14 @@ function useCompanyData() {
   }, [loadCompany]);
 
   const handleUpdate = React.useCallback(
-    async (formData: CompanyData) => {
+    async (formData: CompanyFormValues) => {
       setIsFullScreenLoading(true);
       try {
         const dataCustom = {
           ...formData,
-          description: convertEditorStateToHTMLString(formData.description),
+          description: convertEditorStateToHTMLString(formData.description as import('draft-js').EditorState),
         };
-        await companyService.updateCompany(dataCustom?.id!, dataCustom);
+        await companyService.updateCompany((dataCustom as unknown as CompanyData)?.id as string | number, dataCustom as unknown as Record<string, unknown>);
         setServerErrors(null);
         toastMessages.success(
           t('companyProfile.success.update', 'Company information updated successfully.'),
@@ -75,7 +78,7 @@ function useCompanyData() {
         // Reload after successful update
         await loadCompany();
       } catch (error: unknown) {
-        errorHandling(error as any, setServerErrors as any);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as unknown as Parameters<typeof errorHandling>[1]);
       } finally {
         setIsFullScreenLoading(false);
       }
@@ -108,7 +111,7 @@ function useCompanyData() {
           setCompanyCoverImageUrl(resData?.companyCoverImageUrl ?? null);
         }
       } catch (error: unknown) {
-        errorHandling(error as any);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
       } finally {
         setIsFullScreenLoading(false);
       }
@@ -213,8 +216,8 @@ const CompanyCard = () => {
               height={120}
               sx={{
                 borderRadius: 2,
-                border: (theme: any) => `1px solid ${theme.palette.grey[200]}`,
-                boxShadow: (theme: any) => theme.customShadows.small,
+                border: (theme: import('@mui/material/styles').Theme) => `1px solid ${theme.palette.grey[200]}`,
+                boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: any }) => theme.customShadows.small,
               }}
             />
             <Box sx={{ mt: 2 }}>
@@ -242,8 +245,8 @@ const CompanyCard = () => {
               width="60%"
               sx={{
                 borderRadius: 2,
-                border: (theme: any) => `1px solid ${theme.palette.grey[200]}`,
-                boxShadow: (theme: any) => theme.customShadows.small,
+                border: (theme: import('@mui/material/styles').Theme) => `1px solid ${theme.palette.grey[200]}`,
+                boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: any }) => theme.customShadows.small,
               }}
               fit="cover"
             />
@@ -268,8 +271,8 @@ const CompanyCard = () => {
             <>
               <CompanyForm
                 handleUpdate={handleUpdate}
-                editData={editData}
-                serverErrors={serverErrors}
+                editData={editData as unknown as Partial<CompanyFormValues> | null}
+                serverErrors={serverErrors as unknown as Record<string, string[]> | null}
               />
               <Box sx={{ mt: 3 }}>
                 <Button

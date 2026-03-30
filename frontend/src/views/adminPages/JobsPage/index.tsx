@@ -7,6 +7,12 @@ import { useJobs, useApproveJob, useRejectJob, useUpdateJob, useDeleteJob } from
 import JobTable from './components/JobTable';
 import JobFilters from './components/JobFilters';
 import dayjs from '../../../configs/moment-config';
+import { JobPost } from '../../../types/models';
+import { PaginatedResponse } from '../../../types/api';
+
+type JobPostExt = JobPost & {
+  companyDict?: { companyName?: string };
+};
 
 const JobsPage = () => {
     const { t } = useTranslation('admin');
@@ -24,7 +30,7 @@ const JobsPage = () => {
         onSearchChange,
     } = useDataTable();
     
-    const [selectedJob, setSelectedJob] = useState<any>(null);
+    const [selectedJob, setSelectedJob] = useState<JobPostExt | null>(null);
     const [openDetail, setOpenDetail] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
     const [editJob, setEditJob] = useState({ jobName: '', deadline: '' });
@@ -34,35 +40,36 @@ const JobsPage = () => {
         pageSize: pageSize,
         search: searchTerm,
         ordering,
-    }) as any;
+    });
 
-    const approveMutation = useApproveJob() as any;
-    const rejectMutation = useRejectJob() as any;
-    const updateMutation = useUpdateJob() as any;
-    const deleteMutation = useDeleteJob() as any;
+    const approveMutation = useApproveJob();
+    const rejectMutation = useRejectJob();
+    const updateMutation = useUpdateJob();
+    const deleteMutation = useDeleteJob();
 
     const handleSearchChange = (value: string) => {
         onSearchChange(value);
     };
 
-    const handleViewDetail = (job: any) => {
+    const handleViewDetail = (job: JobPostExt) => {
         setSelectedJob(job);
         setOpenDetail(true);
     };
 
-    const handleEdit = (job: any) => {
+    const handleEdit = (job: JobPostExt) => {
         setSelectedJob(job);
-        setEditJob({ jobName: job.jobName, deadline: job.deadline });
+        setEditJob({ jobName: String(job.jobName || ''), deadline: String(job.deadline || '') });
         setOpenEdit(true);
     };
 
     const handleSaveEdit = () => {
+        if (!selectedJob?.id) return;
         updateMutation.mutate({ id: selectedJob.id, data: editJob }, {
             onSuccess: () => setOpenEdit(false)
         });
     };
 
-    const handleDelete = (id: any) => {
+    const handleDelete = (id: number | string) => {
         if (window.confirm(t('pages.jobs.deleteConfirm'))) {
             deleteMutation.mutate(id);
         }
@@ -73,7 +80,7 @@ const JobsPage = () => {
             <JobFilters searchTerm={searchTerm} onSearchChange={handleSearchChange} />
             <Card>
                 <CardHeader
-                    title={`${t('pages.jobs.title')} (${(jobsData as any)?.count || 0} ${t('pages.jobs.total')})`}
+                    title={`${t('pages.jobs.title')} (${(jobsData as unknown as PaginatedResponse<JobPost>)?.count || 0} ${t('pages.jobs.total')})`}
                 />
                 <CardContent>
                     {Object.keys(rowSelection).length > 0 && (
@@ -97,7 +104,7 @@ const JobsPage = () => {
                         </Box>
                     )}
                     <JobTable
-                        jobs={(jobsData as any)?.results || []}
+                        jobs={(jobsData as unknown as PaginatedResponse<JobPost>)?.results || []}
                         loading={isLoading}
                         pagination={pagination}
                         onPaginationChange={onPaginationChange}

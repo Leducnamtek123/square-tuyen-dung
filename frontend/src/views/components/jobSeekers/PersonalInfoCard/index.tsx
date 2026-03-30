@@ -9,12 +9,18 @@ import toastMessages from "../../../../utils/toastMessages";
 import errorHandling from "../../../../utils/errorHandling";
 import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
 import FormPopup from "../../../../components/Common/Controls/FormPopup";
-import PersonalProfileForm from "../PersonalProfileForm";
+import PersonalProfileForm, { PersonalProfileFormValues } from "../PersonalProfileForm";
 import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
 import { getUserInfo } from "../../../../redux/userSlice";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
+import { JobSeekerProfile, Location } from '../../../../types/models';
+
+type EnhancedJobSeekerProfile = JobSeekerProfile & {
+  user?: { fullName: string };
+  location?: Location & { districtDict?: { name: string } };
+};
 
 interface PersonalInfoCardProps {
   title: string;
@@ -58,7 +64,7 @@ const PersonalInfoCard = ({ title, sx }: PersonalInfoCardProps) => {
 
     const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-    const [profile, setProfile] = React.useState<any>(null);
+    const [profile, setProfile] = React.useState<EnhancedJobSeekerProfile | null>(null);
 
     const item = (title: React.ReactNode, value: React.ReactNode) => {
 
@@ -130,11 +136,11 @@ const PersonalInfoCard = ({ title, sx }: PersonalInfoCardProps) => {
 
     const resData = await jobSeekerProfileService.getProfile();
 
-    setProfile((resData as any).data);
+    setProfile((resData as unknown as { data: EnhancedJobSeekerProfile }).data);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
 
-    errorHandling(error);
+    errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
 
   } finally {
 
@@ -148,9 +154,9 @@ getProfile();
 
 }, [isSuccess]);
 
-const handleUpdateProfile = (data: any) => {
+const handleUpdateProfile = (data: PersonalProfileFormValues) => {
 
-const updateProfile = async (data: any) => {
+const updateProfile = async (data: Partial<EnhancedJobSeekerProfile>) => {
 
   setIsFullScreenLoading(true);
 
@@ -166,9 +172,9 @@ const updateProfile = async (data: any) => {
 
     toastMessages.success(t('jobSeeker:profile.messages.personalUpdateSuccess'));
 
-  } catch (error: any) {
+  } catch (error: unknown) {
 
-    errorHandling(error);
+    errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
 
   } finally {
 
@@ -178,7 +184,7 @@ const updateProfile = async (data: any) => {
 
 };
 
-updateProfile(data);
+updateProfile(data as unknown as Partial<EnhancedJobSeekerProfile>);
 
 };
 
@@ -308,7 +314,7 @@ return (
 
                   {item(t('jobSeeker:profile.fields.phone'), profile?.phone)}
 
-                  {item(t('jobSeeker:profile.fields.gender'), tConfig(allConfig?.genderDict?.[profile?.gender as any]))}
+                  {item(t('jobSeeker:profile.fields.gender'), tConfig(allConfig?.genderDict?.[profile?.gender as keyof typeof allConfig.genderDict]))}
 
                   {item(
 
@@ -326,7 +332,7 @@ return (
 
                     t('jobSeeker:profile.fields.maritalStatus'),
 
-                    tConfig(allConfig?.maritalStatusDict?.[profile?.maritalStatus as any])
+                    tConfig(allConfig?.maritalStatusDict?.[profile?.maritalStatus as keyof typeof allConfig.maritalStatusDict])
 
                   )}
 
@@ -356,7 +362,7 @@ return (
 
                     t('common:city'),
 
-                    tConfig(allConfig?.cityDict?.[profile?.location?.city as any])
+                    tConfig(allConfig?.cityDict?.[(profile?.location as unknown as Record<string, string>)?.city as keyof typeof allConfig.cityDict])
 
                   )}
 

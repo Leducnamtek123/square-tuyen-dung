@@ -20,9 +20,46 @@ import {
 
 import { LOGO_IMAGES } from '@/configs/constants';
 
+import type { User, Resume } from '@/types/models';
+
+export type CVDocExperience = {
+  jobName?: string;
+  companyName?: string;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
+};
+
+export type CVDocEducation = {
+  degreeName?: string;
+  trainingPlaceName?: string;
+  major?: string;
+  startDate?: string;
+  completedDate?: string;
+  description?: string;
+};
+
+export type CVDocAdvancedSkill = {
+  name?: string;
+  level?: number;
+};
+
+export type CVDocLanguageSkill = {
+  language?: string;
+  level?: string | number;
+};
+
+export type CVDocCertificate = {
+  name?: string;
+  trainingPlace?: string;
+  startDate?: string;
+  expirationDate?: string;
+};
+
 interface Props {
-  resume: any;
-  user?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  resume: Resume | any;
+  user?: User | null;
   themeColor?: string;
 }
 
@@ -429,7 +466,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
   });
 
-  const renderLanguageLevel = (level: string) => {
+  const renderLanguageLevel = (level?: string | number) => {
 
     const maxLevel = 5;
 
@@ -455,7 +492,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString?: string) => {
 
     if (!dateString) return '';
 
@@ -513,7 +550,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
                 <Text style={styles.contactItem}>Email: {user?.email}</Text>
 
-                <Text style={styles.contactItem}>SĐT: {user?.phone}</Text>
+                <Text style={styles.contactItem}>SĐT: {(user as User & { phone?: string })?.phone}</Text>
 
                 <Text style={styles.contactItem}>
 
@@ -631,7 +668,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
             <Text style={styles.sectionTitle}>KINH NGHIỆM LÀM VIỆC</Text>
 
-            {resume?.experienceDetails?.map((exp: any, index: number) => (
+            {resume?.experienceDetails?.map((exp: CVDocExperience, index: number) => (
 
               <View key={index} style={styles.experienceItem}>
 
@@ -667,7 +704,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
             <Text style={styles.sectionTitle}>HỌC VẤN</Text>
 
-            {resume?.educationDetails?.map((edu: any, index: number) => (
+            {resume?.educationDetails?.map((edu: CVDocEducation, index: number) => (
 
               <View key={index} style={styles.experienceItem}>
 
@@ -721,7 +758,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
               <View style={styles.skillsGrid}>
 
-                {resume?.advancedSkills?.map((skill: any, index: number) => (
+                {resume?.advancedSkills?.map((skill: CVDocAdvancedSkill, index: number) => (
 
                   <View key={index} style={styles.skillItem}>
 
@@ -747,7 +784,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
               <View style={styles.languageWrapper}>
 
-                {resume?.languageSkills?.map((lang: any, index: number) => (
+                {resume?.languageSkills?.map((lang: CVDocLanguageSkill, index: number) => (
 
                   <View key={index} style={styles.languageItem}>
 
@@ -781,7 +818,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
               <Text style={styles.sectionTitle}>CHỨNG CHỈ</Text>
 
-              {resume?.certificateDetails?.map((cert: any, index: number) => (
+              {resume?.certificateDetails?.map((cert: CVDocCertificate, index: number) => (
 
                 <View key={index} style={styles.experienceItem}>
 

@@ -1,8 +1,9 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
+import { JobSeekerProfile } from '../../../../types/models';
 
-export const useProfiles = (params: any) => {
+export const useProfiles = (params?: Record<string, unknown>) => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -15,36 +16,36 @@ export const useProfiles = (params: any) => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: any) => adminManagementService.createProfile(data),
+        mutationFn: (data: Partial<JobSeekerProfile> | Record<string, unknown>) => adminManagementService.createProfile(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
             toastMessages.success('Candidate profile added successfully');
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error('An error occurred while adding the candidate profile');
             console.error(err);
         }
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: any; data: any }) => adminManagementService.updateProfile(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<JobSeekerProfile> | Record<string, unknown> }) => adminManagementService.updateProfile(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
             toastMessages.success('Candidate profile updated successfully');
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error('An error occurred while updating the candidate profile');
             console.error(err);
         }
     });
 
     const deleteMutation = useMutation({
-        mutationFn: (id: any) => adminManagementService.deleteProfile(id),
+        mutationFn: (id: string | number) => adminManagementService.deleteProfile(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
             toastMessages.success('Candidate profile deleted successfully');
         },
-        onError: (err: any) => {
+        onError: (err: Error | unknown) => {
             toastMessages.error('An error occurred while deleting the candidate profile');
             console.error(err);
         }
@@ -56,5 +57,5 @@ export const useProfiles = (params: any) => {
         updateProfile: updateMutation.mutateAsync,
         deleteProfile: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    } as any;
+    };
 };

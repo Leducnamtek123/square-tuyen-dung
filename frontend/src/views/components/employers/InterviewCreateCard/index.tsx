@@ -8,6 +8,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import { useTranslation } from 'react-i18next';
 import interviewService from '../../../../services/interviewService';
 import questionService from '../../../../services/questionService';
+import { PaginatedResponse } from '@/types/api';
 import questionGroupService from '../../../../services/questionGroupService';
 import jobService from '../../../../services/jobService';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
@@ -17,7 +18,7 @@ import DateTimePickerCustom from '../../../../components/Common/Controls/DateTim
 
 interface JobPost {
   jobName: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface Question {
@@ -25,14 +26,14 @@ interface Question {
   text?: string;
   questionText?: string;
   content?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface QuestionGroup {
   id: number;
   name: string;
   questions?: Question[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface Candidate {
@@ -41,7 +42,7 @@ interface Candidate {
   fullName?: string;
   candidateName?: string;
   email?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 interface FormValues {
@@ -102,24 +103,16 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
     const selectedJobPostId = watch('job_post');
     const selectedGroupId = watch('selected_group');
 
-    const prevJobIdRef = React.useRef<any>(null);
-    const prevGroupIdRef = React.useRef<any>(null);
+    const prevJobIdRef = React.useRef<string | number | null>(null);
+    const prevGroupIdRef = React.useRef<string | number | null>(null);
 
     const fetchQuestions = async () => {
 
-        const questionsRes: any = await questionService.getQuestions({ pageSize: 1000 });
+        const questionsRes = await questionService.getQuestions({ pageSize: 1000 });
 
-        const rawQuestions = Array.isArray(questionsRes?.results)
+        const rawQuestions = (questionsRes as unknown as PaginatedResponse<Record<string, unknown>>).results || [];
 
-            ? questionsRes.results
-
-            : Array.isArray(questionsRes)
-
-                ? questionsRes
-
-                : [];
-
-        setQuestions(rawQuestions.map(transformQuestion).filter(Boolean));
+        setQuestions(rawQuestions.map((q) => transformQuestion(q as Record<string, unknown>) as Question).filter(Boolean));
 
     };
 
@@ -139,43 +132,17 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
                     questionGroupService.getQuestionGroups({ pageSize: 1000 })
 
-                ]) as any[];
+                ]);
 
-                const rawJobs = Array.isArray(jobsRes?.results)
+                const rawJobs = (jobsRes as unknown as PaginatedResponse<Record<string, unknown>>)?.results || [];
+                const rawQuestions = (questionsRes as unknown as PaginatedResponse<Record<string, unknown>>)?.results || [];
+                const rawGroups = (groupsRes as unknown as PaginatedResponse<Record<string, unknown>>)?.results || [];
 
-                    ? jobsRes.results
+                setJobs(rawJobs.map((j) => transformJobPost(j as Record<string, unknown>) as JobPost).filter(Boolean));
 
-                    : Array.isArray(jobsRes)
+                setQuestions(rawQuestions.map((q) => transformQuestion(q as Record<string, unknown>) as Question).filter(Boolean));
 
-                        ? jobsRes
-
-                        : [];
-
-                const rawQuestions = Array.isArray(questionsRes?.results)
-
-                    ? questionsRes.results
-
-                    : Array.isArray(questionsRes)
-
-                        ? questionsRes
-
-                        : [];
-
-                const rawGroups = Array.isArray(groupsRes?.results)
-
-                    ? groupsRes.results
-
-                    : Array.isArray(groupsRes)
-
-                        ? groupsRes
-
-                        : [];
-
-                setJobs(rawJobs.map(transformJobPost).filter(Boolean));
-
-                setQuestions(rawQuestions.map(transformQuestion).filter(Boolean));
-
-                setQuestionGroups(rawGroups.map(transformQuestionGroup).filter(Boolean));
+                setQuestionGroups(rawGroups.map((g) => transformQuestionGroup(g as Record<string, unknown>) as QuestionGroup).filter(Boolean));
 
             } catch (error) {
 
@@ -198,15 +165,16 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
     // Fetch existing session if editing
     useEffect(() => {
         if (sessionId) {
-            interviewService.getSessionDetail(sessionId)
-                .then((session: any) => {
+            interviewService.getSessionDetail(sessionId as number | string)
+                .then((baseSession) => {
+                    const session = baseSession as unknown as Record<string, unknown>;
                     if (session) {
                         reset({
-                            job_post: session.job_post || '',
-                            candidate: session.candidate || '',
-                            scheduled_at: session.scheduled_at || '',
-                            selected_group: session.question_group || '',
-                            selected_questions: session.questions?.map((q: any) => q.id) || []
+                            job_post: ((session.jobPost as Record<string, unknown>)?.id || session.jobPost || session.job_post || '') as string | number,
+                            candidate: ((session.candidate as Record<string, unknown>)?.id || session.candidate || session.candidate_id || '') as string | number,
+                            scheduled_at: (session.scheduledAt as string) || (session.scheduled_at as string) || '',
+                            selected_group: (session.questionGroup as string | number) || (session.question_group as string | number) || '',
+                            selected_questions: (session.questions as Question[])?.map((q) => q.id) || []
                         });
                     }
                 })
@@ -238,14 +206,11 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
     useEffect(() => {
         if (selectedJobPostId) {
-            jobPostActivityService.getAppliedResume({ jobPostId: selectedJobPostId, pageSize: 100 })
-                .then((res: any) => {
-                    const rawCandidates = Array.isArray(res?.results)
-                        ? res.results
-                        : Array.isArray(res)
-                            ? res
-                                    : [];
-                    setCandidates(rawCandidates.map(transformAppliedResume).filter(Boolean));
+            jobPostActivityService.getAppliedResume({ jobPostId: selectedJobPostId as number | string, pageSize: 100 })
+                .then((res) => {
+                    const resRecord = res as unknown as Record<string, unknown>;
+                    const rawCandidates = (resRecord as unknown as PaginatedResponse<Record<string, unknown>>)?.results || [];
+                    setCandidates(rawCandidates.map((c) => transformAppliedResume(c as Record<string, unknown>) as Candidate).filter(Boolean));
                     
                     // Only clear candidate if the job post ID has actually changed (user interaction)
                     if (prevJobIdRef.current !== null && prevJobIdRef.current !== selectedJobPostId) {
@@ -329,17 +294,18 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
             } else {
 
-                const newQuestion = (await questionService.createQuestion({ text: trimmed })) as any;
+                const newQuestion = (await questionService.createQuestion({ text: trimmed })) as unknown as Question;
 
                 toastMessages.success(t('interview:employer.questions.createSuccess'));
 
-                const createdId = newQuestion?.id || newQuestion?.data?.id || newQuestion?.results?.id;
+                const createdId = (newQuestion as Record<string, unknown>)?.id || (newQuestion as Record<string, unknown>)?.data || (newQuestion as Record<string, unknown>)?.results;
 
-                if (createdId) {
+                const createdIdNum = createdId as number;
+                if (createdIdNum) {
 
                     const current = watch('selected_questions') || [];
 
-                    setValue('selected_questions', [...current, createdId]);
+                    setValue('selected_questions', [...current, createdIdNum]);
 
                 }
 
@@ -366,11 +332,11 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
     const onSubmit = async (data: FormValues) => {
         try {
             const payload = {
-                job_post: data.job_post,
-                candidate: data.candidate,
-                scheduled_at: data.scheduled_at,
-                question_ids: data.selected_questions,
-                type: 'mixed' as any
+                jobPostId: Number(data.job_post),
+                candidateId: Number(data.candidate),
+                scheduledAt: data.scheduled_at,
+                questionIds: data.selected_questions.filter(Boolean),
+                type: 'live' as 'ai' | 'live'
             };
 
             if (sessionId) {
@@ -504,7 +470,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
                                         {jobs.map((job) => (
 
-                                            <MenuItem key={job.id} value={job.id}>
+                                            <MenuItem key={String(job.id)} value={job.id as string | number}>
 
                                                 {job.jobName}
 

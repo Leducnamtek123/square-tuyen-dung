@@ -37,11 +37,11 @@ const JobByCategory = () => {
 
   const { jobPostFilter } = useAppSelector((state) => state.filter);
 
-  const careerOptions = (allConfig?.careerOptions || []) as any[];
+  const careerOptions = (allConfig?.careerOptions || []) as Option[];
 
-  const cityOptions = (allConfig?.cityOptions || []) as any[];
+  const cityOptions = (allConfig?.cityOptions || []) as Option[];
 
-  const jobTypeOptions = (allConfig?.jobTypeOptions || []) as any[];
+  const jobTypeOptions = (allConfig?.jobTypeOptions || []) as Option[];
 
   const handleFilter = (id: string | number, type: string) => {
 
@@ -49,19 +49,19 @@ const JobByCategory = () => {
 
       case "CARRER":
 
-        dispatch(searchJobPost({ ...jobPostFilter, careerId: id as any }));
+        dispatch(searchJobPost({ ...jobPostFilter, careerId: String(id) }));
 
         break;
 
       case "CITY":
 
-        dispatch(searchJobPost({ ...jobPostFilter, cityId: id as any }));
+        dispatch(searchJobPost({ ...jobPostFilter, cityId: String(id) }));
 
         break;
 
       case "JOB_TYPE":
 
-        dispatch(searchJobPost({ ...jobPostFilter, jobTypeId: id as any }));
+        dispatch(searchJobPost({ ...jobPostFilter, jobTypeId: String(id) }));
 
         break;
 

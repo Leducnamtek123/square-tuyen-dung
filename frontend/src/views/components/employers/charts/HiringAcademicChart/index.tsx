@@ -301,7 +301,7 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
 
               </Stack>
 
-            ) : !data || !Array.isArray(data?.data) || data.data.length === 0 ? (
+            ) : (!data || !data.data || data.data.length === 0) ? (
 
               <Stack
 

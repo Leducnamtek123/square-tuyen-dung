@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 
 import PasswordTextFieldCustom from '../../../../components/Common/Controls/PasswordTextFieldCustom';
 
-interface UpdatePasswordFormData {
+export interface UpdatePasswordFormData {
   oldPassword?: string;
   newPassword?: string;
   confirmPassword?: string;

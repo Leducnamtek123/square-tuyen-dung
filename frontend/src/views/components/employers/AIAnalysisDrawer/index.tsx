@@ -31,22 +31,39 @@ import { ScoreGauge } from './ScoreGauge';
 import { SkillChipList } from './SkillChipList';
 import { SectionCard } from './SectionCard';
 
+export type AIAnalysisData = {
+  id?: string | number;
+  fullName?: string;
+  jobName?: string;
+  aiAnalysisStatus?: 'processing' | 'completed' | 'failed' | 'idle' | string;
+  aiAnalysisProgress?: number;
+  resumeFileUrl?: string;
+  aiAnalysisMatchingSkills?: string | string[];
+  aiAnalysisMissingSkills?: string | string[];
+  aiAnalysisSkills?: string | string[];
+  aiAnalysisSummary?: string;
+  aiAnalysisPros?: string | string[];
+  aiAnalysisCons?: string | string[];
+  aiAnalysisScore?: number;
+  [key: string]: unknown;
+};
+
 interface AIAnalysisDrawerProps {
   open: boolean;
   onClose: () => void;
   activityId: string | number | null;
-  initialData?: any;
+  initialData?: AIAnalysisData | null;
 }
 
 const renderIcon = (
-  IconComponent: any,
-  props?: Record<string, any>,
+  IconComponent: React.ElementType | { default: React.ElementType } | unknown,
+  props?: Record<string, unknown>,
 ): React.ReactElement | null => {
   if (!IconComponent) return null;
   // Handle ESM default export interop
-  const Component = IconComponent.default || IconComponent;
+  const Component = (IconComponent as { default: React.ElementType }).default || (IconComponent as React.ElementType);
   // Final check to prevent Error #130 if Component is still invalid
-  if (typeof Component !== 'function' && typeof Component !== 'string' && typeof Component?.render !== 'function') {
+  if (typeof Component !== 'function' && typeof Component !== 'string' && typeof (Component as Record<string, unknown>)?.render !== 'function') {
     return null;
   }
   return <Component {...props} />;
@@ -91,7 +108,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
   initialData,
 }) => {
   const { t } = useTranslation('employer');
-  const [data, setData] = React.useState<any>(initialData || null);
+  const [data, setData] = React.useState<AIAnalysisData | null>(initialData || null);
   const [loading, setLoading] = React.useState(false);
   const [analyzing, setAnalyzing] = React.useState(false);
   const [scanLinePosition, setScanLinePosition] = React.useState(-12);
@@ -112,7 +129,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
       setLoading(true);
       try {
         const res = await jobPostActivityService.getJobPostActivityDetail(activityId);
-        setData(res || null);
+        setData((res as AIAnalysisData) || null);
       } catch {
         // use initial data if fetch fails
       } finally {
@@ -130,7 +147,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
     const interval = setInterval(async () => {
       try {
         const res = await jobPostActivityService.getJobPostActivityDetail(activityId);
-        const newData = res as any;
+        const newData = res as AIAnalysisData;
         if (newData) {
           setData(newData);
         }
@@ -178,13 +195,13 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
     if (!activityId) return;
     try {
       setAnalyzing(true);
-      setData((prev: any) => ({ ...(prev || {}), aiAnalysisStatus: 'processing', aiAnalysisProgress: 5 }));
+      setData((prev) => ({ ...(prev || {}), aiAnalysisStatus: 'processing', aiAnalysisProgress: 5 }));
       await jobPostActivityService.analyzeResume(activityId);
       toastMessages.success(t('appliedResume.ai.analysisStarted'));
-    } catch (err: any) {
-      errorHandling(err);
+    } catch (err: unknown) {
+      errorHandling(err as import('axios').AxiosError<Record<string, unknown>>);
       setAnalyzing(false);
-      setData((prev: any) => ({ ...(prev || {}), aiAnalysisStatus: 'failed' }));
+      setData((prev) => ({ ...(prev || {}), aiAnalysisStatus: 'failed' }));
     }
   };
 

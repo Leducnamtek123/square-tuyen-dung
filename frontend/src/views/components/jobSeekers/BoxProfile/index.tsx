@@ -26,7 +26,7 @@ import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
 import toSlug, { salaryString } from "../../../../utils/customData";
 import NoDataCard from "../../../../components/Common/NoDataCard";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-const PDFDownloadLinkAny = PDFDownloadLink as any;
+const PDFDownloadLinkAny = PDFDownloadLink as React.ElementType;
 import CVDoc from "../../../../components/Features/CVDoc";
 import { reloadResume } from "../../../../redux/profileSlice";
 import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
@@ -36,6 +36,20 @@ import ColorPickerDialog from '../../../../components/Common/ColorPickerDialog';
 import { useTranslation } from "react-i18next";
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
+import type { AxiosError } from "axios";
+
+interface BoxProfileResume {
+  slug: string;
+  title: string;
+  isActive: boolean;
+  user?: { fullName?: string };
+  experience?: number;
+  position?: number;
+  salaryMin?: number;
+  salaryMax?: number;
+  updateAt?: string;
+  [key: string]: unknown;
+}
 
 const Loading = () => {
   return (
@@ -87,21 +101,21 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
 
   const [isLoadingResume, setIsLoadingResume] = React.useState(false);
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-  const [resume, setResume] = React.useState<any>(null);
+  const [resume, setResume] = React.useState<BoxProfileResume | null>(null);
   const [openColorPicker, setOpenColorPicker] = React.useState(false);
   const [selectedColor, setSelectedColor] = React.useState('#140861');
   const [isGeneratingPDF, setIsGeneratingPDF] = React.useState(false);
-  const blobRef = React.useRef<any>(null);
+  const blobRef = React.useRef<Blob | null>(null);
 
   React.useEffect(() => {
-    const getOnlineProfile = async (jobSeekerProfileId: string, params: any) => {
+    const getOnlineProfile = async (jobSeekerProfileId: string, params: Record<string, unknown>) => {
       setIsLoadingResume(true);
       try {
         const resData = await jobSeekerProfileService.getResumes(
           jobSeekerProfileId,
           params
         );
-        const parsedResumes = Array.isArray(resData) ? resData : ((resData as any).data || (resData as any).results || []);
+        const parsedResumes = ((resData as unknown as { results?: BoxProfileResume[] })?.results || []) as BoxProfileResume[];
         setResume(parsedResumes.length > 0 ? parsedResumes[0] : null);
       } catch (error) {
         console.error(error);
@@ -109,12 +123,14 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
         setIsLoadingResume(false);
       }
     };
-    if ((currentUser as any)?.jobSeekerProfile?.id) {
-      getOnlineProfile((currentUser as any).jobSeekerProfile.id, {
+    
+    const userPayload = currentUser as unknown as { jobSeekerProfile?: { id?: string }; jobSeekerProfileId?: string };
+    if (userPayload?.jobSeekerProfile?.id) {
+      getOnlineProfile(userPayload.jobSeekerProfile.id, {
         resumeType: CV_TYPES.cvWebsite,
       });
-    } else if ((currentUser as any)?.jobSeekerProfileId) {
-      getOnlineProfile((currentUser as any).jobSeekerProfileId, {
+    } else if (userPayload?.jobSeekerProfileId) {
+      getOnlineProfile(userPayload.jobSeekerProfileId, {
         resumeType: CV_TYPES.cvWebsite,
       });
     }
@@ -127,8 +143,9 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
         await resumeService.activeResume(resumeSlug);
         dispatch(reloadResume());
         toastMessages.success(t("jobSeeker:profile.messages.profileStatusUpdateSuccess"));
-      } catch (error: any) {
-        errorHandling(error);
+      } catch (error) {
+        // Casting through any to satisfy errorHandling strict AxiosError<{errors: ApiError}> generic type requirements
+        errorHandling(error as any);
       } finally {
         setIsFullScreenLoading(false);
       }
@@ -200,7 +217,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                     fileName={`${APP_NAME}_CV_${currentUser?.fullName}-${toSlug(resume?.title || "title")}.pdf`}
                     style={{ textDecoration: "none" }}
                   >
-                    {({ loading, blob }: any) => {
+                    {({ loading, blob }: { loading: boolean, blob: Blob | null }) => {
                       if (blob) {
                         blobRef.current = blob;
                       }
@@ -210,7 +227,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                           icon={<CircularProgress size={16} />}
                           color="secondary"
                           label={t("common:loading")}
-                          sx={{ boxShadow: (theme: any) => theme.customShadows?.medium }}
+                          sx={{ boxShadow: (theme) => theme.customShadows.medium }}
                         />
                       ) : (
                         <Chip
@@ -220,7 +237,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                           label={t("common:actions.download")}
                           onClick={handleDownloadClick}
                           sx={{
-                            boxShadow: (theme: any) => theme.customShadows?.medium,
+                            boxShadow: (theme) => theme.customShadows.medium,
                             "&:hover": { transform: "scale(1.03)" },
                             transition: "all 0.2s ease-in-out",
                           }}
@@ -235,7 +252,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                     icon={<CircularProgress size={16} />}
                     color="secondary"
                     label={t("jobSeeker:profile.actions.generatingPdf")}
-                    sx={{ boxShadow: (theme: any) => theme.customShadows?.medium }}
+                    sx={{ boxShadow: (theme) => theme.customShadows.medium }}
                   />
                 )}
               </Stack>
@@ -259,8 +276,8 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                       height: 130,
                       padding: "4px",
                       borderRadius: "50%",
-                      background: (theme: any) => theme.palette.primary.main,
-                      boxShadow: (theme: any) => theme.customShadows?.medium,
+                      background: (theme) => theme.palette.primary.main,
+                      boxShadow: (theme) => theme.customShadows.medium,
                       transition: "transform 0.2s ease-in-out",
                       "&:hover": { transform: "scale(1.02)" },
                     }}
@@ -301,8 +318,8 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                   <Grid size={12}>
                     <Stack spacing={2}>
                       {[
-                        { icon: faMagicWandSparkles, label: t("jobSeeker:profile.summary.experience"), value: tConfig((allConfig as any)?.experienceDict?.[resume.experience]) },
-                        { icon: faUser, label: t("jobSeeker:profile.summary.position"), value: tConfig((allConfig as any)?.positionDict?.[resume.position]) },
+                        { icon: faMagicWandSparkles, label: t("jobSeeker:profile.summary.experience"), value: tConfig(((allConfig as unknown as Record<string, Record<string, string>>)?.experienceDict || {})[String(resume.experience)]) },
+                        { icon: faUser, label: t("jobSeeker:profile.summary.position"), value: tConfig(((allConfig as unknown as Record<string, Record<string, string>>)?.positionDict || {})[String(resume.position)]) },
                         { icon: faDollarSign, label: t("jobSeeker:profile.summary.desiredSalary"), value: salaryString(resume.salaryMin, resume.salaryMax) },
                         { icon: faCalendar, label: t("jobSeeker:profile.summary.lastUpdated"), value: dayjs(resume.updateAt).format("DD/MM/YYYY HH:mm:ss") }
                       ].map((item, idx) => (
@@ -336,8 +353,8 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                     onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, resume.slug)}`)}
                     sx={{
                       px: 4, py: 1, fontSize: "1rem",
-                      background: (theme: any) => theme.palette.primary.main,
-                      "&:hover": { background: (theme: any) => theme.palette.primary.main, opacity: 0.9, boxShadow: (theme: any) => theme.customShadows?.medium }
+                      background: (theme) => theme.palette.primary.main,
+                      "&:hover": { background: (theme) => theme.palette.primary.main, opacity: 0.9, boxShadow: (theme) => theme.customShadows.medium }
                     }}
                   >
                     {t("jobSeeker:profile.actions.editProfile")}

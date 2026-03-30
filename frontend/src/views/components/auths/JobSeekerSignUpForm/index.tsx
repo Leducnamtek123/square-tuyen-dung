@@ -13,7 +13,7 @@ import useDebounce from "../../../../hooks/useDebounce";
 import authService from "../../../../services/authService";
 import type { RoleName } from "../../../../types/auth";
 
-interface JobSeekerSignUpFormData {
+export interface JobSeekerSignUpFormData {
   fullName: string;
   email: string;
   password?: string;

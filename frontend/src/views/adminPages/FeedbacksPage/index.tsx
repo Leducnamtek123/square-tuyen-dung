@@ -4,6 +4,8 @@ import {
   Chip, Switch, Dialog, DialogTitle, DialogContent, DialogActions,
   Button, Tooltip, Rating, Stack
 } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import { PaginatedResponse } from '@/types/api';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
 import adminManagementService from '../../../services/adminManagementService';
@@ -28,8 +30,8 @@ const FeedbacksPage = () => {
   const fetchFeedbacks = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res: any = await adminManagementService.getFeedbacks({ ordering });
-      setFeedbacks(Array.isArray(res) ? res : (res?.results || res?.data || []));
+      const res = await adminManagementService.getFeedbacks({ ordering }) as PaginatedResponse<Record<string, unknown>>;
+      setFeedbacks(res.results || []);
     } catch (e) { console.error(e); }
     finally { setIsLoading(false); }
   }, [ordering]);

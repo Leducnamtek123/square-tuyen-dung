@@ -18,7 +18,7 @@ import MultilineTextFieldCustom from '../../../../components/Common/Controls/Mul
 
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
 
-interface FormValues {
+export interface FormValues {
   degreeName: string;
   major: string;
   trainingPlaceName: string;

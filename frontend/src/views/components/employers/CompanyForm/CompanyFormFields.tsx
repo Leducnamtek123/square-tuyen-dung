@@ -5,14 +5,18 @@ import SingleSelectCustom from '../../../../components/Common/Controls/SingleSel
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
 import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/TextFieldAutoCompleteCustom';
 import RichTextEditorCustom from '../../../../components/Common/Controls/RichTextEditorCustom';
+import type { Control } from "react-hook-form";
+import type { TFunction } from "i18next";
+import type { SystemConfig, SelectOption } from "../../../../types/models";
 
 interface CompanyFormFieldsProps {
-  control: any;
-  t: any;
-  allConfig: any;
-  districtOptions: any[];
-  locationOptions: any[];
-  handleSelectLocation: (e: any, value: any) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  control: Control<any>;
+  t: TFunction<any, any>;
+  allConfig: SystemConfig | null;
+  districtOptions: SelectOption[];
+  locationOptions: Record<string, unknown>[];
+  handleSelectLocation: (e: React.SyntheticEvent, value: Record<string, unknown> | SelectOption | string | null | any) => void;
 }
 
 const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({

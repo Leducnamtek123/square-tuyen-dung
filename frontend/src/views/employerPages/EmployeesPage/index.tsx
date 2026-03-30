@@ -55,15 +55,7 @@ const slugifyCode = (value: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-const normalizeListPayload = <T,>(payload: unknown): T[] => {
-  if (!payload) return [];
-  if (Array.isArray(payload)) return payload as T[];
-  if (typeof payload === 'object' && payload !== null && 'results' in payload) {
-    const res = (payload as Record<string, unknown>).results;
-    if (Array.isArray(res)) return res as T[];
-  }
-  return [];
-};
+
 
 const EmployeesPage = () => {
     const { t } = useTranslation("employer");
@@ -109,8 +101,8 @@ const EmployeesPage = () => {
     queryFn: () => companyTeamService.getMembers(),
   });
 
-  const roles = useMemo(() => normalizeListPayload<CompanyRole>(rolePayload), [rolePayload]);
-  const members = useMemo(() => normalizeListPayload<CompanyMember>(memberPayload), [memberPayload]);
+  const roles = useMemo(() => rolePayload?.results || [], [rolePayload]);
+  const members = useMemo(() => memberPayload?.results || [], [memberPayload]);
 
   const createRoleMutation = useMutation({
     mutationFn: (data: Omit<CompanyRole, "id" | "company"> & { is_active?: boolean }) => companyTeamService.createRole(data),

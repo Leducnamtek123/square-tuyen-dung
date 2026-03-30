@@ -45,11 +45,11 @@ const ProfileSearch: React.FC = () => {
 
   const { resumeFilter } = useAppSelector((state) => state.filter);
 
-  const { control, reset, handleSubmit } = useForm<any>();
+  const { control, reset, handleSubmit } = useForm<Record<string, unknown>>();
 
   React.useEffect(() => {
 
-    reset((formValues: any) => ({
+    reset((formValues: Record<string, unknown>) => ({
 
       ...formValues,
 
@@ -59,9 +59,9 @@ const ProfileSearch: React.FC = () => {
 
   }, [resumeFilter, reset]);
 
-  const handleFilter = (data: any) => {
+  const handleFilter = (data: Record<string, unknown>) => {
 
-    dispatch(searchResume(data) as any);
+    dispatch(searchResume(data as unknown as Parameters<typeof searchResume>[0]) as unknown as import('@reduxjs/toolkit').AnyAction);
 
   };
 
@@ -207,11 +207,11 @@ const ProfileSearch: React.FC = () => {
 
                   boxShadow: 'none',
 
-                  background: (theme: any) => theme.palette.secondary.main,
+                  background: (theme: import('@mui/material/styles').Theme) => theme.palette.secondary.main,
 
                   '&:hover': {
 
-                    boxShadow: (theme: any) => theme.customShadows.medium,
+                    boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
 
                   }
 
@@ -269,7 +269,7 @@ const ProfileSearch: React.FC = () => {
 
             borderColor: 'grey.100',
 
-            boxShadow: (theme: any) => theme.customShadows.card
+            boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card
 
           }}
 
@@ -354,7 +354,7 @@ const ProfileSearch: React.FC = () => {
                       }
                     }
                   }
-                } as any)}
+                } as Record<string, unknown>)}
 
               />
 
@@ -393,7 +393,7 @@ const ProfileSearch: React.FC = () => {
                       }
                     }
                   }
-                } as any)}
+                } as Record<string, unknown>)}
 
               />
 
@@ -432,7 +432,7 @@ const ProfileSearch: React.FC = () => {
                       }
                     }
                   }
-                } as any)}
+                } as Record<string, unknown>)}
 
               />
 
@@ -471,7 +471,7 @@ const ProfileSearch: React.FC = () => {
                       }
                     }
                   }
-                } as any)}
+                } as Record<string, unknown>)}
 
               />
 
@@ -510,7 +510,7 @@ const ProfileSearch: React.FC = () => {
                       }
                     }
                   }
-                } as any)}
+                } as Record<string, unknown>)}
 
               />
 
@@ -549,7 +549,7 @@ const ProfileSearch: React.FC = () => {
                       }
                     }
                   }
-                } as any)}
+                } as Record<string, unknown>)}
 
               />
 
@@ -588,7 +588,7 @@ const ProfileSearch: React.FC = () => {
                       }
                     }
                   }
-                } as any)}
+                } as Record<string, unknown>)}
 
               />
 
@@ -627,7 +627,7 @@ const ProfileSearch: React.FC = () => {
                       }
                     }
                   }
-                } as any)}
+                } as Record<string, unknown>)}
 
               />
 

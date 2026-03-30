@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-interface JobPostFilter {
+export interface JobPostFilter {
   kw: string;
   careerId: string;
   cityId: string;

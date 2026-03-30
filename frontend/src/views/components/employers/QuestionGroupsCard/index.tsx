@@ -17,8 +17,13 @@ import { useQuestionGroups } from '../../../employerPages/InterviewPages/hooks/u
 import DataTable from '../../../../components/Common/DataTable';
 
 import questionService from '../../../../services/questionService';
+import { PaginatedResponse } from '@/types/api';
 
 import { transformQuestion, transformQuestionGroup } from '../../../../utils/transformers';
+
+import type { ColumnDef } from '@tanstack/react-table';
+
+import type { QuestionGroup, Question } from '../../../../types/models';
 
 interface QuestionGroupsCardProps {
   title?: string;
@@ -38,15 +43,15 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add'); // 'add' or 'edit'
 
-    const [currentGroup, setCurrentGroup] = useState<any>(null);
+    const [currentGroup, setCurrentGroup] = useState<QuestionGroup | null>(null);
 
     const [groupName, setGroupName] = useState('');
 
     const [groupDescription, setGroupDescription] = useState('');
 
-    const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
+    const [selectedQuestions, setSelectedQuestions] = useState<number[]>([]);
 
-    const [allQuestions, setAllQuestions] = useState<any[]>([]);
+    const [allQuestions, setAllQuestions] = useState<Question[]>([]);
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -80,7 +85,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
     });
 
-    const handleChangePage = (event: any, newPage: number) => {
+    const handleChangePage = (event: unknown, newPage: number) => {
 
         setPage(newPage);
 
@@ -100,13 +105,14 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
             try {
 
-                const res = await questionService.getQuestions({ pageSize: 1000 }) as any;
+                const res = await questionService.getQuestions({ pageSize: 1000 });
 
-                const rawQuestions = Array.isArray(res?.results) ? res.results : Array.isArray(res) ? res : [];
+                const rawQuestions = (res as unknown as PaginatedResponse<Record<string, unknown>>)?.results || [];
 
-                setAllQuestions(rawQuestions.map(transformQuestion).filter(Boolean));
+                // Type assertion safe here since transformQuestion normalizes backend entity into models.Question
+                setAllQuestions(rawQuestions.map(transformQuestion).filter(Boolean) as Question[]);
 
-            } catch (error: any) {
+            } catch (error) {
 
                 console.error("Error fetching questions", error);
 
@@ -142,7 +148,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
     };
 
-    const handleOpenEdit = (group: any) => {
+    const handleOpenEdit = (group: QuestionGroup) => {
 
         setDialogMode('edit');
 
@@ -152,13 +158,13 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
         setGroupDescription(group.description || '');
 
-        setSelectedQuestions(group.questions?.map((q: any) => q.id) || []);
+        setSelectedQuestions(group.questions?.map((q: Question) => q.id) || []);
 
         setOpenDialog(true);
 
     };
 
-    const handleOpenDelete = (group: any) => {
+    const handleOpenDelete = (group: QuestionGroup) => {
 
         setCurrentGroup(group);
 
@@ -196,7 +202,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                 await updateQuestionGroup({
 
-                    id: currentGroup.id,
+                    id: currentGroup!.id,
 
                     data: payload
 
@@ -206,7 +212,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
             handleCloseDialog();
 
-        } catch (error: any) {
+        } catch (error) {
 
             console.error(error);
 
@@ -226,9 +232,9 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                 text: newQuestionContent.trim()
 
-            }) as any;
+            });
 
-            const newQ = transformQuestion(res);
+            const newQ = transformQuestion(res as unknown as Record<string, unknown>) as Question | null;
 
             if (newQ) {
 
@@ -242,7 +248,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
             setNewQuestionContent('');
 
-        } catch (error: any) {
+        } catch (error) {
 
             console.error("Error creating question", error);
 
@@ -258,11 +264,11 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
         try {
 
-            await deleteQuestionGroup(currentGroup.id);
+            if (currentGroup) await deleteQuestionGroup(currentGroup.id);
 
             setOpenDeleteDialog(false);
 
-        } catch (error: any) {
+        } catch (error) {
 
             console.error(error);
 
@@ -270,7 +276,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
     };
 
-    const columns = useMemo(() => [
+    const columns = useMemo<ColumnDef<QuestionGroup>[]>(() => [
 
         {
 
@@ -278,7 +284,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
             accessorKey: 'name',
 
-            cell: ({ getValue }: any) => getValue(),
+            cell: ({ row }) => row.original.name,
 
         },
 
@@ -288,7 +294,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
             accessorKey: 'questions',
 
-            cell: ({ getValue }: any) => getValue()?.length || 0,
+            cell: ({ row }) => row.original.questions?.length || 0,
 
         },
 
@@ -298,7 +304,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
             accessorKey: 'description',
 
-            cell: ({ getValue }: any) => getValue() || t('questionGroupsCard.table.na'),
+            cell: ({ row }) => row.original.description || t('questionGroupsCard.table.na'),
 
         },
 
@@ -308,7 +314,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
             id: 'actions',
 
-            cell: ({ row }: any) => (
+            cell: ({ row }) => (
 
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
 
@@ -330,13 +336,13 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
         },
 
-    ], []);
+    ], [t]);
 
     const transformedData = useMemo(() => {
 
-        const rawGroups = Array.isArray((data as any)?.results) ? (data as any).results : Array.isArray(data) ? data : [];
+        const rawGroups = (data as unknown as PaginatedResponse<Record<string, unknown>>)?.results || [];
 
-        return rawGroups.map(transformQuestionGroup).filter(Boolean);
+        return rawGroups.map((g) => transformQuestionGroup(g as Record<string, unknown>) as unknown as QuestionGroup).filter(Boolean);
 
     }, [data]);
 
@@ -558,7 +564,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                     isLoading={isLoading}
 
-                    rowCount={typeof (data as any)?.count === 'number' ? (data as any).count : transformedData.length}
+                    rowCount={typeof data?.count === 'number' ? data.count : transformedData.length}
 
                     pagination={{
                         pageIndex: page,
@@ -632,7 +638,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                                 value={selectedQuestions}
 
-                                onChange={(e: SelectChangeEvent<any[]>) => setSelectedQuestions(e.target.value as any[])}
+                                onChange={(e: SelectChangeEvent<number[]>) => setSelectedQuestions(e.target.value as number[])}
 
                                 input={<OutlinedInput label={t('questionGroupsCard.label.selectquestions', 'Select Questions')} />}
 
@@ -640,7 +646,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Questi
 
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
 
-                                        {(selected as any[]).map((value) => {
+                                        {(selected as number[]).map((value) => {
 
                                             const q = allQuestions.find((item) => item.id === value);
 

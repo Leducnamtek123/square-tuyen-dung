@@ -6,7 +6,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import Link from 'next/link';
 import interviewService from '../../../services/interviewService';
 import { transformInterviewSession } from '../../../utils/transformers';
-import type { InterviewSession } from '../../../types/models';
+import { type InterviewSession } from '../../../types/models';
+import { type PaginatedResponse } from '../../../types/api';
 import { ROUTES } from '../../../configs/constants';
 import DataTable from '../../../components/Common/DataTable';
 import AIToolsCard from '../../../components/Features/AIToolsCard';
@@ -47,12 +48,8 @@ const InterviewLivePage = () => {
         page: page + 1,
         pageSize: rowsPerPage,
       });
-      const rawSessions = Array.isArray(data?.results)
-        ? data.results
-        : Array.isArray(data)
-        ? data
-        : [];
-      const mapped = rawSessions.map((session) => transformInterviewSession(session as Record<string, unknown>) as InterviewSession).filter(Boolean);
+      const rawSessions = (data as unknown as PaginatedResponse<Record<string, unknown>>)?.results || [];
+      const mapped = rawSessions.map((session: Record<string, unknown>) => transformInterviewSession(session) as InterviewSession).filter(Boolean);
       setSessions(mapped);
       setCount(typeof data?.count === 'number' ? data.count : rawSessions.length);
     } catch (error) {

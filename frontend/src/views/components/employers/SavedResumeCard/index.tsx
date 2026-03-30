@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 
 import { Box, Button, Divider, LinearProgress, Stack, Typography } from "@mui/material";
 
@@ -25,15 +24,6 @@ import toastMessages from '../../../../utils/toastMessages';
 
 interface SavedResumeCardProps {
   title: string;
-}
-
-interface RootState {
-  // Add other state slices if they exist
-  auth: any;
-  user: any;
-  config: any;
-  filter: any;
-  profile: any;
 }
 
 const getHeadCells = (t: (key: string) => string) => [
@@ -137,10 +127,11 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
     onPaginationChange({ pageIndex: 0, pageSize: parseInt(event.target.value, 10) });
   };
 
-  const handleFilter = (data: any) => {
-    setFilterData({
+  const handleFilter = (data: Partial<typeof filterData>) => {
+    setFilterData((prev) => ({
+      ...prev,
       ...data,
-    });
+    }));
     onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
   };
 
@@ -153,10 +144,10 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
   };
 
   const handleExport = () => {
-    const exportResumes = async (params: any) => {
+    const exportResumes = async (params: Record<string, unknown>) => {
       setIsFullScreenLoading(true);
       try {
-        const resData = await resumeSavedService.exportResumesSaved(params) as any;
+        const resData = await resumeSavedService.exportResumesSaved(params) as Record<string, unknown>[];
         const data = resData;
         xlsxUtils.exportToXLSX(data, 'SavedResumesList');
       } catch (error: any) {
@@ -294,12 +285,12 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
 
         <SavedResumeTable
           isLoading={isLoading}
-          rows={resumes}
+          rows={resumes as unknown as import('../SavedResumeTable').SavedResumeRow[]}
           rowCount={count}
           pagination={pagination}
-          onPaginationChange={onPaginationChange}
+          onPaginationChange={onPaginationChange as import('@tanstack/react-table').OnChangeFn<import('@tanstack/react-table').PaginationState>}
           sorting={sorting}
-          onSortingChange={onSortingChange}
+          onSortingChange={onSortingChange as import('@tanstack/react-table').OnChangeFn<import('@tanstack/react-table').SortingState>}
           handleUnsave={handleSave}
         />
 

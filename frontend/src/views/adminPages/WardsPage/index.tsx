@@ -29,8 +29,8 @@ import { useWards } from './hooks/useWards';
 
 const WardsPage = () => {
     const { t } = useTranslation('admin');
-    const { data: citiesData, isLoading: isLoadingCities } = useCities() as any;
-    const cities = (citiesData?.results || citiesData) as any[];
+    const { data: citiesData, isLoading: isLoadingCities } = useCities() as { data: { results?: unknown[] } | unknown[]; isLoading: boolean };
+    const cities = ((citiesData as { results?: unknown[] })?.results || citiesData) as Array<{ id: string | number; name: string }>;
 
     const [selectedCity, setSelectedCity] = useState<string | number>('');
     const [selectedDistrict, setSelectedDistrict] = useState<string | number>('');
@@ -55,15 +55,15 @@ const WardsPage = () => {
         city: selectedCity,
         page: 1,
         pageSize: 1000
-    }) as any;
-    const districts = (districtsData?.results || districtsData) as any[];
+    }) as { data: { results?: unknown[] } | unknown[]; isLoading: boolean };
+    const districts = ((districtsData as { results?: unknown[] })?.results || districtsData) as Array<{ id: string | number; name: string }>;
 
     useEffect(() => {
         if (!districts || districts.length === 0) {
             setSelectedDistrict('');
             return;
         }
-        const hasSelectedDistrict = districts.some((value: any) => String(value.id) === String(selectedDistrict));
+        const hasSelectedDistrict = districts.some((value) => String(value.id) === String(selectedDistrict));
         if (!hasSelectedDistrict) {
             setSelectedDistrict(districts[0].id);
         }
@@ -76,18 +76,25 @@ const WardsPage = () => {
         updateWard,
         deleteWard,
         isMutating
-    } = useWards({ district: selectedDistrict, page: page + 1, pageSize: rowsPerPage, ordering }) as any;
-    const wards = (wardsData?.results || wardsData) as any[];
+    } = useWards({ district: selectedDistrict, page: page + 1, pageSize: rowsPerPage, ordering }) as {
+        data: { count?: number; results?: unknown[] } | unknown[];
+        isLoading: boolean;
+        createWard: (ward: unknown) => Promise<unknown>;
+        updateWard: (ward: unknown) => Promise<unknown>;
+        deleteWard: (id: string | number) => Promise<unknown>;
+        isMutating: boolean;
+    };
+    const wards = ((wardsData as { results?: unknown[] })?.results || wardsData) as Array<Record<string, unknown>>;
 
     const districtNameById = useMemo(() => {
         const result: Record<string | number, string> = {};
-        (districts || []).forEach((district: any) => {
+        (districts || []).forEach((district) => {
             result[district.id] = district.name;
         });
         return result;
     }, [districts]);
 
-    const columns = useMemo<ColumnDef<any>[]>(() => [
+    const columns = useMemo<ColumnDef<Record<string, unknown>>[]>(() => [
         {
             accessorKey: 'id',
             header: t('pages.wards.table.id') as string,
@@ -134,7 +141,7 @@ const WardsPage = () => {
 
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-    const [currentWard, setCurrentWard] = useState<any>(null);
+    const [currentWard, setCurrentWard] = useState<Record<string, unknown> | null>(null);
     const [wardName, setWardName] = useState('');
     const [wardCode, setWardCode] = useState('');
     const [targetDistrictId, setTargetDistrictId] = useState<string | number>('');
@@ -150,16 +157,16 @@ const WardsPage = () => {
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (ward: any) => {
+    const handleOpenEdit = (ward: Record<string, unknown>) => {
         setDialogMode('edit');
         setCurrentWard(ward);
-        setWardName(ward.name);
-        setWardCode(ward.code || '');
-        setTargetDistrictId(ward.district);
+        setWardName(ward.name as string);
+        setWardCode((ward.code as string) || '');
+        setTargetDistrictId(ward.district as string | number);
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (ward: any) => {
+    const handleOpenDelete = (ward: Record<string, unknown>) => {
         setCurrentWard(ward);
         setOpenDeleteDialog(true);
     };
@@ -176,7 +183,7 @@ const WardsPage = () => {
                 await createWard({ name: wardName, code: wardCode || null, district: targetDistrictId });
             } else {
                 await updateWard({
-                    id: currentWard.id,
+                    id: currentWard?.id as string | number,
                     data: { name: wardName, code: wardCode || null, district: targetDistrictId }
                 });
             }
@@ -188,7 +195,7 @@ const WardsPage = () => {
 
     const handleDelete = async () => {
         try {
-            await deleteWard(currentWard.id);
+            await deleteWard(currentWard?.id as string | number);
             setOpenDeleteDialog(false);
         } catch (error) {
             console.error(error);
@@ -234,7 +241,7 @@ const WardsPage = () => {
                         }}
                         disabled={isLoadingCities}
                     >
-                        {cities?.map((city: any) => (
+                        {cities?.map((city) => (
                             <MenuItem key={city.id} value={city.id}>
                                 {city.name}
                             </MenuItem>
@@ -252,7 +259,7 @@ const WardsPage = () => {
                         }}
                         disabled={isLoadingDistricts || !(districts && districts.length > 0)}
                     >
-                        {districts?.map((district: any) => (
+                        {districts?.map((district) => (
                             <MenuItem key={district.id} value={district.id}>
                                 {district.name}
                             </MenuItem>
@@ -265,7 +272,7 @@ const WardsPage = () => {
                     columns={columns}
                     data={wards || []}
                     isLoading={isLoadingWards}
-                    rowCount={wardsData?.count || 0}
+                    rowCount={(wardsData as { count?: number })?.count || 0}
                     pagination={pagination}
                     onPaginationChange={onPaginationChange}
                     enableSorting
@@ -289,7 +296,7 @@ const WardsPage = () => {
                             onChange={(e) => setTargetDistrictId(e.target.value)}
                             required
                         >
-                            {districts?.map((district: any) => (
+                            {districts?.map((district) => (
                                 <MenuItem key={district.id} value={district.id}>
                                     {district.name}
                                 </MenuItem>

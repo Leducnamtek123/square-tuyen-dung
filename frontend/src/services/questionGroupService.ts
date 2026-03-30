@@ -1,4 +1,6 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
+import type { PaginatedResponse } from '../types/api';
+import type { QuestionGroup } from '../types/models';
 
 type AnyRecord = Record<string, unknown>;
 
@@ -28,23 +30,23 @@ const normalizeParams = (params: AnyRecord = {}): AnyRecord => {
 };
 
 const questionGroupService = {
-  getQuestionGroups: (params: AnyRecord = {}): Promise<unknown> => {
+  getQuestionGroups: (params: AnyRecord = {}): Promise<PaginatedResponse<QuestionGroup>> => {
     return httpRequest
       .get('interview/web/question-groups/', { params: normalizeParams(params) });
   },
-  getQuestionGroupDetail: (id: IdType): Promise<unknown> => {
+  getQuestionGroupDetail: (id: IdType): Promise<QuestionGroup> => {
     return httpRequest
       .get(`interview/web/question-groups/${id}/`);
   },
-  createQuestionGroup: (data: AnyRecord): Promise<unknown> => {
+  createQuestionGroup: (data: AnyRecord): Promise<QuestionGroup> => {
     return httpRequest
       .post('interview/web/question-groups/', data);
   },
-  updateQuestionGroup: (id: IdType, data: AnyRecord): Promise<unknown> => {
+  updateQuestionGroup: (id: IdType, data: AnyRecord): Promise<QuestionGroup> => {
     return httpRequest
       .patch(`interview/web/question-groups/${id}/`, data);
   },
-  deleteQuestionGroup: (id: IdType): Promise<unknown> => {
+  deleteQuestionGroup: (id: IdType): Promise<void> => {
     return httpRequest
       .delete(`interview/web/question-groups/${id}/`);
   },

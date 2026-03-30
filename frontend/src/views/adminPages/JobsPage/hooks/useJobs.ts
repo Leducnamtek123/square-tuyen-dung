@@ -1,8 +1,10 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import adminJobService from '../../../../services/adminJobService';
 import toastMessages from '../../../../utils/toastMessages';
+import { JobPost } from '../../../../types/models';
+import { PaginatedResponse } from '../../../../types/api';
 
-export const useJobs = (params: any) => {
+export const useJobs = (params: Record<string, unknown>) => {
     return useQuery({
         queryKey: ['admin-jobs', params],
         queryFn: async () => {
@@ -10,13 +12,13 @@ export const useJobs = (params: any) => {
             return res;
         },
         placeholderData: keepPreviousData,
-    }) as any;
+    });
 };
 
 export const useDeleteJob = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (id: any) => adminJobService.deleteJob(id),
+        mutationFn: (id: string | number) => adminJobService.deleteJob(id),
         onSuccess: () => {
             toastMessages.success('Job post deleted');
             queryClient.invalidateQueries({ queryKey: ['admin-jobs'] });
@@ -28,7 +30,7 @@ export const useDeleteJob = () => {
 export const useApproveJob = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (id: any) => adminJobService.approveJob(id),
+        mutationFn: (id: string | number) => adminJobService.approveJob(id),
         onSuccess: () => {
             toastMessages.success('Job post approved');
             queryClient.invalidateQueries({ queryKey: ['admin-jobs'] });
@@ -40,7 +42,7 @@ export const useApproveJob = () => {
 export const useRejectJob = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (id: any) => adminJobService.rejectJob(id),
+        mutationFn: (id: string | number) => adminJobService.rejectJob(id),
         onSuccess: () => {
             toastMessages.success('Job post rejected');
             queryClient.invalidateQueries({ queryKey: ['admin-jobs'] });
@@ -52,7 +54,7 @@ export const useRejectJob = () => {
 export const useUpdateJob = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: ({ id, data }: { id: any, data: any }) => adminJobService.updateJob(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPost> | Record<string, unknown> }) => adminJobService.updateJob(id, data),
         onSuccess: () => {
             toastMessages.success('Job post updated successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-jobs'] });

@@ -226,7 +226,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
   React.useEffect(() => { setIsLoading(queryLoading); }, [queryLoading]);
 
   const dataOptions = React.useMemo<ChartData<'bar'>>(() => {
-    const safeData = Array.isArray(data) ? data : [];
+    const safeData = data || [];
 
     var datasets = [];
 
@@ -379,7 +379,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
 
               </Stack>
 
-            ) : (Array.isArray(data) ? data.length === 0 : true) ? (
+            ) : (!data || data.length === 0) ? (
 
               <Stack
 
