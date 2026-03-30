@@ -370,7 +370,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                 candidate: data.candidate,
                 scheduled_at: data.scheduled_at,
                 question_ids: data.selected_questions,
-                type: 'mixed'
+                type: 'mixed' as any
             };
 
             if (sessionId) {

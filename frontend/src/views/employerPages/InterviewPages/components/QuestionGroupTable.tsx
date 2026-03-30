@@ -8,7 +8,7 @@ import DataTable from '../../../../components/Common/DataTable';
 
 interface Question {
     id: string | number;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 interface QuestionGroup {

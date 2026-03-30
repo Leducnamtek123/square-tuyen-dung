@@ -44,13 +44,14 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
     since: yup.date().nullable(),
     companyEmail: yup.string().required(t('jobPostForm.validation.contactpersonemailisrequired', 'Company email is required.')).email(t('jobPostForm.validation.invalidemail', 'Invalid email.')).max(100, t('jobPostForm.validation.jobnameexceededallowedlength', 'Company email exceeded allowed length.')),
     companyPhone: yup.string().required(t('jobPostForm.validation.contactpersonphoneisrequired', 'Company phone is required.')).matches(REGEX_VALIDATE.phoneRegExp, t('jobPostForm.validation.invalidphonenumber', 'Invalid phone number.')).max(15, t('jobPostForm.validation.jobnameexceededallowedlength', 'Company phone exceeded allowed length.')),
+    description: yup.mixed().notRequired(),
   });
 
   const { control, reset, setValue, setError, handleSubmit } = useForm({
     resolver: yupResolver(schema),
     defaultValues: {
       description: EditorState.createEmpty(),
-      location: { city: '', district: '', address: '', lat: '', lng: '' },
+      location: { city: '' as unknown as number, district: '' as unknown as number, address: '', lat: '' as unknown as number, lng: '' as unknown as number },
     },
   });
 
@@ -67,9 +68,9 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
         // Only clear district if the cityId has actually changed (user interaction)
         // and it's not the initial load (prevCityIdRef.current is not null).
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
-          setValue('location.district', '');
+          setValue('location.district', '' as unknown as number);
         }
-        setDistrictOptions(resData);
+        setDistrictOptions(resData?.data || []);
         prevCityIdRef.current = cityId;
       } catch (error: any) {
         errorHandling(error);

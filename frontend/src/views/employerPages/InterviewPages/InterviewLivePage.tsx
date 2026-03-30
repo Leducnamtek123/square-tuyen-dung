@@ -1,11 +1,12 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Box, Typography, Chip, Stack, Divider, LinearProgress, Button, IconButton } from "@mui/material";
+import { Box, Typography, Chip, Stack, Divider, LinearProgress, Button, IconButton, type Theme } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Link from 'next/link';
 import interviewService from '../../../services/interviewService';
 import { transformInterviewSession } from '../../../utils/transformers';
+import type { InterviewSession } from '../../../types/models';
 import { ROUTES } from '../../../configs/constants';
 import DataTable from '../../../components/Common/DataTable';
 import AIToolsCard from '../../../components/Features/AIToolsCard';
@@ -33,7 +34,7 @@ const getStatusColor = (status: string): "success" | "primary" | "info" | "error
 
 const InterviewLivePage = () => {
   const { t } = useTranslation('employer');
-  const [sessions, setSessions] = useState<any[]>([]);
+  const [sessions, setSessions] = useState<InterviewSession[]>([]);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -42,17 +43,16 @@ const InterviewLivePage = () => {
   const fetchSessions = useCallback(async () => {
     setLoading(true);
     try {
-      const res: any = await interviewService.getSessions({
+      const data = await interviewService.getSessions({
         page: page + 1,
         pageSize: rowsPerPage,
       });
-      const data = res;
       const rawSessions = Array.isArray(data?.results)
         ? data.results
         : Array.isArray(data)
         ? data
         : [];
-      const mapped = rawSessions.map(transformInterviewSession).filter(Boolean);
+      const mapped = rawSessions.map((session) => transformInterviewSession(session as Record<string, unknown>) as InterviewSession).filter(Boolean);
       setSessions(mapped);
       setCount(typeof data?.count === 'number' ? data.count : rawSessions.length);
     } catch (error) {
@@ -73,7 +73,7 @@ const InterviewLivePage = () => {
     return () => clearInterval(interval);
   }, [sessions, fetchSessions]);
 
-  const handleChangePage = (event: any, newPage: number) => {
+  const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
@@ -102,7 +102,7 @@ const InterviewLivePage = () => {
       {
         header: t('interviewLive.table.candidate'),
         accessorKey: 'candidateName',
-        cell: ({ row }: any) => (
+        cell: ({ row }: { row: { original: InterviewSession } }) => (
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
               {row.original.candidateName || 'N/A'}
@@ -116,21 +116,21 @@ const InterviewLivePage = () => {
       {
         header: t('interviewLive.table.position'),
         accessorKey: 'jobName',
-        cell: ({ getValue }: any) => <Typography variant="body2">{getValue() || 'N/A'}</Typography>,
+        cell: ({ getValue }: { getValue: () => string }) => <Typography variant="body2">{getValue() || 'N/A'}</Typography>,
       },
       {
         header: t('interviewLive.table.room'),
-        accessorKey: 'room_name',
-        cell: ({ row }: any) => (
+        accessorKey: 'roomName',
+        cell: ({ row }: { row: { original: InterviewSession } }) => (
           <Typography variant="body2">
-            {row.original.room_name || row.original.roomName || row.original.room || 'N/A'}
+            {row.original.roomName || 'N/A'}
           </Typography>
         ),
       },
       {
         header: t('interviewLive.table.time'),
         accessorKey: 'scheduledAt',
-        cell: ({ getValue }: any) => (
+        cell: ({ getValue }: { getValue: () => string }) => (
           <Typography variant="body2">
             {getValue() ? new Date(getValue()).toLocaleString() : 'N/A'}
           </Typography>
@@ -139,7 +139,7 @@ const InterviewLivePage = () => {
       {
         header: t('interviewLive.table.status'),
         accessorKey: 'status',
-        cell: ({ getValue }: any) => (
+        cell: ({ getValue }: { getValue: () => string }) => (
           <Chip
             label={t(`interviewLive.statuses.${getValue()}`, { defaultValue: getValue()?.replaceAll('_', ' ')?.toUpperCase() })}
             color={getStatusColor(getValue())}
@@ -151,12 +151,12 @@ const InterviewLivePage = () => {
       {
         header: '',
         id: 'actions',
-        cell: ({ row }: any) => (
+        cell: ({ row }: { row: { original: InterviewSession } }) => (
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <IconButton
               component={Link}
-              href={getLink(ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', row.original.id))}
-              {...({} as any)}
+              href={getLink(ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', row.original.id.toString()))}
+              {...({} as Record<string, unknown>)}
               color="primary"
               size="small"
               sx={{
@@ -193,7 +193,7 @@ const InterviewLivePage = () => {
           variant="h5"
           sx={{
             fontWeight: 600,
-            background: (theme: any) => theme.palette.primary.main || theme.palette.primary.main,
+            background: (theme: Theme) => theme.palette.primary.main,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             fontSize: { xs: '1.25rem', sm: '1.5rem' },
@@ -207,14 +207,14 @@ const InterviewLivePage = () => {
           startIcon={<AddIcon />}
           component={Link}
           href={getLink(ROUTES.EMPLOYER.INTERVIEW_CREATE)}
-          {...({} as any)}
+          {...({} as Record<string, unknown>)}
           sx={{
             borderRadius: 2,
             px: 3,
-            background: (theme: any) => theme.palette.primary.main,
-            boxShadow: (theme: any) => theme.customShadows?.small || 1,
+            background: (theme: Theme) => theme.palette.primary.main,
+            boxShadow: (theme: Theme & { customShadows?: Record<string, string | number> }) => theme.customShadows?.small || 1,
             '&:hover': {
-              boxShadow: (theme: any) => theme.customShadows?.medium || 2,
+              boxShadow: (theme: Theme & { customShadows?: Record<string, string | number> }) => theme.customShadows?.medium || 2,
             },
           }}
         >
@@ -247,7 +247,7 @@ const InterviewLivePage = () => {
         sx={{
           backgroundColor: 'background.paper',
           borderRadius: 2,
-          boxShadow: (theme: any) => theme.customShadows?.card || 1,
+          boxShadow: (theme: Theme & { customShadows?: Record<string, string | number> }) => theme.customShadows?.card || 1,
           overflow: 'hidden',
           width: '100%',
           '& .MuiTableContainer-root': {

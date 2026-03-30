@@ -21,7 +21,7 @@ const commonService = {
   getConfigs: async (): Promise<SystemConfig> => {
     const url = 'common/configs/';
     const data = (await httpRequest.get(url)) as SystemConfig;
-    return presignInObject(data) as SystemConfig;
+    return (await presignInObject(data)) as SystemConfig;
   },
 
   getDistrictsByCityId: (cityId: CityInput): Promise<DistrictsResponse> => {
@@ -58,8 +58,8 @@ const commonService = {
 
   getTop10Careers: async (): Promise<Career[]> => {
     const url = 'common/top-careers/';
-    const data = await httpRequest.get(url);
-    return presignInObject(data) as Career[];
+    const data = (await httpRequest.get(url)) as unknown;
+    return (await presignInObject(data)) as Career[];
   },
 
   /**
@@ -117,7 +117,7 @@ const commonService = {
       page += 1;
     }
 
-    return presignInObject(results) as Career[];
+    return (await presignInObject(results)) as Career[];
   },
 
   healthCheck: (): Promise<{ status: string }> => {

@@ -18,6 +18,7 @@ import filterReducer, {
 } from '../filterSlice';
 import profileReducer, { reloadResume } from '../profileSlice';
 import type { RootState } from '../store';
+import type { User } from '../types/models';
 
 // ─── userSlice tests ────────────────────────────────────────────
 describe('userSlice', () => {
@@ -50,7 +51,7 @@ describe('userSlice', () => {
   it('should reset state on removeUserInfo.fulfilled', () => {
     const loggedInState = {
       isAuthenticated: true,
-      currentUser: { id: 1, fullName: 'Test User' } as any,
+      currentUser: { id: 1, fullName: 'Test User' } as User,
       activeWorkspace: { type: 'job_seeker' as const, companyId: null, label: '' },
     };
     const action = { type: removeUserInfo.fulfilled.type };
@@ -171,15 +172,15 @@ describe('filterSlice', () => {
 describe('profileSlice', () => {
   it('should have correct initial state', () => {
     const state = profileReducer(undefined, { type: '@@INIT' });
-    expect(state.resume.isReloadResume).toBe(false);
+    expect(state.resume.reloadCounter).toBe(0);
   });
 
-  it('should toggle reloadResume', () => {
+  it('should increment reloadCounter', () => {
     const state1 = profileReducer(undefined, reloadResume());
-    expect(state1.resume.isReloadResume).toBe(true);
+    expect(state1.resume.reloadCounter).toBe(1);
     
     const state2 = profileReducer(state1, reloadResume());
-    expect(state2.resume.isReloadResume).toBe(false);
+    expect(state2.resume.reloadCounter).toBe(2);
   });
 });
 
@@ -216,6 +217,6 @@ describe('Redux store integration', () => {
     const state = store.getState() as RootState;
     expect(state.filter.jobPostFilter.kw).toBe('python');
     expect(state.auth.email).toBe('a@b.com');
-    expect(state.profile.resume.isReloadResume).toBe(true);
+    expect(state.profile.resume.reloadCounter).toBe(1);
   });
 });

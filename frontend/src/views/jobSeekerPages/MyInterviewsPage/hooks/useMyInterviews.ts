@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import interviewService from '../../../../services/interviewService';
 import { useAppSelector } from '../../../../hooks/useAppStore';
 
-export interface InterviewParams {
-    pageSize?: number;
-    page?: number;
-    [key: string]: any;
+import type { GetSessionsParams } from '../../../../services/interviewService';
+
+export interface InterviewParams extends GetSessionsParams {
+    candidate?: number;
 }
 
 export const useMyInterviews = (params: InterviewParams) => {
@@ -18,7 +18,7 @@ export const useMyInterviews = (params: InterviewParams) => {
 
     const query = useQuery({
         queryKey: ['my-interviews', queryParams],
-        queryFn: () => interviewService.getSessions(queryParams) as Promise<any>,
+        queryFn: () => interviewService.getSessions(queryParams),
         enabled: !!candidateId,
     });
 

@@ -116,7 +116,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
             <NoDataCard title="Chưa có thông báo nào!" />
           )}
 
-          {notifications.map((value, idx) => (
+          {notifications.map((value: any, idx) => (
             <Stack
               direction={{ xs: "column", sm: "row" }}
               spacing={{ xs: 2, sm: 3 }}

@@ -75,14 +75,14 @@ const resumeService = {
 
   getResumes: async (params: GetResumesParams = {}): Promise<PaginatedResponse<Resume>> => {
     const url = 'info/web/resumes/';
-    const data = await httpRequest.get(url, { params });
-    return presignInObject(data) as PaginatedResponse<Resume>;
+    const data = (await httpRequest.get(url, { params })) as unknown;
+    return (await presignInObject(data)) as PaginatedResponse<Resume>;
   },
 
   getResumeDetail: async (resumeSlug: IdType): Promise<Resume> => {
     const url = `info/web/resumes/${resumeSlug}/`;
-    const data = await httpRequest.get(url);
-    return presignInObject(data) as Resume;
+    const data = (await httpRequest.get(url)) as unknown;
+    return (await presignInObject(data)) as Resume;
   },
 
   saveResume: (slug: IdType): Promise<{ saved: boolean }> => {
@@ -97,36 +97,36 @@ const resumeService = {
 
   getResumeOwner: async (resumeSlug: IdType): Promise<ResumeOwner> => {
     const url = `info/web/private-resumes/${resumeSlug}/resume-owner/`;
-    const data = await httpRequest.get(url);
-    return presignInObject(data) as ResumeOwner;
+    const data = (await httpRequest.get(url)) as unknown;
+    return (await presignInObject(data)) as ResumeOwner;
   },
 
   getCv: async (resumeSlug: IdType): Promise<ResumeCV> => {
     const url = `info/web/private-resumes/${resumeSlug}/cv/`;
-    const data = await httpRequest.get(url);
-    return presignInObject(data) as ResumeCV;
+    const data = (await httpRequest.get(url)) as unknown;
+    return (await presignInObject(data)) as ResumeCV;
   },
 
   updateCV: async (resumeSlug: IdType, formData: FormData): Promise<ResumeCV> => {
     const url = `info/web/private-resumes/${resumeSlug}/cv/`;
-    const resData = await httpRequest.put(url, formData, {
+    const resData = (await httpRequest.put(url, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return presignInObject(resData) as ResumeCV;
+    })) as unknown;
+    return (await presignInObject(resData)) as ResumeCV;
   },
 
   addResume: async (data: FormData): Promise<Resume> => {
     const url = 'info/web/private-resumes/';
-    const resData = await httpRequest.post(url, data, {
+    const resData = (await httpRequest.post(url, data, {
       headers: { 'Content-Type': 'multipart/form-data' },
-    });
-    return presignInObject(resData) as Resume;
+    })) as unknown;
+    return (await presignInObject(resData)) as Resume;
   },
 
   updateResume: async (resumeSlug: IdType, data: ResumeInput): Promise<Resume> => {
     const url = `info/web/private-resumes/${resumeSlug}/`;
-    const resData = await httpRequest.put(url, data);
-    return presignInObject(resData) as Resume;
+    const resData = (await httpRequest.put(url, data)) as unknown;
+    return (await presignInObject(resData)) as Resume;
   },
 
   deleteResume: (resumeSlug: IdType): Promise<void> => {
@@ -136,8 +136,8 @@ const resumeService = {
 
   activeResume: async (resumeSlug: IdType): Promise<Resume> => {
     const url = `info/web/private-resumes/${resumeSlug}/resume-active/`;
-    const data = await httpRequest.get(url);
-    return presignInObject(data) as Resume;
+    const data = (await httpRequest.get(url)) as unknown;
+    return (await presignInObject(data)) as Resume;
   },
 
   getExperiencesDetail: (resumeSlug: IdType): Promise<ExperienceDetail[]> => {

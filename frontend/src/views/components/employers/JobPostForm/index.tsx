@@ -34,7 +34,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
     setError,
     reset,
   } = useForm<JobPostFormValues>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
     defaultValues: {
       jobDescription: EditorState.createEmpty(),
       jobRequirement: EditorState.createEmpty(),

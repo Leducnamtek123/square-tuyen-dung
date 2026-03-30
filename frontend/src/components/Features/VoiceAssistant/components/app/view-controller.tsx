@@ -9,7 +9,9 @@ import { WelcomeView } from '@/components/Features/VoiceAssistant/components/app
 const MotionWelcomeView = motion.create(WelcomeView);
 const MotionSessionView = motion.create(SessionView);
 
-const VIEW_MOTION_PROPS = {
+import type { HTMLMotionProps } from 'motion/react';
+
+const VIEW_MOTION_PROPS: HTMLMotionProps<"div"> = {
   variants: {
     visible: {
       opacity: 1,

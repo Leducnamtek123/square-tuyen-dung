@@ -135,8 +135,8 @@ const JobDetailPage = () => {
     const saveJobPost = async () => {
       setIsLoadingSave(true);
       try {
-        const resData = await jobService.saveJobPost(slug as string);
-        const isSaved = resData.isSaved;
+        const resData = await jobService.saveJobPost(slug as string) as { saved: boolean };
+        const isSaved = resData.saved;
         setJobPostDetail({ ...jobPostDetail, isSaved: isSaved });
         toastMessages.success(
           isSaved ? t("jobDetail.savedSuccess") : t("jobDetail.unsavedSuccess")

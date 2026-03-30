@@ -7,7 +7,7 @@ import { ChatEntry } from '@/components/Features/VoiceAssistant/components/livek
 const MotionContainer = motion.create('div');
 const MotionChatEntry = motion.create(ChatEntry);
 
-const CONTAINER_MOTION_PROPS = {
+const CONTAINER_MOTION_PROPS: HTMLMotionProps<"div"> = {
   variants: {
     hidden: {
       opacity: 0,
@@ -24,7 +24,6 @@ const CONTAINER_MOTION_PROPS = {
         delay: 0.2,
         ease: 'easeOut',
         duration: 0.3,
-        stagerDelay: 0.2,
         staggerChildren: 0.1,
         staggerDirection: 1,
       },
@@ -35,7 +34,7 @@ const CONTAINER_MOTION_PROPS = {
   exit: 'hidden',
 };
 
-const MESSAGE_MOTION_PROPS = {
+const MESSAGE_MOTION_PROPS: HTMLMotionProps<"li"> = {
   variants: {
     hidden: {
       opacity: 0,

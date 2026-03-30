@@ -13,7 +13,7 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function S
   { className, children },
   ref
 ) {
-  const scrollContentRef = useRef<HTMLDivElement>(null);
+  const scrollContentRef = useRef<HTMLDivElement | null>(null);
 
   useAutoScroll(scrollContentRef.current);
 

@@ -10,6 +10,7 @@ import Button from "@mui/material/Button";
 import interviewService from "../../services/interviewService";
 import tokenService from "../../services/tokenService";
 import { transformInterviewSession } from "../../utils/transformers";
+import type { InterviewSession } from "../../types/models";
 
 const getSafeLiveKitUrl = () => {
   if (typeof window === 'undefined') return '';
@@ -75,10 +76,10 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
     serverUrl: string;
   } | undefined>(undefined);
   
-  const [session, setSession] = useState<any>(null);
+  const [session, setSession] = useState<InterviewSession | null>(null);
   const [sessionInviteToken, setSessionInviteToken] = useState<string>("");
 
-  const roomName = session?.roomName || session?.room_name;
+  const roomName = session?.roomName;
 
   const JOINABLE_STATUSES = ["scheduled", "calibration", "in_progress"];
   const isJoinable = session && JOINABLE_STATUSES.includes(session.status);
@@ -105,18 +106,18 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
       if (normalizedRole === "jobseeker") {
         inviteToken = routeId;
         if (!inviteToken) throw new Error(t("errors.missingInvite"));
-        detailRaw = await interviewService.getSessionDetailByInviteToken(inviteToken) as any;
+        detailRaw = await interviewService.getSessionDetailByInviteToken(inviteToken);
       } else {
         if (!routeId) throw new Error(t("errors.missingSessionId", { defaultValue: "Missing session ID." }));
-        detailRaw = await interviewService.getSessionDetail(routeId) as any;
-        inviteToken = detailRaw?.invite_token || detailRaw?.inviteToken;
+        detailRaw = await interviewService.getSessionDetail(routeId);
+        inviteToken = detailRaw?.inviteToken || '';
       }
 
-      const mappedSession = transformInterviewSession(detailRaw as any);
+      const mappedSession = transformInterviewSession(detailRaw as unknown as Record<string, unknown>) as InterviewSession;
       setSession(mappedSession);
       setSessionInviteToken(inviteToken || "");
-    } catch (err: any) {
-      setError(err?.message || t("errors.invalidSession"));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("errors.invalidSession"));
     } finally {
       setLoading(false);
     }
@@ -161,8 +162,8 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         serverUrl: urlToUse
       });
       setConnectRoom(true);
-    } catch (err: any) {
-      setError(err?.message || t("errors.invalidSession", { defaultValue: "Cannot start interview." }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("errors.invalidSession", { defaultValue: "Cannot start interview." }));
     } finally {
       setStarting(false);
     }

@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tansta
 import questionGroupService from '../../../../services/questionGroupService';
 import toastMessages from '../../../../utils/toastMessages';
 
-export const useQuestionGroups = (params: any) => {
+export const useQuestionGroups = (params: Record<string, unknown>) => {
     const { t } = useTranslation('employer');
     const queryClient = useQueryClient();
 
@@ -15,7 +15,7 @@ export const useQuestionGroups = (params: any) => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: any) => questionGroupService.createQuestionGroup(data),
+        mutationFn: (data: Record<string, unknown>) => questionGroupService.createQuestionGroup(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
             toastMessages.success(t('questionGroupsCard.messages.addSuccess'));
@@ -27,7 +27,7 @@ export const useQuestionGroups = (params: any) => {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string | number, data: any }) => questionGroupService.updateQuestionGroup(id, data),
+        mutationFn: ({ id, data }: { id: string | number, data: Record<string, unknown> }) => questionGroupService.updateQuestionGroup(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
             toastMessages.success(t('questionGroupsCard.messages.updateSuccess'));

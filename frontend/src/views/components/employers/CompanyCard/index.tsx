@@ -21,7 +21,7 @@ import ImageCropDialog from '@/components/Common/ImageCropDialog';
 
 interface CompanyData {
   id?: number;
-  description?: string;
+  description?: any;
   companyImageUrl?: string;
   companyCoverImageUrl?: string;
   [key: string]: unknown;
@@ -39,8 +39,8 @@ function useCompanyData() {
   const loadCompany = React.useCallback(async () => {
     setIsLoading(true);
     try {
-      const resData = (await companyService.getCompany()) as CompanyData;
-      const data = {
+      const resData = (await companyService.getCompany()) as unknown as CompanyData;
+      const data: CompanyData = {
         ...resData,
         description: createEditorStateFromHTMLString(resData?.description || ''),
       };
@@ -93,8 +93,8 @@ function useCompanyData() {
 
         const resData =
           type === 'logo'
-            ? ((await companyService.updateCompanyImageUrl(formData)) as CompanyData)
-            : ((await companyService.updateCompanyCoverImageUrl(formData)) as CompanyData);
+            ? ((await companyService.updateCompanyImageUrl(formData)) as unknown as CompanyData)
+            : ((await companyService.updateCompanyCoverImageUrl(formData)) as unknown as CompanyData);
 
         const successKey =
           type === 'logo' ? 'companyProfile.success.logoUpdate' : 'companyProfile.success.coverUpdate';

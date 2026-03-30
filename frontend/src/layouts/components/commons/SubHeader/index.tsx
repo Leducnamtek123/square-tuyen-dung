@@ -122,7 +122,7 @@ const SubHeader = () => {
 
   const [open, setOpen] = React.useState(false);
 
-  const [topCareers, setTopCareers] = React.useState([]);
+  const [topCareers, setTopCareers] = React.useState<CareerItem[]>([]);
 
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
@@ -135,7 +135,10 @@ const SubHeader = () => {
 
         const resData = await commonService.getTop10Careers();
 
-        setTopCareers(resData);
+        setTopCareers(resData.map((item: any) => ({
+          ...item,
+          id: String(item.id)
+        })));
 
       } catch (error) {
 

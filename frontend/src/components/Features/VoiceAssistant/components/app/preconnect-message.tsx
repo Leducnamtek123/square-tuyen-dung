@@ -7,7 +7,9 @@ import { cn } from '@/lib/utils';
 
 const MotionMessage = motion.create('p');
 
-const VIEW_MOTION_PROPS = {
+import type { HTMLMotionProps } from 'motion/react';
+
+const VIEW_MOTION_PROPS: HTMLMotionProps<"p"> = {
   variants: {
     visible: {
       opacity: 1,

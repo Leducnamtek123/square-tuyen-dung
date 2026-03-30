@@ -56,6 +56,32 @@ export interface Company {
   jobPostsCount?: number;
 }
 
+export interface CompanyImage {
+  id: number;
+  imageUrl: string;
+}
+
+export interface CompanyRole {
+  id: number;
+  code?: string;
+  name: string;
+  description?: string;
+  permissions?: string[];
+  is_system?: boolean;
+}
+
+export interface CompanyMember {
+  id: number;
+  companyId?: number;
+  user?: User;
+  userDict?: User;
+  invitedEmail?: string;
+  invited_email?: string;
+  role?: CompanyRole;
+  roleId?: number;
+  status?: string;
+}
+
 /* Job */
 
 export interface JobPost {
@@ -219,6 +245,10 @@ export interface InterviewSession {
   duration?: number | null;
   candidate?: User;
   jobPost?: JobPost | null;
+  jobName?: string | null;
+  candidateName?: string | null;
+  candidateEmail?: string | null;
+  companyName?: string | null;
   createdBy?: User | null;
   aiOverallScore?: number | null;
   aiSummary?: string | null;

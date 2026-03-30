@@ -1,10 +1,11 @@
 import React from 'react';
-import { Box, Card, Typography, Button, Avatar, Chip, CircularProgress, useTheme } from "@mui/material";
+import { Box, Card, Typography, Button, Avatar, Chip, CircularProgress, useTheme, type Theme } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 
 import { TabTitle } from '../../../utils/generalFunction';
 import { useMyInterviews } from './hooks/useMyInterviews';
 import { transformInterviewSession } from '../../../utils/transformers';
+import type { InterviewSession } from '../../../types/models';
 import { ROUTES } from '../../../configs/constants';
 import { useRouter } from 'next/navigation';
 import VideoCameraFrontIcon from '@mui/icons-material/VideoCameraFront';
@@ -19,7 +20,7 @@ const MyInterviewsPage = () => {
     const navigate = useRouter();
     const { data: interviewsData, isLoading, isError } = useMyInterviews({ pageSize: 50 });
 
-    const interviews = (interviewsData?.messages || interviewsData?.results || []).map(transformInterviewSession);
+    const interviews = (interviewsData?.results || []).map((session) => transformInterviewSession(session) as InterviewSession);
 
     const handleJoin = (inviteToken: string) => {
         navigate.push(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM.replace(':id', inviteToken)}`);
@@ -45,7 +46,7 @@ const MyInterviewsPage = () => {
             <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
                 {t('jobSeeker:myInterviewsTitle')}
             </Typography>
-            <Card sx={{ p: 2, borderRadius: '12px', boxShadow: (theme as any).customShadows?.card }}>
+            <Card sx={{ p: 2, borderRadius: '12px', boxShadow: (theme as Theme & { customShadows?: Record<string, string> }).customShadows?.card }}>
                 {isLoading ? (
                     <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
                         <CircularProgress />
@@ -63,7 +64,7 @@ const MyInterviewsPage = () => {
                     </Box>
                 ) : (
                     <Grid container spacing={2}>
-                        {interviews.map((interview: any) => (
+                        {interviews.map((interview: InterviewSession) => (
                             <Grid key={interview.id} size={12}>
                                 <Card variant="outlined" sx={{ p: 2, borderRadius: '8px', '&:hover': { borderColor: 'primary.main' } }}>
                                     <Grid container spacing={2} alignItems="center">
@@ -74,10 +75,10 @@ const MyInterviewsPage = () => {
                                         </Grid>
                                         <Grid size="grow">
                                             <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                                                {interview.room_name || interview.roomName || t('jobSeeker:myInterviews.defaultRoomName')}
+                                                {interview.roomName || t('jobSeeker:myInterviews.defaultRoomName')}
                                             </Typography>
                                             <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                                                {t('common:labels.time')}: {dayjs(interview.scheduledAt || interview.scheduled_at).format('HH:mm - DD/MM/YYYY')}
+                                                {t('common:labels.time')}: {dayjs(interview.scheduledAt).format('HH:mm - DD/MM/YYYY')}
                                             </Typography>
                                             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
                                                 {getStatusChip(interview.status)}
@@ -97,8 +98,8 @@ const MyInterviewsPage = () => {
                                             <Button
                                                 variant="contained"
                                                 color="primary"
-                                                disabled={interview.status === 'completed' || interview.status === 'cancelled' || !(interview.invite_token || interview.inviteToken)}
-                                                onClick={() => handleJoin(interview.invite_token || interview.inviteToken)}
+                                                disabled={interview.status === 'completed' || interview.status === 'cancelled' || !interview.inviteToken}
+                                                onClick={() => handleJoin(interview.inviteToken!)}
                                                 startIcon={<VideoCameraFrontIcon />}
                                                 sx={{ borderRadius: '8px', textTransform: 'none' }}
                                             >

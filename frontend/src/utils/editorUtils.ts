@@ -1,9 +1,10 @@
-﻿import {
+import {
   ContentState,
   convertFromHTML,
   convertToRaw,
   EditorState,
 } from 'draft-js';
+// @ts-expect-error No type declaration available for draftjs-to-html
 import draftToHtml from 'draftjs-to-html';
 
 const convertEditorStateToHTMLString = (editorState: EditorState): string => {
@@ -18,10 +19,7 @@ const createEditorStateFromHTMLString = (htmlString: string): EditorState => {
     return EditorState.createEmpty();
   }
   const blocksFromHTML = convertFromHTML(htmlString);
-  const content = ContentState.createFromBlockArray(
-    blocksFromHTML.contentBlocks,
-    blocksFromHTML.entityMap
-  );
+  const content = ContentState.createFromBlockArray(blocksFromHTML.contentBlocks);
   return EditorState.createWithContent(content);
 };
 

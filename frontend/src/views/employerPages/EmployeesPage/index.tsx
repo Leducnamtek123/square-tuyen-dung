@@ -30,7 +30,9 @@ import {
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import AddIcon from "@mui/icons-material/Add";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, CellContext } from '@tanstack/react-table';
+import { AxiosError } from 'axios';
+import type { CompanyRole, CompanyMember } from '../../../types/models';
 
 import companyTeamService from "../../../services/companyTeamService";
 import toastMessages from "../../../utils/toastMessages";
@@ -53,10 +55,13 @@ const slugifyCode = (value: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
-const normalizeListPayload = (payload: any) => {
+const normalizeListPayload = <T,>(payload: unknown): T[] => {
   if (!payload) return [];
-  if (Array.isArray(payload)) return payload;
-  if (Array.isArray(payload.results)) return payload.results;
+  if (Array.isArray(payload)) return payload as T[];
+  if (typeof payload === 'object' && payload !== null && 'results' in payload) {
+    const res = (payload as Record<string, unknown>).results;
+    if (Array.isArray(res)) return res as T[];
+  }
   return [];
 };
 
@@ -96,73 +101,78 @@ const EmployeesPage = () => {
 
   const { data: rolePayload, isLoading: rolesLoading } = useQuery({
     queryKey: ["company-roles"],
-    queryFn: () => companyTeamService.getRoles() as Promise<any>,
+    queryFn: () => companyTeamService.getRoles(),
   });
 
   const { data: memberPayload, isLoading: membersLoading } = useQuery({
     queryKey: ["company-members"],
-    queryFn: () => companyTeamService.getMembers() as Promise<any>,
+    queryFn: () => companyTeamService.getMembers(),
   });
 
-  const roles = useMemo(() => normalizeListPayload(rolePayload), [rolePayload]);
-  const members = useMemo(() => normalizeListPayload(memberPayload), [memberPayload]);
+  const roles = useMemo(() => normalizeListPayload<CompanyRole>(rolePayload), [rolePayload]);
+  const members = useMemo(() => normalizeListPayload<CompanyMember>(memberPayload), [memberPayload]);
 
   const createRoleMutation = useMutation({
-    mutationFn: (data: any) => companyTeamService.createRole(data),
+    mutationFn: (data: Omit<CompanyRole, "id" | "company"> & { is_active?: boolean }) => companyTeamService.createRole(data),
     onSuccess: () => {
       toastMessages.success(t("employees.toast.createRoleSuccess"));
       queryClient.invalidateQueries({ queryKey: ["company-roles"] });
       setOpenRoleDialog(false);
       setRoleForm({ code: "", name: "", description: "", permissions: [] });
     },
-    onError: (error: any) => {
-      toastMessages.error(error?.response?.data?.errors?.errorMessage?.[0] || t("employees.toast.createRoleError"));
+    onError: (error: unknown) => {
+      const axiosError = error as AxiosError<{ errors?: { errorMessage?: string[] } }>;
+      toastMessages.error(axiosError?.response?.data?.errors?.errorMessage?.[0] || t("employees.toast.createRoleError"));
     },
   });
 
   const deleteRoleMutation = useMutation({
-    mutationFn: (id: any) => companyTeamService.deleteRole(id),
+    mutationFn: (id: number) => companyTeamService.deleteRole(id),
     onSuccess: () => {
       toastMessages.success(t("employees.toast.deleteRoleSuccess"));
       queryClient.invalidateQueries({ queryKey: ["company-roles"] });
     },
-    onError: (error: any) => {
-      toastMessages.error(error?.response?.data?.errors?.errorMessage?.[0] || t("employees.toast.deleteRoleError"));
+    onError: (error: unknown) => {
+      const axiosError = error as AxiosError<{ errors?: { errorMessage?: string[] } }>;
+      toastMessages.error(axiosError?.response?.data?.errors?.errorMessage?.[0] || t("employees.toast.deleteRoleError"));
     },
   });
 
   const createMemberMutation = useMutation({
-    mutationFn: (data: any) => companyTeamService.createMember(data),
+    mutationFn: (data: Record<string, unknown>) => companyTeamService.createMember(data),
     onSuccess: () => {
       toastMessages.success(t("employees.toast.createMemberSuccess"));
       queryClient.invalidateQueries({ queryKey: ["company-members"] });
       setOpenMemberDialog(false);
       setMemberForm({ userId: "", roleId: "", status: "ACTIVE", invitedEmail: "" });
     },
-    onError: (error: any) => {
-      toastMessages.error(error?.response?.data?.errors?.errorMessage?.[0] || t("employees.toast.createMemberError"));
+    onError: (error: unknown) => {
+      const axiosError = error as AxiosError<{ errors?: { errorMessage?: string[] } }>;
+      toastMessages.error(axiosError?.response?.data?.errors?.errorMessage?.[0] || t("employees.toast.createMemberError"));
     },
   });
 
   const updateMemberMutation = useMutation({
-    mutationFn: ({ id, data }: { id: any; data: any }) => companyTeamService.updateMember(id, data),
+    mutationFn: ({ id, data }: { id: number; data: Record<string, unknown> }) => companyTeamService.updateMember(id, data),
     onSuccess: () => {
       toastMessages.success(t("employees.toast.updateMemberSuccess"));
       queryClient.invalidateQueries({ queryKey: ["company-members"] });
     },
-    onError: (error: any) => {
-      toastMessages.error(error?.response?.data?.errors?.errorMessage?.[0] || t("employees.toast.updateMemberError"));
+    onError: (error: unknown) => {
+      const axiosError = error as AxiosError<{ errors?: { errorMessage?: string[] } }>;
+      toastMessages.error(axiosError?.response?.data?.errors?.errorMessage?.[0] || t("employees.toast.updateMemberError"));
     },
   });
 
   const deleteMemberMutation = useMutation({
-    mutationFn: (id: any) => companyTeamService.deleteMember(id),
+    mutationFn: (id: number) => companyTeamService.deleteMember(id),
     onSuccess: () => {
       toastMessages.success(t("employees.toast.deleteMemberSuccess"));
       queryClient.invalidateQueries({ queryKey: ["company-members"] });
     },
-    onError: (error: any) => {
-      toastMessages.error(error?.response?.data?.errors?.errorMessage?.[0] || t("employees.toast.deleteMemberError"));
+    onError: (error: unknown) => {
+      const axiosError = error as AxiosError<{ errors?: { errorMessage?: string[] } }>;
+      toastMessages.error(axiosError?.response?.data?.errors?.errorMessage?.[0] || t("employees.toast.deleteMemberError"));
     },
   });
 
@@ -170,7 +180,7 @@ const EmployeesPage = () => {
     createRoleMutation.mutate({
       code: slugifyCode(roleForm.code || roleForm.name),
       name: roleForm.name?.trim(),
-      description: roleForm.description?.trim() || null,
+      description: roleForm.description?.trim() || undefined,
       permissions: roleForm.permissions,
       is_active: true,
     });
@@ -181,22 +191,22 @@ const EmployeesPage = () => {
       userId: Number(memberForm.userId),
       roleId: Number(memberForm.roleId),
       status: memberForm.status,
-      invitedEmail: memberForm.invitedEmail?.trim() || null,
+      invitedEmail: memberForm.invitedEmail?.trim() || undefined,
       is_active: true,
     });
   };
 
-  const roleColumns = useMemo<ColumnDef<any>[]>(() => [
+  const roleColumns = useMemo<ColumnDef<CompanyRole>[]>(() => [
     { accessorKey: 'id', header: t('employees.table.id') as string, enableSorting: true },
     { accessorKey: 'code', header: t('employees.table.code') as string, enableSorting: true },
     { accessorKey: 'name', header: t('employees.table.roleName') as string, enableSorting: true },
     {
       accessorKey: 'permissions',
       header: t('employees.table.permissions') as string,
-      cell: (info: { getValue: () => any; row: { original: any } }) => (
+      cell: (info) => (
         <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>
-          {(info.getValue() as string[] || []).length === 0 && <Chip size="small" label={t("employees.table.noPermissions")} />}
-          {(info.getValue() as string[] || []).map((p: any) => (
+          {((info.getValue() as string[]) || []).length === 0 && <Chip size="small" label={t("employees.table.noPermissions")} />}
+          {((info.getValue() as string[]) || []).map((p) => (
             <Chip size="small" key={`${info.row.original.id}-${p}`} label={p} />
           ))}
         </Stack>
@@ -205,13 +215,13 @@ const EmployeesPage = () => {
     {
       accessorKey: 'is_system',
       header: t('employees.table.system') as string,
-      cell: (info: { getValue: () => any }) => info.getValue() ? t("employees.table.yes") : t("employees.table.no"),
+      cell: (info) => info.getValue() ? t("employees.table.yes") : t("employees.table.no"),
     },
     {
       id: 'actions',
       header: t('employees.table.actions') as string,
       meta: { align: 'right' },
-      cell: (info: { row: { original: any } }) => (
+      cell: (info) => (
         <Button
           color="error"
           size="small"
@@ -223,33 +233,33 @@ const EmployeesPage = () => {
         </Button>
       ),
     },
-  ], [t, deleteRoleMutation.isPending]);
+  ], [t, deleteRoleMutation]);
 
-  const memberColumns = useMemo<ColumnDef<any>[]>(() => [
+  const memberColumns = useMemo<ColumnDef<CompanyMember>[]>(() => [
     { accessorKey: 'id', header: t('employees.table.id') as string, enableSorting: true },
-    { accessorKey: 'userDict.fullName', header: t('employees.table.user') as string, enableSorting: true, cell: (info: { getValue: () => any }) => info.getValue() || "-" },
+    { accessorKey: 'userDict.fullName', header: t('employees.table.user') as string, enableSorting: true, cell: (info) => info.getValue() as string || "-" },
     {
       id: 'email',
       header: t('employees.table.email') as string,
-      cell: (info: { row: { original: any } }) => info.row.original.userDict?.email || info.row.original.invited_email || "-",
+      cell: (info) => info.row.original.userDict?.email || info.row.original.invited_email || "-",
     },
     {
       accessorKey: 'roleId',
       header: t('employees.table.role') as string,
-      cell: (info: { getValue: () => any; row: { original: any } }) => (
+      cell: (info) => (
         <FormControl size="small" fullWidth sx={{ minWidth: 200 }}>
           <Select
-            value={(info.getValue() || info.row.original.role?.id || "").toString()}
+            value={(info.getValue() as string || info.row.original.role?.id || "").toString()}
             onChange={(e: SelectChangeEvent) => {
               const nextRoleId = Number(e.target.value);
-              if (!nextRoleId || nextRoleId === (info.getValue() || info.row.original.role?.id)) return;
+              if (!nextRoleId || nextRoleId === ((info.getValue() as number) || info.row.original.role?.id)) return;
               updateMemberMutation.mutate({
                 id: info.row.original.id,
                 data: { roleId: nextRoleId },
               });
             }}
           >
-            {roles.map((role: any) => (
+            {roles.map((role) => (
               <MenuItem key={role.id} value={role.id.toString()}>
                 {role.name}
               </MenuItem>
@@ -261,7 +271,7 @@ const EmployeesPage = () => {
     {
       accessorKey: 'status',
       header: t('employees.table.status') as string,
-      cell: (info: { getValue: () => any }) => (
+      cell: (info) => (
         <Chip
           size="small"
           label={info.getValue() as string || "UNKNOWN"}
@@ -273,7 +283,7 @@ const EmployeesPage = () => {
       id: 'actions',
       header: t('employees.table.actions') as string,
       meta: { align: 'right' },
-      cell: (info: { row: { original: any } }) => (
+      cell: (info) => (
         <Button
           color="error"
           size="small"
@@ -417,7 +427,7 @@ const EmployeesPage = () => {
                 value={memberForm.roleId}
                 onChange={(e: SelectChangeEvent) => setMemberForm((p) => ({ ...p, roleId: e.target.value }))}
               >
-                {roles.map((role: any) => (
+                {roles.map((role) => (
                   <MenuItem key={role.id} value={role.id.toString()}>
                     {role.name}
                   </MenuItem>

@@ -59,5 +59,5 @@ export const getJobPostSchema = (t: any) =>
     contactPersonName: yup.string().required(t('jobPostForm.validation.contactpersonnameisrequired', 'Contact person name is required.')).max(100, t('jobPostForm.validation.contactpersonnameexceededallowedlength', 'Contact person name exceeded allowed length.')),
     contactPersonPhone: yup.string().required(t('jobPostForm.validation.contactpersonphoneisrequired', 'Contact person phone is required.')).matches(REGEX_VALIDATE.phoneRegExp, t('jobPostForm.validation.invalidphonenumber', 'Invalid phone number.')).max(15, t('jobPostForm.validation.contactpersonphoneexceededallowedlength', 'Contact person phone exceeded allowed length.')),
     contactPersonEmail: yup.string().required(t('jobPostForm.validation.contactpersonemailisrequired', 'Contact person email is required.')).email(t('jobPostForm.validation.invalidemail', 'Invalid email.')).max(100, t('jobPostForm.validation.contactpersonemailexceededallowedlength', 'Contact person email exceeded allowed length.')),
-    isUrgent: yup.boolean().default(false),
+    isUrgent: yup.boolean(),
   });
