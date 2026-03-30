@@ -12,6 +12,7 @@ from apps.interviews.services import (
     update_interview_status,
 )
 
+@csrf_exempt
 def interview_context(request: HttpRequest, room_name: str):
     """
     GET /api/v1/interview/compat/{room_name}/context

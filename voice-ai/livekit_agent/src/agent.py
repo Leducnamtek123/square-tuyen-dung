@@ -11,6 +11,7 @@ from livekit.agents import (
     cli,
 )
 from livekit.plugins import silero, openai
+import openai as openai_lib # Base library for AsyncOpenAI client config
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 from .config import config
@@ -27,7 +28,7 @@ HTTP_CLIENT = httpx.AsyncClient(timeout=httpx.Timeout(60.0, connect=5.0))
 
 async def _update_backend_status(room_name: str, status: str):
     try:
-        url = f"{config.BACKEND_API_URL}/interviews/{room_name}/status"
+        url = f"{config.BACKEND_API_URL}/v1/interview/compat/{room_name}/status"
         resp = await HTTP_CLIENT.patch(url, json={"status": status})
         resp.raise_for_status()
         logger.info("Successfully updated backend status to '%s'", status)
@@ -58,10 +59,10 @@ async def entrypoint(ctx: JobContext):
         await ctx.connect()
         logger.info("Connected to room: %s", ctx.room.name)
 
-        # 2. Fetch context from backend
+        # 2. Fetch context from backend (using compatibility endpoint)
         interview_context = None
         try:
-            context_url = f"{config.BACKEND_API_URL}/interviews/{ctx.room.name}/context"
+            context_url = f"{config.BACKEND_API_URL}/v1/interview/compat/{ctx.room.name}/context"
             resp = await HTTP_CLIENT.get(context_url)
             resp.raise_for_status()
             interview_context = resp.json()
@@ -93,10 +94,13 @@ async def entrypoint(ctx: JobContext):
             language=config.STT_LANGUAGE
         )
         llm_model = openai.LLM(
-            base_url=config.LLAMA_BASE_URL,
-            api_key="no-key-needed",
+            # Using client parameter to customize timeout for llama-cpp 14B
+            client=openai_lib.AsyncOpenAI(
+                api_key="no-key-needed",
+                base_url=config.LLAMA_BASE_URL,
+                http_client=httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0))
+            ),
             model=config.LLAMA_MODEL, 
-            http_client=httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0))
         )
         tts_model = openai.TTS(
             base_url=config.TTS_BASE_URL, 
