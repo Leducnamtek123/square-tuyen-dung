@@ -20,10 +20,9 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-# Install vox-box using uv with cache
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv pip install --system --no-cache-dir "setuptools<82.0" wheel \
-    && uv pip install --system --no-build-isolation vox-box
+# Install vox-box using pip to avoid wheel metadata issues with uv
+RUN pip3 install --no-cache-dir "setuptools<82.0" wheel \
+    && pip3 install --no-cache-dir vox-box
 
 ENV DATA_DIR=/data
 
