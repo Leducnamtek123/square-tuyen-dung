@@ -128,9 +128,9 @@ const jobService = {
     return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<JobPost>>;
   },
 
-  saveJobPost: (slug: IdType): Promise<{ saved: boolean }> => {
+  saveJobPost: (slug: IdType): Promise<{ isSaved: boolean }> => {
     const url = `job/web/job-posts/${slug}/save/`;
-    return httpRequest.post(url) as Promise<{ saved: boolean }>;
+    return httpRequest.post(url) as Promise<{ isSaved: boolean }>;
   },
 };
 

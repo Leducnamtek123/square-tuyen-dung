@@ -85,9 +85,9 @@ const resumeService = {
     return (await presignInObject(data)) as Resume;
   },
 
-  saveResume: (slug: IdType): Promise<{ saved: boolean }> => {
+  saveResume: (slug: IdType): Promise<{ isSaved: boolean }> => {
     const url = `info/web/resumes/${slug}/resume-saved/`;
-    return httpRequest.post(url) as Promise<{ saved: boolean }>;
+    return httpRequest.post(url) as Promise<{ isSaved: boolean }>;
   },
 
   viewResume: (slug: IdType): Promise<{ viewed: boolean }> => {
