@@ -6,9 +6,11 @@ import { useTranslation } from 'react-i18next';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
+import { Question } from '../../../../types/models';
+
 interface QuestionTableProps {
-    questions: any[];
-    loading?: boolean;
+    data: Question[];
+    isLoading?: boolean;
     rowCount?: number;
     pagination?: { pageIndex: number; pageSize: number };
     onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
@@ -16,13 +18,13 @@ interface QuestionTableProps {
     onSortingChange?: OnChangeFn<SortingState>;
     rowSelection?: RowSelectionState;
     onRowSelectionChange?: OnChangeFn<RowSelectionState>;
-    onEdit: (question: any) => void;
-    onDelete: (id: string | number) => void;
+    onEdit: (question: Question) => void;
+    onDelete: (question: Question) => void;
 }
 
 const QuestionTable = ({ 
-    questions, 
-    loading, 
+    data, 
+    isLoading, 
     rowCount, 
     pagination, 
     onPaginationChange, 
@@ -35,7 +37,7 @@ const QuestionTable = ({
 }: QuestionTableProps) => {
     const { t } = useTranslation('admin');
 
-    const columns = useMemo<ColumnDef<any>[]>(() => [
+    const columns = useMemo<ColumnDef<Question>[]>(() => [
         {
             accessorKey: 'questionText',
             header: t('pages.questions.table.questionContent') as string,
@@ -82,7 +84,7 @@ const QuestionTable = ({
                         </IconButton>
                     </Tooltip>
                     <Tooltip title={t('pages.questions.table.delete')}>
-                        <IconButton size="small" onClick={() => onDelete(info.row.original.id)} color="error">
+                        <IconButton size="small" onClick={() => onDelete(info.row.original)} color="error">
                             <DeleteOutlineIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
@@ -94,8 +96,8 @@ const QuestionTable = ({
     return (
         <DataTable
             columns={columns}
-            data={questions || []}
-            isLoading={loading}
+            data={data || []}
+            isLoading={isLoading}
             rowCount={rowCount}
             pagination={pagination}
             onPaginationChange={onPaginationChange}

@@ -1,9 +1,17 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
 import { Notification } from '../../../../types/models';
+import { PaginatedResponse } from '../../../../types/api';
 
-export const useJobNotifications = (params?: Record<string, unknown>) => {
+export type UseJobNotificationsResult = UseQueryResult<PaginatedResponse<Notification>> & {
+    createJobNotification: (data: Partial<Notification> | Record<string, unknown>) => Promise<Notification>;
+    updateJobNotification: (args: { id: string | number; data: Partial<Notification> | Record<string, unknown> }) => Promise<Notification>;
+    deleteJobNotification: (id: string | number) => Promise<void>;
+    isMutating: boolean;
+};
+
+export const useJobNotifications = (params?: Record<string, unknown>): UseJobNotificationsResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -57,5 +65,5 @@ export const useJobNotifications = (params?: Record<string, unknown>) => {
         updateJobNotification: updateMutation.mutateAsync,
         deleteJobNotification: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    };
+    } as UseJobNotificationsResult;
 };

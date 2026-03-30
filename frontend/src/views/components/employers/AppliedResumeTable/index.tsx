@@ -1,5 +1,4 @@
 import React from 'react';
-import { useAppSelector } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';
 import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
@@ -7,7 +6,7 @@ import dayjs from 'dayjs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { ColumnDef, PaginationState, SortingState } from '@tanstack/react-table';
+import { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
 
 import AIAnalysisDrawer from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
@@ -19,31 +18,18 @@ import SendEmailComponent from './SendEmailComponent';
 import AppliedStatusComponent from './AppliedStatusComponent';
 import AIAnalysisComponent from './AIAnalysisComponent';
 import { useConfig } from '@/hooks/useConfig';
+import { JobPostActivity } from '@/types/models';
 
-export type AppliedResumeRow = {
-  id: string | number;
-  fullName: string;
-  type: string | number;
-  title?: string;
-  jobName?: string;
-  createAt?: string;
-  status?: string | number;
-  resumeSlug?: string;
-  isSentEmail?: boolean;
-  email?: string;
-  [key: string]: unknown;
-};
-
-interface AppliedResumeTableProps {
-  rows: AppliedResumeRow[];
+export interface AppliedResumeTableProps {
+  rows: JobPostActivity[];
   isLoading: boolean;
   handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;
   handleDelete: (id: string | number) => void;
   rowCount: number;
   pagination: PaginationState;
-  onPaginationChange: import('@tanstack/react-table').OnChangeFn<PaginationState>;
+  onPaginationChange: OnChangeFn<PaginationState>;
   sorting: SortingState;
-  onSortingChange: import('@tanstack/react-table').OnChangeFn<SortingState>;
+  onSortingChange: OnChangeFn<SortingState>;
 }
 
 const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
@@ -68,7 +54,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     return rows.find(r => r.id === openDrawerId);
   }, [openDrawerId, rows]);
 
-  const columns = React.useMemo<ColumnDef<AppliedResumeRow>[]>(() => [
+  const columns = React.useMemo<ColumnDef<JobPostActivity>[]>(() => [
     {
       accessorKey: 'fullName',
       header: t('appliedResume.table.profileName') as string,
@@ -79,7 +65,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             {info.getValue() as string}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {info.row.original.type === CV_TYPES.cvWebsite ? (
+            {info.row.original.resume?.type === CV_TYPES.cvWebsite ? (
               <Tooltip title={t('appliedResume.table.onlineResume')} arrow>
                 <FontAwesomeIcon icon={faFile} color="#441da0" size="xs" />
               </Tooltip>
@@ -89,14 +75,14 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
               </Tooltip>
             )}
             <Typography variant="caption" color="text.secondary">
-              {info.row.original.title || t('appliedResume.table.notUpdated')}
+              {info.row.original.resume?.title || t('appliedResume.table.notUpdated')}
             </Typography>
           </Box>
         </Box>
       ),
     },
     {
-      accessorKey: 'jobName',
+      accessorKey: 'jobPost.jobName',
       header: t('appliedResume.table.appliedPosition') as string,
       enableSorting: true,
     },
@@ -107,9 +93,9 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
     },
     {
-      accessorKey: 'type',
+      id: 'type',
       header: t('appliedResume.table.profileType') as string,
-      cell: (info) => info.getValue() === CV_TYPES.cvWebsite
+      cell: (info) => info.row.original.resume?.type === CV_TYPES.cvWebsite
         ? t('appliedResume.table.onlineResume')
         : t('appliedResume.table.attachedResume'),
     },
@@ -142,7 +128,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             <IconButton
               color="primary"
               size="small"
-              onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || '')}`)}
+              onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resume?.slug || '')}`)}
             >
               <RemoveRedEyeOutlinedIcon fontSize="small" />
             </IconButton>
@@ -160,7 +146,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             jobPostActivityId={String(info.row.original.id)}
             isSentEmail={info.row.original.isSentEmail || false}
             email={info.row.original.email || ''}
-            fullName={info.row.original.fullName}
+            fullName={info.row.original.fullName || ''}
           />
         </Stack>
       ),
@@ -169,12 +155,17 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
 
   return (
     <>
-      <AIAnalysisDrawer
-        open={Boolean(openDrawerId)}
-        onClose={() => setOpenDrawerId(null)}
-        activityId={openDrawerId}
-        initialData={selectedActivityInfo}
-      />
+      {openDrawerId && selectedActivityInfo && (
+        <AIAnalysisDrawer
+          open={Boolean(openDrawerId)}
+          onClose={() => setOpenDrawerId(null)}
+          activityId={openDrawerId}
+          initialData={{
+            ...selectedActivityInfo,
+            aiAnalysisSummary: selectedActivityInfo.aiAnalysisSummary ?? undefined
+          } as any}
+        />
+      )}
       <DataTable
         columns={columns}
         data={rows}

@@ -1,181 +1,48 @@
-import React from 'react';
-import { useAppSelector } from '@/redux/hooks';
-
-import { Autocomplete, Box, Button, Divider, IconButton, LinearProgress, Stack, TextField, Tooltip, Typography } from "@mui/material";
-
+import React, { useState, useMemo } from 'react';
+import { Autocomplete, Box, Button, Divider, IconButton, LinearProgress, Stack, TextField, Tooltip, Typography, Grid2 as Grid } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-
-import { Grid2 as Grid } from "@mui/material";
-
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-
 import FilterListIcon from '@mui/icons-material/FilterList';
-
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
 import RefreshIcon from '@mui/icons-material/Refresh';
-
 import errorHandling from '../../../../utils/errorHandling';
-
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-
 import xlsxUtils from '../../../../utils/xlsxUtils';
-
 import toastMessages from '../../../../utils/toastMessages';
-
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
-
 import FormPopup from '../../../../components/Common/Controls/FormPopup';
-
 import AppliedResumeFilterForm from '../AppliedResumeFilterForm';
-
 import AppliedResumeTable from '../AppliedResumeTable';
-
 import jobPostActivityService from '../../../../services/jobPostActivityService';
-
 import { useAppliedResumes, useJobPostOptions, useDeleteJobPostActivity } from '../hooks/useEmployerQueries';
 import { useDataTable } from '../../../../hooks';
 import { useConfig } from '@/hooks/useConfig';
+import type { AxiosError } from 'axios';
+import type { ApiError } from '../../../../types/api';
 
 interface AppliedResumeCardProps {
   title: string;
 }
 
-const pageSize = 10;
-
 const defaultFilterData = {
-
   cityId: '',
-
   careerId: '',
-
   experienceId: '',
-
   positionId: '',
-
   academicLevelId: '',
-
   typeOfWorkplaceId: '',
-
   jobTypeId: '',
-
   genderId: '',
-
   maritalStatusId: '',
-
 };
 
 const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle }) => {
-
-  const { t } = useTranslation('employer');
-
+  const { t } = useTranslation(['employer', 'common']);
   const { allConfig } = useConfig();
-
-  const headCells = [
-
-    {
-
-      id: 'title',
-
-      showOrder: false,
-
-      numeric: false,
-
-      disablePadding: true,
-
-      label: t('appliedResume.table.profileName'),
-
-    },
-
-    {
-
-      id: 'jobName',
-
-      showOrder: false,
-
-      numeric: false,
-
-      disablePadding: false,
-
-      label: t('appliedResume.table.appliedPosition'),
-
-    },
-
-    {
-
-      id: 'appliedDate',
-
-      showOrder: false,
-
-      numeric: false,
-
-      disablePadding: false,
-
-      label: t('appliedResume.table.appliedDate'),
-
-    },
-
-    {
-
-      id: 'type',
-
-      showOrder: false,
-
-      numeric: false,
-
-      disablePadding: false,
-
-      label: t('appliedResume.table.profileType'),
-
-    },
-
-    {
-
-      id: 'aiAnalysis',
-
-      showOrder: false,
-
-      numeric: false,
-
-      disablePadding: false,
-
-      label: t('appliedResume.table.aiAnalysis'),
-
-    },
-
-    {
-
-      id: 'city',
-
-      showOrder: false,
-
-      numeric: true,
-
-      disablePadding: false,
-
-      label: t('appliedResume.table.status'),
-
-    },
-
-    {
-
-      id: 'action',
-
-      showOrder: false,
-
-      numeric: true,
-
-      disablePadding: false,
-
-      label: t('appliedResume.table.actions'),
-
-    },
-
-  ];
 
   const {
     page,
-    pageSize: rowsPerPage,
+    pageSize,
     sorting,
     onSortingChange,
     ordering,
@@ -183,599 +50,179 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     onPaginationChange,
   } = useDataTable({ 
     initialSorting: [{ id: 'createAt', desc: true }],
-    initialPageSize: pageSize
+    initialPageSize: 10
   });
 
-  const [filterData, setFilterData] = React.useState(defaultFilterData);
+  const [filterData, setFilterData] = useState(defaultFilterData);
+  const [openPopup, setOpenPopup] = useState(false);
+  const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
+  const [jobPostIdSelect, setJobPostIdSelect] = useState('');
+  const [applicationStatusSelect, setApplicationStatusSelect] = useState('');
 
-  const [openPopup, setOpenPopup] = React.useState(false);
-
-  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-
-  const [jobPostIdSelect, setJobPostIdSelect] = React.useState('');
-
-  const [applicationStatusSelect, setApplicationStatusSelect] =
-
-    React.useState('');
-
-  // TanStack Query hooks
   const { data: jobPostOptions = [] } = useJobPostOptions();
 
-  const queryParams = React.useMemo(() => ({
+  const queryParams = useMemo(() => ({
     page: page + 1,
-    pageSize: rowsPerPage,
+    pageSize,
     ordering,
     ...filterData,
     jobPostId: jobPostIdSelect,
     status: applicationStatusSelect,
-  }), [page, rowsPerPage, ordering, filterData, jobPostIdSelect, applicationStatusSelect]);
+  }), [page, pageSize, ordering, filterData, jobPostIdSelect, applicationStatusSelect]);
 
   const { data: queryData, isLoading } = useAppliedResumes(queryParams);
+  const { deleteJobPostActivity, isMutating: isDeleting } = useDeleteJobPostActivity();
   const resumes = queryData?.results || [];
   const count = queryData?.count || 0;
 
-  const deleteMutation = useDeleteJobPostActivity();
-
-  let numbersFilter = React.useMemo(() => {
-    let cnt = 0;
-    let keys = Object.keys(filterData) as Array<keyof typeof filterData>;
-    for (let i = 0; i < keys.length; i++) {
-      if (
-
-        (keys[i] as string) !== 'jobPostId' &&
-
-        (keys[i] as string) !== 'pageSize' &&
-
-        filterData[keys[i]] !== ''
-
-      ) {
-        cnt = cnt + 1;
-      }
-    }
-    return cnt;
+  const numbersFilter = useMemo(() => {
+    return Object.values(filterData).filter(v => v !== '').length;
   }, [filterData]);
 
   const handleFilter = (data: typeof defaultFilterData) => {
-
     setOpenPopup(false);
-
-    setFilterData({
-      ...data,
-    });
-    onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
+    setFilterData({ ...data });
+    onPaginationChange({ pageIndex: 0, pageSize });
   };
 
-  const handleExport = () => {
-
-    const exportJobPostsActivity = async (params: Record<string, unknown>) => {
-
-      setIsFullScreenLoading(true);
-
-      try {
-
-        const resData = await jobPostActivityService.exportAppliedResume(
-
-          params
-
-        ) as unknown as Record<string, unknown>[];
-
-        const data = resData;
-
-        xlsxUtils.exportToXLSX(data, 'AppliedProfilesList');
-
-      } catch (error: unknown) {
-
-        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
-
-      } finally {
-
-        setIsFullScreenLoading(false);
-
-      }
-
-    };
-
-    exportJobPostsActivity({
-      page: page + 1,
-      pageSize: rowsPerPage,
-      ordering,
-      ...filterData,
-      jobPostId: jobPostIdSelect,
-      status: applicationStatusSelect,
-    });
+  const handleExport = async () => {
+    setIsFullScreenLoading(true);
+    try {
+      const resData = await jobPostActivityService.exportAppliedResume(queryParams);
+      xlsxUtils.exportToXLSX(resData as unknown as Record<string, unknown>[], 'AppliedProfilesList');
+    } catch (error) {
+      errorHandling(error as AxiosError<{ errors?: ApiError }>);
+    } finally {
+      setIsFullScreenLoading(false);
+    }
   };
 
-  const handleChangeApplicationStatus = (id: string | number, value: string | number, callback: (result: boolean) => void) => {
-
-    const changeStatus = async (id: string, data: Record<string, unknown>) => {
-
-      setIsFullScreenLoading(true);
-
-      try {
-
-        await jobPostActivityService.changeApplicationStatus(id, data);
-
-        toastMessages.success(t('appliedResume.status.updateSuccess'));
-
-        // success
-
-        callback(true);
-
-      } catch (error: unknown) {
-
-        // Failed
-
-        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
-
-        callback(false);
-
-      } finally {
-
-        setIsFullScreenLoading(false);
-
-      }
-
-    };
-
-    changeStatus(id as string, { status: value });
-
+  const handleChangeApplicationStatus = async (id: string | number, value: string | number, callback: (result: boolean) => void) => {
+    setIsFullScreenLoading(true);
+    try {
+      await jobPostActivityService.changeApplicationStatus(id as string, { status: value });
+      toastMessages.success(t('employer:appliedResume.status.updateSuccess'));
+      callback(true);
+    } catch (error) {
+      errorHandling(error as AxiosError<{ errors?: ApiError }>);
+      callback(false);
+    } finally {
+      setIsFullScreenLoading(false);
+    }
   };
 
-  const handleDelete = async (id: string | number) => {
-
+  const handleDelete = (id: string | number) => {
     confirmModal(
-
-      () => deleteMutation.mutate(id as string, {
-        onSuccess: () => toastMessages.success(t('appliedResume.delete.success')),
-      }),
-
-      t('appliedResume.delete.title'),
-
-      t('appliedResume.delete.confirm'),
-
+      async () => {
+        try {
+          await deleteJobPostActivity(id);
+          toastMessages.success(t('employer:appliedResume.delete.success'));
+        } catch (error) {
+           errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        }
+      },
+      t('employer:appliedResume.delete.title'),
+      t('employer:appliedResume.delete.confirm'),
       'warning'
-
     );
-
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    onPaginationChange({ pageIndex: newPage, pageSize: rowsPerPage });
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onPaginationChange({ pageIndex: 0, pageSize: parseInt(event.target.value, 10) });
   };
 
   const handleResetFilterData = () => {
     setFilterData(defaultFilterData);
     setJobPostIdSelect('');
     setApplicationStatusSelect('');
-    onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
+    onPaginationChange({ pageIndex: 0, pageSize });
   };
 
   return (
-
-    <Box sx={{
-
-      px: { xs: 1, sm: 2 },
-
-      py: { xs: 2, sm: 2 },
-
-      backgroundColor: 'background.paper',
-
-      borderRadius: 2
-
-    }}>
-
-      {/* Header Section */}
-
-      <Stack
-
-        direction={{ xs: 'column', sm: 'row' }}
-
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
-
-        justifyContent="space-between"
-
-        spacing={{ xs: 2, sm: 0 }}
-
-        mb={4}
-
-      >
-
-        <Typography
-
-          variant="h5"
-
-          sx={{
-
-            fontWeight: 600,
-
-            background: 'primary.main',
-
-            WebkitBackgroundClip: 'text',
-
-            fontSize: { xs: '1.25rem', sm: '1.5rem' }
-
-          }}
-
-        >
-
+    <Box sx={{ px: { xs: 1, sm: 2 }, py: { xs: 2, sm: 2 }, backgroundColor: 'background.paper', borderRadius: 2 }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent="space-between" spacing={{ xs: 2, sm: 0 }} mb={4}>
+        <Typography variant="h5" sx={{ fontWeight: 600, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
           {cardTitle}
-
         </Typography>
-
-        <Button
-
-          variant="outlined"
-
-          color="secondary"
-
-          startIcon={<FileDownloadOutlinedIcon />}
-
-          onClick={handleExport}
-
-          sx={{
-
-            borderRadius: 2,
-
-            px: 3,
-
-            width: { xs: '100%', sm: 'auto' },
-
-            '&:hover': {
-
-              backgroundColor: 'secondary.backgroundHover'
-
-            }
-
-          }}
-
-        >
-
-          {t('appliedResume.downloadList')}
-
+        <Button variant="outlined" color="inherit" startIcon={<FileDownloadOutlinedIcon />} onClick={handleExport} sx={{ borderRadius: 2, px: 3, width: { xs: '100%', sm: 'auto' } }}>
+          {t('employer:appliedResume.downloadList')}
         </Button>
-
       </Stack>
 
-      {/* Filter Section */}
-
       <Box sx={{ mb: 3 }}>
-
-        <Typography
-
-          variant="subtitle1"
-
-          sx={{
-
-            color: 'text.secondary',
-
-            fontWeight: 600,
-
-            mb: 2
-
-          }}
-
-        >
-
-          {t('appliedResume.filters')}
-
+        <Typography variant="subtitle1" sx={{ color: 'text.secondary', fontWeight: 600, mb: 2 }}>
+          {t('employer:appliedResume.filters')}
         </Typography>
-
         <Grid container spacing={2}>
-
-          <Grid
-
-            size={{
-
-              xs: 12,
-
-              sm: 6,
-
-              md: 4,
-
-              xl: 5
-
-            }}>
-
+          <Grid size={{ xs: 12, sm: 6, md: 4, xl: 5 }}>
             <Autocomplete
-
               getOptionLabel={(option) => option.jobName}
-
               value={jobPostOptions.find((o) => String(o.id) === jobPostIdSelect) || null}
-
               onChange={(e, value) => setJobPostIdSelect(value?.id ? String(value.id) : '')}
-
               disablePortal
-
               size="small"
-
               options={jobPostOptions}
-
-              renderInput={(params) => (
-
-                <TextField
-
-                  {...params}
-
-                  placeholder={t('appliedResume.allJobPosts')}
-
-                  sx={{
-
-                    '& .MuiOutlinedInput-root': {
-
-                      borderRadius: 2,
-
-                      backgroundColor: 'background.paper'
-
-                    }
-
-                  }}
-
-                />
-
-              )}
-
+              renderInput={(params) => <TextField {...params} placeholder={t('employer:appliedResume.allJobPosts')} />}
             />
-
           </Grid>
-
-          <Grid
-
-            size={{
-
-              xs: 12,
-
-              sm: 6,
-
-              md: 4,
-
-              xl: 3
-
-            }}>
-
+          <Grid size={{ xs: 12, sm: 6, md: 4, xl: 3 }}>
             <Autocomplete
-
               getOptionLabel={(option) => option.name}
-
-              value={
-
-                (allConfig?.applicationStatusOptions as Array<{ id: string | number; name: string }>)?.find(
-
-                  (o: { id: string | number }) => o.id === applicationStatusSelect
-
-                ) || null
-
-              }
-
+              value={(allConfig?.applicationStatusOptions as any[])?.find(o => String(o.id) === applicationStatusSelect) || null}
               onChange={(e, value) => setApplicationStatusSelect(value?.id ? String(value.id) : '')}
-
               disablePortal
-
               size="small"
-
-              options={(allConfig?.applicationStatusOptions as Array<{ id: string | number; name: string }>) || []}
-
-              renderInput={(params) => (
-
-                <TextField
-
-                  {...params}
-
-                  placeholder={t('appliedResume.allStatuses')}
-
-                  sx={{
-
-                    '& .MuiOutlinedInput-root': {
-
-                      borderRadius: 2,
-
-                      backgroundColor: 'background.paper'
-
-                    }
-
-                  }}
-
-                />
-
-              )}
-
+              options={(allConfig?.applicationStatusOptions as any[]) || []}
+              renderInput={(params) => <TextField {...params} placeholder={t('employer:appliedResume.allStatuses')} />}
             />
-
           </Grid>
-
-          <Grid
-
-            size={{
-
-              xs: 12,
-
-              sm: 12,
-
-              md: 4
-
-            }}>
-
-            <Stack
-
-              direction="row"
-
-              justifyContent={{ xs: 'flex-start', md: 'flex-start' }}
-
-              spacing={1}
-
-            >
-
+          <Grid size={{ xs: 12, sm: 12, md: 4 }}>
+            <Stack direction="row" spacing={1}>
               <Tooltip title={t('common:reset')} arrow>
-
-                <IconButton
-
-                  onClick={handleResetFilterData}
-
-                  sx={{
-
-                    backgroundColor: 'grey.100',
-
-                    borderRadius: 2,
-
-                    '&:hover': {
-
-                      backgroundColor: 'grey.200'
-
-                    }
-
-                  }}
-
-                >
-
+                <IconButton onClick={handleResetFilterData} sx={{ backgroundColor: 'action.hover', borderRadius: 2 }}>
                   <RefreshIcon />
-
                 </IconButton>
-
               </Tooltip>
-
               <Button
-
                 variant="contained"
-
                 color="primary"
-
                 startIcon={<FilterListIcon />}
-
                 endIcon={<ExpandMoreIcon />}
-
                 onClick={() => setOpenPopup(true)}
-
-                sx={{
-
-                  borderRadius: 2,
-
-                  background: 'primary.main',
-
-                  boxShadow: 'custom.small',
-
-                  '&:hover': {
-
-                    boxShadow: 'custom.medium'
-
-                  }
-
-                }}
-
+                sx={{ borderRadius: 2, px: 3, boxShadow: 'none' }}
               >
-
-                {t('appliedResume.advancedFilter')} ({numbersFilter})
-
+                {t('employer:appliedResume.advancedFilter')} ({numbersFilter})
               </Button>
-
             </Stack>
-
           </Grid>
-
         </Grid>
-
       </Box>
 
-      {/* Loading Progress */}
-
       {isLoading ? (
-
         <Box sx={{ width: '100%', mb: 2 }}>
-
-          <LinearProgress
-
-            color="primary"
-
-            sx={{
-
-              height: { xs: 4, sm: 6 },
-
-              borderRadius: 3,
-
-              backgroundColor: 'primary.background'
-
-            }}
-
-          />
-
+          <LinearProgress />
         </Box>
-
       ) : (
-
         <Divider sx={{ mb: 2 }} />
-
       )}
 
-      {/* Table Section */}
-
-      <Box sx={{
-
-        backgroundColor: 'background.paper',
-
-        borderRadius: 2,
-
-        boxShadow: 'custom.card',
-
-        overflow: 'hidden',
-
-        width: '100%',
-
-        '& .MuiTableContainer-root': {
-
-          overflowX: 'auto'
-
-        }
-
-      }}>
-
+      <Box sx={{ backgroundColor: 'background.paper', borderRadius: 2, overflow: 'hidden', width: '100%' }}>
         <AppliedResumeTable
-          rows={resumes as unknown as import('../AppliedResumeTable').AppliedResumeRow[]}
+          rows={resumes}
           isLoading={isLoading}
           rowCount={count}
           pagination={pagination}
-          onPaginationChange={onPaginationChange as import('@tanstack/react-table').OnChangeFn<import('@tanstack/react-table').PaginationState>}
+          onPaginationChange={onPaginationChange as any}
           sorting={sorting}
-          onSortingChange={onSortingChange as import('@tanstack/react-table').OnChangeFn<import('@tanstack/react-table').SortingState>}
+          onSortingChange={onSortingChange as any}
           handleChangeApplicationStatus={handleChangeApplicationStatus}
           handleDelete={handleDelete}
         />
-
       </Box>
 
-      {/* Popup and Loading remain unchanged */}
-
-      <FormPopup
-
-        title={t('appliedResume.advancedFilter')}
-
-        buttonText={t('common:search')}
-
-        buttonIcon={<FilterListIcon />}
-
-        openPopup={openPopup}
-
-        setOpenPopup={setOpenPopup}
-
-      >
-
-        <AppliedResumeFilterForm
-
-          handleFilter={handleFilter}
-
-          filterData={filterData}
-
-        />
-
+      <FormPopup title={t('employer:appliedResume.advancedFilter')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
+        <AppliedResumeFilterForm handleFilter={handleFilter} filterData={filterData} />
       </FormPopup>
 
-      {isFullScreenLoading && <BackdropLoading />}
-
+      {(isFullScreenLoading || isDeleting) && <BackdropLoading />}
     </Box>
-
   );
-
 };
 
 export default AppliedResumeCard;

@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
+import React, { useState, useMemo } from 'react';
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import { useDataTable } from '../../../hooks';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import dayjs from '../../../configs/dayjs-config';
 
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useJobNotifications } from './hooks/useJobNotifications';
-import JobNotificationTable from './components/JobNotificationTable';
+import { useDataTable } from '../../../hooks';
+import { Notification } from '../../../types/models';
 
 const JobNotificationsPage = () => {
     const { t } = useTranslation('admin');
@@ -18,10 +23,10 @@ const JobNotificationsPage = () => {
         onSortingChange,
         ordering,
         pagination,
-        onPaginationChange,
-        searchTerm,
-        onSearchChange,
-    } = useDataTable();
+        onPaginationChange
+    } = useDataTable({ initialPageSize: 10 });
+
+    const [searchTerm, setSearchTerm] = useState('');
 
     const {
         data,
@@ -32,67 +37,59 @@ const JobNotificationsPage = () => {
         isMutating
     } = useJobNotifications({
         page: page + 1,
-        pageSize: pageSize,
+        pageSize,
         kw: searchTerm,
-        ordering,
-    }) as any;
+        ordering
+    });
 
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-    const [currentNotification, setCurrentNotification] = useState<any>(null);
+    const [currentNotification, setCurrentNotification] = useState<Notification | null>(null);
     const [formData, setFormData] = useState({
         title: '',
         content: '',
-        user: '', // Target user ID
+        imageUrl: ''
     });
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onSearchChange(e.target.value);
+        setSearchTerm(e.target.value);
+        onPaginationChange({ pageIndex: 0, pageSize: pageSize });
     };
 
     const handleOpenAdd = () => {
         setDialogMode('add');
-        setFormData({
-            title: '',
-            content: '',
-            user: '',
-        });
-        setCurrentNotification(null);
+        setFormData({ title: '', content: '', imageUrl: '' });
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (notification: any) => {
+    const handleOpenEdit = (notification: Notification) => {
         setDialogMode('edit');
         setCurrentNotification(notification);
         setFormData({
             title: notification.title || '',
             content: notification.content || '',
-            user: notification.user || '',
+            imageUrl: notification.imageUrl || ''
         });
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (notification: any) => {
+    const handleOpenDelete = (notification: Notification) => {
         setCurrentNotification(notification);
         setOpenDeleteDialog(true);
     };
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
-    };
-
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setOpenDeleteDialog(false);
     };
 
     const handleSave = async () => {
         try {
             if (dialogMode === 'add') {
                 await createJobNotification(formData);
-            } else {
+            } else if (currentNotification) {
                 await updateJobNotification({
                     id: currentNotification.id,
                     data: formData
@@ -105,13 +102,75 @@ const JobNotificationsPage = () => {
     };
 
     const handleDelete = async () => {
+        if (!currentNotification) return;
         try {
             await deleteJobNotification(currentNotification.id);
-            setOpenDeleteDialog(false);
+            handleCloseDialog();
         } catch (error) {
             console.error(error);
         }
     };
+
+    const columns = useMemo<ColumnDef<Notification>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: 'ID',
+            enableSorting: true,
+        },
+        {
+            accessorKey: 'imageUrl',
+            header: t('pages.jobNotifications.table.image') as string,
+            cell: (info) => (
+                info.getValue() ? (
+                    <Box component="img" src={info.getValue() as string} sx={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 1 }} />
+                ) : '—'
+            ),
+        },
+        {
+            accessorKey: 'title',
+            header: t('pages.jobNotifications.table.title') as string,
+            enableSorting: true,
+            cell: (info) => (
+                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                    {info.getValue() as string}
+                </Typography>
+            ),
+        },
+        {
+            accessorKey: 'content',
+            header: t('pages.jobNotifications.table.content') as string,
+            cell: (info) => (
+                <Typography variant="body2" sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {info.getValue() as string}
+                </Typography>
+            ),
+        },
+        {
+            accessorKey: 'createAt',
+            header: t('pages.jobNotifications.table.createdAt') as string,
+            enableSorting: true,
+            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '—',
+        },
+        {
+            id: 'actions',
+            header: t('pages.jobNotifications.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                    <Tooltip title={t('pages.jobNotifications.table.edit')}>
+                        <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.jobNotifications.table.delete')}>
+                        <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            ),
+        },
+    ], [t]);
 
     return (
         <Box>
@@ -124,19 +183,14 @@ const JobNotificationsPage = () => {
                         <Link underline="hover" color="inherit" href="/admin">
                             {t('pages.jobNotifications.breadcrumbAdmin')}
                         </Link>
-                        <Typography color="text.primary">{t('pages.jobNotifications.breadcrumbJobsInterviews')}</Typography>
-                        <Typography color="text.primary">{t('pages.jobNotifications.title')}</Typography>
+                        <Typography color="text.primary">{t('pages.jobNotifications.breadcrumbNotifications')}</Typography>
                     </Breadcrumbs>
                 </Box>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleOpenAdd}
-                    sx={{ borderRadius: '8px', textTransform: 'none' }}
-                >
-                    {t('pages.jobNotifications.addBtn')}
+                <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}>
+                    {t('pages.jobNotifications.addNotification')}
                 </Button>
             </Box>
+
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
@@ -157,80 +211,79 @@ const JobNotificationsPage = () => {
                     />
                 </Box>
 
-                <JobNotificationTable
-                    data={(data as any)?.results || data}
+                <DataTable
+                    columns={columns}
+                    data={data?.results || []}
                     isLoading={isLoading}
-                    rowCount={(data as any)?.count || 0}
+                    rowCount={data?.count || 0}
                     pagination={pagination}
                     onPaginationChange={onPaginationChange}
+                    enableSorting
                     sorting={sorting}
                     onSortingChange={onSortingChange}
-                    onEdit={handleOpenEdit}
-                    onDelete={handleOpenDelete}
                 />
             </Paper>
+
             {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
                 <DialogTitle>
-                    {dialogMode === 'add' ? t('pages.jobNotifications.addTitle') : t('pages.jobNotifications.editTitle')}
+                    {dialogMode === 'add' ? t('pages.jobNotifications.addNotification') : t('pages.jobNotifications.editNotification')}
                 </DialogTitle>
                 <DialogContent>
-                    <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
                         <TextField
-                            label={t('pages.jobNotifications.labelTitle')}
+                            label={t('pages.jobNotifications.form.title')}
                             fullWidth
-                            name="title"
                             value={formData.title}
-                            onChange={handleInputChange}
+                            onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                             required
                         />
                         <TextField
-                            label={t('pages.jobNotifications.labelContent')}
+                            label={t('pages.jobNotifications.form.imageUrl')}
+                            fullWidth
+                            value={formData.imageUrl}
+                            onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+                        />
+                        <TextField
+                            label={t('pages.jobNotifications.form.content')}
                             fullWidth
                             multiline
                             rows={4}
-                            name="content"
                             value={formData.content}
-                            onChange={handleInputChange}
+                            onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
                             required
-                        />
-                        <TextField
-                            label={t('pages.jobNotifications.labelRecipient')}
-                            fullWidth
-                            name="user"
-                            value={formData.user}
-                            onChange={handleInputChange}
                         />
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.jobNotifications.cancelBtn')}</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.jobNotifications.cancel')}</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={isMutating || !formData.title || !formData.content}
                     >
-                        {isMutating ? t('pages.jobNotifications.sendingBtn') : t('pages.jobNotifications.confirmBtn')}
+                        {isMutating ? t('common.saving') : t('common.save')}
                     </Button>
                 </DialogActions>
             </Dialog>
+
             {/* Delete Confirmation */}
-            <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-                <DialogTitle>{t('pages.jobNotifications.deleteConfirmTitle')}</DialogTitle>
+            <Dialog open={openDeleteDialog} onClose={handleCloseDialog}>
+                <DialogTitle>{t('pages.jobNotifications.deleteTitle')}</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        {t('pages.jobNotifications.deleteConfirmText', { title: currentNotification?.title })}
+                        {t('pages.jobNotifications.deleteConfirm', { title: currentNotification?.title })}
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.jobNotifications.cancelBtn')}</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.jobNotifications.cancel')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? t('pages.jobNotifications.deletingBtn') : t('pages.jobNotifications.confirmBtn')}
+                        {isMutating ? t('common.deleting') : t('common.delete')}
                     </Button>
                 </DialogActions>
             </Dialog>

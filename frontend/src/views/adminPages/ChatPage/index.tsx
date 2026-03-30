@@ -1,16 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import {
   Box,
   Typography,
   Breadcrumbs,
   Link,
   Paper,
-  CircularProgress,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
   Avatar,
   Chip,
   TextField,
@@ -27,40 +21,24 @@ import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
+import { ChatConversation } from '../../../types/models';
+import { useDataTable } from '../../../hooks';
+import { useChat } from './hooks/useChat';
+import dayjs from '../../../configs/dayjs-config';
 
 const AdminChatPage = () => {
   const { t } = useTranslation('admin');
-  const [conversations, setConversations] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [search, setSearch] = useState('');
+  const {
+      searchTerm: search,
+      onSearchChange: setSearch
+  } = useDataTable();
 
-  const fetchConversations = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      // Backend has no chat conversation endpoint yet (chatbot/urls.py is empty).
-      // Set empty data so the page renders its empty state gracefully.
-      setConversations([]);
-    } catch (e) {
-      console.error(e);
-      setConversations([]);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  const {
+      data,
+      isLoading
+  } = useChat({ kw: search });
 
-  useEffect(() => {
-    fetchConversations();
-  }, [fetchConversations]);
-
-  const filtered = conversations.filter((conv) => {
-    const q = search.toLowerCase();
-    const jobSeeker = conv.jobSeekerName || '';
-    const employer = conv.employerName || conv.companyName || '';
-    return (
-      jobSeeker.toLowerCase().includes(q) ||
-      employer.toLowerCase().includes(q)
-    );
-  });
+  const conversations = data?.results || [];
 
   const stats = [
     {
@@ -86,6 +64,99 @@ const AdminChatPage = () => {
     },
   ];
 
+  const columns: ColumnDef<ChatConversation>[] = [
+    {
+      header: '#',
+      id: 'index',
+      size: 50,
+      cell: (info) => info.row.index + 1,
+    },
+    {
+      header: t('chat.table.candidate'),
+      accessorKey: 'jobSeekerName',
+      cell: (info) => {
+        const conv = info.row.original;
+        const name = conv.jobSeekerName || conv.jobSeeker?.fullName || 'N/A';
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Avatar src={conv.jobSeekerAvatar || undefined} sx={{ width: 32, height: 32, fontSize: 12 }}>
+              {name.charAt(0)}
+            </Avatar>
+            <Box>
+              <Typography variant="body2" fontWeight={600}>{name}</Typography>
+              <Typography variant="caption" color="text.secondary">{conv.jobSeekerEmail || ''}</Typography>
+            </Box>
+          </Box>
+        );
+      },
+    },
+    {
+      header: t('chat.table.employer'),
+      accessorKey: 'employerName',
+      cell: (info) => {
+        const conv = info.row.original;
+        const name = conv.employerName || conv.companyName || conv.employer?.companyName || 'N/A';
+        return (
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Avatar src={conv.employerLogo || undefined} variant="rounded" sx={{ width: 32, height: 32, fontSize: 12 }}>
+              {name.charAt(0)}
+            </Avatar>
+            <Typography variant="body2" fontWeight={600}>{name}</Typography>
+          </Box>
+        );
+      },
+    },
+    {
+      header: t('chat.table.lastMessage'),
+      accessorKey: 'lastMessage',
+      cell: (info) => {
+        const msg = info.getValue() as string | { content: string };
+        const content = typeof msg === 'string' ? msg : msg?.content || '—';
+        return (
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
+          >
+            {content}
+          </Typography>
+        );
+      },
+    },
+    {
+      header: t('chat.table.status'),
+      accessorKey: 'isActive',
+      cell: (info) => (
+        <Chip
+          label={info.getValue() !== false ? t('chat.status.active') : t('chat.status.ended')}
+          size="small"
+          color={info.getValue() !== false ? 'success' : 'default'}
+        />
+      ),
+    },
+    {
+      header: t('chat.table.time'),
+      accessorKey: 'createAt',
+      cell: (info) => (
+        info.getValue() 
+          ? dayjs(info.getValue() as string).format('DD/MM/YYYY') 
+          : '—'
+      ),
+    },
+    {
+      header: '',
+      id: 'actions',
+      meta: { align: 'right' },
+      cell: () => (
+        <Tooltip title={t('chat.tooltip.viewDetail')}>
+          <IconButton size="small" color="primary">
+            <VisibilityIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
+      ),
+    },
+  ];
+
   return (
     <Box>
       {/* Header */}
@@ -94,7 +165,7 @@ const AdminChatPage = () => {
           {t('chat.title')}
         </Typography>
         <Breadcrumbs>
-          <Link underline="hover" color="inherit" href="/">
+          <Link underline="hover" color="inherit" href="/admin">
             {t('chat.breadcrumb')}
           </Link>
           <Typography color="text.primary">{t('chat.title')}</Typography>
@@ -152,111 +223,22 @@ const AdminChatPage = () => {
             placeholder={t('chat.search.placeholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              ),
+            slotProps={{
+                input: {
+                    startAdornment: (
+                        <InputAdornment position="start">
+                            <SearchIcon fontSize="small" />
+                        </InputAdornment>
+                    ),
+                }
             }}
             sx={{ width: { xs: '100%', sm: 320 } }}
           />
         </Box>
 
         <DataTable
-          columns={[
-            {
-              header: '#',
-              id: 'index',
-              size: 50,
-              cell: (info: any) => info.row.index + 1,
-            },
-            {
-              header: t('chat.table.candidate'),
-              accessorKey: 'jobSeekerName',
-              cell: (info: any) => {
-                const conv = info.row.original;
-                const name = conv.jobSeekerName || conv.jobSeeker?.fullName || 'N/A';
-                return (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Avatar src={conv.jobSeekerAvatar} sx={{ width: 32, height: 32, fontSize: 12 }}>
-                      {name.charAt(0)}
-                    </Avatar>
-                    <Box>
-                      <Typography variant="body2" fontWeight={600}>{name}</Typography>
-                      <Typography variant="caption" color="text.secondary">{conv.jobSeekerEmail || ''}</Typography>
-                    </Box>
-                  </Box>
-                );
-              },
-            },
-            {
-              header: t('chat.table.employer'),
-              accessorKey: 'employerName',
-              cell: (info: any) => {
-                const conv = info.row.original;
-                const name = conv.employerName || conv.companyName || conv.employer?.companyName || 'N/A';
-                return (
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Avatar src={conv.employerLogo} variant="rounded" sx={{ width: 32, height: 32, fontSize: 12 }}>
-                      {name.charAt(0)}
-                    </Avatar>
-                    <Typography variant="body2" fontWeight={600}>{name}</Typography>
-                  </Box>
-                );
-              },
-            },
-            {
-              header: t('chat.table.lastMessage'),
-              accessorKey: 'lastMessage',
-              cell: (info: any) => {
-                const msg = info.getValue();
-                const content = typeof msg === 'string' ? msg : msg?.content || '—';
-                return (
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-                  >
-                    {content}
-                  </Typography>
-                );
-              },
-            },
-            {
-              header: t('chat.table.status'),
-              accessorKey: 'isActive',
-              cell: (info: any) => (
-                <Chip
-                  label={info.getValue() !== false ? t('chat.status.active') : t('chat.status.ended')}
-                  size="small"
-                  color={info.getValue() !== false ? 'success' : 'default'}
-                />
-              ),
-            },
-            {
-              header: t('chat.table.time'),
-              accessorKey: 'createAt',
-              cell: (info: any) => (
-                info.getValue() 
-                  ? new Date(info.getValue() as string).toLocaleDateString('vi-VN') 
-                  : '—'
-              ),
-            },
-            {
-              header: '',
-              id: 'actions',
-              meta: { align: 'right' },
-              cell: () => (
-                <Tooltip title={t('chat.tooltip.viewDetail')}>
-                  <IconButton size="small" color="primary">
-                    <VisibilityIcon fontSize="small" />
-                  </IconButton>
-                </Tooltip>
-              ),
-            },
-          ] as ColumnDef<any>[]}
-          data={filtered}
+          columns={columns}
+          data={conversations}
           isLoading={isLoading}
           hidePagination
           emptyMessage={conversations.length === 0 ? t('chat.empty.noConversations') : t('chat.empty.noResults')}

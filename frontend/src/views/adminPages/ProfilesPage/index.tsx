@@ -1,22 +1,15 @@
-import React, { useState } from 'react';
-import { Box, Typography, Paper, TextField, InputAdornment, Pagination, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem } from "@mui/material";
+import React, { useState, useMemo } from 'react';
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Tooltip, IconButton, Stack, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import { Grid2 as Grid } from "@mui/material";
-
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
+import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
-import AddIcon from '@mui/icons-material/Add';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useProfiles } from './hooks/useProfiles';
 import { useDataTable } from '../../../hooks';
-import { useCities } from '../CitiesPage/hooks/useCities';
-import { useDistricts } from '../DistrictsPage/hooks/useDistricts';
-import ProfileTable from './components/ProfileTable';
 import { JobSeekerProfile } from '../../../types/models';
-import { PaginatedResponse } from '../../../types/api';
-
-type JobSeekerProfileExt = JobSeekerProfile & {
-  userDict?: { fullName?: string };
-  location?: { city?: string | number; district?: string | number; address?: string };
-};
+import dayjs from '../../../configs/dayjs-config';
 
 const ProfilesPage = () => {
     const { t } = useTranslation('admin');
@@ -28,157 +21,141 @@ const ProfilesPage = () => {
         onSortingChange,
         ordering,
         pagination,
-        onPaginationChange,
-        searchTerm,
-        onSearchChange,
-    } = useDataTable();
+        onPaginationChange
+    } = useDataTable({ initialPageSize: 10 });
+
+    const [searchTerm, setSearchTerm] = useState('');
 
     const {
         data,
         isLoading,
-        createProfile,
-        updateProfile,
         deleteProfile,
         isMutating
     } = useProfiles({
         page: page + 1,
-        pageSize: pageSize,
+        pageSize,
         kw: searchTerm,
-        ordering,
+        ordering
     });
-
-    const { data: citiesData } = useCities();
-    const cities = (citiesData as unknown as PaginatedResponse<{ id: number; name: string }>)?.results || citiesData as unknown as { id: number; name: string }[];
-
-    const [openDialog, setOpenDialog] = useState(false);
-    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-    const [currentProfile, setCurrentProfile] = useState<JobSeekerProfileExt | null>(null);
-    const [formData, setFormData] = useState({
-        user: { fullName: '' },
-        phone: '',
-        birthday: '',
-        gender: 'M',
-        maritalStatus: 'S',
-        location: {
-            city: '' as string | number,
-            district: '' as string | number,
-            address: ''
-        }
-    });
-
-    const { data: districtsData } = useDistricts({ city: formData.location.city });
-    const districts = (districtsData as unknown as PaginatedResponse<{ id: number; name: string }>)?.results || districtsData as unknown as { id: number; name: string }[];
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [currentProfile, setCurrentProfile] = useState<JobSeekerProfile | null>(null);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onSearchChange(e.target.value);
+        setSearchTerm(e.target.value);
+        onPaginationChange({ pageIndex: 0, pageSize: pageSize });
     };
 
-    const handleOpenAdd = () => {
-        setDialogMode('add');
-        setFormData({
-            user: { fullName: '' },
-            phone: '',
-            birthday: '',
-            gender: 'M',
-            maritalStatus: 'S',
-            location: {
-                city: cities?.[0]?.id || '',
-                district: '',
-                address: ''
-            }
-        });
-        setCurrentProfile(null);
-        setOpenDialog(true);
-    };
-
-    const handleOpenEdit = (profile: JobSeekerProfileExt) => {
-        setDialogMode('edit');
-        setCurrentProfile(profile);
-        setFormData({
-            user: { fullName: profile.userDict?.fullName || '' },
-            phone: profile.phone || '',
-            birthday: profile.birthday || '',
-            gender: profile.gender || 'M',
-            maritalStatus: profile.maritalStatus || 'S',
-            location: {
-                city: (typeof profile.location?.city === 'object' ? (profile.location?.city as { id?: number }).id : profile.location?.city) || '',
-                district: (typeof profile.location?.district === 'object' ? (profile.location?.district as { id?: number }).id : profile.location?.district) || '',
-                address: profile.location?.address || ''
-            }
-        });
-        setOpenDialog(true);
-    };
-
-    const handleOpenDelete = (profile: JobSeekerProfileExt) => {
+    const handleOpenDelete = (profile: JobSeekerProfile) => {
         setCurrentProfile(profile);
         setOpenDeleteDialog(true);
     };
 
     const handleCloseDialog = () => {
-        setOpenDialog(false);
+        setOpenDeleteDialog(false);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        if (name === 'fullName') {
-            setFormData(prev => ({ ...prev, user: { ...prev.user, fullName: value } }));
-        } else if (name.startsWith('loc_')) {
-            const locField = name.replace('loc_', '');
-            setFormData(prev => ({
-                ...prev,
-                location: { ...prev.location, [locField]: value }
-            }));
-        } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
-        }
-    };
-
-    const handleSave = async () => {
+    const handleDelete = async () => {
+        if (!currentProfile) return;
         try {
-            if (dialogMode === 'add') {
-                await createProfile(formData);
-            } else if (currentProfile?.id) {
-                await updateProfile({
-                    id: currentProfile.id,
-                    data: formData
-                });
-            }
+            await deleteProfile(currentProfile.id);
             handleCloseDialog();
         } catch (error) {
             console.error(error);
         }
     };
 
-    const handleDelete = async () => {
-        if (!currentProfile?.id) return;
-        try {
-            await deleteProfile(currentProfile.id);
-            setOpenDeleteDialog(false);
-        } catch (error) {
-            console.error(error);
-        }
-    };
+    const columns = useMemo<ColumnDef<JobSeekerProfile>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: 'ID',
+            enableSorting: true,
+        },
+        {
+            id: 'candidate',
+            header: t('pages.profiles.table.candidate') as string,
+            cell: (info) => {
+                const profile = info.row.original;
+                const user = (profile as any).userDict;
+                return (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Avatar src={user?.avatarUrl} sx={{ width: 32, height: 32 }}>
+                            {user?.fullName?.charAt(0)}
+                        </Avatar>
+                        <Box>
+                            <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {user?.fullName || '—'}
+                            </Typography>
+                            <Typography variant="caption" color="textSecondary">
+                                {user?.email || '—'}
+                            </Typography>
+                        </Box>
+                    </Box>
+                );
+            },
+        },
+        {
+            accessorKey: 'phone',
+            header: t('pages.profiles.table.phone') as string,
+            cell: (info) => info.getValue() as string || '—',
+        },
+        {
+            accessorKey: 'currentJobTitle',
+            header: t('pages.profiles.table.title') as string,
+            cell: (info) => info.getValue() as string || '—',
+        },
+        {
+            accessorKey: 'createAt',
+            header: t('pages.profiles.table.createdAt') as string,
+            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—',
+        },
+        {
+            id: 'actions',
+            header: t('pages.profiles.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => {
+                const profile = info.row.original;
+                return (
+                    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                        <Tooltip title={t('pages.profiles.table.view')}>
+                             <IconButton size="small" component={Link} href={`/profiles/${profile.id}`} target="_blank" color="info">
+                                <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('pages.profiles.table.delete')}>
+                            <IconButton size="small" onClick={() => handleOpenDelete(profile)} color="error">
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    </Stack>
+                );
+            },
+        },
+    ], [t]);
 
     return (
-        <>
-            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
-                    <Button
-                        variant="contained"
-                        startIcon={<AddIcon />}
-                        onClick={handleOpenAdd}
-                        sx={{ borderRadius: '8px', textTransform: 'none' }}
-                    >
-                        {t('pages.profiles.addCandidate')}
-                    </Button>
+        <Box>
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+                        {t('pages.profiles.title')}
+                    </Typography>
+                    <Breadcrumbs aria-label="breadcrumb">
+                        <Link underline="hover" color="inherit" href="/admin">
+                            {t('pages.profiles.breadcrumbAdmin')}
+                        </Link>
+                        <Typography color="text.primary">{t('pages.profiles.breadcrumbResources')}</Typography>
+                        <Typography color="text.primary">{t('pages.profiles.breadcrumbProfiles')}</Typography>
+                    </Breadcrumbs>
+                </Box>
             </Box>
+
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
-                        <TextField
-                            size="small"
-                            placeholder={t('pages.profiles.searchPlaceholder')}
-                            value={searchTerm}
+                    <TextField
+                        size="small"
+                        placeholder={t('pages.profiles.searchPlaceholder')}
+                        value={searchTerm}
                         onChange={handleSearch}
                         sx={{ width: 400 }}
                         slotProps={{
@@ -193,156 +170,40 @@ const ProfilesPage = () => {
                     />
                 </Box>
 
-                <ProfileTable
-                    data={(data as unknown as PaginatedResponse<JobSeekerProfileExt>)?.results || data}
+                <DataTable
+                    columns={columns}
+                    data={data?.results || []}
                     isLoading={isLoading}
-                    rowCount={(data as unknown as PaginatedResponse<JobSeekerProfileExt>)?.count || 0}
+                    rowCount={data?.count || 0}
                     pagination={pagination}
                     onPaginationChange={onPaginationChange}
+                    enableSorting
                     sorting={sorting}
                     onSortingChange={onSortingChange}
-                    onEdit={handleOpenEdit}
-                    onDelete={handleOpenDelete}
                 />
             </Paper>
-            {/* Add/Edit Dialog */}
-            <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-                <DialogTitle>
-                    {dialogMode === 'add' ? t('pages.profiles.addTitle') : t('pages.profiles.editTitle')}
-                </DialogTitle>
-                <DialogContent>
-                    <Grid container spacing={2} sx={{ pt: 1 }}>
-                        <Grid size={12}>
-                            <TextField
-                                label={t('pages.profiles.fullNameLabel')}
-                                fullWidth
-                                name="fullName"
-                                value={formData.user.fullName}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </Grid>
-                        <Grid size={6}>
-                            <TextField
-                                label={t('pages.profiles.phoneLabel')}
-                                fullWidth
-                                name="phone"
-                                value={formData.phone}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </Grid>
-                        <Grid size={6}>
-                            <TextField
-                                label={t('pages.profiles.dobLabel')}
-                                fullWidth
-                                type="date"
-                                name="birthday"
-                                value={formData.birthday}
-                                onChange={handleInputChange}
-                                required
-                                slotProps={{
-                                    inputLabel: { shrink: true }
-                                }}
-                            />
-                        </Grid>
-                        <Grid size={6}>
-                            <TextField
-                                select
-                                label={t('pages.profiles.genderLabel')}
-                                fullWidth
-                                name="gender"
-                                value={formData.gender}
-                                onChange={handleInputChange}
-                            >
-                                <MenuItem value="M">{t('pages.profiles.genderOptions.male')}</MenuItem>
-                                <MenuItem value="F">{t('pages.profiles.genderOptions.female')}</MenuItem>
-                                <MenuItem value="O">{t('pages.profiles.genderOptions.other')}</MenuItem>
-                            </TextField>
-                        </Grid>
-                        <Grid size={6}>
-                            <TextField
-                                select
-                                label={t('pages.profiles.maritalStatusLabel')}
-                                fullWidth
-                                name="maritalStatus"
-                                value={formData.maritalStatus}
-                                onChange={handleInputChange}
-                            >
-                                <MenuItem value="S">{t('pages.profiles.maritalOptions.single')}</MenuItem>
-                                <MenuItem value="M">{t('pages.profiles.maritalOptions.married')}</MenuItem>
-                            </TextField>
-                        </Grid>
-                        <Grid size={6}>
-                            <TextField
-                                select
-                                label={t('pages.profiles.cityLabel')}
-                                fullWidth
-                                name="loc_city"
-                                value={formData.location.city}
-                                onChange={handleInputChange}
-                            >
-                                {cities?.map(city => (
-                                    <MenuItem key={city.id} value={city.id}>{city.name}</MenuItem>
-                                ))}
-                            </TextField>
-                        </Grid>
-                        <Grid size={6}>
-                            <TextField
-                                select
-                                label={t('pages.profiles.districtLabel')}
-                                fullWidth
-                                name="loc_district"
-                                value={formData.location.district}
-                                onChange={handleInputChange}
-                                disabled={!formData.location.city}
-                            >
-                                {districts?.map(d => (
-                                    <MenuItem key={d.id} value={d.id}>{d.name}</MenuItem>
-                                ))}
-                            </TextField>
-                        </Grid>
-                        <Grid size={12}>
-                            <TextField
-                                label={t('pages.profiles.addressLabel')}
-                                fullWidth
-                                name="loc_address"
-                                value={formData.location.address}
-                                onChange={handleInputChange}
-                            />
-                        </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.profiles.cancelBtn')}</Button>
-                    <Button
-                        onClick={handleSave}
-                        variant="contained"
-                        disabled={isMutating || !formData.user.fullName || !formData.phone}
-                    >
-                        {isMutating ? t('pages.profiles.savingBtn') : t('pages.profiles.saveBtn')}
-                    </Button>
-                </DialogActions>
-            </Dialog>
+
             {/* Delete Confirmation */}
-            <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+            <Dialog open={openDeleteDialog} onClose={handleCloseDialog}>
                 <DialogTitle>{t('pages.profiles.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.profiles.deleteText', { name: currentProfile?.userDict?.fullName }) }} />
+                    <Typography>
+                        {t('pages.profiles.deleteConfirm', { name: (currentProfile as any)?.userDict?.fullName })}
+                    </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.profiles.cancelBtn')}</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.profiles.cancel')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? t('pages.profiles.deletingBtn') : t('pages.profiles.deleteBtn')}
+                        {isMutating ? t('common.deleting') : t('common.delete')}
                     </Button>
                 </DialogActions>
             </Dialog>
-        </>
+        </Box>
     );
 };
 

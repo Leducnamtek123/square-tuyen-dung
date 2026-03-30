@@ -8,30 +8,31 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import questionService from '../../../../services/questionService';
-import { useScheduleInterview } from '../../InterviewsPage/hooks/useInterviews';
+import { useInterviews } from '../../InterviewsPage/hooks/useInterviews';
+import { User as UserModel, Question } from '../../../../types/models';
 
 interface ScheduleInterviewDialogProps {
     open: boolean;
     onClose: () => void;
-    user: any;
+    user: UserModel | null;
 }
 
 const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialogProps) => {
     const { t } = useTranslation('admin');
     const [scheduledAt, setScheduledAt] = useState<Dayjs | null>(dayjs().add(1, 'day'));
     const [notes, setNotes] = useState('');
-    const [selectedQuestions, setSelectedQuestions] = useState<any[]>([]);
-    const [questions, setQuestions] = useState<any[]>([]);
+    const [selectedQuestions, setSelectedQuestions] = useState<Question[]>([]);
+    const [questions, setQuestions] = useState<Question[]>([]);
     const [loadingQuestions, setLoadingQuestions] = useState(false);
 
-    const scheduleInterviewMutation = useScheduleInterview() as any;
+    const { scheduleInterview } = useInterviews({});
 
     useEffect(() => {
         if (open) {
             setLoadingQuestions(true);
             questionService.getQuestions({ pageSize: 100 })
-                .then((res: any) => {
-                    const items = res?.results || res || [];
+                .then((res) => {
+                    const items = res?.results || [];
                     setQuestions(items);
                 })
                 .catch(console.error)
@@ -48,11 +49,11 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
     }, [open]);
 
     const handleSubmit = async () => {
-        if (!scheduledAt) return;
+        if (!scheduledAt || !user || !scheduleInterview) return;
         const payload = {
-            candidate: user?.id,
-            candidate_name: user?.fullName || user?.email,
-            candidate_email: user?.email,
+            candidate: user.id,
+            candidate_name: user.fullName || user.email,
+            candidate_email: user.email,
             scheduled_at: scheduledAt.toISOString(),
             interview_type: 'VETTING',
             notes,
@@ -60,7 +61,7 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
         };
 
         try {
-            await scheduleInterviewMutation.mutateAsync(payload);
+            await (scheduleInterview as any)(payload); // useInterviews might need its own refactor later for consistency
             onClose();
         } catch (err) {
             console.error('Schedule interview error:', err);
@@ -105,8 +106,9 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                     <Autocomplete
                         multiple
                         options={questions}
-                        getOptionLabel={(opt) => opt.text || opt.content || `Question #${opt.id}`}
+                        getOptionLabel={(opt) => opt.content || opt.text || `Question #${opt.id}`}
                         value={selectedQuestions}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
                         onChange={(_, v) => setSelectedQuestions(v)}
                         loading={loadingQuestions}
                         renderInput={(params) => (
@@ -132,7 +134,7 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                                 <Chip
                                     {...getTagProps({ index: idx })}
                                     key={opt.id}
-                                    label={opt.text || opt.content || `#${opt.id}`}
+                                    label={opt.content || opt.text || `#${opt.id}`}
                                     size="small"
                                     color="primary"
                                     variant="outlined"
@@ -152,18 +154,16 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                     />
                 </Box>
             </DialogContent>
-            <DialogActions sx={{ px: 3, pb: 2 }}>
+            <DialogActions sx={{ px: 3, pb: 3 }}>
                 <Button onClick={onClose} color="inherit">
                     {t('pages.users.scheduleInterviewDialog.cancelBtn')}
                 </Button>
                 <Button
                     onClick={handleSubmit}
                     variant="contained"
-                    disabled={scheduleInterviewMutation.isPending || !scheduledAt}
+                    disabled={!scheduledAt}
                 >
-                    {scheduleInterviewMutation.isPending 
-                        ? t('pages.users.scheduleInterviewDialog.schedulingBtn') 
-                        : t('pages.users.scheduleInterviewDialog.submitBtn')}
+                    {t('pages.users.scheduleInterviewDialog.submitBtn')}
                 </Button>
             </DialogActions>
         </Dialog>

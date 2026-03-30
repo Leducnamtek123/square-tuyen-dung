@@ -1,15 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip, SelectChangeEvent } from "@mui/material";
+import React, { useState, useMemo } from 'react';
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton, Stack, Autocomplete, Chip, CircularProgress } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import { useDataTable } from '../../../hooks';
-
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useQuestionGroups } from './hooks/useQuestionGroups';
-import QuestionGroupTable from './components/QuestionGroupTable';
-import questionService from '../../../services/questionService';
-import { transformQuestion, transformQuestionGroup } from '../../../utils/transformers';
-import { PaginatedResponse } from '@/types/api';
+import { useQuestions } from '../QuestionsPage/hooks/useQuestions';
+import { useDataTable } from '../../../hooks';
+import { QuestionGroup, Question } from '../../../types/models';
+
+interface QuestionGroupFormData {
+    name: string;
+    description: string;
+    questionIds: number[];
+}
 
 const QuestionGroupsPage = () => {
     const { t } = useTranslation('admin');
@@ -21,24 +28,10 @@ const QuestionGroupsPage = () => {
         onSortingChange,
         ordering,
         pagination,
-        onPaginationChange,
-        searchTerm,
-        onSearchChange,
-    } = useDataTable();
+        onPaginationChange
+    } = useDataTable({ initialPageSize: 10 });
 
-    const [openDialog, setOpenDialog] = useState(false);
-    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-    const [currentGroup, setCurrentGroup] = useState<any>(null);
-    const [groupName, setGroupName] = useState('');
-    const [groupDescription, setGroupDescription] = useState('');
-    const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
-    const [allQuestions, setAllQuestions] = useState<any[]>([]);
-
-    const [openCreateQuestion, setOpenCreateQuestion] = useState(false);
-    const [newQuestionContent, setNewQuestionContent] = useState('');
-    const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
-
-    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const {
         data,
@@ -49,95 +42,72 @@ const QuestionGroupsPage = () => {
         isMutating
     } = useQuestionGroups({
         page: page + 1,
-        pageSize: pageSize,
+        pageSize,
         kw: searchTerm,
-        ordering,
-    }) as any;
+        ordering
+    });
 
-    React.useEffect(() => {
-        const fetchQuestions = async () => {
-            try {
-                const res = await questionService.getAllQuestions({ pageSize: 1000 });
-                const rawQuestions = res.results || [];
-                setAllQuestions(rawQuestions.map(transformQuestion).filter(Boolean));
-            } catch (error) {
-                console.error("Error fetching questions", error);
-            }
-        };
-        fetchQuestions();
-    }, []);
+    const { data: questionsData, isLoading: isLoadingQuestions } = useQuestions({ pageSize: 500 });
+    const allQuestions = questionsData?.results || [];
 
-    const handleCreateQuestion = async () => {
-        if (!newQuestionContent.trim()) return;
-        setIsCreatingQuestion(true);
-        try {
-            const res = await questionService.createQuestion({
-                text: newQuestionContent.trim(),
-                category: ''
-            });
-            const newQ = transformQuestion(res as any);
-            if (newQ) {
-                setAllQuestions(prev => [newQ, ...prev]);
-                setSelectedQuestions(prev => [...prev, newQ.id]);
-            }
-            setOpenCreateQuestion(false);
-            setNewQuestionContent('');
-        } catch (error) {
-            console.error("Error creating question", error);
-        } finally {
-            setIsCreatingQuestion(false);
-        }
-    };
+    const [openDialog, setOpenDialog] = useState(false);
+    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+    const [currentGroup, setCurrentGroup] = useState<QuestionGroup | null>(null);
+    const [formData, setFormData] = useState<QuestionGroupFormData>({
+        name: '',
+        description: '',
+        questionIds: []
+    });
+
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        onSearchChange(e.target.value);
+        setSearchTerm(e.target.value);
+        onPaginationChange({ pageIndex: 0, pageSize: pageSize });
     };
 
     const handleOpenAdd = () => {
         setDialogMode('add');
-        setGroupName('');
-        setGroupDescription('');
-        setSelectedQuestions([]);
-        setCurrentGroup(null);
+        setFormData({ name: '', description: '', questionIds: [] });
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (group: any) => {
+    const handleOpenEdit = (group: QuestionGroup) => {
         setDialogMode('edit');
         setCurrentGroup(group);
-        setGroupName(group.name);
-        setGroupDescription(group.description || '');
-        setSelectedQuestions(group.questions?.map((q: any) => q.id) || []);
+        setFormData({
+            name: group.name || '',
+            description: group.description || '',
+            questionIds: group.questions?.map(q => q.id) || group.questionIds || []
+        });
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (group: any) => {
+    const handleOpenDelete = (group: QuestionGroup) => {
         setCurrentGroup(group);
         setOpenDeleteDialog(true);
     };
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
+        setOpenDeleteDialog(false);
     };
 
     const handleSave = async () => {
-        if (!groupName.trim()) return;
-
         try {
+            // Mapping for backend expectation (snake_case)
+            const payload = {
+                name: formData.name,
+                description: formData.description,
+                question_ids: formData.questionIds 
+            };
+            
             if (dialogMode === 'add') {
-                await createQuestionGroup({
-                    name: groupName,
-                    description: groupDescription,
-                    question_ids: selectedQuestions
-                });
-            } else {
+                await createQuestionGroup(payload);
+            } else if (currentGroup) {
                 await updateQuestionGroup({
                     id: currentGroup.id,
-                    data: {
-                        name: groupName,
-                        description: groupDescription,
-                        question_ids: selectedQuestions
-                    }
+                    data: payload
                 });
             }
             handleCloseDialog();
@@ -147,13 +117,65 @@ const QuestionGroupsPage = () => {
     };
 
     const handleDelete = async () => {
+        if (!currentGroup) return;
         try {
             await deleteQuestionGroup(currentGroup.id);
-            setOpenDeleteDialog(false);
+            handleCloseDialog();
         } catch (error) {
             console.error(error);
         }
     };
+
+    const columns = useMemo<ColumnDef<QuestionGroup>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: 'ID',
+            enableSorting: true,
+        },
+        {
+            accessorKey: 'name',
+            header: t('pages.questionGroups.table.name') as string,
+            enableSorting: true,
+            cell: (info) => (
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {info.getValue() as string}
+                </Typography>
+            ),
+        },
+        {
+            accessorKey: 'description',
+            header: t('pages.questionGroups.table.description') as string,
+            cell: (info) => (
+                <Typography variant="body2" sx={{ maxWidth: 250, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {info.getValue() as string || '—'}
+                </Typography>
+            ),
+        },
+        {
+            id: 'questionsCount',
+            header: t('pages.questionGroups.table.questionsCount') as string,
+            cell: (info) => info.row.original.questions?.length || 0,
+        },
+        {
+            id: 'actions',
+            header: t('pages.questionGroups.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                    <Tooltip title={t('pages.questionGroups.table.edit')}>
+                        <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.questionGroups.table.delete')}>
+                        <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            ),
+        },
+    ], [t]);
 
     return (
         <Box>
@@ -166,19 +188,15 @@ const QuestionGroupsPage = () => {
                         <Link underline="hover" color="inherit" href="/admin">
                             {t('pages.questionGroups.breadcrumbAdmin')}
                         </Link>
-                        <Typography color="text.primary">{t('pages.questionGroups.breadcrumbBank')}</Typography>
+                        <Typography color="text.primary">{t('pages.questionGroups.breadcrumbContent')}</Typography>
                         <Typography color="text.primary">{t('pages.questionGroups.breadcrumbGroups')}</Typography>
                     </Breadcrumbs>
                 </Box>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleOpenAdd}
-                    sx={{ borderRadius: '8px', textTransform: 'none' }}
-                >
-                    {t('pages.questionGroups.addBtn')}
+                <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}>
+                    {t('pages.questionGroups.add')}
                 </Button>
             </Box>
+
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
@@ -186,7 +204,7 @@ const QuestionGroupsPage = () => {
                         placeholder={t('pages.questionGroups.searchPlaceholder')}
                         value={searchTerm}
                         onChange={handleSearch}
-                        sx={{ width: 300 }}
+                        sx={{ width: 400 }}
                         slotProps={{
                             input: {
                                 startAdornment: (
@@ -199,126 +217,111 @@ const QuestionGroupsPage = () => {
                     />
                 </Box>
 
-                <QuestionGroupTable
-                    data={(data?.results || []).map(transformQuestionGroup).filter(Boolean)}
-                    loading={isLoading}
+                <DataTable
+                    columns={columns}
+                    data={data?.results || []}
+                    isLoading={isLoading}
                     rowCount={data?.count || 0}
                     pagination={pagination}
                     onPaginationChange={onPaginationChange}
+                    enableSorting
                     sorting={sorting}
                     onSortingChange={onSortingChange}
-                    onEdit={handleOpenEdit}
-                    onDelete={handleOpenDelete}
                 />
             </Paper>
+
             {/* Add/Edit Dialog */}
-            <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="xs">
+            <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
                 <DialogTitle>
-                    {dialogMode === 'add' ? t('pages.questionGroups.addTitle') : t('pages.questionGroups.editTitle')}
+                    {dialogMode === 'add' ? t('pages.questionGroups.add') : t('pages.questionGroups.edit')}
                 </DialogTitle>
                 <DialogContent>
-                    <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
                         <TextField
-                            label={t('pages.questionGroups.groupNameLabel')}
+                            label={t('pages.questionGroups.form.name')}
                             fullWidth
-                            value={groupName}
-                            onChange={(e) => setGroupName(e.target.value)}
+                            value={formData.name}
+                            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                             required
                         />
                         <TextField
-                            label={t('pages.questionGroups.descriptionLabel')}
+                            label={t('pages.questionGroups.form.description')}
                             fullWidth
                             multiline
-                            rows={3}
-                            value={groupDescription}
-                            onChange={(e) => setGroupDescription(e.target.value)}
+                            rows={2}
+                            value={formData.description}
+                            onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                         />
-                        <FormControl fullWidth>
-                            <InputLabel>{t('pages.questionGroups.selectQuestionsLabel')}</InputLabel>
-                            <Select
-                                multiple
-                                value={selectedQuestions}
-                                onChange={(e: SelectChangeEvent<string[]>) => setSelectedQuestions(e.target.value as string[])}
-                                input={<OutlinedInput label={t('pages.questionGroups.selectQuestionsLabel')} />}
-                                renderValue={(selected) => (
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                        {(selected as string[]).map((value) => {
-                                            const q = allQuestions.find((item) => item.id === value);
-                                            return <Chip key={value} label={q?.text?.substring(0, 30) || 'Question'} />;
-                                        })}
-                                    </Box>
-                                )}
-                            >
-                                {allQuestions.map((q) => (
-                                    <MenuItem key={q.id} value={q.id}>
-                                        {q.text}
-                                    </MenuItem>
-                                ))}
-                            </Select>
-                        </FormControl>
-                        <Button
-                            variant="outlined"
-                            startIcon={<AddIcon />}
-                            onClick={() => setOpenCreateQuestion(true)}
-                            sx={{ alignSelf: 'flex-start' }}
-                        >
-                            {t('pages.questionGroups.createQuestionBtn')}
-                        </Button>
+                        
+                        <Autocomplete
+                            multiple
+                            options={allQuestions}
+                            getOptionLabel={(option: Question) => option.text || `Question #${option.id}`}
+                            value={allQuestions.filter(q => formData.questionIds?.includes(q.id))}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                            onChange={(_, newValue) => setFormData(prev => ({ ...prev, questionIds: newValue.map((v: Question) => v.id) }))}
+                            loading={isLoadingQuestions}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label={t('pages.questionGroups.form.questions')}
+                                    placeholder={t('pages.questionGroups.form.questionsPlaceholder')}
+                                    slotProps={{
+                                        input: {
+                                            ...params.InputProps,
+                                            endAdornment: (
+                                                <React.Fragment>
+                                                    {isLoadingQuestions ? <CircularProgress color="inherit" size={20} /> : null}
+                                                    {params.InputProps.endAdornment}
+                                                </React.Fragment>
+                                            ),
+                                        }
+                                    }}
+                                />
+                            )}
+                            renderTags={(value, getTagProps) =>
+                                value.map((option: Question, index: number) => (
+                                    <Chip
+                                        variant="outlined"
+                                        label={(option.text?.substring(0, 30) || '...') + '...'}
+                                        size="small"
+                                        {...getTagProps({ index })}
+                                        key={option.id}
+                                    />
+                                ))
+                            }
+                        />
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.questionGroups.cancelBtn')}</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.questionGroups.cancel')}</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
-                        disabled={isMutating || !groupName.trim()}
+                        disabled={isMutating || !formData.name}
                     >
-                        {isMutating ? t('pages.questionGroups.savingBtn') : t('pages.questionGroups.saveBtn')}
+                        {isMutating ? t('common.saving') : t('common.save')}
                     </Button>
                 </DialogActions>
             </Dialog>
-            {/* Create Question Dialog */}
-            <Dialog open={openCreateQuestion} onClose={() => setOpenCreateQuestion(false)} fullWidth maxWidth="xs">
-                <DialogTitle>{t('pages.questionGroups.createQuestionTitle')}</DialogTitle>
-                <DialogContent>
-                    <Box sx={{ pt: 1 }}>
-                        <TextField
-                            label={t('pages.questionGroups.questionContentLabel')}
-                            fullWidth
-                            multiline
-                            rows={3}
-                            value={newQuestionContent}
-                            onChange={(e) => setNewQuestionContent(e.target.value)}
-                            required
-                        />
-                    </Box>
-                </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenCreateQuestion(false)} color="inherit">{t('pages.questionGroups.cancelBtn')}</Button>
-                    <Button
-                        onClick={handleCreateQuestion}
-                        variant="contained"
-                        disabled={isCreatingQuestion || !newQuestionContent.trim()}
-                    >
-                        {isCreatingQuestion ? t('pages.questionGroups.creatingBtn') : t('pages.questionGroups.createBtn')}
-                    </Button>
-                </DialogActions>
-            </Dialog>
+
             {/* Delete Confirmation */}
-            <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+            <Dialog open={openDeleteDialog} onClose={handleCloseDialog}>
                 <DialogTitle>{t('pages.questionGroups.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.questionGroups.deleteText', { name: currentGroup?.name }) }} />
+                    <Typography>
+                        {t('pages.questionGroups.deleteConfirm', { name: currentGroup?.name })}
+                    </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.questionGroups.cancelBtn')}</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.questionGroups.cancel')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? t('pages.questionGroups.deletingBtn') : t('pages.questionGroups.deleteBtn')}
+                        {isMutating ? t('common.deleting') : t('common.delete')}
                     </Button>
                 </DialogActions>
             </Dialog>

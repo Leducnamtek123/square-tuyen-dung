@@ -68,7 +68,7 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
               {jobPostDetail?.companyDict?.companyName}
             </Link>
             <p className="text-sm text-muted-foreground">
-              {(allConfig?.employeeSizeDict as any)?.[
+              {(allConfig?.employeeSizeDict as unknown as Record<string, string>)?.[
                 jobPostDetail?.companyDict?.employeeSize
               ] || (
                 <span className="text-xs italic text-gray-300">
@@ -136,15 +136,15 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
           />
           <JobDetailInfoItem
             title={t("jobDetail.experience")}
-            value={(allConfig?.experienceDict as any)?.[jobPostDetail?.experience]}
+            value={(allConfig?.experienceDict as unknown as Record<string, string>)?.[String(jobPostDetail?.experience)]}
           />
           <JobDetailInfoItem
             title={t("jobDetail.position")}
-            value={(allConfig?.positionDict as any)?.[jobPostDetail?.position]}
+            value={(allConfig?.positionDict as unknown as Record<string, string>)?.[String(jobPostDetail?.position)]}
           />
           <JobDetailInfoItem
             title={t("jobDetail.jobType")}
-            value={(allConfig?.jobTypeDict as any)?.[jobPostDetail?.jobType]}
+            value={(allConfig?.jobTypeDict as unknown as Record<string, string>)?.[String(jobPostDetail?.jobType)]}
           />
         </div>
       </div>

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Chip } from "@mui/material";
+import React, { useState, useMemo } from 'react';
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Chip, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
@@ -10,6 +10,7 @@ import dayjs from '../../../configs/dayjs-config';
 import SearchIcon from '@mui/icons-material/Search';
 import { useJobActivities } from './hooks/useJobActivities';
 import { useDataTable } from '../../../hooks';
+import { JobPostActivity } from '../../../types/models';
 
 const JobActivityPage = () => {
     const { t } = useTranslation('admin');
@@ -37,11 +38,11 @@ const JobActivityPage = () => {
         pageSize: rowsPerPage,
         kw: searchTerm,
         ordering
-    }) as any;
+    });
 
     const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [currentActivity, setCurrentActivity] = useState<any>(null);
-    const [statusValue, setStatusValue] = useState('');
+    const [currentActivity, setCurrentActivity] = useState<JobPostActivity | null>(null);
+    const [statusValue, setStatusValue] = useState<number>(0);
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -50,13 +51,13 @@ const JobActivityPage = () => {
         onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
     };
 
-    const handleOpenEdit = (activity: any) => {
+    const handleOpenEdit = (activity: JobPostActivity) => {
         setCurrentActivity(activity);
-        setStatusValue(activity.status || 'PENDING');
+        setStatusValue(activity.status || 0);
         setOpenEditDialog(true);
     };
 
-    const handleOpenDelete = (activity: any) => {
+    const handleOpenDelete = (activity: JobPostActivity) => {
         setCurrentActivity(activity);
         setOpenDeleteDialog(true);
     };
@@ -67,6 +68,7 @@ const JobActivityPage = () => {
     };
 
     const handleSaveStatus = async () => {
+        if (!currentActivity) return;
         try {
             await updateJobActivity({
                 id: currentActivity.id,
@@ -79,6 +81,7 @@ const JobActivityPage = () => {
     };
 
     const handleDelete = async () => {
+        if (!currentActivity) return;
         try {
             await deleteJobActivity(currentActivity.id);
             handleCloseDialogs();
@@ -87,60 +90,68 @@ const JobActivityPage = () => {
         }
     };
 
-    const columns = React.useMemo<ColumnDef<any>[]>(() => [
+    const columns = useMemo<ColumnDef<JobPostActivity>[]>(() => [
         {
-            accessorKey: 'userDict.fullName',
+            accessorKey: 'id',
+            header: 'ID',
+            enableSorting: true,
+        },
+        {
+            accessorKey: 'fullName',
             header: t('pages.jobActivity.table.candidate') as string,
             enableSorting: true,
             cell: (info) => (
-                <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                    {info.getValue() as string || '---'}
-                </Typography>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                      {info.getValue() as string || '---'}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                      {info.row.original.email}
+                  </Typography>
+                </Box>
             ),
         },
         {
-            accessorKey: 'jobPostDict.jobName',
+            accessorKey: 'jobPost.jobName',
             header: t('pages.jobActivity.table.jobPost') as string,
-            enableSorting: true,
-            cell: (info) => info.getValue() || '---',
+            cell: (info) => info.getValue() as string || '---',
         },
         {
-            accessorKey: 'companyDict.companyName',
+            accessorKey: 'jobPost.company.companyName',
             header: t('pages.jobActivity.table.company') as string,
-            enableSorting: true,
-            cell: (info) => info.getValue() || '---',
+            cell: (info) => info.getValue() as string || '---',
         },
         {
-            accessorKey: status,
+            accessorKey: 'status',
             header: t('pages.jobActivity.table.status') as string,
             enableSorting: true,
             cell: (info) => {
-                const status = info.getValue() as string;
+                const status = info.getValue() as number;
                 return (
                     <Chip
-                        label={status || '---'}
+                        label={t(`pages.jobActivity.statusOptions.${status === 1 ? 'applied' : status === 2 ? 'pending' : status === 3 ? 'accepted' : 'rejected'}`)}
                         size="small"
                         color={
-                            status === 'APPLIED' ? 'primary' :
-                                status === 'ACCEPTED' ? 'success' :
-                                    status === 'REJECTED' ? 'error' : 'default'
+                            status === 3 ? 'success' :
+                                status === 4 ? 'error' : 'default'
                         }
+                        variant={status === 1 ? 'outlined' : 'filled'}
                     />
                 );
             },
         },
         {
-            accessorKey: 'updateAt',
+            accessorKey: 'createAt',
             header: t('pages.jobActivity.table.updatedAt') as string,
             enableSorting: true,
-            cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm'),
+            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '—',
         },
         {
             id: 'actions',
             header: t('pages.jobActivity.table.actions') as string,
             meta: { align: 'right' },
             cell: (info) => (
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                     <Tooltip title={t('pages.jobActivity.table.updateStatus')}>
                         <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
                             <EditIcon fontSize="small" />
@@ -151,7 +162,7 @@ const JobActivityPage = () => {
                             <DeleteIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
-                </Box>
+                </Stack>
             ),
         },
     ], [t]);
@@ -190,12 +201,11 @@ const JobActivityPage = () => {
                     />
                 </Box>
 
-
                 <DataTable
                     columns={columns}
-                    data={(data as any)?.results || []}
+                    data={data?.results || []}
                     isLoading={isLoading}
-                    rowCount={(data as any)?.count || 0}
+                    rowCount={data?.count || 0}
                     pagination={pagination}
                     onPaginationChange={onPaginationChange}
                     enableSorting
@@ -213,12 +223,12 @@ const JobActivityPage = () => {
                             fullWidth
                             label={t('pages.jobActivity.statusLabel')}
                             value={statusValue}
-                            onChange={(e) => setStatusValue(e.target.value)}
+                            onChange={(e) => setStatusValue(Number(e.target.value))}
                         >
-                            <MenuItem value="APPLIED">{t('pages.jobActivity.statusOptions.applied')}</MenuItem>
-                            <MenuItem value="PENDING">{t('pages.jobActivity.statusOptions.pending')}</MenuItem>
-                            <MenuItem value="ACCEPTED">{t('pages.jobActivity.statusOptions.accepted')}</MenuItem>
-                            <MenuItem value="REJECTED">{t('pages.jobActivity.statusOptions.rejected')}</MenuItem>
+                            <MenuItem value={1}>{t('pages.jobActivity.statusOptions.applied')}</MenuItem>
+                            <MenuItem value={2}>{t('pages.jobActivity.statusOptions.pending')}</MenuItem>
+                            <MenuItem value={3}>{t('pages.jobActivity.statusOptions.accepted')}</MenuItem>
+                            <MenuItem value={4}>{t('pages.jobActivity.statusOptions.rejected')}</MenuItem>
                         </TextField>
                     </Box>
                 </DialogContent>
@@ -237,7 +247,9 @@ const JobActivityPage = () => {
             <Dialog open={openDeleteDialog} onClose={handleCloseDialogs}>
                 <DialogTitle>{t('pages.jobActivity.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.jobActivity.deleteText', { name: currentActivity?.userDict?.fullName }) }} />
+                    <Typography>
+                        {t('pages.jobActivity.deleteText', { name: currentActivity?.fullName })}
+                    </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button onClick={handleCloseDialogs} color="inherit">{t('pages.jobActivity.cancelBtn')}</Button>

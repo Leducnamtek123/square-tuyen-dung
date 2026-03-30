@@ -1,66 +1,71 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryResult, keepPreviousData } from '@tanstack/react-query';
 import adminInterviewService from '../../../../services/adminInterviewService';
 import toastMessages from '../../../../utils/toastMessages';
 import { InterviewSession } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
-export const useInterviews = (params: Record<string, unknown>) => {
-    return useQuery({
+export type UseInterviewsResult = UseQueryResult<PaginatedResponse<InterviewSession>> & {
+    scheduleInterview: (data: Partial<InterviewSession> | Record<string, unknown>) => Promise<InterviewSession>;
+    updateInterviewStatus: (args: { id: string | number; status: string }) => Promise<InterviewSession>;
+    deleteInterview: (id: string | number) => Promise<void>;
+    isMutating: boolean;
+};
+
+export const useInterviews = (params: Record<string, unknown>): UseInterviewsResult => {
+    const queryClient = useQueryClient();
+
+    const query = useQuery({
         queryKey: ['admin-interviews', params],
         queryFn: async () => {
             const res = await adminInterviewService.getAllInterviews(params);
             return res;
         },
-        placeholderData: (previousData) => previousData as PaginatedResponse<InterviewSession>,
+        placeholderData: keepPreviousData,
         refetchInterval: (query: { state: { data?: PaginatedResponse<InterviewSession> | unknown } }) => {
             const interviews = (query.state.data as PaginatedResponse<InterviewSession>)?.results || [];
             const hasActiveInterview = interviews.some((item: InterviewSession) => ['in_progress', 'calibration', 'processing'].includes(item.status as string));
             return hasActiveInterview ? 5000 : false;
         },
     });
-};
 
-export const useScheduleInterview = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
+    const scheduleMutation = useMutation<InterviewSession, Error, Partial<InterviewSession> | Record<string, unknown>>({
         mutationFn: (data: Partial<InterviewSession> | Record<string, unknown>) => adminInterviewService.scheduleInterview(data),
         onSuccess: () => {
             toastMessages.success('Interview scheduled successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
         },
-        onError: (error: { response?: { data?: { errors?: { detail?: string } } } } | Error | unknown) => {
-            toastMessages.error((error as { response?: { data?: { errors?: { detail?: string } } } }).response?.data?.errors?.detail || 'Failed to schedule interview');
+        onError: (error: any) => {
+            toastMessages.error(error.response?.data?.errors?.detail || 'Failed to schedule interview');
         },
     });
-};
 
-export const useUpdateInterviewStatus = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
+    const updateStatusMutation = useMutation<InterviewSession, Error, { id: string | number; status: string }>({
         mutationFn: ({ id, status }: { id: string | number; status: string }) => adminInterviewService.updateInterviewStatus(id, status),
         onSuccess: () => {
             toastMessages.success('Status updated successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
         },
-        onError: (error: { response?: { data?: { errors?: { detail?: string } } } } | Error | unknown) => {
-            toastMessages.error((error as { response?: { data?: { errors?: { detail?: string } } } }).response?.data?.errors?.detail || 'Update failed');
+        onError: (error: any) => {
+            toastMessages.error(error.response?.data?.errors?.detail || 'Update failed');
         },
     });
-};
 
-export const useDeleteInterview = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
+    const deleteMutation = useMutation<void, Error, string | number>({
         mutationFn: (id: string | number) => adminInterviewService.deleteInterview(id),
         onSuccess: () => {
             toastMessages.success('Interview deleted successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
         },
-        onError: (error: { response?: { data?: { errors?: { detail?: string } } } } | Error | unknown) => {
-            toastMessages.error((error as { response?: { data?: { errors?: { detail?: string } } } }).response?.data?.errors?.detail || 'Delete failed');
+        onError: (error: any) => {
+            toastMessages.error(error.response?.data?.errors?.detail || 'Delete failed');
         },
     });
+
+    return {
+        ...query,
+        scheduleInterview: scheduleMutation.mutateAsync,
+        updateInterviewStatus: updateStatusMutation.mutateAsync,
+        deleteInterview: deleteMutation.mutateAsync,
+        isMutating: scheduleMutation.isPending || updateStatusMutation.isPending || deleteMutation.isPending
+    } as UseInterviewsResult;
 };

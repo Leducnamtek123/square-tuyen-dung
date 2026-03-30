@@ -24,8 +24,21 @@ import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import { formatRoute } from '@/utils/funcUtils';
 import { useAppSelector } from '@/hooks/useAppStore';
 
+interface NotificationItem {
+  key: string;
+  type?: string;
+  title?: string;
+  content?: string;
+  image?: string;
+  is_read?: boolean;
+  is_deleted?: boolean;
+  time?: { seconds: number };
+  [key: string]: unknown;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface NotificationCardProps {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const PAGE_SIZE = 5;
@@ -41,9 +54,9 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
   const [badgeCount, setBadgeCount] = React.useState(0);
 
-  const [notifications, setNotifications] = React.useState<any[]>([]);
+  const [notifications, setNotifications] = React.useState<NotificationItem[]>([]);
 
-  const [lastKey, setLastKey] = React.useState<any>(null);
+  const [lastKey, setLastKey] = React.useState<import('firebase/firestore').QueryDocumentSnapshot | null>(null);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
@@ -132,14 +145,14 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
     });
 
     const unsubscribeList = onSnapshot(first, (querySnapshot) => {
-      const notificationList: any[] = [];
+      const notificationList: NotificationItem[] = [];
       querySnapshot.forEach((docSnap) => {
         notificationList.push({
           ...docSnap.data(),
           key: docSnap.id,
-        });
+        } as NotificationItem);
       });
-      setNotifications(notificationList as any);
+      setNotifications(notificationList);
       setLastKey(querySnapshot.docs[querySnapshot.docs.length - 1] || null);
     });
 
@@ -180,7 +193,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
     );
 
-    const nextNotificationList: any[] = [];
+    const nextNotificationList: NotificationItem[] = [];
 
     const nextQuerySnapshot = await getDocs(nextQuery);
 
@@ -196,7 +209,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
         key: docSnap.id,
 
-      });
+      } as NotificationItem);
 
     });
 
@@ -310,7 +323,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
   };
 
-  const handleClickItem = (item: any) => {
+  const handleClickItem = (item: NotificationItem) => {
 
     switch (item.type) {
 
@@ -368,7 +381,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
         nav.push(
 
-          `/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, item['APPLY_JOB']?.resume_slug)}`
+          `/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, (item['APPLY_JOB'] as Record<string, string>)?.resume_slug)}`
 
         );
 
@@ -624,7 +637,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
                             <TimeAgo
 
-                              date={value?.time?.seconds * 1000}
+                              date={(value?.time?.seconds ?? 0) * 1000}
 
                               type="fromNow"
 

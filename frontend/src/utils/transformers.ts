@@ -1,4 +1,5 @@
 import i18n from '../i18n';
+import { Question, QuestionGroup, JobPost, JobPostActivity } from '../types/models';
 
 type AnyRecord = Record<string, any>;
 
@@ -6,12 +7,8 @@ const t = (key: string, options?: Record<string, unknown>) => i18n.t(key, option
 
 /**
  * Transformers Layer: Centralized mapping from Backend API responses to Frontend models.
- *
- * NOTE: Since camelizeKeys is applied in httpRequest's response interceptor,
- * all data arriving here is already in camelCase. The snake_case fallbacks
- * have been removed.
  */
-export const transformQuestion = (q: AnyRecord | null | undefined): AnyRecord | null => {
+export const transformQuestion = (q: AnyRecord | null | undefined): Question | null => {
   if (!q) return null;
 
   const text = q.text || q.questionText || q.content || '';
@@ -22,26 +19,26 @@ export const transformQuestion = (q: AnyRecord | null | undefined): AnyRecord | 
     category: q.category || t('common:labels.uncategorized'),
     questionType: q.questionType || q.type || 'TEXT',
     text,
-  };
+  } as unknown as Question;
 };
 
 export const transformQuestionGroup = (
   group: AnyRecord | null | undefined,
-): AnyRecord | null => {
+): QuestionGroup | null => {
   if (!group) return null;
 
   return {
     id: group.id,
     name: group.name || '',
     description: group.description || '',
-    questions: (group.questions || []).map(transformQuestion),
+    questions: (group.questions || []).map(transformQuestion).filter((q: Question | null): q is Question => !!q),
     ...group,
-  };
+  } as unknown as QuestionGroup;
 };
 
 export const transformInterviewSession = (
   session: AnyRecord | null | undefined,
-): AnyRecord | null => {
+): any | null => {
   if (!session) return null;
 
   const candidateName =
@@ -89,11 +86,11 @@ export const transformInterviewSession = (
     notes: session.notes || '',
     recordingUrl,
     transcriptUrl,
-    questions: (session.questions || []).map(transformQuestion),
+    questions: (session.questions || []).map(transformQuestion).filter((q: Question | null): q is Question => !!q),
   };
 };
 
-export const transformJobPost = (job: AnyRecord | null | undefined): AnyRecord | null => {
+export const transformJobPost = (job: AnyRecord | null | undefined): JobPost | null => {
   if (!job) return null;
 
   return {
@@ -106,12 +103,12 @@ export const transformJobPost = (job: AnyRecord | null | undefined): AnyRecord |
     deadline: job.deadline,
     ...job,
     jobName: job.jobName || job.title || '',
-  };
+  } as unknown as JobPost;
 };
 
 export const transformAppliedResume = (
   resume: AnyRecord | null | undefined,
-): AnyRecord | null => {
+): any | null => {
   if (!resume) return null;
 
   const userId = resume.userId || resume.user?.id;

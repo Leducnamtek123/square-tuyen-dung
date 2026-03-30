@@ -21,6 +21,7 @@ export interface User {
   isVerifyEmail?: boolean;
   workspaces?: Workspace[];
   canAccessEmployerPortal?: boolean;
+  isActive?: boolean;
 }
 
 export interface Workspace {
@@ -54,6 +55,16 @@ export interface Company {
   fieldOperation?: string | null;
   followersCount?: number;
   jobPostsCount?: number;
+  taxCode?: string;
+  // Admin specific or alternate fields
+  companyImageUrl?: string | null;
+  jobPostNumber?: number;
+  followNumber?: number;
+  locationDict?: {
+    city?: string;
+    district?: string;
+    address?: string;
+  };
 }
 
 export interface CompanyImage {
@@ -112,6 +123,9 @@ export interface JobPost {
   company?: Company | null;
   location?: Location | null;
   createAt?: string;
+  isExpired?: boolean;
+  isVerify?: boolean;
+  appliedNumber?: number;
 }
 
 export interface JobPostActivity {
@@ -153,6 +167,26 @@ export interface Resume {
   city?: City | null;
   career?: Career | null;
   createAt?: string;
+  updateAt?: string;
+  isSaved?: boolean;
+  viewEmployerNumber?: number;
+  lastViewedDate?: string | null;
+  userDict?: {
+    fullName?: string;
+    avatarUrl?: string;
+    email?: string;
+  };
+  jobSeekerProfileDict?: Record<string, unknown> & { old?: string | number };
+  // Search-related fields
+  searchScore?: number;
+  isFeatured?: boolean;
+}
+
+export interface ResumeSaved {
+  id: number;
+  resume: Resume;
+  createAt: string;
+  [key: string]: unknown;
 }
 
 export interface JobSeekerProfile {
@@ -210,18 +244,33 @@ export interface Career {
   name: string;
   slug?: string;
   iconUrl?: string | null;
+  appIconName?: string;
+  app_icon_name?: string;
+  isHot?: boolean;
+  is_hot?: boolean;
+  jobPostTotal?: number;
+  job_post_total?: number;
 }
 
 export interface City {
   id: number;
   name: string;
   slug?: string;
+  code?: string;
 }
 
 export interface District {
   id: number;
   name: string;
-  city?: City;
+  code?: string;
+  city?: number | string | City;
+}
+
+export interface Ward {
+  id: number;
+  name: string;
+  code?: string;
+  district: number;
 }
 
 export interface Location {
@@ -260,6 +309,7 @@ export interface InterviewSession {
   status: string;
   type: string;
   scheduledAt?: string | null;
+  scheduled_at?: string | null;
   startTime?: string | null;
   endTime?: string | null;
   duration?: number | null;
@@ -268,22 +318,45 @@ export interface InterviewSession {
   jobName?: string | null;
   candidateName?: string | null;
   candidateEmail?: string | null;
+  candidate_email?: string | null;
   companyName?: string | null;
   createdBy?: User | null;
   aiOverallScore?: number | null;
+  ai_overall_score?: number | null;
+  aiTechnicalScore?: number | null;
+  ai_technical_score?: number | null;
+  aiCommunicationScore?: number | null;
+  ai_communication_score?: number | null;
   aiSummary?: string | null;
-  aiStrengths?: string[] | null;
-  aiWeaknesses?: string[] | null;
+  ai_summary?: string | null;
+  aiStrengths?: string[] | string | null;
+  ai_strengths?: string[] | string | null;
+  aiWeaknesses?: string[] | string | null;
+  ai_weaknesses?: string[] | string | null;
+  aiDetailedFeedback?: any;
+  ai_detailed_feedback?: any;
+  recordingUrl?: string | null;
+  recording_url?: string | null;
+  evaluations?: InterviewEvaluation[];
+  questions?: Question[];
+  questionGroup?: number | string | QuestionGroup | null;
+  question_group?: number | string | QuestionGroup | null;
+  transcripts?: any[];
 }
 
 export interface InterviewEvaluation {
   id: number;
   attitudeScore?: number | null;
+  attitude_score?: number | null;
   professionalScore?: number | null;
+  professional_score?: number | null;
   overallScore?: number | null;
+  overall_score?: number | null;
   result: 'passed' | 'failed' | 'pending';
   comments?: string | null;
   proposedSalary?: number | null;
+  proposed_salary?: number | null;
+  interview?: number | InterviewSession;
 }
 
 /* Misc */
@@ -298,11 +371,39 @@ export interface Notification {
   createAt?: string;
 }
 
+/* Chat */
+
+export interface ChatConversation {
+  id: number;
+  jobSeekerId: number;
+  jobSeekerName: string;
+  jobSeekerAvatar?: string;
+  jobSeekerEmail?: string;
+  employerId?: number;
+  companyId?: number;
+  employerName?: string;
+  companyName?: string;
+  employerLogo?: string;
+  lastMessage?: string | { content: string };
+  isActive?: boolean;
+  createAt?: string;
+  jobSeeker?: { fullName: string };
+  employer?: { companyName: string };
+}
+
 export interface Feedback {
   id: number;
   content: string;
   rating: number;
+  isActive?: boolean;
+  is_active?: boolean;
   createAt?: string;
+  create_at?: string;
+  userDict?: {
+    fullName?: string;
+    avatarUrl?: string;
+    email?: string;
+  };
 }
 
 export interface Banner {
@@ -310,6 +411,14 @@ export interface Banner {
   imageUrl: string;
   description?: string;
   bannerType: number;
+  imageMobileUrl?: string;
+  button_text?: string;
+  button_link?: string;
+  is_show_button?: boolean;
+  is_active?: boolean;
+  platform?: string;
+  type?: number;
+  description_location?: number;
 }
 
 export interface SelectOption {

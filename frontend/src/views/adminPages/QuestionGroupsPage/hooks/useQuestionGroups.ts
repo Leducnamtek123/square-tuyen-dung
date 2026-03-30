@@ -1,9 +1,17 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
 import { QuestionGroup } from '../../../../types/models';
+import { PaginatedResponse } from '../../../../types/api';
 
-export const useQuestionGroups = (params?: Record<string, unknown>) => {
+export type UseQuestionGroupsResult = UseQueryResult<PaginatedResponse<QuestionGroup>> & {
+    createQuestionGroup: (data: Partial<QuestionGroup> | Record<string, unknown>) => Promise<QuestionGroup>;
+    updateQuestionGroup: (args: { id: string | number; data: Partial<QuestionGroup> | Record<string, unknown> }) => Promise<QuestionGroup>;
+    deleteQuestionGroup: (id: string | number) => Promise<void>;
+    isMutating: boolean;
+};
+
+export const useQuestionGroups = (params?: Record<string, unknown>): UseQuestionGroupsResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -58,5 +66,5 @@ export const useQuestionGroups = (params?: Record<string, unknown>) => {
         updateQuestionGroup: updateMutation.mutateAsync,
         deleteQuestionGroup: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    };
+    } as UseQuestionGroupsResult;
 };

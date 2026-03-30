@@ -19,6 +19,8 @@ import companyImageService from '../../../../services/companyImageService';
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
 import { compressImageFiles } from '../../../../utils/imageCompression';
 import ImageCropDialog from '../../../../components/Common/ImageCropDialog';
+import type { AxiosError } from 'axios';
+import type { ApiError } from '../../../../types/api';
 
 interface FileItem {
   uid: number | string;
@@ -59,13 +61,13 @@ const CompanyImageCard = () => {
 
       try {
 
-        const resData = await companyImageService.getCompanyImages() as any;
+        const resData = await companyImageService.getCompanyImages() as unknown as { results: { id: number | string; imageUrl: string }[] };
 
         const data = resData;
 
         const results = data.results;
 
-        const newResults = results.map((item: any) => ({
+        const newResults = results.map((item) => ({
 
           uid: item.id,
 
@@ -105,11 +107,11 @@ const CompanyImageCard = () => {
 
     try {
 
-      const resData = await companyImageService.addCompanyImage(formData) as any;
+      const resData = await companyImageService.addCompanyImage(formData) as unknown as { id: number | string; imageUrl: string }[];
 
       const results = resData;
 
-      const newResults = results.map((item: any) => ({
+      const newResults = results.map((item) => ({
 
         uid: item.id,
 
@@ -121,9 +123,9 @@ const CompanyImageCard = () => {
 
       toastMessages.success(t('companyImage.uploadSuccess'));
 
-    } catch (error: any) {
+    } catch (error) {
 
-      errorHandling(error);
+      errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
     } finally {
 
@@ -147,9 +149,9 @@ const CompanyImageCard = () => {
 
         toastMessages.success(t('companyImage.deleteSuccess'));
 
-      } catch (error: any) {
+      } catch (error) {
 
-        errorHandling(error);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 

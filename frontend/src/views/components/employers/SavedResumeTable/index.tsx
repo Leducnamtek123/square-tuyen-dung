@@ -6,7 +6,7 @@ import dayjs from 'dayjs';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
-import { ColumnDef, PaginationState, SortingState } from '@tanstack/react-table';
+import { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
 
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
 import DataTable from '../../../../components/Common/DataTable';
@@ -15,38 +15,21 @@ import { faFile, faFilePdf } from '@fortawesome/free-regular-svg-icons';
 import { formatRoute } from '../../../../utils/funcUtils';
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
-
-export type SavedResumeRow = {
-  resume: {
-    title?: string;
-    type?: string | number;
-    salaryMin?: number;
-    salaryMax?: number;
-    experience?: string | number;
-    city?: string | number;
-    slug?: string;
-    userDict?: {
-      fullName?: string;
-    };
-    [key: string]: unknown;
-  };
-  createAt?: string;
-  [key: string]: unknown;
-};
+import { ResumeSaved } from '@/types/models';
 
 interface SavedResumeTableProps {
-  rows: SavedResumeRow[];
+  rows: ResumeSaved[];
   isLoading: boolean;
   handleUnsave: (slug: string) => void;
   rowCount: number;
   pagination: PaginationState;
-  onPaginationChange: import('@tanstack/react-table').OnChangeFn<PaginationState>;
+  onPaginationChange: OnChangeFn<PaginationState>;
   sorting: SortingState;
-  onSortingChange: import('@tanstack/react-table').OnChangeFn<SortingState>;
+  onSortingChange: OnChangeFn<SortingState>;
 }
 
 const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
-  const { t } = useTranslation('employer');
+  const { t } = useTranslation(['employer', 'common']);
   const nav = useRouter();
   const { 
     rows, 
@@ -60,26 +43,26 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
   } = props;
   const { allConfig } = useConfig();
 
-  const columns = React.useMemo<ColumnDef<SavedResumeRow>[]>(() => [
+  const columns = React.useMemo<ColumnDef<ResumeSaved>[]>(() => [
     {
       accessorKey: 'resume.title',
-      header: (t('savedResumeTable.label.resumeTitle') || 'Resume') as string,
+      header: (t('employer:savedResumeTable.label.resumeTitle') || 'Resume') as string,
       enableSorting: true,
       cell: (info) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {info.row.original.resume?.type === CV_TYPES.cvWebsite ? (
-            <Tooltip title={t('savedResumeTable.title.onlineresume')} arrow>
+            <Tooltip title={t('employer:savedResumeTable.title.onlineresume')} arrow>
               <FontAwesomeIcon icon={faFile} color="#441da0" size="xs" />
             </Tooltip>
           ) : (
-            <Tooltip title={t('savedResumeTable.title.attachedresume')} arrow>
+            <Tooltip title={t('employer:savedResumeTable.title.attachedresume')} arrow>
               <FontAwesomeIcon icon={faFilePdf} color="red" size="xs" />
             </Tooltip>
           )}
           <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
             {info.getValue() as string || (
               <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>
-                {t('common.notUpdated')}
+                {t('common:notUpdated')}
               </span>
             )}
           </Typography>
@@ -88,43 +71,43 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
     },
     {
       accessorKey: 'resume.userDict.fullName',
-      header: (t('savedResumeTable.label.candidateName') || 'Candidate') as string,
+      header: (t('employer:savedResumeTable.label.candidateName') || 'Candidate') as string,
       enableSorting: true,
     },
     {
       id: 'salary',
-      header: (t('savedResumeTable.label.salary') || 'Salary') as string,
+      header: (t('employer:savedResumeTable.label.salary') || 'Salary') as string,
       cell: (info) => salaryString(info.row.original.resume?.salaryMin, info.row.original.resume?.salaryMax) || (
-        <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common.notUpdated')}</span>
+        <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common:notUpdated')}</span>
       ),
     },
     {
       accessorKey: 'resume.experience',
-      header: (t('savedResumeTable.label.experience') || 'Experience') as string,
+      header: (t('employer:savedResumeTable.label.experience') || 'Experience') as string,
       cell: (info) => tConfig(allConfig?.experienceDict?.[info.getValue() as number]) || (
-        <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common.notUpdated')}</span>
+        <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common:notUpdated')}</span>
       ),
     },
     {
       accessorKey: 'resume.city',
-      header: (t('savedResumeTable.label.cityProvince') || 'Location') as string,
+      header: (t('employer:savedResumeTable.label.cityProvince') || 'Location') as string,
       cell: (info) => tConfig(allConfig?.cityDict?.[info.getValue() as number]) || (
-        <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common.notUpdated')}</span>
+        <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common:notUpdated')}</span>
       ),
     },
     {
       accessorKey: 'createAt',
-      header: (t('savedResumeTable.label.savedDate') || 'Saved At') as string,
+      header: (t('employer:savedResumeTable.label.savedDate') || 'Saved At') as string,
       enableSorting: true,
       cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
     },
     {
       id: 'actions',
-      header: (t('savedResumeTable.label.actions') || 'Actions') as string,
+      header: (t('employer:savedResumeTable.label.actions') || 'Actions') as string,
       meta: { align: 'right' },
       cell: (info) => (
         <Stack direction="row" spacing={1} justifyContent="flex-end">
-          <Tooltip title={t('savedResumeTable.title.viewprofile')} arrow>
+          <Tooltip title={t('employer:savedResumeTable.title.viewprofile')} arrow>
             <IconButton
               size="small"
               onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resume?.slug || '')}`)}
@@ -140,7 +123,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
             startIcon={<FavoriteIcon fontSize="small" />}
             onClick={() => handleUnsave(info.row.original.resume?.slug || '')}
           >
-            {t('savedResumeTable.label.unsave')}
+            {t('employer:savedResumeTable.label.unsave')}
           </Button>
         </Stack>
       ),
@@ -148,7 +131,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
   ], [allConfig, handleUnsave, nav, t]);
 
   return (
-      <DataTable
+    <DataTable
       columns={columns}
       data={rows}
       isLoading={isLoading}
@@ -158,7 +141,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
       enableSorting
       sorting={sorting}
       onSortingChange={onSortingChange}
-      emptyMessage={t('savedResumeTable.title.youhaventsavedanycandidatesyet')}
+      emptyMessage={t('employer:savedResumeTable.title.youhaventsavedanycandidatesyet')}
     />
   );
 };

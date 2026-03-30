@@ -22,8 +22,16 @@ import { visuallyHidden } from '@mui/utils';
 
 import { Skeleton, Stack } from "@mui/material";
 
+interface HeadCell {
+  id: string;
+  label: string;
+  numeric?: boolean;
+  disablePadding?: boolean;
+  showOrder?: boolean;
+}
+
 interface EnhancedTableHeadProps {
-  headCells: any[];
+  headCells: HeadCell[];
   order: 'asc' | 'desc';
   orderBy: string;
   onRequestSort?: (event: React.MouseEvent<unknown>, property: string) => void;
@@ -47,7 +55,7 @@ function EnhancedTableHead({ headCells = [], order, orderBy, onRequestSort }: En
 
       <TableRow>
 
-        {headCells.map((headCell: any) => (
+        {headCells.map((headCell: HeadCell) => (
 
           <TableCell
 
@@ -120,8 +128,8 @@ EnhancedTableHead.propTypes = {
 };
 
 interface DataTableCustomProps {
-  headCells?: any[];
-  rows?: any[];
+  headCells?: HeadCell[];
+  rows?: Record<string, unknown>[];
   order?: 'asc' | 'desc';
   orderBy?: string;
   page?: number;
@@ -130,8 +138,8 @@ interface DataTableCustomProps {
   handleRequestSort?: (event: React.MouseEvent<unknown>, property: string) => void;
   handleChangePage?: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
   handleChangeRowsPerPage?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  handleDelete?: (id: any) => void;
-  handleUpdate?: (id: any) => void;
+  handleDelete?: (id: string | number) => void;
+  handleUpdate?: (id: string | number) => void;
   children?: React.ReactNode;
 }
 

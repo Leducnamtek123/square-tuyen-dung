@@ -1,21 +1,21 @@
-import React, { useState } from 'react';
-import { Box, Card, CardHeader, CardContent, Typography, Dialog, DialogTitle, DialogContent, DialogActions, Button, Divider, TextField } from "@mui/material";
+import React, { useState, useMemo } from 'react';
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Tooltip, IconButton, Stack, Chip, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
+import { useJobs } from './hooks/useJobs';
 import { useDataTable } from '../../../hooks';
-
-import { useJobs, useApproveJob, useRejectJob, useUpdateJob, useDeleteJob } from './hooks/useJobs';
-import JobTable from './components/JobTable';
-import JobFilters from './components/JobFilters';
-import dayjs from '../../../configs/moment-config';
 import { JobPost } from '../../../types/models';
-import { PaginatedResponse } from '../../../types/api';
-
-type JobPostExt = JobPost & {
-  companyDict?: { companyName?: string };
-};
+import dayjs from '../../../configs/dayjs-config';
 
 const JobsPage = () => {
     const { t } = useTranslation('admin');
+    
     const {
         page,
         pageSize,
@@ -23,181 +23,220 @@ const JobsPage = () => {
         onSortingChange,
         ordering,
         pagination,
-        onPaginationChange,
-        rowSelection,
-        onRowSelectionChange,
-        searchTerm,
-        onSearchChange,
-    } = useDataTable();
-    
-    const [selectedJob, setSelectedJob] = useState<JobPostExt | null>(null);
-    const [openDetail, setOpenDetail] = useState(false);
-    const [openEdit, setOpenEdit] = useState(false);
-    const [editJob, setEditJob] = useState({ jobName: '', deadline: '' });
+        onPaginationChange
+    } = useDataTable({ initialPageSize: 10 });
 
-    const { data: jobsData, isLoading } = useJobs({
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const {
+        data,
+        isLoading,
+        updateJob,
+        deleteJob,
+        isMutating
+    } = useJobs({
         page: page + 1,
-        pageSize: pageSize,
-        search: searchTerm,
-        ordering,
+        pageSize,
+        kw: searchTerm,
+        ordering
     });
 
-    const approveMutation = useApproveJob();
-    const rejectMutation = useRejectJob();
-    const updateMutation = useUpdateJob();
-    const deleteMutation = useDeleteJob();
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [currentJob, setCurrentJob] = useState<JobPost | null>(null);
 
-    const handleSearchChange = (value: string) => {
-        onSearchChange(value);
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+        onPaginationChange({ pageIndex: 0, pageSize: pageSize });
     };
 
-    const handleViewDetail = (job: JobPostExt) => {
-        setSelectedJob(job);
-        setOpenDetail(true);
-    };
-
-    const handleEdit = (job: JobPostExt) => {
-        setSelectedJob(job);
-        setEditJob({ jobName: String(job.jobName || ''), deadline: String(job.deadline || '') });
-        setOpenEdit(true);
-    };
-
-    const handleSaveEdit = () => {
-        if (!selectedJob?.id) return;
-        updateMutation.mutate({ id: selectedJob.id, data: editJob }, {
-            onSuccess: () => setOpenEdit(false)
-        });
-    };
-
-    const handleDelete = (id: number | string) => {
-        if (window.confirm(t('pages.jobs.deleteConfirm'))) {
-            deleteMutation.mutate(id);
+    const handleVerifyJob = async (id: string | number, isVerify: boolean) => {
+        try {
+            await updateJob({
+                id,
+                data: { isVerify }
+            });
+        } catch (error) {
+            console.error(error);
         }
     };
 
+    const handleOpenDelete = (job: JobPost) => {
+        setCurrentJob(job);
+        setOpenDeleteDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDeleteDialog(false);
+    };
+
+    const handleDelete = async () => {
+        if (!currentJob) return;
+        try {
+            await deleteJob(currentJob.id);
+            handleCloseDialog();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const getStatusLabel = (status: JobPost['status']) => {
+        const s = Number(status);
+        switch (s) {
+            case 1: return <Chip label={t('pages.jobs.status.draft')} size="small" variant="outlined" />;
+            case 2: return <Chip label={t('pages.jobs.status.active')} size="small" color="success" />;
+            case 3: return <Chip label={t('pages.jobs.status.expired')} size="small" color="error" />;
+            default: return <Chip label={t('pages.jobs.status.unknown')} size="small" />;
+        }
+    };
+
+    const columns = useMemo<ColumnDef<JobPost>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: 'ID',
+            enableSorting: true,
+        },
+        {
+            accessorKey: 'jobName',
+            header: t('pages.jobs.table.title') as string,
+            enableSorting: true,
+            cell: (info) => (
+                <Box>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                        {info.getValue() as string}
+                    </Typography>
+                    <Typography variant="caption" color="textSecondary">
+                        {info.row.original.company?.companyName || '—'}
+                    </Typography>
+                </Box>
+            ),
+        },
+        {
+            accessorKey: 'status',
+            header: t('pages.jobs.table.status') as string,
+            cell: (info) => getStatusLabel(info.getValue() as JobPost['status']),
+        },
+        {
+            accessorKey: 'isVerify',
+            header: t('pages.jobs.table.verified') as string,
+            cell: (info) => (
+                <Chip 
+                    label={info.getValue() ? t('pages.jobs.verified.yes') : t('pages.jobs.verified.no')} 
+                    size="small" 
+                    variant={info.getValue() ? 'filled' : 'outlined'}
+                    color={info.getValue() ? 'primary' : 'default'}
+                />
+            ),
+        },
+        {
+            accessorKey: 'createAt',
+            header: t('pages.jobs.table.createdAt') as string,
+            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—',
+        },
+        {
+            id: 'actions',
+            header: t('pages.jobs.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => {
+                const job = info.row.original;
+                return (
+                    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                        <Tooltip title={t('pages.jobs.table.view')}>
+                             <IconButton size="small" component="a" href={`/jobs/${job.slug}`} target="_blank" color="info">
+                                <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                        {job.isVerify ? (
+                            <Tooltip title={t('pages.jobs.table.unverify')}>
+                                <IconButton size="small" onClick={() => handleVerifyJob(job.id, false)} color="warning">
+                                    <CancelIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        ) : (
+                            <Tooltip title={t('pages.jobs.table.verify')}>
+                                <IconButton size="small" onClick={() => handleVerifyJob(job.id, true)} color="success">
+                                    <CheckCircleIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+                        <Tooltip title={t('pages.jobs.table.delete')}>
+                            <IconButton size="small" onClick={() => handleOpenDelete(job)} color="error">
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    </Stack>
+                );
+            },
+        },
+    ], [t]);
+
     return (
         <Box>
-            <JobFilters searchTerm={searchTerm} onSearchChange={handleSearchChange} />
-            <Card>
-                <CardHeader
-                    title={`${t('pages.jobs.title')} (${(jobsData as unknown as PaginatedResponse<JobPost>)?.count || 0} ${t('pages.jobs.total')})`}
-                />
-                <CardContent>
-                    {Object.keys(rowSelection).length > 0 && (
-                        <Box sx={{ mb: 2, p: 2, bgcolor: 'primary.light', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Typography variant="subtitle2" color="primary.contrastText">
-                                {t('pages.jobs.bulkSelect.selectedCount', { count: Object.keys(rowSelection).length })}
-                            </Typography>
-                            <Button 
-                                variant="contained" 
-                                color="error" 
-                                size="small"
-                                onClick={() => {
-                                    if (window.confirm(t('pages.jobs.bulkSelect.deleteConfirm'))) {
-                                        // Handle bulk delete here
-                                        console.log('Bulk delete jobs:', Object.keys(rowSelection));
-                                    }
-                                }}
-                            >
-                                {t('pages.jobs.bulkSelect.deleteBtn')}
-                            </Button>
-                        </Box>
-                    )}
-                    <JobTable
-                        jobs={(jobsData as unknown as PaginatedResponse<JobPost>)?.results || []}
-                        loading={isLoading}
-                        pagination={pagination}
-                        onPaginationChange={onPaginationChange}
-                        sorting={sorting}
-                        onSortingChange={onSortingChange}
-                        rowSelection={rowSelection}
-                        onRowSelectionChange={onRowSelectionChange}
-                        onView={handleViewDetail}
-                        onEdit={handleEdit}
-                        onApprove={(id) => approveMutation.mutate(id)}
-                        onReject={(id) => rejectMutation.mutate(id)}
-                        onDelete={handleDelete}
-                    />
-                </CardContent>
-            </Card>
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+                        {t('pages.jobs.title')}
+                    </Typography>
+                    <Breadcrumbs aria-label="breadcrumb">
+                        <Link underline="hover" color="inherit" href="/admin">
+                            {t('pages.jobs.breadcrumbAdmin')}
+                        </Link>
+                        <Typography color="text.primary">{t('pages.jobs.breadcrumbListings')}</Typography>
+                        <Typography color="text.primary">{t('pages.jobs.breadcrumbJobs')}</Typography>
+                    </Breadcrumbs>
+                </Box>
+            </Box>
 
-            {/* Job Detail Dialog */}
-            <Dialog open={openDetail} onClose={() => setOpenDetail(false)} maxWidth="md" fullWidth>
-                <DialogTitle sx={{ fontWeight: 'bold' }}>{t('pages.jobs.detailTitle')}</DialogTitle>
-                <DialogContent dividers>
-                    {selectedJob && (
-                        <Box>
-                            <Typography variant="h6" color="primary" gutterBottom>
-                                {selectedJob.jobName}
-                            </Typography>
-                            <Typography variant="subtitle1" gutterBottom>
-                                {t('pages.jobs.company')}: {selectedJob.companyDict?.companyName}
-                            </Typography>
-                            <Divider sx={{ my: 2 }} />
-                            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2 }}>
-                                <Box>
-                                    <Typography variant="caption" color="textSecondary">{t('pages.jobs.salary')}</Typography>
-                                    <Typography variant="body2">
-                                        {selectedJob.salaryMin?.toLocaleString()} - {selectedJob.salaryMax?.toLocaleString()} VND
-                                    </Typography>
-                                </Box>
-                                <Box>
-                                    <Typography variant="caption" color="textSecondary">{t('pages.jobs.quantity')}</Typography>
-                                    <Typography variant="body2">{selectedJob.quantity} {t('pages.jobs.people')}</Typography>
-                                </Box>
-                                <Box>
-                                    <Typography variant="caption" color="textSecondary">{t('pages.jobs.experience')}</Typography>
-                                    <Typography variant="body2">{selectedJob.experience} {t('pages.jobs.years')}</Typography>
-                                </Box>
-                                <Box>
-                                    <Typography variant="caption" color="textSecondary">{t('pages.jobs.academicLevel')}</Typography>
-                                    <Typography variant="body2">{selectedJob.academicLevel}</Typography>
-                                </Box>
-                            </Box>
-                            <Divider sx={{ my: 2 }} />
-                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>{t('pages.jobs.jobDescription')}</Typography>
-                            <Box dangerouslySetInnerHTML={{ __html: String(selectedJob.jobDescription) }} sx={{ fontSize: '0.875rem' }} />
-                            <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mt: 2, mb: 1 }}>{t('pages.jobs.jobRequirements')}</Typography>
-                            <Box dangerouslySetInnerHTML={{ __html: String(selectedJob.jobRequirement) }} sx={{ fontSize: '0.875rem' }} />
-                        </Box>
-                    )}
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenDetail(false)}>{t('pages.jobs.close')}</Button>
-                    {selectedJob?.status === 1 && (
-                        <>
-                            <Button onClick={() => { rejectMutation.mutate(selectedJob.id); setOpenDetail(false); }} color="error">{t('pages.jobs.reject')}</Button>
-                            <Button onClick={() => { approveMutation.mutate(selectedJob.id); setOpenDetail(false); }} variant="contained" color="success">{t('pages.jobs.approve')}</Button>
-                        </>
-                    )}
-                </DialogActions>
-            </Dialog>
-
-            {/* Edit Job Dialog */}
-            <Dialog open={openEdit} onClose={() => setOpenEdit(false)} maxWidth="sm" fullWidth>
-                <DialogTitle sx={{ fontWeight: 'bold' }}>{t('pages.jobs.editTitle')}</DialogTitle>
-                <DialogContent dividers>
+            <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
+                <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
-                        fullWidth
-                        label={t('pages.jobs.jobTitleLabel')}
-                        value={editJob.jobName}
-                        onChange={(e) => setEditJob({ ...editJob, jobName: e.target.value })}
-                        sx={{ mb: 2 }}
-                    />
-                    <TextField
-                        fullWidth
-                        label={t('pages.jobs.deadlineLabel')}
-                        type="date"
-                        value={editJob.deadline ? dayjs(editJob.deadline).format('YYYY-MM-DD') : ''}
-                        onChange={(e) => setEditJob({ ...editJob, deadline: e.target.value })}
+                        size="small"
+                        placeholder={t('pages.jobs.searchPlaceholder')}
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        sx={{ width: 400 }}
                         slotProps={{
-                            inputLabel: { shrink: true }
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon fontSize="small" color="action" />
+                                    </InputAdornment>
+                                ),
+                            }
                         }}
                     />
+                </Box>
+
+                <DataTable
+                    columns={columns}
+                    data={data?.results || []}
+                    isLoading={isLoading}
+                    rowCount={data?.count || 0}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    enableSorting
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
+                />
+            </Paper>
+
+            {/* Delete Confirmation */}
+            <Dialog open={openDeleteDialog} onClose={handleCloseDialog}>
+                <DialogTitle>{t('pages.jobs.deleteTitle')}</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        {t('pages.jobs.deleteConfirm', { name: currentJob?.jobName })}
+                    </Typography>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setOpenEdit(false)}>{t('pages.jobs.cancel')}</Button>
-                    <Button onClick={handleSaveEdit} variant="contained">{t('pages.jobs.save')}</Button>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.jobs.cancel')}</Button>
+                    <Button
+                        onClick={handleDelete}
+                        color="error"
+                        variant="contained"
+                        disabled={isMutating}
+                    >
+                        {isMutating ? t('common.deleting') : t('common.delete')}
+                    </Button>
                 </DialogActions>
             </Dialog>
         </Box>

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Box, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Avatar, Chip, Tooltip, IconButton } from "@mui/material";
+import React, { useState, useRef } from 'react';
+import { Box, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Avatar, Chip, Tooltip, IconButton, Stack, Breadcrumbs, Link } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from "@mui/material";
 import { ColumnDef } from '@tanstack/react-table';
@@ -8,10 +8,23 @@ import { useDataTable } from '../../../hooks';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
-
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { useCompanies } from './hooks/useCompanies';
+import { Company } from '../../../types/models';
+import { IMAGES } from '../../../configs/constants';
+
+interface CompanyFormData {
+    companyName: string;
+    taxCode: string;
+    companyEmail: string;
+    companyPhone: string;
+    employeeSize: number;
+    fieldOperation: string;
+    websiteUrl: string;
+    description: string;
+}
 
 const CompaniesPage = () => {
     const { t } = useTranslation('admin');
@@ -39,12 +52,13 @@ const CompaniesPage = () => {
         pageSize: pageSize,
         kw: searchTerm,
         ordering,
-    }) as any;
+    });
 
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-    const [currentCompany, setCurrentCompany] = useState<any>(null);
-    const [formData, setFormData] = useState({
+    const [currentCompany, setCurrentCompany] = useState<Company | null>(null);
+    
+    const [formData, setFormData] = useState<CompanyFormData>({
         companyName: '',
         taxCode: '',
         companyEmail: '',
@@ -52,7 +66,12 @@ const CompaniesPage = () => {
         employeeSize: 0,
         fieldOperation: '',
         websiteUrl: '',
+        description: '',
     });
+
+    const [logoFile, setLogoFile] = useState<File | null>(null);
+    const [logoPreview, setLogoPreview] = useState<string>('');
+    const logoInputRef = useRef<HTMLInputElement>(null);
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -70,12 +89,15 @@ const CompaniesPage = () => {
             employeeSize: 50,
             fieldOperation: '',
             websiteUrl: '',
+            description: '',
         });
+        setLogoFile(null);
+        setLogoPreview('');
         setCurrentCompany(null);
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (company: any) => {
+    const handleOpenEdit = (company: Company) => {
         setDialogMode('edit');
         setCurrentCompany(company);
         setFormData({
@@ -86,11 +108,14 @@ const CompaniesPage = () => {
             employeeSize: company.employeeSize || 0,
             fieldOperation: company.fieldOperation || '',
             websiteUrl: company.websiteUrl || '',
+            description: company.description || '',
         });
+        setLogoFile(null);
+        setLogoPreview(company.companyImageUrl || '');
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (company: any) => {
+    const handleOpenDelete = (company: Company) => {
         setCurrentCompany(company);
         setOpenDeleteDialog(true);
     };
@@ -101,26 +126,43 @@ const CompaniesPage = () => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData(prev => ({ ...prev, [name]: name === 'employeeSize' ? Number(value) : value }));
+    };
+
+    const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setLogoFile(file);
+            setLogoPreview(URL.createObjectURL(file));
+        }
     };
 
     const handleSave = async () => {
+        const dataToSend = new FormData();
+        Object.entries(formData).forEach(([key, value]) => {
+            dataToSend.append(key, String(value));
+        });
+        
+        if (logoFile) {
+            dataToSend.append('companyImageFile', logoFile);
+        }
+
+        // Add default location for new companies if needed by API
+        if (dialogMode === 'add') {
+             // If API requires a flat location object or ID
+             dataToSend.append('cityId', '1'); 
+             dataToSend.append('districtId', '1');
+             dataToSend.append('wardId', '1');
+             dataToSend.append('address', 'N/A');
+        }
+
         try {
             if (dialogMode === 'add') {
-                const dataToSave = {
-                    ...formData,
-                    location: {
-                        city: 1,
-                        district: 1,
-                        address: 'N/A'
-                    },
-                    since: '2023-01-01'
-                };
-                await createCompany(dataToSave);
-            } else {
+                await createCompany(dataToSend);
+            } else if (currentCompany) {
                 await updateCompany({
                     id: currentCompany.id,
-                    data: formData
+                    data: dataToSend
                 });
             }
             handleCloseDialog();
@@ -130,6 +172,7 @@ const CompaniesPage = () => {
     };
 
     const handleDelete = async () => {
+        if (!currentCompany) return;
         try {
             await deleteCompany(currentCompany.id);
             setOpenDeleteDialog(false);
@@ -138,15 +181,15 @@ const CompaniesPage = () => {
         }
     };
 
-    const columns = React.useMemo<ColumnDef<any>[]>(() => [
+    const columns = React.useMemo<ColumnDef<Company>[]>(() => [
         {
             accessorKey: 'companyImageUrl',
             header: t('pages.companies.table.logo') as string,
             cell: (info) => (
                 <Avatar
-                    src={info.getValue() as string}
+                    src={info.getValue() as string || IMAGES.companyLogoDefault}
                     variant="rounded"
-                    sx={{ width: 48, height: 48, border: '1px solid', borderColor: 'divider' }}
+                    sx={{ width: 48, height: 48, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}
                 />
             ),
         },
@@ -160,7 +203,7 @@ const CompaniesPage = () => {
                         {info.getValue() as string}
                     </Typography>
                     <Typography variant="caption" color="text.secondary">
-                        Slug: {info.row.original.slug}
+                         {info.row.original.taxCode || '—'}
                     </Typography>
                 </Box>
             ),
@@ -180,7 +223,7 @@ const CompaniesPage = () => {
         {
             accessorKey: 'locationDict.city',
             header: t('pages.companies.table.location') as string,
-            cell: (info) => info.getValue() || '---',
+            cell: (info) => info.getValue() as string || '---',
         },
         {
             accessorKey: 'jobPostNumber',
@@ -201,7 +244,7 @@ const CompaniesPage = () => {
             cell: (info) => (
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
                     <Tooltip title={t('pages.companies.table.viewDetails')}>
-                        <IconButton size="small">
+                        <IconButton size="small" component="a" href={`/companies/${info.row.original.slug}`} target="_blank">
                             <VisibilityIcon fontSize="small" />
                         </IconButton>
                     </Tooltip>
@@ -222,7 +265,16 @@ const CompaniesPage = () => {
 
     return (
         <Box>
-            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+                        {t('pages.companies.title')}
+                    </Typography>
+                    <Breadcrumbs>
+                        <Link underline="hover" color="inherit" href="/admin">{t('pages.companies.breadcrumbAdmin')}</Link>
+                        <Typography color="text.primary">{t('pages.companies.breadcrumbList')}</Typography>
+                    </Breadcrumbs>
+                </Box>
                 <Button
                     variant="contained"
                     startIcon={<AddIcon />}
@@ -232,6 +284,7 @@ const CompaniesPage = () => {
                     {t('pages.companies.addCompany')}
                 </Button>
             </Box>
+
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
@@ -252,12 +305,11 @@ const CompaniesPage = () => {
                     />
                 </Box>
 
-
                 <DataTable
                     columns={columns}
-                    data={((data as any)?.results || data) as any[]}
+                    data={data?.results || []}
                     isLoading={isLoading}
-                    rowCount={(data as any)?.count || 0}
+                    rowCount={data?.count || 0}
                     pagination={pagination}
                     onPaginationChange={onPaginationChange}
                     enableSorting
@@ -265,13 +317,39 @@ const CompaniesPage = () => {
                     onSortingChange={onSortingChange}
                 />
             </Paper>
+
             {/* Add/Edit Dialog */}
-            <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-                <DialogTitle>
+            <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="md">
+                <DialogTitle sx={{ fontWeight: 700 }}>
                     {dialogMode === 'add' ? t('pages.companies.addConfirmTitle') : t('pages.companies.editConfirmTitle')}
                 </DialogTitle>
                 <DialogContent>
-                    <Grid container spacing={2} sx={{ pt: 1 }}>
+                    <Grid container spacing={3} sx={{ pt: 1 }}>
+                        <Grid size={12} sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                             <Box sx={{ position: 'relative' }}>
+                                <Avatar 
+                                    src={logoPreview || IMAGES.companyLogoDefault} 
+                                    sx={{ width: 100, height: 100, border: '2px solid', borderColor: 'primary.main', borderRadius: '12px' }}
+                                    variant="rounded"
+                                />
+                                <IconButton 
+                                    component="label"
+                                    sx={{ 
+                                        position: 'absolute', 
+                                        bottom: -10, 
+                                        right: -10, 
+                                        bgcolor: 'primary.main', 
+                                        color: 'white',
+                                        '&:hover': { bgcolor: 'primary.dark' }
+                                    }}
+                                    size="small"
+                                >
+                                    <input type="file" hidden accept="image/*" onChange={handleLogoSelect} ref={logoInputRef} />
+                                    <PhotoCameraIcon fontSize="small" />
+                                </IconButton>
+                             </Box>
+                        </Grid>
+                        
                         <Grid size={12}>
                             <TextField
                                 label={t('pages.companies.companyNameLabel')}
@@ -340,21 +418,35 @@ const CompaniesPage = () => {
                                 name="websiteUrl"
                                 value={formData.websiteUrl}
                                 onChange={handleInputChange}
+                                placeholder="https://..."
+                            />
+                        </Grid>
+                        <Grid size={12}>
+                            <TextField
+                                label={t('pages.companies.descriptionLabel')}
+                                fullWidth
+                                multiline
+                                rows={4}
+                                name="description"
+                                value={formData.description}
+                                onChange={handleInputChange}
                             />
                         </Grid>
                     </Grid>
                 </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2 }}>
+                <DialogActions sx={{ px: 3, pb: 3 }}>
                     <Button onClick={handleCloseDialog} color="inherit">{t('pages.companies.cancelBtn')}</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
                         disabled={isMutating || !formData.companyName || !formData.taxCode}
+                        sx={{ px: 4 }}
                     >
                         {isMutating ? t('pages.companies.savingBtn') : t('pages.companies.saveBtn')}
                     </Button>
                 </DialogActions>
             </Dialog>
+
             {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
                 <DialogTitle>{t('pages.companies.deleteTitle')}</DialogTitle>

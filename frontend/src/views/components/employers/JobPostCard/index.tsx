@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Button, Divider, LinearProgress, Stack, Typography } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
@@ -19,124 +19,15 @@ import JobPostForm from '../JobPostForm';
 import jobService from '../../../../services/jobService';
 import JobPostsTable from '../JobPostsTable';
 import { useDataTable } from '../../../../hooks';
-import type { JobPost } from '../../../../types/models';
+import { useEmployerJobPosts, useJobPostMutations } from '../hooks/useEmployerQueries';
 import type { ApiError } from '../../../../types/api';
 
-
-
-
-
-const pageSize = 10;
-
 const JobPostCard = () => {
-
   const { t } = useTranslation('employer');
-
-  const headCells = React.useMemo(() => [
-
-    {
-
-      id: 'jobName',
-
-      showOrder: true,
-
-      numeric: false,
-
-      disablePadding: true,
-
-      label: t('jobPost.table.jobTitle'),
-
-    },
-
-    {
-
-      id: 'createAt',
-
-      showOrder: true,
-
-      numeric: false,
-
-      disablePadding: false,
-
-      label: t('jobPost.table.postDate'),
-
-    },
-
-    {
-
-      id: 'deadline',
-
-      showOrder: true,
-
-      numeric: false,
-
-      disablePadding: false,
-
-      label: t('jobPost.table.deadline'),
-
-    },
-
-    {
-
-      id: 'appliedTotal',
-
-      showOrder: true,
-
-      numeric: false,
-
-      disablePadding: false,
-
-      label: t('jobPost.table.applications'),
-
-    },
-
-    {
-
-      id: 'viewedTotal',
-
-      showOrder: true,
-
-      numeric: false,
-
-      disablePadding: false,
-
-      label: t('jobPost.table.views'),
-
-    },
-
-    {
-
-      id: 'isVerify',
-
-      showOrder: false,
-
-      numeric: false,
-
-      disablePadding: false,
-
-      label: t('jobPost.table.status'),
-
-    },
-
-    {
-
-      id: 'action',
-
-      showOrder: false,
-
-      numeric: true,
-
-      disablePadding: false,
-
-      label: t('jobPost.table.actions'),
-
-    },
-
-  ], [t]);
 
   const {
     page,
-    pageSize: rowsPerPage,
+    pageSize,
     sorting,
     onSortingChange,
     ordering,
@@ -144,533 +35,168 @@ const JobPostCard = () => {
     onPaginationChange,
   } = useDataTable({ 
     initialSorting: [{ id: 'createAt', desc: true }],
-    initialPageSize: pageSize
+    initialPageSize: 10
   });
 
-  const [count, setCount] = React.useState<number>(0);
-
-  const [filterData, setFilterData] = React.useState<{ kw: string; isUrgent: boolean | '' }>({
+  const [filterData, setFilterData] = useState<{ kw: string; isUrgent: boolean | ''; statusId: string | number }>({
     kw: '',
     isUrgent: '',
+    statusId: '',
   });
 
-  const [openPopup, setOpenPopup] = React.useState<boolean>(false);
+  const { data, isLoading } = useEmployerJobPosts({
+    page: page + 1,
+    pageSize,
+    ordering,
+    kw: filterData.kw,
+    isUrgent: filterData.isUrgent === '' ? undefined : filterData.isUrgent,
+    status: filterData.statusId === '' ? undefined : filterData.statusId,
+  });
 
-  const [isSuccess, setIsSuccess] = React.useState<boolean>(false);
+  const { addJobPost, updateJobPost, deleteJobPost, isMutating } = useJobPostMutations();
 
-  const [isLoadingJobPost, setIsLoadingJobPost] = React.useState<boolean>(true);
-
-  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState<boolean>(false);
-
-  const [JobPosts, setJobPosts] = React.useState<JobPost[]>([]);
-
-  const [editData, setEditData] = React.useState<Record<string, unknown> | null>(null);
-
-  const [serverErrors, setServerErrors] = React.useState<Record<string, string[]> | null>(null);
-
-  const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
-    // legacy handler, no longer needed if we use DataTable's onSortingChange
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    onPaginationChange({ pageIndex: newPage, pageSize: rowsPerPage });
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onPaginationChange({ pageIndex: 0, pageSize: parseInt(event.target.value, 10) });
-  };
-
-  const loadJobPosts = React.useCallback(async (params: Record<string, unknown>) => {
-
-    setIsLoadingJobPost(true);
-
-    try {
-
-      const resData = await jobService.getEmployerJobPost(params) as { results: JobPost[], count?: number };
-
-      setJobPosts(resData.results);
-
-      setCount(resData.count || resData.results?.length || 0);
-
-    } catch (error) {
-
-      errorHandling(error as AxiosError<{ errors?: ApiError }>);
-
-    } finally {
-
-      setIsLoadingJobPost(false);
-
-    }
-
-  }, []);
-
-  React.useEffect(() => {
-
-    loadJobPosts({
-      page: page + 1,
-      pageSize: rowsPerPage,
-      ordering,
-      ...filterData,
-    });
-  }, [loadJobPosts, isSuccess, page, rowsPerPage, ordering, filterData]);
+  const [openPopup, setOpenPopup] = useState(false);
+  const [editData, setEditData] = useState<Record<string, unknown> | null>(null);
+  const [serverErrors, setServerErrors] = useState<Record<string, string[]> | null>(null);
+  const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
 
   const handleShowUpdate = async (slugOrId: string | number) => {
-
-    const loadJobPostDetailById = async (jobPostId: string | number) => {
-
-      setIsFullScreenLoading(true);
-
-      try {
-
-        const resData = await jobService.getEmployerJobPostDetailById(
-
-          jobPostId
-
-        ) as unknown as Record<string, unknown>;
-
-        let data = resData;
-
-        data = {
-
-          ...data,
-
-          jobDescription: createEditorStateFromHTMLString(
-
-            (data as Record<string, unknown>)?.jobDescription as string || ''
-
-          ),
-
-          jobRequirement: createEditorStateFromHTMLString(
-
-            (data as Record<string, unknown>)?.jobRequirement as string || ''
-
-          ),
-
-          benefitsEnjoyed: createEditorStateFromHTMLString(
-
-            (data as Record<string, unknown>)?.benefitsEnjoyed as string || ''
-
-          ),
-
-        };
-
-        setEditData(data as Record<string, unknown>);
-
-        setOpenPopup(true);
-
-      } catch (error) {
-
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
-
-      } finally {
-
-        setIsFullScreenLoading(false);
-
-      }
-
-    };
-
-    loadJobPostDetailById(slugOrId);
-
+    setIsFullScreenLoading(true);
+    try {
+      const resData = await jobService.getEmployerJobPostDetailById(slugOrId);
+      const data = {
+        ...resData,
+        jobDescription: createEditorStateFromHTMLString(resData.jobDescription || ''),
+        jobRequirement: createEditorStateFromHTMLString(resData.jobRequirement || ''),
+        benefitsEnjoyed: createEditorStateFromHTMLString(resData.benefitsEnjoyed || ''),
+      };
+      setEditData(data as unknown as Record<string, unknown>);
+      setOpenPopup(true);
+    } catch (error) {
+      errorHandling(error as AxiosError<{ errors?: ApiError }>);
+    } finally {
+      setIsFullScreenLoading(false);
+    }
   };
 
   const handleShowAdd = () => {
-
     setEditData(null);
-
     setOpenPopup(true);
-
   };
 
-  const handleAddOrUpdate = async (data: import('../JobPostForm/JobPostSchema').JobPostFormValues) => {
-
-    const dataCustom: Record<string, unknown> = {
-
-      ...data,
-
-      jobDescription: convertEditorStateToHTMLString(data.jobDescription),
-
-      jobRequirement: convertEditorStateToHTMLString(data.jobRequirement),
-
-      benefitsEnjoyed: convertEditorStateToHTMLString(data.benefitsEnjoyed),
-
+  const handleAddOrUpdate = async (formData: any) => {
+    const payload = {
+      ...formData,
+      jobDescription: convertEditorStateToHTMLString(formData.jobDescription),
+      jobRequirement: convertEditorStateToHTMLString(formData.jobRequirement),
+      benefitsEnjoyed: convertEditorStateToHTMLString(formData.benefitsEnjoyed),
     };
 
-    const handleAdd = async (payload: Record<string, unknown>) => {
-
-      setIsFullScreenLoading(true);
-
-      try {
-
-        await jobService.addJobPost(payload as unknown as Parameters<typeof jobService.addJobPost>[0]);
-
-        setOpenPopup(false);
-
-        setIsSuccess(!isSuccess);
-
-        toastMessages.success(t('jobPost.messages.addSuccess'));
-
-      } catch (error) {
-
-        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as unknown as Parameters<typeof errorHandling>[1]);
-
-      } finally {
-
-        setIsFullScreenLoading(false);
-
-      }
-
-    };
-
-    const update = async (payload: Record<string, unknown>) => {
-
-      setIsFullScreenLoading(true);
-
-      try {
-
-        await jobService.updateJobPostById(payload.slug as string || payload.id as string, payload as unknown as Parameters<typeof jobService.updateJobPostById>[1]);
-
-        setOpenPopup(false);
-
-        setIsSuccess(!isSuccess);
-
+    setIsFullScreenLoading(true);
+    try {
+      if (editData && 'id' in editData) {
+        await updateJobPost({ id: editData.id as string | number, data: payload });
         toastMessages.success(t('jobPost.messages.updateSuccess'));
-
-      } catch (error) {
-
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
-
-      } finally {
-
-        setIsFullScreenLoading(false);
-
+      } else {
+        await addJobPost(payload);
+        toastMessages.success(t('jobPost.messages.addSuccess'));
       }
-
-    };
-
-    if ('id' in data) {
-
-      update(dataCustom);
-
-    } else {
-
-      handleAdd(dataCustom);
-
+      setOpenPopup(false);
+    } catch (error) {
+      errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as any);
+    } finally {
+      setIsFullScreenLoading(false);
     }
-
   };
 
-  const handleDelete = async (slugOrId: string | number) => {
-
-    const del = async (id: string | number) => {
-
-      try {
-
-        await jobService.deleteJobPostById(id);
-
-        setIsSuccess(!isSuccess);
-
-        toastMessages.success(t('jobPost.delete.success'));
-
-      } catch (error) {
-
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
-
-      } finally {
-
-        setIsFullScreenLoading(false);
-
-      }
-
-    };
-
+  const handleDelete = (slugOrId: string | number) => {
     confirmModal(
-
-      () => del(slugOrId),
-
+      async () => {
+        setIsFullScreenLoading(true);
+        try {
+          await deleteJobPost(slugOrId);
+          toastMessages.success(t('jobPost.delete.success'));
+        } catch (error) {
+          errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        } finally {
+          setIsFullScreenLoading(false);
+        }
+      },
       t('jobPost.delete.title'),
-
       t('jobPost.delete.confirm'),
-
       'warning'
-
     );
-
   };
 
-  const handleFilter = (data: { kw: string, isUrgent: number | string }) => {
+  const handleFilter = (data: { kw: string, isUrgent: number | string, statusId: string | number }) => {
     setFilterData({
       kw: data.kw,
       isUrgent: data.isUrgent === 1 ? true : data.isUrgent === 2 ? false : '',
+      statusId: data.statusId,
     });
-    onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
+    onPaginationChange({ pageIndex: 0, pageSize });
   };
 
   const handleExport = async () => {
-
     setIsFullScreenLoading(true);
-
     try {
-
       const params = {
-
         page: page + 1,
-        pageSize: rowsPerPage,
+        pageSize,
         ordering,
         kw: filterData.kw,
-        // Drop empty string to pass undefined to satisfy api get params type
         isUrgent: filterData.isUrgent === '' ? undefined : filterData.isUrgent,
+        status: filterData.statusId === '' ? undefined : filterData.statusId,
       };
-
-      const resData = await jobService.exportEmployerJobPosts(params as any);
-
+      const resData = await jobService.exportEmployerJobPosts(params);
       xlsxUtils.exportToXLSX(resData as unknown as Record<string, unknown>[], 'JobList');
-
     } catch (error) {
-
       errorHandling(error as AxiosError<{ errors?: ApiError }>);
-
     } finally {
-
       setIsFullScreenLoading(false);
-
     }
-
   };
 
   return (
-
-    <Box sx={{ 
-
-      px: { xs: 1, sm: 2 }, 
-
-      py: { xs: 2, sm: 2 }, 
-
-      backgroundColor: 'background.paper', 
-
-      borderRadius: 2 
-
-    }}>
-
-      {/* Header Section - Responsive */}
-
-      <Stack 
-
-        direction={{ xs: 'column', sm: 'row' }}
-
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
-
-        justifyContent="space-between" 
-
-        spacing={{ xs: 2, sm: 0 }}
-
-        mb={4}
-
-      >
-
-        <Typography 
-
-          variant="h5" 
-
-          sx={{ 
-
-            fontWeight: 600,
-
-            background: 'primary.main',
-
-            WebkitBackgroundClip: 'text',
-
-            fontSize: { xs: '1.25rem', sm: '1.5rem' }
-
-          }}
-
-        >
-
+    <Box sx={{ px: { xs: 1, sm: 2 }, py: { xs: 2, sm: 2 }, backgroundColor: 'background.paper', borderRadius: 2 }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent="space-between" spacing={{ xs: 2, sm: 0 }} mb={4}>
+        <Typography variant="h5" sx={{ fontWeight: 600, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
           {t('jobPost.title')}
-
         </Typography>
-
-        <Stack 
-
-          direction={{ xs: 'column', sm: 'row' }} 
-
-          spacing={2}
-
-          width={{ xs: '100%', sm: 'auto' }}
-
-        >
-
-          <Button
-
-            variant="outlined"
-
-            color="secondary" // Original color was 'secondary'
-            startIcon={<FileDownloadOutlinedIcon />}
-            onClick={handleExport}
-            fullWidth={false}
-
-            sx={{
-
-              borderRadius: 2,
-
-              px: 3,
-
-              '&:hover': {
-
-                backgroundColor: 'secondary.backgroundHover'
-
-              }
-
-            }}
-
-          >
-
+        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} width={{ xs: '100%', sm: 'auto' }}>
+          <Button variant="outlined" color="inherit" startIcon={<FileDownloadOutlinedIcon />} onClick={handleExport} sx={{ borderRadius: 2, px: 3 }}>
             {t('jobPost.exportList')}
-
           </Button>
-
-          <Button
-
-            variant="contained"
-
-            color="primary"
-
-            startIcon={<AddIcon />}
-
-            onClick={handleShowAdd}
-
-            fullWidth={false}
-
-            sx={{
-
-              borderRadius: 2,
-
-              px: 3,
-
-              background: 'primary.main',
-
-              boxShadow: 'custom.small',
-
-              '&:hover': {
-
-                boxShadow: 'custom.medium'
-
-              }
-
-            }}
-
-          >
-
+          <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleShowAdd} sx={{ borderRadius: 2, px: 3, boxShadow: 'none' }}>
             {t('jobPost.createNew')}
-
           </Button>
-
         </Stack>
-
       </Stack>
 
-      {/* Filter Section - Responsive */}
-
-      <Stack
-
-        direction={{ xs: 'column', md: 'row' }}
-
-        sx={{ mb: 3 }}
-
-        spacing={2}
-
-        alignItems={{ xs: 'flex-start', md: 'center' }}
-
-      >
-
+      <Stack direction={{ xs: 'column', md: 'row' }} sx={{ mb: 3 }} spacing={2} alignItems={{ xs: 'flex-start', md: 'center' }}>
         <Box>
-
-          <Typography 
-
-            variant="subtitle1" 
-
-            sx={{ 
-
-              color: 'text.secondary',
-
-              fontWeight: 600,
-
-              mb: { xs: 1, md: 0 }
-
-            }}
-
-          >
-
+          <Typography variant="subtitle1" sx={{ color: 'text.secondary', fontWeight: 600 }}>
             {t('jobPost.filter')}
-
           </Typography>
-
         </Box>
-
         <Box flex={1} width="100%">
-
           <JobPostFilterForm handleFilter={handleFilter} />
-
         </Box>
-
       </Stack>
 
-      {/* Loading Progress */}
-
-      {isLoadingJobPost ? (
-
+      {isLoading ? (
         <Box sx={{ width: '100%', mb: 2 }}>
-
-          <LinearProgress 
-
-            color="primary"
-
-            sx={{
-
-              height: { xs: 4, sm: 6 },
-
-              borderRadius: 3,
-
-              backgroundColor: 'primary.background'
-
-            }}
-
-          />
-
+          <LinearProgress />
         </Box>
-
       ) : (
-
         <Divider sx={{ mb: 2 }} />
-
       )}
 
-      {/* Table Section */}
-
-      <Box sx={{
-
-        backgroundColor: 'background.paper',
-
-        borderRadius: 2,
-
-        boxShadow: 'custom.card',
-
-        overflow: 'hidden',
-
-        width: '100%',
-
-        '& .MuiTableContainer-root': {
-
-          overflowX: 'auto'
-
-        }
-
-      }}>
-
+      <Box sx={{ backgroundColor: 'background.paper', borderRadius: 2, overflow: 'hidden', width: '100%' }}>
         <JobPostsTable
-          rows={JobPosts}
-          isLoading={isLoadingJobPost}
-          rowCount={count}
+          rows={data?.results || []}
+          isLoading={isLoading}
+          rowCount={data?.count || 0}
           pagination={pagination}
           onPaginationChange={onPaginationChange}
           sorting={sorting}
@@ -678,37 +204,15 @@ const JobPostCard = () => {
           handleDelete={handleDelete}
           handleUpdate={handleShowUpdate}
         />
-
       </Box>
 
-      <FormPopup
-
-        title={t('jobPost.popupTitle')}
-
-        openPopup={openPopup}
-
-        setOpenPopup={setOpenPopup}
-
-      >
-
-        <JobPostForm
-
-          handleAddOrUpdate={handleAddOrUpdate}
-
-          editData={editData}
-
-          serverErrors={serverErrors}
-
-        />
-
+      <FormPopup title={t('jobPost.popupTitle')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
+        <JobPostForm handleAddOrUpdate={handleAddOrUpdate} editData={editData} serverErrors={serverErrors} />
       </FormPopup>
 
-      {isFullScreenLoading && <BackdropLoading />}
-
+      {(isFullScreenLoading || isMutating) && <BackdropLoading />}
     </Box>
-
   );
-
 };
 
 export default JobPostCard;

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Divider, Paper, Typography } from '@mui/material';
-import { InterviewSession } from './index';
+import { InterviewSession } from '@/types/models';
 
 interface InterviewInfoCardProps {
   session: InterviewSession;
@@ -33,14 +33,14 @@ const InterviewInfoCard: React.FC<InterviewInfoCardProps> = ({ session, t, i18n 
                 </Box>
                 <Box>
                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('interviewDetail.label.type')}</Typography>
-                    <Typography variant="body1" sx={{ mt: 0.5 }}>
-                        {(session.type || session.interview_type || 'N/A')?.toUpperCase()}
+                    <Typography variant="body1" sx={{ mt: 0.5, fontWeight: 600 }}>
+                        {(session.type || (session as any).interview_type || 'N/A')?.toUpperCase()}
                     </Typography>
                 </Box>
                 <Box>
                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('interviewDetail.label.schedule')}</Typography>
                     <Typography variant="body2" sx={{ mt: 0.5, fontWeight: 500 }}>
-                        {session.scheduledAt ? new Date(session.scheduledAt).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US') : '---'}
+                        {session.scheduledAt || session.scheduled_at ? new Date((session.scheduledAt || session.scheduled_at) as string).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US') : '---'}
                     </Typography>
                 </Box>
             </Box>

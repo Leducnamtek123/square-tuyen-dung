@@ -1,12 +1,9 @@
+'use client';
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Chip, CircularProgress, Stack, Typography } from '@mui/material';
-import { Grid2 as Grid } from "@mui/material";
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter, useParams } from 'next/navigation';
+import { Box, Button, Chip, CircularProgress, Stack, Typography, Grid2 as Grid } from '@mui/material';
+import { useParams, useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useTranslation } from 'react-i18next';
-import interviewService from '../../../../services/interviewService';
-import { transformInterviewSession } from '../../../../utils/transformers';
 import { ROUTES } from '../../../../configs/constants';
 import InterviewAiEvaluationCard from './InterviewAiEvaluationCard';
 import InterviewAnalysisPanel from './InterviewAnalysisPanel';
@@ -15,39 +12,13 @@ import InterviewInfoCard from './InterviewInfoCard';
 import InterviewQuestionsCard from './InterviewQuestionsCard';
 import InterviewRecordingCard from './InterviewRecordingCard';
 import InterviewTranscriptPanel from './InterviewTranscriptPanel';
-
-export interface Evaluation {
-  attitude_score: number;
-  professional_score: number;
-  result: string;
-  comments: string;
-  proposed_salary: number;
-}
-
-export interface InterviewSession {
-  id: number;
-  status: string;
-  room_name: string;
-  ai_overall_score?: number | null;
-  ai_technical_score?: number | null;
-  ai_communication_score?: number | null;
-  ai_summary?: string | null;
-  ai_strengths?: string[] | string;
-  ai_weaknesses?: string[] | string;
-  ai_detailed_feedback?: string | any;
-  recordingUrl?: string;
-  recording_url?: string;
-  evaluations?: Evaluation[];
-  candidateName?: string;
-  candidateEmail?: string;
-  candidate_email?: string;
-  jobName?: string;
-  type?: string;
-  interview_type?: string;
-  scheduledAt?: string;
-  questions?: any[];
-  transcripts?: any[];
-}
+import { useInterviewDetail, useInterviewMutations } from '../hooks/useEmployerQueries';
+import interviewService from '../../../../services/interviewService';
+import toastMessages from '../../../../utils/toastMessages';
+import errorHandling from '../../../../utils/errorHandling';
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
+import type { AxiosError } from 'axios';
+import type { ApiError } from '../../../../types/api';
 
 export interface EvalFormType {
   attitude_score: number | string;
@@ -57,13 +28,11 @@ export interface EvalFormType {
   proposed_salary: number | string;
 }
 
-
-
 const InterviewDetailCard = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useRouter();
-    const queryClient = useQueryClient();
     const { t, i18n } = useTranslation(['employer', 'interview', 'common']);
+    
     const [evalForm, setEvalForm] = useState<EvalFormType>({
         attitude_score: 0,
         professional_score: 0,
@@ -72,53 +41,24 @@ const InterviewDetailCard = () => {
         proposed_salary: 0
     });
 
-    const { data: session, isLoading: loading } = useQuery<InterviewSession>({
-        queryKey: ['interview-session-detail', id],
-        enabled: !!id,
-        queryFn: async () => {
-            const res = await interviewService.getSessionDetail(id as string) as any;
-            return transformInterviewSession(res) as InterviewSession;
-        },
-        refetchInterval: (query) => {
-            const currentSession = query.state.data;
-            if (!currentSession) return false;
-
-            const resultReady = currentSession.ai_overall_score !== null && currentSession.ai_overall_score !== undefined;
-            const needsPolling = currentSession.status === 'in_progress'
-                || ((currentSession.status === 'completed' || currentSession.status === 'processing') && !resultReady);
-            return needsPolling ? 5000 : false;
-        },
-    });
-
-    const submitEvaluationMutation = useMutation({
-        mutationFn: (payload: EvalFormType & { interview: string | undefined }) => interviewService.submitEvaluation(payload as any),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['interview-session-detail', id] });
-        },
-    });
-
-    const triggerAiMutation = useMutation({
-        mutationFn: (sessionId: number | string) => interviewService.triggerAiEvaluation(sessionId),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['interview-session-detail', id] });
-        },
-    });
-
-    const recordingUrl = session?.recordingUrl || session?.recording_url || null;
+    // Polling logic: Refetch every 5s if session is active or processing
+    const { data: session, isLoading: loading } = useInterviewDetail(id);
+    const { isMutating: isInterviewMutating } = useInterviewMutations();
+    
+    const [isSubmittingEval, setIsSubmittingEval] = useState(false);
 
     useEffect(() => {
-        if (!session?.evaluations?.length) {
-            return;
+        if (session?.evaluations?.length) {
+            const lastEval = session.evaluations[session.evaluations.length - 1];
+            setEvalForm({
+                attitude_score: lastEval.attitude_score || lastEval.attitudeScore || 0,
+                professional_score: lastEval.professional_score || lastEval.professionalScore || 0,
+                result: lastEval.result || 'pending',
+                comments: lastEval.comments || '',
+                proposed_salary: lastEval.proposed_salary || lastEval.proposedSalary || 0
+            });
         }
-        const lastEval = session.evaluations[session.evaluations.length - 1];
-        setEvalForm({
-            attitude_score: lastEval.attitude_score || 0,
-            professional_score: lastEval.professional_score || 0,
-            result: lastEval.result || 'pending',
-            comments: lastEval.comments || '',
-            proposed_salary: lastEval.proposed_salary || 0
-        });
-    }, [session?.id, session?.evaluations]);
+    }, [session]);
 
     const handleEvalChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -126,26 +66,35 @@ const InterviewDetailCard = () => {
     };
 
     const submitHRInfo = async () => {
+        setIsSubmittingEval(true);
         try {
-            await submitEvaluationMutation.mutateAsync({
-                interview: id,
-                ...evalForm,
+            await interviewService.submitEvaluation({
+                interview: Number(id),
+                attitudeScore: Number(evalForm.attitude_score),
+                professionalScore: Number(evalForm.professional_score),
+                overallScore: (Number(evalForm.attitude_score) + Number(evalForm.professional_score)) / 2,
+                result: evalForm.result as any,
+                comments: evalForm.comments,
+                proposedSalary: Number(evalForm.proposed_salary),
             });
+            toastMessages.success(t('interview:interviewDetail.messages.evaluationSuccess'));
         } catch (error) {
-            console.error('Error submitting evaluation', error);
+            errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        } finally {
+            setIsSubmittingEval(false);
         }
     };
 
-    if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}><CircularProgress /></Box>;
+    if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}><CircularProgress /></Box>;
 
     if (!session) return (
         <Box sx={{ textAlign: 'center', py: 5 }}>
-            <Typography color="text.secondary">{t('interviewDetail.messages.notFound')}</Typography>
+            <Typography color="text.secondary">{t('interview:interviewDetail.messages.notFound')}</Typography>
             <Button onClick={() => navigate.back()} sx={{ mt: 2 }}>{t('common:actions.close')}</Button>
         </Box>
     );
 
-    const getStatusColor = (status: string | undefined) => {
+    const getStatusColor = (status: string | undefined): "success" | "primary" | "error" | "info" | "warning" => {
         switch (status) {
             case 'completed': return 'success';
             case 'in_progress': return 'primary';
@@ -155,56 +104,37 @@ const InterviewDetailCard = () => {
         }
     };
 
-    const canJoinLiveRoom = !!session?.id && session.status !== 'cancelled' && session.status !== 'completed';
+    const canJoinLiveRoom = session.status !== 'cancelled' && session.status !== 'completed';
+    const recordingUrl = session.recordingUrl || (session as any).recording_url || null;
 
     return (
-        <Box sx={{
-            px: { xs: 1, sm: 2 },
-            py: { xs: 2, sm: 2 },
-            backgroundColor: 'background.paper',
-            borderRadius: 2
-        }}>
-            <Button
-                startIcon={<ArrowBackIcon />}
-                onClick={() => navigate.back()}
-                sx={{ mb: 3, color: 'text.secondary', fontWeight: 500 }}
-            >
-                {t('interviewDetail.actions.backToList')}
+        <Box sx={{ px: { xs: 1, sm: 2 }, py: { xs: 2, sm: 2 }, backgroundColor: 'background.paper', borderRadius: 2 }}>
+            <Button startIcon={<ArrowBackIcon />} onClick={() => navigate.back()} sx={{ mb: 3, color: 'text.secondary', fontWeight: 500 }}>
+                {t('interview:interviewDetail.actions.backToList')}
             </Button>
-            <Stack
-                direction={{ xs: 'column', sm: 'row' }}
-                justifyContent="space-between"
-                alignItems={{ xs: 'flex-start', sm: 'center' }}
-                spacing={2}
-                mb={4}
-            >
+            
+            <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={2} mb={4}>
                 <Box>
                     <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
                         <Typography variant="h5" sx={{ fontWeight: 700 }}>
-                            {t('interviewDetail.title')}
+                            {t('interview:interviewDetail.title')}
                         </Typography>
                         <Chip
-                            label={t(`interviewLive.statuses.${session.status}`, { defaultValue: session.status?.replaceAll('_', ' ')?.toUpperCase() })}
+                            label={t(`interview:interviewLive.statuses.${session.status}`, { defaultValue: session.status?.replaceAll('_', ' ')?.toUpperCase() })}
                             color={getStatusColor(session.status)}
                             size="small"
-                            sx={{
-                                fontWeight: 700,
-                                fontSize: '0.75rem',
-                                height: 26,
-                                borderRadius: '6px',
-                                letterSpacing: '0.5px',
-                            }}
+                            sx={{ fontWeight: 700, borderRadius: '6px' }}
                         />
                     </Stack>
-                    <Typography variant="body2" color="text.secondary" sx={{ opacity: 0.8 }}>
-                        {t('interviewDetail.label.roomCode')}: <Box component="span" sx={{ fontWeight: 600, color: 'primary.main' }}>{session.room_name}</Box> | ID: {session.id}
+                    <Typography variant="body2" color="text.secondary">
+                        {t('interview:interviewDetail.label.roomCode')}: <Box component="span" sx={{ fontWeight: 600, color: 'primary.main' }}>{session.roomName}</Box> | ID: {session.id}
                     </Typography>
                 </Box>
                 <Button
                     variant="contained"
                     disabled={!canJoinLiveRoom}
                     onClick={() => navigate.push(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id.toString())}`)}
-                    sx={{ borderRadius: 2, minWidth: 180 }}
+                    sx={{ borderRadius: 2, minWidth: 180, boxShadow: 'none' }}
                 >
                     {t('common:actions.joinNow')}
                 </Button>
@@ -212,7 +142,7 @@ const InterviewDetailCard = () => {
 
             <Grid container spacing={3}>
                 <Grid size={{ xs: 12, md: 4 }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <Stack spacing={3}>
                         <InterviewInfoCard session={session} t={t} i18n={i18n} />
                         <InterviewRecordingCard recordingUrl={recordingUrl} t={t} />
                         <InterviewAiEvaluationCard
@@ -220,9 +150,10 @@ const InterviewDetailCard = () => {
                             t={t}
                             onTriggerAi={async () => {
                                 try {
-                                    await triggerAiMutation.mutateAsync(session.id);
+                                    await interviewService.triggerAiEvaluation(session.id);
+                                    toastMessages.success(t('interview:interviewDetail.messages.aiTriggerSuccess'));
                                 } catch (e) {
-                                    console.error(e);
+                                    errorHandling(e as AxiosError<{ errors?: ApiError }>);
                                 }
                             }}
                         />
@@ -230,29 +161,23 @@ const InterviewDetailCard = () => {
                             evalForm={evalForm}
                             onChange={handleEvalChange}
                             onSubmit={submitHRInfo}
-                            disabled={submitEvaluationMutation.isPending || session.status !== 'completed'}
-                            submitting={submitEvaluationMutation.isPending}
+                            disabled={isSubmittingEval || session.status !== 'completed'}
+                            submitting={isSubmittingEval}
                             t={t}
                         />
                         <InterviewQuestionsCard session={session} t={t} />
-                    </Box>
+                    </Stack>
                 </Grid>
 
                 <Grid size={{ xs: 12, md: 8 }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                    <Stack spacing={3}>
                         <InterviewAnalysisPanel session={session} t={t} />
                         <InterviewTranscriptPanel session={session} t={t} i18n={i18n} />
-                    </Box>
+                    </Stack>
                 </Grid>
             </Grid>
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @keyframes pulse {
-                    0% { transform: scale(1); opacity: 1; }
-                    50% { transform: scale(1.5); opacity: 0.5; }
-                    100% { transform: scale(1); opacity: 1; }
-                }
-            `}} />
+            
+            {(isInterviewMutating || isSubmittingEval) && <BackdropLoading />}
         </Box>
     );
 };

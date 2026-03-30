@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Divider, Paper, Typography } from '@mui/material';
-import { InterviewSession } from './index';
+import { Box, Divider, Paper, Typography, Stack, Chip } from '@mui/material';
+import { InterviewSession } from '@/types/models';
 
 interface InterviewQuestionsCardProps {
   session: InterviewSession;
@@ -8,6 +8,8 @@ interface InterviewQuestionsCardProps {
 }
 
 const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session, t }) => {
+    const questions = session.questions || [];
+    
     return (
         <Paper sx={{
             p: 3,
@@ -16,24 +18,26 @@ const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session
             borderColor: 'divider',
             boxShadow: (theme) => theme.shadows[1]
         }}>
-            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 700 }}>
-                {t('interviewDetail.actions.questionList')}
-            </Typography>
+            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 700 }}>{t('interviewDetail.subtitle.questions')}</Typography>
             <Divider sx={{ my: 2 }} />
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                {(session.questions?.length ?? 0) > 0 ? session.questions?.map((q: any, idx: number) => (
-                    <Box key={q.id || idx} sx={{ p: 1.5, bgcolor: 'background.neutral', borderRadius: 2 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main', mb: 0.5 }}>
-                            Q{idx + 1}:
-                        </Typography>
-                        <Typography variant="body2">{q.text}</Typography>
-                    </Box>
-                )) : (
-                    <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+            <Stack spacing={2}>
+                {questions.length > 0 ? (
+                    questions.map((q, idx) => (
+                        <Box key={idx} sx={{ p: 2, bgcolor: 'background.neutral', borderRadius: 2 }}>
+                            <Stack direction="row" spacing={1.5}>
+                                <Chip label={idx + 1} size="small" color="primary" sx={{ fontWeight: 700, height: 20, minWidth: 20 }} />
+                                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                                    {q.text || q.questionText || (q as any).content}
+                                </Typography>
+                            </Stack>
+                        </Box>
+                    ))
+                ) : (
+                    <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 2 }}>
                         {t('interviewDetail.messages.noQuestions')}
                     </Typography>
                 )}
-            </Box>
+            </Stack>
         </Paper>
     );
 };

@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react';
-import { Chip, Tooltip, Switch, Typography, Stack, Select, MenuItem, SelectChangeEvent } from "@mui/material";
+import { Chip, Tooltip, Switch, Typography, Stack, Select, MenuItem, SelectChangeEvent, Avatar, Box } from "@mui/material";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useTranslation } from 'react-i18next';
 import { ROLES_NAME } from '../../../../configs/constants';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
+import { User as UserModel } from '../../../../types/models';
 
 interface UserTableProps {
-    users: any[];
+    users: UserModel[];
     loading?: boolean;
     rowCount?: number;
     pagination?: { pageIndex: number; pageSize: number };
@@ -16,8 +17,8 @@ interface UserTableProps {
     onSortingChange?: OnChangeFn<SortingState>;
     rowSelection?: RowSelectionState;
     onRowSelectionChange?: OnChangeFn<RowSelectionState>;
-    onToggleStatus: (user: any) => void;
-    onRoleChange: (user: any, roleName: string) => void;
+    onToggleStatus: (user: UserModel) => void;
+    onRoleChange: (user: UserModel, roleName: string) => void;
     currentUserId: string | number;
     disableRoleActions?: boolean;
 }
@@ -58,7 +59,7 @@ const UserTable = ({
         return 'default';
     };
 
-    const columns = useMemo<ColumnDef<any>[]>(() => [
+    const columns = useMemo<ColumnDef<UserModel>[]>(() => [
         {
             accessorKey: 'id',
             header: t('pages.users.table.id') as string,
@@ -68,11 +69,20 @@ const UserTable = ({
             accessorKey: 'fullName',
             header: t('pages.users.table.fullName') as string,
             enableSorting: true,
-        },
-        {
-            accessorKey: 'email',
-            header: t('pages.users.table.email') as string,
-            enableSorting: true,
+            cell: (info) => {
+                const user = info.row.original;
+                return (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                        <Avatar src={user.avatarUrl || undefined} sx={{ width: 32, height: 32 }}>
+                            {user.fullName?.charAt(0)}
+                        </Avatar>
+                        <Box>
+                             <Typography variant="body2" sx={{ fontWeight: 600 }}>{user.fullName || '—'}</Typography>
+                             <Typography variant="caption" color="text.secondary">{user.email}</Typography>
+                        </Box>
+                    </Box>
+                );
+            }
         },
         {
             accessorKey: 'roleName',
@@ -82,6 +92,8 @@ const UserTable = ({
                 <Select
                     value={info.getValue() as string || ''}
                     size="small"
+                    variant="standard"
+                    disableUnderline
                     onChange={(event: SelectChangeEvent<string>) => onRoleChange(info.row.original, event.target.value)}
                     disabled={disableRoleActions || info.row.original.id === currentUserId}
                     renderValue={(value) => (
@@ -89,9 +101,10 @@ const UserTable = ({
                             label={getRoleLabel(value)}
                             size="small"
                             color={getRoleColor(value)}
+                            variant="outlined"
                         />
                     )}
-                    sx={{ minWidth: 160 }}
+                    sx={{ minWidth: 140 }}
                 >
                     <MenuItem value={ROLES_NAME.ADMIN}>{getRoleLabel(ROLES_NAME.ADMIN)}</MenuItem>
                     <MenuItem value={ROLES_NAME.EMPLOYER}>{getRoleLabel(ROLES_NAME.EMPLOYER)}</MenuItem>
@@ -119,7 +132,7 @@ const UserTable = ({
                     label={info.getValue() ? t('pages.users.table.active') : t('pages.users.table.blocked')}
                     size="small"
                     color={info.getValue() ? 'success' : 'error'}
-                    variant="outlined"
+                    variant={info.getValue() ? 'filled' : 'outlined'}
                 />
             ),
         },
@@ -131,10 +144,11 @@ const UserTable = ({
                 <Stack direction="row" spacing={0.5} justifyContent="flex-end" alignItems="center">
                     <Tooltip title={info.row.original.isActive ? t('pages.users.table.blockAccount') : t('pages.users.table.unblockAccount')}>
                         <Switch
-                            checked={info.row.original.isActive}
+                            checked={!!info.row.original.isActive}
                             onChange={() => onToggleStatus(info.row.original)}
                             color="primary"
                             size="small"
+                            disabled={disableRoleActions || info.row.original.id === currentUserId}
                         />
                     </Tooltip>
                 </Stack>

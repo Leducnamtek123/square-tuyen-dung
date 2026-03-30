@@ -1,15 +1,30 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 
 import adminSettingsService from '../../../../services/adminSettingsService';
 import toastMessages from '../../../../utils/toastMessages';
 
-export const useSystemSettings = () => {
-    return useQuery({
+export interface SystemSettings {
+    maintenanceMode: boolean;
+    autoApproveJobs: boolean;
+    emailNotifications: boolean;
+    [key: string]: unknown;
+}
+
+export type UseSystemSettingsResult = UseQueryResult<SystemSettings> & {
+    updateSystemSettings: (data: Partial<SystemSettings>) => Promise<SystemSettings>;
+    isMutating: boolean;
+};
+
+export const useSystemSettings = (): UseSystemSettingsResult => {
+    const { t } = useTranslation('admin');
+    const queryClient = useQueryClient();
+
+    const query = useQuery({
         queryKey: ['system-settings'],
         queryFn: async () => {
             const res = await adminSettingsService.getSystemSettings();
-            return res;
+            return res as SystemSettings;
         },
         initialData: {
             maintenanceMode: false,
@@ -17,18 +32,19 @@ export const useSystemSettings = () => {
             emailNotifications: true,
         },
     });
-};
 
-export const useUpdateSystemSettings = () => {
-    const { t } = useTranslation('admin');
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (data: any) => adminSettingsService.updateSystemSettings(data),
+    const updateMutation = useMutation({
+        mutationFn: (data: Partial<SystemSettings>) => adminSettingsService.updateSystemSettings(data as Record<string, unknown>),
         onSuccess: () => {
             toastMessages.success(t('pages.settings.toast.saveSuccess'));
             queryClient.invalidateQueries({ queryKey: ['system-settings'] });
         },
         onError: () => toastMessages.error(t('pages.settings.toast.saveError')),
     });
+
+    return {
+        ...query,
+        updateSystemSettings: updateMutation.mutateAsync,
+        isMutating: updateMutation.isPending
+    } as UseSystemSettingsResult;
 };

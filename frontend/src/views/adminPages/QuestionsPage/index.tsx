@@ -1,23 +1,19 @@
-import React, { useState } from 'react';
-import { Box, Card, CardHeader, CardContent, Typography, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem } from "@mui/material";
+import React, { useState, useMemo } from 'react';
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton, Stack, MenuItem } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import { useDataTable } from '../../../hooks';
-
+import { ColumnDef } from '@tanstack/react-table';
+import DataTable from '../../../components/Common/DataTable';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import { useQuestions, useCreateQuestion, useUpdateQuestion, useDeleteQuestion } from './hooks/useQuestions';
-import { useCareers } from '../CareersPage/hooks/useCareers';
-import QuestionTable from './components/QuestionTable';
-import { Question, Career } from '../../../types/models';
-import { PaginatedResponse } from '../../../types/api';
-import { Theme } from '@mui/material/styles';
-
-type QuestionExt = Question & {
-    difficulty?: number;
-    career?: string | number;
-};
+import { useQuestions } from './hooks/useQuestions';
+import { useDataTable } from '../../../hooks';
+import { Question } from '../../../types/models';
 
 const QuestionsPage = () => {
     const { t } = useTranslation('admin');
+    
     const {
         page,
         pageSize,
@@ -25,167 +21,258 @@ const QuestionsPage = () => {
         onSortingChange,
         ordering,
         pagination,
-        onPaginationChange,
-        rowSelection,
-        onRowSelectionChange,
-    } = useDataTable();
-    
-    const [openDialog, setOpenDialog] = useState(false);
-    const [editingQuestion, setEditingQuestion] = useState<QuestionExt | null>(null);
-    const [formData, setFormData] = useState({
-        questionText: '',
-        difficulty: 1,
-        career: '',
-    });
+        onPaginationChange
+    } = useDataTable({ initialPageSize: 10 });
 
-    const { data: questionsData, isLoading } = useQuestions({
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const {
+        data,
+        isLoading,
+        createQuestion,
+        updateQuestion,
+        deleteQuestion,
+        isMutating
+    } = useQuestions({
         page: page + 1,
-        pageSize: pageSize,
-        ordering,
+        pageSize,
+        kw: searchTerm,
+        ordering
     });
 
-    const { data: careersData } = useCareers({ pageSize: 100 });
-    const careers = (careersData as unknown as PaginatedResponse<Career>)?.results || [];
+    const [openDialog, setOpenDialog] = useState(false);
+    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+    const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+    const [formData, setFormData] = useState<Partial<Question>>({
+        text: '',
+        category: '',
+        questionType: 'GENERAL'
+    });
 
-    const createMutation = useCreateQuestion();
-    const updateMutation = useUpdateQuestion();
-    const deleteMutation = useDeleteQuestion();
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+        onPaginationChange({ pageIndex: 0, pageSize: pageSize });
+    };
 
     const handleOpenAdd = () => {
-        setEditingQuestion(null);
-        setFormData({ questionText: '', difficulty: 1, career: '' });
+        setDialogMode('add');
+        setFormData({ text: '', category: '', questionType: 'GENERAL' });
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (question: QuestionExt) => {
-        setEditingQuestion(question);
+    const handleOpenEdit = (question: Question) => {
+        setDialogMode('edit');
+        setCurrentQuestion(question);
         setFormData({
-            questionText: String(question.questionText || ''),
-            difficulty: Number(question.difficulty || 1),
-            career: String(question.career || ''),
+            text: question.text || '',
+            category: question.category || '',
+            questionType: question.questionType || 'GENERAL'
         });
         setOpenDialog(true);
     };
 
-    const handleSubmit = () => {
-        if (editingQuestion) {
-            updateMutation.mutate({ id: editingQuestion.id, data: formData }, {
-                onSuccess: () => setOpenDialog(false)
-            });
-        } else {
-            createMutation.mutate(formData, {
-                onSuccess: () => setOpenDialog(false)
-            });
+    const handleOpenDelete = (question: Question) => {
+        setCurrentQuestion(question);
+        setOpenDeleteDialog(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
+        setOpenDeleteDialog(false);
+    };
+
+    const handleSave = async () => {
+        try {
+            if (dialogMode === 'add') {
+                await createQuestion(formData);
+            } else if (currentQuestion) {
+                await updateQuestion({
+                    id: currentQuestion.id,
+                    data: formData
+                });
+            }
+            handleCloseDialog();
+        } catch (error) {
+            console.error(error);
         }
     };
 
+    const handleDelete = async () => {
+        if (!currentQuestion) return;
+        try {
+            await deleteQuestion(currentQuestion.id);
+            handleCloseDialog();
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const columns = useMemo<ColumnDef<Question>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: 'ID',
+            enableSorting: true,
+        },
+        {
+            accessorKey: 'text',
+            header: t('pages.questions.table.text') as string,
+            enableSorting: true,
+            cell: (info) => (
+                <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                    {info.getValue() as string}
+                </Typography>
+            ),
+        },
+        {
+            accessorKey: 'questionType',
+            header: t('pages.questions.table.type') as string,
+            cell: (info) => info.getValue() as string || '—',
+        },
+        {
+            accessorKey: 'category',
+            header: t('pages.questions.table.category') as string,
+            cell: (info) => info.getValue() as string || '—',
+        },
+        {
+            id: 'actions',
+            header: t('pages.questions.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                    <Tooltip title={t('pages.questions.table.edit')}>
+                        <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.questions.table.delete')}>
+                        <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            ),
+        },
+    ], [t]);
+
     return (
         <Box>
-            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-                    {t('pages.questions.title')}
-                </Typography>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleOpenAdd}
-                    sx={{ borderRadius: '8px', textTransform: 'none' }}
-                >
-                    {t('pages.questions.addBtn')}
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+                        {t('pages.questions.title')}
+                    </Typography>
+                    <Breadcrumbs aria-label="breadcrumb">
+                        <Link underline="hover" color="inherit" href="/admin">
+                            {t('pages.questions.breadcrumbAdmin')}
+                        </Link>
+                        <Typography color="text.primary">{t('pages.questions.breadcrumbContent')}</Typography>
+                        <Typography color="text.primary">{t('pages.questions.breadcrumbQuestions')}</Typography>
+                    </Breadcrumbs>
+                </Box>
+                <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}>
+                    {t('pages.questions.add')}
                 </Button>
             </Box>
 
-            <Card sx={{ borderRadius: '12px', boxShadow: (theme: Theme) => (theme as unknown as Record<string, Record<string, number>>).customShadows?.card || 1 }} elevation={0}>
-                <CardHeader title={t('pages.questions.listTitle')} sx={{ pb: 0 }} />
-                <CardContent>
-                    {Object.keys(rowSelection).length > 0 && (
-                        <Box sx={{ mb: 2, p: 2, bgcolor: 'primary.light', borderRadius: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Typography variant="subtitle2" color="primary.contrastText">
-                                {t('pages.questions.bulkSelect.selectedCount', { count: Object.keys(rowSelection).length })}
-                            </Typography>
-                            <Button 
-                                variant="contained" 
-                                color="error" 
-                                size="small"
-                                onClick={() => {
-                                    if (window.confirm(t('pages.questions.bulkSelect.deleteConfirm'))) {
-                                        // Handle bulk delete here
-                                        console.log('Bulk delete questions:', Object.keys(rowSelection));
-                                    }
-                                }}
-                            >
-                                {t('pages.questions.bulkSelect.deleteBtn')}
-                            </Button>
-                        </Box>
-                    )}
-                    <QuestionTable
-                        questions={questionsData?.results || []}
-                        loading={isLoading}
-                        rowCount={questionsData?.count || 0}
-                        pagination={pagination}
-                        onPaginationChange={onPaginationChange}
-                        sorting={sorting}
-                        onSortingChange={onSortingChange}
-                        rowSelection={rowSelection}
-                        onRowSelectionChange={onRowSelectionChange}
-                        onEdit={handleOpenEdit}
-                        onDelete={(id: string | number) => {
-                            if (window.confirm(t('pages.questions.deleteConfirm'))) {
-                                deleteMutation.mutate(id);
+            <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
+                <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
+                    <TextField
+                        size="small"
+                        placeholder={t('pages.questions.searchPlaceholder')}
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        sx={{ width: 400 }}
+                        slotProps={{
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon fontSize="small" color="action" />
+                                    </InputAdornment>
+                                ),
                             }
                         }}
                     />
-                </CardContent>
-            </Card>
+                </Box>
 
-            <Dialog open={openDialog} onClose={() => setOpenDialog(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>{editingQuestion ? t('pages.questions.editTitle') : t('pages.questions.addTitle')}</DialogTitle>
-                <DialogContent dividers>
-                    <TextField
-                        fullWidth
-                        label={t('pages.questions.questionContentLabel')}
-                        multiline
-                        rows={4}
-                        value={formData.questionText}
-                        onChange={(e) => setFormData({ ...formData, questionText: e.target.value })}
-                        sx={{ mb: 2 }}
-                        required
-                    />
-                    <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-                        <TextField
-                            fullWidth
-                            select
-                            label={t('pages.questions.difficultyLabel')}
-                            value={formData.difficulty}
-                            onChange={(e) => setFormData({ ...formData, difficulty: Number(e.target.value) })}
-                        >
-                            <MenuItem value={1}>{t('pages.questions.difficulty.easy')}</MenuItem>
-                            <MenuItem value={2}>{t('pages.questions.difficulty.medium')}</MenuItem>
-                            <MenuItem value={3}>{t('pages.questions.difficulty.hard')}</MenuItem>
-                        </TextField>
+                <DataTable
+                    columns={columns}
+                    data={data?.results || []}
+                    isLoading={isLoading}
+                    rowCount={data?.count || 0}
+                    pagination={pagination}
+                    onPaginationChange={onPaginationChange}
+                    enableSorting
+                    sorting={sorting}
+                    onSortingChange={onSortingChange}
+                />
+            </Paper>
 
+            {/* Add/Edit Dialog */}
+            <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
+                <DialogTitle>
+                    {dialogMode === 'add' ? t('pages.questions.add') : t('pages.questions.edit')}
+                </DialogTitle>
+                <DialogContent>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
                         <TextField
+                            label={t('pages.questions.form.text')}
                             fullWidth
+                            multiline
+                            rows={3}
+                            value={formData.text}
+                            onChange={(e) => setFormData(prev => ({ ...prev, text: e.target.value }))}
+                            required
+                        />
+                        <TextField
                             select
-                            label={t('pages.questions.fieldCareerLabel')}
-                            value={formData.career}
-                            onChange={(e) => setFormData({ ...formData, career: e.target.value })}
+                            label={t('pages.questions.form.type')}
+                            fullWidth
+                            value={formData.questionType}
+                            onChange={(e) => setFormData(prev => ({ ...prev, questionType: e.target.value }))}
                         >
-                            <MenuItem value=""><em>{t('pages.questions.selectCareer')}</em></MenuItem>
-                            {careers.map((c) => (
-                                <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>
-                            ))}
+                            <MenuItem value="GENERAL">General</MenuItem>
+                            <MenuItem value="TECHNICAL">Technical</MenuItem>
+                            <MenuItem value="BEHAVIORAL">Behavioral</MenuItem>
                         </TextField>
+                        <TextField
+                            label={t('pages.questions.form.category')}
+                            fullWidth
+                            value={formData.category}
+                            onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                        />
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDialog(false)} color="inherit">{t('pages.questions.cancelBtn')}</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.questions.cancel')}</Button>
                     <Button
-                        onClick={handleSubmit}
+                        onClick={handleSave}
                         variant="contained"
-                        disabled={createMutation.isPending || updateMutation.isPending || !formData.questionText.trim()}
+                        disabled={isMutating || !formData.text}
                     >
-                        {createMutation.isPending || updateMutation.isPending ? t('pages.questions.savingBtn') : t('pages.questions.saveBtn')}
+                        {isMutating ? t('common.saving') : t('common.save')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Delete Confirmation */}
+            <Dialog open={openDeleteDialog} onClose={handleCloseDialog}>
+                <DialogTitle>{t('pages.questions.deleteTitle')}</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        {t('pages.questions.deleteConfirm', { text: currentQuestion?.text })}
+                    </Typography>
+                </DialogContent>
+                <DialogActions sx={{ px: 3, pb: 2 }}>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.questions.cancel')}</Button>
+                    <Button
+                        onClick={handleDelete}
+                        color="error"
+                        variant="contained"
+                        disabled={isMutating}
+                    >
+                        {isMutating ? t('common.deleting') : t('common.delete')}
                     </Button>
                 </DialogActions>
             </Dialog>

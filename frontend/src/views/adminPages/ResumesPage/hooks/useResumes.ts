@@ -1,9 +1,17 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
 import { Resume } from '../../../../types/models';
+import { PaginatedResponse } from '../../../../types/api';
 
-export const useResumes = (params?: Record<string, unknown>) => {
+export type UseResumesResult = UseQueryResult<PaginatedResponse<Resume>> & {
+    createResume: (data: Record<string, unknown>) => Promise<Resume>;
+    updateResume: (args: { id: string | number; data: Record<string, unknown> }) => Promise<Resume>;
+    deleteResume: (id: string | number) => Promise<void>;
+    isMutating: boolean;
+};
+
+export const useResumes = (params?: Record<string, unknown>): UseResumesResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -57,5 +65,5 @@ export const useResumes = (params?: Record<string, unknown>) => {
         updateResume: updateMutation.mutateAsync,
         deleteResume: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    };
+    } as UseResumesResult;
 };

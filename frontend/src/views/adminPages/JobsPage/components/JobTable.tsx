@@ -10,8 +10,14 @@ import { useTranslation } from 'react-i18next';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
+import { JobPost } from '../../../../types/models';
+
+interface JobPostExt extends JobPost {
+  companyDict?: { companyName?: string };
+}
+
 interface JobTableProps {
-    jobs: any[];
+    jobs: JobPostExt[];
     loading: boolean;
     rowCount?: number;
     pagination?: { pageIndex: number; pageSize: number };
@@ -20,11 +26,11 @@ interface JobTableProps {
     onSortingChange?: OnChangeFn<SortingState>;
     rowSelection?: RowSelectionState;
     onRowSelectionChange?: OnChangeFn<RowSelectionState>;
-    onView: (job: any) => void;
-    onEdit: (job: any) => void;
-    onApprove: (id: any) => void;
-    onReject: (id: any) => void;
-    onDelete: (id: any) => void;
+    onView: (job: JobPostExt) => void;
+    onEdit: (job: JobPostExt) => void;
+    onApprove: (id: string | number) => void;
+    onReject: (id: string | number) => void;
+    onDelete: (id: string | number) => void;
 }
 
 const JobTable = ({ 
@@ -58,7 +64,7 @@ const JobTable = ({
         }
     };
 
-    const columns = useMemo<ColumnDef<any>[]>(() => [
+    const columns = useMemo<ColumnDef<JobPostExt>[]>(() => [
         {
             accessorKey: 'jobName',
             header: t('pages.jobs.table.jobPostCompany') as string,
@@ -89,13 +95,13 @@ const JobTable = ({
         {
             accessorKey: 'status',
             header: t('pages.jobs.table.statusCol') as string,
-            cell: (info) => getStatusChip(info.getValue() as number),
+            cell: (info: any) => getStatusChip(info.getValue() as number),
         },
         {
             id: 'actions',
             header: t('pages.jobs.table.actions') as string,
             meta: { align: 'right' },
-            cell: (info) => (
+            cell: (info: any) => (
                 <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                     <Tooltip title={t('pages.jobs.table.viewDetails')}>
                         <IconButton size="small" onClick={() => onView(info.row.original)} color="primary">

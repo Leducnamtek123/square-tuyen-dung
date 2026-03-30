@@ -1,18 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useAppSelector } from '@/redux/hooks';
-
 import { useTranslation } from 'react-i18next';
-
 import { useDispatch } from 'react-redux';
-
 import { useForm } from 'react-hook-form';
-
-import { Button, Stack, Typography } from "@mui/material";
-
-import { Grid2 as Grid } from "@mui/material";
-
+import { Button, Stack, Typography, Grid2 as Grid } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
 import {
   faBriefcase,
   faMagicWandSparkles,
@@ -23,626 +15,184 @@ import {
   faVenusMars,
   faPeopleRoof,
 } from '@fortawesome/free-solid-svg-icons';
-
 import SearchIcon from '@mui/icons-material/Search';
-
 import RefreshIcon from '@mui/icons-material/Refresh';
-
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
-
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
-
 import { resetSearchResume, searchResume } from '../../../../redux/filterSlice';
 import { useConfig } from '@/hooks/useConfig';
 
+export interface ProfileSearchValues {
+  kw: string;
+  cityId: string | number;
+  careerId: string | number;
+  experienceId: string | number;
+  positionId: string | number;
+  academicLevelId: string | number;
+  typeOfWorkplaceId: string | number;
+  jobTypeId: string | number;
+  genderId: string | number;
+  maritalStatusId: string | number;
+}
+
 const ProfileSearch: React.FC = () => {
-
-  const { t } = useTranslation('employer');
-
+  const { t } = useTranslation(['employer', 'common']);
   const dispatch = useDispatch();
-
   const { allConfig } = useConfig();
-
   const { resumeFilter } = useAppSelector((state) => state.filter);
 
-  const { control, reset, handleSubmit } = useForm<Record<string, unknown>>();
+  const { control, reset, handleSubmit } = useForm<ProfileSearchValues>();
 
-  React.useEffect(() => {
-
-    reset((formValues: Record<string, unknown>) => ({
-
-      ...formValues,
-
-      ...resumeFilter,
-
-    }));
-
+  useEffect(() => {
+    reset(resumeFilter as ProfileSearchValues);
   }, [resumeFilter, reset]);
 
-  const handleFilter = (data: Record<string, unknown>) => {
-
-    dispatch(searchResume(data as unknown as Parameters<typeof searchResume>[0]) as unknown as import('@reduxjs/toolkit').AnyAction);
-
+  const handleFilter = (data: ProfileSearchValues) => {
+    dispatch(searchResume(data as any));
   };
 
   const handleReset = () => {
-
     dispatch(resetSearchResume());
-
   };
 
-  return (
-
-    <>
-
-      <Grid component="form" onSubmit={handleSubmit(handleFilter)} size={12}>
-
-        <Grid container spacing={2}>
-
-          <Grid
-
-            size={{
-
-              xs: 12,
-
-              sm: 12,
-
-              md: 5,
-
-              lg: 6,
-
-              xl: 6
-
-            }}>
-
-            <TextFieldCustom
-
-              name="kw"
-
-              showRequired={true}
-
-              placeholder={t('profileSearch.placeholder.enterkeywords')}
-
-              control={control}
-
-              icon={<SearchIcon sx={{ color: 'grey.500' }} />}
-
-              {...({
-                sx: {
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'background.paper',
-                    borderRadius: '12px',
-                    '&:hover': {
-                      backgroundColor: 'grey.50',
-                    },
-                    '& fieldset': {
-                      borderColor: 'grey.200',
-                    },
-                  }
-                }
-              } as any)}
-
-            />
-
-          </Grid>
-
-          <Grid
-
-            size={{
-
-              xs: 12,
-
-              sm: 12,
-
-              md: 4,
-
-              lg: 4,
-
-              xl: 4
-
-            }}>
-
-            <SingleSelectCustom
-
-              name="cityId"
-
-              control={control}
-
-              options={allConfig?.cityOptions || []}
-
-              showRequired={true}
-
-              placeholder={t('profileSearch.placeholder.selectcityprovince')}
-
-              {...({
-                sx: {
-                  '& .MuiOutlinedInput-root': {
-                    backgroundColor: 'background.paper',
-                    borderRadius: '12px',
-                    '&:hover': {
-                      backgroundColor: 'grey.50',
-                    },
-                    '& fieldset': {
-                      borderColor: 'grey.200',
-                    },
-                  }
-                }
-              } as any)}
-
-            />
-
-          </Grid>
-
-          <Grid
-
-            size={{
-
-              xs: 12,
-
-              sm: 12,
-
-              md: 3,
-
-              lg: 2,
-
-              xl: 2
-
-            }}>
-
-            <Stack>
-
-              <Button
-
-                variant="contained"
-
-                color="secondary"
-
-                startIcon={<SearchIcon />}
-
-                sx={{
-
-                  height: '100%',
-
-                  borderRadius: '12px',
-
-                  boxShadow: 'none',
-
-                  background: (theme: import('@mui/material/styles').Theme) => theme.palette.secondary.main,
-
-                  '&:hover': {
-
-                    boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
-
-                  }
-
-                }}
-
-                type="submit"
-
-              >
-
-                {t('profileSearch.label.search')}
-
-              </Button>
-
-            </Stack>
-
-          </Grid>
-
-        </Grid>
-
-      </Grid>
-
-      <Grid
-
-        component="form"
-
-        onSubmit={handleSubmit(handleFilter)}
-
-        size={{
-
-          xs: 12,
-
-          sm: 12,
-
-          md: 12,
-
-          lg: 3,
-
-          xl: 3
-
-        }}>
-
-        <Stack 
-
-          spacing={2.5}
-
-          sx={{
-
+  const FilterGroup = ({ label, icon, name, options, placeholder }: { label: string, icon: any, name: keyof ProfileSearchValues, options: any[], placeholder: string }) => (
+    <Stack spacing={1}>
+      <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary', fontWeight: 600 }}>
+        <FontAwesomeIcon icon={icon} style={{ marginRight: 8, color: '#441da0', width: 16 }} />
+        {label}
+      </Typography>
+      <SingleSelectCustom
+        name={name}
+        control={control}
+        options={options}
+        placeholder={placeholder}
+        sx={{
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 2,
             backgroundColor: 'background.paper',
-
-            borderRadius: '16px',
-
-            padding: 3,
-
-            border: '1px solid',
-
-            borderColor: 'grey.100',
-
-            boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card
-
-          }}
-
-        >
-
-          <Stack
-
-            direction="row"
-
-            justifyContent="space-between"
-
-            alignItems="center"
-
-          >
-
-            <Typography variant="h6" sx={{ fontWeight: 600 }}>{t('profileSearch.title.advancedFilters')}</Typography>
-
-            <Button
-
-              variant="text"
-
-              color="error"
-
-              size="small"
-
-              startIcon={<RefreshIcon />}
-
-              sx={{ 
-
-                textTransform: 'inherit',
-
-                '&:hover': {
-
-                  backgroundColor: 'error.background'
-
-                }
-
-              }}
-
-              onClick={handleReset}
-
-            >
-
-              {t('profileSearch.label.clearFilters')}
-
-            </Button>
-
-          </Stack>
-
-          <Stack spacing={2}>
-
-            <Stack spacing={1}>
-
-              <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', color: 'grey.700' }}>
-
-                <FontAwesomeIcon icon={faBriefcase} style={{ marginRight: 8, color: '#441da0' }} />
-
-                {t('profileSearch.label.careers')}
-
-              </Typography>
-
-              <SingleSelectCustom
-
-                name="careerId"
-
-                control={control}
-
-                options={allConfig?.careerOptions || []}
-
-                placeholder={t('profileSearch.placeholder.allcareers')}
-
-                {...({
-                  sx: {
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: 'background.paper',
-                      borderRadius: '10px',
-                      '&:hover': {
-                        backgroundColor: 'grey.50',
-                      },
-                      '& fieldset': {
-                        borderColor: 'grey.200',
-                      }
-                    }
-                  }
-                } as Record<string, unknown>)}
-
-              />
-
-            </Stack>
-
-            <Stack spacing={1}>
-
-              <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', color: 'grey.700' }}>
-
-                <FontAwesomeIcon icon={faMagicWandSparkles} style={{ marginRight: 8, color: '#441da0' }} />
-
-                {t('profileSearch.label.experience')}
-
-              </Typography>
-
-              <SingleSelectCustom
-
-                name="experienceId"
-
-                control={control}
-
-                options={allConfig?.experienceOptions || []}
-
-                placeholder={t('profileSearch.placeholder.allexperience')}
-
-                {...({
-                  sx: {
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: 'background.paper',
-                      borderRadius: '10px',
-                      '&:hover': {
-                        backgroundColor: 'grey.50',
-                      },
-                      '& fieldset': {
-                        borderColor: 'grey.200',
-                      }
-                    }
-                  }
-                } as Record<string, unknown>)}
-
-              />
-
-            </Stack>
-
-            <Stack spacing={1}>
-
-              <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', color: 'grey.700' }}>
-
-                <FontAwesomeIcon icon={faUsers} style={{ marginRight: 8, color: '#441da0' }} />
-
-                {t('profileSearch.label.position')}
-
-              </Typography>
-
-              <SingleSelectCustom
-
-                name="positionId"
-
-                control={control}
-
-                options={allConfig?.positionOptions || []}
-
-                placeholder={t('profileSearch.placeholder.allpositions')}
-
-                {...({
-                  sx: {
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: 'background.paper',
-                      borderRadius: '10px',
-                      '&:hover': {
-                        backgroundColor: 'grey.50',
-                      },
-                      '& fieldset': {
-                        borderColor: 'grey.200',
-                      }
-                    }
-                  }
-                } as Record<string, unknown>)}
-
-              />
-
-            </Stack>
-
-            <Stack spacing={1}>
-
-              <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', color: 'grey.700' }}>
-
-                <FontAwesomeIcon icon={faGraduationCap} style={{ marginRight: 8, color: '#441da0' }} />
-
-                {t('profileSearch.label.academicLevel')}
-
-              </Typography>
-
-              <SingleSelectCustom
-
-                name="academicLevelId"
-
-                control={control}
-
-                options={allConfig?.academicLevelOptions || []}
-
-                placeholder={t('profileSearch.placeholder.allacademiclevels')}
-
-                {...({
-                  sx: {
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: 'background.paper',
-                      borderRadius: '10px',
-                      '&:hover': {
-                        backgroundColor: 'grey.50',
-                      },
-                      '& fieldset': {
-                        borderColor: 'grey.200',
-                      }
-                    }
-                  }
-                } as Record<string, unknown>)}
-
-              />
-
-            </Stack>
-
-            <Stack spacing={1}>
-
-              <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', color: 'grey.700' }}>
-
-                <FontAwesomeIcon icon={faBuilding} style={{ marginRight: 8, color: '#441da0' }} />
-
-                {t('profileSearch.label.workplace')}
-
-              </Typography>
-
-              <SingleSelectCustom
-
-                name="typeOfWorkplaceId"
-
-                control={control}
-
-                options={allConfig?.typeOfWorkplaceOptions || []}
-
-                placeholder={t('profileSearch.placeholder.allworkplaces')}
-
-                {...({
-                  sx: {
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: 'background.paper',
-                      borderRadius: '10px',
-                      '&:hover': {
-                        backgroundColor: 'grey.50',
-                      },
-                      '& fieldset': {
-                        borderColor: 'grey.200',
-                      }
-                    }
-                  }
-                } as Record<string, unknown>)}
-
-              />
-
-            </Stack>
-
-            <Stack spacing={1}>
-
-              <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', color: 'grey.700' }}>
-
-                <FontAwesomeIcon icon={faPersonDigging} style={{ marginRight: 8, color: '#441da0' }} />
-
-                {t('profileSearch.label.employmentType')}
-
-              </Typography>
-
-              <SingleSelectCustom
-
-                name="jobTypeId"
-
-                control={control}
-
-                options={allConfig?.jobTypeOptions || []}
-
-                placeholder={t('profileSearch.placeholder.allemploymenttypes')}
-
-                {...({
-                  sx: {
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: 'background.paper',
-                      borderRadius: '10px',
-                      '&:hover': {
-                        backgroundColor: 'grey.50',
-                      },
-                      '& fieldset': {
-                        borderColor: 'grey.200',
-                      }
-                    }
-                  }
-                } as Record<string, unknown>)}
-
-              />
-
-            </Stack>
-
-            <Stack spacing={1}>
-
-              <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', color: 'grey.700' }}>
-
-                <FontAwesomeIcon icon={faVenusMars} style={{ marginRight: 8, color: '#441da0' }} />
-
-                {t('profileSearch.label.gender')}
-
-              </Typography>
-
-              <SingleSelectCustom
-
-                name="genderId"
-
-                control={control}
-
-                options={allConfig?.genderOptions || []}
-
-                placeholder={t('profileSearch.placeholder.allgenders')}
-
-                {...({
-                  sx: {
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: 'background.paper',
-                      borderRadius: '10px',
-                      '&:hover': {
-                        backgroundColor: 'grey.50',
-                      },
-                      '& fieldset': {
-                        borderColor: 'grey.200',
-                      }
-                    }
-                  }
-                } as Record<string, unknown>)}
-
-              />
-
-            </Stack>
-
-            <Stack spacing={1}>
-
-              <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', color: 'grey.700' }}>
-
-                <FontAwesomeIcon icon={faPeopleRoof} style={{ marginRight: 8, color: '#441da0' }} />
-
-                {t('profileSearch.label.maritalStatus')}
-
-              </Typography>
-
-              <SingleSelectCustom
-
-                name="maritalStatusId"
-
-                control={control}
-
-                options={allConfig?.maritalStatusOptions || []}
-
-                placeholder={t('profileSearch.placeholder.allmaritalstatuses')}
-
-                {...({
-                  sx: {
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: 'background.paper',
-                      borderRadius: '10px',
-                      '&:hover': {
-                        backgroundColor: 'grey.50',
-                      },
-                      '& fieldset': {
-                        borderColor: 'grey.200',
-                      }
-                    }
-                  }
-                } as Record<string, unknown>)}
-
-              />
-
-            </Stack>
-
-          </Stack>
-
-        </Stack>
-
-      </Grid>
-
-    </>
-
+          }
+        }}
+      />
+    </Stack>
   );
 
+  return (
+    <Grid container spacing={3} size={12}>
+        {/* Main Search Bar */}
+        <Grid size={12}>
+            <Grid container spacing={2} component="form" onSubmit={handleSubmit(handleFilter)}>
+                <Grid size={{ xs: 12, md: 6, lg: 7 }}>
+                    <TextFieldCustom
+                        name="kw"
+                        placeholder={t('employer:profileSearch.placeholder.enterkeywords')}
+                        control={control}
+                        icon={<SearchIcon sx={{ color: 'text.disabled' }} />}
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, backgroundColor: 'background.paper' } }}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, md: 3, lg: 3 }}>
+                    <SingleSelectCustom
+                        name="cityId"
+                        control={control}
+                        options={allConfig?.cityOptions || []}
+                        placeholder={t('employer:profileSearch.placeholder.selectcityprovince')}
+                        sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3, backgroundColor: 'background.paper' } }}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, md: 3, lg: 2 }}>
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        startIcon={<SearchIcon />}
+                        type="submit"
+                        fullWidth
+                        sx={{ height: 48, borderRadius: 3, boxShadow: 'none' }}
+                    >
+                        {t('employer:profileSearch.label.search')}
+                    </Button>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        {/* Advanced Filters Sidebar */}
+        <Grid size={{ xs: 12, lg: 3 }}>
+            <Stack spacing={3} sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 4, border: '1px solid', borderColor: 'divider' }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>{t('employer:profileSearch.title.advancedFilters')}</Typography>
+                    <Button
+                        variant="text"
+                        color="error"
+                        size="small"
+                        startIcon={<RefreshIcon />}
+                        onClick={handleReset}
+                        sx={{ textTransform: 'none', fontWeight: 600 }}
+                    >
+                        {t('employer:profileSearch.label.clearFilters')}
+                    </Button>
+                </Stack>
+
+                <Stack spacing={2.5}>
+                    <FilterGroup
+                        label={t('employer:profileSearch.label.careers')}
+                        icon={faBriefcase}
+                        name="careerId"
+                        options={allConfig?.careerOptions || []}
+                        placeholder={t('employer:profileSearch.placeholder.allcareers')}
+                    />
+                    <FilterGroup
+                        label={t('employer:profileSearch.label.experience')}
+                        icon={faMagicWandSparkles}
+                        name="experienceId"
+                        options={allConfig?.experienceOptions || []}
+                        placeholder={t('employer:profileSearch.placeholder.allexperience')}
+                    />
+                    <FilterGroup
+                        label={t('employer:profileSearch.label.position')}
+                        icon={faUsers}
+                        name="positionId"
+                        options={allConfig?.positionOptions || []}
+                        placeholder={t('employer:profileSearch.placeholder.allpositions')}
+                    />
+                    <FilterGroup
+                        label={t('employer:profileSearch.label.academicLevel')}
+                        icon={faGraduationCap}
+                        name="academicLevelId"
+                        options={allConfig?.academicLevelOptions || []}
+                        placeholder={t('employer:profileSearch.placeholder.allacademiclevels')}
+                    />
+                    <FilterGroup
+                        label={t('employer:profileSearch.label.workplace')}
+                        icon={faBuilding}
+                        name="typeOfWorkplaceId"
+                        options={allConfig?.typeOfWorkplaceOptions || []}
+                        placeholder={t('employer:profileSearch.placeholder.allworkplaces')}
+                    />
+                    <FilterGroup
+                        label={t('employer:profileSearch.label.employmentType')}
+                        icon={faPersonDigging}
+                        name="jobTypeId"
+                        options={allConfig?.jobTypeOptions || []}
+                        placeholder={t('employer:profileSearch.placeholder.allemploymenttypes')}
+                    />
+                    <FilterGroup
+                        label={t('employer:profileSearch.label.gender')}
+                        icon={faVenusMars}
+                        name="genderId"
+                        options={allConfig?.genderOptions || []}
+                        placeholder={t('employer:profileSearch.placeholder.allgenders')}
+                    />
+                    <FilterGroup
+                        label={t('employer:profileSearch.label.maritalStatus')}
+                        icon={faPeopleRoof}
+                        name="maritalStatusId"
+                        options={allConfig?.maritalStatusOptions || []}
+                        placeholder={t('employer:profileSearch.placeholder.allmaritalstatuses')}
+                    />
+                </Stack>
+            </Stack>
+        </Grid>
+    </Grid>
+  );
 };
 
 export default ProfileSearch;

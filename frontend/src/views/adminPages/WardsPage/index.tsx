@@ -1,43 +1,24 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import {
-    Box,
-    Typography,
-    Breadcrumbs,
-    Link,
-    Button,
-    Paper,
-    IconButton,
-    Tooltip,
-    MenuItem,
-    TextField,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions
-} from "@mui/material";
+import React, { useState, useMemo } from 'react';
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
-import { useDataTable } from '../../../hooks';
-
-import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useCities } from '../CitiesPage/hooks/useCities';
-import { useDistricts } from '../DistrictsPage/hooks/useDistricts';
+import SearchIcon from '@mui/icons-material/Search';
+import AddIcon from '@mui/icons-material/Add';
 import { useWards } from './hooks/useWards';
+import { useDistricts } from '../DistrictsPage/hooks/useDistricts';
+import { useCities } from '../CitiesPage/hooks/useCities';
+import { useDataTable } from '../../../hooks';
+import { Ward, District, City } from '../../../types/models';
 
 const WardsPage = () => {
     const { t } = useTranslation('admin');
-    const { data: citiesData, isLoading: isLoadingCities } = useCities() as { data: { results?: unknown[] } | unknown[]; isLoading: boolean };
-    const cities = ((citiesData as { results?: unknown[] })?.results || citiesData) as Array<{ id: string | number; name: string }>;
-
-    const [selectedCity, setSelectedCity] = useState<string | number>('');
-    const [selectedDistrict, setSelectedDistrict] = useState<string | number>('');
-
+    
     const {
         page,
-        pageSize: rowsPerPage,
+        pageSize,
         sorting,
         onSortingChange,
         ordering,
@@ -45,146 +26,96 @@ const WardsPage = () => {
         onPaginationChange
     } = useDataTable({ initialPageSize: 10 });
 
-    useEffect(() => {
-        if (cities && cities.length > 0 && !selectedCity) {
-            setSelectedCity(cities[0].id);
-        }
-    }, [cities, selectedCity]);
-
-    const { data: districtsData, isLoading: isLoadingDistricts } = useDistricts({
-        city: selectedCity,
-        page: 1,
-        pageSize: 1000
-    }) as { data: { results?: unknown[] } | unknown[]; isLoading: boolean };
-    const districts = ((districtsData as { results?: unknown[] })?.results || districtsData) as Array<{ id: string | number; name: string }>;
-
-    useEffect(() => {
-        if (!districts || districts.length === 0) {
-            setSelectedDistrict('');
-            return;
-        }
-        const hasSelectedDistrict = districts.some((value) => String(value.id) === String(selectedDistrict));
-        if (!hasSelectedDistrict) {
-            setSelectedDistrict(districts[0].id);
-        }
-    }, [districts, selectedDistrict]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [cityFilter, setCityFilter] = useState<string | number>('');
+    const [districtFilter, setDistrictFilter] = useState<string | number>('');
 
     const {
-        data: wardsData,
-        isLoading: isLoadingWards,
+        data,
+        isLoading,
         createWard,
         updateWard,
         deleteWard,
         isMutating
-    } = useWards({ district: selectedDistrict, page: page + 1, pageSize: rowsPerPage, ordering }) as {
-        data: { count?: number; results?: unknown[] } | unknown[];
-        isLoading: boolean;
-        createWard: (ward: unknown) => Promise<unknown>;
-        updateWard: (ward: unknown) => Promise<unknown>;
-        deleteWard: (id: string | number) => Promise<unknown>;
-        isMutating: boolean;
-    };
-    const wards = ((wardsData as { results?: unknown[] })?.results || wardsData) as Array<Record<string, unknown>>;
+    } = useWards({
+        page: page + 1,
+        pageSize,
+        kw: searchTerm,
+        district: districtFilter || undefined,
+        ordering
+    });
 
-    const districtNameById = useMemo(() => {
-        const result: Record<string | number, string> = {};
-        (districts || []).forEach((district) => {
-            result[district.id] = district.name;
-        });
-        return result;
-    }, [districts]);
+    const { data: citiesData } = useCities({ pageSize: 100 });
+    const { data: districtsData } = useDistricts({ 
+        pageSize: 500, 
+        city: cityFilter || undefined 
+    });
 
-    const columns = useMemo<ColumnDef<Record<string, unknown>>[]>(() => [
-        {
-            accessorKey: 'id',
-            header: t('pages.wards.table.id') as string,
-            size: 80,
-            enableSorting: true,
-        },
-        {
-            accessorKey: 'name',
-            header: t('pages.wards.table.wardName') as string,
-            enableSorting: true,
-            cell: (info) => <Typography sx={{ fontWeight: 500 }}>{info.getValue() as string}</Typography>,
-        },
-        {
-            accessorKey: 'code',
-            header: t('pages.wards.table.wardCode') as string,
-            enableSorting: true,
-            cell: (info) => info.getValue() || '---',
-        },
-        {
-            accessorKey: 'district',
-            header: t('pages.wards.table.districtName') as string,
-            cell: (info) => districtNameById[info.getValue() as string | number] || '---',
-        },
-        {
-            id: 'actions',
-            header: t('pages.wards.table.actions') as string,
-            meta: { align: 'right' },
-            cell: (info) => (
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                    <Tooltip title={t('pages.wards.table.edit')}>
-                        <IconButton size="small" color="primary" onClick={() => handleOpenEdit(info.row.original)}>
-                            <EditIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('pages.wards.table.delete')}>
-                        <IconButton size="small" color="error" onClick={() => handleOpenDelete(info.row.original)}>
-                            <DeleteIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                </Box>
-            ),
-        },
-    ], [t, districtNameById]);
+    const cities = citiesData?.results || [];
+    const districts = districtsData?.results || [];
 
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-    const [currentWard, setCurrentWard] = useState<Record<string, unknown> | null>(null);
-    const [wardName, setWardName] = useState('');
-    const [wardCode, setWardCode] = useState('');
-    const [targetDistrictId, setTargetDistrictId] = useState<string | number>('');
+    const [currentWard, setCurrentWard] = useState<Ward | null>(null);
+    const [formData, setFormData] = useState<Partial<Ward>>({
+        name: '',
+        code: '',
+        district: undefined
+    });
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+        onPaginationChange({ pageIndex: 0, pageSize: pageSize });
+    };
+
+    const handleCityFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setCityFilter(e.target.value);
+        setDistrictFilter('');
+        onPaginationChange({ pageIndex: 0, pageSize: pageSize });
+    };
+
+    const handleDistrictFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setDistrictFilter(e.target.value);
+        onPaginationChange({ pageIndex: 0, pageSize: pageSize });
+    };
+
     const handleOpenAdd = () => {
         setDialogMode('add');
-        setWardName('');
-        setWardCode('');
-        setTargetDistrictId(selectedDistrict || (districts && districts[0]?.id) || '');
-        setCurrentWard(null);
+        setFormData({ name: '', code: '', district: districtFilter ? Number(districtFilter) : undefined });
         setOpenDialog(true);
     };
 
-    const handleOpenEdit = (ward: Record<string, unknown>) => {
+    const handleOpenEdit = (ward: Ward) => {
         setDialogMode('edit');
         setCurrentWard(ward);
-        setWardName(ward.name as string);
-        setWardCode((ward.code as string) || '');
-        setTargetDistrictId(ward.district as string | number);
+        setFormData({
+            name: ward.name || '',
+            code: ward.code || '',
+            district: typeof ward.district === 'object' ? (ward.district as District)?.id : ward.district
+        });
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (ward: Record<string, unknown>) => {
+    const handleOpenDelete = (ward: Ward) => {
         setCurrentWard(ward);
         setOpenDeleteDialog(true);
     };
 
     const handleCloseDialog = () => {
         setOpenDialog(false);
+        setOpenDeleteDialog(false);
     };
 
     const handleSave = async () => {
-        if (!wardName.trim() || !targetDistrictId) return;
-
         try {
             if (dialogMode === 'add') {
-                await createWard({ name: wardName, code: wardCode || null, district: targetDistrictId });
-            } else {
+                await createWard(formData);
+            } else if (currentWard) {
                 await updateWard({
-                    id: currentWard?.id as string | number,
-                    data: { name: wardName, code: wardCode || null, district: targetDistrictId }
+                    id: currentWard.id,
+                    data: formData
                 });
             }
             handleCloseDialog();
@@ -194,13 +125,66 @@ const WardsPage = () => {
     };
 
     const handleDelete = async () => {
+        if (!currentWard) return;
         try {
-            await deleteWard(currentWard?.id as string | number);
-            setOpenDeleteDialog(false);
+            await deleteWard(currentWard.id);
+            handleCloseDialog();
         } catch (error) {
             console.error(error);
         }
     };
+
+    const columns = useMemo<ColumnDef<Ward>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: 'ID',
+            enableSorting: true,
+        },
+        {
+            accessorKey: 'name',
+            header: t('pages.wards.table.name') as string,
+            enableSorting: true,
+            cell: (info) => (
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    {info.getValue() as string}
+                </Typography>
+            ),
+        },
+        {
+            accessorKey: 'code',
+            header: t('pages.wards.table.code') as string,
+            enableSorting: true,
+        },
+        {
+            accessorKey: 'districtDict.name',
+            header: t('pages.wards.table.district') as string,
+            cell: (info) => info.getValue() as string || '—',
+        },
+        {
+            accessorKey: 'districtDict.cityDict.name',
+            header: t('pages.wards.table.city') as string,
+            cell: (info) => info.getValue() as string || '—',
+        },
+        {
+            id: 'actions',
+            header: t('pages.wards.table.actions') as string,
+            meta: { align: 'right' },
+            cell: (info) => (
+                <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                    <Tooltip title={t('pages.wards.table.edit')}>
+                        <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)} color="primary">
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('pages.wards.table.delete')}>
+                        <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            ),
+        },
+    ], [t]);
 
     return (
         <Box>
@@ -209,140 +193,143 @@ const WardsPage = () => {
                     <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
                         {t('pages.wards.title')}
                     </Typography>
-                    <Breadcrumbs aria-label={t('common.breadcrumb')}>
+                    <Breadcrumbs aria-label="breadcrumb">
                         <Link underline="hover" color="inherit" href="/admin">
                             {t('pages.wards.breadcrumbAdmin')}
                         </Link>
-                        <Typography color="text.primary">{t('pages.wards.breadcrumbGeneral')}</Typography>
+                        <Typography color="text.primary">{t('pages.wards.breadcrumbLocations')}</Typography>
                         <Typography color="text.primary">{t('pages.wards.breadcrumbWards')}</Typography>
                     </Breadcrumbs>
                 </Box>
-                <Button
-                    variant="contained"
-                    startIcon={<AddIcon />}
-                    onClick={handleOpenAdd}
-                    sx={{ borderRadius: '8px', textTransform: 'none' }}
-                >
-                    {t('pages.wards.addWard')}
+                <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenAdd}>
+                    {t('pages.wards.add')}
                 </Button>
             </Box>
 
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
-                <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
+                <Box sx={{ mb: 3, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <TextField
+                        size="small"
+                        placeholder={t('pages.wards.searchPlaceholder')}
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        sx={{ width: 250 }}
+                        slotProps={{
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SearchIcon fontSize="small" color="action" />
+                                    </InputAdornment>
+                                ),
+                            }
+                        }}
+                    />
                     <TextField
                         select
-                        fullWidth
                         size="small"
-                        label={t('pages.wards.filterCityPlaceholder')}
-                        value={selectedCity}
-                        onChange={(e) => {
-                            setSelectedCity(e.target.value);
-                            onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
-                        }}
-                        disabled={isLoadingCities}
+                        label={t('pages.wards.filterByCity')}
+                        value={cityFilter}
+                        onChange={handleCityFilterChange}
+                        sx={{ width: 180 }}
                     >
-                        {cities?.map((city) => (
-                            <MenuItem key={city.id} value={city.id}>
-                                {city.name}
-                            </MenuItem>
+                        <MenuItem value="">{t('common.all')}</MenuItem>
+                        {cities.map((city: City) => (
+                            <MenuItem key={city.id} value={city.id}>{city.name}</MenuItem>
                         ))}
                     </TextField>
                     <TextField
                         select
-                        fullWidth
                         size="small"
-                        label={t('pages.wards.filterDistrictPlaceholder')}
-                        value={selectedDistrict}
-                        onChange={(e) => {
-                            setSelectedDistrict(e.target.value);
-                            onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
-                        }}
-                        disabled={isLoadingDistricts || !(districts && districts.length > 0)}
+                        label={t('pages.wards.filterByDistrict')}
+                        value={districtFilter}
+                        onChange={handleDistrictFilterChange}
+                        sx={{ width: 220 }}
+                        disabled={!cityFilter}
                     >
-                        {districts?.map((district) => (
-                            <MenuItem key={district.id} value={district.id}>
-                                {district.name}
-                            </MenuItem>
+                        <MenuItem value="">{t('common.all')}</MenuItem>
+                        {districts.map((district: District) => (
+                            <MenuItem key={district.id} value={district.id}>{district.name}</MenuItem>
                         ))}
                     </TextField>
                 </Box>
 
-
                 <DataTable
                     columns={columns}
-                    data={wards || []}
-                    isLoading={isLoadingWards}
-                    rowCount={(wardsData as { count?: number })?.count || 0}
+                    data={data?.results || []}
+                    isLoading={isLoading}
+                    rowCount={data?.count || 0}
                     pagination={pagination}
                     onPaginationChange={onPaginationChange}
                     enableSorting
                     sorting={sorting}
                     onSortingChange={onSortingChange}
-                    emptyMessage={!selectedDistrict ? t('pages.wards.table.noDistrictSelected') : t('pages.wards.table.noData')}
                 />
             </Paper>
 
+            {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="xs">
                 <DialogTitle>
-                    {dialogMode === 'add' ? t('pages.wards.addConfirmTitle') : t('pages.wards.editConfirmTitle')}
+                    {dialogMode === 'add' ? t('pages.wards.add') : t('pages.wards.edit')}
                 </DialogTitle>
                 <DialogContent>
-                    <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
                         <TextField
                             select
-                            label={t('pages.wards.districtLabel')}
+                            label={t('pages.wards.form.district')}
                             fullWidth
-                            value={targetDistrictId}
-                            onChange={(e) => setTargetDistrictId(e.target.value)}
+                            value={formData.district || ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, district: Number(e.target.value) }))}
                             required
                         >
-                            {districts?.map((district) => (
-                                <MenuItem key={district.id} value={district.id}>
-                                    {district.name}
-                                </MenuItem>
+                            {districts.map((district: District) => (
+                                <MenuItem key={district.id} value={district.id}>{district.name}</MenuItem>
                             ))}
                         </TextField>
                         <TextField
-                            label={t('pages.wards.wardNameLabel')}
+                            label={t('pages.wards.form.name')}
                             fullWidth
-                            value={wardName}
-                            onChange={(e) => setWardName(e.target.value)}
+                            value={formData.name}
+                            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                             required
                         />
                         <TextField
-                            label={t('pages.wards.wardCodeLabel')}
+                            label={t('pages.wards.form.code')}
                             fullWidth
-                            value={wardCode}
-                            onChange={(e) => setWardCode(e.target.value)}
+                            value={formData.code}
+                            onChange={(e) => setFormData(prev => ({ ...prev, code: e.target.value }))}
+                            required
                         />
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.wards.cancelBtn')}</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.wards.cancel')}</Button>
                     <Button
                         onClick={handleSave}
                         variant="contained"
-                        disabled={isMutating || !wardName.trim() || !targetDistrictId}
+                        disabled={isMutating || !formData.name || !formData.code || !formData.district}
                     >
-                        {isMutating ? t('pages.wards.savingBtn') : t('pages.wards.saveBtn')}
+                        {isMutating ? t('common.saving') : t('common.save')}
                     </Button>
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
+            {/* Delete Confirmation */}
+            <Dialog open={openDeleteDialog} onClose={handleCloseDialog}>
                 <DialogTitle>{t('pages.wards.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography dangerouslySetInnerHTML={{ __html: String(t('pages.wards.deleteText', { name: currentWard?.name })) }} />
+                    <Typography>
+                        {t('pages.wards.deleteConfirm', { name: currentWard?.name })}
+                    </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.wards.cancelBtn')}</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.wards.cancel')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? t('pages.wards.deletingBtn') : t('pages.wards.deleteBtn')}
+                        {isMutating ? t('common.deleting') : t('common.delete')}
                     </Button>
                 </DialogActions>
             </Dialog>

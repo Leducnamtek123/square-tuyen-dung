@@ -1,11 +1,21 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminJobService from '../../../../services/adminJobService';
 import toastMessages from '../../../../utils/toastMessages';
 import { JobPost } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
-export const useJobs = (params: Record<string, unknown>) => {
-    return useQuery({
+export type UseJobsResult = UseQueryResult<PaginatedResponse<JobPost>> & {
+    updateJob: (args: { id: string | number; data: Partial<JobPost> | Record<string, unknown> }) => Promise<JobPost>;
+    approveJob: (id: string | number) => Promise<JobPost>;
+    rejectJob: (id: string | number) => Promise<JobPost>;
+    deleteJob: (id: string | number) => Promise<void>;
+    isMutating: boolean;
+};
+
+export const useJobs = (params: Record<string, unknown>): UseJobsResult => {
+    const queryClient = useQueryClient();
+
+    const query = useQuery({
         queryKey: ['admin-jobs', params],
         queryFn: async () => {
             const res = await adminJobService.getAllJobs(params);
@@ -13,23 +23,18 @@ export const useJobs = (params: Record<string, unknown>) => {
         },
         placeholderData: keepPreviousData,
     });
-};
 
-export const useDeleteJob = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: (id: string | number) => adminJobService.deleteJob(id),
+    const updateMutation = useMutation({
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPost> | Record<string, unknown> }) => 
+            adminJobService.updateJob(id, data as Record<string, unknown>),
         onSuccess: () => {
-            toastMessages.success('Job post deleted');
+            toastMessages.success('Job post updated successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-jobs'] });
         },
-        onError: () => toastMessages.error('Error deleting job post'),
+        onError: () => toastMessages.error('Error updating job post'),
     });
-};
 
-export const useApproveJob = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
+    const approveMutation = useMutation({
         mutationFn: (id: string | number) => adminJobService.approveJob(id),
         onSuccess: () => {
             toastMessages.success('Job post approved');
@@ -37,11 +42,8 @@ export const useApproveJob = () => {
         },
         onError: () => toastMessages.error('Error approving job post'),
     });
-};
 
-export const useRejectJob = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
+    const rejectMutation = useMutation({
         mutationFn: (id: string | number) => adminJobService.rejectJob(id),
         onSuccess: () => {
             toastMessages.success('Job post rejected');
@@ -49,16 +51,22 @@ export const useRejectJob = () => {
         },
         onError: () => toastMessages.error('Error rejecting job post'),
     });
-};
 
-export const useUpdateJob = () => {
-    const queryClient = useQueryClient();
-    return useMutation({
-        mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPost> | Record<string, unknown> }) => adminJobService.updateJob(id, data),
+    const deleteMutation = useMutation({
+        mutationFn: (id: string | number) => adminJobService.deleteJob(id),
         onSuccess: () => {
-            toastMessages.success('Job post updated successfully');
+            toastMessages.success('Job post deleted');
             queryClient.invalidateQueries({ queryKey: ['admin-jobs'] });
         },
-        onError: () => toastMessages.error('Error updating job post'),
+        onError: () => toastMessages.error('Error deleting job post'),
     });
+
+    return {
+        ...query,
+        updateJob: updateMutation.mutateAsync,
+        approveJob: approveMutation.mutateAsync,
+        rejectJob: rejectMutation.mutateAsync,
+        deleteJob: deleteMutation.mutateAsync,
+        isMutating: updateMutation.isPending || approveMutation.isPending || rejectMutation.isPending || deleteMutation.isPending
+    } as UseJobsResult;
 };

@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
-import { Box, Typography, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, Chip, Tooltip, IconButton } from "@mui/material";
+import React, { useState, useMemo } from 'react';
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Tooltip, IconButton, Stack, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import { Grid2 as Grid } from "@mui/material";
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
-import dayjs from '../../../configs/dayjs-config';
-
 import SearchIcon from '@mui/icons-material/Search';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import DownloadIcon from '@mui/icons-material/Download';
 import { useResumes } from './hooks/useResumes';
 import { useDataTable } from '../../../hooks';
+import { Resume } from '../../../types/models';
+import dayjs from '../../../configs/dayjs-config';
 
 const ResumesPage = () => {
     const { t } = useTranslation('admin');
     
     const {
         page,
-        pageSize: rowsPerPage,
+        pageSize,
         sorting,
         onSortingChange,
         ordering,
@@ -30,163 +30,119 @@ const ResumesPage = () => {
     const {
         data,
         isLoading,
-        updateResume,
         deleteResume,
         isMutating
     } = useResumes({
         page: page + 1,
-        pageSize: rowsPerPage,
+        pageSize,
         kw: searchTerm,
         ordering
-    }) as any;
-
-    const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [currentResume, setCurrentResume] = useState<any>(null);
-    const [formData, setFormData] = useState({
-        title: '',
-        salaryMin: 0,
-        salaryMax: 0,
-        isActive: true,
     });
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [currentResume, setCurrentResume] = useState<Resume | null>(null);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-        onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
+        onPaginationChange({ pageIndex: 0, pageSize: pageSize });
     };
 
-    const handleOpenEdit = (resume: any) => {
-        setCurrentResume(resume);
-        setFormData({
-            title: resume.title || '',
-            salaryMin: resume.salaryMin || 0,
-            salaryMax: resume.salaryMax || 0,
-            isActive: resume.isActive ?? true,
-        });
-        setOpenEditDialog(true);
-    };
-
-    const handleOpenDelete = (resume: any) => {
+    const handleOpenDelete = (resume: Resume) => {
         setCurrentResume(resume);
         setOpenDeleteDialog(true);
     };
 
-    const handleCloseDialogs = () => {
-        setOpenEditDialog(false);
+    const handleCloseDialog = () => {
         setOpenDeleteDialog(false);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type, checked } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
-    };
-
-    const handleSaveEdit = async () => {
-        try {
-            await updateResume({
-                id: currentResume.id,
-                data: formData
-            });
-            handleCloseDialogs();
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
     const handleDelete = async () => {
+        if (!currentResume) return;
         try {
             await deleteResume(currentResume.id);
-            handleCloseDialogs();
+            handleCloseDialog();
         } catch (error) {
             console.error(error);
         }
     };
 
-    const columns = React.useMemo<ColumnDef<any>[]>(() => [
+    const columns = useMemo<ColumnDef<Resume>[]>(() => [
+        {
+            accessorKey: 'id',
+            header: 'ID',
+            enableSorting: true,
+        },
         {
             accessorKey: 'title',
-            header: t('pages.resumes.table.resumeTitle') as string,
+            header: t('pages.resumes.table.title') as string,
             enableSorting: true,
             cell: (info) => (
                 <Box>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                    <Typography variant="body2" sx={{ fontWeight: 600 }}>
                         {info.getValue() as string}
                     </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                        Slug: {info.row.original.slug}
+                    <Typography variant="caption" color="textSecondary">
+                        {(info.row.original as any).userDict?.fullName || '—'}
                     </Typography>
                 </Box>
             ),
         },
         {
-            accessorKey: 'userDict.fullName',
-            header: t('pages.resumes.table.candidate') as string,
-            enableSorting: true,
-            cell: (info) => info.getValue() || '---',
+            accessorKey: 'isDefault',
+            header: t('pages.resumes.table.default') as string,
+            cell: (info) => info.getValue() ? t('common.yes') : t('common.no'),
         },
         {
-            accessorKey: 'type',
-            header: t('pages.resumes.table.resumeType') as string,
-            cell: (info) => (
-                <Chip
-                    label={info.getValue() === 'UPLOAD' ? t('pages.resumes.table.uploadedFile') : t('pages.resumes.table.onlineProfile')}
-                    size="small"
-                    variant="outlined"
-                    color={info.getValue() === 'UPLOAD' ? 'primary' : 'secondary'}
-                />
-            ),
-        },
-        {
-            accessorKey: 'experience',
-            header: t('pages.resumes.table.experience') as string,
-            enableSorting: true,
-            cell: (info) => info.getValue() || '---',
-        },
-        {
-            accessorKey: 'updateAt',
-            header: t('pages.resumes.table.lastUpdate') as string,
-            enableSorting: true,
-            cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm'),
-        },
-        {
-            accessorKey: 'isActive',
-            header: t('pages.resumes.table.status') as string,
-            meta: { align: 'center' },
-            cell: (info) => (
-                <Chip
-                    label={info.getValue() ? t('pages.resumes.table.active') : t('pages.resumes.table.inactive')}
-                    size="small"
-                    color={info.getValue() ? 'success' : 'default'}
-                />
-            ),
+            accessorKey: 'createAt',
+            header: t('pages.resumes.table.createdAt') as string,
+            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '—',
         },
         {
             id: 'actions',
             header: t('pages.resumes.table.actions') as string,
             meta: { align: 'right' },
-            cell: (info) => (
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-                    <Tooltip title={t('pages.resumes.table.viewDetails')}>
-                        <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)}>
-                            <VisibilityIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('pages.resumes.table.delete')}>
-                        <IconButton size="small" onClick={() => handleOpenDelete(info.row.original)} color="error">
-                            <DeleteIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                </Box>
-            ),
+            cell: (info) => {
+                const resume = info.row.original;
+                return (
+                    <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+                        <Tooltip title={t('pages.resumes.table.view')}>
+                             <IconButton size="small" component="a" href={resume.fileUrl || '#'} target="_blank" color="info">
+                                <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('pages.resumes.table.download')}>
+                             <IconButton size="small" component="a" href={resume.fileUrl || '#'} download color="primary">
+                                <DownloadIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                        <Tooltip title={t('pages.resumes.table.delete')}>
+                            <IconButton size="small" onClick={() => handleOpenDelete(resume)} color="error">
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    </Stack>
+                );
+            },
         },
     ], [t]);
 
     return (
-        <Box sx={{ p: 2 }}>
+        <Box>
+            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <Box>
+                    <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', mb: 1 }}>
+                        {t('pages.resumes.title')}
+                    </Typography>
+                    <Breadcrumbs aria-label="breadcrumb">
+                        <Link underline="hover" color="inherit" href="/admin">
+                            {t('pages.resumes.breadcrumbAdmin')}
+                        </Link>
+                        <Typography color="text.primary">{t('pages.resumes.breadcrumbResources')}</Typography>
+                        <Typography color="text.primary">{t('pages.resumes.breadcrumbResumes')}</Typography>
+                    </Breadcrumbs>
+                </Box>
+            </Box>
+
             <Paper sx={{ p: 2, mb: 3, borderRadius: '12px' }} elevation={0}>
                 <Box sx={{ mb: 3, display: 'flex', gap: 2 }}>
                     <TextField
@@ -207,7 +163,6 @@ const ResumesPage = () => {
                     />
                 </Box>
 
-
                 <DataTable
                     columns={columns}
                     data={data?.results || []}
@@ -220,69 +175,24 @@ const ResumesPage = () => {
                     onSortingChange={onSortingChange}
                 />
             </Paper>
-            {/* Edit Dialog */}
-            <Dialog open={openEditDialog} onClose={handleCloseDialogs} fullWidth maxWidth="xs">
-                <DialogTitle>{t('pages.resumes.editTitle')}</DialogTitle>
-                <DialogContent>
-                    <Grid container spacing={2} sx={{ pt: 1 }}>
-                        <Grid size={12}>
-                            <TextField
-                                label={t('pages.resumes.resumeTitleLabel')}
-                                fullWidth
-                                name="title"
-                                value={formData.title}
-                                onChange={handleInputChange}
-                                required
-                            />
-                        </Grid>
-                        <Grid size={6}>
-                            <TextField
-                                label={t('pages.resumes.minSalaryLabel')}
-                                fullWidth
-                                type="number"
-                                name="salaryMin"
-                                value={formData.salaryMin}
-                                onChange={handleInputChange}
-                            />
-                        </Grid>
-                        <Grid size={6}>
-                            <TextField
-                                label={t('pages.resumes.maxSalaryLabel')}
-                                fullWidth
-                                type="number"
-                                name="salaryMax"
-                                value={formData.salaryMax}
-                                onChange={handleInputChange}
-                            />
-                        </Grid>
-                    </Grid>
-                </DialogContent>
-                <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialogs} color="inherit">{t('pages.resumes.cancelBtn')}</Button>
-                    <Button
-                        onClick={handleSaveEdit}
-                        variant="contained"
-                        disabled={isMutating || !formData.title}
-                    >
-                        {isMutating ? t('pages.resumes.savingBtn') : t('pages.resumes.saveBtn')}
-                    </Button>
-                </DialogActions>
-            </Dialog>
+
             {/* Delete Confirmation */}
-            <Dialog open={openDeleteDialog} onClose={handleCloseDialogs}>
+            <Dialog open={openDeleteDialog} onClose={handleCloseDialog}>
                 <DialogTitle>{t('pages.resumes.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography dangerouslySetInnerHTML={{ __html: t('pages.resumes.deleteText', { name: currentResume?.title }) }} />
+                    <Typography>
+                        {t('pages.resumes.deleteConfirm', { title: currentResume?.title })}
+                    </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
-                    <Button onClick={handleCloseDialogs} color="inherit">{t('pages.resumes.cancelBtn')}</Button>
+                    <Button onClick={handleCloseDialog} color="inherit">{t('pages.resumes.cancel')}</Button>
                     <Button
                         onClick={handleDelete}
                         color="error"
                         variant="contained"
                         disabled={isMutating}
                     >
-                        {isMutating ? t('pages.resumes.deletingBtn') : t('pages.resumes.deleteBtn')}
+                        {isMutating ? t('common.deleting') : t('common.delete')}
                     </Button>
                 </DialogActions>
             </Dialog>

@@ -1,9 +1,16 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
 import { JobPostActivity } from '../../../../types/models';
+import { PaginatedResponse } from '../../../../types/api';
 
-export const useJobActivities = (params?: Record<string, unknown>) => {
+export type UseJobActivitiesResult = UseQueryResult<PaginatedResponse<JobPostActivity>> & {
+    updateJobActivity: (args: { id: string | number; data: Partial<JobPostActivity> | Record<string, unknown> }) => Promise<unknown>;
+    deleteJobActivity: (id: string | number) => Promise<unknown>;
+    isMutating: boolean;
+};
+
+export const useJobActivities = (params: Record<string, unknown>): UseJobActivitiesResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -13,18 +20,6 @@ export const useJobActivities = (params?: Record<string, unknown>) => {
             return res;
         },
         placeholderData: keepPreviousData,
-    });
-
-    const createMutation = useMutation({
-        mutationFn: (data: Partial<JobPostActivity> | Record<string, unknown>) => adminManagementService.createJobActivity(data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin-job-activities'] });
-            toastMessages.success('Activity added successfully');
-        },
-        onError: (err: Error | unknown) => {
-            toastMessages.error('An error occurred while adding the activity');
-            console.error(err);
-        }
     });
 
     const updateMutation = useMutation({
@@ -53,9 +48,8 @@ export const useJobActivities = (params?: Record<string, unknown>) => {
 
     return {
         ...query,
-        createJobActivity: createMutation.mutateAsync,
         updateJobActivity: updateMutation.mutateAsync,
         deleteJobActivity: deleteMutation.mutateAsync,
-        isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    };
+        isMutating: updateMutation.isPending || deleteMutation.isPending
+    } as UseJobActivitiesResult;
 };

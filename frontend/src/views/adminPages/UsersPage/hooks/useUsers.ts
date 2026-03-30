@@ -1,13 +1,23 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-
+import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import userService from '../../../../services/userService';
 import toastMessages from '../../../../utils/toastMessages';
 import i18n from '../../../../i18n';
+import { User as UserModel } from '../../../../types/models';
+import { PaginatedResponse } from '../../../../types/api';
 
 const t = (key: string, options?: any) => i18n.t(key, { ns: 'admin', ...options }) as string;
 
-export const useUsers = (params: any) => {
-    return useQuery({
+export type UseUsersResult = UseQueryResult<PaginatedResponse<UserModel>> & {
+    toggleUserStatus: (user: UserModel) => Promise<UserModel>;
+    updateUserRole: (args: { userId: string | number; roleName: string }) => Promise<UserModel>;
+    deleteUser: (id: string | number) => Promise<void>;
+    isMutating: boolean;
+};
+
+export const useUsers = (params: Record<string, unknown>): UseUsersResult => {
+    const queryClient = useQueryClient();
+
+    const query = useQuery({
         queryKey: ['users', params],
         queryFn: async () => {
             const response = await userService.getAllUsers(params);
@@ -15,14 +25,10 @@ export const useUsers = (params: any) => {
         },
         placeholderData: keepPreviousData,
     });
-};
 
-export const useToggleUserStatus = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: (user: any) => userService.toggleUserStatus(user.id),
-        onSuccess: (_data, user: any) => {
+    const toggleStatusMutation = useMutation({
+        mutationFn: (user: UserModel) => userService.toggleUserStatus(user.id),
+        onSuccess: (_data, user: UserModel) => {
             toastMessages.success(
                 user.isActive
                     ? t('pages.users.toast.blockSuccess')
@@ -36,13 +42,9 @@ export const useToggleUserStatus = () => {
             );
         }
     });
-};
 
-export const useUpdateUserRole = () => {
-    const queryClient = useQueryClient();
-
-    return useMutation({
-        mutationFn: ({ userId, roleName }: { userId: any; roleName: string }) => userService.updateUser(userId, { roleName }),
+    const updateRoleMutation = useMutation({
+        mutationFn: ({ userId, roleName }: { userId: string | number; roleName: string }) => userService.updateUser(userId, { roleName }),
         onSuccess: () => {
             toastMessages.success(t('pages.users.toast.roleUpdated'));
             queryClient.invalidateQueries({ queryKey: ['users'] });
@@ -53,4 +55,25 @@ export const useUpdateUserRole = () => {
             );
         }
     });
+
+    const deleteMutation = useMutation({
+        mutationFn: (id: string | number) => userService.deleteUser(id),
+        onSuccess: () => {
+            toastMessages.success('User deleted successfully');
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+        },
+        onError: (error: any) => {
+            toastMessages.error(
+                error.response?.data?.errors?.detail || 'Delete failed'
+            );
+        }
+    });
+
+    return {
+        ...query,
+        toggleUserStatus: toggleStatusMutation.mutateAsync,
+        updateUserRole: updateRoleMutation.mutateAsync,
+        deleteUser: deleteMutation.mutateAsync,
+        isMutating: toggleStatusMutation.isPending || updateRoleMutation.isPending || deleteMutation.isPending
+    } as UseUsersResult;
 };

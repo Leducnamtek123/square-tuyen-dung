@@ -1,12 +1,21 @@
-import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
 import i18next from 'i18next';
+import { Ward } from '../../../../types/models';
+import { PaginatedResponse } from '../../../../types/api';
 
-export const useWards = (params?: Record<string, unknown>) => {
+export type UseWardsResult = UseQueryResult<PaginatedResponse<Ward>> & {
+    createWard: (data: Partial<Ward>) => Promise<Ward>;
+    updateWard: (args: { id: string | number; data: Partial<Ward> }) => Promise<Ward>;
+    deleteWard: (id: string | number) => Promise<void>;
+    isMutating: boolean;
+};
+
+export const useWards = (params?: Record<string, unknown>): UseWardsResult => {
     const queryClient = useQueryClient();
 
-    const query = useQuery({
+    const query = useQuery<PaginatedResponse<Ward>>({
         queryKey: ['admin-wards', params],
         queryFn: async () => {
             const res = await adminManagementService.getWards(params);
@@ -16,8 +25,8 @@ export const useWards = (params?: Record<string, unknown>) => {
         enabled: !!(params?.district || !params),
     });
 
-    const createMutation = useMutation({
-        mutationFn: (data: Record<string, unknown>) => adminManagementService.createWard(data),
+    const createMutation = useMutation<Ward, Error, Partial<Ward>>({
+        mutationFn: (data: Partial<Ward>) => adminManagementService.createWard(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-wards'] });
             toastMessages.success(i18next.t('admin:pages.wards.toast.addSuccess'));
@@ -28,8 +37,8 @@ export const useWards = (params?: Record<string, unknown>) => {
         }
     });
 
-    const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> }) => adminManagementService.updateWard(id, data),
+    const updateMutation = useMutation<Ward, Error, { id: string | number; data: Partial<Ward> }>({
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<Ward> }) => adminManagementService.updateWard(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-wards'] });
             toastMessages.success(i18next.t('admin:pages.wards.toast.updateSuccess'));
@@ -40,7 +49,7 @@ export const useWards = (params?: Record<string, unknown>) => {
         }
     });
 
-    const deleteMutation = useMutation({
+    const deleteMutation = useMutation<void, Error, string | number>({
         mutationFn: (id: string | number) => adminManagementService.deleteWard(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-wards'] });
@@ -58,5 +67,5 @@ export const useWards = (params?: Record<string, unknown>) => {
         updateWard: updateMutation.mutateAsync,
         deleteWard: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    };
+    } as UseWardsResult;
 };

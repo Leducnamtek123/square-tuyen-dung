@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Button, Chip, CircularProgress, Divider, Paper, Stack, Typography } from '@mui/material';
-import { InterviewSession } from './index';
+import { InterviewSession } from '@/types/models';
 
 interface InterviewAiEvaluationCardProps {
   session: InterviewSession;

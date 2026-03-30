@@ -4,7 +4,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 
 interface StatCardProps {
     title: string;
-    value: any;
+    value: number | string | undefined;
     icon: React.ReactNode;
     color: string;
     loading: boolean;

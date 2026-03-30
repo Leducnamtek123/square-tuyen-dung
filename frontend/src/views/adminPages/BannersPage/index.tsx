@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import {
-  Box, Typography, Breadcrumbs, Link, Button, Paper, CircularProgress,
+  Box, Typography, Breadcrumbs, Link, Button, Paper,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField,
   FormControlLabel, Switch, Select, MenuItem, InputLabel, FormControl,
   Chip, Tooltip, IconButton, Stack
@@ -10,13 +10,14 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { useTranslation } from 'react-i18next';
-import adminManagementService from '../../../services/adminManagementService';
 import { IMAGES } from '../../../configs/constants';
 import { compressImageFile } from '../../../utils/imageCompression';
 import ImageCropDialog from '../../../components/Common/ImageCropDialog';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
 import { useDataTable } from '../../../hooks';
+import { Banner } from '../../../types/models';
+import { useBanners } from './hooks/useBanners';
 
 /** Aspect ratios per banner type */
 const ASPECT_RATIOS: Record<number, { ratio: number; label: string }> = {
@@ -41,34 +42,52 @@ const DESCRIPTION_LOCATIONS = [
   { value: 4, label: 'Bottom Right' },
 ];
 
-import { PaginatedResponse } from '@/types/api';
+interface BannerFormData {
+    description: string;
+    button_text: string;
+    button_link: string;
+    is_show_button: boolean;
+    is_active: boolean;
+    platform: string;
+    type: number;
+    description_location: number;
+}
 
 const BannersPage = () => {
   const { t } = useTranslation('admin');
-  const [banners, setBanners] = useState<Record<string, unknown>[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [fetchError, setFetchError] = useState<string | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-  const [current, setCurrent] = useState<Record<string, unknown> | null>(null);
+  const [current, setCurrent] = useState<Banner | null>(null);
   const [openDelete, setOpenDelete] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
 
   const {
-    sorting,
-    onSortingChange,
-    ordering,
+      sorting,
+      onSortingChange,
+      ordering,
   } = useDataTable();
 
+  const {
+      data,
+      isLoading,
+      createBanner,
+      updateBanner,
+      deleteBanner,
+      isMutating
+  } = useBanners({ ordering });
+
+  const banners = data?.results || [];
+
   // Form fields
-  const [description, setDescription] = useState('');
-  const [buttonText, setButtonText] = useState('');
-  const [buttonLink, setButtonLink] = useState('');
-  const [isShowButton, setIsShowButton] = useState(false);
-  const [isActive, setIsActive] = useState(false);
-  const [platform, setPlatform] = useState('WEB');
-  const [type, setType] = useState(1);
-  const [descriptionLocation, setDescriptionLocation] = useState(3);
+  const [formData, setFormData] = useState<BannerFormData>({
+    description: '',
+    button_text: '',
+    button_link: '',
+    is_show_button: false,
+    is_active: false,
+    platform: 'WEB',
+    type: 1,
+    description_location: 3
+  });
 
   // File uploads
   const [webImage, setWebImage] = useState<File | null>(null);
@@ -84,26 +103,17 @@ const BannersPage = () => {
   const [cropFileName, setCropFileName] = useState('');
   const [cropTarget, setCropTarget] = useState<'web' | 'mobile'>('web');
 
-  const fetchBanners = useCallback(async () => {
-    setIsLoading(true);
-    setFetchError(null);
-    try {
-      const res = await adminManagementService.getBanners({ ordering }) as PaginatedResponse<Record<string, unknown>>;
-      setBanners(res.results || []);
-    } catch (e) {
-      console.error('[BannersPage] fetchBanners error:', e);
-      setFetchError(t('pages.banners.fetchError') || 'Không thể tải danh sách banner. Vui lòng thử lại.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [t, ordering]);
-
-  useEffect(() => { fetchBanners(); }, [fetchBanners]);
-
   const resetForm = () => {
-    setDescription(''); setButtonText(''); setButtonLink('');
-    setIsShowButton(false); setIsActive(false);
-    setPlatform('WEB'); setType(1); setDescriptionLocation(3);
+    setFormData({
+        description: '',
+        button_text: '',
+        button_link: '',
+        is_show_button: false,
+        is_active: false,
+        platform: 'WEB',
+        type: 1,
+        description_location: 3
+    });
     setWebImage(null); setMobileImage(null);
     setWebPreview(''); setMobilePreview('');
   };
@@ -113,57 +123,59 @@ const BannersPage = () => {
     setOpenDialog(true);
   };
 
-  const handleOpenEdit = (banner: Record<string, unknown>) => {
+  const handleOpenEdit = (banner: Banner) => {
     setDialogMode('edit'); setCurrent(banner);
-    setDescription(banner.description as string || '');
-    setButtonText(banner.button_text as string || '');
-    setButtonLink(banner.button_link as string || '');
-    setIsShowButton(!!banner.is_show_button);
-    setIsActive(!!banner.is_active);
-    setPlatform(banner.platform as string || 'WEB');
-    setType(banner.type as number ?? 1);
-    setDescriptionLocation(banner.description_location as number ?? 3);
+    setFormData({
+        description: banner.description || '',
+        button_text: banner.button_text || '',
+        button_link: banner.button_link || '',
+        is_show_button: !!banner.is_show_button,
+        is_active: !!banner.is_active,
+        platform: banner.platform || 'WEB',
+        type: banner.type ?? 1,
+        description_location: banner.description_location ?? 3
+    });
     setWebImage(null); setMobileImage(null);
-    setWebPreview(banner.imageUrl as string || '');
-    setMobilePreview(banner.imageMobileUrl as string || '');
+    setWebPreview(banner.imageUrl || '');
+    setMobilePreview(banner.imageMobileUrl || '');
     setOpenDialog(true);
   };
 
-  const handleSave = async () => {
-    setIsSaving(true);
-    const formData = new FormData();
-    formData.append('description', description);
-    formData.append('button_text', buttonText);
-    if (buttonLink) formData.append('button_link', buttonLink);
-    formData.append('is_show_button', String(isShowButton));
-    formData.append('is_active', String(isActive));
-    formData.append('platform', platform);
-    formData.append('type', String(type));
-    formData.append('description_location', String(descriptionLocation));
+  const handleInputChange = (name: keyof BannerFormData, value: any) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-    if (webImage) formData.append('imageFile', webImage);
-    if (mobileImage) formData.append('imageMobileFile', mobileImage);
+  const handleSave = async () => {
+    const dataToSend = new FormData();
+    dataToSend.append('description', formData.description);
+    dataToSend.append('button_text', formData.button_text);
+    if (formData.button_link) dataToSend.append('button_link', formData.button_link);
+    dataToSend.append('is_show_button', String(formData.is_show_button));
+    dataToSend.append('is_active', String(formData.is_active));
+    dataToSend.append('platform', formData.platform);
+    dataToSend.append('type', String(formData.type));
+    dataToSend.append('description_location', String(formData.description_location));
+
+    if (webImage) dataToSend.append('imageFile', webImage);
+    if (mobileImage) dataToSend.append('imageMobileFile', mobileImage);
 
     try {
       if (dialogMode === 'add') {
-        await adminManagementService.createBanner(formData as unknown as Record<string, unknown>);
-      } else {
-        await adminManagementService.updateBanner(current!.id as string | number, formData as unknown as Record<string, unknown>);
+        await createBanner(dataToSend);
+      } else if (current) {
+        await updateBanner({ id: current.id, data: dataToSend });
       }
       setOpenDialog(false);
-      fetchBanners();
     } catch (e) { console.error(e); }
-    finally { setIsSaving(false); }
   };
 
   const handleDelete = async () => {
-    setIsSaving(true);
     try {
-      await adminManagementService.deleteBanner(current!.id as string | number);
-      setOpenDelete(false);
-      fetchBanners();
+      if (current) {
+        await deleteBanner(current.id);
+        setOpenDelete(false);
+      }
     } catch (e) { console.error(e); }
-    finally { setIsSaving(false); }
   };
 
   const handleFileSelect = (target: 'web' | 'mobile') =>
@@ -198,9 +210,9 @@ const BannersPage = () => {
     setCropImageSrc('');
   };
 
-  const cropAspect = ASPECT_RATIOS[type] || ASPECT_RATIOS[1];
+  const cropAspect = ASPECT_RATIOS[formData.type] || ASPECT_RATIOS[1];
 
-  const columns = useMemo<ColumnDef<Record<string, unknown>>[]>(() => [
+  const columns = useMemo<ColumnDef<Banner>[]>(() => [
     {
       accessorKey: 'id',
       header: t('pages.banners.table.id') as string,
@@ -258,14 +270,14 @@ const BannersPage = () => {
       accessorKey: 'type',
       header: t('pages.banners.table.type') as string,
       enableSorting: true,
-      cell: (info) => TYPE_OPTIONS.find(t => t.value === info.getValue())?.label || (info.getValue() as string),
+      cell: (info) => TYPE_OPTIONS.find(opt => opt.value === info.getValue())?.label || (info.getValue() as string | number),
     },
     {
       accessorKey: 'is_active',
       header: t('pages.banners.table.status') as string,
       cell: (info) => (
         <Chip label={info.getValue() ? t('pages.banners.active') : t('pages.banners.inactive')} size="small"
-          color={info.getValue() ? 'success' : 'default'} />
+              color={info.getValue() ? 'success' : 'default'} variant="outlined" />
       ),
     },
     {
@@ -273,9 +285,9 @@ const BannersPage = () => {
       header: t('pages.banners.table.actions') as string,
       meta: { align: 'right' },
       cell: (info) => (
-        <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-          <Tooltip title={t('pages.banners.table.edit')}>
-            <IconButton size="small" onClick={() => handleOpenEdit(info.row.original)}>
+        <Stack direction="row" spacing={1} justifyContent="flex-end">
+          <Tooltip title={t('pages.banners.table.editTooltip')}>
+            <IconButton size="small" color="primary" onClick={() => handleOpenEdit(info.row.original)}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -295,7 +307,7 @@ const BannersPage = () => {
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>{t('pages.banners.title')}</Typography>
           <Breadcrumbs>
-            <Link underline="hover" color="inherit" href="/">{t('pages.banners.breadcrumbAdmin')}</Link>
+            <Link underline="hover" color="inherit" href="/admin">{t('pages.banners.breadcrumbAdmin')}</Link>
             <Typography color="text.primary">{t('pages.banners.breadcrumb')}</Typography>
           </Breadcrumbs>
         </Box>
@@ -305,56 +317,45 @@ const BannersPage = () => {
         </Button>
       </Box>
 
-      {fetchError && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 4, gap: 2 }}>
-          <Typography color="error">{fetchError}</Typography>
-          <Button variant="outlined" color="primary" onClick={fetchBanners}>
-            {t('pages.banners.retry') || 'Thử lại'}
-          </Button>
-        </Box>
-      )}
-
-      {!fetchError && (
-        <DataTable
-          columns={columns}
-          data={banners || []}
-          isLoading={isLoading}
-          hidePagination
-          enableSorting
-          sorting={sorting}
-          onSortingChange={onSortingChange}
-          emptyMessage={t('pages.banners.empty')}
-        />
-      )}
+      <DataTable
+        columns={columns}
+        data={banners}
+        isLoading={isLoading}
+        hidePagination
+        enableSorting
+        sorting={sorting}
+        onSortingChange={onSortingChange}
+        emptyMessage={t('pages.banners.empty')}
+      />
 
       {/* Add/Edit Dialog */}
       <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
         <DialogTitle>{dialogMode === 'add' ? t('pages.banners.addTitle') : t('pages.banners.editTitle')}</DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <TextField label={t('pages.banners.form.description')} fullWidth value={description} onChange={e => setDescription(e.target.value)} />
-            <TextField label={t('pages.banners.form.buttonText')} fullWidth value={buttonText} onChange={e => setButtonText(e.target.value)} />
-            <TextField label={t('pages.banners.form.buttonLink')} fullWidth value={buttonLink} onChange={e => setButtonLink(e.target.value)} />
+            <TextField label={t('pages.banners.form.description')} fullWidth value={formData.description} onChange={e => handleInputChange('description', e.target.value)} />
+            <TextField label={t('pages.banners.form.buttonText')} fullWidth value={formData.button_text} onChange={e => handleInputChange('button_text', e.target.value)} />
+            <TextField label={t('pages.banners.form.buttonLink')} fullWidth value={formData.button_link} onChange={e => handleInputChange('button_link', e.target.value)} />
             <FormControl fullWidth size="small">
               <InputLabel>{t('pages.banners.form.platform')}</InputLabel>
-              <Select value={platform} label={t('pages.banners.form.platform')} onChange={e => setPlatform(e.target.value)}>
+              <Select value={formData.platform} label={t('pages.banners.form.platform')} onChange={e => handleInputChange('platform', e.target.value)}>
                 {PLATFORM_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
             </FormControl>
             <FormControl fullWidth size="small">
               <InputLabel>{t('pages.banners.form.bannerType')}</InputLabel>
-              <Select value={type} label={t('pages.banners.form.bannerType')} onChange={e => setType(Number(e.target.value))}>
+              <Select value={formData.type} label={t('pages.banners.form.bannerType')} onChange={e => handleInputChange('type', Number(e.target.value))}>
                 {TYPE_OPTIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
             </FormControl>
             <FormControl fullWidth size="small">
               <InputLabel>{t('pages.banners.form.descLocation')}</InputLabel>
-              <Select value={descriptionLocation} label={t('pages.banners.form.descLocation')} onChange={e => setDescriptionLocation(Number(e.target.value))}>
+              <Select value={formData.description_location} label={t('pages.banners.form.descLocation')} onChange={e => handleInputChange('description_location', Number(e.target.value))}>
                 {DESCRIPTION_LOCATIONS.map(o => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
               </Select>
             </FormControl>
-            <FormControlLabel control={<Switch checked={isShowButton} onChange={e => setIsShowButton(e.target.checked)} />} label={t('pages.banners.form.showButton')} />
-            <FormControlLabel control={<Switch checked={isActive} onChange={e => setIsActive(e.target.checked)} color="success" />} label={t('pages.banners.form.activeLabel')} />
+            <FormControlLabel control={<Switch checked={formData.is_show_button} onChange={e => handleInputChange('is_show_button', e.target.checked)} />} label={t('pages.banners.form.showButton')} />
+            <FormControlLabel control={<Switch checked={formData.is_active} onChange={e => handleInputChange('is_active', e.target.checked)} color="success" />} label={t('pages.banners.form.activeLabel')} />
 
             {/* Web Image Upload */}
             <Typography variant="subtitle2" sx={{ mt: 1, fontWeight: 600 }}>{t('pages.banners.form.webImageLabel')}</Typography>
@@ -370,16 +371,16 @@ const BannersPage = () => {
                   component="img"
                   src={webPreview}
                   alt="Web preview"
-                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement)?.style && ((e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'); }}
+                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement) && ((e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'); }}
                   sx={{ width: '100%', maxHeight: 150, objectFit: 'contain', borderRadius: 1, border: '1px solid', borderColor: 'divider', display: 'block' }}
                 />
                 <Box sx={{ display: 'none', width: '100%', height: 80, borderRadius: 1, border: '1px dashed', borderColor: 'divider', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontSize: 13 }}>
-                  Không thể tải ảnh. Vui lòng chọn ảnh mới.
+                   {t('pages.banners.errorLoadingImage')}
                 </Box>
               </Box>
             ) : (
               <Box sx={{ width: '100%', height: 80, borderRadius: 1, border: '1px dashed', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontSize: 13, bgcolor: 'action.hover' }}>
-                Chưa có ảnh web
+                {t('pages.banners.noWebImage')}
               </Box>
             )}
 
@@ -397,24 +398,24 @@ const BannersPage = () => {
                   component="img"
                   src={mobilePreview}
                   alt="Mobile preview"
-                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement)?.style && ((e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'); }}
+                  onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { e.currentTarget.style.display = 'none'; (e.currentTarget.nextSibling as HTMLElement) && ((e.currentTarget.nextSibling as HTMLElement).style.display = 'flex'); }}
                   sx={{ width: 200, maxHeight: 150, objectFit: 'contain', borderRadius: 1, border: '1px solid', borderColor: 'divider', display: 'block' }}
                 />
                 <Box sx={{ display: 'none', width: 200, height: 80, borderRadius: 1, border: '1px dashed', borderColor: 'divider', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontSize: 13 }}>
-                  Không thể tải ảnh. Vui lòng chọn ảnh mới.
+                  {t('pages.banners.errorLoadingImage')}
                 </Box>
               </Box>
             ) : (
               <Box sx={{ width: 200, height: 80, borderRadius: 1, border: '1px dashed', borderColor: 'divider', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'text.secondary', fontSize: 13, bgcolor: 'action.hover' }}>
-                Chưa có ảnh mobile
+                 {t('pages.banners.noMobileImage')}
               </Box>
             )}
           </Box>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setOpenDialog(false)} color="inherit">{t('pages.banners.cancel')}</Button>
-          <Button onClick={handleSave} variant="contained" disabled={isSaving}>
-            {isSaving ? t('pages.banners.saving') : t('pages.banners.save')}
+          <Button onClick={handleSave} variant="contained" disabled={isMutating}>
+            {isMutating ? t('pages.banners.saving') : t('pages.banners.save')}
           </Button>
         </DialogActions>
       </Dialog>
@@ -425,8 +426,8 @@ const BannersPage = () => {
         <DialogContent><Typography>{t('pages.banners.deleteConfirm', { id: current?.id })}</Typography></DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
           <Button onClick={() => setOpenDelete(false)} color="inherit">{t('pages.banners.cancel')}</Button>
-          <Button onClick={handleDelete} color="error" variant="contained" disabled={isSaving}>
-            {isSaving ? t('pages.banners.deleting') : t('pages.banners.delete')}
+          <Button onClick={handleDelete} color="error" variant="contained" disabled={isMutating}>
+            {isMutating ? t('pages.banners.deleting') : t('pages.banners.delete')}
           </Button>
         </DialogActions>
       </Dialog>
