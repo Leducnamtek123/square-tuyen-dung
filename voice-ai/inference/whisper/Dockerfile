@@ -24,7 +24,7 @@ WORKDIR /app
 # We must upgrade pip first to fix the resolvelib AssertionError bug in old pip versions
 RUN pip3 install --no-cache-dir --upgrade pip \
     && pip3 install --no-cache-dir "setuptools<82.0" wheel \
-    && pip3 install --no-cache-dir vox-box
+    && pip3 install --no-cache-dir --no-build-isolation vox-box
 
 ENV DATA_DIR=/data
 
