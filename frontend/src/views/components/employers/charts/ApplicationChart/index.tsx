@@ -1,6 +1,16 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Card, Divider, Stack, Tooltip as MuiTooltip, Typography, CircularProgress } from "@mui/material";
+import { 
+  Box, 
+  Divider, 
+  Stack, 
+  Tooltip as MuiTooltip, 
+  Typography, 
+  CircularProgress,
+  Paper,
+  alpha,
+  useTheme
+} from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import { Chart } from 'react-chartjs-2';
@@ -20,18 +30,9 @@ import {
 import dayjs from 'dayjs';
 import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerApplicationStatistics } from '../../hooks/useEmployerQueries';
-import { useTheme } from '@mui/material/styles';
 
 interface ApplicationChartProps {
   title: string;
-}
-
-interface ApplicationChartData {
-  labels: string[];
-  title1: string;
-  title2: string;
-  data1: (number | null)[];
-  data2: (number | null)[];
 }
 
 ChartJS.register(
@@ -55,9 +56,7 @@ const options: ChartOptions<'bar'> = {
         padding: 20,
         usePointStyle: true,
         pointStyle: 'circle',
-        font: {
-          size: 12
-        }
+        font: { size: 12, weight: 600 }
       }
     },
     tooltip: {
@@ -73,24 +72,12 @@ const options: ChartOptions<'bar'> = {
   },
   scales: {
     x: {
-      grid: {
-        display: false,
-      },
-      ticks: {
-        font: {
-          size: 12
-        }
-      }
+      grid: { display: false },
+      ticks: { font: { size: 12, weight: 500 } }
     },
     y: {
-      grid: {
-        color: 'rgba(0,0,0,0.05)',
-      },
-      ticks: {
-        font: {
-          size: 12
-        }
-      }
+      grid: { color: 'rgba(0,0,0,0.05)' },
+      ticks: { font: { size: 12, weight: 500 } }
     }
   }
 };
@@ -98,7 +85,6 @@ const options: ChartOptions<'bar'> = {
 const ApplicationChart = ({ title }: ApplicationChartProps) => {
   const { t } = useTranslation('employer');
   const theme = useTheme();
-
   const [isLoading, setIsLoading] = React.useState(true);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[dayjs.Dayjs, dayjs.Dayjs]>([
@@ -152,42 +138,30 @@ const ApplicationChart = ({ title }: ApplicationChartProps) => {
   }, [data, t, theme]);
 
   return (
-    <Card 
+    <Paper 
+      elevation={0}
       sx={{ 
-        p: 3,
-        boxShadow: (theme as any)['customShadows']?.card || theme.shadows[1],
-        border: `1px solid ${theme.palette.divider}`,
-        height: '100%'
+        p: { xs: 2.5, sm: 4 },
+        borderRadius: 4,
+        boxShadow: (theme) => theme.customShadows?.z1,
+        border: '1px solid',
+        borderColor: 'divider',
+        height: '100%',
+        bgcolor: 'background.paper'
       }}
     >
       <Stack spacing={3}>
-        <Box>
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
-          >
-            <Typography variant="h5" color="text.primary">
-              {title}
-            </Typography>
-            <MuiTooltip
-              title={t('applicationChart.title')}
-              arrow
-              placement="left"
-            >
-              <InfoIcon
-                sx={{
-                  color: 'grey.400',
-                  cursor: 'pointer',
-                  '&:hover': {
-                    color: 'primary.main',
-                  },
-                }}
-              />
-            </MuiTooltip>
-          </Stack>
-        </Box>
+        <Stack direction="row" justifyContent="space-between" alignItems="center">
+          <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+            {title}
+          </Typography>
+          <MuiTooltip title={t('applicationChart.title')} arrow placement="top">
+            <InfoIcon sx={{ color: 'text.disabled', cursor: 'pointer', '&:hover': { color: 'primary.main' } }} />
+          </MuiTooltip>
+        </Stack>
+
         <Divider sx={{ borderStyle: 'dashed' }} />
+
         <Box>
           <Stack direction="row" justifyContent="flex-end" spacing={1} mb={3}>
             <RangePickerCustom
@@ -197,20 +171,11 @@ const ApplicationChart = ({ title }: ApplicationChartProps) => {
               setSelectedDateRange={setSelectedDateRange}
             />
           </Stack>
+
           <Box sx={{ position: 'relative', minHeight: 320 }}>
             {isLoading ? (
-              <Stack
-                alignItems="center"
-                justifyContent="center"
-                sx={{ height: 320 }}
-              >
-                <CircularProgress 
-                  size={40}
-                  thickness={3}
-                  sx={{
-                    color: 'primary.main'
-                  }}
-                />
+              <Stack alignItems="center" justifyContent="center" sx={{ height: 320 }}>
+                <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
               </Stack>
             ) : !data ? (
               <Stack
@@ -218,12 +183,16 @@ const ApplicationChart = ({ title }: ApplicationChartProps) => {
                 justifyContent="center"
                 sx={{
                   height: 320,
-                  bgcolor: 'grey.50',
-                  borderRadius: 2
+                  bgcolor: alpha(theme.palette.action.disabled, 0.05),
+                  borderRadius: 3,
+                  border: '1px dashed',
+                  borderColor: 'divider'
                 }}
               >
-                <InsertChartOutlinedIcon sx={{ fontSize: 42, color: "text.secondary" }} />
-                <Typography variant="body2" color="text.secondary">{t('applicationChart.noData')}</Typography>
+                <InsertChartOutlinedIcon sx={{ fontSize: 48, color: "text.disabled", mb: 1 }} />
+                <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+                    {t('applicationChart.noData')}
+                </Typography>
               </Stack>
             ) : (
               <Box sx={{ height: 320 }}>
@@ -233,7 +202,7 @@ const ApplicationChart = ({ title }: ApplicationChartProps) => {
           </Box>
         </Box>
       </Stack>
-    </Card>
+    </Paper>
   );
 };
 

@@ -1,19 +1,20 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, CardContent, Stack, Typography, Skeleton } from "@mui/material";
+import { 
+  Paper, 
+  Stack, 
+  Typography, 
+  Skeleton, 
+  Box, 
+  alpha, 
+  useTheme 
+} from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import AccessTimeOutlinedIcon from '@mui/icons-material/AccessTimeOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
 import { useEmployerGeneralStatistics } from '../hooks/useEmployerQueries';
-
-interface StatisticsData {
-  totalJobPost: number;
-  totalJobPostingPendingApproval: number;
-  totalJobPostExpired: number;
-  totalApply: number;
-}
 
 interface StatItemProps {
   title: string;
@@ -23,55 +24,66 @@ interface StatItemProps {
   loading: boolean;
 }
 
-const StatItem = ({ title, value, color, Icon, loading }: StatItemProps) => (
+const StatItem = ({ title, value, color, Icon, loading }: StatItemProps) => {
+  const theme = useTheme();
+  
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        borderRadius: 4,
+        border: '1px solid',
+        borderColor: alpha(theme.palette.divider, 0.5),
+        boxShadow: (theme) => theme.customShadows?.z1,
+        height: '100%',
+        transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: (theme) => theme.customShadows?.z8,
+        }
+      }}
+    >
+      <Stack spacing={2.5}>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: 48,
+              height: 48,
+              borderRadius: '50%',
+              bgcolor: alpha(color, 0.12),
+              color: color,
+            }}
+          >
+            <Icon sx={{ fontSize: 26 }} />
+          </Box>
+          <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.secondary', lineHeight: 1.2 }}>
+            {title}
+          </Typography>
+        </Stack>
 
-  <Card
-
-    sx={{
-
-      borderRadius: 2,
-
-      boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-
-      height: '100%',
-
-    }}
-
-  >
-
-    <CardContent>
-
-      <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-
-        <Icon sx={{ fontSize: 22, color }} />
-
-        <Typography sx={{ fontWeight: 600, fontSize: '0.95rem', color: '#333' }}>
-
-          {title}
-
-        </Typography>
-
+        {loading ? (
+          <Skeleton width="60%" height={48} variant="text" sx={{ borderRadius: 1 }} />
+        ) : (
+          <Typography 
+            sx={{ 
+                color: 'text.primary', 
+                fontSize: '2.5rem', 
+                fontWeight: 900,
+                lineHeight: 1,
+                letterSpacing: '-1px'
+            }}
+          >
+            {value?.toLocaleString() ?? 0}
+          </Typography>
+        )}
       </Stack>
-
-      {loading ? (
-
-        <Skeleton width={80} height={32} />
-
-      ) : (
-
-        <Typography sx={{ color, fontSize: '1.8rem', fontWeight: 700 }}>
-
-          {value ?? 0}
-
-        </Typography>
-
-      )}
-
-    </CardContent>
-
-  </Card>
-
-);
+    </Paper>
+  );
+};
 
 const EmployerQuantityStatistics = () => {
 

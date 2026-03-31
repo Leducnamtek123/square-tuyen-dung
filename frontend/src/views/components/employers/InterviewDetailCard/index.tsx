@@ -1,8 +1,22 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Chip, CircularProgress, Stack, Typography, Grid2 as Grid } from '@mui/material';
+import { 
+    Box, 
+    Button, 
+    Chip, 
+    Stack, 
+    Typography, 
+    Grid2 as Grid, 
+    Skeleton, 
+    Paper, 
+    IconButton, 
+    Tooltip,
+    alpha,
+    useTheme
+} from '@mui/material';
 import { useParams, useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../../../configs/constants';
 import InterviewAiEvaluationCard from './InterviewAiEvaluationCard';
@@ -32,6 +46,7 @@ const InterviewDetailCard = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useRouter();
     const { t, i18n } = useTranslation(['employer', 'interview', 'common']);
+    const theme = useTheme();
     
     const [evalForm, setEvalForm] = useState<EvalFormType>({
         attitude_score: 0,
@@ -41,11 +56,11 @@ const InterviewDetailCard = () => {
         proposed_salary: 0
     });
 
-    // Polling logic: Refetch every 5s if session is active or processing
+    // Data Fetching & Mutations
     const { data: session, isLoading: loading } = useInterviewDetail(id);
-    const { isMutating: isInterviewMutating } = useInterviewMutations();
+    const { submitEvaluation, isMutating: isInterviewMutating } = useInterviewMutations();
     
-    const [isSubmittingEval, setIsSubmittingEval] = useState(false);
+    const [isTriggeringAi, setIsTriggeringAi] = useState(false);
 
     useEffect(() => {
         if (session?.evaluations?.length) {
@@ -66,9 +81,8 @@ const InterviewDetailCard = () => {
     };
 
     const submitHRInfo = async () => {
-        setIsSubmittingEval(true);
         try {
-            await interviewService.submitEvaluation({
+            await submitEvaluation({
                 interview: Number(id),
                 attitudeScore: Number(evalForm.attitude_score),
                 professionalScore: Number(evalForm.professional_score),
@@ -79,106 +93,256 @@ const InterviewDetailCard = () => {
             });
             toastMessages.success(t('interview:interviewDetail.messages.evaluationSuccess'));
         } catch (error) {
-            errorHandling(error as AxiosError<{ errors?: ApiError }>);
-        } finally {
-            setIsSubmittingEval(false);
+            // Error handled by mutation hook
         }
     };
 
-    if (loading) return <Box sx={{ display: 'flex', justifyContent: 'center', py: 10 }}><CircularProgress /></Box>;
+    const handleTriggerAi = async () => {
+        if (!session?.id) return;
+        setIsTriggeringAi(true);
+        try {
+            await interviewService.triggerAiEvaluation(session.id);
+            toastMessages.success(t('interview:interviewDetail.messages.aiTriggerSuccess'));
+        } catch (e) {
+            errorHandling(e as AxiosError<{ errors?: ApiError }>);
+        } finally {
+            setIsTriggeringAi(false);
+        }
+    };
 
-    if (!session) return (
-        <Box sx={{ textAlign: 'center', py: 5 }}>
-            <Typography color="text.secondary">{t('interview:interviewDetail.messages.notFound')}</Typography>
-            <Button onClick={() => navigate.back()} sx={{ mt: 2 }}>{t('common:actions.close')}</Button>
-        </Box>
-    );
-
-    const getStatusColor = (status: string | undefined): "success" | "primary" | "error" | "info" | "warning" => {
+    const getStatusColor = (status: string | undefined): "success" | "primary" | "error" | "info" | "warning" | "default" => {
         switch (status) {
             case 'completed': return 'success';
             case 'in_progress': return 'primary';
             case 'cancelled': return 'error';
             case 'processing': return 'info';
-            default: return 'warning';
+            case 'scheduled': return 'warning';
+            default: return 'default';
         }
     };
 
+    if (loading) {
+        return (
+            <Box sx={{ p: 4 }}>
+                <Skeleton variant="text" width={200} height={40} sx={{ mb: 3 }} />
+                <Grid container spacing={4}>
+                    <Grid size={{ xs: 12, lg: 4 }}>
+                        <Stack spacing={4}>
+                            <Skeleton variant="rectangular" height={350} sx={{ borderRadius: 4 }} />
+                            <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 4 }} />
+                        </Stack>
+                    </Grid>
+                    <Grid size={{ xs: 12, lg: 8 }}>
+                        <Stack spacing={4}>
+                            <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 4 }} />
+                            <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 4 }} />
+                        </Stack>
+                    </Grid>
+                </Grid>
+            </Box>
+        );
+    }
+
+    if (!session) {
+        return (
+            <Paper 
+                elevation={0} 
+                sx={{ 
+                    textAlign: 'center', 
+                    py: 12, 
+                    borderRadius: 4, 
+                    bgcolor: 'background.neutral',
+                    border: '1px dashed',
+                    borderColor: 'divider'
+                }}
+            >
+                <Typography color="text.secondary" variant="h5" sx={{ fontWeight: 800, mb: 1 }}>
+                    {t('interview:interviewDetail.messages.notFound')}
+                </Typography>
+                <Typography color="text.disabled" variant="body2" sx={{ fontWeight: 600, mb: 4 }}>
+                    {t('interview:interviewDetail.messages.notFoundDesc')}
+                </Typography>
+                <Button 
+                    startIcon={<ArrowBackIcon />} 
+                    onClick={() => navigate.back()} 
+                    sx={{ 
+                        borderRadius: 2.5, 
+                        fontWeight: 800,
+                        px: 4,
+                        py: 1.25,
+                        textTransform: 'none'
+                    }}
+                    variant="contained"
+                    color="primary"
+                >
+                    {t('interview:interviewDetail.actions.backToList')}
+                </Button>
+            </Paper>
+        );
+    }
+
     const canJoinLiveRoom = session.status !== 'cancelled' && session.status !== 'completed';
     const recordingUrl = session.recordingUrl || (session as any).recording_url || null;
+    const statusColor = getStatusColor(session.status);
 
     return (
-        <Box sx={{ px: { xs: 1, sm: 2 }, py: { xs: 2, sm: 2 }, backgroundColor: 'background.paper', borderRadius: 2 }}>
-            <Button startIcon={<ArrowBackIcon />} onClick={() => navigate.back()} sx={{ mb: 3, color: 'text.secondary', fontWeight: 500 }}>
-                {t('interview:interviewDetail.actions.backToList')}
-            </Button>
+        <Paper
+            elevation={0}
+            sx={{ 
+                p: { xs: 3, sm: 6 }, 
+                backgroundColor: 'background.paper', 
+                borderRadius: 4, 
+                boxShadow: (theme: any) => theme.customShadows?.z1,
+                border: '1px solid',
+                borderColor: 'divider'
+            }}
+        >
+            <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 5 }}>
+                <IconButton 
+                    onClick={() => navigate.back()} 
+                    sx={{ 
+                        color: 'text.secondary', 
+                        bgcolor: alpha(theme.palette.action.active, 0.04),
+                        borderRadius: 1.5,
+                        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.08), color: 'primary.main' },
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    <ArrowBackIcon fontSize="small" />
+                </IconButton>
+                <Typography 
+                    variant="subtitle2" 
+                    onClick={() => navigate.back()}
+                    sx={{ 
+                        fontWeight: 900, 
+                        color: 'text.secondary', 
+                        cursor: 'pointer',
+                        '&:hover': { color: 'primary.main' }
+                    }}
+                >
+                    {t('interview:interviewDetail.actions.backToList')}
+                </Typography>
+            </Stack>
             
-            <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={2} mb={4}>
+            <Stack 
+                direction={{ xs: 'column', md: 'row' }} 
+                justifyContent="space-between" 
+                alignItems={{ xs: 'flex-start', md: 'center' }} 
+                spacing={4} 
+                mb={8}
+            >
                 <Box>
-                    <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 1 }}>
-                        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                    <Stack direction="row" alignItems="center" spacing={2} sx={{ mb: 2.5 }}>
+                        <Typography variant="h2" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1.5px' }}>
                             {t('interview:interviewDetail.title')}
                         </Typography>
                         <Chip
-                            label={t(`interview:interviewLive.statuses.${session.status}`, { defaultValue: session.status?.replaceAll('_', ' ')?.toUpperCase() })}
-                            color={getStatusColor(session.status)}
+                            label={t(`interview:interviewLive.statuses.${session.status}`, { 
+                                defaultValue: session.status?.replaceAll('_', ' ')?.toUpperCase() 
+                            })}
                             size="small"
-                            sx={{ fontWeight: 700, borderRadius: '6px' }}
+                            sx={{ 
+                                fontWeight: 900, 
+                                borderRadius: 1.5, 
+                                px: 1,
+                                bgcolor: statusColor === 'default' ? alpha(theme.palette.action.disabled, 0.08) : alpha(theme.palette[statusColor].main, 0.08),
+                                color: statusColor === 'default' ? 'text.secondary' : `${statusColor}.main`,
+                                border: '1px solid',
+                                borderColor: statusColor === 'default' ? alpha(theme.palette.action.disabled, 0.1) : alpha(theme.palette[statusColor].main, 0.1),
+                                textTransform: 'uppercase',
+                                fontSize: '0.75rem',
+                                letterSpacing: '0.5px'
+                            }}
                         />
                     </Stack>
-                    <Typography variant="body2" color="text.secondary">
-                        {t('interview:interviewDetail.label.roomCode')}: <Box component="span" sx={{ fontWeight: 600, color: 'primary.main' }}>{session.roomName}</Box> | ID: {session.id}
-                    </Typography>
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2 }} alignItems={{ xs: 'flex-start', sm: 'center' }}>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center' }}>
+                            {t('interview:interviewDetail.label.roomCode')}: 
+                        </Typography>
+                        <Box sx={{ 
+                            fontWeight: 900, 
+                            color: 'primary.main', 
+                            bgcolor: alpha(theme.palette.primary.main, 0.06), 
+                            px: 2, 
+                            py: 0.75, 
+                            borderRadius: 1.5, 
+                            letterSpacing: '1px',
+                            fontSize: '0.95rem',
+                            border: '1px dashed',
+                            borderColor: alpha(theme.palette.primary.main, 0.2)
+                        }}>
+                            {session.roomName}
+                        </Box> 
+                        <Typography variant="body2" color="text.disabled" sx={{ fontWeight: 600, ml: { sm: 1 } }}>
+                            ID: <Box component="span" sx={{ color: 'text.secondary', fontWeight: 800 }}>{session.id}</Box>
+                        </Typography>
+                    </Stack>
                 </Box>
-                <Button
-                    variant="contained"
-                    disabled={!canJoinLiveRoom}
-                    onClick={() => navigate.push(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id.toString())}`)}
-                    sx={{ borderRadius: 2, minWidth: 180, boxShadow: 'none' }}
-                >
-                    {t('common:actions.joinNow')}
-                </Button>
+                <Tooltip title={!canJoinLiveRoom ? t('interview:interviewDetail.tooltips.cannotJoin') : ''} arrow placement="top">
+                    <Box sx={{ width: { xs: '100%', md: 'auto' } }}>
+                        <Button
+                            variant="contained"
+                            disabled={!canJoinLiveRoom}
+                            onClick={() => navigate.push(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id.toString())}`)}
+                            startIcon={<PlayCircleOutlineIcon />}
+                            sx={{ 
+                                borderRadius: 3, 
+                                minWidth: { xs: '100%', md: 280 }, 
+                                boxShadow: (theme: any) => theme.customShadows?.primary, 
+                                fontWeight: 900,
+                                py: 2,
+                                px: 4,
+                                textTransform: 'none',
+                                fontSize: '1.1rem',
+                                transition: 'all 0.2s',
+                                '&:hover': {
+                                    transform: 'translateY(-2px)',
+                                    boxShadow: (theme: any) => theme.customShadows?.primary
+                                },
+                                '&.Mui-disabled': {
+                                    bgcolor: 'action.disabledBackground',
+                                    color: 'action.disabled'
+                                }
+                            }}
+                        >
+                            {t('common:actions.joinNow')}
+                        </Button>
+                    </Box>
+                </Tooltip>
             </Stack>
 
-            <Grid container spacing={3}>
-                <Grid size={{ xs: 12, md: 4 }}>
-                    <Stack spacing={3}>
+            <Grid container spacing={5}>
+                <Grid size={{ xs: 12, lg: 4 }}>
+                    <Stack spacing={5}>
                         <InterviewInfoCard session={session} t={t} i18n={i18n} />
                         <InterviewRecordingCard recordingUrl={recordingUrl} t={t} />
                         <InterviewAiEvaluationCard
                             session={session}
                             t={t}
-                            onTriggerAi={async () => {
-                                try {
-                                    await interviewService.triggerAiEvaluation(session.id);
-                                    toastMessages.success(t('interview:interviewDetail.messages.aiTriggerSuccess'));
-                                } catch (e) {
-                                    errorHandling(e as AxiosError<{ errors?: ApiError }>);
-                                }
-                            }}
+                            onTriggerAi={handleTriggerAi}
                         />
                         <InterviewHrEvaluationForm
                             evalForm={evalForm}
                             onChange={handleEvalChange}
                             onSubmit={submitHRInfo}
-                            disabled={isSubmittingEval || session.status !== 'completed'}
-                            submitting={isSubmittingEval}
+                            disabled={isInterviewMutating || session.status !== 'completed'}
+                            submitting={isInterviewMutating}
                             t={t}
                         />
                         <InterviewQuestionsCard session={session} t={t} />
                     </Stack>
                 </Grid>
 
-                <Grid size={{ xs: 12, md: 8 }}>
-                    <Stack spacing={3}>
+                <Grid size={{ xs: 12, lg: 8 }}>
+                    <Stack spacing={5}>
                         <InterviewAnalysisPanel session={session} t={t} />
                         <InterviewTranscriptPanel session={session} t={t} i18n={i18n} />
                     </Stack>
                 </Grid>
             </Grid>
             
-            {(isInterviewMutating || isSubmittingEval) && <BackdropLoading />}
-        </Box>
+            {(isInterviewMutating || isTriggeringAi) && <BackdropLoading />}
+        </Paper>
     );
 };
 

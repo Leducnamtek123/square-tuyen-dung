@@ -1,5 +1,5 @@
-import React from 'react';
-import { useForm, useWatch } from 'react-hook-form';
+import React, { useMemo, useEffect, useRef, useState } from 'react';
+import { useForm, useWatch, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useTranslation } from 'react-i18next';
 import { EditorState } from 'draft-js';
@@ -7,14 +7,12 @@ import useDebounce from '../../../../hooks/useDebounce';
 import errorHandling from '../../../../utils/errorHandling';
 import commonService from '../../../../services/commonService';
 import goongService from '../../../../services/goongService';
-import { useAppSelector } from '../../../../redux/hooks';
 import { JobPostFormValues, getJobPostSchema } from './JobPostSchema';
 import JobPostFormFields from './JobPostFormFields';
 import { useConfig } from '@/hooks/useConfig';
 import { PaginatedResponse } from '@/types/api';
 import type { AxiosError } from 'axios';
 import type { ApiError } from '../../../../types/api';
-import type { Resolver } from 'react-hook-form';
 
 interface JobPostFormProps {
   handleAddOrUpdate: (data: JobPostFormValues) => void;
@@ -26,10 +24,10 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
   const { t } = useTranslation('employer');
   const { allConfig } = useConfig();
   
-  const [districtOptions, setDistrictOptions] = React.useState<Record<string, unknown>[]>([]);
-  const [locationOptions, setLocationOptions] = React.useState<Record<string, unknown>[]>([]);
+  const [districtOptions, setDistrictOptions] = useState<Record<string, unknown>[]>([]);
+  const [locationOptions, setLocationOptions] = useState<Record<string, unknown>[]>([]);
 
-  const schema = React.useMemo(() => getJobPostSchema(t), [t]);
+  const schema = useMemo(() => getJobPostSchema(t), [t]);
 
   const {
     handleSubmit,
@@ -37,6 +35,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
     setValue,
     setError,
     reset,
+    clearErrors,
   } = useForm<JobPostFormValues>({
     resolver: yupResolver(schema) as unknown as Resolver<JobPostFormValues>,
     defaultValues: {
@@ -58,26 +57,34 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
   const address = useWatch({ control, name: 'location.address' });
   const addressDebounce = useDebounce(address, 500);
 
-  const prevCityIdRef = React.useRef<number | string | null>(null);
-  React.useEffect(() => {
-    const loadDistricts = async (cityId: number | string) => {
+  const prevCityIdRef = useRef<number | string | null>(null);
+
+  // Load districts when city changes
+  useEffect(() => {
+    const loadDistricts = async (id: number | string) => {
       try {
-        const resData = await commonService.getDistrictsByCityId(cityId);
+        const resData = await commonService.getDistrictsByCityId(id);
+        const results = ((resData as unknown as PaginatedResponse<Record<string, unknown>>)?.results || []) as Record<string, unknown>[];
+        
         // Only clear district if the cityId has actually changed (user interaction)
-        // and it's not the initial load (prevCityIdRef.current is not null).
-        if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
+        if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
           setValue('location.district', '');
         }
-        setDistrictOptions(((resData as unknown as PaginatedResponse<Record<string, unknown>>)?.results || []) as Record<string, unknown>[]);
-        prevCityIdRef.current = cityId;
+        setDistrictOptions(results);
+        prevCityIdRef.current = id;
       } catch (error) {
         errorHandling(error as AxiosError<{ errors?: ApiError }>);
       }
     };
     if (cityId) loadDistricts(cityId);
+    else {
+        setDistrictOptions([]);
+        prevCityIdRef.current = null;
+    }
   }, [cityId, setValue]);
 
-  React.useEffect(() => {
+  // Load location predictions (Goong)
+  useEffect(() => {
     const loadLocation = async (input: string) => {
       if (!input || input.trim().length < 3) {
         setLocationOptions([]);
@@ -85,30 +92,44 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
       }
       try {
         const resData = await goongService.getPlaces(input);
-        if ((resData as Record<string, unknown>)?.predictions) setLocationOptions((resData as Record<string, unknown>).predictions as Record<string, unknown>[]);
-      } catch (error) {}
+        if ((resData as Record<string, unknown>)?.predictions) {
+            setLocationOptions((resData as Record<string, unknown>).predictions as Record<string, unknown>[]);
+        }
+      } catch (error) {
+          // Silent fail for autocomplete
+      }
     };
     loadLocation(addressDebounce);
   }, [addressDebounce]);
 
-  React.useEffect(() => {
+  // Handle edit data loading
+  useEffect(() => {
     if (editData) {
       reset((formValues) => ({ ...formValues, ...(editData as unknown as Partial<JobPostFormValues>) }));
     } else {
-      reset();
+      reset({
+        jobDescription: EditorState.createEmpty(),
+        jobRequirement: EditorState.createEmpty(),
+        benefitsEnjoyed: EditorState.createEmpty(),
+        isUrgent: false,
+        location: { city: '', district: '', address: '', lat: '', lng: '' },
+      });
     }
   }, [editData, reset]);
 
-  React.useEffect(() => {
-    if (serverErrors !== null) {
+  // Handle server errors
+  useEffect(() => {
+    if (serverErrors) {
       for (let err in serverErrors) {
         setError(err as keyof JobPostFormValues, {
           type: 'manual',
           message: serverErrors[err]?.join(' '),
         });
       }
+    } else {
+        clearErrors();
     }
-  }, [serverErrors, setError, reset]);
+  }, [serverErrors, setError, clearErrors]);
 
   const handleSelectLocation = async (e: React.SyntheticEvent, value: Record<string, unknown> | null) => {
     if (!value || typeof value !== 'object' || !value.place_id) return;
@@ -120,7 +141,9 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
       const location = geometryObj.location as Record<string, unknown>;
       setValue('location.lng', location.lng as number | string);
       setValue('location.lat', location.lat as number | string);
-    } catch (error) {}
+    } catch (error) {
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+    }
   };
 
   return (

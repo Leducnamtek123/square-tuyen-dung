@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tooltip, Chip, CircularProgress, Button } from '@mui/material';
+import { Tooltip, Chip, CircularProgress, Button, Box, alpha, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
@@ -9,44 +9,47 @@ export interface AIAnalysisComponentProps {
   onOpenDrawer: () => void;
 }
 
-const renderIcon = (
-  IconComponent: any,
-  props?: Record<string, any>,
-): React.ReactElement | null => {
-  if (!IconComponent) return null;
-  const Component = IconComponent.default || IconComponent;
-  if (typeof Component !== 'function' && typeof Component !== 'string' && typeof Component?.render !== 'function') {
-    return null;
-  }
-  return <Component {...props} />;
-};
-
 const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDrawer }) => {
   const { t } = useTranslation('employer');
+  const theme = useTheme();
   const isCompleted = row.aiAnalysisStatus === 'completed';
   const isProcessing = row.aiAnalysisStatus === 'processing';
   const isFailed = row.aiAnalysisStatus === 'failed';
 
   const getScoreColor = (score: number) => {
-    if (score >= 70) return 'success';
-    if (score >= 40) return 'warning';
-    return 'error';
+    if (score >= 70) return theme.palette.success;
+    if (score >= 40) return theme.palette.warning;
+    return theme.palette.error;
   };
 
   if (isCompleted) {
+    const score = (row.aiAnalysisScore as number) || 0;
+    const color = getScoreColor(score);
     return (
       <Tooltip
-        title={t('appliedResume.ai.viewAnalysis', 'Xem phân tích chi tiết')}
+        title={t('appliedResume.ai.viewAnalysis', 'View detailed AI analysis')}
         arrow
         placement="top"
       >
         <Chip
-          icon={renderIcon(PsychologyIcon) || undefined}
-          label={`${row.aiAnalysisScore || 0}/100`}
-          color={getScoreColor((row.aiAnalysisScore as number) || 0)}
-          size="small"
+          icon={<PsychologyIcon sx={{ fontSize: '1rem !important' }} />}
+          label={`${score}/100`}
           onClick={onOpenDrawer}
-          sx={{ fontWeight: 'bold', cursor: 'pointer' }}
+          sx={{ 
+            fontWeight: 900, 
+            cursor: 'pointer',
+            borderRadius: 1.5,
+            px: 0.5,
+            bgcolor: alpha(color.main, 0.08),
+            color: color.main,
+            border: '1px solid',
+            borderColor: alpha(color.main, 0.1),
+            '& .MuiChip-icon': { color: 'inherit', ml: 0.5 },
+            '&:hover': {
+                bgcolor: alpha(color.main, 0.15),
+                borderColor: color.main
+            }
+          }}
         />
       </Tooltip>
     );
@@ -54,15 +57,26 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
 
   if (isProcessing) {
     return (
-      <Tooltip title={t('appliedResume.ai.processing', 'Đang phân tích')} arrow>
+      <Tooltip title={t('appliedResume.ai.processing', 'AI Analysis in progress')} arrow>
         <Chip
-          icon={<CircularProgress size={12} color="inherit" />}
-          label={t('appliedResume.ai.processing', 'Đang xử lý...')}
-          color="info"
-          size="small"
+          icon={<CircularProgress size={12} color="inherit" thickness={5} />}
+          label={t('appliedResume.ai.processing', 'Processing...')}
           onClick={onOpenDrawer}
           variant="outlined"
-          sx={{ cursor: 'pointer' }}
+          sx={{ 
+            cursor: 'pointer', 
+            borderRadius: 1.5,
+            fontWeight: 800,
+            fontSize: '0.7rem',
+            bgcolor: alpha(theme.palette.info.main, 0.08),
+            color: 'info.main',
+            borderColor: alpha(theme.palette.info.main, 0.2),
+            '& .MuiChip-icon': { ml: 0.5 },
+            '&:hover': {
+                bgcolor: alpha(theme.palette.info.main, 0.15),
+                borderColor: 'info.main'
+            }
+          }}
         />
       </Tooltip>
     );
@@ -70,15 +84,25 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
 
   if (isFailed) {
     return (
-      <Tooltip title="Phân tích lỗi. Bấm để xem chi tiết" arrow>
+      <Tooltip title={t('appliedResume.ai.failed', 'Analysis failed. Click to retry.')} arrow>
         <Chip
-          icon={renderIcon(AutoFixHighIcon) || undefined}
-          label={t('appliedResume.ai.retry', 'Thử lại')}
-          color="error"
-          size="small"
+          icon={<AutoFixHighIcon sx={{ fontSize: '1rem !important' }} />}
+          label={t('appliedResume.ai.retry', 'Retry')}
           onClick={onOpenDrawer}
-          variant="outlined"
-          sx={{ fontWeight: 'bold', cursor: 'pointer' }}
+          sx={{ 
+            fontWeight: 900, 
+            cursor: 'pointer',
+            borderRadius: 1.5,
+            bgcolor: alpha(theme.palette.error.main, 0.08),
+            color: 'error.main',
+            border: '1px solid',
+            borderColor: alpha(theme.palette.error.main, 0.1),
+            '& .MuiChip-icon': { color: 'inherit', ml: 0.5 },
+            '&:hover': {
+                bgcolor: alpha(theme.palette.error.main, 0.15),
+                borderColor: 'error.main'
+            }
+          }}
         />
       </Tooltip>
     );
@@ -88,9 +112,24 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
     <Button
       variant="outlined"
       size="small"
-      startIcon={renderIcon(AutoFixHighIcon)}
+      startIcon={<AutoFixHighIcon sx={{ fontSize: 18 }} />}
       onClick={onOpenDrawer}
-      sx={{ textTransform: 'none', borderRadius: 1.5, fontSize: '0.75rem', py: 0.25 }}
+      sx={{ 
+        textTransform: 'none', 
+        borderRadius: 2, 
+        fontSize: '0.75rem', 
+        py: 0.5,
+        px: 1.5,
+        fontWeight: 900,
+        color: 'primary.main',
+        borderColor: alpha(theme.palette.primary.main, 0.3),
+        borderStyle: 'dashed',
+        '&:hover': {
+            bgcolor: alpha(theme.palette.primary.main, 0.06),
+            borderColor: 'primary.main',
+            borderStyle: 'solid'
+        }
+      }}
     >
       {t('appliedResume.ai.analyze')}
     </Button>

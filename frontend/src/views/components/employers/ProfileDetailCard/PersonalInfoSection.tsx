@@ -1,8 +1,14 @@
 import React from 'react';
-import { Box, Typography } from '@mui/material';
-import { Grid2 as Grid } from "@mui/material";
+import { Box, Typography, Grid2 as Grid, Stack, alpha, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from '@/redux/hooks';
+import PersonIcon from '@mui/icons-material/Person';
+import PhoneIcon from '@mui/icons-material/Phone';
+import EmailIcon from '@mui/icons-material/Email';
+import GenderIcon from '@mui/icons-material/Transgender';
+import CakeIcon from '@mui/icons-material/Cake';
+import FamilyIcon from '@mui/icons-material/FamilyRestroom';
+import LocationIcon from '@mui/icons-material/LocationOn';
+import HomeIcon from '@mui/icons-material/Home';
 import TimeAgo from '../../../../components/Common/TimeAgo';
 import { tConfig } from '../../../../utils/tConfig';
 import InfoItem from './InfoItem';
@@ -13,70 +19,89 @@ interface PersonalInfoSectionProps {
 }
 
 const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail }) => {
-  const { t } = useTranslation('employer');
-  const { allConfig } = useConfig();
+    const { t } = useTranslation(['employer', 'common']);
+    const theme = useTheme();
+    const { allConfig } = useConfig();
 
-  return (
-    <Box>
-      <Typography
-        variant="h5"
-        sx={{
-          mb: 2,
-          color: (theme: any) => theme.palette.primary.main,
-          borderBottom: "2px solid",
-          borderColor: (theme: any) => theme.palette.primary.light,
-          pb: 1,
-          fontSize: { xs: "1.25rem", sm: "1.5rem" },
-        }}
-      >
-        {t('profileDetailCard.title.personalInfo')}
-      </Typography>
-      <Grid container>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem label="Email" value={profileDetail?.user?.email} />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem label={t('profileDetailCard.label.phone')} value={profileDetail?.jobSeekerProfile?.phone} />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.gender')} 
-            value={tConfig((allConfig as any)?.genderDict?.[profileDetail?.jobSeekerProfile?.gender])} 
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.dob')} 
-            value={<TimeAgo date={profileDetail?.jobSeekerProfile?.birthday} type="format" />} 
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.maritalStatus')} 
-            value={tConfig((allConfig as any)?.maritalStatusDict?.[profileDetail?.jobSeekerProfile?.maritalStatus])} 
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.cityProvince')} 
-            value={tConfig((allConfig as any)?.cityDict?.[profileDetail?.jobSeekerProfile?.location?.city])} 
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.district')} 
-            value={profileDetail?.jobSeekerProfile?.location?.districtDict?.name} 
-          />
-        </Grid>
-        <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-          <InfoItem 
-            label={t('profileDetailCard.label.address')} 
-            value={profileDetail?.jobSeekerProfile?.location?.address} 
-          />
-        </Grid>
-      </Grid>
-    </Box>
-  );
+    return (
+        <Box>
+            <Stack direction="row" alignItems="center" spacing={2} mb={4}>
+                <Box 
+                    sx={{ 
+                        p: 1.25, 
+                        borderRadius: 2, 
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        color: 'primary.main',
+                        display: 'flex'
+                    }}
+                >
+                    <PersonIcon sx={{ fontSize: 28 }} />
+                </Box>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+                    {t('profileDetailCard.title.personalInfo')}
+                </Typography>
+            </Stack>
+
+            <Grid container spacing={4}>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <InfoItem 
+                        label={t('common:labels.email')} 
+                        value={profileDetail?.user?.email} 
+                        icon={<EmailIcon />}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <InfoItem 
+                        label={t('profileDetailCard.label.phone')} 
+                        value={profileDetail?.jobSeekerProfile?.phone} 
+                        icon={<PhoneIcon />}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <InfoItem 
+                        label={t('profileDetailCard.label.gender')} 
+                        value={tConfig((allConfig as any)?.genderDict?.[profileDetail?.jobSeekerProfile?.gender])} 
+                        icon={<GenderIcon />}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <InfoItem 
+                        label={t('profileDetailCard.label.dob')} 
+                        value={<TimeAgo date={profileDetail?.jobSeekerProfile?.birthday} type="format" />} 
+                        icon={<CakeIcon />}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <InfoItem 
+                        label={t('profileDetailCard.label.maritalStatus')} 
+                        value={tConfig((allConfig as any)?.maritalStatusDict?.[profileDetail?.jobSeekerProfile?.maritalStatus])} 
+                        icon={<FamilyIcon />}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <InfoItem 
+                        label={t('profileDetailCard.label.cityProvince')} 
+                        value={tConfig((allConfig as any)?.cityDict?.[profileDetail?.jobSeekerProfile?.location?.city])} 
+                        icon={<LocationIcon />}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <InfoItem 
+                        label={t('profileDetailCard.label.district')} 
+                        value={profileDetail?.jobSeekerProfile?.location?.districtDict?.name} 
+                        icon={<LocationIcon />}
+                    />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 4 }}>
+                    <InfoItem 
+                        label={t('profileDetailCard.label.address')} 
+                        value={profileDetail?.jobSeekerProfile?.location?.address} 
+                        icon={<HomeIcon />}
+                    />
+                </Grid>
+            </Grid>
+        </Box>
+    );
 };
 
 export default PersonalInfoSection;

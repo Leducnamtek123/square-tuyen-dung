@@ -1,479 +1,260 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Box, Typography, Button, IconButton, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Stack, Divider, LinearProgress } from "@mui/material";
-
+'use client';
+import React, { useCallback, useMemo, useState } from 'react';
+import { 
+  Box, 
+  Typography, 
+  Button, 
+  IconButton, 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  TextField, 
+  Stack, 
+  Divider,
+  Tooltip,
+  Paper,
+  alpha,
+  useTheme
+} from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
-
 import DeleteIcon from '@mui/icons-material/Delete';
-
 import AddIcon from '@mui/icons-material/Add';
-
-import toastMessages from '../../../../utils/toastMessages';
-
 import { useTranslation } from 'react-i18next';
-
-import questionService from '../../../../services/questionService';
-
-import { transformQuestion } from '../../../../utils/transformers';
-
+import toastMessages from '../../../../utils/toastMessages';
+import { confirmModal } from '../../../../utils/sweetalert2Modal';
+import errorHandling from '../../../../utils/errorHandling';
 import DataTable from '../../../../components/Common/DataTable';
-import { PaginatedResponse } from '@/types/api';
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
+import { useDataTable } from '../../../../hooks';
+import { useEmployerQuestions, useQuestionMutations } from '../hooks/useEmployerQueries';
+import type { AxiosError } from 'axios';
+import type { ApiError } from '../../../../types/api';
+import type { Question } from '../../../../types/models';
 
 interface QuestionBankCardProps {
   title?: string;
 }
 
 const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
+    const { t } = useTranslation(['interview', 'common']);
+    const theme = useTheme();
+    const resolvedTitle = title || t('interview:employer.questionBank.title');
 
-  const { t } = useTranslation(['interview', 'common']);
-
-  const resolvedTitle = title || t('employer.questionBank.title');
-
-  const [questions, setQuestions] = useState<import('@/types/models').Question[]>([]);
-
-  const [count, setCount] = useState(0);
-
-  const [page, setPage] = useState(0);
-
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  const [loading, setLoading] = useState(true);
-
-  const [open, setOpen] = useState(false);
-
-  const [currentQuestion, setCurrentQuestion] = useState<{ text?: string; id?: number | null }>({ text: '', id: null });
-
-  const [isEdit, setIsEdit] = useState(false);
-
-  const fetchQuestions = useCallback(async () => {
-    setLoading(true);
-    try {
-
-      const data = await questionService.getQuestions({
-        page: page + 1,
-        pageSize: rowsPerPage,
-      });
-
-      const rawQuestions = (data as unknown as PaginatedResponse<Record<string, unknown>>)?.results || [];
-      setQuestions(rawQuestions.map((q: Record<string, unknown>) => transformQuestion(q) as import('@/types/models').Question).filter(Boolean));
-      setCount(typeof data?.count === 'number' ? data.count : rawQuestions.length);
-
-    } catch (error: unknown) {
-
-      console.error('Error fetching questions', error);
-
-    } finally {
-      setLoading(false);
-    }
-  }, [page, rowsPerPage]);
-
-  useEffect(() => {
-    fetchQuestions();
-  }, [fetchQuestions]);
-
-  const handleChangePage = (event: unknown, newPage: number) => { // Changed event type to unknown
-
-    setPage(newPage);
-
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-
-    setRowsPerPage(parseInt(event.target.value, 10));
-
-    setPage(0);
-
-  };
-
-  const handleOpen = useCallback((q: { text?: string; id?: number | null } = { text: '' }) => {
-    setCurrentQuestion(q);
-    setIsEdit(!!q.id);
-    setOpen(true);
-  }, []);
-
-  const handleClose = useCallback(() => {
-    setOpen(false);
-    setCurrentQuestion({ text: '', id: null });
-    setIsEdit(false);
-  }, []);
-
-  const handleSubmit = async () => {
-
-    const payload = {
-
-      text: currentQuestion.text?.trim() || '',
-
+    const inputSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: 2.5,
+            backgroundColor: alpha(theme.palette.action.disabled, 0.03),
+            '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
+            '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) }
+        }
     };
 
-    if (!payload.text) {
-
-      toastMessages.error(t('employer.questionBank.textRequired'));
-
-      return;
-
-    }
-
-    try {
-
-      if (isEdit) {
-
-        await questionService.updateQuestion(currentQuestion.id as number, payload);
-
-        toastMessages.success(t('employer.questionBank.updateSuccess'));
-
-      } else {
-
-        await questionService.createQuestion(payload);
-
-        toastMessages.success(t('employer.questionBank.createSuccess'));
-
-      }
-
-      fetchQuestions();
-
-      handleClose();
-
-    } catch (error: unknown) {
-
-      toastMessages.error(t('employer.questionBank.saveError'));
-
-    }
-
-  };
-
-  const handleDelete = useCallback(async (id: string | number) => {
-    if (window.confirm(t('employer.questionBank.deleteConfirm'))) {
-      try {
-        await questionService.deleteQuestion(id);
-        toastMessages.success(t('employer.questionBank.deleteSuccess'));
-        fetchQuestions();
-      } catch (error: unknown) {
-        toastMessages.error(t('employer.questionBank.deleteError'));
-      }
-    }
-  }, [fetchQuestions, t]);
-
-  const columns = useMemo(
-    () => [
-      {
-
-        header: t('employer.questionBank.columns.text'),
-
-        accessorKey: 'text',
-
-        cell: ({ getValue }: { getValue: () => unknown }) => (
-
-          <Typography
-
-            variant="body2"
-
-            sx={{
-
-              display: '-webkit-box',
-
-              WebkitLineClamp: 2,
-
-              WebkitBoxOrient: 'vertical',
-
-              overflow: 'hidden',
-
-              textOverflow: 'ellipsis',
-
-            }}
-
-          >
-
-            {String(getValue() ?? '')}
-
-          </Typography>
-
-        ),
-
-      },
-
-      {
-
-        header: '',
-
-        id: 'actions',
-
-        cell: ({ row }: { row: { original: { id: number; text?: string } } }) => (
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-
-            <IconButton
-
-              size="small"
-
-              onClick={() => handleOpen(row.original)}
-
-              color="primary"
-
-            >
-
-              <EditIcon fontSize="small" />
-
-            </IconButton>
-
-            <IconButton
-
-              size="small"
-
-              onClick={() => handleDelete(row.original.id)}
-
-              color="error"
-
-            >
-
-              <DeleteIcon fontSize="small" />
-
-            </IconButton>
-
-          </Box>
-
-        ),
-
-      },
-
-    ],
-    [t, handleOpen, handleDelete]
-  );
-
-  return (
-
-    <Box
-
-      sx={{
-
-        px: { xs: 1, sm: 2 },
-
-        py: { xs: 2, sm: 2 },
-
-        backgroundColor: 'background.paper',
-
-        borderRadius: 2,
-
-      }}
-
-    >
-
-      <Stack
-
-        direction={{ xs: 'column', sm: 'row' }}
-
-        alignItems={{ xs: 'flex-start', sm: 'center' }}
-
-        justifyContent="space-between"
-
-        spacing={{ xs: 2, sm: 0 }}
-
-        mb={4}
-
-      >
-
-        <Typography
-
-          variant="h5"
-
-          sx={{
-
-            fontWeight: 600,
-
-            background: (theme: import('@mui/material/styles').Theme) =>
-              theme.palette.primary.main,
-
-            WebkitBackgroundClip: 'text',
-
-            WebkitTextFillColor: 'transparent',
-
-            fontSize: { xs: '1.25rem', sm: '1.5rem' },
-
-          }}
-
-        >
-
-          {resolvedTitle}
-
-        </Typography>
-
-        <Button
-
-          variant="contained"
-
-          color="primary"
-
-          startIcon={<AddIcon />}
-
-          onClick={() => handleOpen()}
-
-          sx={{
-
-            borderRadius: 2,
-
-            px: 3,
-
-            background: (theme: import('@mui/material/styles').Theme) => theme.palette.primary.main,
-            boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.small || 1,
-            '&:hover': {
-              boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.medium || 2,
+    const {
+        page,
+        pageSize,
+        pagination,
+        onPaginationChange,
+    } = useDataTable({ initialPageSize: 10 });
+
+    const [open, setOpen] = useState(false);
+    const [currentQuestion, setCurrentQuestion] = useState<{ text?: string; id?: number | null }>({ text: '', id: null });
+    const [isEdit, setIsEdit] = useState(false);
+
+    // Data Fetching Hook
+    const { data: questionData, isLoading } = useEmployerQuestions({
+        page: page + 1,
+        pageSize,
+    });
+
+    const { createQuestion, updateQuestion, deleteQuestion, isMutating } = useQuestionMutations();
+
+    const questions = questionData?.results || [];
+    const count = questionData?.count || 0;
+
+    const handleOpen = useCallback((q: { text?: string; id?: number | null } = { text: '' }) => {
+        setCurrentQuestion(q);
+        setIsEdit(!!q.id);
+        setOpen(true);
+    }, []);
+
+    const handleClose = useCallback(() => {
+        setOpen(false);
+        setCurrentQuestion({ text: '', id: null });
+        setIsEdit(false);
+    }, []);
+
+    const handleSubmit = async () => {
+        const text = currentQuestion.text?.trim() || '';
+        if (!text) {
+            toastMessages.error(t('interview:employer.questionBank.textRequired'));
+            return;
+        }
+
+        try {
+            if (isEdit && currentQuestion.id) {
+                await updateQuestion({ id: currentQuestion.id, data: { text } });
+                toastMessages.success(t('interview:employer.questionBank.updateSuccess'));
+            } else {
+                await createQuestion({ text });
+                toastMessages.success(t('interview:employer.questionBank.createSuccess'));
+            }
+            handleClose();
+        } catch (error) {
+            errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        }
+    };
+
+    const handleDelete = useCallback((id: string | number) => {
+        confirmModal(
+            async () => {
+                try {
+                    await deleteQuestion(id);
+                    toastMessages.success(t('interview:employer.questionBank.deleteSuccess'));
+                } catch (error) {
+                    // Error handled by mutation hook
+                }
             },
+            t('interview:employer.questionBank.deleteTitle', 'Delete Question'),
+            t('interview:employer.questionBank.deleteConfirm'),
+            'warning'
+        );
+    }, [deleteQuestion, t]);
 
-          }}
+    const columns = useMemo(() => [
+        {
+            header: t('interview:employer.questionBank.columns.text'),
+            accessorKey: 'text',
+            cell: ({ getValue }: { getValue: () => unknown }) => (
+                <Typography
+                    variant="body2"
+                    sx={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        fontWeight: 600,
+                        color: 'text.primary'
+                    }}
+                >
+                    {String(getValue() ?? '---')}
+                </Typography>
+            ),
+        },
+        {
+            header: '',
+            id: 'actions',
+            cell: ({ row }: { row: { original: Question } }) => (
+                <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <Tooltip title={t('common:actions.edit')} arrow>
+                        <IconButton 
+                            size="small" 
+                            onClick={() => handleOpen(row.original)} 
+                            color="primary"
+                            sx={{ bgcolor: alpha(theme.palette.primary.main, 0.08), '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) } }}
+                        >
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('common:actions.delete')} arrow>
+                        <IconButton 
+                            size="small" 
+                            onClick={() => handleDelete(row.original.id)} 
+                            color="error"
+                            sx={{ bgcolor: alpha(theme.palette.error.main, 0.08), '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.15) } }}
+                        >
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            ),
+        },
+    ], [t, handleOpen, handleDelete, theme]);
 
-        >
+    return (
+        <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 4, boxShadow: (theme: any) => theme.customShadows?.z1, border: '1px solid', borderColor: 'divider' }}>
+            <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+                alignItems={{ xs: 'flex-start', sm: 'center' }} 
+                justifyContent="space-between" 
+                spacing={2} 
+                mb={4}
+            >
+                <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+                    {resolvedTitle}
+                </Typography>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<AddIcon />}
+                    onClick={() => handleOpen()}
+                    sx={{ borderRadius: 1.5, px: 3, py: 1, boxShadow: 'none', fontWeight: 700, textTransform: 'none' }}
+                >
+                    {t('interview:employer.questionBank.add')}
+                </Button>
+            </Stack>
 
-          {t('employer.questionBank.add')}
-
-        </Button>
-
-      </Stack>
-
-      {loading ? (
-
-        <Box sx={{ width: '100%', mb: 2 }}>
-
-          <LinearProgress
-
-            color="primary"
-
-            sx={{
-              height: { xs: 4, sm: 6 },
-              borderRadius: 3,
-              backgroundColor: 'primary.background',
-            }}
-          />
-        </Box>
-
-      ) : (
-
-        <Divider sx={{ mb: 2 }} />
-
-      )}
-
-      <Box
-
-        sx={{
-
-          backgroundColor: 'background.paper',
-
-          borderRadius: 2,
-
-          boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.card || 1,
-
-          overflow: 'hidden',
-
-          width: '100%',
-
-          '& .MuiTableContainer-root': {
-
-            overflowX: 'auto',
-
-          },
-
-        }}
-
-      >
-
-        <DataTable
-
-          columns={columns}
-
-          data={questions}
-
-          isLoading={loading}
-
-          rowCount={count}
-
-          pagination={{
-            pageIndex: page,
-            pageSize: rowsPerPage,
-          }}
-
-          onPaginationChange={(pagination) => {
-            setPage(pagination.pageIndex);
-            setRowsPerPage(pagination.pageSize);
-          }}
-
-        />
-
-      </Box>
-
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-
-        <DialogTitle sx={{ fontWeight: 600 }}>
-
-          {isEdit
-
-            ? t('employer.questionBank.editTitle')
-
-            : t('employer.questionBank.createTitle')}
-
-        </DialogTitle>
-
-        <DialogContent>
-
-          <Box sx={{ pt: 1 }}>
-
-            <TextField
-
-              autoFocus
-
-              margin="dense"
-
-              label={t('employer.questionBank.textLabel')}
-
-              fullWidth
-
-              multiline
-
-              rows={4}
-
-              variant="outlined"
-
-              value={currentQuestion.text || ''}
-
-              onChange={(e) =>
-
-                setCurrentQuestion({ ...currentQuestion, text: e.target.value })
-
-              }
-
-              sx={{ mb: 3 }}
-
+            <DataTable
+                columns={columns}
+                data={questions}
+                isLoading={isLoading}
+                rowCount={count}
+                pagination={pagination}
+                onPaginationChange={onPaginationChange}
+                emptyMessage={t('interview:employer.questionBank.noData')}
             />
 
-          </Box>
+            <Dialog 
+                open={open} 
+                onClose={handleClose} 
+                fullWidth 
+                maxWidth="sm"
+                PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+            >
+                <DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3, fontSize: '1.5rem' }}>
+                    {isEdit ? t('interview:employer.questionBank.editTitle') : t('interview:employer.questionBank.createTitle')}
+                </DialogTitle>
+                <DialogContent sx={{ px: 3, pb: 0 }}>
+                    <Box sx={{ pt: 2 }}>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            label={t('interview:employer.questionBank.textLabel')}
+                            fullWidth
+                            multiline
+                            rows={5}
+                            variant="outlined"
+                            value={currentQuestion.text || ''}
+                            onChange={(e) => setCurrentQuestion({ ...currentQuestion, text: e.target.value })}
+                            sx={inputSx}
+                        />
+                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.5, px: 1, fontWeight: 500 }}>
+                            {t('interview:employer.questionBank.hint', 'Enter clear and concise question content.')}
+                        </Typography>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 4, pt: 3, gap: 2 }}>
+                    <Button 
+                        onClick={handleClose} 
+                        color="inherit" 
+                        sx={{ fontWeight: 700, textTransform: 'none', borderRadius: 1.5, px: 3 }}
+                    >
+                        {t('common:actions.cancel')}
+                    </Button>
+                    <Button 
+                        onClick={handleSubmit} 
+                        variant="contained" 
+                        sx={{ px: 4, py: 1.25, borderRadius: 1.5, fontWeight: 900, boxShadow: 'none', textTransform: 'none' }}
+                    >
+                        {t('common:actions.save')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
 
-        </DialogContent>
-
-        <DialogActions sx={{ p: 3, gap: 1 }}>
-
-          <Button onClick={handleClose} color="inherit">
-
-            {t('common:actions.cancel')}
-
-          </Button>
-
-          <Button
-
-            onClick={handleSubmit}
-
-            variant="contained"
-
-            sx={{ px: 4, borderRadius: 2 }}
-
-          >
-
-            {t('common:actions.save')}
-
-          </Button>
-
-        </DialogActions>
-
-      </Dialog>
-
-    </Box>
-
-  );
-
+            {isMutating && <BackdropLoading />}
+        </Paper>
+    );
 };
 
 export default QuestionBankCard;

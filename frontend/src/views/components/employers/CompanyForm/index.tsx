@@ -1,7 +1,6 @@
-import React from 'react';
-import { useAppSelector } from '@/redux/hooks';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Grid2 as Grid } from "@mui/material";
@@ -13,12 +12,10 @@ import commonService from '../../../../services/commonService';
 import useDebounce from '../../../../hooks/useDebounce';
 import goongService from '../../../../services/goongService';
 
-import CompanyFormLoading from './CompanyFormLoading';
 import CompanyFormFields from './CompanyFormFields';
 import { useConfig } from '@/hooks/useConfig';
 import type { AxiosError } from 'axios';
 import type { ApiError } from '../../../../types/api';
-import type { Resolver } from 'react-hook-form';
 import type { SelectOption } from '../../../../types/models';
 
 export interface CompanyFormValues {
@@ -42,24 +39,24 @@ interface CompanyFormProps {
 const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFormProps) => {
   const { t } = useTranslation('employer');
   const { allConfig } = useConfig();
-  const [districtOptions, setDistrictOptions] = React.useState<SelectOption[]>([]);
-  const [locationOptions, setLocationOptions] = React.useState<Record<string, unknown>[]>([]);
+  const [districtOptions, setDistrictOptions] = useState<SelectOption[]>([]);
+  const [locationOptions, setLocationOptions] = useState<Record<string, unknown>[]>([]);
 
   const schema = yup.object().shape({
-    companyName: yup.string().required(t('jobPostForm.validation.jobnameisrequired', 'Company name is required.')).max(255, t('jobPostForm.validation.jobnameexceededallowedlength', 'Company name exceeded allowed length.')),
-    taxCode: yup.string().required(t('companyForm.placeholder.entercompanytaxcode', 'Tax code is required.')).max(30, t('jobPostForm.validation.jobnameexceededallowedlength', 'Tax code exceeded allowed length.')),
-    employeeSize: yup.number().required(t('companyForm.placeholder.selectcompanysize', 'Company size is required.')).typeError(t('companyForm.placeholder.selectcompanysize', 'Company size is required.')),
-    fieldOperation: yup.string().required(t('companyForm.placeholder.entercompanyfieldofoperation', 'Field of operation is required.')).max(255, t('jobPostForm.validation.jobnameexceededallowedlength', 'Field of operation exceeded allowed length.')),
+    companyName: yup.string().required(t('companyForm.validation.companyNameRequired', 'Company name is required.')).max(255, t('common:validation.max255')),
+    taxCode: yup.string().required(t('companyForm.placeholder.entercompanytaxcode', 'Tax code is required.')).max(30, t('common:validation.max30')),
+    employeeSize: yup.number().required(t('companyForm.placeholder.selectcompanysize', 'Company size is required.')).typeError(t('companyForm.placeholder.selectcompanysize')),
+    fieldOperation: yup.string().required(t('companyForm.placeholder.entercompanyfieldofoperation', 'Field of operation is required.')).max(255, t('common:validation.max255')),
     location: yup.object().shape({
-      city: yup.number().required(t('jobPostForm.validation.cityprovinceisrequired', 'City/Province is required.')).typeError(t('jobPostForm.validation.cityprovinceisrequired', 'City/Province is required.')),
-      district: yup.number().required(t('jobPostForm.validation.districtisrequired', 'District is required.')).typeError(t('jobPostForm.validation.districtisrequired', 'District is required.')),
-      address: yup.string().required(t('jobPostForm.validation.addressisrequired', 'Address is required.')).max(255, t('jobPostForm.validation.addressexceededallowedlength', 'Address exceeded allowed length.')),
-      lat: yup.number().required(t('jobPostForm.validation.latitudeisrequired', 'Latitude is required.')).typeError(t('jobPostForm.validation.invalidlatitude', 'Invalid latitude.')),
-      lng: yup.number().required(t('jobPostForm.validation.longitudeisrequired', 'Longitude is required.')).typeError(t('jobPostForm.validation.invalidlongitude', 'Invalid longitude.')),
+      city: yup.number().required(t('jobPostForm.validation.cityprovinceisrequired')).typeError(t('jobPostForm.validation.cityprovinceisrequired')),
+      district: yup.number().required(t('jobPostForm.validation.districtisrequired')).typeError(t('jobPostForm.validation.districtisrequired')),
+      address: yup.string().required(t('jobPostForm.validation.addressisrequired')).max(255, t('common:validation.max255')),
+      lat: yup.number().required(t('jobPostForm.validation.latitudeisrequired')).typeError(t('jobPostForm.validation.invalidlatitude')),
+      lng: yup.number().required(t('jobPostForm.validation.longitudeisrequired')).typeError(t('jobPostForm.validation.invalidlongitude')),
     }),
     since: yup.date().nullable(),
-    companyEmail: yup.string().required(t('jobPostForm.validation.contactpersonemailisrequired', 'Company email is required.')).email(t('jobPostForm.validation.invalidemail', 'Invalid email.')).max(100, t('jobPostForm.validation.jobnameexceededallowedlength', 'Company email exceeded allowed length.')),
-    companyPhone: yup.string().required(t('jobPostForm.validation.contactpersonphoneisrequired', 'Company phone is required.')).matches(REGEX_VALIDATE.phoneRegExp, t('jobPostForm.validation.invalidphonenumber', 'Invalid phone number.')).max(15, t('jobPostForm.validation.jobnameexceededallowedlength', 'Company phone exceeded allowed length.')),
+    companyEmail: yup.string().required(t('jobPostForm.validation.contactpersonemailisrequired')).email(t('jobPostForm.validation.invalidemail')).max(100),
+    companyPhone: yup.string().required(t('jobPostForm.validation.contactpersonphoneisrequired')).matches(REGEX_VALIDATE.phoneRegExp, t('jobPostForm.validation.invalidphonenumber')).max(15),
     description: yup.mixed().notRequired(),
   });
 
@@ -75,29 +72,34 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   const address = useWatch({ control, name: 'location.address' });
   const addressDebounce = useDebounce(address, 500);
 
-  const prevCityIdRef = React.useRef<number | string | null>(null);
+  const prevCityIdRef = useRef<number | string | null>(null);
 
-  React.useEffect(() => {
-    const loadDistricts = async (cityId: number | string) => {
+  // Load districts when city changes
+  useEffect(() => {
+    const loadDistricts = async (id: number | string) => {
       try {
-        const resData = await commonService.getDistrictsByCityId(cityId);
+        const resData = await commonService.getDistrictsByCityId(id);
+        const results = (resData as unknown as { data: SelectOption[] })?.data || [];
+        
         // Only clear district if the cityId has actually changed (user interaction)
-        // and it's not the initial load (prevCityIdRef.current is not null).
-        if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
+        if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
           setValue('location.district', '' as unknown as number);
         }
-        setDistrictOptions((resData as unknown as { data: SelectOption[] })?.data || []);
-        prevCityIdRef.current = cityId;
+        setDistrictOptions(results);
+        prevCityIdRef.current = id;
       } catch (error) {
         errorHandling(error as AxiosError<{ errors?: ApiError }>);
       }
     };
-    if (cityId) {
-      loadDistricts(cityId);
+    if (cityId) loadDistricts(cityId);
+    else {
+        setDistrictOptions([]);
+        prevCityIdRef.current = null;
     }
   }, [cityId, setValue]);
 
-  React.useEffect(() => {
+  // Load Goong location predictions
+  useEffect(() => {
     const loadLocation = async (input: string) => {
       if (!input || input.trim().length < 3) {
         setLocationOptions([]);
@@ -105,24 +107,26 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
       }
       try {
         const resData = await goongService.getPlaces(input);
-        if ((resData as Record<string, unknown>).predictions) setLocationOptions((resData as Record<string, unknown>).predictions as Record<string, unknown>[]);
+        if ((resData as Record<string, unknown>).predictions) {
+            setLocationOptions((resData as Record<string, unknown>).predictions as Record<string, unknown>[]);
+        }
       } catch (error) {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+          // Silent fail for autocomplete
       }
     };
     loadLocation(addressDebounce);
   }, [addressDebounce]);
 
-  React.useEffect(() => {
-    if (editData !== null) {
+  // Load edit data
+  useEffect(() => {
+    if (editData) {
       reset((formValues) => ({ ...formValues, ...(editData as unknown as Partial<CompanyFormValues>) }));
-    } else {
-      reset();
     }
   }, [editData, reset]);
 
-  React.useEffect(() => {
-    if (serverErrors !== null) {
+  // Handle server errors
+  useEffect(() => {
+    if (serverErrors) {
       for (let err in serverErrors) {
         setError(err as keyof CompanyFormValues, { type: 'manual', message: serverErrors[err]?.join(' ') });
       }
@@ -148,8 +152,8 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
 
   return (
     <form id="company-form" onSubmit={handleSubmit(handleUpdate)}>
-      <Grid container>
-        <Grid size={{ xs: 12, sm: 12, md: 12, lg: 10, xl: 10 }}>
+      <Grid container justifyContent="center">
+        <Grid size={{ xs: 12, lg: 10 }}>
           <CompanyFormFields
             control={control}
             t={t}

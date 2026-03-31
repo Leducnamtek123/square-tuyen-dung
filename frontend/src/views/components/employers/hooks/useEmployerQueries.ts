@@ -8,6 +8,8 @@ import jobService from '../../../../services/jobService';
 import interviewService from '../../../../services/interviewService';
 import questionService from '../../../../services/questionService';
 import questionGroupService from '../../../../services/questionGroupService';
+import companyService from '../../../../services/companyService';
+import companyImageService from '../../../../services/companyImageService';
 import errorHandling from '../../../../utils/errorHandling';
 import { PaginatedResponse } from '@/types/api';
 import { JobPost, JobPostActivity, Resume, ResumeSaved, InterviewSession, Question, QuestionGroup } from '@/types/models';
@@ -195,6 +197,24 @@ export const useDeleteJobPostActivity = () => {
   };
 };
 
+export const useUpdateApplicationStatus = () => {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: ({ id, status }: { id: string | number; status: string | number }) =>
+      jobPostActivityService.changeApplicationStatus(id, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
+    },
+    onError: (error: any) => errorHandling(error),
+  });
+
+  return {
+    ...mutation,
+    updateStatus: mutation.mutateAsync,
+    isMutating: mutation.isPending
+  };
+};
+
 // ─── Employer Profile Search ────────────────────────────────
 export const useEmployerResumes = (params: Record<string, unknown>): UseEmployerResumesResult => {
   return useQuery({
@@ -222,6 +242,14 @@ export const useToggleSaveResumeOptimistic = () => {
     toggleSaveResume: mutation.mutateAsync,
     isMutating: mutation.isPending
   };
+};
+
+export const useResumeDetail = (slug: string) => {
+  return useQuery({
+    queryKey: ['resumeDetail', slug],
+    queryFn: () => resumeService.getResumeDetail(slug),
+    enabled: !!slug,
+  });
 };
 
 // ─── Interview Management ────────────────────────────────────
@@ -275,12 +303,21 @@ export const useInterviewMutations = () => {
     },
   });
 
+  const evaluationMutation = useMutation({
+    mutationFn: (data: any) => interviewService.submitEvaluation(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['interviewDetail'] });
+    },
+    onError: (error: any) => errorHandling(error),
+  });
+
   return {
     scheduleSession: scheduleMutation.mutateAsync,
     updateSession: updateMutation.mutateAsync,
     deleteSession: deleteMutation.mutateAsync,
     updateStatus: statusMutation.mutateAsync,
-    isMutating: scheduleMutation.isPending || updateMutation.isPending || deleteMutation.isPending || statusMutation.isPending,
+    submitEvaluation: evaluationMutation.mutateAsync,
+    isMutating: scheduleMutation.isPending || updateMutation.isPending || deleteMutation.isPending || statusMutation.isPending || evaluationMutation.isPending,
   };
 };
 
@@ -330,5 +367,108 @@ export const useQuestionMutations = () => {
     updateQuestion: updateMutation.mutateAsync,
     deleteQuestion: deleteMutation.mutateAsync,
     isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending,
+  };
+};
+
+export const useQuestionGroupMutations = () => {
+  const queryClient = useQueryClient();
+
+  const createMutation = useMutation({
+    mutationFn: (data: any) => questionGroupService.createQuestionGroup(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['questionGroups'] });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string | number; data: any }) => questionGroupService.updateQuestionGroup(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['questionGroups'] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string | number) => questionGroupService.deleteQuestionGroup(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['questionGroups'] });
+    },
+  });
+
+  return {
+    createQuestionGroup: createMutation.mutateAsync,
+    updateQuestionGroup: updateMutation.mutateAsync,
+    deleteQuestionGroup: deleteMutation.mutateAsync,
+    isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending,
+  };
+};
+
+// ─── Company Profile ─────────────────────────────────────────
+export const useCompanyProfile = () => {
+  return useQuery({
+    queryKey: ['companyProfile'],
+    queryFn: () => companyService.getCompany(),
+  });
+};
+
+export const useCompanyMutations = () => {
+  const queryClient = useQueryClient();
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string | number; data: any }) => companyService.updateCompany(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companyProfile'] });
+    },
+  });
+
+  const logoMutation = useMutation({
+    mutationFn: (data: FormData) => companyService.updateCompanyImageUrl(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companyProfile'] });
+    },
+  });
+
+  const coverMutation = useMutation({
+    mutationFn: (data: FormData) => companyService.updateCompanyCoverImageUrl(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companyProfile'] });
+    },
+  });
+
+  return {
+    updateCompany: updateMutation.mutateAsync,
+    updateLogo: logoMutation.mutateAsync,
+    updateCover: coverMutation.mutateAsync,
+    isMutating: updateMutation.isPending || logoMutation.isPending || coverMutation.isPending,
+  };
+};
+
+export const useCompanyImages = () => {
+  return useQuery({
+    queryKey: ['companyImages'],
+    queryFn: () => companyImageService.getCompanyImages(),
+  });
+};
+
+export const useCompanyImageMutations = () => {
+  const queryClient = useQueryClient();
+
+  const addMutation = useMutation({
+    mutationFn: (data: FormData) => companyImageService.addCompanyImage(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companyImages'] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string | number) => companyImageService.deleteCompanyImage(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['companyImages'] });
+    },
+  });
+
+  return {
+    addCompanyImages: addMutation.mutateAsync,
+    deleteCompanyImage: deleteMutation.mutateAsync,
+    isMutating: addMutation.isPending || deleteMutation.isPending,
   };
 };

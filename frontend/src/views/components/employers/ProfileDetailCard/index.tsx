@@ -1,12 +1,12 @@
-import React, { Suspense, lazy } from "react";
+'use client';
+import React, { Suspense, lazy, useState } from "react";
 import { useParams } from 'next/navigation';
-import { Box, Card, Stack, Typography } from "@mui/material";
+import { Box, Card, Stack, Typography, Paper } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
 import { CV_TYPES } from "../../../../configs/constants";
 import FormPopup from "../../../../components/Common/Controls/FormPopup";
-import { useQuery } from '@tanstack/react-query';
-import resumeService from "../../../../services/resumeService";
+import { useResumeDetail } from "../hooks/useEmployerQueries";
 
 import PersonalInfoSection from './PersonalInfoSection';
 import GeneralInfoSection from './GeneralInfoSection';
@@ -21,74 +21,69 @@ const LazyPdf = lazy(() => import("../../../../components/Common/Pdf"));
 
 const ProfileDetailCard: React.FC = () => {
   const { t } = useTranslation('employer');
-  const { slug } = useParams<{ slug: string }>();
+  const params = useParams();
+  const slug = params?.slug as string;
 
-  const { data: profileDetail, isLoading } = useQuery({
-    queryKey: ['resumeDetail', slug],
-    queryFn: async () => {
-      const resData = await resumeService.getResumeDetail(slug as string) as any;
-      return resData;
-    },
-    enabled: !!slug,
-  });
-  const [openPopup, setOpenPopup] = React.useState(false);
+  const { data: profileDetail, isLoading } = useResumeDetail(slug);
+  const [openPopup, setOpenPopup] = useState(false);
 
   if (isLoading) return <BackdropLoading open={true} />;
   if (!profileDetail) return null;
 
-  return (
-    <>
-      <Stack spacing={3}>
-        <Card
-          variant="outlined"
-          sx={{
-            p: { xs: 2, sm: 4 },
-            borderRadius: 3,
-            boxShadow: (theme: any) => theme.customShadows?.medium || 2,
-          }}
-        >
-          <Stack spacing={4}>
-            <PersonalInfoSection profileDetail={profileDetail} />
-            <GeneralInfoSection profileDetail={profileDetail} />
-            <CareerGoalsSection profileDetail={profileDetail} />
-          </Stack>
-        </Card>
+  const isOnlineCv = profileDetail?.type === CV_TYPES.cvWebsite;
 
-        {profileDetail?.type && profileDetail.type === CV_TYPES.cvWebsite ? (
-          <>
-            <ExperienceSection profileDetail={profileDetail} />
-            <EducationSection profileDetail={profileDetail} />
-            <CertificateSection profileDetail={profileDetail} />
-            <LanguageSection profileDetail={profileDetail} />
-            <AdvancedSkillSection profileDetail={profileDetail} />
-          </>
-        ) : (
-          <>
-            <FormPopup
-              title={t('sendEmailComponent.title.viewattachedresume', { defaultValue: 'Xem CV đính kèm' })}
-              openPopup={openPopup}
-              setOpenPopup={setOpenPopup}
-              showDialogAction={false}
-            >
-              <Suspense
-                fallback={(
-                  <Box sx={{ p: 3, textAlign: "center" }}>
-                    <Typography variant="subtitle2" color="text.secondary">
-                      {t('profileDetailCard.messages.loadingPdf', { defaultValue: 'Đang tải PDF...' })}
-                    </Typography>
-                  </Box>
-                )}
-              >
-                <LazyPdf
-                  fileUrl={profileDetail?.fileUrl}
-                  title={profileDetail?.title}
-                />
-              </Suspense>
-            </FormPopup>
-          </>
-        )}
-      </Stack>
-    </>
+  return (
+    <Stack spacing={4}>
+      <Paper
+        elevation={0}
+        sx={{
+          p: { xs: 3, md: 5 },
+          borderRadius: 4,
+          border: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          boxShadow: (theme: any) => theme.customShadows?.z1
+        }}
+      >
+        <Stack spacing={6}>
+          <PersonalInfoSection profileDetail={profileDetail as any} />
+          <GeneralInfoSection profileDetail={profileDetail as any} />
+          <CareerGoalsSection profileDetail={profileDetail as any} />
+        </Stack>
+      </Paper>
+
+      {isOnlineCv ? (
+        <Stack spacing={4}>
+          <ExperienceSection profileDetail={profileDetail as any} />
+          <EducationSection profileDetail={profileDetail as any} />
+          <CertificateSection profileDetail={profileDetail as any} />
+          <LanguageSection profileDetail={profileDetail as any} />
+          <AdvancedSkillSection profileDetail={profileDetail as any} />
+        </Stack>
+      ) : (
+        <FormPopup
+          title={t('sendEmailComponent.title.viewattachedresume', { defaultValue: t('common:labels.viewAttachedResume') })}
+          openPopup={openPopup}
+          setOpenPopup={setOpenPopup}
+          showDialogAction={false}
+        >
+          <Suspense
+            fallback={(
+              <Box sx={{ p: 10, textAlign: "center" }}>
+                <Typography variant="subtitle1" color="text.secondary" sx={{ fontWeight: 600 }}>
+                  {t('profileDetailCard.messages.loadingPdf', { defaultValue: t('common:messages.loadingPdf') })}
+                </Typography>
+              </Box>
+            )}
+          >
+            <LazyPdf
+              fileUrl={profileDetail?.fileUrl || ''}
+              title={profileDetail?.title || ''}
+            />
+          </Suspense>
+        </FormPopup>
+      )}
+    </Stack>
   );
 };
 

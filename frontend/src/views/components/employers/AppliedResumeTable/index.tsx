@@ -1,24 +1,33 @@
-import React from 'react';
+'use client';
+import React, { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+import { 
+  Box, 
+  IconButton, 
+  Stack, 
+  Tooltip, 
+  Typography,
+  Chip,
+  alpha,
+  useTheme
+} from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-import { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import DeleteIcon from '@mui/icons-material/Delete';
+import DescriptionIcon from '@mui/icons-material/Description';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import type { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
 
 import AIAnalysisDrawer from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
 import DataTable from '../../../../components/Common/DataTable';
-import { faFile, faFilePdf } from '@fortawesome/free-regular-svg-icons';
-import { formatRoute } from '../../../../utils/funcUtils';
 
 import SendEmailComponent from './SendEmailComponent';
 import AppliedStatusComponent from './AppliedStatusComponent';
 import AIAnalysisComponent from './AIAnalysisComponent';
 import { useConfig } from '@/hooks/useConfig';
-import { JobPostActivity } from '@/types/models';
+import type { JobPostActivity } from '@/types/models';
 
 export interface AppliedResumeTableProps {
   rows: JobPostActivity[];
@@ -35,6 +44,7 @@ export interface AppliedResumeTableProps {
 const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
   const { t } = useTranslation(['employer', 'common']);
   const nav = useRouter();
+  const theme = useTheme();
   const { 
     rows, 
     isLoading, 
@@ -47,34 +57,50 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     onSortingChange
   } = props;
   const { allConfig } = useConfig();
-  const [openDrawerId, setOpenDrawerId] = React.useState<string | number | null>(null);
+  const [openDrawerId, setOpenDrawerId] = useState<string | number | null>(null);
 
-  const selectedActivityInfo = React.useMemo(() => {
+  const selectedActivityInfo = useMemo(() => {
     if (!openDrawerId) return null;
     return rows.find(r => r.id === openDrawerId);
   }, [openDrawerId, rows]);
 
-  const columns = React.useMemo<ColumnDef<JobPostActivity>[]>(() => [
+  const columns = useMemo<ColumnDef<JobPostActivity>[]>(() => [
     {
       accessorKey: 'fullName',
-      header: t('appliedResume.table.profileName') as string,
+      header: t('appliedResume.table.profileName'),
       enableSorting: true,
       cell: (info) => (
-        <Box>
-          <Typography sx={{ fontWeight: 'bold' }}>
-            {info.getValue() as string}
+        <Box sx={{ py: 0.5 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'text.primary', mb: 0.75 }}>
+            {String(info.getValue() ?? '')}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             {info.row.original.resume?.type === CV_TYPES.cvWebsite ? (
               <Tooltip title={t('appliedResume.table.onlineResume')} arrow>
-                <FontAwesomeIcon icon={faFile} color="#441da0" size="xs" />
+                <Box sx={{ 
+                  display: 'flex', 
+                  p: 0.5, 
+                  borderRadius: 1, 
+                  bgcolor: alpha(theme.palette.primary.main, 0.08), 
+                  color: 'primary.main' 
+                }}>
+                  <DescriptionIcon sx={{ fontSize: 14 }} />
+                </Box>
               </Tooltip>
             ) : (
               <Tooltip title={t('appliedResume.table.attachedResume')} arrow>
-                <FontAwesomeIcon icon={faFilePdf} color="red" size="xs" />
+                <Box sx={{ 
+                  display: 'flex', 
+                  p: 0.5, 
+                  borderRadius: 1, 
+                  bgcolor: alpha(theme.palette.error.main, 0.08), 
+                  color: 'error.main' 
+                }}>
+                  <PictureAsPdfIcon sx={{ fontSize: 14 }} />
+                </Box>
               </Tooltip>
             )}
-            <Typography variant="caption" color="text.secondary">
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.2px' }}>
               {info.row.original.resume?.title || t('appliedResume.table.notUpdated')}
             </Typography>
           </Box>
@@ -83,36 +109,61 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     },
     {
       accessorKey: 'jobPost.jobName',
-      header: t('appliedResume.table.appliedPosition') as string,
+      header: t('appliedResume.table.appliedPosition'),
       enableSorting: true,
+      cell: (info) => (
+        <Typography variant="body2" noWrap sx={{ fontWeight: 800, color: 'primary.main', maxWidth: 200 }}>
+            {String(info.getValue() ?? '---')}
+        </Typography>
+      ),
     },
     {
       accessorKey: 'createAt',
-      header: t('appliedResume.table.appliedDate') as string,
+      header: t('appliedResume.table.appliedDate'),
       enableSorting: true,
-      cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
+      cell: (info) => (
+        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+            {info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '---'}
+        </Typography>
+      ),
     },
     {
       id: 'type',
-      header: t('appliedResume.table.profileType') as string,
-      cell: (info) => info.row.original.resume?.type === CV_TYPES.cvWebsite
-        ? t('appliedResume.table.onlineResume')
-        : t('appliedResume.table.attachedResume'),
+      header: t('appliedResume.table.profileType'),
+      cell: (info) => {
+        const isOnline = info.row.original.resume?.type === CV_TYPES.cvWebsite;
+        return (
+          <Chip 
+              label={isOnline ? t('appliedResume.table.onlineResume') : t('appliedResume.table.attachedResume')} 
+              size="small" 
+              sx={{ 
+                fontWeight: 900, 
+                fontSize: '0.7rem',
+                borderRadius: 1.5,
+                bgcolor: isOnline ? alpha(theme.palette.primary.main, 0.08) : alpha(theme.palette.error.main, 0.08),
+                color: isOnline ? 'primary.main' : 'error.main',
+                border: '1px solid',
+                borderColor: isOnline ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.error.main, 0.1),
+                '& .MuiChip-label': { px: 1.5 }
+              }}
+          />
+        );
+      },
     },
     {
       id: 'aiAnalysis',
-      header: t('appliedResume.table.aiAnalysis') as string,
+      header: t('appliedResume.table.aiAnalysis'),
       meta: { align: 'center' },
       cell: (info) => <AIAnalysisComponent row={info.row.original} onOpenDrawer={() => setOpenDrawerId(info.row.original.id)} />,
     },
     {
       accessorKey: 'status',
-      header: t('appliedResume.table.status') as string,
+      header: t('appliedResume.table.status'),
       meta: { align: 'right' },
       cell: (info) => (
         <AppliedStatusComponent
           options={allConfig?.applicationStatusOptions || []}
-          defaultStatus={Number(info.getValue())}
+          defaultStatus={Number(info.getValue() ?? 0)}
           id={String(info.row.original.id)}
           handleChangeApplicationStatus={handleChangeApplicationStatus}
         />
@@ -120,38 +171,50 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     },
     {
       id: 'actions',
-      header: t('appliedResume.table.actions') as string,
+      header: t('appliedResume.table.actions'),
       meta: { align: 'right' },
       cell: (info) => (
-        <Stack direction="row" spacing={1} justifyContent="flex-end">
+        <Stack direction="row" spacing={1} justifyContent="flex-end" alignItems="center">
           <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
             <IconButton
               color="primary"
               size="small"
-              onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resume?.slug || '')}`)}
+              onClick={() => nav.push(`${ROUTES.EMPLOYER.PROFILE_DETAIL.replace(':slug', info.row.original.resume?.slug || '')}`)}
+              sx={{ 
+                bgcolor: alpha(theme.palette.primary.main, 0.06),
+                borderRadius: 1.5,
+                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.12) }
+              }}
             >
-              <RemoveRedEyeOutlinedIcon fontSize="small" />
+              <RemoveRedEyeIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
-            <IconButton
-              size="small"
-              color="error"
-              onClick={() => handleDelete(info.row.original.id)}
-            >
-              <DeleteOutlineOutlinedIcon fontSize="small" />
-            </IconButton>
-          </Tooltip>
+          
           <SendEmailComponent
             jobPostActivityId={String(info.row.original.id)}
             isSentEmail={info.row.original.isSentEmail || false}
             email={info.row.original.email || ''}
             fullName={info.row.original.fullName || ''}
           />
+
+          <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
+            <IconButton
+              size="small"
+              color="error"
+              onClick={() => handleDelete(info.row.original.id)}
+              sx={{ 
+                bgcolor: alpha(theme.palette.error.main, 0.06),
+                borderRadius: 1.5,
+                '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.12) }
+              }}
+            >
+              <DeleteIcon fontSize="small" />
+            </IconButton>
+          </Tooltip>
         </Stack>
       ),
     },
-  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, nav]);
+  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, nav, theme.palette]);
 
   return (
     <>

@@ -1,59 +1,62 @@
 import React from 'react';
-import { Box, Typography, Card } from '@mui/material';
+import { Box, Typography, Paper, Stack, alpha, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import defaultTheme from '../../../../themeConfigs/defaultTheme';
+import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 
 interface CareerGoalsSectionProps {
   profileDetail: any;
 }
 
 const CareerGoalsSection: React.FC<CareerGoalsSectionProps> = ({ profileDetail }) => {
-  const { t } = useTranslation(['employer', 'common']);
+    const { t } = useTranslation(['employer', 'common']);
+    const theme = useTheme();
 
-  return (
-    <Box>
-      <Typography
-        variant="h5"
-        sx={{
-          mb: 2,
-          color: (theme: any) => theme.palette.primary.main,
-          borderBottom: "2px solid",
-          borderColor: (theme: any) => theme.palette.primary.light,
-          pb: 1,
-          fontSize: { xs: "1.25rem", sm: "1.5rem" },
-        }}
-      >
-        {t('profileDetailCard.title.careerGoals', { ns: 'employer' })}
-      </Typography>
-      <Card
-        variant="outlined"
-        sx={{
-          p: 3,
-          background: (theme: any) => theme.palette.grey[50],
-          border: "1px solid",
-          borderColor: (theme: any) => theme.palette.grey[200],
-          boxShadow: 0,
-        }}
-      >
-        <Typography
-          sx={{
-            color: profileDetail?.description
-              ? defaultTheme.palette.text.primary
-              : defaultTheme.palette.text.disabled,
-            fontStyle: profileDetail?.description
-              ? "normal"
-              : "italic",
-            fontSize: profileDetail?.description
-              ? "0.95rem"
-              : (defaultTheme.palette.text as any).disabled?.fontSize || '0.875rem',
-            lineHeight: 1.6,
-          }}
-        >
-          {profileDetail?.description || t('common.notUpdated', { ns: 'common' })}
-        </Typography>
-      </Card>
-    </Box>
-  );
+    return (
+        <Box>
+            <Stack direction="row" alignItems="center" spacing={2} mb={4}>
+                <Box 
+                    sx={{ 
+                        p: 1.25, 
+                        borderRadius: 2, 
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        color: 'primary.main',
+                        display: 'flex'
+                    }}
+                >
+                    <TrackChangesIcon sx={{ fontSize: 28 }} />
+                </Box>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+                    {t('profileDetailCard.title.careerGoals')}
+                </Typography>
+            </Stack>
+            
+            <Paper
+                variant="outlined"
+                sx={{
+                    p: 4,
+                    bgcolor: alpha(theme.palette.action.disabled, 0.04),
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    borderRadius: 3,
+                    boxShadow: 'none',
+                }}
+            >
+                <Typography
+                    variant="body1"
+                    sx={{
+                        color: profileDetail?.description ? 'text.primary' : 'text.disabled',
+                        fontStyle: profileDetail?.description ? 'normal' : 'italic',
+                        lineHeight: 1.8,
+                        fontWeight: 600,
+                        whiteSpace: 'pre-line',
+                        opacity: profileDetail?.description ? 0.9 : 0.6
+                    }}
+                >
+                    {profileDetail?.description || t('common:labels.notUpdated')}
+                </Typography>
+            </Paper>
+        </Box>
+    );
 };
 
 export default CareerGoalsSection;

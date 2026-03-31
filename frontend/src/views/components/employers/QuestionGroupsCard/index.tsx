@@ -1,837 +1,454 @@
-import React, { useState, useMemo, useEffect } from 'react';
-
+'use client';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-
-import { Box, Typography, Breadcrumbs, Link, Button, Paper, TextField, InputAdornment, Dialog, DialogTitle, DialogContent, DialogActions, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip, IconButton, Stack, Divider, LinearProgress, SelectChangeEvent } from "@mui/material";
-
+import { 
+  Box, 
+  Typography, 
+  Breadcrumbs, 
+  Link, 
+  Button, 
+  TextField, 
+  InputAdornment, 
+  Dialog, 
+  DialogTitle, 
+  DialogContent, 
+  DialogActions, 
+  FormControl, 
+  InputLabel, 
+  Select, 
+  MenuItem, 
+  OutlinedInput, 
+  Chip, 
+  IconButton, 
+  Stack, 
+  Divider, 
+  SelectChangeEvent,
+  Tooltip,
+  Paper,
+  alpha,
+  useTheme
+} from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-
 import AddIcon from '@mui/icons-material/Add';
-
 import EditIcon from '@mui/icons-material/Edit';
-
 import DeleteIcon from '@mui/icons-material/Delete';
-
-import { useQuestionGroups } from '../../../employerPages/InterviewPages/hooks/useQuestionGroups';
-
 import DataTable from '../../../../components/Common/DataTable';
-
-import questionService from '../../../../services/questionService';
-import { PaginatedResponse } from '@/types/api';
-
-import { transformQuestion, transformQuestionGroup } from '../../../../utils/transformers';
-
-import type { ColumnDef } from '@tanstack/react-table';
-
+import { useEmployerQuestions, useQuestionGroups, useQuestionMutations, useQuestionGroupMutations } from '../hooks/useEmployerQueries';
+import { useDataTable } from '../../../../hooks';
+import { confirmModal } from '../../../../utils/sweetalert2Modal';
+import errorHandling from '../../../../utils/errorHandling';
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
+import toastMessages from '../../../../utils/toastMessages';
+import type { AxiosError } from 'axios';
+import type { ApiError } from '../../../../types/api';
 import type { QuestionGroup, Question } from '../../../../types/models';
+import type { ColumnDef } from '@tanstack/react-table';
 
 interface QuestionGroupsCardProps {
   title?: string;
 }
 
-const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title = "Question Groups Management" }) => {
+const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
+    const { t } = useTranslation(['employer', 'interview', 'common']);
+    const theme = useTheme();
+    const resolvedTitle = title || t('employer:questionGroupsCard.title', 'Question Groups Management');
 
-  const { t } = useTranslation('employer');
-
-    const [page, setPage] = useState(0);
-
-    const [rowsPerPage, setRowsPerPage] = useState(10);
-
-    const [searchTerm, setSearchTerm] = useState('');
-
-    const [openDialog, setOpenDialog] = useState(false);
-
-    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add'); // 'add' or 'edit'
-
-    const [currentGroup, setCurrentGroup] = useState<QuestionGroup | null>(null);
-
-    const [groupName, setGroupName] = useState('');
-
-    const [groupDescription, setGroupDescription] = useState('');
-
-    const [selectedQuestions, setSelectedQuestions] = useState<number[]>([]);
-
-    const [allQuestions, setAllQuestions] = useState<Question[]>([]);
-
-    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-
-    const [openCreateQuestion, setOpenCreateQuestion] = useState(false);
-
-    const [newQuestionContent, setNewQuestionContent] = useState('');
-
-    const [isCreatingQuestion, setIsCreatingQuestion] = useState(false);
+    const inputSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: 2.5,
+            backgroundColor: alpha(theme.palette.action.disabled, 0.03),
+            '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
+            '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) }
+        }
+    };
 
     const {
+        page,
+        pageSize,
+        pagination,
+        onPaginationChange,
+    } = useDataTable({ initialPageSize: 10 });
 
-        data,
+    const [searchTerm, setSearchTerm] = useState('');
+    const [openDialog, setOpenDialog] = useState(false);
+    const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
+    const [currentGroup, setCurrentGroup] = useState<QuestionGroup | null>(null);
+    const [groupName, setGroupName] = useState('');
+    const [groupDescription, setGroupDescription] = useState('');
+    const [selectedQuestions, setSelectedQuestions] = useState<number[]>([]);
+    
+    const [openCreateQuestion, setOpenCreateQuestion] = useState(false);
+    const [newQuestionContent, setNewQuestionContent] = useState('');
 
-        isLoading,
-
-        createQuestionGroup,
-
-        updateQuestionGroup,
-
-        deleteQuestionGroup,
-
-        isMutating
-
-    } = useQuestionGroups({
-
+    // Data Fetching
+    const { data: groupData, isLoading: groupsLoading } = useQuestionGroups({
         page: page + 1,
-
-        pageSize: rowsPerPage,
-
+        pageSize,
         search: searchTerm
-
     });
 
-    const handleChangePage = (event: unknown, newPage: number) => {
+    const { data: questionData } = useEmployerQuestions({ pageSize: 200 }); // Load enough questions for selection
+    const allQuestions = questionData?.results || [];
 
-        setPage(newPage);
+    const { createQuestionGroup, updateQuestionGroup, deleteQuestionGroup, isMutating: isGroupMutating } = useQuestionGroupMutations();
+    const { createQuestion, isMutating: isQuestionMutating } = useQuestionMutations();
 
-    };
+    const groups = groupData?.results || [];
+    const count = groupData?.count || 0;
 
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-
-        setRowsPerPage(parseInt(event.target.value, 10));
-
-        setPage(0);
-
-    };
-
-    useEffect(() => {
-
-        const fetchQuestions = async () => {
-
-            try {
-
-                const res = await questionService.getQuestions({ pageSize: 1000 });
-
-                const rawQuestions = (res as unknown as PaginatedResponse<Record<string, unknown>>)?.results || [];
-
-                // Type assertion safe here since transformQuestion normalizes backend entity into models.Question
-                setAllQuestions(rawQuestions.map(transformQuestion).filter(Boolean) as Question[]);
-
-            } catch (error) {
-
-                console.error("Error fetching questions", error);
-
-            }
-
-        };
-
-        fetchQuestions();
-
-    }, []);
-
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-
-        setPage(0);
-
+        onPaginationChange({ pageIndex: 0, pageSize });
     };
 
     const handleOpenAdd = () => {
-
         setDialogMode('add');
-
         setGroupName('');
-
         setGroupDescription('');
-
         setSelectedQuestions([]);
-
         setCurrentGroup(null);
-
         setOpenDialog(true);
-
     };
 
-    const handleOpenEdit = (group: QuestionGroup) => {
-
+    const handleOpenEdit = useCallback((group: QuestionGroup) => {
         setDialogMode('edit');
-
         setCurrentGroup(group);
-
         setGroupName(group.name);
-
         setGroupDescription(group.description || '');
-
         setSelectedQuestions(group.questions?.map((q: Question) => q.id) || []);
-
         setOpenDialog(true);
-
-    };
-
-    const handleOpenDelete = (group: QuestionGroup) => {
-
-        setCurrentGroup(group);
-
-        setOpenDeleteDialog(true);
-
-    };
+    }, []);
 
     const handleCloseDialog = () => {
-
         setOpenDialog(false);
-
     };
 
     const handleSave = async () => {
-
         if (!groupName.trim()) return;
 
         const payload = {
-
             name: groupName.trim(),
-
             description: groupDescription.trim(),
-
             question_ids: selectedQuestions
-
         };
 
         try {
-
             if (dialogMode === 'add') {
-
                 await createQuestionGroup(payload);
-
-            } else {
-
-                await updateQuestionGroup({
-
-                    id: currentGroup!.id,
-
-                    data: payload
-
-                });
-
+                toastMessages.success(t('employer:questionGroupsCard.messages.createSuccess'));
+            } else if (currentGroup) {
+                await updateQuestionGroup({ id: currentGroup.id, data: payload });
+                toastMessages.success(t('employer:questionGroupsCard.messages.updateSuccess'));
             }
-
             handleCloseDialog();
-
         } catch (error) {
-
-            console.error(error);
-
+            errorHandling(error as AxiosError<{ errors?: ApiError }>);
         }
-
     };
 
     const handleCreateQuestion = async () => {
-
         if (!newQuestionContent.trim()) return;
-
-        setIsCreatingQuestion(true);
-
         try {
-
-            const res = await questionService.createQuestion({
-
-                text: newQuestionContent.trim()
-
-            });
-
-            const newQ = transformQuestion(res as unknown as Record<string, unknown>) as Question | null;
-
-            if (newQ) {
-
-                setAllQuestions(prev => [newQ, ...prev]);
-
-                setSelectedQuestions(prev => [...prev, newQ.id]);
-
+            const res = await createQuestion({ text: newQuestionContent.trim() });
+            if (res && (res as any).id) {
+                setSelectedQuestions((prev: number[]) => [...prev, (res as any).id]);
+                toastMessages.success(t('interview:employer.questionBank.createSuccess'));
             }
-
             setOpenCreateQuestion(false);
-
             setNewQuestionContent('');
-
         } catch (error) {
-
-            console.error("Error creating question", error);
-
-        } finally {
-
-            setIsCreatingQuestion(false);
-
+            errorHandling(error as AxiosError<{ errors?: ApiError }>);
         }
-
     };
 
-    const handleDelete = async () => {
-
-        try {
-
-            if (currentGroup) await deleteQuestionGroup(currentGroup.id);
-
-            setOpenDeleteDialog(false);
-
-        } catch (error) {
-
-            console.error(error);
-
-        }
-
-    };
+    const handleDelete = useCallback((group: QuestionGroup) => {
+        confirmModal(
+            async () => {
+                try {
+                    await deleteQuestionGroup(group.id);
+                    toastMessages.success(t('employer:questionGroupsCard.messages.deleteSuccess'));
+                } catch (error) {
+                    // Error handled by mutation hook
+                }
+            },
+            t('employer:questionGroupsCard.dialog.confirmDeleteTitle'),
+            t('employer:questionGroupsCard.dialog.confirmDeleteMessage', { name: group.name }),
+            'warning'
+        );
+    }, [deleteQuestionGroup, t]);
 
     const columns = useMemo<ColumnDef<QuestionGroup>[]>(() => [
-
         {
-
-            header: t('questionGroupsCard.table.groupName'),
-
+            header: t('employer:questionGroupsCard.table.groupName'),
             accessorKey: 'name',
-
-            cell: ({ row }) => row.original.name,
-
+            cell: ({ row }: { row: { original: QuestionGroup } }) => <Typography variant="body2" sx={{ fontWeight: 800, color: 'primary.main' }}>{row.original.name}</Typography>,
         },
-
         {
-
-            header: t('questionGroupsCard.table.numberOfQuestions'),
-
+            header: t('employer:questionGroupsCard.table.numberOfQuestions'),
             accessorKey: 'questions',
-
-            cell: ({ row }) => row.original.questions?.length || 0,
-
-        },
-
-        {
-
-            header: t('questionGroupsCard.table.description'),
-
-            accessorKey: 'description',
-
-            cell: ({ row }) => row.original.description || t('questionGroupsCard.table.na'),
-
-        },
-
-        {
-
-            header: '',
-
-            id: 'actions',
-
-            cell: ({ row }) => (
-
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
-
-                    <IconButton size="small" onClick={() => handleOpenEdit(row.original)} color="primary">
-
-                        <EditIcon fontSize="small" />
-
-                    </IconButton>
-
-                    <IconButton size="small" onClick={() => handleOpenDelete(row.original)} color="error">
-
-                        <DeleteIcon fontSize="small" />
-
-                    </IconButton>
-
-                </Box>
-
+            cell: ({ row }: { row: { original: QuestionGroup } }) => (
+                <Chip 
+                    label={row.original.questions?.length || 0} 
+                    size="small" 
+                    variant="outlined" 
+                    sx={{ fontWeight: 900, borderRadius: 1.5, borderColor: alpha(theme.palette.primary.main, 0.3), color: 'primary.main', bgcolor: alpha(theme.palette.primary.main, 0.05) }} 
+                />
             ),
-
         },
-
-    ], [t]);
-
-    const transformedData = useMemo(() => {
-
-        const rawGroups = (data as unknown as PaginatedResponse<Record<string, unknown>>)?.results || [];
-
-        return rawGroups.map((g) => transformQuestionGroup(g as Record<string, unknown>) as unknown as QuestionGroup).filter(Boolean);
-
-    }, [data]);
+        {
+            header: t('employer:questionGroupsCard.table.description'),
+            accessorKey: 'description',
+            cell: ({ row }: { row: { original: QuestionGroup } }) => (
+                <Typography 
+                    variant="body2" 
+                    color="text.secondary" 
+                    sx={{ 
+                        display: '-webkit-box', 
+                        WebkitLineClamp: 2, 
+                        WebkitBoxOrient: 'vertical', 
+                        overflow: 'hidden',
+                        maxWidth: 300,
+                        fontWeight: 500
+                    }}
+                >
+                    {row.original.description || '---'}
+                </Typography>
+            ),
+        },
+        {
+            header: '',
+            id: 'actions',
+            cell: ({ row }: { row: { original: QuestionGroup } }) => (
+                <Stack direction="row" spacing={1} justifyContent="flex-end">
+                    <Tooltip title={t('common:actions.edit')} arrow>
+                        <IconButton 
+                            size="small" 
+                            onClick={() => handleOpenEdit(row.original)} 
+                            color="primary" 
+                            sx={{ bgcolor: alpha(theme.palette.primary.main, 0.08), '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) } }}
+                        >
+                            <EditIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title={t('common:actions.delete')} arrow>
+                        <IconButton 
+                            size="small" 
+                            onClick={() => handleDelete(row.original)} 
+                            color="error" 
+                            sx={{ bgcolor: alpha(theme.palette.error.main, 0.08), '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.15) } }}
+                        >
+                            <DeleteIcon fontSize="small" />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
+            ),
+        },
+    ], [t, handleOpenEdit, handleDelete, theme]);
 
     return (
-
-        <Box sx={{
-
-            px: { xs: 1, sm: 2 },
-
-            py: { xs: 2, sm: 2 },
-
-            backgroundColor: 'background.paper',
-
-            borderRadius: 2
-
-        }}>
-
-            {/* Header Section */}
-
-            <Stack
-
-                direction={{ xs: 'column', sm: 'row' }}
-
-                alignItems={{ xs: 'flex-start', sm: 'center' }}
-
-                justifyContent="space-between"
-
-                spacing={{ xs: 2, sm: 0 }}
-
+        <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 4, boxShadow: (theme) => theme.customShadows?.z1, border: '1px solid', borderColor: 'divider' }}>
+            <Stack 
+                direction={{ xs: 'column', md: 'row' }} 
+                alignItems={{ xs: 'flex-start', md: 'center' }} 
+                justifyContent="space-between" 
+                spacing={2} 
                 mb={4}
-
             >
-
                 <Box>
-
-                    <Typography
-
-                        variant="h5"
-
-                        sx={{
-
-                            fontWeight: 600,
-
-                            background: (theme) => theme.palette.primary.main || theme.palette.primary.main,
-
-                            WebkitBackgroundClip: 'text',
-
-                            WebkitTextFillColor: 'transparent',
-
-                            fontSize: { xs: '1.25rem', sm: '1.5rem' },
-
-                            mb: 0.5
-
-                        }}
-
-                    >
-
-                        {title}
-
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', mb: 1, letterSpacing: '-0.5px' }}>
+                        {resolvedTitle}
                     </Typography>
-
-                    <Breadcrumbs aria-label={t('questionGroupsCard.label.breadcrumb', 'breadcrumb')}>
-
-                        <Link underline="hover" color="inherit" href="/employer/dashboard" sx={{ fontSize: '0.875rem' }}>
-
-                            Employer
-
-                        </Link>
-
-                        <Typography color="text.secondary" sx={{ fontSize: '0.875rem' }}>{t("questionGroupsCard.onlineInterview")}</Typography>
-
-                        <Typography color="text.primary" sx={{ fontSize: '0.875rem' }}>{t("questionGroupsCard.questionGroups")}</Typography>
-
+                    <Breadcrumbs aria-label="breadcrumb">
+                        <Link underline="hover" color="inherit" href="/employer/dashboard" sx={{ fontSize: '0.875rem', fontWeight: 500 }}>{t('common:breadcrumbs.employer')}</Link>
+                        <Typography color="text.secondary" sx={{ fontSize: '0.875rem', fontWeight: 500 }}>{t("employer:questionGroupsCard.onlineInterview")}</Typography>
+                        <Typography color="text.primary" sx={{ fontSize: '0.875rem', fontWeight: 700 }}>{t("employer:questionGroupsCard.questionGroups")}</Typography>
                     </Breadcrumbs>
-
                 </Box>
-
-                <Button
-
-                    variant="contained"
-
-                    color="primary"
-
-                    startIcon={<AddIcon />}
-
-                    onClick={handleOpenAdd}
-
-                    sx={{
-
-                        borderRadius: 2,
-
-                        px: 3,
-
-                        background: (theme: any) => theme.palette.primary.main,
-
-                        boxShadow: (theme: any) => theme.customShadows?.small || 1,
-
-                        '&:hover': {
-
-                            boxShadow: (theme: any) => theme.customShadows?.medium || 2
-
-                        }
-
-                    }}
-
+                <Button 
+                    variant="contained" 
+                    color="primary" 
+                    startIcon={<AddIcon />} 
+                    onClick={handleOpenAdd} 
+                    sx={{ borderRadius: 1.5, px: 3, py: 1, boxShadow: 'none', fontWeight: 700, textTransform: 'none' }}
                 >
-
-                    Add Question Group
-
+                    {t('employer:questionGroupsCard.actions.addGroup')}
                 </Button>
-
             </Stack>
 
-            {/* Filter Section */}
-
-            <Box sx={{ mb: 3 }}>
-
+            <Box sx={{ mb: 4 }}>
                 <TextField
-
                     size="small"
-
-                    placeholder={t('questionGroupsCard.placeholder.searchquestiongroups', 'Search question groups...')}
-
+                    placeholder={t('employer:questionGroupsCard.placeholder.searchquestiongroups')}
                     value={searchTerm}
-
-                    onChange={handleSearch}
-
-                    sx={{
-
-                        width: { xs: '100%', sm: 300 },
-
-                        '& .MuiOutlinedInput-root': {
-
-                            borderRadius: 2
-
-                        }
-
+                    onChange={handleSearchChange}
+                    sx={{ 
+                        width: { xs: '100%', sm: 320 }, 
+                        ...inputSx
                     }}
-
                     slotProps={{
-
                         input: {
-
                             startAdornment: (
-
                                 <InputAdornment position="start">
-
                                     <SearchIcon fontSize="small" color="action" />
-
                                 </InputAdornment>
-
                             ),
-
                         }
-
                     }}
-
                 />
-
             </Box>
 
-            {/* Loading Progress */}
-
-            {isLoading ? (
-
-                <Box sx={{ width: '100%', mb: 2 }}>
-
-                    <LinearProgress
-
-                        color="primary"
-
-                        sx={{
-
-                            height: { xs: 4, sm: 6 },
-
-                            borderRadius: 3,
-
-                            backgroundColor: 'primary.background'
-
-                        }}
-
-                    />
-
-                </Box>
-
-            ) : (
-
-                <Divider sx={{ mb: 2 }} />
-
-            )}
-
-            {/* Table Section */}
-
-            <Box sx={{
-
-                backgroundColor: 'background.paper',
-
-                borderRadius: 2,
-
-                boxShadow: (theme: any) => theme.customShadows?.card || 1,
-
-                overflow: 'hidden',
-
-                width: '100%',
-
-                '& .MuiTableContainer-root': {
-
-                    overflowX: 'auto'
-
-                }
-
-            }}>
-
-                <DataTable
-
-                    columns={columns}
-
-                    data={transformedData}
-
-                    isLoading={isLoading}
-
-                    rowCount={typeof data?.count === 'number' ? data.count : transformedData.length}
-
-                    pagination={{
-                        pageIndex: page,
-                        pageSize: rowsPerPage,
-                    }}
-
-                    onPaginationChange={(pagination) => {
-                        setPage(pagination.pageIndex);
-                        setRowsPerPage(pagination.pageSize);
-                    }}
-
-                />
-
-            </Box>
+            <DataTable
+                columns={columns}
+                data={groups}
+                isLoading={groupsLoading}
+                rowCount={count}
+                pagination={pagination}
+                onPaginationChange={onPaginationChange}
+                emptyMessage={t('employer:questionGroupsCard.noData')}
+            />
 
             {/* Add/Edit Dialog */}
-
-            <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-
-                <DialogTitle sx={{ fontWeight: 600 }}>
-
-                    {dialogMode === 'add' ? t('questionGroupsCard.dialog.addTitle') : t('questionGroupsCard.dialog.editTitle')}
-
+            <Dialog 
+                open={openDialog} 
+                onClose={handleCloseDialog} 
+                fullWidth 
+                maxWidth="sm" 
+                PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+            >
+                <DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3, fontSize: '1.5rem' }}>
+                    {dialogMode === 'add' ? t('employer:questionGroupsCard.dialog.addTitle') : t('employer:questionGroupsCard.dialog.editTitle')}
                 </DialogTitle>
-
-                <DialogContent>
-
-                    <Box sx={{ pt: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-
+                <DialogContent sx={{ px: 3, pb: 0 }}>
+                    <Stack spacing={3} sx={{ pt: 2 }}>
                         <TextField
-
-                            label={t('questionGroupsCard.label.questiongroupname', 'Question Group Name')}
-
+                            label={t('employer:questionGroupsCard.label.questiongroupname')}
                             fullWidth
-
                             variant="outlined"
-
                             value={groupName}
-
                             onChange={(e) => setGroupName(e.target.value)}
-
                             required
-
+                            sx={inputSx}
                         />
-
                         <TextField
-
-                            label={t('questionGroupsCard.label.description', 'Description')}
-
+                            label={t('employer:questionGroupsCard.label.description')}
                             fullWidth
-
                             multiline
-
                             rows={3}
-
                             variant="outlined"
-
                             value={groupDescription}
-
                             onChange={(e) => setGroupDescription(e.target.value)}
-
+                            sx={inputSx}
                         />
-
-                        <FormControl fullWidth variant="outlined">
-
-                            <InputLabel>Select Questions</InputLabel>
-
-                             <Select
-
+                        <FormControl fullWidth variant="outlined" sx={inputSx}>
+                            <InputLabel sx={{ px: 0.5 }}>{t('employer:questionGroupsCard.label.selectquestions')}</InputLabel>
+                            <Select
                                 multiple
-
                                 value={selectedQuestions}
-
                                 onChange={(e: SelectChangeEvent<number[]>) => setSelectedQuestions(e.target.value as number[])}
-
-                                input={<OutlinedInput label={t('questionGroupsCard.label.selectquestions', 'Select Questions')} />}
-
+                                input={<OutlinedInput label={t('employer:questionGroupsCard.label.selectquestions')} />}
                                 renderValue={(selected) => (
-
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-
                                         {(selected as number[]).map((value) => {
-
                                             const q = allQuestions.find((item) => item.id === value);
-
-                                            return <Chip key={value} label={q?.text?.substring(0, 30) || 'Question'} size="small" />;
-
+                                            return (
+                                                <Chip 
+                                                    key={value} 
+                                                    label={q?.text?.substring(0, 30) || 'Question'} 
+                                                    size="small" 
+                                                    sx={{ borderRadius: 1.5, fontWeight: 700, bgcolor: alpha(theme.palette.primary.main, 0.08), color: 'primary.main', border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.1) }}
+                                                />
+                                            );
                                         })}
-
                                     </Box>
-
                                 )}
-
+                                MenuProps={{ PaperProps: { sx: { borderRadius: 2, mt: 1, maxHeight: 300, boxShadow: (theme: any) => theme.customShadows?.z8 } } }}
                             >
-
                                 {allQuestions.map((q) => (
-
                                     <MenuItem key={q.id} value={q.id}>
-
-                                        <Typography variant="body2" sx={{ maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis' }}>
-
+                                        <Typography variant="body2" sx={{ maxWidth: 400, overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 500 }}>
                                             {q.text}
-
                                         </Typography>
-
                                     </MenuItem>
-
                                 ))}
-
                             </Select>
-
                         </FormControl>
-
                         <Button
-
-                            variant="outlined"
-
+                            variant="text"
                             startIcon={<AddIcon />}
-
                             onClick={() => setOpenCreateQuestion(true)}
-
-                            sx={{ alignSelf: 'flex-start', borderRadius: 2 }}
-
+                            color="primary"
+                            sx={{ alignSelf: 'flex-start', borderRadius: 1.5, textTransform: 'none', fontWeight: 800, px: 2, py: 1, bgcolor: alpha(theme.palette.primary.main, 0.05), '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.1) } }}
                         >
-
-                            Create New Question
-
+                            {t('employer:questionGroupsCard.actions.createNewQuestion')}
                         </Button>
-
-                    </Box>
-
+                    </Stack>
                 </DialogContent>
-
-                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-
-                    <Button onClick={handleCloseDialog} color="inherit">{t('questionGroupsCard.dialog.cancel')}</Button>
-
+                <DialogActions sx={{ p: 4, pt: 3, gap: 2 }}>
+                    <Button 
+                        onClick={handleCloseDialog} 
+                        color="inherit" 
+                        sx={{ fontWeight: 700, textTransform: 'none', borderRadius: 1.5, px: 3 }}
+                    >
+                        {t('common:actions.cancel')}
+                    </Button>
                     <Button
-
                         onClick={handleSave}
-
                         variant="contained"
-
-                        disabled={isMutating || !groupName.trim()}
-
-                        sx={{ px: 4, borderRadius: 2 }}
-
+                        disabled={isGroupMutating || !groupName.trim()}
+                        sx={{ px: 4, py: 1.25, borderRadius: 1.5, fontWeight: 900, boxShadow: 'none', textTransform: 'none' }}
                     >
-
-                        {isMutating ? t('questionGroupsCard.dialog.saving') : t('questionGroupsCard.dialog.save')}
-
+                        {t('common:actions.save')}
                     </Button>
-
                 </DialogActions>
-
             </Dialog>
 
-            {/* Create Question Dialog */}
-
-            <Dialog open={openCreateQuestion} onClose={() => setOpenCreateQuestion(false)} fullWidth maxWidth="xs">
-
-                <DialogTitle sx={{ fontWeight: 600 }}>{t('questionGroupsCard.dialog.createNewQuestion')}</DialogTitle>
-
-                <DialogContent>
-
-                    <Box sx={{ pt: 1 }}>
-
+            {/* Create Question Inline Dialog */}
+            <Dialog 
+                open={openCreateQuestion} 
+                onClose={() => setOpenCreateQuestion(false)} 
+                fullWidth 
+                maxWidth="xs" 
+                PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+            >
+                <DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3 }}>{t('employer:questionGroupsCard.dialog.createNewQuestion')}</DialogTitle>
+                <DialogContent sx={{ px: 3, pb: 0 }}>
+                    <Box sx={{ pt: 2 }}>
                         <TextField
-
-                            label={t('questionGroupsCard.label.questioncontent', 'Question Content')}
-
+                            label={t('employer:questionGroupsCard.label.questioncontent')}
                             fullWidth
-
                             multiline
-
-                            rows={3}
-
+                            rows={4}
                             variant="outlined"
-
                             value={newQuestionContent}
-
                             onChange={(e) => setNewQuestionContent(e.target.value)}
-
                             required
-
+                            autoFocus
+                            sx={inputSx}
                         />
-
                     </Box>
-
                 </DialogContent>
-
-                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-
-                    <Button onClick={() => setOpenCreateQuestion(false)} color="inherit">{t('questionGroupsCard.dialog.cancel')}</Button>
-
+                <DialogActions sx={{ p: 4, pt: 3, gap: 2 }}>
+                    <Button 
+                        onClick={() => setOpenCreateQuestion(false)} 
+                        color="inherit" 
+                        sx={{ fontWeight: 700, textTransform: 'none', borderRadius: 1.5, px: 3 }}
+                    >
+                        {t('common:actions.cancel')}
+                    </Button>
                     <Button
-
                         onClick={handleCreateQuestion}
-
                         variant="contained"
-
-                        disabled={isCreatingQuestion || !newQuestionContent.trim()}
-
-                        sx={{ px: 4, borderRadius: 2 }}
-
+                        disabled={isQuestionMutating || !newQuestionContent.trim()}
+                        sx={{ px: 4, py: 1.25, borderRadius: 1.5, fontWeight: 900, boxShadow: 'none', textTransform: 'none' }}
                     >
-
-                        {isCreatingQuestion ? t('questionGroupsCard.dialog.creating') : t('questionGroupsCard.dialog.create')}
-
+                        {t('common:actions.save')}
                     </Button>
-
                 </DialogActions>
-
             </Dialog>
 
-            {/* Delete Confirmation */}
-
-            <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
-
-                <DialogTitle sx={{ fontWeight: 600 }}>{t('questionGroupsCard.dialog.confirmDeleteTitle')}</DialogTitle>
-
-                <DialogContent>
-
-                    <Typography variant="body1">
-
-                        Are you sure you want to delete the question group <strong>{currentGroup?.name}</strong>?
-
-                    </Typography>
-
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-
-                        The questions inside will not be deleted, but their association with this group will be lost.
-
-                    </Typography>
-
-                </DialogContent>
-
-                <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-
-                    <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('questionGroupsCard.dialog.cancel')}</Button>
-
-                    <Button
-
-                        onClick={handleDelete}
-
-                        color="error"
-
-                        variant="contained"
-
-                        disabled={isMutating}
-
-                        sx={{ px: 4, borderRadius: 2 }}
-
-                    >
-
-                        {isMutating ? t('questionGroupsCard.dialog.deleting') : t('questionGroupsCard.dialog.confirmDeleteBtn')}
-
-                    </Button>
-
-                </DialogActions>
-
-            </Dialog>
-
-        </Box>
-
+            {(isGroupMutating || isQuestionMutating) && <BackdropLoading />}
+        </Paper>
     );
-
 };
 
 export default QuestionGroupsCard;

@@ -1,8 +1,10 @@
-import React, { useState, useMemo, useCallback } from 'react';
+'use client';
+import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Divider, LinearProgress, Stack, Typography } from "@mui/material";
+import { Box, Button, Divider, LinearProgress, Stack, Typography, Paper, Tooltip } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+import FilterListIcon from '@mui/icons-material/FilterList';
 import {
   convertEditorStateToHTMLString,
   createEditorStateFromHTMLString,
@@ -44,6 +46,7 @@ const JobPostCard = () => {
     statusId: '',
   });
 
+  // Data Fetching & Mutations
   const { data, isLoading } = useEmployerJobPosts({
     page: page + 1,
     pageSize,
@@ -58,10 +61,10 @@ const JobPostCard = () => {
   const [openPopup, setOpenPopup] = useState(false);
   const [editData, setEditData] = useState<Record<string, unknown> | null>(null);
   const [serverErrors, setServerErrors] = useState<Record<string, string[]> | null>(null);
-  const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const handleShowUpdate = async (slugOrId: string | number) => {
-    setIsFullScreenLoading(true);
+  const handleShowUpdate = useCallback(async (slugOrId: string | number) => {
+    setIsProcessing(true);
     try {
       const resData = await jobService.getEmployerJobPostDetailById(slugOrId);
       const data = {
@@ -75,16 +78,18 @@ const JobPostCard = () => {
     } catch (error) {
       errorHandling(error as AxiosError<{ errors?: ApiError }>);
     } finally {
-      setIsFullScreenLoading(false);
+      setIsProcessing(false);
     }
-  };
+  }, []);
 
-  const handleShowAdd = () => {
+  const handleShowAdd = useCallback(() => {
     setEditData(null);
+    setServerErrors(null);
     setOpenPopup(true);
-  };
+  }, []);
 
   const handleAddOrUpdate = async (formData: any) => {
+    setServerErrors(null);
     const payload = {
       ...formData,
       jobDescription: convertEditorStateToHTMLString(formData.jobDescription),
@@ -92,7 +97,6 @@ const JobPostCard = () => {
       benefitsEnjoyed: convertEditorStateToHTMLString(formData.benefitsEnjoyed),
     };
 
-    setIsFullScreenLoading(true);
     try {
       if (editData && 'id' in editData) {
         await updateJobPost({ id: editData.id as string | number, data: payload });
@@ -104,41 +108,36 @@ const JobPostCard = () => {
       setOpenPopup(false);
     } catch (error) {
       errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as any);
-    } finally {
-      setIsFullScreenLoading(false);
     }
   };
 
-  const handleDelete = (slugOrId: string | number) => {
+  const handleDelete = useCallback((slugOrId: string | number) => {
     confirmModal(
       async () => {
-        setIsFullScreenLoading(true);
         try {
           await deleteJobPost(slugOrId);
           toastMessages.success(t('jobPost.delete.success'));
         } catch (error) {
-          errorHandling(error as AxiosError<{ errors?: ApiError }>);
-        } finally {
-          setIsFullScreenLoading(false);
+          // Error handled by mutation hook
         }
       },
       t('jobPost.delete.title'),
       t('jobPost.delete.confirm'),
       'warning'
     );
-  };
+  }, [deleteJobPost, t]);
 
-  const handleFilter = (data: { kw: string, isUrgent: number | string, statusId: string | number }) => {
+  const handleFilter = useCallback((data: { kw: string, isUrgent: number | string, statusId: string | number }) => {
     setFilterData({
       kw: data.kw,
       isUrgent: data.isUrgent === 1 ? true : data.isUrgent === 2 ? false : '',
       statusId: data.statusId,
     });
     onPaginationChange({ pageIndex: 0, pageSize });
-  };
+  }, [onPaginationChange, pageSize]);
 
   const handleExport = async () => {
-    setIsFullScreenLoading(true);
+    setIsProcessing(true);
     try {
       const params = {
         page: page + 1,
@@ -153,46 +152,106 @@ const JobPostCard = () => {
     } catch (error) {
       errorHandling(error as AxiosError<{ errors?: ApiError }>);
     } finally {
-      setIsFullScreenLoading(false);
+      setIsProcessing(false);
     }
   };
 
   return (
-    <Box sx={{ px: { xs: 1, sm: 2 }, py: { xs: 2, sm: 2 }, backgroundColor: 'background.paper', borderRadius: 2 }}>
-      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent="space-between" spacing={{ xs: 2, sm: 0 }} mb={4}>
-        <Typography variant="h5" sx={{ fontWeight: 600, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-          {t('jobPost.title')}
-        </Typography>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} width={{ xs: '100%', sm: 'auto' }}>
-          <Button variant="outlined" color="inherit" startIcon={<FileDownloadOutlinedIcon />} onClick={handleExport} sx={{ borderRadius: 2, px: 3 }}>
-            {t('jobPost.exportList')}
-          </Button>
-          <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={handleShowAdd} sx={{ borderRadius: 2, px: 3, boxShadow: 'none' }}>
-            {t('jobPost.createNew')}
-          </Button>
+    <Box sx={{ p: { xs: 2, md: 4 } }}>
+      <Paper 
+        elevation={0}
+        sx={{ 
+          p: { xs: 3, md: 5 }, 
+          borderRadius: 4, 
+          border: '1px solid',
+          borderColor: 'divider',
+          boxShadow: (theme: any) => theme.customShadows?.z1,
+          bgcolor: 'background.paper'
+        }}
+      >
+        <Stack 
+          direction={{ xs: 'column', sm: 'row' }} 
+          alignItems={{ xs: 'flex-start', sm: 'center' }} 
+          justifyContent="space-between" 
+          spacing={3} 
+          mb={5}
+        >
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px', mb: 0.5 }}>
+              {t('jobPost.title')}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+              {t('jobPost.manageSubtitle', 'Manage and monitor all your job postings in one place.')}
+            </Typography>
+          </Box>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} width={{ xs: '100%', sm: 'auto' }}>
+            <Button 
+              variant="outlined" 
+              color="inherit" 
+              startIcon={<FileDownloadOutlinedIcon />} 
+              onClick={handleExport} 
+              sx={{ 
+                borderRadius: 2.5, 
+                px: 3, 
+                py: 1,
+                fontWeight: 800, 
+                textTransform: 'none',
+                borderStyle: 'dashed'
+              }}
+            >
+              {t('jobPost.exportList')}
+            </Button>
+            <Button 
+              variant="contained" 
+              color="primary" 
+              startIcon={<AddIcon />} 
+              onClick={handleShowAdd} 
+              sx={{ 
+                borderRadius: 3, 
+                px: 4, 
+                py: 1.25,
+                boxShadow: (theme: any) => theme.customShadows?.primary, 
+                fontWeight: 900,
+                textTransform: 'none'
+              }}
+            >
+              {t('jobPost.createNew')}
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
 
-      <Stack direction={{ xs: 'column', md: 'row' }} sx={{ mb: 3 }} spacing={2} alignItems={{ xs: 'flex-start', md: 'center' }}>
-        <Box>
-          <Typography variant="subtitle1" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-            {t('jobPost.filter')}
-          </Typography>
-        </Box>
-        <Box flex={1} width="100%">
-          <JobPostFilterForm handleFilter={handleFilter} />
-        </Box>
-      </Stack>
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            mb: 5,
+            borderRadius: 3,
+            bgcolor: 'background.neutral',
+            border: '1px solid',
+            borderColor: 'divider'
+          }}
+        >
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', md: 'center' }}>
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 140 }}>
+              <Box sx={{ 
+                p: 0.75, 
+                borderRadius: 1.5, 
+                bgcolor: 'primary.extralight', 
+                color: 'primary.main',
+                display: 'flex'
+              }}>
+                <FilterListIcon sx={{ fontSize: 20 }} />
+              </Box>
+              <Typography variant="subtitle1" sx={{ color: 'text.primary', fontWeight: 900, letterSpacing: '0.5px' }}>
+                {t('jobPost.filter').toUpperCase()}
+              </Typography>
+            </Stack>
+            <Box flex={1} width="100%">
+              <JobPostFilterForm handleFilter={handleFilter} />
+            </Box>
+          </Stack>
+        </Paper>
 
-      {isLoading ? (
-        <Box sx={{ width: '100%', mb: 2 }}>
-          <LinearProgress />
-        </Box>
-      ) : (
-        <Divider sx={{ mb: 2 }} />
-      )}
-
-      <Box sx={{ backgroundColor: 'background.paper', borderRadius: 2, overflow: 'hidden', width: '100%' }}>
         <JobPostsTable
           rows={data?.results || []}
           isLoading={isLoading}
@@ -204,13 +263,13 @@ const JobPostCard = () => {
           handleDelete={handleDelete}
           handleUpdate={handleShowUpdate}
         />
-      </Box>
 
-      <FormPopup title={t('jobPost.popupTitle')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
-        <JobPostForm handleAddOrUpdate={handleAddOrUpdate} editData={editData} serverErrors={serverErrors} />
-      </FormPopup>
+        <FormPopup title={t('jobPost.popupTitle')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
+          <JobPostForm handleAddOrUpdate={handleAddOrUpdate} editData={editData} serverErrors={serverErrors} />
+        </FormPopup>
 
-      {(isFullScreenLoading || isMutating) && <BackdropLoading />}
+        {(isProcessing || isMutating) && <BackdropLoading />}
+      </Paper>
     </Box>
   );
 };

@@ -1,5 +1,6 @@
-import React from 'react';
-import { Box, Button, Stack, Typography, Paper } from '@mui/material';
+'use client';
+import React, { useCallback, useRef, useState, useMemo } from 'react';
+import { Box, Button, Stack, Typography, Paper, Divider } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
@@ -11,149 +12,83 @@ import toastMessages from '@/utils/toastMessages';
 import errorHandling from '@/utils/errorHandling';
 import type { AxiosError } from 'axios';
 import type { ApiError } from '@/types/api';
-import type { CompanyFormValues } from '../CompanyForm';
 import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import CompanyForm from '../CompanyForm';
 import CompanyFormLoading from '../CompanyForm/CompanyFormLoading';
-import companyService from '@/services/companyService';
 import { compressImageFile } from '@/utils/imageCompression';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import ImageCropDialog from '@/components/Common/ImageCropDialog';
+import { useCompanyProfile, useCompanyMutations } from '../hooks/useEmployerQueries';
+import type { CompanyFormValues } from '../CompanyForm';
 
-// ─── Custom hooks extracted from monolithic component ───
-
-interface CompanyData {
-  id?: number | string;
-  description?: unknown;
-  companyImageUrl?: string;
-  companyCoverImageUrl?: string;
-  [key: string]: unknown;
-}
-
-function useCompanyData() {
+const CompanyCard = () => {
   const { t } = useTranslation('employer');
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [editData, setEditData] = React.useState<CompanyData | null>(null);
-  const [companyImageUrl, setCompanyImageUrl] = React.useState<string | null>(null);
-  const [companyCoverImageUrl, setCompanyCoverImageUrl] = React.useState<string | null>(null);
-  const [serverErrors, setServerErrors] = React.useState<Record<string, unknown> | null>(null);
-  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
+  
+  // Data Fetching
+  const { data: company, isLoading } = useCompanyProfile();
+  const { updateCompany, updateLogo, updateCover, isMutating } = useCompanyMutations();
 
-  const loadCompany = React.useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const resData = (await companyService.getCompany()) as unknown as CompanyData;
-      const data: CompanyData = {
-        ...resData,
-        description: createEditorStateFromHTMLString((resData?.description as string) || ''),
-      };
-      setEditData(data);
-      setCompanyImageUrl((prev) => prev ?? (data?.companyImageUrl as string) ?? null);
-      setCompanyCoverImageUrl((prev) => prev ?? (data?.companyCoverImageUrl as string) ?? null);
-    } catch (error: unknown) {
-      errorHandling(error as AxiosError<{ errors?: ApiError }>);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  // Local State
+  const [cropOpen, setCropOpen] = useState(false);
+  const [cropImageSrc, setCropImageSrc] = useState('');
+  const [cropFileName, setCropFileName] = useState('');
+  const [cropTarget, setCropTarget] = useState<'logo' | 'cover'>('logo');
+  const [serverErrors, setServerErrors] = useState<Record<string, string[]> | null>(null);
 
-  // Load company data on mount only
-  React.useEffect(() => {
-    loadCompany();
-  }, [loadCompany]);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const coverInputRef = useRef<HTMLInputElement>(null);
 
-  const handleUpdate = React.useCallback(
-    async (formData: CompanyFormValues) => {
-      setIsFullScreenLoading(true);
-      try {
-        const dataCustom = {
-          ...formData,
-          description: convertEditorStateToHTMLString(formData.description as import('draft-js').EditorState),
-        };
-        await companyService.updateCompany((dataCustom as unknown as CompanyData)?.id as string | number, dataCustom as unknown as Record<string, unknown>);
-        setServerErrors(null);
-        toastMessages.success(
-          t('companyProfile.success.update', 'Company information updated successfully.'),
-        );
-        // Reload after successful update
-        await loadCompany();
-      } catch (error: unknown) {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as unknown as Parameters<typeof errorHandling>[1]);
-      } finally {
-        setIsFullScreenLoading(false);
-      }
-    },
-    [loadCompany, t],
-  );
-
-  const handleUpdateImage = React.useCallback(
-    async (file: File, type: 'logo' | 'cover') => {
-      setIsFullScreenLoading(true);
-      try {
-        const compressed = await compressImageFile(file);
-        const formData = new FormData();
-        formData.append('file', compressed);
-
-        const resData =
-          type === 'logo'
-            ? ((await companyService.updateCompanyImageUrl(formData)) as unknown as CompanyData)
-            : ((await companyService.updateCompanyCoverImageUrl(formData)) as unknown as CompanyData);
-
-        const successKey =
-          type === 'logo' ? 'companyProfile.success.logoUpdate' : 'companyProfile.success.coverUpdate';
-        const successDefault =
-          type === 'logo' ? 'Company logo updated successfully.' : 'Company cover image updated successfully.';
-        toastMessages.success(t(successKey, successDefault));
-
-        if (type === 'logo') {
-          setCompanyImageUrl(resData?.companyImageUrl ?? null);
-        } else {
-          setCompanyCoverImageUrl(resData?.companyCoverImageUrl ?? null);
-        }
-      } catch (error: unknown) {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
-      } finally {
-        setIsFullScreenLoading(false);
-      }
-    },
-    [t],
-  );
-
-  return {
-    isLoading,
-    editData,
-    companyImageUrl,
-    companyCoverImageUrl,
-    serverErrors,
-    isFullScreenLoading,
-    handleUpdate,
-    handleUpdateImage,
-  };
-}
-
-function useImageCrop(onConfirm: (file: File, type: 'logo' | 'cover') => Promise<void>) {
-  const [cropOpen, setCropOpen] = React.useState(false);
-  const [cropImageSrc, setCropImageSrc] = React.useState('');
-  const [cropFileName, setCropFileName] = React.useState('');
-  const [cropTarget, setCropTarget] = React.useState<'logo' | 'cover'>('logo');
-
-  const logoInputRef = React.useRef<HTMLInputElement>(null);
-  const coverInputRef = React.useRef<HTMLInputElement>(null);
-
-  const handleFileSelect =
-    (target: 'logo' | 'cover') => (event: React.ChangeEvent<HTMLInputElement>) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-      setCropTarget(target);
-      setCropFileName(file.name);
-      setCropImageSrc(URL.createObjectURL(file));
-      setCropOpen(true);
-      event.target.value = '';
+  // Transform data for the form
+  const editData = useMemo(() => {
+    if (!company) return null;
+    return {
+      ...company,
+      description: createEditorStateFromHTMLString(company.description || ''),
     };
+  }, [company]);
+
+  const handleUpdate = useCallback(async (formData: CompanyFormValues) => {
+    if (!company?.id) return;
+    setServerErrors(null);
+    try {
+      const payload = {
+        ...formData,
+        description: convertEditorStateToHTMLString(formData.description as import('draft-js').EditorState),
+      };
+      await updateCompany({ id: company.id, data: payload as any });
+      toastMessages.success(t('companyProfile.success.update'));
+    } catch (error) {
+      errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as any);
+    }
+  }, [company?.id, updateCompany, t]);
+
+  const handleFileSelect = (target: 'logo' | 'cover') => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setCropTarget(target);
+    setCropFileName(file.name);
+    setCropImageSrc(URL.createObjectURL(file));
+    setCropOpen(true);
+    event.target.value = '';
+  };
 
   const handleCropConfirm = async (croppedFile: File) => {
     setCropOpen(false);
-    await onConfirm(croppedFile, cropTarget);
+    try {
+      const compressed = await compressImageFile(croppedFile);
+      const formData = new FormData();
+      formData.append('file', compressed);
+
+      if (cropTarget === 'logo') {
+        await updateLogo(formData);
+        toastMessages.success(t('companyProfile.success.logoUpdate'));
+      } else {
+        await updateCover(formData);
+        toastMessages.success(t('companyProfile.success.coverUpdate'));
+      }
+    } catch (error) {
+      errorHandling(error as AxiosError<{ errors?: ApiError }>);
+    }
   };
 
   const handleCropCancel = () => {
@@ -162,140 +97,133 @@ function useImageCrop(onConfirm: (file: File, type: 'logo' | 'cover') => Promise
     setCropImageSrc('');
   };
 
-  return {
-    cropOpen,
-    cropImageSrc,
-    cropFileName,
-    cropTarget,
-    logoInputRef,
-    coverInputRef,
-    handleFileSelect,
-    handleCropConfirm,
-    handleCropCancel,
-  };
-}
-
-// ─── Main Component ───
-
-const CompanyCard = () => {
-  const { t } = useTranslation('employer');
-  const {
-    isLoading,
-    editData,
-    companyImageUrl,
-    companyCoverImageUrl,
-    serverErrors,
-    isFullScreenLoading,
-    handleUpdate,
-    handleUpdateImage,
-  } = useCompanyData();
-
-  const {
-    cropOpen,
-    cropImageSrc,
-    cropFileName,
-    cropTarget,
-    logoInputRef,
-    coverInputRef,
-    handleFileSelect,
-    handleCropConfirm,
-    handleCropCancel,
-  } = useImageCrop(handleUpdateImage);
+  if (isLoading) return <CompanyFormLoading />;
 
   return (
-    <Paper elevation={0}>
-      <Stack spacing={4}>
-        <Box>
-          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: 'text.primary' }}>
-            {t('companyProfile.labels.logo', 'Company Logo')}
-          </Typography>
-          <Box sx={{ position: 'relative' }}>
-            <MuiImageCustom
-              src={companyImageUrl || ''}
-              width={120}
-              height={120}
-              sx={{
-                borderRadius: 2,
-                border: (theme: import('@mui/material/styles').Theme) => `1px solid ${theme.palette.grey[200]}`,
-                boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: any }) => theme.customShadows.small,
-              }}
-            />
-            <Box sx={{ mt: 2 }}>
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<CameraAltOutlinedIcon />}
-                onClick={() => logoInputRef.current?.click()}
-                sx={{ borderRadius: 2, textTransform: 'none', boxShadow: 'none' }}
-              >
-                {t('companyProfile.labels.changeLogo', 'Change Logo')}
-              </Button>
+    <Paper 
+        elevation={0}
+        sx={{ 
+            p: { xs: 3, md: 5 }, 
+            borderRadius: 4, 
+            border: '1px solid',
+            borderColor: 'divider',
+            boxShadow: (theme: any) => theme.customShadows?.z1 
+        }}
+    >
+      <Typography variant="h4" sx={{ fontWeight: 900, mb: 4, color: 'text.primary', letterSpacing: '-0.5px' }}>
+        {t('companyProfile.title', 'Company Information')}
+      </Typography>
+
+      <Stack spacing={5}>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={4}>
+            <Box>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>
+                    {t('companyProfile.labels.logo')}
+                </Typography>
+                <Box sx={{ position: 'relative', width: 140 }}>
+                    <MuiImageCustom
+                        src={company?.companyImageUrl || ''}
+                        width={140}
+                        height={140}
+                        sx={{
+                            borderRadius: 4,
+                            border: (theme: any) => `1px solid ${theme.palette.divider}`,
+                            backgroundColor: 'grey.50',
+                            boxShadow: (theme: any) => theme.customShadows?.z1
+                        }}
+                    />
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        size="small"
+                        startIcon={<CameraAltOutlinedIcon />}
+                        onClick={() => logoInputRef.current?.click()}
+                        sx={{ 
+                            mt: 2, 
+                            borderRadius: 2.5, 
+                            textTransform: 'none', 
+                            boxShadow: (theme: any) => theme.customShadows?.secondary,
+                            width: '100%',
+                            fontWeight: 900,
+                            color: 'white'
+                        }}
+                    >
+                        {t('common:actions.change')}
+                    </Button>
+                </Box>
             </Box>
-          </Box>
-        </Box>
+
+            <Box flex={1}>
+                <Typography variant="h6" sx={{ mb: 2, fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', fontSize: '0.75rem', letterSpacing: '1px' }}>
+                    {t('companyProfile.labels.cover')}
+                </Typography>
+                <Box sx={{ position: 'relative' }}>
+                    <MuiImageCustom
+                        src={company?.coverImageUrl || ''}
+                        height={170}
+                        width="100%"
+                        sx={{
+                            borderRadius: 4,
+                            border: (theme: any) => `1px solid ${theme.palette.divider}`,
+                            backgroundColor: 'grey.50',
+                            boxShadow: (theme: any) => theme.customShadows?.z1
+                        }}
+                        fit="cover"
+                    />
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        size="small"
+                        startIcon={<CameraAltOutlinedIcon />}
+                        onClick={() => coverInputRef.current?.click()}
+                        sx={{ 
+                            mt: 2, 
+                            borderRadius: 2.5, 
+                            textTransform: 'none', 
+                            boxShadow: (theme: any) => theme.customShadows?.secondary,
+                            fontWeight: 900,
+                            color: 'white'
+                        }}
+                    >
+                        {t('common:actions.change')}
+                    </Button>
+                </Box>
+            </Box>
+        </Stack>
+
+        <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box>
-          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600, color: 'text.primary' }}>
-            {t('companyProfile.labels.cover', 'Company Cover Image')}
-          </Typography>
-          <Box sx={{ position: 'relative' }}>
-            <MuiImageCustom
-              src={companyCoverImageUrl || ''}
-              height={160}
-              width="60%"
-              sx={{
-                borderRadius: 2,
-                border: (theme: import('@mui/material/styles').Theme) => `1px solid ${theme.palette.grey[200]}`,
-                boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: any }) => theme.customShadows.small,
-              }}
-              fit="cover"
-            />
-            <Box sx={{ mt: 2 }}>
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<CameraAltOutlinedIcon />}
-                onClick={() => coverInputRef.current?.click()}
-                sx={{ borderRadius: 2, textTransform: 'none', boxShadow: 'none' }}
-              >
-                {t('companyProfile.labels.changeCover', 'Change Cover')}
-              </Button>
-            </Box>
-          </Box>
-        </Box>
-
-        <Box>
-          {isLoading ? (
-            <CompanyFormLoading />
-          ) : (
-            <>
-              <CompanyForm
+            <CompanyForm
                 handleUpdate={handleUpdate}
-                editData={editData as unknown as Partial<CompanyFormValues> | null}
-                serverErrors={serverErrors as unknown as Record<string, string[]> | null}
-              />
-              <Box sx={{ mt: 3 }}>
+                editData={editData as any}
+                serverErrors={serverErrors}
+            />
+            <Box sx={{ mt: 6, display: 'flex', justifyContent: 'flex-end' }}>
                 <Button
-                  variant="contained"
-                  color="primary"
-                  startIcon={<SaveOutlinedIcon />}
-                  type="submit"
-                  form="company-form"
-                  sx={{
-                    px: 4,
-                    py: 1,
-                    fontSize: '0.9rem',
-                    '&:hover': { opacity: 0.9 },
-                  }}
+                    variant="contained"
+                    color="primary"
+                    startIcon={<SaveOutlinedIcon />}
+                    type="submit"
+                    form="company-form"
+                    sx={{
+                        px: 8,
+                        py: 1.5,
+                        borderRadius: 3,
+                        fontWeight: 900,
+                        boxShadow: (theme: any) => theme.customShadows?.primary,
+                        textTransform: 'none',
+                        fontSize: '1rem',
+                        '&:hover': { bgcolor: 'primary.dark' },
+                    }}
                 >
-                  {t('companyProfile.labels.update', 'Update')}
+                    {t('common:actions.saveChanges')}
                 </Button>
-              </Box>
-            </>
-          )}
+            </Box>
         </Box>
       </Stack>
 
+      {/* Hidden Inputs */}
       <input
         ref={logoInputRef}
         type="file"
@@ -311,7 +239,7 @@ const CompanyCard = () => {
         onChange={handleFileSelect('cover')}
       />
 
-      <BackdropLoading open={isFullScreenLoading} />
+      {isMutating && <BackdropLoading />}
 
       <ImageCropDialog
         open={cropOpen}

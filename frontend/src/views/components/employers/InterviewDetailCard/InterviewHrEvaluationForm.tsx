@@ -1,5 +1,23 @@
 import React from 'react';
-import { Box, Button, CircularProgress, Divider, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material';
+import { 
+    Box, 
+    Button, 
+    CircularProgress, 
+    Divider, 
+    MenuItem, 
+    Paper, 
+    Stack, 
+    TextField, 
+    Typography,
+    InputAdornment,
+    alpha,
+    useTheme
+} from '@mui/material';
+import RateReviewIcon from '@mui/icons-material/RateReview';
+import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
+import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
+import SchoolIcon from '@mui/icons-material/School';
+import SendIcon from '@mui/icons-material/Send';
 import { EvalFormType } from './index';
 
 interface InterviewHrEvaluationFormProps {
@@ -12,21 +30,42 @@ interface InterviewHrEvaluationFormProps {
 }
 
 const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({ evalForm, onChange, onSubmit, disabled, submitting, t }) => {
+    const theme = useTheme();
+
+    const inputSx = {
+        '& .MuiOutlinedInput-root': {
+            borderRadius: 2.5,
+            backgroundColor: alpha(theme.palette.action.disabled, 0.03),
+            '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
+            '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) }
+        }
+    };
+
     return (
-        <Paper sx={{
-            p: 3,
-            borderRadius: 3,
-            border: '1px solid',
-            borderColor: 'divider',
-            boxShadow: (theme) => theme.shadows[1],
-            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.1)' : '#fff'
-        }}>
-            <Typography variant="subtitle1" gutterBottom sx={{ fontWeight: 700, color: 'secondary.main' }}>
-                {t('interviewDetail.actions.hrEvaluation')}
-            </Typography>
-            <Divider sx={{ my: 2 }} />
-            <Stack spacing={2.5}>
-                <Stack direction="row" spacing={2}>
+        <Paper 
+            elevation={0}
+            sx={{
+                p: { xs: 3, md: 5 },
+                borderRadius: 4,
+                border: '1px solid',
+                borderColor: 'divider',
+                boxShadow: (theme: any) => theme.customShadows?.z1,
+                bgcolor: 'background.paper',
+                position: 'relative',
+                overflow: 'hidden'
+            }}
+        >
+            <Stack direction="row" alignItems="center" spacing={1.5} mb={3}>
+                <RateReviewIcon color="secondary" sx={{ fontSize: 24 }} />
+                <Typography variant="h6" sx={{ fontWeight: 900, color: 'secondary.main', letterSpacing: '-0.5px' }}>
+                    {t('interviewDetail.actions.hrEvaluation')}
+                </Typography>
+            </Stack>
+
+            <Divider sx={{ mb: 4, borderStyle: 'dashed' }} />
+
+            <Stack spacing={4}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3}>
                     <TextField
                         label={t('interviewDetail.actions.attitudeScore')}
                         name="attitude_score"
@@ -34,7 +73,18 @@ const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({ e
                         fullWidth
                         value={evalForm.attitude_score}
                         onChange={onChange}
-                        slotProps={{ htmlInput: { min: 0, max: 10, step: 0.1 } }}
+                        sx={inputSx}
+                        slotProps={{ 
+                            htmlInput: { min: 0, max: 10, step: 0.1 },
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <EmojiEmotionsIcon sx={{ fontSize: 20, color: 'warning.main' }} />
+                                    </InputAdornment>
+                                ),
+                            },
+                            inputLabel: { sx: { fontWeight: 600 } }
+                        }}
                     />
                     <TextField
                         label={t('interviewDetail.actions.professionalScore')}
@@ -43,9 +93,21 @@ const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({ e
                         fullWidth
                         value={evalForm.professional_score}
                         onChange={onChange}
-                        slotProps={{ htmlInput: { min: 0, max: 10, step: 0.1 } }}
+                        sx={inputSx}
+                        slotProps={{ 
+                            htmlInput: { min: 0, max: 10, step: 0.1 },
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <SchoolIcon sx={{ fontSize: 20, color: 'info.main' }} />
+                                    </InputAdornment>
+                                ),
+                            },
+                            inputLabel: { sx: { fontWeight: 600 } }
+                        }}
                     />
                 </Stack>
+
                 <TextField
                     select
                     label={t('interviewDetail.actions.resultLabel')}
@@ -53,20 +115,32 @@ const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({ e
                     fullWidth
                     value={evalForm.result}
                     onChange={onChange}
+                    sx={inputSx}
+                    slotProps={{
+                        inputLabel: { sx: { fontWeight: 600 } }
+                    }}
                 >
-                    <MenuItem value="pending">{t('interviewDetail.actions.pending')}</MenuItem>
-                    <MenuItem value="passed">{t('interviewDetail.actions.passed')}</MenuItem>
-                    <MenuItem value="failed">{t('interviewDetail.actions.failed')}</MenuItem>
+                    <MenuItem value="pending" sx={{ fontWeight: 600 }}>{t('interviewDetail.actions.pending')}</MenuItem>
+                    <MenuItem value="passed" sx={{ fontWeight: 800, color: 'success.main', bgcolor: alpha(theme.palette.success.main, 0.04) }}>{t('interviewDetail.actions.passed')}</MenuItem>
+                    <MenuItem value="failed" sx={{ fontWeight: 800, color: 'error.main', bgcolor: alpha(theme.palette.error.main, 0.04) }}>{t('interviewDetail.actions.failed')}</MenuItem>
                 </TextField>
+
                 <TextField
                     label={t('interviewDetail.actions.comments')}
                     name="comments"
                     multiline
-                    rows={3}
+                    rows={4}
                     fullWidth
                     value={evalForm.comments}
                     onChange={onChange}
+                    placeholder="Enter HR feedback and internal notes..."
+                    sx={inputSx}
+                    slotProps={{
+                        input: { sx: { lineHeight: 1.8 } },
+                        inputLabel: { sx: { fontWeight: 600 } }
+                    }}
                 />
+
                 <TextField
                     label={t('interviewDetail.actions.proposedSalary')}
                     name="proposed_salary"
@@ -74,14 +148,46 @@ const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({ e
                     fullWidth
                     value={evalForm.proposed_salary}
                     onChange={onChange}
+                    sx={{
+                        ...inputSx,
+                        '& .MuiOutlinedInput-root': {
+                            ...inputSx['& .MuiOutlinedInput-root'],
+                            fontWeight: 800, 
+                            color: 'success.main'
+                        }
+                    }}
+                    slotProps={{
+                        input: {
+                            startAdornment: (
+                                <InputAdornment position="start">
+                                    <MonetizationOnIcon sx={{ fontSize: 20, color: 'success.main' }} />
+                                </InputAdornment>
+                            ),
+                        },
+                        inputLabel: { sx: { fontWeight: 600 } }
+                    }}
                 />
+
                 <Button
                     variant="contained"
                     color="secondary"
                     fullWidth
-                    disabled={disabled}
+                    disabled={disabled || submitting}
                     onClick={onSubmit}
-                    sx={{ borderRadius: 2, py: 1.2, fontWeight: 700 }}
+                    startIcon={!submitting && <SendIcon />}
+                    sx={{ 
+                        borderRadius: 3, 
+                        py: 2, 
+                        fontWeight: 900,
+                        boxShadow: (theme: any) => theme.customShadows?.secondary,
+                        textTransform: 'none',
+                        fontSize: '1.1rem',
+                        transition: 'all 0.25s',
+                        '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: (theme: any) => theme.customShadows?.secondary
+                        }
+                    }}
                 >
                     {submitting ? <CircularProgress size={24} color="inherit" /> : t('interviewDetail.actions.submitEvaluation')}
                 </Button>

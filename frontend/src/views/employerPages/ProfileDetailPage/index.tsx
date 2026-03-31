@@ -1,19 +1,53 @@
 import React from 'react';
-import { Box, Card } from "@mui/material";
+import { Box, Paper, Stack, Button, useTheme, alpha } from "@mui/material";
 import { useTranslation } from "react-i18next";
+import { useRouter } from 'next/navigation';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { TabTitle } from '../../../utils/generalFunction';
 import ProfileDetailCard from '../../components/employers/ProfileDetailCard';
 
 const ProfileDetailPage = () => {
   const { t } = useTranslation('employer');
-  TabTitle(t('profileDetailCard.title.profileDetail'))
+  const router = useRouter();
+  const theme = useTheme();
+  TabTitle(t('profileDetailCard.title.profileDetail'));
 
   return (
-    <Card sx={{ p: 3 }}>
+    <Stack spacing={3}>
       <Box>
-        <ProfileDetailCard />
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => router.back()}
+          sx={{
+            fontWeight: 800,
+            color: 'text.secondary',
+            '&:hover': {
+              bgcolor: alpha(theme.palette.primary.main, 0.08),
+              color: 'primary.main',
+            },
+            transition: 'all 0.2s ease-in-out',
+            px: 2,
+            borderRadius: 2
+          }}
+        >
+          {t('common:buttons.back', { defaultValue: t('common:labels.back') })}
+        </Button>
       </Box>
-    </Card>
+
+      <Paper 
+        elevation={0}
+        sx={{ 
+          p: { xs: 2, md: 4 },
+          borderRadius: 4,
+          border: '1px solid',
+          borderColor: 'divider',
+          bgcolor: 'background.paper',
+          boxShadow: (theme as any).customShadows?.z1
+        }}
+      >
+        <ProfileDetailCard />
+      </Paper>
+    </Stack>
   );
 };
 

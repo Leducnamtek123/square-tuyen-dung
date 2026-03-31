@@ -1,9 +1,11 @@
-import React from 'react';
+'use client';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Chip, IconButton, Tooltip, Stack } from "@mui/material";
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import { Box, Chip, IconButton, Tooltip, Stack, Typography, alpha, useTheme } from "@mui/material";
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import LaunchIcon from '@mui/icons-material/Launch';
 import dayjs from 'dayjs';
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined';
 import DataTable from '../../../../components/Common/DataTable';
 import { JOB_POST_STATUS_BG_COLOR } from '../../../../configs/constants';
 import { useConfig } from '@/hooks/useConfig';
@@ -36,22 +38,33 @@ const JobPostsTable = ({
 
   const { t } = useTranslation('employer');
   const { allConfig } = useConfig();
+  const theme = useTheme();
 
-  const columns = React.useMemo<ColumnDef<JobPost>[]>(() => [
+  const columns = useMemo<ColumnDef<JobPost>[]>(() => [
     {
       header: t('jobPost.table.jobTitle'),
       accessorKey: 'jobName',
       enableSorting: true,
       cell: (info) => (
-        <Box sx={{ fontWeight: 600 }}>
-          {info.getValue() as string}{' '}
+        <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: 1.5, py: 1 }}>
+          <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+            {String(info.getValue() ?? '---')}
+          </Typography>
           {info.row.original.isUrgent && (
             <Chip
-              label={t('jobPost.urgent')}
-              color="error"
-              variant="outlined"
+              label={t('jobPost.urgent').toUpperCase()}
               size="small"
-              sx={{ ml: 1, fontWeight: 700 }}
+              sx={{ 
+                fontWeight: 900, 
+                height: 20, 
+                fontSize: '0.65rem', 
+                borderRadius: 1,
+                bgcolor: alpha(theme.palette.error.main, 0.12),
+                color: 'error.main',
+                border: '1px solid',
+                borderColor: alpha(theme.palette.error.main, 0.24),
+                letterSpacing: 0.5
+              }}
             />
           )}
         </Box>
@@ -61,47 +74,78 @@ const JobPostsTable = ({
       header: t('jobPost.table.postDate'),
       accessorKey: 'createAt',
       enableSorting: true,
-      cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
+      cell: (info) => (
+        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+            {info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '---'}
+        </Typography>
+      ),
     },
     {
       header: t('jobPost.table.deadline'),
       accessorKey: 'deadline',
       enableSorting: true,
-      cell: (info) => (
-        <Box component="span" sx={{ color: info.row.original.isExpired ? 'error.main' : 'primary.main', fontWeight: 600 }}>
-          {dayjs(info.getValue() as string).format('DD/MM/YYYY')}
-        </Box>
-      ),
+      cell: (info) => {
+        const val = info.getValue() as string;
+        const isExpired = info.row.original.isExpired;
+        return (
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              color: isExpired ? 'error.main' : 'primary.main', 
+              fontWeight: 800,
+              bgcolor: isExpired ? alpha(theme.palette.error.main, 0.08) : alpha(theme.palette.primary.main, 0.08),
+              px: 1.5,
+              py: 0.5,
+              borderRadius: 1.5,
+              display: 'inline-block'
+            }}
+          >
+            {val ? dayjs(val).format('DD/MM/YYYY') : '---'}
+          </Typography>
+        );
+      },
     },
     {
       header: t('jobPost.table.applications'),
       accessorKey: 'appliedNumber',
       enableSorting: true,
       cell: (info) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Box component="span" sx={{ fontWeight: 700 }}>{info.getValue() as number || 0}</Box>
-        </Box>
+        <Typography variant="body2" sx={{ fontWeight: 900, color: 'info.main', fontSize: '1rem' }}>
+            {Number(info.getValue() ?? 0)}
+        </Typography>
       )
     },
     {
       header: t('jobPost.table.views'),
       accessorKey: 'views',
       enableSorting: true,
+      cell: (info) => (
+        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+            {Number(info.getValue() ?? 0)}
+        </Typography>
+      ),
     },
     {
       header: t('jobPost.table.status'),
       accessorKey: 'status',
       cell: (info) => {
-        const val = String(info.getValue());
-        const label = (allConfig?.jobPostStatusDict as Record<string, string>)?.[val] || '---';
-        const color = ((JOB_POST_STATUS_BG_COLOR as Record<string, any>)[val]) || 'default';
+        const val = String(info.getValue() ?? '');
+        const label = (allConfig?.jobPostStatusDict as Record<string, string>)?.[val] || val.toUpperCase() || '---';
+        const colorKey = ((JOB_POST_STATUS_BG_COLOR as Record<string, any>)[val]) || 'default';
+        const muiColor = colorKey === 'default' ? 'default' : colorKey;
         
         return (
           <Chip
             label={label}
-            color={color}
             size="small"
-            sx={{ fontWeight: 600 }}
+            sx={{ 
+              fontWeight: 800, 
+              borderRadius: 1.5,
+              bgcolor: muiColor !== 'default' ? alpha(theme.palette[muiColor as 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'].main, 0.12) : 'action.selected',
+              color: muiColor !== 'default' ? `${muiColor}.main` : 'text.secondary',
+              border: '1px solid',
+              borderColor: muiColor !== 'default' ? alpha(theme.palette[muiColor as 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'].main, 0.24) : 'divider',
+            }}
           />
         );
       },
@@ -109,31 +153,40 @@ const JobPostsTable = ({
     {
       header: '',
       id: 'actions',
-      meta: { align: 'right' },
       cell: (info) => (
-        <Stack direction="row" spacing={0.5} justifyContent="flex-end">
+        <Stack direction="row" spacing={1} justifyContent="flex-end">
           <Tooltip title={t('jobPost.tooltips.update')} arrow>
             <IconButton
               size="small"
-              color="primary"
               onClick={() => handleUpdate(info.row.original.slug || info.row.original.id)}
+              sx={{ 
+                color: 'primary.main',
+                bgcolor: alpha(theme.palette.primary.main, 0.08),
+                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.16) },
+                borderRadius: 1.5
+              }}
             >
-              <EditOutlinedIcon fontSize="small" />
+              <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
           <Tooltip title={t('jobPost.tooltips.delete')} arrow>
             <IconButton
               size="small"
-              color="error"
               onClick={() => handleDelete(info.row.original.slug || info.row.original.id)}
+              sx={{ 
+                color: 'error.main',
+                bgcolor: alpha(theme.palette.error.main, 0.08),
+                '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.16) },
+                borderRadius: 1.5
+              }}
             >
-              <DeleteOutlineOutlinedIcon fontSize="small" />
+              <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
         </Stack>
       ),
     },
-  ], [allConfig, handleDelete, handleUpdate, t]);
+  ], [allConfig, handleDelete, handleUpdate, t, theme]);
 
   return (
     <DataTable

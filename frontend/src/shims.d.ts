@@ -48,6 +48,12 @@ declare module '@mui/material/styles' {
       large: string;
       card: string;
       feedback: string;
+      z1: string;
+      z8: string;
+      z12: string;
+      z16: string;
+      z20: string;
+      z24: string;
     };
   }
   interface ThemeOptions {
@@ -57,6 +63,12 @@ declare module '@mui/material/styles' {
       large?: string;
       card?: string;
       feedback?: string;
+      z1?: string;
+      z8?: string;
+      z12?: string;
+      z16?: string;
+      z20?: string;
+      z24?: string;
     };
   }
 }

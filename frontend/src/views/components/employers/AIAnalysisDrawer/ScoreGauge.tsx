@@ -1,14 +1,16 @@
 import React from 'react';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, CircularProgress, Typography, useTheme, alpha } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 
 export const ScoreGauge: React.FC<{ score: number }> = ({ score }) => {
   const { t } = useTranslation('employer');
+  const theme = useTheme();
+
   const getColor = () => {
-    if (score >= 80) return '#22c55e';
-    if (score >= 60) return '#f59e0b';
-    if (score >= 40) return '#f97316';
-    return '#ef4444';
+    if (score >= 80) return theme.palette.success.main;
+    if (score >= 60) return theme.palette.info.main;
+    if (score >= 40) return theme.palette.warning.main;
+    return theme.palette.error.main;
   };
 
   const getLabel = () => {
@@ -18,29 +20,35 @@ export const ScoreGauge: React.FC<{ score: number }> = ({ score }) => {
     return t('scoreGauge.poor');
   };
 
+  const mainColor = getColor();
+
   return (
-    <Box sx={{ textAlign: 'center', py: 2 }}>
+    <Box sx={{ textAlign: 'center', py: 3 }}>
       <Box
         sx={{
           position: 'relative',
           display: 'inline-flex',
-          width: 120,
-          height: 120,
+          width: 140,
+          height: 140,
         }}
       >
         <CircularProgress
           variant="determinate"
           value={100}
-          size={120}
-          thickness={6}
-          sx={{ color: '#f1f5f9', position: 'absolute' }}
+          size={140}
+          thickness={5}
+          sx={{ color: alpha(theme.palette.divider, 0.4), position: 'absolute' }}
         />
         <CircularProgress
           variant="determinate"
           value={score}
-          size={120}
-          thickness={6}
-          sx={{ color: getColor() }}
+          size={140}
+          thickness={5}
+          sx={{ 
+            color: mainColor,
+            strokeLinecap: 'round',
+            filter: `drop-shadow(0 0 8px ${alpha(mainColor, 0.3)})`
+          }}
         />
         <Box
           sx={{
@@ -52,20 +60,25 @@ export const ScoreGauge: React.FC<{ score: number }> = ({ score }) => {
             justifyContent: 'center',
           }}
         >
-          <Typography variant="h4" sx={{ fontWeight: 700, color: getColor() }}>
+          <Typography variant="h3" sx={{ fontWeight: 1000, color: mainColor, lineHeight: 1 }}>
             {score}
           </Typography>
-          <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.7rem' }}>
-            /100
+          <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 800, fontSize: '0.75rem', mt: 0.5 }}>
+            / 100
           </Typography>
         </Box>
       </Box>
-      <Typography
-        variant="body2"
-        sx={{ mt: 1, fontWeight: 600, color: getColor() }}
-      >
-        {getLabel()}
-      </Typography>
+      <Box sx={{ mt: 2 }}>
+        <Typography
+          variant="h6"
+          sx={{ fontWeight: 900, color: mainColor, textTransform: 'uppercase', letterSpacing: '1px', fontSize: '0.9rem' }}
+        >
+          {getLabel()}
+        </Typography>
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+          AI Matching Score
+        </Typography>
+      </Box>
     </Box>
   );
 };

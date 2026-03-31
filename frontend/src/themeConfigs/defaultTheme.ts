@@ -93,6 +93,13 @@ const customShadows = {
   large:    '0px 8px 24px rgba(26, 64, 125, 0.14)',
   card:     '0px 4px 20px rgba(26, 64, 125, 0.08)',
   feedback: '0 8px 32px rgba(42, 169, 225, 0.18)',
+  // Standard elevation levels for premium components
+  z1:  '0px 2px 8px rgba(26, 64, 125, 0.08)',
+  z8:  '0px 8px 16px rgba(26, 64, 125, 0.10)',
+  z12: '0px 12px 24px rgba(26, 64, 125, 0.12)',
+  z16: '0px 16px 32px rgba(26, 64, 125, 0.14)',
+  z20: '0px 20px 40px rgba(26, 64, 125, 0.16)',
+  z24: '0px 24px 48px rgba(26, 64, 125, 0.18)',
 } as const;
 
 const defaultTheme = {

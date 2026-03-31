@@ -1,21 +1,31 @@
-import React from 'react';
-import { Box, Button, IconButton, Stack, Tooltip, Typography } from "@mui/material";
+'use client';
+import React, { useMemo } from 'react';
+import { 
+  Box, 
+  Button, 
+  IconButton, 
+  Stack, 
+  Tooltip, 
+  Typography,
+  Chip,
+  alpha,
+  useTheme
+} from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
-import { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
+import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
+import DescriptionIcon from '@mui/icons-material/Description';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import type { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
 
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
 import DataTable from '../../../../components/Common/DataTable';
 import { salaryString } from '../../../../utils/customData';
-import { faFile, faFilePdf } from '@fortawesome/free-regular-svg-icons';
-import { formatRoute } from '../../../../utils/funcUtils';
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
-import { ResumeSaved } from '@/types/models';
+import type { ResumeSaved } from '@/types/models';
 
 interface SavedResumeTableProps {
   rows: ResumeSaved[];
@@ -30,6 +40,7 @@ interface SavedResumeTableProps {
 
 const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
   const { t } = useTranslation(['employer', 'common']);
+  const theme = useTheme();
   const nav = useRouter();
   const { 
     rows, 
@@ -43,27 +54,27 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
   } = props;
   const { allConfig } = useConfig();
 
-  const columns = React.useMemo<ColumnDef<ResumeSaved>[]>(() => [
+  const columns = useMemo<ColumnDef<ResumeSaved>[]>(() => [
     {
       accessorKey: 'resume.title',
-      header: (t('employer:savedResumeTable.label.resumeTitle') || 'Resume') as string,
+      header: t('employer:savedResumeTable.label.resumeTitle'),
       enableSorting: true,
       cell: (info) => (
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           {info.row.original.resume?.type === CV_TYPES.cvWebsite ? (
-            <Tooltip title={t('employer:savedResumeTable.title.onlineresume')} arrow>
-              <FontAwesomeIcon icon={faFile} color="#441da0" size="xs" />
-            </Tooltip>
+            <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: alpha(theme.palette.primary.main, 0.08), color: 'primary.main', display: 'flex' }}>
+              <DescriptionIcon sx={{ fontSize: 18 }} />
+            </Box>
           ) : (
-            <Tooltip title={t('employer:savedResumeTable.title.attachedresume')} arrow>
-              <FontAwesomeIcon icon={faFilePdf} color="red" size="xs" />
-            </Tooltip>
+            <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: alpha(theme.palette.error.main, 0.08), color: 'error.main', display: 'flex' }}>
+              <PictureAsPdfIcon sx={{ fontSize: 18 }} />
+            </Box>
           )}
-          <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-            {info.getValue() as string || (
-              <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>
+          <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+            {String(info.getValue() ?? '') || (
+              <Typography component="span" variant="caption" sx={{ color: 'text.disabled', fontStyle: 'italic', fontWeight: 600 }}>
                 {t('common:notUpdated')}
-              </span>
+              </Typography>
             )}
           </Typography>
         </Box>
@@ -71,60 +82,123 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
     },
     {
       accessorKey: 'resume.userDict.fullName',
-      header: (t('employer:savedResumeTable.label.candidateName') || 'Candidate') as string,
+      header: t('employer:savedResumeTable.label.candidateName'),
       enableSorting: true,
+      cell: (info) => (
+        <Typography variant="body2" sx={{ fontWeight: 900, color: 'text.primary' }}>
+            {String(info.getValue() ?? '---')}
+        </Typography>
+      ),
     },
     {
       id: 'salary',
-      header: (t('employer:savedResumeTable.label.salary') || 'Salary') as string,
-      cell: (info) => salaryString(info.row.original.resume?.salaryMin, info.row.original.resume?.salaryMax) || (
-        <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common:notUpdated')}</span>
-      ),
+      header: t('employer:savedResumeTable.label.salary'),
+      cell: (info) => {
+        const str = salaryString(info.row.original.resume?.salaryMin, info.row.original.resume?.salaryMax);
+        return str ? (
+            <Typography variant="body2" sx={{ fontWeight: 800, color: 'secondary.main' }}>
+                {str}
+            </Typography>
+        ) : (
+          <Typography component="span" variant="caption" sx={{ color: 'text.disabled', fontStyle: 'italic', fontWeight: 600 }}>
+            {t('common:notUpdated')}
+          </Typography>
+        );
+      },
     },
     {
       accessorKey: 'resume.experience',
-      header: (t('employer:savedResumeTable.label.experience') || 'Experience') as string,
-      cell: (info) => tConfig(allConfig?.experienceDict?.[info.getValue() as number]) || (
-        <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common:notUpdated')}</span>
-      ),
+      header: t('employer:savedResumeTable.label.experience'),
+      cell: (info) => {
+        const val = tConfig(allConfig?.experienceDict?.[info.getValue() as number]);
+        return val ? (
+          <Chip 
+            label={val} 
+            size="small" 
+            sx={{ 
+              fontWeight: 900,
+              fontSize: '0.7rem',
+              borderRadius: 1.5,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              bgcolor: alpha(theme.palette.primary.main, 0.08),
+              color: 'primary.main',
+              border: '1px solid',
+              borderColor: alpha(theme.palette.primary.main, 0.1)
+            }} 
+          />
+        ) : (
+          <Typography component="span" variant="caption" sx={{ color: 'text.disabled', fontStyle: 'italic', fontWeight: 600 }}>
+            {t('common:notUpdated')}
+          </Typography>
+        );
+      },
     },
     {
       accessorKey: 'resume.city',
-      header: (t('employer:savedResumeTable.label.cityProvince') || 'Location') as string,
-      cell: (info) => tConfig(allConfig?.cityDict?.[info.getValue() as number]) || (
-        <span style={{ color: '#e0e0e0', fontStyle: 'italic', fontSize: 13 }}>{t('common:notUpdated')}</span>
-      ),
+      header: t('employer:savedResumeTable.label.cityProvince'),
+      cell: (info) => {
+        const val = tConfig(allConfig?.cityDict?.[info.getValue() as number]);
+        return (
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+                {val || (
+                    <Typography component="span" variant="caption" sx={{ color: 'text.disabled', fontStyle: 'italic', fontWeight: 600 }}>
+                        {t('common:notUpdated')}
+                    </Typography>
+                )}
+            </Typography>
+        );
+      },
     },
     {
       accessorKey: 'createAt',
-      header: (t('employer:savedResumeTable.label.savedDate') || 'Saved At') as string,
+      header: t('employer:savedResumeTable.label.savedDate'),
       enableSorting: true,
-      cell: (info) => dayjs(info.getValue() as string).format('DD/MM/YYYY'),
+      cell: (info) => (
+        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+            {info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY') : '---'}
+        </Typography>
+      ),
     },
     {
       id: 'actions',
-      header: (t('employer:savedResumeTable.label.actions') || 'Actions') as string,
+      header: t('employer:savedResumeTable.label.actions'),
       meta: { align: 'right' },
       cell: (info) => (
         <Stack direction="row" spacing={1} justifyContent="flex-end">
           <Tooltip title={t('employer:savedResumeTable.title.viewprofile')} arrow>
             <IconButton
               size="small"
-              onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resume?.slug || '')}`)}
+              color="primary"
+              onClick={() => nav.push(`${ROUTES.EMPLOYER.PROFILE_DETAIL.replace(':slug', info.row.original.resume?.slug || '')}`)}
+              sx={{ 
+                bgcolor: alpha(theme.palette.primary.main, 0.06), 
+                borderRadius: 1.5,
+                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.12) }
+              }}
             >
-              <RemoveRedEyeOutlinedIcon fontSize="small" color="primary" />
+              <RemoveRedEyeIcon fontSize="small" />
             </IconButton>
           </Tooltip>
-          <Button
-            size="small"
-            variant="outlined"
-            color="error"
-            sx={{ textTransform: 'inherit', minWidth: 100 }}
-            startIcon={<FavoriteIcon fontSize="small" />}
-            onClick={() => handleUnsave(info.row.original.resume?.slug || '')}
-          >
-            {t('employer:savedResumeTable.label.unsave')}
-          </Button>
+          <Tooltip title={t('employer:savedResumeTable.label.unsave')} arrow>
+              <Button
+                size="small"
+                variant="contained"
+                color="error"
+                sx={{ 
+                    textTransform: 'none', 
+                    minWidth: 100, 
+                    borderRadius: 2,
+                    fontWeight: 900,
+                    boxShadow: (theme: any) => theme.customShadows?.z1,
+                    '&:hover': { bgcolor: 'error.dark' }
+                }}
+                startIcon={<FavoriteIcon fontSize="small" />}
+                onClick={() => handleUnsave(info.row.original.resume?.slug || '')}
+              >
+                {t('employer:savedResumeTable.label.unsave')}
+              </Button>
+          </Tooltip>
         </Stack>
       ),
     },

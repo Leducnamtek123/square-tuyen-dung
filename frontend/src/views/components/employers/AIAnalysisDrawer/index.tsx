@@ -11,6 +11,8 @@ import {
   Button,
   Paper,
   Chip,
+  useTheme,
+  alpha,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import PsychologyIcon from '@mui/icons-material/Psychology';
@@ -108,6 +110,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
   initialData,
 }) => {
   const { t } = useTranslation('employer');
+  const theme = useTheme();
   const [data, setData] = React.useState<AIAnalysisData | null>(initialData || null);
   const [loading, setLoading] = React.useState(false);
   const [analyzing, setAnalyzing] = React.useState(false);
@@ -236,16 +239,19 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
       PaperProps={{
         sx: {
           width: { xs: '100%', sm: DRAWER_WIDTH },
-          bgcolor: '#fafbfc',
+          bgcolor: 'background.default',
+          backgroundImage: 'none',
+          boxShadow: (theme: any) => theme.customShadows?.z24
         },
       }}
     >
       <Box
         sx={{
-          px: 2.5,
-          py: 2,
-          bgcolor: 'white',
-          borderBottom: '1px solid #e2e8f0',
+          px: 3,
+          py: 2.5,
+          bgcolor: 'background.paper',
+          borderBottom: '1px solid',
+          borderColor: alpha(theme.palette.divider, 0.8),
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
@@ -254,46 +260,66 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
           zIndex: 10,
         }}
       >
-        <Stack direction="row" spacing={1.5} alignItems="center">
-          {renderIcon(PsychologyIcon, { sx: { color: '#06b6d4', fontSize: 28 } })}
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Box sx={{ 
+              p: 1, 
+              borderRadius: 1.5, 
+              bgcolor: alpha(theme.palette.primary.main, 0.1),
+              color: 'primary.main',
+              display: 'flex'
+          }}>
+            {renderIcon(PsychologyIcon, { sx: { fontSize: 24 } })}
+          </Box>
           <Box>
-            <Typography variant="subtitle1" sx={{ fontWeight: 700, color: '#1e293b', lineHeight: 1.2 }}>
+            <Typography variant="h6" sx={{ fontWeight: 900, color: 'text.primary', lineHeight: 1.2, letterSpacing: '-0.5px' }}>
               {t('appliedResume.ai.drawerTitle')}
             </Typography>
             {data?.fullName && (
-              <Typography variant="caption" sx={{ color: '#64748b' }}>
-                {data.fullName} - {data.jobName}
+              <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+                {data.fullName} • {data.jobName}
               </Typography>
             )}
           </Box>
         </Stack>
-        <IconButton onClick={onClose} size="small">
-          {renderIcon(CloseIcon)}
+        <IconButton 
+            onClick={onClose} 
+            size="small"
+            sx={{ 
+                bgcolor: alpha(theme.palette.action.disabled, 0.05),
+                '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.1), color: 'error.main' }
+            }}
+        >
+          {renderIcon(CloseIcon, { fontSize: 'small' })}
         </IconButton>
       </Box>
 
       {loading ? (
-        <Box sx={{ p: 4, textAlign: 'center' }}>
-          <CircularProgress />
-          <Typography variant="body2" sx={{ mt: 2, color: '#64748b' }}>
+        <Box sx={{ p: 10, textAlign: 'center' }}>
+          <CircularProgress color="primary" thickness={5} size={40} />
+          <Typography variant="subtitle2" sx={{ mt: 3, color: 'text.secondary', fontWeight: 700 }}>
             {t('appliedResume.ai.loading')}
           </Typography>
         </Box>
       ) : (
-        <Box sx={{ p: 2.5, overflowY: 'auto', flex: 1 }}>
+        <Box sx={{ p: 3, overflowY: 'auto', flex: 1 }}>
           {resumeFileUrl && (
-            <SectionCard title={t('appliedResume.ai.resumeTitle')} icon={renderIcon(DescriptionIcon, { fontSize: 'small' })} iconColor="#22d3ee">
+            <SectionCard title={t('appliedResume.ai.resumeTitle')} icon={renderIcon(DescriptionIcon, { fontSize: 'small' })} iconColor={theme.palette.info.main}>
               <Box
                 sx={{
-                  border: '1px solid rgba(34,211,238,0.28)',
-                  borderRadius: 2,
+                  border: '1px solid',
+                  borderColor: alpha(theme.palette.info.main, 0.2),
+                  borderRadius: 3,
                   overflow: 'hidden',
-                  height: { xs: 260, sm: 350 },
+                  height: { xs: 260, sm: 380 },
                   bgcolor: '#0f172a',
                   position: 'relative',
-                  backgroundImage:
-                    'linear-gradient(rgba(34,211,238,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.08) 1px, transparent 1px), radial-gradient(110% 90% at 10% 5%, rgba(15,23,42,0.55) 0%, rgba(2,6,23,0.98) 100%)',
+                  backgroundImage: `
+                    linear-gradient(${alpha(theme.palette.info.main, 0.08)} 1px, transparent 1px), 
+                    linear-gradient(90deg, ${alpha(theme.palette.info.main, 0.08)} 1px, transparent 1px), 
+                    radial-gradient(110% 90% at 10% 5%, rgba(15,23,42,0.55) 0%, rgba(2,6,23,0.98) 100%)
+                  `,
                   backgroundSize: '22px 22px, 22px 22px, cover',
+                  boxShadow: (theme: any) => theme.customShadows?.z8
                 }}
               >
                 {canEmbedResume ? (
@@ -302,29 +328,29 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                     title={t('appliedResume.ai.resumeTitle')}
                     width="100%"
                     height="100%"
-                    style={{ border: 'none', opacity: isProcessing ? 0.85 : 1 }}
+                    style={{ border: 'none', opacity: isProcessing ? 0.7 : 1, transition: 'opacity 0.3s' }}
                     referrerPolicy="no-referrer"
                   />
                 ) : (
                   <Stack
                     alignItems="center"
                     justifyContent="center"
-                    sx={{ height: '100%', px: 2.5, textAlign: 'center', color: '#cbd5e1', gap: 1.5 }}
+                    sx={{ height: '100%', px: 4, textAlign: 'center', color: 'rgba(255,255,255,0.7)', gap: 2 }}
                   >
-                    {renderIcon(DescriptionIcon, { sx: { fontSize: 36, color: '#67e8f9' } })}
-                    <Typography variant="body2">
+                    {renderIcon(DescriptionIcon, { sx: { fontSize: 48, color: theme.palette.info.light, opacity: 0.8 } })}
+                    <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
                       {t('appliedResume.ai.cannotEmbed')}
                     </Typography>
-                    <Typography variant="caption" sx={{ color: '#94a3b8' }}>
+                    <Typography variant="caption" sx={{ opacity: 0.6, maxWidth: 280 }}>
                       {t('appliedResume.ai.cannotEmbedHint')}
                     </Typography>
                   </Stack>
                 )}
-
-                <Box sx={{ position: 'absolute', top: 10, left: 10, width: 28, height: 28, borderTop: '2px solid #22d3ee', borderLeft: '2px solid #22d3ee', pointerEvents: 'none' }} />
-                <Box sx={{ position: 'absolute', top: 10, right: 10, width: 28, height: 28, borderTop: '2px solid #22d3ee', borderRight: '2px solid #22d3ee', pointerEvents: 'none' }} />
-                <Box sx={{ position: 'absolute', bottom: 10, left: 10, width: 28, height: 28, borderBottom: '2px solid #22d3ee', borderLeft: '2px solid #22d3ee', pointerEvents: 'none' }} />
-                <Box sx={{ position: 'absolute', bottom: 10, right: 10, width: 28, height: 28, borderBottom: '2px solid #22d3ee', borderRight: '2px solid #22d3ee', pointerEvents: 'none' }} />
+                
+                <Box sx={{ position: 'absolute', top: 12, left: 12, width: 24, height: 24, borderTop: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, borderLeft: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, pointerEvents: 'none' }} />
+                <Box sx={{ position: 'absolute', top: 12, right: 12, width: 24, height: 24, borderTop: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, borderRight: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, pointerEvents: 'none' }} />
+                <Box sx={{ position: 'absolute', bottom: 12, left: 12, width: 24, height: 24, borderBottom: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, borderLeft: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, pointerEvents: 'none' }} />
+                <Box sx={{ position: 'absolute', bottom: 12, right: 12, width: 24, height: 24, borderBottom: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, borderRight: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, pointerEvents: 'none' }} />
 
                 {isProcessing && (
                   <Box
@@ -334,17 +360,16 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                       right: 0,
                       top: `calc(${scanLinePosition}% - 18px)`,
                       height: 34,
-                      background:
-                        'linear-gradient(180deg, rgba(34,211,238,0) 0%, rgba(34,211,238,0.58) 45%, rgba(34,211,238,0) 100%)',
-                      boxShadow: '0 0 22px rgba(34,211,238,0.68), 0 0 46px rgba(34,211,238,0.32)',
+                      background: `linear-gradient(180deg, transparent 0%, ${alpha(theme.palette.info.main, 0.4)} 45%, transparent 100%)`,
+                      boxShadow: `0 0 20px ${alpha(theme.palette.info.main, 0.4)}, 0 0 40px ${alpha(theme.palette.info.main, 0.2)}`,
                       pointerEvents: 'none',
                     }}
                   />
                 )}
               </Box>
 
-              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 1.25 }}>
-                <Typography variant="caption" sx={{ color: '#64748b' }}>
+              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 1.5 }}>
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
                   {isProcessing ? t('appliedResume.ai.scanStatusScanning') : isCompleted ? t('appliedResume.ai.scanStatusComplete') : t('appliedResume.ai.scanStatusIdle')}
                 </Typography>
                 <Button
@@ -353,7 +378,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                   variant="text"
                   size="small"
                   startIcon={renderIcon(OpenInNewIcon, { fontSize: 'small' })}
-                  sx={{ textTransform: 'none', fontSize: '0.75rem' }}
+                  sx={{ textTransform: 'none', fontSize: '0.75rem', fontWeight: 900 }}
                 >
                   {t('appliedResume.ai.openCV')}
                 </Button>
@@ -365,57 +390,79 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
             <Paper
               elevation={0}
               sx={{
-                p: 2.5,
-                mb: 1.5,
-                border: '1px solid rgba(34,211,238,0.35)',
-                borderRadius: 2,
-                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #0f172a 100%)',
+                p: 3,
+                mb: 2,
+                border: '1px solid',
+                borderColor: alpha(theme.palette.info.main, 0.3),
+                borderRadius: 3,
+                background: `linear-gradient(135deg, ${theme.palette.info.dark} 0%, ${alpha(theme.palette.info.dark, 0.8)} 100%)`,
+                boxShadow: (theme: any) => theme.customShadows?.info
               }}
             >
-              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.2 }}>
-                <Typography variant="subtitle2" sx={{ color: '#a5f3fc', fontWeight: 700 }}>
+              <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
+                <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                   {t('appliedResume.ai.scanning')}
                 </Typography>
-                <Chip size="small" label={`${scanProgress}%`} sx={{ color: '#0f172a', bgcolor: '#67e8f9', fontWeight: 700 }} />
+                <Chip 
+                    size="small" 
+                    label={`${scanProgress}%`} 
+                    sx={{ 
+                        color: 'info.dark', 
+                        bgcolor: 'info.light', 
+                        fontWeight: 1000,
+                        boxShadow: '0 0 10px rgba(0,0,0,0.2)'
+                    }} 
+                />
               </Stack>
               <LinearProgress
                 variant="determinate"
                 value={scanProgress}
                 sx={{
-                  height: 8,
-                  borderRadius: 999,
-                  bgcolor: 'rgba(103,232,249,0.2)',
+                  height: 10,
+                  borderRadius: 5,
+                  bgcolor: alpha(theme.palette.info.light, 0.2),
                   '& .MuiLinearProgress-bar': {
-                    borderRadius: 999,
-                    background: 'linear-gradient(90deg, #22d3ee 0%, #06b6d4 55%, #0891b2 100%)',
+                    borderRadius: 5,
+                    background: `linear-gradient(90deg, ${theme.palette.info.light} 0%, white 100%)`,
                   },
                 }}
               />
-              <Typography variant="caption" sx={{ color: '#bae6fd', mt: 1, display: 'block' }}>
+              <Typography variant="caption" sx={{ color: 'white', mt: 1.5, display: 'block', fontWeight: 600, opacity: 0.9 }}>
                 {t('appliedResume.ai.scanProgress')}
               </Typography>
             </Paper>
           )}
 
           {isFailed && (
-            <Paper elevation={0} sx={{ p: 3, mb: 1.5, border: '1px solid #fecaca', borderRadius: 2, bgcolor: '#fef2f2', textAlign: 'center' }}>
-              {renderIcon(CancelIcon, { sx: { fontSize: 36, color: '#ef4444', mb: 1 } })}
-              <Typography variant="body1" sx={{ fontWeight: 600, color: '#991b1b' }}>
+            <Paper 
+                elevation={0} 
+                sx={{ 
+                    p: 4, 
+                    mb: 2, 
+                    border: '1px solid', 
+                    borderColor: alpha(theme.palette.error.main, 0.2), 
+                    borderRadius: 3, 
+                    bgcolor: alpha(theme.palette.error.main, 0.04), 
+                    textAlign: 'center' 
+                }}
+            >
+              {renderIcon(CancelIcon, { sx: { fontSize: 48, color: 'error.main', mb: 2, opacity: 0.8 } })}
+              <Typography variant="h6" sx={{ fontWeight: 900, color: 'error.dark' }}>
                 {t('appliedResume.ai.failedTitle')}
               </Typography>
               {data?.aiAnalysisSummary && (
-                <Typography variant="body2" sx={{ color: '#b91c1c', mt: 0.5, fontSize: '0.8rem' }}>
+                <Typography variant="body2" sx={{ color: 'error.main', mt: 1, fontWeight: 600 }}>
                   {data.aiAnalysisSummary}
                 </Typography>
               )}
               <Button
-                variant="outlined"
+                variant="contained"
                 color="error"
-                size="small"
+                size="medium"
                 startIcon={renderIcon(RefreshIcon)}
                 onClick={handleAnalyze}
                 disabled={analyzing}
-                sx={{ mt: 2, textTransform: 'none' }}
+                sx={{ mt: 3, textTransform: 'none', fontWeight: 900, borderRadius: 2, boxShadow: (theme: any) => theme.customShadows?.error }}
               >
                 {t('appliedResume.ai.retry')}
               </Button>
@@ -426,32 +473,52 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
             <Paper
               elevation={0}
               sx={{
-                p: 3,
-                mb: 1.5,
-                border: '1px dashed #67e8f9',
-                borderRadius: 2,
+                p: 5,
+                mb: 2,
+                border: '2px dashed',
+                borderColor: alpha(theme.palette.primary.main, 0.3),
+                borderRadius: 4,
                 textAlign: 'center',
-                background: 'linear-gradient(135deg, #f8fafc 0%, #ecfeff 100%)',
+                background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.02)} 0%, ${alpha(theme.palette.primary.main, 0.05)} 100%)`,
+                transition: 'all 0.3s ease',
+                '&:hover': {
+                    borderColor: 'primary.main',
+                    bgcolor: alpha(theme.palette.primary.main, 0.06)
+                }
               }}
             >
-              {renderIcon(AutoFixHighIcon, { sx: { fontSize: 40, color: '#0891b2', mb: 1 } })}
-              <Typography variant="body1" sx={{ fontWeight: 700, color: '#0f172a', mb: 0.5 }}>
+              <Box sx={{ 
+                  p: 2, 
+                  borderRadius: '50%', 
+                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  display: 'inline-flex',
+                  mb: 2
+              }}>
+                {renderIcon(AutoFixHighIcon, { sx: { fontSize: 48, color: 'primary.main' } })}
+              </Box>
+              <Typography variant="h5" sx={{ fontWeight: 1000, color: 'text.primary', mb: 1, letterSpacing: '-0.5px' }}>
                 {t('appliedResume.ai.idleTitle')}
               </Typography>
-              <Typography variant="caption" sx={{ color: '#475569', display: 'block', mb: 2 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', display: 'block', mb: 4, fontWeight: 600, px: 2 }}>
                 {t('appliedResume.ai.idleHint')}
               </Typography>
               <Button
                 variant="contained"
+                size="large"
                 startIcon={renderIcon(AutoFixHighIcon)}
                 onClick={handleAnalyze}
                 disabled={analyzing}
                 sx={{
                   textTransform: 'none',
-                  background: 'linear-gradient(90deg, #0891b2 0%, #22d3ee 100%)',
-                  color: '#0f172a',
-                  fontWeight: 700,
-                  '&:hover': { background: 'linear-gradient(90deg, #0e7490 0%, #06b6d4 100%)' },
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 3,
+                  background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+                  color: 'white',
+                  fontWeight: 900,
+                  fontSize: '1rem',
+                  boxShadow: (theme: any) => theme.customShadows?.primary,
+                  '&:hover': { transform: 'translateY(-2px)', boxShadow: (theme: any) => theme.customShadows?.z12 }
                 }}
               >
                 {t('appliedResume.ai.startScan')}
@@ -464,67 +531,86 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
               <Paper
                 elevation={0}
                 sx={{
-                  p: 2,
-                  mb: 1.5,
-                  border: '1px solid #bae6fd',
-                  borderRadius: 2,
-                  background: 'linear-gradient(135deg, #ecfeff 0%, #f0fdfa 100%)',
+                  p: 2.5,
+                  mb: 2,
+                  border: '1px solid',
+                  borderColor: alpha(theme.palette.success.main, 0.2),
+                  borderRadius: 3,
+                  background: `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.04)} 0%, ${alpha(theme.palette.success.main, 0.08)} 100%)`,
+                  boxShadow: (theme: any) => theme.customShadows?.success
                 }}
               >
-                <Stack direction="row" spacing={1} alignItems="center" justifyContent="space-between" sx={{ flexWrap: 'wrap', rowGap: 1 }}>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    {renderIcon(CheckCircleIcon, { sx: { color: '#0e7490' } })}
-                    <Typography variant="subtitle2" sx={{ fontWeight: 700, color: '#134e4a' }}>
+                <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" sx={{ flexWrap: 'wrap', rowGap: 1.5 }}>
+                  <Stack direction="row" spacing={1.5} alignItems="center">
+                    <Box sx={{ color: 'success.main', display: 'flex' }}>
+                        {renderIcon(CheckCircleIcon, { sx: { fontSize: 24 } })}
+                    </Box>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'success.dark', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                       {t('appliedResume.ai.completeTitle')}
                     </Typography>
                   </Stack>
                   <Stack direction="row" spacing={1}>
-                    <Chip size="small" label={`Match: ${stats.matchingSkills}`} color="success" variant="outlined" />
-                    <Chip size="small" label={`Missing: ${stats.missingSkills}`} color="error" variant="outlined" />
-                    <Chip size="small" label={`Skills: ${stats.totalSkills}`} color="info" variant="outlined" />
+                    <Chip size="small" label={`Match: ${stats.matchingSkills}`} sx={{ fontWeight: 800, bgcolor: 'success.main', color: 'white' }} />
+                    <Chip size="small" label={`Missing: ${stats.missingSkills}`} sx={{ fontWeight: 800, bgcolor: 'error.main', color: 'white' }} />
                   </Stack>
                 </Stack>
               </Paper>
 
-              <Paper elevation={0} sx={{ mb: 1.5, border: '1px solid #e2e8f0', borderRadius: 2 }}>
+              <Paper 
+                elevation={0} 
+                sx={{ 
+                    mb: 2, 
+                    border: '1px solid', 
+                    borderColor: alpha(theme.palette.divider, 0.8), 
+                    borderRadius: 3,
+                    bgcolor: 'background.paper',
+                    boxShadow: (theme: any) => theme.customShadows?.z1
+                }}
+              >
                 <ScoreGauge score={data?.aiAnalysisScore || 0} />
               </Paper>
 
-              <SectionCard title={t('appliedResume.ai.overviewTitle')} icon={renderIcon(PsychologyIcon, { fontSize: 'small' })} iconColor="#6366f1">
-                <Typography variant="body2" sx={{ color: '#334155', lineHeight: 1.7 }}>
+              <SectionCard title={t('appliedResume.ai.overviewTitle')} icon={renderIcon(PsychologyIcon, { fontSize: 'small' })} iconColor={theme.palette.secondary.main}>
+                <Typography variant="body2" sx={{ color: 'text.primary', lineHeight: 1.8, fontWeight: 600, opacity: 0.9 }}>
                   {data?.aiAnalysisSummary || t('appliedResume.ai.noEvaluation')}
                 </Typography>
               </SectionCard>
 
-              <SectionCard title={t('appliedResume.ai.prosTitle')} icon={renderIcon(ThumbUpAltIcon, { fontSize: 'small' })} iconColor="#22c55e">
+              <SectionCard title={t('appliedResume.ai.prosTitle')} icon={renderIcon(ThumbUpAltIcon, { fontSize: 'small' })} iconColor={theme.palette.success.main}>
                 <SkillChipList skills={data?.aiAnalysisPros} color="success" />
               </SectionCard>
 
-              <SectionCard title={t('appliedResume.ai.consTitle')} icon={renderIcon(ThumbDownAltIcon, { fontSize: 'small' })} iconColor="#ef4444">
+              <SectionCard title={t('appliedResume.ai.consTitle')} icon={renderIcon(ThumbDownAltIcon, { fontSize: 'small' })} iconColor={theme.palette.error.main}>
                 <SkillChipList skills={data?.aiAnalysisCons} color="error" />
               </SectionCard>
 
-              <SectionCard title={t('appliedResume.ai.matchingSkillsTitle')} icon={renderIcon(CheckCircleIcon, { fontSize: 'small' })} iconColor="#22c55e">
+              <SectionCard title={t('appliedResume.ai.matchingSkillsTitle')} icon={renderIcon(CheckCircleIcon, { fontSize: 'small' })} iconColor={theme.palette.success.main}>
                 <SkillChipList skills={data?.aiAnalysisMatchingSkills} color="success" icon={renderIcon(CheckCircleIcon) || undefined} />
               </SectionCard>
 
-              <SectionCard title={t('appliedResume.ai.missingSkillsTitle')} icon={renderIcon(CancelIcon, { fontSize: 'small' })} iconColor="#f97316">
+              <SectionCard title={t('appliedResume.ai.missingSkillsTitle')} icon={renderIcon(CancelIcon, { fontSize: 'small' })} iconColor={theme.palette.warning.main}>
                 <SkillChipList skills={data?.aiAnalysisMissingSkills} color="error" icon={renderIcon(CancelIcon) || undefined} />
               </SectionCard>
 
-              <SectionCard title={t('appliedResume.ai.allSkillsTitle')} icon={renderIcon(AutoFixHighIcon, { fontSize: 'small' })} iconColor="#3b82f6">
+              <SectionCard title={t('appliedResume.ai.allSkillsTitle')} icon={renderIcon(AutoFixHighIcon, { fontSize: 'small' })} iconColor={theme.palette.primary.main}>
                 <SkillChipList skills={data?.aiAnalysisSkills} color="primary" />
               </SectionCard>
 
-              <Box sx={{ textAlign: 'center', mt: 2, mb: 3 }}>
-                <Divider sx={{ mb: 2 }} />
+              <Box sx={{ textAlign: 'center', mt: 3, mb: 4 }}>
+                <Divider sx={{ mb: 3, borderStyle: 'dashed' }} />
                 <Button
                   variant="outlined"
-                  size="small"
+                  color="primary"
+                  size="medium"
                   startIcon={renderIcon(RefreshIcon)}
                   onClick={handleAnalyze}
                   disabled={analyzing}
-                  sx={{ textTransform: 'none' }}
+                  sx={{ 
+                    textTransform: 'none', 
+                    fontWeight: 900, 
+                    borderRadius: 2,
+                    px: 3
+                  }}
                 >
                   {t('appliedResume.ai.reanalyze')}
                 </Button>

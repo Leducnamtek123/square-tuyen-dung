@@ -1,7 +1,9 @@
 import React from 'react';
-import { Box, Typography, Card, Divider } from '@mui/material';
-import { Grid2 as Grid } from "@mui/material";
+import { Box, Typography, Stack, Paper, Divider, alpha, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import SchoolIcon from '@mui/icons-material/School';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import TimeAgo from '../../../../components/Common/TimeAgo';
 
 interface EducationSectionProps {
@@ -9,48 +11,79 @@ interface EducationSectionProps {
 }
 
 const EducationSection: React.FC<EducationSectionProps> = ({ profileDetail }) => {
-  const { t } = useTranslation(['employer', 'common']);
+    const { t } = useTranslation(['employer', 'common']);
+    const theme = useTheme();
 
-  if (!(profileDetail?.educationDetails?.length > 0)) return null;
+    if (!(profileDetail?.educationDetails?.length > 0)) return null;
 
-  return (
-    <Box sx={{ mt: 2 }}>
-      <Typography variant="h5" sx={{ mb: 1.5 }}>
-        {t('profileDetailCard.title.education', { ns: 'employer' })}
-      </Typography>
-      <Box>
-        <Card variant="outlined" sx={{ p: 2, borderWidth: 2, boxShadow: 0 }}>
-          <Grid container spacing={1}>
-            {profileDetail.educationDetails.map((value: any, index: number) => (
-              <React.Fragment key={value.id || index}>
-                <Grid size={12}>
-                  <Typography sx={{ fontSize: 17.5, fontWeight: "bold", mb: 0.5 }}>
-                    {value?.degreeName} - {t('profileDetailCard.label.major', { ns: 'employer' })}: {value?.major}
-                  </Typography>
-                  <Typography sx={{ fontWeight: "bold", fontSize: 15 }}>
-                    {value?.trainingPlaceName}
-                  </Typography>
-                  <Typography sx={{ color: "gray" }}>
-                    <TimeAgo date={value?.startDate} type="format" /> -{" "}
-                    {value.completedDate ? (
-                      <TimeAgo date={value?.completedDate} type="format" />
-                    ) : (
-                      t('common.present', { ns: 'common' })
-                    )}
-                  </Typography>
-                </Grid>
-                {index < profileDetail.educationDetails.length - 1 && (
-                  <Grid size={12}>
-                    <Divider />
-                  </Grid>
-                )}
-              </React.Fragment>
-            ))}
-          </Grid>
-        </Card>
-      </Box>
-    </Box>
-  );
+    return (
+        <Box>
+            <Stack direction="row" alignItems="center" spacing={2} mb={4}>
+                <Box 
+                    sx={{ 
+                        p: 1.25, 
+                        borderRadius: 2, 
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        color: 'primary.main',
+                        display: 'flex'
+                    }}
+                >
+                    <SchoolIcon sx={{ fontSize: 28 }} />
+                </Box>
+                <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+                    {t('profileDetailCard.title.education')}
+                </Typography>
+            </Stack>
+
+            <Paper
+                elevation={0}
+                sx={{
+                    p: { xs: 3, md: 5 },
+                    borderRadius: 4,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    bgcolor: 'background.paper',
+                    boxShadow: (theme: any) => theme.customShadows?.z1
+                }}
+            >
+                <Stack spacing={5}>
+                    {profileDetail.educationDetails.map((value: any, index: number) => (
+                        <Box key={value.id || index}>
+                            <Stack spacing={2}>
+                                <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', lineHeight: 1.3 }}>
+                                    {value?.degreeName} - {t('profileDetailCard.label.major')}: {value?.major}
+                                </Typography>
+                                
+                                <Stack spacing={1.5}>
+                                    <Stack direction="row" alignItems="center" spacing={1.5}>
+                                        <LocationOnIcon sx={{ fontSize: 20, color: 'text.secondary', opacity: 0.8 }} />
+                                        <Typography variant="subtitle1" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                                            {value?.trainingPlaceName}
+                                        </Typography>
+                                    </Stack>
+                                    
+                                    <Stack direction="row" alignItems="center" spacing={1.5}>
+                                        <CalendarMonthIcon sx={{ fontSize: 20, color: 'text.secondary', opacity: 0.8 }} />
+                                        <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary', opacity: 0.8 }}>
+                                            <TimeAgo date={value?.startDate} type="format" /> -{" "}
+                                            {value.completedDate ? (
+                                                <TimeAgo date={value?.completedDate} type="format" />
+                                            ) : (
+                                                t('common:labels.present')
+                                            )}
+                                        </Typography>
+                                    </Stack>
+                                </Stack>
+                            </Stack>
+                            {index < profileDetail.educationDetails.length - 1 && (
+                                <Divider sx={{ mt: 5, borderStyle: 'dashed', borderColor: alpha(theme.palette.divider, 0.8) }} />
+                            )}
+                        </Box>
+                    ))}
+                </Stack>
+            </Paper>
+        </Box>
+    );
 };
 
 export default EducationSection;

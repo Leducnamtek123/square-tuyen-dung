@@ -1,201 +1,124 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Button, Stack, Tooltip, IconButton } from "@mui/material";
+import { Button, Stack, Tooltip, IconButton, Box, alpha, useTheme } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
-import { useAppSelector } from '../../../../redux/hooks';
 import { useConfig } from '@/hooks/useConfig';
 
 interface JobPostFilterFormProps {
   handleFilter: (data: any) => void;
 }
 
-
-
 const JobPostFilterForm = ({ handleFilter }: JobPostFilterFormProps) => {
-
   const { t } = useTranslation('employer');
-
   const { allConfig } = useConfig();
+  const theme = useTheme();
 
   const {
-
     control,
-
     handleSubmit,
-
     reset,
-
     formState: { defaultValues },
-
   } = useForm<any>({
-
     defaultValues: {
-
       kw: '',
-
       isUrgent: '',
-
       statusId: '',
-
     },
-
   });
 
+  const inputSx = {
+    '& .MuiOutlinedInput-root': {
+        borderRadius: 2.5,
+        backgroundColor: alpha(theme.palette.action.disabled, 0.03),
+        '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
+        '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) }
+    }
+  };
+
   return (
-
     <form onSubmit={handleSubmit(handleFilter)}>
-
-      <Grid container spacing={2}>
-
-        <Grid
-
-          size={{
-
-            xs: 12,
-
-            sm: 12,
-
-            md: 5,
-
-            lg: 5,
-
-            xl: 5
-
-          }}>
-
+      <Grid container spacing={3} alignItems="center">
+        <Grid size={{ xs: 12, sm: 12, md: 5 }}>
           <TextFieldCustom
-
             name="kw"
-
             placeholder={t('jobPost.filters.keywordsPlaceholder')}
-
             control={control}
-
+            sx={inputSx}
           />
-
         </Grid>
-
-        <Grid flex={1}>
-
+        <Grid size={{ xs: 12, sm: 6, md: 2.5 }}>
           <SingleSelectCustom
-
             name="isUrgent"
-
             control={control}
-
             options={[
-
               { id: 1, name: t('jobPost.filters.urgent') },
-
               { id: 2, name: t('jobPost.filters.notUrgent') },
-
             ]}
-
-            showRequired={true}
-
+            showRequired={false}
             placeholder={t('jobPost.filters.urgentPlaceholder')}
-
+            sx={inputSx}
           />
-
         </Grid>
-
-        <Grid flex={1}>
-
+        <Grid size={{ xs: 12, sm: 6, md: 2.5 }}>
           <SingleSelectCustom
-
             name="statusId"
-
             control={control}
-
             options={(allConfig?.jobPostStatusOptions || []) as any[]}
-
-            showRequired={true}
-
+            showRequired={false}
             placeholder={t('jobPost.filters.statusPlaceholder')}
-
+            sx={inputSx}
           />
-
         </Grid>
-
-        <Grid>
-
+        <Grid size={{ xs: 12, md: 'auto' }}>
           <Stack
-
             direction="row"
-
-            spacing={2}
-
-            justifyContent={{
-
-              xs: 'flex-end',
-
-              sm: 'center',
-
-              md: 'center',
-
-              lg: 'center',
-
-              xl: 'center',
-
-            }}
-
+            spacing={1.5}
+            justifyContent={{ xs: 'flex-end', md: 'center' }}
+            alignItems="center"
           >
-
             <Tooltip title={t('jobPost.filters.reset')} arrow>
-
               <IconButton
-
                 aria-label={t('jobPostFilterForm.label.refresh', 'refresh')}
-
                 onClick={() => {
-
                   reset();
-
                   handleFilter(defaultValues);
-
                 }}
-
+                sx={{ 
+                  borderRadius: 2,
+                  bgcolor: 'action.selected',
+                  '&:hover': { bgcolor: 'action.hover' }
+                }}
               >
-
-                <RefreshIcon />
-
+                <RefreshIcon sx={{ fontSize: 20 }} />
               </IconButton>
-
             </Tooltip>
-
             <Button
-
-              sx={{ color: 'white' }}
-
               variant="contained"
-
               color="secondary"
-
               type="submit"
-
               startIcon={<SearchIcon />}
-
+              sx={{ 
+                borderRadius: 2.5, 
+                px: 4, 
+                py: 1,
+                fontWeight: 900,
+                textTransform: 'none',
+                boxShadow: (theme: any) => theme.customShadows?.secondary,
+                minWidth: 120
+              }}
             >
-
               {t('jobPost.filters.search')}
-
             </Button>
-
           </Stack>
-
         </Grid>
-
       </Grid>
-
     </form>
-
   );
-
 };
 
 export default JobPostFilterForm;

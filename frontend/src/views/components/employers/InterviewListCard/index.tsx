@@ -1,6 +1,17 @@
 'use client';
-import React, { useMemo, useState } from 'react';
-import { Box, Typography, Button, Chip, IconButton, Stack, Divider, LinearProgress, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
+import React, { useMemo } from 'react';
+import { 
+    Box, 
+    Typography, 
+    Button, 
+    Chip, 
+    IconButton, 
+    Stack, 
+    Tooltip,
+    Paper,
+    alpha,
+    useTheme
+} from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
@@ -14,15 +25,16 @@ import { formatRoute } from '../../../../utils/funcUtils';
 import { useInterviewSessions, useInterviewMutations } from '../hooks/useEmployerQueries';
 import { useDataTable } from '../../../../hooks';
 import toastMessages from '../../../../utils/toastMessages';
-import { InterviewSession } from '@/types/models';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
+import { confirmModal } from '../../../../utils/sweetalert2Modal';
 
 interface InterviewListCardProps {
   title?: string;
 }
 
 const InterviewListCard = ({ title }: InterviewListCardProps) => {
-    const { t } = useTranslation(['interview', 'common']);
+    const { t } = useTranslation(['interview', 'common', 'employer']);
+    const theme = useTheme();
     const displayTitle = title || t('interview:interviewListCard.title');
 
     const {
@@ -30,231 +42,308 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
         pageSize,
         onPaginationChange,
         pagination,
-    } = useDataTable({ initialPageSize: 10 });
+        sorting,
+        onSortingChange,
+        ordering
+    } = useDataTable({ 
+        initialSorting: [{ id: 'scheduledAt', desc: true }],
+        initialPageSize: 10 
+    });
 
     const queryParams = useMemo(() => ({
         page: page + 1,
         pageSize: pageSize,
-    }), [page, pageSize]);
+        ordering: ordering
+    }), [page, pageSize, ordering]);
 
-    // Polling logic: Refetch every 10s if we have active sessions
+    // Polling logic: Refetch every 10s to keep session statuses updated
     const { data: queryData, isLoading: isQueryLoading } = useInterviewSessions(queryParams, 10000);
     const { deleteSession, updateStatus, isMutating } = useInterviewMutations();
 
     const sessions = queryData?.results || [];
     const count = queryData?.count || 0;
 
-    const [deleteDialog, setDeleteDialog] = useState<{ open: boolean, id: string | number | null }>({ open: false, id: null });
-    const [cancelDialog, setCancelDialog] = useState<{ open: boolean, id: string | number | null, roomName: string | null }>({ open: false, id: null, roomName: null });
-
-    const handleDelete = async () => {
-        if (!deleteDialog.id) return;
-        try {
-            await deleteSession(deleteDialog.id);
-            toastMessages.success(t('interview:interviewListCard.messages.deleteSuccess'));
-            setDeleteDialog({ open: false, id: null });
-        } catch (error) {
-            toastMessages.error(t('interview:interviewListCard.messages.deleteError'));
-        }
+    const handleDelete = (id: string | number) => {
+        confirmModal(
+            async () => {
+                try {
+                    await deleteSession(id);
+                    toastMessages.success(t('interview:interviewListCard.messages.deleteSuccess'));
+                } catch (error) {
+                    // Error handled by mutation hook
+                }
+            },
+            t('interview:interviewListCard.confirmDeleteTitle'),
+            t('interview:interviewListCard.confirmDeleteMessage'),
+            'warning'
+        );
     };
 
-    const handleCancel = async () => {
-        if (!cancelDialog.roomName) return;
-        try {
-            await updateStatus({ roomName: cancelDialog.roomName, status: 'cancelled' });
-            toastMessages.success(t('interview:interviewListCard.messages.cancelSuccess'));
-            setCancelDialog({ open: false, id: null, roomName: null });
-        } catch (error) {
-            toastMessages.error(t('interview:interviewListCard.messages.cancelError'));
-        }
+    const handleCancel = (roomName: string) => {
+        confirmModal(
+            async () => {
+                try {
+                    await updateStatus({ roomName, status: 'cancelled' });
+                    toastMessages.success(t('interview:interviewListCard.messages.cancelSuccess'));
+                } catch (error) {
+                    // Error handled by mutation hook
+                }
+            },
+            t('interview:interviewListCard.confirmCancelTitle'),
+            t('interview:interviewListCard.confirmCancelMessage'),
+            'warning'
+        );
     };
 
-    const getStatusColor = (status: string): "success" | "primary" | "info" | "error" | "default" => {
+    const getStatusColor = (status: string): "success" | "primary" | "info" | "error" | "warning" | "default" => {
         switch (status) {
             case 'completed': return 'success';
             case 'in_progress': return 'primary';
             case 'scheduled': return 'info';
             case 'cancelled': return 'error';
+            case 'processing': return 'warning';
             default: return 'default';
         }
     };
 
-    const columns = useMemo<any>(() => [
+    const columns = useMemo(() => [
         {
             header: t('interview:interviewListCard.candidate'),
             accessorKey: 'candidateName',
+            enableSorting: true,
             cell: ({ row }: any) => (
                 <Box>
-                    <Typography variant="body2" sx={{ fontWeight: 600 }}>{row.original.candidateName}</Typography>
-                    <Typography variant="caption" color="text.secondary">{row.original.candidateEmail || '---'}</Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 900, color: 'text.primary', mb: 0.25 }}>
+                        {row.original.candidateName || '---'}
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, opacity: 0.8 }}>
+                        {row.original.candidateEmail || '---'}
+                    </Typography>
                 </Box>
             ),
         },
         {
             header: t('interview:interviewListCard.position'),
             accessorKey: 'jobName',
-            cell: ({ getValue }: any) => <Typography variant="body2">{String(getValue() || '---')}</Typography>,
+            enableSorting: true,
+            cell: ({ getValue }: any) => (
+                <Typography variant="body2" noWrap sx={{ fontWeight: 800, color: 'primary.main', maxWidth: 200 }}>
+                    {String(getValue() || '---')}
+                </Typography>
+            ),
         },
         {
             header: t('interview:interviewListCard.time'),
             accessorKey: 'scheduledAt',
+            enableSorting: true,
             cell: ({ getValue }: any) => (
-                <Typography variant="body2">
-                    {getValue() ? new Date(getValue()).toLocaleString() : '---'}
+                <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
+                    {getValue() ? new Date(getValue()).toLocaleString('vi-VN', { 
+                        year: 'numeric', 
+                        month: '2-digit', 
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    }) : '---'}
                 </Typography>
             ),
         },
         {
             header: t('interview:interviewListCard.status'),
             accessorKey: 'status',
-            cell: ({ getValue }: any) => (
-                <Chip
-                    label={t(`interview:interviewListCard.statuses.${getValue()}`, { defaultValue: (getValue() as string)?.replaceAll('_', ' ')?.toUpperCase() })}
-                    color={getStatusColor(getValue() as string)}
-                    size="small"
-                    sx={{ fontWeight: 'bold' }}
-                />
-            ),
+            cell: ({ getValue }: any) => {
+                const status = getValue() as string;
+                const statusColor = getStatusColor(status);
+                return (
+                    <Chip
+                        label={t(`interview:interviewListCard.statuses.${status}`, { 
+                            defaultValue: status?.replaceAll('_', ' ')?.toUpperCase() || '---' 
+                        })}
+                        size="small"
+                        sx={{ 
+                            fontWeight: 900, 
+                            borderRadius: 1.5, 
+                            textTransform: 'uppercase',
+                            fontSize: '0.7rem',
+                            letterSpacing: '0.5px',
+                            bgcolor: statusColor === 'default' ? alpha(theme.palette.action.disabled, 0.08) : alpha(theme.palette[statusColor].main, 0.08),
+                            color: statusColor === 'default' ? 'text.secondary' : `${statusColor}.main`,
+                            border: '1px solid',
+                            borderColor: statusColor === 'default' ? alpha(theme.palette.action.disabled, 0.1) : alpha(theme.palette[statusColor].main, 0.1),
+                        }}
+                    />
+                );
+            },
         },
         {
             header: t('interview:interviewListCard.aiScore'),
-            accessorKey: 'ai_overall_score',
-            cell: ({ row }: any) => (
-                row.original.ai_overall_score ? (
-                    <Typography color="primary" sx={{ fontWeight: 'bold' }}>{row.original.ai_overall_score}/10</Typography>
-                ) : (
-                    <Typography variant="caption" color="text.secondary">
-                        {row.original.status === 'completed' ? t('interview:interviewListCard.grading') : '-'}
+            accessorKey: 'aiOverallScore',
+            meta: { align: 'center' },
+            cell: ({ row }: any) => {
+                const score = row.original.ai_overall_score || row.original.aiOverallScore;
+                if (score) {
+                    return (
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Typography color="secondary" sx={{ fontWeight: 900, fontSize: '1.1rem' }}>
+                                {score}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary" sx={{ ml: 0.5, fontWeight: 800 }}>
+                                /10
+                            </Typography>
+                        </Box>
+                    );
+                }
+                return (
+                    <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic', fontWeight: 700 }}>
+                        {row.original.status === 'completed' ? t('interview:interviewListCard.grading') : '---'}
                     </Typography>
-                )
-            ),
+                );
+            },
         },
         {
-            header: '',
+            header: t('common:actions'),
             id: 'actions',
-            cell: ({ row }: any) => (
-                <Stack direction="row" spacing={1} justifyContent="flex-end">
-                    <IconButton
-                        component={Link}
-                        href={`/${formatRoute(ROUTES.EMPLOYER.INTERVIEW_DETAIL, String(row.original.id))}`}
-                        color="primary"
-                        size="small"
-                        title={t('common:view')}
-                        sx={{ bgcolor: 'primary.background', '&:hover': { bgcolor: 'primary.backgroundHover' } }}
-                    >
-                        <VisibilityIcon fontSize="small" />
-                    </IconButton>
+            meta: { align: 'right' },
+            cell: ({ row }: any) => {
+                const session = row.original;
+                const canEdit = ['draft', 'scheduled'].includes(session.status);
+                const canCancel = session.status === 'scheduled';
 
-                    {['draft', 'scheduled'].includes(row.original.status) && (
-                        <IconButton
-                            component={Link}
-                            href={`/${formatRoute(ROUTES.EMPLOYER.INTERVIEW_EDIT, String(row.original.id))}`}
-                            color="info"
-                            size="small"
-                            title={t('interview:interviewListCard.editInterview')}
-                            sx={{ bgcolor: 'info.background', '&:hover': { bgcolor: 'info.backgroundHover' } }}
-                        >
-                            <EditIcon fontSize="small" />
-                        </IconButton>
-                    )}
+                return (
+                    <Stack direction="row" spacing={1} justifyContent="flex-end">
+                        <Tooltip title={t('common:view')} arrow>
+                            <IconButton
+                                component={Link}
+                                href={`/${formatRoute(ROUTES.EMPLOYER.INTERVIEW_DETAIL, String(session.id))}`}
+                                color="primary"
+                                size="small"
+                                sx={{ 
+                                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                                    borderRadius: 1.5,
+                                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.12) }
+                                }}
+                            >
+                                <VisibilityIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
 
-                    {row.original.status === 'scheduled' && (
-                        <IconButton
-                            onClick={() => setCancelDialog({ open: true, id: row.original.id, roomName: row.original.roomName })}
-                            color="warning"
-                            size="small"
-                            title={t('interview:interviewListCard.cancelInterview')}
-                            sx={{ bgcolor: 'warning.background', '&:hover': { bgcolor: 'warning.backgroundHover' } }}
-                        >
-                            <BlockIcon fontSize="small" />
-                        </IconButton>
-                    )}
+                        {canEdit && (
+                            <Tooltip title={t('interview:interviewListCard.editInterview')} arrow>
+                                <IconButton
+                                    component={Link}
+                                    href={`/${formatRoute(ROUTES.EMPLOYER.INTERVIEW_EDIT, String(session.id))}`}
+                                    color="info"
+                                    size="small"
+                                    sx={{ 
+                                        bgcolor: alpha(theme.palette.info.main, 0.06),
+                                        borderRadius: 1.5,
+                                        '&:hover': { bgcolor: alpha(theme.palette.info.main, 0.12) }
+                                    }}
+                                >
+                                    <EditIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        )}
 
-                    <IconButton
-                        onClick={() => setDeleteDialog({ open: true, id: row.original.id })}
-                        color="error"
-                        size="small"
-                        title={t('interview:interviewListCard.deleteInterview')}
-                        sx={{ bgcolor: 'error.background', '&:hover': { bgcolor: 'error.backgroundHover' } }}
-                    >
-                        <DeleteIcon fontSize="small" />
-                    </IconButton>
-                </Stack>
-            ),
+                        {canCancel && (
+                            <Tooltip title={t('interview:interviewListCard.cancelInterview')} arrow>
+                                <IconButton
+                                    onClick={() => handleCancel(session.roomName)}
+                                    color="warning"
+                                    size="small"
+                                    sx={{ 
+                                        bgcolor: alpha(theme.palette.warning.main, 0.06),
+                                        borderRadius: 1.5,
+                                        '&:hover': { bgcolor: alpha(theme.palette.warning.main, 0.12) }
+                                    }}
+                                >
+                                    <BlockIcon fontSize="small" />
+                                </IconButton>
+                            </Tooltip>
+                        )}
+
+                        <Tooltip title={t('interview:interviewListCard.deleteInterview')} arrow>
+                            <IconButton
+                                onClick={() => handleDelete(session.id)}
+                                color="error"
+                                size="small"
+                                sx={{ 
+                                    bgcolor: alpha(theme.palette.error.main, 0.06),
+                                    borderRadius: 1.5,
+                                    '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.12) }
+                                }}
+                            >
+                                <DeleteIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    </Stack>
+                );
+            },
         },
-    ], [t]);
+    ], [t, theme.palette]);
 
     return (
-        <Box sx={{ px: { xs: 1, sm: 2 }, py: { xs: 2, sm: 2 }, backgroundColor: 'background.paper', borderRadius: 2 }}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent="space-between" spacing={{ xs: 2, sm: 0 }} mb={4}>
-                <Typography variant="h5" sx={{ fontWeight: 600, fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-                    {displayTitle}
-                </Typography>
+        <Paper 
+            elevation={0}
+            sx={{ 
+                p: { xs: 3, sm: 5 }, 
+                backgroundColor: 'background.paper', 
+                borderRadius: 4, 
+                boxShadow: (theme: any) => theme.customShadows?.z1,
+                border: '1px solid',
+                borderColor: 'divider'
+            }}
+        >
+            <Stack 
+                direction={{ xs: 'column', sm: 'row' }} 
+                alignItems={{ xs: 'flex-start', sm: 'center' }} 
+                justifyContent="space-between" 
+                spacing={3} 
+                mb={6}
+            >
+                <Box>
+                    <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px' }}>
+                        {displayTitle}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, mt: 0.5, opacity: 0.8 }}>
+                        {t('interview:interviewListCard.description', { count })}
+                    </Typography>
+                </Box>
                 <Button
                     variant="contained"
                     color="primary"
                     startIcon={<AddIcon />}
                     component={Link}
                     href={`/${ROUTES.EMPLOYER.INTERVIEW_CREATE}`}
-                    sx={{ borderRadius: 2, px: 3, boxShadow: 'none' }}
+                    sx={{ 
+                        borderRadius: 3, 
+                        px: 4, 
+                        py: 1.5,
+                        boxShadow: (theme: any) => theme.customShadows?.primary, 
+                        fontWeight: 900, 
+                        textTransform: 'none',
+                        fontSize: '0.95rem'
+                    }}
                 >
                     {t('interview:interviewListCard.scheduleInterview')}
                 </Button>
             </Stack>
 
-            {isQueryLoading ? (
-                <Box sx={{ width: '100%', mb: 2 }}>
-                    <LinearProgress />
-                </Box>
-            ) : (
-                <Divider sx={{ mb: 2 }} />
-            )}
-
-            <Box sx={{ backgroundColor: 'background.paper', borderRadius: 2, overflow: 'hidden', width: '100%' }}>
-                <DataTable
-                    columns={columns}
-                    data={sessions}
-                    isLoading={isQueryLoading}
-                    rowCount={count}
-                    pagination={pagination}
-                    onPaginationChange={onPaginationChange as any}
-                    emptyMessage={t('interview:interviewListCard.noInterviews')}
-                />
-            </Box>
-
-            {/* Confirmation Dialogs */}
-            <Dialog open={deleteDialog.open} onClose={() => !isMutating && setDeleteDialog({ open: false, id: null })}>
-                <DialogTitle>{t('interview:interviewListCard.confirmDeleteTitle')}</DialogTitle>
-                <DialogContent>
-                    <Typography>{t('interview:interviewListCard.confirmDeleteMessage')}</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setDeleteDialog({ open: false, id: null })} disabled={isMutating}>
-                        {t('common:cancel')}
-                    </Button>
-                    <Button onClick={handleDelete} color="error" variant="contained" disabled={isMutating}>
-                        {isMutating ? <CircularProgress size={24} /> : t('common:confirm')}
-                    </Button>
-                </DialogActions>
-            </Dialog>
-
-            <Dialog open={cancelDialog.open} onClose={() => !isMutating && setCancelDialog({ open: false, id: null, roomName: null })}>
-                <DialogTitle>{t('interview:interviewListCard.confirmCancelTitle')}</DialogTitle>
-                <DialogContent>
-                    <Typography>{t('interview:interviewListCard.confirmCancelMessage')}</Typography>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setCancelDialog({ open: false, id: null, roomName: null })} disabled={isMutating}>
-                        {t('common:cancel')}
-                    </Button>
-                    <Button onClick={handleCancel} color="warning" variant="contained" disabled={isMutating}>
-                        {isMutating ? <CircularProgress size={24} /> : t('common:confirm')}
-                    </Button>
-                </DialogActions>
-            </Dialog>
+            <DataTable
+                columns={columns as any}
+                data={sessions}
+                isLoading={isQueryLoading}
+                rowCount={count}
+                pagination={pagination}
+                onPaginationChange={onPaginationChange as any}
+                enableSorting
+                sorting={sorting}
+                onSortingChange={onSortingChange as any}
+                emptyMessage={t('interview:interviewListCard.noInterviews')}
+            />
 
             {isMutating && <BackdropLoading />}
-        </Box>
+        </Paper>
     );
 };
 
