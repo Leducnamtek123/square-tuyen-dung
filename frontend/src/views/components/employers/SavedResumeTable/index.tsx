@@ -190,7 +190,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
                     minWidth: 100, 
                     borderRadius: 2,
                     fontWeight: 900,
-                    boxShadow: (theme: any) => theme.customShadows?.z1,
+                    boxShadow: (theme) => theme.customShadows?.z1,
                     '&:hover': { bgcolor: 'error.dark' }
                 }}
                 startIcon={<FavoriteIcon fontSize="small" />}

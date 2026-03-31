@@ -1,28 +1,29 @@
 import React from 'react';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { Box, InputAdornment, OutlinedInput, Typography } from "@mui/material";
+import { SxProps, Theme } from '@mui/material/styles';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ValidationError from '../ValidationError';
 
-interface Props {
+interface Props<T extends FieldValues = FieldValues> {
   name: string;
-  control: Control<any>;
+  control: Control<T>;
   title?: string | null;
   showRequired?: boolean;
   placeholder?: string;
-  sx?: any;
+  sx?: SxProps<Theme>;
 }
 
-const PasswordTextFieldCustom = ({
+const PasswordTextFieldCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
   title = null,
   showRequired = false,
   placeholder = '',
   sx = {},
-}: Props) => {
+}: Props<T>) => {
 
   const [showPassword, setShowPassword] = React.useState(false);
 
@@ -48,7 +49,7 @@ const PasswordTextFieldCustom = ({
 
       <Controller
 
-        name={name}
+        name={name as Path<T>}
 
         control={control}
 

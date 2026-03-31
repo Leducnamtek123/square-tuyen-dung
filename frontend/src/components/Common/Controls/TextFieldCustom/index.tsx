@@ -1,13 +1,14 @@
 import React from 'react';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { InputAdornment, TextField, Typography } from "@mui/material";
+import { SxProps, Theme } from '@mui/material/styles';
 import ValidationError from '../ValidationError';
 
-interface Props {
+interface Props<T extends FieldValues = FieldValues> {
   name: string;
-  control: Control<any>;
+  control: Control<T>;
   title?: string | null;
   showRequired?: boolean;
   placeholder?: string;
@@ -15,10 +16,10 @@ interface Props {
   disabled?: boolean;
   icon?: React.ReactNode;
   type?: string;
-  sx?: any;
+  sx?: SxProps<Theme>;
 }
 
-const TextFieldCustom = ({
+const TextFieldCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
   title = null,
@@ -29,13 +30,13 @@ const TextFieldCustom = ({
   icon = null,
   type = 'text',
   sx = {},
-}: Props) => {
+}: Props<T>) => {
 
   // Format display number with comma
 
-  const formatDisplay = (value: any) => {
+  const formatDisplay = (value: unknown) => {
     if (type !== 'number' || !value) return value;
-    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   };
 
   return (
@@ -49,9 +50,7 @@ const TextFieldCustom = ({
       )}
 
       <Controller
-
-        name={name}
-
+        name={name as Path<T>}
         control={control}
 
         render={({ field, fieldState }) => (

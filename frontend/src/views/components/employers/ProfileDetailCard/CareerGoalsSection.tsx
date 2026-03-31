@@ -3,8 +3,10 @@ import { Box, Typography, Paper, Stack, alpha, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 
+import { ResumeDetailResponse } from '@/types/models';
+
 interface CareerGoalsSectionProps {
-  profileDetail: any;
+  profileDetail: ResumeDetailResponse;
 }
 
 const CareerGoalsSection: React.FC<CareerGoalsSectionProps> = ({ profileDetail }) => {

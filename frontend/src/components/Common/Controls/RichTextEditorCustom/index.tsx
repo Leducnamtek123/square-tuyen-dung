@@ -2,7 +2,7 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 import { EditorState } from 'draft-js';
 import { Typography } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -19,19 +19,19 @@ const DraftEditor = dynamic(
   { ssr: false }
 );
 
-interface Props {
-  control: Control<any>;
+interface Props<T extends FieldValues = FieldValues> {
+  control: Control<T>;
   name: string;
   title?: string;
   showRequired?: boolean;
 }
 
-const RichTextEditorCustom = ({
+const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
   control,
   name,
   title = '',
   showRequired = false,
-}: Props) => {
+}: Props<T>) => {
   return (
     <div>
       {title && (
@@ -42,8 +42,8 @@ const RichTextEditorCustom = ({
 
       <Controller
         control={control}
-        name={name}
-        defaultValue={EditorState.createEmpty()}
+        name={name as Path<T>}
+        defaultValue={EditorState.createEmpty() as unknown as undefined}
         render={({ field, fieldState }) => {
           const safeEditorState = field.value?.getCurrentContent
             ? field.value

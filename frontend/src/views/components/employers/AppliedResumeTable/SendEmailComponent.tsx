@@ -3,9 +3,11 @@ import { Button, Tooltip, alpha, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
 import MarkEmailReadRoundedIcon from '@mui/icons-material/MarkEmailReadRounded';
+import { AxiosError } from 'axios';
+import { ApiError } from '../../../../types/api';
 
 import { convertEditorStateToHTMLString } from '../../../../utils/editorUtils';
-import SendMailCard from '../SendMailCard';
+import SendMailCard, { SendMailData, SendMailFormData } from '../SendMailCard';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 import toastMessages from '../../../../utils/toastMessages';
@@ -28,7 +30,7 @@ const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
   const theme = useTheme();
   const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
   const [openSendMailPopup, setOpenSendMailPopup] = useState(false);
-  const [sendMailData, setSendMailData] = useState<any>(null);
+  const [sendMailData, setSendMailData] = useState<SendMailData | null>(null);
   const [sentEmail, setSentEmail] = useState(isSentEmail);
 
   useEffect(() => {
@@ -43,7 +45,7 @@ const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
     setOpenSendMailPopup(true);
   };
 
-  const handleSendEmail = async (data: any) => {
+  const handleSendEmail = async (data: SendMailFormData) => {
     setIsFullScreenLoading(true);
     try {
       const newData = {
@@ -54,8 +56,8 @@ const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
       setSentEmail(true);
       setOpenSendMailPopup(false);
       toastMessages.success(t('appliedResume.email.sentSuccess'));
-    } catch (error: any) {
-      errorHandling(error);
+    } catch (error: unknown) {
+      errorHandling(error as AxiosError<{ errors?: ApiError }>);
     } finally {
       setIsFullScreenLoading(false);
     }

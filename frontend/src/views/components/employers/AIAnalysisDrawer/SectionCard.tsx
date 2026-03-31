@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, Stack, Box, Typography, alpha, useTheme } from '@mui/material';
+import { Paper, Stack, Box, Typography, alpha, useTheme, Theme } from '@mui/material';
 
 export const SectionCard: React.FC<{
   title: string;
@@ -23,7 +23,7 @@ export const SectionCard: React.FC<{
         transition: 'all 0.2s ease-in-out',
         '&:hover': { 
             borderColor: theme.palette.primary.main,
-            boxShadow: (theme: any) => theme.customShadows?.z1
+            boxShadow: (theme: Theme) => theme.customShadows?.z1
         },
       }}
     >

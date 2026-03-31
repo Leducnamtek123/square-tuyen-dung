@@ -3,15 +3,17 @@ import { Box, Typography, Stack, Paper, Divider, LinearProgress, alpha, useTheme
 import { useTranslation } from 'react-i18next';
 import TranslateIcon from '@mui/icons-material/Translate';
 
+import { ResumeDetailResponse } from '@/types/models';
+
 interface LanguageSectionProps {
-  profileDetail: any;
+  profileDetail: ResumeDetailResponse;
 }
 
 const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
     const { t } = useTranslation(['employer', 'common']);
     const theme = useTheme();
 
-    if (!(profileDetail?.languageDetails?.length > 0)) return null;
+    if (!(profileDetail?.languageDetails && profileDetail.languageDetails.length > 0)) return null;
 
     return (
         <Box>
@@ -40,11 +42,11 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
                     border: '1px solid',
                     borderColor: 'divider',
                     bgcolor: 'background.paper',
-                    boxShadow: (theme: any) => theme.customShadows?.z1
+                    boxShadow: (theme) => theme.customShadows?.z1
                 }}
             >
                 <Stack spacing={4}>
-                    {profileDetail.languageDetails.map((value: any, index: number) => (
+                    {(profileDetail.languageDetails || []).map((value: Record<string, string | number>, index: number) => (
                         <Box key={value.id || index}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main' }}>
@@ -69,7 +71,7 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
                             
                             <LinearProgress 
                                 variant="determinate" 
-                                value={value?.point || 0} 
+                                value={Number(value?.point || 0)} 
                                 sx={{ 
                                     height: 8, 
                                     borderRadius: 4,
@@ -81,7 +83,7 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
                                 }} 
                             />
                             
-                            {index < profileDetail.languageDetails.length - 1 && (
+                            {index < (profileDetail.languageDetails?.length || 0) - 1 && (
                                 <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: alpha(theme.palette.divider, 0.8) }} />
                             )}
                         </Box>

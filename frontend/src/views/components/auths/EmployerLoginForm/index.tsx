@@ -17,8 +17,8 @@ export interface EmployerLoginFormData {
 
 interface EmployerLoginFormProps {
   onLogin: (data: EmployerLoginFormData) => void;
-  onFacebookLogin?: (result: any) => void;
-  onGoogleLogin: (result: any) => void;
+  onFacebookLogin?: (result: Record<string, unknown>) => void;
+  onGoogleLogin: (result: Record<string, unknown>) => void;
 }
 
 
@@ -136,7 +136,7 @@ const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: Employer
       email: "",
       password: "",
     },
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<EmployerLoginFormData>,
   });
 
   const googleLogin = useGoogleLogin({

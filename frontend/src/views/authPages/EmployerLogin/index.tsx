@@ -177,7 +177,7 @@ const EmployerLogin = () => {
         toastMessages.error(t('messages.loginError'));
       }
     } catch (error) {
-      const axiosError = error as AxiosError<any>;
+      const axiosError = error as AxiosError<{ errors?: Record<string, string[]> }>;
       const res = axiosError?.response;
 
       if (res?.status === 400) {

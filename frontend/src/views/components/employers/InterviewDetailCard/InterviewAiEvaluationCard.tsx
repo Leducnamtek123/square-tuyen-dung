@@ -3,10 +3,11 @@ import { Box, Button, Chip, CircularProgress, Divider, Paper, Stack, Typography,
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import { InterviewSession } from '@/types/models';
+import { TFunction } from 'i18next';
 
 interface InterviewAiEvaluationCardProps {
   session: InterviewSession;
-  t: (key: string, options?: any) => string;
+  t: TFunction;
   onTriggerAi: () => void;
 }
 
@@ -26,7 +27,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                     : `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.05)} 0%, ${alpha(theme.palette.background.paper, 1)} 100%)`,
                 border: '1px solid',
                 borderColor: 'divider',
-                boxShadow: (theme: any) => theme.customShadows?.z1,
+                boxShadow: (theme) => theme.customShadows?.z1,
                 position: 'relative',
                 overflow: 'hidden'
             }}
@@ -194,7 +195,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                                     sx={{ 
                                         borderRadius: 3, 
                                         fontWeight: 900, 
-                                        boxShadow: (theme: any) => theme.customShadows?.primary,
+                                        boxShadow: (theme) => theme.customShadows?.primary,
                                         px: 6,
                                         py: 2,
                                         textTransform: 'none',

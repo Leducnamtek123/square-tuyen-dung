@@ -6,10 +6,12 @@ import PersonIcon from '@mui/icons-material/Person';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import { InterviewSession } from '@/types/models';
 
+import { i18n, TFunction } from 'i18next';
+
 interface InterviewTranscriptPanelProps {
   session: InterviewSession;
-  t: (key: string, options?: any) => string;
-  i18n: any;
+  t: TFunction;
+  i18n: i18n;
 }
 
 const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n }) => {
@@ -28,7 +30,7 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                 maxHeight: 1200,
                 border: '1px solid',
                 borderColor: 'divider',
-                boxShadow: (theme: any) => theme.customShadows?.z1,
+                boxShadow: (theme) => theme.customShadows?.z1,
                 bgcolor: 'background.paper',
                 position: 'relative',
                 overflow: 'hidden'
@@ -79,7 +81,7 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                                         width: 44, 
                                         height: 44, 
                                         bgcolor: isInterviewer ? 'primary.main' : 'secondary.main',
-                                        boxShadow: (theme: any) => isInterviewer ? theme.customShadows?.primary : theme.customShadows?.secondary,
+                                        boxShadow: (theme) => isInterviewer ? theme.customShadows?.primary : theme.customShadows?.secondary,
                                         border: '2.5px solid',
                                         borderColor: isInterviewer ? alpha(theme.palette.primary.light, 0.5) : alpha(theme.palette.secondary.light, 0.5)
                                     }}>
@@ -105,7 +107,7 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                                                 borderRadius: isInterviewer ? '0px 20px 20px 20px' : '20px 0px 20px 20px',
                                                 border: '1px solid',
                                                 borderColor: isInterviewer ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.divider, 0.5),
-                                                boxShadow: (theme: any) => isInterviewer ? 'none' : theme.customShadows?.z1
+                                                boxShadow: (theme) => isInterviewer ? 'none' : theme.customShadows?.z1
                                             }}
                                         >
                                             <Typography variant="body2" sx={{ lineHeight: 2, color: 'text.primary', fontWeight: 700, fontSize: '0.95rem' }}>

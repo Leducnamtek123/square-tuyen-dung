@@ -58,14 +58,14 @@ const ProfileSearch: React.FC = () => {
     }, [resumeFilter, reset]);
 
     const handleFilter = (data: ProfileSearchValues) => {
-        dispatch(searchResume(data as any));
+        dispatch(searchResume(data as unknown as Parameters<typeof searchResume>[0]));
     };
 
     const handleReset = () => {
         dispatch(resetSearchResume());
     };
 
-    const FilterGroup = ({ label, icon: Icon, name, options, placeholder }: { label: string, icon: any, name: keyof ProfileSearchValues, options: any[], placeholder: string }) => (
+    const FilterGroup = ({ label, icon: Icon, name, options, placeholder }: { label: string, icon: React.ElementType, name: keyof ProfileSearchValues, options: React.ComponentProps<typeof SingleSelectCustom>['options'], placeholder: string }) => (
         <Stack spacing={1.5}>
             <Typography variant="caption" sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 1.5, fontSize: '0.7rem' }}>
                 <Icon sx={{ marginRight: 1, color: 'primary.main', fontSize: 18 }} />
@@ -100,7 +100,7 @@ const ProfileSearch: React.FC = () => {
                         bgcolor: 'background.paper', 
                         border: '1px solid', 
                         borderColor: 'divider',
-                        boxShadow: (theme: any) => theme.customShadows?.z1
+                        boxShadow: (theme) => theme.customShadows?.z1
                     }}
                 >
                     <Grid container spacing={2} component="form" onSubmit={handleSubmit(handleFilter)} alignItems="center">
@@ -150,7 +150,7 @@ const ProfileSearch: React.FC = () => {
                                 sx={{ 
                                     height: 56, 
                                     borderRadius: 3.5, 
-                                    boxShadow: (theme: any) => theme.customShadows?.primary,
+                                    boxShadow: (theme) => theme.customShadows?.primary,
                                     fontWeight: 900,
                                     fontSize: '1rem',
                                     textTransform: 'none',
@@ -173,7 +173,7 @@ const ProfileSearch: React.FC = () => {
                         borderRadius: 4, 
                         border: '1px solid', 
                         borderColor: 'divider',
-                        boxShadow: (theme: any) => theme.customShadows?.z1
+                        boxShadow: (theme) => theme.customShadows?.z1
                     }}
                 >
                     <Stack spacing={4}>

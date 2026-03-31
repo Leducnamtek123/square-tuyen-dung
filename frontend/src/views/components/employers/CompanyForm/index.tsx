@@ -40,7 +40,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   const { t } = useTranslation('employer');
   const { allConfig } = useConfig();
   const [districtOptions, setDistrictOptions] = useState<SelectOption[]>([]);
-  const [locationOptions, setLocationOptions] = useState<Record<string, unknown>[]>([]);
+  const [locationOptions, setLocationOptions] = useState<SelectOption[]>([]);
 
   const schema = yup.object().shape({
     companyName: yup.string().required(t('companyForm.validation.companyNameRequired', 'Company name is required.')).max(255, t('common:validation.max255')),
@@ -108,7 +108,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
       try {
         const resData = await goongService.getPlaces(input);
         if ((resData as Record<string, unknown>).predictions) {
-            setLocationOptions((resData as Record<string, unknown>).predictions as Record<string, unknown>[]);
+            setLocationOptions((resData as Record<string, unknown>).predictions as SelectOption[]);
         }
       } catch (error) {
           // Silent fail for autocomplete
@@ -135,10 +135,10 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
     }
   }, [serverErrors, setError, clearErrors]);
 
-  const handleSelectLocation = async (e: React.SyntheticEvent, value: Record<string, unknown> | null) => {
-    if (!value || typeof value !== 'object' || !value.place_id) return;
+  const handleSelectLocation = async (e: React.SyntheticEvent, value: string | SelectOption | null) => {
+    if (!value || typeof value !== 'object' || !('place_id' in value)) return;
     try {
-      const resData = await goongService.getPlaceDetailByPlaceId(value.place_id as string);
+      const resData = await goongService.getPlaceDetailByPlaceId((value as Record<string, unknown>).place_id as string);
       const resultObj = (resData as Record<string, unknown>)?.result as Record<string, unknown> | undefined;
       const geometryObj = resultObj?.geometry as Record<string, unknown> | undefined;
       if (!geometryObj?.location) return;

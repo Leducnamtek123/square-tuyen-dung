@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { Stack, Alert, Box, Button, Typography } from "@mui/material";
 
@@ -10,19 +10,19 @@ import FileUploadIcon from '@mui/icons-material/FileUpload';
 
 import FilePresentIcon from '@mui/icons-material/FilePresent';
 
-interface Props {
-  control: Control<any>;
+interface Props<T extends FieldValues = FieldValues> {
+  control: Control<T>;
   name: string;
   title?: string;
   showRequired?: boolean;
 }
 
-const FileUploadCustom = ({
+const FileUploadCustom = <T extends FieldValues = FieldValues>({
   control,
   name,
   title = '',
   showRequired = false,
-}: Props) => {
+}: Props<T>) => {
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const inputRef = React.useRef<HTMLInputElement | null>(null);
 
@@ -227,7 +227,7 @@ const FileUploadCustom = ({
 
       <Controller
 
-        name={name}
+        name={name as Path<T>}
 
         control={control}
 

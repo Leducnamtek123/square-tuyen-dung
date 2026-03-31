@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
-import { Box, IconButton, Typography, Stack, Chip, Skeleton, Tooltip } from "@mui/material";
+import { Box, IconButton, Typography, Stack, Chip, Skeleton, Tooltip, Theme } from "@mui/material";
 import HelpIcon from '@mui/icons-material/Help';
 import StarOutlineIcon from '@mui/icons-material/StarOutline';
 import StarIcon from '@mui/icons-material/Star';
@@ -54,11 +54,11 @@ const ProfileUploadCard = ({
 
         borderRadius: 2,
 
-        boxShadow: (theme: any) => theme.customShadows.card,
+        boxShadow: (theme: Theme) => theme.customShadows.card,
         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: (theme: any) => theme.customShadows.large,
+          boxShadow: (theme: Theme) => theme.customShadows.large,
         }
 
       }}

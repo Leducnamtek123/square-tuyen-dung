@@ -17,7 +17,7 @@ import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 
 interface OptionType {
   id: string | number;
-  name?: string;
+  name: string;
   description?: string;
   [key: string]: unknown;
 }

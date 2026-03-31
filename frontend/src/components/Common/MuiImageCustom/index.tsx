@@ -6,11 +6,11 @@ interface MuiImageCustomProps {
   loading?: 'lazy' | 'eager';
   src: string | StaticImageData | null | undefined;
   fallbackSrc?: string | StaticImageData;
-  onError?: (event: any) => void;
-  [key: string]: any;
+  onError?: (event: Record<string, unknown>) => void;
+  [key: string]: unknown;
 }
 
-const ImageWithLoading = Image as any;
+const ImageWithLoading = Image as React.ElementType;
 
 const resolveSrc = (src: string | StaticImageData | null | undefined): string => {
   if (!src) return '';
@@ -36,7 +36,7 @@ const MuiImageCustom = (props: MuiImageCustomProps) => {
   }, [src, resolvedFallback]);
 
   const handleError = React.useCallback(
-    (event: any) => {
+    (event: Record<string, unknown>) => {
       if (resolvedFallback && imageSrc !== resolvedFallback) {
         setImageSrc(resolvedFallback);
       }

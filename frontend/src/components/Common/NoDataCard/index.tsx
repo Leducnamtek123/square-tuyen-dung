@@ -40,7 +40,7 @@ const NoDataCard = ({
         {imgComponentSgv ? (
           imgComponentSgv
         ) : (
-          <SvgIcon src={(SVG_IMAGES as any)[svgKey]} />
+          <SvgIcon src={SVG_IMAGES[svgKey as keyof typeof SVG_IMAGES]} />
         )}
       </Box>
       <Typography variant="h6" align="center">

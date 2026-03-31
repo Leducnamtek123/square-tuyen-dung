@@ -1,22 +1,25 @@
 import React from 'react';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { Autocomplete, TextField, Typography } from "@mui/material";
+import { SxProps, Theme } from '@mui/material/styles';
 import { useTranslation } from 'react-i18next';
 import ValidationError from '../ValidationError';
 
-interface Props {
+import type { SelectOption } from '@/types/models';
+
+interface Props<T extends FieldValues = FieldValues> {
   name: string;
-  control: Control<any>;
-  options?: any[];
+  control: Control<T>;
+  options?: SelectOption[];
   title?: string | null;
   showRequired?: boolean;
   placeholder?: string;
-  sx?: any;
+  sx?: SxProps<Theme>;
 }
 
-const SingleSelectCustom = ({
+const SingleSelectCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
   options = [],
@@ -24,7 +27,7 @@ const SingleSelectCustom = ({
   showRequired = false,
   placeholder = '',
   sx = {},
-}: Props) => {
+}: Props<T>) => {
   const { t } = useTranslation('common');
 
   return (
@@ -40,9 +43,7 @@ const SingleSelectCustom = ({
       )}
 
       <Controller
-
-        name={name}
-
+        name={name as Path<T>}
         control={control}
 
         render={({ field, fieldState }) => (

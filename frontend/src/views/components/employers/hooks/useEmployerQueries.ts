@@ -15,7 +15,7 @@ import { PaginatedResponse } from '@/types/api';
 import { JobPost, JobPostActivity, Resume, ResumeSaved, InterviewSession, Question, QuestionGroup } from '@/types/models';
 
 // ─── Types ───────────────────────────────────────────────────
-export type UseEmployerGeneralStatsResult = UseQueryResult<any>; // Define more specific type if available in statisticService
+export type UseEmployerGeneralStatsResult = UseQueryResult<Record<string, unknown>>; // Define more specific type if available in statisticService
 export type UseSavedResumesResult = UseQueryResult<PaginatedResponse<ResumeSaved>>;
 export type UseAppliedResumesResult = UseQueryResult<PaginatedResponse<JobPostActivity>>;
 export type UseEmployerResumesResult = UseQueryResult<PaginatedResponse<Resume>>;
@@ -98,14 +98,14 @@ export const useJobPostMutations = () => {
   const queryClient = useQueryClient();
 
   const addMutation = useMutation({
-    mutationFn: (data: any) => jobService.addJobPost(data),
+    mutationFn: (data: Record<string, unknown>) => jobService.addJobPost(data as unknown as Parameters<typeof jobService.addJobPost>[0]),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerJobPosts'] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: any }) => jobService.updateJobPostById(id, data),
+    mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> }) => jobService.updateJobPostById(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerJobPosts'] });
     },
@@ -145,7 +145,7 @@ export const useToggleSaveResume = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['savedResumes'] });
     },
-    onError: (error: any) => errorHandling(error),
+    onError: (error: unknown) => errorHandling(error as AxiosError<Record<string, unknown>>),
   });
 
   return {
@@ -172,9 +172,9 @@ export const useJobPostOptions = () => {
   return useQuery({
     queryKey: ['jobPostOptions'],
     queryFn: async (): Promise<JobPostOption[]> => {
-       // Casting to any because jobService might not have explicit type for getJobPostOptions in current context
-      const response = await (jobService as any).getJobPostOptions();
-      return (response as JobPostOption[]) || [];
+      const getOptions = (jobService as Record<string, unknown>).getJobPostOptions as unknown as () => Promise<JobPostOption[]>;
+      const response = await getOptions();
+      return response || [];
     },
     staleTime: 5 * 60_000,
   });
@@ -205,7 +205,7 @@ export const useUpdateApplicationStatus = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
     },
-    onError: (error: any) => errorHandling(error),
+    onError: (error: unknown) => errorHandling(error as AxiosError<Record<string, unknown>>),
   });
 
   return {
@@ -234,7 +234,7 @@ export const useToggleSaveResumeOptimistic = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerResumes'] });
     },
-    onError: (error: any) => errorHandling(error),
+    onError: (error: unknown) => errorHandling(error as AxiosError<Record<string, unknown>>),
   });
 
   return {
@@ -253,7 +253,7 @@ export const useResumeDetail = (slug: string) => {
 };
 
 // ─── Interview Management ────────────────────────────────────
-export const useInterviewSessions = (params: any, refetchInterval?: number | false): UseInterviewSessionsResult => {
+export const useInterviewSessions = (params: Record<string, unknown>, refetchInterval?: number | false): UseInterviewSessionsResult => {
   return useQuery({
     queryKey: ['interviewSessions', params],
     queryFn: () => interviewService.getSessions(params),
@@ -274,14 +274,14 @@ export const useInterviewMutations = () => {
   const queryClient = useQueryClient();
 
   const scheduleMutation = useMutation({
-    mutationFn: (data: any) => interviewService.scheduleSession(data),
+    mutationFn: (data: Record<string, unknown>) => interviewService.scheduleSession(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewSessions'] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: any }) => interviewService.updateSession(id, data),
+    mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> }) => interviewService.updateSession(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewSessions'] });
       queryClient.invalidateQueries({ queryKey: ['interviewDetail'] });
@@ -296,7 +296,7 @@ export const useInterviewMutations = () => {
   });
 
   const statusMutation = useMutation({
-    mutationFn: ({ roomName, status }: { roomName: any; status: string }) => interviewService.updateSessionStatus(roomName, status),
+    mutationFn: ({ roomName, status }: { roomName: string | number; status: string }) => interviewService.updateSessionStatus(roomName, status),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewSessions'] });
       queryClient.invalidateQueries({ queryKey: ['interviewDetail'] });
@@ -304,11 +304,11 @@ export const useInterviewMutations = () => {
   });
 
   const evaluationMutation = useMutation({
-    mutationFn: (data: any) => interviewService.submitEvaluation(data),
+    mutationFn: (data: Record<string, unknown>) => interviewService.submitEvaluation(data as unknown as Parameters<typeof interviewService.submitEvaluation>[0]),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewDetail'] });
     },
-    onError: (error: any) => errorHandling(error),
+    onError: (error: unknown) => errorHandling(error as AxiosError<Record<string, unknown>>),
   });
 
   return {
@@ -322,7 +322,7 @@ export const useInterviewMutations = () => {
 };
 
 // ─── Questions & Groups ──────────────────────────────────────
-export const useEmployerQuestions = (params: any): UseEmployerQuestionsResult => {
+export const useEmployerQuestions = (params: Record<string, unknown>): UseEmployerQuestionsResult => {
   return useQuery({
     queryKey: ['employerQuestions', params],
     queryFn: () => questionService.getQuestions(params),
@@ -330,7 +330,7 @@ export const useEmployerQuestions = (params: any): UseEmployerQuestionsResult =>
   });
 };
 
-export const useQuestionGroups = (params: any): UseQuestionGroupsResult => {
+export const useQuestionGroups = (params: Record<string, unknown>): UseQuestionGroupsResult => {
   return useQuery({
     queryKey: ['questionGroups', params],
     queryFn: () => questionGroupService.getQuestionGroups(params),
@@ -342,14 +342,14 @@ export const useQuestionMutations = () => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (data: any) => questionService.createQuestion(data),
+    mutationFn: (data: Record<string, unknown>) => questionService.createQuestion(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerQuestions'] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: any }) => questionService.updateQuestion(id, data),
+    mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> }) => questionService.updateQuestion(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerQuestions'] });
     },
@@ -374,14 +374,14 @@ export const useQuestionGroupMutations = () => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (data: any) => questionGroupService.createQuestionGroup(data),
+    mutationFn: (data: Record<string, unknown>) => questionGroupService.createQuestionGroup(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['questionGroups'] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: any }) => questionGroupService.updateQuestionGroup(id, data),
+    mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> }) => questionGroupService.updateQuestionGroup(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['questionGroups'] });
     },
@@ -414,7 +414,7 @@ export const useCompanyMutations = () => {
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: any }) => companyService.updateCompany(id, data),
+    mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> | FormData }) => companyService.updateCompany(id, data as unknown as Parameters<typeof companyService.updateCompany>[1]),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companyProfile'] });
     },

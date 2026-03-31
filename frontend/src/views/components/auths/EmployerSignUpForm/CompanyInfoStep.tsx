@@ -8,15 +8,16 @@ import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/
 import type { Control } from 'react-hook-form';
 import type { TFunction } from 'i18next';
 import type { EmployerSignUpFormData } from './index';
+import type { SelectOption } from '@/types/models';
 
 interface CompanyInfoStepProps {
   control: Control<EmployerSignUpFormData>;
   t: TFunction<string | string[], undefined>;
   show: boolean;
-  allConfig: { employeeSizeOptions?: Record<string, unknown>[]; cityOptions?: Record<string, unknown>[] } | null;
-  districtOptions: Record<string, unknown>[];
-  locationOptions: Record<string, unknown>[];
-  handleSelectLocation: (e: React.SyntheticEvent, value: Record<string, unknown> | null) => void;
+  allConfig: { employeeSizeOptions?: SelectOption[]; cityOptions?: SelectOption[] } | null;
+  districtOptions: SelectOption[];
+  locationOptions: SelectOption[];
+  handleSelectLocation: (e: React.SyntheticEvent, value: string | SelectOption | null) => void;
 }
 
 const CompanyInfoStep: React.FC<CompanyInfoStepProps> = ({

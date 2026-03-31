@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Paper, Stack, Button, useTheme, alpha } from "@mui/material";
+import { Box, Paper, Stack, Button, useTheme, alpha, Theme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -42,7 +42,7 @@ const ProfileDetailPage = () => {
           border: '1px solid',
           borderColor: 'divider',
           bgcolor: 'background.paper',
-          boxShadow: (theme as any).customShadows?.z1
+          boxShadow: (theme as Theme).customShadows?.z1
         }}
       >
         <ProfileDetailCard />

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Card, Stack, Typography } from "@mui/material";
+import { Box, Card, Stack, Typography, Theme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Grid2 as Grid } from "@mui/material";
 
@@ -57,7 +57,7 @@ const SupportPage = () => {
           variant="h3"
           sx={{
             mb: 2,
-            background: (theme: any) => theme.palette.primary.main,
+            background: (theme: Theme) => theme.palette.primary.main,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 700,
@@ -117,7 +117,7 @@ const SupportPage = () => {
           variant="h4"
           sx={{
             mb: 3,
-            background: (theme: any) => theme.palette.primary.main,
+            background: (theme: Theme) => theme.palette.primary.main,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 700,

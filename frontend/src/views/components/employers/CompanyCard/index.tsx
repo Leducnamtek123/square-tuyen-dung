@@ -1,6 +1,6 @@
 'use client';
 import React, { useCallback, useRef, useState, useMemo } from 'react';
-import { Box, Button, Stack, Typography, Paper, Divider } from '@mui/material';
+import { Box, Button, Stack, Typography, Paper, Divider, Theme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
 import CameraAltOutlinedIcon from '@mui/icons-material/CameraAltOutlined';
@@ -55,10 +55,10 @@ const CompanyCard = () => {
         ...formData,
         description: convertEditorStateToHTMLString(formData.description as import('draft-js').EditorState),
       };
-      await updateCompany({ id: company.id, data: payload as any });
+      await updateCompany({ id: company.id, data: payload as Parameters<typeof updateCompany>[0]['data'] });
       toastMessages.success(t('companyProfile.success.update'));
     } catch (error) {
-      errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as any);
+      errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as Parameters<typeof errorHandling>[1]);
     }
   }, [company?.id, updateCompany, t]);
 
@@ -107,7 +107,7 @@ const CompanyCard = () => {
             borderRadius: 4, 
             border: '1px solid',
             borderColor: 'divider',
-            boxShadow: (theme: any) => theme.customShadows?.z1 
+            boxShadow: (theme: Theme) => theme.customShadows?.z1 
         }}
     >
       <Typography variant="h4" sx={{ fontWeight: 900, mb: 4, color: 'text.primary', letterSpacing: '-0.5px' }}>
@@ -127,9 +127,9 @@ const CompanyCard = () => {
                         height={140}
                         sx={{
                             borderRadius: 4,
-                            border: (theme: any) => `1px solid ${theme.palette.divider}`,
+                            border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
                             backgroundColor: 'grey.50',
-                            boxShadow: (theme: any) => theme.customShadows?.z1
+                            boxShadow: (theme: Theme) => theme.customShadows?.z1
                         }}
                     />
                     <Button
@@ -142,7 +142,7 @@ const CompanyCard = () => {
                             mt: 2, 
                             borderRadius: 2.5, 
                             textTransform: 'none', 
-                            boxShadow: (theme: any) => theme.customShadows?.secondary,
+                            boxShadow: (theme: Theme) => theme.customShadows?.secondary,
                             width: '100%',
                             fontWeight: 900,
                             color: 'white'
@@ -164,9 +164,9 @@ const CompanyCard = () => {
                         width="100%"
                         sx={{
                             borderRadius: 4,
-                            border: (theme: any) => `1px solid ${theme.palette.divider}`,
+                            border: (theme: Theme) => `1px solid ${theme.palette.divider}`,
                             backgroundColor: 'grey.50',
-                            boxShadow: (theme: any) => theme.customShadows?.z1
+                            boxShadow: (theme: Theme) => theme.customShadows?.z1
                         }}
                         fit="cover"
                     />
@@ -180,7 +180,7 @@ const CompanyCard = () => {
                             mt: 2, 
                             borderRadius: 2.5, 
                             textTransform: 'none', 
-                            boxShadow: (theme: any) => theme.customShadows?.secondary,
+                            boxShadow: (theme: Theme) => theme.customShadows?.secondary,
                             fontWeight: 900,
                             color: 'white'
                         }}
@@ -196,7 +196,7 @@ const CompanyCard = () => {
         <Box>
             <CompanyForm
                 handleUpdate={handleUpdate}
-                editData={editData as any}
+                editData={editData as Parameters<typeof CompanyForm>[0]['editData']}
                 serverErrors={serverErrors}
             />
             <Box sx={{ mt: 6, display: 'flex', justifyContent: 'flex-end' }}>
@@ -211,7 +211,7 @@ const CompanyCard = () => {
                         py: 1.5,
                         borderRadius: 3,
                         fontWeight: 900,
-                        boxShadow: (theme: any) => theme.customShadows?.primary,
+                        boxShadow: (theme: Theme) => theme.customShadows?.primary,
                         textTransform: 'none',
                         fontSize: '1rem',
                         '&:hover': { bgcolor: 'primary.dark' },

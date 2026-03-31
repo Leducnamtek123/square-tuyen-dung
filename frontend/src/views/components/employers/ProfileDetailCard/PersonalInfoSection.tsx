@@ -14,8 +14,10 @@ import { tConfig } from '../../../../utils/tConfig';
 import InfoItem from './InfoItem';
 import { useConfig } from '@/hooks/useConfig';
 
+import { ResumeDetailResponse } from '@/types/models';
+
 interface PersonalInfoSectionProps {
-  profileDetail: any;
+  profileDetail: ResumeDetailResponse;
 }
 
 const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail }) => {
@@ -53,14 +55,14 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.phone')} 
-                        value={profileDetail?.jobSeekerProfile?.phone} 
+                        value={profileDetail?.jobSeekerProfile?.phone as string} 
                         icon={<PhoneIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.gender')} 
-                        value={tConfig((allConfig as any)?.genderDict?.[profileDetail?.jobSeekerProfile?.gender])} 
+                        value={tConfig(allConfig?.genderDict?.[profileDetail?.jobSeekerProfile?.gender as string | number])} 
                         icon={<GenderIcon />}
                     />
                 </Grid>
@@ -74,28 +76,28 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.maritalStatus')} 
-                        value={tConfig((allConfig as any)?.maritalStatusDict?.[profileDetail?.jobSeekerProfile?.maritalStatus])} 
+                        value={tConfig(allConfig?.maritalStatusDict?.[profileDetail?.jobSeekerProfile?.maritalStatus as string | number])} 
                         icon={<FamilyIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.cityProvince')} 
-                        value={tConfig((allConfig as any)?.cityDict?.[profileDetail?.jobSeekerProfile?.location?.city])} 
+                        value={tConfig(allConfig?.cityDict?.[(profileDetail?.jobSeekerProfile?.location as Record<string, string>)?.city as string])} 
                         icon={<LocationIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.district')} 
-                        value={profileDetail?.jobSeekerProfile?.location?.districtDict?.name} 
+                        value={((profileDetail?.jobSeekerProfile?.location as unknown as Record<string, unknown>)?.districtDict as Record<string, string>)?.name} 
                         icon={<LocationIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.address')} 
-                        value={profileDetail?.jobSeekerProfile?.location?.address} 
+                        value={(profileDetail?.jobSeekerProfile?.location as unknown as Record<string, string>)?.address} 
                         icon={<HomeIcon />}
                     />
                 </Grid>

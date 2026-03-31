@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Stack, Typography } from "@mui/material";
+import { Card, Stack, Typography, Theme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Grid2 as Grid } from "@mui/material";
 
@@ -27,7 +27,7 @@ const SettingPage = () => {
                   variant="h5"
                   sx={{
                     fontWeight: 600,
-                    background: (theme: any) => theme.palette.primary.main,
+                    background: (theme: Theme) => theme.palette.primary.main,
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     fontSize: { xs: "1.25rem", sm: "1.5rem" },

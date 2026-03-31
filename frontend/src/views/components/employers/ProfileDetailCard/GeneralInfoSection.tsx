@@ -20,15 +20,15 @@ type ConfigDict = Record<string, string>;
 
 export interface GeneralInfoProfileExt extends Partial<JobSeekerProfile> {
   title?: string;
-  position?: string;
-  academicLevel?: string;
-  experience?: string;
-  career?: string;
-  city?: string;
-  salaryMin?: number;
-  salaryMax?: number;
-  typeOfWorkplace?: string;
-  jobType?: string;
+  position?: string | number | null;
+  academicLevel?: string | number | null;
+  experience?: string | number | null;
+  career?: import('../../../../types/models').Career | string | number | null;
+  city?: import('../../../../types/models').City | string | number | null;
+  salaryMin?: number | string | null;
+  salaryMax?: number | string | null;
+  typeOfWorkplace?: string | number | null;
+  jobType?: string | number | null;
 }
 
 interface GeneralInfoSectionProps {

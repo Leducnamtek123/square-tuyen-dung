@@ -126,7 +126,7 @@ const SavedResumeFilterForm: React.FC<SavedResumeFilterFormProps> = ({ handleFil
                 borderRadius: 2.5,
                 fontWeight: 900,
                 textTransform: 'none',
-                boxShadow: (theme: any) => theme.customShadows?.secondary,
+                boxShadow: (theme) => theme.customShadows?.secondary,
                 '&:hover': { bgcolor: 'secondary.dark' }
               }}
             >

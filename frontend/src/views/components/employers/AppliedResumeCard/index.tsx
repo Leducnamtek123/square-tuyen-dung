@@ -37,12 +37,15 @@ import { useDataTable } from '../../../../hooks';
 import { useConfig } from '@/hooks/useConfig';
 import type { AxiosError } from 'axios';
 import type { ApiError } from '../../../../types/api';
+import type { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
+
+import { AppliedResumeFilterData } from '../AppliedResumeFilterForm';
 
 interface AppliedResumeCardProps {
   title: string;
 }
 
-const defaultFilterData = {
+const defaultFilterData: AppliedResumeFilterData = {
   cityId: '',
   careerId: '',
   experienceId: '',
@@ -100,7 +103,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     return Object.values(filterData).filter(v => v !== '').length;
   }, [filterData]);
 
-  const handleFilter = useCallback((data: typeof defaultFilterData) => {
+  const handleFilter = useCallback((data: AppliedResumeFilterData) => {
     setOpenPopup(false);
     setFilterData({ ...data });
     onPaginationChange({ pageIndex: 0, pageSize });
@@ -161,7 +164,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
           borderRadius: 4, 
           border: '1px solid',
           borderColor: 'divider',
-          boxShadow: (theme: any) => theme.customShadows?.z1,
+          boxShadow: (theme) => theme.customShadows?.z1,
           bgcolor: 'background.paper'
         }}
       >
@@ -189,7 +192,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
                 borderRadius: 3, 
                 px: 4, 
                 py: 1.25,
-                boxShadow: (theme: any) => theme.customShadows?.primary, 
+                boxShadow: (theme) => theme.customShadows?.primary, 
                 fontWeight: 900,
                 textTransform: 'none'
               }}
@@ -263,14 +266,14 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                   <Autocomplete
                       getOptionLabel={(option) => option.name}
-                      value={(allConfig?.applicationStatusOptions as any[])?.find(o => String(o.id) === applicationStatusSelect) || null}
+                      value={allConfig?.applicationStatusOptions?.find(o => String(o.id) === applicationStatusSelect) || null}
                       onChange={(e, value) => {
                           setApplicationStatusSelect(value?.id ? String(value.id) : '');
                           onPaginationChange({ pageIndex: 0, pageSize });
                       }}
                       disablePortal
                       size="small"
-                      options={(allConfig?.applicationStatusOptions as any[]) || []}
+                      options={allConfig?.applicationStatusOptions || []}
                       renderInput={(params) => (
                           <TextField 
                               {...params} 
@@ -356,9 +359,9 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
           isLoading={isLoading}
           rowCount={count}
           pagination={pagination}
-          onPaginationChange={onPaginationChange as any}
+          onPaginationChange={onPaginationChange as OnChangeFn<PaginationState>}
           sorting={sorting}
-          onSortingChange={onSortingChange as any}
+          onSortingChange={onSortingChange as OnChangeFn<SortingState>}
           handleChangeApplicationStatus={handleChangeApplicationStatus}
           handleDelete={handleDelete}
         />

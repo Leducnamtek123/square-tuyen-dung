@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Card, Stack, Typography, Button } from "@mui/material";
+import { Box, Card, Stack, Typography, Button, Theme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Grid2 as Grid } from "@mui/material";
 
@@ -50,7 +50,7 @@ const PricingPage = () => {
           variant="h3"
           sx={{
             mb: 2,
-            background: (theme: any) => theme.palette.primary.main,
+            background: (theme: Theme) => theme.palette.primary.main,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 700,

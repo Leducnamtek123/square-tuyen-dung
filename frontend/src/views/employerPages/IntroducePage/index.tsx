@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Card, Stack, Typography } from "@mui/material";
+import { Box, Card, Stack, Typography, Theme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { Grid2 as Grid } from "@mui/material";
 
@@ -64,7 +64,7 @@ const IntroducePage = () => {
           variant="h3"
           sx={{
             mb: 2,
-            background: (theme: any) => theme.palette.primary.main,
+            background: (theme: Theme) => theme.palette.primary.main,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 700,
@@ -103,7 +103,7 @@ const IntroducePage = () => {
                 transition: "all 0.3s ease-in-out",
                 "&:hover": {
                   transform: "translateY(-6px)",
-                  boxShadow: (theme: any) => theme.customShadows.card,
+                  boxShadow: (theme: Theme) => theme.customShadows.card,
                   borderColor: "primary.light",
                 },
               }}
@@ -128,7 +128,7 @@ const IntroducePage = () => {
           sx={{
             mb: 4,
             textAlign: "center",
-            background: (theme: any) => theme.palette.primary.main,
+            background: (theme: Theme) => theme.palette.primary.main,
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             fontWeight: 700,

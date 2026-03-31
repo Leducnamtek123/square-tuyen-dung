@@ -1,8 +1,7 @@
 import React from 'react';
 
-interface Props {
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
   src: string;
-  [key: string]: any;
 }
 
 const SvgIcon = ({ src, ...props }: Props) => {

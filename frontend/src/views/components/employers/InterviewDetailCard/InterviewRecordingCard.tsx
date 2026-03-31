@@ -3,9 +3,11 @@ import { Box, Button, Divider, Paper, Typography, Stack, alpha, useTheme } from 
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
+import { TFunction } from 'i18next';
+
 interface InterviewRecordingCardProps {
   recordingUrl: string | null;
-  t: any;
+  t: TFunction;
 }
 
 const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordingUrl, t }) => {
@@ -20,7 +22,7 @@ const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordi
                 borderRadius: 4,
                 border: '1px solid',
                 borderColor: 'divider',
-                boxShadow: (theme: any) => theme.customShadows?.z1,
+                boxShadow: (theme) => theme.customShadows?.z1,
                 bgcolor: 'background.paper',
                 position: 'relative',
                 overflow: 'hidden'
@@ -46,7 +48,7 @@ const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordi
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        boxShadow: (theme: any) => theme.customShadows?.z12,
+                        boxShadow: (theme) => theme.customShadows?.z12,
                         border: '1px solid',
                         borderColor: alpha(theme.palette.common.white, 0.1)
                     }}

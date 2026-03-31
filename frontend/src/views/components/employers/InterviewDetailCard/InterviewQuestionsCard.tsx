@@ -3,10 +3,11 @@ import { Box, Divider, Paper, Typography, Stack, Chip, alpha, useTheme } from '@
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import QuizIcon from '@mui/icons-material/Quiz';
 import { InterviewSession } from '@/types/models';
+import { TFunction } from 'i18next';
 
 interface InterviewQuestionsCardProps {
   session: InterviewSession;
-  t: (key: string, options?: any) => string;
+  t: TFunction;
 }
 
 const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session, t }) => {
@@ -21,7 +22,7 @@ const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session
                 borderRadius: 4,
                 border: '1px solid',
                 borderColor: 'divider',
-                boxShadow: (theme: any) => theme.customShadows?.z1,
+                boxShadow: (theme) => theme.customShadows?.z1,
                 bgcolor: 'background.paper',
                 position: 'relative',
                 overflow: 'hidden'
@@ -65,7 +66,7 @@ const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session
                                     bgcolor: alpha(theme.palette.primary.main, 0.02),
                                     borderColor: alpha(theme.palette.primary.main, 0.2),
                                     transform: 'translateX(4px)',
-                                    boxShadow: (theme: any) => theme.customShadows?.z8
+                                    boxShadow: (theme) => theme.customShadows?.z8
                                 },
                                 transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
                             }}
@@ -83,14 +84,14 @@ const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session
                                         color: 'primary.contrastText',
                                         fontWeight: 900,
                                         fontSize: '0.85rem',
-                                        boxShadow: (theme: any) => theme.customShadows?.primary,
+                                        boxShadow: (theme) => theme.customShadows?.primary,
                                         flexShrink: 0
                                     }} 
                                 >
                                     {idx + 1}
                                 </Box>
                                 <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 1.8, pt: 0.5 }}>
-                                    {q.text || q.questionText || (q as any).content}
+                                    {q.text || q.questionText || q.content}
                                 </Typography>
                             </Stack>
                         </Box>

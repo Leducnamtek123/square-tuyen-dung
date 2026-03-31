@@ -1,33 +1,34 @@
 import React from 'react';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import Radio from '@mui/material/Radio';
 
 import RadioGroup from '@mui/material/RadioGroup';
 
 import FormControlLabel from '@mui/material/FormControlLabel';
+import type { SelectOption } from '@/types/models';
 
 import { FormLabel, Typography } from "@mui/material";
 
 import FormControl from '@mui/material/FormControl';
 import ValidationError from '../ValidationError';
 
-interface Props {
+interface Props<T extends FieldValues = FieldValues> {
   name: string;
-  control: Control<any>;
+  control: Control<T>;
   title?: string;
   showRequired?: boolean;
-  options?: any[];
+  options?: SelectOption[];
 }
 
-const RadioCustom = ({
+const RadioCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
   title = '',
   showRequired = false,
   options = [],
-}: Props) => {
+}: Props<T>) => {
 
   return (
 
@@ -35,7 +36,7 @@ const RadioCustom = ({
 
       <Controller
 
-        name={name}
+        name={name as Path<T>}
 
         control={control}
 

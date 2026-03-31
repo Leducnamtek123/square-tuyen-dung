@@ -19,6 +19,7 @@ import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import SchoolIcon from '@mui/icons-material/School';
 import SendIcon from '@mui/icons-material/Send';
 import { EvalFormType } from './index';
+import { TFunction } from 'i18next';
 
 interface InterviewHrEvaluationFormProps {
   evalForm: EvalFormType;
@@ -26,7 +27,7 @@ interface InterviewHrEvaluationFormProps {
   onSubmit: () => void;
   disabled: boolean;
   submitting: boolean;
-  t: (key: string, options?: any) => string;
+  t: TFunction;
 }
 
 const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({ evalForm, onChange, onSubmit, disabled, submitting, t }) => {
@@ -49,7 +50,7 @@ const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({ e
                 borderRadius: 4,
                 border: '1px solid',
                 borderColor: 'divider',
-                boxShadow: (theme: any) => theme.customShadows?.z1,
+                boxShadow: (theme) => theme.customShadows?.z1,
                 bgcolor: 'background.paper',
                 position: 'relative',
                 overflow: 'hidden'
@@ -179,13 +180,13 @@ const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({ e
                         borderRadius: 3, 
                         py: 2, 
                         fontWeight: 900,
-                        boxShadow: (theme: any) => theme.customShadows?.secondary,
+                        boxShadow: (theme) => theme.customShadows?.secondary,
                         textTransform: 'none',
                         fontSize: '1.1rem',
                         transition: 'all 0.25s',
                         '&:hover': {
                             transform: 'translateY(-2px)',
-                            boxShadow: (theme: any) => theme.customShadows?.secondary
+                            boxShadow: (theme) => theme.customShadows?.secondary
                         }
                     }}
                 >

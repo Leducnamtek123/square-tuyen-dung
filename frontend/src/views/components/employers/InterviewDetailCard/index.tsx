@@ -87,7 +87,7 @@ const InterviewDetailCard = () => {
                 attitudeScore: Number(evalForm.attitude_score),
                 professionalScore: Number(evalForm.professional_score),
                 overallScore: (Number(evalForm.attitude_score) + Number(evalForm.professional_score)) / 2,
-                result: evalForm.result as any,
+                result: evalForm.result,
                 comments: evalForm.comments,
                 proposedSalary: Number(evalForm.proposed_salary),
             });
@@ -182,7 +182,7 @@ const InterviewDetailCard = () => {
     }
 
     const canJoinLiveRoom = session.status !== 'cancelled' && session.status !== 'completed';
-    const recordingUrl = session.recordingUrl || (session as any).recording_url || null;
+    const recordingUrl = session.recordingUrl || session.recording_url || null;
     const statusColor = getStatusColor(session.status);
 
     return (
@@ -192,7 +192,7 @@ const InterviewDetailCard = () => {
                 p: { xs: 3, sm: 6 }, 
                 backgroundColor: 'background.paper', 
                 borderRadius: 4, 
-                boxShadow: (theme: any) => theme.customShadows?.z1,
+                boxShadow: (theme) => theme.customShadows?.z1,
                 border: '1px solid',
                 borderColor: 'divider'
             }}
@@ -288,7 +288,7 @@ const InterviewDetailCard = () => {
                             sx={{ 
                                 borderRadius: 3, 
                                 minWidth: { xs: '100%', md: 280 }, 
-                                boxShadow: (theme: any) => theme.customShadows?.primary, 
+                                boxShadow: (theme) => theme.customShadows?.primary, 
                                 fontWeight: 900,
                                 py: 2,
                                 px: 4,
@@ -297,7 +297,7 @@ const InterviewDetailCard = () => {
                                 transition: 'all 0.2s',
                                 '&:hover': {
                                     transform: 'translateY(-2px)',
-                                    boxShadow: (theme: any) => theme.customShadows?.primary
+                                    boxShadow: (theme) => theme.customShadows?.primary
                                 },
                                 '&.Mui-disabled': {
                                     bgcolor: 'action.disabledBackground',

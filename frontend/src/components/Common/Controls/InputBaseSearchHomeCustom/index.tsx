@@ -14,7 +14,7 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import ClearIcon from '@mui/icons-material/Clear';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { Box, ClickAwayListener, List, ListItem, ListItemIcon, ListItemText, Popper, Stack, Typography } from "@mui/material";
 
@@ -32,21 +32,21 @@ import jobService from '@/services/jobService';
 
 import { ROUTES } from '@/configs/constants';
 
-interface Props {
+interface Props<T extends FieldValues = FieldValues> {
   name: string;
-  control: Control<any>;
+  control: Control<T>;
   placeholder?: string;
   showSubmitButton?: boolean;
   location?: 'HOME' | string;
 }
 
-const InputBaseSearchHomeCustom = ({
+const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
   placeholder,
   showSubmitButton = false,
   location = 'HOME',
-}: Props) => {
+}: Props<T>) => {
   const theme = useTheme();
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const inputSearchRef = React.useRef<HTMLDivElement | null>(null);
@@ -122,7 +122,7 @@ const InputBaseSearchHomeCustom = ({
           <SearchIcon color="disabled" />
 
           <Controller
-            name={name}
+            name={name as Path<T>}
             control={control}
             render={({ field }) => (
               <InputBase

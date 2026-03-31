@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 
@@ -13,19 +13,20 @@ import dayjs from '@/configs/moment-config';
 import { Typography, Box, SxProps, Theme } from "@mui/material";
 
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import type { Dayjs } from 'dayjs';
 
-interface Props {
+interface Props<T extends FieldValues = FieldValues> {
     name: string;
-    control: Control<any>;
+    control: Control<T>;
     title?: string | null;
     showRequired?: boolean;
-    minDateTime?: any;
-    maxDateTime?: any;
+    minDateTime?: Dayjs | string | null;
+    maxDateTime?: Dayjs | string | null;
     fullWidth?: boolean;
     sx?: SxProps<Theme>;
 }
 
-const DateTimePickerCustom = ({
+const DateTimePickerCustom = <T extends FieldValues = FieldValues>({
     name,
     control,
     title = null,
@@ -34,9 +35,9 @@ const DateTimePickerCustom = ({
     maxDateTime = null,
     fullWidth = true,
     sx = {},
-}: Props) => {
+}: Props<T>) => {
 
-    const parseDate = (date: any) => {
+    const parseDate = (date: Dayjs | string | null | undefined) => {
         if (!date) return undefined;
         try {
             const parsedDate = dayjs(date);
@@ -64,7 +65,7 @@ const DateTimePickerCustom = ({
 
                 <Controller
 
-                    name={name}
+                    name={name as Path<T>}
 
                     control={control}
 

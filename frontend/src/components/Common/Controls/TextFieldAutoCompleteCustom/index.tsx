@@ -1,25 +1,26 @@
 import React from 'react';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { Autocomplete, TextField, Typography } from "@mui/material";
+import { SxProps, Theme } from '@mui/material/styles';
 import ValidationError from '../ValidationError';
-
-interface Props {
+import type { SelectOption } from '@/types/models';
+interface Props<T extends FieldValues = FieldValues> {
   name: string;
-  control: Control<any>;
+  control: Control<T>;
   title?: string | null;
   showRequired?: boolean;
   placeholder?: string;
   disabled?: boolean;
-  options: any[];
+  options: SelectOption[];
   loading?: boolean;
-  handleSelect?: (event: any, value: any) => void;
+  handleSelect?: (event: React.SyntheticEvent, value: string | SelectOption | null) => void;
   helperText?: string;
-  sx?: any;
+  sx?: SxProps<Theme>;
 }
 
-const TextFieldAutoCompleteCustom = ({
+const TextFieldAutoCompleteCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
   title = null,
@@ -31,7 +32,7 @@ const TextFieldAutoCompleteCustom = ({
   handleSelect,
   helperText = '',
   sx = {},
-}: Props) => {
+}: Props<T>) => {
 
   const [open, setOpen] = React.useState(false);
 
@@ -53,9 +54,9 @@ const TextFieldAutoCompleteCustom = ({
 
         control={control}
 
-        name={name}
+        name={name as Path<T>}
 
-        defaultValue=""
+        defaultValue={"" as unknown as undefined}
 
         render={({ field, fieldState }) => (
 
@@ -84,9 +85,9 @@ const TextFieldAutoCompleteCustom = ({
               }}
 
               getOptionLabel={(option) =>
-
-                option?.description || field.value || ''
-
+                typeof option === 'string'
+                  ? option
+                  : (option?.description as string) || (option?.name as string) || field.value || ''
               }
 
               options={options}

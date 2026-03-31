@@ -2,28 +2,29 @@ import React from 'react';
 
 import { useTheme } from '@mui/material/styles';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import TextField from '@mui/material/TextField';
 
 import Autocomplete from '@mui/material/Autocomplete';
 import { useTranslation } from 'react-i18next';
+import type { SelectOption } from '@/types/models';
 
-interface Props {
+interface Props<T extends FieldValues = FieldValues> {
   name: string;
-  control: Control<any>;
+  control: Control<T>;
   placeholder?: string;
-  options?: any[];
+  options?: SelectOption[];
   noOptionsText?: string;
 }
 
-const SingleSelectSearchCustom = ({
+const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
   placeholder = '',
   name,
   control,
   options = [],
   noOptionsText,
-}: Props) => {
+}: Props<T>) => {
 
   const theme = useTheme();
   const { t } = useTranslation('common');
@@ -32,7 +33,7 @@ const SingleSelectSearchCustom = ({
 
     <Controller
 
-      name={name}
+      name={name as Path<T>}
 
       control={control}
 

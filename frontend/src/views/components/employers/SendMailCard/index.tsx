@@ -11,11 +11,24 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 import RichTextEditorCustom from '../../../../components/Common/Controls/RichTextEditorCustom';
 import CheckboxCustom from '../../../../components/Common/Controls/CheckboxCustom';
 
+export interface SendMailData {
+  fullName?: string;
+  email?: string;
+}
+
+export interface SendMailFormData {
+  fullName: string;
+  email: string;
+  title: string;
+  content: EditorState;
+  isSendMe: boolean;
+}
+
 interface SendMailCardProps {
   openPopup: boolean;
   setOpenPopup: (open: boolean) => void;
-  sendMailData: any;
-  handleSendEmail: (data: any) => void;
+  sendMailData: SendMailData | null;
+  handleSendEmail: (data: SendMailFormData) => void;
 }
 
 const SendMailCard: React.FC<SendMailCardProps> = ({
@@ -42,16 +55,20 @@ const SendMailCard: React.FC<SendMailCardProps> = ({
       .required('Email subject is required.')
       .max(200, 'Email subject length exceeded.'),
     content: yup
-      .mixed()
-      .test('content', 'Email content is required.', (value: any) =>
-        value?.getCurrentContent?.()?.hasText?.()
-      ),
+      .mixed<EditorState>()
+      .test('content', 'Email content is required.', (value) => {
+        if (!value) return false;
+        return value.getCurrentContent().hasText();
+      }),
     isSendMe: yup.boolean().default(false),
   });
 
-  const { control, reset, handleSubmit } = useForm<any>({
-    resolver: yupResolver(schema),
+  const { control, reset, handleSubmit } = useForm<SendMailFormData>({
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<SendMailFormData>, // yup resolver workaround for drafted mixed types
     defaultValues: {
+      fullName: '',
+      email: '',
+      title: '',
       content: EditorState.createEmpty(),
       isSendMe: false,
     },
@@ -65,12 +82,18 @@ const SendMailCard: React.FC<SendMailCardProps> = ({
 
   React.useEffect(() => {
     if (sendMailData) {
-      reset((formValues: any) => ({
+      reset((formValues) => ({
         ...formValues,
         ...sendMailData,
       }));
     } else {
-      reset();
+      reset({
+        fullName: '',
+        email: '',
+        title: '',
+        content: EditorState.createEmpty(),
+        isSendMe: false,
+      });
     }
   }, [sendMailData, reset]);
 

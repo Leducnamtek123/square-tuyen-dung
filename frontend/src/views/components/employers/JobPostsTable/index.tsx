@@ -131,7 +131,7 @@ const JobPostsTable = ({
       cell: (info) => {
         const val = String(info.getValue() ?? '');
         const label = (allConfig?.jobPostStatusDict as Record<string, string>)?.[val] || val.toUpperCase() || '---';
-        const colorKey = ((JOB_POST_STATUS_BG_COLOR as Record<string, any>)[val]) || 'default';
+        const colorKey = ((JOB_POST_STATUS_BG_COLOR as Record<string, string>)[val]) || 'default';
         const muiColor = colorKey === 'default' ? 'default' : colorKey;
         
         return (

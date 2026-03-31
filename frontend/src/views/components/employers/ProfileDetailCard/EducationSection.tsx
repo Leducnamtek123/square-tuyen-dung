@@ -6,15 +6,17 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import TimeAgo from '../../../../components/Common/TimeAgo';
 
+import { ResumeDetailResponse } from '@/types/models';
+
 interface EducationSectionProps {
-  profileDetail: any;
+  profileDetail: ResumeDetailResponse;
 }
 
 const EducationSection: React.FC<EducationSectionProps> = ({ profileDetail }) => {
     const { t } = useTranslation(['employer', 'common']);
     const theme = useTheme();
 
-    if (!(profileDetail?.educationDetails?.length > 0)) return null;
+    if (!(profileDetail?.educationDetails && profileDetail.educationDetails.length > 0)) return null;
 
     return (
         <Box>
@@ -43,11 +45,11 @@ const EducationSection: React.FC<EducationSectionProps> = ({ profileDetail }) =>
                     border: '1px solid',
                     borderColor: 'divider',
                     bgcolor: 'background.paper',
-                    boxShadow: (theme: any) => theme.customShadows?.z1
+                    boxShadow: (theme) => theme.customShadows?.z1
                 }}
             >
                 <Stack spacing={5}>
-                    {profileDetail.educationDetails.map((value: any, index: number) => (
+                    {(profileDetail.educationDetails || []).map((value: Record<string, string | number>, index: number) => (
                         <Box key={value.id || index}>
                             <Stack spacing={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', lineHeight: 1.3 }}>
@@ -75,7 +77,7 @@ const EducationSection: React.FC<EducationSectionProps> = ({ profileDetail }) =>
                                     </Stack>
                                 </Stack>
                             </Stack>
-                            {index < profileDetail.educationDetails.length - 1 && (
+                            {index < (profileDetail.educationDetails?.length || 0) - 1 && (
                                 <Divider sx={{ mt: 5, borderStyle: 'dashed', borderColor: alpha(theme.palette.divider, 0.8) }} />
                             )}
                         </Box>

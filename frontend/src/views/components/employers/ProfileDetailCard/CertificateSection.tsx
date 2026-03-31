@@ -5,15 +5,17 @@ import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import TimeAgo from '../../../../components/Common/TimeAgo';
 
+import { ResumeDetailResponse } from '@/types/models';
+
 interface CertificateSectionProps {
-  profileDetail: any;
+  profileDetail: ResumeDetailResponse;
 }
 
 const CertificateSection: React.FC<CertificateSectionProps> = ({ profileDetail }) => {
     const { t } = useTranslation(['employer', 'common']);
     const theme = useTheme();
 
-    if (!(profileDetail?.certificateDetails?.length > 0)) return null;
+    if (!(profileDetail?.certificateDetails && profileDetail.certificateDetails.length > 0)) return null;
 
     return (
         <Box>
@@ -42,11 +44,11 @@ const CertificateSection: React.FC<CertificateSectionProps> = ({ profileDetail }
                     border: '1px solid',
                     borderColor: 'divider',
                     bgcolor: 'background.paper',
-                    boxShadow: (theme: any) => theme.customShadows?.z1
+                    boxShadow: (theme) => theme.customShadows?.z1
                 }}
             >
                 <Stack spacing={5}>
-                    {profileDetail.certificateDetails.map((value: any, index: number) => (
+                    {(profileDetail.certificateDetails || []).map((value: Record<string, string | number>, index: number) => (
                         <Box key={value.id || index}>
                             <Stack spacing={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', lineHeight: 1.3 }}>
@@ -66,7 +68,7 @@ const CertificateSection: React.FC<CertificateSectionProps> = ({ profileDetail }
                                     </Stack>
                                 </Stack>
                             </Stack>
-                            {index < profileDetail.certificateDetails.length - 1 && (
+                            {index < (profileDetail.certificateDetails?.length || 0) - 1 && (
                                 <Divider sx={{ mt: 5, borderStyle: 'dashed', borderColor: alpha(theme.palette.divider, 0.8) }} />
                             )}
                         </Box>

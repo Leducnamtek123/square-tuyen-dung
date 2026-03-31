@@ -10,9 +10,9 @@ import { ROUTES, APP_NAME } from '@/configs/constants';
 import MenuItem from './MenuItem';
 
 interface EmployerMenuProps {
-  t: any;
-  location: any;
-  expandedItems: any;
+  t: (key: string) => string;
+  location: Record<string, unknown>;
+  expandedItems: Record<string, boolean>;
   handleExpand: (section: string) => void;
 }
 

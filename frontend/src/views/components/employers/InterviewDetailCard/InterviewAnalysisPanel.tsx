@@ -6,10 +6,11 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import FeedIcon from '@mui/icons-material/Feed';
 import { InterviewSession } from '@/types/models';
+import { TFunction } from 'i18next';
 
 interface InterviewAnalysisPanelProps {
   session: InterviewSession;
-  t: (key: string, options?: any) => string;
+  t: TFunction;
 }
 
 const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session, t }) => {
@@ -32,7 +33,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                 borderRadius: 4,
                 border: '1px solid',
                 borderColor: 'divider',
-                boxShadow: (theme: any) => theme.customShadows?.z1,
+                boxShadow: (theme) => theme.customShadows?.z1,
                 bgcolor: 'background.paper',
                 position: 'relative',
                 overflow: 'hidden'
@@ -125,7 +126,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                         borderRadius: 4, 
                         borderLeft: '8px solid', 
                         borderLeftColor: 'primary.main', 
-                        boxShadow: (theme: any) => theme.customShadows?.z1,
+                        boxShadow: (theme) => theme.customShadows?.z1,
                         border: '1px solid',
                         borderColor: alpha(theme.palette.primary.main, 0.1),
                         borderLeftWidth: '8px'

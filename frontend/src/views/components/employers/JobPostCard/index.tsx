@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Button, Divider, LinearProgress, Stack, Typography, Paper, Tooltip } from "@mui/material";
+import { Box, Button, Divider, LinearProgress, Stack, Typography, Paper, Tooltip, Theme } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -18,6 +18,7 @@ import type { AxiosError } from 'axios';
 import FormPopup from '../../../../components/Common/Controls/FormPopup';
 import JobPostFilterForm from '../JobPostFilterForm';
 import JobPostForm from '../JobPostForm';
+import type { JobPostFormValues } from '../JobPostForm/JobPostSchema';
 import jobService from '../../../../services/jobService';
 import JobPostsTable from '../JobPostsTable';
 import { useDataTable } from '../../../../hooks';
@@ -88,13 +89,13 @@ const JobPostCard = () => {
     setOpenPopup(true);
   }, []);
 
-  const handleAddOrUpdate = async (formData: any) => {
+  const handleAddOrUpdate = async (formData: JobPostFormValues) => {
     setServerErrors(null);
     const payload = {
       ...formData,
-      jobDescription: convertEditorStateToHTMLString(formData.jobDescription),
-      jobRequirement: convertEditorStateToHTMLString(formData.jobRequirement),
-      benefitsEnjoyed: convertEditorStateToHTMLString(formData.benefitsEnjoyed),
+      jobDescription: convertEditorStateToHTMLString(formData.jobDescription as import('draft-js').EditorState),
+      jobRequirement: convertEditorStateToHTMLString(formData.jobRequirement as import('draft-js').EditorState),
+      benefitsEnjoyed: convertEditorStateToHTMLString(formData.benefitsEnjoyed as import('draft-js').EditorState),
     };
 
     try {
@@ -107,7 +108,7 @@ const JobPostCard = () => {
       }
       setOpenPopup(false);
     } catch (error) {
-      errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as any);
+      errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as Parameters<typeof errorHandling>[1]);
     }
   };
 
@@ -165,7 +166,7 @@ const JobPostCard = () => {
           borderRadius: 4, 
           border: '1px solid',
           borderColor: 'divider',
-          boxShadow: (theme: any) => theme.customShadows?.z1,
+          boxShadow: (theme: Theme) => theme.customShadows?.z1,
           bgcolor: 'background.paper'
         }}
       >
@@ -210,7 +211,7 @@ const JobPostCard = () => {
                 borderRadius: 3, 
                 px: 4, 
                 py: 1.25,
-                boxShadow: (theme: any) => theme.customShadows?.primary, 
+                boxShadow: (theme: Theme) => theme.customShadows?.primary, 
                 fontWeight: 900,
                 textTransform: 'none'
               }}

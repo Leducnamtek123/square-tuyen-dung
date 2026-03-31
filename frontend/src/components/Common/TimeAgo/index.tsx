@@ -2,10 +2,9 @@ import React from 'react';
 import dayjs from '@/configs/dayjs-config';
 
 interface Props {
-  date: string | number | Date | any;
+  date: string | number | Date;
   type?: 'fromNow' | 'format' | 'ago';
   format?: string;
-  [key: string]: any;
 }
 
 const TimeAgo = ({ date, type = 'fromNow', format = 'DD/MM/YYYY HH:mm' }: Props) => {

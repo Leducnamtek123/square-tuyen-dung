@@ -9,14 +9,15 @@ import type { Control } from "react-hook-form";
 import type { TFunction } from "i18next";
 import type { SystemConfig, SelectOption } from "../../../../types/models";
 
+import type { CompanyFormValues } from './index';
+
 interface CompanyFormFieldsProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  control: Control<any>;
-  t: TFunction<any, any>;
+  control: Control<CompanyFormValues>;
+  t: TFunction<"employer", undefined>;
   allConfig: SystemConfig | null;
   districtOptions: SelectOption[];
-  locationOptions: Record<string, unknown>[];
-  handleSelectLocation: (e: React.SyntheticEvent, value: Record<string, unknown> | SelectOption | string | null | any) => void;
+  locationOptions: SelectOption[];
+  handleSelectLocation: (e: React.SyntheticEvent, value: string | SelectOption | null) => void;
 }
 
 const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({

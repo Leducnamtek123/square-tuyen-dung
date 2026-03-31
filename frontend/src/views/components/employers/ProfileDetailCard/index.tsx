@@ -7,6 +7,7 @@ import BackdropLoading from "../../../../components/Common/Loading/BackdropLoadi
 import { CV_TYPES } from "../../../../configs/constants";
 import FormPopup from "../../../../components/Common/Controls/FormPopup";
 import { useResumeDetail } from "../hooks/useEmployerQueries";
+import { ResumeDetailResponse } from '@/types/models';
 
 import PersonalInfoSection from './PersonalInfoSection';
 import GeneralInfoSection from './GeneralInfoSection';
@@ -42,23 +43,23 @@ const ProfileDetailCard: React.FC = () => {
           border: '1px solid',
           borderColor: 'divider',
           bgcolor: 'background.paper',
-          boxShadow: (theme: any) => theme.customShadows?.z1
+          boxShadow: (theme) => theme.customShadows?.z1
         }}
       >
         <Stack spacing={6}>
-          <PersonalInfoSection profileDetail={profileDetail as any} />
-          <GeneralInfoSection profileDetail={profileDetail as any} />
-          <CareerGoalsSection profileDetail={profileDetail as any} />
+          <PersonalInfoSection profileDetail={profileDetail as ResumeDetailResponse} />
+          <GeneralInfoSection profileDetail={profileDetail as import('../../../../types/models').ResumeDetailResponse} />
+          <CareerGoalsSection profileDetail={profileDetail as ResumeDetailResponse} />
         </Stack>
       </Paper>
 
       {isOnlineCv ? (
         <Stack spacing={4}>
-          <ExperienceSection profileDetail={profileDetail as any} />
-          <EducationSection profileDetail={profileDetail as any} />
-          <CertificateSection profileDetail={profileDetail as any} />
-          <LanguageSection profileDetail={profileDetail as any} />
-          <AdvancedSkillSection profileDetail={profileDetail as any} />
+          <ExperienceSection profileDetail={profileDetail as ResumeDetailResponse} />
+          <EducationSection profileDetail={profileDetail as ResumeDetailResponse} />
+          <CertificateSection profileDetail={profileDetail as ResumeDetailResponse} />
+          <LanguageSection profileDetail={profileDetail as ResumeDetailResponse} />
+          <AdvancedSkillSection profileDetail={profileDetail as ResumeDetailResponse} />
         </Stack>
       ) : (
         <FormPopup

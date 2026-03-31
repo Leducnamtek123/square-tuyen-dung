@@ -3,7 +3,7 @@ import React from 'react';
 import { useDropzone, Accept } from 'react-dropzone';
 import { compressImageFiles } from '@/utils/imageCompression';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { Stack, Box, Typography, Button } from "@mui/material";
 
@@ -14,7 +14,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 interface FileDropzoneProps {
   accept?: Accept;
   onDrop: (files: File[]) => void;
-  values?: any;
+  values?: File[] | null;
 }
 
 const FileDropzone = ({ accept, onDrop, values }: FileDropzoneProps) => {
@@ -244,14 +244,14 @@ const FileDropzone = ({ accept, onDrop, values }: FileDropzoneProps) => {
 
 };
 
-interface BasicDropzoneProps {
-  control: Control<any>;
+interface BasicDropzoneProps<T extends FieldValues = FieldValues> {
+  control: Control<T>;
   name: string;
   title?: string;
   showRequired?: boolean;
 }
 
-const BasicDropzone = ({ control, name, title = '', showRequired = false }: BasicDropzoneProps) => {
+const BasicDropzone = <T extends FieldValues = FieldValues>({ control, name, title = '', showRequired = false }: BasicDropzoneProps<T>) => {
 
   return (
 
@@ -287,7 +287,7 @@ const BasicDropzone = ({ control, name, title = '', showRequired = false }: Basi
 
         <Controller
 
-          name={name}
+          name={name as Path<T>}
 
           control={control}
 

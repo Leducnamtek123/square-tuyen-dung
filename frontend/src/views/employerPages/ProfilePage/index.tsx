@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Card, Divider, Typography } from "@mui/material";
+import { Box, Card, Divider, Typography, Theme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { TabTitle } from "../../../utils/generalFunction";
 import ProfileCard from "../../components/employers/ProfileCard";
@@ -14,7 +14,7 @@ const ProfilePage = () => {
         variant="h5"
         sx={{
           fontWeight: 600,
-          background: (theme: any) => theme.palette.primary.main,
+          background: (theme: Theme) => theme.palette.primary.main,
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           fontSize: { xs: "1.25rem", sm: "1.5rem" },

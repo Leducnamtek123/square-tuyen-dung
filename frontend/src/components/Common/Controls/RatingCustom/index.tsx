@@ -1,18 +1,18 @@
 import React from 'react';
-import { Controller, Control } from 'react-hook-form';
+import { Controller, Control, FieldValues, Path } from 'react-hook-form';
 import Rating from '@mui/material/Rating';
 import Typography from '@mui/material/Typography';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
-interface RatingCustomProps {
+interface RatingCustomProps<T extends FieldValues = FieldValues> {
   name: string;
-  control: Control<any>;
+  control: Control<T>;
   title?: string | null;
   onChangeActive?: (event: React.SyntheticEvent, value: number) => void;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
-const RatingCustom = ({ name, control, title = null, onChangeActive, ...props }: RatingCustomProps) => {
+const RatingCustom = <T extends FieldValues = FieldValues>({ name, control, title = null, onChangeActive, ...props }: RatingCustomProps<T>) => {
 
   return (
 
@@ -30,9 +30,9 @@ const RatingCustom = ({ name, control, title = null, onChangeActive, ...props }:
 
       <Controller
 
-        defaultValue={5}
+        defaultValue={5 as unknown as undefined}
 
-        name={name}
+        name={name as Path<T>}
 
         control={control}
 

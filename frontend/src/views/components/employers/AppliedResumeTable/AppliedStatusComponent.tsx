@@ -4,9 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { confirmModal, errorModal } from '../../../../utils/sweetalert2Modal';
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
+import { SelectOption } from '@/types/models';
 
 export interface AppliedStatusComponentProps {
-  options: any[];
+  options: SelectOption[];
   defaultStatus: number;
   id: string;
   handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;
@@ -34,8 +35,8 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
       errorModal(
         t('appliedResume.status.errorTitle'),
         t('appliedResume.status.errorMsg', {
-          fromStatus: tConfig((allConfig as any)?.applicationStatusDict?.[applyStatus]) || '---',
-          toStatus: tConfig((allConfig as any)?.applicationStatusDict?.[chooseValue]) || '---',
+          fromStatus: tConfig(allConfig?.applicationStatusDict?.[applyStatus]) || '---',
+          toStatus: tConfig(allConfig?.applicationStatusDict?.[chooseValue]) || '---',
         })
       );
       return;
@@ -52,7 +53,7 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
         }),
       t('appliedResume.status.updateTitle'),
       t('appliedResume.status.updateConfirm', { 
-        statusName: tConfig((allConfig as any)?.applicationStatusDict?.[chooseValue]) || '---' 
+        statusName: tConfig(allConfig?.applicationStatusDict?.[chooseValue]) || '---' 
       }),
       'question'
     );
@@ -105,7 +106,7 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
             }}
         >
             {options.map((option) => (
-                <MenuItem key={option.id} value={option.id}>
+                <MenuItem key={option.id as string | number} value={option.id as string | number}>
                     <Typography variant="body2" sx={{ fontWeight: 800, fontSize: '0.8125rem' }}>
                         {option.name}
                     </Typography>

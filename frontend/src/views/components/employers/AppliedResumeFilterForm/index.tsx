@@ -15,19 +15,31 @@ import EngineeringIcon from '@mui/icons-material/Engineering';
 import WcIcon from '@mui/icons-material/Wc';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
+export interface AppliedResumeFilterData {
+  cityId?: number | string | null;
+  careerId?: number | string | null;
+  experienceId?: number | string | null;
+  positionId?: number | string | null;
+  academicLevelId?: number | string | null;
+  typeOfWorkplaceId?: number | string | null;
+  jobTypeId?: number | string | null;
+  genderId?: number | string | null;
+  maritalStatusId?: number | string | null;
+}
+
 interface AppliedResumeFilterFormProps {
-  handleFilter: (data: any) => void;
-  filterData: any;
+  handleFilter: (data: AppliedResumeFilterData) => void;
+  filterData: Partial<AppliedResumeFilterData> | null;
 }
 
 const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handleFilter, filterData }) => {
   const { t } = useTranslation('common');
   const theme = useTheme();
   const { allConfig } = useConfig();
-  const { control, handleSubmit, reset } = useForm<any>();
+  const { control, handleSubmit, reset } = useForm<AppliedResumeFilterData>();
 
   React.useEffect(() => {
-    reset((formValues: any) => ({
+    reset((formValues) => ({
       ...formValues,
       ...filterData,
     }));

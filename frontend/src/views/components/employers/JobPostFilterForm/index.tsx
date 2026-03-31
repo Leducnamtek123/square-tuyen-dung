@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Button, Stack, Tooltip, IconButton, Box, alpha, useTheme } from "@mui/material";
+import { Button, Stack, Tooltip, IconButton, Box, alpha, useTheme, Theme } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -9,8 +9,14 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import { useConfig } from '@/hooks/useConfig';
 
+export interface JobPostFilterFormValues {
+  kw: string;
+  isUrgent: string;
+  statusId: string;
+}
+
 interface JobPostFilterFormProps {
-  handleFilter: (data: any) => void;
+  handleFilter: (data: JobPostFilterFormValues) => void;
 }
 
 const JobPostFilterForm = ({ handleFilter }: JobPostFilterFormProps) => {
@@ -23,7 +29,7 @@ const JobPostFilterForm = ({ handleFilter }: JobPostFilterFormProps) => {
     handleSubmit,
     reset,
     formState: { defaultValues },
-  } = useForm<any>({
+  } = useForm<JobPostFilterFormValues>({
     defaultValues: {
       kw: '',
       isUrgent: '',
@@ -68,7 +74,7 @@ const JobPostFilterForm = ({ handleFilter }: JobPostFilterFormProps) => {
           <SingleSelectCustom
             name="statusId"
             control={control}
-            options={(allConfig?.jobPostStatusOptions || []) as any[]}
+            options={(allConfig?.jobPostStatusOptions || []) as React.ComponentProps<typeof SingleSelectCustom>['options']}
             showRequired={false}
             placeholder={t('jobPost.filters.statusPlaceholder')}
             sx={inputSx}
@@ -86,7 +92,7 @@ const JobPostFilterForm = ({ handleFilter }: JobPostFilterFormProps) => {
                 aria-label={t('jobPostFilterForm.label.refresh', 'refresh')}
                 onClick={() => {
                   reset();
-                  handleFilter(defaultValues);
+                  handleFilter(defaultValues as JobPostFilterFormValues);
                 }}
                 sx={{ 
                   borderRadius: 2,
@@ -108,7 +114,7 @@ const JobPostFilterForm = ({ handleFilter }: JobPostFilterFormProps) => {
                 py: 1,
                 fontWeight: 900,
                 textTransform: 'none',
-                boxShadow: (theme: any) => theme.customShadows?.secondary,
+                boxShadow: (theme: Theme) => theme.customShadows?.secondary,
                 minWidth: 120
               }}
             >

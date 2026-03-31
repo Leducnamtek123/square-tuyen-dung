@@ -14,7 +14,7 @@ import type { Resume } from '@/types/models';
 const ProfileCard: React.FC = () => {
     const { t } = useTranslation('employer');
     const theme = useTheme();
-    const { resumeFilter } = useAppSelector((state: any) => state.filter);
+    const { resumeFilter } = useAppSelector((state) => state.filter);
     const { pageSize } = resumeFilter;
     const [page, setPage] = React.useState(1);
 
@@ -40,7 +40,7 @@ const ProfileCard: React.FC = () => {
 
     const handleSave = (slug: string) => {
         toggleSave(slug, {
-            onSuccess: (resData: any) => {
+            onSuccess: (resData: Record<string, unknown>) => {
                 const isSaved = resData.isSaved;
                 toastMessages.success(
                     isSaved ? t('profileCard.messages.saveSuccess') : t('profileCard.messages.unsaveSuccess')
@@ -114,8 +114,8 @@ const ProfileCard: React.FC = () => {
                                                 updateAt={resume.updateAt || ''}
                                                 isSaved={resume.isSaved || false}
                                                 viewEmployerNumber={resume.viewEmployerNumber || 0}
-                                                user={resume.userDict as any}
-                                                city={resume.city as any}
+                                                user={resume.userDict as Record<string, unknown>}
+                                                city={resume.city?.id ?? ''}
                                                 jobSeekerProfile={resume.jobSeekerProfileDict || {}}
                                                 type={resume.type?.toString()}
                                                 lastViewedDate={resume.lastViewedDate ?? undefined}
@@ -143,7 +143,7 @@ const ProfileCard: React.FC = () => {
                                                     height: 44,
                                                     minWidth: 44,
                                                     '&.Mui-selected': {
-                                                        boxShadow: (theme: any) => theme.customShadows?.primary,
+                                                        boxShadow: (theme) => theme.customShadows?.primary,
                                                         border: 'none',
                                                         color: '#fff',
                                                         fontWeight: 1000

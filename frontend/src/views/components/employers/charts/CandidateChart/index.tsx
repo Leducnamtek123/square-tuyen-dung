@@ -197,7 +197,7 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
               </Stack>
             ) : (
               <Box sx={{ height: 320 }}>
-                <Line data={dataOptions} options={options as any} height={300} />
+                <Line data={dataOptions} options={options as import('chart.js').ChartOptions<"line">} height={300} />
               </Box>
             )}
           </Box>

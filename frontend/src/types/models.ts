@@ -147,6 +147,16 @@ export interface JobPostActivity {
 
 /* Resume & Profile */
 
+export interface ResumeDetailResponse extends Resume {
+  jobSeekerProfile?: Record<string, any>;
+  experiencesDetails?: Record<string, any>[];
+  educationDetails?: Record<string, any>[];
+  certificateDetails?: Record<string, any>[];
+  languageDetails?: Record<string, any>[];
+  skillDetails?: Record<string, any>[];
+  user?: Record<string, any>;
+}
+
 export interface Resume {
   id: number;
   title?: string;
@@ -308,6 +318,7 @@ export interface InterviewSession {
   inviteToken?: string;
   status: string;
   type: string;
+  interview_type?: string;
   scheduledAt?: string | null;
   scheduled_at?: string | null;
   startTime?: string | null;
@@ -422,8 +433,9 @@ export interface Banner {
 }
 
 export interface SelectOption {
-  id: number | string;
+  id: number | string | null;
   name: string;
+  [key: string]: unknown;
 }
 
 export interface SystemConfig {
@@ -440,6 +452,7 @@ export interface SystemConfig {
   genderDict?: Record<string | number, string>;
   maritalStatusDict?: Record<string | number, string>;
   jobPostStatusDict?: Record<string | number, string>;
+  applicationStatusDict?: Record<string | number, string>;
   banners?: Banner[];
   socialMediaLinks?: Record<string, string>;
   companyInfo?: Record<string, string>;

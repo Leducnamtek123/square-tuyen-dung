@@ -10,25 +10,25 @@ import SearchIcon from '@mui/icons-material/Search';
 
 import ClearIcon from '@mui/icons-material/Clear';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { Box } from "@mui/material";
 
 import { IconButton, InputAdornment } from "@mui/material";
 
-interface Props {
+interface Props<T extends FieldValues = FieldValues> {
   name: string;
-  control: Control<any>;
+  control: Control<T>;
   placeholder?: string;
   showSubmitButton?: boolean;
 }
 
-const InputBaseSearchCompanyCustom = ({
+const InputBaseSearchCompanyCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
   placeholder,
   showSubmitButton = false,
-}: Props) => {
+}: Props<T>) => {
 
   const theme = useTheme();
 
@@ -62,7 +62,7 @@ const InputBaseSearchCompanyCustom = ({
 
         <Controller
 
-          name={name}
+          name={name as Path<T>}
 
           control={control}
 

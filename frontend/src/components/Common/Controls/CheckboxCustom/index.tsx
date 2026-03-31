@@ -1,18 +1,18 @@
 import React from 'react';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { Checkbox, FormControlLabel } from "@mui/material";
 import ValidationError from '../ValidationError';
 
-interface Props {
+interface Props<T extends FieldValues = FieldValues> {
   name: string;
-  control: Control<any>;
+  control: Control<T>;
   title?: string;
   disabled?: boolean;
 }
 
-const CheckboxCustom = ({ name, control, title = '', disabled = false }: Props) => {
+const CheckboxCustom = <T extends FieldValues = FieldValues>({ name, control, title = '', disabled = false }: Props<T>) => {
 
   return (
 
@@ -20,7 +20,7 @@ const CheckboxCustom = ({ name, control, title = '', disabled = false }: Props) 
 
       <Controller
 
-        name={name}
+        name={name as Path<T>}
 
         control={control}
 

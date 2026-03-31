@@ -13,6 +13,7 @@ import {
   Chip,
   useTheme,
   alpha,
+  Theme
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import PsychologyIcon from '@mui/icons-material/Psychology';
@@ -241,7 +242,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
           width: { xs: '100%', sm: DRAWER_WIDTH },
           bgcolor: 'background.default',
           backgroundImage: 'none',
-          boxShadow: (theme: any) => theme.customShadows?.z24
+          boxShadow: (theme: Theme) => theme.customShadows?.z24
         },
       }}
     >
@@ -319,7 +320,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                     radial-gradient(110% 90% at 10% 5%, rgba(15,23,42,0.55) 0%, rgba(2,6,23,0.98) 100%)
                   `,
                   backgroundSize: '22px 22px, 22px 22px, cover',
-                  boxShadow: (theme: any) => theme.customShadows?.z8
+                  boxShadow: (theme: Theme) => theme.customShadows?.z8
                 }}
               >
                 {canEmbedResume ? (
@@ -396,7 +397,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                 borderColor: alpha(theme.palette.info.main, 0.3),
                 borderRadius: 3,
                 background: `linear-gradient(135deg, ${theme.palette.info.dark} 0%, ${alpha(theme.palette.info.dark, 0.8)} 100%)`,
-                boxShadow: (theme: any) => theme.customShadows?.info
+                boxShadow: (theme: Theme) => theme.customShadows?.info
               }}
             >
               <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
@@ -462,7 +463,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                 startIcon={renderIcon(RefreshIcon)}
                 onClick={handleAnalyze}
                 disabled={analyzing}
-                sx={{ mt: 3, textTransform: 'none', fontWeight: 900, borderRadius: 2, boxShadow: (theme: any) => theme.customShadows?.error }}
+                sx={{ mt: 3, textTransform: 'none', fontWeight: 900, borderRadius: 2, boxShadow: (theme: Theme) => theme.customShadows?.error }}
               >
                 {t('appliedResume.ai.retry')}
               </Button>
@@ -517,8 +518,8 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                   color: 'white',
                   fontWeight: 900,
                   fontSize: '1rem',
-                  boxShadow: (theme: any) => theme.customShadows?.primary,
-                  '&:hover': { transform: 'translateY(-2px)', boxShadow: (theme: any) => theme.customShadows?.z12 }
+                  boxShadow: (theme: Theme) => theme.customShadows?.primary,
+                  '&:hover': { transform: 'translateY(-2px)', boxShadow: (theme: Theme) => theme.customShadows?.z12 }
                 }}
               >
                 {t('appliedResume.ai.startScan')}
@@ -537,7 +538,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                   borderColor: alpha(theme.palette.success.main, 0.2),
                   borderRadius: 3,
                   background: `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.04)} 0%, ${alpha(theme.palette.success.main, 0.08)} 100%)`,
-                  boxShadow: (theme: any) => theme.customShadows?.success
+                  boxShadow: (theme: Theme) => theme.customShadows?.success
                 }}
               >
                 <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="space-between" sx={{ flexWrap: 'wrap', rowGap: 1.5 }}>
@@ -564,7 +565,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
                     borderColor: alpha(theme.palette.divider, 0.8), 
                     borderRadius: 3,
                     bgcolor: 'background.paper',
-                    boxShadow: (theme: any) => theme.customShadows?.z1
+                    boxShadow: (theme: Theme) => theme.customShadows?.z1
                 }}
               >
                 <ScoreGauge score={data?.aiAnalysisScore || 0} />

@@ -22,7 +22,8 @@ import {
     Skeleton,
     InputAdornment,
     alpha,
-    useTheme
+    useTheme,
+    Theme
 } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import { useRouter } from 'next/navigation';
@@ -112,11 +113,11 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
     useEffect(() => {
         if (sessionDetail) {
             reset({
-                job_post: (sessionDetail.jobPost as any)?.id || sessionDetail.jobPost || '',
-                candidate: (sessionDetail.candidate as any)?.id || sessionDetail.candidate || '',
+                job_post: ((sessionDetail.jobPost as unknown as Record<string, unknown>)?.id as string | number) || (sessionDetail.jobPost as unknown as string | number) || '',
+                candidate: ((sessionDetail.candidate as unknown as Record<string, unknown>)?.id as string | number) || (sessionDetail.candidate as unknown as string | number) || '',
                 scheduled_at: sessionDetail.scheduledAt || '',
-                selected_group: (sessionDetail.questionGroup as any)?.id || (sessionDetail.questionGroup as any) || '',
-                selected_questions: sessionDetail.questions?.map((q: any) => q.id) || []
+                selected_group: ((sessionDetail.questionGroup as unknown as Record<string, unknown>)?.id as string | number) || (sessionDetail.questionGroup as unknown as string | number) || '',
+                selected_questions: sessionDetail.questions?.map((q: unknown) => (q as {id: number}).id) || []
             });
         }
     }, [sessionDetail, reset]);
@@ -203,7 +204,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                     borderRadius: 4,
                     border: '1px solid',
                     borderColor: 'divider',
-                    boxShadow: (theme: any) => theme.customShadows?.z1,
+                    boxShadow: (theme: Theme) => theme.customShadows?.z1,
                     bgcolor: 'background.paper',
                     position: 'relative',
                     overflow: 'hidden'
@@ -219,7 +220,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        boxShadow: (theme: any) => alpha(theme.palette.primary.main, 0.1)
+                        boxShadow: (theme: Theme) => alpha(theme.palette.primary.main, 0.1)
                     }}>
                         <EventIcon sx={{ fontSize: 28 }} />
                     </Box>
@@ -369,13 +370,13 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                                             {...field} 
                                             multiple 
                                             input={<OutlinedInput label={t('interview:interviewCreateCard.label.selectinterviewquestions')} />} 
-                                            renderValue={(selected: any) => (
+                                            renderValue={(selected: unknown) => (
                                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                                    {selected.map((val: any) => {
+                                                    {((selected as unknown[]) ?? []).map((val: unknown) => {
                                                         const q = questions.find(item => String(item.id) === String(val));
                                                         return (
                                                             <Chip 
-                                                                key={val} 
+                                                                key={val as React.Key} 
                                                                 label={(q?.text || `Q#${val}`).substring(0, 50)} 
                                                                 size="small" 
                                                                 sx={{ 
@@ -478,7 +479,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                                         px: 8, 
                                         py: 1.5,
                                         fontWeight: 900, 
-                                        boxShadow: (theme: any) => theme.customShadows?.primary,
+                                        boxShadow: (theme: Theme) => theme.customShadows?.primary,
                                         textTransform: 'none',
                                         fontSize: '1.05rem'
                                     }}
@@ -500,7 +501,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                     sx: { 
                         borderRadius: 4, 
                         p: 1,
-                        boxShadow: (theme: any) => theme.customShadows?.z24,
+                        boxShadow: (theme: Theme) => theme.customShadows?.z24,
                         border: '1px solid',
                         borderColor: 'divider'
                     } 
@@ -545,7 +546,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                             px: 5, 
                             py: 1.25,
                             fontWeight: 900, 
-                            boxShadow: (theme: any) => theme.customShadows?.primary,
+                            boxShadow: (theme: Theme) => theme.customShadows?.primary,
                             textTransform: 'none'
                         }}
                     >

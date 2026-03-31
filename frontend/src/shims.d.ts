@@ -48,6 +48,12 @@ declare module '@mui/material/styles' {
       large: string;
       card: string;
       feedback: string;
+      primary: string;
+      secondary: string;
+      info: string;
+      success: string;
+      warning: string;
+      error: string;
       z1: string;
       z8: string;
       z12: string;
@@ -63,6 +69,12 @@ declare module '@mui/material/styles' {
       large?: string;
       card?: string;
       feedback?: string;
+      primary?: string;
+      secondary?: string;
+      info?: string;
+      success?: string;
+      warning?: string;
+      error?: string;
       z1?: string;
       z8?: string;
       z12?: string;

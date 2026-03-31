@@ -1,25 +1,27 @@
 import React from 'react';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { DatePicker } from '@mui/x-date-pickers';
 
 import dayjs from '@/configs/moment-config';
 
 import { Typography } from "@mui/material";
+import { SxProps, Theme } from '@mui/material/styles';
+import type { Dayjs } from 'dayjs';
 import ValidationError from '../ValidationError';
 
-interface Props {
+interface Props<T extends FieldValues = FieldValues> {
   name: string;
-  control: Control<any>;
+  control: Control<T>;
   title?: string | null;
   showRequired?: boolean;
-  minDate?: any;
-  maxDate?: any;
-  sx?: any;
+  minDate?: Dayjs | string | null;
+  maxDate?: Dayjs | string | null;
+  sx?: SxProps<Theme>;
 }
 
-const DatePickerCustom = ({
+const DatePickerCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
   title = null,
@@ -27,9 +29,9 @@ const DatePickerCustom = ({
   minDate = null,
   maxDate = null,
   sx = {},
-}: Props) => {
+}: Props<T>) => {
 
-  const parseDate = (date: any) => {
+  const parseDate = (date: Dayjs | string | null | undefined) => {
     if (!date) return undefined;
     try {
       const parsedDate = dayjs(date);
@@ -55,7 +57,7 @@ const DatePickerCustom = ({
 
       <Controller
 
-        name={name}
+        name={name as Path<T>}
 
         control={control}
 

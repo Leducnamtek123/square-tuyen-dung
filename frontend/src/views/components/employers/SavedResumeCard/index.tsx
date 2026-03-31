@@ -22,6 +22,8 @@ import toastMessages from '../../../../utils/toastMessages';
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
 import type { AxiosError } from 'axios';
 import type { ApiError } from '../../../../types/api';
+import type { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
+import { SavedResumeFilterValues } from '../SavedResumeFilterForm';
 
 interface SavedResumeCardProps {
   title: string;
@@ -43,7 +45,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
     initialPageSize: 10
   });
 
-  const [filterData, setFilterData] = useState({
+  const [filterData, setFilterData] = useState<SavedResumeFilterValues>({
     kw: '',
     salaryMax: '',
     experienceId: '',
@@ -65,7 +67,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
   const resumes = queryData?.results || [];
   const count = queryData?.count || 0;
 
-  const handleFilter = useCallback((data: Partial<typeof filterData>) => {
+  const handleFilter = useCallback((data: Partial<SavedResumeFilterValues>) => {
     setFilterData((prev) => ({
       ...prev,
       ...data,
@@ -110,7 +112,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
           borderRadius: 4, 
           border: '1px solid',
           borderColor: 'divider',
-          boxShadow: (theme: any) => theme.customShadows?.z1,
+          boxShadow: (theme) => theme.customShadows?.z1,
           bgcolor: 'background.paper'
         }}
       >
@@ -138,7 +140,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
                 borderRadius: 3, 
                 px: 4, 
                 py: 1.25,
-                boxShadow: (theme: any) => theme.customShadows?.primary, 
+                boxShadow: (theme) => theme.customShadows?.primary, 
                 fontWeight: 900,
                 textTransform: 'none'
               }}
@@ -174,7 +176,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
                 {t('employer:savedResume.filters').toUpperCase()}
             </Typography>
           </Stack>
-          <SavedResumeFilterForm handleFilter={handleFilter as any} />
+          <SavedResumeFilterForm handleFilter={handleFilter} />
         </Paper>
 
         <Box sx={{ overflow: 'hidden', width: '100%' }}>
@@ -183,9 +185,9 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
             rows={resumes}
             rowCount={count}
             pagination={pagination}
-            onPaginationChange={onPaginationChange as any}
+            onPaginationChange={onPaginationChange as OnChangeFn<PaginationState>}
             sorting={sorting}
-            onSortingChange={onSortingChange as any}
+            onSortingChange={onSortingChange as OnChangeFn<SortingState>}
             handleUnsave={handleUnsave}
           />
         </Box>

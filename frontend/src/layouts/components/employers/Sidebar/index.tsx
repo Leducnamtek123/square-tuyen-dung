@@ -1,5 +1,5 @@
 import React from 'react';
-import { Drawer, useTheme } from "@mui/material";
+import { Drawer, useTheme, Theme } from "@mui/material";
 import DrawerContent from './DrawerContent';
 
 interface SidebarProps {
@@ -8,7 +8,7 @@ interface SidebarProps {
 }
 
 interface MobileSidebarProps extends SidebarProps {
-  container?: any;
+  container?: Element | (() => Element | null) | null;
   mobileOpen: boolean;
   handleDrawerToggle: () => void;
 }
@@ -32,7 +32,7 @@ const Sidebar = ({ drawerWidth, isAdmin }: SidebarProps) => {
           width: drawerWidth,
           borderRight: '0px',
           backgroundColor: theme.palette.background.paper,
-          boxShadow: (theme as any).customShadows.sidebar,
+          boxShadow: (theme as Theme).customShadows?.z8,
           borderRadius: '0px 10px 10px 0px',
         },
       }}

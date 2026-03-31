@@ -3,15 +3,17 @@ import { Box, Typography, Stack, Paper, Divider, LinearProgress, alpha, useTheme
 import { useTranslation } from 'react-i18next';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 
+import { ResumeDetailResponse } from '@/types/models';
+
 interface AdvancedSkillSectionProps {
-  profileDetail: any;
+  profileDetail: ResumeDetailResponse;
 }
 
 const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDetail }) => {
     const { t } = useTranslation(['employer', 'common']);
     const theme = useTheme();
 
-    if (!(profileDetail?.skillDetails?.length > 0)) return null;
+    if (!(profileDetail?.skillDetails && profileDetail.skillDetails.length > 0)) return null;
 
     return (
         <Box>
@@ -40,11 +42,11 @@ const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDeta
                     border: '1px solid',
                     borderColor: 'divider',
                     bgcolor: 'background.paper',
-                    boxShadow: (theme: any) => theme.customShadows?.z1
+                    boxShadow: (theme) => theme.customShadows?.z1
                 }}
             >
                 <Stack spacing={4}>
-                    {profileDetail.skillDetails.map((value: any, index: number) => (
+                    {(profileDetail.skillDetails || []).map((value: Record<string, string | number>, index: number) => (
                         <Box key={value.id || index}>
                             <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', mb: 2 }}>
                                 {value?.skillName}
@@ -52,7 +54,7 @@ const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDeta
                             
                             <LinearProgress 
                                 variant="determinate" 
-                                value={value?.point || 0} 
+                                value={Number(value?.point || 0)} 
                                 sx={{ 
                                     height: 8, 
                                     borderRadius: 4,
@@ -64,7 +66,7 @@ const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDeta
                                 }} 
                             />
                             
-                            {index < profileDetail.skillDetails.length - 1 && (
+                            {index < (profileDetail.skillDetails?.length || 0) - 1 && (
                                 <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: alpha(theme.palette.divider, 0.8) }} />
                             )}
                         </Box>

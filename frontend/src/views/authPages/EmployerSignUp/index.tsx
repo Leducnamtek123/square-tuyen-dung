@@ -161,7 +161,7 @@ const EmployerSignUp = () => {
 
     try {
 
-      const resData = await authService.checkCreds(email, roleName) as any;
+      const resData = await authService.checkCreds(email, roleName) as { exists: boolean, emailVerified: boolean };
 
       const { exists, emailVerified } = resData;
 
@@ -193,7 +193,7 @@ const EmployerSignUp = () => {
 
     } catch (error) {
 
-      errorHandling(error as AxiosError<any>, undefined);
+      errorHandling(error as AxiosError<{ errors?: import('../../../types/api').ApiError }>, undefined);
 
       return false;
 

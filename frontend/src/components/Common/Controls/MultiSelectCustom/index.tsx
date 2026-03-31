@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import Checkbox from '@mui/material/Checkbox';
 
@@ -15,11 +15,11 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import { Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import ValidationError from '../ValidationError';
-
-interface Props {
+import type { SelectOption } from '@/types/models';
+interface Props<T extends FieldValues = FieldValues> {
   name: string;
-  control: Control<any>;
-  options?: any[];
+  control: Control<T>;
+  options?: SelectOption[];
   title?: string | null;
   showRequired?: boolean;
   placeholder?: string;
@@ -29,14 +29,14 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
-const MultiSelectCustom = ({
+const MultiSelectCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
   options = [],
   title = null,
   showRequired = false,
   placeholder = '',
-}: Props) => {
+}: Props<T>) => {
   const { t } = useTranslation('common');
 
   return (
@@ -55,7 +55,7 @@ const MultiSelectCustom = ({
 
       <Controller
 
-        name={name}
+        name={name as Path<T>}
 
         control={control}
 

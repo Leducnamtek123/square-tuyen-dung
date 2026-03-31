@@ -174,7 +174,7 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
               </Stack>
             ) : (
               <Box sx={{ height: 320 }}>
-                <Pie data={dataOptions} options={options as any} height={300} />
+                <Pie data={dataOptions} options={options as import('chart.js').ChartOptions<"pie">} height={300} />
               </Box>
             )}
           </Box>

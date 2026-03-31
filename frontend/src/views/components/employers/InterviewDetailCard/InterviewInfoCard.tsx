@@ -7,11 +7,12 @@ import CategoryIcon from '@mui/icons-material/Category';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import EmailIcon from '@mui/icons-material/Email';
 import { InterviewSession } from '@/types/models';
+import { i18n, TFunction } from 'i18next';
 
 interface InterviewInfoCardProps {
   session: InterviewSession;
-  t: (key: string, options?: any) => string;
-  i18n: any;
+  t: TFunction;
+  i18n: i18n;
 }
 
 const InterviewInfoCard: React.FC<InterviewInfoCardProps> = ({ session, t, i18n }) => {
@@ -25,7 +26,7 @@ const InterviewInfoCard: React.FC<InterviewInfoCardProps> = ({ session, t, i18n 
                 borderRadius: 4,
                 border: '1px solid',
                 borderColor: 'divider',
-                boxShadow: (theme: any) => theme.customShadows?.z1,
+                boxShadow: (theme) => theme.customShadows?.z1,
                 position: 'relative',
                 overflow: 'hidden',
                 bgcolor: 'background.paper'
@@ -84,7 +85,7 @@ const InterviewInfoCard: React.FC<InterviewInfoCardProps> = ({ session, t, i18n 
                     </Stack>
                     <Box sx={{ ml: 4 }}>
                         <Chip
-                            label={(session.type || (session as any).interview_type || 'N/A')?.toUpperCase()}
+                            label={(session.type || session.interview_type || 'N/A')?.toUpperCase()}
                             size="small"
                             sx={{ 
                                 fontWeight: 900, 

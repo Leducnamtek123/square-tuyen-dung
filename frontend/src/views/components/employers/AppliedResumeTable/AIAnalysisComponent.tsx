@@ -3,9 +3,10 @@ import { Tooltip, Chip, CircularProgress, Button, Box, alpha, useTheme } from '@
 import { useTranslation } from 'react-i18next';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
+import { JobPostActivity } from '@/types/models';
 
 export interface AIAnalysisComponentProps {
-  row: any;
+  row: JobPostActivity;
   onOpenDrawer: () => void;
 }
 

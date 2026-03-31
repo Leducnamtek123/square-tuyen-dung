@@ -9,7 +9,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
 export interface MenuItemProps {
-  icon?: any;
+  icon?: React.ElementType;
   text: string;
   to?: string;
   onClick?: () => void;
@@ -62,7 +62,7 @@ const MenuItem = ({ icon: Icon, text, to, onClick, isSelected, isExpanded, hasCh
 
   return (
     <StyledListItemButton
-      component={(to ? Link : 'div') as any}
+      component={to ? Link : 'div'}
       href={to}
       onClick={onClick}
       selected={isSelected || isActive}

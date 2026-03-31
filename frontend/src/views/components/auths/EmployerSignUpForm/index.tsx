@@ -17,6 +17,7 @@ import { useAppSelector } from '../../../../hooks/useAppStore';
 import type { AxiosError } from 'axios';
 import type { RoleName } from '../../../../types/auth';
 import type { RootState } from '../../../../redux/store';
+import type { SelectOption } from '@/types/models';
 
 import AccountInfoStep from './AccountInfoStep';
 import CompanyInfoStep from './CompanyInfoStep';
@@ -82,9 +83,9 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
   const { t } = useTranslation('auth');
   const steps = [t('steps.loginInfo'), t('steps.companyInfo')];
   const [activeStep, setActiveStep] = React.useState(0);
-  const { allConfig } = useAppSelector((state: RootState & { config?: { allConfig?: { employeeSizeOptions?: Record<string, unknown>[]; cityOptions?: Record<string, unknown>[] } } }) => state.config || {});
-  const [districtOptions, setDistrictOptions] = React.useState<Record<string, unknown>[]>([]);
-  const [locationOptions, setLocationOptions] = React.useState<Record<string, unknown>[]>([]);
+  const { allConfig } = useAppSelector((state: RootState & { config?: { allConfig?: { employeeSizeOptions?: SelectOption[]; cityOptions?: SelectOption[] } } }) => state.config || {});
+  const [districtOptions, setDistrictOptions] = React.useState<SelectOption[]>([]);
+  const [locationOptions, setLocationOptions] = React.useState<SelectOption[]>([]);
 
   const schema = yup.object().shape({
     fullName: yup.string().required(t('validation.requiredFullName')).max(100, t('validation.maxCompanyName')),
@@ -172,7 +173,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
         return;
       }
       try {
-        const resData = await goongService.getPlaces(input) as { predictions?: Record<string, unknown>[] };
+        const resData = await goongService.getPlaces(input) as { predictions?: SelectOption[] };
         if (resData.predictions) setLocationOptions(resData.predictions);
       } catch (error) { }
     };
@@ -205,7 +206,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
     checkEmail();
   }, [emailDebounce, clearErrors, emailExistsError, setError, t]);
 
-  const handleSelectLocation = async (e: React.SyntheticEvent, value: Record<string, unknown> | null) => {
+  const handleSelectLocation = async (e: React.SyntheticEvent, value: string | SelectOption | null) => {
     if (!value || typeof value !== 'object' || !value.place_id) return;
     try {
       const resData = await goongService.getPlaceDetailByPlaceId(value.place_id as string) as { result?: { geometry?: { location?: { lat?: number, lng?: number } } } };
@@ -219,7 +220,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
   React.useEffect(() => {
     const loadDistricts = async (cityId: number) => {
       try {
-        const resData = await commonService.getDistrictsByCityId(cityId) as unknown as Record<string, unknown>[];
+        const resData = await commonService.getDistrictsByCityId(cityId) as unknown as SelectOption[];
         // Only clear district if the cityId has actually changed (user interaction)
         // and it's not the initial load (prevCityIdRef.current is not null).
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
@@ -273,7 +274,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
             control={control}
             t={t}
             show={activeStep !== 0}
-            allConfig={allConfig as { employeeSizeOptions?: Record<string, unknown>[]; cityOptions?: Record<string, unknown>[] } | null}
+            allConfig={allConfig as { employeeSizeOptions?: SelectOption[]; cityOptions?: SelectOption[] } | null}
             districtOptions={districtOptions}
             locationOptions={locationOptions}
             handleSelectLocation={handleSelectLocation}

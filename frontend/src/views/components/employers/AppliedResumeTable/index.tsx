@@ -19,7 +19,7 @@ import DescriptionIcon from '@mui/icons-material/Description';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import type { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
 
-import AIAnalysisDrawer from '../AIAnalysisDrawer';
+import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
 import DataTable from '../../../../components/Common/DataTable';
 
@@ -226,7 +226,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
           initialData={{
             ...selectedActivityInfo,
             aiAnalysisSummary: selectedActivityInfo.aiAnalysisSummary ?? undefined
-          } as any}
+          } as AIAnalysisData}
         />
       )}
       <DataTable

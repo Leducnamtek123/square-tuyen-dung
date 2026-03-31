@@ -161,13 +161,13 @@ const DataTable = <TData,>({
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
-                                    const meta = header.column.columnDef.meta as any;
+                                    const meta = header.column.columnDef.meta as Record<string, unknown> | undefined;
                                     const canSort = header.column.getCanSort();
                                     
                                     return (
                                         <TableCell
                                             key={header.id}
-                                            align={meta?.align || 'left'}
+                                            align={(meta?.align as 'left' | 'center' | 'right' | 'justify' | 'inherit') || 'left'}
                                             sx={{ fontWeight: 'bold', color: 'text.secondary', py: 2 }}
                                             sortDirection={header.column.getIsSorted() || false}
                                         >
@@ -212,7 +212,7 @@ const DataTable = <TData,>({
                                         <TableCell 
                                             key={cell.id} 
                                             sx={{ py: 1.5 }}
-                                            align={(cell.column.columnDef.meta as any)?.align || 'left'}
+                                            align={((cell.column.columnDef.meta as Record<string, unknown>)?.align as 'left' | 'center' | 'right' | 'justify' | 'inherit') || 'left'}
                                         >
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>

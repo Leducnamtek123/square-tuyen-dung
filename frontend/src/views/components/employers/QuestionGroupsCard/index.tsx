@@ -26,7 +26,8 @@ import {
   Tooltip,
   Paper,
   alpha,
-  useTheme
+  useTheme,
+  Theme
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
@@ -150,8 +151,8 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
         if (!newQuestionContent.trim()) return;
         try {
             const res = await createQuestion({ text: newQuestionContent.trim() });
-            if (res && (res as any).id) {
-                setSelectedQuestions((prev: number[]) => [...prev, (res as any).id]);
+            if (res && (res as { id?: number }).id) {
+                setSelectedQuestions((prev: number[]) => [...prev, (res as { id: number }).id]);
                 toastMessages.success(t('interview:employer.questionBank.createSuccess'));
             }
             setOpenCreateQuestion(false);
@@ -361,7 +362,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
                                         })}
                                     </Box>
                                 )}
-                                MenuProps={{ PaperProps: { sx: { borderRadius: 2, mt: 1, maxHeight: 300, boxShadow: (theme: any) => theme.customShadows?.z8 } } }}
+                                MenuProps={{ PaperProps: { sx: { borderRadius: 2, mt: 1, maxHeight: 300, boxShadow: (theme: Theme) => theme.customShadows?.z8 } } }}
                             >
                                 {allQuestions.map((q) => (
                                     <MenuItem key={q.id} value={q.id}>

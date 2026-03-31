@@ -15,7 +15,8 @@ import {
   Tooltip,
   Paper,
   alpha,
-  useTheme
+  useTheme,
+  Theme
 } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -173,7 +174,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
     ], [t, handleOpen, handleDelete, theme]);
 
     return (
-        <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 4, boxShadow: (theme: any) => theme.customShadows?.z1, border: '1px solid', borderColor: 'divider' }}>
+        <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 4, boxShadow: (theme: Theme) => theme.customShadows?.z1, border: '1px solid', borderColor: 'divider' }}>
             <Stack 
                 direction={{ xs: 'column', sm: 'row' }} 
                 alignItems={{ xs: 'flex-start', sm: 'center' }} 

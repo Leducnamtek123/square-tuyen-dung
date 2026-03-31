@@ -27,6 +27,8 @@ import { useDataTable } from '../../../../hooks';
 import toastMessages from '../../../../utils/toastMessages';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
+import { ColumnDef, OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
+import { InterviewSession } from '@/types/models';
 
 interface InterviewListCardProps {
   title?: string;
@@ -106,12 +108,12 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
         }
     };
 
-    const columns = useMemo(() => [
+    const columns = useMemo<ColumnDef<InterviewSession>[]>(() => [
         {
             header: t('interview:interviewListCard.candidate'),
             accessorKey: 'candidateName',
             enableSorting: true,
-            cell: ({ row }: any) => (
+            cell: ({ row }) => (
                 <Box>
                     <Typography variant="body2" sx={{ fontWeight: 900, color: 'text.primary', mb: 0.25 }}>
                         {row.original.candidateName || '---'}
@@ -126,7 +128,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             header: t('interview:interviewListCard.position'),
             accessorKey: 'jobName',
             enableSorting: true,
-            cell: ({ getValue }: any) => (
+            cell: ({ getValue }) => (
                 <Typography variant="body2" noWrap sx={{ fontWeight: 800, color: 'primary.main', maxWidth: 200 }}>
                     {String(getValue() || '---')}
                 </Typography>
@@ -136,9 +138,9 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             header: t('interview:interviewListCard.time'),
             accessorKey: 'scheduledAt',
             enableSorting: true,
-            cell: ({ getValue }: any) => (
+            cell: ({ getValue }) => (
                 <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
-                    {getValue() ? new Date(getValue()).toLocaleString('vi-VN', { 
+                    {getValue() ? new Date(getValue() as string).toLocaleString('vi-VN', { 
                         year: 'numeric', 
                         month: '2-digit', 
                         day: '2-digit',
@@ -151,7 +153,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
         {
             header: t('interview:interviewListCard.status'),
             accessorKey: 'status',
-            cell: ({ getValue }: any) => {
+            cell: ({ getValue }) => {
                 const status = getValue() as string;
                 const statusColor = getStatusColor(status);
                 return (
@@ -179,7 +181,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             header: t('interview:interviewListCard.aiScore'),
             accessorKey: 'aiOverallScore',
             meta: { align: 'center' },
-            cell: ({ row }: any) => {
+            cell: ({ row }) => {
                 const score = row.original.ai_overall_score || row.original.aiOverallScore;
                 if (score) {
                     return (
@@ -204,7 +206,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             header: t('common:actions'),
             id: 'actions',
             meta: { align: 'right' },
-            cell: ({ row }: any) => {
+            cell: ({ row }) => {
                 const session = row.original;
                 const canEdit = ['draft', 'scheduled'].includes(session.status);
                 const canCancel = session.status === 'scheduled';
@@ -289,7 +291,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
                 p: { xs: 3, sm: 5 }, 
                 backgroundColor: 'background.paper', 
                 borderRadius: 4, 
-                boxShadow: (theme: any) => theme.customShadows?.z1,
+                boxShadow: (theme) => theme.customShadows?.z1,
                 border: '1px solid',
                 borderColor: 'divider'
             }}
@@ -319,7 +321,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
                         borderRadius: 3, 
                         px: 4, 
                         py: 1.5,
-                        boxShadow: (theme: any) => theme.customShadows?.primary, 
+                        boxShadow: (theme) => theme.customShadows?.primary, 
                         fontWeight: 900, 
                         textTransform: 'none',
                         fontSize: '0.95rem'
@@ -330,15 +332,15 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             </Stack>
 
             <DataTable
-                columns={columns as any}
+                columns={columns}
                 data={sessions}
                 isLoading={isQueryLoading}
                 rowCount={count}
                 pagination={pagination}
-                onPaginationChange={onPaginationChange as any}
+                onPaginationChange={onPaginationChange as OnChangeFn<PaginationState>}
                 enableSorting
                 sorting={sorting}
-                onSortingChange={onSortingChange as any}
+                onSortingChange={onSortingChange as OnChangeFn<SortingState>}
                 emptyMessage={t('interview:interviewListCard.noInterviews')}
             />
 

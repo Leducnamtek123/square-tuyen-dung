@@ -62,7 +62,7 @@ export default function EmployerSectionLayout({
 
       if (isPublicPage) {
         if (token) {
-          let user = currentUser as any;
+          let user = currentUser;
           if (!currentUser) {
             try {
               user = await dispatch(getUserInfo()).unwrap();
@@ -94,7 +94,7 @@ export default function EmployerSectionLayout({
         return;
       }
 
-      let user = currentUser as any;
+      let user = currentUser;
       if (!user) {
         try {
           user = await dispatch(getUserInfo()).unwrap();

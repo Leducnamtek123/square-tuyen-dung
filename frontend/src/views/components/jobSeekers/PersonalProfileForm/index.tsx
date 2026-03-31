@@ -23,6 +23,7 @@ import DatePickerCustom from '../../../../components/Common/Controls/DatePickerC
 
 import commonService from '../../../../services/commonService';
 import { useConfig } from '@/hooks/useConfig';
+import type { SelectOption } from '@/types/models';
 
 export interface PersonalProfileFormValues {
   user: {
@@ -172,7 +173,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
   });
 
-  const [districtOptions, setDistrictOptions] = React.useState<Record<string, unknown>[]>([]);
+  const [districtOptions, setDistrictOptions] = React.useState<SelectOption[]>([]);
 
   const { control, setValue, reset, handleSubmit } = useForm<PersonalProfileFormValues>({
 
@@ -244,7 +245,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
   React.useEffect(() => {
     const loadDistricts = async (id: number | string) => {
       try {
-        const resData = await commonService.getDistrictsByCityId(id) as unknown as Record<string, unknown>[];
+        const resData = await commonService.getDistrictsByCityId(id) as unknown as SelectOption[];
         // Only clear district if the cityId has actually changed (user interaction)
         // and it's not the initial load (prevCityIdRef.current is not null).
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {

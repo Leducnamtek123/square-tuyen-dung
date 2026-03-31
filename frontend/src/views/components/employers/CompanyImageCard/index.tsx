@@ -46,8 +46,8 @@ const CompanyImageCard = () => {
   const [cropFileName, setCropFileName] = useState('');
 
   const fileList = useMemo<FileItem[]>(() => {
-    const results = (imagesData as any)?.results || [];
-    return results.map((item: any) => ({
+    const results = (imagesData as unknown as { results?: Array<{ id: number | string; imageUrl: string }> })?.results ?? imagesData ?? [];
+    return (results as Array<{ id: number | string; imageUrl: string }>).map((item) => ({
       uid: item.id,
       url: item.imageUrl,
     }));
@@ -217,7 +217,7 @@ const CompanyImageCard = () => {
             component="img"
             src={previewImage}
             alt="Preview"
-            sx={{ width: '100%', borderRadius: 2, boxShadow: (theme: any) => theme.customShadows?.z8 }}
+            sx={{ width: '100%', borderRadius: 2, boxShadow: (theme) => theme.customShadows?.z8 }}
           />
         </DialogContent>
       </Dialog>
