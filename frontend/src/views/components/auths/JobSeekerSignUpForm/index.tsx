@@ -22,8 +22,8 @@ export interface JobSeekerSignUpFormData {
 
 interface JobSeekerSignUpFormProps {
   onRegister: (data: JobSeekerSignUpFormData) => void;
-  onFacebookRegister: (result: any) => void;
-  onGoogleRegister: (result: any) => void;
+  onFacebookRegister: (result: Record<string, unknown>) => void;
+  onGoogleRegister: (result: Omit<import('@react-oauth/google').CodeResponse, "error" | "error_description" | "error_uri">) => void;
   serverErrors?: Record<string, string[]>;
   checkCreds?: (email: string, roleName: RoleName) => Promise<boolean>;
 }
@@ -162,7 +162,7 @@ const JobSeekerSignUpForm = ({
       password: "",
       confirmPassword: "",
     },
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<JobSeekerSignUpFormData>,
   });
 
   const email = useWatch({
@@ -175,7 +175,7 @@ const JobSeekerSignUpForm = ({
 
   React.useEffect(() => {
     for (const err in serverErrors) {
-      setError(err as any, { type: 'manual', message: serverErrors[err]?.join(" ") });
+      setError(err as keyof JobSeekerSignUpFormData, { type: 'manual', message: serverErrors[err]?.join(" ") });
     }
   }, [serverErrors, setError]);
 
@@ -191,7 +191,7 @@ const JobSeekerSignUpForm = ({
 
     const checkEmail = async () => {
       try {
-        const resData = (await authService.emailExists(normalizedEmail)) as any;
+        const resData = (await authService.emailExists(normalizedEmail)) as { exists: boolean };
         if (resData?.exists === true) {
           setError('email', {
             type: 'manual',

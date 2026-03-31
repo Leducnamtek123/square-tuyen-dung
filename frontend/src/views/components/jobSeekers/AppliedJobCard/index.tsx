@@ -14,6 +14,31 @@ import { useTranslation } from 'react-i18next';
 
 const pageSize = 10;
 
+interface JobPostActivity {
+  id: number;
+  createAt: string;
+  jobPostDict: {
+    id: number;
+    slug: string;
+    jobName: string;
+    deadline: string;
+    isUrgent: boolean;
+    isHot: boolean;
+    salaryMin: number;
+    salaryMax: number;
+    companyDict?: {
+      companyImageUrl: string;
+      companyName: string;
+    };
+    locationDict?: {
+      city: number;
+    };
+  };
+  resumeDict?: {
+    type: number | string;
+  };
+}
+
 const AppliedJobCard = () => {
   const { t } = useTranslation(['jobSeeker', 'common']);
   const [page, setPage] = React.useState(1);
@@ -25,7 +50,7 @@ const AppliedJobCard = () => {
         pageSize: pageSize,
         page: page,
       });
-      const result = (resData as any).data;
+      const result = (resData as { data: { results: JobPostActivity[]; count: number } }).data;
       return {
         results: result.results || [],
         count: result.count || 0,
@@ -68,15 +93,15 @@ const AppliedJobCard = () => {
           </NoDataCard>
         ) : (
           <Stack spacing={2}>
-            {jobPostsApplied.map((value: any) => (
+            {jobPostsApplied.map((value: JobPostActivity) => (
               <JobPostAction
                 key={value.id}
                 id={value?.jobPostDict.id}
-                slug={value?.jobPostDict.slug}
-                companyImageUrl={value?.jobPostDict?.companyDict?.companyImageUrl}
-                companyName={value?.jobPostDict?.companyDict?.companyName}
-                jobName={value?.jobPostDict?.jobName}
-                cityId={value?.jobPostDict?.locationDict?.city}
+                slug={value.jobPostDict.slug || ''}
+                companyImageUrl={value.jobPostDict.companyDict?.companyImageUrl || ''}
+                companyName={value.jobPostDict.companyDict?.companyName || ''}
+                jobName={value.jobPostDict.jobName || ''}
+                cityId={value.jobPostDict.locationDict?.city}
                 deadline={value?.jobPostDict?.deadline}
                 isUrgent={value?.jobPostDict?.isUrgent}
                 isHot={value?.jobPostDict?.isHot}

@@ -184,10 +184,10 @@ const CompaniesPage = () => {
     const columns = React.useMemo<ColumnDef<Company>[]>(() => [
         {
             accessorKey: 'companyImageUrl',
-            header: t('pages.companies.table.logo') as string,
+            header: t('pages.companies.table.logo'),
             cell: (info) => (
                 <Avatar
-                    src={info.getValue() as string || IMAGES.companyLogoDefault}
+                    src={(info.getValue() as string) || IMAGES.companyLogoDefault}
                     variant="rounded"
                     sx={{ width: 48, height: 48, border: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}
                 />
@@ -195,7 +195,7 @@ const CompaniesPage = () => {
         },
         {
             accessorKey: 'companyName',
-            header: t('pages.companies.table.companyName') as string,
+            header: t('pages.companies.table.companyName'),
             enableSorting: true,
             cell: (info) => (
                 <Box>
@@ -210,36 +210,36 @@ const CompaniesPage = () => {
         },
         {
             accessorKey: 'employeeSize',
-            header: t('pages.companies.table.scale') as string,
+            header: t('pages.companies.table.scale'),
             enableSorting: true,
-            cell: (info) => info.getValue() || '---',
+            cell: (info) => (info.getValue() as number | string) || '---',
         },
         {
             accessorKey: 'fieldOperation',
-            header: t('pages.companies.table.field') as string,
+            header: t('pages.companies.table.field'),
             enableSorting: true,
-            cell: (info) => info.getValue() || '---',
+            cell: (info) => (info.getValue() as string) || '---',
         },
         {
             accessorKey: 'locationDict.city',
-            header: t('pages.companies.table.location') as string,
-            cell: (info) => info.getValue() as string || '---',
+            header: t('pages.companies.table.location'),
+            cell: (info) => (info.getValue() as string) || '---',
         },
         {
             accessorKey: 'jobPostNumber',
-            header: t('pages.companies.table.jobPosts') as string,
+            header: t('pages.companies.table.jobPosts'),
             meta: { align: 'center' },
-            cell: (info) => <Chip label={String(info.getValue() || 0)} size="small" variant="outlined" />,
+            cell: (info) => <Chip label={String((info.getValue() as number) || 0)} size="small" variant="outlined" />,
         },
         {
             accessorKey: 'followNumber',
-            header: t('pages.companies.table.followers') as string,
+            header: t('pages.companies.table.followers'),
             meta: { align: 'center' },
-            cell: (info) => <Chip label={String(info.getValue() || 0)} size="small" />,
+            cell: (info) => <Chip label={String((info.getValue() as number) || 0)} size="small" />,
         },
         {
             id: 'actions',
-            header: t('pages.companies.table.actions') as string,
+            header: t('pages.companies.table.actions'),
             meta: { align: 'right' },
             cell: (info) => (
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
@@ -451,7 +451,9 @@ const CompaniesPage = () => {
             <Dialog open={openDeleteDialog} onClose={() => setOpenDeleteDialog(false)}>
                 <DialogTitle>{t('pages.companies.deleteTitle')}</DialogTitle>
                 <DialogContent>
-                    <Typography dangerouslySetInnerHTML={{ __html: String(t('pages.companies.deleteText', { name: currentCompany?.companyName })) }} />
+                    <Typography>
+                        {t('pages.companies.deleteText', { name: currentCompany?.companyName })}
+                    </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
                     <Button onClick={() => setOpenDeleteDialog(false)} color="inherit">{t('pages.companies.cancelBtn')}</Button>

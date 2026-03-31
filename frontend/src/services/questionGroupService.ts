@@ -2,12 +2,11 @@ import httpRequest from '../utils/httpRequest';
 import type { PaginatedResponse } from '../types/api';
 import type { QuestionGroup } from '../types/models';
 
-type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number;
 
-const normalizeParams = (params: AnyRecord = {}): AnyRecord => {
-  const normalized: AnyRecord = { ...params };
+const normalizeParams = (params: Record<string, unknown> = {}): Record<string, unknown> => {
+  const normalized: Record<string, unknown> = { ...params };
 
   if (normalized.page_size && !normalized.pageSize) {
     normalized.pageSize = normalized.page_size;
@@ -30,7 +29,7 @@ const normalizeParams = (params: AnyRecord = {}): AnyRecord => {
 };
 
 const questionGroupService = {
-  getQuestionGroups: (params: AnyRecord = {}): Promise<PaginatedResponse<QuestionGroup>> => {
+  getQuestionGroups: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<QuestionGroup>> => {
     return httpRequest
       .get('interview/web/question-groups/', { params: normalizeParams(params) });
   },
@@ -38,11 +37,11 @@ const questionGroupService = {
     return httpRequest
       .get(`interview/web/question-groups/${id}/`);
   },
-  createQuestionGroup: (data: AnyRecord): Promise<QuestionGroup> => {
+  createQuestionGroup: (data: Record<string, unknown>): Promise<QuestionGroup> => {
     return httpRequest
       .post('interview/web/question-groups/', data);
   },
-  updateQuestionGroup: (id: IdType, data: AnyRecord): Promise<QuestionGroup> => {
+  updateQuestionGroup: (id: IdType, data: Record<string, unknown>): Promise<QuestionGroup> => {
     return httpRequest
       .patch(`interview/web/question-groups/${id}/`, data);
   },
@@ -53,3 +52,4 @@ const questionGroupService = {
 };
 
 export default questionGroupService;
+

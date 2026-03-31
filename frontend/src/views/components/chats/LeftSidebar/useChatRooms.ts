@@ -1,7 +1,7 @@
 import React from 'react';
 import { collection, onSnapshot, query, where, orderBy, startAfter, limit, getDocs } from 'firebase/firestore';
 import db from '../../../../configs/firebase-config';
-import { ChatContext } from '../../../../context/ChatProvider';
+import { useChatContext } from '../../../../context/ChatProvider';
 import { getUserAccount } from '../../../../services/firebaseService';
 
 export interface UserAccount {
@@ -18,7 +18,7 @@ export interface UserAccount {
 export interface ChatRoomData {
   id: string;
   members: string[];
-  updatedAt: any;
+  updatedAt: import('firebase/firestore').FieldValue | import('firebase/firestore').Timestamp;
   user?: UserAccount;
   recipientId?: string;
   unreadCount?: number;
@@ -28,10 +28,10 @@ const LIMIT = 20;
 const chatRoomCollectionRef = collection(db, 'chatRooms');
 
 export const useChatRooms = () => {
-  const { currentUserChat, setSelectedRoomId } = React.useContext(ChatContext) as any;
+  const { currentUserChat, setSelectedRoomId } = useChatContext();
   const [isLoading, setIsLoading] = React.useState(true);
   const [hasMore, setHasMore] = React.useState(true);
-  const [lastDocument, setLastDocument] = React.useState<any>(null);
+  const [lastDocument, setLastDocument] = React.useState<import('firebase/firestore').DocumentSnapshot | null>(null);
   const [chatRooms, setChatRooms] = React.useState<ChatRoomData[]>([]);
   const [page, setPage] = React.useState(0);
   const [count, setCount] = React.useState(0);
@@ -71,7 +71,7 @@ export const useChatRooms = () => {
             }
             const userAccount = await getUserAccount('accounts', `${partnerId}`) as UserAccount;
             chatRoomsData.push({
-              ...(chatRoomData as any),
+              ...(chatRoomData as Omit<ChatRoomData, "id" | "user">),
               id: doc.id,
               user: userAccount,
             });
@@ -118,7 +118,7 @@ export const useChatRooms = () => {
             }
             const userAccount = await getUserAccount('accounts', `${partnerId}`) as UserAccount;
             chatRoomsData.push({
-              ...(chatRoomData as any),
+              ...(chatRoomData as Omit<ChatRoomData, "id" | "user">),
               id: doc.id,
               user: userAccount,
             });

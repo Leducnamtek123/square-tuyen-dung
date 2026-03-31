@@ -1,14 +1,12 @@
 import i18n from '../i18n';
-import { Question, QuestionGroup, JobPost, JobPostActivity } from '../types/models';
-
-type AnyRecord = Record<string, any>;
+import { Question, QuestionGroup, JobPost } from '../types/models';
 
 const t = (key: string, options?: Record<string, unknown>) => i18n.t(key, options);
 
 /**
  * Transformers Layer: Centralized mapping from Backend API responses to Frontend models.
  */
-export const transformQuestion = (q: AnyRecord | null | undefined): Question | null => {
+export const transformQuestion = (q: any | null | undefined): Question | null => {
   if (!q) return null;
 
   const text = q.text || q.questionText || q.content || '';
@@ -23,7 +21,7 @@ export const transformQuestion = (q: AnyRecord | null | undefined): Question | n
 };
 
 export const transformQuestionGroup = (
-  group: AnyRecord | null | undefined,
+  group: any | null | undefined,
 ): QuestionGroup | null => {
   if (!group) return null;
 
@@ -37,7 +35,7 @@ export const transformQuestionGroup = (
 };
 
 export const transformInterviewSession = (
-  session: AnyRecord | null | undefined,
+  session: any | null | undefined,
 ): any | null => {
   if (!session) return null;
 
@@ -90,7 +88,7 @@ export const transformInterviewSession = (
   };
 };
 
-export const transformJobPost = (job: AnyRecord | null | undefined): JobPost | null => {
+export const transformJobPost = (job: any | null | undefined): JobPost | null => {
   if (!job) return null;
 
   return {
@@ -107,7 +105,7 @@ export const transformJobPost = (job: AnyRecord | null | undefined): JobPost | n
 };
 
 export const transformAppliedResume = (
-  resume: AnyRecord | null | undefined,
+  resume: any | null | undefined,
 ): any | null => {
   if (!resume) return null;
 

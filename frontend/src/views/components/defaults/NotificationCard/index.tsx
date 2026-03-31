@@ -15,6 +15,8 @@ interface NotificationCardProps {
   title: React.ReactNode;
 }
 
+
+
 const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
   const nav = useRouter();
   const {
@@ -28,7 +30,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
     handleRemoveAll
   } = useNotifications();
 
-  const handleClickItem = (item: any) => {
+  const handleClickItem = (item: typeof notifications[0]) => {
     switch (item.type) {
       case "SYSTEM":
         handleRead(item.key);
@@ -53,7 +55,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
         break;
       case "APPLY_JOB":
         handleRead(item.key);
-        nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, item["APPLY_JOB"]?.resume_slug)}`);
+        nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, (item["APPLY_JOB"] as Record<string, string>)?.resume_slug)}`);
         break;
       default:
         break;
@@ -116,7 +118,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
             <NoDataCard title="Chưa có thông báo nào!" />
           )}
 
-          {notifications.map((value: any, idx) => (
+          {notifications.map((value, idx) => (
             <Stack
               direction={{ xs: "column", sm: "row" }}
               spacing={{ xs: 2, sm: 3 }}
@@ -170,7 +172,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                   </Typography>
                   <Stack direction="row" alignItems="center" spacing={1} sx={{ mt: 1 }}>
                     <Typography variant="caption" color="text.disabled" sx={{ fontWeight: 500 }}>
-                      <TimeAgo date={value?.time?.seconds * 1000} type="fromNow" />
+                      <TimeAgo date={(value?.time?.seconds || 0) * 1000} type="fromNow" />
                     </Typography>
                     {!value?.is_read && (
                       <Box sx={{ px: 1, py: 0.25, backgroundColor: "error.main", color: "white", borderRadius: 1, fontSize: "0.7rem", fontWeight: "bold" }}>

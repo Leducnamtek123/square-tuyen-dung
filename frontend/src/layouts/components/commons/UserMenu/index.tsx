@@ -27,7 +27,19 @@ interface UserMenuProps {
   handleCloseUserMenu: () => void;
 }
 
+interface WorkspaceItem {
+  type: "company" | "candidate";
+  companyId?: number | string;
+  label: string;
+  roleCode?: string;
+}
 
+interface MenuItem {
+  key: string;
+  isSelected: boolean;
+  label: string;
+  onClick: () => void;
+}
 
 const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) => {
   const { t } = useTranslation('common');
@@ -35,7 +47,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
   const dispatch = useDispatch();
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
 
-  const workspaces = useMemo(() => currentUser?.workspaces || [], [currentUser?.workspaces]);
+  const workspaces = useMemo(() => (currentUser?.workspaces || []) as WorkspaceItem[], [currentUser?.workspaces]);
 
   const openPortal = (toEmployer = false, path = "") => {
     const normalizedPath = path ? `/${path.replace(/^\/+/, "")}` : "";
@@ -48,8 +60,8 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
   };
 
   const menuItems = React.useMemo(() => {
-    const items: any[] = [];
-    workspaces.forEach((workspace: any) => {
+    const items: MenuItem[] = [];
+    workspaces.forEach((workspace) => {
       const key = `${workspace.type}-${workspace.companyId || "candidate"}`;
       const isSelected =
         workspace.type === activeWorkspace?.type &&
@@ -64,7 +76,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
             ? `${workspace.label} (${workspace.roleCode || "member"})`
             : t("nav.accountManagement"),
         onClick: () => {
-          dispatch(setActiveWorkspace(workspace));
+          dispatch(setActiveWorkspace(workspace as any));
           if (workspace.type === "company") {
             openPortal(true, ROUTES.EMPLOYER.DASHBOARD);
             return;
@@ -79,7 +91,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
   const handleLogout = () => {
     const accessToken = tokenService.getAccessTokenFromCookie() || '';
     const backend = tokenService.getProviderFromCookie() || '';
-    (dispatch as any)(removeUserInfo({ accessToken, backend }))
+    (dispatch as import('../../../../redux/store').AppDispatch)(removeUserInfo({ accessToken, backend }))
       .unwrap()
       .then(() => {
         dispatch(resetSearchJobPostFilter());
@@ -88,7 +100,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
 
         nav.push(`/${ROUTES.AUTH.LOGIN}`);
       })
-      .catch((error: any) => {
+      .catch((error: import('axios').AxiosError<{ errors?: import('../../../../types/api').ApiError }>) => {
         errorHandling(error);
       });
   };
@@ -174,9 +186,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
         </Button>
       </Stack>
     </Menu>
-
   );
-
 };
 
 export default UserMenu;

@@ -1,16 +1,16 @@
 import httpRequest from '../utils/httpRequest';
 
-type AnyRecord = Record<string, unknown>;
 
 const adminSettingsService = {
-  getSystemSettings: (): Promise<AnyRecord> => {
+  getSystemSettings: (): Promise<Record<string, unknown>> => {
     const url = 'admin/web/system-settings/';
-    return httpRequest.get<AnyRecord>(url) as any as Promise<AnyRecord>;
+    return httpRequest.get<Record<string, unknown>>(url) as unknown as Promise<Record<string, unknown>>;
   },
-  updateSystemSettings: (data: AnyRecord): Promise<AnyRecord> => {
+  updateSystemSettings: (data: Record<string, unknown>): Promise<Record<string, unknown>> => {
     const url = 'admin/web/system-settings/';
-    return httpRequest.put<AnyRecord>(url, data) as any as Promise<AnyRecord>;
+    return httpRequest.put<Record<string, unknown>>(url, data) as unknown as Promise<Record<string, unknown>>;
   },
 };
 
 export default adminSettingsService;
+

@@ -72,3 +72,27 @@ def add_post_verify_required_notifications(company, job_post):
 
 def add_job_post_verify_notification(job_post):
     return NotificationService.add_job_post_verify_notification(job_post)
+
+
+def secure_check_creds(email, role_name=None):
+    """
+    Checks if a user exists with optional role filtering.
+    Designed to be used as a backend for check_creds views.
+    """
+    from apps.accounts.models import User
+    from apps.profiles.models import CompanyMember
+    from django.db.models import Q
+    from shared.configs import variable_system as var_sys
+
+    users = User.objects.filter(email__iexact=email)
+
+    if role_name:
+        if role_name == var_sys.EMPLOYER:
+            member_user_ids = CompanyMember.objects.filter(
+                is_active=True, status=CompanyMember.STATUS_ACTIVE
+            ).values_list("user_id", flat=True)
+            users = users.filter(Q(role_name=role_name) | Q(id__in=member_user_ids))
+        else:
+            users = users.filter(role_name=role_name)
+
+    return users.first()

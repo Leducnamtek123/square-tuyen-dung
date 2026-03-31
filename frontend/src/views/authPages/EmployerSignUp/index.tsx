@@ -82,7 +82,7 @@ const EmployerSignUp = () => {
 
   const handleRegister = (data: EmployerSignUpFormData) => {
 
-    const register = async (data: Record<string, unknown>, roleName: RoleName) => {
+    const register = async (data: import('../../../types/auth').EmployerRegisterData, roleName: RoleName) => {
 
       setIsFullScreenLoading(true);
 

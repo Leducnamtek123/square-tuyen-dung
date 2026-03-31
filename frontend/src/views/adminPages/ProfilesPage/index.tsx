@@ -76,10 +76,10 @@ const ProfilesPage = () => {
             header: t('pages.profiles.table.candidate') as string,
             cell: (info) => {
                 const profile = info.row.original;
-                const user = (profile as any).userDict;
+                const user = profile.userDict;
                 return (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                        <Avatar src={user?.avatarUrl} sx={{ width: 32, height: 32 }}>
+                        <Avatar src={user?.avatarUrl ?? undefined} sx={{ width: 32, height: 32 }}>
                             {user?.fullName?.charAt(0)}
                         </Avatar>
                         <Box>
@@ -188,7 +188,7 @@ const ProfilesPage = () => {
                 <DialogTitle>{t('pages.profiles.deleteTitle')}</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        {t('pages.profiles.deleteConfirm', { name: (currentProfile as any)?.userDict?.fullName })}
+                        {t('pages.profiles.deleteConfirm', { name: currentProfile?.userDict?.fullName })}
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>

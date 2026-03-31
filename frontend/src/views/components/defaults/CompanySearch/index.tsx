@@ -40,9 +40,9 @@ const CompanySearch = () => {
 
   }, [companyFilter, reset]);
 
-  const handleFilter = (data: any) => {
+  const handleFilter = (data: { kw: string; cityId: string }) => {
 
-    dispatch(searchCompany(data));
+    dispatch(searchCompany({ ...companyFilter, ...data } as import('../../../../redux/filterSlice').CompanyFilter));
 
   };
 

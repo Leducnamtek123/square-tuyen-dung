@@ -34,15 +34,15 @@ import {
   DocumentData,
 } from 'firebase/firestore';
 import db from '../../../../configs/firebase-config';
-import { ChatContext } from '../../../../context/ChatProvider';
 import Message from '../Message';
 import { RootState } from '../../../../redux/store';
+import { useChatContext } from '../../../../context/ChatProvider';
 
 // Types
 interface ChatRoom {
   id: string;
   members: string[];
-  updatedAt: any;
+  updatedAt: import('firebase/firestore').FieldValue | import('firebase/firestore').Timestamp;
   recipientId: string;
   createdBy: string;
   unreadCount?: number;
@@ -52,7 +52,7 @@ interface MessageData {
   id: string;
   text: string;
   senderId: string;
-  createdAt: any;
+  createdAt: { seconds: number; nanoseconds: number } | null;
 }
 
 const LIMIT_MESSAGE = 20;
@@ -61,7 +61,7 @@ const messageCollectionRef = collection(db, 'messages');
 const ChatWindow = () => {
   const { t } = useTranslation('chat');
   const { currentUser } = useSelector((state: RootState) => state.user);
-  const context = React.useContext(ChatContext);
+  const { currentUserChat, selectedRoomId, setSelectedRoomId } = useChatContext();
 
   const inputRef = React.useRef<HTMLInputElement>(null);
   const messageListRef = React.useRef<HTMLDivElement>(null);
@@ -73,10 +73,7 @@ const ChatWindow = () => {
   const [hasMore, setHasMore] = React.useState(true);
   const [lastDocument, setLastDocument] = React.useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [messages, setMessages] = React.useState<MessageData[]>([]);
-  const [page, setPage] = React.useState(1);
   const [count, setCount] = React.useState(0);
-
-  const { currentUserChat, selectedRoomId } = context || {};
 
   // Update unreadCount
   React.useEffect(() => {
@@ -211,7 +208,7 @@ const ChatWindow = () => {
     }
   }, [messages]);
 
-  if (!context || !currentUserChat || !selectedRoomId) {
+  if (!currentUserChat || !selectedRoomId) {
     return (
       <Box 
         sx={{ 

@@ -39,3 +39,36 @@ export interface BotConfig {
   CHAT_ICON?: string;
   MODE?: string;
 }
+
+/** Auth DTOs */
+export interface JobSeekerRegisterData {
+  email: string;
+  fullName: string;
+  password?: string;
+  platform?: string;
+  [key: string]: unknown;
+}
+
+export interface EmployerRegisterData extends Omit<import('../views/components/auths/EmployerSignUpForm').EmployerSignUpFormData, 'confirmPassword'> {
+  platform?: string;
+}
+
+export interface ResetPasswordData {
+  token?: string | string[];
+  newPassword: string;
+  confirmPassword: string;
+  platform?: string;
+}
+
+export interface ChangePasswordData {
+  oldPassword?: string;
+  newPassword?: string;
+  confirmPassword?: string;
+}
+
+export interface UserSettingsData {
+  receiveNotification?: boolean;
+  receiveEmail?: boolean;
+  [key: string]: unknown;
+}
+

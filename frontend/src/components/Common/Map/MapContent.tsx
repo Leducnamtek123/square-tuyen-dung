@@ -7,11 +7,23 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { Box, Typography, Paper } from "@mui/material";
 import { ICONS } from "@/configs/constants";
+import type { LatLngExpression } from "leaflet";
+
+interface StaticImageData {
+  src: string;
+  height: number;
+  width: number;
+  blurDataURL?: string;
+  blurWidth?: number;
+  blurHeight?: number;
+}
 
 // Next.js image imports return objects; extract string src
-const toSrc = (img: any): string => typeof img === 'string' ? img : img?.src || img?.default?.src || '';
-const markerShadow = toSrc(markerShadowImport);
-const markerIconRetina = toSrc(markerIconRetinaImport);
+const toSrc = (img: string | StaticImageData | { default: StaticImageData }): string => 
+  typeof img === 'string' ? img : (img as any)?.src || (img as any)?.default?.src || '';
+
+const markerShadow = toSrc(markerShadowImport as any);
+const markerIconRetina = toSrc(markerIconRetinaImport as any);
 
 interface Props {
   title?: string;
@@ -20,108 +32,66 @@ interface Props {
   longitude?: number;
 }
 
-
-
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+// Fix for default Leaflet icon issues in Webpack/Next.js
+interface LeafletIconDefault extends L.Icon.Default {
+  _getIconUrl?: string;
+}
+delete (L.Icon.Default.prototype as LeafletIconDefault)._getIconUrl;
 
 L.Icon.Default.mergeOptions({
-
   iconUrl: ICONS.LOCATION_MARKER,
-
   iconRetinaUrl: markerIconRetina,
-
   shadowUrl: markerShadow,
-
   iconSize: [56, 56],
-
   iconAnchor: [28, 60],
-
   popupAnchor: [0, -60],
-
   shadowSize: [41, 41]
-
 });
 
 const Map = ({ title, subTitle, latitude, longitude }: Props) => {
-
   if (!latitude || !longitude) {
-
     return (
-
       <Box 
-
         sx={{ 
-
           display: 'flex', 
-
           alignItems: 'center', 
-
           justifyContent: 'center',
-
           height: '250px', 
-
           backgroundColor: '#f8f9fa', 
-
           borderRadius: 2,
-
           border: '1px dashed #ced4da'
-
         }}
-
       >
-
         <Typography 
-
           sx={{ 
-
             color: '#9e9e9e', 
-
             fontStyle: 'italic', 
-
             fontSize: '0.875rem',
-
             display: 'flex',
-
             alignItems: 'center',
-
             gap: 1
-
           }}
-
         >
-
           <LocationOnIcon fontSize="small" />
-
           Chưa thể xác định vị trí trên bản đồ
-
         </Typography>
-
       </Box>
-
     );
-
   }
 
+  const position: LatLngExpression = [latitude, longitude];
+
   return (
-
     <Paper 
-
       elevation={3} 
-
       sx={{ 
-
         overflow: "hidden", 
-
         height: "250px", 
-
         borderRadius: 2,
-
       }}
-
     >
-
       <MapContainer
-        center={[latitude as number, longitude as number] as any}
+        center={position}
         zoom={15}
         scrollWheelZoom={false}
         style={{ height: "100%", width: "100%"}}
@@ -129,24 +99,15 @@ const Map = ({ title, subTitle, latitude, longitude }: Props) => {
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <Marker position={[latitude as number, longitude as number] as any}>
-
+        <Marker position={position}>
           <Popup>
-
             <Typography variant="subtitle2" fontWeight="bold">{title}</Typography>
-
             <Typography variant="body2">{subTitle}</Typography>
-
           </Popup>
-
         </Marker>
-
       </MapContainer>
-
     </Paper>
-
   );
-
 };
 
 export default Map;

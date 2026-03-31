@@ -1,9 +1,9 @@
 import React from "react";
 import { Box, Typography, Avatar } from "@mui/material";
-import { ChatContext } from "../../../../context/ChatProvider";
 import { formatMessageDate } from "../../../../utils/dateHelper";
 import defaultTheme from "../../../../themeConfigs/defaultTheme";
 import { useTranslation } from 'react-i18next';
+import { useChatContext } from "../../../../context/ChatProvider";
 
 interface MessageProps {
   userId: string | number;
@@ -17,12 +17,9 @@ interface MessageProps {
 
 const Message = ({ userId, text, avatarUrl, createdAt }: MessageProps) => {
   const { t } = useTranslation('chat');
-  const context = React.useContext(ChatContext);
-  const { currentUserChat } = context || {};
+  const { currentUserChat } = useChatContext();
 
   const isMe = `${currentUserChat?.userId}` === `${userId}`;
-
-  if (!context) return null;
 
   return (
     <Box

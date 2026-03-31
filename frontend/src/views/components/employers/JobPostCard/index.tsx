@@ -91,11 +91,30 @@ const JobPostCard = () => {
 
   const handleAddOrUpdate = async (formData: JobPostFormValues) => {
     setServerErrors(null);
-    const payload = {
-      ...formData,
+    const payload: import('../../../../services/jobService').JobPostInput = {
+      jobName: formData.jobName || '',
+      deadline: formData.deadline ? (typeof formData.deadline === 'string' ? formData.deadline : formData.deadline.toISOString()) : '',
+      quantity: Number(formData.quantity),
+      salaryMin: Number(formData.salaryMin),
+      salaryMax: Number(formData.salaryMax),
+      isHot: formData.isHot,
+      isUrgent: formData.isUrgent,
+      careerId: Number(formData.career),
+      position: Number(formData.position),
+      experience: Number(formData.experience),
+      academicLevel: Number(formData.academicLevel),
+      jobType: Number(formData.jobType),
+      typeOfWorkplace: Number(formData.typeOfWorkplace),
+      genderRequired: formData.genderRequired,
       jobDescription: convertEditorStateToHTMLString(formData.jobDescription as import('draft-js').EditorState),
       jobRequirement: convertEditorStateToHTMLString(formData.jobRequirement as import('draft-js').EditorState),
       benefitsEnjoyed: convertEditorStateToHTMLString(formData.benefitsEnjoyed as import('draft-js').EditorState),
+      contactPersonName: formData.contactPersonName,
+      contactPersonPhone: formData.contactPersonPhone,
+      contactPersonEmail: formData.contactPersonEmail,
+      cityId: Number(formData.location.city),
+      districtId: Number(formData.location.district),
+      address: formData.location.address,
     };
 
     try {

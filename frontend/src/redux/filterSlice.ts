@@ -15,14 +15,14 @@ export interface JobPostFilter {
   pageSize: number;
 }
 
-interface CompanyFilter {
+export interface CompanyFilter {
   kw: string;
   cityId: string;
   page: number;
   pageSize: number;
 }
 
-interface ResumeFilter {
+export interface ResumeFilter {
   kw: string;
   cityId: string;
   careerId: string;

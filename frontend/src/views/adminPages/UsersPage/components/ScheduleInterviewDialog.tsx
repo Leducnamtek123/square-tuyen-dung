@@ -61,7 +61,7 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
         };
 
         try {
-            await (scheduleInterview as any)(payload); // useInterviews might need its own refactor later for consistency
+            await scheduleInterview(payload); 
             onClose();
         } catch (err) {
             console.error('Schedule interview error:', err);

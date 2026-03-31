@@ -4,13 +4,27 @@ import { ChatContext } from '../../../../context/ChatProvider';
 import { addDocument, checkChatRoomExists, checkExists, createUser } from '../../../../services/firebaseService';
 import { RootState } from '../../../../redux/store';
 
-export const useRightSidebarData = (fetchData: (params: any) => Promise<any>, pageSize: number = 12) => {
+export interface UserDataPayload {
+  userId?: string;
+  name?: string;
+  email?: string;
+  avatarUrl?: string;
+  company?: {
+    companyId?: string;
+    slug?: string;
+    companyName?: string;
+    imageUrl?: string;
+  } | null;
+  [key: string]: unknown;
+}
+
+export const useRightSidebarData = <T,>(fetchData: (params: { page: number; pageSize: number }) => Promise<{ count: number; results: T[] }>, pageSize: number = 12) => {
   const context = React.useContext(ChatContext);
   const { currentUser } = useSelector((state: RootState) => state.user);
   const userId = currentUser?.id;
 
   const [isLoading, setIsLoading] = React.useState(true);
-  const [dataList, setDataList] = React.useState<any[]>([]);
+  const [dataList, setDataList] = React.useState<T[]>([]);
   const [page, setPage] = React.useState(1);
   const [count, setCount] = React.useState(0);
 
@@ -20,7 +34,7 @@ export const useRightSidebarData = (fetchData: (params: any) => Promise<any>, pa
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const resData = (await fetchData({ page, pageSize })) as any;
+        const resData = await fetchData({ page, pageSize });
         const data = resData;
         setCount(data.count);
         setDataList(data.results);
@@ -33,7 +47,7 @@ export const useRightSidebarData = (fetchData: (params: any) => Promise<any>, pa
     loadData();
   }, [page, fetchData, pageSize]);
 
-  const handleAddRoom = async (partnerId: string, userData: any) => {
+  const handleAddRoom = async (partnerId: string, userData: UserDataPayload) => {
     if (!userId || !setSelectedRoomId) return;
 
     let allowCreateNewChatRoom = false;

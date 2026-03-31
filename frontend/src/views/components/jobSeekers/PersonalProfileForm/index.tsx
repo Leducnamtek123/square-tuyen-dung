@@ -51,8 +51,7 @@ export interface PersonalProfileFormValues {
 
 interface PersonalProfileFormProps {
   handleUpdateProfile: (data: PersonalProfileFormValues) => void;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  editData: Partial<PersonalProfileFormValues> | any | null;
+  editData: Partial<PersonalProfileFormValues> | null;
 }
 
 

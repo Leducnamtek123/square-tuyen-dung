@@ -1,9 +1,8 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import jobService from '../../../../../services/jobService';
 
-type AnyRecord = Record<string, unknown>;
 
-export const useJobPosts = (params: AnyRecord, page: number) => {
+export const useJobPosts = (params: Record<string, unknown>, page: number) => {
     return useQuery({
         queryKey: ['jobPosts', params, page],
         queryFn: async () => {
@@ -17,7 +16,7 @@ export const useJobPosts = (params: AnyRecord, page: number) => {
     });
 };
 
-export const useSuggestedJobPosts = (params: AnyRecord, enabled: boolean = true) => {
+export const useSuggestedJobPosts = (params: Record<string, unknown>, enabled: boolean = true) => {
     return useQuery({
         queryKey: ['suggestedJobPosts', params],
         queryFn: async () => {
@@ -28,3 +27,4 @@ export const useSuggestedJobPosts = (params: AnyRecord, enabled: boolean = true)
         enabled,
     });
 };
+

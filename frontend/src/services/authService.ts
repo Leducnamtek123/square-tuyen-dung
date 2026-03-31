@@ -4,11 +4,8 @@ import { ensurePresignedUrl } from '../utils/presignUrl';
 import type { AuthProvider, RoleName, TokenPair } from '../types/auth';
 import type { User } from '../types/models';
 
-type AnyRecord = Record<string, unknown>;
-
-type TokenResponse = TokenPair & AnyRecord;
-
-type UserResponse = User & AnyRecord;
+type UserResponse = User & Record<string, unknown>;
+type TokenResponse = TokenPair & Record<string, unknown>;
 
 const authService = {
   getToken: (
@@ -36,7 +33,7 @@ const authService = {
     redirectUri?: string,
   ): Promise<TokenResponse> => {
     const url = 'auth/convert-token/';
-    const data: AnyRecord = {
+    const data: Record<string, unknown> = {
       grant_type: AUTH_CONFIG.CONVERT_TOKEN_KEY,
       client_id: clientId,
       client_secret: clientSecret,
@@ -82,12 +79,12 @@ const authService = {
     return httpRequest.post(url, { email });
   },
 
-  jobSeekerRegister: (data: AnyRecord): Promise<unknown> => {
+  jobSeekerRegister: (data: import('../types/auth').JobSeekerRegisterData): Promise<unknown> => {
     const url = 'auth/job-seeker/register/';
     return httpRequest.post(url, data);
   },
 
-  employerRegister: (data: AnyRecord): Promise<unknown> => {
+  employerRegister: (data: import('../types/auth').EmployerRegisterData): Promise<unknown> => {
     const url = 'auth/employer/register/';
     return httpRequest.post(url, data);
   },
@@ -111,7 +108,7 @@ const authService = {
     return (await httpRequest.get(url)) as UserResponse;
   },
 
-  updateUser: async (data: AnyRecord): Promise<UserResponse> => {
+  updateUser: async (data: Partial<User>): Promise<UserResponse> => {
     const url = 'auth/update-user/';
     const resData = (await httpRequest.patch(url, data)) as UserResponse;
     if (resData?.avatarUrl) {
@@ -142,17 +139,17 @@ const authService = {
     return resData;
   },
 
-  changePassword: (data: AnyRecord): Promise<unknown> => {
+  changePassword: (data: import('../types/auth').ChangePasswordData): Promise<unknown> => {
     const url = 'auth/change-password/';
     return httpRequest.put(url, data);
   },
 
-  forgotPassword: (data: AnyRecord): Promise<unknown> => {
+  forgotPassword: (data: { email: string; platform?: string }): Promise<unknown> => {
     const url = 'auth/forgot-password/';
     return httpRequest.post(url, data);
   },
 
-  resetPassword: (data: AnyRecord): Promise<unknown> => {
+  resetPassword: (data: import('../types/auth').ResetPasswordData): Promise<unknown> => {
     const url = 'auth/reset-password/';
     return httpRequest.post(url, data);
   },
@@ -162,7 +159,7 @@ const authService = {
     return httpRequest.get(url);
   },
 
-  updateUserSettings: (data: AnyRecord): Promise<unknown> => {
+  updateUserSettings: (data: import('../types/auth').UserSettingsData): Promise<unknown> => {
     const url = 'auth/settings/';
     return httpRequest.put(url, data);
   },

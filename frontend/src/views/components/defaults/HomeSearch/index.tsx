@@ -21,6 +21,8 @@ const HomeSearch = () => {
   const nav = useRouter();
   const { allConfig } = useConfig();
 
+  const { jobPostFilter } = useAppSelector((state) => state.filter);
+
   const { control, handleSubmit } = useForm({
     defaultValues: {
       kw: '',
@@ -68,9 +70,9 @@ const HomeSearch = () => {
     }
   };
 
-  const handleFilter = (data: any) => {
+  const handleFilter = (data: { kw: string; cityId: string; careerId: string }) => {
     handleSaveKeyworLocalStorage(data?.kw);
-    dispatch(searchJobPost(data));
+    dispatch(searchJobPost({ ...jobPostFilter, ...data } as import('../../../../redux/filterSlice').JobPostFilter));
     nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
   };
 

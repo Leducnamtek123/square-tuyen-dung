@@ -14,15 +14,15 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 
 import RatingCustom from '../../../../components/Common/Controls/RatingCustom';
 
-interface FormValues {
+export interface FormValues {
   name: string;
   level: number;
 }
 
 interface AdvancedSkillFormProps {
-  handleAddOrUpdate: (data: any) => void;
-  editData: any;
-  serverErrors?: any;
+  handleAddOrUpdate: (data: FormValues) => void;
+  editData: Partial<FormValues> | null;
+  serverErrors?: Record<string, string[]> | null;
 }
 
 
@@ -55,7 +55,7 @@ const AdvancedSkillForm = ({
 
   const { control, reset, setError, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<FormValues>,
 
   });
 
@@ -87,7 +87,7 @@ const AdvancedSkillForm = ({
 
       for (let err in serverErrors) {
 
-        setError(err as any, {
+        setError(err as keyof FormValues, {
 
           type: 'server',
 

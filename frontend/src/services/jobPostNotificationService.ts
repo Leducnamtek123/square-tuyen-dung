@@ -1,41 +1,55 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
+import type { PaginatedResponse } from '../types/api';
 
-type AnyRecord = Record<string, unknown>;
+export interface JobPostNotification {
+  id: number;
+  jobName: string;
+  career?: number;
+  city?: number;
+  experience?: number;
+  salaryMin?: number;
+  salary?: number | null;
+  frequency?: number;
+  isActive: boolean;
+  createdAt: string;
+}
+
 
 type IdType = string | number;
 
 const jobPostNotificationService = {
-  addJobPostNotification: (data: AnyRecord): Promise<unknown> => {
+  addJobPostNotification: (data: Record<string, unknown>): Promise<JobPostNotification> => {
     const url = 'job/web/job-post-notifications/';
-    return httpRequest.post(url, data);
+    return httpRequest.post(url, data) as Promise<JobPostNotification>;
   },
 
-  getJobPostNotifications: (params: AnyRecord = {}): Promise<unknown> => {
+  getJobPostNotifications: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<JobPostNotification>> => {
     const url = 'job/web/job-post-notifications/';
     return httpRequest.get(url, {
       params: params,
-    });
+    }) as Promise<PaginatedResponse<JobPostNotification>>;
   },
 
-  updateJobPostNotificationById: (id: IdType, data: AnyRecord): Promise<unknown> => {
+  updateJobPostNotificationById: (id: IdType, data: Partial<JobPostNotification> | Record<string, unknown>): Promise<JobPostNotification> => {
     const url = `job/web/job-post-notifications/${id}/`;
-    return httpRequest.put(url, data);
+    return httpRequest.put(url, data) as Promise<JobPostNotification>;
   },
 
-  getJobPostNotificationDetailById: (id: IdType): Promise<unknown> => {
+  getJobPostNotificationDetailById: (id: IdType): Promise<JobPostNotification> => {
     const url = `job/web/job-post-notifications/${id}/`;
-    return httpRequest.get(url);
+    return httpRequest.get(url) as Promise<JobPostNotification>;
   },
 
-  deleteJobPostNotificationDetailById: (id: IdType): Promise<unknown> => {
+  deleteJobPostNotificationDetailById: (id: IdType): Promise<void> => {
     const url = `job/web/job-post-notifications/${id}/`;
-    return httpRequest.delete(url);
+    return httpRequest.delete(url) as Promise<void>;
   },
 
-  active: (id: IdType): Promise<unknown> => {
+  active: (id: IdType): Promise<JobPostNotification> => {
     const url = `job/web/job-post-notifications/${id}/`;
-    return httpRequest.patch(url, {});
+    return httpRequest.patch(url, {}) as Promise<JobPostNotification>;
   },
 };
 
 export default jobPostNotificationService;
+

@@ -29,10 +29,11 @@ import { isAdminPortalPath, isEmployerPortalPath } from "../../../../configs/por
 import { localizeRoutePath } from "../../../../configs/routeLocalization";
 
 interface HeaderProps {
-  [key: string]: any;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
-const Header = (props: HeaderProps) => {
+const Header = (_props: HeaderProps) => {
 
   const { t, i18n } = useTranslation('common');
 
@@ -98,7 +99,7 @@ const Header = (props: HeaderProps) => {
 
   };
 
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const handleOpenUserMenu = (event: React.UIEvent<HTMLElement>) => {
 
     setAnchorElUser(event.currentTarget);
 
@@ -148,7 +149,7 @@ const Header = (props: HeaderProps) => {
 
         tabIndex={0}
 
-        onKeyDown={(e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleOpenUserMenu(e as any); } }}
+        onKeyDown={(e: React.KeyboardEvent<HTMLElement>) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleOpenUserMenu(e); } }}
 
         sx={{
 

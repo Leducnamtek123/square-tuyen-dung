@@ -27,10 +27,11 @@ export interface AppNotification {
   title?: string;
   content?: string;
   imageUrl?: string | null;
+  image?: string | null;
   type?: string;
   is_read?: boolean;
   is_deleted?: boolean;
-  time?: unknown; // Firestore Timestamp
+  time?: { seconds: number; nanoseconds?: number };
   link?: string;
   [field: string]: unknown;
 }

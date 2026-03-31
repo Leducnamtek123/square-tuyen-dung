@@ -7,7 +7,7 @@ import JobPost from '../../../../components/Features/JobPost';
 import NoDataCard from '../../../../components/Common/NoDataCard';
 
 interface FilterJobPostCardProps {
-  params?: any;
+  params?: Record<string, unknown>;
 }
 
 const pageSize = 12;
@@ -61,7 +61,7 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
         ...resolvedParams,
         pageSize: pageSize,
         page: page,
-      }) as any;
+      }) as { results?: Array<import('../../../../types/models').JobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }>, count?: number };
       return {
         results: resData?.results || [],
         count: resData?.count || 0,
@@ -94,16 +94,16 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
         ) : (
           <>
             <Grid container spacing={2}>
-              {jobPosts.map((value: any) => (
+              {jobPosts.map((value: import('../../../../types/models').JobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }) => (
                 <Grid key={value.id} size={col}>
                   {/* Start: Job post */}
                   <JobPost
                     id={value.id}
                     slug={value.slug}
                     companyImageUrl={value?.companyDict?.companyImageUrl}
-                    companyName={value?.companyDict?.companyName}
+                    companyName={value?.companyDict?.companyName as string}
                     jobName={value?.jobName}
-                    cityId={value?.locationDict?.city}
+                    cityId={value?.locationDict?.city as unknown as number}
                     deadline={value?.deadline}
                     isUrgent={value?.isUrgent}
                     isHot={value?.isHot}

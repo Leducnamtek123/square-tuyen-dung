@@ -131,16 +131,16 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
     }
   }, [serverErrors, setError, clearErrors]);
 
-  const handleSelectLocation = async (e: React.SyntheticEvent, value: Record<string, unknown> | null) => {
-    if (!value || typeof value !== 'object' || !value.place_id) return;
+  const handleSelectLocation = async (_e: React.SyntheticEvent, value: Record<string, unknown> | null) => {
+    if (!value || !value.place_id) return;
     try {
       const resData = await goongService.getPlaceDetailByPlaceId(value.place_id as string);
-      const resultObj = (resData as Record<string, unknown>)?.result as Record<string, unknown> | undefined;
-      const geometryObj = resultObj?.geometry as Record<string, unknown> | undefined;
+      if (!resData) return;
+      const geometryObj = resData.result.geometry;
       if (!geometryObj?.location) return;
-      const location = geometryObj.location as Record<string, unknown>;
-      setValue('location.lng', location.lng as number | string);
-      setValue('location.lat', location.lat as number | string);
+      const location = geometryObj.location;
+      setValue('location.lng', location.lng);
+      setValue('location.lat', location.lat);
     } catch (error) {
         errorHandling(error as AxiosError<{ errors?: ApiError }>);
     }

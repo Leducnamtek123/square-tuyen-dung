@@ -4,12 +4,13 @@ import toastMessages from '../../../../utils/toastMessages';
 import i18n from '../../../../i18n';
 import { User as UserModel } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import { RoleName } from '../../../../types/auth';
 
-const t = (key: string, options?: any) => i18n.t(key, { ns: 'admin', ...options }) as string;
+const t = (key: string, options?: Record<string, unknown>) => i18n.t(key, { ns: 'admin', ...options });
 
 export type UseUsersResult = UseQueryResult<PaginatedResponse<UserModel>> & {
     toggleUserStatus: (user: UserModel) => Promise<UserModel>;
-    updateUserRole: (args: { userId: string | number; roleName: string }) => Promise<UserModel>;
+    updateUserRole: (args: { userId: string | number; roleName: RoleName }) => Promise<UserModel>;
     deleteUser: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
@@ -36,22 +37,24 @@ export const useUsers = (params: Record<string, unknown>): UseUsersResult => {
             );
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
-        onError: (error: any) => {
+        onError: (error: unknown) => {
+            const err = error as import('axios').AxiosError<{ errors?: { detail?: string } }>;
             toastMessages.error(
-                error.response?.data?.errors?.detail || t('pages.users.toast.actionFailed')
+                err.response?.data?.errors?.detail || t('pages.users.toast.actionFailed')
             );
         }
     });
 
     const updateRoleMutation = useMutation({
-        mutationFn: ({ userId, roleName }: { userId: string | number; roleName: string }) => userService.updateUser(userId, { roleName }),
+        mutationFn: ({ userId, roleName }: { userId: string | number; roleName: RoleName }) => userService.updateUser(userId, { roleName }),
         onSuccess: () => {
             toastMessages.success(t('pages.users.toast.roleUpdated'));
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
-        onError: (error: any) => {
+        onError: (error: unknown) => {
+            const err = error as import('axios').AxiosError<{ errors?: { detail?: string } }>;
             toastMessages.error(
-                error.response?.data?.errors?.detail || t('pages.users.toast.roleUpdateFailed')
+                err.response?.data?.errors?.detail || t('pages.users.toast.roleUpdateFailed')
             );
         }
     });
@@ -62,9 +65,10 @@ export const useUsers = (params: Record<string, unknown>): UseUsersResult => {
             toastMessages.success('User deleted successfully');
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
-        onError: (error: any) => {
+        onError: (error: unknown) => {
+            const err = error as import('axios').AxiosError<{ errors?: { detail?: string } }>;
             toastMessages.error(
-                error.response?.data?.errors?.detail || 'Delete failed'
+                err.response?.data?.errors?.detail || 'Delete failed'
             );
         }
     });
@@ -75,5 +79,5 @@ export const useUsers = (params: Record<string, unknown>): UseUsersResult => {
         updateUserRole: updateRoleMutation.mutateAsync,
         deleteUser: deleteMutation.mutateAsync,
         isMutating: toggleStatusMutation.isPending || updateRoleMutation.isPending || deleteMutation.isPending
-    } as UseUsersResult;
+    } as unknown as UseUsersResult;
 };

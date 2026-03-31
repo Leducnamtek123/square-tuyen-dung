@@ -17,8 +17,8 @@ export interface FormValues {
 
 interface CertificateFormProps {
   handleAddOrUpdate: (data: FormValues) => void;
-  editData: any;
-  serverErrors?: any;
+  editData: Partial<FormValues> | null;
+  serverErrors?: Record<string, string[]> | null;
 }
 
 const CertificateForm = ({
@@ -51,7 +51,7 @@ const CertificateForm = ({
       startDate: null,
       expirationDate: null,
     },
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<FormValues>,
   });
 
   React.useEffect(() => {
@@ -74,7 +74,7 @@ const CertificateForm = ({
   React.useEffect(() => {
     if (serverErrors !== null) {
       for (let err in serverErrors) {
-        setError(err as any, {
+        setError(err as keyof FormValues, {
           type: 'server',
           message: serverErrors[err]?.join(' '),
         });

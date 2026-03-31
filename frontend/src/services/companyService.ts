@@ -4,7 +4,6 @@ import { presignInObject } from '../utils/presignUrl';
 import type { PaginatedResponse } from '../types/api';
 import type { Company, JobPost } from '../types/models';
 
-type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number;
 
@@ -15,7 +14,7 @@ const companyService = {
     return presignInObject(data);
   },
 
-  updateCompany: async (id: IdType, data: AnyRecord): Promise<Company> => {
+  updateCompany: async (id: IdType, data: Record<string, unknown>): Promise<Company> => {
     const url = `info/web/private-companies/${id}/`;
     const resData = await httpRequest.put<unknown, Company>(url, data);
     return presignInObject(resData);
@@ -43,7 +42,7 @@ const companyService = {
 
   // public
 
-  getCompanies: async (params: AnyRecord = {}): Promise<PaginatedResponse<Company>> => {
+  getCompanies: async (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Company>> => {
     const url = 'info/web/companies/';
     const data = await httpRequest.get<unknown, PaginatedResponse<Company>>(url, {
       params: params,
@@ -76,3 +75,4 @@ const companyService = {
 };
 
 export default companyService;
+

@@ -15,7 +15,11 @@ import { PaginatedResponse } from '@/types/api';
 import { JobPost, JobPostActivity, Resume, ResumeSaved, InterviewSession, Question, QuestionGroup } from '@/types/models';
 
 // ─── Types ───────────────────────────────────────────────────
-export type UseEmployerGeneralStatsResult = UseQueryResult<Record<string, unknown>>; // Define more specific type if available in statisticService
+export type UseEmployerGeneralStatsResult = UseQueryResult<import('../../../../services/statisticService').EmployerGeneralStats>;
+export type UseEmployerApplicationStatsResult = UseQueryResult<import('../../../../services/statisticService').EmployerApplicationStats>;
+export type UseEmployerCandidateStatsResult = UseQueryResult<import('../../../../services/statisticService').EmployerCandidateStats>;
+export type UseEmployerRecruitmentStatsResult = UseQueryResult<import('../../../../services/statisticService').EmployerRecruitmentStatItem[]>;
+export type UseEmployerRecruitmentByRankStatsResult = UseQueryResult<import('../../../../services/statisticService').EmployerRecruitmentByRankStats>;
 export type UseSavedResumesResult = UseQueryResult<PaginatedResponse<ResumeSaved>>;
 export type UseAppliedResumesResult = UseQueryResult<PaginatedResponse<JobPostActivity>>;
 export type UseEmployerResumesResult = UseQueryResult<PaginatedResponse<Resume>>;
@@ -32,7 +36,7 @@ export interface JobPostOption {
 }
 
 // ─── Employer Statistics ─────────────────────────────────────
-export const useEmployerGeneralStatistics = () => {
+export const useEmployerGeneralStatistics = (): UseEmployerGeneralStatsResult => {
   return useQuery({
     queryKey: ['employerGeneralStatistics'],
     queryFn: async () => {
@@ -42,7 +46,7 @@ export const useEmployerGeneralStatistics = () => {
   });
 };
 
-export const useEmployerApplicationStatistics = (params: Record<string, unknown>) => {
+export const useEmployerApplicationStatistics = (params: Record<string, unknown> = {}): UseEmployerApplicationStatsResult => {
   return useQuery({
     queryKey: ['employerApplicationStatistics', params],
     queryFn: async () => {
@@ -52,7 +56,7 @@ export const useEmployerApplicationStatistics = (params: Record<string, unknown>
   });
 };
 
-export const useEmployerCandidateStatistics = (params: Record<string, unknown>) => {
+export const useEmployerCandidateStatistics = (params: Record<string, unknown> = {}): UseEmployerCandidateStatsResult => {
   return useQuery({
     queryKey: ['employerCandidateStatistics', params],
     queryFn: async () => {
@@ -62,7 +66,7 @@ export const useEmployerCandidateStatistics = (params: Record<string, unknown>) 
   });
 };
 
-export const useEmployerRecruitmentStatistics = (params: Record<string, unknown>) => {
+export const useEmployerRecruitmentStatistics = (params: Record<string, unknown> = {}): UseEmployerRecruitmentStatsResult => {
   return useQuery({
     queryKey: ['employerRecruitmentStatistics', params],
     queryFn: async () => {
@@ -72,7 +76,7 @@ export const useEmployerRecruitmentStatistics = (params: Record<string, unknown>
   });
 };
 
-export const useEmployerRecruitmentByRank = (params: Record<string, unknown>) => {
+export const useEmployerRecruitmentByRank = (params: Record<string, unknown> = {}): UseEmployerRecruitmentByRankStatsResult => {
   return useQuery({
     queryKey: ['employerRecruitmentByRank', params],
     queryFn: async () => {
@@ -83,7 +87,7 @@ export const useEmployerRecruitmentByRank = (params: Record<string, unknown>) =>
 };
 
 // ─── Job Posts ──────────────────────────────────────────────
-export const useEmployerJobPosts = (params: Record<string, unknown>): UseEmployerJobPostsResult => {
+export const useEmployerJobPosts = (params: import('../../../../services/jobService').GetJobPostsParams = {}): UseEmployerJobPostsResult => {
   return useQuery({
     queryKey: ['employerJobPosts', params],
     queryFn: async () => {
@@ -98,14 +102,14 @@ export const useJobPostMutations = () => {
   const queryClient = useQueryClient();
 
   const addMutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) => jobService.addJobPost(data as unknown as Parameters<typeof jobService.addJobPost>[0]),
+    mutationFn: (data: import('../../../../services/jobService').JobPostInput) => jobService.addJobPost(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerJobPosts'] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> }) => jobService.updateJobPostById(id, data),
+    mutationFn: ({ id, data }: { id: string | number; data: Partial<import('../../../../services/jobService').JobPostInput> }) => jobService.updateJobPostById(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerJobPosts'] });
     },
@@ -172,9 +176,9 @@ export const useJobPostOptions = () => {
   return useQuery({
     queryKey: ['jobPostOptions'],
     queryFn: async (): Promise<JobPostOption[]> => {
-      const getOptions = (jobService as Record<string, unknown>).getJobPostOptions as unknown as () => Promise<JobPostOption[]>;
-      const response = await getOptions();
-      return response || [];
+      const response = await jobService.getJobPostOptions();
+      const statusOptions = response.statusOptions || [];
+      return statusOptions as unknown as JobPostOption[];
     },
     staleTime: 5 * 60_000,
   });
@@ -253,7 +257,7 @@ export const useResumeDetail = (slug: string) => {
 };
 
 // ─── Interview Management ────────────────────────────────────
-export const useInterviewSessions = (params: Record<string, unknown>, refetchInterval?: number | false): UseInterviewSessionsResult => {
+export const useInterviewSessions = (params: import('../../../../services/interviewService').GetSessionsParams = {}, refetchInterval?: number | false): UseInterviewSessionsResult => {
   return useQuery({
     queryKey: ['interviewSessions', params],
     queryFn: () => interviewService.getSessions(params),
@@ -274,14 +278,14 @@ export const useInterviewMutations = () => {
   const queryClient = useQueryClient();
 
   const scheduleMutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) => interviewService.scheduleSession(data),
+    mutationFn: (data: import('../../../../services/interviewService').ScheduleSessionInput) => interviewService.scheduleSession(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewSessions'] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> }) => interviewService.updateSession(id, data),
+    mutationFn: ({ id, data }: { id: string | number; data: Partial<import('../../../../services/interviewService').ScheduleSessionInput> }) => interviewService.updateSession(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewSessions'] });
       queryClient.invalidateQueries({ queryKey: ['interviewDetail'] });
@@ -304,7 +308,7 @@ export const useInterviewMutations = () => {
   });
 
   const evaluationMutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) => interviewService.submitEvaluation(data as unknown as Parameters<typeof interviewService.submitEvaluation>[0]),
+    mutationFn: (data: import('../../../../services/interviewService').SubmitEvaluationInput) => interviewService.submitEvaluation(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewDetail'] });
     },
@@ -322,7 +326,7 @@ export const useInterviewMutations = () => {
 };
 
 // ─── Questions & Groups ──────────────────────────────────────
-export const useEmployerQuestions = (params: Record<string, unknown>): UseEmployerQuestionsResult => {
+export const useEmployerQuestions = (params: Record<string, unknown> = {}): UseEmployerQuestionsResult => {
   return useQuery({
     queryKey: ['employerQuestions', params],
     queryFn: () => questionService.getQuestions(params),
@@ -330,7 +334,7 @@ export const useEmployerQuestions = (params: Record<string, unknown>): UseEmploy
   });
 };
 
-export const useQuestionGroups = (params: Record<string, unknown>): UseQuestionGroupsResult => {
+export const useQuestionGroups = (params: Record<string, unknown> = {}): UseQuestionGroupsResult => {
   return useQuery({
     queryKey: ['questionGroups', params],
     queryFn: () => questionGroupService.getQuestionGroups(params),
@@ -414,7 +418,7 @@ export const useCompanyMutations = () => {
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> | FormData }) => companyService.updateCompany(id, data as unknown as Parameters<typeof companyService.updateCompany>[1]),
+    mutationFn: ({ id, data }: { id: string | number; data: Parameters<typeof companyService.updateCompany>[1] }) => companyService.updateCompany(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['companyProfile'] });
     },

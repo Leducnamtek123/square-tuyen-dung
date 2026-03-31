@@ -16,15 +16,7 @@ import ItemLoading from "./ItemLoading";
 import ItemComponent from "./ItemComponent";
 import { useJobPostNotifications, useJobPostNotificationMutations } from "../hooks/useJobSeekerQueries";
 
-interface JobPostNotification {
-  id: number;
-  jobName: string;
-  salary: number | null;
-  frequency: number;
-  isActive: boolean;
-  career: number;
-  city: number;
-}
+import type { JobPostNotification } from "../../../../services/jobPostNotificationService";
 
 const pageSize = 12;
 
@@ -38,7 +30,7 @@ const JobPostNotificationCard = () => {
   const [editData, setEditData] = React.useState<Partial<JobPostNotificationFormValues> & { id?: number } | null>(null);
 
   const { data, isLoading } = useJobPostNotifications({ page, pageSize });
-  const jobPostNotifications: JobPostNotification[] = (data?.results as unknown as JobPostNotification[]) || [];
+  const jobPostNotifications: JobPostNotification[] = (data?.results || []);
   const count = data?.count || 0;
 
   const { addMutation, updateMutation, deleteMutation } = useJobPostNotificationMutations();
@@ -50,8 +42,8 @@ const JobPostNotificationCard = () => {
   const handleShowUpdate = async (id: number) => {
     setIsFullScreenLoading(true);
     try {
-      const resData = await jobPostNotificationService.getJobPostNotificationDetailById(id) as Partial<JobPostNotificationFormValues> & { id?: number };
-      setEditData(resData);
+      const resData = await jobPostNotificationService.getJobPostNotificationDetailById(id);
+      setEditData(resData as unknown as Partial<JobPostNotificationFormValues> & { id?: number });
       setOpenPopup(true);
     } catch (error) {
       errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
@@ -67,14 +59,14 @@ const JobPostNotificationCard = () => {
 
   const handleAddOrUpdate = (formData: JobPostNotificationFormValues & { id?: number }) => {
     if ("id" in formData && formData.id) {
-      updateMutation.mutate(formData as unknown as Record<string, unknown> & { id: number }, {
+      updateMutation.mutate({ id: formData.id, data: { ...formData } as any }, {
         onSuccess: () => {
           setOpenPopup(false);
           toastMessages.success(t("jobSeeker:jobManagement.notifications.updatedSuccess"));
         },
       });
     } else {
-      addMutation.mutate(formData as unknown as Record<string, unknown>, {
+      addMutation.mutate({ ...formData } as any, {
         onSuccess: () => {
           setOpenPopup(false);
           toastMessages.success(t("jobSeeker:jobManagement.notifications.addedSuccess"));
@@ -123,9 +115,9 @@ const JobPostNotificationCard = () => {
                 sx={{
                   px: 3,
                   py: 1,
-                  background: (theme: any) => theme.palette.primary.main,
+                  background: (theme: import('@mui/material').Theme) => theme.palette.primary.main,
                   "&:hover": {
-                    background: (theme: any) => theme.palette.primary.main,
+                    background: (theme: import('@mui/material').Theme) => theme.palette.primary.main,
                     opacity: 0.9,
                   },
                 }}
@@ -160,11 +152,11 @@ const JobPostNotificationCard = () => {
                     key={value.id}
                     id={value.id}
                     jobName={value.jobName}
-                    salary={value.salary}
-                    frequency={value.frequency}
+                    salary={value.salary || null}
+                    frequency={value.frequency || 0}
                     isActive={value.isActive}
-                    career={value.career}
-                    city={value.city}
+                    career={value.career || 0}
+                    city={value.city || 0}
                     handleShowUpdate={handleShowUpdate}
                     handleDelete={handleDeleteJobPostNotification}
                   />
@@ -211,7 +203,7 @@ const JobPostNotificationCard = () => {
               </Box>
             </Stack>
           </Stack>
-        ) as any}
+        ) as React.ReactElement}
         buttonText={editData ? t("common:actions.save") : t("jobSeeker:jobManagement.notifications.create")}
         buttonIcon={null}
         openPopup={openPopup}

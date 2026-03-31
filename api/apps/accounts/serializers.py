@@ -42,20 +42,6 @@ class UpdatePasswordSerializer(PasswordConfirmMixin, serializers.Serializer):
     newPassword = serializers.CharField(required=True, max_length=128)
     confirmPassword = serializers.CharField(required=True, max_length=128)
 
-    def validate(self, attrs):
-        attrs = super().validate(attrs)
-        user = self.context['user']
-        old_pass = attrs.get('oldPassword', '')
-        if not user.check_password(old_pass):
-            raise serializers.ValidationError({'oldPassword': ERROR_MESSAGES['CURRENT_PASSWORD_INCORRECT']})
-        return attrs
-
-    def update(self, instance, validated_data):
-        instance.set_password(validated_data.get('newPassword'))
-        instance.save()
-
-        return instance
-
 class ResetPasswordSerializer(PlatformValidationMixin, PasswordConfirmMixin, DynamicFieldsMixin, serializers.Serializer):
     newPassword = serializers.CharField(required=True, max_length=128)
     confirmPassword = serializers.CharField(required=True, max_length=128)
@@ -87,24 +73,6 @@ class JobSeekerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
         django_validate_password(value)
         return value
 
-
-
-    def create(self, validated_data):
-        try:
-            with transaction.atomic():
-                validated_data.pop("confirmPassword")
-                validated_data.pop("platform")
-                user = User.objects.create_user_with_role_name(**validated_data,
-                                                               is_active=False,
-                                                               role_name=var_sys.JOB_SEEKER)
-                job_seeker_profile = JobSeekerProfile.objects.create(user=user)
-                Resume.objects.create(job_seeker_profile=job_seeker_profile, user=user,
-                                      type=var_sys.CV_WEBSITE)
-
-                return user
-        except Exception as ex:
-            helper.print_log_error("create user in JobSeekerRegisterSerializer", ex)
-            raise
 
     class Meta:
         model = User
@@ -158,28 +126,6 @@ class EmployerRegisterSerializer(PasswordConfirmMixin, serializers.Serializer):
     def validate_password(self, value):
         django_validate_password(value)
         return value
-
-
-
-    def create(self, validated_data):
-        try:
-            with transaction.atomic():
-                validated_data.pop("confirmPassword")
-                validated_data.pop("platform")
-                company = validated_data.pop("company")
-                location = company.pop("location")
-
-                location_obj = Location.objects.create(**location)
-                user = User.objects.create_user_with_role_name(**validated_data,
-                                                               is_active=False,
-                                                               has_company=True,
-                                                               role_name=var_sys.EMPLOYER)
-                Company.objects.create(user=user, **company, location=location_obj)
-
-                return user
-        except Exception as ex:
-            helper.print_log_error("create user in EmployerRegisterSerializer", ex)
-            raise
 
     class Meta:
         model = User
@@ -398,40 +344,6 @@ class AvatarSerializer(serializers.ModelSerializer):
         except Exception as ex:
             helper.print_log_error("AvatarSerializer.get_avatar_url", ex)
         return var_sys.AVATAR_DEFAULT["AVATAR"]
-
-    def update(self, user, validated_data):
-        file = validated_data.pop('file')
-
-        try:
-            with transaction.atomic():
-                public_id = None
-                # Overwrite if image already exists
-                if user.avatar:
-                    path_list = user.avatar.public_id.split('/')
-                    public_id = path_list[-1] if path_list else None
-                # Call upload service
-                avatar_upload_result = CloudinaryService.upload_image(
-                    file,
-                    settings.CLOUDINARY_DIRECTORY["avatar"],
-                    public_id=public_id
-                )
-                if not avatar_upload_result:
-                    raise Exception("Lỗi khi tải ảnh lên máy chủ lưu trữ.")
-                user.avatar = File.update_or_create_file_with_cloudinary(
-                    user.avatar,
-                    avatar_upload_result,
-                    File.AVATAR_TYPE
-                )
-                user.save()
-
-                # update in firebase
-                if not user.has_company:
-                    queue_auth.update_avatar.delay(user.id, user.avatar.get_full_url())
-            
-            return user
-        except Exception as ex:
-            helper.print_log_error("AvatarSerializer.update", ex)
-            raise
 
     class Meta:
         model = User

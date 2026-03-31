@@ -82,7 +82,7 @@ const ResumesPage = () => {
                         {info.getValue() as string}
                     </Typography>
                     <Typography variant="caption" color="textSecondary">
-                        {(info.row.original as any).userDict?.fullName || '—'}
+                        {info.row.original.userDict?.fullName || '—'}
                     </Typography>
                 </Box>
             ),

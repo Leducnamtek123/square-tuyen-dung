@@ -127,45 +127,21 @@ class JobSeekerJobPostActivityViewSet(
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        job_post_activity = serializer.save()
-        headers = self.get_success_headers(serializer.data)
 
-        if settings.AI_RESUME_AUTO_ANALYZE:
-            try:
-                from ..tasks import analyze_resume_ai
+        from ..services import JobActivityService
+        try:
+            job_post_activity = JobActivityService.apply_to_job(
+                user=request.user,
+                validated_data=serializer.validated_data
+            )
+        except ValueError as e:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({"errorMessage": str(e)})
 
-                job_post_activity.ai_analysis_status = 'processing'
-                job_post_activity.ai_analysis_progress = 5
-                job_post_activity.save()
-                analyze_resume_ai.delay(job_post_activity.id)
-            except Exception as ex:
-                helper.print_log_error("auto analyze resume", ex)
+        response_serializer = self.get_serializer(job_post_activity)
+        headers = self.get_success_headers(response_serializer.data)
 
-        user = request.user
-        job_post = job_post_activity.job_post
-        company = job_post.company
-        domain = settings.DOMAIN_CLIENT["job_seeker"]
-
-        subject = f"XÃ¡c nháº­n á»©ng tuyá»ƒn: {job_post.job_name}"
-        to = [user.email]
-        data = {
-            "full_name": user.full_name,
-            "company_name": company.company_name,
-            "job_name": job_post.job_name,
-            "find_job_post_link": domain + "viec-lam",
-        }
-
-        queue_mail.send_email_confirm_application.delay(
-            to=to,
-            subject=subject,
-            data=data,
-        )
-
-        helper.add_apply_job_notifications(
-            job_post_activity=job_post_activity,
-        )
-
-        return var_res.response_data(status=status.HTTP_201_CREATED, data=serializer.data)
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data, headers=headers)
 
 
 class EmployerJobPostActivityViewSet(
@@ -353,29 +329,12 @@ class EmployerJobPostActivityViewSet(
             stt = data["status"]
             job_post_activity = self.get_object()
 
-            if job_post_activity.status > stt:
+            from ..services import JobActivityService
+            try:
+                JobActivityService.change_application_status(job_post_activity, stt)
+                return var_res.response_data(status=status.HTTP_200_OK)
+            except ValueError:
                 return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
-
-            job_post_activity.status = stt
-            job_post_activity.save()
-
-            notification_title = job_post_activity.job_post.company.company_name
-            notification_content = APPLICATION_STATUS_MESSAGES["STATUS_UPDATED"].format(
-                job_name=job_post_activity.job_post.job_name,
-                status=[x for x in var_sys.APPLICATION_STATUS if x[0] == stt][0][1],
-            )
-
-            logo = job_post_activity.job_post.company.logo
-            company_logo_url = logo.get_full_url() if logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
-
-            helper.add_apply_status_notifications(
-                notification_title,
-                notification_content,
-                company_logo_url,
-                job_post_activity.user_id,
-            )
-
-            return var_res.response_data(status=status.HTTP_200_OK)
 
         return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
@@ -383,8 +342,6 @@ class EmployerJobPostActivityViewSet(
     def send_email(self, request, pk):
         try:
             data = request.data
-            user = request.user
-            company = user.company
             serializer = SendMailToJobSeekerSerializer(data=data)
             if not serializer.is_valid():
                 return var_res.response_data(
@@ -392,38 +349,17 @@ class EmployerJobPostActivityViewSet(
                     errors=serializer.errors,
                 )
 
-            validate_data = serializer.data
-            to = [validate_data.get("email")]
-            is_send_me = validate_data.pop("isSendMe")
-            if is_send_me:
-                to.append(user.email)
-
-            email_data = {
-                'content': validate_data.get("content"),
-                'company_image': company.logo.get_full_url()
-                if company.logo
-                else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"],
-                'company_name': company.company_name,
-                'company_phone': company.company_phone,
-                'company_email': company.company_email,
-                'company_address': company.location.address,
-                'company_website_url': company.website_url,
-            }
-
-            queue_mail.send_email_reply_job_seeker_task.delay(
-                to=to,
-                subject=validate_data.get("title"),
-                data=email_data,
+            from ..services import JobActivityService
+            JobActivityService.send_email_to_job_seeker(
+                activity=self.get_object(),
+                user=request.user,
+                validated_data=serializer.validated_data
             )
-
-            job_post_activity = self.get_object()
-            job_post_activity.is_sent_email = True
-            job_post_activity.save()
+            return var_res.response_data()
         except Exception as ex:
             helper.print_log_error("send_email", ex)
             return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        else:
-            return var_res.response_data()
+
 
     @action(methods=["post"], detail=True, url_path="analyze-resume", url_name="analyze-resume")
     def analyze_resume(self, request, pk):
@@ -433,20 +369,19 @@ class EmployerJobPostActivityViewSet(
                     status=status.HTTP_503_SERVICE_UNAVAILABLE,
                     errors={"errorMessage": ["Database schema is outdated. Please run migrations first."]},
                 )
+            
             job_post_activity = self.get_object()
             if job_post_activity.job_post.company != request.user.company:
                 return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
 
-            from ..tasks import analyze_resume_ai
-
-            job_post_activity.ai_analysis_status = 'processing'
-            job_post_activity.ai_analysis_progress = 5
-            job_post_activity.save()
-            analyze_resume_ai.delay(job_post_activity.id)
+            from ..services import JobActivityService
+            JobActivityService.trigger_ai_analysis(job_post_activity)
+            
             return var_res.response_data(data={"detail": "AI analysis task has been queued."}, status=status.HTTP_202_ACCEPTED)
         except Exception as ex:
             helper.print_log_error("analyze_resume", ex)
             return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class AdminJobPostActivityViewSet(viewsets.ModelViewSet):

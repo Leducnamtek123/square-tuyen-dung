@@ -104,7 +104,7 @@ const ChatPage = () => {
                 borderColor: 'divider',
                 p: 2,
                 bgcolor: 'background.paper',
-                boxShadow: (theme: Theme) => (theme as any).customShadows?.card,
+                boxShadow: (theme: Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.card,
                 display: 'flex',
                 alignItems: 'center',
                 gap: 2
@@ -143,7 +143,7 @@ const ChatPage = () => {
                 fontWeight={600}
                 sx={{
                   flex: 1,
-                  background: (theme: Theme) => (theme.palette.primary as any).main,
+                  background: (theme: Theme) => theme.palette.primary.main,
                   backgroundClip: 'text',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',

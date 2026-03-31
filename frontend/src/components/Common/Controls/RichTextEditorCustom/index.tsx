@@ -7,6 +7,7 @@ import { EditorState } from 'draft-js';
 import { Typography } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
+import type { EditorProps } from 'react-draft-wysiwyg';
 
 const DraftEditor = dynamic(
   async () => {
@@ -14,7 +15,7 @@ const DraftEditor = dynamic(
     // Handle ESM/CJS interop: in production builds the named export
     // "Editor" may live under mod.default.Editor or just mod.default
     const Editor = mod.Editor || (mod as any).default?.Editor || (mod as any).default || mod;
-    return Editor;
+    return Editor as React.ComponentType<EditorProps>;
   },
   { ssr: false }
 );
@@ -43,7 +44,7 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
       <Controller
         control={control}
         name={name as Path<T>}
-        defaultValue={EditorState.createEmpty() as unknown as undefined}
+        defaultValue={EditorState.createEmpty() as unknown as any}
         render={({ field, fieldState }) => {
           const safeEditorState = field.value?.getCurrentContent
             ? field.value
@@ -61,7 +62,7 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
                   minHeight: 200,
                   borderBottomLeftRadius: 4,
                   borderBottomRightRadius: 4,
-                } as any}
+                }}
                 editorState={safeEditorState}
                 onEditorStateChange={field.onChange}
                 toolbar={{

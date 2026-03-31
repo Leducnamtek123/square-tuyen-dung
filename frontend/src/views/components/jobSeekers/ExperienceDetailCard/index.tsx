@@ -228,7 +228,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
   };
 
-  const handleAddOrUpdate = (data: FormValues | (FormValues & { id: string | number })) => {
+  const handleAddOrUpdate = (data: FormValues & { id?: string | number }) => {
 
     const create = async (payload: FormValues & { resume?: string }) => {
 
@@ -756,7 +756,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
           handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
 
-          editData={editData}
+          editData={editData as unknown as Partial<FormValues>}
 
         />
 

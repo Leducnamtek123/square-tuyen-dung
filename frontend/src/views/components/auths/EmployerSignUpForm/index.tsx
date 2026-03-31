@@ -173,8 +173,15 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
         return;
       }
       try {
-        const resData = await goongService.getPlaces(input) as { predictions?: SelectOption[] };
-        if (resData.predictions) setLocationOptions(resData.predictions);
+        const resData = await goongService.getPlaces(input);
+        if (resData.predictions) {
+          const mappedOptions: SelectOption[] = resData.predictions.map(p => ({
+            id: p.place_id,
+            name: p.description,
+            place_id: p.place_id
+          }));
+          setLocationOptions(mappedOptions);
+        }
       } catch (error) { }
     };
     loadLocation(addressDebounce);
@@ -209,10 +216,10 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
   const handleSelectLocation = async (e: React.SyntheticEvent, value: string | SelectOption | null) => {
     if (!value || typeof value !== 'object' || !value.place_id) return;
     try {
-      const resData = await goongService.getPlaceDetailByPlaceId(value.place_id as string) as { result?: { geometry?: { location?: { lat?: number, lng?: number } } } };
+      const resData = await goongService.getPlaceDetailByPlaceId(value.place_id as string);
       if (!resData?.result?.geometry?.location) return;
-      setValue('company.location.lat', resData?.result?.geometry.location.lat?.toString() || '');
-      setValue('company.location.lng', resData?.result?.geometry.location.lng?.toString() || '');
+      setValue('company.location.lat', resData.result.geometry.location.lat.toString() || '');
+      setValue('company.location.lng', resData.result.geometry.location.lng.toString() || '');
     } catch (error) { }
   };
 

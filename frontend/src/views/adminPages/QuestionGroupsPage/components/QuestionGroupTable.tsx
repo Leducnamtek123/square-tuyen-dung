@@ -7,15 +7,15 @@ import { ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
 interface QuestionGroupTableProps {
-    data: any[];
+    data: import('../../../../types/models').QuestionGroup[];
     loading?: boolean;
     rowCount?: number;
     pagination?: { pageIndex: number; pageSize: number };
     onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
     sorting?: SortingState;
     onSortingChange?: OnChangeFn<SortingState>;
-    onEdit: (group: any) => void;
-    onDelete: (group: any) => void;
+    onEdit: (group: import('../../../../types/models').QuestionGroup) => void;
+    onDelete: (group: import('../../../../types/models').QuestionGroup) => void;
 }
 
 const QuestionGroupTable = ({ 
@@ -31,7 +31,7 @@ const QuestionGroupTable = ({
 }: QuestionGroupTableProps) => {
     const { t } = useTranslation('admin');
 
-    const columns = useMemo<ColumnDef<any>[]>(() => [
+    const columns = useMemo<ColumnDef<import('../../../../types/models').QuestionGroup>[]>(() => [
         {
             accessorKey: 'name',
             header: t('pages.questionGroups.table.groupName') as string,

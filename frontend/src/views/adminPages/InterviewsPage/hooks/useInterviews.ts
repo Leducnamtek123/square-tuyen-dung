@@ -34,8 +34,11 @@ export const useInterviews = (params: Record<string, unknown>): UseInterviewsRes
             toastMessages.success('Interview scheduled successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
         },
-        onError: (error: any) => {
-            toastMessages.error(error.response?.data?.errors?.detail || 'Failed to schedule interview');
+        onError: (err: Error) => {
+            const axiosError = err as import('axios').AxiosError<{ errors?: import('../../../../types/api').ApiError }>;
+            const detail = axiosError.response?.data?.errors?.detail;
+            const message = Array.isArray(detail) ? detail.join(', ') : (detail || 'Failed to schedule interview');
+            toastMessages.error(message);
         },
     });
 
@@ -45,8 +48,11 @@ export const useInterviews = (params: Record<string, unknown>): UseInterviewsRes
             toastMessages.success('Status updated successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
         },
-        onError: (error: any) => {
-            toastMessages.error(error.response?.data?.errors?.detail || 'Update failed');
+        onError: (err: Error) => {
+            const axiosError = err as import('axios').AxiosError<{ errors?: import('../../../../types/api').ApiError }>;
+            const detail = axiosError.response?.data?.errors?.detail;
+            const message = Array.isArray(detail) ? detail.join(', ') : (detail || 'Update failed');
+            toastMessages.error(message);
         },
     });
 
@@ -56,8 +62,11 @@ export const useInterviews = (params: Record<string, unknown>): UseInterviewsRes
             toastMessages.success('Interview deleted successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-interviews'] });
         },
-        onError: (error: any) => {
-            toastMessages.error(error.response?.data?.errors?.detail || 'Delete failed');
+        onError: (err: Error) => {
+            const axiosError = err as import('axios').AxiosError<{ errors?: import('../../../../types/api').ApiError }>;
+            const detail = axiosError.response?.data?.errors?.detail;
+            const message = Array.isArray(detail) ? detail.join(', ') : (detail || 'Delete failed');
+            toastMessages.error(message);
         },
     });
 

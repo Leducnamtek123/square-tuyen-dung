@@ -11,7 +11,7 @@ import FileUploadIcon from "@mui/icons-material/FileUpload";
 
 
 
-import CVForm from "../CVForm";
+import CVForm, { FormValues as CVFormValues } from "../CVForm";
 
 
 
@@ -139,11 +139,11 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-  const handleUpdate = (data: { files: FileList | File[] }) => {
+  const handleUpdate = (data: CVFormValues) => {
 
 
 
-    const updateCV = async (slug: string | undefined, payloadData: { files: FileList | File[] }) => {
+    const updateCV = async (slug: string | undefined, payloadData: CVFormValues) => {
       if (!slug) return;
 
 
@@ -156,7 +156,9 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-      formData.append("file", payloadData.files[0]);
+      if (payloadData.files && payloadData.files.length > 0) {
+        formData.append("file", payloadData.files[0] as Blob);
+      }
 
 
 
@@ -622,7 +624,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-        <CVForm handleUpdate={handleUpdate} />
+        <CVForm handleUpdate={handleUpdate as (data: CVFormValues) => void} />
 
 
 

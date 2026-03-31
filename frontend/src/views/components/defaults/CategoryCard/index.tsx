@@ -10,7 +10,7 @@ import { searchJobPost } from '../../../../redux/filterSlice';
 import { ROUTES } from '../../../../configs/constants';
 
 interface CategoryCardProps {
-  options: any[];
+  options: { id: string | number | null; name: string }[];
   type: string;
 }
 
@@ -29,7 +29,8 @@ const CategoryCard = ({ options, type }: CategoryCardProps) => {
     setItems(filterItems);
   };
 
-  const handleFilter = (id: string | number) => {
+  const handleFilter = (id: string | number | null) => {
+    if (id === null) return;
     switch (type) {
       case 'CARRER':
         dispatch(searchJobPost({ ...jobPostFilter, careerId: id as string }));

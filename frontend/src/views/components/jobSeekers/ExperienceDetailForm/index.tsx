@@ -29,8 +29,8 @@ export interface FormValues {
 }
 
 interface ExperienceDetailFormProps {
-  handleAddOrUpdate: (data: any) => void;
-  editData: any;
+  handleAddOrUpdate: (data: FormValues) => void;
+  editData: Partial<FormValues> | null;
 }
 
 
@@ -104,7 +104,7 @@ const ExperienceDetailForm = ({ handleAddOrUpdate, editData }: ExperienceDetailF
 
         t('jobSeeker:profile.validation.endDateComparison'),
 
-        function (value: any) {
+        function (value) {
           const startDate = this.parent.startDate;
           if (!value || !startDate) return true;
           return !(value <= startDate);
@@ -117,12 +117,12 @@ const ExperienceDetailForm = ({ handleAddOrUpdate, editData }: ExperienceDetailF
 
     leaveReason: yup.string().max(255, t('jobSeeker:profile.validation.leaveReasonMax')),
 
+    description: yup.string().nullable().max(1000, t('jobSeeker:profile.validation.descriptionMax')),
+
   });
 
   const { control, reset, handleSubmit } = useForm<FormValues>({
-
-    resolver: yupResolver(schema) as any,
-
+    resolver: yupResolver(schema) as import('react-hook-form').Resolver<FormValues>,
   });
 
   React.useEffect(() => {

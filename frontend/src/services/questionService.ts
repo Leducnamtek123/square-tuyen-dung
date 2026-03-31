@@ -2,12 +2,11 @@ import httpRequest from '../utils/httpRequest';
 import type { PaginatedResponse } from '../types/api';
 import type { Question } from '../types/models';
 
-type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number;
 
-const normalizeParams = (params: AnyRecord = {}): AnyRecord => {
-  const normalized: AnyRecord = { ...params };
+const normalizeParams = (params: Record<string, unknown> = {}): Record<string, unknown> => {
+  const normalized: Record<string, unknown> = { ...params };
 
   if (normalized.page_size && !normalized.pageSize) {
     normalized.pageSize = normalized.page_size;
@@ -25,14 +24,14 @@ const normalizeParams = (params: AnyRecord = {}): AnyRecord => {
 };
 
 const questionService = {
-  getQuestions: (params: AnyRecord = {}): Promise<PaginatedResponse<Question>> => {
+  getQuestions: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Question>> => {
     return httpRequest
       .get('interview/web/questions/', { params: normalizeParams(params) });
   },
 
   // Alias for better clarity in Admin contexts
 
-  getAllQuestions: (params: AnyRecord = {}): Promise<PaginatedResponse<Question>> => {
+  getAllQuestions: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Question>> => {
     return httpRequest
       .get('interview/web/questions/', { params: normalizeParams(params) });
   },
@@ -41,11 +40,11 @@ const questionService = {
     return httpRequest.get(`interview/web/questions/${id}/`);
   },
 
-  createQuestion: (data: AnyRecord): Promise<Question> => {
+  createQuestion: (data: Record<string, unknown>): Promise<Question> => {
     return httpRequest.post('interview/web/questions/', data);
   },
 
-  updateQuestion: (id: IdType, data: AnyRecord): Promise<Question> => {
+  updateQuestion: (id: IdType, data: Record<string, unknown>): Promise<Question> => {
     // Using PATCH for more flexible partial updates
     return httpRequest
       .patch(`interview/web/questions/${id}/`, data);
@@ -57,3 +56,4 @@ const questionService = {
 };
 
 export default questionService;
+

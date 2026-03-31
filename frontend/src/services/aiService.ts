@@ -1,9 +1,8 @@
 import httpRequest from '../utils/httpRequest';
 
-type AnyRecord = Record<string, unknown>;
 
 const aiService = {
-  tts: async (payload: AnyRecord): Promise<Blob> => {
+  tts: async (payload: Record<string, unknown>): Promise<Blob> => {
     const url = 'ai/tts/';
     const response = await httpRequest.post(url, payload, {
       responseType: 'arraybuffer',
@@ -16,7 +15,7 @@ const aiService = {
     return new Blob([raw], { type: 'audio/mpeg' });
   },
 
-  transcribe: async (file: File, params: AnyRecord = {}): Promise<AnyRecord> => {
+  transcribe: async (file: File, params: Record<string, unknown> = {}): Promise<Record<string, unknown>> => {
     const url = 'ai/transcribe/';
     const formData = new FormData();
     formData.append('audio', file);
@@ -27,8 +26,9 @@ const aiService = {
         'Content-Type': 'multipart/form-data',
       },
     });
-    return (response as unknown as AnyRecord) ?? {};
+    return (response as unknown as Record<string, unknown>) ?? {};
   },
 };
 
 export default aiService;
+

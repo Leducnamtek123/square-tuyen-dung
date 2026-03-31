@@ -2,7 +2,6 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { animate, useMotionValue, useMotionValueEvent } from 'motion/react';
 import { useTrackVolume } from '@livekit/components-react';
 
-type AnyRecord = Record<string, unknown>;
 
 type AnimatedValue = number | number[];
 
@@ -18,7 +17,7 @@ function useAnimatedValue(initialValue: AnimatedValue) {
   useMotionValueEvent(motionValue, 'change', (nextValue) => setValue(nextValue));
 
   const animateFn = useCallback(
-    (targetValue: AnimatedValue, transition: AnyRecord) => {
+    (targetValue: AnimatedValue, transition: Record<string, unknown>) => {
       controlsRef.current = animate(
         motionValue as any,
         targetValue as any,
@@ -102,3 +101,4 @@ export function useAgentAudioVisualizerWave({
     opacity,
   };
 }
+

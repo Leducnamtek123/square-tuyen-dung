@@ -1,11 +1,10 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 
-type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number;
 
 const advancedSkillService = {
-  addAdvancedSkills: (data: AnyRecord): Promise<unknown> => {
+  addAdvancedSkills: (data: Record<string, unknown>): Promise<unknown> => {
     const url = `info/web/advanced-skills/`;
     return httpRequest.post(url, data);
   },
@@ -15,7 +14,7 @@ const advancedSkillService = {
     return httpRequest.get(url);
   },
 
-  updateAdvancedSkillById: (id: IdType, data: AnyRecord): Promise<unknown> => {
+  updateAdvancedSkillById: (id: IdType, data: Record<string, unknown>): Promise<unknown> => {
     const url = `info/web/advanced-skills/${id}/`;
     return httpRequest.put(url, data);
   },
@@ -27,3 +26,4 @@ const advancedSkillService = {
 };
 
 export default advancedSkillService;
+

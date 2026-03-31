@@ -72,7 +72,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
     const accessToken = tokenService.getAccessTokenFromCookie() || '';
     const backend = tokenService.getProviderFromCookie() || '';
 
-    (dispatch as any)(removeUserInfo({ accessToken, backend }))
+    (dispatch as import('../../../../redux/store').AppDispatch)(removeUserInfo({ accessToken, backend }))
 
       .unwrap()
 
@@ -88,7 +88,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
       })
 
-      .catch((error: any) => {
+      .catch((error: import('axios').AxiosError<{ errors?: import('../../../../types/api').ApiError }>) => {
 
         errorHandling(error);
 

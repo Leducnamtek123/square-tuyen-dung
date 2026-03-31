@@ -6,6 +6,7 @@ import { ROLES_NAME } from '../../../../configs/constants';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 import { User as UserModel } from '../../../../types/models';
+import { RoleName } from '../../../../types/auth';
 
 interface UserTableProps {
     users: UserModel[];
@@ -18,7 +19,7 @@ interface UserTableProps {
     rowSelection?: RowSelectionState;
     onRowSelectionChange?: OnChangeFn<RowSelectionState>;
     onToggleStatus: (user: UserModel) => void;
-    onRoleChange: (user: UserModel, roleName: string) => void;
+    onRoleChange: (user: UserModel, roleName: RoleName) => void;
     currentUserId: string | number;
     disableRoleActions?: boolean;
 }
@@ -94,7 +95,7 @@ const UserTable = ({
                     size="small"
                     variant="standard"
                     disableUnderline
-                    onChange={(event: SelectChangeEvent<string>) => onRoleChange(info.row.original, event.target.value)}
+                    onChange={(event: SelectChangeEvent<string>) => onRoleChange(info.row.original, event.target.value as RoleName)}
                     disabled={disableRoleActions || info.row.original.id === currentUserId}
                     renderValue={(value) => (
                         <Chip

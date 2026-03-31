@@ -3,27 +3,25 @@ import { presignInObject } from '../utils/presignUrl';
 import { User as UserModel } from '../types/models';
 import { PaginatedResponse } from '../types/api';
 
-type AnyRecord = Record<string, unknown>;
-
 type IdType = string | number;
 
 const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
   const data = await promise;
-  return presignInObject(data) as any as T;
+  return presignInObject(data);
 };
 
 const userService = {
-  getAllUsers: (params: AnyRecord = {}): Promise<PaginatedResponse<UserModel>> => {
+  getAllUsers: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<UserModel>> => {
     const url = 'auth/users/';
-    return withPresign(httpRequest.get<PaginatedResponse<UserModel>>(url, { params })) as any as Promise<PaginatedResponse<UserModel>>;
+    return withPresign(httpRequest.get(url, { params }) as Promise<PaginatedResponse<UserModel>>);
   },
-  updateUser: (id: IdType, data: AnyRecord): Promise<UserModel> => {
+  updateUser: (id: IdType, data: Partial<UserModel>): Promise<UserModel> => {
     const url = `auth/users/${id}/`;
-    return withPresign(httpRequest.patch<UserModel>(url, data)) as any as Promise<UserModel>;
+    return withPresign(httpRequest.patch(url, data) as Promise<UserModel>);
   },
   toggleUserStatus: (id: IdType): Promise<UserModel> => {
     const url = `auth/users/${id}/toggle-active/`;
-    return httpRequest.post<UserModel>(url) as any as Promise<UserModel>;
+    return httpRequest.post(url) as Promise<UserModel>;
   },
   deleteUser: (id: IdType): Promise<void> => {
     const url = `auth/users/${id}/`;

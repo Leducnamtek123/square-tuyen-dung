@@ -1,4 +1,4 @@
-﻿import datetime
+import datetime
 import logging
 import time
 
@@ -38,6 +38,9 @@ from . import permissions as perms_custom
 from .services import (
     PasswordResetService,
     EmailVerificationService,
+    AvatarService,
+    RegistrationService,
+    AccountService,
     UserNotFoundError,
     CooldownActiveError,
 )
@@ -156,31 +159,14 @@ def check_creds(request):
     serializer_data = check_creds_serializer.data
 
     email = serializer_data["email"]
-
     role_name = serializer_data.get("roleName", None)
 
-    user = User.objects.filter(email__iexact=email)
-
-    if role_name is not None:
-        if role_name == var_sys.EMPLOYER:
-            try:
-                member_user_ids = CompanyMember.objects.filter(
-                    is_active=True,
-                    status=CompanyMember.STATUS_ACTIVE,
-                ).values_list("user_id", flat=True)
-                user = user.filter(Q(role_name=role_name) | Q(id__in=member_user_ids))
-            except Exception:
-                user = user.filter(role_name=role_name)
-        else:
-            user = user.filter(role_name=role_name)
+    user = helper.secure_check_creds(email, role_name)
 
     res_data["email"] = email
 
-    if user.exists():
-        user = user.first()
-
+    if user:
         res_data["exists"] = True
-
         if user.is_verify_email:
             res_data["email_verified"] = True
 
@@ -314,99 +300,15 @@ def reset_password(request):
         )
 
     try:
-        now = datetime.datetime.now()
-
-        now = now.astimezone(pytz.utc)
-
-        platform = serializer.data.get("platform")
-
-        new_password = serializer.data.get("newPassword")
-
-        if platform == "WEB":
-            token = serializer.data.get("token")
-
-            user_id = force_str(urlsafe_base64_decode(token))
-
-            forgot_password_tokens = ForgotPasswordToken.objects.filter(
-                token=token, user_id=user_id, is_active=True
-            )
-
-            if not forgot_password_tokens.exists():
-                return response_data(
-                    status=status.HTTP_400_BAD_REQUEST,
-                    errors={
-                        "errorMessage": [
-                            ERROR_MESSAGES["INVALID_PASSWORD_RESET_LINK"]
-                        ]
-                    },
-                )
-
-            forgot_password_token = forgot_password_tokens.first()
-
-            if forgot_password_token.expired_at < now:
-                return response_data(
-                    status=status.HTTP_400_BAD_REQUEST,
-                    errors={
-                        "errorMessage": [
-                            ERROR_MESSAGES["PASSWORD_RESET_LINK_EXPIRED"]
-                        ]
-                    },
-                )
-
-            with transaction.atomic():
-                user = forgot_password_token.user
-
-                user.set_password(new_password)
-
-                user.save()
-
-                forgot_password_token.is_active = False
-
-                forgot_password_token.save()
-
-                return response_data(
-                    data={"redirectLoginUrl": f"/{settings.REDIRECT_LOGIN_CLIENT}"}
-                )
-
-        else:
-            code = serializer.data.get("code")
-
-            forgot_password_tokens = ForgotPasswordToken.objects.filter(code=code)
-
-            if not forgot_password_tokens.exists():
-                return response_data(
-                    status=status.HTTP_400_BAD_REQUEST,
-                    errors={
-                        "code": [ERROR_MESSAGES["INVALID_PASSWORD_RESET_CODE"]]
-                    },
-                )
-
-            forgot_password_token = forgot_password_tokens.first()
-
-            if forgot_password_token.expired_at < now or not forgot_password_token.is_active:
-                return response_data(
-                    status=status.HTTP_400_BAD_REQUEST,
-                    errors={
-                        "code": [ERROR_MESSAGES["PASSWORD_RESET_CODE_EXPIRED"]]
-                    },
-                )
-
-            with transaction.atomic():
-                user = forgot_password_token.user
-
-                user.set_password(new_password)
-
-                user.save()
-
-                forgot_password_token.is_active = False
-
-                forgot_password_token.save()
-
-                return response_data()
-
+        result = PasswordResetService.reset_password(serializer.validated_data)
+        return response_data(result, SUCCESS_MESSAGES["PASSWORD_RESET_SUCCESS"])
+    except (InvalidTokenError, TokenExpiredError) as e:
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors=e.args[0] if e.args else str(e)
+        )
     except Exception as ex:
         helper.print_log_error("reset_password", ex)
-
         return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -415,23 +317,28 @@ def reset_password(request):
 def change_password(request):
     try:
         data = request.data
-
-        user = request.user
-
-        reset_pass_serializer = UpdatePasswordSerializer(
-            user, data=data, context={"user": request.user}
+        serializer = UpdatePasswordSerializer(
+            request.user, data=data, context={"user": request.user}
         )
 
-        if not reset_pass_serializer.is_valid():
+        if not serializer.is_valid():
             return response_data(
-                status=status.HTTP_400_BAD_REQUEST, errors=reset_pass_serializer.errors
+                status=status.HTTP_400_BAD_REQUEST, errors=serializer.errors
             )
 
-        reset_pass_serializer.save()
+        AccountService.update_password(
+            user=request.user,
+            old_password=serializer.validated_data.get("oldPassword"),
+            new_password=serializer.validated_data.get("newPassword")
+        )
 
+    except ValueError as e:
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"oldPassword": [str(e)]}
+        )
     except Exception as ex:
         helper.print_log_error("change_password", ex)
-
         return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return response_data(status=status.HTTP_200_OK)
@@ -474,7 +381,6 @@ def update_user_account(request):
 def avatar(request):
     if request.method == "PUT":
         files = request.FILES
-
         avatar_serializer = AvatarSerializer(request.user, data=files)
 
         if not avatar_serializer.is_valid():
@@ -483,56 +389,26 @@ def avatar(request):
             )
 
         try:
-            avatar_serializer.save()
-
+            avatar_file = avatar_serializer.validated_data["file"]
+            avatar_url = AvatarService.update_avatar(request.user, avatar_file)
+            return response_data(
+                status=status.HTTP_200_OK,
+                data={"avatarUrl": avatar_url}
+            )
         except Exception as ex:
-            helper.print_log_error("avatar", ex)
-
+            helper.print_log_error("avatar_update", ex)
             return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return response_data(status=status.HTTP_200_OK, data=avatar_serializer.data)
 
     if request.method == "DELETE":
-        user = request.user
-
         try:
-            if user.avatar:
-                is_destroy_success = CloudinaryService.delete_image(
-                    user.avatar.public_id
-                )
-
-                if not is_destroy_success:
-                    helper.print_log_error(
-                        "destroy_avatar_in_cloud",
-                        ERROR_MESSAGES["CLOUDINARY_UPLOAD_ERROR"],
-                    )
-
-                # Delete file in DB
-                user.avatar.delete()
-
-                user.avatar = None
-
-                user.save()
-
-            # update in firebase
-            if not user.has_company:
-                queue_auth.update_avatar.delay(
-                    user.id, var_sys.AVATAR_DEFAULT["AVATAR"]
-                )
-
+            avatar_url = AvatarService.delete_avatar(request.user)
+            return response_data(
+                status=status.HTTP_200_OK,
+                data={"avatarUrl": avatar_url}
+            )
         except Exception as ex:
-            helper.print_log_error("delete_avatar", ex)
-
+            helper.print_log_error("avatar_delete", ex)
             return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        return response_data(
-            status=status.HTTP_200_OK,
-            data={
-                "avatarUrl": user.avatar.get_full_url()
-                if user.avatar
-                else var_sys.AVATAR_DEFAULT["AVATAR"]
-            },
-        )
 
     return response_data(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -541,7 +417,6 @@ def avatar(request):
 @permission_classes([AllowAny])
 def employer_register(request):
     data = request.data
-
     serializer = EmployerRegisterSerializer(data=data)
 
     if not serializer.is_valid():
@@ -550,16 +425,15 @@ def employer_register(request):
         )
 
     try:
-        user = serializer.save()
+        # Move business logic to RegistrationService
+        user = RegistrationService.register_employer(serializer.validated_data)
 
         platform = serializer.validated_data.get("platform")
-
         if user:
             helper.send_email_verify_email(request, user, platform=platform)
 
     except Exception as ex:
         helper.print_log_error("employer_register", ex)
-
         return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return response_data(status=status.HTTP_201_CREATED)
@@ -569,7 +443,6 @@ def employer_register(request):
 @permission_classes([AllowAny])
 def job_seeker_register(request):
     data = request.data
-
     serializer = JobSeekerRegisterSerializer(data=data)
 
     if not serializer.is_valid():
@@ -578,16 +451,15 @@ def job_seeker_register(request):
         )
 
     try:
-        user = serializer.save()
+        # Move business logic to RegistrationService
+        user = RegistrationService.register_job_seeker(serializer.validated_data)
 
         platform = serializer.validated_data.get("platform")
-
         if user:
             helper.send_email_verify_email(request=request, user=user, platform=platform)
 
     except Exception as ex:
         helper.print_log_error("job_seeker_register", ex)
-
         return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return response_data(status=status.HTTP_201_CREATED)
@@ -720,23 +592,19 @@ class UserViewSet(
     @action(methods=["post"], detail=True, url_path="toggle-active", url_name="toggle-active")
     def toggle_active(self, request, pk=None):
         try:
-            user = self.get_object()
-
-            if user == request.user:
-                return response_data(
-                    status=status.HTTP_400_BAD_REQUEST,
-                    errors={
-                        "detail": "BÃ¡ÂºÂ¡n khÃƒÂ´ng thÃ¡Â»Æ’ tÃ¡Â»Â± khÃƒÂ³a tÃƒÂ i khoÃ¡ÂºÂ£n cÃ¡Â»Â§a chÃƒÂ­nh mÃƒÂ¬nh."
-                    },
-                )
-
-            user.is_active = not user.is_active
-
-            user.save()
-
+            user = AccountService.toggle_active(pk, request.user)
             return response_data(data={"isActive": user.is_active})
 
+        except PermissionError as e:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": str(e)},
+            )
+        except UserNotFoundError as e:
+            return response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                errors={"detail": str(e)},
+            )
         except Exception as ex:
             helper.print_log_error("toggle_active", ex)
-
             return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

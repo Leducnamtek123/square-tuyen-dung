@@ -1,11 +1,10 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 
-type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number;
 
 const educationDetailService = {
-  addEducationsDetail: (data: AnyRecord): Promise<unknown> => {
+  addEducationsDetail: (data: Record<string, unknown>): Promise<unknown> => {
     const url = `info/web/educations-detail/`;
     return httpRequest.post(url, data);
   },
@@ -15,7 +14,7 @@ const educationDetailService = {
     return httpRequest.get(url);
   },
 
-  updateEducationDetailById: (id: IdType, data: AnyRecord): Promise<unknown> => {
+  updateEducationDetailById: (id: IdType, data: Record<string, unknown>): Promise<unknown> => {
     const url = `info/web/educations-detail/${id}/`;
     return httpRequest.put(url, data);
   },
@@ -27,3 +26,4 @@ const educationDetailService = {
 };
 
 export default educationDetailService;
+

@@ -139,30 +139,35 @@ class PrivateJobPostViewSet(
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return var_res.response_data(status=status.HTTP_201_CREATED, data=serializer.data)
+
+        from ..services import JobPostService
+        job_post = JobPostService.create_job(
+            user=request.user,
+            validated_data=serializer.validated_data
+        )
+
+        response_serializer = self.get_serializer(job_post)
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data)
 
     def update(self, request, *args, **kwargs):
-        user = request.user
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
-        old_status = instance.status
 
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
 
-        if getattr(instance, '_prefetched_objects_cache', None):
-            instance._prefetched_objects_cache = {}
+        from ..services import JobPostService
+        updated_instance = JobPostService.update_job(
+            user=request.user,
+            job_post=instance,
+            validated_data=serializer.validated_data
+        )
 
-        if old_status != var_sys.JobPostStatus.PENDING:
-            helper.add_post_verify_required_notifications(
-                company=user.company,
-                job_post=self.get_object(),
-            )
+        if getattr(updated_instance, '_prefetched_objects_cache', None):
+            updated_instance._prefetched_objects_cache = {}
 
-        return var_res.response_data(data=serializer.data)
+        response_serializer = self.get_serializer(updated_instance)
+        return var_res.response_data(data=response_serializer.data)
 
     def list(self, request, *args, **kwargs):
         queryset = (
@@ -449,19 +454,11 @@ class JobPostViewSet(viewsets.GenericViewSet, generics.ListAPIView, generics.Ret
 
     @action(methods=["post"], detail=True, url_path="save", url_name="save")
     def save_job(self, request, slug):
-        saved_job_posts = SavedJobPost.objects.filter(user=request.user, job_post=self.get_object())
-        is_saved = False
-
-        if saved_job_posts.exists():
-            saved_job_post = saved_job_posts.first()
-            saved_job_post.delete()
-        else:
-            SavedJobPost.objects.create(
-                user=request.user,
-                job_post=self.get_object(),
-            )
-            is_saved = True
-
+        from ..services import JobActivityService
+        is_saved = JobActivityService.toggle_save_job(
+            user=request.user,
+            job_post=self.get_object()
+        )
         return var_res.response_data(data={"isSaved": is_saved})
 
 

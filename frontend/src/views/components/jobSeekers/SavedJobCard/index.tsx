@@ -39,13 +39,13 @@ const SavedJobCard = () => {
 
   const toggleSave = useToggleSaveJob();
 
-  const handleChangePage = (event: any, newPage: number) => {
+  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
   };
 
   const handleSave = (slug: string) => {
     toggleSave.mutate(slug, {
-      onSuccess: (resData: any) => {
+      onSuccess: (resData: { isSaved: boolean }) => {
         const isSaved = resData.isSaved;
         toastMessages.success(
           isSaved ? t('jobSeeker:jobManagement.messages.saved') : t('jobSeeker:jobManagement.messages.unsaved')

@@ -181,7 +181,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-          ? (allConfig?.frequencyNotificationOptions?.[0]?.id as any)
+          ? (allConfig?.frequencyNotificationOptions?.[0]?.id as number | null)
 
 
 
@@ -193,7 +193,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<JobPostNotificationFormValues>,
 
 
 
@@ -231,7 +231,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
       reset({
         frequency: (allConfig?.frequencyNotificationOptions || []).length > 0
-          ? (allConfig?.frequencyNotificationOptions?.[0]?.id as any)
+          ? (allConfig?.frequencyNotificationOptions?.[0]?.id as number | null)
           : null,
       });
 
@@ -249,7 +249,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-    <form id="modal-form" onSubmit={handleSubmit(handleAddOrUpdate as any)}>
+    <form id="modal-form" onSubmit={handleSubmit(handleAddOrUpdate)}>
 
 
 

@@ -36,7 +36,7 @@ const SidebarViewTotal = () => {
                 width: 100,
                 height: 100,
                 borderRadius: "50%",
-                background: (theme: any) => (theme.palette.primary as any).background,
+                background: (theme: import('@mui/material').Theme) => theme.palette.primary.light,
                 animation: "pulse 2s infinite",
               }}
             />
@@ -44,7 +44,7 @@ const SidebarViewTotal = () => {
               sx={{
                 width: 80,
                 height: 80,
-                background: (theme: any) => (theme.palette.primary as any).main,
+                background: (theme: import('@mui/material').Theme) => theme.palette.primary.main,
                 fontSize: "1.75rem",
                 fontWeight: 700,
               }}
@@ -71,10 +71,10 @@ const SidebarViewTotal = () => {
           size="medium"
           onClick={() => nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`)}
           sx={{
-            background: (theme: any) => (theme.palette.primary as any).main,
+            background: (theme: import('@mui/material').Theme) => theme.palette.primary.main,
             px: 3,
             "&:hover": {
-              background: (theme: any) => (theme.palette.primary as any).main,
+              background: (theme: import('@mui/material').Theme) => theme.palette.primary.main,
               opacity: 0.9,
               transform: "translateY(-1px)",
               transition: "all 0.2s",

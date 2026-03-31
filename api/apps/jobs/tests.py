@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.test import TestCase
 
 from apps.jobs.models import JobPost, JobPostActivity
-from apps.jobs.services import JobService
+from apps.jobs.services import JobPostService, JobActivityService
 from apps.jobs.ai_scoring_service import _fallback_scoring, build_scoring_prompt
 from shared.configs import variable_system as var_sys
 
@@ -43,7 +43,7 @@ class TestJobService:
 
     def test_get_active_jobs_returns_active_only(self, job_post):
         """Should only return active, non-expired jobs."""
-        jobs = JobService.get_active_jobs()
+        jobs = JobPostService.get_active_jobs()
         assert job_post in jobs
 
     def test_get_active_jobs_excludes_expired(self, job_post):
@@ -51,7 +51,7 @@ class TestJobService:
         job_post.deadline = timezone.now().date() - timedelta(days=1)
         job_post.save()
 
-        jobs = JobService.get_active_jobs()
+        jobs = JobPostService.get_active_jobs()
         assert job_post not in jobs
 
     def test_get_active_jobs_excludes_inactive_status(self, job_post):
@@ -59,72 +59,96 @@ class TestJobService:
         job_post.status = var_sys.JobPostStatus.PENDING
         job_post.save()
 
-        jobs = JobService.get_active_jobs()
+        jobs = JobPostService.get_active_jobs()
         assert job_post not in jobs
 
     def test_get_active_jobs_filter_by_career(self, job_post, career):
         """Should filter by career_id."""
-        jobs = JobService.get_active_jobs(filters={'career_id': career.id})
+        jobs = JobPostService.get_active_jobs(filters={'career_id': career.id})
         assert job_post in jobs
 
-        jobs = JobService.get_active_jobs(filters={'career_id': 99999})
+        jobs = JobPostService.get_active_jobs(filters={'career_id': 99999})
         assert job_post not in jobs
 
     def test_get_active_jobs_filter_by_keyword(self, job_post):
         """Should filter by keyword in job name or company name."""
-        jobs = JobService.get_active_jobs(filters={'keyword': 'Python'})
+        jobs = JobPostService.get_active_jobs(filters={'keyword': 'Python'})
         assert job_post in jobs
 
-        jobs = JobService.get_active_jobs(filters={'keyword': 'nonexistent'})
+        jobs = JobPostService.get_active_jobs(filters={'keyword': 'nonexistent'})
         assert job_post not in jobs
 
     def test_apply_to_job_success(self, job_seeker_user, job_post, resume):
         """Should successfully create an application."""
-        activity, error = JobService.apply_to_job(
+        validated_data = {
+            'job_post': job_post,
+            'resume': resume,
+            'fullName': 'Test Name',
+            'email': 'test@test.com'
+        }
+        activity = JobActivityService.apply_to_job(
             user=job_seeker_user,
-            job_post=job_post,
-            resume=resume,
+            validated_data=validated_data,
         )
         assert activity is not None
-        assert error is None
         assert activity.user == job_seeker_user
         assert activity.job_post == job_post
 
     def test_apply_to_job_duplicate_rejected(self, job_seeker_user, job_post, resume):
         """Should reject duplicate applications."""
-        JobService.apply_to_job(job_seeker_user, job_post, resume)
-        activity, error = JobService.apply_to_job(job_seeker_user, job_post, resume)
-
-        assert activity is None
-        assert 'đã ứng tuyển' in error
+        validated_data = {
+            'job_post': job_post,
+            'resume': resume,
+            'fullName': 'Test Name',
+            'email': 'test@test.com'
+        }
+        JobActivityService.apply_to_job(job_seeker_user, validated_data)
+        
+        with pytest.raises(ValueError, match="đã ứng tuyển"):
+            JobActivityService.apply_to_job(job_seeker_user, validated_data)
 
     def test_apply_to_job_expired_rejected(self, job_seeker_user, job_post, resume):
         """Should reject applications to expired jobs."""
         job_post.deadline = timezone.now().date() - timedelta(days=1)
         job_post.save()
 
-        activity, error = JobService.apply_to_job(job_seeker_user, job_post, resume)
-        assert activity is None
-        assert 'hết hạn' in error
+        validated_data = {
+            'job_post': job_post,
+            'resume': resume,
+            'fullName': 'Test Name',
+            'email': 'test@test.com'
+        }
+        with pytest.raises(ValueError, match="hết hạn"):
+            JobActivityService.apply_to_job(job_seeker_user, validated_data)
 
     def test_apply_to_job_inactive_rejected(self, job_seeker_user, job_post, resume):
         """Should reject applications to inactive jobs."""
         job_post.status = var_sys.JobPostStatus.PENDING
         job_post.save()
 
-        activity, error = JobService.apply_to_job(job_seeker_user, job_post, resume)
-        assert activity is None
-        assert 'không còn hoạt động' in error
+        validated_data = {
+            'job_post': job_post,
+            'resume': resume,
+            'fullName': 'Test Name',
+            'email': 'test@test.com'
+        }
+        with pytest.raises(ValueError, match="không còn hoạt động"):
+            JobActivityService.apply_to_job(job_seeker_user, validated_data)
 
     def test_apply_wrong_resume_owner(self, employer_user, job_post, resume):
         """Should reject if resume doesn't belong to applicant."""
-        activity, error = JobService.apply_to_job(employer_user, job_post, resume)
-        assert activity is None
-        assert 'không thuộc về bạn' in error
+        validated_data = {
+            'job_post': job_post,
+            'resume': resume,
+            'fullName': 'Test Name',
+            'email': 'test@test.com'
+        }
+        with pytest.raises(ValueError, match="không thuộc về bạn"):
+            JobActivityService.apply_to_job(employer_user, validated_data)
 
     def test_get_employer_job_stats(self, company, job_post):
         """Should return correct employer stats."""
-        stats = JobService.get_employer_job_stats(company)
+        stats = JobActivityService.get_employer_job_stats(company)
         assert stats['total_jobs'] == 1
         assert stats['active_jobs'] == 1
         assert stats['total_applications'] == 0

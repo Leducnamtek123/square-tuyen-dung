@@ -400,7 +400,7 @@ return (
 
         handleUpdateProfile={handleUpdateProfile}
 
-        editData={profile}
+        editData={profile as unknown as Partial<PersonalProfileFormValues>}
 
       />
 

@@ -3,7 +3,6 @@ import { presignInObject } from '../utils/presignUrl';
 import type { Resume, JobSeekerProfile } from '../types/models';
 import type { PaginatedResponse } from '../types/api';
 
-type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number | undefined;
 
@@ -14,7 +13,7 @@ const jobSeekerProfileService = {
     return presignInObject(data);
   },
 
-  updateProfile: async (data: AnyRecord): Promise<JobSeekerProfile> => {
+  updateProfile: async (data: Record<string, unknown>): Promise<JobSeekerProfile> => {
     const url = 'info/profile/';
     const resData = await httpRequest.put<unknown, JobSeekerProfile>(url, data);
     return presignInObject(resData);
@@ -22,7 +21,7 @@ const jobSeekerProfileService = {
 
   getResumes: async (
     jobSeekerProfileId: IdType,
-    params: AnyRecord = {}
+    params: Record<string, unknown> = {}
   ): Promise<PaginatedResponse<Resume>> => {
     if (!jobSeekerProfileId) {
       return { count: 0, results: [] };
@@ -34,3 +33,4 @@ const jobSeekerProfileService = {
 };
 
 export default jobSeekerProfileService;
+

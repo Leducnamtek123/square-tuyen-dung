@@ -73,13 +73,13 @@ const UpdatePasswordForm = ({ handleUpdatePassword, serverErrors = {} }: UpdateP
       newPassword: '',
       confirmPassword: '',
     },
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as import('react-hook-form').Resolver<UpdatePasswordFormData>,
   });
 
   React.useEffect(() => {
 
     for (const err in serverErrors) {
-      setError(err as any, { type: 'manual', message: serverErrors[err]?.join(' ') });
+      setError(err as keyof UpdatePasswordFormData, { type: 'manual', message: serverErrors[err]?.join(' ') });
     }
 
   }, [serverErrors, setError]);

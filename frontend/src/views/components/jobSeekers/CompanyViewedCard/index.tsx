@@ -9,6 +9,9 @@ import { useTranslation } from 'react-i18next';
 
 const pageSize = 10;
 
+import type { Company, Resume } from '../../../../types/models';
+import type { ResumeViewed } from '../../../../services/resumeViewedService';
+
 const CompanyViewedCard = () => {
   const { t } = useTranslation(['jobSeeker']);
   const [page, setPage] = React.useState(1);
@@ -37,16 +40,16 @@ const CompanyViewedCard = () => {
           ></NoDataCard>
         ) : (
           <Stack spacing={2}>
-            {resumesViewed.map((value: any) => (
+            {resumesViewed.map((item) => (
               <CompanyAction
-                key={value.id}
-                id={value.id}
-                views={value.views}
-                createAt={value.createAt}
-                resume={value.resume}
-                company={value.company}
+                key={item.id}
+                id={item.id}
+                views={item.views}
+                createAt={item.createAt}
+                resume={item.resume}
+                company={item.company}
               >
-                {value.isSavedResume && (
+                {item.isSavedResume && (
                   <Chip
                     icon={<CheckIcon />}
                     label={t('jobSeeker:myCompany.savedProfile')}

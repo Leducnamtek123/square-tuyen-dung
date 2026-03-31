@@ -91,7 +91,7 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 
 
             <Grid container spacing={2}>
 
-              {jobPosts.map((value: any) => (
+              {jobPosts.map((value: import('../../../../types/models').JobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }) => (
 
                 <Grid key={value.id} size={col}>
 
@@ -109,7 +109,7 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 
 
                     jobName={value?.jobName}
 
-                    cityId={value?.locationDict?.city}
+                    cityId={value?.locationDict?.city as unknown as number}
 
                     deadline={value?.deadline}
 

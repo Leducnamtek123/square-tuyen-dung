@@ -1,11 +1,10 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 
-type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number;
 
 const experienceDetailService = {
-  addExperienceDetail: (data: AnyRecord): Promise<unknown> => {
+  addExperienceDetail: (data: Record<string, unknown>): Promise<unknown> => {
     const url = `info/web/experiences-detail/`;
     return httpRequest.post(url, data);
   },
@@ -15,7 +14,7 @@ const experienceDetailService = {
     return httpRequest.get(url);
   },
 
-  updateExperienceDetailById: (id: IdType, data: AnyRecord): Promise<unknown> => {
+  updateExperienceDetailById: (id: IdType, data: Record<string, unknown>): Promise<unknown> => {
     const url = `info/web/experiences-detail/${id}/`;
     return httpRequest.put(url, data);
   },
@@ -27,3 +26,4 @@ const experienceDetailService = {
 };
 
 export default experienceDetailService;
+

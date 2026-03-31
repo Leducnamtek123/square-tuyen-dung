@@ -23,7 +23,7 @@ const LoadingComponentItem = () => (
 
 interface SidebarRendererProps {
   searchPlaceholderKey: string;
-  getSubtextName: (user: any) => string;
+  getSubtextName: (user?: import('./useChatRooms').UserAccount) => string;
 }
 
 const SidebarRenderer = ({ searchPlaceholderKey, getSubtextName }: SidebarRendererProps) => {

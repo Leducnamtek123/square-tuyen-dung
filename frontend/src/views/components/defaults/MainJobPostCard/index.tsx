@@ -79,7 +79,7 @@ const MainJobPostCard = () => {
 
           <>
 
-            {jobPosts.map((value: any) => (
+            {jobPosts.map((value: import('../../../../types/models').JobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }) => (
 
               <JobPostLarge
 
@@ -91,11 +91,11 @@ const MainJobPostCard = () => {
 
                 companyImageUrl={value?.companyDict?.companyImageUrl}
 
-                companyName={value?.companyDict?.companyName}
+                companyName={value?.companyDict?.companyName as string}
 
                 jobName={value?.jobName}
 
-                cityId={value?.locationDict?.city}
+                cityId={value?.locationDict?.city as unknown as number}
 
                 deadline={value?.deadline}
 

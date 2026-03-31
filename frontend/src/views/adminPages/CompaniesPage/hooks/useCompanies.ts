@@ -5,8 +5,8 @@ import { Company } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
 export type UseCompaniesResult = UseQueryResult<PaginatedResponse<Company>> & {
-    createCompany: (data: Record<string, unknown> | FormData) => Promise<Company>;
-    updateCompany: (args: { id: string | number; data: Record<string, unknown> | FormData }) => Promise<Company>;
+    createCompany: (data: FormData) => Promise<Company>;
+    updateCompany: (args: { id: string | number; data: FormData }) => Promise<Company>;
     deleteCompany: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
@@ -17,14 +17,14 @@ export const useCompanies = (params?: Record<string, unknown>): UseCompaniesResu
     const query = useQuery({
         queryKey: ['admin-companies', params],
         queryFn: async () => {
-            const res = await adminManagementService.getCompanies(params);
+            const res = await adminManagementService.getCompanies(params as Record<string, unknown>);
             return res;
         },
         placeholderData: keepPreviousData,
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: Record<string, unknown> | FormData) => adminManagementService.createCompany(data),
+        mutationFn: (data: FormData) => adminManagementService.createCompany(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] });
             toastMessages.success('Company added successfully');
@@ -36,7 +36,7 @@ export const useCompanies = (params?: Record<string, unknown>): UseCompaniesResu
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> | FormData }) => adminManagementService.updateCompany(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: FormData }) => adminManagementService.updateCompany(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-companies'] });
             toastMessages.success('Company updated successfully');
@@ -65,5 +65,5 @@ export const useCompanies = (params?: Record<string, unknown>): UseCompaniesResu
         updateCompany: updateMutation.mutateAsync,
         deleteCompany: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    } as UseCompaniesResult;
+    } as unknown as UseCompaniesResult;
 };

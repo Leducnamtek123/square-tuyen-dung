@@ -519,9 +519,9 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
         <GeneralInfoForm
 
-          handleUpdate={handleUpdateResumeDetail as unknown as (data: Record<string, unknown>) => void}
+          handleUpdate={handleUpdateResumeDetail}
 
-          editData={resumeDetail}
+          editData={resumeDetail as unknown as Partial<FormValues>}
 
         />
 

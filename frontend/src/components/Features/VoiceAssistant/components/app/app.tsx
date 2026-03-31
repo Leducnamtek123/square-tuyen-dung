@@ -24,7 +24,7 @@ function AppSetup() {
   return null;
 }
 
-function AutoConnect({ onError }: { onError?: (err: any) => void }) {
+function AutoConnect({ onError }: { onError?: (err: unknown) => void }) {
   const { isConnected, start } = useSessionContext();
   const hasStarted = useRef(false);
   const connectionAttempted = useRef(false);

@@ -2,18 +2,39 @@ import React from 'react';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 import RightSidebarRenderer from './RightSidebarRenderer';
 
+interface JobPostChatActivityData {
+  id: string;
+  userId: string;
+  fullName?: string;
+  userEmail?: string;
+  companyId?: string;
+  companySlug?: string;
+  companyName?: string;
+  companyImageUrl?: string;
+  jobPostTitle?: string;
+}
+
+interface AppliedResumeChatData {
+  id: string;
+  userId: string;
+  fullName?: string;
+  userEmail?: string;
+  avatarUrl?: string;
+  jobPostTitle?: string;
+}
+
 export const RightSidebar = () => {
   return (
     <RightSidebarRenderer
       titleKey="appliedJobs"
       noDataKey="noAppliedJobs"
-      fetchData={jobPostActivityService.getJobPostChatActivity}
+      fetchData={(params) => jobPostActivityService.getJobPostChatActivity(params) as Promise<{ count: number; results: JobPostChatActivityData[] }>}
       mapDataToUI={(value) => ({
         id: value.id,
-        imageUrl: value?.companyImageUrl,
-        primaryText: value?.jobPostTitle,
-        secondaryText: value?.companyName,
-        partnerId: value?.userId,
+        imageUrl: value?.companyImageUrl || '',
+        primaryText: value?.jobPostTitle || '',
+        secondaryText: value?.companyName || '',
+        partnerId: value?.userId || '',
         userDataWrapper: {
           userId: value?.userId,
           name: value?.fullName,
@@ -36,13 +57,13 @@ export const EmployerSidebar = () => {
     <RightSidebarRenderer
       titleKey="candidates"
       noDataKey="noCandidates"
-      fetchData={jobPostActivityService.getAppliedResumeChat}
+      fetchData={(params) => jobPostActivityService.getAppliedResumeChat(params) as Promise<{ count: number; results: AppliedResumeChatData[] }>}
       mapDataToUI={(value) => ({
         id: value.id,
-        imageUrl: value?.avatarUrl,
-        primaryText: value?.fullName,
-        secondaryText: value?.jobPostTitle,
-        partnerId: value?.userId,
+        imageUrl: value?.avatarUrl || '',
+        primaryText: value?.fullName || '',
+        secondaryText: value?.jobPostTitle || '',
+        partnerId: value?.userId || '',
         userDataWrapper: {
           userId: value?.userId,
           name: value?.fullName,

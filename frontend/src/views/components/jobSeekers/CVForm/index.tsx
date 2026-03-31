@@ -12,12 +12,12 @@ import BasicDropzone from '../../../../components/Common/Controls/BasicDropzone'
 
 import { useTranslation } from 'react-i18next';
 
-interface FormValues {
-  files: any;
+export interface FormValues {
+  files: File[] | null;
 }
 
 interface CVFormProps {
-  handleUpdate: (data: any) => void;
+  handleUpdate: (data: FormValues) => void;
 }
 
 
@@ -33,53 +33,17 @@ const CVForm = ({ handleUpdate }: CVFormProps) => {
 
 
     files: yup
-
-
-
-      .mixed()
-
-
-
+      .mixed<File[]>()
+      .nullable()
       .test(
-
-
-
         'files empty',
-
-
-
         t('jobSeeker:profile.validation.fileRequired'),
-
-
-
-        (value: any) =>
-
-
-
+        (value) =>
           !(
-
-
-
             value === undefined ||
-
-
-
             value === null ||
-
-
-
-            value === '' ||
-
-
-
             value.length === 0
-
-
-
           )
-
-
-
       ),
 
 
@@ -92,7 +56,7 @@ const CVForm = ({ handleUpdate }: CVFormProps) => {
 
 
 
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<FormValues>,
 
 
 

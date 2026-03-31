@@ -14,7 +14,6 @@ import {
 } from 'firebase/firestore';
 import db from '../configs/firebase-config';
 
-type AnyRecord = Record<string, unknown>;
 
 type Condition = {
   fieldName: string;
@@ -27,8 +26,8 @@ const useFireStoreGetChatRoom = (
   userId: string | number,
   sort: OrderByDirection = 'desc',
   limitNum: number | null = null
-): AnyRecord[] => {
-  const [docs, setDocs] = React.useState<AnyRecord[]>([]);
+): Record<string, unknown>[] => {
+  const [docs, setDocs] = React.useState<Record<string, unknown>[]>([]);
 
   React.useEffect(() => {
     const collectionRef = collection(db, 'chatRooms');
@@ -55,11 +54,11 @@ const useFireStoreGetChatRoom = (
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
       // Collect all partner IDs first
-      const roomsData: { docId: string; data: AnyRecord; partnerId: string }[] = [];
+      const roomsData: { docId: string; data: Record<string, unknown>; partnerId: string }[] = [];
       const partnerIds = new Set<string>();
 
       querySnapshot.docs.forEach((doc) => {
-        const chatRoomData = doc.data() as AnyRecord;
+        const chatRoomData = doc.data() as Record<string, unknown>;
         let partnerId = '';
         if (chatRoomData?.userId1 === `${userId}`) {
           partnerId = chatRoomData?.userId2 as string;
@@ -71,7 +70,7 @@ const useFireStoreGetChatRoom = (
       });
 
       // Batch fetch all partner accounts in one query (max 30 per `in` query)
-      const userMap = new Map<string, AnyRecord>();
+      const userMap = new Map<string, Record<string, unknown>>();
       const idArray = Array.from(partnerIds).filter(Boolean);
 
       if (idArray.length > 0) {
@@ -99,7 +98,7 @@ const useFireStoreGetChatRoom = (
       }
 
       // Merge rooms with user data
-      const chatRoomsData: AnyRecord[] = roomsData.map((room) => ({
+      const chatRoomsData: Record<string, unknown>[] = roomsData.map((room) => ({
         ...room.data,
         id: room.docId,
         user: userMap.get(room.partnerId) || null,
@@ -115,3 +114,4 @@ const useFireStoreGetChatRoom = (
 };
 
 export default useFireStoreGetChatRoom;
+

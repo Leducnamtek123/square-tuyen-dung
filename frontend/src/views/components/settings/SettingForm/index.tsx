@@ -5,13 +5,13 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Grid2 as Grid } from "@mui/material";
 import CheckboxCustom from '../../../../components/Common/Controls/CheckboxCustom';
 
-interface FormValues {
+export interface FormValues {
   emailNotificationActive: boolean;
   smsNotificationActive: boolean;
 }
 
 interface SettingFormProps {
-  editData: any;
+  editData: Partial<FormValues> | null;
   handleUpdate: (data: FormValues) => void;
 }
 
@@ -22,7 +22,7 @@ const SettingForm = ({ editData, handleUpdate }: SettingFormProps) => {
   });
 
   const { control, reset, handleSubmit } = useForm<FormValues>({
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<FormValues>,
   });
 
   React.useEffect(() => {

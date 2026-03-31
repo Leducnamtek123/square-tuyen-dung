@@ -2,7 +2,6 @@ import httpRequest from '../utils/httpRequest';
 
 import type { ApiResponse } from '../types/api';
 
-type AnyRecord = Record<string, unknown>;
 
 // --- INTERFACES: Job Seeker Statistics ---
 export interface JobSeekerGeneralStats {
@@ -84,22 +83,22 @@ const statisticService = {
     return httpRequest.get(url, { params: { type: 'general' } });
   },
 
-  employerRecruitmentStatisticsByRank: (data: AnyRecord = {}): Promise<EmployerRecruitmentByRankStats> => {
+  employerRecruitmentStatisticsByRank: (data: Record<string, unknown> = {}): Promise<EmployerRecruitmentByRankStats> => {
     const url = 'job/web/statistics/employer/';
     return httpRequest.post(url, data, { params: { type: 'recruitment-by-rank' } });
   },
 
-  employerApplicationStatistics: (data: AnyRecord = {}): Promise<EmployerApplicationStats> => {
+  employerApplicationStatistics: (data: Record<string, unknown> = {}): Promise<EmployerApplicationStats> => {
     const url = 'job/web/statistics/employer/';
     return httpRequest.post(url, data, { params: { type: 'application' } });
   },
 
-  employerCandidateStatistics: (data: AnyRecord = {}): Promise<EmployerCandidateStats> => {
+  employerCandidateStatistics: (data: Record<string, unknown> = {}): Promise<EmployerCandidateStats> => {
     const url = 'job/web/statistics/employer/';
     return httpRequest.post(url, data, { params: { type: 'candidate' } });
   },
 
-  employerRecruitmentStatistics: (data: AnyRecord = {}): Promise<EmployerRecruitmentStatItem[]> => {
+  employerRecruitmentStatistics: (data: Record<string, unknown> = {}): Promise<EmployerRecruitmentStatItem[]> => {
     const url = 'job/web/statistics/employer/';
     return httpRequest.post(url, data, { params: { type: 'recruitment' } });
   },
@@ -126,3 +125,4 @@ const statisticService = {
 };
 
 export default statisticService;
+

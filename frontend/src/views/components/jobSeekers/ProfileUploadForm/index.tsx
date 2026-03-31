@@ -20,8 +20,8 @@ import SingleSelectCustom from '../../../../components/Common/Controls/SingleSel
 import FileUploadCustom from '../../../../components/Common/Controls/FileUploadCustom';
 import { useConfig } from '@/hooks/useConfig';
 
-interface FormValues {
-  file: any;
+export interface FormValues {
+  file: File[] | null;
   title: string;
   position: number | string;
   academicLevel: number | string;
@@ -38,7 +38,7 @@ interface FormValues {
 }
 
 interface ProfileUploadFormProps {
-  handleAdd: (data: any) => void;
+  handleAdd: (data: FormValues) => void;
 }
 
 
@@ -52,29 +52,17 @@ const ProfileUploadForm = ({ handleAdd }: ProfileUploadFormProps) => {
   const schema = yup.object().shape({
 
     file: yup
-
-      .mixed()
-
+      .mixed<File[]>()
+      .nullable()
       .test(
-
         'files empty',
-
         t('jobSeeker:profile.validation.fileRequired'),
-
-        (value: any) =>
-
+        (value) =>
           !(
-
             value === undefined ||
-
             value === null ||
-
-            value === '' ||
-
             value.length === 0
-
           )
-
       ),
 
     title: yup
@@ -209,7 +197,7 @@ const ProfileUploadForm = ({ handleAdd }: ProfileUploadFormProps) => {
 
   const { control, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<FormValues>,
 
   });
 

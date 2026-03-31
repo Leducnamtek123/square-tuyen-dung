@@ -1,7 +1,5 @@
 import React from 'react';
-import { useAppSelector } from '@/redux/hooks';
-
-import { useDispatch } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 
 import { Box, Stack, IconButton, Typography } from "@mui/material";
 
@@ -24,7 +22,7 @@ import { compressImageFile } from '../../../../utils/imageCompression';
 import ImageCropDialog from '../../../../components/Common/ImageCropDialog';
 
 interface AvatarCardProps {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 
@@ -33,7 +31,7 @@ const AvatarCard = () => {
 
   const { t } = useTranslation('auth');
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const { currentUser } = useAppSelector((state) => state.user);
 
@@ -65,7 +63,7 @@ const AvatarCard = () => {
 
     setIsFullScreenLoading(true);
 
-    (dispatch as any)(updateAvatar(formData))
+    dispatch(updateAvatar(formData))
 
       .unwrap()
 
@@ -91,7 +89,7 @@ const AvatarCard = () => {
 
       setIsFullScreenLoading(true);
 
-      (dispatch as any)(deleteAvatar())
+      dispatch(deleteAvatar())
 
         .unwrap()
 

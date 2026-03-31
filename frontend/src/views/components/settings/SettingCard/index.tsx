@@ -34,8 +34,8 @@ const SettingCard = ({ title, sx }: SettingCardProps) => {
   const { data: editData, isLoading } = useUserSettings();
   const updateSettings = useUpdateUserSettings();
 
-  const handleUpdateUserSetting = (data: any) => {
-    updateSettings.mutate(data);
+  const handleUpdateUserSetting = (data: import('../SettingForm').FormValues) => {
+    updateSettings.mutate(data as unknown as Record<string, unknown>);
   };
 
   return (
@@ -79,7 +79,7 @@ const SettingCard = ({ title, sx }: SettingCardProps) => {
                   }}
                 >
                   <SettingForm
-                    editData={editData}
+                    editData={editData as unknown as Partial<import('../SettingForm').FormValues> | null}
                     handleUpdate={handleUpdateUserSetting}
                   />
                 </Box>

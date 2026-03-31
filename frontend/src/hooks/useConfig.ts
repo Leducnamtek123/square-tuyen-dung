@@ -12,7 +12,7 @@ export const useConfig = () => {
       // Fire both requests in parallel
       const [resData, careersRes] = await Promise.all([
         commonService.getConfigs(),
-        commonService.getAllCareersSimple().catch(() => [] as any[]),
+        commonService.getAllCareersSimple().catch(() => [] as import('../types/models').Career[]),
       ]);
 
       let merged = { ...(resData as SystemConfig) };
@@ -21,7 +21,7 @@ export const useConfig = () => {
         merged = {
           ...merged,
           careers: careersRes,
-          careerOptions: careersRes.map((career: any) => ({
+          careerOptions: careersRes.map((career: import('../types/models').Career) => ({
             id: career.id,
             name: career.name,
           })),

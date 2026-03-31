@@ -22,7 +22,7 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
 
   const { t } = useTranslation('auth');
 
-  const { currentUser } = useAppSelector((state: any) => state.user);
+  const { currentUser } = useAppSelector((state: import('../../../../redux/store').RootState) => state.user);
 
   const schema = yup.object().shape({
 
@@ -38,7 +38,7 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
 
   const { control, reset, setError, handleSubmit } = useForm<AccountFormData>({
 
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as import('react-hook-form').Resolver<AccountFormData>,
 
   });
 
@@ -48,7 +48,7 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
 
       ...formValues,
 
-      fullName: currentUser?.fullName,
+      fullName: currentUser?.fullName || '',
 
       email: currentUser?.email,
 
@@ -66,7 +66,7 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
 
       for (const err in serverErrors) {
 
-        setError(err as any, {
+        setError(err as keyof AccountFormData, {
 
           type: 'manual',
 
@@ -85,7 +85,7 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
 
   return (
 
-    <form id="account-form" onSubmit={handleSubmit(handleUpdate as any)}>
+    <form id="account-form" onSubmit={handleSubmit(handleUpdate)}>
 
       <Grid container spacing={2}>
 

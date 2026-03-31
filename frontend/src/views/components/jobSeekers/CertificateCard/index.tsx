@@ -42,7 +42,7 @@ import EmptyCard from '../../../../components/Common/EmptyCard';
 
 import FormPopup from '../../../../components/Common/Controls/FormPopup';
 
-import CertificateForm from '../CertificateForm';
+import CertificateForm, { FormValues as CertificateFormValues } from '../CertificateForm';
 
 import TimeAgo from '../../../../components/Common/TimeAgo';
 
@@ -52,7 +52,6 @@ import certificateService from '../../../../services/certificateService';
 import { Theme } from '@mui/material/styles';
 import { AxiosError } from 'axios';
 import { ApiError } from '@/types/api';
-import { FormValues } from '../CertificateForm';
 
 interface Certificate {
   id: string | number;
@@ -154,7 +153,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
   const [editData, setEditData] = React.useState<Certificate | null>(null);
 
-  const [serverErrors, setServerErrors] = React.useState<Record<string, unknown> | null>(null);
+  const [serverErrors, setServerErrors] = React.useState<Record<string, string[]> | null>(null);
 
   React.useEffect(() => {
 
@@ -227,9 +226,9 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
   };
 
-  const handleAddOrUpdate = (data: FormValues | (FormValues & { id: string | number })) => {
+  const handleAddOrUpdate = (data: CertificateFormValues & { id?: string | number }) => {
 
-    const create = async (payload: FormValues & { resume?: string }) => {
+    const create = async (payload: CertificateFormValues & { resume?: string }) => {
 
       setIsFullScreenLoading(true);
 
@@ -245,7 +244,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as unknown as React.Dispatch<React.SetStateAction<Record<string, unknown> | null>>);
 
       } finally {
 
@@ -255,7 +254,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
     };
 
-    const update = async (payload: FormValues & { id?: string | number }) => {
+    const update = async (payload: CertificateFormValues & { id?: string | number }) => {
 
       setIsFullScreenLoading(true);
 
@@ -649,9 +648,9 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
         <CertificateForm
 
-          handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
+          handleAddOrUpdate={handleAddOrUpdate as unknown as (data: CertificateFormValues) => void}
 
-          editData={editData}
+          editData={editData as unknown as Partial<CertificateFormValues>}
 
           serverErrors={serverErrors}
 

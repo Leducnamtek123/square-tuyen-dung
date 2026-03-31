@@ -121,7 +121,7 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
   }, [currentUser, isSuccess, reloadCounter]);
 
-  const handleAdd = (data: Record<string, string | Blob>) => {
+  const handleAdd = (data: import('../ProfileUploadForm').FormValues) => {
 
     const addResumeUpload = async (formData: FormData) => {
 
@@ -153,7 +153,12 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
     for (const key in data) {
 
-      formData.append(key, data[key]);
+      const value = data[key as keyof import('../ProfileUploadForm').FormValues];
+      if (key === 'file' && Array.isArray(value) && value.length > 0) {
+        formData.append(key, value[0]);
+      } else if (value !== null && value !== undefined) {
+        formData.append(key, value as string | Blob);
+      }
 
     }
 

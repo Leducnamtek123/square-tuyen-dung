@@ -23,10 +23,20 @@ export interface CompanyFormValues {
   taxCode: string;
   employeeSize: number;
   fieldOperation: string;
-  location: { city: number; district: number; address: string; lat: number; lng: number };
+  location: { 
+    city: number | string; 
+    district: number | string; 
+    address: string; 
+    lat: number | string; 
+    lng: number | string 
+  };
   since?: Date | null;
   companyEmail: string;
   companyPhone: string;
+  websiteUrl?: string;
+  facebookUrl?: string;
+  youtubeUrl?: string;
+  linkedinUrl?: string;
   description?: EditorState;
 }
 
@@ -61,10 +71,10 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   });
 
   const { control, reset, setValue, setError, clearErrors, handleSubmit } = useForm<CompanyFormValues>({
-    resolver: yupResolver(schema) as unknown as Resolver<CompanyFormValues>,
+    resolver: yupResolver(schema) as Resolver<CompanyFormValues>,
     defaultValues: {
       description: EditorState.createEmpty(),
-      location: { city: '' as unknown as number, district: '' as unknown as number, address: '', lat: '' as unknown as number, lng: '' as unknown as number },
+      location: { city: '', district: '', address: '', lat: '', lng: '' },
     },
   });
 
@@ -83,7 +93,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
         
         // Only clear district if the cityId has actually changed (user interaction)
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
-          setValue('location.district', '' as unknown as number);
+          setValue('location.district', '');
         }
         setDistrictOptions(results);
         prevCityIdRef.current = id;
@@ -107,8 +117,8 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
       }
       try {
         const resData = await goongService.getPlaces(input);
-        if ((resData as Record<string, unknown>).predictions) {
-            setLocationOptions((resData as Record<string, unknown>).predictions as SelectOption[]);
+        if (resData.predictions) {
+            setLocationOptions(resData.predictions as unknown as SelectOption[]);
         }
       } catch (error) {
           // Silent fail for autocomplete
@@ -138,13 +148,14 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   const handleSelectLocation = async (e: React.SyntheticEvent, value: string | SelectOption | null) => {
     if (!value || typeof value !== 'object' || !('place_id' in value)) return;
     try {
-      const resData = await goongService.getPlaceDetailByPlaceId((value as Record<string, unknown>).place_id as string);
-      const resultObj = (resData as Record<string, unknown>)?.result as Record<string, unknown> | undefined;
-      const geometryObj = resultObj?.geometry as Record<string, unknown> | undefined;
+      const prediction = value as unknown as import('../../../../services/goongService').PlacePrediction;
+      const resData = await goongService.getPlaceDetailByPlaceId(prediction.place_id);
+      const resultObj = resData?.result;
+      const geometryObj = resultObj?.geometry;
       if (!geometryObj?.location) return;
-      const location = geometryObj.location as Record<string, unknown>;
-      setValue('location.lat', location.lat as number);
-      setValue('location.lng', location.lng as number);
+      const location = geometryObj.location;
+      setValue('location.lat', location.lat);
+      setValue('location.lng', location.lng);
     } catch (error) {
       errorHandling(error as AxiosError<{ errors?: ApiError }>);
     }

@@ -20,21 +20,21 @@ const LoadingComponentItem = () => (
   </Stack>
 );
 
-interface RightSidebarRendererProps {
+interface RightSidebarRendererProps<T> {
   titleKey: string;
   noDataKey: string;
-  fetchData: (params: any) => Promise<any>;
-  mapDataToUI: (item: any) => {
+  fetchData: (params: { page: number; pageSize: number }) => Promise<{ count: number; results: T[] }>;
+  mapDataToUI: (item: T) => {
     id: string;
     imageUrl: string;
     primaryText: string;
     secondaryText: string;
     partnerId: string;
-    userDataWrapper: any;
+    userDataWrapper: import('./useRightSidebarData').UserDataPayload;
   };
 }
 
-const RightSidebarRenderer = ({ titleKey, noDataKey, fetchData, mapDataToUI }: RightSidebarRendererProps) => {
+const RightSidebarRenderer = <T,>({ titleKey, noDataKey, fetchData, mapDataToUI }: RightSidebarRendererProps<T>) => {
   const { t } = useTranslation('chat');
   const {
     isLoading,
@@ -111,7 +111,7 @@ const RightSidebarRenderer = ({ titleKey, noDataKey, fetchData, mapDataToUI }: R
                     '&:hover': {
                       bgcolor: (theme) => theme.palette.mode === 'light' ? 'rgba(0, 0, 0, 0.04)' : 'rgba(255, 255, 255, 0.04)',
                       transform: 'translateY(-2px)',
-                      boxShadow: (theme: Theme) => (theme as any).customShadows?.card
+                      boxShadow: (theme: Theme) => (theme as Theme & { customShadows?: { card: string } }).customShadows?.card
                     }
                   }}
                 >

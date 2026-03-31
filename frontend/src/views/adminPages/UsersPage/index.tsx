@@ -59,7 +59,7 @@ const UsersPage = () => {
         }
     };
 
-    const handleRoleChange = async (user: UserModel, roleName: string) => {
+    const handleRoleChange = async (user: UserModel, roleName: import('../../../types/auth').RoleName) => {
         if (!user || user.roleName === roleName || user.id === currentUserId) {
             return;
         }

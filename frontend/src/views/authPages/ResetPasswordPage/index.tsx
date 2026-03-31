@@ -22,7 +22,7 @@ const ResetPasswordPage = () => {
 
   const [errorMessage, setErrorMessage] = React.useState(null);
 
-  const handleResetPassword = async (data: any) => {
+  const handleResetPassword = async (data: import('../../components/auths/ResetPasswordForm').ResetPasswordFormData) => {
     try {
       await authService.resetPassword({
         token,

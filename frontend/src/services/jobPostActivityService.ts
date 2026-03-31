@@ -1,7 +1,6 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 
-type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number;
 
@@ -14,44 +13,44 @@ const withPresign = async (promise: WithPresignInput): Promise<unknown> => {
 
 const jobPostActivityService = {
   // job seeker
-  applyJob: (data: AnyRecord): Promise<unknown> => {
+  applyJob: (data: Record<string, unknown>): Promise<unknown> => {
     const url = 'job/web/job-seeker-job-posts-activity/';
     return httpRequest.post(url, data);
   },
 
-  getJobPostActivity: (params: AnyRecord = {}): Promise<unknown> => {
+  getJobPostActivity: (params: Record<string, unknown> = {}): Promise<unknown> => {
     const url = 'job/web/job-seeker-job-posts-activity/';
     return httpRequest.get(url, { params: params });
   },
 
-  getJobPostChatActivity: (params: AnyRecord = {}): Promise<unknown> => {
+  getJobPostChatActivity: (params: Record<string, unknown> = {}): Promise<unknown> => {
     const url = 'job/web/job-seeker-job-posts-activity/chat/';
     return httpRequest.get(url, { params: params });
   },
 
   // employer
 
-  sendEmail: (id: IdType, data: AnyRecord): Promise<unknown> => {
+  sendEmail: (id: IdType, data: Record<string, unknown>): Promise<unknown> => {
     const url = `job/web/employer-job-posts-activity/${id}/send-email/`;
     return httpRequest.post(url, data);
   },
 
-  getAppliedResume: (params: AnyRecord = {}): Promise<unknown> => {
+  getAppliedResume: (params: Record<string, unknown> = {}): Promise<unknown> => {
     const url = 'job/web/employer-job-posts-activity/';
     return withPresign(httpRequest.get(url, { params: params }));
   },
 
-  getAppliedResumeChat: (params: AnyRecord = {}): Promise<unknown> => {
+  getAppliedResumeChat: (params: Record<string, unknown> = {}): Promise<unknown> => {
     const url = 'job/web/employer-job-posts-activity/chat/';
     return withPresign(httpRequest.get(url, { params: params }));
   },
 
-  exportAppliedResume: (params: AnyRecord = {}): Promise<unknown> => {
+  exportAppliedResume: (params: Record<string, unknown> = {}): Promise<unknown> => {
     const url = 'job/web/employer-job-posts-activity/export/';
     return withPresign(httpRequest.get(url, { params: params }));
   },
 
-  changeApplicationStatus: (id: IdType, data: AnyRecord): Promise<unknown> => {
+  changeApplicationStatus: (id: IdType, data: Record<string, unknown>): Promise<unknown> => {
     const url = `job/web/employer-job-posts-activity/${id}/application-status/`;
     return httpRequest.put(url, data);
   },
@@ -73,3 +72,4 @@ const jobPostActivityService = {
 };
 
 export default jobPostActivityService;
+

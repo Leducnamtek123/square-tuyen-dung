@@ -1,7 +1,6 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 
-type AnyRecord = Record<string, unknown>;
 
 type WithPresignInput = Promise<unknown>;
 
@@ -12,7 +11,7 @@ const withPresign = async (promise: WithPresignInput): Promise<unknown> => {
 
 const adminService = {
   // user-related admin endpoints
-  getUsers: (params: AnyRecord = {}): Promise<unknown> => {
+  getUsers: (params: Record<string, unknown> = {}): Promise<unknown> => {
     // backend does not expose a separate "admin" path for users;
     // the same `auth/users/` viewset is used and guarded by IsAdminUser
     // so we call the regular users endpoint.
@@ -28,3 +27,4 @@ const adminService = {
 };
 
 export default adminService;
+

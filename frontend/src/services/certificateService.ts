@@ -1,11 +1,10 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
 
-type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number;
 
 const certificateService = {
-  addCertificates: (data: AnyRecord): Promise<unknown> => {
+  addCertificates: (data: Record<string, unknown>): Promise<unknown> => {
     const url = `info/web/certificates-detail/`;
     return httpRequest.post(url, data);
   },
@@ -15,7 +14,7 @@ const certificateService = {
     return httpRequest.get(url);
   },
 
-  updateCertificateById: (id: IdType, data: AnyRecord): Promise<unknown> => {
+  updateCertificateById: (id: IdType, data: Record<string, unknown>): Promise<unknown> => {
     const url = `info/web/certificates-detail/${id}/`;
     return httpRequest.put(url, data);
   },
@@ -27,3 +26,4 @@ const certificateService = {
 };
 
 export default certificateService;
+

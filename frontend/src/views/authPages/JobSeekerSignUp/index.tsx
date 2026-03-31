@@ -37,7 +37,7 @@ import tokenService from '../../../services/tokenService';
 
 import { JobSeekerSignUpFormData } from '../../components/auths/JobSeekerSignUpForm';
 
-type AnyRecord = Record<string, unknown>;
+
 
 const StyledCard = styled(Card)(({ theme }) => ({
 
@@ -103,7 +103,7 @@ const JobSeekerSignUp = () => {
 
   const handleRegister = (data: JobSeekerSignUpFormData) => {
 
-    const register = async (payload: AnyRecord, roleName: RoleName) => {
+    const register = async (payload: import('../../../types/auth').JobSeekerRegisterData, roleName: RoleName) => {
 
       setIsFullScreenLoading(true);
 
@@ -152,7 +152,7 @@ const JobSeekerSignUp = () => {
           }
         }
 
-        errorHandling(axiosError, setServerErrors as (errors: Record<string, unknown>) => void);
+        errorHandling(axiosError, (errs) => setServerErrors(errs as Record<string, string[]>));
 
       } finally {
 
@@ -242,8 +242,7 @@ const JobSeekerSignUp = () => {
 
   };
 
-  const handleFacebookRegister = (result: Record<string, any>) => {
-
+  const handleFacebookRegister = (result: { data?: { accessToken: string } }) => {
     const accessToken = result?.data?.accessToken;
 
     if (accessToken) {

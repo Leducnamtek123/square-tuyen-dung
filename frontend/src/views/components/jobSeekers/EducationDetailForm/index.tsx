@@ -29,8 +29,8 @@ export interface FormValues {
 }
 
 interface EducationDetailFormProps {
-  handleAddOrUpdate: (data: any) => void;
-  editData: any;
+  handleAddOrUpdate: (data: FormValues) => void;
+  editData: Partial<FormValues> | null;
 }
 
 
@@ -81,7 +81,7 @@ const EducationDetailForm = ({ handleAddOrUpdate, editData }: EducationDetailFor
 
   const { control, reset, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<FormValues>,
 
   });
 

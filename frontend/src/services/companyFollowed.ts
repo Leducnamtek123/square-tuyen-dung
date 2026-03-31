@@ -1,12 +1,14 @@
-﻿import httpRequest from '../utils/httpRequest';
+import httpRequest from '../utils/httpRequest';
+import type { PaginatedResponse } from '../types/api';
+import type { Company } from '../types/models';
 
-type AnyRecord = Record<string, unknown>;
 
 const companyFollowed = {
-  getCompaniesFollowed: (params: AnyRecord = {}): Promise<unknown> => {
+  getCompaniesFollowed: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<{ id: number, company: Company }>> => {
     const url = 'info/web/companies-follow/';
-    return httpRequest.get(url, { params: params });
+    return httpRequest.get(url, { params: params }) as Promise<PaginatedResponse<{ id: number, company: Company }>>;
   },
 };
 
 export default companyFollowed;
+

@@ -11,6 +11,13 @@ import { useCompaniesFollowed, useToggleFollowCompany } from '../hooks/useJobSee
 
 const pageSize = 10;
 
+import type { Company } from '../../../../types/models';
+
+interface CompanyFollowed {
+  id: number;
+  company: Company;
+}
+
 const CompanyFollowedCard = () => {
   const { t } = useTranslation(['jobSeeker', 'common']);
   const [page, setPage] = React.useState(1);
@@ -58,7 +65,7 @@ const CompanyFollowedCard = () => {
           </NoDataCard>
         ) : (
           <Stack spacing={2}>
-            {companies.map((value: any) => (
+            {companies.map((value) => (
               <CompanyActionFollow
                 key={value.id}
                 company={value.company}

@@ -17,8 +17,8 @@ interface JobSeekerLoginFormData {
 
 interface JobSeekerLoginFormProps {
   onLogin: (data: JobSeekerLoginFormData) => void;
-  onFacebookLogin?: (result: any) => void;
-  onGoogleLogin: (result: any) => void;
+  onFacebookLogin?: (result: Record<string, unknown>) => void;
+  onGoogleLogin: (result: Omit<import('@react-oauth/google').CodeResponse, "error" | "error_description" | "error_uri">) => void;
 }
 
 
@@ -136,7 +136,7 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeek
       email: "",
       password: "",
     },
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<JobSeekerLoginFormData>,
   });
 
   const googleLogin = useGoogleLogin({

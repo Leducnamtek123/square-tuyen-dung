@@ -25,7 +25,7 @@ import EmptyCard from '../../../../components/Common/EmptyCard';
 
 import FormPopup from '../../../../components/Common/Controls/FormPopup';
 
-import AdvancedSkillForm from '../AdvancedSkillForm';
+import AdvancedSkillForm, { FormValues as AdvancedSkillFormValues } from '../AdvancedSkillForm';
 
 import resumeService from '../../../../services/resumeService';
 
@@ -126,7 +126,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
   const [editData, setEditData] = React.useState<AdvancedSkill | null>(null);
 
-  const [serverErrors, setServerErrors] = React.useState<Record<string, unknown> | null>(null);
+  const [serverErrors, setServerErrors] = React.useState<Record<string, string[]> | null>(null);
 
   React.useEffect(() => {
 
@@ -199,15 +199,15 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
   };
 
-  const handleAddOrUpdate = (data: Record<string, unknown>) => {
+  const handleAddOrUpdate = (data: AdvancedSkillFormValues & { id?: string | number }) => {
 
-    const create = async (payload: Record<string, unknown>) => {
+    const create = async (payload: AdvancedSkillFormValues & { resume?: string }) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await advancedSkillService.addAdvancedSkills(payload);
+        await advancedSkillService.addAdvancedSkills(payload as unknown as Record<string, unknown>);
 
         setOpenPopup(false);
 
@@ -217,7 +217,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as unknown as React.Dispatch<React.SetStateAction<Record<string, unknown> | null>>);
 
       } finally {
 
@@ -227,13 +227,13 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
     };
 
-    const update = async (payload: Record<string, unknown>) => {
+    const update = async (payload: AdvancedSkillFormValues & { id?: string | number }) => {
 
       setIsFullScreenLoading(true);
 
       try {
 
-        await advancedSkillService.updateAdvancedSkillById(payload.id as string | number, payload);
+        await advancedSkillService.updateAdvancedSkillById(payload.id as string | number, payload as unknown as Record<string, unknown>);
 
         setOpenPopup(false);
 
@@ -458,7 +458,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       <FormPopup title={t('jobSeeker:profile.sections.skills')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
 
-        <AdvancedSkillForm handleAddOrUpdate={handleAddOrUpdate} editData={editData} serverErrors={serverErrors} />
+        <AdvancedSkillForm handleAddOrUpdate={handleAddOrUpdate as (data: AdvancedSkillFormValues) => void} editData={editData as unknown as Partial<AdvancedSkillFormValues>} serverErrors={serverErrors} />
 
       </FormPopup>
 

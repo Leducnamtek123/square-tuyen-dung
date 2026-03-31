@@ -19,13 +19,12 @@ import {
 
 import db, { serverTimestamp, auth } from '../configs/firebase-config';
 
-type AnyRecord = Record<string, unknown>;
 
 type IdType = string | number;
 
 export const addDocument = async (
   collectionName: string,
-  data: AnyRecord
+  data: Record<string, unknown>
 ): Promise<string> => {
   const queryRef = collection(db, collectionName);
 
@@ -62,7 +61,7 @@ export const checkExists = async (
 
 export const createUser = async (
   collectionName: string,
-  userData: AnyRecord,
+  userData: Record<string, unknown>,
   userId: IdType
 ): Promise<boolean> => {
   try {
@@ -99,13 +98,13 @@ export const checkChatRoomExists = async (
 export const getChatRoomById = async (
   chatRoomId: IdType,
   currentUserId: IdType
-): Promise<AnyRecord> => {
+): Promise<Record<string, unknown>> => {
   const chatRoomRef = doc(db, 'chatRooms', `${chatRoomId}`);
   const docSnap = await getDoc(chatRoomRef);
 
   if (docSnap.exists()) {
     let partnerId = '';
-    const chatRoomData = docSnap.data() as AnyRecord;
+    const chatRoomData = docSnap.data() as Record<string, unknown>;
 
     const members = (chatRoomData.members as unknown as string[]) || [];
     if (members[0] === `${currentUserId}`) {
@@ -119,21 +118,21 @@ export const getChatRoomById = async (
       ...chatRoomData,
       id: docSnap.id,
       user: userAccount,
-    } as AnyRecord;
+    } as Record<string, unknown>;
   }
 
-  return {} as AnyRecord;
+  return {} as Record<string, unknown>;
 };
 
 export const getUserAccount = async (
   collectionName: string,
   userId: IdType
-): Promise<AnyRecord | null> => {
+): Promise<Record<string, unknown> | null> => {
   const userRef = doc(db, collectionName, `${userId}`);
   const docSnap = await getDoc(userRef);
 
   if (docSnap.exists()) {
-    return docSnap.data() as AnyRecord;
+    return docSnap.data() as Record<string, unknown>;
   }
 
   return null;
@@ -221,3 +220,4 @@ export const verifyCode = async (
   const user = result.user;
   return user.getIdToken();
 };
+

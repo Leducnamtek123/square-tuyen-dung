@@ -145,6 +145,13 @@ export interface JobPostActivity {
   aiAnalysisProgress?: number;
 }
 
+export interface UserDict {
+  id?: number;
+  fullName?: string;
+  avatarUrl?: string | null;
+  email?: string;
+}
+
 /* Resume & Profile */
 
 export interface ResumeDetailResponse extends Resume {
@@ -181,11 +188,7 @@ export interface Resume {
   isSaved?: boolean;
   viewEmployerNumber?: number;
   lastViewedDate?: string | null;
-  userDict?: {
-    fullName?: string;
-    avatarUrl?: string;
-    email?: string;
-  };
+  userDict?: UserDict;
   jobSeekerProfileDict?: Record<string, unknown> & { old?: string | number };
   // Search-related fields
   searchScore?: number;
@@ -206,6 +209,7 @@ export interface JobSeekerProfile {
   gender?: 'M' | 'F' | 'O' | null;
   maritalStatus?: 'S' | 'M' | null;
   location?: Location | null;
+  userDict?: UserDict;
 }
 
 export interface EducationDetail {

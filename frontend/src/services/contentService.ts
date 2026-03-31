@@ -1,7 +1,6 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 
-type AnyRecord = Record<string, unknown>;
 
 type WithPresignInput = Promise<unknown>;
 
@@ -16,17 +15,17 @@ const contentService = {
     return httpRequest.get(url);
   },
 
-  createFeedback: (data: AnyRecord): Promise<unknown> => {
+  createFeedback: (data: Record<string, unknown>): Promise<unknown> => {
     const url = 'content/web/feedbacks/';
     return httpRequest.post(url, data);
   },
 
-  sendSMSDownloadApp: (data: AnyRecord): Promise<unknown> => {
+  sendSMSDownloadApp: (data: Record<string, unknown>): Promise<unknown> => {
     const url = 'content/web/sms-download-app/';
     return httpRequest.post(url, data);
   },
 
-  getBanners: (params: AnyRecord = {}): Promise<unknown> => {
+  getBanners: (params: Record<string, unknown> = {}): Promise<unknown> => {
     const url = 'content/web/banner/';
     return withPresign(httpRequest.get(url, { params: params }));
   },
@@ -38,3 +37,4 @@ const contentService = {
 };
 
 export default contentService;
+

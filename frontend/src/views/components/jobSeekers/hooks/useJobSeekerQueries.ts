@@ -12,14 +12,24 @@ import { JobPost, Company, Resume } from '../../../../types/models';
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
 
-type AnyRecord = Record<string, unknown>;
+// ─── Query Helpers ──────────────────────────────────────────
+import type { UseQueryResult, UseMutationResult } from '@tanstack/react-query';
+
+export type UseSavedJobsResult = UseQueryResult<PaginatedResponse<JobPost>>;
+export type UseCompaniesFollowedResult = UseQueryResult<PaginatedResponse<{ id: number, company: Company }>>;
+export type UseResumeViewedResult = UseQueryResult<PaginatedResponse<import('../../../../services/resumeViewedService').ResumeViewed>>;
+export type UseJobSeekerTotalViewResult = UseQueryResult<import('../../../../services/statisticService').JobSeekerTotalViewStats>;
+export type UseJobSeekerActivityStatsResult = UseQueryResult<import('../../../../services/statisticService').JobSeekerActivityStats>;
+export type UseResumesResult = UseQueryResult<Resume[]>;
+export type UseJobPostNotificationsResult = UseQueryResult<PaginatedResponse<import('../../../../services/jobPostNotificationService').JobPostNotification>>;
+
 
 // ─── Saved Jobs ─────────────────────────────────────────────
-export const useSavedJobs = (params: AnyRecord) => {
+export const useSavedJobs = (params: import('../../../../services/jobService').GetJobPostsParams = {}): UseSavedJobsResult => {
     return useQuery({
         queryKey: ['savedJobs', params],
         queryFn: async () => {
-            const response = await jobService.getJobPostsSaved(params) as unknown as PaginatedResponse<JobPost>;
+            const response = await jobService.getJobPostsSaved(params);
             return response;
         },
         placeholderData: keepPreviousData,
@@ -38,11 +48,11 @@ export const useToggleSaveJob = () => {
 };
 
 // ─── Companies Followed ─────────────────────────────────────
-export const useCompaniesFollowed = (params: AnyRecord) => {
+export const useCompaniesFollowed = (params: Record<string, unknown> = {}): UseCompaniesFollowedResult => {
     return useQuery({
         queryKey: ['companiesFollowed', params],
         queryFn: async () => {
-            const response = await companyFollowed.getCompaniesFollowed(params) as unknown as PaginatedResponse<{ id: number, company: Company; [key: string]: unknown }>;
+            const response = await companyFollowed.getCompaniesFollowed(params) as PaginatedResponse<{ id: number, company: Company }>;
             return response;
         },
         placeholderData: keepPreviousData,
@@ -61,11 +71,11 @@ export const useToggleFollowCompany = () => {
 };
 
 // ─── Companies Viewed (Resume) ──────────────────────────────
-export const useResumeViewed = (params: AnyRecord) => {
+export const useResumeViewed = (params: Record<string, unknown> = {}): UseResumeViewedResult => {
     return useQuery({
         queryKey: ['resumeViewed', params],
         queryFn: async () => {
-            const response = await resumeViewedService.getResumeViewed(params) as unknown as PaginatedResponse<{ id: number, resume: Resume; [key: string]: unknown }>;
+            const response = await resumeViewedService.getResumeViewed(params);
             return response;
         },
         placeholderData: keepPreviousData,
@@ -73,7 +83,7 @@ export const useResumeViewed = (params: AnyRecord) => {
 };
 
 // ─── Statistics ─────────────────────────────────────────────
-export const useJobSeekerTotalView = () => {
+export const useJobSeekerTotalView = (): UseJobSeekerTotalViewResult => {
     return useQuery({
         queryKey: ['jobSeekerTotalView'],
         queryFn: async () => {
@@ -83,7 +93,7 @@ export const useJobSeekerTotalView = () => {
     });
 };
 
-export const useJobSeekerActivityStatistics = () => {
+export const useJobSeekerActivityStatistics = (): UseJobSeekerActivityStatsResult => {
     return useQuery({
         queryKey: ['jobSeekerActivityStatistics'],
         queryFn: async () => {
@@ -94,11 +104,11 @@ export const useJobSeekerActivityStatistics = () => {
 };
 
 // ─── Job Application (Resumes) ──────────────────────────────
-export const useResumes = (jobSeekerProfileId: string | undefined) => {
+export const useResumes = (jobSeekerProfileId: string | undefined): UseResumesResult => {
     return useQuery({
         queryKey: ['resumes', jobSeekerProfileId],
         queryFn: async () => {
-            const response = await jobSeekerProfileService.getResumes(jobSeekerProfileId!, {}) as unknown as PaginatedResponse<Record<string, unknown>>;
+            const response = await jobSeekerProfileService.getResumes(jobSeekerProfileId!, {}) as PaginatedResponse<Resume>;
             return response.results || [];
         },
         enabled: !!jobSeekerProfileId,
@@ -106,11 +116,11 @@ export const useResumes = (jobSeekerProfileId: string | undefined) => {
 };
 
 // ─── Job Post Notifications ─────────────────────────────────
-export const useJobPostNotifications = (params: AnyRecord) => {
+export const useJobPostNotifications = (params: Record<string, unknown> = {}): UseJobPostNotificationsResult => {
     return useQuery({
         queryKey: ['jobPostNotifications', params],
         queryFn: async () => {
-            const response = await jobPostNotificationService.getJobPostNotifications(params) as unknown as PaginatedResponse<Record<string, unknown>>;
+            const response = await jobPostNotificationService.getJobPostNotifications(params);
             return response;
         },
         placeholderData: keepPreviousData,
@@ -122,13 +132,13 @@ export const useJobPostNotificationMutations = () => {
     const invalidate = () => queryClient.invalidateQueries({ queryKey: ['jobPostNotifications'] });
 
     const addMutation = useMutation({
-        mutationFn: (data: AnyRecord) => jobPostNotificationService.addJobPostNotification(data),
+        mutationFn: (data: Parameters<typeof jobPostNotificationService.addJobPostNotification>[0]) => jobPostNotificationService.addJobPostNotification(data),
         onSuccess: () => invalidate(),
         onError: (error: unknown) => errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>),
     });
 
     const updateMutation = useMutation({
-        mutationFn: (data: AnyRecord & { id: string | number }) => jobPostNotificationService.updateJobPostNotificationById(data.id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: Parameters<typeof jobPostNotificationService.updateJobPostNotificationById>[1] }) => jobPostNotificationService.updateJobPostNotificationById(id, data),
         onSuccess: () => invalidate(),
         onError: (error: unknown) => errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>),
     });
@@ -157,7 +167,7 @@ export const useUserSettings = (enabled: boolean = true) => {
 export const useUpdateUserSettings = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: AnyRecord) => authService.updateUserSettings(data),
+        mutationFn: (data: Record<string, unknown>) => authService.updateUserSettings(data),
         onSuccess: (response: unknown) => {
             queryClient.setQueryData(['userSettings'], response);
             toastMessages.success("Settings updated successfully.");
@@ -167,3 +177,4 @@ export const useUpdateUserSettings = () => {
         },
     });
 };
+
