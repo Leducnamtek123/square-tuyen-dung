@@ -54,6 +54,8 @@ class AdminCareerViewSet(viewsets.ModelViewSet):
 
     permission_classes = [perms_custom.IsAdminUser]
 
+    pagination_class = paginations.CustomPagination
+
     def get_serializer(self, *args, **kwargs):
 
         if self.action in ['list', 'retrieve']:
@@ -70,6 +72,8 @@ class AdminCityViewSet(viewsets.ModelViewSet):
 
     permission_classes = [perms_custom.IsAdminUser]
 
+    pagination_class = paginations.CustomPagination
+
 class AdminDistrictViewSet(viewsets.ModelViewSet):
 
     queryset = District.objects.select_related('city').all().order_by('id')
@@ -77,6 +81,8 @@ class AdminDistrictViewSet(viewsets.ModelViewSet):
     serializer_class = DistrictSerializer
 
     permission_classes = [perms_custom.IsAdminUser]
+
+    pagination_class = paginations.CustomPagination
 
     filterset_fields = ['city']
 
@@ -87,6 +93,8 @@ class AdminWardViewSet(viewsets.ModelViewSet):
     serializer_class = WardSerializer
 
     permission_classes = [perms_custom.IsAdminUser]
+
+    pagination_class = paginations.CustomPagination
 
     filterset_fields = ['district']
 
