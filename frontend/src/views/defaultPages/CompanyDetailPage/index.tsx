@@ -12,6 +12,7 @@ import companyService from "../../../services/companyService";
 import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
 import CompanyDetailLoading from "./components/CompanyDetailLoading";
 import { useAppSelector } from "../../../hooks/useAppStore";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import useSEO from "../../../hooks/useSEO";
 import useStructuredData from "../../../hooks/useStructuredData";
@@ -66,26 +67,25 @@ const CompanyDetailPage = () => {
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
 
   const [openSharePopup, setOpenSharePopup] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [isLoadingFollow, setIsLoadingFollow] = React.useState(false);
-  const [companyDetail, setCompanyDetail] = React.useState<CompanyDetailProps | null>(null);
-  const [imageList, setImageList] = React.useState<{ original: string, thumbnail: string }[]>([]);
+  const queryClient = useQueryClient();
+
+  const { data: fetchRes, isLoading } = useQuery({
+    queryKey: ['companyDetail', slug],
+    queryFn: () => companyService.getCompanyDetailById(slug as string),
+    enabled: !!slug
+  });
+
+  const companyDetail = React.useMemo(() => {
+    if (!fetchRes) return null;
+    return fetchRes as unknown as { companyImages?: { imageUrl: string }[] } & CompanyDetailProps;
+  }, [fetchRes]);
+
+  const imageList = React.useMemo(() => {
+    if (!companyDetail?.companyImages) return [];
+    return companyDetail.companyImages.map(img => ({ original: img.imageUrl, thumbnail: img.imageUrl }));
+  }, [companyDetail?.companyImages]);
 
   const safeDescriptionHtml = React.useMemo(() => sanitizeCompanyDescription(companyDetail?.description), [companyDetail?.description]);
-
-  React.useEffect(() => {
-    const getCompanyDetail = async (companySlug: string | undefined) => {
-      try {
-        const resData = await companyService.getCompanyDetailById(companySlug as string) as unknown as { companyImages?: { imageUrl: string }[] } & CompanyDetailProps;
-        setCompanyDetail(resData);
-        setImageList((resData?.companyImages || []).map((img: { imageUrl: string }) => ({ original: img.imageUrl, thumbnail: img.imageUrl })));
-      } catch (error) {
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    getCompanyDetail(slug as string);
-  }, [slug]);
 
   const stripHtml = (html: string) => (html || '').replace(/<[^>]*>/g, '').slice(0, 160);
 
@@ -126,28 +126,33 @@ const CompanyDetailPage = () => {
     ] : []
   );
 
+  const followMutation = useMutation({
+    mutationFn: (companySlug: string) => companyService.followCompany(companySlug),
+    onSuccess: (resData: unknown) => {
+      const isFollowed = (resData as { isFollowed: boolean }).isFollowed;
+      queryClient.setQueryData(['companyDetail', slug], (old: unknown) => {
+        if (!old) return old;
+        const oldData = old as Record<string, unknown> & CompanyDetailProps;
+        return {
+          ...oldData,
+          isFollowed,
+          followNumber: isFollowed ? (oldData.followNumber || 0) + 1 : (oldData.followNumber || 0) - 1
+        };
+      });
+      toastMessages.success(isFollowed ? t("companyDetail.followedSuccessfully") : t("companyDetail.unfollowedSuccessfully"));
+      queryClient.invalidateQueries({ queryKey: ['companiesFollowed'] });
+    }
+  });
+
   const handleFollow = () => {
-    const follow = async () => {
-      setIsLoadingFollow(true);
-      try {
-        const resData = await companyService.followCompany(slug as string) as unknown as { isFollowed: boolean };
-        const isFollowed = resData.isFollowed;
-        setCompanyDetail({ ...companyDetail, isFollowed, followNumber: isFollowed ? (companyDetail?.followNumber || 0) + 1 : (companyDetail?.followNumber || 0) - 1 });
-        toastMessages.success(isFollowed ? t("companyDetail.followedSuccessfully") : t("companyDetail.unfollowedSuccessfully"));
-      } catch (error) {
-        errorHandling(error as AxiosError<Record<string, unknown>>);
-      } finally {
-        setIsLoadingFollow(false);
-      }
-    };
-    follow();
+    if (slug) followMutation.mutate(slug as string);
   };
 
   return isLoading ? <CompanyDetailLoading /> : companyDetail === null ? <NoDataCard /> : (
     <>
       <Box sx={{ mt: 2 }}>
         <Stack spacing={2}>
-          <CompanyHeader companyDetail={companyDetail} allConfig={allConfig} isAuthenticated={isAuthenticated} currentUser={currentUser} isLoadingFollow={isLoadingFollow} handleFollow={handleFollow} setOpenSharePopup={setOpenSharePopup} t={t} />
+          <CompanyHeader companyDetail={companyDetail} allConfig={allConfig} isAuthenticated={isAuthenticated} currentUser={currentUser} isLoadingFollow={followMutation.isPending} handleFollow={handleFollow} setOpenSharePopup={setOpenSharePopup} t={t} />
           <Box>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 8 }}>

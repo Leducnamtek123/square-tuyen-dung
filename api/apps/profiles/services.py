@@ -5,7 +5,8 @@ Encapsulates business logic for resumes, companies, and profiles.
 import logging
 
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count, Q, QuerySet
+from typing import Optional, Tuple, Dict, Any, Union
 
 from apps.profiles.models import (
     Resume, Company, CompanyFollowed,
@@ -19,7 +20,7 @@ class ResumeService:
     """Business logic for Resume operations."""
 
     @staticmethod
-    def get_optimized_resume_queryset():
+    def get_optimized_resume_queryset() -> QuerySet[Resume]:
         """Return a fully optimized Resume queryset with all related data."""
         return (
             Resume.objects
@@ -37,7 +38,7 @@ class ResumeService:
         )
 
     @staticmethod
-    def get_active_resumes(career_id=None, city_id=None):
+    def get_active_resumes(career_id: Optional[int] = None, city_id: Optional[int] = None) -> QuerySet[Resume]:
         """Get active resumes with optional filters."""
         queryset = ResumeService.get_optimized_resume_queryset().filter(
             is_active=True
@@ -50,7 +51,7 @@ class ResumeService:
 
     @staticmethod
     @transaction.atomic
-    def toggle_save_resume(company, resume):
+    def toggle_save_resume(company: Company, resume: Resume) -> Tuple[bool, str]:
         """
         Toggle save/unsave a resume for a company.
         Returns (saved: bool, message: str).
@@ -67,7 +68,7 @@ class ResumeService:
         return True, "Đã lưu hồ sơ."
 
     @staticmethod
-    def record_resume_view(company, resume):
+    def record_resume_view(company: Company, resume: Resume) -> bool:
         """Record that a company viewed a resume (idempotent)."""
         _, created = ResumeViewed.objects.get_or_create(
             company=company, resume=resume
@@ -79,7 +80,7 @@ class CompanyService:
     """Business logic for Company operations."""
 
     @staticmethod
-    def get_optimized_company_queryset():
+    def get_optimized_company_queryset() -> QuerySet[Company]:
         """Return a fully optimized Company queryset."""
         return (
             Company.objects
@@ -92,7 +93,7 @@ class CompanyService:
 
     @staticmethod
     @transaction.atomic
-    def toggle_follow(user, company):
+    def toggle_follow(user: Any, company: Company) -> Tuple[bool, str]:
         """
         Toggle follow/unfollow a company.
         Returns (is_following: bool, message: str).
@@ -109,7 +110,7 @@ class CompanyService:
         return True, "Đã theo dõi công ty."
 
     @staticmethod
-    def get_company_stats(company):
+    def get_company_stats(company: Company) -> Dict[str, int]:
         """Get company profile statistics."""
         from apps.jobs.models import JobPost, JobPostActivity
 

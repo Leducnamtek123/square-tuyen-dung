@@ -50,7 +50,7 @@ export const useToggleSaveJob = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['savedJobs'] });
         },
-        onError: (error: unknown) => errorHandling(error as AxiosError<{ errors?: ApiError }>),
+
     });
 };
 
@@ -73,7 +73,7 @@ export const useToggleFollowCompany = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['companiesFollowed'] });
         },
-        onError: (error: unknown) => errorHandling(error as AxiosError<{ errors?: ApiError }>),
+
     });
 };
 
@@ -111,11 +111,11 @@ export const useJobSeekerActivityStatistics = (): UseJobSeekerActivityStatsResul
 };
 
 // ─── Job Application (Resumes) ──────────────────────────────
-export const useResumes = (jobSeekerProfileId: string | undefined): UseResumesResult => {
+export const useResumes = (jobSeekerProfileId: string | undefined, params: Record<string, unknown> = {}): UseResumesResult => {
     return useQuery({
-        queryKey: ['resumes', jobSeekerProfileId],
+        queryKey: ['resumes', jobSeekerProfileId, params],
         queryFn: async () => {
-            const response = await jobSeekerProfileService.getResumes(jobSeekerProfileId!, {}) as PaginatedResponse<Resume>;
+            const response = await jobSeekerProfileService.getResumes(jobSeekerProfileId!, params) as PaginatedResponse<Resume>;
             return response.results || [];
         },
         enabled: !!jobSeekerProfileId,
@@ -141,19 +141,19 @@ export const useJobPostNotificationMutations = () => {
     const addMutation = useMutation({
         mutationFn: (data: Parameters<typeof jobPostNotificationService.addJobPostNotification>[0]) => jobPostNotificationService.addJobPostNotification(data),
         onSuccess: () => invalidate(),
-        onError: (error: unknown) => errorHandling(error as AxiosError<{ errors?: ApiError }>),
+
     });
 
     const updateMutation = useMutation({
         mutationFn: ({ id, data }: { id: string | number; data: Parameters<typeof jobPostNotificationService.updateJobPostNotificationById>[1] }) => jobPostNotificationService.updateJobPostNotificationById(id, data),
         onSuccess: () => invalidate(),
-        onError: (error: unknown) => errorHandling(error as AxiosError<{ errors?: ApiError }>),
+
     });
 
     const deleteMutation = useMutation({
         mutationFn: (id: number) => jobPostNotificationService.deleteJobPostNotificationDetailById(id),
         onSuccess: () => invalidate(),
-        onError: (error: unknown) => errorHandling(error as AxiosError<{ errors?: ApiError }>),
+
     });
 
     return { addMutation, updateMutation, deleteMutation };

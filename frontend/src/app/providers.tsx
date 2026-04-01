@@ -2,15 +2,23 @@
 
 import React from 'react';
 import { Provider } from 'react-redux';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import store from '../redux/store';
 import '../configs/dayjs-config';
 import '../i18n';
+import errorHandling from '@/utils/errorHandling';
+import type { AxiosError } from 'axios';
 
 function makeQueryClient() {
   return new QueryClient({
+    queryCache: new QueryCache({
+      onError: (error) => errorHandling(error as AxiosError<Record<string, unknown>>)
+    }),
+    mutationCache: new MutationCache({
+      onError: (error) => errorHandling(error as AxiosError<Record<string, unknown>>)
+    }),
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,

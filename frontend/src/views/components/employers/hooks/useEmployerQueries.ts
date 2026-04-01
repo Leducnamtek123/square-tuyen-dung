@@ -159,7 +159,6 @@ export const useToggleSaveResume = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['savedResumes'] });
     },
-    onError: (error: unknown) => errorHandling(error as AxiosError<Record<string, unknown>>),
   });
 
   return {
@@ -201,7 +200,6 @@ export const useDeleteJobPostActivity = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
     },
-    onError: (error: Error | unknown) => errorHandling(error as AxiosError<Record<string, unknown>>),
   });
 
   return {
@@ -219,7 +217,6 @@ export const useUpdateApplicationStatus = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
     },
-    onError: (error: unknown) => errorHandling(error as AxiosError<Record<string, unknown>>),
   });
 
   return {
@@ -248,7 +245,6 @@ export const useToggleSaveResumeOptimistic = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerResumes'] });
     },
-    onError: (error: unknown) => errorHandling(error as AxiosError<Record<string, unknown>>),
   });
 
   return {
@@ -322,7 +318,6 @@ export const useInterviewMutations = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewDetail'] });
     },
-    onError: (error: unknown) => errorHandling(error as AxiosError<Record<string, unknown>>),
   });
 
   return {

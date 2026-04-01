@@ -36,6 +36,8 @@ import ColorPickerDialog from '../../../../components/Common/ColorPickerDialog';
 import { useTranslation } from "react-i18next";
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
+import { useQueryClient } from '@tanstack/react-query';
+import { useResumes } from '../hooks/useJobSeekerQueries';
 import type { AxiosError } from "axios";
 import type { ApiError } from '@/types/api';
 
@@ -100,42 +102,30 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
   const { currentUser } = useAppSelector((state) => state.user);
   const { allConfig } = useConfig();
 
-  const [isLoadingResume, setIsLoadingResume] = React.useState(false);
-  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-  const [resume, setResume] = React.useState<BoxProfileResume | null>(null);
   const [openColorPicker, setOpenColorPicker] = React.useState(false);
+  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const [selectedColor, setSelectedColor] = React.useState('#140861');
   const [isGeneratingPDF, setIsGeneratingPDF] = React.useState(false);
   const blobRef = React.useRef<Blob | null>(null);
+  const queryClient = useQueryClient();
 
+  const userPayload = currentUser as unknown as { jobSeekerProfile?: { id?: string }; jobSeekerProfileId?: string };
+  const jobSeekerProfileId = userPayload?.jobSeekerProfile?.id || userPayload?.jobSeekerProfileId || undefined;
+
+  const { data: resumes, isLoading: isLoadingResume } = useResumes(jobSeekerProfileId, {
+    resumeType: CV_TYPES.cvWebsite,
+  });
+
+  const resume = React.useMemo(() => {
+    return (resumes && resumes.length > 0 ? resumes[0] : null) as unknown as BoxProfileResume | null;
+  }, [resumes]);
+
+  // Sync Redux reloadCounter invalidation
   React.useEffect(() => {
-    const getOnlineProfile = async (jobSeekerProfileId: string, params: Record<string, unknown>) => {
-      setIsLoadingResume(true);
-      try {
-        const resData = await jobSeekerProfileService.getResumes(
-          jobSeekerProfileId,
-          params
-        );
-        const parsedResumes = ((resData as unknown as { results?: BoxProfileResume[] })?.results || []) as BoxProfileResume[];
-        setResume(parsedResumes.length > 0 ? parsedResumes[0] : null);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setIsLoadingResume(false);
-      }
-    };
-    
-    const userPayload = currentUser as unknown as { jobSeekerProfile?: { id?: string }; jobSeekerProfileId?: string };
-    if (userPayload?.jobSeekerProfile?.id) {
-      getOnlineProfile(userPayload.jobSeekerProfile.id, {
-        resumeType: CV_TYPES.cvWebsite,
-      });
-    } else if (userPayload?.jobSeekerProfileId) {
-      getOnlineProfile(userPayload.jobSeekerProfileId, {
-        resumeType: CV_TYPES.cvWebsite,
-      });
+    if (reloadCounter > 0) {
+      queryClient.invalidateQueries({ queryKey: ['resumes', jobSeekerProfileId] });
     }
-  }, [currentUser, reloadCounter]);
+  }, [reloadCounter, jobSeekerProfileId, queryClient]);
 
   const handleActive = (slug: string) => {
     const activeResume = async (resumeSlug: string) => {

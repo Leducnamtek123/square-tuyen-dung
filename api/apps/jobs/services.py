@@ -5,8 +5,9 @@ Encapsulates business logic separate from views/serializers.
 import logging
 
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Q, QuerySet, Prefetch
 from django.utils import timezone
+from typing import Optional, Dict, Any, Union
 
 from apps.jobs.models import JobPost, JobPostActivity
 from shared.configs import variable_system as var_sys
@@ -18,7 +19,7 @@ class JobPostService:
     """Business logic for Job Posts."""
 
     @staticmethod
-    def get_active_jobs(filters=None, user=None):
+    def get_active_jobs(filters: Optional[Dict[str, Any]] = None, user: Any = None) -> QuerySet[JobPost]:
         """Get all active, non-expired job posts with optimized queries."""
         queryset = (
             JobPost.objects
@@ -61,7 +62,7 @@ class JobPostService:
 
     @staticmethod
     @transaction.atomic
-    def create_job(user, validated_data):
+    def create_job(user: Any, validated_data: Dict[str, Any]) -> JobPost:
         """Creates a new job post."""
         # Ensure company is linked
         if not hasattr(user, 'company'):
@@ -76,7 +77,7 @@ class JobPostService:
 
     @staticmethod
     @transaction.atomic
-    def update_job(user, job_post, validated_data):
+    def update_job(user: Any, job_post: JobPost, validated_data: Dict[str, Any]) -> JobPost:
         """Updates an existing job post."""
         old_status = job_post.status
 
@@ -101,7 +102,7 @@ class JobActivityService:
 
     @staticmethod
     @transaction.atomic
-    def apply_to_job(user, validated_data):
+    def apply_to_job(user: Any, validated_data: Dict[str, Any]) -> JobPostActivity:
         """
         Apply to a job post. Returns activity object.
         Business rules:
@@ -177,7 +178,7 @@ class JobActivityService:
 
     @staticmethod
     @transaction.atomic
-    def toggle_save_job(user, job_post):
+    def toggle_save_job(user: Any, job_post: JobPost) -> bool:
         """Toggles the 'saved' status of a job post for a user."""
         from apps.jobs.models import SavedJobPost
         saved_job, created = SavedJobPost.objects.get_or_create(
@@ -192,7 +193,7 @@ class JobActivityService:
 
     @staticmethod
     @transaction.atomic
-    def change_application_status(activity, new_status):
+    def change_application_status(activity: JobPostActivity, new_status: int) -> JobPostActivity:
         from shared.configs import variable_system as var_sys
         from shared.configs.messages import APPLICATION_STATUS_MESSAGES
         from shared.helpers import helper
@@ -227,7 +228,7 @@ class JobActivityService:
         return activity
 
     @staticmethod
-    def send_email_to_job_seeker(activity, user, validated_data):
+    def send_email_to_job_seeker(activity: JobPostActivity, user: Any, validated_data: Dict[str, Any]) -> None:
         from shared.configs import variable_system as var_sys
         from console.jobs import queue_mail
 
@@ -260,7 +261,7 @@ class JobActivityService:
         activity.save()
 
     @staticmethod
-    def trigger_ai_analysis(activity):
+    def trigger_ai_analysis(activity: JobPostActivity) -> None:
         from apps.jobs.tasks import analyze_resume_ai
         
         activity.ai_analysis_status = 'processing'
@@ -269,7 +270,7 @@ class JobActivityService:
         analyze_resume_ai.delay(activity.id)
 
     @staticmethod
-    def get_employer_job_stats(company):
+    def get_employer_job_stats(company: Any) -> Dict[str, int]:
         """Get statistics for an employer's jobs."""
         jobs = JobPost.objects.filter(company=company)
         today = timezone.now().date()
