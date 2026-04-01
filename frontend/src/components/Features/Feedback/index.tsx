@@ -250,7 +250,7 @@ const Feedback = (_props: FeedbackProps) => {
               <MultilineTextFieldCustom
                 name="content"
                 placeholder={t('feedback.placeholder')}
-                control={control as unknown as ReactHookFormControl<ReactHookFormFieldValues>}
+                control={control as any}
                 minRows={5}
                 maxRows={8}
                 sx={{

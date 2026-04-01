@@ -22,23 +22,23 @@ interface OptionType {
   [key: string]: unknown;
 }
 
-interface JobPostFormFieldsProps<TFieldValues extends FieldValues = FieldValues> {
-  control: Control<TFieldValues>;
-  allConfig: Record<string, unknown> | null | unknown;
+interface JobPostFormFieldsProps {
+  control: any;
+  allConfig: Record<string, unknown> | null | any;
   t: TFunction;
   districtOptions: Record<string, unknown>[];
   locationOptions: Record<string, unknown>[];
   handleSelectLocation: (e: React.SyntheticEvent, value: Record<string, unknown> | null) => void;
 }
 
-function JobPostFormFields<TFieldValues extends FieldValues = FieldValues>({
+function JobPostFormFields({
   control,
   allConfig,
   t,
   districtOptions,
   locationOptions,
   handleSelectLocation
-}: JobPostFormFieldsProps<TFieldValues>) {
+}: JobPostFormFieldsProps) {
   const theme = useTheme();
 
   const inputSx = {
@@ -95,25 +95,25 @@ function JobPostFormFields<TFieldValues extends FieldValues = FieldValues>({
         <TextFieldCustom name="jobName" title={t('jobPostForm.title.jobtitle', 'Job Title')} showRequired={true} placeholder={t('jobPostForm.placeholder.enterjobtitle', 'Enter job title')} control={control} sx={inputSx} />
       </Grid>
       <Grid size={12}>
-        <SingleSelectCustom name="career" control={control as unknown as Control<FieldValues>} options={((allConfig as Record<string, unknown[]>)?.careerOptions || []) as OptionType[]} title={t('jobPostForm.title.career', 'Career')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectcareer', 'Select career')} sx={inputSx} />
+        <SingleSelectCustom name="career" control={control} options={((allConfig as Record<string, unknown[]>)?.careerOptions || []) as OptionType[]} title={t('jobPostForm.title.career', 'Career')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectcareer', 'Select career')} sx={inputSx} />
       </Grid>
       <Grid size={6}>
-        <SingleSelectCustom name="position" control={control as unknown as Control<FieldValues>} options={((allConfig as Record<string, unknown[]>)?.positionOptions || []) as OptionType[]} title={t('jobPostForm.title.position', 'Position')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectposition', 'Select position')} sx={inputSx} />
+        <SingleSelectCustom name="position" control={control} options={((allConfig as Record<string, unknown[]>)?.positionOptions || []) as OptionType[]} title={t('jobPostForm.title.position', 'Position')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectposition', 'Select position')} sx={inputSx} />
       </Grid>
       <Grid size={6}>
-        <SingleSelectCustom name="experience" control={control as unknown as Control<FieldValues>} options={((allConfig as Record<string, unknown[]>)?.experienceOptions || []) as OptionType[]} title={t('jobPostForm.title.experience', 'Experience')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectrequiredexperience', 'Select required experience')} sx={inputSx} />
+        <SingleSelectCustom name="experience" control={control} options={((allConfig as Record<string, unknown[]>)?.experienceOptions || []) as OptionType[]} title={t('jobPostForm.title.experience', 'Experience')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectrequiredexperience', 'Select required experience')} sx={inputSx} />
       </Grid>
       <Grid size={6}>
-        <SingleSelectCustom name="typeOfWorkplace" control={control as unknown as Control<FieldValues>} options={((allConfig as Record<string, unknown[]>)?.typeOfWorkplaceOptions || []) as OptionType[]} title={t('jobPostForm.title.workplace', 'Workplace')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectworkplace', 'Select workplace')} sx={inputSx} />
+        <SingleSelectCustom name="typeOfWorkplace" control={control} options={((allConfig as Record<string, unknown[]>)?.typeOfWorkplaceOptions || []) as OptionType[]} title={t('jobPostForm.title.workplace', 'Workplace')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectworkplace', 'Select workplace')} sx={inputSx} />
       </Grid>
       <Grid size={6}>
-        <SingleSelectCustom name="jobType" control={control as unknown as Control<FieldValues>} options={((allConfig as Record<string, unknown[]>)?.jobTypeOptions || []) as OptionType[]} title={t('jobPostForm.title.jobtype', 'Job Type')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectjobtype', 'Select job type')} sx={inputSx} />
+        <SingleSelectCustom name="jobType" control={control} options={((allConfig as Record<string, unknown[]>)?.jobTypeOptions || []) as OptionType[]} title={t('jobPostForm.title.jobtype', 'Job Type')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectjobtype', 'Select job type')} sx={inputSx} />
       </Grid>
       <Grid size={6}>
         <TextFieldCustom name="quantity" title={t('jobPostForm.title.numberofvacancies', 'Number of Vacancies')} placeholder={t('jobPostForm.placeholder.enternumberofvacancies', 'Enter number of vacancies')} showRequired={true} control={control} type="number" sx={inputSx} />
       </Grid>
       <Grid size={6}>
-        <SingleSelectCustom name="genderRequired" control={control as unknown as Control<FieldValues>} options={((allConfig as Record<string, unknown[]>)?.genderOptions || []) as OptionType[]} title={t('jobPostForm.title.genderrequirement', 'Gender Requirement')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectgenderrequirement', 'Select gender requirement')} sx={inputSx} />
+        <SingleSelectCustom name="genderRequired" control={control} options={((allConfig as Record<string, unknown[]>)?.genderOptions || []) as OptionType[]} title={t('jobPostForm.title.genderrequirement', 'Gender Requirement')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectgenderrequirement', 'Select gender requirement')} sx={inputSx} />
       </Grid>
       <Grid size={6}>
         <TextFieldCustom name="salaryMin" title={t('jobPostForm.title.minimumsalary', 'Minimum Salary')} showRequired={true} placeholder={t('jobPostForm.placeholder.enterminimumsalary', 'Enter minimum salary')} control={control} type="number" sx={inputSx} />
@@ -122,7 +122,7 @@ function JobPostFormFields<TFieldValues extends FieldValues = FieldValues>({
         <TextFieldCustom name="salaryMax" title={t('jobPostForm.title.maximumsalary', 'Maximum Salary')} showRequired={true} placeholder={t('jobPostForm.placeholder.entermaximumsalary', 'Enter maximum salary')} control={control} type="number" sx={inputSx} />
       </Grid>
       <Grid size={6}>
-        <SingleSelectCustom name="academicLevel" control={control as unknown as Control<FieldValues>} options={((allConfig as Record<string, unknown[]>)?.academicLevelOptions || []) as OptionType[]} title={t('jobPostForm.title.academiclevel', 'Academic Level')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectacademiclevel', 'Select academic level')} sx={inputSx} />
+        <SingleSelectCustom name="academicLevel" control={control} options={((allConfig as Record<string, unknown[]>)?.academicLevelOptions || []) as OptionType[]} title={t('jobPostForm.title.academiclevel', 'Academic Level')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectacademiclevel', 'Select academic level')} sx={inputSx} />
       </Grid>
       <Grid size={6}>
         <DatePickerCustom name="deadline" control={control} showRequired={true} title={t('jobPostForm.title.applicationdeadline', 'Application Deadline')} minDate={DATE_OPTIONS.tomorrow()} sx={inputSx} />
@@ -155,13 +155,13 @@ function JobPostFormFields<TFieldValues extends FieldValues = FieldValues>({
       </Grid>
 
       <Grid size={{ xs: 12, md: 6 }}>
-        <SingleSelectCustom name="location.city" control={control as unknown as Control<FieldValues>} options={((allConfig as Record<string, unknown[]>)?.countryOptions || []) as OptionType[]} title={t('jobPostForm.title.cityprovince', 'City/Province')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectcityprovince', 'Select city/province')} sx={inputSx} />
+        <SingleSelectCustom name="location.city" control={control} options={((allConfig as Record<string, unknown[]>)?.countryOptions || []) as OptionType[]} title={t('jobPostForm.title.cityprovince', 'City/Province')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectcityprovince', 'Select city/province')} sx={inputSx} />
       </Grid>
       <Grid size={{ xs: 12, md: 6 }}>
-        <SingleSelectCustom name="location.district" control={control as unknown as Control<FieldValues>} options={(districtOptions || []) as OptionType[]} title={t('jobPostForm.title.district', 'District')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectdistrict', 'Select district')} sx={inputSx} />
+        <SingleSelectCustom name="location.district" control={control} options={(districtOptions || []) as OptionType[]} title={t('jobPostForm.title.district', 'District')} showRequired={true} placeholder={t('jobPostForm.placeholder.selectdistrict', 'Select district')} sx={inputSx} />
       </Grid>
       <Grid size={12}>
-        <TextFieldAutoCompleteCustom name="location.address" control={control as unknown as Control<FieldValues>} options={locationOptions as OptionType[]} title={t('jobPostForm.title.address', 'Address')} showRequired={true} placeholder={t('jobPostForm.placeholder.enteraddress', 'Enter address')} handleSelect={handleSelectLocation as (e: React.SyntheticEvent, value: unknown) => void} sx={inputSx} />
+        <TextFieldAutoCompleteCustom name="location.address" control={control} options={locationOptions as OptionType[]} title={t('jobPostForm.title.address', 'Address')} showRequired={true} placeholder={t('jobPostForm.placeholder.enteraddress', 'Enter address')} handleSelect={handleSelectLocation as (e: React.SyntheticEvent, value: unknown) => void} sx={inputSx} />
       </Grid>
       <Grid size={12}>
         <Box sx={{ 

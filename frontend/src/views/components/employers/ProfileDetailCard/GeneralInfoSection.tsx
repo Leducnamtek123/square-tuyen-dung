@@ -72,35 +72,35 @@ const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.desiredLevel')}
-                        value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.positionDict?.[profileDetail?.position as string])}
+                        value={tConfig(allConfig?.positionDict?.[profileDetail?.position as string])}
                         icon={<PositionIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.educationLevel')}
-                        value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.academicLevelDict?.[profileDetail?.academicLevel as string])} 
+                        value={tConfig(allConfig?.academicLevelDict?.[profileDetail?.academicLevel as string])} 
                         icon={<SchoolIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.experience')}
-                        value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.experienceDict?.[profileDetail?.experience as string])}
+                        value={tConfig(allConfig?.experienceDict?.[profileDetail?.experience as string])}
                         icon={<HistoryIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.career')}
-                        value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.careerDict?.[profileDetail?.career as string])}
+                        value={tConfig(allConfig?.careerDict?.[profileDetail?.career as string])}
                         icon={<CareerIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.workLocation')}
-                        value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.cityDict?.[profileDetail?.city as string])}
+                        value={tConfig(allConfig?.cityDict?.[profileDetail?.city as string])}
                         icon={<LocationIcon />}
                     />
                 </Grid>
@@ -114,14 +114,14 @@ const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.workplaceType')}
-                        value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.typeOfWorkplaceDict?.[profileDetail?.typeOfWorkplace as string])}
+                        value={tConfig(allConfig?.typeOfWorkplaceDict?.[profileDetail?.typeOfWorkplace as string])}
                         icon={<BuildingIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.jobType')}
-                        value={tConfig((allConfig as unknown as Record<string, ConfigDict>)?.jobTypeDict?.[profileDetail?.jobType as string])}
+                        value={tConfig(allConfig?.jobTypeDict?.[profileDetail?.jobType as string])}
                         icon={<WorkerIcon />}
                     />
                 </Grid>

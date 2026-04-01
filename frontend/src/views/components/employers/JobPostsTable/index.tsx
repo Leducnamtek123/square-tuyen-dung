@@ -130,7 +130,7 @@ const JobPostsTable = ({
       accessorKey: 'status',
       cell: (info) => {
         const val = String(info.getValue() ?? '');
-        const label = (allConfig?.jobPostStatusDict as Record<string, string>)?.[val] || val.toUpperCase() || '---';
+        const label = allConfig?.jobPostStatusDict?.[val] || val.toUpperCase() || '---';
         const colorKey = ((JOB_POST_STATUS_BG_COLOR as Record<string, string>)[val]) || 'default';
         const muiColor = colorKey === 'default' ? 'default' : colorKey;
         

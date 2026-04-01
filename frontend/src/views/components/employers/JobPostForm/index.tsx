@@ -37,7 +37,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
     reset,
     clearErrors,
   } = useForm<JobPostFormValues>({
-    resolver: yupResolver(schema) as unknown as Resolver<JobPostFormValues>,
+    resolver: yupResolver(schema) as any,
     defaultValues: {
       jobDescription: EditorState.createEmpty(),
       jobRequirement: EditorState.createEmpty(),
@@ -64,7 +64,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
     const loadDistricts = async (id: number | string) => {
       try {
         const resData = await commonService.getDistrictsByCityId(id);
-        const results = ((resData as unknown as PaginatedResponse<Record<string, unknown>>)?.results || []) as Record<string, unknown>[];
+        const results = (((resData as any)?.results || (Array.isArray(resData) ? resData : [])) as Record<string, unknown>[]);
         
         // Only clear district if the cityId has actually changed (user interaction)
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
@@ -105,7 +105,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
   // Handle edit data loading
   useEffect(() => {
     if (editData) {
-      reset((formValues) => ({ ...formValues, ...(editData as unknown as Partial<JobPostFormValues>) }));
+      reset((formValues) => ({ ...formValues, ...(editData as Partial<JobPostFormValues>) }));
     } else {
       reset({
         jobDescription: EditorState.createEmpty(),

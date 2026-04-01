@@ -207,7 +207,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       try {
 
-        await advancedSkillService.addAdvancedSkills(payload as unknown as Record<string, unknown>);
+        await advancedSkillService.addAdvancedSkills(payload as any);
 
         setOpenPopup(false);
 
@@ -233,7 +233,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       try {
 
-        await advancedSkillService.updateAdvancedSkillById(payload.id as string | number, payload as unknown as Record<string, unknown>);
+        await advancedSkillService.updateAdvancedSkillById(payload.id as string | number, payload as any);
 
         setOpenPopup(false);
 
@@ -458,7 +458,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       <FormPopup title={t('jobSeeker:profile.sections.skills')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
 
-        <AdvancedSkillForm handleAddOrUpdate={handleAddOrUpdate as (data: AdvancedSkillFormValues) => void} editData={editData as unknown as Partial<AdvancedSkillFormValues>} serverErrors={serverErrors} />
+        <AdvancedSkillForm handleAddOrUpdate={handleAddOrUpdate as (data: AdvancedSkillFormValues) => void} editData={editData as any} serverErrors={serverErrors} />
 
       </FormPopup>
 

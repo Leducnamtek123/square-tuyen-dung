@@ -555,7 +555,7 @@ const JobPostLarge = ({
 
                 >
 
-                  {tConfig(((allConfig as unknown as Record<string, Record<string, string>>)?.cityDict || {})[String(cityId)]) || (
+                  {tConfig(allConfig?.cityDict?.[String(cityId)]) || (
 
                     <span style={{ fontStyle: "italic", opacity: 0.7 }}>
 

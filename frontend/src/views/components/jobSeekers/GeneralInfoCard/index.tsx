@@ -250,7 +250,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
       try {
 
-        await resumeService.updateResume(slug, payload as unknown as Record<string, unknown>);
+        await resumeService.updateResume(slug, payload as any);
 
         setIsSuccess(!isSuccess);
 
@@ -521,7 +521,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
           handleUpdate={handleUpdateResumeDetail}
 
-          editData={resumeDetail as unknown as Partial<FormValues>}
+          editData={resumeDetail as any}
 
         />
 

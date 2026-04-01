@@ -19,7 +19,7 @@ interface CompanySidebarProps {
     location?: { address?: string; lat?: number; lng?: number; [key: string]: unknown };
     [key: string]: unknown 
   };
-  imageList: string[] | Record<string, unknown>[];
+  imageList: { original: string; thumbnail?: string }[];
   t: TFunction;
 }
 
@@ -102,7 +102,7 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageLis
               {t("companyDetail.images")}
             </Typography>
             <Box sx={{ borderRadius: 2, overflow: "hidden", border: "1px solid", borderColor: "grey.200" }}>
-              <ImageGalleryCustom images={imageList as unknown as { original: string; thumbnail?: string }[]} />
+              <ImageGalleryCustom images={imageList} />
             </Box>
           </Box>
         )}

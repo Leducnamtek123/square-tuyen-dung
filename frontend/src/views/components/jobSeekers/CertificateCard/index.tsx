@@ -234,7 +234,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       try {
 
-        await certificateService.addCertificates(payload as unknown as Record<string, unknown>);
+        await certificateService.addCertificates(payload as any);
 
         setOpenPopup(false);
 
@@ -260,7 +260,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       try {
 
-        await certificateService.updateCertificateById(payload.id as string | number, payload as unknown as Record<string, unknown>);
+        await certificateService.updateCertificateById(payload.id as string | number, payload as any);
 
         setOpenPopup(false);
 
@@ -650,7 +650,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
           handleAddOrUpdate={handleAddOrUpdate as unknown as (data: CertificateFormValues) => void}
 
-          editData={editData as unknown as Partial<CertificateFormValues>}
+          editData={editData as any}
 
           serverErrors={serverErrors}
 

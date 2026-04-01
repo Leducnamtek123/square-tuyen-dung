@@ -45,7 +45,7 @@ const JobPostNotificationCard = () => {
     setIsFullScreenLoading(true);
     try {
       const resData = await jobPostNotificationService.getJobPostNotificationDetailById(id);
-      setEditData(resData as unknown as Partial<JobPostNotificationFormValues> & { id?: number });
+      setEditData(resData as any);
       setOpenPopup(true);
     } catch (error) {
       errorHandling(error as AxiosError<Record<string, unknown>>);

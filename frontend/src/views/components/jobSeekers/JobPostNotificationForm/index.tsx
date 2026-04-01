@@ -194,7 +194,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<JobPostNotificationFormValues>,
+    resolver: yupResolver(schema) as any,
 
 
 

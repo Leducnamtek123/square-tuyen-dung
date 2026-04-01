@@ -138,7 +138,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
         },
       },
     },
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<EmployerSignUpFormData>,
+    resolver: yupResolver(schema) as any,
   });
 
   const cityId = useWatch({ control, name: 'company.location.city' });

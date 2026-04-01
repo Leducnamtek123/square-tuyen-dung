@@ -84,7 +84,7 @@ const EducationDetailForm = ({ handleAddOrUpdate, editData }: EducationDetailFor
 
   const { control, reset, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<FormValues>,
+    resolver: yupResolver(schema) as any,
 
   });
 
@@ -244,7 +244,7 @@ const EducationDetailForm = ({ handleAddOrUpdate, editData }: EducationDetailFor
 
             placeholder={t('jobSeeker:profile.placeholders.additionalDescription')}
 
-            control={control as unknown as ReactHookFormControl<ReactHookFormFieldValues>}
+            control={control as any}
 
           />
 

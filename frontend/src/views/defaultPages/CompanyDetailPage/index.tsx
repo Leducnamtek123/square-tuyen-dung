@@ -40,6 +40,7 @@ export type CompanyDetailProps = {
   linkedinUrl?: string;
   followNumber?: number;
   isFollowed?: boolean;
+  companyImages?: { imageUrl: string }[];
   [key: string]: unknown;
 };
 
@@ -77,7 +78,7 @@ const CompanyDetailPage = () => {
 
   const companyDetail = React.useMemo(() => {
     if (!fetchRes) return null;
-    return fetchRes as unknown as { companyImages?: { imageUrl: string }[] } & CompanyDetailProps;
+    return fetchRes as unknown as CompanyDetailProps;
   }, [fetchRes]);
 
   const imageList = React.useMemo(() => {
@@ -156,7 +157,7 @@ const CompanyDetailPage = () => {
           <Box>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 8 }}>
-                <Card sx={{ p: 3, boxShadow: (theme: Theme) => (theme as unknown as { customShadows?: Record<string, string> }).customShadows?.small || 1 }}>
+                <Card sx={{ p: 3, boxShadow: (theme: Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.small || 1 }}>
                   <Stack spacing={4}>
                     <CompanyAbout companyDetail={companyDetail} safeDescriptionHtml={safeDescriptionHtml} t={t} />
                     <Box>

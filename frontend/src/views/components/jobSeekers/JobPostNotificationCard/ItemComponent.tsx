@@ -125,9 +125,9 @@ const ItemComponent = ({
                 </Box>
                 <Box className="info-item">
                   <FontAwesomeIcon icon={faLocationDot} />
-                  {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.cityDict?.[String(city)]) ? (
+                  {tConfig(allConfig?.cityDict?.[String(city)]) ? (
                     <Typography component="span" fontSize="14px">
-                      {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.cityDict?.[String(city)])}
+                      {tConfig(allConfig?.cityDict?.[String(city)])}
                     </Typography>
                   ) : (
                     <Typography component="span" fontSize="13px" fontStyle="italic" color="grey.400">
@@ -137,9 +137,9 @@ const ItemComponent = ({
                 </Box>
                 <Box className="info-item">
                   <FontAwesomeIcon icon={faBriefcase} />
-                  {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.careerDict?.[String(career)]) ? (
+                  {tConfig(allConfig?.careerDict?.[String(career)]) ? (
                     <Typography component="span" fontSize="14px">
-                      {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.careerDict?.[String(career)])}
+                      {tConfig(allConfig?.careerDict?.[String(career)])}
                     </Typography>
                   ) : (
                     <Typography component="span" fontSize="13px" fontStyle="italic" color="grey.400">
@@ -149,9 +149,9 @@ const ItemComponent = ({
                 </Box>
                 <Box className="info-item">
                   <FontAwesomeIcon icon={faCalendarAlt} />
-                  {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.frequencyNotificationDict?.[String(frequency)]) ? (
+                  {tConfig((allConfig as any)?.frequencyNotificationDict?.[String(frequency)]) ? (
                     <Typography component="span" fontSize="14px">
-                      {tConfig((allConfig as unknown as Record<string, Record<string, string>>)?.frequencyNotificationDict?.[String(frequency)])}
+                      {tConfig((allConfig as any)?.frequencyNotificationDict?.[String(frequency)])}
                     </Typography>
                   ) : (
                     <Typography component="span" fontSize="13px" fontStyle="italic" color="grey.400">

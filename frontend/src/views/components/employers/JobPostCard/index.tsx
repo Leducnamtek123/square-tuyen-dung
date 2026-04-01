@@ -76,7 +76,7 @@ const JobPostCard = () => {
         jobRequirement: createEditorStateFromHTMLString(resData.jobRequirement || ''),
         benefitsEnjoyed: createEditorStateFromHTMLString(resData.benefitsEnjoyed || ''),
       };
-      setEditData(data as unknown as Record<string, unknown>);
+      setEditData(data as any);
       setOpenPopup(true);
     } catch (error) {
       errorHandling(error as AxiosError<{ errors?: ApiError }>);
@@ -170,7 +170,7 @@ const JobPostCard = () => {
         status: filterData.statusId === '' ? undefined : filterData.statusId,
       };
       const resData = await jobService.exportEmployerJobPosts(params);
-      xlsxUtils.exportToXLSX(resData as unknown as Record<string, unknown>[], 'JobList');
+      xlsxUtils.exportToXLSX(resData as any, 'JobList');
     } catch (error) {
       errorHandling(error as AxiosError<{ errors?: ApiError }>);
     } finally {

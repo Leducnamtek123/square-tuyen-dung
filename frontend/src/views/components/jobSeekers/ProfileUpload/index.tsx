@@ -113,7 +113,7 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
     };
 
-    const user = currentUser as unknown as Record<string, unknown> & { jobSeekerProfile?: { id?: number | string }; jobSeekerProfileId?: number | string };
+    const user = currentUser as any;
     getOnlineProfile(user?.jobSeekerProfile?.id || user?.jobSeekerProfileId, {
 
       resumeType: CV_TYPES.cvUpload,

@@ -164,7 +164,7 @@ const JobSeekerSignUpForm = ({
       password: "",
       confirmPassword: "",
     },
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<JobSeekerSignUpFormData>,
+    resolver: yupResolver(schema) as any,
   });
 
   const email = useWatch({

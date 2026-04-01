@@ -65,7 +65,7 @@ const SendMailCard: React.FC<SendMailCardProps> = ({
   });
 
   const { control, reset, handleSubmit } = useForm<SendMailFormData>({
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<SendMailFormData>, // yup resolver workaround for drafted mixed types
+    resolver: yupResolver(schema) as any, // yup resolver workaround for drafted mixed types
     defaultValues: {
       fullName: '',
       email: '',

@@ -110,7 +110,7 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 
 
                     jobName={value?.jobName}
 
-                    cityId={value?.locationDict?.city as unknown as number}
+                    cityId={value?.locationDict?.city as any}
 
                     deadline={value?.deadline}
 

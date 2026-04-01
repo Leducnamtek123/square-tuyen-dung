@@ -138,7 +138,7 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeek
       email: "",
       password: "",
     },
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<JobSeekerLoginFormData>,
+    resolver: yupResolver(schema) as any,
   });
 
   const googleLogin = useGoogleLogin({

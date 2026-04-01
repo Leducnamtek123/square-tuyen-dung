@@ -50,6 +50,7 @@ const JobDetailPage = () => {
     createdAt?: string;
     isSaved?: boolean;
     isApplied?: boolean;
+    companyDict?: Company;
     [key: string]: unknown;
   }
 
@@ -118,7 +119,7 @@ const JobDetailPage = () => {
               ? `${(typeof window !== 'undefined' ? window.location.origin : '')}/cong-ty/${jobPostDetail.companySlug}`
               : undefined,
             companyLogoUrl: jobPostDetail.companyImageUrl as string | undefined,
-            location: (jobPostDetail.locationName || (typeof jobPostDetail.location === 'object' ? (jobPostDetail.location as unknown as Record<string, unknown>)?.address : jobPostDetail.location)) as string,
+            location: (jobPostDetail.locationName || (typeof jobPostDetail.location === 'object' ? jobPostDetail.location?.address : jobPostDetail.location)) as string,
             salary: {
               min: jobPostDetail.salaryMin,
               max: jobPostDetail.salaryMax,
@@ -204,10 +205,10 @@ const JobDetailPage = () => {
                 jobPostDetail={jobPostDetail}
                 allConfig={allConfig}
               />
-              <JobDetailContactCard jobPostDetail={jobPostDetail as unknown as JobPost & { companyDict?: Company; location?: Location & { lat?: number; lng?: number; } }} />
+              <JobDetailContactCard jobPostDetail={jobPostDetail as JobPost & { companyDict?: Company; location?: Location & { lat?: number; lng?: number; } }} />
             </div>
             <div>
-              <JobDetailSidebar jobPostDetail={jobPostDetail as unknown as JobPost & { companyDict?: Company }} />
+              <JobDetailSidebar jobPostDetail={jobPostDetail as JobPost & { companyDict?: Company }} />
             </div>
           </div>
         </div>

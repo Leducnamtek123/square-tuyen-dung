@@ -62,12 +62,12 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
           <div className="grid gap-4 sm:grid-cols-2">
             <JobDetailInfoItem
               title={t("jobDetail.career")}
-              value={(allConfig?.careerDict as unknown as Record<string, string>)?.[String(jobPostDetail?.career)]}
+              value={allConfig?.careerDict?.[String(jobPostDetail?.career)]}
             />
             <JobDetailInfoItem
               title={t("jobDetail.workplaceType")}
               value={
-                (allConfig?.typeOfWorkplaceDict as unknown as Record<string, string>)?.[
+                allConfig?.typeOfWorkplaceDict?.[
                   String(jobPostDetail?.typeOfWorkplace)
                 ]
               }
@@ -75,7 +75,7 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
             <JobDetailInfoItem
               title={t("jobDetail.academicLevel")}
               value={
-                (allConfig?.academicLevelDict as unknown as Record<string, string>)?.[String(jobPostDetail?.academicLevel)]
+                allConfig?.academicLevelDict?.[String(jobPostDetail?.academicLevel)]
               }
             />
             <JobDetailInfoItem
@@ -84,11 +84,11 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
             />
             <JobDetailInfoItem
               title={t("jobDetail.location")}
-              value={(allConfig?.cityDict as unknown as Record<string, string>)?.[String(jobPostDetail?.location?.city)]}
+              value={allConfig?.cityDict?.[String(jobPostDetail?.location?.city)]}
             />
             <JobDetailInfoItem
               title={t("jobDetail.genderRequired")}
-              value={(allConfig?.genderDict as unknown as Record<string, string>)?.[String(jobPostDetail?.genderRequired)]}
+              value={allConfig?.genderDict?.[String(jobPostDetail?.genderRequired)]}
             />
           </div>
         </div>

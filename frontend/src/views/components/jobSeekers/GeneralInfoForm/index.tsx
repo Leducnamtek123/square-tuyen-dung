@@ -186,7 +186,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
   const { control, reset, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<FormValues>,
+    resolver: yupResolver(schema) as any,
 
   });
 
@@ -554,7 +554,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.objective')}
 
-            control={control as unknown as ReactHookFormControl<ReactHookFormFieldValues>}
+            control={control as any}
 
           />
 
@@ -570,7 +570,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.skillsSummary')}
 
-            control={control as unknown as ReactHookFormControl<ReactHookFormFieldValues>}
+            control={control as any}
 
           />
 

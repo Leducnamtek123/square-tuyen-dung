@@ -23,7 +23,7 @@ const SettingForm = ({ editData, handleUpdate }: SettingFormProps) => {
   });
 
   const { control, reset, handleSubmit } = useForm<FormValues>({
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<FormValues>,
+    resolver: yupResolver(schema) as any,
   });
 
   React.useEffect(() => {

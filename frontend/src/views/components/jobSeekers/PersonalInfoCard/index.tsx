@@ -185,7 +185,7 @@ const updateProfile = async (data: Partial<EnhancedJobSeekerProfile>) => {
 
 };
 
-updateProfile(data as unknown as Partial<EnhancedJobSeekerProfile>);
+      updateProfile(data as any);
 
 };
 
@@ -401,7 +401,7 @@ return (
 
         handleUpdateProfile={handleUpdateProfile}
 
-        editData={profile as unknown as Partial<PersonalProfileFormValues>}
+        editData={profile as any}
 
       />
 

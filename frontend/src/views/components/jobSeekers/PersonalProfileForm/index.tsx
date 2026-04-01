@@ -178,7 +178,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
   const { control, setValue, reset, handleSubmit } = useForm<PersonalProfileFormValues>({
 
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<PersonalProfileFormValues>,
+    resolver: yupResolver(schema) as any,
 
   });
 

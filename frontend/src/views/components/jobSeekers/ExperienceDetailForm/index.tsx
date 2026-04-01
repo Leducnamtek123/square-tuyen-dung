@@ -125,7 +125,7 @@ const ExperienceDetailForm = ({ handleAddOrUpdate, editData }: ExperienceDetailF
   });
 
   const { control, reset, handleSubmit } = useForm<FormValues>({
-    resolver: yupResolver(schema) as ReactHookFormResolver<FormValues>,
+    resolver: yupResolver(schema) as any,
   });
 
   React.useEffect(() => {
@@ -252,7 +252,7 @@ const ExperienceDetailForm = ({ handleAddOrUpdate, editData }: ExperienceDetailF
 
             placeholder={t('jobSeeker:profile.placeholders.additionalDescription')}
 
-            control={control as unknown as ReactHookFormControl<ReactHookFormFieldValues>}
+            control={control as any}
 
           />
 

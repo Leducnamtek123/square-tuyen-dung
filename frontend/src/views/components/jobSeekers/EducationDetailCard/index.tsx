@@ -232,7 +232,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       try {
 
-        await educationDetailService.addEducationsDetail(payload as unknown as Record<string, unknown>);
+        await educationDetailService.addEducationsDetail(payload as any);
 
         setOpenPopup(false);
 
@@ -258,7 +258,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       try {
 
-        await educationDetailService.updateEducationDetailById(payload.id as string | number, payload as unknown as Record<string, unknown>);
+        await educationDetailService.updateEducationDetailById(payload.id as string | number, payload as any);
 
         setOpenPopup(false);
 
@@ -750,7 +750,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
           handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
 
-          editData={editData as unknown as Partial<FormValues>}
+          editData={editData as any}
 
         />
 

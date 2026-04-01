@@ -189,6 +189,7 @@ export interface Resume {
   viewEmployerNumber?: number;
   lastViewedDate?: string | null;
   userDict?: UserDict;
+  user?: User | null;
   jobSeekerProfileDict?: Record<string, unknown> & { old?: string | number };
   // Search-related fields
   searchScore?: number;
@@ -452,18 +453,18 @@ export interface SelectOption {
 export interface SystemConfig {
   careers?: Career[];
   cities?: City[];
-  cityDict: Record<number | string, string>;
-  careerDict: Record<number, string>;
-  experienceDict?: Record<number | string, string>;
-  positionDict?: Record<number | string, string>;
-  jobTypeDict?: Record<number | string, string>;
-  typeOfWorkplaceDict?: Record<number | string, string>;
-  academicLevelDict?: Record<number | string, string>;
-  employeeSizeDict?: Record<number | string, string>;
-  genderDict?: Record<string | number, string>;
-  maritalStatusDict?: Record<string | number, string>;
-  jobPostStatusDict?: Record<string | number, string>;
-  applicationStatusDict?: Record<string | number, string>;
+  cityDict?: Record<string, string>;
+  careerDict?: Record<string, string>;
+  experienceDict?: Record<string, string>;
+  positionDict?: Record<string, string>;
+  jobTypeDict?: Record<string, string>;
+  typeOfWorkplaceDict?: Record<string, string>;
+  academicLevelDict?: Record<string, string>;
+  employeeSizeDict?: Record<string, string>;
+  genderDict?: Record<string, string>;
+  maritalStatusDict?: Record<string, string>;
+  jobPostStatusDict?: Record<string, string>;
+  applicationStatusDict?: Record<string, string>;
   banners?: Banner[];
   socialMediaLinks?: Record<string, string>;
   companyInfo?: Record<string, string>;

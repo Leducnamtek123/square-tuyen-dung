@@ -104,8 +104,8 @@ const JobPostSearch = () => {
   React.useEffect(() => {
     const loadDistricts = async () => {
       try {
-        const resData = await commonService.getDistrictsByCityId(cityId) as unknown as PaginatedResponse<Record<string, unknown>>;
-        setDistrictOptions((resData?.results as unknown as SelectOption[]) || []);
+        const resData = await commonService.getDistrictsByCityId(cityId) as any;
+        setDistrictOptions((resData?.results as SelectOption[]) || []);
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
           setValue('districtId', '');
           setValue('wardId', '');
@@ -130,8 +130,8 @@ const JobPostSearch = () => {
   React.useEffect(() => {
     const loadWards = async () => {
       try {
-        const resData = await commonService.getWardsByDistrictId(districtId) as unknown as PaginatedResponse<Record<string, unknown>>;
-        setWardOptions((resData?.results as unknown as SelectOption[]) || []);
+        const resData = await commonService.getWardsByDistrictId(districtId) as any;
+        setWardOptions((resData?.results as SelectOption[]) || []);
       } catch (error) {
         setWardOptions([]);
       }

@@ -17,7 +17,7 @@ const MainJobPostCard = () => {
     setPage(1);
   }, [jobPostFilter]);
 
-  const { data, isLoading } = useJobPosts(jobPostFilter as unknown as Record<string, unknown>, page);
+  const { data, isLoading } = useJobPosts(jobPostFilter as any, page);
   const jobPosts = data?.results || [];
   const count = data?.count || 0;
 
@@ -96,7 +96,7 @@ const MainJobPostCard = () => {
 
                 jobName={value?.jobName}
 
-                cityId={value?.locationDict?.city as unknown as number}
+                cityId={value?.locationDict?.city as any}
 
                 deadline={value?.deadline}
 

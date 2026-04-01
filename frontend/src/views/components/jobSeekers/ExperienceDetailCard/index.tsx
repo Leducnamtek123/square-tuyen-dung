@@ -236,7 +236,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
       try {
 
-        await experienceDetailService.addExperienceDetail(payload as unknown as Record<string, unknown>);
+        await experienceDetailService.addExperienceDetail(payload as any);
 
         setOpenPopup(false);
 
@@ -262,7 +262,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
       try {
 
-        await experienceDetailService.updateExperienceDetailById(payload.id as string | number, payload as unknown as Record<string, unknown>);
+        await experienceDetailService.updateExperienceDetailById(payload.id as string | number, payload as any);
 
         setOpenPopup(false);
 
@@ -756,7 +756,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
           handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
 
-          editData={editData as unknown as Partial<FormValues>}
+          editData={editData as any}
 
         />
 

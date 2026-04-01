@@ -487,7 +487,7 @@ const JobPost = ({
 
           <Typography sx={{ fontWeight: 500, fontSize: 13 }} variant="body2">
 
-            {tConfig(allConfig?.cityDict[cityId]) || (
+            {tConfig(allConfig?.cityDict?.[cityId]) || (
 
               <span style={{ fontStyle: 'italic', color: theme.palette.grey[500] }}>
 

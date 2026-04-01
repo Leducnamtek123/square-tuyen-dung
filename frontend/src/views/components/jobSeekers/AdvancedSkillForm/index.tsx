@@ -56,7 +56,7 @@ const AdvancedSkillForm = ({
 
   const { control, reset, setError, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<FormValues>,
+    resolver: yupResolver(schema) as any,
 
   });
 

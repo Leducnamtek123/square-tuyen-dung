@@ -57,7 +57,7 @@ const CVForm = ({ handleUpdate }: CVFormProps) => {
 
 
 
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<FormValues>,
+    resolver: yupResolver(schema) as any,
 
 
 

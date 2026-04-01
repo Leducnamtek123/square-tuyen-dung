@@ -41,19 +41,7 @@ import { useResumes } from '../hooks/useJobSeekerQueries';
 import type { AxiosError } from "axios";
 import type { ApiError } from '@/types/api';
 
-interface BoxProfileResume {
-  slug: string;
-  title: string;
-  isActive: boolean;
-  user?: { fullName?: string };
-  experience?: number;
-  position?: number;
-  salaryMin?: number;
-  salaryMax?: number;
-  updateAt?: string;
-  [key: string]: unknown;
-}
-
+import type { Resume } from '../../../../types/models';
 const Loading = () => {
   return (
     <Grid container spacing={3}>
@@ -117,7 +105,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
   });
 
   const resume = React.useMemo(() => {
-    return (resumes && resumes.length > 0 ? resumes[0] : null) as unknown as BoxProfileResume | null;
+    return (resumes && resumes.length > 0 ? resumes[0] : null);
   }, [resumes]);
 
   // Sync Redux reloadCounter invalidation

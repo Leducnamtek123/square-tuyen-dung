@@ -213,7 +213,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       try {
 
-        await languageSkillService.addLanguageSkills(payload as unknown as Record<string, unknown>);
+        await languageSkillService.addLanguageSkills(payload as any);
 
         setOpenPopup(false);
 
@@ -239,7 +239,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       try {
 
-        await languageSkillService.updateLanguageSkillById(payload.id as string | number, payload as unknown as Record<string, unknown>);
+        await languageSkillService.updateLanguageSkillById(payload.id as string | number, payload as any);
 
         setOpenPopup(false);
 
@@ -465,7 +465,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       <FormPopup title={t('jobSeeker:profile.sections.language')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
 
-        <LanguageSkillForm handleAddOrUpdate={handleAddOrUpdate as (data: LanguageskillformFormValues) => void} editData={editData as unknown as Partial<LanguageskillformFormValues>} serverErrors={serverErrors} />
+        <LanguageSkillForm handleAddOrUpdate={handleAddOrUpdate as (data: LanguageskillformFormValues) => void} editData={editData as any} serverErrors={serverErrors} />
 
       </FormPopup>
 

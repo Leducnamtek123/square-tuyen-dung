@@ -20,7 +20,7 @@ const MyInterviewsPage = () => {
     const navigate = useRouter();
     const { data: interviewsData, isLoading, isError } = useMyInterviews({ pageSize: 50 });
 
-    const interviews = (interviewsData?.results || []).map((session) => transformInterviewSession(session as unknown as Record<string, unknown>) as InterviewSession);
+    const interviews = (interviewsData?.results || []).map((session) => transformInterviewSession(session as any) as InterviewSession);
 
     const handleJoin = (inviteToken: string) => {
         navigate.push(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM.replace(':id', inviteToken)}`);

@@ -104,7 +104,7 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
                     companyImageUrl={value?.companyDict?.companyImageUrl}
                     companyName={value?.companyDict?.companyName as string}
                     jobName={value?.jobName}
-                    cityId={value?.locationDict?.city as unknown as number}
+                    cityId={value?.locationDict?.city as any}
                     deadline={value?.deadline}
                     isUrgent={value?.isUrgent}
                     isHot={value?.isHot}

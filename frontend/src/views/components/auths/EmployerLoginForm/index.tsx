@@ -137,7 +137,7 @@ const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: Employer
       email: "",
       password: "",
     },
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<EmployerLoginFormData>,
+    resolver: yupResolver(schema) as any,
   });
 
   const googleLogin = useGoogleLogin({
