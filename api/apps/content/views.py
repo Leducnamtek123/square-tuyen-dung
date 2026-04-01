@@ -8,9 +8,8 @@ from django.conf import settings
 from shared.helpers import helper, utils
 
 from shared import renderers
-
+from shared import pagination as paginations
 from shared.configs import variable_response as var_res, variable_system as var_sys, app_setting as app_set
-
 from shared.configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
 
 from rest_framework.decorators import api_view, permission_classes
@@ -229,6 +228,7 @@ class AdminBannerViewSet(viewsets.ModelViewSet):
     queryset = Banner.objects.all().select_related('image', 'image_mobile').order_by('-create_at')
     permission_classes = [perms_sys.IsAdminUser]
     renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
 
     def get_serializer_class(self):
         from .serializers import AdminBannerSerializer
@@ -260,6 +260,11 @@ class AdminBannerViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(type=banner_type)
         if is_active is not None:
             queryset = queryset.filter(is_active=is_active in ['true', '1', 'True'])
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
         return var_res.response_data(data=serializer.data)
@@ -334,6 +339,7 @@ class AdminFeedbackViewSet(viewsets.ModelViewSet):
     queryset = Feedback.objects.all().select_related('user').order_by('-create_at')
     permission_classes = [perms_sys.IsAdminUser]
     renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
 
     def get_serializer_class(self):
         from .serializers import AdminFeedbackSerializer
@@ -348,6 +354,11 @@ class AdminFeedbackViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(is_active=is_active in ['true', '1', 'True'])
         if rating:
             queryset = queryset.filter(rating=int(rating))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
         return var_res.response_data(data=serializer.data)
