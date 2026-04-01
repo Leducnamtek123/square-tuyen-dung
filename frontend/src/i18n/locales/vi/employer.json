@@ -716,7 +716,12 @@
       "info": "Thông tin công ty",
       "multimedia": "Đa phương tiện"
     },
-    "title": "Thông tin công ty"
+    "title": "Thông tin công ty",
+    "following": "Đang theo dõi",
+    "follow": "Theo dõi",
+    "followers": "người theo dõi",
+    "notUpdated": "Chưa cập nhật thông tin",
+    "jobCount": "việc làm"
   },
   "companyProfile": {
     "success": {
@@ -952,5 +957,12 @@
     "good": "Phù hợp",
     "fair": "Tạm được",
     "poor": "Chưa phù hợp"
+  },
+  "applyForm": {
+    "resume": {
+      "empty": "Hồ sơ của bạn đang trống",
+      "pleaseUpload": "Xin hãy đính kèm CV hoặc tạo mới.",
+      "createNow": "Tạo hồ sơ ngay"
+    }
   }
 }

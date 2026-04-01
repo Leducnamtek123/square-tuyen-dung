@@ -1,5 +1,5 @@
 {
-  "appName": "Project",
+  "appName": "Tuyen Dung",
   "city": "Tỉnh/Thành phố",
   "career": "Ngành nghề",
   "experience": "Kinh nghiệm",
@@ -27,7 +27,11 @@
     "confirm": "Xác nhận",
     "add": "Thêm",
     "download": "Tải xuống",
-    "upload": "Tải lên"
+    "upload": "Tải lên",
+    "sendOTP": "Gửi OTP",
+    "verifyOTP": "Xác nhận",
+    "changePhone": "Đổi số C.T",
+    "resendOTP": "Gửi lại OTP"
   },
   "loading": "Đang tải...",
   "noData": "Không có dữ liệu",
@@ -46,7 +50,8 @@
   "labels": {
     "time": "Thời gian",
     "job": "Công việc",
-    "uncategorized": "Chưa phân loại"
+    "uncategorized": "Chưa phân loại",
+    "notUpdated": "Chưa cập nhật"
   },
   "placeholders": {
     "selectCity": "Chọn Tỉnh/Thành phố",
@@ -60,7 +65,8 @@
     "allWorkplaces": "Tất cả nơi làm việc",
     "allJobTypes": "Tất cả hình thức làm việc",
     "allGenders": "Tất cả giới tính",
-    "allMaritalStatuses": "Tất cả tình trạng hôn nhân"
+    "allMaritalStatuses": "Tất cả tình trạng hôn nhân",
+    "allCities": "Tất cả tỉnh thành"
   },
   "nav": {
     "jobs": "Việc làm",
@@ -239,5 +245,103 @@
     "copyError": "Copy lỗi",
     "retry": "Thử lại",
     "reload": "Tải lại trang"
+  },
+  "saving": "Đang lưu...",
+  "save": "Lưu",
+  "deleting": "Đang xóa...",
+  "delete": "Xóa",
+  "yes": "Có",
+  "no": "Không",
+  "saveChanges": "Lưu các thay đổi",
+  "successMessage": "Thành công!",
+  "errorMessage": "Đã xảy ra lỗi!",
+  "login": {
+    "phone": "Số điện thoại",
+    "phoneIntro": "Vui lòng nhập số điện thoại để tiếp tục",
+    "otpIntro": "Nhập mã OTP vừa gửi tới máy của bạn",
+    "resendIn": "Gửi lại mã sau..."
+  },
+  "validation": {
+    "invalidDate": "Ngày không hợp lệ"
+  },
+  "form": {
+    "phoneNumber": "Số điện thoại của bạn",
+    "otpCode": "Mã OTP"
+  },
+  "loadPreviousMessages": "Tải tin nhắn cũ hơn",
+  "typeAMessage": "Gõ tin nhắn...",
+  "chatRooms": "Các cuộc trò chuyện",
+  "appliedResume": {
+    "ai": {
+      "viewAnalysis": "Xem phân tích AI",
+      "failed": "Phân tích thất bại"
+    },
+    "email": {
+      "resendTooltip": "Gửi lại mail",
+      "sendTooltip": "Gửi phản hồi"
+    }
+  },
+  "companyProfile": {
+    "title": "Hồ sơ công ty"
+  },
+  "logo": "Logo",
+  "cover": "Ảnh bìa",
+  "companyForm": {
+    "validation": {
+      "companyNameRequired": "Tên công ty là bắt buộc"
+    }
+  },
+  "interviewDetail": {
+    "messages": {
+      "aiAnalyzingDesc": "AI đang tiến hành phân tích hồ sơ...",
+      "aiNeedsTrigger": "Cần khởi tạo AI phân tích",
+      "noData": "Không có dữ liệu",
+      "noDetails": "Không có chi tiết",
+      "noQuestions": "Không có danh sách câu hỏi",
+      "noTranscript": "Không có bản ghi",
+      "noTranscriptDesc": "Chưa có cuộc hội thoại nào để ghi lại."
+    },
+    "actions": {
+      "triggerAi": "Kích hoạt Phân Tích"
+    },
+    "subtitle": {
+      "analysis": "Kết quả Phân Tích",
+      "questions": "Câu hỏi gợi ý",
+      "transcript": "Bản ghi cuộc hội thoại"
+    },
+    "label": {
+      "detailedFeedback": "Đánh giá chi tiết",
+      "interviewer": "Người phỏng vấn"
+    }
+  },
+  "jobPost": {
+    "manageSubtitle": "Quản lý chi tiết bài đăng",
+    "remaining": "Còn lại"
+  },
+  "jobPostForm": {
+    "section": {
+      "basicInfo": "Thông tin cơ bản",
+      "location": "Khu vực làm việc",
+      "contact": "Thông tin liên hệ"
+    }
+  },
+  "minimum-wage-comparison": "Lương tối thiểu",
+  "maximum-wage-comparison": "Lương tối đa",
+  "editorContent": "Nội dung",
+  "profileDetailCard": {
+    "label": {
+      "issuedDate": "Ngày cấp"
+    }
+  },
+  "content": "Nội dung",
+  "start-date-comparison": "Ngày bắt đầu",
+  "end-date-comparison": "Ngày kết thúc",
+  "questionGroupsCard": {
+    "label": {
+      "questionCount": "Số câu"
+    },
+    "table": {
+      "noData": "Chưa có dữ liệu"
+    }
   }
 }

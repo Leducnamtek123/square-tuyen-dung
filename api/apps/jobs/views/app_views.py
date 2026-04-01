@@ -283,39 +283,28 @@ class JobPostViewSet(viewsets.ViewSet,
 
         return var_res.response_data(data=serializer.data)
 
-    @action(methods=["post"], detail=True,
-
-            url_path="save", url_name="save")
-
+    @action(methods=["post"], detail=True, url_path="save", url_name="save", permission_classes=[perms_sys.IsAuthenticated])
     def save_job(self, request, pk):
+        try:
+            saved_job_posts = SavedJobPost.objects.filter(user=request.user, job_post=self.get_object())
 
-        saved_job_posts = SavedJobPost.objects.filter(user=request.user, job_post=self.get_object())
+            is_saved = False
 
-        is_saved = False
+            if saved_job_posts.exists():
+                saved_job_post = saved_job_posts.first()
+                saved_job_post.delete()
+            else:
+                SavedJobPost.objects.create(
+                    user=request.user,
+                    job_post=self.get_object()
+                )
+                is_saved = True
 
-        if saved_job_posts.exists():
-
-            saved_job_post = saved_job_posts.first()
-
-            saved_job_post.delete()
-
-        else:
-
-            SavedJobPost.objects.create(
-
-                user=request.user,
-
-                job_post=self.get_object()
-
-            )
-
-            is_saved = True
-
-        return var_res.response_data(data={
-
-            "isSaved": is_saved
-
-        })
+            return var_res.response_data(data={
+                "isSaved": is_saved
+            })
+        except Exception as e:
+            return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors={"errorMessage": [str(e)]})
 
     @action(methods=["get"], detail=False,
 

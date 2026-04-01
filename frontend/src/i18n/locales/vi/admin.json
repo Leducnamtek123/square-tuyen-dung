@@ -86,8 +86,17 @@
         "actions": "Thao tác",
         "edit": "Chỉnh sửa",
         "delete": "Xóa",
-        "noData": "Không có dữ liệu"
-      }
+        "noData": "Không có dữ liệu",
+        "name": "Tên ngành nghề"
+      },
+      "breadcrumbResources": "Tài nguyên",
+      "add": "Thêm ngành nghề",
+      "edit": "Sửa",
+      "form": {
+        "name": "Tên ngành nghề"
+      },
+      "cancel": "Hủy",
+      "deleteConfirm": "Bạn có chắc muốn xóa ngành nghề này?"
     },
     "cities": {
       "title": "Quản lý Tỉnh/Thành phố",
@@ -113,8 +122,19 @@
         "actions": "Thao tác",
         "edit": "Chỉnh sửa",
         "delete": "Xóa",
-        "noData": "Không có dữ liệu"
-      }
+        "noData": "Không có dữ liệu",
+        "name": "Tên thành phố"
+      },
+      "breadcrumbLocations": "Địa điểm",
+      "add": "Thêm",
+      "searchPlaceholder": "Tìm kiếm...",
+      "edit": "Sửa",
+      "form": {
+        "name": "Tên",
+        "code": "Mã"
+      },
+      "cancel": "Hủy",
+      "deleteConfirm": "Bạn có chắc muốn xóa?"
     },
     "districts": {
       "title": "Quản lý Quận/Huyện",
@@ -143,8 +163,22 @@
         "edit": "Chỉnh sửa",
         "delete": "Xóa",
         "noData": "Không có dữ liệu cho thành phố này",
-        "noCitySelected": "Vui lòng chọn thành phố để xem danh sách quận/huyện"
-      }
+        "noCitySelected": "Vui lòng chọn thành phố để xem danh sách quận/huyện",
+        "name": "Tên",
+        "city": "Thành phố"
+      },
+      "breadcrumbLocations": "Địa điểm",
+      "add": "Thêm",
+      "searchPlaceholder": "Tìm kiếm...",
+      "filterByCity": "Lọc theo tỉnh/thành",
+      "edit": "Sửa",
+      "form": {
+        "city": "Thành phố",
+        "name": "Tên",
+        "code": "Mã"
+      },
+      "cancel": "Hủy",
+      "deleteConfirm": "Xác nhận xóa?"
     },
     "wards": {
       "title": "Quản lý Phường/Xã",
@@ -175,7 +209,10 @@
         "edit": "Chỉnh sửa",
         "delete": "Xóa",
         "noData": "Không có dữ liệu cho quận/huyện này",
-        "noDistrictSelected": "Vui lòng chọn quận/huyện để xem danh sách phường/xã"
+        "noDistrictSelected": "Vui lòng chọn quận/huyện để xem danh sách phường/xã",
+        "name": "Phường/Xã",
+        "district": "Quận/Huyện",
+        "city": "Thành phố"
       },
       "toast": {
         "addSuccess": "Thêm phường/xã thành công",
@@ -184,7 +221,20 @@
         "updateError": "Có lỗi xảy ra khi cập nhật phường/xã",
         "deleteSuccess": "Xóa phường/xã thành công",
         "deleteError": "Có lỗi xảy ra khi xóa phường/xã"
-      }
+      },
+      "breadcrumbLocations": "Địa điểm",
+      "add": "Thêm",
+      "searchPlaceholder": "Tìm kiếm...",
+      "filterByCity": "Thành phố",
+      "filterByDistrict": "Quận/Huyện",
+      "edit": "Sửa",
+      "form": {
+        "district": "Quận/huyện",
+        "name": "Tên phường/xã",
+        "code": "Mã"
+      },
+      "cancel": "Hủy",
+      "deleteConfirm": "Xóa phường/xã này?"
     },
     "companies": {
       "addCompany": "Thêm công ty",
@@ -217,7 +267,11 @@
         "viewDetails": "Xem chi tiết",
         "edit": "Chỉnh sửa",
         "delete": "Xóa"
-      }
+      },
+      "title": "Danh sách công ty",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbList": "Danh sách",
+      "descriptionLabel": "Mô tả"
     },
     "jobActivity": {
       "title": "Lịch sử Ứng tuyển Tuyển dụng",
@@ -298,11 +352,32 @@
         "edit": "Chỉnh sửa",
         "approveAction": "Duyệt",
         "rejectAction": "Từ chối",
-        "delete": "Xóa"
+        "delete": "Xóa",
+        "title": "Tiêu đề",
+        "verified": "Đã thu tiền?",
+        "createdAt": "Ngày tạo",
+        "view": "Xem",
+        "unverify": "Hủy đóng dấu",
+        "verify": "Xác nhận thu tiền"
       },
       "filter": {
         "searchPlaceholder": "Tìm theo tiêu đề hoặc công ty..."
-      }
+      },
+      "status": {
+        "draft": "Bản nháp",
+        "active": "Đang mở",
+        "expired": "Hết hạn",
+        "unknown": "Không rõ"
+      },
+      "verified": {
+        "yes": "Có",
+        "no": "Không"
+      },
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbListings": "Danh sách",
+      "breadcrumbJobs": "Tin tuyển dụng",
+      "searchPlaceholder": "Tìm kiếm...",
+      "deleteTitle": "Xóa tin"
     },
     "profiles": {
       "addCandidate": "Thêm ứng viên",
@@ -344,8 +419,18 @@
         "viewDetails": "Xem chi tiết",
         "edit": "Chỉnh sửa",
         "delete": "Xóa",
-        "noData": "Không có dữ liệu"
-      }
+        "noData": "Không có dữ liệu",
+        "candidate": "Ứng viên",
+        "title": "Tiêu đề",
+        "createdAt": "Ngày tạo",
+        "view": "Xem"
+      },
+      "title": "Hồ sơ cá nhân",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbResources": "Tài nguyên",
+      "breadcrumbProfiles": "Hồ sơ",
+      "deleteConfirm": "Sẽ xóa vĩnh viễn, tiếp tục?",
+      "cancel": "Hủy"
     },
     "questionGroups": {
       "title": "Quản lý Nhóm câu hỏi",
@@ -378,8 +463,21 @@
         "questionCount": "Số lượng câu hỏi",
         "actions": "Thao tác",
         "edit": "Chỉnh sửa",
-        "delete": "Xóa"
-      }
+        "delete": "Xóa",
+        "name": "Tên",
+        "questionsCount": "Số câu hỏi"
+      },
+      "breadcrumbContent": "Nội dung",
+      "add": "Thêm",
+      "edit": "Sửa",
+      "form": {
+        "name": "Tên nhóm",
+        "description": "Mô tả",
+        "questions": "Câu hỏi",
+        "questionsPlaceholder": "Chọn câu hỏi"
+      },
+      "cancel": "Hủy",
+      "deleteConfirm": "Xác nhận xóa nhóm này?"
     },
     "resumes": {
       "searchPlaceholder": "Tìm kiếm hồ sơ...",
@@ -408,8 +506,19 @@
         "inactive": "Không hoạt động",
         "viewDetails": "Xem chi tiết",
         "delete": "Xóa",
-        "noData": "Không có dữ liệu"
-      }
+        "noData": "Không có dữ liệu",
+        "title": "Tiêu đề CS",
+        "default": "Mặc định",
+        "createdAt": "Ngày tạo",
+        "view": "Xem sơ yếu lí lịch",
+        "download": "Tải CV"
+      },
+      "title": "Quản lý Resume",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbResources": "Tài nguyên",
+      "breadcrumbResumes": "Sơ yếu lý lịch",
+      "deleteConfirm": "Xóa resume này?",
+      "cancel": "Hủy"
     },
     "users": {
       "bulkSelect": {
@@ -462,7 +571,15 @@
         "actionFailed": "Thao tác thất bại.",
         "roleUpdated": "Đã cập nhật vai trò.",
         "roleUpdateFailed": "Cập nhật vai trò thất bại."
-      }
+      },
+      "searchPlaceholder": "Tìm tên/email...",
+      "filters": {
+        "role": "Vai trò",
+        "allRoles": "Tất cả"
+      },
+      "title": "Quản lý người dùng",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbList": "Danh sách"
     },
     "questions": {
       "title": "Ngân hàng Câu hỏi Phỏng vấn",
@@ -495,8 +612,24 @@
         "actions": "Thao tác",
         "general": "Chung",
         "edit": "Chỉnh sửa",
-        "delete": "Xóa"
-      }
+        "delete": "Xóa",
+        "text": "Nội dung",
+        "type": "Loại",
+        "category": "Danh mục"
+      },
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbContent": "Nội dung",
+      "breadcrumbQuestions": "Câu hỏi",
+      "add": "Thêm câu hỏi",
+      "searchPlaceholder": "Tìm kiếm...",
+      "edit": "Cập nhật",
+      "form": {
+        "text": "Nội dung",
+        "type": "Loại",
+        "category": "Danh mục"
+      },
+      "cancel": "Hủy",
+      "deleteTitle": "Xóa câu hỏi"
     },
     "interviewLive": {
       "title": "Phỏng vấn Trực tiếp Công ty",
@@ -540,8 +673,21 @@
         "actions": "Thao tác",
         "edit": "Chỉnh sửa",
         "delete": "Xóa",
-        "noData": "Không tìm thấy dữ liệu"
-      }
+        "noData": "Không tìm thấy dữ liệu",
+        "image": "Ảnh",
+        "createdAt": "Ngày tạo"
+      },
+      "breadcrumbNotifications": "Thông báo",
+      "addNotification": "Thêm thông báo",
+      "editNotification": "Cập nhật",
+      "form": {
+        "title": "Tiêu đề",
+        "imageUrl": "URL Ảnh",
+        "content": "Nội dung"
+      },
+      "cancel": "Hủy",
+      "deleteTitle": "Xóa thông báo",
+      "deleteConfirm": "Bạn có chắc muốn xóa?"
     },
     "interviews": {
       "bulkSelect": {
@@ -552,23 +698,55 @@
       "type": {
         "vetting": "Vetting",
         "recruitment": "Tuyển dụng"
-      }
+      },
+      "table": {
+        "room": "Phòng",
+        "jobPost": "Việc làm",
+        "candidate": "Ứng viên",
+        "status": "Trạng thái",
+        "scheduledAt": "Lịch hẹn",
+        "actions": "Thao tác",
+        "editStatus": "Đổi trạng thái",
+        "delete": "Xóa"
+      },
+      "title": "Lịch phỏng vấn",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Phỏng vấn",
+      "editStatusTitle": "Đổi trạng thái lịch",
+      "form": {
+        "status": "Trạng thái"
+      },
+      "cancel": "Hủy",
+      "save": "Lưu",
+      "deleteTitle": "Xóa lịch hẹn",
+      "deleteConfirm": "Bạn có chắc muốn xóa?",
+      "delete": "Xóa"
     },
     "settings": {
       "title": "Cài đặt Hệ thống",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Cài đặt",
       "generalTitle": "Cài đặt Chung",
       "maintenanceMode": {
         "label": "Bảo trì Hệ thống",
-        "description": "Dừng tất cả hoạt động của người dùng để bảo trì"
+        "description": "Dừng tất cả hoạt động của người dùng để bảo trì",
+        "desc": "Dừng tất cả hoạt động của người dùng để bảo trì"
       },
       "autoApproveJobs": {
         "label": "Tự động duyệt tin tuyển dụng",
-        "description": "Cho phép các tin tuyển dụng được phê duyệt tự động"
+        "description": "Cho phép các tin tuyển dụng được phê duyệt tự động",
+        "desc": "Cho phép các tin tuyển dụng được phê duyệt tự động"
       },
       "emailNotifications": {
         "label": "Thông báo Email",
-        "description": "Gửi thông báo hệ thống qua email cho quản trị viên"
+        "description": "Gửi thông báo hệ thống qua email cho quản trị viên",
+        "desc": "Gửi thông báo hệ thống qua email cho quản trị viên"
       },
+      "apiTitle": "API & Dịch vụ bên ngoài",
+      "googleApiKey": "Google API Key",
+      "supportEmail": "Email hỗ trợ",
+      "summary": "Tóm tắt cấu hình",
+      "summaryText": "Vui lòng kiểm tra kỹ các thông tin cấu hình trước khi lưu. Các thay đổi có thể ảnh hưởng đến toàn bộ hệ thống ngay lập tức.",
       "saveBtn": "Lưu thay đổi",
       "notificationDemo": {
         "title": "Demo thông báo",
@@ -618,7 +796,8 @@
         "status": "Trạng thái",
         "actions": "Thao tác",
         "edit": "Sửa",
-        "deleteTooltip": "Xóa"
+        "deleteTooltip": "Xóa",
+        "editTooltip": "Sửa"
       },
       "form": {
         "description": "Mô tả",
@@ -633,7 +812,10 @@
         "mobileImageLabel": "Ảnh Mobile Banner",
         "chooseWeb": "Chọn ảnh web",
         "chooseMobile": "Chọn ảnh mobile"
-      }
+      },
+      "errorLoadingImage": "Lỗi khi tải ảnh",
+      "noWebImage": "Chưa có ảnh web",
+      "noMobileImage": "Chưa có ảnh mobile"
     },
     "feedbacks": {
       "title": "Quản lý Đánh giá",

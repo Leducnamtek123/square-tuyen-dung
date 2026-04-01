@@ -418,5 +418,19 @@
   "appliedJobs": "Việc làm đã ứng tuyển",
   "savedJobs": "Việc làm đã lưu",
   "employersViewedProfile": "Nhà tuyển dụng đã xem hồ sơ",
-  "followedCompanies": "Công ty đang theo dõi"
+  "followedCompanies": "Công ty đang theo dõi",
+  "applyForm": {
+    "resume": {
+      "empty": "Hồ sơ của bạn đang trống",
+      "pleaseUpload": "Xin hãy đính kèm CV hoặc tạo mới.",
+      "createNow": "Tạo hồ sơ ngay"
+    }
+  },
+  "company": {
+    "following": "Đang theo dõi",
+    "follow": "Theo dõi",
+    "followers": "người theo dõi",
+    "notUpdated": "Chưa cập nhật thông tin",
+    "jobCount": "việc làm"
+  }
 }

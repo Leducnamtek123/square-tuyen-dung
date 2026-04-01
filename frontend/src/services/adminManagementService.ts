@@ -98,22 +98,22 @@ const adminManagementService = {
   },
 
   getWards: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Ward>> => {
-    const url = 'info/web/admin/wards/';
+    const url = 'common/admin/wards/';
     return httpRequest.get<PaginatedResponse<Ward>>(url, { params });
   },
 
   createWard: (data: Record<string, unknown>): Promise<Ward> => {
-    const url = 'info/web/admin/wards/';
+    const url = 'common/admin/wards/';
     return httpRequest.post<Ward>(url, data);
   },
 
   updateWard: (id: string | number, data: Record<string, unknown>): Promise<Ward> => {
-    const url = `info/web/admin/wards/${id}/`;
+    const url = `common/admin/wards/${id}/`;
     return httpRequest.patch<Ward>(url, data);
   },
 
   deleteWard: (id: string | number): Promise<void> => {
-    const url = `info/web/admin/wards/${id}/`;
+    const url = `common/admin/wards/${id}/`;
     return httpRequest.delete(url);
   },
 
@@ -143,37 +143,37 @@ const adminManagementService = {
   },
 
   getBanners: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Banner>> => {
-    const url = 'info/web/admin/banners/';
+    const url = 'content/web/admin/banners/';
     return withPresign(httpRequest.get<PaginatedResponse<Banner>>(url, { params }));
   },
 
   createBanner: (data: Record<string, unknown> | FormData): Promise<Banner> => {
-    const url = 'info/web/admin/banners/';
+    const url = 'content/web/admin/banners/';
     return withPresign(httpRequest.post<Banner>(url, data, adminManagementService.buildMultipartConfig(data)));
   },
 
   updateBanner: (id: IdType, data: Record<string, unknown> | FormData): Promise<Banner> => {
-    const url = `info/web/admin/banners/${id}/`;
+    const url = `content/web/admin/banners/${id}/`;
     return withPresign(httpRequest.patch<Banner>(url, data, adminManagementService.buildMultipartConfig(data)));
   },
 
   deleteBanner: (id: IdType): Promise<void> => {
-    const url = `info/web/admin/banners/${id}/`;
+    const url = `content/web/admin/banners/${id}/`;
     return httpRequest.delete(url);
   },
 
   getFeedbacks: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Feedback>> => {
-    const url = 'info/web/admin/feedbacks/';
+    const url = 'content/web/admin/feedbacks/';
     return withPresign(httpRequest.get<PaginatedResponse<Feedback>>(url, { params }));
   },
 
   updateFeedback: (id: IdType, data: Record<string, unknown>): Promise<Feedback> => {
-    const url = `info/web/admin/feedbacks/${id}/`;
+    const url = `content/web/admin/feedbacks/${id}/`;
     return withPresign(httpRequest.patch<Feedback>(url, data));
   },
 
   deleteFeedback: (id: IdType): Promise<void> => {
-    const url = `info/web/admin/feedbacks/${id}/`;
+    const url = `content/web/admin/feedbacks/${id}/`;
     return httpRequest.delete(url);
   },
 

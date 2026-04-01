@@ -452,14 +452,17 @@ class JobPostViewSet(viewsets.GenericViewSet, generics.ListAPIView, generics.Ret
         serializer = self.get_serializer(queryset, many=True)
         return var_res.response_data(data=serializer.data)
 
-    @action(methods=["post"], detail=True, url_path="save", url_name="save")
+    @action(methods=["post"], detail=True, url_path="save", url_name="save", permission_classes=[perms_sys.IsAuthenticated])
     def save_job(self, request, slug):
         from ..services import JobActivityService
-        is_saved = JobActivityService.toggle_save_job(
-            user=request.user,
-            job_post=self.get_object()
-        )
-        return var_res.response_data(data={"isSaved": is_saved})
+        try:
+            is_saved = JobActivityService.toggle_save_job(
+                user=request.user,
+                job_post=self.get_object()
+            )
+            return var_res.response_data(data={"isSaved": is_saved})
+        except Exception as e:
+            return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors={"errorMessage": [str(e)]})
 
 
 class AdminJobPostViewSet(viewsets.ModelViewSet):
