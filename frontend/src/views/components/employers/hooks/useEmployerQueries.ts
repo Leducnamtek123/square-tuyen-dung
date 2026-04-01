@@ -187,7 +187,7 @@ export const useJobPostOptions = () => {
     queryFn: async (): Promise<JobPostOption[]> => {
       const response = await jobService.getJobPostOptions();
       const statusOptions = response.statusOptions || [];
-      return statusOptions as unknown as JobPostOption[];
+      return statusOptions as typeof statusOptions & JobPostOption[];
     },
     staleTime: 5 * 60_000,
   });

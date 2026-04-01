@@ -90,7 +90,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
     const loadDistricts = async (id: number | string) => {
       try {
         const resData = await commonService.getDistrictsByCityId(id);
-        const results = (resData as unknown as { data: SelectOption[] })?.data || [];
+        const results = (resData as any)?.data || [];
         
         // Only clear district if the cityId has actually changed (user interaction)
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
@@ -119,7 +119,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
       try {
         const resData = await goongService.getPlaces(input);
         if (resData.predictions) {
-            setLocationOptions(resData.predictions as unknown as SelectOption[]);
+            setLocationOptions(resData.predictions as any);
         }
       } catch (error) {
           // Silent fail for autocomplete
@@ -131,7 +131,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   // Load edit data
   useEffect(() => {
     if (editData) {
-      reset((formValues) => ({ ...formValues, ...(editData as unknown as Partial<CompanyFormValues>) }));
+      reset((formValues) => ({ ...formValues, ...(editData as any) }));
     }
   }, [editData, reset]);
 
@@ -149,7 +149,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   const handleSelectLocation = async (e: React.SyntheticEvent, value: string | SelectOption | null) => {
     if (!value || typeof value !== 'object' || !('place_id' in value)) return;
     try {
-      const prediction = value as unknown as PlacePrediction;
+      const prediction = value as any;
       const resData = await goongService.getPlaceDetailByPlaceId(prediction.place_id);
       const resultObj = resData?.result;
       const geometryObj = resultObj?.geometry;

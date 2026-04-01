@@ -80,5 +80,5 @@ export const useUsers = (params: Record<string, unknown>): UseUsersResult => {
         updateUserRole: updateRoleMutation.mutateAsync,
         deleteUser: deleteMutation.mutateAsync,
         isMutating: toggleStatusMutation.isPending || updateRoleMutation.isPending || deleteMutation.isPending
-    } as unknown as UseUsersResult;
+    } as any;
 };

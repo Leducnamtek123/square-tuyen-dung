@@ -35,281 +35,281 @@ const adminManagementService = {
 
   getCareers: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Career>> => {
     const url = 'common/admin/careers/';
-    return withPresign(httpRequest.get<PaginatedResponse<Career>>(url, { params }) as unknown as Promise<PaginatedResponse<Career>>);
+    return withPresign(httpRequest.get<PaginatedResponse<Career>>(url, { params }) as any);
   },
 
   createCareer: (data: Record<string, unknown> | FormData): Promise<Career> => {
     const url = 'common/admin/careers/';
     return withPresign(
-      httpRequest.post<Career>(url, data, adminManagementService.buildMultipartConfig(data)) as unknown as Promise<Career>
+      httpRequest.post<Career>(url, data, adminManagementService.buildMultipartConfig(data)) as any
     );
   },
 
   updateCareer: (id: IdType, data: Record<string, unknown> | FormData): Promise<Career> => {
     const url = `common/admin/careers/${id}/`;
     return withPresign(
-      httpRequest.patch<Career>(url, data, adminManagementService.buildMultipartConfig(data)) as unknown as Promise<Career>
+      httpRequest.patch<Career>(url, data, adminManagementService.buildMultipartConfig(data)) as any
     );
   },
 
   deleteCareer: (id: IdType): Promise<void> => {
     const url = `common/admin/careers/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url) as any;
   },
 
   getCities: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<City>> => {
     const url = 'common/admin/cities/';
-    return withPresign(httpRequest.get<PaginatedResponse<City>>(url, { params }) as unknown as Promise<PaginatedResponse<City>>);
+    return withPresign(httpRequest.get<PaginatedResponse<City>>(url, { params }) as any);
   },
 
   createCity: (data: Record<string, unknown>): Promise<City> => {
     const url = 'common/admin/cities/';
-    return withPresign(httpRequest.post<City>(url, data) as unknown as Promise<City>);
+    return withPresign(httpRequest.post<City>(url, data) as any);
   },
 
   updateCity: (id: IdType, data: Record<string, unknown>): Promise<City> => {
     const url = `common/admin/cities/${id}/`;
-    return withPresign(httpRequest.patch<City>(url, data) as unknown as Promise<City>);
+    return withPresign(httpRequest.patch<City>(url, data) as any);
   },
 
   deleteCity: (id: IdType): Promise<void> => {
     const url = `common/admin/cities/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url) as any;
   },
 
   getDistricts: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<District>> => {
     const url = 'common/admin/districts/';
-    return withPresign(httpRequest.get<PaginatedResponse<District>>(url, { params }) as unknown as Promise<PaginatedResponse<District>>);
+    return withPresign(httpRequest.get<PaginatedResponse<District>>(url, { params }) as any);
   },
 
   createDistrict: (data: Record<string, unknown>): Promise<District> => {
     const url = 'common/admin/districts/';
-    return withPresign(httpRequest.post<District>(url, data) as unknown as Promise<District>);
+    return withPresign(httpRequest.post<District>(url, data) as any);
   },
 
   updateDistrict: (id: IdType, data: Record<string, unknown>): Promise<District> => {
     const url = `common/admin/districts/${id}/`;
-    return withPresign(httpRequest.patch<District>(url, data) as unknown as Promise<District>);
+    return withPresign(httpRequest.patch<District>(url, data) as any);
   },
 
   deleteDistrict: (id: IdType): Promise<void> => {
     const url = `common/admin/districts/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url) as any;
   },
 
   getWards: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Ward>> => {
     const url = 'info/web/admin/wards/';
-    return httpRequest.get<PaginatedResponse<Ward>>(url, { params }) as unknown as Promise<PaginatedResponse<Ward>>;
+    return httpRequest.get<PaginatedResponse<Ward>>(url, { params });
   },
 
   createWard: (data: Record<string, unknown>): Promise<Ward> => {
     const url = 'info/web/admin/wards/';
-    return httpRequest.post<Ward>(url, data) as unknown as Promise<Ward>;
+    return httpRequest.post<Ward>(url, data);
   },
 
   updateWard: (id: string | number, data: Record<string, unknown>): Promise<Ward> => {
     const url = `info/web/admin/wards/${id}/`;
-    return httpRequest.patch<Ward>(url, data) as unknown as Promise<Ward>;
+    return httpRequest.patch<Ward>(url, data);
   },
 
   deleteWard: (id: string | number): Promise<void> => {
     const url = `info/web/admin/wards/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url) as any;
   },
 
   getCompanies: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Company>> => {
     const url = 'info/web/admin/companies/';
-    return withPresign(httpRequest.get<PaginatedResponse<Company>>(url, { params }) as unknown as Promise<PaginatedResponse<Company>>);
+    return withPresign(httpRequest.get<PaginatedResponse<Company>>(url, { params }));
   },
 
   getCompanyDetail: (id: IdType): Promise<Company> => {
     const url = `info/web/admin/companies/${id}/`;
-    return withPresign(httpRequest.get<Company>(url) as unknown as Promise<Company>);
+    return withPresign(httpRequest.get<Company>(url));
   },
 
   createCompany: (data: Record<string, unknown> | FormData): Promise<Company> => {
     const url = 'info/web/admin/companies/';
-    return withPresign(httpRequest.post<Company>(url, data, adminManagementService.buildMultipartConfig(data)) as unknown as Promise<Company>);
+    return withPresign(httpRequest.post<Company>(url, data, adminManagementService.buildMultipartConfig(data)));
   },
 
   updateCompany: (id: IdType, data: Record<string, unknown> | FormData): Promise<Company> => {
     const url = `info/web/admin/companies/${id}/`;
-    return withPresign(httpRequest.patch<Company>(url, data, adminManagementService.buildMultipartConfig(data)) as unknown as Promise<Company>);
+    return withPresign(httpRequest.patch<Company>(url, data, adminManagementService.buildMultipartConfig(data)));
   },
 
   deleteCompany: (id: IdType): Promise<void> => {
     const url = `info/web/admin/companies/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url);
   },
 
   getBanners: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Banner>> => {
     const url = 'info/web/admin/banners/';
-    return withPresign(httpRequest.get<PaginatedResponse<Banner>>(url, { params }) as unknown as Promise<PaginatedResponse<Banner>>);
+    return withPresign(httpRequest.get<PaginatedResponse<Banner>>(url, { params }));
   },
 
   createBanner: (data: Record<string, unknown> | FormData): Promise<Banner> => {
     const url = 'info/web/admin/banners/';
-    return withPresign(httpRequest.post<Banner>(url, data, adminManagementService.buildMultipartConfig(data)) as unknown as Promise<Banner>);
+    return withPresign(httpRequest.post<Banner>(url, data, adminManagementService.buildMultipartConfig(data)));
   },
 
   updateBanner: (id: IdType, data: Record<string, unknown> | FormData): Promise<Banner> => {
     const url = `info/web/admin/banners/${id}/`;
-    return withPresign(httpRequest.patch<Banner>(url, data, adminManagementService.buildMultipartConfig(data)) as unknown as Promise<Banner>);
+    return withPresign(httpRequest.patch<Banner>(url, data, adminManagementService.buildMultipartConfig(data)));
   },
 
   deleteBanner: (id: IdType): Promise<void> => {
     const url = `info/web/admin/banners/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url);
   },
 
   getFeedbacks: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Feedback>> => {
     const url = 'info/web/admin/feedbacks/';
-    return withPresign(httpRequest.get<PaginatedResponse<Feedback>>(url, { params }) as unknown as Promise<PaginatedResponse<Feedback>>);
+    return withPresign(httpRequest.get<PaginatedResponse<Feedback>>(url, { params }));
   },
 
   updateFeedback: (id: IdType, data: Record<string, unknown>): Promise<Feedback> => {
     const url = `info/web/admin/feedbacks/${id}/`;
-    return withPresign(httpRequest.patch<Feedback>(url, data) as unknown as Promise<Feedback>);
+    return withPresign(httpRequest.patch<Feedback>(url, data));
   },
 
   deleteFeedback: (id: IdType): Promise<void> => {
     const url = `info/web/admin/feedbacks/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url);
   },
 
   // Job Seeker Profiles
 
   getProfiles: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<JobSeekerProfile>> => {
     const url = 'info/web/admin/job-seeker-profiles/';
-    return withPresign(httpRequest.get<PaginatedResponse<JobSeekerProfile>>(url, { params }) as unknown as Promise<PaginatedResponse<JobSeekerProfile>>);
+    return withPresign(httpRequest.get<PaginatedResponse<JobSeekerProfile>>(url, { params }));
   },
 
   getProfileDetail: (id: string | number): Promise<JobSeekerProfile> => {
     const url = `info/web/admin/job-seeker-profiles/${id}/`;
-    return withPresign(httpRequest.get<JobSeekerProfile>(url) as unknown as Promise<JobSeekerProfile>);
+    return withPresign(httpRequest.get<JobSeekerProfile>(url));
   },
 
   createProfile: (data: Record<string, unknown>): Promise<JobSeekerProfile> => {
     const url = 'info/web/admin/job-seeker-profiles/';
-    return withPresign(httpRequest.post<JobSeekerProfile>(url, data) as unknown as Promise<JobSeekerProfile>);
+    return withPresign(httpRequest.post<JobSeekerProfile>(url, data));
   },
 
   updateProfile: (id: string | number, data: Record<string, unknown>): Promise<JobSeekerProfile> => {
     const url = `info/web/admin/job-seeker-profiles/${id}/`;
-    return withPresign(httpRequest.patch<JobSeekerProfile>(url, data) as unknown as Promise<JobSeekerProfile>);
+    return withPresign(httpRequest.patch<JobSeekerProfile>(url, data));
   },
 
   deleteProfile: (id: string | number): Promise<void> => {
     const url = `info/web/admin/job-seeker-profiles/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url);
   },
 
   getResumes: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Resume>> => {
     const url = 'info/web/admin/resumes/';
-    return withPresign(httpRequest.get<PaginatedResponse<Resume>>(url, { params }) as unknown as Promise<PaginatedResponse<Resume>>);
+    return withPresign(httpRequest.get<PaginatedResponse<Resume>>(url, { params }));
   },
 
   getResumeDetail: (id: string | number): Promise<Resume> => {
     const url = `info/web/admin/resumes/${id}/`;
-    return withPresign(httpRequest.get<Resume>(url) as unknown as Promise<Resume>);
+    return withPresign(httpRequest.get<Resume>(url));
   },
 
   createResume: (data: Record<string, unknown>): Promise<Resume> => {
     const url = 'info/web/admin/resumes/';
-    return withPresign(httpRequest.post<Resume>(url, data) as unknown as Promise<Resume>);
+    return withPresign(httpRequest.post<Resume>(url, data));
   },
 
   updateResume: (id: string | number, data: Record<string, unknown>): Promise<Resume> => {
     const url = `info/web/admin/resumes/${id}/`;
-    return withPresign(httpRequest.patch<Resume>(url, data) as unknown as Promise<Resume>);
+    return withPresign(httpRequest.patch<Resume>(url, data));
   },
 
   deleteResume: (id: string | number): Promise<void> => {
     const url = `info/web/admin/resumes/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url);
   },
 
   // Job Activity
 
   getJobActivities: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<JobPostActivity>> => {
     const url = 'job/web/admin/job-posts-activity/';
-    return httpRequest.get<PaginatedResponse<JobPostActivity>>(url, { params }) as unknown as Promise<PaginatedResponse<JobPostActivity>>;
+    return httpRequest.get<PaginatedResponse<JobPostActivity>>(url, { params });
   },
 
   createJobActivity: (data: Record<string, unknown>): Promise<JobPostActivity> => {
     const url = 'job/web/admin/job-posts-activity/';
-    return httpRequest.post<JobPostActivity>(url, data) as unknown as Promise<JobPostActivity>;
+    return httpRequest.post<JobPostActivity>(url, data);
   },
 
   updateJobActivity: (id: IdType, data: Record<string, unknown>): Promise<JobPostActivity> => {
     const url = `job/web/admin/job-posts-activity/${id}/`;
-    return httpRequest.patch<JobPostActivity>(url, data) as unknown as Promise<JobPostActivity>;
+    return httpRequest.patch<JobPostActivity>(url, data);
   },
 
   deleteJobActivity: (id: IdType): Promise<void> => {
     const url = `job/web/admin/job-posts-activity/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url);
   },
 
   getJobNotifications: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Notification>> => {
     const url = 'job/web/admin/job-post-notifications/';
-    return httpRequest.get<PaginatedResponse<Notification>>(url, { params }) as unknown as Promise<PaginatedResponse<Notification>>;
+    return httpRequest.get<PaginatedResponse<Notification>>(url, { params });
   },
 
   createJobNotification: (data: Record<string, unknown>): Promise<Notification> => {
     const url = 'job/web/admin/job-post-notifications/';
-    return httpRequest.post<Notification>(url, data) as unknown as Promise<Notification>;
+    return httpRequest.post<Notification>(url, data);
   },
 
   updateJobNotification: (id: IdType, data: Record<string, unknown>): Promise<Notification> => {
     const url = `job/web/admin/job-post-notifications/${id}/`;
-    return httpRequest.patch<Notification>(url, data) as unknown as Promise<Notification>;
+    return httpRequest.patch<Notification>(url, data);
   },
 
   deleteJobNotification: (id: IdType): Promise<void> => {
     const url = `job/web/admin/job-post-notifications/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url);
   },
 
   getQuestionGroups: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<QuestionGroup>> => {
     const url = 'interview/web/question-groups/';
-    return httpRequest.get<PaginatedResponse<QuestionGroup>>(url, { params: normalizeInterviewListParams(params) }) as unknown as Promise<PaginatedResponse<QuestionGroup>>;
+    return httpRequest.get<PaginatedResponse<QuestionGroup>>(url, { params: normalizeInterviewListParams(params) });
   },
 
   createQuestionGroup: (data: Record<string, unknown>): Promise<QuestionGroup> => {
     const url = 'interview/web/question-groups/';
-    return httpRequest.post<QuestionGroup>(url, data) as unknown as Promise<QuestionGroup>;
+    return httpRequest.post<QuestionGroup>(url, data);
   },
 
   updateQuestionGroup: (id: string | number, data: Record<string, unknown>): Promise<QuestionGroup> => {
     const url = `interview/web/question-groups/${id}/`;
-    return httpRequest.patch<QuestionGroup>(url, data) as unknown as Promise<QuestionGroup>;
+    return httpRequest.patch<QuestionGroup>(url, data);
   },
 
   deleteQuestionGroup: (id: string | number): Promise<void> => {
     const url = `interview/web/question-groups/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url);
   },
 
   // Questions (Admin)
   getQuestions: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Question>> => {
     const url = 'interview/web/questions/';
-    return httpRequest.get<PaginatedResponse<Question>>(url, { params: normalizeInterviewListParams(params) }) as unknown as Promise<PaginatedResponse<Question>>;
+    return httpRequest.get<PaginatedResponse<Question>>(url, { params: normalizeInterviewListParams(params) });
   },
 
   createQuestion: (data: Record<string, unknown>): Promise<Question> => {
     const url = 'interview/web/questions/';
-    return httpRequest.post<Question>(url, data) as unknown as Promise<Question>;
+    return httpRequest.post<Question>(url, data);
   },
 
   updateQuestion: (id: string | number, data: Record<string, unknown>): Promise<Question> => {
     const url = `interview/web/questions/${id}/`;
-    return httpRequest.patch<Question>(url, data) as unknown as Promise<Question>;
+    return httpRequest.patch<Question>(url, data);
   },
 
   deleteQuestion: (id: string | number): Promise<void> => {
     const url = `interview/web/questions/${id}/`;
-    return httpRequest.delete(url) as unknown as Promise<void>;
+    return httpRequest.delete(url);
   },
 };
 

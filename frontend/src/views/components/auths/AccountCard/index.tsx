@@ -57,7 +57,7 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
     const update = async (data: UpdatePasswordFormData) => {
       setIsFullScreenLoading(true);
       try {
-        await authService.changePassword(data as unknown as Record<string, unknown>);
+        await authService.changePassword(data as any);
         setOpenPopup(false);
         toastMessages.success(t('account.passwordChangeSuccess'));
         let path = ROUTES.AUTH.LOGIN;

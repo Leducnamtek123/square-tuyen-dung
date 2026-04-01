@@ -69,7 +69,7 @@ const JobApplicationCard = () => {
           </Stack>
         ) : (
           <List disablePadding>
-            {(data as unknown as JobApplicationExt[] || []).map((item: JobApplicationExt) => (
+            {((data as JobApplicationExt[]) || []).map((item: JobApplicationExt) => (
               <ListItem
                 key={item?.id || item?.title}
                 sx={{

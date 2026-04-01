@@ -246,13 +246,13 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
   React.useEffect(() => {
     const loadDistricts = async (id: number | string) => {
       try {
-        const resData = await commonService.getDistrictsByCityId(id) as unknown as SelectOption[];
+        const resData = await commonService.getDistrictsByCityId(id);
         // Only clear district if the cityId has actually changed (user interaction)
         // and it's not the initial load (prevCityIdRef.current is not null).
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
           setValue('location.district', '');
         }
-        setDistrictOptions(resData);
+        setDistrictOptions((resData as any)?.results || resData || []);
         prevCityIdRef.current = id;
       } catch (error) {
         errorHandling(error as AxiosError<Record<string, unknown>>);

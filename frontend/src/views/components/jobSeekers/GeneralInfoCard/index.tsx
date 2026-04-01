@@ -221,7 +221,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
       try {
 
-        const resData = await resumeService.getResumeOwner(slug) as unknown as ResumeDetail;
+        const resData = await resumeService.getResumeOwner(slug) as any;
 
         setResumeDetail(resData);
 

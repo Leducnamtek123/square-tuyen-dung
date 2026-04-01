@@ -4,6 +4,17 @@ import tokenService from '../services/tokenService';
 import { AUTH_CONFIG } from '../configs/constants';
 import type { RetryAxiosRequestConfig } from '../types/api';
 import type { TokenPair } from '../types/auth';
+import type { AxiosInstance, AxiosRequestConfig } from 'axios';
+
+export interface HttpServiceInstance extends Omit<AxiosInstance, 'get' | 'post' | 'put' | 'patch' | 'delete'> {
+  (config: AxiosRequestConfig): Promise<any>;
+  (url: string, config?: AxiosRequestConfig): Promise<any>;
+  get<T = any, R = T, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+  post<T = any, R = T, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+  put<T = any, R = T, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+  patch<T = any, R = T, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<R>;
+  delete<T = any, R = T, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;
+}
 import { cleanParams } from './params';
 import { camelizeKeys } from './camelCase';
 
@@ -39,7 +50,7 @@ const httpRequest = axios.create({
   },
   withCredentials: true,
   timeout: 30000,
-});
+}) as HttpServiceInstance;
 
 const refreshClient = axios.create({
   baseURL,

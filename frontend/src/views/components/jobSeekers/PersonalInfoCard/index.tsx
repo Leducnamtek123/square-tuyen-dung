@@ -137,7 +137,7 @@ const PersonalInfoCard = ({ title, sx }: PersonalInfoCardProps) => {
 
     const resData = await jobSeekerProfileService.getProfile();
 
-    setProfile((resData as unknown as { data: EnhancedJobSeekerProfile }).data);
+    setProfile((resData as any).data);
 
   } catch (error: unknown) {
 
@@ -363,7 +363,7 @@ return (
 
                     t('common:city'),
 
-                    tConfig(allConfig?.cityDict?.[(profile?.location as unknown as Record<string, string>)?.city as keyof typeof allConfig.cityDict])
+                    tConfig(allConfig?.cityDict?.[((profile?.location as any)?.city as keyof typeof allConfig.cityDict)])
 
                   )}
 

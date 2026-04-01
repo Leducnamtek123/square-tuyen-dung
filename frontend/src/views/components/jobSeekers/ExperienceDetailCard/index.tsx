@@ -166,7 +166,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
       try {
 
-        const resData = await resumeService.getExperiencesDetail(slug) as unknown as ExperienceDetail[];
+        const resData = await resumeService.getExperiencesDetail(slug) as any;
 
         setExperiencesDetail(resData);
 
@@ -198,7 +198,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
           experienceId
 
-        ) as unknown as ExperienceDetail;
+        ) as any;
 
         setEditData(resData);
 

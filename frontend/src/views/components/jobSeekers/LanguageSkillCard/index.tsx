@@ -223,7 +223,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as unknown as Parameters<typeof errorHandling>[1]);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as any);
 
       } finally {
 

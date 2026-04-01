@@ -152,7 +152,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
   React.useEffect(() => {
     for (const err in serverErrors) {
       if (err === 'company' && typeof serverErrors[err] === 'object') {
-        const companyErrors = serverErrors[err] as unknown as Record<string, string[] | Record<string, string[]>>;
+        const companyErrors = serverErrors[err] as any;
         for (const companyErr in companyErrors) {
           if (companyErr === 'location' && typeof companyErrors[companyErr] === 'object') {
             const locationErrors = companyErrors[companyErr] as Record<string, string[]>;
@@ -230,7 +230,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
   React.useEffect(() => {
     const loadDistricts = async (cityId: number) => {
       try {
-        const resData = await commonService.getDistrictsByCityId(cityId) as unknown as SelectOption[];
+        const resData = await commonService.getDistrictsByCityId(cityId) as any;
         // Only clear district if the cityId has actually changed (user interaction)
         // and it's not the initial load (prevCityIdRef.current is not null).
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
@@ -242,7 +242,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
         errorHandling(error as AxiosError<{ errors?: ApiError }>);
       }
     };
-    if (cityId) loadDistricts(cityId as unknown as number);
+    if (cityId) loadDistricts(cityId as any);
   }, [cityId, setValue]);
 
   const handleSubmtNextSuccess = (data: EmployerSignUpFormData) => handleNext(data.email);

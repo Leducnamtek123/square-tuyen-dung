@@ -49,7 +49,7 @@ const InterviewLivePage = () => {
         page: page + 1,
         pageSize: rowsPerPage,
       });
-      const rawSessions = (data as unknown as PaginatedResponse<Record<string, unknown>>)?.results || [];
+      const rawSessions = (data as PaginatedResponse<InterviewSession> & PaginatedResponse<Record<string, unknown>>)?.results || [];
       const mapped = rawSessions.map((session: Record<string, unknown>) => transformInterviewSession(session) as InterviewSession).filter(Boolean);
       setSessions(mapped);
       setCount(typeof data?.count === 'number' ? data.count : rawSessions.length);

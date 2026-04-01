@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { useSavedJobs, useToggleSaveJob } from '../hooks/useJobSeekerQueries';
 
 interface JobPost {
-  id: string;
+  id: string | number;
   slug: string;
   companyDict?: {
     companyImageUrl?: string;
@@ -34,7 +34,7 @@ const SavedJobCard = () => {
   const [page, setPage] = React.useState(1);
 
   const { data, isLoading } = useSavedJobs({ pageSize, page });
-  const jobPosts: JobPost[] = (data?.results as unknown as JobPost[]) || [];
+  const jobPosts = (data?.results || []) as Array<JobPost>;
   const count = data?.count || 0;
 
   const toggleSave = useToggleSaveJob();

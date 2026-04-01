@@ -97,7 +97,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
   const blobRef = React.useRef<Blob | null>(null);
   const queryClient = useQueryClient();
 
-  const userPayload = currentUser as unknown as { jobSeekerProfile?: { id?: string }; jobSeekerProfileId?: string };
+  const userPayload = currentUser as any;
   const jobSeekerProfileId = userPayload?.jobSeekerProfile?.id || userPayload?.jobSeekerProfileId || undefined;
 
   const { data: resumes, isLoading: isLoadingResume } = useResumes(jobSeekerProfileId, {
@@ -192,7 +192,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                 </Stack>
                 {!isGeneratingPDF && (
                   <PDFDownloadLinkAny
-                    document={<CVDoc resume={resume as unknown as React.ComponentProps<typeof CVDoc>['resume']} user={currentUser as React.ComponentProps<typeof CVDoc>['user']} themeColor={selectedColor} />}
+                    document={<CVDoc resume={resume as any} user={currentUser as any} themeColor={selectedColor} />}
                     fileName={`${APP_NAME}_CV_${currentUser?.fullName}-${toSlug(resume?.title || "title")}.pdf`}
                     style={{ textDecoration: "none" }}
                   >
@@ -297,8 +297,8 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                   <Grid size={12}>
                     <Stack spacing={2}>
                       {[
-                        { icon: faMagicWandSparkles, label: t("jobSeeker:profile.summary.experience"), value: tConfig(((allConfig as unknown as Record<string, Record<string, string>>)?.experienceDict || {})[String(resume.experience)]) },
-                        { icon: faUser, label: t("jobSeeker:profile.summary.position"), value: tConfig(((allConfig as unknown as Record<string, Record<string, string>>)?.positionDict || {})[String(resume.position)]) },
+                        { icon: faMagicWandSparkles, label: t("jobSeeker:profile.summary.experience"), value: tConfig((allConfig as any)?.experienceDict?.[String(resume.experience)]) },
+                        { icon: faUser, label: t("jobSeeker:profile.summary.position"), value: tConfig((allConfig as any)?.positionDict?.[String(resume.position)]) },
                         { icon: faDollarSign, label: t("jobSeeker:profile.summary.desiredSalary"), value: salaryString(resume.salaryMin, resume.salaryMax) },
                         { icon: faCalendar, label: t("jobSeeker:profile.summary.lastUpdated"), value: dayjs(resume.updateAt).format("DD/MM/YYYY HH:mm:ss") }
                       ].map((item, idx) => (

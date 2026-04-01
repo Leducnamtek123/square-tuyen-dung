@@ -58,7 +58,7 @@ const ProfileSearch: React.FC = () => {
     }, [resumeFilter, reset]);
 
     const handleFilter = (data: ProfileSearchValues) => {
-        dispatch(searchResume(data as unknown as Parameters<typeof searchResume>[0]));
+        dispatch(searchResume(data as any));
     };
 
     const handleReset = () => {

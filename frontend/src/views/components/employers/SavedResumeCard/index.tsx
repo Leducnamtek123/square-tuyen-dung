@@ -95,7 +95,7 @@ const SavedResumeCard: React.FC<SavedResumeCardProps> = ({ title }) => {
     setIsProcessing(true);
     try {
       const resData = await resumeSavedService.exportResumesSaved(queryParams);
-      xlsxUtils.exportToXLSX(resData as unknown as Record<string, unknown>[], 'SavedResumesList');
+      xlsxUtils.exportToXLSX(resData as any, 'SavedResumesList');
     } catch (error) {
       errorHandling(error as AxiosError<{ errors?: ApiError }>);
     } finally {

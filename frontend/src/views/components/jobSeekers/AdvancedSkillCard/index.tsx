@@ -137,7 +137,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       try {
 
-        const resData = await resumeService.getAdvancedSkills(slug) as unknown as AdvancedSkill[];
+        const resData = await resumeService.getAdvancedSkills(slug) as AdvancedSkill[];
 
         setAdvancedSkills(resData);
 
@@ -167,7 +167,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       try {
 
-        const resData = await advancedSkillService.getAdvancedSkillById(skillId) as unknown as AdvancedSkill;
+        const resData = await advancedSkillService.getAdvancedSkillById(skillId) as AdvancedSkill;
 
         setEditData(resData);
 
@@ -217,7 +217,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as unknown as React.Dispatch<React.SetStateAction<Record<string, unknown> | null>>);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as React.Dispatch<React.SetStateAction<Record<string, unknown> | null>>);
 
       } finally {
 

@@ -164,7 +164,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       try {
 
-        const resData = await resumeService.getCertificates(slug) as unknown as Certificate[];
+        const resData = await resumeService.getCertificates(slug) as any;
 
         setCertificates(resData);
 
@@ -194,7 +194,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       try {
 
-        const resData = await certificateService.getCertificateById(certId) as unknown as Certificate;
+        const resData = await certificateService.getCertificateById(certId) as any;
 
         setEditData(resData);
 
@@ -244,7 +244,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as unknown as React.Dispatch<React.SetStateAction<Record<string, unknown> | null>>);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as any);
 
       } finally {
 
@@ -648,7 +648,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
         <CertificateForm
 
-          handleAddOrUpdate={handleAddOrUpdate as unknown as (data: CertificateFormValues) => void}
+          handleAddOrUpdate={handleAddOrUpdate as any}
 
           editData={editData as any}
 

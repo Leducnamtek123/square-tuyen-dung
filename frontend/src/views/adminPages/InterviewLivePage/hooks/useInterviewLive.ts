@@ -28,7 +28,7 @@ export const useInterviewLive = (params: { page: number; pageSize: number }): Us
             const res = await interviewService.getSessions({
                 page: params.page,
                 pageSize: params.pageSize,
-            }) as unknown as PaginatedResponse<Record<string, unknown>>;
+            }) as PaginatedResponse<InterviewSession> & PaginatedResponse<Record<string, unknown>>;
             
             const rawSessions = res.results || [];
             const mapped = rawSessions.map(transformInterviewSession).filter(Boolean) as InterviewSessionExt[];

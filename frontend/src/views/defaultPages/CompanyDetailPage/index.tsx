@@ -23,26 +23,18 @@ import CompanySidebar from "./CompanySidebar";
 import { useConfig } from '@/hooks/useConfig';
 import { Theme } from "@mui/material/styles";
 
-export type CompanyDetailProps = {
-  id?: number | string;
-  companyName?: string;
-  description?: string;
-  fieldOperation?: string;
-  companyImageUrl?: string;
-  websiteUrl?: string;
-  email?: string;
-  phone?: string;
-  address?: string;
-  cityName?: string;
-  since?: string;
-  employeeSize?: number;
+import type { Company } from "../../../types/models";
+
+export interface CompanyDetailProps extends Omit<Partial<Company>, 'location'> {
+  location?: { address?: string; lat?: number; lng?: number; city?: number; district?: number; ward?: number; [key: string]: unknown } | null;
   facebookUrl?: string;
+  youtubeUrl?: string;
   linkedinUrl?: string;
   followNumber?: number;
   isFollowed?: boolean;
   companyImages?: { imageUrl: string }[];
   [key: string]: unknown;
-};
+}
 
 const sanitizeCompanyDescription = (rawHtml: string | undefined) => {
   if (!rawHtml || typeof rawHtml !== "string") return "";
@@ -78,15 +70,15 @@ const CompanyDetailPage = () => {
 
   const companyDetail = React.useMemo(() => {
     if (!fetchRes) return null;
-    return fetchRes as unknown as CompanyDetailProps;
+    return fetchRes as CompanyDetailProps;
   }, [fetchRes]);
 
   const imageList = React.useMemo(() => {
-    if (!companyDetail?.companyImages) return [];
-    return companyDetail.companyImages.map(img => ({ original: img.imageUrl, thumbnail: img.imageUrl }));
+    if (!companyDetail?.companyImages || !Array.isArray(companyDetail.companyImages)) return [];
+    return companyDetail.companyImages.map((img: { imageUrl: string }) => ({ original: img.imageUrl, thumbnail: img.imageUrl }));
   }, [companyDetail?.companyImages]);
 
-  const safeDescriptionHtml = React.useMemo(() => sanitizeCompanyDescription(companyDetail?.description), [companyDetail?.description]);
+  const safeDescriptionHtml = React.useMemo(() => sanitizeCompanyDescription(companyDetail?.description || undefined), [companyDetail?.description]);
 
   const stripHtml = (html: string) => (html || '').replace(/<[^>]*>/g, '').slice(0, 160);
 
@@ -107,10 +99,10 @@ const CompanyDetailPage = () => {
         url: companyDetail.websiteUrl || (typeof window !== 'undefined' ? window.location.href : ''),
         logoUrl: companyDetail.companyImageUrl || '',
         description: companyDetail.description || '',
-        email: companyDetail.email,
-        phone: companyDetail.phone,
-        address: companyDetail.address,
-        city: companyDetail.cityName,
+        email: typeof companyDetail.email === 'string' ? companyDetail.email : undefined,
+        phone: typeof companyDetail.phone === 'string' ? companyDetail.phone : undefined,
+        address: typeof companyDetail.address === 'string' ? companyDetail.address : undefined,
+        city: typeof companyDetail.cityName === 'string' ? companyDetail.cityName : undefined,
         country: 'VN',
         foundingDate: companyDetail.since ? dayjs(companyDetail.since).format('YYYY') : undefined,
         numberOfEmployees: companyDetail.employeeSize ? String(companyDetail.employeeSize) : undefined,

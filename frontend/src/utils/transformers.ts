@@ -17,7 +17,7 @@ export const transformQuestion = (q: Record<string, unknown> | null | undefined)
     category: q.category || t('common:labels.uncategorized'),
     questionType: q.questionType || q.type || 'TEXT',
     text,
-  } as unknown as Question;
+  } as any;
 };
 
 export const transformQuestionGroup = (
@@ -31,7 +31,7 @@ export const transformQuestionGroup = (
     description: group.description || '',
     questions: (Array.isArray(group.questions) ? group.questions : []).map((q) => transformQuestion(q as Record<string, unknown>)).filter((q: Question | null): q is Question => !!q),
     ...group,
-  } as unknown as QuestionGroup;
+  } as any;
 };
 
 export const transformInterviewSession = (
@@ -98,7 +98,7 @@ export const transformInterviewSession = (
     recordingUrl,
     transcriptUrl,
     questions: (Array.isArray(s.questions) ? s.questions : []).map((q) => transformQuestion(q as Record<string, unknown>)).filter((q: Question | null): q is Question => !!q),
-  } as unknown as InterviewSession;
+  } as any;
 };
 
 export const transformJobPost = (job: Record<string, unknown> | null | undefined): JobPost | null => {
@@ -118,7 +118,7 @@ export const transformJobPost = (job: Record<string, unknown> | null | undefined
     deadline: job.deadline as string,
     ...job,
     jobName: (job.jobName || job.title || '') as string,
-  } as unknown as JobPost;
+  } as any;
 };
 
 export const transformAppliedResume = (

@@ -166,7 +166,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       try {
 
-        const resData = await resumeService.getEducationsDetail(slug) as unknown as EducationDetail[];
+        const resData = await resumeService.getEducationsDetail(slug) as any;
 
         setEducationsDetail(resData);
 
@@ -194,7 +194,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       try {
 
-        const resData = await educationDetailService.getEducationDetailById(eduId) as unknown as EducationDetail;
+        const resData = await educationDetailService.getEducationDetailById(eduId) as any;
 
         setEditData(resData);
 

@@ -16,19 +16,19 @@ import type { AxiosRequestConfig } from 'axios';
 
 export const api = {
   get: <T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> =>
-    httpRequest.get(url, config) as unknown as Promise<T>,
+    httpRequest.get(url, config) as Promise<T>,
 
   post: <T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> =>
-    httpRequest.post(url, data, config) as unknown as Promise<T>,
+    httpRequest.post(url, data, config) as Promise<T>,
 
   put: <T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> =>
-    httpRequest.put(url, data, config) as unknown as Promise<T>,
+    httpRequest.put(url, data, config) as Promise<T>,
 
   patch: <T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> =>
-    httpRequest.patch(url, data, config) as unknown as Promise<T>,
+    httpRequest.patch(url, data, config) as Promise<T>,
 
   delete: <T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> =>
-    httpRequest.delete(url, config) as unknown as Promise<T>,
+    httpRequest.delete(url, config) as Promise<T>,
 };
 
 export default api;

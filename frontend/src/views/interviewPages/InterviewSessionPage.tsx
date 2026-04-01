@@ -113,7 +113,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         inviteToken = detailRaw?.inviteToken || '';
       }
 
-      const mappedSession = transformInterviewSession(detailRaw as unknown as Record<string, unknown>) as InterviewSession;
+      const mappedSession = transformInterviewSession(detailRaw as InterviewSession & Record<string, unknown>) as InterviewSession;
       setSession(mappedSession);
       setSessionInviteToken(inviteToken || "");
     } catch (err) {

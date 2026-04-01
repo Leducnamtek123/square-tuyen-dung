@@ -46,7 +46,7 @@ const CompanyImageCard = () => {
   const [cropFileName, setCropFileName] = useState('');
 
   const fileList = useMemo<FileItem[]>(() => {
-    const results = (imagesData as unknown as { results?: Array<{ id: number | string; imageUrl: string }> })?.results ?? imagesData ?? [];
+    const results = (imagesData as any)?.results ?? imagesData ?? [];
     return (results as Array<{ id: number | string; imageUrl: string }>).map((item) => ({
       uid: item.id,
       url: item.imageUrl,

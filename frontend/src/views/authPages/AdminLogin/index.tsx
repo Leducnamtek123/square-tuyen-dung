@@ -146,7 +146,7 @@ const AdminLogin: React.FC = () => {
       setIsLoading(true);
       try {
         const resData = await authService.getToken(email, password, roleName as RoleName);
-        const { accessToken, refreshToken, backend } = resData as unknown as { accessToken: string; refreshToken: string; backend: string };
+        const { accessToken, refreshToken, backend } = resData as any;
 
         const saved = tokenService.saveAccessTokenAndRefreshTokenToCookie(
           accessToken,

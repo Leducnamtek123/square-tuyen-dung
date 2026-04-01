@@ -9,16 +9,10 @@ import ImageGalleryCustom from "../../../components/Common/ImageGalleryCustom";
 import type { Theme as StylesTheme } from '@mui/material/styles';
 import type { Company } from '@/types/models';
 import type { TFunction } from 'i18next';
+import { CompanyDetailProps } from './index';
 
 interface CompanySidebarProps {
-  companyDetail: Omit<Partial<Company>, 'id'> & { 
-    id?: string | number;
-    facebookUrl?: string; 
-    youtubeUrl?: string; 
-    linkedinUrl?: string; 
-    location?: { address?: string; lat?: number; lng?: number; [key: string]: unknown };
-    [key: string]: unknown 
-  };
+  companyDetail: CompanyDetailProps;
   imageList: { original: string; thumbnail?: string }[];
   t: TFunction;
 }

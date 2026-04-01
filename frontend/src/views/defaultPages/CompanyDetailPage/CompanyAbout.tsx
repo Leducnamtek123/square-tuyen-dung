@@ -1,9 +1,10 @@
 import React from 'react';
 import { Box, Typography } from "@mui/material";
-import type { CompanyDetailProps } from './index';
+import type { TFunction } from 'i18next';
+import { CompanyDetailProps } from './index';
 
 interface CompanyAboutProps {
-  companyDetail: CompanyDetailProps | null;
+  companyDetail: CompanyDetailProps;
   safeDescriptionHtml: string;
   t: (key: string) => string;
 }

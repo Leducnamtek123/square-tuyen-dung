@@ -113,10 +113,10 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
     useEffect(() => {
         if (sessionDetail) {
             reset({
-                job_post: ((sessionDetail.jobPost as unknown as Record<string, unknown>)?.id as string | number) || (sessionDetail.jobPost as unknown as string | number) || '',
-                candidate: ((sessionDetail.candidate as unknown as Record<string, unknown>)?.id as string | number) || (sessionDetail.candidate as unknown as string | number) || '',
+                job_post: (sessionDetail.jobPost as any)?.id || sessionDetail.jobPost || '',
+                candidate: (sessionDetail.candidate as any)?.id || sessionDetail.candidate || '',
                 scheduled_at: sessionDetail.scheduledAt || '',
-                selected_group: ((sessionDetail.questionGroup as unknown as Record<string, unknown>)?.id as string | number) || (sessionDetail.questionGroup as unknown as string | number) || '',
+                selected_group: (sessionDetail.questionGroup as any)?.id || sessionDetail.questionGroup || '',
                 selected_questions: sessionDetail.questions?.map((q: unknown) => (q as {id: number}).id) || []
             });
         }

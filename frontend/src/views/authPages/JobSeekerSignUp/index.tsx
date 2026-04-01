@@ -195,7 +195,7 @@ const JobSeekerSignUp = () => {
         token,
         redirectUri
 
-      )) as unknown as { accessToken: string; refreshToken: string; backend: string };
+      )) as any;
 
       const { accessToken, refreshToken, backend } = resData;
 
@@ -225,7 +225,7 @@ const JobSeekerSignUp = () => {
 
           .catch(() => {
 
-            errorHandling({ response: null } as unknown as AxiosError<Record<string, unknown>>);
+            errorHandling({ response: null } as any);
 
           });
 

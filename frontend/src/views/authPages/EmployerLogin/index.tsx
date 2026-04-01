@@ -76,7 +76,7 @@ const EmployerLogin = () => {
 
       try {
         const resData = await authService.getToken(email, password, roleName);
-        const { accessToken, refreshToken, backend } = resData as unknown as { accessToken: string; refreshToken: string; backend: string };
+        const { accessToken, refreshToken, backend } = resData as any;
 
         const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
           accessToken,
@@ -155,7 +155,7 @@ const EmployerLogin = () => {
     setIsFullScreenLoading(true);
 
     try {
-      const resData = await authService.convertToken(clientId, clientSecrect, provider, token, redirectUri) as unknown as { accessToken: string; refreshToken: string; backend: string };
+      const resData = await authService.convertToken(clientId, clientSecrect, provider, token, redirectUri) as any;
       const { accessToken, refreshToken, backend } = resData;
 
       const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
