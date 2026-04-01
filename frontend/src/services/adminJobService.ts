@@ -6,16 +6,16 @@ type IdType = string | number;
 
 const adminJobService = {
   getAllJobs: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<JobPost>> => {
-    return httpRequest.get<PaginatedResponse<JobPost>>('job/web/admin-job-posts/', { params }) as any;
+    return httpRequest.get<PaginatedResponse<JobPost>>('job/web/admin-job-posts/', { params });
   },
   updateJob: (id: IdType, data: Partial<JobPost>): Promise<JobPost> => {
-    return httpRequest.patch<JobPost>(`job/web/admin-job-posts/${id}/`, data) as any;
+    return httpRequest.patch<JobPost>(`job/web/admin-job-posts/${id}/`, data);
   },
   approveJob: (id: IdType): Promise<JobPost> => {
-    return httpRequest.patch<JobPost>(`job/web/admin-job-posts/${id}/approve/`) as any;
+    return httpRequest.patch<JobPost>(`job/web/admin-job-posts/${id}/approve/`);
   },
   rejectJob: (id: IdType): Promise<JobPost> => {
-    return httpRequest.patch<JobPost>(`job/web/admin-job-posts/${id}/reject/`) as any;
+    return httpRequest.patch<JobPost>(`job/web/admin-job-posts/${id}/reject/`);
   },
   deleteJob: (id: IdType): Promise<void> => {
     return httpRequest.delete(`job/web/admin-job-posts/${id}/`);

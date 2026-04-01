@@ -54,7 +54,7 @@ const adminManagementService = {
 
   deleteCareer: (id: IdType): Promise<void> => {
     const url = `common/admin/careers/${id}/`;
-    return httpRequest.delete(url) as any;
+    return httpRequest.delete(url);
   },
 
   getCities: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<City>> => {
@@ -74,7 +74,7 @@ const adminManagementService = {
 
   deleteCity: (id: IdType): Promise<void> => {
     const url = `common/admin/cities/${id}/`;
-    return httpRequest.delete(url) as any;
+    return httpRequest.delete(url);
   },
 
   getDistricts: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<District>> => {
@@ -94,7 +94,7 @@ const adminManagementService = {
 
   deleteDistrict: (id: IdType): Promise<void> => {
     const url = `common/admin/districts/${id}/`;
-    return httpRequest.delete(url) as any;
+    return httpRequest.delete(url);
   },
 
   getWards: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Ward>> => {
@@ -114,7 +114,7 @@ const adminManagementService = {
 
   deleteWard: (id: string | number): Promise<void> => {
     const url = `info/web/admin/wards/${id}/`;
-    return httpRequest.delete(url) as any;
+    return httpRequest.delete(url);
   },
 
   getCompanies: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Company>> => {

@@ -106,7 +106,7 @@ export const getChatRoomById = async (
     let partnerId = '';
     const chatRoomData = docSnap.data() as Record<string, unknown>;
 
-    const members = (chatRoomData.members as unknown as string[]) || [];
+    const members = (chatRoomData as { members?: string[] }).members || [];
     if (members[0] === `${currentUserId}`) {
       partnerId = members[1] || '';
     } else {
