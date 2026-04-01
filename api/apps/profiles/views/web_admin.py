@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 
 from apps.accounts import permissions as perms_custom
+from shared import pagination as paginations
 
 from ..models import Company, JobSeekerProfile, Resume
 from ..serializers import CompanySerializer, JobSeekerProfileSerializer, ResumeSerializer
@@ -14,6 +15,8 @@ class AdminCompanyViewSet(viewsets.ModelViewSet):
 
     permission_classes = [perms_custom.IsAdminUser]
 
+    pagination_class = paginations.CustomPagination
+
 
 class AdminJobSeekerProfileViewSet(viewsets.ModelViewSet):
 
@@ -23,6 +26,8 @@ class AdminJobSeekerProfileViewSet(viewsets.ModelViewSet):
 
     permission_classes = [perms_custom.IsAdminUser]
 
+    pagination_class = paginations.CustomPagination
+
 
 class AdminResumeViewSet(viewsets.ModelViewSet):
 
@@ -31,5 +36,7 @@ class AdminResumeViewSet(viewsets.ModelViewSet):
     serializer_class = ResumeSerializer
 
     permission_classes = [perms_custom.IsAdminUser]
+
+    pagination_class = paginations.CustomPagination
 
     lookup_field = 'id'

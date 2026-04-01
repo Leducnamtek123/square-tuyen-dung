@@ -388,3 +388,4 @@ class AdminJobPostActivityViewSet(viewsets.ModelViewSet):
     queryset = JobPostActivity.objects.select_related('user', 'job_post', 'resume').all().order_by('id')
     serializer_class = EmployerJobPostActivitySerializer
     permission_classes = [perms_custom.IsAdminUser]
+    pagination_class = paginations.CustomPagination

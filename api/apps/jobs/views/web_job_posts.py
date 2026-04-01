@@ -471,6 +471,7 @@ class AdminJobPostViewSet(viewsets.ModelViewSet):
     )
     serializer_class = JobPostSerializer
     permission_classes = [perms_custom.IsAdminUser]
+    pagination_class = paginations.CustomPagination
     filter_backends = [DjangoFilterBackend, AliasedOrderingFilter, SearchFilter]
     filterset_class = JobPostFilter
     search_fields = ['job_name', 'company__company_name']

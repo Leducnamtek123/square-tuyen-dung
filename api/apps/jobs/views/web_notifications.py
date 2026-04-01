@@ -107,3 +107,4 @@ class AdminJobPostNotificationViewSet(viewsets.ModelViewSet):
     queryset = JobPostNotification.objects.select_related('user', 'career', 'city').all().order_by('id')
     serializer_class = JobPostNotificationSerializer
     permission_classes = [perms_custom.IsAdminUser]
+    pagination_class = paginations.CustomPagination
