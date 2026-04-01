@@ -17,6 +17,7 @@ import { useConfig } from '@/hooks/useConfig';
 import type { AxiosError } from 'axios';
 import type { ApiError } from '../../../../types/api';
 import type { SelectOption } from '../../../../types/models';
+import type { PlacePrediction } from '../../../../services/goongService';
 
 export interface CompanyFormValues {
   companyName: string;
@@ -148,7 +149,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   const handleSelectLocation = async (e: React.SyntheticEvent, value: string | SelectOption | null) => {
     if (!value || typeof value !== 'object' || !('place_id' in value)) return;
     try {
-      const prediction = value as unknown as import('../../../../services/goongService').PlacePrediction;
+      const prediction = value as unknown as PlacePrediction;
       const resData = await goongService.getPlaceDetailByPlaceId(prediction.place_id);
       const resultObj = resData?.result;
       const geometryObj = resultObj?.geometry;

@@ -23,6 +23,7 @@ import { IMAGES, ROUTES } from '@/configs/constants';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import { formatRoute } from '@/utils/funcUtils';
 import { useAppSelector } from '@/hooks/useAppStore';
+import type { QueryDocumentSnapshot } from 'firebase/firestore';
 
 interface NotificationItem {
   key: string;
@@ -56,7 +57,7 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 
   const [notifications, setNotifications] = React.useState<NotificationItem[]>([]);
 
-  const [lastKey, setLastKey] = React.useState<import('firebase/firestore').QueryDocumentSnapshot | null>(null);
+  const [lastKey, setLastKey] = React.useState<QueryDocumentSnapshot | null>(null);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 

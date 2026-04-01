@@ -15,6 +15,10 @@ import { setActiveWorkspace } from "../../../../redux/userSlice";
 
 import { HOST_NAME, ROUTES } from "../../../../configs/constants";
 import tokenService from "../../../../services/tokenService";
+import type { Workspace } from '@/types/models';
+import type { ApiError } from '../../../../types/api';
+import type { AxiosError } from 'axios';
+import type { AppDispatch } from '../../../../redux/store';
 import {
   resetSearchCompany,
   resetSearchJobPostFilter,
@@ -76,7 +80,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
             ? `${workspace.label} (${workspace.roleCode || "member"})`
             : t("nav.accountManagement"),
         onClick: () => {
-          dispatch(setActiveWorkspace(workspace as unknown as import('@/types/models').Workspace));
+          dispatch(setActiveWorkspace(workspace as unknown as Workspace));
           if (workspace.type === "company") {
             openPortal(true, ROUTES.EMPLOYER.DASHBOARD);
             return;
@@ -91,7 +95,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
   const handleLogout = () => {
     const accessToken = tokenService.getAccessTokenFromCookie() || '';
     const backend = tokenService.getProviderFromCookie() || '';
-    (dispatch as import('../../../../redux/store').AppDispatch)(removeUserInfo({ accessToken, backend }))
+    (dispatch as AppDispatch)(removeUserInfo({ accessToken, backend }))
       .unwrap()
       .then(() => {
         dispatch(resetSearchJobPostFilter());
@@ -100,7 +104,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
 
         nav.push(`/${ROUTES.AUTH.LOGIN}`);
       })
-      .catch((error: import('axios').AxiosError<{ errors?: import('../../../../types/api').ApiError }>) => {
+      .catch((error: AxiosError<{ errors?: ApiError }>) => {
         errorHandling(error);
       });
   };

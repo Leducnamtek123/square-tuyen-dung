@@ -2,6 +2,7 @@ import * as yup from 'yup';
 import { EditorState } from 'draft-js';
 import dayjs from 'dayjs';
 import { REGEX_VALIDATE } from '../../../../configs/constants';
+import type { TFunction } from 'i18next';
 
 export interface JobPostFormValues {
   jobName?: string;
@@ -33,7 +34,7 @@ export interface JobPostFormValues {
   isHot?: boolean;
 }
 
-export const getJobPostSchema = (t: import('i18next').TFunction<string | string[], undefined>) => 
+export const getJobPostSchema = (t: TFunction<string | string[], undefined>) => 
   yup.object().shape({
     jobName: yup.string().required(t('jobPostForm.validation.jobnameisrequired', 'Job name is required.')).max(200, t('jobPostForm.validation.jobnameexceededallowedlength', 'Job name exceeded allowed length.')),
     career: yup.number().required(t('jobPostForm.validation.careerisrequired', 'Career is required.')).typeError(t('jobPostForm.validation.careerisrequired', 'Career is required.')),

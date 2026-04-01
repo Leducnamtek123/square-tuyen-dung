@@ -7,6 +7,7 @@ import { Alert, Box, Chip, Dialog, Divider, IconButton, Stack, Typography, Conta
 import { Grid2 as Grid } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import { useConfig } from '@/hooks/useConfig';
+import type { TFunction } from 'i18next';
 interface CareerOption {
   id: string;
   name: string;
@@ -26,7 +27,7 @@ const DesktopContent = (
   setOpen: (open: boolean) => void,
   careers: CareerOption[],
   handleFilter: (id: string) => void,
-  t: import('i18next').TFunction
+  t: TFunction
 ) => {
   const theme = useTheme();
 
@@ -136,7 +137,7 @@ const MobileContent = (
   setOpen: (open: boolean) => void,
   careers: CareerOption[],
   handleFilter: (id: string) => void,
-  t: import('i18next').TFunction
+  t: TFunction
 ) => {
   return (
     <Box>

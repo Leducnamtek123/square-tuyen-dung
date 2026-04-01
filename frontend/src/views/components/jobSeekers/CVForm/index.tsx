@@ -11,6 +11,7 @@ import { Grid2 as Grid } from "@mui/material";
 import BasicDropzone from '../../../../components/Common/Controls/BasicDropzone';
 
 import { useTranslation } from 'react-i18next';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface FormValues {
   files: File[] | null;
@@ -56,7 +57,7 @@ const CVForm = ({ handleUpdate }: CVFormProps) => {
 
 
 
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<FormValues>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<FormValues>,
 
 
 

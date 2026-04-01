@@ -8,6 +8,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
 
 import { ROLES_NAME, ROUTES } from "../../../../configs/constants";
+import type { User } from '@/types/models';
 
 interface JobDetailActionsProps {
   isApplied: boolean;
@@ -17,7 +18,7 @@ interface JobDetailActionsProps {
   handleShowApplyForm: () => void;
   setOpenSharePopup: (open: boolean) => void;
   isAuthenticated: boolean;
-  currentUser: import('@/types/models').User | null;
+  currentUser: User | null;
 }
 
 const JobDetailActions: React.FC<JobDetailActionsProps> = ({

@@ -4,6 +4,7 @@ import { Grid2 as Grid } from "@mui/material";
 import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import SettingForm from "../SettingForm";
 import { useUserSettings, useUpdateUserSettings } from "../../jobSeekers/hooks/useJobSeekerQueries";
+import type { FormValues as SettingformFormValues } from '../SettingForm';
 
 interface SettingCardProps {
   title: React.ReactNode;
@@ -34,7 +35,7 @@ const SettingCard = ({ title, sx }: SettingCardProps) => {
   const { data: editData, isLoading } = useUserSettings();
   const updateSettings = useUpdateUserSettings();
 
-  const handleUpdateUserSetting = (data: import('../SettingForm').FormValues) => {
+  const handleUpdateUserSetting = (data: SettingformFormValues) => {
     updateSettings.mutate(data as unknown as Record<string, unknown>);
   };
 
@@ -79,7 +80,7 @@ const SettingCard = ({ title, sx }: SettingCardProps) => {
                   }}
                 >
                   <SettingForm
-                    editData={editData as unknown as Partial<import('../SettingForm').FormValues> | null}
+                    editData={editData as unknown as Partial<SettingformFormValues> | null}
                     handleUpdate={handleUpdateUserSetting}
                   />
                 </Box>

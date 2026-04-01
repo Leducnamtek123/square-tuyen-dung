@@ -16,6 +16,7 @@ import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { JobSeekerProfile, Location } from '../../../../types/models';
+import type { AxiosError } from 'axios';
 
 type EnhancedJobSeekerProfile = JobSeekerProfile & {
   user?: { fullName: string };
@@ -140,7 +141,7 @@ const PersonalInfoCard = ({ title, sx }: PersonalInfoCardProps) => {
 
   } catch (error: unknown) {
 
-    errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
+    errorHandling(error as AxiosError<Record<string, unknown>>);
 
   } finally {
 
@@ -174,7 +175,7 @@ const updateProfile = async (data: Partial<EnhancedJobSeekerProfile>) => {
 
   } catch (error: unknown) {
 
-    errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
+    errorHandling(error as AxiosError<Record<string, unknown>>);
 
   } finally {
 

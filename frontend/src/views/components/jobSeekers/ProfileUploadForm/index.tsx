@@ -19,6 +19,9 @@ import SingleSelectCustom from '../../../../components/Common/Controls/SingleSel
 
 import FileUploadCustom from '../../../../components/Common/Controls/FileUploadCustom';
 import { useConfig } from '@/hooks/useConfig';
+import type { Control as ReactHookFormControl } from 'react-hook-form';
+import type { FieldValues as ReactHookFormFieldValues } from 'react-hook-form';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface FormValues {
   file: File[] | null;
@@ -197,7 +200,7 @@ const ProfileUploadForm = ({ handleAdd }: ProfileUploadFormProps) => {
 
   const { control, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<FormValues>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<FormValues>,
 
   });
 
@@ -545,7 +548,7 @@ const ProfileUploadForm = ({ handleAdd }: ProfileUploadFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.objective')}
 
-            control={control as unknown as import('react-hook-form').Control<import('react-hook-form').FieldValues>}
+            control={control as unknown as ReactHookFormControl<ReactHookFormFieldValues>}
 
           />
 
@@ -561,7 +564,7 @@ const ProfileUploadForm = ({ handleAdd }: ProfileUploadFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.skillsSummary')}
 
-            control={control as unknown as import('react-hook-form').Control<import('react-hook-form').FieldValues>}
+            control={control as unknown as ReactHookFormControl<ReactHookFormFieldValues>}
 
           />
 

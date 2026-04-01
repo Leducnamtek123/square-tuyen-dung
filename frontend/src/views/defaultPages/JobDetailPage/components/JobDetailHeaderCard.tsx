@@ -18,10 +18,11 @@ import { formatRoute } from "../../../../utils/funcUtils";
 import JobDetailActions from "./JobDetailActions";
 import JobDetailInfoItem from "./JobDetailInfoItem";
 import type { JobPost, SystemConfig, User } from '../../../../types/models';
+import type { Company } from '@/types/models';
 
 interface JobDetailHeaderCardProps {
-  jobPostDetail: import('@/types/models').JobPost & {
-    companyDict?: import('@/types/models').Company;
+  jobPostDetail: JobPost & {
+    companyDict?: Company;
     isApplied?: boolean;
     isSaved?: boolean;
   };

@@ -5,17 +5,18 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { useTranslation } from 'react-i18next';
 import { ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
+import type { QuestionGroup } from '../../../../types/models';
 
 interface QuestionGroupTableProps {
-    data: import('../../../../types/models').QuestionGroup[];
+    data: QuestionGroup[];
     loading?: boolean;
     rowCount?: number;
     pagination?: { pageIndex: number; pageSize: number };
     onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
     sorting?: SortingState;
     onSortingChange?: OnChangeFn<SortingState>;
-    onEdit: (group: import('../../../../types/models').QuestionGroup) => void;
-    onDelete: (group: import('../../../../types/models').QuestionGroup) => void;
+    onEdit: (group: QuestionGroup) => void;
+    onDelete: (group: QuestionGroup) => void;
 }
 
 const QuestionGroupTable = ({ 
@@ -31,7 +32,7 @@ const QuestionGroupTable = ({
 }: QuestionGroupTableProps) => {
     const { t } = useTranslation('admin');
 
-    const columns = useMemo<ColumnDef<import('../../../../types/models').QuestionGroup>[]>(() => [
+    const columns = useMemo<ColumnDef<QuestionGroup>[]>(() => [
         {
             accessorKey: 'name',
             header: t('pages.questionGroups.table.groupName') as string,

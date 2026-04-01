@@ -14,6 +14,10 @@ import RatingCustom from '@/components/Common/Controls/RatingCustom';
 import MultilineTextFieldCustom from '@/components/Common/Controls/MultilineTextFieldCustom';
 import contentService from '@/services/contentService';
 import { FEEDBACK_IMAGES } from '@/configs/constants';
+import type { Control as ReactHookFormControl } from 'react-hook-form';
+import type { ApiError } from '@/types/api';
+import type { FieldValues as ReactHookFormFieldValues } from 'react-hook-form';
+import type { AxiosError } from 'axios';
 
 interface FeedbackProps {}
 
@@ -64,7 +68,7 @@ const Feedback = (_props: FeedbackProps) => {
         toastMessages.success(t('feedback.success'));
       } catch (error) {
         // We use an explicit cast here because errorHandling expects AxiosError but catching produces unknown.
-        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
       } finally {
         setIsFullScreenLoading(false);
       }
@@ -246,7 +250,7 @@ const Feedback = (_props: FeedbackProps) => {
               <MultilineTextFieldCustom
                 name="content"
                 placeholder={t('feedback.placeholder')}
-                control={control as unknown as import('react-hook-form').Control<import('react-hook-form').FieldValues>}
+                control={control as unknown as ReactHookFormControl<ReactHookFormFieldValues>}
                 minRows={5}
                 maxRows={8}
                 sx={{

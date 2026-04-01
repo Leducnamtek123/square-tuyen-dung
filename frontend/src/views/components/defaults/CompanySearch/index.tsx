@@ -12,6 +12,7 @@ import {
 } from '../../../../redux/filterSlice';
 import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppStore';
 import { useConfig } from '@/hooks/useConfig';
+import type { CompanyFilter } from '../../../../redux/filterSlice';
 
 const CompanySearch = () => {
   const { t } = useTranslation('public');
@@ -42,7 +43,7 @@ const CompanySearch = () => {
 
   const handleFilter = (data: { kw: string; cityId: string }) => {
 
-    dispatch(searchCompany({ ...companyFilter, ...data } as import('../../../../redux/filterSlice').CompanyFilter));
+    dispatch(searchCompany({ ...companyFilter, ...data } as CompanyFilter));
 
   };
 

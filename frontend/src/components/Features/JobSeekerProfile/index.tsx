@@ -29,6 +29,7 @@ import { CV_TYPES, ROUTES } from '@/configs/constants';
 import { formatRoute } from '@/utils/funcUtils';
 import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
+import type { Theme as StylesTheme } from '@mui/material/styles';
 
 interface JobSeekerProfileProps {
   id: string | number;
@@ -99,7 +100,7 @@ const JobSeekerProfile = ({
                     borderColor: 'primary.main',
                     bgcolor: alpha(theme.palette.primary.main, 0.02),
                     transform: 'translateY(-4px)',
-                    boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.z12,
+                    boxShadow: (theme: StylesTheme & { customShadows?: Record<string, string> }) => theme.customShadows?.z12,
                     '& .profile-actions': { opacity: 1, transform: 'translateX(0)' }
                 },
             }}
@@ -114,7 +115,7 @@ const JobSeekerProfile = ({
                         borderRadius: 2.5,
                         border: '1px solid',
                         borderColor: 'divider',
-                        boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.z1
+                        boxShadow: (theme: StylesTheme & { customShadows?: Record<string, string> }) => theme.customShadows?.z1
                     }}
                 />
                 
@@ -240,7 +241,7 @@ const JobSeekerProfile = ({
                                     '&:hover': { 
                                         bgcolor: isSaved ? 'error.main' : 'text.primary', 
                                         color: '#fff',
-                                        boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.error
+                                        boxShadow: (theme: StylesTheme & { customShadows?: Record<string, string> }) => theme.customShadows?.error
                                     }
                                 }}
                             >
@@ -256,7 +257,7 @@ const JobSeekerProfile = ({
                                     '&:hover': { 
                                         bgcolor: 'primary.main', 
                                         color: '#fff',
-                                        boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.primary
+                                        boxShadow: (theme: StylesTheme & { customShadows?: Record<string, string> }) => theme.customShadows?.primary
                                     }
                                 }}
                             >

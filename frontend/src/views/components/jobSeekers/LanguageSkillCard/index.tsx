@@ -33,6 +33,10 @@ import resumeService from '../../../../services/resumeService';
 import languageSkillService from '../../../../services/languageSkillService';
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
+import type { FormValues as LanguageskillformFormValues } from '../LanguageSkillForm';
+import type { Theme as StylesTheme } from '@mui/material/styles';
+import type { ApiError } from '@/types/api';
+import type { AxiosError } from 'axios';
 
 interface LanguageSkill {
   id: string | number;
@@ -145,7 +149,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -177,7 +181,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -201,9 +205,9 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
   };
 
-  const handleAddOrUpdate = (data: import('../LanguageSkillForm').FormValues & { id?: string | number }) => {
+  const handleAddOrUpdate = (data: LanguageskillformFormValues & { id?: string | number }) => {
 
-    const create = async (payload: import('../LanguageSkillForm').FormValues & { resume?: string }) => {
+    const create = async (payload: LanguageskillformFormValues & { resume?: string }) => {
 
       setIsFullScreenLoading(true);
 
@@ -219,7 +223,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>, setServerErrors as unknown as Parameters<typeof errorHandling>[1]);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as unknown as Parameters<typeof errorHandling>[1]);
 
       } finally {
 
@@ -229,7 +233,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
     };
 
-    const update = async (payload: import('../LanguageSkillForm').FormValues & { id?: string | number }) => {
+    const update = async (payload: LanguageskillformFormValues & { id?: string | number }) => {
 
       setIsFullScreenLoading(true);
 
@@ -245,7 +249,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -291,7 +295,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
 
       } finally {
 
@@ -329,7 +333,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
           p: 3,
 
-          boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
+          boxShadow: (theme: StylesTheme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
 
         }}
 
@@ -365,7 +369,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
+                    boxShadow: (theme: StylesTheme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -461,7 +465,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       <FormPopup title={t('jobSeeker:profile.sections.language')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
 
-        <LanguageSkillForm handleAddOrUpdate={handleAddOrUpdate as (data: import('../LanguageSkillForm').FormValues) => void} editData={editData as unknown as Partial<import('../LanguageSkillForm').FormValues>} serverErrors={serverErrors} />
+        <LanguageSkillForm handleAddOrUpdate={handleAddOrUpdate as (data: LanguageskillformFormValues) => void} editData={editData as unknown as Partial<LanguageskillformFormValues>} serverErrors={serverErrors} />
 
       </FormPopup>
 

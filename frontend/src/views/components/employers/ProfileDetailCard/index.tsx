@@ -17,6 +17,7 @@ import EducationSection from './EducationSection';
 import CertificateSection from './CertificateSection';
 import LanguageSection from './LanguageSection';
 import AdvancedSkillSection from './AdvancedSkillSection';
+import type { ResumeDetailResponse as ModelsResumeDetailResponse } from '../../../../types/models';
 
 const LazyPdf = lazy(() => import("../../../../components/Common/Pdf"));
 
@@ -48,7 +49,7 @@ const ProfileDetailCard: React.FC = () => {
       >
         <Stack spacing={6}>
           <PersonalInfoSection profileDetail={profileDetail as ResumeDetailResponse} />
-          <GeneralInfoSection profileDetail={profileDetail as import('../../../../types/models').ResumeDetailResponse} />
+          <GeneralInfoSection profileDetail={profileDetail as ModelsResumeDetailResponse} />
           <CareerGoalsSection profileDetail={profileDetail as ResumeDetailResponse} />
         </Stack>
       </Paper>

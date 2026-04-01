@@ -11,6 +11,7 @@ import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstac
 import DataTable from '../../../../components/Common/DataTable';
 
 import { JobPost } from '../../../../types/models';
+import type { CellContext as ReactTableCellContext } from '@tanstack/react-table';
 
 interface JobPostExt extends JobPost {
   companyDict?: { companyName?: string };
@@ -95,13 +96,13 @@ const JobTable = ({
         {
             accessorKey: 'status',
             header: t('pages.jobs.table.statusCol') as string,
-            cell: (info: import('@tanstack/react-table').CellContext<JobPostExt, unknown>) => getStatusChip(info.getValue() as number),
+            cell: (info: ReactTableCellContext<JobPostExt, unknown>) => getStatusChip(info.getValue() as number),
         },
         {
             id: 'actions',
             header: t('pages.jobs.table.actions') as string,
             meta: { align: 'right' },
-            cell: (info: import('@tanstack/react-table').CellContext<JobPostExt, unknown>) => (
+            cell: (info: ReactTableCellContext<JobPostExt, unknown>) => (
                 <Stack direction="row" spacing={0.5} justifyContent="flex-end">
                     <Tooltip title={t('pages.jobs.table.viewDetails')}>
                         <IconButton size="small" onClick={() => onView(info.row.original)} color="primary">

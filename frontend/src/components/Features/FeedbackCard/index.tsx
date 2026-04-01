@@ -3,6 +3,7 @@ import { Box, Card, Skeleton, Stack, Typography, useTheme } from "@mui/material"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuoteLeft } from '@fortawesome/free-solid-svg-icons';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
+import type { Theme as StylesTheme } from '@mui/material/styles';
 
 interface FeedbackCardProps {
   id?: string | number;
@@ -21,11 +22,11 @@ const FeedbackCard = ({ avatarUrl = '', fullName = '', content = '' }: FeedbackC
         p: 3,
         py: 3,
         mb: 1,
-        boxShadow: (t: import('@mui/material/styles').Theme & { customShadows: Record<string, unknown> }) => t.customShadows.card,
+        boxShadow: (t: StylesTheme & { customShadows: Record<string, unknown> }) => t.customShadows.card,
         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: (t: import('@mui/material/styles').Theme & { customShadows: Record<string, unknown> }) => t.customShadows.large,
+          boxShadow: (t: StylesTheme & { customShadows: Record<string, unknown> }) => t.customShadows.large,
         },
       }}
     >
@@ -33,8 +34,8 @@ const FeedbackCard = ({ avatarUrl = '', fullName = '', content = '' }: FeedbackC
         <MuiImageCustom
           sx={{
             borderRadius: '50%',
-            border: (t: import('@mui/material/styles').Theme) => `4px solid ${t.palette.primary.light}`,
-            boxShadow: (t: import('@mui/material/styles').Theme & { customShadows: Record<string, unknown> }) => t.customShadows.medium,
+            border: (t: StylesTheme) => `4px solid ${t.palette.primary.light}`,
+            boxShadow: (t: StylesTheme & { customShadows: Record<string, unknown> }) => t.customShadows.medium,
             objectFit: 'contain',
           }}
           width={120}
@@ -49,7 +50,7 @@ const FeedbackCard = ({ avatarUrl = '', fullName = '', content = '' }: FeedbackC
         sx={{
           textAlign: 'center',
           fontWeight: 'bold',
-          color: (t: import('@mui/material/styles').Theme) => t.palette.primary.main,
+          color: (t: StylesTheme) => t.palette.primary.main,
           mb: 2,
         }}
       >
@@ -70,7 +71,7 @@ const FeedbackCard = ({ avatarUrl = '', fullName = '', content = '' }: FeedbackC
           gutterBottom
           sx={{
             textAlign: 'center',
-            color: (t: import('@mui/material/styles').Theme) => t.palette.text.secondary,
+            color: (t: StylesTheme) => t.palette.text.secondary,
             px: 2,
             lineHeight: 1.8,
             fontStyle: 'italic',
@@ -96,7 +97,7 @@ const Loading = () => (
       p: 3,
       py: 3,
       mb: 1,
-      boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
+      boxShadow: (theme: StylesTheme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
     }}
   >
     <Skeleton
@@ -106,7 +107,7 @@ const Loading = () => (
       sx={{ 
         margin: '0 auto',
         mb: 3,
-        backgroundColor: (theme: import('@mui/material/styles').Theme) => theme.palette.grey[200]
+        backgroundColor: (theme: StylesTheme) => theme.palette.grey[200]
       }}
     />
     <Stack sx={{ height: 200, width: '100%' }}>
@@ -116,7 +117,7 @@ const Loading = () => (
         sx={{ 
           margin: '0 auto',
           mb: 2,
-          backgroundColor: (theme: import('@mui/material/styles').Theme) => theme.palette.grey[200]
+          backgroundColor: (theme: StylesTheme) => theme.palette.grey[200]
         }}
       />
       <Skeleton 
@@ -125,13 +126,13 @@ const Loading = () => (
         sx={{ 
           margin: '0 auto',
           mb: 3,
-          backgroundColor: (theme: import('@mui/material/styles').Theme) => theme.palette.grey[200]
+          backgroundColor: (theme: StylesTheme) => theme.palette.grey[200]
         }}
       />
       <Skeleton 
         height={100}
         sx={{ 
-          backgroundColor: (theme: import('@mui/material/styles').Theme) => theme.palette.grey[200]
+          backgroundColor: (theme: StylesTheme) => theme.palette.grey[200]
         }}
       />
     </Stack>

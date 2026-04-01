@@ -3,6 +3,7 @@ import { Switch } from "@mui/material";
 import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
 import jobPostNotificationService from "../../../../services/jobPostNotificationService";
 import errorHandling from "../../../../utils/errorHandling";
+import type { AxiosError } from 'axios';
 
 interface ActiveButtonComponentProps {
   id: number;
@@ -21,7 +22,7 @@ const ActiveButtonComponent = ({ id, isActive }: ActiveButtonComponentProps) => 
         const data = resData;
         setChecked(data.isActive);
       } catch (error) {
-        errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
+        errorHandling(error as AxiosError<Record<string, unknown>>);
       } finally {
         setIsFullScreenLoading(false);
       }

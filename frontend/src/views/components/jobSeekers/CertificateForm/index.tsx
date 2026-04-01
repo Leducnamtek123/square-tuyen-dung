@@ -7,6 +7,7 @@ import { Grid2 as Grid } from "@mui/material";
 import { DATE_OPTIONS } from '../../../../configs/constants';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface FormValues {
   name: string;
@@ -51,7 +52,7 @@ const CertificateForm = ({
       startDate: null,
       expirationDate: null,
     },
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<FormValues>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<FormValues>,
   });
 
   React.useEffect(() => {

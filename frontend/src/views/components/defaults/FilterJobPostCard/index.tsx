@@ -5,6 +5,7 @@ import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import jobService from '../../../../services/jobService';
 import JobPost from '../../../../components/Features/JobPost';
 import NoDataCard from '../../../../components/Common/NoDataCard';
+import type { JobPost as ModelsJobPost } from '../../../../types/models';
 
 interface FilterJobPostCardProps {
   params?: Record<string, unknown>;
@@ -61,7 +62,7 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
         ...resolvedParams,
         pageSize: pageSize,
         page: page,
-      }) as { results?: Array<import('../../../../types/models').JobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }>, count?: number };
+      }) as { results?: Array<ModelsJobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }>, count?: number };
       return {
         results: resData?.results || [],
         count: resData?.count || 0,
@@ -94,7 +95,7 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
         ) : (
           <>
             <Grid container spacing={2}>
-              {jobPosts.map((value: import('../../../../types/models').JobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }) => (
+              {jobPosts.map((value: ModelsJobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }) => (
                 <Grid key={value.id} size={col}>
                   {/* Start: Job post */}
                   <JobPost

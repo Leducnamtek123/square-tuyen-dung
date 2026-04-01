@@ -14,6 +14,7 @@ import {
 } from '../../../../redux/filterSlice';
 import { ROUTES } from '../../../../configs/constants';
 import { useConfig } from '@/hooks/useConfig';
+import type { JobPostFilter } from '../../../../redux/filterSlice';
 
 const HomeSearch = () => {
   const { t } = useTranslation(['common']);
@@ -72,7 +73,7 @@ const HomeSearch = () => {
 
   const handleFilter = (data: { kw: string; cityId: string; careerId: string }) => {
     handleSaveKeyworLocalStorage(data?.kw);
-    dispatch(searchJobPost({ ...jobPostFilter, ...data } as import('../../../../redux/filterSlice').JobPostFilter));
+    dispatch(searchJobPost({ ...jobPostFilter, ...data } as JobPostFilter));
     nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
   };
 

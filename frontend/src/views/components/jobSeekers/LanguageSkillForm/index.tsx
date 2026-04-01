@@ -15,6 +15,7 @@ import SingleSelectCustom from '../../../../components/Common/Controls/SingleSel
 
 import RatingCustom from '../../../../components/Common/Controls/RatingCustom';
 import { useConfig } from '@/hooks/useConfig';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface FormValues {
   language: number | string;
@@ -58,7 +59,7 @@ const LanguageSkillForm = ({
 
   const { control, reset, setError, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<FormValues>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<FormValues>,
 
   });
 

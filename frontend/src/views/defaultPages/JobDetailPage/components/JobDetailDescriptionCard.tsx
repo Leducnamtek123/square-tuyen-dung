@@ -4,9 +4,10 @@ import { useTranslation } from "react-i18next";
 import JobDetailInfoItem from "./JobDetailInfoItem";
 
 import type { JobPost, SystemConfig } from '../../../../types/models';
+import type { Company } from '@/types/models';
 
 interface JobDetailDescriptionCardProps {
-  jobPostDetail: import('@/types/models').JobPost & { companyDict?: import('@/types/models').Company };
+  jobPostDetail: JobPost & { companyDict?: Company };
   allConfig: SystemConfig | null;
 }
 

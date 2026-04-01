@@ -11,6 +11,7 @@ import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 
 import PasswordTextFieldCustom from '../../../../components/Common/Controls/PasswordTextFieldCustom';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface UpdatePasswordFormData {
   oldPassword?: string;
@@ -73,7 +74,7 @@ const UpdatePasswordForm = ({ handleUpdatePassword, serverErrors = {} }: UpdateP
       newPassword: '',
       confirmPassword: '',
     },
-    resolver: yupResolver(schema) as import('react-hook-form').Resolver<UpdatePasswordFormData>,
+    resolver: yupResolver(schema) as ReactHookFormResolver<UpdatePasswordFormData>,
   });
 
   React.useEffect(() => {

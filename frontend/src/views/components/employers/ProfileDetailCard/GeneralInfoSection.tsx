@@ -15,6 +15,8 @@ import { salaryString } from '../../../../utils/customData';
 import InfoItem from './InfoItem';
 import { useConfig } from '@/hooks/useConfig';
 import { JobSeekerProfile } from '../../../../types/models';
+import type { Career } from '../../../../types/models';
+import type { City } from '../../../../types/models';
 
 type ConfigDict = Record<string, string>;
 
@@ -23,8 +25,8 @@ export interface GeneralInfoProfileExt extends Partial<JobSeekerProfile> {
   position?: string | number | null;
   academicLevel?: string | number | null;
   experience?: string | number | null;
-  career?: import('../../../../types/models').Career | string | number | null;
-  city?: import('../../../../types/models').City | string | number | null;
+  career?: Career | string | number | null;
+  city?: City | string | number | null;
   salaryMin?: number | string | null;
   salaryMax?: number | string | null;
   typeOfWorkplace?: string | number | null;

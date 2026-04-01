@@ -37,12 +37,14 @@ import db from '../../../../configs/firebase-config';
 import Message from '../Message';
 import { RootState } from '../../../../redux/store';
 import { useChatContext } from '../../../../context/ChatProvider';
+import type { Timestamp } from 'firebase/firestore';
+import type { FieldValue } from 'firebase/firestore';
 
 // Types
 interface ChatRoom {
   id: string;
   members: string[];
-  updatedAt: import('firebase/firestore').FieldValue | import('firebase/firestore').Timestamp;
+  updatedAt: FieldValue | Timestamp;
   recipientId: string;
   createdBy: string;
   unreadCount?: number;

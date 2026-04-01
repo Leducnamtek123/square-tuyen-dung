@@ -5,6 +5,7 @@ import { ABOUT_IMAGES, HOST_NAME, ROUTES } from '@/configs/constants';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
+import type { Theme as StylesTheme } from '@mui/material/styles';
 
 interface AppIntroductionCardProps {
   // Add specific props if needed, otherwise use an empty interface or React.FC
@@ -55,7 +56,7 @@ const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
               borderRadius: 2, 
               maxHeight: 300, 
               objectFit: 'cover',
-              boxShadow: (theme: import('@mui/material/styles').Theme) => theme.shadows[1]
+              boxShadow: (theme: StylesTheme) => theme.shadows[1]
             }} 
           />
         </Box>

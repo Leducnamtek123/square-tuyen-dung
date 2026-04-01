@@ -6,6 +6,7 @@ import NoDataCard from "../../../../components/Common/NoDataCard";
 import JobPost from "../../../../components/Features/JobPost";
 import { useAppSelector } from "../../../../hooks/useAppStore";
 import { useSuggestedJobPosts } from "../MainJobPostCard/hooks/useJobPosts";
+import type { JobPost as ModelsJobPost } from '../../../../types/models';
 
 interface SuggestedJobPostCardProps {
   pageSize?: number;
@@ -91,7 +92,7 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 
 
             <Grid container spacing={2}>
 
-              {jobPosts.map((value: import('../../../../types/models').JobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }) => (
+              {jobPosts.map((value: ModelsJobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }) => (
 
                 <Grid key={value.id} size={col}>
 

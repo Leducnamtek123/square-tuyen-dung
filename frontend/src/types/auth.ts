@@ -1,3 +1,4 @@
+import type { EmployerSignUpFormData } from '../views/components/auths/EmployerSignUpForm';
 /** OAuth2 token pair returned by the Django backend. */
 export interface TokenPair {
   access_token: string;
@@ -49,7 +50,7 @@ export interface JobSeekerRegisterData {
   [key: string]: unknown;
 }
 
-export interface EmployerRegisterData extends Omit<import('../views/components/auths/EmployerSignUpForm').EmployerSignUpFormData, 'confirmPassword'> {
+export interface EmployerRegisterData extends Omit<EmployerSignUpFormData, 'confirmPassword'> {
   platform?: string;
 }
 

@@ -13,6 +13,7 @@ import { Grid2 as Grid } from "@mui/material";
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 
 import RatingCustom from '../../../../components/Common/Controls/RatingCustom';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface FormValues {
   name: string;
@@ -55,7 +56,7 @@ const AdvancedSkillForm = ({
 
   const { control, reset, setError, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<FormValues>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<FormValues>,
 
   });
 

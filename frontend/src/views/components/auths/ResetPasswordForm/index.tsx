@@ -5,6 +5,7 @@ import * as yup from 'yup';
 import { Box, Button, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import PasswordTextFieldCustom from '../../../../components/Common/Controls/PasswordTextFieldCustom';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface ResetPasswordFormData {
   newPassword: string;
@@ -57,7 +58,7 @@ const ResetPasswordForm = ({ handleResetPassword, serverErrors = {} }: ResetPass
       newPassword: '',
       confirmPassword: '',
     },
-    resolver: yupResolver(schema) as import('react-hook-form').Resolver<ResetPasswordFormData>,
+    resolver: yupResolver(schema) as ReactHookFormResolver<ResetPasswordFormData>,
   });
 
   React.useEffect(() => {

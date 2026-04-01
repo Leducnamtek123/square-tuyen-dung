@@ -17,6 +17,9 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 import MultilineTextFieldCustom from '../../../../components/Common/Controls/MultilineTextFieldCustom';
 
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
+import type { Control as ReactHookFormControl } from 'react-hook-form';
+import type { FieldValues as ReactHookFormFieldValues } from 'react-hook-form';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface FormValues {
   jobName: string;
@@ -122,7 +125,7 @@ const ExperienceDetailForm = ({ handleAddOrUpdate, editData }: ExperienceDetailF
   });
 
   const { control, reset, handleSubmit } = useForm<FormValues>({
-    resolver: yupResolver(schema) as import('react-hook-form').Resolver<FormValues>,
+    resolver: yupResolver(schema) as ReactHookFormResolver<FormValues>,
   });
 
   React.useEffect(() => {
@@ -249,7 +252,7 @@ const ExperienceDetailForm = ({ handleAddOrUpdate, editData }: ExperienceDetailF
 
             placeholder={t('jobSeeker:profile.placeholders.additionalDescription')}
 
-            control={control as unknown as import('react-hook-form').Control<import('react-hook-form').FieldValues>}
+            control={control as unknown as ReactHookFormControl<ReactHookFormFieldValues>}
 
           />
 

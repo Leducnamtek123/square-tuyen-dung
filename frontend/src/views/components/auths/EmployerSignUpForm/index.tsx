@@ -21,6 +21,9 @@ import type { SelectOption } from '@/types/models';
 
 import AccountInfoStep from './AccountInfoStep';
 import CompanyInfoStep from './CompanyInfoStep';
+import type { FieldErrors } from 'react-hook-form';
+import type { ApiError } from '../../../../types/api';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface EmployerSignUpFormData {
   fullName: string;
@@ -135,7 +138,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
         },
       },
     },
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<EmployerSignUpFormData>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<EmployerSignUpFormData>,
   });
 
   const cityId = useWatch({ control, name: 'company.location.city' });
@@ -236,7 +239,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
         setDistrictOptions(resData);
         prevCityIdRef.current = cityId;
       } catch (error) {
-        errorHandling(error as AxiosError<{ errors?: import('../../../../types/api').ApiError }>);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
       }
     };
     if (cityId) loadDistricts(cityId as unknown as number);
@@ -244,7 +247,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
 
   const handleSubmtNextSuccess = (data: EmployerSignUpFormData) => handleNext(data.email);
 
-  const handleSubmitNextError = async (errors: import('react-hook-form').FieldErrors<EmployerSignUpFormData>) => {
+  const handleSubmitNextError = async (errors: FieldErrors<EmployerSignUpFormData>) => {
     if (!('fullName' in errors) && !('email' in errors) && !('password' in errors) && !('confirmPassword' in errors)) {
       const email = getValues('email');
       handleNext(email);

@@ -14,18 +14,25 @@ import errorHandling from '../../../../utils/errorHandling';
 
 // ─── Query Helpers ──────────────────────────────────────────
 import type { UseQueryResult, UseMutationResult } from '@tanstack/react-query';
+import type { JobSeekerTotalViewStats } from '../../../../services/statisticService';
+import type { GetJobPostsParams } from '../../../../services/jobService';
+import type { ApiError } from '@/types/api';
+import type { AxiosError } from 'axios';
+import type { JobSeekerActivityStats } from '../../../../services/statisticService';
+import type { JobPostNotification } from '../../../../services/jobPostNotificationService';
+import type { ResumeViewed } from '../../../../services/resumeViewedService';
 
 export type UseSavedJobsResult = UseQueryResult<PaginatedResponse<JobPost>>;
 export type UseCompaniesFollowedResult = UseQueryResult<PaginatedResponse<{ id: number, company: Company }>>;
-export type UseResumeViewedResult = UseQueryResult<PaginatedResponse<import('../../../../services/resumeViewedService').ResumeViewed>>;
-export type UseJobSeekerTotalViewResult = UseQueryResult<import('../../../../services/statisticService').JobSeekerTotalViewStats>;
-export type UseJobSeekerActivityStatsResult = UseQueryResult<import('../../../../services/statisticService').JobSeekerActivityStats>;
+export type UseResumeViewedResult = UseQueryResult<PaginatedResponse<ResumeViewed>>;
+export type UseJobSeekerTotalViewResult = UseQueryResult<JobSeekerTotalViewStats>;
+export type UseJobSeekerActivityStatsResult = UseQueryResult<JobSeekerActivityStats>;
 export type UseResumesResult = UseQueryResult<Resume[]>;
-export type UseJobPostNotificationsResult = UseQueryResult<PaginatedResponse<import('../../../../services/jobPostNotificationService').JobPostNotification>>;
+export type UseJobPostNotificationsResult = UseQueryResult<PaginatedResponse<JobPostNotification>>;
 
 
 // ─── Saved Jobs ─────────────────────────────────────────────
-export const useSavedJobs = (params: import('../../../../services/jobService').GetJobPostsParams = {}): UseSavedJobsResult => {
+export const useSavedJobs = (params: GetJobPostsParams = {}): UseSavedJobsResult => {
     return useQuery({
         queryKey: ['savedJobs', params],
         queryFn: async () => {
@@ -43,7 +50,7 @@ export const useToggleSaveJob = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['savedJobs'] });
         },
-        onError: (error: unknown) => errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>),
+        onError: (error: unknown) => errorHandling(error as AxiosError<{ errors?: ApiError }>),
     });
 };
 
@@ -66,7 +73,7 @@ export const useToggleFollowCompany = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['companiesFollowed'] });
         },
-        onError: (error: unknown) => errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>),
+        onError: (error: unknown) => errorHandling(error as AxiosError<{ errors?: ApiError }>),
     });
 };
 
@@ -134,19 +141,19 @@ export const useJobPostNotificationMutations = () => {
     const addMutation = useMutation({
         mutationFn: (data: Parameters<typeof jobPostNotificationService.addJobPostNotification>[0]) => jobPostNotificationService.addJobPostNotification(data),
         onSuccess: () => invalidate(),
-        onError: (error: unknown) => errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>),
+        onError: (error: unknown) => errorHandling(error as AxiosError<{ errors?: ApiError }>),
     });
 
     const updateMutation = useMutation({
         mutationFn: ({ id, data }: { id: string | number; data: Parameters<typeof jobPostNotificationService.updateJobPostNotificationById>[1] }) => jobPostNotificationService.updateJobPostNotificationById(id, data),
         onSuccess: () => invalidate(),
-        onError: (error: unknown) => errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>),
+        onError: (error: unknown) => errorHandling(error as AxiosError<{ errors?: ApiError }>),
     });
 
     const deleteMutation = useMutation({
         mutationFn: (id: number) => jobPostNotificationService.deleteJobPostNotificationDetailById(id),
         onSuccess: () => invalidate(),
-        onError: (error: unknown) => errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>),
+        onError: (error: unknown) => errorHandling(error as AxiosError<{ errors?: ApiError }>),
     });
 
     return { addMutation, updateMutation, deleteMutation };

@@ -9,6 +9,8 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useTranslation } from 'react-i18next';
 import TextFieldCustom from "../../../../components/Common/Controls/TextFieldCustom";
 import PasswordTextFieldCustom from "../../../../components/Common/Controls/PasswordTextFieldCustom";
+import type { CodeResponse } from '@react-oauth/google';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 interface JobSeekerLoginFormData {
   email: string;
@@ -18,7 +20,7 @@ interface JobSeekerLoginFormData {
 interface JobSeekerLoginFormProps {
   onLogin: (data: JobSeekerLoginFormData) => void;
   onFacebookLogin?: (result: Record<string, unknown>) => void;
-  onGoogleLogin: (result: Omit<import('@react-oauth/google').CodeResponse, "error" | "error_description" | "error_uri">) => void;
+  onGoogleLogin: (result: Omit<CodeResponse, "error" | "error_description" | "error_uri">) => void;
 }
 
 
@@ -136,7 +138,7 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeek
       email: "",
       password: "",
     },
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<JobSeekerLoginFormData>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<JobSeekerLoginFormData>,
   });
 
   const googleLogin = useGoogleLogin({

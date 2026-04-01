@@ -3,6 +3,9 @@ import { collection, onSnapshot, query, where, orderBy, startAfter, limit, getDo
 import db from '../../../../configs/firebase-config';
 import { useChatContext } from '../../../../context/ChatProvider';
 import { getUserAccount } from '../../../../services/firebaseService';
+import type { Timestamp } from 'firebase/firestore';
+import type { DocumentSnapshot } from 'firebase/firestore';
+import type { FieldValue } from 'firebase/firestore';
 
 export interface UserAccount {
   id?: string;
@@ -18,7 +21,7 @@ export interface UserAccount {
 export interface ChatRoomData {
   id: string;
   members: string[];
-  updatedAt: import('firebase/firestore').FieldValue | import('firebase/firestore').Timestamp;
+  updatedAt: FieldValue | Timestamp;
   user?: UserAccount;
   recipientId?: string;
   unreadCount?: number;
@@ -31,7 +34,7 @@ export const useChatRooms = () => {
   const { currentUserChat, setSelectedRoomId } = useChatContext();
   const [isLoading, setIsLoading] = React.useState(true);
   const [hasMore, setHasMore] = React.useState(true);
-  const [lastDocument, setLastDocument] = React.useState<import('firebase/firestore').DocumentSnapshot | null>(null);
+  const [lastDocument, setLastDocument] = React.useState<DocumentSnapshot | null>(null);
   const [chatRooms, setChatRooms] = React.useState<ChatRoomData[]>([]);
   const [page, setPage] = React.useState(0);
   const [count, setCount] = React.useState(0);

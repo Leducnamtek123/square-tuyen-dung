@@ -34,6 +34,7 @@ import { Pie } from 'react-chartjs-2';
 import dayjs from 'dayjs';
 import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerRecruitmentByRank } from '../../hooks/useEmployerQueries';
+import type { ChartOptions } from 'chart.js';
 
 interface HiringAcademicChartProps {
   title: string;
@@ -174,7 +175,7 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
               </Stack>
             ) : (
               <Box sx={{ height: 320 }}>
-                <Pie data={dataOptions} options={options as import('chart.js').ChartOptions<"pie">} height={300} />
+                <Pie data={dataOptions} options={options as ChartOptions<"pie">} height={300} />
               </Box>
             )}
           </Box>

@@ -17,6 +17,9 @@ import MultilineTextFieldCustom from '../../../../components/Common/Controls/Mul
 
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import { useConfig } from '@/hooks/useConfig';
+import type { Control as ReactHookFormControl } from 'react-hook-form';
+import type { FieldValues as ReactHookFormFieldValues } from 'react-hook-form';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface FormValues {
   title: string;
@@ -183,7 +186,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
   const { control, reset, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<FormValues>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<FormValues>,
 
   });
 
@@ -551,7 +554,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.objective')}
 
-            control={control as unknown as import('react-hook-form').Control<import('react-hook-form').FieldValues>}
+            control={control as unknown as ReactHookFormControl<ReactHookFormFieldValues>}
 
           />
 
@@ -567,7 +570,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.skillsSummary')}
 
-            control={control as unknown as import('react-hook-form').Control<import('react-hook-form').FieldValues>}
+            control={control as unknown as ReactHookFormControl<ReactHookFormFieldValues>}
 
           />
 

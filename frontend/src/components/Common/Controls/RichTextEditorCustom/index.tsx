@@ -2,7 +2,7 @@
 
 import React from 'react';
 import dynamic from 'next/dynamic';
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path, PathValue } from 'react-hook-form';
 import { EditorState } from 'draft-js';
 import { Typography } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -44,7 +44,7 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
       <Controller
         control={control}
         name={name as Path<T>}
-        defaultValue={EditorState.createEmpty() as unknown as import('react-hook-form').PathValue<T, import('react-hook-form').Path<T>>}
+        defaultValue={EditorState.createEmpty() as unknown as PathValue<T, Path<T>>}
         render={({ field, fieldState }) => {
           const safeEditorState = field.value?.getCurrentContent
             ? field.value

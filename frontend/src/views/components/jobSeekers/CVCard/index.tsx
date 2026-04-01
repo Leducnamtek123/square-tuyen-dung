@@ -38,6 +38,7 @@ import resumeService from "../../../../services/resumeService";
 
 
 import toastMessages from "../../../../utils/toastMessages";
+import type { AxiosError } from 'axios';
 
 
 
@@ -111,7 +112,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-        errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
+        errorHandling(error as AxiosError<Record<string, unknown>>);
 
 
 
@@ -186,7 +187,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-        errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
+        errorHandling(error as AxiosError<Record<string, unknown>>);
 
 
 

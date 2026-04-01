@@ -33,6 +33,7 @@ import errorHandling from '../../../../utils/errorHandling';
 import { ScoreGauge } from './ScoreGauge';
 import { SkillChipList } from './SkillChipList';
 import { SectionCard } from './SectionCard';
+import type { AxiosError } from 'axios';
 
 export type AIAnalysisData = {
   id?: string | number;
@@ -203,7 +204,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
       await jobPostActivityService.analyzeResume(activityId);
       toastMessages.success(t('appliedResume.ai.analysisStarted'));
     } catch (err: unknown) {
-      errorHandling(err as import('axios').AxiosError<Record<string, unknown>>);
+      errorHandling(err as AxiosError<Record<string, unknown>>);
       setAnalyzing(false);
       setData((prev) => ({ ...(prev || {}), aiAnalysisStatus: 'failed' }));
     }

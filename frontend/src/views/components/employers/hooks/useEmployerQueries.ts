@@ -13,13 +13,23 @@ import companyImageService from '../../../../services/companyImageService';
 import errorHandling from '../../../../utils/errorHandling';
 import { PaginatedResponse } from '@/types/api';
 import { JobPost, JobPostActivity, Resume, ResumeSaved, InterviewSession, Question, QuestionGroup } from '@/types/models';
+import type { ScheduleSessionInput } from '../../../../services/interviewService';
+import type { EmployerCandidateStats } from '../../../../services/statisticService';
+import type { JobPostInput } from '../../../../services/jobService';
+import type { GetJobPostsParams } from '../../../../services/jobService';
+import type { GetSessionsParams } from '../../../../services/interviewService';
+import type { EmployerRecruitmentStatItem } from '../../../../services/statisticService';
+import type { EmployerApplicationStats } from '../../../../services/statisticService';
+import type { EmployerGeneralStats } from '../../../../services/statisticService';
+import type { SubmitEvaluationInput } from '../../../../services/interviewService';
+import type { EmployerRecruitmentByRankStats } from '../../../../services/statisticService';
 
 // ─── Types ───────────────────────────────────────────────────
-export type UseEmployerGeneralStatsResult = UseQueryResult<import('../../../../services/statisticService').EmployerGeneralStats>;
-export type UseEmployerApplicationStatsResult = UseQueryResult<import('../../../../services/statisticService').EmployerApplicationStats>;
-export type UseEmployerCandidateStatsResult = UseQueryResult<import('../../../../services/statisticService').EmployerCandidateStats>;
-export type UseEmployerRecruitmentStatsResult = UseQueryResult<import('../../../../services/statisticService').EmployerRecruitmentStatItem[]>;
-export type UseEmployerRecruitmentByRankStatsResult = UseQueryResult<import('../../../../services/statisticService').EmployerRecruitmentByRankStats>;
+export type UseEmployerGeneralStatsResult = UseQueryResult<EmployerGeneralStats>;
+export type UseEmployerApplicationStatsResult = UseQueryResult<EmployerApplicationStats>;
+export type UseEmployerCandidateStatsResult = UseQueryResult<EmployerCandidateStats>;
+export type UseEmployerRecruitmentStatsResult = UseQueryResult<EmployerRecruitmentStatItem[]>;
+export type UseEmployerRecruitmentByRankStatsResult = UseQueryResult<EmployerRecruitmentByRankStats>;
 export type UseSavedResumesResult = UseQueryResult<PaginatedResponse<ResumeSaved>>;
 export type UseAppliedResumesResult = UseQueryResult<PaginatedResponse<JobPostActivity>>;
 export type UseEmployerResumesResult = UseQueryResult<PaginatedResponse<Resume>>;
@@ -87,7 +97,7 @@ export const useEmployerRecruitmentByRank = (params: Record<string, unknown> = {
 };
 
 // ─── Job Posts ──────────────────────────────────────────────
-export const useEmployerJobPosts = (params: import('../../../../services/jobService').GetJobPostsParams = {}): UseEmployerJobPostsResult => {
+export const useEmployerJobPosts = (params: GetJobPostsParams = {}): UseEmployerJobPostsResult => {
   return useQuery({
     queryKey: ['employerJobPosts', params],
     queryFn: async () => {
@@ -102,14 +112,14 @@ export const useJobPostMutations = () => {
   const queryClient = useQueryClient();
 
   const addMutation = useMutation({
-    mutationFn: (data: import('../../../../services/jobService').JobPostInput) => jobService.addJobPost(data),
+    mutationFn: (data: JobPostInput) => jobService.addJobPost(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerJobPosts'] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: Partial<import('../../../../services/jobService').JobPostInput> }) => jobService.updateJobPostById(id, data),
+    mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPostInput> }) => jobService.updateJobPostById(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerJobPosts'] });
     },
@@ -257,7 +267,7 @@ export const useResumeDetail = (slug: string) => {
 };
 
 // ─── Interview Management ────────────────────────────────────
-export const useInterviewSessions = (params: import('../../../../services/interviewService').GetSessionsParams = {}, refetchInterval?: number | false): UseInterviewSessionsResult => {
+export const useInterviewSessions = (params: GetSessionsParams = {}, refetchInterval?: number | false): UseInterviewSessionsResult => {
   return useQuery({
     queryKey: ['interviewSessions', params],
     queryFn: () => interviewService.getSessions(params),
@@ -278,14 +288,14 @@ export const useInterviewMutations = () => {
   const queryClient = useQueryClient();
 
   const scheduleMutation = useMutation({
-    mutationFn: (data: import('../../../../services/interviewService').ScheduleSessionInput) => interviewService.scheduleSession(data),
+    mutationFn: (data: ScheduleSessionInput) => interviewService.scheduleSession(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewSessions'] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: Partial<import('../../../../services/interviewService').ScheduleSessionInput> }) => interviewService.updateSession(id, data),
+    mutationFn: ({ id, data }: { id: string | number; data: Partial<ScheduleSessionInput> }) => interviewService.updateSession(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewSessions'] });
       queryClient.invalidateQueries({ queryKey: ['interviewDetail'] });
@@ -308,7 +318,7 @@ export const useInterviewMutations = () => {
   });
 
   const evaluationMutation = useMutation({
-    mutationFn: (data: import('../../../../services/interviewService').SubmitEvaluationInput) => interviewService.submitEvaluation(data),
+    mutationFn: (data: SubmitEvaluationInput) => interviewService.submitEvaluation(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interviewDetail'] });
     },

@@ -5,6 +5,7 @@ import i18n from '../../../../i18n';
 import { User as UserModel } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 import { RoleName } from '../../../../types/auth';
+import type { AxiosError } from 'axios';
 
 const t = (key: string, options?: Record<string, unknown>) => i18n.t(key, { ns: 'admin', ...options });
 
@@ -38,7 +39,7 @@ export const useUsers = (params: Record<string, unknown>): UseUsersResult => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
         onError: (error: unknown) => {
-            const err = error as import('axios').AxiosError<{ errors?: { detail?: string } }>;
+            const err = error as AxiosError<{ errors?: { detail?: string } }>;
             toastMessages.error(
                 err.response?.data?.errors?.detail || t('pages.users.toast.actionFailed')
             );
@@ -52,7 +53,7 @@ export const useUsers = (params: Record<string, unknown>): UseUsersResult => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
         onError: (error: unknown) => {
-            const err = error as import('axios').AxiosError<{ errors?: { detail?: string } }>;
+            const err = error as AxiosError<{ errors?: { detail?: string } }>;
             toastMessages.error(
                 err.response?.data?.errors?.detail || t('pages.users.toast.roleUpdateFailed')
             );
@@ -66,7 +67,7 @@ export const useUsers = (params: Record<string, unknown>): UseUsersResult => {
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
         onError: (error: unknown) => {
-            const err = error as import('axios').AxiosError<{ errors?: { detail?: string } }>;
+            const err = error as AxiosError<{ errors?: { detail?: string } }>;
             toastMessages.error(
                 err.response?.data?.errors?.detail || 'Delete failed'
             );

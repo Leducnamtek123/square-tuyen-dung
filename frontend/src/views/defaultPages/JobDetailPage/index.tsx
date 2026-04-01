@@ -25,6 +25,8 @@ import { useAppSelector } from "../../../hooks/useAppStore";
 import useSEO from "../../../hooks/useSEO";
 import useStructuredData from "../../../hooks/useStructuredData";
 import { useConfig } from '@/hooks/useConfig';
+import type { Location } from '@/types/models';
+import type { Company } from '@/types/models';
 
 const JobDetailPage = () => {
   const { slug } = useParams();
@@ -202,10 +204,10 @@ const JobDetailPage = () => {
                 jobPostDetail={jobPostDetail}
                 allConfig={allConfig}
               />
-              <JobDetailContactCard jobPostDetail={jobPostDetail as unknown as import('@/types/models').JobPost & { companyDict?: import('@/types/models').Company; location?: import('@/types/models').Location & { lat?: number; lng?: number; } }} />
+              <JobDetailContactCard jobPostDetail={jobPostDetail as unknown as JobPost & { companyDict?: Company; location?: Location & { lat?: number; lng?: number; } }} />
             </div>
             <div>
-              <JobDetailSidebar jobPostDetail={jobPostDetail as unknown as import('@/types/models').JobPost & { companyDict?: import('@/types/models').Company }} />
+              <JobDetailSidebar jobPostDetail={jobPostDetail as unknown as JobPost & { companyDict?: Company }} />
             </div>
           </div>
         </div>

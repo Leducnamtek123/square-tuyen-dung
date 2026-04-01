@@ -15,6 +15,8 @@ import EmployerSignUpForm, { EmployerSignUpFormData } from '../../components/aut
 import { useAppDispatch } from '../../../hooks/useAppStore';
 import type { RoleName } from '../../../types/auth';
 import type { AxiosError } from 'axios';
+import type { ApiError } from '../../../types/api';
+import type { EmployerRegisterData } from '../../../types/auth';
 
 
 
@@ -82,7 +84,7 @@ const EmployerSignUp = () => {
 
   const handleRegister = (data: EmployerSignUpFormData) => {
 
-    const register = async (data: import('../../../types/auth').EmployerRegisterData, roleName: RoleName) => {
+    const register = async (data: EmployerRegisterData, roleName: RoleName) => {
 
       setIsFullScreenLoading(true);
 
@@ -193,7 +195,7 @@ const EmployerSignUp = () => {
 
     } catch (error) {
 
-      errorHandling(error as AxiosError<{ errors?: import('../../../types/api').ApiError }>, undefined);
+      errorHandling(error as AxiosError<{ errors?: ApiError }>, undefined);
 
       return false;
 

@@ -36,6 +36,7 @@ import type { AxiosError } from 'axios';
 import tokenService from '../../../services/tokenService';
 
 import { JobSeekerSignUpFormData } from '../../components/auths/JobSeekerSignUpForm';
+import type { JobSeekerRegisterData } from '../../../types/auth';
 
 
 
@@ -103,7 +104,7 @@ const JobSeekerSignUp = () => {
 
   const handleRegister = (data: JobSeekerSignUpFormData) => {
 
-    const register = async (payload: import('../../../types/auth').JobSeekerRegisterData, roleName: RoleName) => {
+    const register = async (payload: JobSeekerRegisterData, roleName: RoleName) => {
 
       setIsFullScreenLoading(true);
 

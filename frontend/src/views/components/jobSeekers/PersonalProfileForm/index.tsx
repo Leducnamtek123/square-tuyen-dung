@@ -24,6 +24,8 @@ import DatePickerCustom from '../../../../components/Common/Controls/DatePickerC
 import commonService from '../../../../services/commonService';
 import { useConfig } from '@/hooks/useConfig';
 import type { SelectOption } from '@/types/models';
+import type { AxiosError } from 'axios';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface PersonalProfileFormValues {
   user: {
@@ -176,7 +178,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
   const { control, setValue, reset, handleSubmit } = useForm<PersonalProfileFormValues>({
 
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<PersonalProfileFormValues>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<PersonalProfileFormValues>,
 
   });
 
@@ -253,7 +255,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
         setDistrictOptions(resData);
         prevCityIdRef.current = id;
       } catch (error) {
-        errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
+        errorHandling(error as AxiosError<Record<string, unknown>>);
       }
     };
     if (cityId) {

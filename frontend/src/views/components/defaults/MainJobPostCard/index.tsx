@@ -5,6 +5,7 @@ import JobPostLarge from '../../../../components/Features/JobPostLarge';
 import NoDataCard from '../../../../components/Common/NoDataCard';
 import { useAppSelector } from '../../../../hooks/useAppStore';
 import { useJobPosts } from './hooks/useJobPosts';
+import type { JobPost } from '../../../../types/models';
 
 const MainJobPostCard = () => {
   const { t } = useTranslation('public');
@@ -79,7 +80,7 @@ const MainJobPostCard = () => {
 
           <>
 
-            {jobPosts.map((value: import('../../../../types/models').JobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }) => (
+            {jobPosts.map((value: JobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }) => (
 
               <JobPostLarge
 

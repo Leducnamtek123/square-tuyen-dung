@@ -20,6 +20,7 @@ import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import ImageCropDialog from '@/components/Common/ImageCropDialog';
 import { useCompanyProfile, useCompanyMutations } from '../hooks/useEmployerQueries';
 import type { CompanyFormValues } from '../CompanyForm';
+import type { EditorState } from 'draft-js';
 
 const CompanyCard = () => {
   const { t } = useTranslation('employer');
@@ -53,7 +54,7 @@ const CompanyCard = () => {
     try {
       const payload = {
         ...formData,
-        description: convertEditorStateToHTMLString(formData.description as import('draft-js').EditorState),
+        description: convertEditorStateToHTMLString(formData.description as EditorState),
       };
       await updateCompany({ id: company.id, data: payload as Parameters<typeof updateCompany>[0]['data'] });
       toastMessages.success(t('companyProfile.success.update'));

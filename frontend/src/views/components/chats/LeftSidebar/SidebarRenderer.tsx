@@ -8,6 +8,7 @@ import ChatRoomSearch from '../../../../components/Features/Chats/ChatRoomSearch
 import { useTranslation } from 'react-i18next';
 import { useChatRooms, ChatRoomData } from './useChatRooms';
 import { useDebounce } from '../../../../hooks';
+import type { UserAccount } from './useChatRooms';
 
 const LoadingComponentItem = () => (
   <Stack direction="row" spacing={1} alignItems="center">
@@ -23,7 +24,7 @@ const LoadingComponentItem = () => (
 
 interface SidebarRendererProps {
   searchPlaceholderKey: string;
-  getSubtextName: (user?: import('./useChatRooms').UserAccount) => string;
+  getSubtextName: (user?: UserAccount) => string;
 }
 
 const SidebarRenderer = ({ searchPlaceholderKey, getSubtextName }: SidebarRendererProps) => {

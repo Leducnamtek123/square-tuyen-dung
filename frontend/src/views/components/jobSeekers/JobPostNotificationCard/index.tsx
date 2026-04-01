@@ -17,6 +17,8 @@ import ItemComponent from "./ItemComponent";
 import { useJobPostNotifications, useJobPostNotificationMutations } from "../hooks/useJobSeekerQueries";
 
 import type { JobPostNotification } from "../../../../services/jobPostNotificationService";
+import type { Theme as MaterialTheme } from '@mui/material';
+import type { AxiosError } from 'axios';
 
 const pageSize = 12;
 
@@ -46,7 +48,7 @@ const JobPostNotificationCard = () => {
       setEditData(resData as unknown as Partial<JobPostNotificationFormValues> & { id?: number });
       setOpenPopup(true);
     } catch (error) {
-      errorHandling(error as import('axios').AxiosError<Record<string, unknown>>);
+      errorHandling(error as AxiosError<Record<string, unknown>>);
     } finally {
       setIsFullScreenLoading(false);
     }
@@ -115,9 +117,9 @@ const JobPostNotificationCard = () => {
                 sx={{
                   px: 3,
                   py: 1,
-                  background: (theme: import('@mui/material').Theme) => theme.palette.primary.main,
+                  background: (theme: MaterialTheme) => theme.palette.primary.main,
                   "&:hover": {
-                    background: (theme: import('@mui/material').Theme) => theme.palette.primary.main,
+                    background: (theme: MaterialTheme) => theme.palette.primary.main,
                     opacity: 0.9,
                   },
                 }}

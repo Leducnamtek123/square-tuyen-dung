@@ -12,6 +12,8 @@ import PasswordTextFieldCustom from "../../../../components/Common/Controls/Pass
 import useDebounce from "../../../../hooks/useDebounce";
 import authService from "../../../../services/authService";
 import type { RoleName } from "../../../../types/auth";
+import type { CodeResponse } from '@react-oauth/google';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface JobSeekerSignUpFormData {
   fullName: string;
@@ -23,7 +25,7 @@ export interface JobSeekerSignUpFormData {
 interface JobSeekerSignUpFormProps {
   onRegister: (data: JobSeekerSignUpFormData) => void;
   onFacebookRegister: (result: Record<string, unknown>) => void;
-  onGoogleRegister: (result: Omit<import('@react-oauth/google').CodeResponse, "error" | "error_description" | "error_uri">) => void;
+  onGoogleRegister: (result: Omit<CodeResponse, "error" | "error_description" | "error_uri">) => void;
   serverErrors?: Record<string, string[]>;
   checkCreds?: (email: string, roleName: RoleName) => Promise<boolean>;
 }
@@ -162,7 +164,7 @@ const JobSeekerSignUpForm = ({
       password: "",
       confirmPassword: "",
     },
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<JobSeekerSignUpFormData>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<JobSeekerSignUpFormData>,
   });
 
   const email = useWatch({

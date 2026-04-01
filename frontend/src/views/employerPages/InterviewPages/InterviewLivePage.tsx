@@ -11,6 +11,7 @@ import { type PaginatedResponse } from '../../../types/api';
 import { ROUTES } from '../../../configs/constants';
 import DataTable from '../../../components/Common/DataTable';
 import AIToolsCard from '../../../components/Features/AIToolsCard';
+import type { CellContext as ReactTableCellContext } from '@tanstack/react-table';
 
 const ACTIVE_STATUSES = ['in_progress', 'calibration', 'processing', 'connecting', 'active'];
 
@@ -99,7 +100,7 @@ const InterviewLivePage = () => {
       {
         header: t('interviewLive.table.candidate'),
         accessorKey: 'candidateName',
-        cell: ({ row }: import('@tanstack/react-table').CellContext<InterviewSession, unknown>) => (
+        cell: ({ row }: ReactTableCellContext<InterviewSession, unknown>) => (
           <Box>
             <Typography variant="body2" sx={{ fontWeight: 500 }}>
               {row.original.candidateName || 'N/A'}
@@ -113,12 +114,12 @@ const InterviewLivePage = () => {
       {
         header: t('interviewLive.table.position'),
         accessorKey: 'jobName',
-        cell: ({ getValue }: import('@tanstack/react-table').CellContext<InterviewSession, unknown>) => <Typography variant="body2">{(getValue() as string) || 'N/A'}</Typography>,
+        cell: ({ getValue }: ReactTableCellContext<InterviewSession, unknown>) => <Typography variant="body2">{(getValue() as string) || 'N/A'}</Typography>,
       },
       {
         header: t('interviewLive.table.room'),
         accessorKey: 'roomName',
-        cell: ({ row }: import('@tanstack/react-table').CellContext<InterviewSession, unknown>) => (
+        cell: ({ row }: ReactTableCellContext<InterviewSession, unknown>) => (
           <Typography variant="body2">
             {row.original.roomName || 'N/A'}
           </Typography>
@@ -127,7 +128,7 @@ const InterviewLivePage = () => {
       {
         header: t('interviewLive.table.time'),
         accessorKey: 'scheduledAt',
-        cell: ({ getValue }: import('@tanstack/react-table').CellContext<InterviewSession, unknown>) => (
+        cell: ({ getValue }: ReactTableCellContext<InterviewSession, unknown>) => (
           <Typography variant="body2">
             {(getValue() as string) ? new Date(getValue() as string).toLocaleString() : 'N/A'}
           </Typography>
@@ -136,7 +137,7 @@ const InterviewLivePage = () => {
       {
         header: t('interviewLive.table.status'),
         accessorKey: 'status',
-        cell: ({ getValue }: import('@tanstack/react-table').CellContext<InterviewSession, unknown>) => (
+        cell: ({ getValue }: ReactTableCellContext<InterviewSession, unknown>) => (
           <Chip
             label={t(`interviewLive.statuses.${getValue() as string}`, { defaultValue: (getValue() as string)?.replaceAll('_', ' ')?.toUpperCase() })}
             color={getStatusColor(getValue() as string)}
@@ -148,7 +149,7 @@ const InterviewLivePage = () => {
       {
         header: '',
         id: 'actions',
-        cell: ({ row }: import('@tanstack/react-table').CellContext<InterviewSession, unknown>) => (
+        cell: ({ row }: ReactTableCellContext<InterviewSession, unknown>) => (
           <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
             <IconButton
               component={Link}

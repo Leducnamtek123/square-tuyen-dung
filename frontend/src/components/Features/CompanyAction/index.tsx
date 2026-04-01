@@ -19,8 +19,8 @@ interface CompanyActionProps {
   id: string | number;
   views: number;
   createAt: string;
-  resume: Partial<import('@/types/models').Resume> | null;
-  company: Partial<import('@/types/models').Company> | null;
+  resume: Partial<Resume> | null;
+  company: Partial<Company> | null;
   children: React.ReactNode;
 }
 
@@ -238,12 +238,14 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
 interface CompanyActionFollowProps {
   id: string | number;
-  company: Partial<import('@/types/models').Company> | null;
+  company: Partial<Company> | null;
   children: React.ReactNode;
 }
 
 import CompanyActionFollow from './CompanyActionFollow';
 import Loading from './Loading';
+import type { Resume } from '@/types/models';
+import type { Company } from '@/types/models';
 
 const CompanyActionWithSubComponents = Object.assign(CompanyAction, {
   CompanyActionFollow,

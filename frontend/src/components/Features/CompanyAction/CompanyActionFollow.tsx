@@ -7,9 +7,10 @@ import { faBriefcase, faFontAwesome, faUsers } from '@fortawesome/free-solid-svg
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import {ROUTES } from '@/configs/constants';
 import { formatRoute } from '@/utils/funcUtils';
+import type { Company } from '@/types/models';
 
 export interface CompanyActionFollowProps {
-  company: Partial<import('@/types/models').Company> | null;
+  company: Partial<Company> | null;
   children?: React.ReactNode;
 }
 

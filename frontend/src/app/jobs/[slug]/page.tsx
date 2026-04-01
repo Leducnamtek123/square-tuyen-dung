@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
 import { serverFetch } from '@/lib/server-fetch';
 import JobDetailClientPage from './ClientPage';
+import type { Company } from '@/types/models';
+import type { JobPost } from '@/types/models';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -8,7 +10,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const job = await serverFetch<import('@/types/models').JobPost & { company?: import('@/types/models').Company; city?: { name?: string } }>(`job/web/job-posts/${slug}/`);
+  const job = await serverFetch<JobPost & { company?: Company; city?: { name?: string } }>(`job/web/job-posts/${slug}/`);
 
   if (!job) {
     return {

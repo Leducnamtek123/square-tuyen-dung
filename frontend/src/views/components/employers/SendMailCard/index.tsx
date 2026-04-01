@@ -10,6 +10,7 @@ import FormPopup from '../../../../components/Common/Controls/FormPopup';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import RichTextEditorCustom from '../../../../components/Common/Controls/RichTextEditorCustom';
 import CheckboxCustom from '../../../../components/Common/Controls/CheckboxCustom';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface SendMailData {
   fullName?: string;
@@ -64,7 +65,7 @@ const SendMailCard: React.FC<SendMailCardProps> = ({
   });
 
   const { control, reset, handleSubmit } = useForm<SendMailFormData>({
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<SendMailFormData>, // yup resolver workaround for drafted mixed types
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<SendMailFormData>, // yup resolver workaround for drafted mixed types
     defaultValues: {
       fullName: '',
       email: '',

@@ -37,6 +37,7 @@ import { useTranslation } from "react-i18next";
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import type { AxiosError } from "axios";
+import type { ApiError } from '@/types/api';
 
 interface BoxProfileResume {
   slug: string;
@@ -145,7 +146,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
         toastMessages.success(t("jobSeeker:profile.messages.profileStatusUpdateSuccess"));
       } catch (error) {
         // Casting through unknown to satisfy errorHandling strict AxiosError<{errors: ApiError}> generic type requirements
-        errorHandling(error as import('axios').AxiosError<{errors: import('@/types/api').ApiError}>);
+        errorHandling(error as AxiosError<{errors: ApiError}>);
       } finally {
         setIsFullScreenLoading(false);
       }

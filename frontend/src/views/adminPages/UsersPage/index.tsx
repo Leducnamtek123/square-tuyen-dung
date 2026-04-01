@@ -8,6 +8,7 @@ import { useUsers } from './hooks/useUsers';
 import UserTable from './components/UserTable';
 import UserFilters from './components/UserFilters';
 import { User as UserModel } from '../../../types/models';
+import type { RoleName } from '../../../types/auth';
 
 const UsersPage = () => {
     const { t } = useTranslation('admin');
@@ -59,7 +60,7 @@ const UsersPage = () => {
         }
     };
 
-    const handleRoleChange = async (user: UserModel, roleName: import('../../../types/auth').RoleName) => {
+    const handleRoleChange = async (user: UserModel, roleName: RoleName) => {
         if (!user || user.roleName === roleName || user.id === currentUserId) {
             return;
         }

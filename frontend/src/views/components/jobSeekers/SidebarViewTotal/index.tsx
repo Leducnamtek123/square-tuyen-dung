@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Avatar, Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
 import { useJobSeekerTotalView } from "../hooks/useJobSeekerQueries";
 import { ROUTES } from "../../../../configs/constants";
+import type { Theme as MaterialTheme } from '@mui/material';
 
 const SidebarViewTotal = () => {
   const { t } = useTranslation('jobSeeker');
@@ -36,7 +37,7 @@ const SidebarViewTotal = () => {
                 width: 100,
                 height: 100,
                 borderRadius: "50%",
-                background: (theme: import('@mui/material').Theme) => theme.palette.primary.light,
+                background: (theme: MaterialTheme) => theme.palette.primary.light,
                 animation: "pulse 2s infinite",
               }}
             />
@@ -44,7 +45,7 @@ const SidebarViewTotal = () => {
               sx={{
                 width: 80,
                 height: 80,
-                background: (theme: import('@mui/material').Theme) => theme.palette.primary.main,
+                background: (theme: MaterialTheme) => theme.palette.primary.main,
                 fontSize: "1.75rem",
                 fontWeight: 700,
               }}
@@ -71,10 +72,10 @@ const SidebarViewTotal = () => {
           size="medium"
           onClick={() => nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`)}
           sx={{
-            background: (theme: import('@mui/material').Theme) => theme.palette.primary.main,
+            background: (theme: MaterialTheme) => theme.palette.primary.main,
             px: 3,
             "&:hover": {
-              background: (theme: import('@mui/material').Theme) => theme.palette.primary.main,
+              background: (theme: MaterialTheme) => theme.palette.primary.main,
               opacity: 0.9,
               transform: "translateY(-1px)",
               transition: "all 0.2s",

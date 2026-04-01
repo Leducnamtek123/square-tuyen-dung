@@ -7,6 +7,7 @@ import ResetPasswordForm from '../../components/auths/ResetPasswordForm';
 import authService from '../../../services/authService';
 import { ROUTES } from '../../../configs/constants';
 import type { AxiosError } from 'axios';
+import type { ResetPasswordFormData } from '../../components/auths/ResetPasswordForm';
 
 
 
@@ -22,7 +23,7 @@ const ResetPasswordPage = () => {
 
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
-  const handleResetPassword = async (data: import('../../components/auths/ResetPasswordForm').ResetPasswordFormData) => {
+  const handleResetPassword = async (data: ResetPasswordFormData) => {
     try {
       await authService.resetPassword({
         token,

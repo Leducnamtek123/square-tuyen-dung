@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import commonService from '../services/commonService';
 import type { SystemConfig } from '../types/models';
+import type { Career } from '../types/models';
 
 const CONFIG_QUERY_KEY = ['systemConfig'];
 const STALE_TIME = 10 * 60 * 1000; // 10 minutes
@@ -12,7 +13,7 @@ export const useConfig = () => {
       // Fire both requests in parallel
       const [resData, careersRes] = await Promise.all([
         commonService.getConfigs(),
-        commonService.getAllCareersSimple().catch(() => [] as import('../types/models').Career[]),
+        commonService.getAllCareersSimple().catch(() => [] as Career[]),
       ]);
 
       let merged = { ...(resData as SystemConfig) };
@@ -21,7 +22,7 @@ export const useConfig = () => {
         merged = {
           ...merged,
           careers: careersRes,
-          careerOptions: careersRes.map((career: import('../types/models').Career) => ({
+          careerOptions: careersRes.map((career: Career) => ({
             id: career.id,
             name: career.name,
           })),

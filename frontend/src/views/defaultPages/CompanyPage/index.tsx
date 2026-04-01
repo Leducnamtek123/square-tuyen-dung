@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import CompanySearch from '../../components/defaults/CompanySearch';
 import Companies from '../../../components/Features/Companies';
 import useSEO from '../../../hooks/useSEO';
+import type { Theme as StylesTheme } from '@mui/material/styles';
 
 
 
@@ -82,7 +83,7 @@ const CompanyPage = () => {
 
             py: 4,
 
-            boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.large,
+            boxShadow: (theme: StylesTheme & { customShadows?: Record<string, string> }) => theme.customShadows?.large,
 
             bgcolor: 'background.paper',
 

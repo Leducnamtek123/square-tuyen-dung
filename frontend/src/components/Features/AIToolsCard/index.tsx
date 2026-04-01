@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Button, Card, Divider, Stack, TextField, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import aiService from '@/services/aiService';
+import type { AxiosError } from 'axios';
 
 const AIToolsCard = () => {
   const { t } = useTranslation('common');
@@ -45,7 +46,7 @@ const AIToolsCard = () => {
       const objectUrl = URL.createObjectURL(blob);
       setTtsAudioUrl(objectUrl);
     } catch (error: unknown) {
-      const axiosError = error as import('axios').AxiosError<{ detail?: string }>;
+      const axiosError = error as AxiosError<{ detail?: string }>;
       setTtsError(
         axiosError.response?.data?.detail ||
           t('aiTools.tts.error', { defaultValue: 'Unable to generate audio right now.' })
@@ -67,7 +68,7 @@ const AIToolsCard = () => {
       const res = await aiService.transcribe(transcribeFile, { language: 'vi' });
       setTranscription(String(res?.transcription || ''));
     } catch (error: unknown) {
-      const axiosError = error as import('axios').AxiosError<{ errors?: { detail?: string } }>;
+      const axiosError = error as AxiosError<{ errors?: { detail?: string } }>;
       setTranscribeError(
         axiosError.response?.data?.errors?.detail ||
           t('aiTools.transcribe.error', { defaultValue: 'Unable to transcribe audio right now.' })

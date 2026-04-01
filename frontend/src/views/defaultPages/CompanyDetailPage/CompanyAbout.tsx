@@ -1,8 +1,9 @@
 import React from 'react';
 import { Box, Typography } from "@mui/material";
+import type { CompanyDetailProps } from './index';
 
 interface CompanyAboutProps {
-  companyDetail: import('./index').CompanyDetailProps | null;
+  companyDetail: CompanyDetailProps | null;
   safeDescriptionHtml: string;
   t: (key: string) => string;
 }

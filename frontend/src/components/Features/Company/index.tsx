@@ -26,6 +26,8 @@ import { RootState } from '@/redux/store';
 import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { useTranslation } from 'react-i18next';
+import type { ApiError } from '@/types/api';
+import type { AxiosError } from 'axios';
 
 interface FollowProps {
   slug: string;
@@ -58,7 +60,7 @@ const FollowComponent = ({ slug, isFollowed }: FollowProps) => {
         );
 
       } catch (error) {
-        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
       } finally {
 
         setIsLoadingFollow(false);

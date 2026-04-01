@@ -3,6 +3,11 @@ import { AUTH_CONFIG } from '../configs/constants';
 import { ensurePresignedUrl } from '../utils/presignUrl';
 import type { AuthProvider, RoleName, TokenPair } from '../types/auth';
 import type { User } from '../types/models';
+import type { ResetPasswordData } from '../types/auth';
+import type { ChangePasswordData } from '../types/auth';
+import type { UserSettingsData } from '../types/auth';
+import type { EmployerRegisterData } from '../types/auth';
+import type { JobSeekerRegisterData } from '../types/auth';
 
 type UserResponse = User & Record<string, unknown>;
 type TokenResponse = TokenPair & Record<string, unknown>;
@@ -79,12 +84,12 @@ const authService = {
     return httpRequest.post(url, { email });
   },
 
-  jobSeekerRegister: (data: import('../types/auth').JobSeekerRegisterData): Promise<unknown> => {
+  jobSeekerRegister: (data: JobSeekerRegisterData): Promise<unknown> => {
     const url = 'auth/job-seeker/register/';
     return httpRequest.post(url, data);
   },
 
-  employerRegister: (data: import('../types/auth').EmployerRegisterData): Promise<unknown> => {
+  employerRegister: (data: EmployerRegisterData): Promise<unknown> => {
     const url = 'auth/employer/register/';
     return httpRequest.post(url, data);
   },
@@ -139,7 +144,7 @@ const authService = {
     return resData;
   },
 
-  changePassword: (data: import('../types/auth').ChangePasswordData): Promise<unknown> => {
+  changePassword: (data: ChangePasswordData): Promise<unknown> => {
     const url = 'auth/change-password/';
     return httpRequest.put(url, data);
   },
@@ -149,7 +154,7 @@ const authService = {
     return httpRequest.post(url, data);
   },
 
-  resetPassword: (data: import('../types/auth').ResetPasswordData): Promise<unknown> => {
+  resetPassword: (data: ResetPasswordData): Promise<unknown> => {
     const url = 'auth/reset-password/';
     return httpRequest.post(url, data);
   },
@@ -159,7 +164,7 @@ const authService = {
     return httpRequest.get(url);
   },
 
-  updateUserSettings: (data: import('../types/auth').UserSettingsData): Promise<unknown> => {
+  updateUserSettings: (data: UserSettingsData): Promise<unknown> => {
     const url = 'auth/settings/';
     return httpRequest.put(url, data);
   },

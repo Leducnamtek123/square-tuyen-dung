@@ -13,6 +13,7 @@ import {
 } from '@/components/Features/VoiceAssistant/components/livekit/agent-control-bar/agent-control-bar';
 import { cn } from '@/lib/utils';
 import { ScrollArea } from '../livekit/scroll-area/scroll-area';
+import type { Transition } from 'motion/react';
 
 const MotionBottom = motion.create('div');
 
@@ -33,7 +34,7 @@ const BOTTOM_VIEW_MOTION_PROPS = {
   transition: {
     duration: 0.3,
     delay: 0.5,
-    ease: 'easeOut' as import('motion/react').Transition['ease'],
+    ease: 'easeOut' as Transition['ease'],
   },
 };
 

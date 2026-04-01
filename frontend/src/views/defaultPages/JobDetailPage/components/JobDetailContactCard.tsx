@@ -7,9 +7,12 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 
 import Map from "../../../../components/Common/Map";
+import type { Location } from '@/types/models';
+import type { Company } from '@/types/models';
+import type { JobPost } from '@/types/models';
 
 interface JobDetailContactCardProps {
-  jobPostDetail: import('@/types/models').JobPost & { companyDict?: import('@/types/models').Company; location?: import('@/types/models').Location & { lat?: number; lng?: number; } };
+  jobPostDetail: JobPost & { companyDict?: Company; location?: Location & { lat?: number; lng?: number; } };
 }
 
 const JobDetailContactCard: React.FC<JobDetailContactCardProps> = ({ jobPostDetail }) => {

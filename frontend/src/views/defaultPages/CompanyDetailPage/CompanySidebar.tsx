@@ -6,10 +6,12 @@ import { FacebookIcon, YoutubeIcon, LinkedinIcon } from "../../../components/Com
 import Map from "../../../components/Common/Map";
 import ImageGalleryCustom from "../../../components/Common/ImageGalleryCustom";
 
+import type { Theme as StylesTheme } from '@mui/material/styles';
+import type { Company } from '@/types/models';
 import type { TFunction } from 'i18next';
 
 interface CompanySidebarProps {
-  companyDetail: Omit<Partial<import('@/types/models').Company>, 'id'> & { 
+  companyDetail: Omit<Partial<Company>, 'id'> & { 
     id?: string | number;
     facebookUrl?: string; 
     youtubeUrl?: string; 
@@ -18,12 +20,12 @@ interface CompanySidebarProps {
     [key: string]: unknown 
   };
   imageList: string[] | Record<string, unknown>[];
-  t: import('i18next').TFunction;
+  t: TFunction;
 }
 
 const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageList, t }) => {
   return (
-    <Card sx={{ p: 3, boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.small || 1 }}>
+    <Card sx={{ p: 3, boxShadow: (theme: StylesTheme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.small || 1 }}>
       <Stack spacing={3}>
         {/* Website */}
         <Box>

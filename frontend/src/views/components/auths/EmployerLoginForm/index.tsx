@@ -9,6 +9,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useTranslation } from 'react-i18next';
 import TextFieldCustom from "../../../../components/Common/Controls/TextFieldCustom";
 import PasswordTextFieldCustom from "../../../../components/Common/Controls/PasswordTextFieldCustom";
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface EmployerLoginFormData {
   email?: string;
@@ -136,7 +137,7 @@ const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: Employer
       email: "",
       password: "",
     },
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<EmployerLoginFormData>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<EmployerLoginFormData>,
   });
 
   const googleLogin = useGoogleLogin({

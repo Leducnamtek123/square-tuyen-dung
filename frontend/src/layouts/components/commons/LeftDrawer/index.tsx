@@ -22,6 +22,9 @@ import tokenService from '../../../../services/tokenService';
 
 import AccountSwitchMenu from '../AccountSwitchMenu';
 import { isEmployerPortalPath } from '../../../../configs/portalRouting';
+import type { ApiError } from '../../../../types/api';
+import type { AxiosError } from 'axios';
+import type { AppDispatch } from '../../../../redux/store';
 import {
 
   resetSearchCompany,
@@ -72,7 +75,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
     const accessToken = tokenService.getAccessTokenFromCookie() || '';
     const backend = tokenService.getProviderFromCookie() || '';
 
-    (dispatch as import('../../../../redux/store').AppDispatch)(removeUserInfo({ accessToken, backend }))
+    (dispatch as AppDispatch)(removeUserInfo({ accessToken, backend }))
 
       .unwrap()
 
@@ -88,7 +91,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
 
       })
 
-      .catch((error: import('axios').AxiosError<{ errors?: import('../../../../types/api').ApiError }>) => {
+      .catch((error: AxiosError<{ errors?: ApiError }>) => {
 
         errorHandling(error);
 

@@ -40,6 +40,7 @@ import { confirmModal } from "../../../../utils/sweetalert2Modal";
 import NoDataCard from "../../../../components/Common/NoDataCard";
 
 import { reloadResume } from "../../../../redux/profileSlice";
+import type { FormValues as ProfileuploadformFormValues } from '../ProfileUploadForm';
 
 interface Resume {
   id: string | number;
@@ -121,7 +122,7 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
   }, [currentUser, isSuccess, reloadCounter]);
 
-  const handleAdd = (data: import('../ProfileUploadForm').FormValues) => {
+  const handleAdd = (data: ProfileuploadformFormValues) => {
 
     const addResumeUpload = async (formData: FormData) => {
 
@@ -153,7 +154,7 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
     for (const key in data) {
 
-      const value = data[key as keyof import('../ProfileUploadForm').FormValues];
+      const value = data[key as keyof ProfileuploadformFormValues];
       if (key === 'file' && Array.isArray(value) && value.length > 0) {
         formData.append(key, value[0]);
       } else if (value !== null && value !== undefined) {

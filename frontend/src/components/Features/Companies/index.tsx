@@ -8,6 +8,8 @@ import NoDataCard from "@/components/Common/NoDataCard";
 import Company from "@/components/Features/Company";
 import companyService from "@/services/companyService";
 import { RootState } from "@/redux/store";
+import type { Company as ModelsCompany } from '@/types/models';
+import type { PaginatedResponse } from '@/types/api';
 
 interface Props {
   [key: string]: unknown;
@@ -32,7 +34,7 @@ const Companies = (_props: Props) => {
       const resData = (await companyService.getCompanies({
         ...companyFilter,
         page: page,
-      })) as import('@/types/api').PaginatedResponse<import('@/types/models').Company>;
+      })) as PaginatedResponse<ModelsCompany>;
       return {
         results: resData?.results || [],
         count: resData?.count || 0,
@@ -121,7 +123,7 @@ const Companies = (_props: Props) => {
         ) : (
           <>
             <Grid container spacing={2}>
-              {companies.map((value: import('@/types/models').Company) => (
+              {companies.map((value: ModelsCompany) => (
                 <Grid
                   key={value.id}
                   size={{

@@ -18,6 +18,7 @@ import type { ApiError } from "@/types/api";
 import { formatRoute } from "@/utils/funcUtils";
 import { useAppSelector } from "@/hooks/useAppStore";
 import type { Resume } from "@/types/models";
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 interface ApplyFormProps {
   handleApplyJob: (data: ApplyFormValues) => void;
@@ -63,7 +64,7 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
       phone: (currentUser as { jobSeekerProfile?: { phone?: string } })?.jobSeekerProfile?.phone || "",
       resume: "",
     },
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<ApplyFormValues>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<ApplyFormValues>,
   });
 
   React.useEffect(() => {

@@ -6,10 +6,11 @@ import { TextField, Typography } from "@mui/material";
 import ValidationError from '../ValidationError';
 
 import type { SxProps, Theme } from '@mui/material/styles';
+import type { FieldValues as ReactHookFormFieldValues } from 'react-hook-form';
 
 interface Props<T extends Record<string, unknown>> {
   name: string;
-  control: Control<T | import('react-hook-form').FieldValues>;
+  control: Control<T | ReactHookFormFieldValues>;
   title?: string | null;
   showRequired?: boolean;
   placeholder?: string;

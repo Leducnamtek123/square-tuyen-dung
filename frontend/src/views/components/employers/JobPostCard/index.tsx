@@ -24,6 +24,8 @@ import JobPostsTable from '../JobPostsTable';
 import { useDataTable } from '../../../../hooks';
 import { useEmployerJobPosts, useJobPostMutations } from '../hooks/useEmployerQueries';
 import type { ApiError } from '../../../../types/api';
+import type { EditorState } from 'draft-js';
+import type { JobPostInput } from '../../../../services/jobService';
 
 const JobPostCard = () => {
   const { t } = useTranslation('employer');
@@ -91,7 +93,7 @@ const JobPostCard = () => {
 
   const handleAddOrUpdate = async (formData: JobPostFormValues) => {
     setServerErrors(null);
-    const payload: import('../../../../services/jobService').JobPostInput = {
+    const payload: JobPostInput = {
       jobName: formData.jobName || '',
       deadline: formData.deadline ? (typeof formData.deadline === 'string' ? formData.deadline : formData.deadline.toISOString()) : '',
       quantity: Number(formData.quantity),
@@ -106,9 +108,9 @@ const JobPostCard = () => {
       jobType: Number(formData.jobType),
       typeOfWorkplace: Number(formData.typeOfWorkplace),
       genderRequired: formData.genderRequired,
-      jobDescription: convertEditorStateToHTMLString(formData.jobDescription as import('draft-js').EditorState),
-      jobRequirement: convertEditorStateToHTMLString(formData.jobRequirement as import('draft-js').EditorState),
-      benefitsEnjoyed: convertEditorStateToHTMLString(formData.benefitsEnjoyed as import('draft-js').EditorState),
+      jobDescription: convertEditorStateToHTMLString(formData.jobDescription as EditorState),
+      jobRequirement: convertEditorStateToHTMLString(formData.jobRequirement as EditorState),
+      benefitsEnjoyed: convertEditorStateToHTMLString(formData.benefitsEnjoyed as EditorState),
       contactPersonName: formData.contactPersonName,
       contactPersonPhone: formData.contactPersonPhone,
       contactPersonEmail: formData.contactPersonEmail,

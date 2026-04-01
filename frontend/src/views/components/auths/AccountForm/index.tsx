@@ -6,6 +6,8 @@ import * as yup from 'yup';
 import { Grid2 as Grid } from "@mui/material";
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import { useAppSelector } from '../../../../redux/hooks';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
+import type { RootState } from '../../../../redux/store';
 
 interface AccountFormData {
   fullName: string;
@@ -22,7 +24,7 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
 
   const { t } = useTranslation('auth');
 
-  const { currentUser } = useAppSelector((state: import('../../../../redux/store').RootState) => state.user);
+  const { currentUser } = useAppSelector((state: RootState) => state.user);
 
   const schema = yup.object().shape({
 
@@ -38,7 +40,7 @@ const AccountForm = ({ handleUpdate, serverErrors }: AccountFormProps) => {
 
   const { control, reset, setError, handleSubmit } = useForm<AccountFormData>({
 
-    resolver: yupResolver(schema) as import('react-hook-form').Resolver<AccountFormData>,
+    resolver: yupResolver(schema) as ReactHookFormResolver<AccountFormData>,
 
   });
 

@@ -17,6 +17,7 @@ import RadioCustom from '../../../../components/Common/Controls/RadioCustom';
 
 import { useTranslation } from 'react-i18next';
 import { useConfig } from '@/hooks/useConfig';
+import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface JobPostNotificationFormValues {
   frequency: number | null;
@@ -193,7 +194,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<JobPostNotificationFormValues>,
+    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<JobPostNotificationFormValues>,
 
 
 

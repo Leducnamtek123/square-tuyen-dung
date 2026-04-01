@@ -4,6 +4,7 @@ import { Box, Chip, Pagination, Skeleton, Stack, Tooltip, Typography, Theme, But
 import InboxOutlinedIcon from '@mui/icons-material/InboxOutlined';
 import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 import { useRightSidebarData } from './useRightSidebarData';
+import type { UserDataPayload } from './useRightSidebarData';
 
 const LoadingComponentItem = () => (
   <Stack direction="row" spacing={1} alignItems="center">
@@ -30,7 +31,7 @@ interface RightSidebarRendererProps<T> {
     primaryText: string;
     secondaryText: string;
     partnerId: string;
-    userDataWrapper: import('./useRightSidebarData').UserDataPayload;
+    userDataWrapper: UserDataPayload;
   };
 }
 
