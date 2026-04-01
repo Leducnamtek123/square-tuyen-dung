@@ -3,6 +3,9 @@ import { useRouter, useParams } from 'next/navigation';
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import type { JobPost } from "@/types/models";
+import type { AxiosError } from "axios";
+import type { ApiError } from "@/types/api";
 
 import JobDetailLoading from "./components/JobDetailLoading";
 import JobDetailHeaderCard from "./components/JobDetailHeaderCard";
@@ -35,7 +38,20 @@ const JobDetailPage = () => {
   const [isApplySucces, setIsApplySuccess] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isLoadingSave, setIsLoadingSave] = React.useState(false);
-  const [jobPostDetail, setJobPostDetail] = React.useState<any>(null);
+
+  interface ExtendedJobPost extends JobPost {
+    companyName?: string;
+    companyImageUrl?: string;
+    companySlug?: string;
+    locationName?: string;
+    jobTypeName?: string;
+    createdAt?: string;
+    isSaved?: boolean;
+    isApplied?: boolean;
+    [key: string]: unknown;
+  }
+
+  const [jobPostDetail, setJobPostDetail] = React.useState<ExtendedJobPost | null>(null);
   const canApply =
     !isAuthenticated ||
     currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
@@ -47,7 +63,7 @@ const JobDetailPage = () => {
       try {
         const resData = await jobService.getJobPostDetailById(jobPostSlug);
         const data = resData;
-        setJobPostDetail(data);
+        setJobPostDetail(data as ExtendedJobPost);
       } catch (error) {
         const slugValue = String(jobPostSlug || '');
         const isNumericId = /^\d+$/.test(slugValue);
@@ -56,13 +72,13 @@ const JobDetailPage = () => {
             const fallbackData = await companyService.getCompanyJobPostDetailById(
               Number(slugValue)
             );
-            setJobPostDetail(fallbackData);
+            setJobPostDetail(fallbackData as ExtendedJobPost);
             return;
           } catch (fallbackError) {
-            errorHandling(fallbackError as any);
+            errorHandling(fallbackError as AxiosError<{ errors?: ApiError }>);
           }
         } else {
-          errorHandling(error as any);
+          errorHandling(error as AxiosError<{ errors?: ApiError }>);
         }
       } finally {
         setIsLoading(false);
@@ -99,14 +115,14 @@ const JobDetailPage = () => {
             companyUrl: jobPostDetail.companySlug
               ? `${(typeof window !== 'undefined' ? window.location.origin : '')}/cong-ty/${jobPostDetail.companySlug}`
               : undefined,
-            companyLogoUrl: jobPostDetail.companyImageUrl,
-            location: jobPostDetail.locationName || jobPostDetail.location,
+            companyLogoUrl: jobPostDetail.companyImageUrl as string | undefined,
+            location: (jobPostDetail.locationName || (typeof jobPostDetail.location === 'object' ? (jobPostDetail.location as unknown as Record<string, unknown>)?.address : jobPostDetail.location)) as string,
             salary: {
               min: jobPostDetail.salaryMin,
               max: jobPostDetail.salaryMax,
               currency: 'VND',
             },
-            jobType: jobPostDetail.jobTypeName || jobPostDetail.jobType,
+            jobType: (jobPostDetail.jobTypeName || jobPostDetail.jobType)?.toString(),
             datePosted: jobPostDetail.createAt || jobPostDetail.createdAt,
             validThrough: jobPostDetail.deadline,
             url: (typeof window !== 'undefined' ? window.location.href : ''),
@@ -125,8 +141,8 @@ const JobDetailPage = () => {
 
   React.useEffect(() => {
     if (isApplySucces) {
-      setJobPostDetail((prev: any) =>
-        prev ? { ...prev, isApplied: true } : prev
+      setJobPostDetail((prev) =>
+        prev ? { ...prev, isApplied: true } as ExtendedJobPost : prev
       );
     }
   }, [isApplySucces]);
@@ -137,12 +153,12 @@ const JobDetailPage = () => {
       try {
         const resData = await jobService.saveJobPost(slug as string) as { isSaved: boolean };
         const isSaved = resData.isSaved;
-        setJobPostDetail({ ...jobPostDetail, isSaved: isSaved });
+        setJobPostDetail({ ...jobPostDetail, isSaved: isSaved } as ExtendedJobPost);
         toastMessages.success(
           isSaved ? t("jobDetail.savedSuccess") : t("jobDetail.unsavedSuccess")
         );
       } catch (error) {
-        errorHandling(error as any);
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
       } finally {
         setIsLoadingSave(false);
       }
@@ -186,10 +202,10 @@ const JobDetailPage = () => {
                 jobPostDetail={jobPostDetail}
                 allConfig={allConfig}
               />
-              <JobDetailContactCard jobPostDetail={jobPostDetail} />
+              <JobDetailContactCard jobPostDetail={jobPostDetail as unknown as import('@/types/models').JobPost & { companyDict?: import('@/types/models').Company; location?: import('@/types/models').Location & { lat?: number; lng?: number; } }} />
             </div>
             <div>
-              <JobDetailSidebar jobPostDetail={jobPostDetail} />
+              <JobDetailSidebar jobPostDetail={jobPostDetail as unknown as import('@/types/models').JobPost & { companyDict?: import('@/types/models').Company }} />
             </div>
           </div>
         </div>
@@ -212,7 +228,7 @@ const JobDetailPage = () => {
 
       <ApplyCard
         title={jobPostDetail?.jobName}
-        jobPostId={jobPostDetail?.id}
+        jobPostId={jobPostDetail?.id as number}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
         setIsApplySuccess={setIsApplySuccess}
@@ -246,7 +262,7 @@ const JobDetailPage = () => {
             subject: jobPostDetail?.jobName,
             body: jobPostDetail?.jobDescription,
           },
-        } as any)}
+        } as React.ComponentProps<typeof SocialNetworkSharingPopup>)}
       />
     </>
   );

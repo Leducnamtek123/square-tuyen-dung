@@ -49,7 +49,7 @@ const EducationSection: React.FC<EducationSectionProps> = ({ profileDetail }) =>
                 }}
             >
                 <Stack spacing={5}>
-                    {(profileDetail.educationDetails || []).map((value: Record<string, string | number>, index: number) => (
+                    {(profileDetail.educationDetails || []).map((value, index: number) => (
                         <Box key={value.id || index}>
                             <Stack spacing={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', lineHeight: 1.3 }}>
@@ -67,9 +67,9 @@ const EducationSection: React.FC<EducationSectionProps> = ({ profileDetail }) =>
                                     <Stack direction="row" alignItems="center" spacing={1.5}>
                                         <CalendarMonthIcon sx={{ fontSize: 20, color: 'text.secondary', opacity: 0.8 }} />
                                         <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary', opacity: 0.8 }}>
-                                            <TimeAgo date={value?.startDate} type="format" /> -{" "}
+                                            {value?.startDate && <TimeAgo date={value.startDate} type="format" />} -{" "}
                                             {value.completedDate ? (
-                                                <TimeAgo date={value?.completedDate} type="format" />
+                                                <TimeAgo date={value.completedDate} type="format" />
                                             ) : (
                                                 t('common:labels.present')
                                             )}

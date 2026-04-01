@@ -93,8 +93,8 @@ const MessageResponseInner = memo(({
   const needsMath = useMemo(() => canRunStreamdown && hasMath(content), [canRunStreamdown, content]);
 
   const [streamdownState, setStreamdownState] = useState<{
-    Streamdown: any;
-    plugins: any;
+    Streamdown: React.ElementType | null;
+    plugins: Record<string, unknown> | null;
   }>({
     Streamdown: null,
     plugins: null,
@@ -113,7 +113,7 @@ const MessageResponseInner = memo(({
           import("@streamdown/cjk"),
         ]);
 
-        const plugins: any = { cjk };
+        const plugins: Record<string, unknown> = { cjk };
 
         if (needsCode) {
           const { code } = await import("@streamdown/code");
@@ -176,7 +176,7 @@ const MessageResponseInner = memo(({
     );
   }
 
-  const Streamdown = streamdownState.Streamdown as any;
+  const Streamdown = streamdownState.Streamdown as React.ElementType;
 
   return (
     <Streamdown
@@ -187,7 +187,7 @@ const MessageResponseInner = memo(({
       {children}
     </Streamdown>
   );
-}, (prevProps, nextProps) => prevProps.children === nextProps.children);
+}, (prevProps: MessageResponseInnerProps, nextProps: MessageResponseInnerProps) => prevProps.children === nextProps.children);
 
 MessageResponseInner.displayName = "MessageResponseInner";
 

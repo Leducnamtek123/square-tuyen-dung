@@ -19,8 +19,8 @@ interface CompanyActionProps {
   id: string | number;
   views: number;
   createAt: string;
-  resume: any;
-  company: any;
+  resume: Partial<import('@/types/models').Resume> | null;
+  company: Partial<import('@/types/models').Company> | null;
   children: React.ReactNode;
 }
 
@@ -146,7 +146,7 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
                   noWrap
 
-                  onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug)}`)}
+                  onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug as string)}`)}
 
                 >
 
@@ -238,14 +238,16 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
 interface CompanyActionFollowProps {
   id: string | number;
-  company: any;
+  company: Partial<import('@/types/models').Company> | null;
   children: React.ReactNode;
 }
 
 import CompanyActionFollow from './CompanyActionFollow';
 import Loading from './Loading';
 
-(CompanyAction as any).CompanyActionFollow = CompanyActionFollow;
-(CompanyAction as any).Loading = Loading;
+const CompanyActionWithSubComponents = Object.assign(CompanyAction, {
+  CompanyActionFollow,
+  Loading
+});
 
-export default CompanyAction;
+export default CompanyActionWithSubComponents;

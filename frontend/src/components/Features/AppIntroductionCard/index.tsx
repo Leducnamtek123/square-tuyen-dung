@@ -55,7 +55,7 @@ const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
               borderRadius: 2, 
               maxHeight: 300, 
               objectFit: 'cover',
-              boxShadow: (theme: any) => theme.shadows[1]
+              boxShadow: (theme: import('@mui/material/styles').Theme) => theme.shadows[1]
             }} 
           />
         </Box>

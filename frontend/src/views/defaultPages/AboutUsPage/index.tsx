@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { TabTitle } from "../../../utils/generalFunction";
 import MuiImageCustom from "../../../components/Common/MuiImageCustom";
 import { ABOUT_IMAGES, APP_NAME } from "../../../configs/constants";
+import { Theme } from "@mui/material/styles";
 
 
 
@@ -58,7 +59,7 @@ const AboutUsPage = () => {
 
             mb: 2,
 
-            background: (theme: any) => theme.palette.primary.main,
+            background: (theme: Theme) => theme.palette.primary.main,
 
             WebkitBackgroundClip: "text",
 
@@ -137,11 +138,11 @@ const AboutUsPage = () => {
 
                     transform: "translateY(-8px)",
 
-                    boxShadow: (theme: any) => theme.customShadows.card,
+                    boxShadow: (theme: Theme) => theme.customShadows.card,
 
                     borderColor: 'primary.light',
 
-                    backgroundColor: (theme: any) => `${theme.palette.primary.background}`,
+                    backgroundColor: (theme: Theme) => `${theme.palette.primary.background}`,
 
                     "& .feature-icon": {
 
@@ -259,7 +260,7 @@ const AboutUsPage = () => {
 
           textAlign: "center",
 
-          background: (theme: any) => theme.palette.primary.main,
+          background: (theme: Theme) => theme.palette.primary.main,
 
           WebkitBackgroundClip: "text",
 

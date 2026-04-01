@@ -23,7 +23,7 @@ interface JobPostActionProps {
   companyImageUrl?: string;
   companyName: string;
   jobName: string;
-  cityId: any;
+  cityId: string | number | undefined;
   deadline: string | Date;
   isUrgent?: boolean;
   isHot?: boolean;
@@ -279,7 +279,7 @@ const JobPostAction = ({
 
                     <FontAwesomeIcon icon={faLocationDot} />
 
-                    {tConfig(allConfig?.cityDict[cityId]) || (
+                    {tConfig(cityId ? allConfig?.cityDict?.[String(cityId)] : undefined) || (
 
                       <span style={{
 
@@ -347,7 +347,7 @@ const Loading = () => {
 
   const [parentWidth, setParentWidth] = React.useState(0);
 
-  const [stackDirection, setStackDirection] = React.useState('column');
+  const [stackDirection, setStackDirection] = React.useState<'column' | 'row'>('column');
 
   const theme = useTheme();
 
@@ -405,7 +405,7 @@ const Loading = () => {
 
       >
 
-        <Stack direction={stackDirection as any} spacing={2}>
+        <Stack direction={stackDirection} spacing={2}>
 
           <Box flex={1}>
 

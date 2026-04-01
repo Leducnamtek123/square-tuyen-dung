@@ -46,7 +46,7 @@ const LanguageSection: React.FC<LanguageSectionProps> = ({ profileDetail }) => {
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.languageDetails || []).map((value: Record<string, string | number>, index: number) => (
+                    {(profileDetail.languageDetails || []).map((value, index: number) => (
                         <Box key={value.id || index}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main' }}>

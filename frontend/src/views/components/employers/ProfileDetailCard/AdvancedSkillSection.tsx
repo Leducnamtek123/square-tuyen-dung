@@ -46,7 +46,7 @@ const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDeta
                 }}
             >
                 <Stack spacing={4}>
-                    {(profileDetail.skillDetails || []).map((value: Record<string, string | number>, index: number) => (
+                    {(profileDetail.skillDetails || []).map((value, index: number) => (
                         <Box key={value.id || index}>
                             <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', mb: 2 }}>
                                 {value?.skillName}

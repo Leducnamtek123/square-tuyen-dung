@@ -49,7 +49,7 @@ async function probeSTT(): Promise<ServiceState> {
   const t0 = Date.now();
   try {
     // A GET to the service base (expect 404 or 405, not 0)
-    const res = await httpRequest.get('ai/transcribe/', { timeout: 5000 } as any).catch(() => null);
+    const res = await httpRequest.get('ai/transcribe/', { timeout: 5000 }).catch(() => null);
     // Even a 405 means the service is up
     return { status: 'online', latencyMs: Date.now() - t0 };
   } catch {
@@ -60,7 +60,7 @@ async function probeSTT(): Promise<ServiceState> {
 async function probeTTS(): Promise<ServiceState> {
   const t0 = Date.now();
   try {
-    await httpRequest.get('ai/tts/', { timeout: 5000 } as any).catch(() => null);
+    await httpRequest.get('ai/tts/', { timeout: 5000 }).catch(() => null);
     return { status: 'online', latencyMs: Date.now() - t0 };
   } catch {
     return { status: 'offline' };
@@ -71,7 +71,7 @@ async function probeTTS(): Promise<ServiceState> {
 // Util
 // ---------------------------------------------------------------------------
 
-const statusColor = (s: ServiceStatus) => {
+const statusColor = (s: ServiceStatus): 'success' | 'error' | 'default' => {
   if (s === 'online') return 'success';
   if (s === 'offline') return 'error';
   return 'default';
@@ -169,7 +169,7 @@ const AIServiceHealthBanner: React.FC = () => {
               )
             }
             label={label}
-            color={statusColor(state.status) as any}
+            color={statusColor(state.status)}
             variant="outlined"
             sx={{ fontWeight: 500, fontSize: '0.72rem' }}
           />

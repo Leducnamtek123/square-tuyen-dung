@@ -13,6 +13,8 @@ import errorHandling from "@/utils/errorHandling";
 import { CV_TYPES, REGEX_VALIDATE, ROUTES } from "@/configs/constants";
 import TextFieldCustom from "@/components/Common/Controls/TextFieldCustom";
 import jobSeekerProfileService from "@/services/jobSeekerProfileService";
+import type { AxiosError } from "axios";
+import type { ApiError } from "@/types/api";
 import { formatRoute } from "@/utils/funcUtils";
 import { useAppSelector } from "@/hooks/useAppStore";
 import type { Resume } from "@/types/models";
@@ -21,7 +23,7 @@ interface ApplyFormProps {
   handleApplyJob: (data: ApplyFormValues) => void;
 }
 
-interface ApplyFormValues {
+export interface ApplyFormValues {
   fullName: string;
   email: string;
   phone: string;
@@ -58,10 +60,10 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
     defaultValues: {
       fullName: currentUser?.fullName || "",
       email: currentUser?.email || "",
-      phone: (currentUser as any)?.jobSeekerProfile?.phone || "",
+      phone: (currentUser as { jobSeekerProfile?: { phone?: string } })?.jobSeekerProfile?.phone || "",
       resume: "",
     },
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as unknown as import('react-hook-form').Resolver<ApplyFormValues>,
   });
 
   React.useEffect(() => {
@@ -71,14 +73,14 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
         const resData = await jobSeekerProfileService.getResumes(jobSeekerProfileId);
         const parsedResumes = Array.isArray(resData) ? resData : (resData.results || []);
         setResumes(parsedResumes);
-      } catch (error: any) {
-        errorHandling(error);
+      } catch (error) {
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
       } finally {
         setIsLoadingResumes(false);
       }
     };
 
-    getOnlineProfile((currentUser as any)?.jobSeekerProfileId);
+    getOnlineProfile((currentUser as { jobSeekerProfileId?: number | string })?.jobSeekerProfileId);
   }, [currentUser]);
 
   return (

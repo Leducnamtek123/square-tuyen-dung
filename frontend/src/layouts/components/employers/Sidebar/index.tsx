@@ -74,7 +74,7 @@ const MobileSidebar = ({
           width: drawerWidth,
           borderRight: '0px',
           backgroundColor: theme.palette.background.paper,
-          boxShadow: (theme as any).customShadows.sidebar,
+          boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.sidebar,
           borderRadius: '0px 10px 10px 0px',
         },
       }}

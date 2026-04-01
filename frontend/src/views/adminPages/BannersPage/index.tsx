@@ -141,7 +141,7 @@ const BannersPage = () => {
     setOpenDialog(true);
   };
 
-  const handleInputChange = (name: keyof BannerFormData, value: any) => {
+  const handleInputChange = (name: keyof BannerFormData, value: unknown) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 

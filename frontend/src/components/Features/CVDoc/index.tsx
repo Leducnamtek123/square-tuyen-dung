@@ -1,5 +1,8 @@
 import React from 'react';
 
+import dayjs from "dayjs";
+import { salaryString } from "@/utils/customData";
+
 import {
 
   Page,
@@ -56,9 +59,30 @@ export type CVDocCertificate = {
   expirationDate?: string;
 };
 
+interface ExtraData {
+  name?: string;
+  [key: string]: unknown;
+}
+
+interface ExtendedResume extends Resume {
+  user?: User | null;
+  positionChooseData?: ExtraData;
+  experienceChooseData?: ExtraData;
+  academicLevelChooseData?: ExtraData;
+  typeOfWorkplaceChooseData?: ExtraData;
+  jobTypeChooseData?: ExtraData;
+  salaryMin?: number;
+  salaryMax?: number;
+  experienceDetails?: Record<string, unknown>[];
+  educationDetails?: Record<string, unknown>[];
+  advancedSkills?: Record<string, unknown>[];
+  languageSkills?: Record<string, unknown>[];
+  certificateDetails?: Record<string, unknown>[];
+  [key: string]: unknown;
+}
+
 interface Props {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  resume: Resume | any;
+  resume: ExtendedResume;
   user?: User | null;
   themeColor?: string;
 }
@@ -622,11 +646,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
                   <Text style={styles.infoValue}>
 
-                    {`${(resume?.salaryMin / 1000000).toFixed(1)} - ${(
-
-                      resume?.salaryMax / 1000000
-
-                    ).toFixed(1)} triệu`}
+                    {salaryString(resume.salaryMin || undefined, resume.salaryMax || undefined)}
 
                   </Text>
 
@@ -776,7 +796,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
           {/* Languages */}
 
-          {resume?.languageSkills?.length > 0 && (
+          {resume.languageSkills && resume.languageSkills.length > 0 && (
 
             <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
 
@@ -812,7 +832,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
           {/* Certificates */}
 
-          {resume?.certificateDetails?.length > 0 && (
+          {resume.certificateDetails && resume.certificateDetails.length > 0 && (
 
             <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
 

@@ -551,7 +551,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.objective')}
 
-            control={control}
+            control={control as unknown as import('react-hook-form').Control<import('react-hook-form').FieldValues>}
 
           />
 
@@ -567,7 +567,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.skillsSummary')}
 
-            control={control}
+            control={control as unknown as import('react-hook-form').Control<import('react-hook-form').FieldValues>}
 
           />
 

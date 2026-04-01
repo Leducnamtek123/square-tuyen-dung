@@ -3,7 +3,7 @@ import { Box, Typography, Chip, Tooltip, IconButton } from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useTranslation } from 'react-i18next';
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 import dayjs from '../../../../configs/dayjs-config';
 import { Resume } from '../../../../types/models';
@@ -12,11 +12,11 @@ interface ResumeTableProps {
     data: Resume[];
     isLoading: boolean;
     rowCount: number;
-    pagination: any;
-    onPaginationChange: any;
+    pagination: PaginationState;
+    onPaginationChange: OnChangeFn<PaginationState>;
     enableSorting?: boolean;
-    sorting?: any;
-    onSortingChange?: any;
+    sorting?: SortingState;
+    onSortingChange?: OnChangeFn<SortingState>;
     onEdit: (resume: Resume) => void;
     onDelete: (resume: Resume) => void;
 }

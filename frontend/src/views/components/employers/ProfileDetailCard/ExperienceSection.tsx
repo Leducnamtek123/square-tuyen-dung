@@ -50,7 +50,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ profileDetail }) 
                 }}
             >
                 <Stack spacing={5}>
-                    {(profileDetail.experiencesDetails || []).map((value: Record<string, string | number>, index: number) => (
+                    {(profileDetail.experiencesDetails || []).map((value, index: number) => (
                         <Box key={value.id || index}>
                             <Grid container spacing={4}>
                                 <Grid size={{ xs: 12, md: 4 }}>
@@ -69,7 +69,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ profileDetail }) 
                                         <Stack direction="row" alignItems="center" spacing={1.5}>
                                             <CalendarMonthIcon sx={{ fontSize: 20, color: 'text.secondary', opacity: 0.8 }} />
                                             <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary', opacity: 0.8 }}>
-                                                <TimeAgo date={value?.startDate} type="format" /> - <TimeAgo date={value?.endDate} type="format" />
+                                                {value?.startDate && <TimeAgo date={value.startDate} type="format" />} - {value?.endDate ? <TimeAgo date={value.endDate} type="format" /> : t('common:labels.present')}
                                             </Typography>
                                         </Stack>
                                     </Stack>

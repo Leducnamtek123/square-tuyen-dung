@@ -11,10 +11,10 @@ import contentService from '@/services/contentService';
 import NoDataCard from '@/components/Common/NoDataCard';
 
 interface FeedbackCarouselProps {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
-const styles: any = {
+const styles: Record<string, unknown> = {
   ".swiper-pagination": {
     bottom: "-5px !important",
   },
@@ -42,7 +42,7 @@ const FeedbackCarousel = (_props: FeedbackCarouselProps) => {
   const { data: feedbacks = [], isLoading } = useQuery({
     queryKey: ['feedbacks'],
     queryFn: async () => {
-      const resData: any = await contentService.getFeedbacks();
+      const resData = await contentService.getFeedbacks() as { id: string | number; userDict?: { avatarUrl?: string; fullName?: string }; content?: string; [key: string]: unknown }[];
       return resData || [];
     },
     staleTime: 10 * 60_000, // feedbacks change rarely, cache 10 min
@@ -107,7 +107,7 @@ const FeedbackCarousel = (_props: FeedbackCarouselProps) => {
             }}
             modules={[Pagination, Autoplay]}
           >
-            {feedbacks.map((value: any) => (
+            {feedbacks.map((value: { id: string | number; userDict?: { avatarUrl?: string; fullName?: string }; content?: string; [key: string]: unknown }) => (
               <SwiperSlide key={value.id}>
                 <FeedbackCard
                   avatarUrl={value?.userDict?.avatarUrl}

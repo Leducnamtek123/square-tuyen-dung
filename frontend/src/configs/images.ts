@@ -58,10 +58,10 @@ import star5 from '../assets/images/feedbacks/5star.gif';
 
 // Next.js static image imports return { src, width, height } objects.
 // This helper extracts the string URL for use in regular <img> tags.
-const imgSrc = (img: any): string => {
+const imgSrc = (img: string | { src?: string; default?: { src?: string } } | null | undefined): string => {
   if (typeof img === 'string') return img;
   if (img && typeof img === 'object' && typeof img.src === 'string') return img.src;
-  if (img && typeof img === 'object' && typeof img.default === 'object') return img.default.src;
+  if (img && typeof img === 'object' && typeof img.default === 'object') return img.default.src || '';
   if (img && typeof img === 'object' && typeof img.default === 'string') return img.default;
   return String(img ?? '');
 };

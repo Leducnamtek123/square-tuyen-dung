@@ -76,7 +76,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
             ? `${workspace.label} (${workspace.roleCode || "member"})`
             : t("nav.accountManagement"),
         onClick: () => {
-          dispatch(setActiveWorkspace(workspace as any));
+          dispatch(setActiveWorkspace(workspace as unknown as import('@/types/models').Workspace));
           if (workspace.type === "company") {
             openPortal(true, ROUTES.EMPLOYER.DASHBOARD);
             return;

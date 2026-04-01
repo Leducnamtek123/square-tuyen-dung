@@ -7,6 +7,9 @@ import BackdropLoading from '@/components/Common/Loading/BackdropLoading';
 import FormPopup from '@/components/Common/Controls/FormPopup';
 import ApplyForm from '@/components/Features/ApplyForm';
 import jobPostActivityService from '@/services/jobPostActivityService';
+import type { ApplyFormValues } from '@/components/Features/ApplyForm';
+import type { AxiosError } from 'axios';
+import type { ApiError } from '@/types/api';
 
 interface ApplyCardProps {
   title?: string;
@@ -25,16 +28,16 @@ const ApplyCard = ({
 }: ApplyCardProps) => {
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const handleApplyJob = (data: any) => {
-    const applyJob = async (applyData: any) => {
+  const handleApplyJob = (data: ApplyFormValues) => {
+    const applyJob = async (applyData: ApplyFormValues & { job_post?: string | number }) => {
       setIsFullScreenLoading(true);
       try {
-        await jobPostActivityService.applyJob(applyData);
+        await jobPostActivityService.applyJob(applyData as unknown as Record<string, unknown>);
         toastMessages.success('Applied successfully.');
         setIsApplySuccess(true);
         setOpenPopup(false);
-      } catch (error: any) {
-        errorHandling(error);
+      } catch (error: unknown) {
+        errorHandling(error as AxiosError<{ errors?: ApiError }>);
       } finally {
         setIsFullScreenLoading(false);
       }

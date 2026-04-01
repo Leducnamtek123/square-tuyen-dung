@@ -17,16 +17,16 @@ const ForgotPasswordPage = () => {
 
   const navigate = useRouter();
 
-  const [successMessage, setSuccessMessage] = React.useState(null);
+  const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
 
-  const [errorMessage, setErrorMessage] = React.useState(null);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
-  const handleRequestResetPassword = async (data: any) => {
+  const handleRequestResetPassword = async (data: { email: string }) => {
     try {
       await authService.forgotPassword({ email: data.email, platform: 'WEB' });
-      setSuccessMessage(t('forgotPassword.success', { email: data?.email }) as any);
+      setSuccessMessage(t('forgotPassword.success', { email: data?.email }));
     } catch (error) {
-      setErrorMessage(t('messages.tryAgain') as any);
+      setErrorMessage(t('messages.tryAgain'));
     }
   };
 

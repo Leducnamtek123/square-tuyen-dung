@@ -155,13 +155,13 @@ export interface UserDict {
 /* Resume & Profile */
 
 export interface ResumeDetailResponse extends Resume {
-  jobSeekerProfile?: Record<string, any>;
-  experiencesDetails?: Record<string, any>[];
-  educationDetails?: Record<string, any>[];
-  certificateDetails?: Record<string, any>[];
-  languageDetails?: Record<string, any>[];
-  skillDetails?: Record<string, any>[];
-  user?: Record<string, any>;
+  jobSeekerProfile?: JobSeekerProfile;
+  experiencesDetails?: ExperienceDetail[];
+  educationDetails?: EducationDetail[];
+  certificateDetails?: Certificate[];
+  languageDetails?: LanguageSkill[];
+  skillDetails?: AdvancedSkill[];
+  user?: User;
 }
 
 export interface Resume {
@@ -214,41 +214,48 @@ export interface JobSeekerProfile {
 
 export interface EducationDetail {
   id: number;
-  degreeName: string;
-  major: string;
-  trainingPlaceName: string;
-  startDate: string;
+  degreeName?: string;
+  major?: string;
+  trainingPlaceName?: string;
+  startDate?: string;
   completedDate?: string | null;
   description?: string | null;
 }
 
 export interface ExperienceDetail {
   id: number;
-  jobName: string;
-  companyName: string;
-  startDate: string;
-  endDate: string;
+  jobName?: string;
+  companyName?: string;
+  startDate?: string;
+  endDate?: string;
   description?: string | null;
 }
 
 export interface Certificate {
   id: number;
-  name: string;
-  trainingPlace: string;
-  startDate: string;
+  name?: string;
+  trainingPlace?: string;
+  startDate?: string;
   expirationDate?: string | null;
+  certificateName?: string;
+  trainingPlaceName?: string;
 }
 
 export interface LanguageSkill {
   id: number;
-  language: number;
-  level: number;
+  language?: number;
+  level?: number;
+  languageName?: string;
+  levelName?: string;
+  point?: number | string;
 }
 
 export interface AdvancedSkill {
   id: number;
-  name: string;
-  level: number;
+  name?: string;
+  level?: number;
+  skillName?: string;
+  point?: number | string;
 }
 
 /* Common */
@@ -348,15 +355,15 @@ export interface InterviewSession {
   ai_strengths?: string[] | string | null;
   aiWeaknesses?: string[] | string | null;
   ai_weaknesses?: string[] | string | null;
-  aiDetailedFeedback?: any;
-  ai_detailed_feedback?: any;
+  aiDetailedFeedback?: Record<string, unknown>;
+  ai_detailed_feedback?: Record<string, unknown>;
   recordingUrl?: string | null;
   recording_url?: string | null;
   evaluations?: InterviewEvaluation[];
   questions?: Question[];
   questionGroup?: number | string | QuestionGroup | null;
   question_group?: number | string | QuestionGroup | null;
-  transcripts?: any[];
+  transcripts?: Record<string, unknown>[];
 }
 
 export interface InterviewEvaluation {

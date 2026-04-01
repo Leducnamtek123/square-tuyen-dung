@@ -80,6 +80,6 @@ const HeaderChatInfo = ({ avatarUrl, title, subTitle }: HeaderChatInfoProps) => 
 };
 
 // Assign HeaderChatInfo to ChatInfo
-(ChatInfo as any).HeaderChatInfo = HeaderChatInfo;
+(ChatInfo as typeof ChatInfo & { HeaderChatInfo: typeof HeaderChatInfo }).HeaderChatInfo = HeaderChatInfo;
 
 export default ChatInfo as typeof ChatInfo & { HeaderChatInfo: typeof HeaderChatInfo };

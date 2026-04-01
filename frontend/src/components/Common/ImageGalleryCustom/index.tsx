@@ -4,7 +4,7 @@ import 'react-image-gallery/styles/css/image-gallery.css';
 import ImageGallery from 'react-image-gallery';
 
 interface ImageGalleryCustomProps {
-  images: any[];
+  images: { original: string; thumbnail?: string }[];
 }
 
 const ImageGalleryCustom = ({ images }: ImageGalleryCustomProps) => {

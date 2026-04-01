@@ -9,7 +9,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 
 interface Props<T extends Record<string, unknown>> {
   name: string;
-  control: Control<T | any>;
+  control: Control<T | import('react-hook-form').FieldValues>;
   title?: string | null;
   showRequired?: boolean;
   placeholder?: string;

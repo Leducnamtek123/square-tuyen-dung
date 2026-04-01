@@ -255,7 +255,7 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
               py: 1,
               px: 2,
               '&.Mui-selected': {
-                backgroundColor: (theme.palette.primary as any).light + '20',
+                backgroundColor: (theme.palette.primary as { light?: string }).light + '20',
               }
             }}
           >

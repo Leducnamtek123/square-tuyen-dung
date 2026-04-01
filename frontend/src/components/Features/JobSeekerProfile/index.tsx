@@ -99,7 +99,7 @@ const JobSeekerProfile = ({
                     borderColor: 'primary.main',
                     bgcolor: alpha(theme.palette.primary.main, 0.02),
                     transform: 'translateY(-4px)',
-                    boxShadow: (theme: any) => theme.customShadows?.z12,
+                    boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.z12,
                     '& .profile-actions': { opacity: 1, transform: 'translateX(0)' }
                 },
             }}
@@ -114,7 +114,7 @@ const JobSeekerProfile = ({
                         borderRadius: 2.5,
                         border: '1px solid',
                         borderColor: 'divider',
-                        boxShadow: (theme: any) => theme.customShadows?.z1
+                        boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.z1
                     }}
                 />
                 
@@ -240,7 +240,7 @@ const JobSeekerProfile = ({
                                     '&:hover': { 
                                         bgcolor: isSaved ? 'error.main' : 'text.primary', 
                                         color: '#fff',
-                                        boxShadow: (theme: any) => theme.customShadows?.error
+                                        boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.error
                                     }
                                 }}
                             >
@@ -256,7 +256,7 @@ const JobSeekerProfile = ({
                                     '&:hover': { 
                                         bgcolor: 'primary.main', 
                                         color: '#fff',
-                                        boxShadow: (theme: any) => theme.customShadows?.primary
+                                        boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.primary
                                     }
                                 }}
                             >

@@ -69,7 +69,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.dob')} 
-                        value={<TimeAgo date={profileDetail?.jobSeekerProfile?.birthday} type="format" />} 
+                        value={profileDetail?.jobSeekerProfile?.birthday ? <TimeAgo date={profileDetail.jobSeekerProfile.birthday} type="format" /> : ''} 
                         icon={<CakeIcon />}
                     />
                 </Grid>
@@ -83,7 +83,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.cityProvince')} 
-                        value={tConfig(allConfig?.cityDict?.[(profileDetail?.jobSeekerProfile?.location as Record<string, string>)?.city as string])} 
+                        value={tConfig(allConfig?.cityDict?.[(profileDetail?.jobSeekerProfile?.location as unknown as Record<string, string>)?.city as string])} 
                         icon={<LocationIcon />}
                     />
                 </Grid>

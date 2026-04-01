@@ -20,10 +20,10 @@ interface StaticImageData {
 
 // Next.js image imports return objects; extract string src
 const toSrc = (img: string | StaticImageData | { default: StaticImageData }): string => 
-  typeof img === 'string' ? img : (img as any)?.src || (img as any)?.default?.src || '';
+  typeof img === 'string' ? img : (img as { src?: string; default?: { src?: string } })?.src || (img as { default?: { src?: string } })?.default?.src || '';
 
-const markerShadow = toSrc(markerShadowImport as any);
-const markerIconRetina = toSrc(markerIconRetinaImport as any);
+const markerShadow = toSrc(markerShadowImport as string | StaticImageData | { default: StaticImageData });
+const markerIconRetina = toSrc(markerIconRetinaImport as string | StaticImageData | { default: StaticImageData });
 
 interface Props {
   title?: string;

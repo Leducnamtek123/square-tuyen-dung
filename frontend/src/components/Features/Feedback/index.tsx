@@ -63,7 +63,7 @@ const Feedback = (_props: FeedbackProps) => {
         handleClose();
         toastMessages.success(t('feedback.success'));
       } catch (error) {
-        // We use any here because errorHandling implicitly expects AxiosError but catching produces unknown.
+        // We use an explicit cast here because errorHandling expects AxiosError but catching produces unknown.
         errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
       } finally {
         setIsFullScreenLoading(false);
@@ -246,7 +246,7 @@ const Feedback = (_props: FeedbackProps) => {
               <MultilineTextFieldCustom
                 name="content"
                 placeholder={t('feedback.placeholder')}
-                control={control}
+                control={control as unknown as import('react-hook-form').Control<import('react-hook-form').FieldValues>}
                 minRows={5}
                 maxRows={8}
                 sx={{

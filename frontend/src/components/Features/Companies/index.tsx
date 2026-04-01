@@ -10,7 +10,7 @@ import companyService from "@/services/companyService";
 import { RootState } from "@/redux/store";
 
 interface Props {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const Companies = (_props: Props) => {
@@ -32,7 +32,7 @@ const Companies = (_props: Props) => {
       const resData = (await companyService.getCompanies({
         ...companyFilter,
         page: page,
-      })) as any;
+      })) as import('@/types/api').PaginatedResponse<import('@/types/models').Company>;
       return {
         results: resData?.results || [],
         count: resData?.count || 0,
@@ -121,7 +121,7 @@ const Companies = (_props: Props) => {
         ) : (
           <>
             <Grid container spacing={2}>
-              {companies.map((value: any) => (
+              {companies.map((value: import('@/types/models').Company) => (
                 <Grid
                   key={value.id}
                   size={{
@@ -132,17 +132,17 @@ const Companies = (_props: Props) => {
                     xl: 4
                   }}>
                   <Company
-                    id={value.id}
-                    slug={value.slug}
-                    companyImageUrl={value.companyImageUrl}
-                    companyCoverImageUrl={value.companyCoverImageUrl}
-                    companyName={value.companyName}
-                    employeeSize={value.employeeSize}
-                    fieldOperation={value.fieldOperation}
-                    city={value.locationDict?.city}
-                    followNumber={value.followNumber}
-                    jobPostNumber={value.jobPostNumber}
-                    isFollowed={value.isFollowed}
+                    id={value.id as number}
+                    slug={value.slug as string}
+                    companyImageUrl={value.companyImageUrl || ''}
+                    companyCoverImageUrl={(value as unknown as Record<string, unknown>).companyCoverImageUrl as string}
+                    companyName={value.companyName || ''}
+                    employeeSize={value.employeeSize as string | number}
+                    fieldOperation={value.fieldOperation as string}
+                    city={(value.locationDict as unknown as Record<string, unknown>)?.city as string}
+                    followNumber={(value as unknown as Record<string, unknown>).followNumber as number}
+                    jobPostNumber={(value as unknown as Record<string, unknown>).jobPostNumber as number}
+                    isFollowed={(value as unknown as Record<string, unknown>).isFollowed as boolean}
                   />
                 </Grid>
               ))}

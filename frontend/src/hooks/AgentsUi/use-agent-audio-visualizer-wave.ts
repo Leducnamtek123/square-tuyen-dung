@@ -19,9 +19,9 @@ function useAnimatedValue(initialValue: AnimatedValue) {
   const animateFn = useCallback(
     (targetValue: AnimatedValue, transition: Record<string, unknown>) => {
       controlsRef.current = animate(
-        motionValue as any,
-        targetValue as any,
-        transition as any
+        motionValue as Parameters<typeof animate>[0],
+        targetValue as Parameters<typeof animate>[1],
+        transition as Parameters<typeof animate>[2]
       );
     },
     [motionValue]
@@ -42,7 +42,7 @@ export function useAgentAudioVisualizerWave({
   const { value: frequency, animate: animateFrequency } = useAnimatedValue(DEFAULT_FREQUENCY);
   const { value: opacity, animate: animateOpacity } = useAnimatedValue(1.0);
 
-  const volume = useTrackVolume(audioTrack as any, {
+  const volume = useTrackVolume(audioTrack as Parameters<typeof useTrackVolume>[0], {
     fftSize: 512,
     smoothingTimeConstant: 0.55,
   });

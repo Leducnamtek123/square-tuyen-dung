@@ -11,11 +11,11 @@ import dayjs from 'dayjs';
 interface Props {
   allowSubmit: boolean;
   setAllowSubmit: (allow: boolean) => void;
-  selectedDateRange: [any, any] | null;
-  setSelectedDateRange: (range: [any, any]) => void;
+  selectedDateRange: [dayjs.Dayjs | null, dayjs.Dayjs | null] | null;
+  setSelectedDateRange: (range: [dayjs.Dayjs | null, dayjs.Dayjs | null]) => void;
 }
 
-function getMonthDiff(dateA: any, dateB: any) {
+function getMonthDiff(dateA: Date, dateB: Date) {
   const msPerDay = 86400000;
   const daysDiff = Math.round((dateB.getTime() - dateA.getTime()) / msPerDay);
   const monthDiff = Math.floor(daysDiff / 30);
@@ -32,7 +32,7 @@ const RangePickerCustom = ({
 
   const [maxDate, setMaxDate] = React.useState(dayjs());
 
-  const handleDateRangeChange = (startValue: any, endValue: any) => {
+  const handleDateRangeChange = (startValue: dayjs.Dayjs | null, endValue: dayjs.Dayjs | null) => {
     if (startValue && endValue) {
       const startDate = new Date(dayjs(startValue).format('YYYY-MM-DD'));
       const endDate = new Date(dayjs(endValue).format('YYYY-MM-DD'));
@@ -46,7 +46,7 @@ const RangePickerCustom = ({
     setSelectedDateRange([startValue, endValue]);
   };
 
-  function handleCalendarChange(dates: any) {
+  function handleCalendarChange(dates: (dayjs.Dayjs | null)[]) {
 
     if (
 

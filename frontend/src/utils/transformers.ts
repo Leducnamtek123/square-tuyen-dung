@@ -1,12 +1,12 @@
 import i18n from '../i18n';
-import { Question, QuestionGroup, JobPost } from '../types/models';
+import { Question, QuestionGroup, JobPost, InterviewSession } from '../types/models';
 
 const t = (key: string, options?: Record<string, unknown>) => i18n.t(key, options);
 
 /**
  * Transformers Layer: Centralized mapping from Backend API responses to Frontend models.
  */
-export const transformQuestion = (q: any | null | undefined): Question | null => {
+export const transformQuestion = (q: Record<string, unknown> | null | undefined): Question | null => {
   if (!q) return null;
 
   const text = q.text || q.questionText || q.content || '';
@@ -21,7 +21,7 @@ export const transformQuestion = (q: any | null | undefined): Question | null =>
 };
 
 export const transformQuestionGroup = (
-  group: any | null | undefined,
+  group: Record<string, unknown> | null | undefined,
 ): QuestionGroup | null => {
   if (!group) return null;
 
@@ -29,99 +29,120 @@ export const transformQuestionGroup = (
     id: group.id,
     name: group.name || '',
     description: group.description || '',
-    questions: (group.questions || []).map(transformQuestion).filter((q: Question | null): q is Question => !!q),
+    questions: (Array.isArray(group.questions) ? group.questions : []).map((q) => transformQuestion(q as Record<string, unknown>)).filter((q: Question | null): q is Question => !!q),
     ...group,
   } as unknown as QuestionGroup;
 };
 
 export const transformInterviewSession = (
-  session: any | null | undefined,
-): any | null => {
+  session: Record<string, unknown> | null | undefined,
+): InterviewSession | null => {
   if (!session) return null;
+  const s = session as Record<string, unknown>;
+  const dicts = s as {
+    candidateDict?: { fullName: string; email: string; id: number };
+    jobSeekerDict?: { fullName: string; email: string; id: number };
+    jobPostDict?: { jobName: string; companyName: string; id: number };
+    companyDict?: { companyName: string };
+  };
 
-  const candidateName =
-    session.candidateName ||
-    session.candidateDict?.fullName ||
-    session.jobSeekerDict?.fullName ||
-    '';
-  const candidateEmail =
-    session.candidateEmail ||
-    session.candidateDict?.email ||
-    session.jobSeekerDict?.email ||
-    '';
-  const jobName =
-    session.jobName ||
-    session.jobPostName ||
-    session.jobPostDict?.jobName ||
-    '';
-  const scheduledAt = session.scheduledAt || session.startTime || '';
-  const inviteToken = session.inviteToken || null;
-  const recordingUrl = session.recordingUrl || null;
-  const transcriptUrl = session.transcriptUrl || null;
-  const companyName =
-    session.companyName ||
-    session.companyDict?.companyName ||
-    session.jobPostDict?.companyName ||
-    '';
+  const candidateName = (
+    s.candidateName ||
+    dicts.candidateDict?.fullName ||
+    dicts.jobSeekerDict?.fullName ||
+    ''
+  ) as string;
+  const candidateEmail = (
+    s.candidateEmail ||
+    dicts.candidateDict?.email ||
+    dicts.jobSeekerDict?.email ||
+    ''
+  ) as string;
+  const jobName = (
+    s.jobName ||
+    s.jobPostName ||
+    dicts.jobPostDict?.jobName ||
+    ''
+  ) as string;
+  const scheduledAt = (s.scheduledAt || s.startTime || '') as string;
+  const inviteToken = (s.inviteToken || undefined) as string | undefined;
+  const recordingUrl = (s.recordingUrl || null) as string | null | undefined;
+  const transcriptUrl = (s.transcriptUrl || null) as string | null | undefined;
+  const companyName = (
+    s.companyName ||
+    dicts.companyDict?.companyName ||
+    dicts.jobPostDict?.companyName ||
+    ''
+  ) as string;
 
   return {
-    ...session,
-    id: session.id,
-    jobPostId:
-      session.jobPost || session.jobPostDict?.id || null,
-    candidateId:
-      session.candidate || session.candidateDict?.id || session.jobSeekerDict?.id,
+    ...s,
+    id: s.id as number,
+    jobPostId: (
+      s.jobPost || dicts.jobPostDict?.id || null
+    ) as number | null,
+    candidateId: (
+      s.candidate || dicts.candidateDict?.id || dicts.jobSeekerDict?.id
+    ) as number | undefined,
     candidateName,
     candidateEmail,
     companyName,
     jobName,
-    roomName: session.roomName || session.room || '',
+    roomName: (s.roomName || s.room || '') as string,
     scheduledAt,
-    status: session.status || 'PENDING',
-    interviewType: session.interviewType || null,
-    type: session.type || session.interviewType || null,
+    status: (s.status as string) || 'PENDING',
+    interviewType: (s.interviewType || undefined) as string | undefined,
+    type: (s.type || s.interviewType || undefined) as string | undefined,
     inviteToken,
-    notes: session.notes || '',
+    notes: (s.notes || '') as string,
     recordingUrl,
     transcriptUrl,
-    questions: (session.questions || []).map(transformQuestion).filter((q: Question | null): q is Question => !!q),
-  };
+    questions: (Array.isArray(s.questions) ? s.questions : []).map((q) => transformQuestion(q as Record<string, unknown>)).filter((q: Question | null): q is Question => !!q),
+  } as unknown as InterviewSession;
 };
 
-export const transformJobPost = (job: any | null | undefined): JobPost | null => {
+export const transformJobPost = (job: Record<string, unknown> | null | undefined): JobPost | null => {
   if (!job) return null;
+  const dicts = job as {
+    companyDict?: { companyName: string };
+    locationDict?: { city: string };
+  };
 
   return {
-    id: job.id,
-    title: job.jobName || job.title || '',
-    companyName: job.companyDict?.companyName || '',
-    location: job.locationDict?.city || '',
-    salaryMin: job.salaryMin,
-    salaryMax: job.salaryMax,
-    deadline: job.deadline,
+    id: job.id as number,
+    title: (job.jobName || job.title || '') as string,
+    companyName: (dicts.companyDict?.companyName || '') as string,
+    location: (dicts.locationDict?.city || '') as string,
+    salaryMin: job.salaryMin as number,
+    salaryMax: job.salaryMax as number,
+    deadline: job.deadline as string,
     ...job,
-    jobName: job.jobName || job.title || '',
+    jobName: (job.jobName || job.title || '') as string,
   } as unknown as JobPost;
 };
 
 export const transformAppliedResume = (
-  resume: any | null | undefined,
-): any | null => {
+  resume: Record<string, unknown> | null | undefined,
+): Record<string, unknown> | null => {
   if (!resume) return null;
+  const dicts = resume as {
+    user?: { id: number; fullName: string; email: string };
+    resume?: { slug: string };
+  };
 
-  const userId = resume.userId || resume.user?.id;
-  const candidateName = resume.fullName || resume.user?.fullName || '';
+  const userId = (resume.userId || dicts.user?.id) as number;
+  const candidateName = (resume.fullName || dicts.user?.fullName || '') as string;
 
   return {
     ...resume,
-    id: resume.id,
+    id: resume.id as number,
     candidateId: userId,
     userId: userId,
     candidateName,
     fullName: candidateName,
-    email: resume.email || resume.user?.email || '',
-    resumeSlug: resume.resumeSlug || resume.resume?.slug || '',
-    jobName: resume.jobName || '',
-    status: resume.status,
+    email: (resume.email || dicts.user?.email || '') as string,
+    resumeSlug: (resume.resumeSlug || dicts.resume?.slug || '') as string,
+    jobName: (resume.jobName || '') as string,
+    status: resume.status as number,
   };
 };

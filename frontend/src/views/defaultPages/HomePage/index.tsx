@@ -26,7 +26,7 @@ import type { SvgIconComponent } from "@mui/icons-material";
 import LazyLoadSection from "../../../components/Common/LazyLoadSection";
 
 // Next.js image imports return objects; extract string src
-const toSrc = (img: any): string => typeof img === 'string' ? img : img?.src || img?.default?.src || '';
+const toSrc = (img: string | { src?: string; default?: { src?: string } } | null | undefined): string => typeof img === 'string' ? img : img?.src || img?.default?.src || '';
 const bannerExplore = toSrc(bannerExploreImport);
 const bannerExplorePc = toSrc(bannerExplorePcImport);
 

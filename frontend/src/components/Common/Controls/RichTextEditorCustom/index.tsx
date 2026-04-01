@@ -14,7 +14,7 @@ const DraftEditor = dynamic(
     const mod = await import('react-draft-wysiwyg');
     // Handle ESM/CJS interop: in production builds the named export
     // "Editor" may live under mod.default.Editor or just mod.default
-    const Editor = mod.Editor || (mod as any).default?.Editor || (mod as any).default || mod;
+    const Editor = mod.Editor || (mod as { default?: { Editor?: React.ComponentType<EditorProps> } | React.ComponentType<EditorProps> }).default || mod;
     return Editor as React.ComponentType<EditorProps>;
   },
   { ssr: false }
@@ -44,7 +44,7 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
       <Controller
         control={control}
         name={name as Path<T>}
-        defaultValue={EditorState.createEmpty() as unknown as any}
+        defaultValue={EditorState.createEmpty() as unknown as import('react-hook-form').PathValue<T, import('react-hook-form').Path<T>>}
         render={({ field, fieldState }) => {
           const safeEditorState = field.value?.getCurrentContent
             ? field.value

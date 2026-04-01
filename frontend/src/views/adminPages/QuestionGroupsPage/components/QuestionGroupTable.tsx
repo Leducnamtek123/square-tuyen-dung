@@ -56,7 +56,7 @@ const QuestionGroupTable = ({
             header: t('pages.questionGroups.table.questionCount') as string,
             cell: (info) => (
                 <Typography variant="body2">
-                    {(info.getValue() as any[])?.length || 0}
+                    {(info.getValue() as unknown[])?.length || 0}
                 </Typography>
             ),
         },

@@ -23,10 +23,10 @@ const JobApplicationCard = () => {
   const nav = useRouter();
   const { currentUser } = useAppSelector((state) => state.user);
   
-  const user = currentUser as unknown as Record<string, any>;
+  const user = currentUser as unknown as Record<string, unknown> & { jobSeekerProfile?: { id?: number | string }; jobSeekerProfileId?: number | string };
   const profileId = user?.jobSeekerProfile?.id || user?.jobSeekerProfileId;
 
-  const { data, isLoading } = useResumes(profileId);
+  const { data, isLoading } = useResumes(profileId ? String(profileId) : undefined);
 
   return (
     <Box

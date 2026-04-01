@@ -14,7 +14,7 @@ interface Banner {
 }
 
 interface MainJobRightBannerProps {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const StyledBannerImage = styled("img")({
@@ -41,10 +41,10 @@ const MainJobRightBanner = (_props: MainJobRightBannerProps) => {
   React.useEffect(() => {
     const getRightBanners = async () => {
       try {
-        const resData: any = await contentService.getBanners({
+        const resData = await contentService.getBanners({
           type: BANNER_TYPES.MAIN_JOB_RIGHT,
         });
-        const data = Array.isArray(resData) ? resData : (resData?.results || resData?.data || []);
+        const data = Array.isArray(resData) ? resData : ((resData as { results?: Banner[] })?.results || (resData as { data?: Banner[] })?.data || []);
         setRightBanners(data);
       } catch (error) {}
     };
@@ -81,7 +81,7 @@ const MainJobRightBanner = (_props: MainJobRightBannerProps) => {
                 bottom: '20px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                zIndex: (theme.zIndex as any).card + 1
+                zIndex: (theme.zIndex as unknown as Record<string, number>).card + 1
               }}
             >
               <Button

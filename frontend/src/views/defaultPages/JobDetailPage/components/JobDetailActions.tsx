@@ -17,7 +17,7 @@ interface JobDetailActionsProps {
   handleShowApplyForm: () => void;
   setOpenSharePopup: (open: boolean) => void;
   isAuthenticated: boolean;
-  currentUser: any;
+  currentUser: import('@/types/models').User | null;
 }
 
 const JobDetailActions: React.FC<JobDetailActionsProps> = ({

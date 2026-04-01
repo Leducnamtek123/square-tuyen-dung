@@ -2,9 +2,9 @@ import React from 'react';
 import { Box, Typography } from "@mui/material";
 
 interface CompanyAboutProps {
-  companyDetail: any;
+  companyDetail: import('./index').CompanyDetailProps | null;
   safeDescriptionHtml: string;
-  t: any;
+  t: (key: string) => string;
 }
 
 const CompanyAbout: React.FC<CompanyAboutProps> = ({ companyDetail, safeDescriptionHtml, t }) => {

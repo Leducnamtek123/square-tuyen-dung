@@ -4,7 +4,7 @@ import CropperImport, { Area } from 'react-easy-crop';
 
 // Handle ESM/CJS interop: in production builds the default import can resolve
 // to the module wrapper object instead of the component function.
-const Cropper = (CropperImport as any).default || CropperImport;
+const Cropper = (CropperImport as { default?: typeof CropperImport }).default || CropperImport;
 import {
   Dialog,
   DialogTitle,

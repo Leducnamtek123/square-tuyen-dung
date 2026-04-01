@@ -24,14 +24,14 @@ const styles = {
   },
 };
 
-const RenderItem = ({ item }: { item: any }) => {
+const RenderItem = ({ item }: { item: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string } }) => {
   return (
     <Box
       component="img"
       src={item.imageUrl}
       alt={item.description || 'Banner'}
       loading="lazy"
-      onError={(e: any) => { e.target.src = IMAGES.coverImageDefault; e.target.onerror = null; }}
+      onError={(e) => { (e.target as HTMLImageElement).src = IMAGES.coverImageDefault; (e.target as HTMLImageElement).onerror = null; }}
       sx={{
         width: '100%',
         height: '100%',
@@ -44,13 +44,13 @@ const RenderItem = ({ item }: { item: any }) => {
 };
 
 const TopSlide = () => {
-  const [banners, setBanners] = React.useState<any[]>([]);
+  const [banners, setBanners] = React.useState<{ targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[]>([]);
 
   React.useEffect(() => {
     const getBanners = async () => {
       try {
         const resData = await contentService.getBanners({ type: BANNER_TYPES.HOME });
-        const data = Array.isArray(resData) ? resData : ((resData as any)?.results || (resData as any)?.data || []);
+        const data = Array.isArray(resData) ? resData : ((resData as { results?: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[]; data?: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[] })?.results || (resData as { results?: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[]; data?: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[] })?.data || []);
         setBanners(data);
       } catch (error) {
         // Error handled silently

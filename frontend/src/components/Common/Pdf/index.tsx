@@ -12,6 +12,7 @@ import ZoomOutOutlinedIcon from '@mui/icons-material/ZoomOutOutlined';
 import ZoomInOutlinedIcon from '@mui/icons-material/ZoomInOutlined';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import toSlug from '@/utils/customData';
+import type { Theme } from '@mui/material/styles';
 
 interface PdfProps {
   fileUrl: string;
@@ -89,7 +90,7 @@ const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
               >
 
                 <ZoomOut>
-                  {(props: any) => (
+                  {(props: { onClick: () => void }) => (
 
                     <IconButton
 
@@ -110,7 +111,7 @@ const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
                 </ZoomOut>
 
                 <Zoom>
-                  {(props: any) => (
+                  {(props: { onZoom: (scale: number | SpecialZoomLevel) => void }) => (
 
                     <Chip
 
@@ -131,7 +132,7 @@ const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
                 </Zoom>
 
                 <ZoomIn>
-                  {(props: any) => (
+                  {(props: { onClick: () => void }) => (
 
                     <IconButton
 
@@ -160,12 +161,12 @@ const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
               <Stack direction="row" justifyContent="flex-end">
 
                 <Download>
-                  {(props: any) => (
+                  {(props: { onClick: () => void }) => (
 
                     <Button
 
                       sx={{
-                        boxShadow: (theme: any) => theme.customShadows.medium,
+                        boxShadow: (theme: Theme & { customShadows?: { medium?: string } }) => theme.customShadows?.medium || 'none',
 
                         color: 'white',
 

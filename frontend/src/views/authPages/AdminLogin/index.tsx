@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { AppDispatch } from '../../../redux/store';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import {
@@ -91,7 +92,7 @@ const Dot = styled('button')<{ active: boolean }>(({ active }) => ({
 const AdminLogin: React.FC = () => {
   const { t } = useTranslation(['auth', 'admin']);
   TabTitle(t('auth:login.adminTitle'));
-  const dispatch = useDispatch() as any;
+  const dispatch = useDispatch<AppDispatch>();
   const nav = useRouter();
 
   const [isLoading, setIsLoading] = React.useState(false);
@@ -140,17 +141,17 @@ const AdminLogin: React.FC = () => {
   };
 
   /* ── auth logic ── */
-  const handleLogin = (data: any) => {
-    const getAccessToken = async (email: string, password: any, roleName: string) => {
+  const handleLogin: React.ComponentProps<typeof AdminLoginForm>['onLogin'] = (data) => {
+    const getAccessToken = async (email: string, password: string, roleName: string) => {
       setIsLoading(true);
       try {
         const resData = await authService.getToken(email, password, roleName as RoleName);
-        const { accessToken, refreshToken, backend } = resData as any;
+        const { accessToken, refreshToken, backend } = resData as unknown as { accessToken: string; refreshToken: string; backend: string };
 
         const saved = tokenService.saveAccessTokenAndRefreshTokenToCookie(
           accessToken,
           refreshToken,
-          backend as any,
+          backend,
         );
 
         if (saved) {
@@ -165,8 +166,8 @@ const AdminLogin: React.FC = () => {
         } else {
           toastMessages.error(t('auth:messages.loginError'));
         }
-      } catch (error: any) {
-        const res = error?.response;
+      } catch (error: unknown) {
+        const res = (error as { response?: { status?: number; data?: { errors?: Record<string, string[]> } } })?.response;
         if (res?.status === 400) {
           const errors = res?.data?.errors;
           if (errors && 'errorMessage' in errors) {
@@ -180,11 +181,11 @@ const AdminLogin: React.FC = () => {
       }
     };
 
-    const checkCreds = async (email: string, password: any, roleName: string) => {
+    const checkCreds = async (email: string, password: string, roleName: string) => {
       setIsLoading(true);
       try {
         const resData = await authService.checkCreds(email, roleName as RoleName);
-        const { exists, email: resEmail, emailVerified } = resData as any;
+        const { exists, email: resEmail, emailVerified } = resData as { exists: boolean; email: string; emailVerified: boolean };
 
         if (exists === true && emailVerified === false) {
           dispatch(
@@ -208,7 +209,7 @@ const AdminLogin: React.FC = () => {
       }
     };
 
-    checkCreds(data.email, data.password, ROLES_NAME.ADMIN);
+    checkCreds(data.email, data.password || '', ROLES_NAME.ADMIN);
   };
 
   return (

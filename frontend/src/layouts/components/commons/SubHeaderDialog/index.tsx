@@ -26,7 +26,7 @@ const DesktopContent = (
   setOpen: (open: boolean) => void,
   careers: CareerOption[],
   handleFilter: (id: string) => void,
-  t: any
+  t: import('i18next').TFunction
 ) => {
   const theme = useTheme();
 
@@ -136,7 +136,7 @@ const MobileContent = (
   setOpen: (open: boolean) => void,
   careers: CareerOption[],
   handleFilter: (id: string) => void,
-  t: any
+  t: import('i18next').TFunction
 ) => {
   return (
     <Box>

@@ -9,7 +9,7 @@ interface Props {
   setOpen: (open: boolean) => void;
   handleUpload: (files: File[]) => void;
   title?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const DropzoneDialogCustom = (props: Props) => {

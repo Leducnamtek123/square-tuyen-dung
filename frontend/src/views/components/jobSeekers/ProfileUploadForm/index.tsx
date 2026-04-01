@@ -545,7 +545,7 @@ const ProfileUploadForm = ({ handleAdd }: ProfileUploadFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.objective')}
 
-            control={control}
+            control={control as unknown as import('react-hook-form').Control<import('react-hook-form').FieldValues>}
 
           />
 
@@ -561,7 +561,7 @@ const ProfileUploadForm = ({ handleAdd }: ProfileUploadFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.skillsSummary')}
 
-            control={control}
+            control={control as unknown as import('react-hook-form').Control<import('react-hook-form').FieldValues>}
 
           />
 

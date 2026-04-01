@@ -45,7 +45,7 @@ const FollowComponent = ({ slug, isFollowed }: FollowProps) => {
 
       try {
 
-        const resData = (await companyService.followCompany(slugCompany)) as any;
+        const resData = (await companyService.followCompany(slugCompany)) as unknown as { isFollowed: boolean };
 
         const isFollowed = resData.isFollowed;
 
@@ -57,8 +57,8 @@ const FollowComponent = ({ slug, isFollowed }: FollowProps) => {
 
         );
 
-      } catch (error: any) {
-        errorHandling(error);
+      } catch (error) {
+        errorHandling(error as import('axios').AxiosError<{ errors?: import('@/types/api').ApiError }>);
       } finally {
 
         setIsLoadingFollow(false);
@@ -407,7 +407,7 @@ const Company = ({
                   style={{ width: 16, color: '#757575' }}
                 />
 
-                {tConfig((allConfig as any)?.cityDict[city]) || (
+                {tConfig((allConfig as { cityDict?: Record<string, string> })?.cityDict?.[city]) || (
 
                   <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
 
@@ -426,7 +426,7 @@ const Company = ({
                   style={{ width: 16, color: '#757575' }}
                 />
 
-                {tConfig((allConfig as any)?.employeeSizeDict[employeeSize]) || (
+                {tConfig((allConfig as { employeeSizeDict?: Record<string, string> })?.employeeSizeDict?.[employeeSize]) || (
 
                   <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
 

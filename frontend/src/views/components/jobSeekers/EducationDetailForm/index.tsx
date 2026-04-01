@@ -241,7 +241,7 @@ const EducationDetailForm = ({ handleAddOrUpdate, editData }: EducationDetailFor
 
             placeholder={t('jobSeeker:profile.placeholders.additionalDescription')}
 
-            control={control}
+            control={control as unknown as import('react-hook-form').Control<import('react-hook-form').FieldValues>}
 
           />
 

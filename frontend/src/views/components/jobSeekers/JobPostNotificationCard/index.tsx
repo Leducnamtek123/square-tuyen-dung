@@ -59,14 +59,14 @@ const JobPostNotificationCard = () => {
 
   const handleAddOrUpdate = (formData: JobPostNotificationFormValues & { id?: number }) => {
     if ("id" in formData && formData.id) {
-      updateMutation.mutate({ id: formData.id, data: { ...formData } as any }, {
+      updateMutation.mutate({ id: formData.id, data: { ...formData } as Record<string, unknown> }, {
         onSuccess: () => {
           setOpenPopup(false);
           toastMessages.success(t("jobSeeker:jobManagement.notifications.updatedSuccess"));
         },
       });
     } else {
-      addMutation.mutate({ ...formData } as any, {
+      addMutation.mutate({ ...formData } as Record<string, unknown>, {
         onSuccess: () => {
           setOpenPopup(false);
           toastMessages.success(t("jobSeeker:jobManagement.notifications.addedSuccess"));

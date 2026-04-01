@@ -144,8 +144,8 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
         dispatch(reloadResume());
         toastMessages.success(t("jobSeeker:profile.messages.profileStatusUpdateSuccess"));
       } catch (error) {
-        // Casting through any to satisfy errorHandling strict AxiosError<{errors: ApiError}> generic type requirements
-        errorHandling(error as any);
+        // Casting through unknown to satisfy errorHandling strict AxiosError<{errors: ApiError}> generic type requirements
+        errorHandling(error as import('axios').AxiosError<{errors: import('@/types/api').ApiError}>);
       } finally {
         setIsFullScreenLoading(false);
       }
@@ -213,7 +213,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                 </Stack>
                 {!isGeneratingPDF && (
                   <PDFDownloadLinkAny
-                    document={<CVDoc resume={resume} user={currentUser} themeColor={selectedColor} />}
+                    document={<CVDoc resume={resume as unknown as React.ComponentProps<typeof CVDoc>['resume']} user={currentUser as React.ComponentProps<typeof CVDoc>['user']} themeColor={selectedColor} />}
                     fileName={`${APP_NAME}_CV_${currentUser?.fullName}-${toSlug(resume?.title || "title")}.pdf`}
                     style={{ textDecoration: "none" }}
                   >

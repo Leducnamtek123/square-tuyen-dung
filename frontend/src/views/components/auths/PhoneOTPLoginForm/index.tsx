@@ -50,9 +50,9 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
       const result = await signInWithPhone(phoneNumber, appVerifier);
       setConfirmationResult(result);
       setResendTimer(60);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || 'Failed to send OTP');
+      setError((err as Error).message || 'Failed to send OTP');
     }
   };
 
@@ -62,9 +62,9 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
       setError(null);
       const idToken = await verifyCode(confirmationResult, otpCode);
       onLogin(idToken);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || 'Invalid OTP code');
+      setError((err as Error).message || 'Invalid OTP code');
     }
   };
 

@@ -6,8 +6,7 @@ import JobDetailInfoItem from "./JobDetailInfoItem";
 import type { JobPost, SystemConfig } from '../../../../types/models';
 
 interface JobDetailDescriptionCardProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  jobPostDetail: JobPost | any;
+  jobPostDetail: import('@/types/models').JobPost & { companyDict?: import('@/types/models').Company };
   allConfig: SystemConfig | null;
 }
 
@@ -24,7 +23,7 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
           <div
             className="mt-6 text-sm leading-6"
             dangerouslySetInnerHTML={{
-              __html: jobPostDetail?.jobDescription,
+              __html: jobPostDetail?.jobDescription || '',
             }}
           />
         </div>
@@ -38,7 +37,7 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
           <div
             className="mt-6 text-sm leading-6"
             dangerouslySetInnerHTML={{
-              __html: jobPostDetail?.jobRequirement,
+              __html: jobPostDetail?.jobRequirement || '',
             }}
           />
         </div>
@@ -52,7 +51,7 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
           <div
             className="mt-6 text-sm leading-6"
             dangerouslySetInnerHTML={{
-              __html: jobPostDetail?.benefitsEnjoyed,
+              __html: jobPostDetail?.benefitsEnjoyed || '',
             }}
           />
         </div>

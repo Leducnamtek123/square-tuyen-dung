@@ -44,9 +44,10 @@ const AIToolsCard = () => {
       }
       const objectUrl = URL.createObjectURL(blob);
       setTtsAudioUrl(objectUrl);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const axiosError = error as import('axios').AxiosError<{ detail?: string }>;
       setTtsError(
-        error?.response?.data?.detail ||
+        axiosError.response?.data?.detail ||
           t('aiTools.tts.error', { defaultValue: 'Unable to generate audio right now.' })
       );
     } finally {
@@ -65,9 +66,10 @@ const AIToolsCard = () => {
     try {
       const res = await aiService.transcribe(transcribeFile, { language: 'vi' });
       setTranscription(String(res?.transcription || ''));
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const axiosError = error as import('axios').AxiosError<{ errors?: { detail?: string } }>;
       setTranscribeError(
-        error?.response?.data?.errors?.detail ||
+        axiosError.response?.data?.errors?.detail ||
           t('aiTools.transcribe.error', { defaultValue: 'Unable to transcribe audio right now.' })
       );
     } finally {

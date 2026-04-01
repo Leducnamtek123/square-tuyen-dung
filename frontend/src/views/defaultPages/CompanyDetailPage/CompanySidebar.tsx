@@ -6,15 +6,24 @@ import { FacebookIcon, YoutubeIcon, LinkedinIcon } from "../../../components/Com
 import Map from "../../../components/Common/Map";
 import ImageGalleryCustom from "../../../components/Common/ImageGalleryCustom";
 
+import type { TFunction } from 'i18next';
+
 interface CompanySidebarProps {
-  companyDetail: any;
-  imageList: any[];
-  t: any;
+  companyDetail: Omit<Partial<import('@/types/models').Company>, 'id'> & { 
+    id?: string | number;
+    facebookUrl?: string; 
+    youtubeUrl?: string; 
+    linkedinUrl?: string; 
+    location?: { address?: string; lat?: number; lng?: number; [key: string]: unknown };
+    [key: string]: unknown 
+  };
+  imageList: string[] | Record<string, unknown>[];
+  t: import('i18next').TFunction;
 }
 
 const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageList, t }) => {
   return (
-    <Card sx={{ p: 3, boxShadow: (theme: any) => theme.customShadows?.small || 1 }}>
+    <Card sx={{ p: 3, boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.small || 1 }}>
       <Stack spacing={3}>
         {/* Website */}
         <Box>
@@ -39,17 +48,17 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageLis
           </Typography>
           <Stack direction="row" spacing={1} sx={{ "& .MuiIconButton-root": { bgcolor: "grey.50", transition: "all 0.2s", "&:hover": { transform: "translateY(-2px)" } } }}>
             {companyDetail?.facebookUrl && (
-              <IconButton color="primary" aria-label="facebook" href={companyDetail.facebookUrl} target="_blank">
+              <IconButton component="a" color="primary" aria-label="facebook" href={companyDetail.facebookUrl} target="_blank">
                 <FacebookIcon size={30} />
               </IconButton>
             )}
             {companyDetail?.youtubeUrl && (
-              <IconButton color="primary" aria-label="youtube" href={companyDetail.youtubeUrl} target="_blank">
+              <IconButton component="a" color="primary" aria-label="youtube" href={companyDetail.youtubeUrl} target="_blank">
                 <YoutubeIcon size={30} />
               </IconButton>
             )}
             {companyDetail?.linkedinUrl && (
-              <IconButton color="primary" aria-label="linkedin" href={companyDetail.linkedinUrl} target="_blank">
+              <IconButton component="a" color="primary" aria-label="linkedin" href={companyDetail.linkedinUrl} target="_blank">
                 <LinkedinIcon size={30} />
               </IconButton>
             )}
@@ -91,7 +100,7 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageLis
               {t("companyDetail.images")}
             </Typography>
             <Box sx={{ borderRadius: 2, overflow: "hidden", border: "1px solid", borderColor: "grey.200" }}>
-              <ImageGalleryCustom images={imageList} />
+              <ImageGalleryCustom images={imageList as unknown as { original: string; thumbnail?: string }[]} />
             </Box>
           </Box>
         )}

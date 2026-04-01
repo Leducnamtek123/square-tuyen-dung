@@ -5,12 +5,12 @@ import { memo, useMemo } from "react";
 import type { ElementType, ReactNode } from "react";
 
 // Cache motion components at module level to avoid creating during render
-const motionComponentCache = new Map<ElementType, any>();
+const motionComponentCache = new Map<ElementType, React.ElementType>();
 
 const getMotionComponent = (element: ElementType) => {
   let component = motionComponentCache.get(element);
   if (!component) {
-    component = motion.create(element as any);
+    component = motion.create(element as keyof React.JSX.IntrinsicElements) as unknown as React.ElementType;
     motionComponentCache.set(element, component);
   }
   return component;
@@ -52,7 +52,7 @@ const ShimmerComponent = ({
           "--spread": `${dynamicSpread}px`,
           backgroundImage:
             "var(--bg), linear-gradient(var(--color-muted-foreground), var(--color-muted-foreground))"
-        } as any
+        } as React.CSSProperties
       }
       transition={{
         duration,

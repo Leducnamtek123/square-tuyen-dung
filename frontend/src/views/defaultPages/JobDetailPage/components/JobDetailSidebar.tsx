@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import FilterJobPostCard from "../../../components/defaults/FilterJobPostCard";
 
 interface JobDetailSidebarProps {
-  jobPostDetail: any;
+  jobPostDetail: Record<string, unknown> | import('@/types/models').JobPost & { companyDict?: import('@/types/models').Company };
 }
 
 const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) => {

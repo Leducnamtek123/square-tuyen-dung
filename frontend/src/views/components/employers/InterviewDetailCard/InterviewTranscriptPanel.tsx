@@ -73,7 +73,8 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
             }}>
                 {transcripts.length > 0 ? (
                     <Stack spacing={6}>
-                        {transcripts.map((item, idx) => {
+                        {transcripts.map((itemRaw, idx) => {
+                            const item = itemRaw as Record<string, string>;
                             const isInterviewer = item.speaker === 'interviewer';
                             return (
                                 <Stack key={idx} direction="row" spacing={3} alignItems="flex-start">

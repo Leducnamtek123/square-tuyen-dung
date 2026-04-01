@@ -101,7 +101,7 @@ const ChatBot = () => {
       const response = await chatbotService.chat(payload);
       const reply =
         response?.reply ||
-        (response as any)?.data?.reply ||
+        (response as { data?: { reply?: string } })?.data?.reply ||
         t('chat:chatbot.error.apology');
       setMessages((prev) => [
         ...prev,

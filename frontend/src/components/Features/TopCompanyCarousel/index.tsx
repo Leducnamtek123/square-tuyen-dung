@@ -13,10 +13,13 @@ import { ROUTES, IMAGES } from '@/configs/constants';
 import { formatRoute } from '@/utils/funcUtils';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { useTranslation } from 'react-i18next';
+import type { Company } from '@/types/models';
 
 interface Props {
-  [key: string]: any;
+  [key: string]: unknown;
 }
+
+import type { Theme } from '@mui/material/styles';
 
 const styles = {
   ".swiper-pagination": {
@@ -30,7 +33,7 @@ const styles = {
     width: 12,
     height: 12,
     opacity: 0.5,
-    backgroundColor: (theme: any) => theme.palette.primary.main,
+    backgroundColor: (theme: Theme) => theme.palette.primary.main,
     transition: "all 0.3s ease",
   },
   ".swiper-pagination-bullet-active": {
@@ -89,10 +92,12 @@ const TopCompanyCarousel = () => {
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['top-companies'],
     queryFn: async () => {
-      const resData: any = await companyService.getTopCompanies();
+      const resData = await companyService.getTopCompanies();
       // httpRequest interceptor already unwraps response.data.data
       // so resData is the companies array directly
-      return Array.isArray(resData) ? resData : (resData?.data || resData?.results || []);
+      if (Array.isArray(resData)) return resData as Company[];
+      const fallback = resData as unknown as { data?: Company[], results?: Company[] };
+      return fallback?.data || fallback?.results || [];
     },
     staleTime: 5 * 60_000,
   });
@@ -142,7 +147,7 @@ const TopCompanyCarousel = () => {
                   <Loading />
                 </SwiperSlide>
               ))
-            : companies.map((value: any) => (
+            : companies.map((value: Company & { shortDescription?: string }) => (
                 <SwiperSlide key={value.id}>
                   <Card
                     sx={{
@@ -161,14 +166,14 @@ const TopCompanyCarousel = () => {
                       flexDirection: 'column',
                       '&:hover': {
                         transform: 'translateY(-4px)',
-                        boxShadow: (theme: any) => theme.customShadows.medium,
+                        boxShadow: (theme: Theme & { customShadows?: { medium?: string } }) => theme.customShadows?.medium || 'none',
                         borderColor: 'primary.main',
                         '& .company-name': {
                           color: 'primary.main',
                         }
                       },
                     }}
-                    onClick={() => nav.push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, value.slug)}`, i18n.language))}
+                    onClick={() => nav.push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, value.slug as string)}`, i18n.language))}
                   >
                     <Box
                       sx={{
@@ -189,7 +194,7 @@ const TopCompanyCarousel = () => {
                       <MuiImageCustom
                         width="100%"
                         height="100%"
-                        src={value?.companyImageUrl}
+                        src={value?.companyImageUrl as string | undefined}
                         fallbackSrc={IMAGES.companyLogoDefault}
                         duration={200}
                         sx={{ 
@@ -215,7 +220,7 @@ const TopCompanyCarousel = () => {
                         transition: 'color 0.3s ease',
                       }}
                     >
-                      {value?.companyName}
+                      {value?.companyName as React.ReactNode}
                     </Typography>
 
                     <Typography
@@ -232,7 +237,7 @@ const TopCompanyCarousel = () => {
                         height: 42, 
                       }}
                     >
-                      {value?.shortDescription || "Môi trường làm việc năng động, sáng tạo với nhiều cơ hội thăng tiến và phát triển sự nghiệp..."}
+                      {(value?.shortDescription as React.ReactNode) || "Môi trường làm việc năng động, sáng tạo với nhiều cơ hội thăng tiến và phát triển sự nghiệp..."}
                     </Typography>
 
                     <Stack 

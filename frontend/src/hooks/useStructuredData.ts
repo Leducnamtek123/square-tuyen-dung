@@ -77,7 +77,7 @@ const mapJobType = (type?: string): string => {
 const buildSchema = (data: StructuredDataSchema): object => {
   switch (data.type) {
     case 'JobPosting': {
-      const schema: any = {
+      const schema: Record<string, unknown> = {
         '@context': 'https://schema.org',
         '@type': 'JobPosting',
         title: data.title,
@@ -121,7 +121,7 @@ const buildSchema = (data: StructuredDataSchema): object => {
     }
 
     case 'Organization': {
-      const schema: any = {
+      const schema: Record<string, unknown> = {
         '@context': 'https://schema.org',
         '@type': 'Organization',
         name: data.name,
@@ -153,7 +153,7 @@ const buildSchema = (data: StructuredDataSchema): object => {
     }
 
     case 'WebSite': {
-      const schema: any = {
+      const schema: Record<string, unknown> = {
         '@context': 'https://schema.org',
         '@type': 'WebSite',
         name: data.name,

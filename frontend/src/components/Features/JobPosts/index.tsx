@@ -4,7 +4,7 @@ import { Grid2 as Grid } from "@mui/material";
 import JobPost from '@/components/Features/JobPost';
 
 interface JobPostsProps {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 const JobPosts = (_props: JobPostsProps) => {
@@ -35,7 +35,7 @@ const JobPosts = (_props: JobPostsProps) => {
 
               }}>
 
-              <JobPost {...({} as any)} />
+              <JobPost {...({} as React.ComponentProps<typeof JobPost>)} />
 
             </Grid>
 

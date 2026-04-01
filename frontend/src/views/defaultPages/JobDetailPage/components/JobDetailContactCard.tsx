@@ -9,7 +9,7 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Map from "../../../../components/Common/Map";
 
 interface JobDetailContactCardProps {
-  jobPostDetail: any;
+  jobPostDetail: import('@/types/models').JobPost & { companyDict?: import('@/types/models').Company; location?: import('@/types/models').Location & { lat?: number; lng?: number; } };
 }
 
 const JobDetailContactCard: React.FC<JobDetailContactCardProps> = ({ jobPostDetail }) => {

@@ -7,17 +7,31 @@ import { useTranslation } from 'react-i18next';
 import { ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
+interface ProfileTableRow {
+    id?: number | string;
+    userDict?: {
+        avatar?: string;
+        fullName?: string;
+        email?: string;
+        phone?: string;
+        gender?: string;
+        birthday?: string;
+        [key: string]: unknown;
+    };
+    [key: string]: unknown;
+}
+
 interface ProfileTableProps {
-    data: any[];
+    data: ProfileTableRow[];
     isLoading?: boolean;
     rowCount?: number;
     pagination?: { pageIndex: number; pageSize: number };
     onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
     sorting?: SortingState;
     onSortingChange?: OnChangeFn<SortingState>;
-    onView?: (profile: any) => void;
-    onEdit: (profile: any) => void;
-    onDelete: (profile: any) => void;
+    onView?: (profile: ProfileTableRow) => void;
+    onEdit: (profile: ProfileTableRow) => void;
+    onDelete: (profile: ProfileTableRow) => void;
 }
 
 const ProfileTable = ({ 
@@ -34,7 +48,7 @@ const ProfileTable = ({
 }: ProfileTableProps) => {
     const { t } = useTranslation('admin');
 
-    const columns = useMemo<ColumnDef<any>[]>(() => [
+    const columns = useMemo<ColumnDef<ProfileTableRow>[]>(() => [
         {
             id: 'avatar',
             header: t('pages.profiles.table.avatar') as string,

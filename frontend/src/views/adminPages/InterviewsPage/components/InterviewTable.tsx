@@ -9,8 +9,20 @@ import { useTranslation } from 'react-i18next';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
+interface InterviewTableRow {
+    id: number | string;
+    candidateName?: string;
+    candidateEmail?: string;
+    jobName?: string;
+    interview_type?: string;
+    interviewType?: string;
+    scheduledAt?: string;
+    status?: string;
+    [key: string]: unknown;
+}
+
 interface InterviewTableProps {
-    interviews: any[];
+    interviews: InterviewTableRow[];
     loading: boolean;
     rowCount?: number;
     pagination?: { pageIndex: number; pageSize: number };
@@ -19,9 +31,9 @@ interface InterviewTableProps {
     onSortingChange?: OnChangeFn<SortingState>;
     rowSelection?: RowSelectionState;
     onRowSelectionChange?: OnChangeFn<RowSelectionState>;
-    onView: (interview: any) => void;
-    onDelete: (id: any) => void;
-    onUpdateStatus: (id: any, status: string) => void;
+    onView: (interview: InterviewTableRow) => void;
+    onDelete: (id: number | string) => void;
+    onUpdateStatus: (id: number | string, status: string) => void;
 }
 
 const InterviewTable = ({ 
@@ -40,7 +52,7 @@ const InterviewTable = ({
 }: InterviewTableProps) => {
     const { t } = useTranslation(['interview', 'admin']);
 
-    const getStatusChip = (status: any) => {
+    const getStatusChip = (status: unknown) => {
         const lowerStatus = String(status ?? '').toLowerCase();
         switch (lowerStatus) {
             case 'completed':
@@ -54,22 +66,22 @@ const InterviewTable = ({
             case 'scheduled':
                 return <Chip label={t('common.status.scheduled', { ns: 'admin' })} color="primary" size="small" />;
             case 'cancelled':
-                return <Chip label={t('common.status.cancelled', { ns: 'admin' })} color="error" size="small" />;
+                return <Chip label={t('common.status.cancelled', { ns: 'admin' }) as string} color="error" size="small" />;
             default:
-                return <Chip label={status || t('common.status.unknown', { ns: 'admin' })} size="small" />;
+                return <Chip label={(status || t('common.status.unknown', { ns: 'admin' })) as string} size="small" />;
         }
     };
 
-    const getTypeChip = (type: any) => {
-        switch (type?.toUpperCase()) {
+    const getTypeChip = (type: unknown) => {
+        switch (typeof type === 'string' ? type.toUpperCase() : '') {
             case 'VETTING':
-                return <Chip label={t('pages.interviews.type.vetting', { ns: 'admin' })} color="warning" size="small" variant="outlined" />;
+                return <Chip label={t('pages.interviews.type.vetting', { ns: 'admin' }) as string} color="warning" size="small" variant="outlined" />;
             default:
-                return <Chip label={t('pages.interviews.type.recruitment', { ns: 'admin' })} color="primary" size="small" variant="outlined" />;
+                return <Chip label={t('pages.interviews.type.recruitment', { ns: 'admin' }) as string} color="primary" size="small" variant="outlined" />;
         }
     };
 
-    const columns = useMemo<ColumnDef<any>[]>(() => [
+    const columns = useMemo<ColumnDef<InterviewTableRow>[]>(() => [
         {
             accessorKey: 'candidateName',
             header: t('interviewAdminPage.candidateEmployer', { ns: 'interview' }) as string,

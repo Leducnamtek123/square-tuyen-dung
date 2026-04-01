@@ -27,9 +27,9 @@ function useAnimatedValue(initialValue: AnimatedValue) {
   const animateFn = useCallback(
     (targetValue: AnimatedValue, transition: Record<string, unknown>) => {
       controlsRef.current = animate(
-        motionValue as any,
-        targetValue as any,
-        transition as any
+        motionValue as Parameters<typeof animate>[0],
+        targetValue as Parameters<typeof animate>[1],
+        transition as Parameters<typeof animate>[2]
       );
     },
     [motionValue]
@@ -57,7 +57,7 @@ export function useAgentAudioVisualizerAura(
   // Note: We can't call hooks conditionally, so we expect the caller 
   // to ensure context or handle the error if this hook is used outside of Room.
   // However, we'll try to be safe by checking if audioTrack exists.
-  const trackVolume = useTrackVolume(audioTrack as any, {
+  const trackVolume = useTrackVolume(audioTrack as Parameters<typeof useTrackVolume>[0], {
     fftSize: 512,
     smoothingTimeConstant: 0.55,
   });

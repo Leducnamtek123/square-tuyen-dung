@@ -20,7 +20,7 @@ const ResetPasswordPage = () => {
 
   const navigate = useRouter();
 
-  const [errorMessage, setErrorMessage] = React.useState(null);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const handleResetPassword = async (data: import('../../components/auths/ResetPasswordForm').ResetPasswordFormData) => {
     try {
@@ -32,7 +32,7 @@ const ResetPasswordPage = () => {
       });
       navigate.push(`/${ROUTES.AUTH.LOGIN}?successMessage=Password updated successfully`);
     } catch (error) {
-      setErrorMessage(t('messages.tryAgain') as any);
+      setErrorMessage(t('messages.tryAgain') as string);
     }
   };
 

@@ -139,7 +139,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                         </Stack>
                         <Divider sx={{ mb: 3, opacity: 0.5 }} />
                         <Typography variant="body2" sx={{ lineHeight: 2, color: 'text.primary', fontWeight: 700, whiteSpace: 'pre-wrap' }}>
-                            {session.aiDetailedFeedback || session.ai_detailed_feedback || t('interviewDetail.messages.noDetails')}
+                            {typeof session.aiDetailedFeedback === 'string' ? session.aiDetailedFeedback : typeof session.ai_detailed_feedback === 'string' ? session.ai_detailed_feedback : JSON.stringify(session.aiDetailedFeedback || session.ai_detailed_feedback || t('interviewDetail.messages.noDetails'), null, 2)}
                         </Typography>
                     </Box>
                 </Grid>

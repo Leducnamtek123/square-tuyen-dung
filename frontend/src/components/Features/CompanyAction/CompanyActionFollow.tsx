@@ -9,7 +9,7 @@ import {ROUTES } from '@/configs/constants';
 import { formatRoute } from '@/utils/funcUtils';
 
 export interface CompanyActionFollowProps {
-  company: any;
+  company: Partial<import('@/types/models').Company> | null;
   children?: React.ReactNode;
 }
 
@@ -75,7 +75,7 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                           color: theme.palette.primary.dark
                         }
                       }}
-                      onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug)}`)}
+                      onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug || '')}`)}
                     >
                       {company?.companyName}
                     </Typography>

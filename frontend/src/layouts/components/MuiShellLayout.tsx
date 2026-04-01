@@ -28,7 +28,7 @@ interface NavItem {
   id: string;
   type?: 'section' | 'item';
   label: string;
-  icon?: any;
+  icon?: React.ReactNode;
   to?: string;
   children?: NavItem[];
 }

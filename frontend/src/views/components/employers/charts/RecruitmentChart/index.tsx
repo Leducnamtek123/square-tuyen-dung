@@ -114,7 +114,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
   const theme = useTheme();
   const [isLoading, setIsLoading] = React.useState(true);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
-  const [selectedDateRange, setSelectedDateRange] = React.useState<[Dayjs, Dayjs]>([
+  const [selectedDateRange, setSelectedDateRange] = React.useState<[Dayjs | null, Dayjs | null]>([
     dayjs(new Date()).subtract(1, "month"),
     dayjs(new Date()),
   ]);

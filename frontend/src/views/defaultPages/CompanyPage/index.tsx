@@ -82,7 +82,7 @@ const CompanyPage = () => {
 
             py: 4,
 
-            boxShadow: (theme: any) => theme.customShadows.large,
+            boxShadow: (theme: import('@mui/material/styles').Theme & { customShadows?: Record<string, string> }) => theme.customShadows?.large,
 
             bgcolor: 'background.paper',
 

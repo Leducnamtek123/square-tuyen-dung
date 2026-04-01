@@ -59,9 +59,9 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
 
   const [searchValue, setSearchValue] = React.useState('');
 
-  const [searchResult, setSearchResult] = React.useState([]);
+  const [searchResult, setSearchResult] = React.useState<string[]>([]);
 
-  const [recentSearch, setRecentSearch] = React.useState([]);
+  const [recentSearch, setRecentSearch] = React.useState<string[]>([]);
 
   const debounded = useDebounce(searchValue, 300);
 
@@ -74,7 +74,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
       }
       try {
         const resData = await jobService.searchJobSuggestTitle(kw);
-        const data = Array.isArray(resData) ? resData : ((resData as any)?.results || (resData as any)?.data || []);
+        const data = Array.isArray(resData) ? resData : ((resData as { results?: string[] })?.results || (resData as { data?: string[] })?.data || []);
         setSearchResult(data.flat());
       } catch (error) {
         console.error('Search failed: ', error);

@@ -7,7 +7,7 @@ import NextAppDirEmotionCacheProvider from './EmotionCache';
 import defaultTheme from '../../themeConfigs/defaultTheme';
 import { createTheme } from '@mui/material/styles';
 
-const theme = createTheme(defaultTheme as any);
+const theme = createTheme(defaultTheme as import('@mui/material/styles').ThemeOptions);
 
 export default function ThemeRegistry({ children }: { children: React.ReactNode }) {
   return (

@@ -29,7 +29,7 @@ interface JobPostLargeProps {
   companyImageUrl?: string;
   companyName: string;
   jobName: string;
-  cityId: any;
+  cityId: number | string | undefined;
   deadline: string | Date;
   isUrgent?: boolean;
   isHot?: boolean;
@@ -555,7 +555,7 @@ const JobPostLarge = ({
 
                 >
 
-                  {tConfig(allConfig?.cityDict[cityId]) || (
+                  {tConfig(((allConfig as unknown as Record<string, Record<string, string>>)?.cityDict || {})[String(cityId)]) || (
 
                     <span style={{ fontStyle: "italic", opacity: 0.7 }}>
 

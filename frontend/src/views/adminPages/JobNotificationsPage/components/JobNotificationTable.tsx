@@ -7,16 +7,27 @@ import dayjs from '../../../../configs/dayjs-config';
 import { ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
+interface JobNotificationRow {
+  title?: string;
+  content?: string;
+  createAt?: string;
+  userDict?: {
+    fullName?: string;
+    email?: string;
+  };
+  [key: string]: unknown;
+}
+
 interface JobNotificationTableProps {
-    data: any[];
+    data: JobNotificationRow[];
     isLoading?: boolean;
     rowCount?: number;
     pagination?: { pageIndex: number; pageSize: number };
     onPaginationChange?: (pagination: { pageIndex: number; pageSize: number }) => void;
     sorting?: SortingState;
     onSortingChange?: OnChangeFn<SortingState>;
-    onEdit?: (row: any) => void;
-    onDelete?: (row: any) => void;
+    onEdit?: (row: JobNotificationRow) => void;
+    onDelete?: (row: JobNotificationRow) => void;
 }
 
 const JobNotificationTable = ({ 
@@ -32,7 +43,7 @@ const JobNotificationTable = ({
 }: JobNotificationTableProps) => {
     const { t } = useTranslation('admin');
 
-    const columns = useMemo<ColumnDef<any>[]>(() => [
+    const columns = useMemo<ColumnDef<JobNotificationRow>[]>(() => [
         {
             accessorKey: 'title',
             header: t('pages.jobNotifications.table.title') as string,

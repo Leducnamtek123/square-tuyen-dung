@@ -48,7 +48,7 @@ const CertificateSection: React.FC<CertificateSectionProps> = ({ profileDetail }
                 }}
             >
                 <Stack spacing={5}>
-                    {(profileDetail.certificateDetails || []).map((value: Record<string, string | number>, index: number) => (
+                    {(profileDetail.certificateDetails || []).map((value, index: number) => (
                         <Box key={value.id || index}>
                             <Stack spacing={2}>
                                 <Typography variant="h6" sx={{ fontWeight: 900, color: 'primary.main', lineHeight: 1.3 }}>
@@ -63,7 +63,7 @@ const CertificateSection: React.FC<CertificateSectionProps> = ({ profileDetail }
                                     <Stack direction="row" alignItems="center" spacing={1.5}>
                                         <CalendarMonthIcon sx={{ fontSize: 20, color: 'text.secondary', opacity: 0.8 }} />
                                         <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary', opacity: 0.8 }}>
-                                            {t('profileDetailCard.label.issuedDate')}: <TimeAgo date={value?.startDate} type="format" />
+                                            {t('profileDetailCard.label.issuedDate')}: {value?.startDate && <TimeAgo date={value.startDate} type="format" />}
                                         </Typography>
                                     </Stack>
                                 </Stack>

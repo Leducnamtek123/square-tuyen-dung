@@ -135,7 +135,7 @@ const SubHeader = () => {
 
         const resData = await commonService.getTop10Careers();
 
-        setTopCareers(resData.map((item: any) => ({
+        setTopCareers(resData.map((item: { name: string; metadata?: Record<string, unknown>; id?: number | string }) => ({
           ...item,
           id: String(item.id)
         })));

@@ -20,8 +20,11 @@ import JobDetailInfoItem from "./JobDetailInfoItem";
 import type { JobPost, SystemConfig, User } from '../../../../types/models';
 
 interface JobDetailHeaderCardProps {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  jobPostDetail: JobPost | any;
+  jobPostDetail: import('@/types/models').JobPost & {
+    companyDict?: import('@/types/models').Company;
+    isApplied?: boolean;
+    isSaved?: boolean;
+  };
   allConfig: SystemConfig | null;
   isAuthenticated: boolean;
   currentUser: User | null;
@@ -59,18 +62,13 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
           />
           <div className="min-w-0 flex-1">
             <Link
-              href={`/${formatRoute(
-                ROUTES.JOB_SEEKER.COMPANY_DETAIL,
-                jobPostDetail?.companyDict?.slug
-              )}`}
+              href={`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, jobPostDetail?.companyDict?.slug || '')}`}
               className="text-lg font-semibold text-foreground hover:underline"
             >
               {jobPostDetail?.companyDict?.companyName}
             </Link>
             <p className="text-sm text-muted-foreground">
-              {(allConfig?.employeeSizeDict as unknown as Record<string, string>)?.[
-                jobPostDetail?.companyDict?.employeeSize
-              ] || (
+              {((allConfig as unknown as Record<string, Record<string, string>>)?.employeeSizeDict || {})[String(jobPostDetail?.companyDict?.employeeSize)] || (
                 <span className="text-xs italic text-gray-300">
                   {t("jobDetail.notUpdated")}
                 </span>
@@ -112,8 +110,8 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
 
           <div className="mt-8">
             <JobDetailActions
-            isApplied={jobPostDetail.isApplied}
-            isSaved={jobPostDetail.isSaved}
+            isApplied={jobPostDetail?.isApplied || false}
+            isSaved={jobPostDetail?.isSaved || false}
             isLoadingSave={isLoadingSave}
             handleSave={onSave}
             handleShowApplyForm={onShowApplyForm}

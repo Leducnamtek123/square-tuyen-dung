@@ -16,7 +16,7 @@ const baseUrl = BACKEND_URL.endsWith('/') ? BACKEND_URL : `${BACKEND_URL}/`;
  * Lightweight server-side GET request.
  * Returns parsed JSON data, or null on failure (never throws).
  */
-export async function serverFetch<T = any>(
+export async function serverFetch<T = unknown>(
   path: string,
   options?: { revalidate?: number }
 ): Promise<T | null> {

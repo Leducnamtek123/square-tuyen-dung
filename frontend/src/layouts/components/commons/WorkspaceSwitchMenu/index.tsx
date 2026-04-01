@@ -7,23 +7,28 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { HOST_NAME, ROUTES } from "../../../../configs/constants";
 import { setActiveWorkspace } from "../../../../redux/userSlice";
 
-interface WorkspaceSwitchMenuProps {
-  [key: string]: any;
+export interface WorkspaceItem {
+  type: "company" | "job_seeker";
+  companyId?: number | null;
+  label?: string;
+  [key: string]: unknown;
 }
 
-
+interface WorkspaceSwitchMenuProps {
+  [key: string]: unknown;
+}
 
 const WorkspaceSwitchMenu = () => {
   const dispatch = useDispatch();
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
-  const workspaces = React.useMemo(() => (currentUser?.workspaces as any[]) || [], [currentUser?.workspaces]);
+  const workspaces = React.useMemo(() => (currentUser?.workspaces as WorkspaceItem[]) || [], [currentUser?.workspaces]);
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
   const currentWorkspace = React.useMemo(() => {
     if (!activeWorkspace) return null;
-    return workspaces.find((w: any) => {
+    return workspaces.find((w: WorkspaceItem) => {
       if (w.type !== activeWorkspace.type) return false;
       if (w.type === "company") return Number(w.companyId) === Number(activeWorkspace.companyId);
       return true;
@@ -43,7 +48,7 @@ const WorkspaceSwitchMenu = () => {
     window.location.href = targetUrl;
   };
 
-  const handleSelectWorkspace = (workspace: any) => {
+  const handleSelectWorkspace = (workspace: WorkspaceItem) => {
     dispatch(setActiveWorkspace(workspace));
     setAnchorEl(null);
     if (workspace.type === "company") {

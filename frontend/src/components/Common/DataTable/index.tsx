@@ -28,7 +28,7 @@ import {
 import { useTranslation } from 'react-i18next';
 
 interface Props<TData> {
-  columns: ColumnDef<TData, any>[];
+  columns: ColumnDef<TData, unknown>[];
   data: TData[];
   isLoading?: boolean;
   rowCount?: number;
