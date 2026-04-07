@@ -175,5 +175,19 @@
     "markCompleted": "Đánh dấu hoàn thành",
     "cancelInterview": "Hủy phỏng vấn",
     "delete": "Xóa"
+  },
+  "common": {
+    "na": "N/A",
+    "status": {
+      "completed": "Hoàn thành",
+      "inProgress": "Đang diễn ra",
+      "scheduled": "Đã lên lịch",
+      "cancelled": "Đã hủy",
+      "pending": "Chờ xử lý",
+      "unknown": "Không xác định"
+    },
+    "table": {
+      "noData": "Không có dữ liệu"
+    }
   }
 }

@@ -86,8 +86,17 @@
         "actions": "Actions",
         "edit": "Edit",
         "delete": "Delete",
-        "noData": "No data found"
-      }
+        "noData": "No data found",
+        "name": "Career Name"
+      },
+      "breadcrumbResources": "Resources",
+      "add": "Add Career",
+      "edit": "Edit",
+      "form": {
+        "name": "Career Name"
+      },
+      "cancel": "Cancel",
+      "deleteConfirm": "Are you sure you want to delete this career?"
     },
     "cities": {
       "title": "City Management",
@@ -113,8 +122,19 @@
         "actions": "Actions",
         "edit": "Edit",
         "delete": "Delete",
-        "noData": "No data found"
-      }
+        "noData": "No data found",
+        "name": "City Name"
+      },
+      "breadcrumbLocations": "Locations",
+      "add": "Add",
+      "searchPlaceholder": "Search...",
+      "edit": "Edit",
+      "form": {
+        "name": "Name",
+        "code": "Code"
+      },
+      "cancel": "Cancel",
+      "deleteConfirm": "Are you sure you want to delete?"
     },
     "districts": {
       "title": "District Management",
@@ -143,8 +163,22 @@
         "edit": "Edit",
         "delete": "Delete",
         "noData": "No data found for this city",
-        "noCitySelected": "Please select a city to see the district list"
-      }
+        "noCitySelected": "Please select a city to see the district list",
+        "name": "Name",
+        "city": "City"
+      },
+      "breadcrumbLocations": "Locations",
+      "add": "Add",
+      "searchPlaceholder": "Search...",
+      "filterByCity": "Filter by City",
+      "edit": "Edit",
+      "form": {
+        "city": "City",
+        "name": "Name",
+        "code": "Code"
+      },
+      "cancel": "Cancel",
+      "deleteConfirm": "Are you sure you want to delete?"
     },
     "wards": {
       "title": "Ward Management",
@@ -175,7 +209,10 @@
         "edit": "Edit",
         "delete": "Delete",
         "noData": "No data found for this district",
-        "noDistrictSelected": "Please select a district to see the ward list"
+        "noDistrictSelected": "Please select a district to see the ward list",
+        "name": "Ward",
+        "district": "District",
+        "city": "City"
       },
       "toast": {
         "addSuccess": "Ward added successfully",
@@ -184,7 +221,20 @@
         "updateError": "An error occurred while updating the ward",
         "deleteSuccess": "Ward deleted successfully",
         "deleteError": "An error occurred while deleting the ward"
-      }
+      },
+      "breadcrumbLocations": "Locations",
+      "add": "Add",
+      "searchPlaceholder": "Search...",
+      "filterByCity": "City",
+      "filterByDistrict": "District",
+      "edit": "Edit",
+      "form": {
+        "district": "District",
+        "name": "Ward Name",
+        "code": "Code"
+      },
+      "cancel": "Cancel",
+      "deleteConfirm": "Delete this ward?"
     },
     "companies": {
       "addCompany": "Add Company",
@@ -217,7 +267,11 @@
         "viewDetails": "View details",
         "edit": "Edit",
         "delete": "Delete"
-      }
+      },
+      "title": "Company List",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbList": "List",
+      "descriptionLabel": "Description"
     },
     "jobActivity": {
       "title": "Job Post Activity Log",
@@ -298,11 +352,32 @@
         "edit": "Edit",
         "approveAction": "Approve",
         "rejectAction": "Reject",
-        "delete": "Delete"
+        "delete": "Delete",
+        "title": "Title",
+        "verified": "Payment Verified?",
+        "createdAt": "Created At",
+        "view": "View",
+        "unverify": "Unverify",
+        "verify": "Verify Payment"
       },
       "filter": {
         "searchPlaceholder": "Search by job title or company..."
-      }
+      },
+      "status": {
+        "draft": "Draft",
+        "active": "Active",
+        "expired": "Expired",
+        "unknown": "Unknown"
+      },
+      "verified": {
+        "yes": "Yes",
+        "no": "No"
+      },
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbListings": "Listings",
+      "breadcrumbJobs": "Job Posts",
+      "searchPlaceholder": "Search...",
+      "deleteTitle": "Delete Job Post"
     },
     "profiles": {
       "addCandidate": "Add Candidate",
@@ -344,8 +419,18 @@
         "viewDetails": "View details",
         "edit": "Edit",
         "delete": "Delete",
-        "noData": "No data found"
-      }
+        "noData": "No data found",
+        "candidate": "Candidate",
+        "title": "Title",
+        "createdAt": "Created At",
+        "view": "View"
+      },
+      "title": "Candidate Profiles",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbResources": "Resources",
+      "breadcrumbProfiles": "Profiles",
+      "deleteConfirm": "This will be permanently deleted, continue?",
+      "cancel": "Cancel"
     },
     "questionGroups": {
       "title": "Question Group Management",
@@ -378,8 +463,21 @@
         "questionCount": "Question Count",
         "actions": "Actions",
         "edit": "Edit",
-        "delete": "Delete"
-      }
+        "delete": "Delete",
+        "name": "Name",
+        "questionsCount": "Questions Count"
+      },
+      "breadcrumbContent": "Content",
+      "add": "Add",
+      "edit": "Edit",
+      "form": {
+        "name": "Group Name",
+        "description": "Description",
+        "questions": "Questions",
+        "questionsPlaceholder": "Select questions"
+      },
+      "cancel": "Cancel",
+      "deleteConfirm": "Delete this group?"
     },
     "resumes": {
       "searchPlaceholder": "Search resumes...",
@@ -408,8 +506,19 @@
         "inactive": "Inactive",
         "viewDetails": "View details",
         "delete": "Delete",
-        "noData": "No data found"
-      }
+        "noData": "No data found",
+        "title": "Resume Title",
+        "default": "Default",
+        "createdAt": "Created At",
+        "view": "View Resume",
+        "download": "Download CV"
+      },
+      "title": "Resume Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbResources": "Resources",
+      "breadcrumbResumes": "Resumes",
+      "deleteConfirm": "Delete this resume?",
+      "cancel": "Cancel"
     },
     "users": {
       "bulkSelect": {
@@ -462,7 +571,15 @@
         "actionFailed": "Operation failed.",
         "roleUpdated": "Role updated.",
         "roleUpdateFailed": "Role update failed."
-      }
+      },
+      "searchPlaceholder": "Search name/email...",
+      "filters": {
+        "role": "Role",
+        "allRoles": "All"
+      },
+      "title": "User Management",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbList": "List"
     },
     "questions": {
       "title": "Interview Question Bank",
@@ -495,8 +612,24 @@
         "actions": "Actions",
         "general": "General",
         "edit": "Edit",
-        "delete": "Delete"
-      }
+        "delete": "Delete",
+        "text": "Content",
+        "type": "Type",
+        "category": "Category"
+      },
+      "breadcrumbAdmin": "Admin",
+      "breadcrumbContent": "Content",
+      "breadcrumbQuestions": "Questions",
+      "add": "Add Question",
+      "searchPlaceholder": "Search...",
+      "edit": "Update",
+      "form": {
+        "text": "Content",
+        "type": "Type",
+        "category": "Category"
+      },
+      "cancel": "Cancel",
+      "deleteTitle": "Delete Question"
     },
     "interviewLive": {
       "title": "Live Company Interviews",
@@ -540,8 +673,21 @@
         "actions": "Actions",
         "edit": "Edit",
         "delete": "Delete",
-        "noData": "No data found"
-      }
+        "noData": "No data found",
+        "image": "Image",
+        "createdAt": "Created At"
+      },
+      "breadcrumbNotifications": "Notifications",
+      "addNotification": "Add Notification",
+      "editNotification": "Update",
+      "form": {
+        "title": "Title",
+        "imageUrl": "Image URL",
+        "content": "Content"
+      },
+      "cancel": "Cancel",
+      "deleteTitle": "Delete Notification",
+      "deleteConfirm": "Are you sure you want to delete?"
     },
     "interviews": {
       "bulkSelect": {
@@ -552,23 +698,64 @@
       "type": {
         "vetting": "Vetting",
         "recruitment": "Recruitment"
-      }
+      },
+      "status": {
+        "scheduled": "Scheduled",
+        "in_progress": "In Progress",
+        "completed": "Completed",
+        "cancelled": "Cancelled",
+        "calibration": "Calibration",
+        "processing": "Processing",
+        "expired": "Expired"
+      },
+      "table": {
+        "room": "Room",
+        "jobPost": "Job Post",
+        "candidate": "Candidate",
+        "status": "Status",
+        "scheduledAt": "Scheduled At",
+        "actions": "Actions",
+        "editStatus": "Edit Status",
+        "delete": "Delete"
+      },
+      "title": "Interview Schedule",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Interviews",
+      "editStatusTitle": "Change Interview Status",
+      "form": {
+        "status": "Status"
+      },
+      "cancel": "Cancel",
+      "save": "Save",
+      "deleteTitle": "Delete Interview",
+      "deleteConfirm": "Are you sure you want to delete?",
+      "delete": "Delete"
     },
     "settings": {
       "title": "System Settings",
+      "breadcrumbAdmin": "Admin",
+      "breadcrumb": "Settings",
       "generalTitle": "General Settings",
       "maintenanceMode": {
         "label": "System Maintenance",
-        "description": "Stop all user activities for maintenance"
+        "description": "Stop all user activities for maintenance",
+        "desc": "Stop all user activities for maintenance"
       },
       "autoApproveJobs": {
         "label": "Auto-approve Job Posts",
-        "description": "Allow job posts to be approved automatically"
+        "description": "Allow job posts to be approved automatically",
+        "desc": "Allow job posts to be approved automatically"
       },
       "emailNotifications": {
         "label": "Email Notifications",
-        "description": "Send system notifications via email to administrators"
+        "description": "Send system notifications via email to administrators",
+        "desc": "Send system notifications via email to administrators"
       },
+      "apiTitle": "API & External Services",
+      "googleApiKey": "Google API Key",
+      "supportEmail": "Support Email",
+      "summary": "Configuration Summary",
+      "summaryText": "Please review all configuration settings carefully before saving. Changes may affect the entire system immediately.",
       "saveBtn": "Save Changes",
       "notificationDemo": {
         "title": "Notification Demo",
@@ -618,8 +805,12 @@
         "status": "Status",
         "actions": "Actions",
         "edit": "Edit",
-        "deleteTooltip": "Delete"
+        "deleteTooltip": "Delete",
+        "editTooltip": "Edit"
       },
+      "errorLoadingImage": "Error loading image",
+      "noWebImage": "No web image",
+      "noMobileImage": "No mobile image",
       "form": {
         "description": "Description",
         "buttonText": "Button Text",
@@ -632,7 +823,21 @@
         "webImageLabel": "Web Banner Image",
         "mobileImageLabel": "Mobile Banner Image",
         "chooseWeb": "Choose web image",
-        "chooseMobile": "Choose mobile image"
+        "chooseMobile": "Choose mobile image",
+        "platformOptions": {
+          "web": "Web",
+          "app": "Mobile App"
+        },
+        "typeOptions": {
+          "home": "Home",
+          "mainJobRight": "Main Job Right"
+        },
+        "descLocationOptions": {
+          "topLeft": "Top Left",
+          "topRight": "Top Right",
+          "bottomLeft": "Bottom Left",
+          "bottomRight": "Bottom Right"
+        }
       }
     },
     "feedbacks": {
@@ -660,30 +865,47 @@
     }
   },
   "common": {
-    "pagination": {
-      "rowsPerPage": "Rows per page:",
-      "displayedRows": "{{from}}-{{to}} of {{count}}",
-      "all": "All"
-    },
-    "breadcrumb": "Breadcrumb",
-    "table": {
-      "noData": "No data available",
-      "loading": "Loading data...",
-      "sortTooltip": "Click to sort",
-      "ascTooltip": "Sort ascending",
-      "descTooltip": "Sort descending"
-    },
+    "saving": "Saving...",
+    "save": "Save",
+    "deleting": "Deleting...",
+    "delete": "Delete",
+    "all": "All",
+    "yes": "Yes",
+    "no": "No",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "search": "Search",
+    "edit": "Edit",
+    "add": "Add",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "reset": "Reset",
+    "actions": "Actions",
     "status": {
       "completed": "Completed",
-      "pending": "Pending",
-      "inProgress": "In progress",
+      "inProgress": "In Progress",
       "scheduled": "Scheduled",
       "cancelled": "Cancelled",
-      "unknown": "Unknown"
+      "pending": "Pending",
+      "unknown": "Unknown",
+      "label": "Status"
     },
+    "active": "Active",
+    "inactive": "Inactive",
+    "enable": "Enable",
+    "disable": "Disable",
+    "noData": "No data found",
+    "error": "Error",
+    "success": "Success",
     "na": "N/A",
     "system": "System",
-    "hot": "Hot"
+    "table": {
+      "noData": "No data found"
+    }
   },
   "chat": {
     "title": "Chat with Employers",

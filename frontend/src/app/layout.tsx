@@ -1,17 +1,17 @@
 import type { Metadata, Viewport } from 'next';
-import { Open_Sans } from 'next/font/google';
+import { Be_Vietnam_Pro } from 'next/font/google';
 import ThemeRegistry from '../components/ThemeRegistry/ThemeRegistry';
 import { Providers } from './providers';
 import ClientAppRoot from './ClientAppRoot';
 import './globals.css';           // Global CSS (Tailwind + design tokens)
 import './app-overrides.css';     // App-level overrides
 
-const openSans = Open_Sans({
+const beVietnamPro = Be_Vietnam_Pro({
   subsets: ['latin', 'vietnamese'],
   weight: ['300', '400', '500', '600', '700', '800'],
   style: ['normal', 'italic'],
   display: 'swap',
-  variable: '--font-open-sans',
+  variable: '--font-be-vietnam-pro',
 });
 
 export const metadata: Metadata = {
@@ -38,11 +38,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={openSans.variable} suppressHydrationWarning>
+    <html lang="vi" className={beVietnamPro.variable} suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/svg+xml" href="/square-icons/icon.svg" />
       </head>
-      <body style={{ fontFamily: 'var(--font-open-sans), sans-serif' }} suppressHydrationWarning>
+      <body style={{ fontFamily: 'var(--font-be-vietnam-pro), sans-serif' }} suppressHydrationWarning>
         <ThemeRegistry>
           <Providers>
             <ClientAppRoot>

@@ -106,6 +106,9 @@ const defaultTheme = {
   mode,
   palette: colors,
   customShadows,
+  typography: {
+    fontFamily: "'Be Vietnam Pro', var(--font-be-vietnam-pro), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  },
 } as const;
 
 export default defaultTheme;

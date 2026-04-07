@@ -175,5 +175,19 @@
     "markCompleted": "Mark as completed",
     "cancelInterview": "Cancel interview",
     "delete": "Delete"
+  },
+  "common": {
+    "na": "N/A",
+    "status": {
+      "completed": "Completed",
+      "inProgress": "In Progress",
+      "scheduled": "Scheduled",
+      "cancelled": "Cancelled",
+      "pending": "Pending",
+      "unknown": "Unknown"
+    },
+    "table": {
+      "noData": "No data found"
+    }
   }
 }

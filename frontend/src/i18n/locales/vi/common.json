@@ -343,5 +343,8 @@
     "table": {
       "noData": "Chưa có dữ liệu"
     }
+  },
+  "common": {
+    "hot": "Nổi bật"
   }
 }

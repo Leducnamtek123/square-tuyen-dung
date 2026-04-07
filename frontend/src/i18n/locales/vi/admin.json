@@ -699,6 +699,15 @@
         "vetting": "Vetting",
         "recruitment": "Tuyển dụng"
       },
+      "status": {
+        "scheduled": "Đã lên lịch",
+        "in_progress": "Đang diễn ra",
+        "completed": "Đã hoàn thành",
+        "cancelled": "Đã hủy",
+        "calibration": "Hiệu chuẩn",
+        "processing": "Đang xử lý",
+        "expired": "Đã hết hạn"
+      },
       "table": {
         "room": "Phòng",
         "jobPost": "Việc làm",
@@ -801,17 +810,31 @@
       },
       "form": {
         "description": "Mô tả",
-        "buttonText": "Button Text",
-        "buttonLink": "Button Link",
-        "platform": "Platform",
+        "buttonText": "Nội dung nút",
+        "buttonLink": "Liên kết nút",
+        "platform": "Nền tảng",
         "bannerType": "Loại banner",
         "descLocation": "Vị trí mô tả",
-        "showButton": "Hiện button",
-        "activeLabel": "Active",
+        "showButton": "Hiện nút",
+        "activeLabel": "Kích hoạt",
         "webImageLabel": "Ảnh Web Banner",
         "mobileImageLabel": "Ảnh Mobile Banner",
         "chooseWeb": "Chọn ảnh web",
-        "chooseMobile": "Chọn ảnh mobile"
+        "chooseMobile": "Chọn ảnh mobile",
+        "platformOptions": {
+          "web": "Trang web",
+          "app": "Ứng dụng di động"
+        },
+        "typeOptions": {
+          "home": "Trang chủ",
+          "mainJobRight": "Việc làm chính (phải)"
+        },
+        "descLocationOptions": {
+          "topLeft": "Trên trái",
+          "topRight": "Trên phải",
+          "bottomLeft": "Dưới trái",
+          "bottomRight": "Dưới phải"
+        }
       },
       "errorLoadingImage": "Lỗi khi tải ảnh",
       "noWebImage": "Chưa có ảnh web",
@@ -842,30 +865,47 @@
     }
   },
   "common": {
-    "pagination": {
-      "rowsPerPage": "Số hàng mỗi trang:",
-      "displayedRows": "{{from}}-{{to}} của {{count}}",
-      "all": "Tất cả"
-    },
-    "breadcrumb": "Đường dẫn",
-    "table": {
-      "noData": "Không có dữ liệu",
-      "loading": "Đang tải dữ liệu...",
-      "sortTooltip": "Nhấn để sắp xếp",
-      "ascTooltip": "Sắp xếp tăng dần",
-      "descTooltip": "Sắp xếp giảm dần"
-    },
+    "saving": "Đang lưu...",
+    "save": "Lưu",
+    "deleting": "Đang xóa...",
+    "delete": "Xóa",
+    "all": "Tất cả",
+    "yes": "Có",
+    "no": "Không",
+    "saveChanges": "Lưu thay đổi",
+    "cancel": "Hủy",
+    "confirm": "Xác nhận",
+    "loading": "Đang tải...",
+    "search": "Tìm kiếm",
+    "edit": "Chỉnh sửa",
+    "add": "Thêm mới",
+    "close": "Đóng",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "submit": "Gửi",
+    "reset": "Đặt lại",
+    "actions": "Thao tác",
     "status": {
-      "completed": "Đã hoàn thành",
-      "pending": "Đang chờ",
-      "inProgress": "Đang thực hiện",
+      "completed": "Hoàn thành",
+      "inProgress": "Đang diễn ra",
       "scheduled": "Đã lên lịch",
       "cancelled": "Đã hủy",
-      "unknown": "Không rõ"
+      "pending": "Chờ xử lý",
+      "unknown": "Không xác định",
+      "label": "Trạng thái"
     },
+    "active": "Hoạt động",
+    "inactive": "Không hoạt động",
+    "enable": "Bật",
+    "disable": "Tắt",
+    "noData": "Không có dữ liệu",
+    "error": "Lỗi",
+    "success": "Thành công",
     "na": "N/A",
     "system": "Hệ thống",
-    "hot": "Hot"
+    "table": {
+      "noData": "Không có dữ liệu"
+    }
   },
   "chat": {
     "title": "Kết nối với nhà tuyển dụng",

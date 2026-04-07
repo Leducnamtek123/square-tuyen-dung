@@ -25,23 +25,6 @@ const ASPECT_RATIOS: Record<number, { ratio: number; label: string }> = {
   2: { ratio: 1 / 1, label: '1:1' },     // Main Job Right (square)
 };
 
-const PLATFORM_OPTIONS = [
-  { value: 'WEB', label: 'Web' },
-  { value: 'APP', label: 'Mobile App' },
-];
-
-const TYPE_OPTIONS = [
-  { value: 1, label: 'Home' },
-  { value: 2, label: 'Main Job Right' },
-];
-
-const DESCRIPTION_LOCATIONS = [
-  { value: 1, label: 'Top Left' },
-  { value: 2, label: 'Top Right' },
-  { value: 3, label: 'Bottom Left' },
-  { value: 4, label: 'Bottom Right' },
-];
-
 interface BannerFormData {
     description: string;
     button_text: string;
@@ -55,6 +38,23 @@ interface BannerFormData {
 
 const BannersPage = () => {
   const { t } = useTranslation('admin');
+
+  const PLATFORM_OPTIONS = [
+    { value: 'WEB', label: t('pages.banners.form.platformOptions.web') },
+    { value: 'APP', label: t('pages.banners.form.platformOptions.app') },
+  ];
+
+  const TYPE_OPTIONS = [
+    { value: 1, label: t('pages.banners.form.typeOptions.home') },
+    { value: 2, label: t('pages.banners.form.typeOptions.mainJobRight') },
+  ];
+
+  const DESCRIPTION_LOCATIONS = [
+    { value: 1, label: t('pages.banners.form.descLocationOptions.topLeft') },
+    { value: 2, label: t('pages.banners.form.descLocationOptions.topRight') },
+    { value: 3, label: t('pages.banners.form.descLocationOptions.bottomLeft') },
+    { value: 4, label: t('pages.banners.form.descLocationOptions.bottomRight') },
+  ];
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
   const [current, setCurrent] = useState<Banner | null>(null);

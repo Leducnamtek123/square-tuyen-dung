@@ -239,5 +239,8 @@
     "copyError": "Copy error",
     "retry": "Retry",
     "reload": "Reload page"
+  },
+  "common": {
+    "hot": "Hot"
   }
 }
