@@ -132,7 +132,10 @@
     "resume": {
       "online": "Hồ sơ trực tuyến",
       "attached": "CV đính kèm",
-      "preview": "Xem trước hồ sơ"
+      "preview": "Xem trước hồ sơ",
+      "empty": "Bạn chưa tải lên hồ sơ",
+      "pleaseUpload": "Vui lòng tải lên hồ sơ để ứng tuyển",
+      "createNow": "Tạo hồ sơ ngay"
     },
     "fields": {
       "fullName": "Họ và tên",
@@ -155,5 +158,15 @@
       "phoneMax": "Số điện thoại vượt quá độ dài cho phép."
     },
     "note": "Vui lòng cung cấp chính xác họ tên, email và số điện thoại để nhà tuyển dụng có thể liên hệ với bạn."
+  },
+  "company": {
+    "following": "Đang theo dõi",
+    "follow": "Theo dõi",
+    "followers": "{{count}} người theo dõi",
+    "notUpdated": "Chưa cập nhật",
+    "jobCount": "{{count}} việc làm"
+  },
+  "jobPost": {
+    "remaining": "Còn {{days}} ngày"
   }
 }

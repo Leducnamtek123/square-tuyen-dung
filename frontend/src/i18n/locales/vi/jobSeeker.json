@@ -79,7 +79,9 @@
       "gradeOrRank": "Xếp loại/Điểm số",
       "salaryMin": "Lương tối thiểu",
       "salaryMax": "Lương tối đa",
-      "skillName": "Tên kỹ năng"
+      "skillName": "Tên kỹ năng",
+      "certificateName": "Tên chứng chỉ",
+      "expirationDate": "Ngày hết hạn"
     },
     "placeholders": {
       "fullName": "Nhập họ và tên",
@@ -120,7 +122,8 @@
       "trainingPlace": "Nhập tên trường/trung tâm đào tạo",
       "gradeOrRank": "Nhập xếp loại/điểm số",
       "selectLanguage": "Chọn ngoại ngữ",
-      "skillName": "Nhập tên kỹ năng"
+      "skillName": "Nhập tên kỹ năng",
+      "certificateName": "Nhập tên chứng chỉ"
     },
     "validation": {
       "fullNameRequired": "Vui lòng nhập họ và tên.",
@@ -180,7 +183,8 @@
       "skillNameRequired": "Vui lòng nhập tên kỹ năng.",
       "skillNameMax": "Tên kỹ năng vượt quá độ dài cho phép.",
       "fileRequired": "Vui lòng chọn tệp tin.",
-      "fieldMax": "{{field}} vượt quá độ dài cho phép."
+      "fieldMax": "{{field}} vượt quá độ dài cho phép.",
+      "descriptionMax": "Mô tả không được vượt quá 1000 ký tự"
     },
     "messages": {
       "personalUpdateSuccess": "Cập nhật thông tin cá nhân thành công",

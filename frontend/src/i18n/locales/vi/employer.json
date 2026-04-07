@@ -54,12 +54,16 @@
       "missingSkillsTitle": "Kỹ năng còn thiếu",
       "allSkillsTitle": "Tất cả kỹ năng",
       "noData": "Không có dữ liệu",
-      "resumeTitle": "Hồ sơ ứng viên"
+      "resumeTitle": "Hồ sơ ứng viên",
+      "viewAnalysis": "Xem phân tích AI",
+      "failed": "Phân tích AI thất bại"
     },
     "email": {
       "sentSuccess": "Gửi email thành công.",
       "resend": "Gửi lại",
-      "send": "Gửi email"
+      "send": "Gửi email",
+      "resendTooltip": "Gửi lại email",
+      "sendTooltip": "Gửi email"
     },
     "status": {
       "updateTitle": "Cập nhật trạng thái ứng tuyển",
@@ -72,7 +76,8 @@
       "title": "Xóa hồ sơ ứng tuyển",
       "confirm": "Hồ sơ ứng tuyển này sẽ bị xóa vĩnh viễn và không thể khôi phục. Bạn có chắc chắn không?",
       "success": "Xóa hồ sơ ứng tuyển thành công."
-    }
+    },
+    "manageSubtitle": "Quản lý hồ sơ ứng tuyển"
   },
   "savedResume": {
     "title": "Quản lý hồ sơ đã lưu",
@@ -80,7 +85,10 @@
     "filters": "Bộ lọc:",
     "messages": {
       "unsaveSuccess": "Bỏ lưu hồ sơ thành công."
-    }
+    },
+    "confirmUnsaveTitle": "Bỏ lưu hồ sơ",
+    "confirmUnsaveMessage": "Bạn có chắc muốn bỏ lưu hồ sơ này?",
+    "manageSubtitle": "Quản lý hồ sơ đã lưu"
   },
   "savedResumeTable": {
     "title": {
@@ -161,7 +169,8 @@
       "addSuccess": "Thêm tin tuyển dụng thành công.",
       "updateSuccess": "Cập nhật tin tuyển dụng thành công."
     },
-    "popupTitle": "Tin tuyển dụng"
+    "popupTitle": "Tin tuyển dụng",
+    "manageSubtitle": "Quản lý các tin tuyển dụng"
   },
   "sendEmailComponent": {
     "label": {
@@ -265,6 +274,9 @@
     },
     "helperText": {
       "automaticallyfilledifyouchooseasuggestedaddress": "Tự động điền nếu bạn chọn một địa chỉ gợi ý"
+    },
+    "validation": {
+      "companyNameRequired": "Tên công ty là bắt buộc"
     }
   },
   "statItem": {
@@ -468,11 +480,20 @@
     },
     "label": {
       "resultsFound": "Kết quả tìm thấy:",
-      "profiles": "{{count}} hồ sơ"
+      "profiles": "{{count}} hồ sơ",
+      "yearsOld": "{{age}} tuổi",
+      "lastViewed": "Xem lần cuối: {{date}}",
+      "updatedAt": "Cập nhật: {{date}}",
+      "viewsCount": "{{count}} lượt xem"
     },
     "messages": {
       "saveSuccess": "Lưu hồ sơ thành công.",
       "unsaveSuccess": "Bỏ lưu hồ sơ thành công."
+    },
+    "actions": {
+      "unsave": "Bỏ lưu",
+      "save": "Lưu lại",
+      "viewProfile": "Xem hồ sơ"
     }
   },
   "profileSearch": {
@@ -510,7 +531,8 @@
       "questiongroupname": "Tên nhóm câu hỏi",
       "description": "Mô tả",
       "selectquestions": "Chọn câu hỏi",
-      "questioncontent": "Nội dung câu hỏi"
+      "questioncontent": "Nội dung câu hỏi",
+      "questionCount": "{{count}} câu hỏi"
     },
     "placeholder": {
       "searchquestiongroups": "Tìm kiếm nhóm câu hỏi..."
@@ -521,7 +543,8 @@
       "updateSuccess": "Cập nhật nhóm câu hỏi thành công",
       "updateError": "Có lỗi xảy ra khi cập nhật bộ câu hỏi",
       "deleteSuccess": "Xóa nhóm câu hỏi thành công",
-      "deleteError": "Có lỗi xảy ra khi xóa bộ câu hỏi"
+      "deleteError": "Có lỗi xảy ra khi xóa bộ câu hỏi",
+      "createSuccess": "Tạo nhóm câu hỏi thành công"
     },
     "onlineInterview": "Phỏng vấn trực tuyến",
     "questionGroups": "Nhóm câu hỏi",
@@ -530,7 +553,8 @@
       "groupName": "Tên nhóm câu hỏi",
       "numberOfQuestions": "Số câu hỏi",
       "description": "Mô tả",
-      "na": "N/A"
+      "na": "N/A",
+      "noData": "Không có dữ liệu"
     },
     "dialog": {
       "addTitle": "Thêm nhóm câu hỏi mới",
@@ -545,8 +569,15 @@
       "confirmDeleteMessage1": "Bạn có chắc chắn muốn xóa nhóm câu hỏi",
       "confirmDeleteMessage2": "Các câu hỏi bên trong sẽ không bị xóa, nhưng liên kết với nhóm này sẽ bị mất.",
       "confirmDeleteBtn": "Xác nhận xóa",
-      "deleting": "Đang xóa..."
-    }
+      "deleting": "Đang xóa...",
+      "confirmDeleteMessage": "Bạn có chắc muốn xóa nhóm câu hỏi này?"
+    },
+    "title": "Nhóm câu hỏi",
+    "actions": {
+      "addGroup": "Thêm nhóm",
+      "createNewQuestion": "Tạo câu hỏi mới"
+    },
+    "noData": "Chưa có nhóm câu hỏi"
   },
   "sendMailCard": {
     "title": {
@@ -709,7 +740,8 @@
   },
   "common": {
     "notUpdated": "Chưa cập nhật",
-    "present": "Hiện tại"
+    "present": "Hiện tại",
+    "appName": "Square Tuyển Dụng"
   },
   "company": {
     "tabs": {
@@ -735,7 +767,8 @@
       "cover": "Ảnh bìa công ty",
       "changeCover": "Thay đổi ảnh bìa",
       "update": "Cập nhật"
-    }
+    },
+    "title": "Hồ sơ công ty"
   },
   "pricing": {
     "heroTitle": "Giải pháp Đầu tư Nhân sự",
@@ -964,5 +997,9 @@
       "pleaseUpload": "Xin hãy đính kèm CV hoặc tạo mới.",
       "createNow": "Tạo hồ sơ ngay"
     }
+  },
+  "interviewListCard": {
+    "editInterview": "Chỉnh sửa phỏng vấn",
+    "description": "Xem và quản lý lịch phỏng vấn"
   }
 }

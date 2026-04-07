@@ -126,7 +126,10 @@
       "deleteError": "Could not delete this question.",
       "columns": {
         "text": "Question Content"
-      }
+      },
+      "deleteTitle": "Delete Question",
+      "noData": "No questions yet",
+      "hint": "Create questions to use in interviews"
     }
   },
   "interviewListCard": {
@@ -159,7 +162,8 @@
       "processing": "Processing",
       "completed": "Completed",
       "cancelled": "Cancelled"
-    }
+    },
+    "description": "View scheduled interviews"
   },
   "interviewAdminPage": {
     "title": "Interview Management",
@@ -188,6 +192,55 @@
     },
     "table": {
       "noData": "No data found"
+    }
+  },
+  "interviewCreateCard": {
+    "messages": {
+      "updateSuccess": "Interview updated successfully",
+      "scheduleSuccess": "Interview scheduled successfully"
+    },
+    "title": {
+      "editOnlineInterview": "Edit Online Interview",
+      "scheduleOnlineInterview": "Schedule Online Interview",
+      "scheduledtime": "Scheduled Time"
+    },
+    "description": {
+      "schedulingHelper": "Fill in the details below to schedule an interview"
+    },
+    "label": {
+      "basicInfo": "Basic Information",
+      "selectjobpost": "Select Job Post",
+      "selectcandidate": "Select Candidate",
+      "questions": "Questions",
+      "selectquestiongroupoptional": "Select Question Group (Optional)",
+      "selectinterviewquestions": "Select Interview Questions",
+      "selectquestions": "Select Questions"
+    },
+    "validation": {
+      "selectJobPost": "Please select a job post",
+      "selectCandidate": "Please select a candidate"
+    },
+    "helperText": {
+      "selectaquestiongrouptoautomaticallyfillthequestions below": "Select a question group to auto-fill questions"
+    },
+    "scheduleNow": "Schedule Now"
+  },
+  "interviewDetail": {
+    "messages": {
+      "evaluationSuccess": "Evaluation saved successfully",
+      "aiTriggerSuccess": "AI evaluation started",
+      "notFound": "Interview not found",
+      "notFoundDesc": "The interview you are looking for does not exist"
+    },
+    "actions": {
+      "backToList": "Back to List"
+    },
+    "title": "Interview Details",
+    "label": {
+      "roomCode": "Room Code"
+    },
+    "tooltips": {
+      "cannotJoin": "Cannot join at this time"
     }
   }
 }

@@ -32,6 +32,9 @@
       "apology": "Xin lỗi, tôi gặp chút trục trặc khi xử lý câu hỏi này.",
       "busy": "Máy chủ đang bận, vui lòng thử lại sau.",
       "tryAgainLater": "Tôi xin lỗi, hiện tại tôi không thể phản hồi. Vui lòng thử lại sau giây lát."
-    }
-  }
+    },
+    "retry": "Thử lại"
+  },
+  "loadPreviousMessages": "Tải tin nhắn trước",
+  "typeAMessage": "Nhập tin nhắn..."
 }

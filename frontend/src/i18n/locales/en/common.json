@@ -80,7 +80,11 @@
     "confirm": "Confirm",
     "add": "Add",
     "download": "Download",
-    "upload": "Upload"
+    "upload": "Upload",
+    "change": "Change",
+    "saveChanges": "Save Changes",
+    "preview": "Preview",
+    "back": "Back"
   },
   "status": {
     "pending": "Pending",
@@ -96,7 +100,11 @@
   "labels": {
     "time": "Time",
     "job": "Job",
-    "uncategorized": "Uncategorized"
+    "uncategorized": "Uncategorized",
+    "present": "Present",
+    "viewAttachedResume": "View Attached Resume",
+    "email": "Email",
+    "back": "Back"
   },
   "placeholders": {
     "selectCity": "Select City/Province",
@@ -242,5 +250,21 @@
   },
   "common": {
     "hot": "Hot"
-  }
+  },
+  "validation": {
+    "max255": "Maximum 255 characters",
+    "max30": "Maximum 30 characters"
+  },
+  "messages": {
+    "loadingPdf": "Loading PDF..."
+  },
+  "breadcrumbs": {
+    "employer": "Employer"
+  },
+  "buttons": {
+    "back": "Back"
+  },
+  "cancel": "Cancel",
+  "none": "None",
+  "view": "View"
 }

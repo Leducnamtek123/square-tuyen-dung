@@ -32,6 +32,9 @@
     "status": "Ready",
     "placeholder": "Type a message...",
     "launcherAria": "Open Square AI assistant",
-    "closeAria": "Close chat"
-  }
+    "closeAria": "Close chat",
+    "retry": "Retry"
+  },
+  "loadPreviousMessages": "Load previous messages",
+  "typeAMessage": "Type a message..."
 }

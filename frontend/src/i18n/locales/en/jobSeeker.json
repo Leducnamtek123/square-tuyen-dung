@@ -79,7 +79,9 @@
       "degreeName": "Degree Name",
       "major": "Major",
       "completedDate": "Completion Date",
-      "gradeOrRank": "Grade / Rank"
+      "gradeOrRank": "Grade / Rank",
+      "certificateName": "Certificate Name",
+      "expirationDate": "Expiration Date"
     },
     "placeholders": {
       "fullName": "Enter full name",
@@ -120,7 +122,8 @@
       "degreeName": "Enter degree name",
       "major": "Enter major",
       "trainingPlace": "Enter training institution",
-      "gradeOrRank": "Enter grade or rank"
+      "gradeOrRank": "Enter grade or rank",
+      "certificateName": "Enter certificate name"
     },
     "validation": {
       "fullNameRequired": "Full name is required.",
@@ -180,7 +183,8 @@
       "skillNameRequired": "Skill name is required.",
       "skillNameMax": "Skill name exceeds allowed length.",
       "fileRequired": "File is required.",
-      "fieldMax": "{{field}} exceeds allowed length."
+      "fieldMax": "{{field}} exceeds allowed length.",
+      "descriptionMax": "Description must not exceed 1000 characters"
     },
     "messages": {
       "personalUpdateSuccess": "Personal information updated successfully",

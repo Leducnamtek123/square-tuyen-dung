@@ -31,7 +31,11 @@
     "sendOTP": "Gửi OTP",
     "verifyOTP": "Xác nhận",
     "changePhone": "Đổi số C.T",
-    "resendOTP": "Gửi lại OTP"
+    "resendOTP": "Gửi lại OTP",
+    "change": "Thay đổi",
+    "saveChanges": "Lưu thay đổi",
+    "preview": "Xem trước",
+    "back": "Quay lại"
   },
   "loading": "Đang tải...",
   "noData": "Không có dữ liệu",
@@ -51,7 +55,11 @@
     "time": "Thời gian",
     "job": "Công việc",
     "uncategorized": "Chưa phân loại",
-    "notUpdated": "Chưa cập nhật"
+    "notUpdated": "Chưa cập nhật",
+    "present": "Hiện tại",
+    "viewAttachedResume": "Xem hồ sơ đính kèm",
+    "email": "Email",
+    "back": "Quay lại"
   },
   "placeholders": {
     "selectCity": "Chọn Tỉnh/Thành phố",
@@ -262,7 +270,9 @@
     "resendIn": "Gửi lại mã sau..."
   },
   "validation": {
-    "invalidDate": "Ngày không hợp lệ"
+    "invalidDate": "Ngày không hợp lệ",
+    "max255": "Tối đa 255 ký tự",
+    "max30": "Tối đa 30 ký tự"
   },
   "form": {
     "phoneNumber": "Số điện thoại của bạn",
@@ -346,5 +356,17 @@
   },
   "common": {
     "hot": "Nổi bật"
-  }
+  },
+  "messages": {
+    "loadingPdf": "Đang tải PDF..."
+  },
+  "breadcrumbs": {
+    "employer": "Nhà tuyển dụng"
+  },
+  "buttons": {
+    "back": "Quay lại"
+  },
+  "cancel": "Hủy",
+  "none": "Không có",
+  "view": "Xem"
 }

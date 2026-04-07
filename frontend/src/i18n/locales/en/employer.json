@@ -54,12 +54,16 @@
       "missingSkillsTitle": "Missing skills",
       "allSkillsTitle": "All skills",
       "noData": "No data",
-      "resumeTitle": "Candidate resume"
+      "resumeTitle": "Candidate resume",
+      "viewAnalysis": "View AI Analysis",
+      "failed": "AI analysis failed"
     },
     "email": {
       "sentSuccess": "Email sent successfully.",
       "resend": "Resend",
-      "send": "Send email"
+      "send": "Send email",
+      "resendTooltip": "Resend email",
+      "sendTooltip": "Send email"
     },
     "status": {
       "updateTitle": "Update application status",
@@ -72,7 +76,8 @@
       "title": "Delete Applied Profile",
       "confirm": "This applied profile will be permanently deleted and cannot be recovered. Are you sure?",
       "success": "Candidate application deleted successfully."
-    }
+    },
+    "manageSubtitle": "Manage applied resumes"
   },
   "savedResume": {
     "title": "Saved Resume Management",
@@ -80,7 +85,10 @@
     "filters": "Filters:",
     "messages": {
       "unsaveSuccess": "Unsaved successfully."
-    }
+    },
+    "confirmUnsaveTitle": "Unsave Resume",
+    "confirmUnsaveMessage": "Are you sure you want to unsave this resume?",
+    "manageSubtitle": "Manage saved resumes"
   },
   "savedResumeTable": {
     "title": {
@@ -161,7 +169,8 @@
       "addSuccess": "Job post added successfully.",
       "updateSuccess": "Job post updated successfully."
     },
-    "popupTitle": "Job Post"
+    "popupTitle": "Job Post",
+    "manageSubtitle": "Manage your job postings"
   },
   "sendEmailComponent": {
     "label": {
@@ -265,6 +274,9 @@
     },
     "helperText": {
       "automaticallyfilledifyouchooseasuggestedaddress": "Automatically filled if you choose a suggested address."
+    },
+    "validation": {
+      "companyNameRequired": "Company name is required"
     }
   },
   "statItem": {
@@ -468,11 +480,20 @@
     },
     "label": {
       "resultsFound": "Results found:",
-      "profiles": "{{count}} profiles"
+      "profiles": "{{count}} profiles",
+      "yearsOld": "{{age}} years old",
+      "lastViewed": "Last viewed: {{date}}",
+      "updatedAt": "Updated: {{date}}",
+      "viewsCount": "{{count}} views"
     },
     "messages": {
       "saveSuccess": "Saved successfully.",
       "unsaveSuccess": "Unsaved successfully."
+    },
+    "actions": {
+      "unsave": "Unsave",
+      "save": "Save",
+      "viewProfile": "View Profile"
     }
   },
   "profileSearch": {
@@ -510,7 +531,8 @@
       "questiongroupname": "Question Group Name",
       "description": "Description",
       "selectquestions": "Select Questions",
-      "questioncontent": "Question Content"
+      "questioncontent": "Question Content",
+      "questionCount": "{{count}} questions"
     },
     "onlineInterview": "Online Interview",
     "questionGroups": "Question Groups",
@@ -519,7 +541,8 @@
       "groupName": "Question Group Name",
       "numberOfQuestions": "Number of Questions",
       "description": "Description",
-      "na": "N/A"
+      "na": "N/A",
+      "noData": "No data"
     },
     "dialog": {
       "addTitle": "Add New Question Group",
@@ -534,7 +557,8 @@
       "confirmDeleteMessage1": "Are you sure you want to delete the question group",
       "confirmDeleteMessage2": "The questions inside will not be deleted, but their association with this group will be lost.",
       "confirmDeleteBtn": "Confirm Delete",
-      "deleting": "Deleting..."
+      "deleting": "Deleting...",
+      "confirmDeleteMessage": "Are you sure you want to delete this group?"
     },
     "placeholder": {
       "searchquestiongroups": "Search question groups..."
@@ -545,8 +569,15 @@
       "updateSuccess": "Updated question group successfully",
       "updateError": "Error occurred while updating question set",
       "deleteSuccess": "Deleted question group successfully",
-      "deleteError": "Error occurred while deleting question set"
-    }
+      "deleteError": "Error occurred while deleting question set",
+      "createSuccess": "Question group created successfully"
+    },
+    "title": "Question Groups",
+    "actions": {
+      "addGroup": "Add Group",
+      "createNewQuestion": "Create New Question"
+    },
+    "noData": "No question groups yet"
   },
   "sendMailCard": {
     "title": {
@@ -709,7 +740,8 @@
   },
   "common": {
     "notUpdated": "Not updated",
-    "present": "Present"
+    "present": "Present",
+    "appName": "Square Tuyển Dụng"
   },
   "company": {
     "tabs": {
@@ -730,7 +762,8 @@
       "cover": "Company Cover Image",
       "changeCover": "Change Cover",
       "update": "Update"
-    }
+    },
+    "title": "Company Profile"
   },
   "pricing": {
     "heroTitle": "HR Investment Solutions",
@@ -952,5 +985,9 @@
     "good": "Good match",
     "fair": "Fair",
     "poor": "Not a match"
+  },
+  "interviewListCard": {
+    "editInterview": "Edit Interview",
+    "description": "View and manage your scheduled interviews"
   }
 }

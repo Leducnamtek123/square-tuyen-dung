@@ -904,7 +904,12 @@
     "na": "N/A",
     "system": "Hệ thống",
     "table": {
-      "noData": "Không có dữ liệu"
+      "noData": "Không có dữ liệu",
+      "sortTooltip": "Sắp xếp"
+    },
+    "pagination": {
+      "rowsPerPage": "Số dòng mỗi trang",
+      "displayedRows": "{{from}}-{{to}} trên {{count}}"
     }
   },
   "chat": {

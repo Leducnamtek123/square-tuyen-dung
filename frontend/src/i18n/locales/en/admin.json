@@ -904,7 +904,12 @@
     "na": "N/A",
     "system": "System",
     "table": {
-      "noData": "No data found"
+      "noData": "No data found",
+      "sortTooltip": "Sort"
+    },
+    "pagination": {
+      "rowsPerPage": "Rows per page",
+      "displayedRows": "{{from}}-{{to}} of {{count}}"
     }
   },
   "chat": {

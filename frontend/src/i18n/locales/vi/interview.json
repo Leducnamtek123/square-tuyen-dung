@@ -126,7 +126,10 @@
       "deleteError": "Không thể xóa câu hỏi này.",
       "columns": {
         "text": "Nội dung câu hỏi"
-      }
+      },
+      "deleteTitle": "Xóa câu hỏi",
+      "noData": "Chưa có câu hỏi nào",
+      "hint": "Tạo câu hỏi để sử dụng trong phỏng vấn"
     }
   },
   "interviewListCard": {
@@ -159,7 +162,8 @@
       "processing": "Đang xử lý",
       "completed": "Hoàn thành",
       "cancelled": "Đã hủy"
-    }
+    },
+    "description": "Xem lịch phỏng vấn"
   },
   "interviewAdminPage": {
     "title": "Quản lý Phỏng vấn",
@@ -188,6 +192,55 @@
     },
     "table": {
       "noData": "Không có dữ liệu"
+    }
+  },
+  "interviewCreateCard": {
+    "messages": {
+      "updateSuccess": "Cập nhật phỏng vấn thành công",
+      "scheduleSuccess": "Lên lịch phỏng vấn thành công"
+    },
+    "title": {
+      "editOnlineInterview": "Chỉnh sửa phỏng vấn trực tuyến",
+      "scheduleOnlineInterview": "Lên lịch phỏng vấn trực tuyến",
+      "scheduledtime": "Thời gian phỏng vấn"
+    },
+    "description": {
+      "schedulingHelper": "Điền thông tin bên dưới để lên lịch phỏng vấn"
+    },
+    "label": {
+      "basicInfo": "Thông tin cơ bản",
+      "selectjobpost": "Chọn tin tuyển dụng",
+      "selectcandidate": "Chọn ứng viên",
+      "questions": "Câu hỏi",
+      "selectquestiongroupoptional": "Chọn nhóm câu hỏi (Tùy chọn)",
+      "selectinterviewquestions": "Chọn câu hỏi phỏng vấn",
+      "selectquestions": "Chọn câu hỏi"
+    },
+    "validation": {
+      "selectJobPost": "Vui lòng chọn tin tuyển dụng",
+      "selectCandidate": "Vui lòng chọn ứng viên"
+    },
+    "helperText": {
+      "selectaquestiongrouptoautomaticallyfillthequestions below": "Chọn nhóm câu hỏi để tự động điền câu hỏi"
+    },
+    "scheduleNow": "Lên lịch ngay"
+  },
+  "interviewDetail": {
+    "messages": {
+      "evaluationSuccess": "Lưu đánh giá thành công",
+      "aiTriggerSuccess": "Bắt đầu đánh giá AI",
+      "notFound": "Không tìm thấy phỏng vấn",
+      "notFoundDesc": "Phỏng vấn bạn đang tìm không tồn tại"
+    },
+    "actions": {
+      "backToList": "Quay lại danh sách"
+    },
+    "title": "Chi tiết phỏng vấn",
+    "label": {
+      "roomCode": "Mã phòng"
+    },
+    "tooltips": {
+      "cannotJoin": "Chưa thể tham gia lúc này"
     }
   }
 }

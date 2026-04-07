@@ -132,7 +132,10 @@
     "resume": {
       "online": "Online profile",
       "attached": "Attached CV",
-      "preview": "Preview profile"
+      "preview": "Preview profile",
+      "empty": "You have not uploaded a resume yet",
+      "pleaseUpload": "Please upload your resume to apply",
+      "createNow": "Create Resume Now"
     },
     "fields": {
       "fullName": "Full name",
@@ -155,5 +158,15 @@
       "phoneMax": "Phone number exceeds allowed length."
     },
     "note": "Please provide accurate full name, email, and phone number so employers can contact you."
+  },
+  "company": {
+    "following": "Following",
+    "follow": "Follow",
+    "followers": "{{count}} followers",
+    "notUpdated": "Not updated",
+    "jobCount": "{{count}} jobs"
+  },
+  "jobPost": {
+    "remaining": "{{days}} days remaining"
   }
 }
