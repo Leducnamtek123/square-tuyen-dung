@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from apps.interviews.models import InterviewSession
 from apps.interviews.services import update_interview_status
+from apps.interviews.livekit_service import LiveKitService
 
 logger = logging.getLogger("livekit.webhook")
 
@@ -78,6 +79,7 @@ def _handle_livekit_event(payload: dict[str, Any]) -> None:
         if session.status in {"draft", "scheduled", "calibration", "processing"}:
             update_interview_status(session, "in_progress")
             logger.info("LiveKit webhook: session %s marked in_progress", session.id)
+            LiveKitService.start_recording(session.room_name)
     elif event in {"room_finished", "room_ended", "room_stopped", "room_disconnected"}:
         if session.status not in {"completed", "cancelled"}:
             update_interview_status(session, "completed")

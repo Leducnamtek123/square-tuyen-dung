@@ -233,6 +233,28 @@ services:
       - data-net
 
   # ---------------------------------------------------------------------------
+  # LiveKit Egress (For Recording & S3 Upload)
+  # ---------------------------------------------------------------------------
+  livekit-egress:
+    container_name: tuyendung-studio-livekit-egress
+    image: livekit/egress:latest
+    restart: always
+    environment:
+      - EGRESS_CONFIG_FILE=/etc/egress.yaml
+    volumes:
+      - ./voice-ai/egress.yaml:/etc/egress.yaml
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      redis:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    networks:
+      - proxy-net
+      - app-net
+      - data-net
+
+  # ---------------------------------------------------------------------------
   # AI Services (GPU enabled by default)
   # ---------------------------------------------------------------------------
   llama-cpp:

@@ -748,7 +748,12 @@
       "info": "Company Information",
       "multimedia": "Multimedia"
     },
-    "title": "Company Information"
+    "title": "Company Information",
+    "following": "Following",
+    "follow": "Follow",
+    "followers": "followers",
+    "notUpdated": "Information not updated",
+    "jobCount": "jobs"
   },
   "companyProfile": {
     "success": {
@@ -989,5 +994,12 @@
   "interviewListCard": {
     "editInterview": "Edit Interview",
     "description": "View and manage your scheduled interviews"
+  },
+  "applyForm": {
+    "resume": {
+      "empty": "Your resume is empty",
+      "pleaseUpload": "Please attach a CV or create a new one.",
+      "createNow": "Create resume now"
+    }
   }
 }

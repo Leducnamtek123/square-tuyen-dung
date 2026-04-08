@@ -12,6 +12,9 @@ from livekit import api
 LIVEKIT_API_KEY = config('LIVEKIT_API_KEY', default='devkey')
 LIVEKIT_API_SECRET = config('LIVEKIT_API_SECRET', default='secret')
 LIVEKIT_URL = config('LIVEKIT_URL', default='http://livekit:7880')
+MINIO_ROOT_USER = config('MINIO_ROOT_USER', default='minioadmin')
+MINIO_ROOT_PASSWORD = config('MINIO_ROOT_PASSWORD', default='minioadmin')
+MINIO_BUCKET = config('MINIO_BUCKET', default='square')
 LIVEKIT_AGENT_NAME = config('LIVEKIT_AGENT_NAME', default='square-ai-interviewer')
 
 logger = logging.getLogger(__name__)
@@ -107,3 +110,35 @@ class LiveKitService:
             asyncio.run(_delete_room())
         except Exception as exc:
             logger.warning("LiveKit delete_room failed: %s", exc)
+
+    @staticmethod
+    def start_recording(room_name: str) -> None:
+        """Start a room composite egress to record the interview to S3/MinIO."""
+        async def _start_egress():
+            lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+            try:
+                filepath = f"interviews/{room_name}/recording.mp4"
+                s3_upload = api.S3Upload(
+                    access_key=MINIO_ROOT_USER,
+                    secret=MINIO_ROOT_PASSWORD,
+                    endpoint="http://minio:9000",
+                    bucket=MINIO_BUCKET,
+                    force_path_style=True,
+                )
+                
+                req = api.RoomCompositeEgressRequest(
+                    room_name=room_name,
+                    file=api.EncodedFileOutput(
+                        filepath=filepath,
+                        s3=s3_upload
+                    )
+                )
+                await lkapi.egress.start_room_composite_egress(req)
+                logger.info("Started egress recording for room %s at %s", room_name, filepath)
+            finally:
+                await lkapi.aclose()
+        
+        try:
+            asyncio.run(_start_egress())
+        except Exception as exc:
+            logger.warning("LiveKit start_recording failed: %s", exc)

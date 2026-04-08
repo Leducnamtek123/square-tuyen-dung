@@ -1,0 +1,8 @@
+api_key: devkey
+api_secret: secret
+ws_url: ws://livekit:7880
+redis:
+  address: "redis:6379"
+
+# S3 configuration can still be handled via environment variables inside Python start script
+# But in egress, having the base YAML is sufficient.

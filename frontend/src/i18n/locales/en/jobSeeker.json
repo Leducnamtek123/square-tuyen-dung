@@ -422,5 +422,19 @@
     }
   },
   "presenterationPlaceholder": "Enter your self-introduction",
-  "notUpdatedzePlaceholder": "Not updated"
+  "notUpdatedzePlaceholder": "Not updated",
+  "applyForm": {
+    "resume": {
+      "empty": "Your resume is empty",
+      "pleaseUpload": "Please attach a CV or create a new one.",
+      "createNow": "Create resume now"
+    }
+  },
+  "company": {
+    "following": "Following",
+    "follow": "Follow",
+    "followers": "followers",
+    "notUpdated": "Information not updated",
+    "jobCount": "jobs"
+  }
 }
