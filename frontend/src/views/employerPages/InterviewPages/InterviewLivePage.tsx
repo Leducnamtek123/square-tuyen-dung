@@ -1,8 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Box, Typography, Chip, Stack, Divider, LinearProgress, Button, IconButton, type Theme } from "@mui/material";
+import {
+  Box, Typography, Chip, Stack, Divider, LinearProgress, Button, IconButton,
+  Paper, Avatar, alpha, useTheme, type Theme,
+} from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import AddIcon from '@mui/icons-material/Add';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import QuizIcon from '@mui/icons-material/Quiz';
+import PersonIcon from '@mui/icons-material/Person';
+import WorkIcon from '@mui/icons-material/Work';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import ScheduleIcon from '@mui/icons-material/Schedule';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import Link from 'next/link';
 import interviewService from '../../../services/interviewService';
 import { transformInterviewSession } from '../../../utils/transformers';
@@ -34,8 +46,43 @@ const getStatusColor = (status: string): "success" | "primary" | "info" | "error
   }
 };
 
+/** Elapsed time component that ticks every second */
+const ElapsedTimer: React.FC<{ startTime: string | null | undefined }> = ({ startTime }) => {
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (!startTime) return;
+    const start = new Date(startTime).getTime();
+    const update = () => setElapsed(Math.floor((Date.now() - start) / 1000));
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [startTime]);
+
+  if (!startTime) return null;
+
+  const m = Math.floor(elapsed / 60);
+  const s = elapsed % 60;
+
+  return (
+    <Typography
+      variant="caption"
+      sx={{
+        fontWeight: 900,
+        fontFamily: 'monospace',
+        fontSize: '0.85rem',
+        color: 'primary.main',
+        letterSpacing: 1,
+      }}
+    >
+      {m.toString().padStart(2, '0')}:{s.toString().padStart(2, '0')}
+    </Typography>
+  );
+};
+
 const InterviewLivePage = () => {
   const { t } = useTranslation('employer');
+  const theme = useTheme();
   const [sessions, setSessions] = useState<InterviewSession[]>([]);
   const [count, setCount] = useState(0);
   const [page, setPage] = useState(0);
@@ -94,6 +141,16 @@ const InterviewLivePage = () => {
     const completed = sessions.filter((s) => s.status === 'completed').length;
     return { active, scheduled, completed };
   }, [sessions]);
+
+  // Split sessions
+  const activeSessions = useMemo(
+    () => sessions.filter((s) => ACTIVE_STATUSES.includes(s.status)),
+    [sessions]
+  );
+  const otherSessions = useMemo(
+    () => sessions.filter((s) => !ACTIVE_STATUSES.includes(s.status)),
+    [sessions]
+  );
 
   const columns = useMemo(
     () => [
@@ -171,6 +228,73 @@ const InterviewLivePage = () => {
     [t, getLink]
   );
 
+  // Stat card component
+  const StatCard: React.FC<{
+    icon: React.ReactNode;
+    label: string;
+    value: number;
+    color: string;
+    pulse?: boolean;
+  }> = ({ icon, label, value, color, pulse }) => (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        borderRadius: 3,
+        border: '1px solid',
+        borderColor: alpha(color, 0.15),
+        bgcolor: alpha(color, 0.04),
+        flex: 1,
+        minWidth: 160,
+        position: 'relative',
+        overflow: 'hidden',
+        transition: 'all 0.3s',
+        '&:hover': {
+          borderColor: alpha(color, 0.3),
+          transform: 'translateY(-2px)',
+          boxShadow: `0 8px 24px ${alpha(color, 0.1)}`,
+        },
+      }}
+    >
+      {pulse && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 12,
+            right: 12,
+            width: 8,
+            height: 8,
+            borderRadius: '50%',
+            bgcolor: color,
+            animation: 'statPulse 2s infinite',
+            '@keyframes statPulse': {
+              '0%, 100%': { opacity: 1, boxShadow: `0 0 0 0px ${alpha(color, 0.4)}` },
+              '50%': { opacity: 0.6, boxShadow: `0 0 0 6px ${alpha(color, 0)}` },
+            },
+          }}
+        />
+      )}
+      <Stack direction="row" alignItems="center" spacing={1.5} mb={1.5}>
+        <Avatar
+          sx={{
+            width: 36,
+            height: 36,
+            bgcolor: alpha(color, 0.12),
+            color: color,
+          }}
+        >
+          {icon}
+        </Avatar>
+        <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase', letterSpacing: 0.5, fontSize: '0.7rem' }}>
+          {label}
+        </Typography>
+      </Stack>
+      <Typography variant="h3" sx={{ fontWeight: 900, color: color, letterSpacing: '-1px' }}>
+        {value}
+      </Typography>
+    </Paper>
+  );
+
   return (
     <Box
       sx={{
@@ -180,12 +304,13 @@ const InterviewLivePage = () => {
         borderRadius: 2,
       }}
     >
+      {/* Header */}
       <Stack
         direction={{ xs: 'column', sm: 'row' }}
         alignItems={{ xs: 'flex-start', sm: 'center' }}
         justifyContent="space-between"
         spacing={{ xs: 2, sm: 0 }}
-        mb={2}
+        mb={3}
       >
         <Typography
           variant="h5"
@@ -220,13 +345,30 @@ const InterviewLivePage = () => {
         </Button>
       </Stack>
 
-      <Stack direction="row" spacing={1.5} mb={3} flexWrap="wrap">
-        <Chip label={t('interviewLive.stats.inProgress', { count: stats.active })} color="primary" variant="outlined" />
-        <Chip label={t('interviewLive.stats.scheduled', { count: stats.scheduled })} color="info" variant="outlined" />
-        <Chip label={t('interviewLive.stats.completed', { count: stats.completed })} color="success" variant="outlined" />
+      {/* Stats Cards */}
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mb={4}>
+        <StatCard
+          icon={<TrendingUpIcon sx={{ fontSize: 20 }} />}
+          label={t('interviewLive.stats.inProgress', { count: stats.active }).replace(String(stats.active), '').trim() || 'In Progress'}
+          value={stats.active}
+          color={theme.palette.primary.main}
+          pulse={stats.active > 0}
+        />
+        <StatCard
+          icon={<ScheduleIcon sx={{ fontSize: 20 }} />}
+          label={t('interviewLive.stats.scheduled', { count: stats.scheduled }).replace(String(stats.scheduled), '').trim() || 'Scheduled'}
+          value={stats.scheduled}
+          color={theme.palette.info.main}
+        />
+        <StatCard
+          icon={<CheckCircleIcon sx={{ fontSize: 20 }} />}
+          label={t('interviewLive.stats.completed', { count: stats.completed }).replace(String(stats.completed), '').trim() || 'Completed'}
+          value={stats.completed}
+          color={theme.palette.success.main}
+        />
       </Stack>
 
-      {loading ? (
+      {loading && (
         <Box sx={{ width: '100%', mb: 2 }}>
           <LinearProgress
             color="primary"
@@ -237,10 +379,132 @@ const InterviewLivePage = () => {
             }}
           />
         </Box>
-      ) : (
-        <Divider sx={{ mb: 2 }} />
       )}
 
+      {/* Active Session Cards */}
+      {activeSessions.length > 0 && (
+        <Box sx={{ mb: 4 }}>
+          <Stack direction="row" alignItems="center" spacing={1.5} mb={2.5}>
+            <FiberManualRecordIcon
+              sx={{
+                fontSize: 12,
+                color: theme.palette.primary.main,
+                animation: 'liveDot 2s infinite',
+                '@keyframes liveDot': {
+                  '0%, 100%': { opacity: 1 },
+                  '50%': { opacity: 0.3 },
+                },
+              }}
+            />
+            <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary' }}>
+              {t('interviewLive.activeNow', { defaultValue: 'Active Now' })}
+            </Typography>
+          </Stack>
+
+          <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} flexWrap="wrap" useFlexGap>
+            {activeSessions.map((session) => (
+              <Paper
+                key={session.id}
+                elevation={0}
+                sx={{
+                  p: 3,
+                  borderRadius: 3,
+                  border: '1px solid',
+                  borderColor: alpha(theme.palette.primary.main, 0.15),
+                  bgcolor: alpha(theme.palette.primary.main, 0.02),
+                  flex: { xs: '1 1 100%', md: '1 1 calc(50% - 8px)' },
+                  maxWidth: { md: 'calc(50% - 8px)' },
+                  position: 'relative',
+                  overflow: 'hidden',
+                  transition: 'all 0.3s',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    borderColor: alpha(theme.palette.primary.main, 0.3),
+                    transform: 'translateY(-2px)',
+                    boxShadow: `0 8px 32px ${alpha(theme.palette.primary.main, 0.1)}`,
+                  },
+                }}
+                component={Link}
+                href={getLink(ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', session.id.toString()))}
+              >
+                {/* Pulse indicator */}
+                <Box
+                  sx={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 3,
+                    background: `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.3)}, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.3)})`,
+                    animation: 'shimmer 2s infinite',
+                    '@keyframes shimmer': {
+                      '0%': { transform: 'translateX(-100%)' },
+                      '100%': { transform: 'translateX(100%)' },
+                    },
+                  }}
+                />
+
+                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={2}>
+                  <Box>
+                    <Stack direction="row" alignItems="center" spacing={1} mb={0.5}>
+                      <PersonIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary' }}>
+                        {session.candidateName || 'Unknown'}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" alignItems="center" spacing={1}>
+                      <WorkIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
+                      <Typography variant="caption" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                        {session.jobName || 'N/A'}
+                      </Typography>
+                    </Stack>
+                  </Box>
+                  <Stack alignItems="flex-end" spacing={0.5}>
+                    <Chip
+                      label={t(`interviewLive.statuses.${session.status}`, { defaultValue: session.status?.replaceAll('_', ' ')?.toUpperCase() })}
+                      color="primary"
+                      size="small"
+                      sx={{ fontWeight: 900, fontSize: '0.65rem', height: 22 }}
+                    />
+                    <ElapsedTimer startTime={session.startTime} />
+                  </Stack>
+                </Stack>
+
+                <Divider sx={{ my: 1.5, borderStyle: 'dashed', borderColor: alpha(theme.palette.primary.main, 0.1) }} />
+
+                {/* Quick Actions */}
+                <Stack direction="row" spacing={1.5} alignItems="center" justifyContent="flex-end">
+                  <Button
+                    variant="text"
+                    size="small"
+                    startIcon={<VisibilityIcon sx={{ fontSize: 16 }} />}
+                    component={Link}
+                    href={getLink(ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', session.id.toString()))}
+                    {...({} as Record<string, unknown>)}
+                    onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                    sx={{
+                      textTransform: 'none',
+                      fontWeight: 800,
+                      fontSize: '0.75rem',
+                      color: 'primary.main',
+                      '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.06) },
+                    }}
+                  >
+                    {t('common:actions.details', { defaultValue: 'Details' })}
+                  </Button>
+                </Stack>
+              </Paper>
+            ))}
+          </Stack>
+        </Box>
+      )}
+
+      {/* Divider between active cards and table */}
+      {activeSessions.length > 0 && otherSessions.length > 0 && (
+        <Divider sx={{ mb: 3, borderStyle: 'dashed' }} />
+      )}
+
+      {/* Data Table for other sessions */}
       <Box
         sx={{
           backgroundColor: 'background.paper',
@@ -255,9 +519,9 @@ const InterviewLivePage = () => {
       >
         <DataTable
           columns={columns}
-          data={sessions}
+          data={activeSessions.length > 0 ? otherSessions : sessions}
           isLoading={loading}
-          count={count}
+          count={activeSessions.length > 0 ? count - activeSessions.length : count}
           page={page}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}

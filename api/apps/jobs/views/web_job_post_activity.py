@@ -136,7 +136,7 @@ class JobSeekerJobPostActivityViewSet(
             )
         except ValueError as e:
             from rest_framework.exceptions import ValidationError
-            raise ValidationError({"errorMessage": str(e)})
+            raise ValidationError({"errorMessage": [str(e)]})
 
         response_serializer = self.get_serializer(job_post_activity)
         headers = self.get_success_headers(response_serializer.data)

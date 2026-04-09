@@ -437,7 +437,7 @@ class EducationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def validate(self, attrs):
         if EducationDetail.objects.count() >= 10:
             raise serializers.ValidationError(
-                {'errorMessage': ERROR_MESSAGES["MAXIMUM_EDUCATION"]})
+                {'errorMessage': [ERROR_MESSAGES["MAXIMUM_EDUCATION"]]})
         return attrs
 
     class Meta:
@@ -466,7 +466,7 @@ class ExperienceSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def validate(self, attrs):
         if ExperienceDetail.objects.count() >= 10:
             raise serializers.ValidationError(
-                {'errorMessage': ERROR_MESSAGES["MAXIMUM_EXPERIENCE"]})
+                {'errorMessage': [ERROR_MESSAGES["MAXIMUM_EXPERIENCE"]]})
         return attrs
 
     class Meta:
@@ -491,7 +491,7 @@ class CertificateSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def validate(self, attrs):
         if Certificate.objects.count() >= 10:
             raise serializers.ValidationError(
-                {'errorMessage': ERROR_MESSAGES["MAXIMUM_CERTIFICATE"]})
+                {'errorMessage': [ERROR_MESSAGES["MAXIMUM_CERTIFICATE"]]})
         return attrs
 
     class Meta:
@@ -521,7 +521,7 @@ class AdvancedSkillSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     def validate(self, attrs):
         if AdvancedSkill.objects.count() >= 15:
             raise serializers.ValidationError(
-                {'errorMessage': ERROR_MESSAGES["MAXIMUM_ADVANCED"]})
+                {'errorMessage': [ERROR_MESSAGES["MAXIMUM_ADVANCED"]]})
         return attrs
 
     class Meta:

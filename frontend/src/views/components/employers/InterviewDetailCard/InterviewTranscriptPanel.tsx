@@ -1,22 +1,52 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Box, Paper, Stack, Typography, Divider, Avatar, Chip, alpha, useTheme } from '@mui/material';
 import ForumIcon from '@mui/icons-material/Forum';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { InterviewSession } from '@/types/models';
 
 import { i18n, TFunction } from 'i18next';
+import type { SSETranscript } from '../../../employerPages/InterviewPages/hooks/useInterviewSSE';
 
 interface InterviewTranscriptPanelProps {
   session: InterviewSession;
   t: TFunction;
   i18n: i18n;
+  liveTranscripts?: SSETranscript[];
+  isLive?: boolean;
 }
 
-const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n }) => {
+const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n, liveTranscripts = [], isLive = false }) => {
     const theme = useTheme();
-    const transcripts = session.transcripts || [];
+    const transcriptEndRef = useRef<HTMLDivElement>(null);
+    const existingTranscripts = session.transcripts || [];
+
+    // Merge existing + live transcripts, deduplicate by id
+    const mergedTranscripts = React.useMemo(() => {
+        const existingIds = new Set(existingTranscripts.map((t: Record<string, unknown>) => t.id));
+        const liveOnly = liveTranscripts.filter((lt) => !existingIds.has(lt.id));
+        const mapped = existingTranscripts.map((t: Record<string, unknown>) => ({
+            ...t,
+            _isLive: false,
+        }));
+        const liveMapped = liveOnly.map((lt) => ({
+            speaker: lt.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
+            text: lt.content,
+            timestamp: lt.createAt ? new Date(lt.createAt).toLocaleTimeString() : '',
+            id: lt.id,
+            _isLive: true,
+        }));
+        return [...mapped, ...liveMapped];
+    }, [existingTranscripts, liveTranscripts]);
+
+    // Auto-scroll when new live transcripts appear
+    useEffect(() => {
+        if (liveTranscripts.length > 0 && transcriptEndRef.current) {
+            transcriptEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    }, [liveTranscripts.length]);
 
     return (
         <Paper 
@@ -41,9 +71,41 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                 <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
                     {t('interviewDetail.subtitle.transcript')}
                 </Typography>
-                {transcripts.length > 0 && (
+
+                {/* Live indicator */}
+                {isLive && (
+                    <Chip
+                        icon={
+                            <FiberManualRecordIcon
+                                sx={{
+                                    fontSize: '10px !important',
+                                    color: '#22c55e !important',
+                                    animation: 'livePulse 2s infinite',
+                                    '@keyframes livePulse': {
+                                        '0%, 100%': { opacity: 1 },
+                                        '50%': { opacity: 0.3 },
+                                    },
+                                }}
+                            />
+                        }
+                        label="LIVE"
+                        size="small"
+                        sx={{
+                            fontWeight: 900,
+                            height: 24,
+                            fontSize: '0.65rem',
+                            letterSpacing: 1.5,
+                            bgcolor: alpha('#22c55e', 0.08),
+                            color: '#22c55e',
+                            border: '1px solid',
+                            borderColor: alpha('#22c55e', 0.15),
+                        }}
+                    />
+                )}
+
+                {mergedTranscripts.length > 0 && (
                     <Chip 
-                        label={`${transcripts.length} ${t('common:labels.messages', { defaultValue: 'messages' })}`} 
+                        label={`${mergedTranscripts.length} ${t('common:labels.messages', { defaultValue: 'messages' })}`} 
                         size="small" 
                         sx={{ 
                             ml: 'auto', 
@@ -71,13 +133,26 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                 '&::-webkit-scrollbar-thumb': { bgcolor: alpha(theme.palette.divider, 0.5), borderRadius: '10px' },
                 '&::-webkit-scrollbar-track': { bgcolor: 'transparent' }
             }}>
-                {transcripts.length > 0 ? (
+                {mergedTranscripts.length > 0 ? (
                     <Stack spacing={6}>
-                        {transcripts.map((itemRaw, idx) => {
-                            const item = itemRaw as Record<string, string>;
-                            const isInterviewer = item.speaker === 'interviewer';
+                        {mergedTranscripts.map((item, idx) => {
+                            const record = item as Record<string, unknown>;
+                            const isInterviewer = record.speaker === 'interviewer';
+                            const isNewLive = Boolean(record._isLive);
                             return (
-                                <Stack key={idx} direction="row" spacing={3} alignItems="flex-start">
+                                <Stack
+                                    key={idx}
+                                    direction="row"
+                                    spacing={3}
+                                    alignItems="flex-start"
+                                    sx={{
+                                        animation: isNewLive ? 'fadeSlideIn 0.5s ease-out' : 'none',
+                                        '@keyframes fadeSlideIn': {
+                                            from: { opacity: 0, transform: 'translateY(12px)' },
+                                            to: { opacity: 1, transform: 'translateY(0)' },
+                                        },
+                                    }}
+                                >
                                     <Avatar sx={{ 
                                         width: 44, 
                                         height: 44, 
@@ -93,10 +168,26 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                                             <Typography variant="caption" sx={{ fontWeight: 900, color: isInterviewer ? 'primary.main' : 'secondary.main', textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: 1.5 }}>
                                                 {isInterviewer ? t('interviewDetail.label.interviewer') : t('interviewDetail.label.candidate')}
                                             </Typography>
+                                            {isNewLive && (
+                                                <Chip
+                                                    label="NEW"
+                                                    size="small"
+                                                    sx={{
+                                                        height: 18,
+                                                        fontSize: '0.55rem',
+                                                        fontWeight: 900,
+                                                        letterSpacing: 1,
+                                                        bgcolor: alpha('#f59e0b', 0.1),
+                                                        color: '#f59e0b',
+                                                        border: '1px solid',
+                                                        borderColor: alpha('#f59e0b', 0.2),
+                                                    }}
+                                                />
+                                            )}
                                             <Stack direction="row" alignItems="center" spacing={0.5} sx={{ color: 'text.disabled' }}>
                                                 <AccessTimeIcon sx={{ fontSize: 14 }} />
                                                 <Typography variant="caption" sx={{ fontWeight: 800 }}>
-                                                    {item.timestamp || ''}
+                                                    {(record.timestamp as string) || ''}
                                                 </Typography>
                                             </Stack>
                                         </Stack>
@@ -112,13 +203,14 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                                             }}
                                         >
                                             <Typography variant="body2" sx={{ lineHeight: 2, color: 'text.primary', fontWeight: 700, fontSize: '0.95rem' }}>
-                                                {item.text}
+                                                {record.text as string}
                                             </Typography>
                                         </Paper>
                                     </Box>
                                 </Stack>
                             );
                         })}
+                        <div ref={transcriptEndRef} />
                     </Stack>
                 ) : (
                     <Box sx={{ textAlign: 'center', py: 15, opacity: 0.6 }}>

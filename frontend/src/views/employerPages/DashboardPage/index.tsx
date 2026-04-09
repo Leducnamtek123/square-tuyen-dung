@@ -16,6 +16,8 @@ import ApplicationChart from '../../components/employers/charts/ApplicationChart
 
 import HiringAcademicChart from '../../components/employers/charts/HiringAcademicChart';
 
+import InterviewStatsChart from '../../components/employers/charts/InterviewStatsChart';
+
 
 
 const DashboardPage = () => {
@@ -37,6 +39,28 @@ const DashboardPage = () => {
           <EmployerQuantityStatistics />
 
           {/* End: EmployerQuantityStatistics */}
+
+        </Grid>
+
+        <Grid
+
+          size={{
+
+            xs: 12,
+
+            sm: 12,
+
+            md: 12,
+
+            lg: 6
+
+          }}>
+
+          {/* Start: InterviewStatsChart */}
+
+          <InterviewStatsChart title={t('dashboard.interviewChart', 'Interview Statistics')} />
+
+          {/* End: InterviewStatsChart */}
 
         </Grid>
 

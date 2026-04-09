@@ -26,7 +26,8 @@ const errorHandling = (
     case 400: {
       const errors = res.data?.errors;
       if (errors && 'errorMessage' in errors) {
-        toastMessages.error(errors.errorMessage!.join(' '));
+        const msg = errors.errorMessage;
+        toastMessages.error(Array.isArray(msg) ? msg.join(' ') : String(msg));
       } else {
         setError && setError(errors as Record<string, unknown>);
       }

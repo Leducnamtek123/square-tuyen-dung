@@ -31,6 +31,15 @@ export interface EmployerGeneralStats {
   totalJobPostingPendingApproval: number;
   totalJobPostExpired: number;
   totalApply: number;
+  totalFollowers: number;
+  totalSavedProfiles: number;
+  totalInterviews: number;
+  totalInterviewsCompleted: number;
+  totalInterviewsInProgress: number;
+  avgAiOverallScore: number;
+  avgAiTechnicalScore: number;
+  avgAiCommunicationScore: number;
+  conversionRate: number;
 }
 
 export interface EmployerRecruitmentStatItem {
@@ -64,6 +73,19 @@ export interface EmployerRecruitmentByRankStats {
   data: number[];
   labels: string[];
   backgroundColor: string[];
+}
+
+export interface EmployerInterviewStats {
+  labels: string[];
+  completedData: number[];
+  scheduledData: number[];
+  cancelledData: number[];
+  inProgressData: number[];
+  avgScoreData: number[];
+  passedCount: number;
+  failedCount: number;
+  pendingCount: number;
+  avgDurationSeconds: number;
 }
 
 // --- INTERFACES: Admin Statistics ---
@@ -101,6 +123,11 @@ const statisticService = {
   employerRecruitmentStatistics: (data: Record<string, unknown> = {}): Promise<EmployerRecruitmentStatItem[]> => {
     const url = 'job/web/statistics/employer/';
     return httpRequest.post(url, data, { params: { type: 'recruitment' } });
+  },
+
+  employerInterviewStatistics: (data: Record<string, unknown> = {}): Promise<EmployerInterviewStats> => {
+    const url = 'job/web/statistics/employer/';
+    return httpRequest.post(url, data, { params: { type: 'interview' } });
   },
 
   jobSeekerGeneralStatistics: (): Promise<JobSeekerGeneralStats> => {

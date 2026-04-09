@@ -17,6 +17,8 @@ import {
 import { useParams, useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../../../configs/constants';
 import InterviewAiEvaluationCard from './InterviewAiEvaluationCard';
@@ -26,7 +28,9 @@ import InterviewInfoCard from './InterviewInfoCard';
 import InterviewQuestionsCard from './InterviewQuestionsCard';
 import InterviewRecordingCard from './InterviewRecordingCard';
 import InterviewTranscriptPanel from './InterviewTranscriptPanel';
+import InterviewObserverDialog from './InterviewObserverDialog';
 import { useInterviewDetail, useInterviewMutations } from '../hooks/useEmployerQueries';
+import { useInterviewSSE } from '../../../employerPages/InterviewPages/hooks/useInterviewSSE';
 import interviewService from '../../../../services/interviewService';
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
@@ -41,6 +45,8 @@ export interface EvalFormType {
   comments: string;
   proposed_salary: number | string;
 }
+
+const ACTIVE_STATUSES = ['in_progress', 'calibration', 'processing', 'connecting', 'active'];
 
 const InterviewDetailCard = () => {
     const { id } = useParams<{ id: string }>();
@@ -61,6 +67,18 @@ const InterviewDetailCard = () => {
     const { submitEvaluation, isMutating: isInterviewMutating } = useInterviewMutations();
     
     const [isTriggeringAi, setIsTriggeringAi] = useState(false);
+    const [observerOpen, setObserverOpen] = useState(false);
+    const [observerLoading, setObserverLoading] = useState(false);
+
+    // SSE for live updates
+    const isSessionActive = session ? ACTIVE_STATUSES.includes(session.status) : false;
+    const { liveTranscripts, liveStatus, connected: sseConnected } = useInterviewSSE({
+        sessionId: session?.id,
+        enabled: isSessionActive,
+    });
+
+    // Effective status (SSE may update it in real-time)
+    const effectiveStatus = liveStatus || session?.status;
 
     useEffect(() => {
         if (session?.evaluations?.length) {
@@ -107,6 +125,19 @@ const InterviewDetailCard = () => {
             errorHandling(e as AxiosError<{ errors?: ApiError }>);
         } finally {
             setIsTriggeringAi(false);
+        }
+    };
+
+    const handleObserverMode = async () => {
+        if (!session?.id) return;
+        setObserverLoading(true);
+        try {
+            // We just open the dialog - SSE is already connected
+            setObserverOpen(true);
+        } catch (e) {
+            errorHandling(e as AxiosError<{ errors?: ApiError }>);
+        } finally {
+            setObserverLoading(false);
         }
     };
 
@@ -181,9 +212,10 @@ const InterviewDetailCard = () => {
         );
     }
 
-    const canJoinLiveRoom = session.status !== 'cancelled' && session.status !== 'completed';
+    const canJoinLiveRoom = effectiveStatus !== 'cancelled' && effectiveStatus !== 'completed';
+    const canObserve = effectiveStatus === 'in_progress';
     const recordingUrl = session.recordingUrl || session.recording_url || null;
-    const statusColor = getStatusColor(session.status);
+    const statusColor = getStatusColor(effectiveStatus);
 
     return (
         <Paper
@@ -237,8 +269,8 @@ const InterviewDetailCard = () => {
                             {t('interview:interviewDetail.title')}
                         </Typography>
                         <Chip
-                            label={t(`interview:interviewLive.statuses.${session.status}`, { 
-                                defaultValue: session.status?.replaceAll('_', ' ')?.toUpperCase() 
+                            label={t(`interview:interviewLive.statuses.${effectiveStatus}`, { 
+                                defaultValue: effectiveStatus?.replaceAll('_', ' ')?.toUpperCase() 
                             })}
                             size="small"
                             sx={{ 
@@ -254,6 +286,24 @@ const InterviewDetailCard = () => {
                                 letterSpacing: '0.5px'
                             }}
                         />
+                        {/* SSE Live indicator */}
+                        {isSessionActive && sseConnected && (
+                            <Chip
+                                icon={<FiberManualRecordIcon sx={{ fontSize: '10px !important', color: '#22c55e !important', animation: 'pulse 2s infinite', '@keyframes pulse': { '0%,100%': { opacity: 1 }, '50%': { opacity: 0.3 } } }} />}
+                                label="LIVE"
+                                size="small"
+                                sx={{
+                                    fontWeight: 900,
+                                    fontSize: '0.65rem',
+                                    letterSpacing: 1.5,
+                                    height: 24,
+                                    bgcolor: alpha('#22c55e', 0.08),
+                                    color: '#22c55e',
+                                    border: '1px solid',
+                                    borderColor: alpha('#22c55e', 0.15),
+                                }}
+                            />
+                        )}
                     </Stack>
                     <Stack direction={{ xs: 'column', sm: 'row' }} spacing={{ xs: 1, sm: 2 }} alignItems={{ xs: 'flex-start', sm: 'center' }}>
                         <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center' }}>
@@ -278,37 +328,73 @@ const InterviewDetailCard = () => {
                         </Typography>
                     </Stack>
                 </Box>
-                <Tooltip title={!canJoinLiveRoom ? t('interview:interviewDetail.tooltips.cannotJoin') : ''} arrow placement="top">
-                    <Box sx={{ width: { xs: '100%', md: 'auto' } }}>
-                        <Button
-                            variant="contained"
-                            disabled={!canJoinLiveRoom}
-                            onClick={() => navigate.push(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id.toString())}`)}
-                            startIcon={<PlayCircleOutlineIcon />}
-                            sx={{ 
-                                borderRadius: 3, 
-                                minWidth: { xs: '100%', md: 280 }, 
-                                boxShadow: (theme) => theme.customShadows?.primary, 
-                                fontWeight: 900,
-                                py: 2,
-                                px: 4,
-                                textTransform: 'none',
-                                fontSize: '1.1rem',
-                                transition: 'all 0.2s',
-                                '&:hover': {
-                                    transform: 'translateY(-2px)',
-                                    boxShadow: (theme) => theme.customShadows?.primary
-                                },
-                                '&.Mui-disabled': {
-                                    bgcolor: 'action.disabledBackground',
-                                    color: 'action.disabled'
-                                }
-                            }}
-                        >
-                            {t('common:actions.joinNow')}
-                        </Button>
-                    </Box>
-                </Tooltip>
+
+                {/* Action Buttons */}
+                <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: { xs: '100%', md: 'auto' } }}>
+                    {/* Observer Mode Button */}
+                    {canObserve && (
+                        <Tooltip title="Quan sát ẩn — ứng viên không biết bạn đang xem" arrow placement="top">
+                            <Button
+                                variant="outlined"
+                                onClick={handleObserverMode}
+                                disabled={observerLoading}
+                                startIcon={<VisibilityOffIcon />}
+                                sx={{ 
+                                    borderRadius: 3, 
+                                    minWidth: { xs: '100%', sm: 200 },
+                                    fontWeight: 900,
+                                    py: 2,
+                                    px: 3,
+                                    textTransform: 'none',
+                                    fontSize: '0.95rem',
+                                    borderColor: alpha(theme.palette.warning.main, 0.4),
+                                    color: 'warning.main',
+                                    transition: 'all 0.2s',
+                                    '&:hover': {
+                                        borderColor: 'warning.main',
+                                        bgcolor: alpha(theme.palette.warning.main, 0.04),
+                                        transform: 'translateY(-2px)',
+                                    },
+                                }}
+                            >
+                                {t('common:actions.observe', { defaultValue: 'Observer Mode' })}
+                            </Button>
+                        </Tooltip>
+                    )}
+
+                    {/* Join Room Button */}
+                    <Tooltip title={!canJoinLiveRoom ? t('interview:interviewDetail.tooltips.cannotJoin') : ''} arrow placement="top">
+                        <Box sx={{ width: { xs: '100%', md: 'auto' } }}>
+                            <Button
+                                variant="contained"
+                                disabled={!canJoinLiveRoom}
+                                onClick={() => navigate.push(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id.toString())}`)}
+                                startIcon={<PlayCircleOutlineIcon />}
+                                sx={{ 
+                                    borderRadius: 3, 
+                                    minWidth: { xs: '100%', md: 280 }, 
+                                    boxShadow: (theme) => theme.customShadows?.primary, 
+                                    fontWeight: 900,
+                                    py: 2,
+                                    px: 4,
+                                    textTransform: 'none',
+                                    fontSize: '1.1rem',
+                                    transition: 'all 0.2s',
+                                    '&:hover': {
+                                        transform: 'translateY(-2px)',
+                                        boxShadow: (theme) => theme.customShadows?.primary
+                                    },
+                                    '&.Mui-disabled': {
+                                        bgcolor: 'action.disabledBackground',
+                                        color: 'action.disabled'
+                                    }
+                                }}
+                            >
+                                {t('common:actions.joinNow')}
+                            </Button>
+                        </Box>
+                    </Tooltip>
+                </Stack>
             </Stack>
 
             <Grid container spacing={5}>
@@ -325,7 +411,7 @@ const InterviewDetailCard = () => {
                             evalForm={evalForm}
                             onChange={handleEvalChange}
                             onSubmit={submitHRInfo}
-                            disabled={isInterviewMutating || session.status !== 'completed'}
+                            disabled={isInterviewMutating || effectiveStatus !== 'completed'}
                             submitting={isInterviewMutating}
                             t={t}
                         />
@@ -336,12 +422,30 @@ const InterviewDetailCard = () => {
                 <Grid size={{ xs: 12, lg: 8 }}>
                     <Stack spacing={5}>
                         <InterviewAnalysisPanel session={session} t={t} />
-                        <InterviewTranscriptPanel session={session} t={t} i18n={i18n} />
+                        <InterviewTranscriptPanel
+                            session={session}
+                            t={t}
+                            i18n={i18n}
+                            liveTranscripts={liveTranscripts}
+                            isLive={isSessionActive && sseConnected}
+                        />
                     </Stack>
                 </Grid>
             </Grid>
             
             {(isInterviewMutating || isTriggeringAi) && <BackdropLoading />}
+
+            {/* Observer Mode Dialog */}
+            <InterviewObserverDialog
+                open={observerOpen}
+                onClose={() => setObserverOpen(false)}
+                sessionId={session.id}
+                candidateName={session.candidateName}
+                jobName={session.jobName}
+                liveTranscripts={liveTranscripts}
+                liveStatus={liveStatus}
+                sseConnected={sseConnected}
+            />
         </Paper>
     );
 };

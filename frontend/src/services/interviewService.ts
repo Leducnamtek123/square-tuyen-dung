@@ -45,6 +45,20 @@ export interface LiveKitTokenResponse {
   roomName: string;
 }
 
+export interface SessionMetrics {
+  sessionId: number;
+  status: string;
+  startTime: string | null;
+  endTime: string | null;
+  elapsedSeconds: number | null;
+  duration: number | null;
+  questionCursor: number;
+  totalQuestions: number;
+  transcriptCount: number;
+  candidateName: string | null;
+  jobName: string | null;
+}
+
 /* ── Service ──────────────────────────────────────────────────────────── */
 
 const interviewService = {
@@ -104,6 +118,21 @@ const interviewService = {
   getEvaluations: (sessionId: IdType): Promise<PaginatedResponse<InterviewEvaluation>> => {
     const url = `interview/web/evaluations/`;
     return httpRequest.get(url, { params: { interview: sessionId } }) as Promise<PaginatedResponse<InterviewEvaluation>>;
+  },
+
+  getObserverToken: (sessionId: IdType): Promise<LiveKitTokenResponse & { mode: string }> => {
+    const url = `interview/web/sessions/${sessionId}/observer-token/`;
+    return httpRequest.post(url) as Promise<LiveKitTokenResponse & { mode: string }>;
+  },
+
+  getSessionMetrics: (sessionId: IdType): Promise<SessionMetrics> => {
+    const url = `interview/web/sessions/${sessionId}/live-metrics/`;
+    return httpRequest.get(url) as Promise<SessionMetrics>;
+  },
+
+  getSSEUrl: (sessionId: IdType): string => {
+    const base = (process.env.NEXT_PUBLIC_API_BASE || '/api').replace(/\/$/, '');
+    return `${base}/interview/web/sessions/${sessionId}/stream/`;
   },
 };
 

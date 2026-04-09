@@ -112,6 +112,34 @@ class LiveKitService:
             logger.warning("LiveKit delete_room failed: %s", exc)
 
     @staticmethod
+    def create_observer_token(
+        room_name: str,
+        observer_identity: str,
+        observer_name: str,
+    ) -> str:
+        """
+        Tạo JWT token cho employer quan sát ẩn.
+        hidden=True: ứng viên không thấy participant này.
+        can_publish=False: không thể nói/gửi media.
+        can_subscribe=True: có thể nghe audio realtime.
+        """
+        token_builder = (
+            api.AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+            .with_identity(observer_identity)
+            .with_name(observer_name)
+            .with_grants(api.VideoGrants(
+                room_join=True,
+                room=room_name,
+                room_admin=False,
+                can_publish=False,
+                can_publish_data=False,
+                can_subscribe=True,
+                hidden=True,
+            ))
+        )
+        return token_builder.to_jwt()
+
+    @staticmethod
     def start_recording(room_name: str) -> None:
         """Start a room composite egress to record the interview to S3/MinIO."""
         async def _start_egress():

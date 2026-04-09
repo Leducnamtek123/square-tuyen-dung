@@ -1,4 +1,7 @@
-@import "tailwindcss";
+/* TailwindCSS v4 — selective import to avoid Preflight conflicting with MUI */
+/* DO NOT use @import "tailwindcss" — its CSS reset breaks MUI components */
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/utilities" layer(utilities);
 @import "tw-animate-css";
 /* @import "@livekit/components-styles"; -- loaded in interview pages only */
 
@@ -181,17 +184,6 @@ code {
   display: none !important;
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-
-  html {
-    @apply font-sans;
-  }
-}
-
+/* Note: removed @layer base { * { @apply border-border } } to prevent
+   Tailwind from overriding MUI component border colors globally.
+   MUI manages its own borders via the theme's divider/palette system. */

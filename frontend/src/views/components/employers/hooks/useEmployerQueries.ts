@@ -23,6 +23,7 @@ import type { EmployerApplicationStats } from '../../../../services/statisticSer
 import type { EmployerGeneralStats } from '../../../../services/statisticService';
 import type { SubmitEvaluationInput } from '../../../../services/interviewService';
 import type { EmployerRecruitmentByRankStats } from '../../../../services/statisticService';
+import type { EmployerInterviewStats } from '../../../../services/statisticService';
 
 // ─── Types ───────────────────────────────────────────────────
 export type UseEmployerGeneralStatsResult = UseQueryResult<EmployerGeneralStats>;
@@ -30,6 +31,7 @@ export type UseEmployerApplicationStatsResult = UseQueryResult<EmployerApplicati
 export type UseEmployerCandidateStatsResult = UseQueryResult<EmployerCandidateStats>;
 export type UseEmployerRecruitmentStatsResult = UseQueryResult<EmployerRecruitmentStatItem[]>;
 export type UseEmployerRecruitmentByRankStatsResult = UseQueryResult<EmployerRecruitmentByRankStats>;
+export type UseEmployerInterviewStatsResult = UseQueryResult<EmployerInterviewStats>;
 export type UseSavedResumesResult = UseQueryResult<PaginatedResponse<ResumeSaved>>;
 export type UseAppliedResumesResult = UseQueryResult<PaginatedResponse<JobPostActivity>>;
 export type UseEmployerResumesResult = UseQueryResult<PaginatedResponse<Resume>>;
@@ -91,6 +93,16 @@ export const useEmployerRecruitmentByRank = (params: Record<string, unknown> = {
     queryKey: ['employerRecruitmentByRank', params],
     queryFn: async () => {
       const response = await statisticService.employerRecruitmentStatisticsByRank(params);
+      return response;
+    },
+  });
+};
+
+export const useEmployerInterviewStatistics = (params: Record<string, unknown> = {}): UseEmployerInterviewStatsResult => {
+  return useQuery({
+    queryKey: ['employerInterviewStatistics', params],
+    queryFn: async () => {
+      const response = await statisticService.employerInterviewStatistics(params);
       return response;
     },
   });

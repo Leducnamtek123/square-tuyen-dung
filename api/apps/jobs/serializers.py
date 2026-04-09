@@ -241,7 +241,7 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
             company = getattr(user, "company", None)
             if not company:
-                raise serializers.ValidationError({"errorMessage": "Tài khoản của bạn chưa liên kết với công ty."})
+                raise serializers.ValidationError({"errorMessage": ["Tài khoản của bạn chưa liên kết với công ty."]})
 
             location_data = validated_data.pop('location')
 

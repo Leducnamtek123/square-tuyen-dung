@@ -29,6 +29,8 @@ from .services import (
     update_interview_status,
     queue_invitation_email,
     queue_ai_evaluation,
+    create_observer_livekit_token,
+    get_session_questions,
 )
 from apps.accounts import permissions as perms_custom
 
@@ -268,6 +270,48 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         session = self.get_object()
         queue_ai_evaluation(session)
         return response_data(data={"detail": "AI evaluation task has been queued."})
+
+    # POST /sessions/{pk}/observer-token/
+    @action(detail=True, methods=['post'], url_path='observer-token',
+            permission_classes=[permissions.IsAuthenticated])
+    def observer_token(self, request, pk=None):
+        """Create a hidden LiveKit token for employer to observe interview silently."""
+        session = self.get_object()
+        try:
+            data = create_observer_livekit_token(session, request)
+            return response_data(data=data)
+        except ValueError as exc:
+            return response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": [str(exc)]})
+
+    # GET /sessions/{pk}/live-metrics/
+    @action(detail=True, methods=['get'], url_path='live-metrics',
+            permission_classes=[permissions.IsAuthenticated])
+    def live_metrics(self, request, pk=None):
+        """Return realtime metrics for an interview session."""
+        session = self.get_object()
+        questions = get_session_questions(session)
+        total_questions = questions.count()
+        transcript_count = session.transcripts.count()
+
+        elapsed = None
+        if session.start_time:
+            from django.utils import timezone
+            now = session.end_time or timezone.now()
+            elapsed = int((now - session.start_time).total_seconds())
+
+        return response_data(data={
+            "sessionId": session.id,
+            "status": session.status,
+            "startTime": session.start_time.isoformat() if session.start_time else None,
+            "endTime": session.end_time.isoformat() if session.end_time else None,
+            "elapsedSeconds": elapsed,
+            "duration": session.duration,
+            "questionCursor": session.question_cursor,
+            "totalQuestions": total_questions,
+            "transcriptCount": transcript_count,
+            "candidateName": session.candidate.full_name if session.candidate else None,
+            "jobName": session.job_post.job_name if session.job_post else None,
+        })
 
 class InterviewEvaluationViewSet(viewsets.ModelViewSet):
     queryset = InterviewEvaluation.objects.select_related('interview', 'evaluator').all()

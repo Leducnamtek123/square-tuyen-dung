@@ -1,11 +1,15 @@
 from __future__ import annotations
 
+import json
+import logging
 from typing import Dict, Iterable, Optional
 from django.conf import settings
 from django.utils import timezone
 
 from .livekit_service import LiveKitService
 from .models import InterviewSession, InterviewTranscript, Question
+
+logger = logging.getLogger(__name__)
 
 
 def get_session_questions(session: InterviewSession) -> Iterable[Question]:
@@ -63,12 +67,33 @@ def create_livekit_participant_token(session: InterviewSession, request) -> Dict
     }
 
 
+def broadcast_interview_event(session_id: int, event_type: str, data: dict) -> None:
+    """Publish an event to Redis Pub/Sub for SSE streaming to employer."""
+    try:
+        import redis as _redis
+        r = _redis.Redis(
+            host=settings.SERVICE_REDIS_HOST,
+            port=settings.SERVICE_REDIS_PORT,
+            password=settings.SERVICE_REDIS_PASSWORD or None,
+            db=settings.SERVICE_REDIS_DB,
+            decode_responses=True,
+            socket_connect_timeout=3,
+        )
+        channel = f"interview:{session_id}:events"
+        payload = {"_event_type": event_type, **data}
+        r.publish(channel, json.dumps(payload, ensure_ascii=False, default=str))
+        r.close()
+    except Exception as exc:
+        logger.warning("broadcast_interview_event failed: %s", exc)
+
+
 def update_interview_status(
     session: InterviewSession,
     new_status: str,
     *,
     max_duration_seconds: Optional[int] = None,
 ) -> str:
+    old_status = session.status
     was_started = session.start_time is not None
     apply_status_transition(session, new_status)
     run_status_side_effects(
@@ -77,6 +102,15 @@ def update_interview_status(
         was_started=was_started,
         max_duration_seconds=max_duration_seconds,
     )
+    # Broadcast status change to SSE subscribers
+    broadcast_interview_event(session.id, "status_changed", {
+        "sessionId": session.id,
+        "oldStatus": old_status,
+        "newStatus": new_status,
+        "startTime": session.start_time.isoformat() if session.start_time else None,
+        "endTime": session.end_time.isoformat() if session.end_time else None,
+        "duration": session.duration,
+    })
     return new_status
 
 
@@ -114,6 +148,17 @@ def append_transcript(session: InterviewSession, payload: Dict[str, object]) -> 
         interview=session,
         **payload,
     )
+    # Broadcast new transcript to SSE subscribers
+    broadcast_interview_event(session.id, "transcript_added", {
+        "sessionId": session.id,
+        "transcript": {
+            "id": transcript.id,
+            "speakerRole": transcript.speaker_role,
+            "content": transcript.content,
+            "speechDurationMs": transcript.speech_duration_ms,
+            "createAt": transcript.create_at.isoformat() if transcript.create_at else None,
+        },
+    })
     return transcript
 
 
@@ -159,3 +204,32 @@ def queue_ai_evaluation(session: InterviewSession) -> None:
     session.status = "processing"
     session.save(update_fields=["status", "update_at"])
     evaluate_interview_session.delay(session.id)
+
+
+def create_observer_livekit_token(session: InterviewSession, request) -> Dict[str, str]:
+    """Create a hidden LiveKit token for employer to observe interview silently."""
+    allowed_statuses = ("scheduled", "calibration", "in_progress")
+    if session.status not in allowed_statuses:
+        raise ValueError(
+            f"Không thể quan sát buổi phỏng vấn này vì trạng thái hiện tại là: {session.get_status_display()}"
+        )
+
+    user = request.user
+    observer_identity = f"observer-{user.id}"
+    observer_name = f"[Observer] {user.full_name or user.email}"
+
+    token = LiveKitService.create_observer_token(
+        room_name=session.room_name,
+        observer_identity=observer_identity,
+        observer_name=observer_name,
+    )
+
+    server_url = _build_public_livekit_url(request)
+
+    return {
+        "token": token,
+        "room_name": session.room_name,
+        "participant_identity": observer_identity,
+        "server_url": server_url,
+        "mode": "observer",
+    }

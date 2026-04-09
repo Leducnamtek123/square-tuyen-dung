@@ -104,7 +104,8 @@ const EmployerLogin = () => {
           const errors = res?.data?.errors;
 
           if (errors && 'errorMessage' in errors) {
-            setErrorMessage(errors.errorMessage.join(' '));
+            const errMsg = errors.errorMessage;
+            setErrorMessage(Array.isArray(errMsg) ? errMsg.join(' ') : String(errMsg));
           } else {
             toastMessages.error(t('messages.tryAgain'));
           }
@@ -184,7 +185,8 @@ const EmployerLogin = () => {
         const errors = res?.data?.errors;
 
         if (errors && 'errorMessage' in errors) {
-          setErrorMessage(errors.errorMessage.join(' '));
+          const errMsg = errors.errorMessage;
+          setErrorMessage(Array.isArray(errMsg) ? errMsg.join(' ') : String(errMsg));
         } else {
           toastMessages.error(t('messages.tryAgain'));
         }

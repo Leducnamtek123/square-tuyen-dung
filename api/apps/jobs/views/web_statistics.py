@@ -4,12 +4,13 @@ from datetime import timedelta
 
 import pandas as pd
 import pytz
-from django.db.models import Count, F, Q, Sum
-from django.db.models.functions import ExtractMonth, ExtractYear, TruncDate
+from django.db.models import Avg, Count, F, Q, Sum
+from django.db.models.functions import ExtractMonth, ExtractYear, TruncDate, TruncMonth
 from rest_framework import status, viewsets
 
 from apps.accounts import permissions as perms_custom
 from apps.accounts.models import User
+from apps.interviews.models import InterviewEvaluation, InterviewSession
 from apps.profiles.models import CompanyFollowed, ResumeViewed
 from shared.configs import variable_response as var_res
 from shared.configs import variable_system as var_sys
@@ -164,6 +165,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
             "candidate": self.candidate_statistics,
             "application": self.application_statistics,
             "recruitment-by-rank": self.recruitment_statistics_by_rank,
+            "interview": self.interview_statistics,
         }
         handler = handlers.get(stat_type)
         if not handler:
@@ -185,16 +187,53 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
 
     def general_statistics(self, request):
         user = request.user
-        total_job_post = JobPost.objects.filter(company=user.company).count()
+        company = user.company
+
+        # Job post stats
+        total_job_post = JobPost.objects.filter(company=company).count()
         total_job_posting_pending_approval = JobPost.objects.filter(
-            company=user.company,
+            company=company,
             status=var_sys.JobPostStatus.PENDING,
         ).count()
         total_job_post_expired = JobPost.objects.filter(
-            company=user.company,
+            company=company,
             deadline__lt=datetime.datetime.now().date(),
         ).count()
-        total_apply = JobPostActivity.objects.filter(job_post__company=user.company).count()
+        total_apply = JobPostActivity.objects.filter(job_post__company=company).count()
+
+        # Company engagement stats
+        total_followers = CompanyFollowed.objects.filter(
+            company=company
+        ).count()
+        # Saved profiles — placeholder for future ResumeSaved model
+        total_saved_profiles = 0
+
+        # Interview stats
+        interview_qs = InterviewSession.objects.filter(
+            job_post__company=company
+        )
+        total_interviews = interview_qs.count()
+        total_interviews_completed = interview_qs.filter(
+            status='completed'
+        ).count()
+        total_interviews_in_progress = interview_qs.filter(
+            status='in_progress'
+        ).count()
+
+        # AI scores (completed interviews only)
+        ai_scores = interview_qs.filter(
+            status='completed',
+            ai_overall_score__isnull=False,
+        ).aggregate(
+            avgOverallScore=Avg('ai_overall_score'),
+            avgTechnicalScore=Avg('ai_technical_score'),
+            avgCommunicationScore=Avg('ai_communication_score'),
+        )
+
+        # Conversion rate: applications → interviews
+        conversion_rate = round(
+            (total_interviews / total_apply * 100) if total_apply > 0 else 0, 1
+        )
 
         return var_res.response_data(
             data={
@@ -202,6 +241,129 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
                 "totalJobPostingPendingApproval": total_job_posting_pending_approval,
                 "totalJobPostExpired": total_job_post_expired,
                 "totalApply": total_apply,
+                "totalFollowers": total_followers,
+                "totalSavedProfiles": total_saved_profiles,
+                "totalInterviews": total_interviews,
+                "totalInterviewsCompleted": total_interviews_completed,
+                "totalInterviewsInProgress": total_interviews_in_progress,
+                "avgAiOverallScore": float(ai_scores['avgOverallScore'] or 0),
+                "avgAiTechnicalScore": float(ai_scores['avgTechnicalScore'] or 0),
+                "avgAiCommunicationScore": float(ai_scores['avgCommunicationScore'] or 0),
+                "conversionRate": conversion_rate,
+            }
+        )
+
+    def interview_statistics(self, request):
+        """Interview statistics by month — status breakdown + AI score trends."""
+        serializer = StatisticsSerializer(data=request.data)
+        if not serializer.is_valid():
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                data=None,
+                errors=serializer.errors,
+            )
+
+        start_date = pd.to_datetime(serializer.data.get("startDate"))
+        end_date = pd.to_datetime(serializer.data.get("endDate"))
+        user = request.user
+        company = user.company
+
+        base_qs = InterviewSession.objects.filter(
+            job_post__company=company,
+            create_at__date__range=[
+                start_date.tz_localize(pytz.utc).date(),
+                end_date.tz_localize(pytz.utc).date(),
+            ],
+        )
+
+        # Status breakdown by month
+        status_by_month = (
+            base_qs
+            .annotate(month=TruncMonth('create_at'))
+            .values('month', 'status')
+            .annotate(count=Count('id'))
+            .order_by('month')
+        )
+
+        # AI score trends by month
+        score_by_month = (
+            base_qs
+            .filter(status='completed', ai_overall_score__isnull=False)
+            .annotate(month=TruncMonth('create_at'))
+            .values('month')
+            .annotate(
+                avgOverall=Avg('ai_overall_score'),
+                avgTechnical=Avg('ai_technical_score'),
+                avgCommunication=Avg('ai_communication_score'),
+                count=Count('id'),
+            )
+            .order_by('month')
+        )
+
+        # Build monthly data
+        date_range = pd.date_range(start=start_date, end=end_date, freq='MS')
+        labels = []
+        completed_data = []
+        scheduled_data = []
+        cancelled_data = []
+        in_progress_data = []
+        avg_score_data = []
+
+        status_dict = {}
+        for entry in status_by_month:
+            key = entry['month'].strftime('%Y-%m')
+            if key not in status_dict:
+                status_dict[key] = {}
+            status_dict[key][entry['status']] = entry['count']
+
+        score_dict = {}
+        for entry in score_by_month:
+            key = entry['month'].strftime('%Y-%m')
+            score_dict[key] = float(entry['avgOverall'] or 0)
+
+        for date in date_range:
+            key = date.strftime('%Y-%m')
+            labels.append(f"T{date.month}/{date.year}")
+            month_data = status_dict.get(key, {})
+            completed_data.append(month_data.get('completed', 0))
+            scheduled_data.append(month_data.get('scheduled', 0) + month_data.get('draft', 0))
+            cancelled_data.append(month_data.get('cancelled', 0))
+            in_progress_data.append(
+                month_data.get('in_progress', 0)
+                + month_data.get('processing', 0)
+                + month_data.get('calibration', 0)
+            )
+            avg_score_data.append(round(score_dict.get(key, 0), 1))
+
+        # Pass/Fail ratio
+        eval_qs = InterviewEvaluation.objects.filter(
+            interview__job_post__company=company,
+            interview__create_at__date__range=[
+                start_date.tz_localize(pytz.utc).date(),
+                end_date.tz_localize(pytz.utc).date(),
+            ],
+        )
+        passed = eval_qs.filter(result='passed').count()
+        failed = eval_qs.filter(result='failed').count()
+        pending = eval_qs.filter(result='pending').count()
+
+        # Average duration
+        avg_duration = base_qs.filter(
+            status='completed', duration__isnull=False
+        ).aggregate(avg=Avg('duration'))['avg']
+
+        return var_res.response_data(
+            data={
+                "labels": labels,
+                "completedData": completed_data,
+                "scheduledData": scheduled_data,
+                "cancelledData": cancelled_data,
+                "inProgressData": in_progress_data,
+                "avgScoreData": avg_score_data,
+                "passedCount": passed,
+                "failedCount": failed,
+                "pendingCount": pending,
+                "avgDurationSeconds": int(avg_duration or 0),
             }
         )
 
@@ -297,23 +459,16 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         data1 = []
         data2 = []
 
+        # Optimize: convert querysets to dicts for O(1) lookup instead of O(n)
+        dict1 = {x['date']: x['count'] for x in queryset1}
+        dict2 = {x['date']: x['count'] for x in queryset2}
+
         date_range = pd.date_range(start=start_date1, end=end_date1, freq='D')
         for date in date_range:
-            d1 = 0
-            d2 = 0
-            label = date.strftime("%d/%m")
-
-            items1 = [x for x in queryset1 if x.get("date") == date.date()]
-            if items1:
-                d1 = items1[0].get("count", 0)
-
-            items2 = [x for x in queryset2 if x.get("date") == date.date()]
-            if items2:
-                d1 = items2[0].get("count", 0)
-
-            data1.append(d1)
-            data2.append(d2)
-            labels.append(label)
+            d = date.date()
+            data1.append(dict1.get(d, 0))
+            data2.append(dict2.get(d, 0))
+            labels.append(date.strftime("%d/%m"))
 
         return var_res.response_data(
             data={
@@ -342,29 +497,51 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         end_date = pd.to_datetime(serializer.data.get("endDate"))
         user = request.user
 
-        job_post_data = JobPost.objects.filter(company=user.company).values_list("create_at", flat=True)
-        job_post_activity_data = (
-            JobPostActivity.objects.filter(job_post__company=user.company)
-            .filter(
+        # Optimize: cumulative job count using DB aggregation instead of O(n²)
+        total_jobs_before_range = JobPost.objects.filter(
+            company=user.company,
+            create_at__date__lt=start_date.tz_localize(pytz.utc).date(),
+        ).count()
+
+        jobs_by_date = dict(
+            JobPost.objects.filter(
+                company=user.company,
                 create_at__date__range=[
                     start_date.tz_localize(pytz.utc).date(),
                     end_date.tz_localize(pytz.utc).date(),
-                ]
+                ],
             )
-            .values_list("create_at", flat=True)
+            .annotate(date=TruncDate('create_at'))
+            .values('date')
+            .annotate(count=Count('id'))
+            .values_list('date', 'count')
+        )
+
+        applies_by_date = dict(
+            JobPostActivity.objects.filter(
+                job_post__company=user.company,
+                create_at__date__range=[
+                    start_date.tz_localize(pytz.utc).date(),
+                    end_date.tz_localize(pytz.utc).date(),
+                ],
+            )
+            .annotate(date=TruncDate('create_at'))
+            .values('date')
+            .annotate(count=Count('id'))
+            .values_list('date', 'count')
         )
 
         labels = []
         data1 = []
         data2 = []
+        cumulative_jobs = total_jobs_before_range
         date_range = pd.date_range(start=start_date, end=end_date, freq='D')
         for date in date_range:
-            total_job_post = len(list(filter(lambda item: item.date() <= date.date(), job_post_data)))
-            total_apply = len(list(filter(lambda item: item.date() == date.date(), job_post_activity_data)))
-            label = date.strftime("%d/%m")
-            data1.append(total_job_post)
-            data2.append(total_apply)
-            labels.append(label)
+            d = date.date()
+            cumulative_jobs += jobs_by_date.get(d, 0)
+            data1.append(cumulative_jobs)
+            data2.append(applies_by_date.get(d, 0))
+            labels.append(date.strftime("%d/%m"))
 
         return var_res.response_data(
             data={

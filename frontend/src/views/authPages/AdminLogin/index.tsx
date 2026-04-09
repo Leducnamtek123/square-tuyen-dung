@@ -171,7 +171,8 @@ const AdminLogin: React.FC = () => {
         if (res?.status === 400) {
           const errors = res?.data?.errors;
           if (errors && 'errorMessage' in errors) {
-            setErrorMessage(errors.errorMessage.join(' '));
+            const errMsg = errors.errorMessage;
+            setErrorMessage(Array.isArray(errMsg) ? errMsg.join(' ') : String(errMsg));
           } else {
             toastMessages.error(t('auth:messages.tryAgain'));
           }

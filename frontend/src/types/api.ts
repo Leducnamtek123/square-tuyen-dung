@@ -1,4 +1,4 @@
-﻿import type { AxiosRequestConfig } from 'axios';
+import type { AxiosRequestConfig } from 'axios';
 
 /** Standard API response wrapper used by Django's MyJSONRenderer. */
 export interface ApiResponse<T = unknown> {
@@ -14,8 +14,8 @@ export interface PaginatedResponse<T = unknown> {
 
 /** Shape of error payloads returned by the backend. */
 export interface ApiError {
-  errorMessage?: string[];
-  [field: string]: string[] | undefined;
+  errorMessage?: string[] | string;
+  [field: string]: string[] | string | undefined;
 }
 
 /** Axios config extended with retry flag (used by httpRequest interceptor). */

@@ -190,7 +190,8 @@ const JobSeekerLogin = () => {
 
           if (errors?.errorMessage) {
 
-            setErrorMessage(errors.errorMessage.join(' '));
+            const errMsg = errors.errorMessage;
+            setErrorMessage(Array.isArray(errMsg) ? errMsg.join(' ') : String(errMsg));
 
           } else {
 
@@ -339,7 +340,8 @@ const JobSeekerLogin = () => {
       if (res?.status === 400) {
         const errors = res?.data?.errors;
         if (errors?.errorMessage) {
-          setErrorMessage(errors.errorMessage.join(' '));
+          const errMsg = errors.errorMessage;
+          setErrorMessage(Array.isArray(errMsg) ? errMsg.join(' ') : String(errMsg));
         } else {
           toastMessages.error(t('messages.tryAgain'));
         }
@@ -426,7 +428,8 @@ const JobSeekerLogin = () => {
       if (res?.status === 400) {
         const errors = res?.data?.errors;
         if (errors?.errorMessage) {
-          setErrorMessage(errors.errorMessage.join(' '));
+          const errMsg = errors.errorMessage;
+          setErrorMessage(Array.isArray(errMsg) ? errMsg.join(' ') : String(errMsg));
         } else if (errors?.token) {
            setErrorMessage(errors.token.join(' '));
         } else {

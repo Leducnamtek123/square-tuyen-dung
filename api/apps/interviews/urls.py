@@ -5,6 +5,7 @@ Interview Module — URL Configuration
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
+from .sse_views import interview_event_stream
 
 web_router = DefaultRouter()
 web_router.register('questions', views.QuestionViewSet, basename='interview-questions')
@@ -14,6 +15,7 @@ web_router.register('evaluations', views.InterviewEvaluationViewSet, basename='i
 
 urlpatterns = [
     path('web/', include(web_router.urls)),
+    path('web/sessions/<int:session_id>/stream/', interview_event_stream, name='interview-sse-stream'),
     path(
         'web/statistics/admin-general-statistics/',
         views.InterviewStatisticViewSet.as_view({'get': 'general_statistics'}),

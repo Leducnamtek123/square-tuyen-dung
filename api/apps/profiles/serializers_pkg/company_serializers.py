@@ -61,7 +61,7 @@ class CompanyImageSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
             if CompanyImage.objects.filter(company=company).count() + count_upload_file > 15:
                 raise serializers.ValidationError(
-                    {'errorMessage': ERROR_MESSAGES["MAXIMUM_IMAGES"]})
+                    {'errorMessage': [ERROR_MESSAGES["MAXIMUM_IMAGES"]]})
 
         return attrs
 
