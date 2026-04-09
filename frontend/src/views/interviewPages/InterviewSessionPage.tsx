@@ -6,6 +6,7 @@ import { App as VoiceAssistantApp } from "../../components/Features/VoiceAssista
 import { APP_CONFIG_DEFAULTS } from "../../components/Features/VoiceAssistant/app-config";
 import { cn } from "@/lib/utils";
 import Button from "@mui/material/Button";
+import { PreflightRoom } from "./PreflightRoom";
 
 import interviewService from "../../services/interviewService";
 import tokenService from "../../services/tokenService";
@@ -70,6 +71,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
   const [error, setError] = useState("");
+  const [showPreflight, setShowPreflight] = useState(false);
   const [connectRoom, setConnectRoom] = useState(false);
   const [connectionDetails, setConnectionDetails] = useState<{
     token: string;
@@ -190,7 +192,8 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (roomName) {
         // Use fetch with keepalive to ensure the request is sent even after the page is closed
-        const apiUrl = `${process.env.NEXT_PUBLIC_BASE_API_URL || ""}/interview/web/sessions/${roomName}/status/`;
+        const baseApi = process.env.NEXT_PUBLIC_API_BASE || "/api";
+        const apiUrl = `${baseApi.replace(/\/$/, '')}/interview/web/sessions/${roomName}/status/`;
         fetch(apiUrl, {
           method: "PATCH",
           headers: {
@@ -300,6 +303,15 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
               connectionDetails={connectionDetails}
               onDisconnect={terminateInterviewSession}
             />
+          ) : showPreflight ? (
+            <div className="relative flex h-full items-center justify-center px-6 transition-all duration-500">
+               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.15),transparent_52%)]" />
+               <PreflightRoom 
+                  onJoin={initiateInterviewSession} 
+                  onCancel={() => setShowPreflight(false)} 
+                  starting={starting} 
+               />
+            </div>
           ) : (
             <div className="relative flex h-full items-center justify-center px-6">
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.22),transparent_52%)]" />
@@ -336,7 +348,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                     <>
                       <Button
                         variant="contained"
-                        onClick={initiateInterviewSession}
+                        onClick={() => setShowPreflight(true)}
                         disabled={starting}
                         className="h-14 rounded-2xl bg-cyan-500 px-12 text-sm font-black uppercase tracking-[0.2em] shadow-2xl shadow-cyan-500/20 hover:bg-cyan-400 hover:shadow-cyan-400/30 transition-all active:scale-[0.98] disabled:opacity-50"
                       >

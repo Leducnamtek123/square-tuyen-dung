@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import i18n from '@/i18n';
 
 export default function GlobalError({
   error,
@@ -29,10 +30,10 @@ export default function GlobalError({
           }}
         >
           <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
-            Hệ thống gặp sự cố
+            {i18n.t('errors.system.title', { defaultValue: 'Hệ thống gặp sự cố / System Error' })}
           </h1>
           <p style={{ color: '#666', maxWidth: '480px', marginBottom: '2rem' }}>
-            Đã xảy ra lỗi nghiêm trọng. Vui lòng thử tải lại trang.
+            {i18n.t('errors.system.message', { defaultValue: 'Đã xảy ra lỗi nghiêm trọng. Vui lòng thử tải lại trang. / A critical error has occurred. Please try reloading the page.' })}
           </p>
           <button
             onClick={reset}
@@ -46,7 +47,7 @@ export default function GlobalError({
               cursor: 'pointer',
             }}
           >
-            Tải lại trang
+            {i18n.t('common:actions.reload', { defaultValue: 'Tải lại trang / Reload Page' })}
           </button>
         </div>
       </body>

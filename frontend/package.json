@@ -12,6 +12,7 @@
     "@fortawesome/free-solid-svg-icons": "^7.2.0",
     "@fortawesome/react-fontawesome": "^3.2.0",
     "@goongmaps/goong-map-react": "^1.1.2",
+    "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^3.10.0",
     "@livekit/components-react": "^2.9.15",
     "@livekit/components-styles": "^1.2.0",
@@ -94,7 +95,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint --dir src",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "browserslist": {

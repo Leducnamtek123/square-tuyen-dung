@@ -14,7 +14,9 @@ import {
   Grid2 as Grid,
   Paper,
   alpha,
-  useTheme
+  useTheme,
+  ToggleButton,
+  ToggleButtonGroup
 } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
@@ -23,6 +25,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import ViewKanbanIcon from '@mui/icons-material/ViewKanban';
 import errorHandling from '../../../../utils/errorHandling';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 import xlsxUtils from '../../../../utils/xlsxUtils';
@@ -31,6 +35,7 @@ import { confirmModal } from '../../../../utils/sweetalert2Modal';
 import FormPopup from '../../../../components/Common/Controls/FormPopup';
 import AppliedResumeFilterForm from '../AppliedResumeFilterForm';
 import AppliedResumeTable from '../AppliedResumeTable';
+import AppliedResumeKanban from '../AppliedResumeKanban';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 import { useAppliedResumes, useJobPostOptions, useDeleteJobPostActivity, useUpdateApplicationStatus } from '../hooks/useEmployerQueries';
 import { useDataTable } from '../../../../hooks';
@@ -61,6 +66,8 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   const { t } = useTranslation(['employer', 'common']);
   const { allConfig } = useConfig();
   const theme = useTheme();
+  
+  const [viewMode, setViewMode] = useState<'table' | 'board'>('table');
 
   const {
     page,
@@ -84,13 +91,13 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   const { data: jobPostOptions = [] } = useJobPostOptions();
 
   const queryParams = useMemo(() => ({
-    page: page + 1,
-    pageSize,
+    page: viewMode === 'board' ? 1 : page + 1,
+    pageSize: viewMode === 'board' ? 100 : pageSize,
     ordering,
     ...filterData,
     jobPostId: jobPostIdSelect,
     status: applicationStatusSelect,
-  }), [page, pageSize, ordering, filterData, jobPostIdSelect, applicationStatusSelect]);
+  }), [page, pageSize, ordering, filterData, jobPostIdSelect, applicationStatusSelect, viewMode]);
 
   const { data: queryData, isLoading } = useAppliedResumes(queryParams);
   const { deleteJobPostActivity, isMutating: isDeleting } = useDeleteJobPostActivity();
@@ -183,22 +190,41 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               {t('employer:appliedResume.manageSubtitle', 'Track and manage candidate applications efficiently across all job postings.')}
             </Typography>
           </Box>
-          <Button 
-              variant="contained" 
-              color="primary" 
-              startIcon={<FileDownloadOutlinedIcon />} 
-              onClick={handleExport} 
-              sx={{ 
-                borderRadius: 3, 
-                px: 4, 
-                py: 1.25,
-                boxShadow: (theme) => theme.customShadows?.primary, 
-                fontWeight: 900,
-                textTransform: 'none'
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
+            <ToggleButtonGroup
+              value={viewMode}
+              exclusive
+              onChange={(_, newValue) => {
+                if (newValue) setViewMode(newValue);
               }}
-          >
-            {t('employer:appliedResume.downloadList')}
-          </Button>
+              size="small"
+              sx={{ bgcolor: 'background.neutral', '& .MuiToggleButton-root': { borderRadius: 3 } }}
+            >
+              <ToggleButton value="table" sx={{ fontWeight: 800, px: 2, textTransform: 'none' }}>
+                <ViewListIcon sx={{ mr: 1, fontSize: 18 }} /> {t('employer:appliedResume.tableView', { defaultValue: 'Table' })}
+              </ToggleButton>
+              <ToggleButton value="board" sx={{ fontWeight: 800, px: 2, textTransform: 'none' }}>
+                <ViewKanbanIcon sx={{ mr: 1, fontSize: 18 }} /> {t('employer:appliedResume.boardView', { defaultValue: 'Board' })}
+              </ToggleButton>
+            </ToggleButtonGroup>
+
+            <Button 
+                variant="contained" 
+                color="primary" 
+                startIcon={<FileDownloadOutlinedIcon />} 
+                onClick={handleExport} 
+                sx={{ 
+                  borderRadius: 3, 
+                  px: 4, 
+                  py: 1.25,
+                  boxShadow: (theme) => theme.customShadows?.primary, 
+                  fontWeight: 900,
+                  textTransform: 'none'
+                }}
+            >
+              {t('employer:appliedResume.downloadList')}
+            </Button>
+          </Stack>
         </Stack>
 
         <Paper
@@ -354,17 +380,26 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
           </Grid>
         </Paper>
 
-        <AppliedResumeTable
-          rows={resumes}
-          isLoading={isLoading}
-          rowCount={count}
-          pagination={pagination}
-          onPaginationChange={onPaginationChange as OnChangeFn<PaginationState>}
-          sorting={sorting}
-          onSortingChange={onSortingChange as OnChangeFn<SortingState>}
-          handleChangeApplicationStatus={handleChangeApplicationStatus}
-          handleDelete={handleDelete}
-        />
+        {viewMode === 'table' ? (
+            <AppliedResumeTable
+              rows={resumes}
+              isLoading={isLoading}
+              rowCount={count}
+              pagination={pagination}
+              onPaginationChange={onPaginationChange as OnChangeFn<PaginationState>}
+              sorting={sorting}
+              onSortingChange={onSortingChange as OnChangeFn<SortingState>}
+              handleChangeApplicationStatus={handleChangeApplicationStatus}
+              handleDelete={handleDelete}
+            />
+        ) : (
+            <AppliedResumeKanban
+              rows={resumes}
+              isLoading={isLoading}
+              handleChangeApplicationStatus={handleChangeApplicationStatus}
+              handleDelete={handleDelete}
+            />
+        )}
 
         <FormPopup title={t('employer:appliedResume.advancedFilter')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
           <AppliedResumeFilterForm handleFilter={handleFilter} filterData={filterData} />

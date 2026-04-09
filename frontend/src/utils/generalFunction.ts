@@ -1,5 +1,11 @@
-﻿const TabTitle = (newTitle: string): string => {
-  return (document.title = newTitle);
+import { useEffect } from 'react';
+
+const useTabTitle = (newTitle: string): void => {
+  useEffect(() => {
+    if (typeof document !== 'undefined') {
+      document.title = newTitle;
+    }
+  }, [newTitle]);
 };
 
-export { TabTitle };
+export { useTabTitle as TabTitle };
