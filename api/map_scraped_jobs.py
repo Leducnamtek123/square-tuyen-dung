@@ -71,7 +71,7 @@ def seed_scraped_jobs():
              user = User.objects.create_user_with_role_name(
                  email=dummy_email,
                  full_name=company_name[:100],
-                 role_name=var_sys.Role.EMPLOYER,
+                 role_name=var_sys.EMPLOYER,
                  password=f"DummyPass@{generate_random_string(5)}"
              )
 
@@ -82,7 +82,7 @@ def seed_scraped_jobs():
                  tax_code=generate_random_tax_code(),
                  company_email=dummy_email,
                  company_phone=generate_random_phone(),
-                 employee_size=var_sys.EmployeeSize.LESS_THAN_10,
+                 employee_size=1, # Under 10 employees
                  description=f"<p>Công ty tự động cào từ TopCV.</p>"
              )
              print(f"✅ Đã tạo Ghost Company: {company_name}")
@@ -101,14 +101,14 @@ def seed_scraped_jobs():
                 quantity=1,
                 deadline=deadline,
                 job_description=f"<p>Job gốc từ TopCV: <a href='{job_url}'>{job_url}</a></p><p>Mức lương: {salary_str}</p>",
-                position=var_sys.Position.EMPLOYEE,
-                type_of_workplace=var_sys.TypeOfWorkplace.ON_SITE,
-                experience=var_sys.Experience.NO_EXPERIENCE,
-                academic_level=var_sys.AcademicLevel.COLLEGE,
-                job_type=var_sys.JobType.FULL_TIME,
+                position=5, # Staff / Employee
+                type_of_workplace=1, # Office-based
+                experience=1, # No experience
+                academic_level=3, # College
+                job_type=1, # Full-time Permanent
                 salary_min=salary_min,
                 salary_max=salary_max,
-                status=var_sys.JobPostStatus.PUBLISHED,
+                status=var_sys.JobPostStatus.APPROVED,
                 contact_person_name="HR Tự Động",
                 contact_person_phone="0999999999",
                 contact_person_email="hr@dummy.com",
