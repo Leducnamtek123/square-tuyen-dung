@@ -167,6 +167,7 @@
     "jobCount": "{{count}} việc làm"
   },
   "jobPost": {
-    "remaining": "Còn {{days}} ngày"
+    "remaining": "Còn {{days}} ngày",
+    "timeLeft": "Còn"
   }
 }

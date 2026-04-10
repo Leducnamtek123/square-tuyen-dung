@@ -37,10 +37,10 @@ def seed_scraped_jobs():
         jobs_data = json.load(f)
 
     # Lấy Career & Location mặc định làm chuẩn
-    career = Career.objects.first()
+    all_careers = list(Career.objects.all())
     location = Location.objects.first()
 
-    if not career or not location:
+    if not all_careers or not location:
         print("❌ Lỗi: Database của bạn chưa có Master Data (Career / Location). Hãy add ít nhất 1 Career!")
         return
 
@@ -93,6 +93,10 @@ def seed_scraped_jobs():
         salary_min = 10000000
         salary_max = 20000000
         
+        # Ngẫu nhiên gán is_urgent (~30%) và is_hot (~20%)
+        is_urgent = random.random() < 0.3
+        is_hot = random.random() < 0.2
+
         # 2. Tạo JobPost với Company đó
         # Kiểm tra chống trùng tên job trong cùng 1 công ty
         if not JobPost.objects.filter(job_name=title, company=company).exists():
@@ -108,19 +112,32 @@ def seed_scraped_jobs():
                 job_type=1, # Full-time Permanent
                 salary_min=salary_min,
                 salary_max=salary_max,
+                is_urgent=is_urgent,
+                is_hot=is_hot,
                 status=var_sys.JobPostStatus.APPROVED,
                 contact_person_name="HR Tự Động",
                 contact_person_phone="0999999999",
                 contact_person_email="hr@dummy.com",
-                career=career,
+                career=random.choice(all_careers),
                 location=location,
                 user=user,
                 company=company
             )
+            tag = ''
+            if is_urgent: tag += ' 🔥URGENT'
+            if is_hot: tag += ' ⭐HOT'
             success_count += 1
-            print(f"   -> Đăng Job: {title}")
+            print(f"   -> Đăng Job: {title}{tag}")
         else:
-            print(f"   -> Bỏ qua Job trùng lặp: {title}")
+            JobPost.objects.filter(job_name=title, company=company).update(
+                career=random.choice(all_careers),
+                is_urgent=is_urgent,
+                is_hot=is_hot
+            )
+            tag = ''
+            if is_urgent: tag += ' 🔥URGENT'
+            if is_hot: tag += ' ⭐HOT'
+            print(f"   -> Update Job: {title}{tag}")
 
     print(f"🎉 HOÀN TẤT! Đã đẩy thành công {success_count} công việc thực tế vào Database dự án.")
 

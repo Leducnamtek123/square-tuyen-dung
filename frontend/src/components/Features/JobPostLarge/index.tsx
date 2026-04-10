@@ -679,7 +679,7 @@ const JobPostLarge = ({
 
           >
 
-            {t('jobPost.remaining', 'Còn')}{" "}
+            {t('jobPost.timeLeft', 'Còn')}{" "}
 
             <TimeAgo date={deadline} type="fromNow" />
 
