@@ -102,12 +102,12 @@ const InterviewDetailCard = () => {
         try {
             await submitEvaluation({
                 interview: Number(id),
-                attitudeScore: Number(evalForm.attitude_score),
-                professionalScore: Number(evalForm.professional_score),
-                overallScore: (Number(evalForm.attitude_score) + Number(evalForm.professional_score)) / 2,
+                attitude_score: Number(evalForm.attitude_score),
+                professional_score: Number(evalForm.professional_score),
+                overall_score: (Number(evalForm.attitude_score) + Number(evalForm.professional_score)) / 2,
                 result: evalForm.result,
                 comments: evalForm.comments,
-                proposedSalary: Number(evalForm.proposed_salary),
+                proposed_salary: Number(evalForm.proposed_salary),
             });
             toastMessages.success(t('interview:interviewDetail.messages.evaluationSuccess'));
         } catch (error) {

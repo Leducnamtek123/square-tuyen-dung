@@ -29,12 +29,12 @@ export interface ScheduleSessionInput {
 
 export interface SubmitEvaluationInput {
   interview: number;
-  attitudeScore?: number;
-  professionalScore?: number;
-  overallScore?: number;
+  attitude_score?: number;
+  professional_score?: number;
+  overall_score?: number;
   result?: 'passed' | 'failed' | 'pending';
   comments?: string;
-  proposedSalary?: number;
+  proposed_salary?: number;
 }
 
 /* ── Response Types ───────────────────────────────────────────────────── */
