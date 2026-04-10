@@ -158,11 +158,11 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
     const onSubmit = async (data: FormValues) => {
         try {
             const payload = {
-                jobPostId: Number(data.job_post),
-                candidateId: Number(data.candidate),
-                scheduledAt: data.scheduled_at,
-                questionIds: data.selected_questions.filter(Boolean),
-                type: 'live' as const
+                job_post: Number(data.job_post),
+                candidate: Number(data.candidate),
+                scheduled_at: data.scheduled_at,
+                question_ids: data.selected_questions.filter(Boolean),
+                type: 'mixed' as const
             };
 
             if (sessionId) {

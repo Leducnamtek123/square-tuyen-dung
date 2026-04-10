@@ -18,11 +18,13 @@ export interface GetSessionsParams {
 }
 
 export interface ScheduleSessionInput {
-  candidateId?: number;
-  jobPostId?: number;
-  scheduledAt?: string;
-  type?: 'ai' | 'live';
-  roomName?: string;
+  candidate?: number;
+  job_post?: number;
+  scheduled_at?: string;
+  type?: 'technical' | 'behavioral' | 'mixed';
+  question_ids?: number[];
+  question_group?: number;
+  notes?: string;
 }
 
 export interface SubmitEvaluationInput {
