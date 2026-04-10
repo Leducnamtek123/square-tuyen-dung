@@ -68,6 +68,7 @@
     "rightsReserved": "© {{year}} {{appName}}. All Rights Reserved.",
     "forJobSeekers": "For Job Seekers"
   },
+  "actionsLabel": "Actions",
   "actions": {
     "start": "Start",
     "close": "Close",

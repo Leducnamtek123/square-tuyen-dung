@@ -203,7 +203,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             },
         },
         {
-            header: t('common:actions'),
+            header: t('common:actionsLabel', { defaultValue: 'Thao tác' }),
             id: 'actions',
             meta: { align: 'right' },
             cell: ({ row }) => {
@@ -216,7 +216,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
                         <Tooltip title={t('common:view')} arrow>
                             <IconButton
                                 component={Link}
-                                href={`/${formatRoute(ROUTES.EMPLOYER.INTERVIEW_DETAIL, String(session.id))}`}
+                                href={`/${formatRoute(ROUTES.EMPLOYER.INTERVIEW_DETAIL, String(session.id), ':id')}`}
                                 color="primary"
                                 size="small"
                                 sx={{ 
@@ -233,7 +233,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
                             <Tooltip title={t('interview:interviewListCard.editInterview')} arrow>
                                 <IconButton
                                     component={Link}
-                                    href={`/${formatRoute(ROUTES.EMPLOYER.INTERVIEW_EDIT, String(session.id))}`}
+                                    href={`/${formatRoute(ROUTES.EMPLOYER.INTERVIEW_EDIT, String(session.id), ':id')}`}
                                     color="info"
                                     size="small"
                                     sx={{ 
