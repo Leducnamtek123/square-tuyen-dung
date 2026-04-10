@@ -107,5 +107,57 @@ describe('authService', () => {
       await authService.getUserSettings();
       expect(httpRequest.get).toHaveBeenCalledWith('auth/settings/');
     });
+
+    it('convertToken calls post with optional redirectUri', async () => {
+      await authService.convertToken('client', 'secret', 'google', 'token', 'uri');
+      expect(httpRequest.post).toHaveBeenCalledWith('auth/convert-token/', {
+        grant_type: 'convert_token',
+        client_id: 'client',
+        client_secret: 'secret',
+        backend: 'google',
+        token: 'token',
+        redirect_uri: 'uri'
+      });
+    });
+
+    it('firebaseLogin calls post', async () => {
+      await authService.firebaseLogin('token', 'JOB_SEEKER');
+      expect(httpRequest.post).toHaveBeenCalledWith('auth/firebase-login/', expect.any(Object));
+    });
+
+    it('revokeToken calls post', async () => {
+      await authService.revokeToken('token', 'google');
+      expect(httpRequest.post).toHaveBeenCalledWith('auth/revoke-token/', expect.any(Object));
+    });
+
+    it('jobSeekerRegister calls post', async () => {
+      await authService.jobSeekerRegister({ email: 'a@b.com' } as any);
+      expect(httpRequest.post).toHaveBeenCalledWith('auth/job-seeker/register/', { email: 'a@b.com' });
+    });
+
+    it('employerRegister calls post', async () => {
+      await authService.employerRegister({ email: 'a@b.com' } as any);
+      expect(httpRequest.post).toHaveBeenCalledWith('auth/employer/register/', { email: 'a@b.com' });
+    });
+
+    it('changePassword calls put', async () => {
+      await authService.changePassword({ new_password: 'pass' } as any);
+      expect(httpRequest.put).toHaveBeenCalledWith('auth/change-password/', { new_password: 'pass' });
+    });
+
+    it('resetPassword calls post', async () => {
+      await authService.resetPassword({ email: 'a@b.com' } as any);
+      expect(httpRequest.post).toHaveBeenCalledWith('auth/reset-password/', { email: 'a@b.com' });
+    });
+
+    it('updateUserSettings calls put', async () => {
+      await authService.updateUserSettings({ language: 'vi' } as any);
+      expect(httpRequest.put).toHaveBeenCalledWith('auth/settings/', { language: 'vi' });
+    });
+
+    it('sendVerifyEmail calls post', async () => {
+      await authService.sendVerifyEmail('a@b.com');
+      expect(httpRequest.post).toHaveBeenCalledWith('auth/send-verify-email/', { email: 'a@b.com', platform: 'WEB' });
+    });
   });
 });

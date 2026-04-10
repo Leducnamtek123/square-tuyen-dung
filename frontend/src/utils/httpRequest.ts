@@ -52,7 +52,7 @@ const httpRequest = axios.create({
   timeout: 30000,
 }) as HttpServiceInstance;
 
-const refreshClient = axios.create({
+export const refreshClient = axios.create({
   baseURL,
   headers: {
     'Content-Type': 'application/json',
