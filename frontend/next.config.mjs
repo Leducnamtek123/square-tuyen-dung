@@ -60,6 +60,10 @@ const nextConfig = {
       { source: '/thong-bao', destination: '/notifications' },
       { source: '/tai-khoan', destination: '/account' },
       { source: '/ket-noi-voi-nha-tuyen-dung', destination: '/chat' },
+      { source: '/lien-he', destination: '/contact' },
+      { source: '/cau-hoi-thuong-gap', destination: '/faq' },
+      { source: '/dieu-khoan-dich-vu', destination: '/terms-of-service' },
+      { source: '/chinh-sach-bao-mat', destination: '/privacy-policy' },
 
       // ── Employer (/nha-tuyen-dung → /employer) ──
       { source: '/nha-tuyen-dung/login', destination: '/employer/login' },
@@ -85,6 +89,8 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/cai-dat', destination: '/employer/settings' },
       { source: '/nha-tuyen-dung/ket-noi-voi-ung-vien', destination: '/employer/chat' },
       { source: '/nha-tuyen-dung/danh-sach-phong-van', destination: '/employer/interviews' },
+      { source: '/nha-tuyen-dung/danh-sach-phong-van/:id', destination: '/employer/interviews/:id' },
+      { source: '/nha-tuyen-dung/danh-sach-phong-van/:id/edit', destination: '/employer/interviews/:id/edit' },
       { source: '/nha-tuyen-dung/ngan-hang-cau-hoi', destination: '/employer/question-bank' },
       { source: '/nha-tuyen-dung/bo-cau-hoi', destination: '/employer/question-groups' },
       { source: '/nha-tuyen-dung/xac-thuc-nha-tuyen-dung', destination: '/employer/verification' },

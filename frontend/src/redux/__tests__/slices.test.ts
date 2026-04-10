@@ -1,12 +1,15 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+// Jest globals: describe, it, expect, beforeEach
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer, {
   getUserInfo,
+  getUserWorkspaces,
+  updateUserInfo,
+  updateAvatar,
+  deleteAvatar,
   removeUserInfo,
   setActiveWorkspace,
 } from '../userSlice';
 import authReducer, { updateVerifyEmail } from '../authSlice';
-import configReducer from '../configSlice';
 import filterReducer, {
   searchJobPost,
   searchJobPostWithKeyword,
@@ -59,6 +62,67 @@ describe('userSlice', () => {
     expect(state.isAuthenticated).toBe(false);
     expect(state.currentUser).toBeNull();
     expect(state.activeWorkspace).toBeNull();
+  });
+
+  it('should handle getUserInfo.fulfilled', () => {
+    const action = {
+      type: getUserInfo.fulfilled.type,
+      payload: { id: 1, email: 'test@example.com', workspaces: [{ type: 'company', companyId: 10, label: 'Company 1' }] }
+    };
+    const state = userReducer(undefined, action);
+    expect(state.isAuthenticated).toBe(true);
+    expect(state.currentUser?.email).toBe('test@example.com');
+    // tests resolveActiveWorkspace falling back to first item when no preferred default exists and role is not EMPLOYER
+    expect(state.activeWorkspace).toEqual({ type: 'company', companyId: 10, label: 'Company 1' });
+  });
+
+  it('should resolve active workspace based on preferred workspace during getUserInfo', () => {
+    const initialState = {
+      isAuthenticated: false,
+      currentUser: null,
+      activeWorkspace: { type: 'job_seeker' as const, companyId: null, label: 'Preferred JS' },
+    };
+    const action = {
+      type: getUserInfo.fulfilled.type,
+      payload: {
+        id: 1, email: 'test@example.com',
+        workspaces: [
+          { type: 'company', companyId: 10, label: 'Company 1' },
+          { type: 'job_seeker', companyId: null, label: 'My JS Workspace' }
+        ]
+      }
+    };
+    const state = userReducer(initialState, action);
+    expect(state.activeWorkspace).toEqual({ type: 'job_seeker', companyId: null, label: 'My JS Workspace' });
+  });
+
+  it('should resolve default workspace if preferred is not found', () => {
+    const action = {
+      type: getUserWorkspaces.fulfilled.type,
+      payload: {
+        workspaces: [
+          { type: 'company', companyId: 10, label: 'No Default' },
+          { type: 'company', companyId: 11, label: 'Default', isDefault: true }
+        ]
+      }
+    };
+    const state = userReducer(undefined, action);
+    expect(state.activeWorkspace).toEqual({ type: 'company', companyId: 11, label: 'Default' });
+  });
+
+  it('should resolve first company if employer and no preferred/default', () => {
+    const action = {
+      type: getUserWorkspaces.fulfilled.type,
+      payload: {
+        roleName: 'EMPLOYER',
+        workspaces: [
+          { type: 'job_seeker', companyId: null, label: 'JS' },
+          { type: 'company', companyId: 15, label: 'First Company' }
+        ]
+      }
+    };
+    const state = userReducer(undefined, action);
+    expect(state.activeWorkspace).toEqual({ type: 'company', companyId: 15, label: 'First Company' });
   });
 });
 
@@ -193,7 +257,6 @@ describe('Redux store integration', () => {
       reducer: {
         auth: authReducer,
         user: userReducer,
-        config: configReducer,
         filter: filterReducer,
         profile: profileReducer,
       },
@@ -204,7 +267,6 @@ describe('Redux store integration', () => {
     const state = store.getState() as RootState;
     expect(state).toHaveProperty('auth');
     expect(state).toHaveProperty('user');
-    expect(state).toHaveProperty('config');
     expect(state).toHaveProperty('filter');
     expect(state).toHaveProperty('profile');
   });

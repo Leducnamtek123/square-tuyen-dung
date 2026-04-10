@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+// Jest globals: describe, it, expect
 import { ROUTES, HOST_NAME, ROLES_NAME, AUTH_CONFIG } from '../../configs/constants';
 
 describe('Application Constants', () => {
