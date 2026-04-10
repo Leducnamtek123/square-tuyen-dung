@@ -27,7 +27,7 @@ def generate_random_tax_code():
 
 def seed_scraped_jobs():
     print("Bắt đầu đọc file JSON data cào từ TopCV...")
-    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '../scripts/jobs_data.json')
+    file_path = '/app/jobs_data.json' # Đọc trực tiếp từ thư mục app trong Docker
     
     if not os.path.exists(file_path):
         print(f"❌ Không tìm thấy file data: {file_path}")
@@ -124,5 +124,4 @@ def seed_scraped_jobs():
 
     print(f"🎉 HOÀN TẤT! Đã đẩy thành công {success_count} công việc thực tế vào Database dự án.")
 
-if __name__ == '__main__':
-    seed_scraped_jobs()
+seed_scraped_jobs()
