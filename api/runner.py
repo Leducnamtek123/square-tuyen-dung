@@ -1,0 +1,773 @@
+import os
+import json
+import random
+import string
+import django
+from django.utils import timezone
+from datetime import timedelta
+from django.utils.text import slugify
+
+# Lấy các dependencies Model
+from apps.accounts.models import User
+from apps.profiles.models import Company
+from common.models import Career
+from apps.locations.models import Location
+from apps.jobs.models import JobPost
+from shared.configs import variable_system as var_sys
+
+def generate_random_string(length=10):
+    letters_and_digits = string.ascii_letters + string.digits
+    return ''.join(random.choice(letters_and_digits) for _ in range(length))
+
+def generate_random_phone():
+    return '09' + ''.join(random.choice(string.digits) for _ in range(8))
+
+def generate_random_tax_code():
+    return ''.join(random.choice(string.digits) for _ in range(10))
+
+def seed_scraped_jobs():
+    print(flush=True, "Bắt đầu đọc file JSON data cào từ TopCV...")
+    
+    jobs_data = json.loads(r"""[
+    {
+        "id": "job_real_topcv_0",
+        "title": "Nhân Viên Tư Vấn Bán Hàng/Kinh Doanh/Sales Xe Ô Tô Tại Showroom - Thu Nhập Cao Đến 50 Triệu - Quận 12(Cũ)",
+        "company": "CÔNG TY TNHH ĐỆ NHẤT Ô TÔ",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "10 - 50 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-tu-van-ban-hang-kinh-doanh-sales-xe-o-to-tai-showroom-thu-nhap-cao-den-50-trieu-quan-12cu/2106133.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.808Z"
+    },
+    {
+        "id": "job_real_topcv_1",
+        "title": "Nhân Viên Kinh Doanh/ Telesales / Sales/ Nhân Viên Tư Vấn/ Chăm Sóc Khách Hàng- Không Yêu Cầu Kinh Nghiệm (Thu Nhập Từ 10 Triệu - 25 Triệu)",
+        "company": "CÔNG TY TNHH XUÂN THU TOÀN PHÁT",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "10 - 25 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-kinh-doanh-telesales-sales-nhan-vien-tu-van-cham-soc-khach-hang-khong-yeu-cau-kinh-nghiem-thu-nhap-tu-10-trieu-25-trieu/2106354.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.809Z"
+    },
+    {
+        "id": "job_real_topcv_2",
+        "title": "Nhân Viên Chăm Sóc Khách Hàng  - 1 Năm Kinh Nghiệm - Làm Việc Tại Đại Mỗ, HN - Thu Nhập 10 Triệu +++",
+        "company": "CÔNG TY CỔ PHẦN KOMEX VIỆT NAM",
+        "location": "Hà Nội",
+        "salary": "Thoả thuận",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-cham-soc-khach-hang-1-nam-kinh-nghiem-lam-viec-tai-dai-mo-hn-thu-nhap-10-trieu/2110629.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.809Z"
+    },
+    {
+        "id": "job_real_topcv_3",
+        "title": "Kỹ Thuật Công Trình/ Giám Sát Thi Công Nội Thất Gỗ - Chỉ Tuyển Nam -  Lương Cứng 16 Triệu-25 Triệu/Tháng - Dưới 1 Năm Kinh Nghiệm",
+        "company": "Công ty Cổ phần A.T.A Việt Nam",
+        "location": "Hà Nội",
+        "salary": "16 - 25 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ky-thuat-cong-trinh-giam-sat-thi-cong-noi-that-go-chi-tuyen-nam-luong-cung-16-trieu-25-trieu-thang-duoi-1-nam-kinh-nghiem/2108431.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.810Z"
+    },
+    {
+        "id": "job_real_topcv_4",
+        "title": "Trưởng Phòng Kinh Doanh Lương Cứng 15 Triệu + Hoa Hồng Cao (Hà Nội)",
+        "company": "Công ty TNHH Thương mại và nhập khẩu Hòa Bình Group",
+        "location": "Hà Nội",
+        "salary": "15 - 30 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/truong-phong-kinh-doanh-luong-cung-15-trieu-hoa-hong-cao-ha-noi/2115968.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.810Z"
+    },
+    {
+        "id": "job_real_topcv_5",
+        "title": "Nhân Viên Kỹ Thuật/ Lắp Đặt (Khóa Vân Tay, Camera) - Lương Thưởng Hấp Dẫn+++ Tại Hà Nội",
+        "company": "CÔNG TY TNHH PHÁT TRIỂN CÔNG NGHỆ VÀ GIẢI PHÁP TOÀN CẦU",
+        "location": "Hà Nội",
+        "salary": "8 - 14 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-ky-thuat-lap-dat-khoa-van-tay-camera-luong-thuong-hap-dan-tai-ha-noi/2113147.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.811Z"
+    },
+    {
+        "id": "job_real_topcv_6",
+        "title": "Nhân Viên Telesales - Bán Hàng Qua Điện Thoại",
+        "company": "CÔNG TY TÀI CHÍNH TRÁCH NHIỆM HỮU HẠN MỘT THÀNH VIÊN LOTTE VIỆT NAM",
+        "location": "Hồ Chí Minh (mới) & Hà Nội",
+        "salary": "7 - 10 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-telesales-ban-hang-qua-dien-thoai/2115941.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.811Z"
+    },
+    {
+        "id": "job_real_topcv_7",
+        "title": "Nhân Viên Kinh Doanh Van Công Nghiệp Thu Nhập Lên Đến 30 Triệu Tại Hồ Chí Minh",
+        "company": "CÔNG TY TNHH TM DV AN PHÚ THÀNH",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "15 - 30 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-kinh-doanh-van-cong-nghiep-thu-nhap-len-den-30-trieu-tai-ho-chi-minh/2101006.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.811Z"
+    },
+    {
+        "id": "job_real_topcv_8",
+        "title": "Nhân Viên Thiết Kế Công Nghệ/Kỹ Sư Môi Trường Thu Nhập 12 Đến 15 Triệu Đồng",
+        "company": "CÔNG TY TNHH CÔNG NGHỆ MÔI TRƯỜNG NGUYÊN KHANG",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "12 - 15 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-thiet-ke-cong-nghe-ky-su-moi-truong-thu-nhap-12-den-15-trieu-dong/2096538.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.812Z"
+    },
+    {
+        "id": "job_real_topcv_9",
+        "title": "Kế Toán Trưởng - Thu Nhập Đến 35 Triệu - Kinh Nghiệm Từ 3 Năm - Bến Lức - Tây Ninh",
+        "company": "CÔNG TY TNHH THIỆN TÂM AN GIANG",
+        "location": "Tây Ninh (mới)",
+        "salary": "25 - 35 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ke-toan-truong-thu-nhap-den-35-trieu-kinh-nghiem-tu-3-nam-ben-luc-tay-ninh/2107355.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.812Z"
+    },
+    {
+        "id": "job_real_topcv_10",
+        "title": "Nhân Viên Kinh Doanh Lương Cứng 8-15 Triệu | Không Đạt KPI Vẫn Nhận Đủ Lương / Sales BĐS / Sales Realty",
+        "company": "CÔNG TY CỔ PHẦN KINH DOANH VÀ ĐẦU TƯ ĐẤT XANH MIỀN TRUNG",
+        "location": "Đà Nẵng (mới) & 2 nơi khác",
+        "salary": "50 - 100 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/brand/datxanhmientrung1/tuyen-dung/nhan-vien-kinh-doanh-luong-cung-8-15-trieu-khong-dat-kpi-van-nhan-du-luong-sales-bds-sales-realty-j2112742.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.813Z"
+    },
+    {
+        "id": "job_real_topcv_11",
+        "title": "Content Creator (Short - Form Video & Photo)",
+        "company": "CÔNG TY TNHH THƯƠNG MẠI DỊCH VỤ VÀ ĐẦU TƯ VQH",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "8 - 15 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/content-creator-short-form-video-photo/2106038.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.813Z"
+    },
+    {
+        "id": "job_real_topcv_12",
+        "title": "Kỹ Sư Quản Lý Hồ Sơ Dự Án Giao Thông (10–13tr) – Đồng Nai | Chấp Nhận Fresher",
+        "company": "CÔNG TY TNHH GIAO THÔNG VÀ XÂY DỰNG TIẾN LƯỢNG",
+        "location": "Đồng Nai (mới)",
+        "salary": "Thoả thuận",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ky-su-quan-ly-ho-so-du-an-giao-thong-1013tr-dong-nai-chap-nhan-fresher/2110747.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.813Z"
+    },
+    {
+        "id": "job_real_topcv_13",
+        "title": "Senior UA Marketing (Mobile Game) [Hà Nội] - Thu Nhập Cạnh Tranh, Có Cơ Hội Công Tác Tại Hàn Quốc",
+        "company": "CÔNG TY TNHH NSTAGE VIỆT NAM",
+        "location": "Hà Nội",
+        "salary": "Thoả thuận",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/senior-ua-marketing-mobile-game-ha-noi-thu-nhap-canh-tranh-co-co-hoi-cong-tac-tai-han-quoc/2060195.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.814Z"
+    },
+    {
+        "id": "job_real_topcv_14",
+        "title": "Kế Toán Thuế [Hà Nội] - Thu Nhập Upto 15 Triệu, Môi Trường Giáo Dục Ổn Định",
+        "company": "Công ty TNHH MathExpress",
+        "location": "Hà Nội",
+        "salary": "12 - 15 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ke-toan-thue-ha-noi-thu-nhap-upto-15-trieu-moi-truong-giao-duc-on-dinh/2115184.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.814Z"
+    },
+    {
+        "id": "job_real_topcv_15",
+        "title": "Kỹ Thuật Viên Sơn Xe - Thu Nhập Hấp Dẫn - Đi Làm Ngay",
+        "company": "CÔNG TY CỔ PHẦN Ô TÔ THÀNH AN",
+        "location": "Hà Nội",
+        "salary": "7 - 15 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ky-thuat-vien-son-xe-thu-nhap-hap-dan-di-lam-ngay/2073027.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.814Z"
+    },
+    {
+        "id": "job_real_topcv_16",
+        "title": "Kế Toán Trưởng (Lương 20 - 25 Triệu) - Tại Gia Lâm, Hà Nội",
+        "company": "CÔNG TY CỔ PHẦN KINH DOANH BẤT ĐỘNG SẢN MAYHOMES",
+        "location": "Hà Nội",
+        "salary": "20 - 25 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ke-toan-truong-luong-20-25-trieu-tai-gia-lam-ha-noi/2092977.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.815Z"
+    },
+    {
+        "id": "job_real_topcv_17",
+        "title": "Kiến Trúc Sư Thiết Kế (Nhà Phố – Biệt Thự) - Lương Up To 10 Triệu - Yêu Cầu 1 Năm Kinh Nghiệm",
+        "company": "CÔNG TY CỔ PHẦN ĐẦU TƯ KIẾN TRÚC XÂY DỰNG AN NAM",
+        "location": "Cần Thơ (mới)",
+        "salary": "7 - 10 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/kien-truc-su-thiet-ke-nha-pho-biet-thu-luong-up-to-10-trieu-yeu-cau-1-nam-kinh-nghiem/2099656.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.815Z"
+    },
+    {
+        "id": "job_real_topcv_18",
+        "title": "Nhân Viên Video Editor (1,5 Năm Kinh Nghiệm) - Thu Nhập 10-20 Triệu, Tại Hà Nội",
+        "company": "CÔNG TY TNHH FTV CREATIVE HOLDINGS",
+        "location": "Hà Nội",
+        "salary": "10 - 15 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-video-editor-1-5-nam-kinh-nghiem-thu-nhap-10-20-trieu-tai-ha-noi/2073071.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.815Z"
+    },
+    {
+        "id": "job_real_topcv_19",
+        "title": "Nhân Viên Quản Trị Kênh Youtube (1,5 Năm Kinh Nghiệm) - Thu Nhập 10-20 Triệu, Tại Hà Nội",
+        "company": "CÔNG TY TNHH FTV CREATIVE HOLDINGS",
+        "location": "Hà Nội",
+        "salary": "10 - 20 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-quan-tri-kenh-youtube-1-5-nam-kinh-nghiem-thu-nhap-10-20-trieu-tai-ha-noi/2077964.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.822Z"
+    },
+    {
+        "id": "job_real_topcv_20",
+        "title": "Nhân Viên Sales Online/Telesales / Tư Vấn Nhượng Quyền (Có Data Sẵn) - Thu Nhập Lên Đến 25 Triệu - Làm Việc Tại Quận Tân Phú (Cũ)",
+        "company": "CÔNG TY TNHH SX TM VŨ THIÊN",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "15 - 25 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-sales-online-telesales-tu-van-nhuong-quyen-co-data-san-thu-nhap-len-den-25-trieu-lam-viec-tai-quan-tan-phu-cu/2052530.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.822Z"
+    },
+    {
+        "id": "job_real_topcv_21",
+        "title": "Chuyên Viên Kinh Doanh BĐS Nghỉ Dưỡng Cao Cấp (Lương Cứng 15 Triệu + Hoa Hồng 5%)",
+        "company": "CÔNG TY TNHH BẤT ĐỘNG SẢN BRIDGON RISE",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "50 - 100 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/chuyen-vien-kinh-doanh-bds-nghi-duong-cao-cap-luong-cung-15-trieu-hoa-hong-5/2105152.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.822Z"
+    },
+    {
+        "id": "job_real_topcv_22",
+        "title": "Nhân Viên Kinh Doanh/ Sales/ Telesales_ Thu Nhập Từ 10-20 Triệu_ Làm Việc Tại Hồ Chí Minh",
+        "company": "CÔNG TY CỔ PHẦN TẬP ĐOÀN TRUYỀN THÔNG QUỐC GIA",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "10 - 20 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-kinh-doanh-sales-telesales-thu-nhap-tu-10-20-trieu-lam-viec-tai-ho-chi-minh/2104696.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.822Z"
+    },
+    {
+        "id": "job_real_topcv_23",
+        "title": "Kỹ Sư Revit/BIM (Kiến Trúc - Kết Cấu - Hạ Tầng) - Nghỉ T7 & CN - Dự Án Quốc Tế",
+        "company": "CÔNG TY TNHH DOALLTECH VIETNAM",
+        "location": "Hà Nội",
+        "salary": "Thoả thuận",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ky-su-revit-bim-kien-truc-ket-cau-ha-tang-nghi-t7-cn-du-an-quoc-te/2108415.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.823Z"
+    },
+    {
+        "id": "job_real_topcv_24",
+        "title": "Chuyên Viên Cấp Cao/Chuyên Gia Phòng Quản Trị Mô Hình Và Danh Mục - Khối Quản Trị Rủi Ro",
+        "company": "Ngân hàng TMCP Quốc Dân",
+        "location": "Hà Nội",
+        "salary": "Thoả thuận",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/chuyen-vien-cap-cao-chuyen-gia-phong-quan-tri-mo-hinh-va-danh-muc-khoi-quan-tri-rui-ro/2108105.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.823Z"
+    },
+    {
+        "id": "job_real_topcv_25",
+        "title": "Nhân Viên Kinh Doanh/ Sales/ Tư Vấn Khóa Học Part-Time [Hà Nội] - Thu Nhập Upto 12 Triệu, Sẵn Data Khách Hàng",
+        "company": "Công ty TNHH Thương mại Khải Linh - Hà Nội",
+        "location": "Hà Nội",
+        "salary": "Thoả thuận",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-kinh-doanh-sales-tu-van-khoa-hoc-part-time-ha-noi-thu-nhap-upto-12-trieu-san-data-khach-hang/2053905.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.823Z"
+    },
+    {
+        "id": "job_real_topcv_26",
+        "title": "Kế Toán Tổng Hợp",
+        "company": "CÔNG TY TNHH DATANI LOGISTICS",
+        "location": "Hà Nội",
+        "salary": "15 - 20 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ke-toan-tong-hop/2115103.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.823Z"
+    },
+    {
+        "id": "job_real_topcv_27",
+        "title": "Nhân Viên Nhắc Phí Tại Hiện Trường",
+        "company": "CÔNG TY TÀI CHÍNH TRÁCH NHIỆM HỮU HẠN MỘT THÀNH VIÊN LOTTE VIỆT NAM",
+        "location": "Hồ Chí Minh (mới) & 5 nơi khác",
+        "salary": "7.5 - 12 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-nhac-phi-tai-hien-truong/2115933.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.823Z"
+    },
+    {
+        "id": "job_real_topcv_28",
+        "title": "Content Marketing - Up To 12tr++ + Phụ Cấp Nhiều + Thưởng Cao",
+        "company": "Công ty TNHH Quốc tế Luminix",
+        "location": "Hà Nội",
+        "salary": "Tới 12 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/content-marketing-up-to-12tr-phu-cap-nhieu-thuong-cao/2109348.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.824Z"
+    },
+    {
+        "id": "job_real_topcv_29",
+        "title": "Nhân Viên Nhắc Phí Qua Điện Thoại",
+        "company": "CÔNG TY TÀI CHÍNH TRÁCH NHIỆM HỮU HẠN MỘT THÀNH VIÊN LOTTE VIỆT NAM",
+        "location": "Hồ Chí Minh (mới) & Hà Nội",
+        "salary": "7 - 12 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-nhac-phi-qua-dien-thoai/2115917.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.824Z"
+    },
+    {
+        "id": "job_real_topcv_30",
+        "title": "Nhân Viên Logistic Chứng Từ - Lương 12 - 18 Triệu - Hà Nội",
+        "company": "CÔNG TY TNHH TIẾP VẬN QUỐC TẾ JING HOI",
+        "location": "Hà Nội",
+        "salary": "12 - 18 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-logistic-chung-tu-luong-12-18-trieu-ha-noi/2106693.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.824Z"
+    },
+    {
+        "id": "job_real_topcv_31",
+        "title": "Giáo Viên THCS/THPT Các Bộ Môn (Thu Nhập 5-10M/Tháng _ Làm Tại Nhà/Remote _ Nhận Việc Ngay)",
+        "company": "CÔNG TY CỔ PHẦN CÔNG NGHỆ MARATHON EDUCATION",
+        "location": "Hồ Chí Minh (mới) & 9 nơi khác",
+        "salary": "5 - 10 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/giao-vien-thcs-thpt-cac-bo-mon-thu-nhap-5-10m-thang-lam-tai-nha-remote-nhan-viec-ngay/2054069.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.824Z"
+    },
+    {
+        "id": "job_real_topcv_32",
+        "title": "Kế Toán Quản Trị (Nữ) Làm Việc Tại Thủ Đức - HCM, Thu Nhập 15 Triệu/Tháng, Phỏng Vấn Đi Làm Ngay",
+        "company": "CÔNG TY TNHH PHY NUT",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "Từ 15 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ke-toan-quan-tri-nu-lam-viec-tai-thu-duc-hcm-thu-nhap-15-trieu-thang-phong-van-di-lam-ngay/2109700.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.824Z"
+    },
+    {
+        "id": "job_real_topcv_33",
+        "title": "Nhân Viên Kinh Doanh Bất Động Sản- Lương Cơ Bản 8 - 30 Triệu/Tháng - Hỗ Trợ 100% DATA Marketing + Đối Ứng Phí MKT Cá Nhân Đến 50%- THỦ ĐỨC- Đi Làm Ngay",
+        "company": "CÔNG TY CỔ PHẦN ĐẦU TƯ VÀ PHÁT TRIỂN SÀI GÒN REALTY",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "Từ 50 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-kinh-doanh-bat-dong-san-luong-co-ban-8-30-trieu-thang-ho-tro-100-data-marketing-doi-ung-phi-mkt-ca-nhan-den-50-thu-duc-di-lam-ngay/2116923.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.824Z"
+    },
+    {
+        "id": "job_real_topcv_34",
+        "title": "Nhân Viên Kinh Doanh (Ưu Tiên Nữ, Thu Nhập 15 - 20 Triệu)",
+        "company": "Công Ty Cổ Phần Văn Hóa Song Hành",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "Thoả thuận",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-kinh-doanh-uu-tien-nu-thu-nhap-15-20-trieu/2059301.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.825Z"
+    },
+    {
+        "id": "job_real_topcv_35",
+        "title": "Nhân Viên Tư Vấn Bán Hàng - Khu Vực Hồ Chí Minh, Lái Thiêu (Lương Cơ Bản 8tr5)",
+        "company": "Công ty Cổ phần DXMD Việt Nam",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "8.5 - 120 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-tu-van-ban-hang-khu-vuc-ho-chi-minh-lai-thieu-luong-co-ban-8tr5/2103088.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.825Z"
+    },
+    {
+        "id": "job_real_topcv_36",
+        "title": "Trưởng Nhóm Vận Hành Logistics",
+        "company": "CÔNG TY CỔ PHẦN ĐẦU TƯ XÂY DỰNG THÀNH NAM",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "18 - 20 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/truong-nhom-van-hanh-logistics/2108400.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.825Z"
+    },
+    {
+        "id": "job_real_topcv_37",
+        "title": "Kế Toán Tổng Hợp (Đại Đồng , Bắc Ninh) - Hỗ Trợ Cơm Trưa, Mức Lương Upto 15M++",
+        "company": "CÔNG TY TNHH ĐÔNG PHÚ TIÊN",
+        "location": "Bắc Ninh (mới)",
+        "salary": "9 - 15 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ke-toan-tong-hop-dai-dong-bac-ninh-ho-tro-com-trua-muc-luong-upto-15m/2112475.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.825Z"
+    },
+    {
+        "id": "job_real_topcv_38",
+        "title": "Sales Logistics/ Nhân Viên Kinh Doanh Logistics - Từ 6 Tháng Kinh Nghiệm - Lương Cơ Bản Upto 15 Triệu Tại Hạ Long, Quảng Ninh",
+        "company": "CÔNG TY TNHH HẠ LONG CONNECTION",
+        "location": "Quảng Ninh",
+        "salary": "Từ 18 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/sales-logistics-nhan-vien-kinh-doanh-logistics-tu-6-thang-kinh-nghiem-luong-co-ban-upto-15-trieu-tai-ha-long-quang-ninh/2074023.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.825Z"
+    },
+    {
+        "id": "job_real_topcv_39",
+        "title": "Video Content Cretor - Lương Thưởng Hấp Dẫn",
+        "company": "CÔNG TY CỔ PHẦN CÔNG NGHỆ THẾ HỆ MỚI HANEL PT",
+        "location": "Bắc Ninh (mới)",
+        "salary": "Thoả thuận",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/video-content-cretor-luong-thuong-hap-dan/2108532.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.825Z"
+    },
+    {
+        "id": "job_real_topcv_40",
+        "title": "Kỹ Sư Cấp Cao Phòng Cháy Chữa Cháy EHS - Thu Nhập Upto 35+++",
+        "company": "CÔNG TY TNHH CÔNG NGHIỆP JINKO SOLAR (VIỆT NAM)",
+        "location": "Quảng Ninh",
+        "salary": "18 - 35 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ky-su-cap-cao-phong-chay-chua-chay-ehs-thu-nhap-upto-35/2074371.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.825Z"
+    },
+    {
+        "id": "job_real_topcv_41",
+        "title": "Kế Toán Nội Bộ Store Hàng Hiệu Luxury Thu Nhập Up To 14 Triệu Tại Hà Nội - Nhận Việc Ngay",
+        "company": "Hộ kinh doanh Nguyễn Duy Tuấn",
+        "location": "Hà Nội",
+        "salary": "9 - 14 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ke-toan-noi-bo-store-hang-hieu-luxury-thu-nhap-up-to-14-trieu-tai-ha-noi-nhan-viec-ngay/2000847.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.826Z"
+    },
+    {
+        "id": "job_real_topcv_42",
+        "title": "Nhân Viên Kinh Doanh Khối Khách Hàng Cá Nhân (Hà Nội)",
+        "company": "HSBC",
+        "location": "Hà Nội",
+        "salary": "Thoả thuận",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-kinh-doanh-khoi-khach-hang-ca-nhan-ha-noi/2117165.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.826Z"
+    },
+    {
+        "id": "job_real_topcv_43",
+        "title": "Kế Toán Thuế - Thu Nhập 15- 17 Triệu - Đi Làm Ngay",
+        "company": "Công ty TNHH May Cao Nguyễn",
+        "location": "Hà Nội",
+        "salary": "15 - 17 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/ke-toan-thue-thu-nhap-15-17-trieu-di-lam-ngay/2115940.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.826Z"
+    },
+    {
+        "id": "job_real_topcv_44",
+        "title": "Nhân Viên Kinh Doanh",
+        "company": "CÔNG TY TNHH THƯƠNG MẠI THÁI SƠN NAM",
+        "location": "Hồ Chí Minh (mới)",
+        "salary": "Thoả thuận",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-kinh-doanh/2102650.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.826Z"
+    },
+    {
+        "id": "job_real_topcv_45",
+        "title": "Nhân Viên Tư Vấn Khóa Học/Chăm Sóc Khách Hàng/ Sales [Thái Nguyên] Thu Nhập Từ 12-20tr/Tháng| Nhận Việc Ngay",
+        "company": "CÔNG TY TNHH GIÁO DỤC IELTS MENTOR",
+        "location": "Thái Nguyên (mới)",
+        "salary": "12 - 20 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-tu-van-khoa-hoc-cham-soc-khach-hang-sales-thai-nguyen-thu-nhap-tu-12-20tr-thang-nhan-viec-ngay/2075507.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.826Z"
+    },
+    {
+        "id": "job_real_topcv_46",
+        "title": "Chuyên Viên TikTok - Tại Hưng Yên ( Thu Nhập 10-20 Triệu + Thưởng)",
+        "company": "Công Ty TNHH Điện Tử Việt Nhật",
+        "location": "Hưng Yên (mới)",
+        "salary": "10 - 20 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/chuyen-vien-tiktok-tai-hung-yen-thu-nhap-10-20-trieu-thuong/2074637.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.826Z"
+    },
+    {
+        "id": "job_real_topcv_47",
+        "title": "Quản Lý Vận Hành Bưu Cục - Thu Nhập 8-13 Triệu",
+        "company": "CÔNG TY CỔ PHẦN GIAO HÀNG TIẾT KIỆM",
+        "location": "Hưng Yên (mới) & 10 nơi khác",
+        "salary": "8 - 13 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/quan-ly-van-hanh-buu-cuc-thu-nhap-8-13-trieu/2105632.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.826Z"
+    },
+    {
+        "id": "job_real_topcv_48",
+        "title": "Nhân Viên Kinh Doanh Logistics / Sales Logistics / Bán Hàng - Thu Nhập Upto 25 Triệu Đồng - Có Kinh Nghiệm - Hà Nội",
+        "company": "CÔNG TY TNHH GATELINK VIỆT NAM",
+        "location": "Hà Nội & Hồ Chí Minh (mới)",
+        "salary": "Tới 25 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/nhan-vien-kinh-doanh-logistics-sales-logistics-ban-hang-thu-nhap-upto-25-trieu-dong-co-kinh-nghiem-ha-noi/2115868.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.827Z"
+    },
+    {
+        "id": "job_real_topcv_49",
+        "title": "Social Commerce Lead / Leader Brand / Lương Cứng 20-30M + Hoa Hồng / Tại Cầu Giấy - HN",
+        "company": "Công ty TNHH Thương Mại GAIN Việt Nam",
+        "location": "Hà Nội",
+        "salary": "20 - 30 triệu",
+        "skills": [
+            "Tùy vị trí",
+            "Kỹ năng chuyên môn"
+        ],
+        "url": "https://www.topcv.vn/viec-lam/social-commerce-lead-leader-brand-luong-cung-20-30m-hoa-hong-tai-cau-giay-hn/2115504.html?ta_source=JobSearchList_LinkDetail&u_sr_id=AeqPKwk2XctL14d1mco0ZVKT169KMdhEfKUrTqKv_1775805050",
+        "dateCrawled": "2026-04-10T07:10:53.827Z"
+    }
+]""")
+
+
+    # Lấy Career & Location mặc định làm chuẩn
+    career = Career.objects.first()
+    location = Location.objects.first()
+
+    if not career or not location:
+        print(flush=True, "❌ Lỗi: Database của bạn chưa có Master Data (Career / Location). Hãy add ít nhất 1 Career!")
+        return
+
+    deadline = timezone.now().date() + timedelta(days=60)
+    success_count = 0
+
+    print(flush=True, f"👉 Tìm thấy {len(jobs_data)} công việc trong JSON. Bắt đầu xử lý mapping Ghost Companies...")
+
+    for job in jobs_data:
+        company_name = job.get('company', 'Công ty Ẩn Danh')
+        title = job.get('title', 'Không rõ vị trí')
+        salary_str = job.get('salary', 'Thỏa thuận')
+        job_url = job.get('url', '#')
+
+        # 1. Tra cứu hoặc Sinh Dummy Company
+        company = Company.objects.filter(company_name=company_name).first()
+        
+        if not company:
+             # Tạo User trước vì Company yêu cầu OneToOneField(User)
+             slug_name = slugify(company_name) or generate_random_string(8)
+             dummy_email = f"hr.{slug_name[:15]}.{generate_random_string(4)}@dummy.com"
+             
+             # Chống trùng lặp email nếu create
+             if User.objects.filter(email=dummy_email).exists():
+                 dummy_email = f"{generate_random_string(10)}@dummy.com"
+
+             # Create user
+             user = User.objects.create_user_with_role_name(
+                 email=dummy_email,
+                 full_name=company_name[:100],
+                 role_name=var_sys.Role.EMPLOYER,
+                 password=f"DummyPass@{generate_random_string(5)}"
+             )
+
+             # Create Company
+             company = Company.objects.create(
+                 user=user,
+                 company_name=company_name,
+                 tax_code=generate_random_tax_code(),
+                 company_email=dummy_email,
+                 company_phone=generate_random_phone(),
+                 employee_size=var_sys.EmployeeSize.LESS_THAN_10,
+                 description=f"<p>Công ty tự động cào từ TopCV.</p>"
+             )
+             print(flush=True, f"✅ Đã tạo Ghost Company: {company_name}")
+        else:
+             user = company.user
+
+        # Xử lý parse lương cơ bản
+        salary_min = 10000000
+        salary_max = 20000000
+        
+        # 2. Tạo JobPost với Company đó
+        # Kiểm tra chống trùng tên job trong cùng 1 công ty
+        if not JobPost.objects.filter(job_name=title, company=company).exists():
+            JobPost.objects.create(
+                job_name=title,
+                quantity=1,
+                deadline=deadline,
+                job_description=f"<p>Job gốc từ TopCV: <a href='{job_url}'>{job_url}</a></p><p>Mức lương: {salary_str}</p>",
+                position=var_sys.Position.EMPLOYEE,
+                type_of_workplace=var_sys.TypeOfWorkplace.ON_SITE,
+                experience=var_sys.Experience.NO_EXPERIENCE,
+                academic_level=var_sys.AcademicLevel.COLLEGE,
+                job_type=var_sys.JobType.FULL_TIME,
+                salary_min=salary_min,
+                salary_max=salary_max,
+                status=var_sys.JobPostStatus.PUBLISHED,
+                contact_person_name="HR Tự Động",
+                contact_person_phone="0999999999",
+                contact_person_email="hr@dummy.com",
+                career=career,
+                location=location,
+                user=user,
+                company=company
+            )
+            success_count += 1
+            print(flush=True, f"   -> Đăng Job: {title}")
+        else:
+            print(flush=True, f"   -> Bỏ qua Job trùng lặp: {title}")
+
+    print(flush=True, f"🎉 HOÀN TẤT! Đã đẩy thành công {success_count} công việc thực tế vào Database dự án.")
+
+seed_scraped_jobs()
