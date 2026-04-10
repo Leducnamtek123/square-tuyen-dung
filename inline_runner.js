@@ -14,8 +14,8 @@ pyScript = pyScript.replace(
 );
 
 
-// Thêm flush=True vào print để Windows pipe không bị giấu log
-pyScript = pyScript.replace(/print\(/g, "print(flush=True, ");
+// Cấu hình lại standard output để in log tự động
+pyScript = "import sys\nif hasattr(sys.stdout, 'reconfigure'): sys.stdout.reconfigure(line_buffering=True)\n" + pyScript;
 
 fs.writeFileSync('./api/runner.py', pyScript);
 console.log("✅ Đã chuấn bị mã nguồn python hoàn tất!");
