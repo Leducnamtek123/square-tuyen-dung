@@ -4,7 +4,7 @@
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
-import { Box, Link } from "@mui/material";
+import { Box, Link, Skeleton } from "@mui/material";
 import HomeSearch from '../../../../views/components/defaults/HomeSearch';
 import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 import contentService from '../../../../services/contentService';
@@ -45,15 +45,19 @@ const RenderItem = ({ item }: { item: { targetUrl?: string; imageUrl?: string; d
 
 const TopSlide = () => {
   const [banners, setBanners] = React.useState<{ targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[]>([]);
+  const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
     const getBanners = async () => {
       try {
+        setIsLoading(true);
         const resData = await contentService.getBanners({ type: BANNER_TYPES.HOME });
         const data = Array.isArray(resData) ? resData : ((resData as { results?: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[]; data?: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[] })?.results || (resData as { results?: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[]; data?: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[] })?.data || []);
         setBanners(data);
       } catch (error) {
         // Error handled silently
+      } finally {
+        setIsLoading(false);
       }
     };
     getBanners();
@@ -83,7 +87,11 @@ const TopSlide = () => {
             className="mySwiper"
             style={{ height: '100%' }}
           >
-            {banners.length > 0 ? (
+            {isLoading ? (
+              <SwiperSlide>
+                <Skeleton variant="rectangular" width="100%" height="100%" sx={{ borderRadius: 1.5, display: 'block', transform: 'none' }} />
+              </SwiperSlide>
+            ) : banners.length > 0 ? (
               banners.map((value) => (
                 <SwiperSlide key={value.id} style={{ cursor: 'pointer' }}>
                   <Link href={value?.buttonLink} target="_blank">
