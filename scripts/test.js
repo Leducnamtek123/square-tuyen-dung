@@ -1,0 +1,1 @@
+const axios=require('axios');const cheerio=require('cheerio');axios.get('https://www.topcv.vn/tim-viec-lam-it', {headers: {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}}).then(res=>{const $ = cheerio.load(res.data); console.log($('.job-item-search-result, .job-item-2, .job-item-default').first().html());}).catch(console.error);
