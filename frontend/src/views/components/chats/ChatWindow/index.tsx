@@ -16,6 +16,10 @@ import SendIcon from '@mui/icons-material/Send';
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
+import CloseIcon from '@mui/icons-material/Close';
+import Popover from '@mui/material/Popover';
+import EmojiPicker from 'emoji-picker-react';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import {
   collection,
   onSnapshot,
@@ -33,7 +37,7 @@ import {
   QueryDocumentSnapshot,
   DocumentData,
 } from 'firebase/firestore';
-import db from '../../../../configs/firebase-config';
+import db, { storage } from '../../../../configs/firebase-config';
 import Message from '../Message';
 import { RootState } from '../../../../redux/store';
 import { useChatContext } from '../../../../context/ChatProvider';
@@ -55,6 +59,9 @@ interface MessageData {
   text: string;
   senderId: string;
   createdAt: { seconds: number; nanoseconds: number } | null;
+  attachmentUrl?: string;
+  attachmentType?: string;
+  fileName?: string;
 }
 
 const LIMIT_MESSAGE = 20;
@@ -76,6 +83,22 @@ const ChatWindow = () => {
   const [lastDocument, setLastDocument] = React.useState<QueryDocumentSnapshot<DocumentData> | null>(null);
   const [messages, setMessages] = React.useState<MessageData[]>([]);
   const [count, setCount] = React.useState(0);
+  
+  // File upload & Emoji states
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = React.useState(false);
+  const [uploadProgress, setUploadProgress] = React.useState(0);
+  const [emojiAnchorEl, setEmojiAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  const handleEmojiClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setEmojiAnchorEl(event.currentTarget);
+  };
+  const handleEmojiClose = () => {
+    setEmojiAnchorEl(null);
+  };
+  const onEmojiSelect = (emojiObject: any) => {
+    setInputValue(prev => prev + emojiObject.emoji);
+  };
 
   // Update unreadCount
   React.useEffect(() => {
@@ -152,6 +175,28 @@ const ChatWindow = () => {
     }
   }, [selectedRoomId]);
 
+  const sendNotificationToPartner = async (messageText: string) => {
+    if (!partnerId || !currentUser) return;
+    try {
+      const notificationRef = collection(db, 'users', partnerId, 'notifications');
+      await addDoc(notificationRef, {
+        is_deleted: false,
+        is_read: false,
+        image: currentUser?.avatarUrl || '',
+        title: "Tin nhắn mới",
+        content: `${currentUser?.fullName || 'Ai đó'} gửi một tin nhắn.`,
+        time: serverTimestamp(),
+        type: "NEW_MESSAGE",
+        NEW_MESSAGE: {
+          chatRoomId: selectedRoomId,
+          text: messageText,
+        }
+      });
+    } catch (err) {
+      console.error("Error creating notification: ", err);
+    }
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || !selectedRoomId || !currentUserChat) return;
@@ -174,9 +219,68 @@ const ChatWindow = () => {
         recipientId: partnerId,
         unreadCount: (selectedRoom?.unreadCount || 0) + 1,
       });
+      sendNotificationToPartner(inputValue);
     } catch (error) {
       console.error("Error sending message: ", error);
     }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedRoomId || !currentUserChat) return;
+    
+    // reset input
+    if (fileInputRef.current) fileInputRef.current.value = '';
+
+    const isImage = file.type.startsWith('image/');
+    const attachmentType = isImage ? 'image' : 'document';
+    const fileName = file.name;
+    const storageRef = ref(storage, `chat_attachments/${selectedRoomId}/${Date.now()}_${fileName}`);
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setUploadProgress(progress);
+      },
+      (error) => {
+        console.error("Upload failed: ", error);
+        setIsUploading(false);
+      },
+      async () => {
+        setIsUploading(false);
+        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+        
+        const messageData = {
+          chatRoomId: selectedRoomId,
+          senderId: `${currentUserChat.userId}`,
+          text: isImage ? 'Đã gửi một hình ảnh' : `Đã gửi file: ${fileName}`,
+          createdAt: serverTimestamp(),
+          attachmentUrl: downloadURL,
+          attachmentType,
+          fileName,
+        };
+
+        try {
+          await addDoc(messageCollectionRef, messageData);
+          
+          const chatRoomRef = doc(db, 'chatRooms', selectedRoomId);
+          await updateDoc(chatRoomRef, {
+            updatedAt: serverTimestamp(),
+            lastMessage: messageData.text,
+            recipientId: partnerId,
+            unreadCount: (selectedRoom?.unreadCount || 0) + 1,
+          });
+          sendNotificationToPartner(messageData.text);
+        } catch (err) {
+          console.error("Error saving file message: ", err);
+        }
+      }
+    );
   };
 
   const handleLoadMore = async () => {
@@ -278,6 +382,9 @@ const ChatWindow = () => {
                 userId={msg.senderId}
                 text={msg.text}
                 createdAt={msg.createdAt}
+                attachmentUrl={msg.attachmentUrl}
+                attachmentType={msg.attachmentType}
+                fileName={msg.fileName}
               />
             ))}
           </>
@@ -298,12 +405,34 @@ const ChatWindow = () => {
           bgcolor: 'background.paper',
         }}
       >
-        <IconButton size="small" sx={{ mr: 1 }}>
-          <AttachFileIcon fontSize="small" />
+        <input 
+          type="file" 
+          ref={fileInputRef} 
+          style={{ display: 'none' }} 
+          onChange={handleFileUpload} 
+        />
+        <IconButton size="small" sx={{ mr: 1 }} disabled={isUploading} onClick={() => fileInputRef.current?.click()}>
+          {isUploading ? <CircularProgress size={20} variant="determinate" value={uploadProgress} /> : <AttachFileIcon fontSize="small" />}
         </IconButton>
-        <IconButton size="small" sx={{ mr: 1 }}>
+        <IconButton size="small" sx={{ mr: 1 }} onClick={handleEmojiClick}>
           <SentimentSatisfiedAltIcon fontSize="small" />
         </IconButton>
+        
+        <Popover
+          open={Boolean(emojiAnchorEl)}
+          anchorEl={emojiAnchorEl}
+          onClose={handleEmojiClose}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'center',
+          }}
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'center',
+          }}
+        >
+          <EmojiPicker onEmojiClick={onEmojiSelect} />
+        </Popover>
         <InputBase
           sx={{ ml: 1, flex: 1, fontSize: 14 }}
           placeholder={t('typeAMessage')}

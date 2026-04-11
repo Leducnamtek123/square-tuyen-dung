@@ -377,19 +377,15 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
         break;
 
       case 'APPLY_JOB':
-
         handleRead(item.key);
-
         nav.push(
-
           `/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, (item['APPLY_JOB'] as Record<string, string>)?.resume_slug)}`
-
         );
-
         break;
-
+      case 'NEW_MESSAGE':
+        handleRead(item.key);
+        break;
       default:
-
         break;
 
     }

@@ -13,9 +13,14 @@ interface MessageProps {
     seconds: number;
     nanoseconds: number;
   } | null;
+  attachmentUrl?: string;
+  attachmentType?: string;
+  fileName?: string;
 }
 
-const Message = ({ userId, text, avatarUrl, createdAt }: MessageProps) => {
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
+
+const Message = ({ userId, text, avatarUrl, createdAt, attachmentUrl, attachmentType, fileName }: MessageProps) => {
   const { t } = useTranslation('chat');
   const { currentUserChat } = useChatContext();
 
@@ -57,6 +62,30 @@ const Message = ({ userId, text, avatarUrl, createdAt }: MessageProps) => {
         >
           {text}
         </Typography>
+        
+        {attachmentUrl && (
+          <Box sx={{ mb: 1, p: 0.5, bgcolor: isMe ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)", borderRadius: 1 }}>
+            {attachmentType === 'image' ? (
+              <img 
+                src={attachmentUrl} 
+                alt="attachment" 
+                style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8, cursor: 'pointer' }} 
+                onClick={() => window.open(attachmentUrl, '_blank')}
+              />
+            ) : (
+              <Box 
+                sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer', color: isMe ? 'white' : 'primary.main' }}
+                onClick={() => window.open(attachmentUrl, '_blank')}
+              >
+                <FileDownloadOutlinedIcon sx={{ mr: 1 }} />
+                <Typography variant="body2" sx={{ textDecoration: 'underline' }}>
+                  {fileName || 'Download File'}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+        )}
+        
         <Typography variant="caption" color="text.secondary">
           {createdAt?.seconds
             ? formatMessageDate(createdAt?.seconds * 1000)

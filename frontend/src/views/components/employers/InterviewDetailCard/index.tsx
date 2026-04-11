@@ -19,6 +19,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import StopCircleIcon from '@mui/icons-material/StopCircle';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { ROUTES } from '../../../../configs/constants';
@@ -149,6 +150,19 @@ const InterviewDetailCard = () => {
             errorHandling(e as AxiosError<{ errors?: ApiError }>);
         } finally {
             setObserverLoading(false);
+        }
+    };
+
+    const handleForceEndInterview = async () => {
+        if (!session?.roomName) return;
+        if (!window.confirm(t('interview:interviewDetail.messages.confirmForceEnd', { defaultValue: 'Bạn có chắc chắn muốn kết thúc buổi phỏng vấn này ngay lập tức không?' }))) return;
+        
+        try {
+            await interviewService.updateSessionStatus(session.roomName, 'completed');
+            toastMessages.success(t('interview:interviewDetail.messages.forceEndSuccess', { defaultValue: 'Đã yêu cầu kết thúc buổi phỏng vấn' }));
+            queryClient.invalidateQueries({ queryKey: ['interviewDetail', id] });
+        } catch (e) {
+            errorHandling(e as AxiosError<{ errors?: ApiError }>);
         }
     };
 
@@ -342,6 +356,36 @@ const InterviewDetailCard = () => {
 
                 {/* Action Buttons */}
                 <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: { xs: '100%', md: 'auto' } }}>
+                    {/* Stop Interview Button */}
+                    {canObserve && (
+                        <Tooltip title="Kết thúc ngay lập tức buổi phỏng vấn này" arrow placement="top">
+                            <Button
+                                variant="outlined"
+                                onClick={handleForceEndInterview}
+                                startIcon={<StopCircleIcon />}
+                                sx={{ 
+                                    borderRadius: 3, 
+                                    minWidth: { xs: '100%', sm: 200 },
+                                    fontWeight: 900,
+                                    py: 2,
+                                    px: 3,
+                                    textTransform: 'none',
+                                    fontSize: '0.95rem',
+                                    borderColor: alpha(theme.palette.error.main, 0.4),
+                                    color: 'error.main',
+                                    transition: 'all 0.2s',
+                                    '&:hover': {
+                                        borderColor: 'error.main',
+                                        bgcolor: alpha(theme.palette.error.main, 0.04),
+                                        transform: 'translateY(-2px)',
+                                    },
+                                }}
+                            >
+                                {t('common:actions.stop', { defaultValue: 'Kết thúc' })}
+                            </Button>
+                        </Tooltip>
+                    )}
+
                     {/* Observer Mode Button */}
                     {canObserve && (
                         <Tooltip title="Quan sát ẩn — ứng viên không biết bạn đang xem" arrow placement="top">

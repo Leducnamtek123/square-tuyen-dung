@@ -1,6 +1,7 @@
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, initializeFirestore, serverTimestamp } from 'firebase/firestore';
+import { getStorage } from 'firebase/storage';
 
 let firebaseConfig: FirebaseOptions;
 
@@ -35,6 +36,7 @@ const db = enableLongPolling
     })
   : getFirestore(app);
 const auth = getAuth(app);
+const storage = getStorage(app);
 
-export { serverTimestamp, auth };
+export { serverTimestamp, auth, storage };
 export default db;

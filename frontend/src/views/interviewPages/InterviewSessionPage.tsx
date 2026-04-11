@@ -184,39 +184,21 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
     }
   }, [roomName]);
 
-  // Lifecycle Management: Graceful Cleanup & Tab Close
+  // Lifecycle Management
+  // Removed unmount & beforeunload implicit completion so users can rejoin disconnected sessions
   useEffect(() => {
     if (!connectRoom) return;
 
-    // 1. Handle browser/tab closure
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (roomName) {
-        // Use fetch with keepalive to ensure the request is sent even after the page is closed
-        const baseApi = process.env.NEXT_PUBLIC_API_BASE || "/api";
-        const apiUrl = `${baseApi.replace(/\/$/, '')}/interview/web/sessions/${roomName}/status/`;
-        fetch(apiUrl, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${tokenService.getAccessTokenFromCookie()}`
-          },
-          body: JSON.stringify({ status: "completed" }),
-          keepalive: true,
-        }).catch(err => console.error("Keepalive update failed:", err));
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
-
-    // 2. Handle component unmounting (navigation away)
+    // We no longer trigger `completed` status automatically on tab close/unmount.
+    // If the browser crashes, the session stays `in_progress` letting the candidate rejoin.
+    // The session will be naturally completed if the user clicks "End Call" manually, 
+    // or by backend max_duration timeout.
+    
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-      // We don't call terminateInterviewSession here immediately if we want to allow page navigation 
-      // without necessarily ending the call, but if the user wants it at "unmount", this is the place.
-      // Based on proposed changes: "Gắn event useEffect return cleanup để gọi terminateInterviewSession()"
-      terminateInterviewSession();
+      // Intentionally kept empty - let the candidate rejoin if they reload or crash.
+      // terminateInterviewSession() will still be called via explicitly clicking "End call".
     };
-  }, [connectRoom, roomName, terminateInterviewSession]);
+  }, [connectRoom]);
 
   const sessionInfo = useMemo(() => ({
     jobName: session?.jobName,
