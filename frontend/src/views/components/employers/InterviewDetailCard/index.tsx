@@ -20,6 +20,7 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from '@tanstack/react-query';
 import { ROUTES } from '../../../../configs/constants';
 import InterviewAiEvaluationCard from './InterviewAiEvaluationCard';
 import InterviewAnalysisPanel from './InterviewAnalysisPanel';
@@ -62,6 +63,8 @@ const InterviewDetailCard = () => {
         proposed_salary: 0
     });
 
+    const queryClient = useQueryClient();
+
     // Data Fetching & Mutations
     const { data: session, isLoading: loading } = useInterviewDetail(id);
     const { submitEvaluation, isMutating: isInterviewMutating } = useInterviewMutations();
@@ -79,6 +82,14 @@ const InterviewDetailCard = () => {
 
     // Effective status (SSE may update it in real-time)
     const effectiveStatus = liveStatus || session?.status;
+
+    useEffect(() => {
+        if (liveStatus && session?.status && liveStatus !== session.status) {
+            if (liveStatus === 'completed') {
+                queryClient.invalidateQueries({ queryKey: ['interviewDetail', id] });
+            }
+        }
+    }, [liveStatus, session?.status, queryClient, id]);
 
     useEffect(() => {
         if (session?.evaluations?.length) {
@@ -404,6 +415,7 @@ const InterviewDetailCard = () => {
                         <InterviewRecordingCard recordingUrl={recordingUrl} t={t} />
                         <InterviewAiEvaluationCard
                             session={session}
+                            effectiveStatus={effectiveStatus}
                             t={t}
                             onTriggerAi={handleTriggerAi}
                         />

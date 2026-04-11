@@ -201,8 +201,19 @@ def queue_invitation_email(session_id: int) -> None:
 def queue_ai_evaluation(session: InterviewSession) -> None:
     from .tasks import evaluate_interview_session
 
+    old_status = session.status
     session.status = "processing"
     session.save(update_fields=["status", "update_at"])
+
+    broadcast_interview_event(session.id, "status_changed", {
+        "sessionId": session.id,
+        "oldStatus": old_status,
+        "newStatus": "processing",
+        "startTime": session.start_time.isoformat() if session.start_time else None,
+        "endTime": session.end_time.isoformat() if session.end_time else None,
+        "duration": session.duration,
+    })
+
     evaluate_interview_session.delay(session.id)
 
 

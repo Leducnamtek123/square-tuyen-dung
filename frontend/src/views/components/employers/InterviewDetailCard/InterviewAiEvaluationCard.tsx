@@ -7,14 +7,15 @@ import { TFunction } from 'i18next';
 
 interface InterviewAiEvaluationCardProps {
   session: InterviewSession;
+  effectiveStatus?: string;
   t: TFunction;
   onTriggerAi: () => void;
 }
 
-const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ session, t, onTriggerAi }) => {
+const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ session, effectiveStatus, t, onTriggerAi }) => {
     const theme = useTheme();
     const hasResult = session.ai_overall_score !== null && session.ai_overall_score !== undefined;
-    const isProcessing = session.status === 'processing';
+    const isProcessing = effectiveStatus === 'processing' || session.status === 'processing';
 
     return (
         <Paper 
@@ -185,9 +186,9 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                                 />
                             </Box>
                             <Typography variant="body1" color="text.secondary" sx={{ mb: 5, fontWeight: 800, maxWidth: 300, mx: 'auto', lineHeight: 1.8 }}>
-                                {session.status === 'completed' ? t('interviewDetail.messages.aiNeedsTrigger') : t('interviewDetail.messages.notEnded')}
+                                {effectiveStatus === 'completed' || session.status === 'completed' ? t('interviewDetail.messages.aiNeedsTrigger') : t('interviewDetail.messages.notEnded')}
                             </Typography>
-                            {session.status === 'completed' && (
+                            {(effectiveStatus === 'completed' || session.status === 'completed') && (
                                 <Button
                                     variant="contained"
                                     onClick={onTriggerAi}

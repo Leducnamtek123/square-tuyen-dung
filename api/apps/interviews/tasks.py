@@ -13,6 +13,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from .livekit_service import LiveKitService
 from .models import InterviewSession
+from .services import broadcast_interview_event
 
 logger = logging.getLogger(__name__)
 
@@ -255,6 +256,15 @@ Luu y: chi tra ve 1 JSON object hop le, khong them giai thich.
         session.status = "completed"
         session.save()
 
+        broadcast_interview_event(session.id, "status_changed", {
+            "sessionId": session.id,
+            "oldStatus": "processing",
+            "newStatus": "completed",
+            "startTime": session.start_time.isoformat() if session.start_time else None,
+            "endTime": session.end_time.isoformat() if session.end_time else None,
+            "duration": session.duration,
+        })
+
         logger.info(
             "AI evaluation for session %s completed successfully. Score=%s",
             session_id,
@@ -264,6 +274,7 @@ Luu y: chi tra ve 1 JSON object hop le, khong them giai thich.
 
     except InterviewSession.DoesNotExist:
         logger.error("InterviewSession ID %s not found for evaluation.", session_id)
+        return None
     except ValidationError as e:
         logger.error("AI output schema validation failed for session %s: %s", session_id, e)
     except ValueError as e:
@@ -272,5 +283,22 @@ Luu y: chi tra ve 1 JSON object hop le, khong them giai thich.
         logger.error("Failed to decode JSON from AI response for session %s", session_id)
     except Exception as e:
         logger.error("Unexpected error in evaluate_interview_session(%s): %s", session_id, e)
+
+    # If we caught an error (other than DoesNotExist), revert to completed so frontend doesn't hang
+    try:
+        session = InterviewSession.objects.get(id=session_id)
+        if session.status == "processing":
+            session.status = "completed"
+            session.save(update_fields=["status", "update_at"])
+            broadcast_interview_event(session.id, "status_changed", {
+                "sessionId": session.id,
+                "oldStatus": "processing",
+                "newStatus": "completed",
+                "startTime": session.start_time.isoformat() if session.start_time else None,
+                "endTime": session.end_time.isoformat() if session.end_time else None,
+                "duration": session.duration,
+            })
+    except Exception as e2:
+        logger.error("Failed to revert session %s status to completed: %s", session_id, e2)
 
     return None
