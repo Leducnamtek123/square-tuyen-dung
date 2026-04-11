@@ -635,7 +635,6 @@ def upload_file(request):
         from apps.files.models import File
         from django.conf import settings
         from rest_framework import status
-        import shared.responses as var_res
         
         file_obj = serializer.validated_data['file']
         file_type = serializer.validated_data['file_type']

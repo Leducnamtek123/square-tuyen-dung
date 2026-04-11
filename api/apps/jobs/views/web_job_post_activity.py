@@ -172,7 +172,7 @@ class EmployerJobPostActivityViewSet(
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        if instance.job_post.company != request.user.company:
+        if instance.job_post.company != request.user.active_company:
             return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
         fields = [
             "id",
@@ -203,7 +203,7 @@ class EmployerJobPostActivityViewSet(
         queryset = (
             self.filter_queryset(
                 self.get_queryset()
-                .filter(job_post__company=user.company, is_deleted=False)
+                .filter(job_post__company=user.active_company, is_deleted=False)
                 .order_by('-id', 'create_at')
             )
         )
@@ -257,7 +257,7 @@ class EmployerJobPostActivityViewSet(
         queryset = (
             self.filter_queryset(
                 self.get_queryset()
-                .filter(job_post__company=user.company)
+                .filter(job_post__company=user.active_company)
                 .annotate(
                     userId=F('user_id'),
                     fullName=F('user__full_name'),
@@ -294,7 +294,7 @@ class EmployerJobPostActivityViewSet(
         user = request.user
         queryset = (
             self.filter_queryset(
-                self.get_queryset().filter(job_post__company=user.company).order_by('-id', 'create_at')
+                self.get_queryset().filter(job_post__company=user.active_company).order_by('-id', 'create_at')
             )
         )
 
@@ -328,7 +328,7 @@ class EmployerJobPostActivityViewSet(
         if data.get("status", None):
             stt = data["status"]
             job_post_activity = self.get_object()
-            if job_post_activity.job_post.company != request.user.company:
+            if job_post_activity.job_post.company != request.user.active_company:
                 return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
 
             from ..services import JobActivityService
@@ -353,7 +353,7 @@ class EmployerJobPostActivityViewSet(
 
             from ..services import JobActivityService
             activity = self.get_object()
-            if activity.job_post.company != request.user.company:
+            if activity.job_post.company != request.user.active_company:
                 return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
             JobActivityService.send_email_to_job_seeker(
                 activity=activity,
@@ -376,7 +376,7 @@ class EmployerJobPostActivityViewSet(
                 )
             
             job_post_activity = self.get_object()
-            if job_post_activity.job_post.company != request.user.company:
+            if job_post_activity.job_post.company != request.user.active_company:
                 return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
 
             from ..services import JobActivityService
