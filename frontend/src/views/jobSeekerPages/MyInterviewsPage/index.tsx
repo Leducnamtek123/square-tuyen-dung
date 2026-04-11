@@ -14,7 +14,7 @@ import dayjs from '../../../configs/dayjs-config';
 import { useTranslation } from 'react-i18next';
 
 const MyInterviewsPage = () => {
-    const { t } = useTranslation(['jobSeeker', 'common', 'errors']);
+    const { t } = useTranslation(['jobSeeker', 'common', 'errors', 'interview']);
     const theme = useTheme();
     TabTitle(t('jobSeeker:myInterviewsTitle'));
     const navigate = useRouter();
@@ -27,18 +27,19 @@ const MyInterviewsPage = () => {
     };
 
     const getStatusChip = (status: string) => {
+        let color: "success" | "primary" | "info" | "error" | "warning" | "default" = "default";
         switch (status) {
-            case 'scheduled':
-                return <Chip label={t('common:status.scheduled')} color="info" size="small" />;
-            case 'in_progress':
-                return <Chip label={t('common:status.inProgress')} color="warning" size="small" />;
-            case 'completed':
-                return <Chip label={t('common:status.completed')} color="success" size="small" />;
-            case 'cancelled':
-                return <Chip label={t('common:status.cancelled')} color="error" size="small" />;
-            default:
-                return <Chip label={status} size="small" />;
+            case 'completed': color = 'success'; break;
+            case 'in_progress': color = 'primary'; break;
+            case 'processing': color = 'warning'; break;
+            case 'scheduled': color = 'info'; break;
+            case 'cancelled': color = 'error'; break;
         }
+        return <Chip 
+            label={t(`interview:interviewListCard.statuses.${status}`, { defaultValue: status.replaceAll('_', ' ').toUpperCase() })} 
+            color={color} 
+            size="small" 
+        />;
     };
 
     return (

@@ -164,7 +164,9 @@
       "cancelled": "Đã hủy",
       "draft": "Bản nháp",
       "calibration": "Kiểm tra thiết bị",
-      "interrupted": "Bị gián đoạn"
+      "interrupted": "Bị gián đoạn",
+      "connecting": "Đang kết nối",
+      "active": "Hoạt động"
     },
     "description": "Xem lịch phỏng vấn"
   },

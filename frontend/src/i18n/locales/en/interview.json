@@ -164,7 +164,9 @@
       "cancelled": "Cancelled",
       "draft": "Draft",
       "calibration": "Calibration",
-      "interrupted": "Interrupted"
+      "interrupted": "Interrupted",
+      "connecting": "Connecting",
+      "active": "Active"
     },
     "description": "View scheduled interviews"
   },

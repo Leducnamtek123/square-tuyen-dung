@@ -81,7 +81,7 @@ const ElapsedTimer: React.FC<{ startTime: string | null | undefined }> = ({ star
 };
 
 const InterviewLivePage = () => {
-  const { t } = useTranslation('employer');
+  const { t } = useTranslation(['employer', 'interview', 'common']);
   const theme = useTheme();
   const [sessions, setSessions] = useState<InterviewSession[]>([]);
   const [count, setCount] = useState(0);
@@ -196,7 +196,7 @@ const InterviewLivePage = () => {
         accessorKey: 'status',
         cell: ({ getValue }: ReactTableCellContext<InterviewSession, unknown>) => (
           <Chip
-            label={t(`interviewLive.statuses.${getValue() as string}`, { defaultValue: (getValue() as string)?.replaceAll('_', ' ')?.toUpperCase() })}
+            label={t(`interview:interviewListCard.statuses.${getValue() as string}`, { defaultValue: (getValue() as string)?.replaceAll('_', ' ')?.toUpperCase() })}
             color={getStatusColor(getValue() as string)}
             size="small"
             sx={{ fontWeight: 'bold' }}
@@ -461,7 +461,7 @@ const InterviewLivePage = () => {
                   </Box>
                   <Stack alignItems="flex-end" spacing={0.5}>
                     <Chip
-                      label={t(`interviewLive.statuses.${session.status}`, { defaultValue: session.status?.replaceAll('_', ' ')?.toUpperCase() })}
+                      label={t(`interview:interviewListCard.statuses.${session.status}`, { defaultValue: session.status?.replaceAll('_', ' ')?.toUpperCase() })}
                       color="primary"
                       size="small"
                       sx={{ fontWeight: 900, fontSize: '0.65rem', height: 22 }}

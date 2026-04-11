@@ -269,7 +269,7 @@ const InterviewDetailCard = () => {
                             {t('interview:interviewDetail.title')}
                         </Typography>
                         <Chip
-                            label={t(`interview:interviewLive.statuses.${effectiveStatus}`, { 
+                            label={t(`interview:interviewListCard.statuses.${effectiveStatus}`, { 
                                 defaultValue: effectiveStatus?.replaceAll('_', ' ')?.toUpperCase() 
                             })}
                             size="small"

@@ -708,7 +708,9 @@
         "processing": "Processing",
         "expired": "Expired",
         "draft": "Draft",
-        "interrupted": "Interrupted"
+        "interrupted": "Interrupted",
+        "connecting": "Connecting",
+        "active": "Active"
       },
       "table": {
         "room": "Room",

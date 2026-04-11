@@ -708,7 +708,9 @@
         "processing": "Đang xử lý",
         "expired": "Đã hết hạn",
         "draft": "Bản nháp",
-        "interrupted": "Bị gián đoạn"
+        "interrupted": "Bị gián đoạn",
+        "connecting": "Đang kết nối",
+        "active": "Hoạt động"
       },
       "table": {
         "room": "Phòng",
