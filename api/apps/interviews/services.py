@@ -12,6 +12,11 @@ from .models import InterviewSession, InterviewTranscript, Question
 logger = logging.getLogger(__name__)
 
 
+class SessionNotJoinableError(ValueError):
+    """Exception raised when an interview session is not in a joinable state."""
+    pass
+
+
 def get_session_questions(session: InterviewSession) -> Iterable[Question]:
     questions = session.questions.all()
     if questions.exists():
@@ -47,7 +52,7 @@ def create_livekit_participant_token(session: InterviewSession, request) -> Dict
     # Security: Chỉ cấp token nếu status là 'scheduled', 'calibration' hoặc 'in_progress'
     allowed_statuses = ("scheduled", "calibration", "in_progress")
     if session.status not in allowed_statuses:
-        raise ValueError(f"Không thể tham gia buổi phỏng vấn này vì trạng thái hiện tại là: {session.get_status_display()}")
+        raise SessionNotJoinableError(f"Không thể tham gia buổi phỏng vấn này vì trạng thái hiện tại là: {session.get_status_display()}")
 
     participant_identity = f"candidate-{session.candidate_id}"
     participant_name = session.candidate.full_name or session.candidate.email or participant_identity
@@ -221,7 +226,7 @@ def create_observer_livekit_token(session: InterviewSession, request) -> Dict[st
     """Create a hidden LiveKit token for employer to observe interview silently."""
     allowed_statuses = ("scheduled", "calibration", "in_progress")
     if session.status not in allowed_statuses:
-        raise ValueError(
+        raise SessionNotJoinableError(
             f"Không thể quan sát buổi phỏng vấn này vì trạng thái hiện tại là: {session.get_status_display()}"
         )
 

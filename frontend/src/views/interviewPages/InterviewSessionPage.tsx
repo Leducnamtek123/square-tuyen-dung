@@ -62,6 +62,27 @@ type InterviewSessionPageProps = {
   role?: "jobseeker" | "employer" | "admin" | string;
 };
 
+const JOINABLE_STATUSES = ["scheduled", "calibration", "in_progress"];
+
+const getErrorDetail = (err: unknown): string | null => {
+  const maybeAxios = err as {
+    response?: {
+      data?: {
+        errors?: {
+          detail?: string[] | string;
+        };
+      };
+    };
+    message?: string;
+  };
+
+  const detail = maybeAxios?.response?.data?.errors?.detail;
+  if (Array.isArray(detail) && detail.length > 0) return String(detail[0]);
+  if (typeof detail === "string" && detail.trim()) return detail;
+  if (maybeAxios?.message) return maybeAxios.message;
+  return null;
+};
+
 const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps) => {
   const normalizedRole = normalizeRole(role);
   const { id: routeId } = useParams<{ id?: string }>();
@@ -83,7 +104,6 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
 
   const roomName = session?.roomName;
 
-  const JOINABLE_STATUSES = ["scheduled", "calibration", "in_progress"];
   const isJoinable = session && JOINABLE_STATUSES.includes(session.status);
 
   const sessionTitle = useMemo(() => {
@@ -135,6 +155,35 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
       setStarting(true);
       setError("");
 
+      if (!sessionInviteToken) {
+        throw new Error(t("errors.missingInvite", { defaultValue: "Missing interview invite code." }));
+      }
+
+      // Refresh latest status right before connecting to avoid stale UI -> backend 400 mismatch.
+      if (normalizedRole !== "jobseeker" && !routeId) {
+        throw new Error(t("errors.missingSessionId", { defaultValue: "Missing session ID." }));
+      }
+
+      const latestRaw =
+        normalizedRole === "jobseeker"
+          ? await interviewService.getSessionDetailByInviteToken(sessionInviteToken)
+          : await interviewService.getSessionDetail(routeId as string);
+      const latestSession = transformInterviewSession(
+        latestRaw as InterviewSession & Record<string, unknown>
+      ) as InterviewSession;
+      setSession(latestSession);
+
+      if (!JOINABLE_STATUSES.includes(latestSession.status)) {
+        throw new Error(
+          t("errors.sessionNotReadyForJoin", {
+            defaultValue: "Không thể vào phòng lúc này vì phiên đang ở trạng thái {{status}}.",
+            status: t(`interviewListCard.statuses.${latestSession.status}`, {
+              defaultValue: latestSession.status?.replaceAll("_", " "),
+            }),
+          })
+        );
+      }
+
       const tokenData = await interviewService.getLiveKitToken(sessionInviteToken);
       if (!tokenData?.token) {
         throw new Error(t("errors.tokenMissing", { defaultValue: "Connection token missing. Please try again." }));
@@ -165,11 +214,11 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
       });
       setConnectRoom(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t("errors.invalidSession", { defaultValue: "Cannot start interview." }));
+      setError(getErrorDetail(err) || t("errors.invalidSession", { defaultValue: "Cannot start interview." }));
     } finally {
       setStarting(false);
     }
-  }, [roomName, sessionInviteToken, t]);
+  }, [normalizedRole, roomName, routeId, sessionInviteToken, t]);
 
   const terminateInterviewSession = useCallback(async () => {
     setConnectRoom(false);
@@ -323,8 +372,10 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                       ? t("readyBody", {
                           defaultValue: "Join the secure interview room with AI. Your camera and microphone will only be shared when you choose.",
                         })
-                      : t("sessionNotJoinableBody", {
-                          defaultValue: "This interview session has already ended or been cancelled.",
+                      : t(`errors.unjoinableByStatus.${statusKey}`, {
+                          defaultValue: t("sessionNotJoinableBody", {
+                            defaultValue: "This interview session has already ended or been cancelled.",
+                          }),
                         })}
                   </p>
                 </div>

@@ -1,12 +1,6 @@
-'use client';
-
-import dynamic from 'next/dynamic';
-
-const InterviewLivePage = dynamic(
-  () => import('@/views/employerPages/InterviewPages/InterviewLivePage'),
-  { ssr: false }
-);
+import { redirect } from 'next/navigation';
+import { ROUTES } from '@/configs/constants';
 
 export default function Page() {
-  return <InterviewLivePage />;
+  redirect(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`);
 }

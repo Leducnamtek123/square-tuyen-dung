@@ -31,6 +31,7 @@ from .services import (
     queue_ai_evaluation,
     create_observer_livekit_token,
     get_session_questions,
+    SessionNotJoinableError,
 )
 from apps.accounts import permissions as perms_custom
 
@@ -201,6 +202,11 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
 
         try:
             return response_data(data=create_livekit_participant_token(session, request))
+        except SessionNotJoinableError as exc:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": [str(exc)], "code": "SESSION_NOT_JOINABLE"}
+            )
         except ValueError as exc:
             return response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": [str(exc)]})
 
@@ -280,6 +286,11 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         try:
             data = create_observer_livekit_token(session, request)
             return response_data(data=data)
+        except SessionNotJoinableError as exc:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": [str(exc)], "code": "SESSION_NOT_JOINABLE"}
+            )
         except ValueError as exc:
             return response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": [str(exc)]})
 
