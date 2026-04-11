@@ -17,6 +17,8 @@ urlpatterns = [
 
     path('presign/', views.presign_url),
 
+    path('upload-file/', views.upload_file),
+
     path('health/', views.health_check, name='health_check'),
 
 ]

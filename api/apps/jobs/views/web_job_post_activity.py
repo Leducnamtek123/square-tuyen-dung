@@ -328,6 +328,8 @@ class EmployerJobPostActivityViewSet(
         if data.get("status", None):
             stt = data["status"]
             job_post_activity = self.get_object()
+            if job_post_activity.job_post.company != request.user.company:
+                return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
 
             from ..services import JobActivityService
             try:
@@ -350,8 +352,11 @@ class EmployerJobPostActivityViewSet(
                 )
 
             from ..services import JobActivityService
+            activity = self.get_object()
+            if activity.job_post.company != request.user.company:
+                return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
             JobActivityService.send_email_to_job_seeker(
-                activity=self.get_object(),
+                activity=activity,
                 user=request.user,
                 validated_data=serializer.validated_data
             )

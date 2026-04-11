@@ -1,0 +1,19 @@
+[
+  {
+    "origin": [
+      "https://tuyendung.square.vn",
+      "http://localhost:3000",
+      "http://localhost:3005"
+    ],
+    "method": ["GET", "POST", "PUT", "DELETE", "HEAD"],
+    "maxAgeSeconds": 3600,
+    "responseHeader": [
+      "Content-Type",
+      "Content-Length",
+      "Content-Range",
+      "Authorization",
+      "x-goog-resumable",
+      "x-goog-content-length-range"
+    ]
+  }
+]

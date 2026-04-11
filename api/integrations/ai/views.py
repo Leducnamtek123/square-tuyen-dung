@@ -255,12 +255,28 @@ RECRUITMENT_TOOLS = [
     }
 ]
 
+
+def _can_search_candidates(request: DRFRequest) -> bool:
+    return (
+        request.user.is_authenticated
+        and getattr(request.user, 'role_name', None) in ('employer', 'admin')
+    )
+
+
+def _can_create_interview(request: DRFRequest) -> bool:
+    return (
+        request.user.is_authenticated
+        and getattr(request.user, 'role_name', None) in ('employer', 'admin')
+    )
+
 def execute_tool_call(tool_call, request):
     """Thực thi một tool call và trả về kết quả."""
     name = tool_call.get("function", {}).get("name")
     args = json.loads(tool_call.get("function", {}).get("arguments", "{}"))
     
     if name == "search_candidates":
+        if not _can_search_candidates(request):
+            return "Lỗi: Bạn không có quyền tìm kiếm ứng viên."
         query = args.get("query")
         limit = args.get("limit", 5)
         
@@ -289,6 +305,8 @@ def execute_tool_call(tool_call, request):
         return json.dumps(results, ensure_ascii=False)
         
     elif name == "create_interview_invitation":
+        if not _can_create_interview(request):
+            return "Lỗi: Bạn không có quyền tạo lời mời phỏng vấn."
         candidate_id = args.get("candidate_id")
         job_post_id = args.get("job_post_id")
         scheduled_at = args.get("scheduled_at")
@@ -352,12 +370,12 @@ class ChatAPIView(APIView):
         # Determine which tools to make available.
         # Only authenticated employers/admins can create interview invitations.
         available_tools = list(RECRUITMENT_TOOLS)
-        can_create_interview = (
-            request.user.is_authenticated
-            and getattr(request.user, 'role_name', None) in ('employer', 'admin')
-        )
-        if not can_create_interview:
-            # Strip create_interview_invitation tool for unauthenticated / non-employer users
+        if not _can_search_candidates(request):
+            available_tools = [
+                t for t in available_tools
+                if t.get("function", {}).get("name") != "search_candidates"
+            ]
+        if not _can_create_interview(request):
             available_tools = [
                 t for t in available_tools
                 if t.get("function", {}).get("name") != "create_interview_invitation"
@@ -366,9 +384,10 @@ class ChatAPIView(APIView):
         payload = {
             "model": model,
             "messages": messages,
-            "tools": available_tools,
-            "tool_choice": "auto",
         }
+        if available_tools:
+            payload["tools"] = available_tools
+            payload["tool_choice"] = "auto"
         if "temperature" in body:
             payload["temperature"] = body.get("temperature")
         if "max_tokens" in body:

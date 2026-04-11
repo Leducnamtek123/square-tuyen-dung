@@ -5,6 +5,9 @@ from rest_framework import permissions
 from apps.profiles.models import CompanyMember
 
 
+import logging
+logger = logging.getLogger(__name__)
+
 def _has_active_company_membership(request):
     cached = getattr(request, "_has_active_company_membership", None)
     if cached is not None:
@@ -16,7 +19,8 @@ def _has_active_company_membership(request):
             status=CompanyMember.STATUS_ACTIVE,
             is_active=True,
         ).exists()
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error checking company membership for user {request.user.id}: {str(e)}")
         cached = False
 
     request._has_active_company_membership = cached
@@ -43,7 +47,11 @@ class IsEmployerUser(permissions.IsAuthenticated):
         if user.is_authenticated:
             if user.role_name == var_sys.EMPLOYER:
                 return True
-            return _has_active_company_membership(request)
+            
+            has_membership = _has_active_company_membership(request)
+            if not has_membership:
+                logger.warning(f"User {user.id} (role: {user.role_name}) denied access as Employer (no active membership found).")
+            return has_membership
 
         return False
 

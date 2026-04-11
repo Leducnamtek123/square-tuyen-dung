@@ -1,10 +1,7 @@
 
-import datetime
 import logging
 
 logger = logging.getLogger(__name__)
-
-from console.jobs import queue_mail
 
 from shared import pagination as paginations
 from shared import renderers
@@ -14,7 +11,7 @@ from shared.configs.messages import ERROR_MESSAGES
 
 from shared.helpers import helper
 
-from django.conf import settings
+from django.utils import timezone
 
 from django.db.models import F, Count, Prefetch
 
@@ -118,7 +115,7 @@ class JobPostViewSet(viewsets.ViewSet,
             self.get_queryset()
             .filter(
                 status=var_sys.JobPostStatus.APPROVED,
-                deadline__gte=datetime.datetime.now().date()
+                deadline__gte=timezone.localdate()
             )
             .prefetch_related(
                 Prefetch(
@@ -174,7 +171,7 @@ class JobPostViewSet(viewsets.ViewSet,
                 'company', 'company__logo', 'company__cover_image', 'company__user',
                 'location', 'location__city', 'career'
             )
-            .filter(status=var_sys.JobPostStatus.APPROVED, deadline__gte=datetime.datetime.now().date())
+            .filter(status=var_sys.JobPostStatus.APPROVED, deadline__gte=timezone.localdate())
             .filter(career__in=careers_id, location__city__in=cities_id)
             .prefetch_related(
                 Prefetch(
@@ -364,7 +361,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
         queryset = self.filter_queryset(self.get_queryset()
 
-                                        .filter(status=var_sys.JobPostStatus.APPROVED, deadline__gte=datetime.datetime.now().date()
+                                        .filter(status=var_sys.JobPostStatus.APPROVED, deadline__gte=timezone.localdate()
 
                                                 ).annotate(
 
@@ -428,47 +425,20 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
 
         serializer.is_valid(raise_exception=True)
 
-        job_post_activity = serializer.save()
+        from ..services import JobActivityService
+        try:
+            job_post_activity = JobActivityService.apply_to_job(
+                user=request.user,
+                validated_data=serializer.validated_data
+            )
+        except ValueError as e:
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError({"errorMessage": [str(e)]})
 
-        headers = self.get_success_headers(serializer.data)
+        response_serializer = self.get_serializer(job_post_activity)
+        headers = self.get_success_headers(response_serializer.data)
 
-        # send email here
-
-        user = request.user
-
-        job_post = job_post_activity.job_post
-
-        company = job_post.company
-
-        domain = settings.DOMAIN_CLIENT["job_seeker"]
-
-        subject = f"Xác nhận ứng tuyển: {job_post.job_name}"
-
-        to = [user.email]
-
-        data = {
-
-            "full_name": user.full_name,
-
-            "company_name": company.company_name,
-
-            "job_name": job_post.job_name,
-
-            "find_job_post_link": domain + "viec-lam",
-
-        }
-
-        queue_mail.send_email_confirm_application.delay(
-
-            to=to,
-
-            subject=subject,
-
-            data=data
-
-        )
-
-        return var_res.response_data(status=status.HTTP_201_CREATED, data=serializer.data)
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data, headers=headers)
 
     def list(self, request, *args, **kwargs):
 

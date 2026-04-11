@@ -19,7 +19,6 @@ import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import CloseIcon from '@mui/icons-material/Close';
 import Popover from '@mui/material/Popover';
 import EmojiPicker from 'emoji-picker-react';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import {
   collection,
   onSnapshot,
@@ -37,10 +36,11 @@ import {
   QueryDocumentSnapshot,
   DocumentData,
 } from 'firebase/firestore';
-import db, { storage } from '../../../../configs/firebase-config';
+import db from '../../../../configs/firebase-config';
 import Message from '../Message';
 import { RootState } from '../../../../redux/store';
 import { useChatContext } from '../../../../context/ChatProvider';
+import commonService from '../../../../services/commonService';
 import type { Timestamp } from 'firebase/firestore';
 import type { FieldValue } from 'firebase/firestore';
 
@@ -235,52 +235,42 @@ const ChatWindow = () => {
     const isImage = file.type.startsWith('image/');
     const attachmentType = isImage ? 'image' : 'document';
     const fileName = file.name;
-    const storageRef = ref(storage, `chat_attachments/${selectedRoomId}/${Date.now()}_${fileName}`);
 
     setIsUploading(true);
-    setUploadProgress(0);
+    setUploadProgress(10); // Start with some progress
 
-    const uploadTask = uploadBytesResumable(storageRef, file);
+    try {
+      // Use backend upload instead of Firebase
+      const res = await commonService.uploadFile(file, 'OTHER');
+      const downloadURL = res.data.url;
+      
+      setIsUploading(false);
+      setUploadProgress(100);
 
-    uploadTask.on('state_changed',
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setUploadProgress(progress);
-      },
-      (error) => {
-        console.error("Upload failed: ", error);
-        setIsUploading(false);
-      },
-      async () => {
-        setIsUploading(false);
-        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-        
-        const messageData = {
-          chatRoomId: selectedRoomId,
-          senderId: `${currentUserChat.userId}`,
-          text: isImage ? 'Đã gửi một hình ảnh' : `Đã gửi file: ${fileName}`,
-          createdAt: serverTimestamp(),
-          attachmentUrl: downloadURL,
-          attachmentType,
-          fileName,
-        };
+      const messageData = {
+        chatRoomId: selectedRoomId,
+        senderId: `${currentUserChat.userId}`,
+        text: isImage ? 'Đã gửi một hình ảnh' : `Đã gửi file: ${fileName}`,
+        createdAt: serverTimestamp(),
+        attachmentUrl: downloadURL,
+        attachmentType,
+        fileName,
+      };
 
-        try {
-          await addDoc(messageCollectionRef, messageData);
-          
-          const chatRoomRef = doc(db, 'chatRooms', selectedRoomId);
-          await updateDoc(chatRoomRef, {
-            updatedAt: serverTimestamp(),
-            lastMessage: messageData.text,
-            recipientId: partnerId,
-            unreadCount: (selectedRoom?.unreadCount || 0) + 1,
-          });
-          sendNotificationToPartner(messageData.text);
-        } catch (err) {
-          console.error("Error saving file message: ", err);
-        }
-      }
-    );
+      await addDoc(messageCollectionRef, messageData);
+      
+      const chatRoomRef = doc(db, 'chatRooms', selectedRoomId);
+      await updateDoc(chatRoomRef, {
+        updatedAt: serverTimestamp(),
+        lastMessage: messageData.text,
+        recipientId: partnerId,
+        unreadCount: (selectedRoom?.unreadCount || 0) + 1,
+      });
+      sendNotificationToPartner(messageData.text);
+    } catch (error) {
+      console.error("Upload or save failed: ", error);
+      setIsUploading(false);
+    }
   };
 
   const handleLoadMore = async () => {

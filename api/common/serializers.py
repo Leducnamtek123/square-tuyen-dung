@@ -175,3 +175,7 @@ class LocationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         model = Location
 
         fields = ('city', 'district', 'ward', 'address', 'lat', 'lng')
+
+class FileUploadSerializer(serializers.Serializer):
+    file = serializers.FileField(required=True)
+    file_type = serializers.ChoiceField(choices=File.FILE_TYPES, default=File.OTHER_TYPE)

@@ -37,7 +37,9 @@ from .serializers import (
 
     DistrictSerializer,
 
-    WardSerializer
+    WardSerializer,
+
+    FileUploadSerializer
 
 )
 
@@ -624,3 +626,44 @@ def _is_allowed_public_minio_url(value: str) -> bool:
         return False
     except Exception:
         return False
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def upload_file(request):
+    serializer = FileUploadSerializer(data=request.data)
+    if serializer.is_valid():
+        from apps.files.models import File
+        from django.conf import settings
+        from rest_framework import status
+        import shared.responses as var_res
+        
+        file_obj = serializer.validated_data['file']
+        file_type = serializer.validated_data['file_type']
+        
+        # Determine folder based on file type
+        folder = "chat_attachments"
+        if file_type == File.AVATAR_TYPE:
+            folder = settings.CLOUDINARY_DIRECTORY.get("avatar", "avatar/")
+        elif file_type == File.CV_TYPE:
+            folder = settings.CLOUDINARY_DIRECTORY.get("cv", "cv/")
+        elif file_type == File.COMPANY_LOGO_TYPE:
+            folder = settings.CLOUDINARY_DIRECTORY.get("logo", "logo/")
+            
+        upload_result = CloudinaryService.upload_file(file_obj, folder)
+        
+        if upload_result:
+            file_instance = File.update_or_create_file_with_cloudinary(
+                None,
+                upload_result,
+                file_type
+            )
+            return var_res.response_data(data={
+                "id": file_instance.id,
+                "url": file_instance.get_full_url(),
+                "name": file_obj.name,
+                "format": upload_result.get("format"),
+                "bytes": upload_result.get("bytes")
+            })
+        return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR, errors={"errorMessage": ["Upload failed."]})
+    
+    return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors=serializer.errors)

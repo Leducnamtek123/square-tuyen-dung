@@ -124,6 +124,21 @@ const commonService = {
     const url = 'common/health/';
     return httpRequest.get(url) as Promise<{ status: string }>;
   },
+
+  uploadFile: async (
+    file: File,
+    fileType: string = 'OTHER',
+  ): Promise<{ data: { id: number; url: string; name: string } }> => {
+    const url = 'common/upload-file/';
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('file_type', fileType);
+    return httpRequest.post(url, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }) as Promise<{ data: { id: number; url: string; name: string } }>;
+  },
 };
 
 export default commonService;
