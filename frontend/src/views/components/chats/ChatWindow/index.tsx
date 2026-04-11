@@ -242,7 +242,7 @@ const ChatWindow = () => {
     try {
       // Use backend upload instead of Firebase
       const res = await commonService.uploadFile(file, 'OTHER');
-      const downloadURL = res.data.url;
+      const downloadURL = res.url;
       
       setIsUploading(false);
       setUploadProgress(100);

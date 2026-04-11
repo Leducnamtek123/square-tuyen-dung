@@ -128,7 +128,7 @@ const commonService = {
   uploadFile: async (
     file: File,
     fileType: string = 'OTHER',
-  ): Promise<{ data: { id: number; url: string; name: string } }> => {
+  ): Promise<{ id: number; url: string; name: string }> => {
     const url = 'common/upload-file/';
     const formData = new FormData();
     formData.append('file', file);
@@ -137,7 +137,7 @@ const commonService = {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
-    }) as Promise<{ data: { id: number; url: string; name: string } }>;
+    }) as Promise<{ id: number; url: string; name: string }>;
   },
 };
 
