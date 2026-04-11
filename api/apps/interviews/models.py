@@ -119,7 +119,7 @@ class InterviewSession(CommonBaseModel):
         'in_progress': {'completed', 'interrupted', 'processing'},
         'processing': {'completed', 'interrupted'},
         'interrupted': {'processing', 'completed', 'in_progress', 'cancelled'},
-        'completed': set(),
+        'completed': {'processing'},
         'cancelled': set(),
     }
 
