@@ -347,8 +347,15 @@
       "notFound": "Interview session information not found",
       "aiGenerating": "AI evaluation results are being generated",
       "aiAnalyzing": "AI is analyzing the conversation...",
+      "aiAnalyzingDesc": "AI is analyzing the profile...",
+      "aiNeedsTrigger": "AI analysis needs to be triggered",
       "notEnded": "Interview has not ended",
-      "noHistory": "No conversation data available"
+      "noHistory": "No conversation data available",
+      "noData": "No data",
+      "noDetails": "No details available",
+      "noQuestions": "No interview questions",
+      "noTranscript": "No transcript",
+      "noTranscriptDesc": "No conversation has been recorded yet."
     },
     "actions": {
       "backToList": "Back to list",

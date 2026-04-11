@@ -88,8 +88,11 @@ async def entrypoint(ctx: JobContext):
             )
         # 4. Initialize Models
         stt_model = openai.STT(
-            base_url=config.stt_base_url, 
-            api_key=config.STT_API_KEY,
+            client=openai_lib.AsyncOpenAI(
+                api_key=config.STT_API_KEY,
+                base_url=config.stt_base_url,
+                http_client=httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0))
+            ),
             model=config.stt_model,
             language=config.STT_LANGUAGE
         )
@@ -98,16 +101,18 @@ async def entrypoint(ctx: JobContext):
             client=openai_lib.AsyncOpenAI(
                 api_key="no-key-needed",
                 base_url=config.LLAMA_BASE_URL,
-                http_client=httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0))
+                http_client=httpx.AsyncClient(timeout=httpx.Timeout(300.0, connect=10.0))
             ),
             model=config.LLAMA_MODEL, 
         )
         tts_model = openai.TTS(
-            base_url=config.TTS_BASE_URL, 
-            api_key=config.TTS_API_KEY,
+            client=openai_lib.AsyncOpenAI(
+                api_key=config.TTS_API_KEY,
+                base_url=config.TTS_BASE_URL,
+                http_client=httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0))
+            ),
             model=config.TTS_MODEL,
             voice=config.TTS_VOICE,
-            instructions="Nói tiếng Việt, giọng rõ ràng, thân thiện."
         )
 
         # 5. Create AgentSession following 1.4.x / LIVIKIT_AGENTS_DOCS.md style

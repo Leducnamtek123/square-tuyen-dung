@@ -80,7 +80,12 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
     videoTrack: agentVideoTrack,
   } = useVoiceAssistant();
   const [screenShareTrack] = useTracks([Track.Source.ScreenShare]);
-  const cameraTrack: TrackReference | undefined = useLocalTrackRef(Track.Source.Camera);
+  const cameraTracks = useTracks([Track.Source.Camera]);
+  
+  // Use the first non-agent camera track (could be local if we are the candidate, or remote if we are the observer)
+  const cameraTrack: TrackReference | undefined = cameraTracks.find(
+    (t) => t.participant.identity !== agentVideoTrack?.participant?.identity
+  );
 
   const isCameraEnabled = cameraTrack && !cameraTrack.publication.isMuted;
   const isScreenShareEnabled = screenShareTrack && !screenShareTrack.publication.isMuted;
@@ -223,9 +228,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                 >
                   <VideoTrack
                     trackRef={cameraTrack || screenShareTrack}
-                    width={(cameraTrack || screenShareTrack)?.publication.dimensions?.width ?? 0}
-                    height={(cameraTrack || screenShareTrack)?.publication.dimensions?.height ?? 0}
-                    className="bg-slate-800/60 backdrop-blur-md aspect-square w-[90px] rounded-2xl border border-white/10 object-cover shadow-2xl shadow-black/50"
+                    className="bg-slate-800/60 backdrop-blur-md aspect-square !w-[90px] !h-[90px] rounded-2xl border border-white/10 object-cover shadow-2xl shadow-black/50 overflow-hidden"
                   />
                 </MotionContainer>
               )}
