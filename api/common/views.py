@@ -645,7 +645,7 @@ def upload_file(request):
             folder = settings.CLOUDINARY_DIRECTORY.get("avatar", "avatar/")
         elif file_type == File.CV_TYPE:
             folder = settings.CLOUDINARY_DIRECTORY.get("cv", "cv/")
-        elif file_type == File.COMPANY_LOGO_TYPE:
+        elif file_type == File.LOGO_TYPE:
             folder = settings.CLOUDINARY_DIRECTORY.get("logo", "logo/")
             
         upload_result = CloudinaryService.upload_file(file_obj, folder)
