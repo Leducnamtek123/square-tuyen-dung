@@ -29,11 +29,25 @@
             ]
         },
         {
+            "collectionGroup": "chatRooms",
+            "queryScope": "COLLECTION",
+            "fields": [
+                {
+                    "fieldPath": "members",
+                    "arrayConfig": "CONTAINS"
+                },
+                {
+                    "fieldPath": "createdAt",
+                    "order": "DESCENDING"
+                }
+            ]
+        },
+        {
             "collectionGroup": "messages",
             "queryScope": "COLLECTION",
             "fields": [
                 {
-                    "fieldPath": "roomId",
+                    "fieldPath": "chatRoomId",
                     "order": "ASCENDING"
                 },
                 {
@@ -47,7 +61,7 @@
             "queryScope": "COLLECTION",
             "fields": [
                 {
-                    "fieldPath": "roomId",
+                    "fieldPath": "chatRoomId",
                     "order": "ASCENDING"
                 },
                 {
@@ -58,7 +72,7 @@
         },
         {
             "collectionGroup": "notifications",
-            "queryScope": "COLLECTION",
+            "queryScope": "COLLECTION_GROUP",
             "fields": [
                 {
                     "fieldPath": "is_deleted",
