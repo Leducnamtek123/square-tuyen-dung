@@ -297,8 +297,8 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                   <Grid size={12}>
                     <Stack spacing={2}>
                       {[
-                        { icon: faMagicWandSparkles, label: t("jobSeeker:profile.summary.experience"), value: tConfig((allConfig as any)?.experienceDict?.[String(resume.experience)]) },
-                        { icon: faUser, label: t("jobSeeker:profile.summary.position"), value: tConfig((allConfig as any)?.positionDict?.[String(resume.position)]) },
+                        { icon: faMagicWandSparkles, label: t("jobSeeker:profile.summary.experience"), value: tConfig(allConfig?.experienceDict?.[String(resume.experience)]) },
+                        { icon: faUser, label: t("jobSeeker:profile.summary.position"), value: tConfig(allConfig?.positionDict?.[String(resume.position)]) },
                         { icon: faDollarSign, label: t("jobSeeker:profile.summary.desiredSalary"), value: salaryString(resume.salaryMin, resume.salaryMax) },
                         { icon: faCalendar, label: t("jobSeeker:profile.summary.lastUpdated"), value: dayjs(resume.updateAt).format("DD/MM/YYYY HH:mm:ss") }
                       ].map((item, idx) => (

@@ -743,7 +743,17 @@
   "unavailableTitle": "Unavailable Title",
   "readyTitle": "Ready Title",
   "interviewListCard": {
-    "candidate": "Candidate"
+    "candidate": "Candidate",
+    "statuses": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "calibration": "Calibration",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "interrupted": "Interrupted",
+      "processing": "Processing"
+    }
   },
   "controls": {
     "end": "End"
@@ -751,5 +761,30 @@
   "sessionNotJoinable": "Session Not Joinable",
   "readyBody": "Ready Body",
   "sessionNotJoinableBody": "Session Not Joinable Body",
-  "startInterview": "Start Interview"
+  "startInterview": "Start Interview",
+  "cvDoc": {
+    "labels": {
+      "email": "Email:",
+      "phone": "Phone:",
+      "updatedAt": "Updated:",
+      "position": "Position:",
+      "experience": "Experience:",
+      "education": "Education:",
+      "salary": "Salary:",
+      "workplace": "Workplace:",
+      "jobType": "Job Type:",
+      "present": "Present",
+      "major": "Major:",
+      "languagePrefix": "",
+      "noExpiration": "No Expiration"
+    },
+    "sections": {
+      "generalInfo": "GENERAL INFORMATION",
+      "workExperience": "WORK EXPERIENCE",
+      "education": "EDUCATION",
+      "skills": "PROFESSIONAL SKILLS",
+      "languages": "LANGUAGES",
+      "certificates": "CERTIFICATES"
+    }
+  }
 }

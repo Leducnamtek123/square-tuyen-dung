@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { 
     Box, 
     Typography, 
@@ -41,10 +41,7 @@ import {
     useInterviewMutations, 
     useQuestionMutations 
 } from '../hooks/useEmployerQueries';
-import errorHandling from '../../../../utils/errorHandling';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import type { AxiosError } from 'axios';
-import type { ApiError } from '../../../../types/api';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import EditIcon from '@mui/icons-material/Edit';
 import EventIcon from '@mui/icons-material/Event';
@@ -54,6 +51,7 @@ import QuizIcon from '@mui/icons-material/Quiz';
 import CategoryIcon from '@mui/icons-material/Category';
 import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
+import type { InterviewSession, Question, QuestionGroup, User } from '../../../../types/models';
 
 interface FormValues {
   job_post: string | number;
@@ -67,6 +65,14 @@ interface InterviewCreateCardProps {
   title?: string;
   sessionId?: string | number;
 }
+
+/** Extract id from a field that may be a nested object or a plain ID */
+const extractId = (field: unknown): string | number => {
+    if (field != null && typeof field === 'object' && 'id' in field) {
+        return (field as { id: number }).id;
+    }
+    return (field as string | number) ?? '';
+};
 
 const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessionId }) => {
     const navigate = useRouter();
@@ -86,7 +92,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
     const selectedJobPostId = watch('job_post');
     const selectedGroupId = watch('selected_group');
 
-    // Data Fetching Hooks
+    // ── Data Fetching (TanStack Query) ─────────────────────────
     const { data: jobData, isLoading: isLoadingJobs } = useEmployerJobPosts({ pageSize: 1000 });
     const { data: questionData } = useEmployerQuestions({ pageSize: 1000 });
     const { data: groupData } = useQuestionGroups({ pageSize: 1000 });
@@ -94,45 +100,56 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
         jobPostId: selectedJobPostId as number, 
         pageSize: 1000 
     }, !!selectedJobPostId);
-    
     const { data: sessionDetail, isLoading: isLoadingSession } = useInterviewDetail(sessionId as string | number);
 
     const { scheduleSession, updateSession, isMutating: isInterviewMutating } = useInterviewMutations();
     const { createQuestion, updateQuestion, isMutating: isQuestionMutating } = useQuestionMutations();
 
-    const jobs = jobData?.results || [];
-    const questions = questionData?.results || [];
-    const questionGroups = groupData?.results || [];
-    const candidates = candidateData?.results || [];
+    // ── Derived data (no state needed) ─────────────────────────
+    const jobs = useMemo(() => jobData?.results ?? [], [jobData]);
+    const questions = useMemo(() => questionData?.results ?? [], [questionData]);
+    const questionGroups = useMemo(() => groupData?.results ?? [], [groupData]);
+    const candidates = useMemo(() => candidateData?.results ?? [], [candidateData]);
 
+    // ── Local state — only for dialog ──────────────────────────
     const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
     const [questionDraft, setQuestionDraft] = useState('');
     const [editingQuestionId, setEditingQuestionId] = useState<number | null>(null);
 
-    // Load existing session data if editing
+    // ── Load existing session data when editing ────────────────
     useEffect(() => {
         if (sessionDetail) {
             reset({
-                job_post: (sessionDetail.jobPost as any)?.id || sessionDetail.jobPost || '',
-                candidate: (sessionDetail.candidate as any)?.id || sessionDetail.candidate || '',
-                scheduled_at: sessionDetail.scheduledAt || '',
-                selected_group: (sessionDetail.questionGroup as any)?.id || sessionDetail.questionGroup || '',
-                selected_questions: sessionDetail.questions?.map((q: unknown) => (q as {id: number}).id) || []
+                job_post: extractId(sessionDetail.jobPost),
+                candidate: extractId(sessionDetail.candidate),
+                scheduled_at: sessionDetail.scheduledAt ?? '',
+                selected_group: extractId(sessionDetail.questionGroup),
+                selected_questions: sessionDetail.questions?.map((q: Question) => q.id) ?? []
             });
         }
     }, [sessionDetail, reset]);
 
-    // Handle question group selection
+    // ── Sync question group → selected questions ───────────────
     useEffect(() => {
         if (selectedGroupId && selectedGroupId !== "") {
             const group = questionGroups.find((g) => String(g.id) === String(selectedGroupId));
-            if (group && group.questions) {
+            if (group?.questions) {
                 setValue('selected_questions', group.questions.map(q => q.id), { shouldValidate: true });
             }
         }
     }, [selectedGroupId, questionGroups, setValue]);
 
-    const handleSaveQuestion = async () => {
+    // ── Handlers ───────────────────────────────────────────────
+    const handleJobPostChange = useCallback((
+        onChange: (value: string | number) => void,
+        value: string | number
+    ) => {
+        onChange(value);
+        // Reset candidate when job post is changed
+        setValue('candidate', '', { shouldValidate: false });
+    }, [setValue]);
+
+    const handleSaveQuestion = useCallback(async () => {
         const trimmed = questionDraft.trim();
         if (!trimmed) {
             toastMessages.error(t('interview:employer.questions.textRequired'));
@@ -146,16 +163,16 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
             } else {
                 const newQuestion = await createQuestion({ text: trimmed });
                 toastMessages.success(t('interview:employer.questions.createSuccess'));
-                const current = watch('selected_questions') || [];
+                const current = watch('selected_questions') ?? [];
                 setValue('selected_questions', [...current, newQuestion.id], { shouldValidate: true });
             }
             setIsQuestionDialogOpen(false);
-        } catch (error) {
+        } catch {
             // Error handled by mutation hook
         }
-    };
+    }, [questionDraft, editingQuestionId, updateQuestion, createQuestion, t, watch, setValue]);
 
-    const onSubmit = async (data: FormValues) => {
+    const onSubmit = useCallback(async (data: FormValues) => {
         try {
             const payload = {
                 job_post: Number(data.job_post),
@@ -173,20 +190,36 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                 toastMessages.success(t('interview:interviewCreateCard.messages.scheduleSuccess'));
             }
             navigate.push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`);
-        } catch (error) {
+        } catch {
             // Error handled by mutation hook
         }
-    };
+    }, [sessionId, updateSession, scheduleSession, t, navigate]);
 
-    const inputSx = {
+    const handleOpenAddQuestion = useCallback(() => {
+        setEditingQuestionId(null);
+        setQuestionDraft('');
+        setIsQuestionDialogOpen(true);
+    }, []);
+
+    const handleOpenEditQuestion = useCallback(() => {
+        const id = watch('selected_questions')[0];
+        const q = questions.find(item => item.id === id);
+        setEditingQuestionId(id);
+        setQuestionDraft(q?.text ?? '');
+        setIsQuestionDialogOpen(true);
+    }, [watch, questions]);
+
+    // ── Styles ─────────────────────────────────────────────────
+    const inputSx = useMemo(() => ({
         '& .MuiOutlinedInput-root': {
             borderRadius: 2.5,
             backgroundColor: alpha(theme.palette.action.disabled, 0.03),
             '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
             '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) }
         }
-    };
+    }), [theme]);
 
+    // ── Loading state ──────────────────────────────────────────
     if (isLoadingSession && sessionId) {
         return (
             <Box sx={{ p: 4 }}>
@@ -246,6 +279,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                             </Divider>
                         </Grid>
 
+                        {/* Job Post Select */}
                         <Grid size={{ xs: 12, md: 6 }}>
                             <Controller
                                 name="job_post"
@@ -253,7 +287,8 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                                 rules={{ required: t('interview:interviewCreateCard.validation.selectJobPost') }}
                                 render={({ field }) => (
                                     <TextField 
-                                        {...field} 
+                                        {...field}
+                                        onChange={(e) => handleJobPostChange(field.onChange, e.target.value)}
                                         select 
                                         fullWidth 
                                         label={t('interview:interviewCreateCard.label.selectjobpost')} 
@@ -277,6 +312,8 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                                 )}
                             />
                         </Grid>
+
+                        {/* Candidate Select */}
                         <Grid size={{ xs: 12, md: 6 }}>
                             <Controller
                                 name="candidate"
@@ -303,11 +340,22 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                                             inputLabel: { sx: { fontWeight: 600 } }
                                         }}
                                     >
-                                        {candidates.map((c) => <MenuItem key={c.id} value={c.id} sx={{ fontWeight: 600 }}>{c.fullName} - {c.email}</MenuItem>)}
+                                        {candidates.length === 0 && !isLoadingCandidates && selectedJobPostId ? (
+                                            <MenuItem disabled value="">
+                                                <em>{t('interview:interviewCreateCard.noCandidates')}</em>
+                                            </MenuItem>
+                                        ) : null}
+                                        {candidates.map((c) => (
+                                            <MenuItem key={c.userId ?? c.id} value={c.userId ?? c.id} sx={{ fontWeight: 600 }}>
+                                                {c.fullName} - {c.email}
+                                            </MenuItem>
+                                        ))}
                                     </TextField>
                                 )}
                             />
                         </Grid>
+
+                        {/* Scheduled Time */}
                         <Grid size={{ xs: 12, md: 6 }}>
                             <DateTimePickerCustom 
                                 name="scheduled_at" 
@@ -328,6 +376,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                             </Divider>
                         </Grid>
 
+                        {/* Question Group */}
                         <Grid size={12}>
                             <Controller
                                 name="selected_group"
@@ -359,6 +408,8 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                                 )}
                             />
                         </Grid>
+
+                        {/* Questions Multi-Select */}
                         <Grid size={12}>
                             <FormControl fullWidth error={!!errors.selected_questions} sx={inputSx}>
                                 <InputLabel sx={{ fontWeight: 600 }}>{t('interview:interviewCreateCard.label.selectinterviewquestions')}</InputLabel>
@@ -370,14 +421,14 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                                             {...field} 
                                             multiple 
                                             input={<OutlinedInput label={t('interview:interviewCreateCard.label.selectinterviewquestions')} />} 
-                                            renderValue={(selected: unknown) => (
+                                            renderValue={(selected: number[]) => (
                                                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                                    {((selected as unknown[]) ?? []).map((val: unknown) => {
-                                                        const q = questions.find(item => String(item.id) === String(val));
+                                                    {selected.map((val) => {
+                                                        const q = questions.find(item => item.id === val);
                                                         return (
                                                             <Chip 
-                                                                key={val as React.Key} 
-                                                                label={(q?.text || `Q#${val}`).substring(0, 50)} 
+                                                                key={val} 
+                                                                label={(q?.text ?? `Q#${val}`).substring(0, 50)} 
                                                                 size="small" 
                                                                 sx={{ 
                                                                     fontWeight: 900, 
@@ -413,13 +464,15 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                                 {errors.selected_questions && <Typography variant="caption" color="error" sx={{ mt: 1, fontWeight: 800 }}>{errors.selected_questions.message}</Typography>}
                             </FormControl>
                         </Grid>
+
+                        {/* Question Buttons */}
                         <Grid size={12}>
                             <Stack direction="row" spacing={2.5} justifyContent="flex-end">
                                 <Button 
                                     variant="outlined" 
                                     size="medium"
                                     startIcon={<AddCircleOutlineIcon />}
-                                    onClick={() => { setEditingQuestionId(null); setQuestionDraft(''); setIsQuestionDialogOpen(true); }}
+                                    onClick={handleOpenAddQuestion}
                                     sx={{ 
                                         textTransform: 'none', 
                                         borderRadius: 2.5, 
@@ -435,14 +488,8 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                                     size="medium"
                                     color="secondary"
                                     startIcon={<EditIcon />}
-                                    disabled={(watch('selected_questions') || []).length !== 1} 
-                                    onClick={() => {
-                                        const id = watch('selected_questions')[0];
-                                        const q = questions.find(item => item.id === id);
-                                        setEditingQuestionId(id);
-                                        setQuestionDraft(q?.text || '');
-                                        setIsQuestionDialogOpen(true);
-                                    }}
+                                    disabled={(watch('selected_questions') ?? []).length !== 1} 
+                                    onClick={handleOpenEditQuestion}
                                     sx={{ 
                                         textTransform: 'none', 
                                         borderRadius: 2.5, 
@@ -456,6 +503,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                             </Stack>
                         </Grid>
                         
+                        {/* Submit */}
                         <Grid size={12}>
                             <Divider sx={{ mt: 4, mb: 2, borderStyle: 'dashed' }} />
                             <Stack direction="row" spacing={2} justifyContent="flex-end">
@@ -492,6 +540,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                 </form>
             </Paper>
 
+            {/* Question Dialog */}
             <Dialog 
                 open={isQuestionDialogOpen} 
                 onClose={() => setIsQuestionDialogOpen(false)} 

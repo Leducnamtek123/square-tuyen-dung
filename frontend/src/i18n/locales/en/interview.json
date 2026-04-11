@@ -161,7 +161,10 @@
       "in_progress": "In Progress",
       "processing": "Processing",
       "completed": "Completed",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "draft": "Draft",
+      "calibration": "Calibration",
+      "interrupted": "Interrupted"
     },
     "description": "View scheduled interviews"
   },
@@ -223,7 +226,8 @@
     "helperText": {
       "selectaquestiongrouptoautomaticallyfillthequestions below": "Select a question group to auto-fill questions"
     },
-    "scheduleNow": "Schedule Now"
+    "scheduleNow": "Schedule Now",
+    "noCandidates": "No candidates have applied for this position"
   },
   "interviewDetail": {
     "messages": {

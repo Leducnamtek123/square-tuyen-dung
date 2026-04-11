@@ -130,6 +130,7 @@ export interface JobPost {
 
 export interface JobPostActivity {
   id: number;
+  userId?: number;
   fullName?: string;
   email?: string;
   phone?: string;
@@ -480,6 +481,7 @@ export interface SystemConfig {
   employeeSizeOptions?: SelectOption[];
   languageOptions?: SelectOption[];
   frequencyNotificationOptions?: SelectOption[];
+  frequencyNotificationDict?: Record<string, string>;
   applicationStatusOptions?: SelectOption[];
   jobPostStatusOptions?: SelectOption[];
 }

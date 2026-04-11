@@ -638,7 +638,9 @@
       "calibration": "Đang hiệu chuẩn",
       "processing": "Đang xử lý",
       "connecting": "Đang kết nối",
-      "active": "Hoạt động"
+      "active": "Hoạt động",
+      "draft": "Bản nháp",
+      "interrupted": "Bị gián đoạn"
     }
   },
   "verification": {
@@ -934,7 +936,7 @@
       "email": "Email",
       "role": "Role",
       "status": "Trạng thái",
-      "noPermissions": "No permissions",
+      "noPermissions": "Không có quyền",
       "yes": "Yes",
       "no": "No",
       "delete": "Xóa"
@@ -1000,6 +1002,16 @@
   },
   "interviewListCard": {
     "editInterview": "Chỉnh sửa phỏng vấn",
-    "description": "Xem và quản lý lịch phỏng vấn"
+    "description": "Xem và quản lý lịch phỏng vấn",
+    "statuses": {
+      "draft": "Bản nháp",
+      "scheduled": "Đã lên lịch",
+      "calibration": "Kiểm tra thiết bị",
+      "in_progress": "Đang phỏng vấn",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "interrupted": "Bị gián đoạn",
+      "processing": "Đang xử lý"
+    }
   }
 }

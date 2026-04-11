@@ -36,7 +36,7 @@ const SettingCard = ({ title, sx }: SettingCardProps) => {
   const updateSettings = useUpdateUserSettings();
 
   const handleUpdateUserSetting = (data: SettingformFormValues) => {
-    updateSettings.mutate(data as any);
+    updateSettings.mutate(data);
   };
 
   return (
@@ -80,7 +80,7 @@ const SettingCard = ({ title, sx }: SettingCardProps) => {
                   }}
                 >
                   <SettingForm
-                    editData={editData as any}
+                    editData={editData}
                     handleUpdate={handleUpdateUserSetting}
                   />
                 </Box>

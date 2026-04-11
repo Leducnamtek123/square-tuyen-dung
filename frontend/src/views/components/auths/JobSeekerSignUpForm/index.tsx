@@ -164,7 +164,7 @@ const JobSeekerSignUpForm = ({
       password: "",
       confirmPassword: "",
     },
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as any // TODO: fix yup schema inference to match form type,
   });
 
   const email = useWatch({

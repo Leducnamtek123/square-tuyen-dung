@@ -706,7 +706,9 @@
         "cancelled": "Cancelled",
         "calibration": "Calibration",
         "processing": "Processing",
-        "expired": "Expired"
+        "expired": "Expired",
+        "draft": "Draft",
+        "interrupted": "Interrupted"
       },
       "table": {
         "room": "Room",

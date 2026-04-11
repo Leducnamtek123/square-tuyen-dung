@@ -149,9 +149,9 @@ const ItemComponent = ({
                 </Box>
                 <Box className="info-item">
                   <FontAwesomeIcon icon={faCalendarAlt} />
-                  {tConfig((allConfig as any)?.frequencyNotificationDict?.[String(frequency)]) ? (
+                  {tConfig(allConfig?.frequencyNotificationDict?.[String(frequency)]) ? (
                     <Typography component="span" fontSize="14px">
-                      {tConfig((allConfig as any)?.frequencyNotificationDict?.[String(frequency)])}
+                      {tConfig(allConfig?.frequencyNotificationDict?.[String(frequency)])}
                     </Typography>
                   ) : (
                     <Typography component="span" fontSize="13px" fontStyle="italic" color="grey.400">

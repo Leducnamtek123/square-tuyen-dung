@@ -137,7 +137,7 @@ const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: Employer
       email: "",
       password: "",
     },
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as any // TODO: fix yup schema inference to match form type,
   });
 
   const googleLogin = useGoogleLogin({

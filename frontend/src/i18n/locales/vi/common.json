@@ -126,7 +126,7 @@
     "candidateDashboard": "Bảng điều khiển ứng viên",
     "employerDashboard": "Bảng điều khiển nhà tuyển dụng",
     "connectWith": "Kết nối với {{appName}}",
-    "rightsReserved": "© {{year}} {{appName}}. All Rights Reserved."
+    "rightsReserved": "© {{year}} {{appName}}. Bản quyền được bảo lưu."
   },
   "quickSearch": "Tìm kiếm nhanh",
   "notUpdated": "Chưa cập nhật",
@@ -743,7 +743,17 @@
   "unavailableTitle": "[VI] unavailableTitle",
   "readyTitle": "[VI] readyTitle",
   "interviewListCard": {
-    "candidate": "[VI] candidate"
+    "candidate": "[VI] candidate",
+    "statuses": {
+      "draft": "Bản nháp",
+      "scheduled": "Đã lên lịch",
+      "calibration": "Kiểm tra thiết bị",
+      "in_progress": "Đang phỏng vấn",
+      "completed": "Hoàn thành",
+      "cancelled": "Đã hủy",
+      "interrupted": "Bị gián đoạn",
+      "processing": "Đang xử lý"
+    }
   },
   "controls": {
     "end": "[VI] end"
@@ -751,5 +761,30 @@
   "sessionNotJoinable": "[VI] sessionNotJoinable",
   "readyBody": "[VI] readyBody",
   "sessionNotJoinableBody": "[VI] sessionNotJoinableBody",
-  "startInterview": "[VI] startInterview"
+  "startInterview": "[VI] startInterview",
+  "cvDoc": {
+    "labels": {
+      "email": "Email:",
+      "phone": "SĐT:",
+      "updatedAt": "Cập nhật:",
+      "position": "Vị trí:",
+      "experience": "Kinh nghiệm:",
+      "education": "Học vấn:",
+      "salary": "Mức lương:",
+      "workplace": "Nơi làm việc:",
+      "jobType": "Hình thức:",
+      "present": "Hiện tại",
+      "major": "Chuyên ngành:",
+      "languagePrefix": "Tiếng ",
+      "noExpiration": "Không thời hạn"
+    },
+    "sections": {
+      "generalInfo": "THÔNG TIN CHUNG",
+      "workExperience": "KINH NGHIỆM LÀM VIỆC",
+      "education": "HỌC VẤN",
+      "skills": "KỸ NĂNG CHUYÊN MÔN",
+      "languages": "NGOẠI NGỮ",
+      "certificates": "CHỨNG CHỈ"
+    }
+  }
 }

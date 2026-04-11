@@ -68,8 +68,8 @@ export interface ChangePasswordData {
 }
 
 export interface UserSettingsData {
-  receiveNotification?: boolean;
-  receiveEmail?: boolean;
+  emailNotificationActive?: boolean;
+  smsNotificationActive?: boolean;
   [key: string]: unknown;
 }
 

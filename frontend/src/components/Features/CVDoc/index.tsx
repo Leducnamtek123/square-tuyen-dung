@@ -1,4 +1,5 @@
 import React from 'react';
+import i18next from 'i18next';
 
 import dayjs from "dayjs";
 import { salaryString } from "@/utils/customData";
@@ -572,13 +573,13 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
               <View style={styles.contactInfo}>
 
-                <Text style={styles.contactItem}>Email: {user?.email}</Text>
+                <Text style={styles.contactItem}>{i18next.t('common:cvDoc.labels.email')} {user?.email}</Text>
 
-                <Text style={styles.contactItem}>SĐT: {(user as User & { phone?: string })?.phone}</Text>
+                <Text style={styles.contactItem}>{i18next.t('common:cvDoc.labels.phone')} {(user as User & { phone?: string })?.phone}</Text>
 
                 <Text style={styles.contactItem}>
 
-                  Cập nhật: {formatDate(resume?.updateAt)}
+                  {i18next.t('common:cvDoc.labels.updatedAt')} {formatDate(resume?.updateAt)}
 
                 </Text>
 
@@ -598,7 +599,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
           <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
 
-            <Text style={styles.sectionTitle}>THÔNG TIN CHUNG</Text>
+            <Text style={styles.sectionTitle}>{i18next.t('common:cvDoc.sections.generalInfo')}</Text>
 
             <View style={styles.infoGridWrapper}>
 
@@ -606,7 +607,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
                 <View style={styles.infoItem}>
 
-                  <Text style={styles.infoLabel}>Vị trí:</Text>
+                  <Text style={styles.infoLabel}>{i18next.t('common:cvDoc.labels.position')}</Text>
 
                   <Text style={styles.infoValue}>
 
@@ -618,7 +619,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
                 <View style={styles.infoItem}>
 
-                  <Text style={styles.infoLabel}>Kinh nghiệm:</Text>
+                  <Text style={styles.infoLabel}>{i18next.t('common:cvDoc.labels.experience')}</Text>
 
                   <Text style={styles.infoValue}>
 
@@ -630,7 +631,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
                 <View style={styles.infoItem}>
 
-                  <Text style={styles.infoLabel}>Học vấn:</Text>
+                  <Text style={styles.infoLabel}>{i18next.t('common:cvDoc.labels.education')}</Text>
 
                   <Text style={styles.infoValue}>
 
@@ -642,7 +643,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
                 <View style={styles.infoItem}>
 
-                  <Text style={styles.infoLabel}>Mức lương:</Text>
+                  <Text style={styles.infoLabel}>{i18next.t('common:cvDoc.labels.salary')}</Text>
 
                   <Text style={styles.infoValue}>
 
@@ -654,7 +655,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
                 <View style={styles.infoItem}>
 
-                  <Text style={styles.infoLabel}>Nơi làm việc:</Text>
+                  <Text style={styles.infoLabel}>{i18next.t('common:cvDoc.labels.workplace')}</Text>
 
                   <Text style={styles.infoValue}>
 
@@ -666,7 +667,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
                 <View style={styles.infoItem}>
 
-                  <Text style={styles.infoLabel}>Hình thức:</Text>
+                  <Text style={styles.infoLabel}>{i18next.t('common:cvDoc.labels.jobType')}</Text>
 
                   <Text style={styles.infoValue}>
 
@@ -686,7 +687,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
           <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
 
-            <Text style={styles.sectionTitle}>KINH NGHIỆM LÀM VIỆC</Text>
+            <Text style={styles.sectionTitle}>{i18next.t('common:cvDoc.sections.workExperience')}</Text>
 
             {resume?.experienceDetails?.map((exp: CVDocExperience, index: number) => (
 
@@ -704,7 +705,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
                   <Text style={styles.experienceDate}>
 
-                      {formatDate(exp?.startDate)} - {formatDate(exp?.endDate) || "Hiện tại"}
+                      {formatDate(exp?.startDate)} - {formatDate(exp?.endDate) || i18next.t('common:cvDoc.labels.present')}
 
                   </Text>
 
@@ -722,7 +723,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
           <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
 
-            <Text style={styles.sectionTitle}>HỌC VẤN</Text>
+            <Text style={styles.sectionTitle}>{i18next.t('common:cvDoc.sections.education')}</Text>
 
             {resume?.educationDetails?.map((edu: CVDocEducation, index: number) => (
 
@@ -742,7 +743,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
                     <Text style={[styles.experienceCompany, { fontSize: 11 }]}>
 
-                      Chuyên ngành: {edu?.major}
+                      {i18next.t('common:cvDoc.labels.major')} {edu?.major}
 
                     </Text>
 
@@ -772,7 +773,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
           <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
 
-            <Text style={styles.sectionTitle}>KỸ NĂNG CHUYÊN MÔN</Text>
+            <Text style={styles.sectionTitle}>{i18next.t('common:cvDoc.sections.skills')}</Text>
 
             <View style={styles.skillsWrapper}>
 
@@ -800,7 +801,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
             <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
 
-              <Text style={styles.sectionTitle}>NGOẠI NGỮ</Text>
+              <Text style={styles.sectionTitle}>{i18next.t('common:cvDoc.sections.languages')}</Text>
 
               <View style={styles.languageWrapper}>
 
@@ -810,7 +811,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
                     <Text style={styles.languageName}>
 
-                      Tiếng {lang?.language}
+                      {i18next.t('common:cvDoc.labels.languagePrefix')}{lang?.language}
 
                     </Text>
 
@@ -836,7 +837,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
             <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
 
-              <Text style={styles.sectionTitle}>CHỨNG CHỈ</Text>
+              <Text style={styles.sectionTitle}>{i18next.t('common:cvDoc.sections.certificates')}</Text>
 
               {resume?.certificateDetails?.map((cert: CVDocCertificate, index: number) => (
 
@@ -864,7 +865,7 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 
                         ? ` - ${formatDate(cert?.expirationDate)}`
 
-                        : " - Không thời hạn"}
+                        : ` - ${i18next.t('common:cvDoc.labels.noExpiration')}`}
 
                     </Text>
 

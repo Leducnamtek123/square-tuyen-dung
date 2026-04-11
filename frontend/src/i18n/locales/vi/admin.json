@@ -696,7 +696,7 @@
         "deleteBtn": "Xóa mục đã chọn"
       },
       "type": {
-        "vetting": "Vetting",
+        "vetting": "Sàng lọc",
         "recruitment": "Tuyển dụng"
       },
       "status": {
@@ -706,7 +706,9 @@
         "cancelled": "Đã hủy",
         "calibration": "Hiệu chuẩn",
         "processing": "Đang xử lý",
-        "expired": "Đã hết hạn"
+        "expired": "Đã hết hạn",
+        "draft": "Bản nháp",
+        "interrupted": "Bị gián đoạn"
       },
       "table": {
         "room": "Phòng",
@@ -788,8 +790,8 @@
       "deleteTitle": "Xóa Banner",
       "deleteConfirm": "Bạn có chắc muốn xóa banner #{{id}}?",
       "empty": "Chưa có banner nào",
-      "active": "Active",
-      "inactive": "Inactive",
+      "active": "Đang hoạt động",
+      "inactive": "Không hoạt động",
       "cancel": "Hủy",
       "save": "Lưu",
       "saving": "Đang lưu...",

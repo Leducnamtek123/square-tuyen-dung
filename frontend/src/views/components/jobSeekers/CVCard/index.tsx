@@ -243,7 +243,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-          boxShadow: (theme: Theme) => (theme as any).customShadows.card,
+          boxShadow: (theme: Theme) => theme.customShadows.card,
 
 
 
@@ -251,7 +251,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-            boxShadow: (theme: Theme) => (theme as any).customShadows.medium,
+            boxShadow: (theme: Theme) => theme.customShadows.medium,
 
 
 
@@ -347,7 +347,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-                boxShadow: (theme: Theme) => (theme as any).customShadows.medium,
+                boxShadow: (theme: Theme) => theme.customShadows.medium,
 
 
 
@@ -547,7 +547,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-          boxShadow: (theme: Theme) => (theme as any).customShadows.small,
+          boxShadow: (theme: Theme) => theme.customShadows.small,
 
 
 

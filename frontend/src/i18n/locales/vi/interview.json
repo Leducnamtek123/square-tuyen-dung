@@ -18,10 +18,10 @@
   "cameraPreview": "Xem trước Camera",
   "cameraHint": "Bật camera để xem trước hình ảnh của bạn.",
   "controls": {
-    "mic": "Microphone",
-    "camera": "Camera",
+    "mic": "Micrô",
+    "camera": "Máy ảnh",
     "share": "Chia sẻ",
-    "chat": "Chat",
+    "chat": "Trò chuyện",
     "end": "Kết thúc",
     "enableAudio": "Bật âm thanh"
   },
@@ -56,8 +56,8 @@
     },
     "devices": {
       "select": "Chọn một {{kind}}",
-      "microphone": "microphone",
-      "camera": "camera",
+      "microphone": "micrô",
+      "camera": "máy ảnh",
       "speaker": "loa"
     },
     "theme": {
@@ -161,7 +161,10 @@
       "in_progress": "Đang diễn ra",
       "processing": "Đang xử lý",
       "completed": "Hoàn thành",
-      "cancelled": "Đã hủy"
+      "cancelled": "Đã hủy",
+      "draft": "Bản nháp",
+      "calibration": "Kiểm tra thiết bị",
+      "interrupted": "Bị gián đoạn"
     },
     "description": "Xem lịch phỏng vấn"
   },
@@ -223,7 +226,8 @@
     "helperText": {
       "selectaquestiongrouptoautomaticallyfillthequestions below": "Chọn nhóm câu hỏi để tự động điền câu hỏi"
     },
-    "scheduleNow": "Lên lịch ngay"
+    "scheduleNow": "Lên lịch ngay",
+    "noCandidates": "Không có ứng viên nào đã ứng tuyển vị trí này"
   },
   "interviewDetail": {
     "messages": {

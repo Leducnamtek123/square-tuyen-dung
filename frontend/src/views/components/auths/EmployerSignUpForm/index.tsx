@@ -138,7 +138,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
         },
       },
     },
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as any // TODO: fix yup schema inference to match form type,
   });
 
   const cityId = useWatch({ control, name: 'company.location.city' });
@@ -152,7 +152,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
   React.useEffect(() => {
     for (const err in serverErrors) {
       if (err === 'company' && typeof serverErrors[err] === 'object') {
-        const companyErrors = serverErrors[err] as any;
+        const companyErrors = serverErrors[err] as unknown as Record<string, string[] | Record<string, string[]>>;
         for (const companyErr in companyErrors) {
           if (companyErr === 'location' && typeof companyErrors[companyErr] === 'object') {
             const locationErrors = companyErrors[companyErr] as Record<string, string[]>;
@@ -230,19 +230,19 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
   React.useEffect(() => {
     const loadDistricts = async (cityId: number) => {
       try {
-        const resData = await commonService.getDistrictsByCityId(cityId) as any;
+        const resData = await commonService.getDistrictsByCityId(cityId);
         // Only clear district if the cityId has actually changed (user interaction)
         // and it's not the initial load (prevCityIdRef.current is not null).
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
           setValue('company.location.district', '');
         }
-        setDistrictOptions(resData);
+        setDistrictOptions(resData.data?.map(d => ({ id: d.id, name: d.name })) || []);
         prevCityIdRef.current = cityId;
       } catch (error) {
         errorHandling(error as AxiosError<{ errors?: ApiError }>);
       }
     };
-    if (cityId) loadDistricts(cityId as any);
+    if (cityId) loadDistricts(Number(cityId));
   }, [cityId, setValue]);
 
   const handleSubmtNextSuccess = (data: EmployerSignUpFormData) => handleNext(data.email);

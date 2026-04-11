@@ -11,6 +11,7 @@ import { PaginatedResponse } from '@/types/api';
 import { JobPost, Company, Resume } from '../../../../types/models';
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
+import type { UserSettingsData } from '../../../../types/auth';
 
 // ─── Query Helpers ──────────────────────────────────────────
 import type { UseQueryResult, UseMutationResult } from '@tanstack/react-query';
@@ -174,7 +175,7 @@ export const useUserSettings = (enabled: boolean = true) => {
 export const useUpdateUserSettings = () => {
     const queryClient = useQueryClient();
     return useMutation({
-        mutationFn: (data: Record<string, unknown>) => authService.updateUserSettings(data),
+        mutationFn: (data: UserSettingsData) => authService.updateUserSettings(data),
         onSuccess: (response: unknown) => {
             queryClient.setQueryData(['userSettings'], response);
             toastMessages.success("Settings updated successfully.");

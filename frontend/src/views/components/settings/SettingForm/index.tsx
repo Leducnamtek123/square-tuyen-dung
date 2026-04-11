@@ -6,10 +6,10 @@ import { Grid2 as Grid } from "@mui/material";
 import CheckboxCustom from '../../../../components/Common/Controls/CheckboxCustom';
 import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
-export interface FormValues {
+export type FormValues = {
   emailNotificationActive: boolean;
   smsNotificationActive: boolean;
-}
+};
 
 interface SettingFormProps {
   editData: Partial<FormValues> | null;

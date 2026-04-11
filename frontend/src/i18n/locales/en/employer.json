@@ -638,7 +638,9 @@
       "calibration": "Calibration",
       "processing": "Processing",
       "connecting": "Connecting",
-      "active": "Active"
+      "active": "Active",
+      "draft": "Draft",
+      "interrupted": "Interrupted"
     }
   },
   "verification": {
@@ -993,7 +995,17 @@
   },
   "interviewListCard": {
     "editInterview": "Edit Interview",
-    "description": "View and manage your scheduled interviews"
+    "description": "View and manage your scheduled interviews",
+    "statuses": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "calibration": "Calibration",
+      "in_progress": "In Progress",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "interrupted": "Interrupted",
+      "processing": "Processing"
+    }
   },
   "applyForm": {
     "resume": {

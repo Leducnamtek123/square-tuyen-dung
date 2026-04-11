@@ -6,6 +6,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import GroupIcon from '@mui/icons-material/Group';
 import { ROLES_NAME } from '../../../configs/constants';
 import { RootState } from '../../../redux/store';
+import { useTranslation } from 'react-i18next';
 
 // page components
 import RightSidebar from '../../components/chats/RightSidebar';
@@ -19,6 +20,7 @@ const ChatPage = () => {
   const isMedium = useMediaQuery(theme.breakpoints.down('md'));
 
   const { currentUser } = useSelector((state: RootState) => state.user);
+  const { t } = useTranslation('chat');
 
   const [openLeftDrawer, setOpenLeftDrawer] = React.useState(false);
   const [openRightDrawer, setOpenRightDrawer] = React.useState(false);
@@ -150,8 +152,8 @@ const ChatPage = () => {
                   textAlign: 'center'
                 }}
               >
-                New way to follow your chance.{' '}
-                <span>More engage, more success</span>
+                {t('slogan')}{' '}
+                <span>{t('sloganSub')}</span>
               </Typography>
             </Box>
 

@@ -1,8 +1,9 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import jobService from '../../../../../services/jobService';
+import type { JobPostFilter } from '../../../../../redux/filterSlice';
 
 
-export const useJobPosts = (params: Record<string, unknown>, page: number) => {
+export const useJobPosts = (params: JobPostFilter, page: number) => {
     return useQuery({
         queryKey: ['jobPosts', params, page],
         queryFn: async () => {

@@ -46,7 +46,7 @@ const ForgotPasswordForm = ({ handleRequestResetPassword }: ForgotPasswordFormPr
 
     },
 
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
 
   });
 

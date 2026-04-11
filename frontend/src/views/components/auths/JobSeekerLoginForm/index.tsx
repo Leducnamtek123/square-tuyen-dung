@@ -138,7 +138,7 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeek
       email: "",
       password: "",
     },
-    resolver: yupResolver(schema) as any,
+    resolver: yupResolver(schema) as any // TODO: fix yup schema inference to match form type,
   });
 
   const googleLogin = useGoogleLogin({
