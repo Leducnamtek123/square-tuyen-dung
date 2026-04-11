@@ -574,37 +574,49 @@ def presign_url(request):
                         object_path = object_path[len(bucket) + 1:]
         else:
             # Plain public_id
-            object_path = target.lstrip("/") if target else None
+            object_path = str(target).lstrip("/") if target else None
 
         if not object_path:
             if url and _is_allowed_public_minio_url(url):
                 return var_res.response_data(data={"url": url})
             return var_res.response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                errors={"errorMessage": ["Unable to generate presigned URL."]},
+                errors={"errorMessage": ["Unable to generate presigned URL. Path identify failed."]},
                 data=None,
             )
 
         from datetime import timedelta
+        # Ensure expires is an int to prevent TypeError
+        try:
+            val_expires = int(expires)
+        except (TypeError, ValueError):
+            val_expires = 3600
+            
         client = CloudinaryService._get_presign_client()
         presigned = client.presigned_get_object(
             bucket,
             object_path,
-            expires=timedelta(seconds=expires),
+            expires=timedelta(seconds=val_expires),
         )
         presigned = CloudinaryService._rewrite_presigned_url(presigned)
         return var_res.response_data(data={"url": presigned})
 
-    except Exception:
+    except Exception as e:
+        helper.print_log_error(func_name="presign_url", error=e)
         # Fallback to original approach
-        presigned, _ = CloudinaryService.get_url_from_public_id(target, {})
-        if presigned:
-            return var_res.response_data(data={"url": presigned})
+        try:
+            presigned, _ = CloudinaryService.get_url_from_public_id(target, {})
+            if presigned:
+                return var_res.response_data(data={"url": presigned})
+        except Exception as e2:
+            helper.print_log_error(func_name="presign_url_fallback", error=e2)
+
         if url and _is_allowed_public_minio_url(url):
             return var_res.response_data(data={"url": url})
+            
         return var_res.response_data(
-            status=status.HTTP_400_BAD_REQUEST,
-            errors={"errorMessage": ["Unable to generate presigned URL."]},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            errors={"errorMessage": ["Internal error generating presigned URL."]},
             data=None,
         )
 

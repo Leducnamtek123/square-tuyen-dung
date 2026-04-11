@@ -62,7 +62,9 @@ def _event_stream(session_id: int, user):
         last_heartbeat = time.time()
 
         while True:
-            message = pubsub.get_message(timeout=1.0)
+            # We use a 1.0s timeout. gevent will yield here to other concurrent SSE connections.
+            # ignore_subscribe_messages=True prevents 'subscribe'/'unsubscribe' noise in the stream.
+            message = pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
 
             if message and message["type"] == "message":
                 try:

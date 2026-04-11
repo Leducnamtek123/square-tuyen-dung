@@ -23,6 +23,7 @@ google-api-core>=2.15.0
 geopy==2.3.0
 grpcio-status>=1.48.2
 gunicorn==22.0.0
+gevent==24.2.1
 infobip-api-python-client==6.0.0
 MarkupPy==1.14
 mysqlclient==2.2.0

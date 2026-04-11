@@ -147,9 +147,18 @@ async def entrypoint(ctx: JobContext):
             # ev is a ConversationItemAddedEvent which contains the 'item'
             item = ev.item
             role = "candidate" if item.role == "user" else "ai_agent"
-            if item.content and item.content.strip():
+            
+            # item.content can be str or List[ContentPart] in livekit-agents 1.4+
+            content = ""
+            if isinstance(item.content, str):
+                content = item.content
+            elif isinstance(item.content, list):
+                # Join text from all content parts that have a 'text' attribute
+                content = "".join([getattr(c, 'text', '') for c in item.content])
+            
+            if content and content.strip():
                 # We use the interviewer instance's method to append transcript
-                asyncio.create_task(interviewer_agent._append_transcript(role, item.content.strip()))
+                asyncio.create_task(interviewer_agent._append_transcript(role, content.strip()))
 
         session.on("conversation_item_added", _on_history_added)
 

@@ -71,7 +71,7 @@ services:
     build:
       context: ./api
       dockerfile: ${BACKEND_DOCKERFILE:-Dockerfile.prod}
-    command: ${BACKEND_COMMAND:-sh docker-entrypoint.sh gunicorn --bind 0.0.0.0:8000 --workers 3 config.wsgi:application}
+    command: ${BACKEND_COMMAND:-sh docker-entrypoint.sh gunicorn --bind 0.0.0.0:8000 --workers 3 --worker-class gevent --timeout 120 config.wsgi:application}
     env_file:
       - .env
     expose:

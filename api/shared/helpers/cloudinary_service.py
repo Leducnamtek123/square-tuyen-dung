@@ -43,11 +43,15 @@ class CloudinaryService:
         endpoint, secure = CloudinaryService._resolve_endpoint(
             endpoint, settings.MINIO_SECURE
         )
+        # 🔑 Explicitly set region to avoid network calls for auto-detection
+        # which can cause hangs and 502 timeouts in containerized environments.
+        region = getattr(settings, "MINIO_REGION", "us-east-1")
         return Minio(
             endpoint=endpoint,
             access_key=settings.MINIO_ACCESS_KEY,
             secret_key=settings.MINIO_SECRET_KEY,
-            secure=secure
+            secure=secure,
+            region=region
         )
 
     @staticmethod
