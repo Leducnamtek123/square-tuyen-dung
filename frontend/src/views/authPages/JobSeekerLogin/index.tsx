@@ -625,9 +625,7 @@ const JobSeekerLogin = () => {
                       backgroundColor: loginMode === 'email' ? 'primary.dark' : 'rgba(0,0,0,0.04)',
                     },
                   }}
-                >
-                  Email
-                </Button>
+                >{t('auto.index_email_ce8a', `Email`)}</Button>
                 <Button
                   onClick={() => setLoginMode('phone')}
                   disableElevation

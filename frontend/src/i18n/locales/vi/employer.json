@@ -129,7 +129,8 @@
     "recruitmentChart": "BIỂU ĐỒ TUYỂN DỤNG",
     "candidateChart": "BIỂU ĐỒ ỨNG VIÊN",
     "applicationChart": "BIỂU ĐỒ TUYỂN DỤNG & ỨNG TUYỂN",
-    "academicChart": "BIỂU ĐỒ TUYỂN DỤNG THEO TRÌNH ĐỘ"
+    "academicChart": "BIỂU ĐỒ TUYỂN DỤNG THEO TRÌNH ĐỘ",
+    "interviewChart": "THỐNG KÊ PHỎNG VẤN"
   },
   "jobPost": {
     "title": "Quản lý tin tuyển dụng",
@@ -284,7 +285,11 @@
       "totaljobposts": "Tổng tin tuyển dụng",
       "pendingjobposts": "Tin chờ duyệt",
       "expiredjobposts": "Tin hết hạn",
-      "totalapplications": "Tổng lượt ứng tuyển"
+      "totalapplications": "Tổng lượt ứng tuyển",
+      "totalinterviews": "Tổng số phỏng vấn",
+      "completedinterviews": "Phỏng vấn hoàn thành",
+      "conversionrate": "Tỉ lệ chuyển đổi",
+      "avgaiscore": "Điểm AI trung bình"
     }
   },
   "interviewCreateCard": {
@@ -487,6 +492,11 @@
     },
     "helperText": {
       "automaticallyfilledifyouchooseasuggestedaddress": "Tự động điền nếu bạn chọn một địa chỉ gợi ý"
+    },
+    "section": {
+      "basicInfo": "Thông tin cơ bản",
+      "location": "Địa điểm làm việc",
+      "contact": "Thông tin liên hệ"
     }
   },
   "profileCard": {
@@ -787,6 +797,20 @@
     },
     "title": "Hồ sơ công ty"
   },
+  "interviewChart": {
+    "labels": {
+      "completed": "Hoàn thành",
+      "scheduled": "Đã lên lịch",
+      "inProgress": "Đang diễn ra",
+      "cancelled": "Đã hủy"
+    },
+    "tooltip": "Phân tích hiệu suất phỏng vấn theo tháng",
+    "passed": "Đạt",
+    "failed": "Không đạt",
+    "pending": "Chờ duyệt",
+    "avgDuration": "Thời lượng TB",
+    "noData": "Không có dữ liệu phỏng vấn"
+  },
   "pricing": {
     "heroTitle": "Giải pháp Đầu tư Nhân sự",
     "heroSubtitle": "Lựa chọn gói dịch vụ tối ưu để tiếp cận nguồn lực tài năng chất lượng cao và nâng cao hiệu suất tuyển dụng của doanh nghiệp.",
@@ -1028,5 +1052,13 @@
       "interrupted": "Bị gián đoạn",
       "processing": "Đang xử lý"
     }
+  },
+  "form": {
+    "district": "Phường/Xã",
+    "districtPlaceholder": "Chọn phường/xã"
+  },
+  "questionBank": {
+    "deleteTitle": "Xóa câu hỏi",
+    "hint": "Nhập nội dung câu hỏi rõ ràng và ngắn gọn."
   }
 }

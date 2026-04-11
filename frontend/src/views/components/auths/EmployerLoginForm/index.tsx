@@ -304,11 +304,7 @@ const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: Employer
 
             }}
 
-          >
-
-            Facebook
-
-          </StyledSocialButton>
+          >{t('auto.index_facebook_d855', `Facebook`)}</StyledSocialButton>
 
         </LoginSocialFacebook> */}
 
@@ -338,11 +334,7 @@ const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: Employer
 
           }}
 
-        >
-
-          Google
-
-        </StyledSocialButton>
+        >{t('auto.index_google_8b36', `Google`)}</StyledSocialButton>
 
       </Stack>
 

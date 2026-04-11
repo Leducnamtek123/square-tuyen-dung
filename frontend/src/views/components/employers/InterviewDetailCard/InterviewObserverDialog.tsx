@@ -127,9 +127,7 @@ const InterviewObserverDialog: React.FC<InterviewObserverDialogProps> = ({
               }}
             >
               <VisibilityOffIcon sx={{ fontSize: 18, color: 'warning.main' }} />
-              <Typography variant="caption" sx={{ fontWeight: 900, color: 'warning.main', letterSpacing: 1, textTransform: 'uppercase', fontSize: '0.7rem' }}>
-                Observer Mode
-              </Typography>
+              <Typography variant="caption" sx={{ fontWeight: 900, color: 'warning.main', letterSpacing: 1, textTransform: 'uppercase', fontSize: '0.7rem' }}>{t('common:auto.InterviewObserverDialog_observer_mode_daff', `Observer Mode`)}</Typography>
             </Box>
             <Box>
               <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 800 }}>
@@ -184,9 +182,7 @@ const InterviewObserverDialog: React.FC<InterviewObserverDialogProps> = ({
                 borderColor: alpha('#ef4444', 0.3),
                 '&:hover': { bgcolor: alpha('#ef4444', 0.25) },
               }}
-            >
-              End Observation
-            </Button>
+            >{t('common:auto.InterviewObserverDialog_end_observation_130a', `End Observation`)}</Button>
           </Stack>
         </Box>
 
@@ -235,12 +231,8 @@ const InterviewObserverDialog: React.FC<InterviewObserverDialogProps> = ({
               >
                 <VolumeUpIcon sx={{ fontSize: 64, color: alpha('#0ea5e9', 0.5) }} />
               </Box>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700, mb: 1 }}>
-                🔇 Hidden Observer Mode
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.25)', fontWeight: 600, maxWidth: 280, display: 'block', mx: 'auto' }}>
-                You are observing this interview silently. The candidate cannot see or hear you.
-              </Typography>
+              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700, mb: 1 }}>{t('common:auto.InterviewObserverDialog__hidden_observer_mode_72e9', `🔇 Hidden Observer Mode`)}</Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.25)', fontWeight: 600, maxWidth: 280, display: 'block', mx: 'auto' }}>{t('common:auto.InterviewObserverDialog_you_are_observing_this_intervi_7cb3', `You are observing this interview silently. The candidate cannot see or hear you.`)}</Typography>
             </Box>
           </Box>
 
@@ -255,9 +247,7 @@ const InterviewObserverDialog: React.FC<InterviewObserverDialogProps> = ({
           >
             <Box sx={{ px: 3, py: 2, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
               <Stack direction="row" alignItems="center" spacing={1}>
-                <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900 }}>
-                  Live Transcript
-                </Typography>
+                <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900 }}>{t('common:auto.InterviewObserverDialog_live_transcript_b857', `Live Transcript`)}</Typography>
                 <Chip
                   label={`${liveTranscripts.length} messages`}
                   size="small"
@@ -328,9 +318,7 @@ const InterviewObserverDialog: React.FC<InterviewObserverDialogProps> = ({
                 </Stack>
               ) : (
                 <Box sx={{ textAlign: 'center', py: 10 }}>
-                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 700 }}>
-                    Waiting for conversation to begin...
-                  </Typography>
+                  <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 700 }}>{t('common:auto.InterviewObserverDialog_waiting_for_conversation_to_be_3e38', `Waiting for conversation to begin...`)}</Typography>
                   <Box
                     sx={{
                       mt: 3,

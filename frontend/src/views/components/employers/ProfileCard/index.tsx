@@ -95,9 +95,7 @@ const ProfileCard: React.FC = () => {
                                 <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.secondary', letterSpacing: '-0.5px' }}>
                                     {t('profileCard.title.noresultsfound')}
                                 </Typography>
-                                <Typography variant="body1" color="text.secondary" sx={{ mt: 1.5, fontWeight: 600, maxWidth: 400, mx: 'auto', opacity: 0.7 }}>
-                                    Try adjusting your search filters or keywords to discover more talented candidates.
-                                </Typography>
+                                <Typography variant="body1" color="text.secondary" sx={{ mt: 1.5, fontWeight: 600, maxWidth: 400, mx: 'auto', opacity: 0.7 }}>{t('employer:auto.index_try_adjusting_your_search_filt_5ec9', `Try adjusting your search filters or keywords to discover more talented candidates.`)}</Typography>
                             </Paper>
                         ) : (
                             <Stack spacing={5}>

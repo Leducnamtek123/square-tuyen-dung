@@ -436,5 +436,29 @@
     "followers": "người theo dõi",
     "notUpdated": "Chưa cập nhật thông tin",
     "jobCount": "việc làm"
+  },
+  "home": {
+    "topCompanies": "Công ty nổi bật",
+    "noCompaniesFound": "Hiện chưa tìm công ty phù hợp với tiêu chí của bạn",
+    "noFeedbacks": "Chưa có người dùng nào đánh giá"
+  },
+  "jobPost": {
+    "timeLeft": "Còn"
+  },
+  "login": {
+    "phone": "Số điện thoại",
+    "phoneIntro": "Nhập số điện thoại của bạn để nhận mã xác thực.",
+    "otpIntro": "Nhập mã 6 chữ số đã được gửi đến điện thoại của bạn.",
+    "resendIn": "Gửi lại sau"
+  },
+  "actions": {
+    "sendOTP": "Gửi mã OTP",
+    "verifyOTP": "Xác thực & Đăng nhập",
+    "changePhone": "Thay đổi số điện thoại",
+    "resendOTP": "Gửi lại mã"
+  },
+  "form": {
+    "phoneNumber": "Số điện thoại",
+    "otpCode": "Mã OTP"
   }
 }

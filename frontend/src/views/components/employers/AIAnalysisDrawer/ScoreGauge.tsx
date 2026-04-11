@@ -75,9 +75,7 @@ export const ScoreGauge: React.FC<{ score: number }> = ({ score }) => {
         >
           {getLabel()}
         </Typography>
-        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-          AI Matching Score
-        </Typography>
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>{t('employer:auto.ScoreGauge_ai_matching_score_158d', `AI Matching Score`)}</Typography>
       </Box>
     </Box>
   );

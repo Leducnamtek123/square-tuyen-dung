@@ -433,9 +433,9 @@ const EmployeesPage = () => {
                 value={memberForm.status}
                 onChange={(e: SelectChangeEvent) => setMemberForm((p) => ({ ...p, status: e.target.value }))}
               >
-                <MenuItem value="ACTIVE">ACTIVE</MenuItem>
-                <MenuItem value="INVITED">INVITED</MenuItem>
-                <MenuItem value="DISABLED">DISABLED</MenuItem>
+                <MenuItem value="ACTIVE">{t('employer:auto.index_active_18ff', `ACTIVE`)}</MenuItem>
+                <MenuItem value="INVITED">{t('employer:auto.index_invited_3792', `INVITED`)}</MenuItem>
+                <MenuItem value="DISABLED">{t('employer:auto.index_disabled_055c', `DISABLED`)}</MenuItem>
               </Select>
             </FormControl>
             <TextField

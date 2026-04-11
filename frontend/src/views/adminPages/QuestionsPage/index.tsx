@@ -232,9 +232,9 @@ const QuestionsPage = () => {
                             value={formData.questionType}
                             onChange={(e) => setFormData(prev => ({ ...prev, questionType: e.target.value }))}
                         >
-                            <MenuItem value="GENERAL">General</MenuItem>
-                            <MenuItem value="TECHNICAL">Technical</MenuItem>
-                            <MenuItem value="BEHAVIORAL">Behavioral</MenuItem>
+                            <MenuItem value="GENERAL">{t('admin:auto.index_general_0db3', `General`)}</MenuItem>
+                            <MenuItem value="TECHNICAL">{t('admin:auto.index_technical_ad1e', `Technical`)}</MenuItem>
+                            <MenuItem value="BEHAVIORAL">{t('admin:auto.index_behavioral_f828', `Behavioral`)}</MenuItem>
                         </TextField>
                         <TextField
                             label={t('pages.questions.form.category')}

@@ -305,11 +305,7 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeek
 
             }}
 
-          >
-
-            Facebook
-
-          </StyledSocialButton>
+          >{t('auto.index_facebook_d855', `Facebook`)}</StyledSocialButton>
 
         </LoginSocialFacebook> */}
 
@@ -339,11 +335,7 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeek
 
           }}
 
-        >
-
-          Google
-
-        </StyledSocialButton>
+        >{t('auto.index_google_8b36', `Google`)}</StyledSocialButton>
 
       </Stack>
 

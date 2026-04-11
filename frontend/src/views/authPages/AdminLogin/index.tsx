@@ -261,9 +261,7 @@ const AdminLogin: React.FC = () => {
             sx={{ mt: 4, textAlign: 'center', color: 'text.disabled' }}
           >
             {t('auth:login.visitPage')}&nbsp;
-            <Link href="https://square.vn" target="_blank" sx={{ color: '#1a73e8' }}>
-              www.square.vn
-            </Link>
+            <Link href="https://square.vn" target="_blank" sx={{ color: '#1a73e8' }}>{t('common:auto.index_wwwsquarevn_9a21', `www.square.vn`)}</Link>
           </Typography>
         </LeftPanel>
 

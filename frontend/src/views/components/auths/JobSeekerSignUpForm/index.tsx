@@ -426,11 +426,7 @@ const JobSeekerSignUpForm = ({
 
             }}
 
-          >
-
-            Facebook
-
-          </StyledSocialButton>
+          >{t('auto.index_facebook_d855', `Facebook`)}</StyledSocialButton>
 
         </LoginSocialFacebook> */}
 
@@ -460,11 +456,7 @@ const JobSeekerSignUpForm = ({
 
           }}
 
-        >
-
-          Google
-
-        </StyledSocialButton>
+        >{t('auto.index_google_8b36', `Google`)}</StyledSocialButton>
 
       </Stack>
 

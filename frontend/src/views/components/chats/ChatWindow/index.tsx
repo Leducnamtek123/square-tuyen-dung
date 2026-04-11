@@ -229,9 +229,7 @@ const ChatWindow = () => {
         <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
           {t('noConversationSelected')}
         </Typography>
-        <Typography variant="body2" color="text.disabled" sx={{ mt: 1 }}>
-          Chọn một cuộc hội thoại ở danh sách bên trái để bắt đầu nhắn tin
-        </Typography>
+        <Typography variant="body2" color="text.disabled" sx={{ mt: 1 }}>{t('auto.index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32', `Chọn một cuộc hội thoại ở danh sách bên trái để bắt đầu nhắn tin`)}</Typography>
       </Box>
     );
   }
