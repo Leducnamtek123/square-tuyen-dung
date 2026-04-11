@@ -109,7 +109,7 @@ const InterviewInfoCard: React.FC<InterviewInfoCardProps> = ({ session, t, i18n 
                         </Typography>
                     </Stack>
                     <Box sx={{ ml: 4 }}>
-                        <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.5 }}>
+                        <Typography variant="body2" sx={{ fontWeight: 800, color: 'text.primary', lineHeight: 1.5 }} suppressHydrationWarning>
                             {session.scheduledAt || session.scheduled_at ? new Date((session.scheduledAt || session.scheduled_at) as string).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US', {
                                 weekday: 'long',
                                 year: 'numeric',

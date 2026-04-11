@@ -326,16 +326,20 @@
       "aiEvaluation": "Kết quả đánh giá AI",
       "analysis": "Phân tích AI",
       "history": "Lịch sử cuộc trò chuyện",
-      "recording": "Ghi hình phỏng vấn"
+      "recording": "Ghi hình phỏng vấn",
+      "transcript": "Bản ghi cuộc trò chuyện",
+      "questions": "Danh sách câu hỏi"
     },
     "label": {
       "roomCode": "Mã phòng",
+      "id": "ID",
       "candidate": "ỨNG VIÊN",
       "position": "VỊ TRÍ",
       "type": "LOẠI PHỎNG VẤN",
       "schedule": "LỊCH TRÌNH",
       "liveMonitoring": "THEO DÕI TRỰC TIẾP",
       "aiInterviewer": "Người phỏng vấn AI",
+      "interviewer": "Người phỏng vấn",
       "candidateSmall": "Ứng viên",
       "technicalScore": "Điểm kỹ thuật",
       "communicationScore": "Điểm giao tiếp",
@@ -347,6 +351,7 @@
     },
     "messages": {
       "notFound": "Không tìm thấy thông tin phiên phỏng vấn",
+      "notFoundDesc": "Phiên phỏng vấn này không tồn tại hoặc đã bị xóa.",
       "aiGenerating": "Kết quả đánh giá AI đang được khởi tạo",
       "aiAnalyzing": "AI đang phân tích cuộc trò chuyện...",
       "aiAnalyzingDesc": "AI đang tiến hành phân tích hồ sơ...",
@@ -360,6 +365,7 @@
       "noTranscriptDesc": "Chưa có cuộc hội thoại nào để ghi lại."
     },
     "actions": {
+      "triggerAi": "Kích hoạt AI đánh giá",
       "backToList": "Quay lại danh sách",
       "viewReport": "Xem báo cáo chi tiết",
       "openRecording": "Mở ghi hình",

@@ -326,16 +326,20 @@
       "aiEvaluation": "AI Evaluation Result",
       "analysis": "AI Analysis",
       "history": "Conversation History",
-      "recording": "Interview Recording"
+      "recording": "Interview Recording",
+      "transcript": "Conversation Transcript",
+      "questions": "Question List"
     },
     "label": {
       "roomCode": "Room Code",
+      "id": "ID",
       "candidate": "CANDIDATE",
       "position": "POSITION",
       "type": "INTERVIEW TYPE",
       "schedule": "SCHEDULE",
       "liveMonitoring": "LIVE MONITORING",
       "aiInterviewer": "AI Interviewer",
+      "interviewer": "Interviewer",
       "candidateSmall": "Candidate",
       "technicalScore": "Technical Score",
       "communicationScore": "Communication Score",
@@ -347,6 +351,7 @@
     },
     "messages": {
       "notFound": "Interview session information not found",
+      "notFoundDesc": "This interview session does not exist or has been deleted.",
       "aiGenerating": "AI evaluation results are being generated",
       "aiAnalyzing": "AI is analyzing the conversation...",
       "aiAnalyzingDesc": "AI is analyzing the profile...",
