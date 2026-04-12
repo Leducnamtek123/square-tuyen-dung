@@ -45,5 +45,6 @@ USER appuser
 # This ensures they are baked into the image and don't fail at runtime
 RUN python3 -m src.agent download-files
 
-# Default command
-CMD ["python3", "-m", "src.agent", "start"]
+# Run the application
+ENTRYPOINT ["python3", "-m", "src.agent"]
+CMD ["start"]

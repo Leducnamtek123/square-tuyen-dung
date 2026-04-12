@@ -1,15 +1,21 @@
 import asyncio
+import json
 import logging
+
 import httpx
-from typing import Any
+from dotenv import load_dotenv
 
 from livekit.agents import (
     AgentServer,
     AgentSession,
     JobContext,
     JobProcess,
+    MetricsCollectedEvent,
+    TurnHandlingOptions,
     cli,
+    metrics,
 )
+from livekit.agents.voice.events import CloseEvent
 from livekit.plugins import openai, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 import openai as openai_lib
@@ -17,13 +23,12 @@ import openai as openai_lib
 from .config import config
 from .interviewer import Interviewer
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("agent")
+load_dotenv()
 
-# Set ONNX execution providers to CPU only to avoid GPU discovery warnings in Docker
-import os
-os.environ["ONNXRUNTIME_EXECUTION_PROVIDERS"] = "CPUExecutionProvider"
+# Configure logging
+logger = logging.getLogger("square-ai-interviewer")
+logger.setLevel(logging.INFO)
+
 
 # --- Helper Functions ---
 async def _update_backend_status(room_name: str, status: str) -> None:
@@ -35,200 +40,131 @@ async def _update_backend_status(room_name: str, status: str) -> None:
     except Exception as e:
         logger.warning(f"Failed to update backend status for {room_name}: {e}")
 
-# --- LiveKit Agent Implementation ---
+
+# --- AgentServer Setup (1.5.x Pattern) ---
+server = AgentServer()
+
 
 def prewarm(proc: JobProcess) -> None:
     """Pre-load heavy models in the main (prewarm) process to save time on job startup."""
     proc.userdata["vad"] = silero.VAD.load()
 
+
+server.setup_fnc = prewarm
+
+
+@server.rtc_session()
 async def entrypoint(ctx: JobContext) -> None:
     # Set log context for better debugging
     ctx.log_context_fields = {"room": ctx.room.name}
     logger.info(f"Starting interview agent for room: {ctx.room.name}")
 
-    # CRITICAL for 1.x: Connect to the room first
-    await ctx.connect()
+    # 1. Initialize Models
+    stt_model = openai.STT(
+        api_key=config.STT_API_KEY,
+        base_url=config.STT_BASE_URL,
+        model=config.STT_MODEL,
+    )
 
-    session = None
+    llm_model = openai.LLM(
+        client=openai_lib.AsyncOpenAI(
+            api_key="no-key-needed",
+            base_url=config.LLAMA_BASE_URL,
+            http_client=httpx.AsyncClient(
+                timeout=httpx.Timeout(300.0, connect=10.0)
+            ),
+        ),
+        model=config.LLAMA_MODEL,
+    )
+
+    tts_model = openai.TTS(
+        client=openai_lib.AsyncOpenAI(
+            api_key=config.TTS_API_KEY,
+            base_url=config.TTS_BASE_URL,
+            http_client=httpx.AsyncClient(
+                timeout=httpx.Timeout(120.0, connect=10.0)
+            ),
+        ),
+        model=config.TTS_MODEL,
+        voice=config.TTS_VOICE,
+    )
+
+    # 2. Context Preparation from room metadata
+    agent_context = {
+        "candidateName": "Ứng viên",
+        "jobTitle": "Vị trí này",
+        "jobDescription": "",
+        "backendApiUrl": config.BACKEND_API_URL,
+        "roomName": ctx.room.name,
+    }
     try:
-        # 1. Initialize Models
-        stt_model = openai.STT(
-            api_key=config.STT_API_KEY,
-            base_url=config.STT_BASE_URL,
-            model=config.STT_MODEL,
-        )
-
-        llm_model = openai.LLM(
-            client=openai_lib.AsyncOpenAI(
-                api_key="no-key-needed",
-                base_url=config.LLAMA_BASE_URL,
-                http_client=httpx.AsyncClient(timeout=httpx.Timeout(300.0, connect=10.0))
-            ),
-            model=config.LLAMA_MODEL, 
-        )
-
-        tts_model = openai.TTS(
-            client=openai_lib.AsyncOpenAI(
-                api_key=config.TTS_API_KEY,
-                base_url=config.TTS_BASE_URL,
-                http_client=httpx.AsyncClient(timeout=httpx.Timeout(120.0, connect=10.0))
-            ),
-            model=config.TTS_MODEL,
-            voice=config.TTS_VOICE,
-        )
-
-        # 2. Context Preparation
-        agent_context = {
-            "candidateName": "Ứng viên",
-            "jobTitle": "Vị trí này",
-            "jobDescription": "",
-            "backendApiUrl": config.BACKEND_API_URL,
-            "roomName": ctx.room.name,
-        }
-        try:
-            metadata = ctx.room.metadata
-            if metadata:
-                import json
-                pm = json.loads(metadata)
-                agent_context.update({
+        metadata = ctx.room.metadata
+        if metadata:
+            pm = json.loads(metadata)
+            agent_context.update(
+                {
                     "candidateName": pm.get("candidate_name", "Ứng viên"),
                     "jobTitle": pm.get("job_title", "Vị trí này"),
                     "jobDescription": pm.get("job_description", ""),
-                })
-        except Exception as e:
-            logger.warning(f"Failed to parse room metadata: {e}")
-
-        # Create Interviewer logic engine (inherits from livekit.agents.Agent)
-        interviewer = Interviewer(context=agent_context)
-
-        # 3. Setup Session (Standard 1.5.x Pattern)
-        from livekit.agents import TurnHandlingOptions
-
-        
-        session = AgentSession(
-            stt=stt_model,
-            llm=llm_model,
-            tts=tts_model,
-            vad=ctx.proc.userdata["vad"],
-            turn_handling=TurnHandlingOptions(
-                turn_detection=MultilingualModel(),
-
-
-            ),
-        )
-
-        # 4. Event Handlers (Persistence and Debugging)
-        @session.on("conversation_item_added")
-        def _on_history_added(ev):
-            item = ev.item
-            role = "candidate" if item.role == "user" else "ai_agent"
-            content = ""
-            if isinstance(item.content, str):
-                content = item.content
-            elif isinstance(item.content, list):
-                content = "".join([getattr(c, 'text', '') for c in item.content])
-            
-            if content and content.strip():
-                asyncio.create_task(interviewer._append_transcript(role, content.strip()))
-
-        @session.on("user_input_transcribed")
-        def _on_debug_transcript(ev):
-            if ev.transcript:
-                asyncio.create_task(ctx.room.local_participant.set_attributes({
-                    "lk.agent.last_heard": ev.transcript[:60] + ("..." if len(ev.transcript) > 60 else "")
-                }))
-
-        # 5. Start the Session and Greeting
-        await session.start(
-            agent=interviewer,
-            room=ctx.room
-        )
-        
-        # Mark interview as active in backend
-        await _update_backend_status(ctx.room.name, "in_progress")
-
-        # Initial Greeting
-        await session.generate_reply(
-            instructions=f"Hãy chào đón ứng viên {agent_context['candidateName']} một cách nồng nhiệt và giới thiệu về buổi phỏng vấn vị trí {agent_context['jobTitle']}."
-        )
-
-        # 6. Wait loop - keep the worker alive while connected
-        while ctx.room.is_connected():
-            await asyncio.sleep(1)
-
+                }
+            )
     except Exception as e:
-        logger.error(f"CRITICAL ERROR in interview_agent: {e}", exc_info=True)
-    finally:
-        # Final status sync
+        logger.warning(f"Failed to parse room metadata: {e}")
+
+    # 3. Create Interviewer Agent (greeting is handled in on_enter)
+    interviewer = Interviewer(context=agent_context)
+
+    # 4. Setup Session (Standard 1.5.x Pattern)
+    session = AgentSession(
+        stt=stt_model,
+        llm=llm_model,
+        tts=tts_model,
+        vad=ctx.proc.userdata["vad"],
+        turn_handling=TurnHandlingOptions(
+            turn_detection=MultilingualModel(),
+        ),
+        preemptive_generation=True,
+    )
+
+    # 5. Event Handlers
+    @session.on("metrics_collected")
+    def _on_metrics_collected(ev: MetricsCollectedEvent) -> None:
+        metrics.log_metrics(ev.metrics)
+
+    @session.on("close")
+    def _on_close(ev: CloseEvent) -> None:
+        logger.info(
+            f"Session closed for room: {ctx.room.name}, reason: {ev.reason}"
+        )
+        # Sync remaining transcript from session history
+        for item in session.history.items:
+            if item.type == "message":
+                role = "candidate" if item.role == "user" else "ai_agent"
+                content = item.text_content
+                if content and content.strip():
+                    asyncio.create_task(
+                        interviewer._append_transcript(role, content.strip())
+                    )
+
+    # 6. Shutdown callback for final status sync
+    async def on_shutdown() -> None:
         await _update_backend_status(ctx.room.name, "completed")
         logger.info(f"Session finished for room: {ctx.room.name}")
+        logger.info(f"Usage: {session.usage}")
 
+    ctx.add_shutdown_callback(on_shutdown)
 
-def download_files():
-    """Download necessary models to the local cache and link them correctly."""
-    import os
-    from huggingface_hub import hf_hub_download, snapshot_download
-    
-    # 1. Download Silero VAD
-    print("Downloading Silero VAD...")
-    silero.VAD.load()
-    
-    # 2. Download and Fix Turn Detector (The "multilingual" branch hack)
-    print("Downloading Multilingual Turn Detector...")
-    repo_id = "livekit/turn-detector"
-    revision = "multlingual"
-    
-    try:
-        # Download the entire multilingual snapshot
-        snapshot_path = snapshot_download(
-            repo_id=repo_id, 
-            revision=revision,
-            allow_patterns=["languages.json", "onnx/model_q8.onnx", "onnx/config.json"]
-        )
-        
-        # We manually point the 'main' reference to the commit we just downloaded.
-        # This tricks the plugin (which looks for 'main') into finding the files.
-        cache_base = os.path.expanduser("~/.cache/huggingface/hub/models--livekit--turn-detector")
-        
-        # Ensure the 'refs' directory exists
-        refs_dir = os.path.join(cache_base, "refs")
-        main_ref_path = os.path.join(refs_dir, "main")
-        os.makedirs(refs_dir, exist_ok=True)
-        
-        # The snapshot_path is .../snapshots/<commit_hash>
-        commit_hash = os.path.basename(snapshot_path)
-        
-        # Write the commit hash to the 'main' ref
-        with open(main_ref_path, "w") as f:
-            f.write(commit_hash)
-            
-        print(f"Successfully linked {revision} ({commit_hash}) to main.")
-        
-    except Exception as e:
-        print(f"Warning: Could not pre-download turn detector files: {e}")
-        
-    print("Models downloaded and linked successfully.")
+    # 7. Start the Session (no ctx.connect() needed - handled by session.start)
+    await session.start(
+        agent=interviewer,
+        room=ctx.room,
+    )
 
+    # Mark interview as active in backend
+    await _update_backend_status(ctx.room.name, "in_progress")
 
-
+    # NO busy-wait loop needed - framework manages lifecycle automatically
 
 
 if __name__ == "__main__":
-    import sys
-    from livekit.agents import WorkerOptions
-    
-    if len(sys.argv) > 1 and sys.argv[1] == "download-files":
-        download_files()
-    else:
-        cli.run_app(
-            WorkerOptions(
-                entrypoint_fnc=entrypoint,
-                prewarm_fnc=prewarm,
-                agent_name="square-ai-interviewer",
-            )
-        )
-
-
-
-
-
+    cli.run_app(server)
