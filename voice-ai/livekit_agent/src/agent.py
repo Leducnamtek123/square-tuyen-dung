@@ -119,11 +119,14 @@ async def entrypoint(ctx: JobContext):
         # Load VAD here via asyncio.to_thread to prevent blocking the event loop
         vad_model = await asyncio.to_thread(silero.VAD.load)
         
-        try:
-            device_turn_detector = MultilingualModel()
-        except Exception as e:
-            logger.warning("MultilingualModel load failed, falling back to default: %s", e)
-            device_turn_detector = None # Will fallback to VAD-based
+        # Using a simpler VAD-based turn detector for better reliability in single-language mode
+        # This replaces the complex MultilingualModel which can sometimes filter out speech incorrectly.
+        from livekit.agents import turn_detector
+        device_turn_detector = turn_detector.VADBasedTurnDetector(
+            vad=vad_model,
+            min_endpointing_delay=config.MIN_ENDPOINTING_DELAY,
+            max_endpointing_delay=config.MAX_ENDPOINTING_DELAY,
+        )
 
         session = AgentSession(
             stt=stt_model,
@@ -140,6 +143,14 @@ async def entrypoint(ctx: JobContext):
             room=ctx.room,
             agent=interviewer_agent
         )
+
+        # 6.2 Debugging: Update agent metadata when we hear something to see it in the UI
+        def _on_debug_transcript(ev):
+            if ev.transcript:
+                asyncio.create_task(ctx.room.local_participant.set_attributes({
+                    "lk.agent.last_heard": ev.transcript[:60] + ("..." if len(ev.transcript) > 60 else "")
+                }))
+        session.on("user_input_transcribed", _on_debug_transcript)
 
         # 6.5. Attach transcript listeners for history persistence
         # This ensures every turn is saved to the backend database.
