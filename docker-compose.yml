@@ -400,7 +400,7 @@ services:
   minio:
     container_name: tuyendung-studio-minio
     image: minio/minio:RELEASE.2025-04-22T22-12-26Z
-    command: server /data --console-address "${MINIO_CONSOLE_ADDRESS:-:9001}"
+    command: server /data --address ":9000" --console-address "${MINIO_CONSOLE_ADDRESS:-:9001}"
     env_file:
       - .env
     volumes:

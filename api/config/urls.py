@@ -34,7 +34,7 @@ api_v1_patterns = [
     path("ai/tts/", ai_views.tts),
     path("ai/transcribe/", ai_views.transcribe),
     path("ai/chat/", ai_views.chat),
-    path("interview/livekit/webhook", livekit_webhook.livekit_webhook),
+    path("livekit/webhook", livekit_webhook.livekit_webhook),
     # Compatibility endpoints for voice-agent integration.
     path("interview/compat/<str:room_name>/context", interviews_compat_views.interview_context),
     path("interview/compat/<str:room_name>/next-question", interviews_compat_views.interview_next_question),
