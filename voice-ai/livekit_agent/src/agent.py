@@ -5,11 +5,11 @@ from typing import Any
 
 from livekit.agents import (
     AgentServer,
+    AgentSession,
     JobContext,
     JobProcess,
     cli,
 )
-from livekit.agents.pipeline import VoicePipelineAgent, ChatContext
 from livekit.plugins import openai, silero
 import openai as openai_lib
 
@@ -50,10 +50,12 @@ async def entrypoint(ctx: JobContext) -> None:
     ctx.log_context_fields = {"room": ctx.room.name}
     logger.info(f"Starting interview agent for room: {ctx.room.name}")
 
+    # CRITICAL for 1.x: Connect to the room first
+    await ctx.connect()
+
     session = None
     try:
         # 1. Initialize Models
-        # Optimized for high-quality, low-latency interaction
         stt_model = openai.STT(
             api_key=config.STT_API_KEY,
             base_url=config.STT_BASE_URL,
@@ -100,62 +102,68 @@ async def entrypoint(ctx: JobContext) -> None:
         except Exception as e:
             logger.warning(f"Failed to parse room metadata: {e}")
 
-        # Create Interviewer logic engine
+        # Create Interviewer logic engine (inherits from livekit.agents.Agent)
         interviewer = Interviewer(context=agent_context)
-        
-        from .prompts import INTERVIEWER_INSTRUCTIONS
-        chat_ctx = ChatContext().append(
-            role="system",
-            text=f"{INTERVIEWER_INSTRUCTIONS}\n\nThông tin ngữ cảnh:\n- Ứng viên: {agent_context['candidateName']}\n- Vị trí: {agent_context['jobTitle']}\n- Mô tả công việc: {agent_context['jobDescription']}",
-        )
 
-        # 3. Create Voice Pipeline Agent
+        # 3. Setup Session (Standard 1.5.x Pattern)
+        from livekit.agents import TurnHandlingOptions
         from livekit.plugins.turn_detector.multilingual import MultilingualModel
         
-        agent = VoicePipelineAgent(
+        session = AgentSession(
             stt=stt_model,
             llm=llm_model,
             tts=tts_model,
             vad=ctx.proc.userdata["vad"],
-            chat_ctx=chat_ctx,
-            fnc_ctx=interviewer, # Provide interview tools (get_next_question, etc.)
-            turn_detector=MultilingualModel(vad=ctx.proc.userdata["vad"]),
-            interrupt_speech_duration=0.5,
-            min_endpointing_delay=0.5,
+            turn_handling=TurnHandlingOptions(
+                turn_detection=MultilingualModel(vad=ctx.proc.userdata["vad"]),
+            ),
         )
 
         # 4. Event Handlers (Persistence and Debugging)
-        @agent.on("agent_speech_committed")
-        def _on_agent_speech(msg):
-            if msg.text:
-                asyncio.create_task(interviewer._append_transcript("ai_agent", msg.text))
+        @session.on("conversation_item_added")
+        def _on_history_added(ev):
+            item = ev.item
+            role = "candidate" if item.role == "user" else "ai_agent"
+            content = ""
+            if isinstance(item.content, str):
+                content = item.content
+            elif isinstance(item.content, list):
+                content = "".join([getattr(c, 'text', '') for c in item.content])
+            
+            if content and content.strip():
+                asyncio.create_task(interviewer._append_transcript(role, content.strip()))
 
-        @agent.on("user_speech_committed")
-        def _on_user_speech(msg):
-            if isinstance(msg.content, str) and msg.content.strip():
-                asyncio.create_task(interviewer._append_transcript("candidate", msg.content.strip()))
+        @session.on("user_input_transcribed")
+        def _on_debug_transcript(ev):
+            if ev.transcript:
+                asyncio.create_task(ctx.room.local_participant.set_attributes({
+                    "lk.agent.last_heard": ev.transcript[:60] + ("..." if len(ev.transcript) > 60 else "")
+                }))
 
-        @agent.on("transcript_received")
-        def _on_partial_transcript(ev):
-            # Optional: push partial transcript to room attributes for UI
-            pass
-
-        # 5. Start the Agent in the room
-        agent.start(ctx.room)
+        # 5. Start the Session and Greeting
+        await session.start(
+            agent=interviewer,
+            room=ctx.room
+        )
         
         # Mark interview as active in backend
         await _update_backend_status(ctx.room.name, "in_progress")
 
         # Initial Greeting
-        candidate_name = agent_context["candidateName"]
-        await agent.say(f"Xin chào {candidate_name}, tôi là trợ lý phỏng vấn ảo của Square. Rất vui được gặp bạn. Chúng ta bắt đầu buổi phỏng vấn nhé?", allow_interruptions=True)
-        
-        # Mark interview as active in backend
-        await _update_backend_status(ctx.room.name, "in_progress")
+        await session.generate_reply(
+            instructions=f"Hãy chào đón ứng viên {agent_context['candidateName']} một cách nồng nhiệt và giới thiệu về buổi phỏng vấn vị trí {agent_context['jobTitle']}."
+        )
 
         # 6. Wait loop - keep the worker alive while connected
         while ctx.room.is_connected():
             await asyncio.sleep(1)
+
+    except Exception as e:
+        logger.error(f"CRITICAL ERROR in interview_agent: {e}", exc_info=True)
+    finally:
+        # Final status sync
+        await _update_backend_status(ctx.room.name, "completed")
+        logger.info(f"Session finished for room: {ctx.room.name}")
 
     except Exception as e:
         logger.error(f"CRITICAL ERROR in interview_agent: {e}", exc_info=True)
