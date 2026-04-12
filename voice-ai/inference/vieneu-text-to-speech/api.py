@@ -9,11 +9,18 @@ if os.path.exists(os.path.join(os.path.dirname(__file__), "src")):
 import logging
 import time
 import numpy as np
+import queue
 import torch
 import uvicorn
 import subprocess
 import threading
-import queue
+
+# Polyfill for missing torch bit-types if needed by dynamic imports (like torchao)
+if not hasattr(torch, "int1"):
+    torch.int1 = torch.int8 
+if not hasattr(torch, "uint1"):
+    torch.uint1 = torch.uint8
+
 from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
