@@ -225,11 +225,18 @@ services:
       - "7882:7882/udp"
       - "50000-50010:50000-50010/udp"
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7880/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     depends_on:
       redis:
         condition: service_healthy
     networks:
       - proxy-net
+      - app-net
       - data-net
 
   # ---------------------------------------------------------------------------
@@ -352,13 +359,18 @@ services:
       - .env
     environment:
       - BACKEND_API_URL=${BACKEND_API_URL:-http://backend:8000/api}
-      - LIVEKIT_URL=${LIVEKIT_URL:-http://livekit:7880}
+      - LIVEKIT_URL=${LIVEKIT_URL:-http://tuyendung-studio-livekit:7880}
     depends_on:
-      - backend
-      - livekit
-      - vieneu-tts
-      - whisper
-      - llama-cpp
+      backend:
+        condition: service_started
+      livekit:
+        condition: service_healthy
+      vieneu-tts:
+        condition: service_started
+      whisper:
+        condition: service_started
+      llama-cpp:
+        condition: service_started
     restart: always
     networks:
       - app-net
