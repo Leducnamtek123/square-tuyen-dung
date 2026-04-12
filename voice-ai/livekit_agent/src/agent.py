@@ -36,7 +36,10 @@ async def _update_backend_status(room_name: str, status: str) -> None:
 
 # --- LiveKit Agent Implementation ---
 
-server = AgentServer()
+server = AgentServer(
+    agent_name="square-ai-interviewer",
+)
+
 
 def prewarm(proc: JobProcess) -> None:
     """Pre-load heavy models in the main (prewarm) process to save time on job startup."""
