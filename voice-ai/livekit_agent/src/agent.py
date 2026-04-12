@@ -11,6 +11,7 @@ from livekit.agents import (
     cli,
 )
 from livekit.plugins import openai, silero
+from livekit.plugins.turn_detector.multilingual import MultilingualModel
 import openai as openai_lib
 
 from .config import config
@@ -102,7 +103,7 @@ async def entrypoint(ctx: JobContext) -> None:
 
         # 3. Setup Session (Standard 1.5.x Pattern)
         from livekit.agents import TurnHandlingOptions
-        from livekit.plugins.turn_detector.multilingual import MultilingualModel
+
         
         session = AgentSession(
             stt=stt_model,
@@ -169,14 +170,12 @@ def download_files():
     silero.VAD.load()
     
     print("Downloading Multilingual Turn Detector...")
-    try:
-        from livekit.plugins.turn_detector import MultilingualModel
-        # This triggers the automatic download of internal assets like languages.json
-        MultilingualModel()
-    except Exception as e:
-        print(f"Note: MultilingualModel download handled: {e}")
+    # This triggers the automatic download of internal assets like languages.json
+    # We don't catch exceptions here so that the Docker build fails if download fails
+    MultilingualModel()
         
     print("Models downloaded successfully.")
+
 
 
 if __name__ == "__main__":
