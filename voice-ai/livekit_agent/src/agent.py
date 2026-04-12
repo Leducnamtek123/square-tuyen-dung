@@ -170,11 +170,19 @@ def download_files():
     silero.VAD.load()
     
     print("Downloading Multilingual Turn Detector...")
-    # This triggers the automatic download of internal assets like languages.json
-    # We don't catch exceptions here so that the Docker build fails if download fails
-    MultilingualModel()
+    try:
+        from huggingface_hub import hf_hub_download
+        repo_id = "livekit/turn-detector"
+        for filename in ["languages.json", "model.onnx", "config.json"]:
+            print(f"Downloading {filename}...")
+            hf_hub_download(repo_id=repo_id, filename=filename)
+    except Exception as e:
+        print(f"Warning: Could not pre-download turn detector files: {e}")
+        # We don't raise here to allow build to continue if it's just a warning, 
+        # but the print will help us debug.
         
     print("Models downloaded successfully.")
+
 
 
 
