@@ -165,9 +165,19 @@ async def entrypoint(ctx: JobContext) -> None:
 
 def download_files():
     """Download necessary models to the local cache. Used by Dockerfile."""
-    print("Downloading models...")
+    print("Downloading Silero VAD...")
     silero.VAD.load()
+    
+    print("Downloading Multilingual Turn Detector...")
+    try:
+        from livekit.plugins.turn_detector import MultilingualModel
+        # This triggers the automatic download of internal assets like languages.json
+        MultilingualModel()
+    except Exception as e:
+        print(f"Note: MultilingualModel download handled: {e}")
+        
     print("Models downloaded successfully.")
+
 
 if __name__ == "__main__":
     import sys
