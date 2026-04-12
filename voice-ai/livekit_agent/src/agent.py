@@ -20,11 +20,15 @@ from .interviewer import Interviewer
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("agent")
 
+# Set ONNX execution providers to CPU only to avoid GPU discovery warnings in Docker
+import os
+os.environ["ONNXRUNTIME_EXECUTION_PROVIDERS"] = "CPUExecutionProvider"
+
 # --- Helper Functions ---
 async def _update_backend_status(room_name: str, status: str) -> None:
     """Update the interview status in the central backend."""
     try:
-        url = f"{config.BACKEND_API_URL}/interviews/{room_name}/status"
+        url = f"{config.BACKEND_API_URL}/v1/interview/compat/{room_name}/status"
         async with httpx.AsyncClient() as client:
             await client.patch(url, json={"status": status}, timeout=5.0)
     except Exception as e:
@@ -86,7 +90,7 @@ async def entrypoint(ctx: JobContext) -> None:
             tts=tts_model,
             vad=ctx.proc.userdata["vad"],
             turn_handling=TurnHandlingOptions(
-                turn_detection=MultilingualModel(),
+                turn_detection=MultilingualModel(vad=ctx.proc.userdata["vad"]),
                 interruption={
                     "resume_false_interruption": True,
                     "false_interruption_timeout": 1.0,
@@ -159,6 +163,13 @@ async def entrypoint(ctx: JobContext) -> None:
         # Final status sync
         await _update_backend_status(ctx.room.name, "completed")
         logger.info(f"Session finished for room: {ctx.room.name}")
+
+@server.cli.command("download-files")
+def download_files():
+    """Download necessary models to the local cache. Used by Dockerfile."""
+    print("Downloading models...")
+    silero.VAD.load()
+    print("Models downloaded successfully.")
 
 if __name__ == "__main__":
     cli.run_app(server)

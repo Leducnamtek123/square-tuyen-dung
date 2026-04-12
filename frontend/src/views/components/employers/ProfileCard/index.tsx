@@ -62,9 +62,6 @@ const ProfileCard: React.FC = () => {
                                 {t('profileCard.label.resultsFound')}
                             </Typography>
                             <Typography component="span" variant="h3" color="primary" sx={{ fontWeight: 1000, lineHeight: 1 }}>
-                                {count}
-                            </Typography>
-                            <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 700, opacity: 0.8 }}>
                                 {t('profileCard.label.profiles', { count })}
                             </Typography>
                         </Box>

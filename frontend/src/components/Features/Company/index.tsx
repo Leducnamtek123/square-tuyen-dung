@@ -333,7 +333,7 @@ const Company = ({
 
                 />
 
-                {followNumber} {t('company.followers', 'lượt theo dõi')}
+                {t('company.followers', { count: followNumber })}
 
               </Typography>
 
@@ -465,7 +465,7 @@ const Company = ({
                   style={{ width: 16, color: defaultTheme.palette.primary.main }}
                 />
 
-                {jobPostNumber} {t('company.jobCount', 'việc làm')}
+                {t('company.jobCount', { count: jobPostNumber })}
 
               </Typography>
 

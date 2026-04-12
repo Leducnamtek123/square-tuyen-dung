@@ -288,7 +288,7 @@ const JobSeekerProfile = ({
                             }}
                         >
                             <RemoveRedEyeOutlinedIcon sx={{ fontSize: 14 }} />
-                            {viewEmployerNumber} {t('employer:profileCard.label.viewsCount')}
+                            {t('employer:profileCard.label.viewsCount', { count: viewEmployerNumber })}
                         </Typography>
                     </Stack>
                 </Stack>

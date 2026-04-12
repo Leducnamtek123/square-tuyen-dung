@@ -101,7 +101,7 @@ class Interviewer(Agent):
         if not self._backend_api_url or not self._room_name:
             return {"error": "missing_backend_context"}
 
-        url = f"{self._backend_api_url}/interviews/{self._room_name}/next-question"
+        url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/next-question"
         try:
             async with httpx.AsyncClient() as client:
                 resp = await client.post(url, json={"advance": advance}, timeout=10.0)
@@ -151,7 +151,7 @@ class Interviewer(Agent):
         if not self._backend_api_url or not self._room_name:
             return
         try:
-            url = f"{self._backend_api_url}/interviews/{self._room_name}/status"
+            url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/status"
             async with httpx.AsyncClient() as client:
                 # Compatibility: Some endpoints use PATCH, some POST. 
                 # Interviews compat view handles PATCH/POST.
@@ -177,7 +177,7 @@ class Interviewer(Agent):
             if speech_duration_ms is not None:
                 payload["speech_duration_ms"] = int(speech_duration_ms)
             async with httpx.AsyncClient() as client:
-                url = f"{self._backend_api_url}/interviews/{self._room_name}/append-transcription"
+                url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/append-transcription"
                 resp = await client.post(url, json=payload, timeout=5.0)
                 if resp.status_code != 201:
                     logger.debug("append_transcript returned %d", resp.status_code)

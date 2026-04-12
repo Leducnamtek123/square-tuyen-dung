@@ -49,7 +49,7 @@ const QuestionGroupTable = ({ data, loading, onEdit, onDelete }: QuestionGroupTa
         },
         {
             accessorKey: 'questions',
-            header: t('questionGroupsCard.label.questionCount') as string,
+            header: t('questionGroupsCard.table.numberOfQuestions') as string,
             cell: (info) => (
                 <Typography variant="body2">
                     {(info.getValue() as Question[])?.length || 0}
