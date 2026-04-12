@@ -36,17 +36,10 @@ async def _update_backend_status(room_name: str, status: str) -> None:
 
 # --- LiveKit Agent Implementation ---
 
-server = AgentServer()
-
-
-
 def prewarm(proc: JobProcess) -> None:
     """Pre-load heavy models in the main (prewarm) process to save time on job startup."""
     proc.userdata["vad"] = silero.VAD.load()
 
-server.setup_fnc = prewarm
-
-@server.rtc_session()
 async def entrypoint(ctx: JobContext) -> None:
     # Set log context for better debugging
     ctx.log_context_fields = {"room": ctx.room.name}
@@ -182,13 +175,13 @@ if __name__ == "__main__":
         download_files()
     else:
         cli.run_app(
-            server, 
             WorkerOptions(
                 entrypoint_fnc=entrypoint,
                 prewarm_fnc=prewarm,
                 agent_name="square-ai-interviewer",
             )
         )
+
 
 
 
