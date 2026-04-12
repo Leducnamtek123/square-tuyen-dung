@@ -235,9 +235,15 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - proxy-net
-      - app-net
-      - data-net
+      proxy-net:
+        aliases:
+          - livekit
+      app-net:
+        aliases:
+          - livekit
+      data-net:
+        aliases:
+          - livekit
 
   # ---------------------------------------------------------------------------
   # LiveKit Egress (For Recording & S3 Upload)

@@ -16,4 +16,4 @@ room:
 webhook:
   api_key: devkey
   urls:
-    - http://backend:8001/api/livekit/webhook
+    - http://backend:8000/api/livekit/webhook
