@@ -175,10 +175,12 @@ def download_files():
         repo_id = "livekit/turn-detector"
         # The multilingual assets are on a specific branch (note the typo 'multlingual')
         revision = "multlingual"
-        for filename in ["languages.json", "onnx/model.onnx", "onnx/config.json"]:
+        # We download the 'q8' (quantized) version as it's the plugin default
+        for filename in ["languages.json", "onnx/model_q8.onnx", "onnx/config.json"]:
             print(f"Downloading {filename} from {revision} branch...")
             hf_hub_download(repo_id=repo_id, filename=filename, revision=revision)
     except Exception as e:
+
 
         print(f"Warning: Could not pre-download turn detector files: {e}")
         # We don't raise here to allow build to continue if it's just a warning, 
