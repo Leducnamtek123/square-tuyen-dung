@@ -79,6 +79,14 @@ def get_tts():
             # which helps in debugging via logs rather than seeing continuous container restarts.
     return tts
 
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception(f"Unhandled exception during {request.method} {request.url}")
+    return Response(
+        content=f"Internal Server Error: {str(exc)}",
+        status_code=500
+    )
+
 class OpenAITTSRequest(BaseModel):
     input: str
     model: str = "tts-1"
@@ -97,8 +105,20 @@ async def list_voices():
 
 @app.post("/v1/audio/speech")
 async def tts_speech(req: OpenAITTSRequest):
-    logger.info(f"Received TTS request: {req.model_dump()}")
+    # Basic input validation
+    if not req.input or not req.input.strip():
+        logger.warning("Received empty TTS input")
+        raise HTTPException(status_code=400, detail="Input text cannot be empty")
+        
+    logger.info(f"Received TTS request (len={len(req.input)}): {req.model} / {req.voice}")
+    
     engine = get_tts()
+    if engine is None:
+        logger.error("TTS engine accessed but is None (not initialized)")
+        raise HTTPException(
+            status_code=503, 
+            detail="TTS engine is still initializing or failed to load. Please check server logs."
+        )
     
     # Resolve voice
     voice_data = None
@@ -148,8 +168,13 @@ async def tts_speech(req: OpenAITTSRequest):
             ffmpeg_cmd.extend(["-f", "mp3", "-c:a", "libmp3lame", "-ab", "128k"])
         
         ffmpeg_cmd.extend(["-fflags", "nobuffer", "-flush_packets", "1", "-"])
-        
-        process = subprocess.Popen(ffmpeg_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=0)
+
+        try:
+            process = subprocess.Popen(ffmpeg_cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=0)
+        except OSError as e:
+            logger.error(f"Failed to start FFmpeg: {e}")
+            raise HTTPException(status_code=500, detail=f"FFmpeg startup failed: {e}")
+
         ex_q = queue.Queue()
 
         def write_to_ffmpeg():
