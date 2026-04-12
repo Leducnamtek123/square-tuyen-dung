@@ -120,9 +120,14 @@ async def entrypoint(ctx: JobContext):
         vad_model = await asyncio.to_thread(silero.VAD.load)
         
         # Using a simpler VAD-based turn detector for better reliability in single-language mode
-        # This fixes the TypeError: MultilingualModel.__init__() got an unexpected keyword argument 'vad'
-        from livekit.agents import turn_detector
-        device_turn_detector = turn_detector.VADBasedTurnDetector(
+        # This fixes the ImportError: cannot import name 'turn_detector' from 'livekit.agents'
+        # In newer versions, it's located in livekit.plugins.turn_detector
+        try:
+            from livekit.plugins.turn_detector import VADBasedTurnDetector
+        except ImportError:
+            from livekit.agents.turn_detector import VADBasedTurnDetector
+            
+        device_turn_detector = VADBasedTurnDetector(
             vad=vad_model,
             min_endpointing_delay=config.MIN_ENDPOINTING_DELAY,
             max_endpointing_delay=config.MAX_ENDPOINTING_DELAY,
