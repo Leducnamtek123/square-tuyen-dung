@@ -166,7 +166,6 @@ async def entrypoint(ctx: JobContext) -> None:
         logger.info(f"Session finished for room: {ctx.room.name}")
 
 
-@server.cli.command("download-files")
 def download_files():
     """Download necessary models to the local cache. Used by Dockerfile."""
     print("Downloading models...")
@@ -174,4 +173,9 @@ def download_files():
     print("Models downloaded successfully.")
 
 if __name__ == "__main__":
-    cli.run_app(server)
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "download-files":
+        download_files()
+    else:
+        cli.run_app(server)
+
