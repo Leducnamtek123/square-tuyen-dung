@@ -5,11 +5,11 @@ from typing import Any
 
 from livekit.agents import (
     AgentServer,
-    AgentSession,
     JobContext,
     JobProcess,
     cli,
 )
+from livekit.agents.pipeline import VoicePipelineAgent, ChatContext
 from livekit.plugins import openai, silero
 import openai as openai_lib
 
@@ -79,74 +79,76 @@ async def entrypoint(ctx: JobContext) -> None:
             voice=config.TTS_VOICE,
         )
 
-        # 2. Setup Session with the latest 1.5.x patterns
-        # We use TurnHandlingOptions to manage how the AI detects when the user finishes speaking.
-        from livekit.agents import TurnHandlingOptions
-        from livekit.plugins.turn_detector.multilingual import MultilingualModel
-        
-        session = AgentSession(
-            stt=stt_model,
-            llm=llm_model,
-            tts=tts_model,
-            vad=ctx.proc.userdata["vad"],
-            turn_handling=TurnHandlingOptions(
-                turn_detection=MultilingualModel(vad=ctx.proc.userdata["vad"]),
-                interruption={
-                    "resume_false_interruption": True,
-                    "false_interruption_timeout": 1.0,
-                },
-            ),
-            preemptive_generation=config.PREEMPTIVE_GENERATION,
-        )
-
-        # 3. Context Preparation
-        # We extract candidate and job info from the room metadata
-        agent_context = {}
+        # 2. Context Preparation
+        agent_context = {
+            "candidateName": "Ứng viên",
+            "jobTitle": "Vị trí này",
+            "jobDescription": "",
+            "backendApiUrl": config.BACKEND_API_URL,
+            "roomName": ctx.room.name,
+        }
         try:
             metadata = ctx.room.metadata
             if metadata:
                 import json
                 pm = json.loads(metadata)
-                agent_context = {
+                agent_context.update({
                     "candidateName": pm.get("candidate_name", "Ứng viên"),
                     "jobTitle": pm.get("job_title", "Vị trí này"),
                     "jobDescription": pm.get("job_description", ""),
-                    "backendApiUrl": config.BACKEND_API_URL,
-                    "roomName": ctx.room.name,
-                }
+                })
         except Exception as e:
             logger.warning(f"Failed to parse room metadata: {e}")
 
-        # Create Interviewer Agent instance
-        interviewer_agent = Interviewer(context=agent_context)
+        # Create Interviewer logic engine
+        interviewer = Interviewer(context=agent_context)
         
-        # 4. Event Handlers (History and Debugging)
-        @session.on("conversation_item_added")
-        def _on_history_added(ev):
-            item = ev.item
-            role = "candidate" if item.role == "user" else "ai_agent"
-            content = ""
-            if isinstance(item.content, str):
-                content = item.content
-            elif isinstance(item.content, list):
-                content = "".join([getattr(c, 'text', '') for c in item.content])
-            
-            if content and content.strip():
-                # Persist to database via interviewer's helper
-                asyncio.create_task(interviewer_agent._append_transcript(role, content.strip()))
-
-        @session.on("user_input_transcribed")
-        def _on_debug_transcript(ev):
-            if ev.transcript:
-                asyncio.create_task(ctx.room.local_participant.set_attributes({
-                    "lk.agent.last_heard": ev.transcript[:60] + ("..." if len(ev.transcript) > 60 else "")
-                }))
-
-        # 5. Start the Session (This triggers on_enter in Interviewer class)
-        await session.start(
-            agent=interviewer_agent,
-            room=ctx.room
+        from .prompts import INTERVIEWER_INSTRUCTIONS
+        chat_ctx = ChatContext().append(
+            role="system",
+            text=f"{INTERVIEWER_INSTRUCTIONS}\n\nThông tin ngữ cảnh:\n- Ứng viên: {agent_context['candidateName']}\n- Vị trí: {agent_context['jobTitle']}\n- Mô tả công việc: {agent_context['jobDescription']}",
         )
+
+        # 3. Create Voice Pipeline Agent
+        from livekit.plugins.turn_detector.multilingual import MultilingualModel
+        
+        agent = VoicePipelineAgent(
+            stt=stt_model,
+            llm=llm_model,
+            tts=tts_model,
+            vad=ctx.proc.userdata["vad"],
+            chat_ctx=chat_ctx,
+            fnc_ctx=interviewer, # Provide interview tools (get_next_question, etc.)
+            turn_detector=MultilingualModel(vad=ctx.proc.userdata["vad"]),
+            interrupt_speech_duration=0.5,
+            min_endpointing_delay=0.5,
+        )
+
+        # 4. Event Handlers (Persistence and Debugging)
+        @agent.on("agent_speech_committed")
+        def _on_agent_speech(msg):
+            if msg.text:
+                asyncio.create_task(interviewer._append_transcript("ai_agent", msg.text))
+
+        @agent.on("user_speech_committed")
+        def _on_user_speech(msg):
+            if isinstance(msg.content, str) and msg.content.strip():
+                asyncio.create_task(interviewer._append_transcript("candidate", msg.content.strip()))
+
+        @agent.on("transcript_received")
+        def _on_partial_transcript(ev):
+            # Optional: push partial transcript to room attributes for UI
+            pass
+
+        # 5. Start the Agent in the room
+        agent.start(ctx.room)
+        
+        # Mark interview as active in backend
+        await _update_backend_status(ctx.room.name, "in_progress")
+
+        # Initial Greeting
+        candidate_name = agent_context["candidateName"]
+        await agent.say(f"Xin chào {candidate_name}, tôi là trợ lý phỏng vấn ảo của Square. Rất vui được gặp bạn. Chúng ta bắt đầu buổi phỏng vấn nhé?", allow_interruptions=True)
         
         # Mark interview as active in backend
         await _update_backend_status(ctx.room.name, "in_progress")
@@ -158,8 +160,6 @@ async def entrypoint(ctx: JobContext) -> None:
     except Exception as e:
         logger.error(f"CRITICAL ERROR in interview_agent: {e}", exc_info=True)
     finally:
-        if session:
-            await session.aclose()
         # Final status sync
         await _update_backend_status(ctx.room.name, "completed")
         logger.info(f"Session finished for room: {ctx.room.name}")
