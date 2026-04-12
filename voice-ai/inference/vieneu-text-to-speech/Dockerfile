@@ -31,7 +31,7 @@ WORKDIR /workspace
 RUN uv venv /opt/venv && \
     uv pip install --no-cache \
     "torch==2.6.0" "torchaudio==2.6.0" --index-url https://download.pytorch.org/whl/cu124 && \
-    uv pip install --no-cache "vieneu[gpu]>=1.2.6" "loguru" "fastapi" "uvicorn" "pydantic" "numpy"
+    uv pip install --no-cache "transformers>=4.45.0" "accelerate>=0.30.0" "vieneu[gpu]>=1.2.6" "loguru" "fastapi" "uvicorn" "pydantic" "numpy"
 
 # Ensure PyTorch's bundled NCCL takes priority over the system one
 ENV LD_LIBRARY_PATH="/opt/venv/lib/python3.10/site-packages/torch/lib:${LD_LIBRARY_PATH}"
