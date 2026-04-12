@@ -35,14 +35,8 @@ class Config:
 
     STT_PROVIDER: str = os.getenv("STT_PROVIDER", "whisper").lower()
 
-    @property
-    def stt_base_url(self) -> str:
-        return os.getenv("STT_BASE_URL", "http://whisper:8080/v1")
-
-    @property
-    def stt_model(self) -> str:
-        return os.getenv("STT_MODEL", "openai/whisper-large-v3")
-
+    STT_BASE_URL: str = os.getenv("STT_BASE_URL", "http://whisper:8080/v1")
+    STT_MODEL: str = os.getenv("STT_MODEL", "openai/whisper-large-v3")
     STT_LANGUAGE: str = os.getenv("STT_LANGUAGE", "vi")
     STT_API_KEY: str = os.getenv("STT_API_KEY", "no-key-needed")
 
@@ -50,6 +44,7 @@ class Config:
     TTS_MODEL: str = os.getenv("TTS_MODEL", "tts-1")
     TTS_VOICE: str = os.getenv("TTS_VOICE", "Bình (nam miền Bắc)")
     TTS_API_KEY: str = os.getenv("TTS_API_KEY", "no-key-needed")
+
 
     # Streaming/latency tuning
     PREEMPTIVE_GENERATION: bool = os.getenv("PREEMPTIVE_GENERATION", "1").lower() in (
@@ -74,6 +69,6 @@ class Config:
         "yes",
     )
 
-    BACKEND_API_URL: str = os.getenv("BACKEND_API_URL", "http://backend:8001/api")
+    BACKEND_API_URL: str = os.getenv("BACKEND_API_URL", "http://backend:8000/api")
 
 config = Config()

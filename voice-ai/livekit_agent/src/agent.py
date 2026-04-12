@@ -165,12 +165,6 @@ async def entrypoint(ctx: JobContext) -> None:
         await _update_backend_status(ctx.room.name, "completed")
         logger.info(f"Session finished for room: {ctx.room.name}")
 
-    except Exception as e:
-        logger.error(f"CRITICAL ERROR in interview_agent: {e}", exc_info=True)
-    finally:
-        # Final status sync
-        await _update_backend_status(ctx.room.name, "completed")
-        logger.info(f"Session finished for room: {ctx.room.name}")
 
 @server.cli.command("download-files")
 def download_files():

@@ -405,7 +405,11 @@ services:
       - .env
     volumes:
       - minio-data:/data
-    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     deploy:
       resources:
         limits:
@@ -414,10 +418,12 @@ services:
       proxy-net:
         aliases:
           - minio
+          - minio-s3
           - s3.tuyendung.square.vn
       app-net:
         aliases:
           - minio
+          - minio-s3
 
   # ---------------------------------------------------------------------------
   # MinIO Init (set bucket policy — runs once per deploy)
