@@ -50,6 +50,15 @@ class Interviewer(Agent):
     def current_stage(self) -> InterviewStage:
         return self._current_stage
 
+    async def on_enter(self) -> None:
+        """Called when the agent joins the session. Triggers the initial greeting."""
+        logger.info("Interviewer agent entered session. Generating initial greeting...")
+        # Instruct the LLM to greet the user based on the provided character instructions
+        if hasattr(self, "session") and self.session:
+            self.session.generate_reply(
+                instructions="Hãy chào đón ứng viên một cách lịch sự, giới thiệu bản thân là người phỏng vấn từ Square AI và bắt đầu phần giới thiệu (Introduction)."
+            )
+
     @function_tool
     async def set_interview_stage(
         self,
