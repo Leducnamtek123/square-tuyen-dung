@@ -6,6 +6,7 @@ import sys
 if os.path.exists(os.path.join(os.path.dirname(__file__), "src")):
     sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
+import logging
 import time
 import numpy as np
 import torch
@@ -13,7 +14,7 @@ import uvicorn
 import subprocess
 import threading
 import queue
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -31,9 +32,12 @@ app.add_middleware(
 )
 
 @app.get("/health")
-async def health():
+async def health(response: Response):
     if tts is not None:
         return {"status": "ok", "model_loaded": True}
+    
+    # Return 503 Service Unavailable until the model is ready
+    response.status_code = 503
     return {"status": "initializing", "model_loaded": False}
 
 # Global TTS Instance
@@ -42,31 +46,37 @@ tts = None
 def get_tts():
     global tts
     if tts is None:
-        # Detect device: prefer environment variable, fallback to auto-detection
-        device = os.getenv("TTS_DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
-        
-        logger.info(f"🚀 Initializing VieNeu-TTS (Mode: standard, Device: {device})...")
-        
-        # Initialize TTS 
-        # Switching to 'standard' mode for maximum stability 
-        # as 'fast' mode (LMDeploy) is hitting a fatal buffer error on this system.
-        tts = Vieneu(
-            mode='standard', 
-            backbone_repo="pnnbao-ump/VieNeu-TTS",
-            backbone_device=device,
-            codec_device=device
-        )
-        
-        # DEBUG: List all available voices at startup
         try:
-            voices = tts.list_preset_voices()
-            logger.info(f"🎤 Available preset voices ({len(voices)}):")
-            for desc, vid in voices:
-                logger.info(f"  - {desc} [ID: {vid}]")
-        except Exception as e:
-            logger.error(f"Failed to list voices: {e}")
+            # Detect device: prefer environment variable, fallback to auto-detection
+            device = os.getenv("TTS_DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
             
-        logger.info("✅ VieNeu-TTS (Standard Mode) Initialized")
+            logger.info(f"🚀 Initializing VieNeu-TTS (Mode: standard, Device: {device})...")
+            
+            # Initialize TTS 
+            # Switching to 'standard' mode for maximum stability 
+            # as 'fast' mode (LMDeploy) is hitting a fatal buffer error on this system.
+            tts = Vieneu(
+                mode='standard', 
+                backbone_repo="pnnbao-ump/VieNeu-TTS",
+                backbone_device=device,
+                codec_device=device
+            )
+            
+            # DEBUG: List all available voices at startup
+            try:
+                voices = tts.list_preset_voices()
+                logger.info(f"🎤 Available preset voices ({len(voices)}):")
+                for desc, vid in voices:
+                    logger.info(f"  - {desc} [ID: {vid}]")
+            except Exception as e:
+                logger.error(f"Failed to list voices: {e}")
+                
+            logger.info("✅ VieNeu-TTS (Standard Mode) Initialized and Ready")
+        except Exception as e:
+            logger.critical(f"❌ FATAL ERROR during VieNeu-TTS initialization: {e}")
+            logger.exception(e)
+            # We don't exit the process here to allow the health check to keep returning 503
+            # which helps in debugging via logs rather than seeing continuous container restarts.
     return tts
 
 class OpenAITTSRequest(BaseModel):
@@ -210,4 +220,16 @@ async def startup_event():
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8298))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    
+    # Custom logging config to suppress /health logs
+    log_config = uvicorn.config.LOGGING_CONFIG
+    log_config["formatters"]["access"]["fmt"] = "%(asctime)s | %(levelname)s | %(client_addr)s - \"%(request_line)s\" %(status_code)s"
+    
+    # We use a filter to skip health checks in the access log
+    class HealthCheckFilter(logging.Filter):
+        def filter(self, record: logging.LogRecord) -> bool:
+            return "/health" not in record.getMessage()
+
+    logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())
+    
+    uvicorn.run(app, host="0.0.0.0", port=port, log_config=log_config)
