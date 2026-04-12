@@ -72,7 +72,6 @@ const InterviewDetailCard = () => {
     
     const [isTriggeringAi, setIsTriggeringAi] = useState(false);
     const [observerOpen, setObserverOpen] = useState(false);
-    const [observerLoading, setObserverLoading] = useState(false);
 
     // SSE for live updates
     const isSessionActive = session ? ACTIVE_STATUSES.includes(session.status) : false;
@@ -140,11 +139,25 @@ const InterviewDetailCard = () => {
         }
     };
 
+    const [connectionDetails, setConnectionDetails] = useState<{ token: string; serverUrl: string } | null>(null);
+    const [observerLoading, setObserverLoading] = useState(false);
+
     const handleObserverMode = async () => {
         if (!session?.id) return;
         setObserverLoading(true);
         try {
-            // We just open the dialog - SSE is already connected
+            // 1. Fetch live observer token from backend
+            const details = await interviewService.getObserverToken(session.id);
+            
+            // 2. Extract server URL (backend returns different keys sometimes)
+            const serverUrl = details.serverUrl || details.server_url || process.env.NEXT_PUBLIC_LIVEKIT_URL || '';
+            
+            setConnectionDetails({
+                token: details.token,
+                serverUrl: serverUrl
+            });
+            
+            // 3. Open the dialog
             setObserverOpen(true);
         } catch (e) {
             errorHandling(e as AxiosError<{ errors?: ApiError }>);
@@ -491,7 +504,6 @@ const InterviewDetailCard = () => {
             
             {(isInterviewMutating || isTriggeringAi) && <BackdropLoading />}
 
-            {/* Observer Mode Dialog */}
             <InterviewObserverDialog
                 open={observerOpen}
                 onClose={() => setObserverOpen(false)}
@@ -501,6 +513,7 @@ const InterviewDetailCard = () => {
                 liveTranscripts={liveTranscripts}
                 liveStatus={liveStatus}
                 sseConnected={sseConnected}
+                connectionDetails={connectionDetails}
             />
         </Paper>
     );

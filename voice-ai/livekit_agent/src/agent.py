@@ -120,9 +120,8 @@ async def entrypoint(ctx: JobContext):
         vad_model = await asyncio.to_thread(silero.VAD.load)
         
         # Using a simpler VAD-based turn detector for better reliability in single-language mode
-        # This replaces the complex MultilingualModel which can sometimes filter out speech incorrectly.
-        from livekit.agents import turn_detector
-        device_turn_detector = turn_detector.VADBasedTurnDetector(
+        # We use the MultilingualModel from the turn_detector plugin as it provides standard VAD-based endpointing.
+        device_turn_detector = MultilingualModel(
             vad=vad_model,
             min_endpointing_delay=config.MIN_ENDPOINTING_DELAY,
             max_endpointing_delay=config.MAX_ENDPOINTING_DELAY,

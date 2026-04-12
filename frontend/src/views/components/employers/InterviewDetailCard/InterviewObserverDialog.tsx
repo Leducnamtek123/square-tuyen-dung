@@ -25,6 +25,14 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import { useTranslation } from 'react-i18next';
 
+import { 
+  LiveKitRoom, 
+  RoomAudioRenderer, 
+  TrackLoop, 
+  useTracks, 
+  BarVisualizer 
+} from '@livekit/components-react';
+import { Track } from 'livekit-client';
 import type { SSETranscript } from '../../../employerPages/InterviewPages/hooks/useInterviewSSE';
 
 interface InterviewObserverDialogProps {
@@ -36,7 +44,7 @@ interface InterviewObserverDialogProps {
   liveTranscripts: SSETranscript[];
   liveStatus: string | null;
   sseConnected: boolean;
-  /** LiveKit connection details (optional — for audio streaming) */
+  /** LiveKit connection details for audio streaming */
   connectionDetails?: { token: string; serverUrl: string } | null;
 }
 
@@ -46,6 +54,34 @@ const Transition = React.forwardRef(function Transition(
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
+
+/** Compact Visualizer for a more premium look */
+const LiveObserverVisualizer = () => {
+  const tracks = useTracks([Track.Source.Microphone]);
+  
+  return (
+    <Box sx={{ width: '100%', maxWidth: 400, px: 4 }}>
+      {tracks.length > 0 ? (
+        <Stack spacing={4} alignItems="center">
+          <Box sx={{ height: 100, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+             <BarVisualizer barCount={15} style={{ height: '60px', width: '200px' }} />
+          </Box>
+          <Typography variant="caption" sx={{ color: '#22c55e', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }}>
+            <FiberManualRecordIcon sx={{ fontSize: 8, mr: 1, verticalAlign: 'middle', animation: 'pulse 1.5s infinite' }} />
+            Receiving Live Audio
+          </Typography>
+        </Stack>
+      ) : (
+        <Stack spacing={3} alignItems="center">
+           <VolumeUpIcon sx={{ fontSize: 64, color: 'rgba(255,255,255,0.1)' }} />
+           <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.2)', fontWeight: 700 }}>
+             Waiting for Audio Tracks...
+           </Typography>
+        </Stack>
+      )}
+    </Box>
+  );
+};
 
 const InterviewObserverDialog: React.FC<InterviewObserverDialogProps> = ({
   open,
@@ -85,156 +121,134 @@ const InterviewObserverDialog: React.FC<InterviewObserverDialogProps> = ({
 
   const statusText = liveStatus || 'in_progress';
 
-  return (
-    <Dialog
-      open={open}
-      onClose={onClose}
-      fullScreen
-      TransitionComponent={Transition}
-      PaperProps={{
-        sx: {
-          bgcolor: '#0a0e1a',
-          backgroundImage: 'radial-gradient(ellipse at top, rgba(56,189,248,0.07) 0%, transparent 60%)',
-        },
-      }}
-    >
-      <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100vh' }}>
-        {/* Header */}
-        <Box
-          sx={{
-            px: 3,
-            py: 2,
-            borderBottom: '1px solid rgba(255,255,255,0.06)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            backdropFilter: 'blur(20px)',
-            bgcolor: 'rgba(10,14,26,0.8)',
-          }}
-        >
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                bgcolor: alpha(theme.palette.warning.main, 0.1),
-                border: '1px solid',
-                borderColor: alpha(theme.palette.warning.main, 0.2),
-                px: 2,
-                py: 0.75,
-                borderRadius: 2,
-              }}
-            >
-              <VisibilityOffIcon sx={{ fontSize: 18, color: 'warning.main' }} />
-              <Typography variant="caption" sx={{ fontWeight: 900, color: 'warning.main', letterSpacing: 1, textTransform: 'uppercase', fontSize: '0.7rem' }}>{t('common:auto.InterviewObserverDialog_observer_mode_daff', `Observer Mode`)}</Typography>
-            </Box>
-            <Box>
-              <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 800 }}>
-                {candidateName || 'Candidate'} — {jobName || 'Interview'}
-              </Typography>
-              <Stack direction="row" alignItems="center" spacing={1}>
-                <FiberManualRecordIcon
-                  sx={{
-                    fontSize: 10,
-                    color: sseConnected ? '#22c55e' : '#ef4444',
-                    animation: sseConnected ? 'pulse 2s infinite' : 'none',
-                    '@keyframes pulse': {
-                      '0%, 100%': { opacity: 1 },
-                      '50%': { opacity: 0.4 },
-                    },
-                  }}
-                />
-                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>
-                  {sseConnected ? 'Live' : 'Reconnecting...'} • {formatTime(elapsed)}
-                </Typography>
-              </Stack>
-            </Box>
-          </Stack>
-
-          <Stack direction="row" alignItems="center" spacing={2}>
-            <Chip
-              label={statusText.replaceAll('_', ' ').toUpperCase()}
-              size="small"
-              sx={{
-                fontWeight: 900,
-                bgcolor: statusText === 'in_progress' ? alpha('#22c55e', 0.15) : alpha('#94a3b8', 0.15),
-                color: statusText === 'in_progress' ? '#22c55e' : '#94a3b8',
-                border: '1px solid',
-                borderColor: statusText === 'in_progress' ? alpha('#22c55e', 0.3) : alpha('#94a3b8', 0.2),
-                fontSize: '0.65rem',
-                letterSpacing: 1.5,
-              }}
-            />
-            <Button
-              onClick={onClose}
-              variant="contained"
-              size="small"
-              sx={{
-                bgcolor: alpha('#ef4444', 0.15),
-                color: '#f87171',
-                fontWeight: 900,
-                fontSize: '0.7rem',
-                letterSpacing: 1,
-                textTransform: 'uppercase',
-                borderRadius: 2,
-                border: '1px solid',
-                borderColor: alpha('#ef4444', 0.3),
-                '&:hover': { bgcolor: alpha('#ef4444', 0.25) },
-              }}
-            >{t('common:auto.InterviewObserverDialog_end_observation_130a', `End Observation`)}</Button>
-          </Stack>
-        </Box>
-
-        {/* Main Content */}
-        <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-          {/* Left: Audio Visualizer Placeholder */}
+  const DialogInner = (
+    <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100vh' }}>
+      {/* Header */}
+      <Box
+        sx={{
+          px: 3,
+          py: 2,
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          backdropFilter: 'blur(20px)',
+          bgcolor: 'rgba(10,14,26,0.8)',
+        }}
+      >
+        <Stack direction="row" alignItems="center" spacing={2}>
           <Box
             sx={{
-              width: { xs: '0%', md: '45%' },
-              display: { xs: 'none', md: 'flex' },
-              flexDirection: 'column',
+              display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              borderRight: '1px solid rgba(255,255,255,0.05)',
-              position: 'relative',
-              overflow: 'hidden',
+              gap: 1,
+              bgcolor: alpha(theme.palette.warning.main, 0.1),
+              border: '1px solid',
+              borderColor: alpha(theme.palette.warning.main, 0.2),
+              px: 2,
+              py: 0.75,
+              borderRadius: 2,
             }}
           >
-            <Box
-              sx={{
-                position: 'absolute',
-                inset: 0,
-                background: 'radial-gradient(circle at center, rgba(56,189,248,0.08) 0%, transparent 70%)',
-              }}
-            />
-            <Box sx={{ position: 'relative', textAlign: 'center' }}>
-              <Box
+            <VisibilityOffIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+            <Typography variant="caption" sx={{ fontWeight: 900, color: 'warning.main', letterSpacing: 1, textTransform: 'uppercase', fontSize: '0.7rem' }}>{t('common:auto.InterviewObserverDialog_observer_mode_daff', `Observer Mode`)}</Typography>
+          </Box>
+          <Box>
+            <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 800 }}>
+              {candidateName || 'Candidate'} — {jobName || 'Interview'}
+            </Typography>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <FiberManualRecordIcon
                 sx={{
-                  width: 180,
-                  height: 180,
-                  borderRadius: '50%',
-                  border: '3px solid',
-                  borderColor: sseConnected ? alpha('#22c55e', 0.3) : alpha('#94a3b8', 0.2),
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  mx: 'auto',
-                  mb: 4,
-                  bgcolor: alpha('#0ea5e9', 0.05),
-                  animation: sseConnected ? 'pulseRing 3s infinite' : 'none',
-                  '@keyframes pulseRing': {
-                    '0%, 100%': { boxShadow: `0 0 0 0px ${alpha('#22c55e', 0.2)}` },
-                    '50%': { boxShadow: `0 0 0 15px ${alpha('#22c55e', 0)}` },
+                  fontSize: 10,
+                  color: sseConnected ? '#22c55e' : '#ef4444',
+                  animation: sseConnected ? 'pulse 2s infinite' : 'none',
+                  '@keyframes pulse': {
+                    '0%, 100%': { opacity: 1 },
+                    '50%': { opacity: 0.4 },
                   },
                 }}
-              >
-                <VolumeUpIcon sx={{ fontSize: 64, color: alpha('#0ea5e9', 0.5) }} />
+              />
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>
+                {sseConnected ? 'Live' : 'Reconnecting...'} • {formatTime(elapsed)}
+              </Typography>
+            </Stack>
+          </Box>
+        </Stack>
+
+        <Stack direction="row" alignItems="center" spacing={2}>
+          <Chip
+            label={statusText.replaceAll('_', ' ').toUpperCase()}
+            size="small"
+            sx={{
+              fontWeight: 900,
+              bgcolor: statusText === 'in_progress' ? alpha('#22c55e', 0.15) : alpha('#94a3b8', 0.15),
+              color: statusText === 'in_progress' ? '#22c55e' : '#94a3b8',
+              border: '1px solid',
+              borderColor: statusText === 'in_progress' ? alpha('#22c55e', 0.3) : alpha('#94a3b8', 0.2),
+              fontSize: '0.65rem',
+              letterSpacing: 1.5,
+            }}
+          />
+          <Button
+            onClick={onClose}
+            variant="contained"
+            size="small"
+            sx={{
+              bgcolor: alpha('#ef4444', 0.15),
+              color: '#f87171',
+              fontWeight: 900,
+              fontSize: '0.7rem',
+              letterSpacing: 1,
+              textTransform: 'uppercase',
+              borderRadius: 2,
+              border: '1px solid',
+              borderColor: alpha('#ef4444', 0.3),
+              '&:hover': { bgcolor: alpha('#ef4444', 0.25) },
+            }}
+          >{t('common:auto.InterviewObserverDialog_end_observation_130a', `End Observation`)}</Button>
+        </Stack>
+      </Box>
+
+      {/* Main Content */}
+      <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+        {/* Left: Audio Visualizer */}
+        <Box
+          sx={{
+            width: { xs: '0%', md: '45%' },
+            display: { xs: 'none', md: 'flex' },
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            borderRight: '1px solid rgba(255,255,255,0.05)',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          <Box
+            sx={{
+              position: 'absolute',
+              inset: 0,
+              background: 'radial-gradient(circle at center, rgba(56,189,248,0.08) 0%, transparent 70%)',
+            }}
+          />
+          <Box sx={{ position: 'relative', textAlign: 'center', width: '100%' }}>
+            {connectionDetails ? (
+              <LiveObserverVisualizer />
+            ) : (
+              <Box sx={{ p: 4 }}>
+                <Typography variant="body2" sx={{ color: 'warning.main', fontWeight: 800, mb: 1 }}>{t('common:auto.InterviewObserverDialog_audio_disabled_a82b', `Audio Monitoring Disabled`)}</Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>{t('common:auto.InterviewObserverDialog_check_server_config_to_e_e72a', `Check server configuration to enable real-time listening.`)}</Typography>
               </Box>
+            )}
+            
+            <Box sx={{ mt: 6 }}>
               <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700, mb: 1 }}>{t('common:auto.InterviewObserverDialog__hidden_observer_mode_72e9', `🔇 Hidden Observer Mode`)}</Typography>
               <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.25)', fontWeight: 600, maxWidth: 280, display: 'block', mx: 'auto' }}>{t('common:auto.InterviewObserverDialog_you_are_observing_this_intervi_7cb3', `You are observing this interview silently. The candidate cannot see or hear you.`)}</Typography>
             </Box>
+            <RoomAudioRenderer />
           </Box>
+        </Box>
 
           {/* Right: Live Transcript */}
           <Box
@@ -351,6 +365,34 @@ const InterviewObserverDialog: React.FC<InterviewObserverDialogProps> = ({
           </Box>
         </Box>
       </DialogContent>
+  );
+
+  return (
+    <Dialog
+      open={open}
+      onClose={onClose}
+      fullScreen
+      TransitionComponent={Transition}
+      PaperProps={{
+        sx: {
+          bgcolor: '#0a0e1a',
+          backgroundImage: 'radial-gradient(ellipse at top, rgba(56,189,248,0.07) 0%, transparent 60%)',
+        },
+      }}
+    >
+      {connectionDetails ? (
+        <LiveKitRoom
+          token={connectionDetails.token}
+          serverUrl={connectionDetails.serverUrl}
+          connect={open}
+          audio={false} // Observer doesn't publish audio
+          video={false} // Observer doesn't publish video
+        >
+          {DialogInner}
+        </LiveKitRoom>
+      ) : (
+        DialogInner
+      )}
     </Dialog>
   );
 };
