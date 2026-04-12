@@ -29,8 +29,9 @@ const notAuthenticationURL = [
   'auth/forgot-password/',
   'auth/reset-password/',
   'auth/send-verify-email/',
+  'auth/firebase-login/',
 ];
-const publicEndpointPrefixes = ['interview/web/sessions/invite/'];
+const publicEndpointPrefixes = ['common/', 'jobs/web/', 'profiles/web/', 'interview/web/sessions/invite/'];
 
 // Prefix for API endpoints
 const prefix = 'api';
@@ -135,6 +136,13 @@ httpRequest.interceptors.response.use(
     }
 
     if (status !== 401 || !originalConfig) {
+      if (status && status >= 400) {
+        console.error(`[API Error] ${method.toUpperCase()} ${originalConfig?.url}`, {
+          status,
+          params: originalConfig?.params,
+          data: error.response?.data,
+        });
+      }
       return Promise.reject(error);
     }
 
@@ -188,7 +196,11 @@ httpRequest.interceptors.response.use(
       originalConfig.headers = originalConfig.headers || {};
       originalConfig.headers['Authorization'] = `Bearer ${accessToken}`;
       return httpRequest(originalConfig);
-    } catch (refreshError) {
+    } catch (refreshError: any) {
+      console.error(`[Auth Error] Refresh token failed for ${originalConfig.url}`, {
+        status: refreshError.response?.status,
+        data: refreshError.response?.data,
+      });
       refreshPromise = null;
       tokenService.removeAccessTokenAndRefreshTokenFromCookie();
       return Promise.reject(refreshError);
