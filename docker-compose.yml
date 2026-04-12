@@ -270,45 +270,6 @@ services:
   # ---------------------------------------------------------------------------
   # AI Services (GPU enabled by default)
   # ---------------------------------------------------------------------------
-  llama-cpp:
-    container_name: tuyendung-studio-llama-cpp
-    image: ghcr.io/ggml-org/llama.cpp:server-cuda
-    profiles: ["gpu"]
-    init: true
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
-    command:
-      - --host
-      - ${LLAMA_HOST:-0.0.0.0}
-      - --port
-      - "${LLAMA_PORT:-11434}"
-      - --hf-repo
-      - "${LLAMA_HF_REPO:-bartowski/Qwen2.5-14B-Instruct-GGUF}"
-      - --hf-file
-      - "${LLAMA_HF_FILE:-Qwen2.5-14B-Instruct-Q4_K_M.gguf}"
-      - --alias
-      - "${LLAMA_MODEL_ALIAS:-qwen2.5-14b}"
-      - --ctx-size
-      - "${LLAMA_CTX_SIZE:-16384}"
-      - --n-gpu-layers
-      - "${LLAMA_N_GPU_LAYERS:-100}"
-    volumes:
-      - llama-models:/root/.cache
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:11434/v1/models > /dev/null"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 120s
-    restart: always
-    networks:
-      - app-net
-
   whisper:
     container_name: tuyendung-studio-whisper
     build:
@@ -388,8 +349,6 @@ services:
       vieneu-tts:
         condition: service_healthy
       whisper:
-        condition: service_healthy
-      llama-cpp:
         condition: service_healthy
     restart: always
     networks:
@@ -491,4 +450,3 @@ volumes:
   whisper-data:
   minio-data:
   elasticsearch-data:
-  llama-models:

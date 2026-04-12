@@ -71,7 +71,7 @@ async def entrypoint(ctx: JobContext) -> None:
             api_key="no-key-needed",
             base_url=config.LLAMA_BASE_URL,
             http_client=httpx.AsyncClient(
-                timeout=httpx.Timeout(300.0, connect=10.0)
+                timeout=httpx.Timeout(600.0, connect=15.0)
             ),
         ),
         model=config.LLAMA_MODEL,
