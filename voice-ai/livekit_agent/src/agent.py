@@ -183,8 +183,13 @@ if __name__ == "__main__":
     else:
         cli.run_app(
             server, 
-            WorkerOptions(agent_name="square-ai-interviewer")
+            WorkerOptions(
+                entrypoint_fnc=entrypoint,
+                prewarm_fnc=prewarm,
+                agent_name="square-ai-interviewer",
+            )
         )
+
 
 
 
