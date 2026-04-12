@@ -53,7 +53,7 @@ def prewarm(proc: JobProcess) -> None:
 server.setup_fnc = prewarm
 
 
-@server.rtc_session()
+@server.rtc_session(agent_name="square-ai-interviewer")
 async def entrypoint(ctx: JobContext) -> None:
     # Set log context for better debugging
     ctx.log_context_fields = {"room": ctx.room.name}
