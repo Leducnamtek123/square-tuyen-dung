@@ -176,12 +176,15 @@ def download_files():
 
 if __name__ == "__main__":
     import sys
+    from livekit.agents import WorkerOptions
+    
     if len(sys.argv) > 1 and sys.argv[1] == "download-files":
         download_files()
     else:
-        # Fallback to ensure agent name is set if not provided by Compose
-        if not os.environ.get("LIVEKIT_AGENT_NAME"):
-            os.environ["LIVEKIT_AGENT_NAME"] = "square-ai-interviewer"
-        cli.run_app(server)
+        cli.run_app(
+            server, 
+            WorkerOptions(agent_name="square-ai-interviewer")
+        )
+
 
 
