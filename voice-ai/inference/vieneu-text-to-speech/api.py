@@ -21,7 +21,16 @@ from pydantic import BaseModel
 from vieneu import Vieneu
 from loguru import logger
 
-app = FastAPI(title="VieNeu-TTS OpenAI API Bridge")
+from contextlib import asynccontextmanager
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Warm up in background to not block startup
+    threading.Thread(target=get_tts, daemon=True).start()
+    yield
+    # Cleanup logic (if any) could go here
+
+app = FastAPI(title="VieNeu-TTS OpenAI API Bridge", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -237,11 +246,6 @@ async def tts_speech(req: OpenAITTSRequest):
         media_type = "audio/pcm;rate=24000"
         
     return StreamingResponse(generator(), media_type=media_type)
-
-@app.on_event("startup")
-async def startup_event():
-    # Warm up in background to not block startup
-    threading.Thread(target=get_tts, daemon=True).start()
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8298))
