@@ -165,28 +165,50 @@ async def entrypoint(ctx: JobContext) -> None:
 
 
 def download_files():
-    """Download necessary models to the local cache. Used by Dockerfile."""
+    """Download necessary models to the local cache and link them correctly."""
+    import os
+    from huggingface_hub import hf_hub_download, snapshot_download
+    
+    # 1. Download Silero VAD
     print("Downloading Silero VAD...")
     silero.VAD.load()
     
+    # 2. Download and Fix Turn Detector (The "multilingual" branch hack)
     print("Downloading Multilingual Turn Detector...")
+    repo_id = "livekit/turn-detector"
+    revision = "multlingual"
+    
     try:
-        from huggingface_hub import hf_hub_download
-        repo_id = "livekit/turn-detector"
-        # The multilingual assets are on a specific branch (note the typo 'multlingual')
-        revision = "multlingual"
-        # We download the 'q8' (quantized) version as it's the plugin default
-        for filename in ["languages.json", "onnx/model_q8.onnx", "onnx/config.json"]:
-            print(f"Downloading {filename} from {revision} branch...")
-            hf_hub_download(repo_id=repo_id, filename=filename, revision=revision)
-    except Exception as e:
-
-
-        print(f"Warning: Could not pre-download turn detector files: {e}")
-        # We don't raise here to allow build to continue if it's just a warning, 
-        # but the print will help us debug.
+        # Download the entire multilingual snapshot
+        snapshot_path = snapshot_download(
+            repo_id=repo_id, 
+            revision=revision,
+            allow_patterns=["languages.json", "onnx/model_q8.onnx", "onnx/config.json"]
+        )
         
-    print("Models downloaded successfully.")
+        # We manually point the 'main' reference to the commit we just downloaded.
+        # This tricks the plugin (which looks for 'main') into finding the files.
+        cache_base = os.path.expanduser("~/.cache/huggingface/hub/models--livekit--turn-detector")
+        
+        # Ensure the 'refs' directory exists
+        refs_dir = os.path.join(cache_base, "refs")
+        main_ref_path = os.path.join(refs_dir, "main")
+        os.makedirs(refs_dir, exist_ok=True)
+        
+        # The snapshot_path is .../snapshots/<commit_hash>
+        commit_hash = os.path.basename(snapshot_path)
+        
+        # Write the commit hash to the 'main' ref
+        with open(main_ref_path, "w") as f:
+            f.write(commit_hash)
+            
+        print(f"Successfully linked {revision} ({commit_hash}) to main.")
+        
+    except Exception as e:
+        print(f"Warning: Could not pre-download turn detector files: {e}")
+        
+    print("Models downloaded and linked successfully.")
+
 
 
 
