@@ -411,8 +411,13 @@ services:
         limits:
           memory: 1G
     networks:
-      - proxy-net
-      - app-net
+      proxy-net:
+        aliases:
+          - minio
+          - s3.tuyendung.square.vn
+      app-net:
+        aliases:
+          - minio
 
   # ---------------------------------------------------------------------------
   # MinIO Init (set bucket policy — runs once per deploy)
