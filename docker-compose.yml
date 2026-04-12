@@ -378,6 +378,8 @@ services:
     environment:
       - BACKEND_API_URL=${BACKEND_API_URL:-http://backend:8000/api}
       - LIVEKIT_URL=${LIVEKIT_URL:-http://tuyendung-studio-livekit:7880}
+      - LIVEKIT_AGENT_NAME=square-ai-interviewer
+
     depends_on:
       backend:
         condition: service_started

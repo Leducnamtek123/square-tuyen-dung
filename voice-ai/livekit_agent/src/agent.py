@@ -36,9 +36,8 @@ async def _update_backend_status(room_name: str, status: str) -> None:
 
 # --- LiveKit Agent Implementation ---
 
-server = AgentServer(
-    agent_name="square-ai-interviewer",
-)
+server = AgentServer()
+
 
 
 def prewarm(proc: JobProcess) -> None:
@@ -180,5 +179,9 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "download-files":
         download_files()
     else:
+        # Fallback to ensure agent name is set if not provided by Compose
+        if not os.environ.get("LIVEKIT_AGENT_NAME"):
+            os.environ["LIVEKIT_AGENT_NAME"] = "square-ai-interviewer"
         cli.run_app(server)
+
 
