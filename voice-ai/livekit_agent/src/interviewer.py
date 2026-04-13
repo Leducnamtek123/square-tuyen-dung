@@ -34,8 +34,19 @@ class Interviewer(Agent):
                 f"\n\nThông tin ngữ cảnh:\n"
                 f"- Ứng viên: {candidate_name}\n"
                 f"- Vị trí: {job_title}\n"
-                f"- Mô tả công việc: {job_desc}"
+                f"- Mô tả công việc: {job_desc}\n"
             )
+            
+            questions = context.get("questions", [])
+            if questions:
+                q_text = ""
+                total_q = len(questions)
+                for i, q in enumerate(questions, 1):
+                    q_text += f"{i}. {q.get('text', '')}\n"
+                instructions += (
+                    f"\nDANH SÁCH {total_q} CÂU HỎI BẮT BUỘC PHẢI HỎI THEO THỨ TỰ TỪ 1 ĐẾN {total_q}:\n{q_text}\n"
+                    f"Khi phần phỏng vấn kỹ thuật bắt đầu, hãy tự động lấy câu hỏi ở đây ra hỏi lần lượt từng câu một, KHÔNG tự chế câu hỏi."
+                )
 
         super().__init__(
             instructions=instructions,
@@ -97,7 +108,7 @@ class Interviewer(Agent):
 
             msg = f"Interview stage updated to {stage_name}."
             if new_stage == InterviewStage.TECHNICAL:
-                msg += " You should now call `get_next_question()` immediately to start the technical section."
+                msg += " System: Start asking the listed questions strictly and chronologically now."
 
             return msg
         except KeyError:
@@ -111,52 +122,7 @@ class Interviewer(Agent):
         """Get the current progress of the interview."""
         return f"Currently in the {self._current_stage.name} stage."
 
-    async def _fetch_next_question(self, advance: bool = True) -> dict:
-        if advance is None:
-            advance = True
-        if not self._backend_api_url or not self._room_name:
-            return {"error": "missing_backend_context"}
-
-        url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/next-question"
-        try:
-            async with httpx.AsyncClient() as client:
-                resp = await client.post(
-                    url, json={"advance": advance}, timeout=10.0
-                )
-            if resp.status_code != 200:
-                return {"error": "backend_error", "status": resp.status_code}
-            return resp.json()
-        except Exception as e:
-            logger.error("Error fetching next question: %s", e)
-            return {"error": str(e)}
-
-    @function_tool
-    async def get_next_question(
-        self,
-        context: RunContext,
-        advance: bool = True,
-    ) -> str:
-        """Get the next technical question from the interview question bank.
-
-        Args:
-            advance: Whether to move to the next question. Default is True.
-        """
-        payload = await self._fetch_next_question(advance)
-        if "error" in payload:
-            return (
-                "Error: Could not retrieve questions at this time. "
-                "Please proceed with personal background questions instead."
-            )
-
-        res = parse_question_payload(payload)
-        if res.done:
-            return (
-                "All predefined technical questions have been asked. "
-                "You can move to the Q&A section now by calling "
-                "`set_interview_stage('q_and_a')`."
-            )
-
-        return f"The next question to ask is: {res.question_text}"
+    # Tool get_next_question has been removed for low-latency zero-tool architecture
 
     @function_tool
     async def finish_interview(

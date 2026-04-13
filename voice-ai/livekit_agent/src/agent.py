@@ -111,6 +111,17 @@ async def entrypoint(ctx: JobContext) -> None:
     except Exception as e:
         logger.warning(f"Failed to parse room metadata: {e}")
 
+    # Fetch pre-loaded questions from context endpoint
+    try:
+        url = f"{config.BACKEND_API_URL}/v1/interview/compat/{ctx.room.name}/context"
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(url, timeout=5.0)
+            if resp.status_code == 200:
+                data = resp.json()
+                agent_context["questions"] = data.get("questions", [])
+    except Exception as e:
+        logger.warning(f"Failed to fetch predefined questions: {e}")
+
     # 3. Create Interviewer Agent (greeting is handled in on_enter)
     interviewer = Interviewer(context=agent_context)
 
