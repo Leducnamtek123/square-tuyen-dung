@@ -794,7 +794,11 @@ class ResumeSavedViewSet(viewsets.ViewSet,
 
     filterset_class = ResumeSavedFilter
 
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend, filters.AliasedOrderingFilter]
+
+    ordering_fields = (
+        ('createAt', 'create_at'),
+    )
 
     def list(self, request, *args, **kwargs):
 
@@ -802,9 +806,15 @@ class ResumeSavedViewSet(viewsets.ViewSet,
 
         user = request.user
 
+        company = user.get_active_company()
+
+        if not company:
+
+            return var_res.response_data(data=[])
+
         queryset = self.filter_queryset(self.get_queryset()
 
-                                        .filter(company=user.company, resume__is_active=True)
+                                        .filter(company=company, resume__is_active=True)
 
                                         .select_related(
                                             'resume', 'resume__user', 'resume__user__avatar',
@@ -839,9 +849,15 @@ class ResumeSavedViewSet(viewsets.ViewSet,
 
         user = request.user
 
+        company = user.get_active_company()
+
+        if not company:
+
+            return var_res.response_data(data=[])
+
         queryset = self.filter_queryset(self.get_queryset()
 
-                                        .filter(company=user.company,
+                                        .filter(company=company,
 
                                                 resume__is_active=True)
 
