@@ -146,6 +146,9 @@ def run_status_side_effects(
 
         timeout = int(max_duration_seconds or getattr(settings, "INTERVIEW_MAX_DURATION_SECONDS", 1800))
         end_interview_session.apply_async(args=[session.id, "max_duration"], countdown=timeout)
+        # Bắt đầu ghi hình egress ngay khi phỏng vấn bắt đầu "in_progress"
+        import threading
+        threading.Thread(target=LiveKitService.start_recording, args=(session.room_name,)).start()
 
 
 def append_transcript(session: InterviewSession, payload: Dict[str, object]) -> InterviewTranscript:

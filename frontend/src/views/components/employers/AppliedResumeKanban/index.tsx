@@ -182,7 +182,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                     </Stack>
                                                                     
                                                                     <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, fontSize: '0.8rem' }} noWrap>
-                                                                        {item.jobPost?.jobName || 'N/A'}
+                                                                        {item.jobName || 'N/A'}
                                                                     </Typography>
 
                                                                     <Typography variant="caption" sx={{ color: 'text.disabled', fontWeight: 500 }}>
@@ -203,7 +203,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                          </Box>
                                                                          <Stack direction="row" spacing={0.5}>
                                                                              <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
-                                                                                <IconButton size="small" onClick={() => nav.push(`${ROUTES.EMPLOYER.PROFILE_DETAIL.replace(':slug', item.resume?.slug || '')}`)}>
+                                                                                <IconButton size="small" onClick={() => nav.push(`/${ROUTES.EMPLOYER.PROFILE_DETAIL.replace(':slug', item.resume?.slug || '')}`)}>
                                                                                     <RemoveRedEyeIcon fontSize="small" />
                                                                                 </IconButton>
                                                                              </Tooltip>

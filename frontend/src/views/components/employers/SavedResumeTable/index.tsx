@@ -170,7 +170,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
             <IconButton
               size="small"
               color="primary"
-              onClick={() => nav.push(`${ROUTES.EMPLOYER.PROFILE_DETAIL.replace(':slug', info.row.original.resume?.slug || '')}`)}
+              onClick={() => nav.push(`/${ROUTES.EMPLOYER.PROFILE_DETAIL.replace(':slug', info.row.original.resume?.slug || '')}`)}
               sx={{ 
                 bgcolor: alpha(theme.palette.primary.main, 0.06), 
                 borderRadius: 1.5,

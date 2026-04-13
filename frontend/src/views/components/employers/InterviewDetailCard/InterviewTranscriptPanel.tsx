@@ -25,10 +25,13 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
 
     // Merge existing + live transcripts, deduplicate by id
     const mergedTranscripts = React.useMemo(() => {
-        const existingIds = new Set(existingTranscripts.map((t: Record<string, unknown>) => t.id));
+        const existingIds = new Set(existingTranscripts.map((t: Record<string, any>) => t.id));
         const liveOnly = liveTranscripts.filter((lt) => !existingIds.has(lt.id));
-        const mapped = existingTranscripts.map((t: Record<string, unknown>) => ({
-            ...t,
+        const mapped = existingTranscripts.map((t: Record<string, any>) => ({
+            speaker: (t.speaker_role || t.speakerRole) === 'ai_agent' ? 'interviewer' : 'candidate',
+            text: t.content || t.text,
+            timestamp: (t.create_at || t.createAt) ? new Date(t.create_at || t.createAt).toLocaleTimeString() : '',
+            id: t.id,
             _isLive: false,
         }));
         const liveMapped = liveOnly.map((lt) => ({

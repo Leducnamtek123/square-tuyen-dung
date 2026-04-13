@@ -138,6 +138,7 @@ export interface JobPostActivity {
   isSentEmail?: boolean;
   isDeleted?: boolean;
   jobPost?: JobPost;
+  jobName?: string;
   resume?: Resume;
   createAt?: string;
   aiAnalysisScore?: number | null;

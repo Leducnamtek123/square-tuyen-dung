@@ -108,12 +108,12 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       ),
     },
     {
-      accessorKey: 'jobPost.jobName',
+      accessorKey: 'jobName',
       header: t('appliedResume.table.appliedPosition'),
       enableSorting: true,
       cell: (info) => (
         <Typography variant="body2" noWrap sx={{ fontWeight: 800, color: 'primary.main', maxWidth: 200 }}>
-            {String(info.getValue() ?? '---')}
+            {info.row.original.jobName ? String(info.row.original.jobName) : '---'}
         </Typography>
       ),
     },
@@ -179,7 +179,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             <IconButton
               color="primary"
               size="small"
-              onClick={() => nav.push(`${ROUTES.EMPLOYER.PROFILE_DETAIL.replace(':slug', info.row.original.resume?.slug || '')}`)}
+              onClick={() => nav.push(`/${ROUTES.EMPLOYER.PROFILE_DETAIL.replace(':slug', info.row.original.resume?.slug || '')}`)}
               sx={{ 
                 bgcolor: alpha(theme.palette.primary.main, 0.06),
                 borderRadius: 1.5,

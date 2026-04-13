@@ -326,7 +326,11 @@ class EmployerJobPostActivityViewSet(
     def change_application_status(self, request, pk):
         data = request.data
         if data.get("status", None):
-            stt = data["status"]
+            try:
+                stt = int(data["status"])
+            except ValueError:
+                return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
+                
             job_post_activity = self.get_object()
             if job_post_activity.job_post.company != request.user.active_company:
                 return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
