@@ -139,6 +139,7 @@ export interface JobPostActivity {
   isDeleted?: boolean;
   jobPost?: JobPost;
   jobName?: string;
+  resumeSlug?: string;
   resume?: Resume;
   createAt?: string;
   aiAnalysisScore?: number | null;
@@ -201,6 +202,7 @@ export interface Resume {
 export interface ResumeSaved {
   id: number;
   resume: Resume;
+  resumeSlug?: string;
   createAt: string;
   [key: string]: unknown;
 }

@@ -176,7 +176,7 @@ export const ROUTES = {
     APPLIED_PROFILE: 'employer/applied-profiles',
     SAVED_PROFILE: 'employer/saved-profiles',
     PROFILE: 'employer/candidates',
-    PROFILE_DETAIL: 'employer/candidates/:slug',
+    PROFILE_DETAIL: 'employer/candidate-detail/:slug',
     COMPANY: 'employer/company',
     EMPLOYEES: 'employer/employees',
     NOTIFICATION: 'employer/notifications',

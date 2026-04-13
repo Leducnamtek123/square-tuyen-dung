@@ -82,6 +82,7 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/ho-so-da-luu', destination: '/employer/saved-profiles' },
       { source: '/nha-tuyen-dung/danh-sach-ung-vien', destination: '/employer/candidates' },
       { source: '/nha-tuyen-dung/chi-tiet-ung-vien/:slug', destination: '/employer/candidates/:slug' },
+      { source: '/employer/candidate-detail/:slug', destination: '/employer/candidates/:slug' },
       { source: '/nha-tuyen-dung/cong-ty', destination: '/employer/company' },
       { source: '/nha-tuyen-dung/nhan-su-va-vai-tro', destination: '/employer/employees' },
       { source: '/nha-tuyen-dung/thong-bao', destination: '/employer/notifications' },

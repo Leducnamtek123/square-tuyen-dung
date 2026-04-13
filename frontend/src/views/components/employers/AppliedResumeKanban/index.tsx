@@ -34,6 +34,8 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import type { JobPostActivity } from '@/types/models';
 import { useConfig } from '@/hooks/useConfig';
 import { ROUTES, CV_TYPES } from '../../../../configs/constants';
+import { formatRoute } from '@/utils/funcUtils';
+
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import SendEmailComponent from '../AppliedResumeTable/SendEmailComponent';
 
@@ -203,7 +205,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                          </Box>
                                                                          <Stack direction="row" spacing={0.5}>
                                                                              <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
-                                                                                <IconButton size="small" onClick={() => nav.push(`/${ROUTES.EMPLOYER.PROFILE_DETAIL.replace(':slug', item.resume?.slug || '')}`)}>
+                                                                                <IconButton size="small" onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, item.resumeSlug || item.resume?.slug || '')}`)}>
                                                                                     <RemoveRedEyeIcon fontSize="small" />
                                                                                 </IconButton>
                                                                              </Tooltip>

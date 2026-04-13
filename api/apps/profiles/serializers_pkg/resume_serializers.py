@@ -391,6 +391,7 @@ class ResumeSavedSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         "id", "slug", "title", "salaryMin", "salaryMax",
         "experience", "city", "userDict", "jobSeekerProfileDict", "type"
     ])
+    resumeSlug = serializers.ReadOnlyField(source="resume.slug")
     createAt = serializers.DateTimeField(source='create_at', read_only=True)
     updateAt = serializers.DateTimeField(source='update_at', read_only=True)
 

@@ -22,6 +22,8 @@ import type { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tans
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
 import DataTable from '../../../../components/Common/DataTable';
+import { formatRoute } from '@/utils/funcUtils';
+
 
 import SendEmailComponent from './SendEmailComponent';
 import AppliedStatusComponent from './AppliedStatusComponent';
@@ -179,7 +181,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             <IconButton
               color="primary"
               size="small"
-              onClick={() => nav.push(`/${ROUTES.EMPLOYER.PROFILE_DETAIL.replace(':slug', info.row.original.resume?.slug || '')}`)}
+              onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`)}
               sx={{ 
                 bgcolor: alpha(theme.palette.primary.main, 0.06),
                 borderRadius: 1.5,
