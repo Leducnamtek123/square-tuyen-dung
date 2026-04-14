@@ -285,6 +285,11 @@ class JobPostViewSet(viewsets.GenericViewSet, generics.ListAPIView, generics.Ret
     filterset_class = JobPostFilter
     filter_backends = [DjangoFilterBackend, AliasedOrderingFilter]
     lookup_field = "slug"
+
+    def get_permissions(self):
+        if self.action in ["get_job_posts_saved"]:
+            return [perms_sys.IsAuthenticated()]
+        return [perms_sys.AllowAny()]
     ordering_fields = (
         ('jobName', 'job_name'),
         ('createAt', 'create_at'),

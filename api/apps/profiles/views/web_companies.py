@@ -58,7 +58,7 @@ class CompanyView(viewsets.ViewSet):
 
             return [perms_custom.IsEmployerUser()]
 
-        return perms_sys.IsAuthenticated()
+        return [perms_sys.IsAuthenticated()]
 
     def get_company_info(self, request):
 
@@ -67,6 +67,8 @@ class CompanyView(viewsets.ViewSet):
         try:
 
             company = user.active_company
+            if not company:
+                return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": "User has no active company."})
 
             company_serializer = CompanySerializer(company)
 
@@ -85,10 +87,13 @@ class CompanyView(viewsets.ViewSet):
         try:
 
             user = request.user
+            company = user.active_company
+            if not company:
+                return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": "User has no active company."})
 
             job_post_queryset = JobPost.objects.get(
 
-                pk=pk, company=user.active_company)
+                pk=pk, company=company)
 
             job_post_serializer = job_serializers \
                 .JobPostSerializer(job_post_queryset,
