@@ -9,7 +9,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import questionService from '../../../../services/questionService';
-import { useInterviews } from '../../InterviewsPage/hooks/useInterviews';
 import { User as UserModel, Question } from '../../../../types/models';
 
 interface ScheduleInterviewDialogProps {
@@ -50,7 +49,7 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
     }, [open]);
 
     const handleSubmit = async () => {
-        if (!scheduledAt || !user || !scheduleInterview) return;
+        if (!scheduledAt || !user) return;
         const payload = {
             candidate: user.id,
             candidate_name: user.fullName || user.email,

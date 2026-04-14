@@ -92,7 +92,7 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 
 
             <Grid container spacing={2}>
 
-              {jobPosts.map((value: ModelsJobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }) => (
+              {jobPosts.map((value: ModelsJobPost & { companyDict?: any; locationDict?: any; }) => (
 
                 <Grid key={value.id} size={col}>
 

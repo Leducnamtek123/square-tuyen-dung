@@ -80,7 +80,7 @@ const MainJobPostCard = () => {
 
           <>
 
-            {jobPosts.map((value: JobPost & { companyDict?: Record<string, string>; locationDict?: Record<string, string | number>; }) => (
+            {jobPosts.map((value: JobPost & { companyDict?: any; locationDict?: any; }) => (
 
               <JobPostLarge
 
