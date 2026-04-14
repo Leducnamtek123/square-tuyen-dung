@@ -49,11 +49,7 @@ class CompanyImageSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         user = request.user
 
         if user.role_name == var_sys.EMPLOYER:
-            company = None
-            if hasattr(user, "get_active_company"):
-                company = user.get_active_company()
-            if not company:
-                company = getattr(user, "company", None)
+            company = user.get_active_company()
             if not company:
                 raise serializers.ValidationError(
                     {'errorMessage': ["Company not found."]}
@@ -72,11 +68,7 @@ class CompanyImageSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
         with transaction.atomic():
             for file in files:
-                company = None
-                if hasattr(request.user, "get_active_company"):
-                    company = request.user.get_active_company()
-                if not company:
-                    company = getattr(request.user, "company", None)
+                company = request.user.get_active_company()
                 if not company:
                     raise serializers.ValidationError(
                         {'errorMessage': ["Company not found."]}

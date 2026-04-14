@@ -31,7 +31,7 @@ const notAuthenticationURL = [
   'auth/send-verify-email/',
   'auth/firebase-login/',
 ];
-const publicEndpointPrefixes = ['common/', 'jobs/web/', 'profiles/web/', 'interview/web/sessions/invite/'];
+const publicEndpointPrefixes = ['common/', 'job/web/job-posts/', 'job/web/search/', 'info/web/companies/', 'content/web/banner', 'content/web/feedbacks/', 'interview/web/sessions/invite/'];
 
 // Prefix for API endpoints
 const prefix = 'api';

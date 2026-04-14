@@ -139,17 +139,17 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         if request is None:
             return None
         user = request.user
-        if user.is_authenticated and user.role_name == var_sys.EMPLOYER:
+        if user.is_authenticated and user.active_company:
             if hasattr(resume, "_prefetched_objects_cache") and "resumesaved_set" in resume._prefetched_objects_cache:
                 return len(resume.resumesaved_set.all()) > 0
-            return resume.resumesaved_set.filter(company=user.company).exists()
+            return resume.resumesaved_set.filter(company=user.active_company).exists()
         return None
 
     def get_last_viewed_date(self, resume):
         request = self.context.get('request', None)
         if request is None:
             return None
-        company = getattr(request.user, 'company', None)
+        company = request.user.active_company
         if not company:
             return None
         if hasattr(resume, "_prefetched_objects_cache") and "resumeviewed_set" in resume._prefetched_objects_cache:
@@ -266,7 +266,12 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         with transaction.atomic():
             request = self.context['request']
             user = request.user
-            job_seeker_profile = user.job_seeker_profile
+            job_seeker_profile = getattr(user, 'job_seeker_profile', None)
+            if not job_seeker_profile:
+                # If it's a job seeker without a profile, we should probably create one or error out gracefully.
+                # For now, we'll error out as a resume requires a profile context.
+                from rest_framework.exceptions import ValidationError
+                raise ValidationError({"errorMessage": ["User does not have a job seeker profile. Please complete your profile first."]})
             pdf_file = validated_data.pop('file')
 
             resume = Resume.objects.create(**validated_data,
@@ -435,8 +440,15 @@ class EducationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     resumeId = serializers.PrimaryKeyRelatedField(source='resume', queryset=Resume.objects.all(), required=False)
 
 
+    def validate_resume(self, resume):
+        request = self.context.get('request')
+        if request and resume and resume.user != request.user:
+            raise serializers.ValidationError("You do not own this resume.")
+        return resume
+
     def validate(self, attrs):
-        if EducationDetail.objects.count() >= 10:
+        resume = attrs.get('resume', None)
+        if resume and EducationDetail.objects.filter(resume=resume).count() >= 10:
             raise serializers.ValidationError(
                 {'errorMessage': [ERROR_MESSAGES["MAXIMUM_EDUCATION"]]})
         return attrs
@@ -464,8 +476,15 @@ class ExperienceSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     resumeId = serializers.PrimaryKeyRelatedField(source='resume', queryset=Resume.objects.all(), required=False)
 
 
+    def validate_resume(self, resume):
+        request = self.context.get('request')
+        if request and resume and resume.user != request.user:
+            raise serializers.ValidationError("You do not own this resume.")
+        return resume
+
     def validate(self, attrs):
-        if ExperienceDetail.objects.count() >= 10:
+        resume = attrs.get('resume', None)
+        if resume and ExperienceDetail.objects.filter(resume=resume).count() >= 10:
             raise serializers.ValidationError(
                 {'errorMessage': [ERROR_MESSAGES["MAXIMUM_EXPERIENCE"]]})
         return attrs
@@ -489,8 +508,15 @@ class CertificateSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     resumeId = serializers.PrimaryKeyRelatedField(source='resume', queryset=Resume.objects.all(), required=False)
 
 
+    def validate_resume(self, resume):
+        request = self.context.get('request')
+        if request and resume and resume.user != request.user:
+            raise serializers.ValidationError("You do not own this resume.")
+        return resume
+
     def validate(self, attrs):
-        if Certificate.objects.count() >= 10:
+        resume = attrs.get('resume', None)
+        if resume and Certificate.objects.filter(resume=resume).count() >= 10:
             raise serializers.ValidationError(
                 {'errorMessage': [ERROR_MESSAGES["MAXIMUM_CERTIFICATE"]]})
         return attrs
@@ -507,6 +533,12 @@ class LanguageSkillSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     resumeId = serializers.PrimaryKeyRelatedField(source='resume', queryset=Resume.objects.all(), required=False)
 
 
+    def validate_resume(self, resume):
+        request = self.context.get('request')
+        if request and resume and resume.user != request.user:
+            raise serializers.ValidationError("You do not own this resume.")
+        return resume
+
     class Meta:
         model = LanguageSkill
         fields = ('id', 'language', 'level', 'resume', 'resumeId')
@@ -519,8 +551,15 @@ class AdvancedSkillSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     resumeId = serializers.PrimaryKeyRelatedField(source='resume', queryset=Resume.objects.all(), required=False)
 
 
+    def validate_resume(self, resume):
+        request = self.context.get('request')
+        if request and resume and resume.user != request.user:
+            raise serializers.ValidationError("You do not own this resume.")
+        return resume
+
     def validate(self, attrs):
-        if AdvancedSkill.objects.count() >= 15:
+        resume = attrs.get('resume', None)
+        if resume and AdvancedSkill.objects.filter(resume=resume).count() >= 15:
             raise serializers.ValidationError(
                 {'errorMessage': [ERROR_MESSAGES["MAXIMUM_ADVANCED"]]})
         return attrs
@@ -587,17 +626,17 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         if request is None:
             return None
         user = request.user
-        if user.is_authenticated and user.role_name == var_sys.EMPLOYER:
+        if user.is_authenticated and user.active_company:
             if hasattr(resume, "_prefetched_objects_cache") and "resumesaved_set" in resume._prefetched_objects_cache:
                 return len(resume.resumesaved_set.all()) > 0
-            return resume.resumesaved_set.filter(company=user.company).exists()
+            return resume.resumesaved_set.filter(company=user.active_company).exists()
         return None
 
     def get_last_viewed_date(self, resume):
         request = self.context.get('request', None)
         if request is None:
             return None
-        company = getattr(request.user, 'company', None)
+        company = request.user.active_company
         if not company:
             return None
         if hasattr(resume, "_prefetched_objects_cache") and "resumeviewed_set" in resume._prefetched_objects_cache:
@@ -612,7 +651,7 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         request = self.context.get('request', None)
         if request is None:
             return False
-        company = getattr(request.user, 'company', None)
+        company = request.user.active_company
         if not company:
             return False
         if hasattr(resume, "_prefetched_objects_cache") and "contactprofile_set" in resume._prefetched_objects_cache:
@@ -623,7 +662,7 @@ class ResumeDetailSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
         request = self.context.get('request', None)
         if request is None:
             return None
-        company = getattr(request.user, 'company', None)
+        company = request.user.active_company
         if not company:
             return None
         if hasattr(resume, "_prefetched_objects_cache") and "jobpostactivity_set" in resume._prefetched_objects_cache:

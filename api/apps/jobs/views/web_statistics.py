@@ -187,7 +187,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
 
     def general_statistics(self, request):
         user = request.user
-        company = user.company
+        company = user.active_company
 
         # Job post stats
         total_job_post = JobPost.objects.filter(company=company).count()
@@ -266,7 +266,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         start_date = pd.to_datetime(serializer.data.get("startDate"))
         end_date = pd.to_datetime(serializer.data.get("endDate"))
         user = request.user
-        company = user.company
+        company = user.active_company
 
         base_qs = InterviewSession.objects.filter(
             job_post__company=company,
@@ -381,7 +381,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         user = request.user
 
         queryset = (
-            JobPostActivity.objects.filter(job_post__company=user.company)
+            JobPostActivity.objects.filter(job_post__company=user.active_company)
             .values(stt=F('status'))
             .filter(
                 Q(create_at__isnull=True)
@@ -427,7 +427,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         user = request.user
         queryset1 = (
             JobPostActivity.objects.filter(
-                job_post__company=user.company,
+                job_post__company=user.active_company,
                 create_at__date__range=[
                     start_date1.tz_localize(pytz.utc).date(),
                     end_date1.tz_localize(pytz.utc).date(),
@@ -441,7 +441,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
 
         queryset2 = (
             JobPostActivity.objects.filter(
-                job_post__company=user.company,
+                job_post__company=user.active_company,
                 create_at__date__range=[
                     start_date2.tz_localize(pytz.utc).date(),
                     end_date2.tz_localize(pytz.utc).date(),
@@ -499,13 +499,13 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
 
         # Optimize: cumulative job count using DB aggregation instead of O(n²)
         total_jobs_before_range = JobPost.objects.filter(
-            company=user.company,
+            company=user.active_company,
             create_at__date__lt=start_date.tz_localize(pytz.utc).date(),
         ).count()
 
         jobs_by_date = dict(
             JobPost.objects.filter(
-                company=user.company,
+                company=user.active_company,
                 create_at__date__range=[
                     start_date.tz_localize(pytz.utc).date(),
                     end_date.tz_localize(pytz.utc).date(),
@@ -519,7 +519,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
 
         applies_by_date = dict(
             JobPostActivity.objects.filter(
-                job_post__company=user.company,
+                job_post__company=user.active_company,
                 create_at__date__range=[
                     start_date.tz_localize(pytz.utc).date(),
                     end_date.tz_localize(pytz.utc).date(),
@@ -568,7 +568,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
         end_date = pd.to_datetime(serializer.data.get("endDate"))
 
         user = request.user
-        company = getattr(user, 'company', None)
+        company = user.active_company
         if not company:
             return var_res.response_data(data={"labels": [], "data": []})
 

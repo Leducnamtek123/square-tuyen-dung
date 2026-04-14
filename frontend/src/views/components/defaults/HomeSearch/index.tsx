@@ -66,8 +66,8 @@ const HomeSearch = () => {
           localStorage.setItem('project_search_history', JSON.stringify([kw]));
         }
       }
-    } catch (error) {
-      console.error('Loi khi set kw vao local storage: ', error);
+    } catch {
+      // localStorage access may fail in private browsing
     }
   };
 

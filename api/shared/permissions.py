@@ -40,15 +40,10 @@ class IsCompanyOwnerOrMember(BasePermission):
         user = request.user
         company = getattr(obj, 'company', obj)
 
-        # Company owner
-        if hasattr(user, 'company') and user.company == company:
+        # Use active_company which handles both owner and member lookup
+        user_company = getattr(user, 'active_company', None)
+        if user_company and user_company == company:
             return True
-
-        # Company member
-        if hasattr(company, 'companymember_set'):
-            return company.companymember_set.filter(
-                user=user, is_active=True
-            ).exists()
 
         return False
 
@@ -64,7 +59,7 @@ class IsJobPostCompanyOwner(BasePermission):
         user = request.user
         if user.role_name != var_sys.EMPLOYER:
             return False
-        return obj.company == getattr(user, 'company', None)
+        return obj.company == getattr(user, 'active_company', None)
 
 
 class IsEmployer(BasePermission):

@@ -225,11 +225,10 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
     setConnectionDetails(undefined);
     try {
       if (roomName) {
-        console.log("[InterviewSessionPage] Terminating session:", roomName);
         await interviewService.updateSessionStatus(roomName, "completed");
       }
-    } catch (err) {
-      console.warn("[InterviewSessionPage] Error during termination:", err);
+    } catch {
+      // Termination error is non-critical; session will timeout naturally
     }
   }, [roomName]);
 

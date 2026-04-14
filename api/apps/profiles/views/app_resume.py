@@ -343,6 +343,11 @@ class EducationDetailViewSet(
     queryset = EducationDetail.objects
     serializer_class = EducationSerializer
     renderer_classes = [renderers.MyJSONRenderer]
+    permission_classes = [perms_custom.IsJobSeekerUser]
+
+    def get_queryset(self):
+        return self.queryset.filter(resume__user=self.request.user)
+
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -358,6 +363,11 @@ class ExperienceDetailViewSet(
     queryset = ExperienceDetail.objects
     serializer_class = ExperienceSerializer
     renderer_classes = [renderers.MyJSONRenderer]
+    permission_classes = [perms_custom.IsJobSeekerUser]
+
+    def get_queryset(self):
+        return self.queryset.filter(resume__user=self.request.user)
+
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -373,6 +383,11 @@ class CertificateDetailViewSet(
     queryset = Certificate.objects
     serializer_class = CertificateSerializer
     renderer_classes = [renderers.MyJSONRenderer]
+    permission_classes = [perms_custom.IsJobSeekerUser]
+
+    def get_queryset(self):
+        return self.queryset.filter(resume__user=self.request.user)
+
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -388,6 +403,11 @@ class LanguageSkillViewSet(
     queryset = LanguageSkill.objects
     serializer_class = LanguageSkillSerializer
     renderer_classes = [renderers.MyJSONRenderer]
+    permission_classes = [perms_custom.IsJobSeekerUser]
+
+    def get_queryset(self):
+        return self.queryset.filter(resume__user=self.request.user)
+
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -403,6 +423,11 @@ class AdvancedSkillViewSet(
     queryset = AdvancedSkill.objects
     serializer_class = AdvancedSkillSerializer
     renderer_classes = [renderers.MyJSONRenderer]
+    permission_classes = [perms_custom.IsJobSeekerUser]
+
+    def get_queryset(self):
+        return self.queryset.filter(resume__user=self.request.user)
+
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

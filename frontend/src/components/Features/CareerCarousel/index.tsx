@@ -1,6 +1,4 @@
-// import 'swiper/css";
 import { useAppSelector } from '@/redux/hooks';
-// import 'swiper/css/pagination";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { useRouter } from 'next/navigation';

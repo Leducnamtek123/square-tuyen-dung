@@ -66,7 +66,7 @@ class CompanyView(viewsets.ViewSet):
 
         try:
 
-            company = Company.objects.get(user=user)
+            company = user.active_company
 
             company_serializer = CompanySerializer(company)
 
@@ -88,7 +88,7 @@ class CompanyView(viewsets.ViewSet):
 
             job_post_queryset = JobPost.objects.get(
 
-                pk=pk, user=user, company=user.company)
+                pk=pk, company=user.active_company)
 
             job_post_serializer = job_serializers \
                 .JobPostSerializer(job_post_queryset,
@@ -140,11 +140,7 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
         files = request.FILES
 
-        company = None
-        if hasattr(request.user, "get_active_company"):
-            company = request.user.get_active_company()
-        if not company:
-            company = getattr(request.user, "company", None)
+        company = request.user.get_active_company()
         if not company:
             return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
@@ -178,11 +174,7 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
         files = request.FILES
 
-        company = None
-        if hasattr(request.user, "get_active_company"):
-            company = request.user.get_active_company()
-        if not company:
-            company = getattr(request.user, "company", None)
+        company = request.user.get_active_company()
         if not company:
             return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
@@ -480,11 +472,7 @@ class CompanyImageViewSet(viewsets.ViewSet,
 
         if self.request.user.is_authenticated:
 
-            company = None
-            if hasattr(self.request.user, "get_active_company"):
-                company = self.request.user.get_active_company()
-            if not company:
-                company = getattr(self.request.user, "company", None)
+            company = self.request.user.get_active_company()
             if not company:
                 return queryset.none()
 

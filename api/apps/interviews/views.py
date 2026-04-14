@@ -64,6 +64,7 @@ class InterviewStatisticViewSet(viewsets.ViewSet):
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.select_related('career', 'career__icon', 'company', 'author').all()
     serializer_class = QuestionSerializer
+    permission_classes = [perms_custom.IsEmployerUser]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = ['career', 'difficulty']
     search_fields = ['text']
@@ -82,9 +83,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
     def _resolve_company(self, user):
         try:
-            return getattr(user, 'company', None)
-        except ObjectDoesNotExist:
-            return None
+            return user.get_active_company()
         except Exception:
             return None
 
@@ -100,6 +99,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 class QuestionGroupViewSet(viewsets.ModelViewSet):
     queryset = QuestionGroup.objects.prefetch_related('questions', 'questions__career', 'questions__career__icon').select_related('company', 'author').all()
     serializer_class = QuestionGroupSerializer
+    permission_classes = [perms_custom.IsEmployerUser]
     filter_backends = [SearchFilter, OrderingFilter]
     search_fields = ['name', 'description']
     ordering_fields = ['create_at', 'name']
@@ -117,9 +117,7 @@ class QuestionGroupViewSet(viewsets.ModelViewSet):
 
     def _resolve_company(self, user):
         try:
-            return getattr(user, 'company', None)
-        except ObjectDoesNotExist:
-            return None
+            return user.get_active_company()
         except Exception:
             return None
 
@@ -133,6 +131,17 @@ class QuestionGroupViewSet(viewsets.ModelViewSet):
             serializer.save(author=user)
 
 class InterviewSessionViewSet(viewsets.ModelViewSet):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_permissions(self):
+        # Agent-facing endpoints are AllowAny (secured by room_name/invite_token)
+        if self.action in [
+            'retrieve_by_invite_token', 'livekit_token_by_invite_token',
+            'context', 'update_status', 'append_transcription',
+        ]:
+            return [permissions.AllowAny()]
+        return super().get_permissions()
+
     def get_queryset(self):
         user = self.request.user
         base_qs = InterviewSession.objects.select_related(
@@ -327,8 +336,24 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
 class InterviewEvaluationViewSet(viewsets.ModelViewSet):
     queryset = InterviewEvaluation.objects.select_related('interview', 'evaluator').all()
     serializer_class = InterviewEvaluationSerializer
+    permission_classes = [permissions.IsAuthenticated]
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['interview', 'result']
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_anonymous:
+            return self.queryset.none()
+        role = getattr(user, 'role_name', None)
+        if role == 'EMPLOYER':
+            company = user.get_active_company() if hasattr(user, 'get_active_company') else None
+            if company:
+                return self.queryset.filter(interview__job_post__company=company)
+            return self.queryset.filter(evaluator=user)
+        elif role == 'ADMIN':
+            return self.queryset.all()
+        # Job seeker: only evaluations on their own interviews
+        return self.queryset.filter(interview__candidate=user)
 
     def perform_create(self, serializer):
         serializer.save(evaluator=self.request.user)

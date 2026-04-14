@@ -239,7 +239,7 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
             user = request.user
 
-            company = getattr(user, "company", None)
+            company = user.get_active_company()
             if not company:
                 raise serializers.ValidationError({"errorMessage": ["Tài khoản của bạn chưa liên kết với công ty."]})
 

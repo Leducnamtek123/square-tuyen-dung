@@ -354,28 +354,6 @@ const JobSeekerLogin = () => {
 
   };
 
-  // const handleFacebookLogin = (result) => {
-
-  //   const accessToken = result?.data?.accessToken;
-
-  //   if (accessToken) {
-
-  //     handleSocialLogin(
-
-  //       AUTH_CONFIG.FACEBOOK_CLIENT_ID,
-
-  //       AUTH_CONFIG.FACEBOOK_CLIENT_SECRET,
-
-  //       AUTH_PROVIDER.FACEBOOK,
-
-  //       accessToken
-
-  //     );
-
-  //   }
-
-  // };
-
   const handleGoogleLogin = (result: { code?: string }) => {
 
     const code = result?.code;
@@ -652,7 +630,6 @@ const JobSeekerLogin = () => {
             {loginMode === 'email' ? (
               <JobSeekerLoginForm
                 onLogin={handleLogin}
-                // onFacebookLogin={handleFacebookLogin}
                 onGoogleLogin={handleGoogleLogin}
               />
             ) : (

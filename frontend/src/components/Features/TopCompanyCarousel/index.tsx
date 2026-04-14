@@ -1,5 +1,3 @@
-// import 'swiper/css';
-// import 'swiper/css/pagination';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';

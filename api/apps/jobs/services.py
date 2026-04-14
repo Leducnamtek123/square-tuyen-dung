@@ -65,12 +65,13 @@ class JobPostService:
     def create_job(user: Any, validated_data: Dict[str, Any]) -> JobPost:
         """Creates a new job post."""
         # Ensure company is linked
-        if not hasattr(user, 'company'):
+        company = user.active_company
+        if not company:
             raise ValueError("Người dùng chưa có thông tin công ty.")
 
         job_post = JobPost.objects.create(
             user=user,
-            company=user.company,
+            company=company,
             **validated_data
         )
         return job_post
@@ -89,10 +90,13 @@ class JobPostService:
         # Trigger notifications if status changes from APPROVED to something else that requires re-verification
         if old_status == var_sys.JobPostStatus.APPROVED and job_post.status != var_sys.JobPostStatus.APPROVED:
             from shared.helpers import helper
-            helper.add_post_verify_required_notifications(
-                company=user.company,
-                job_post=job_post,
-            )
+            try:
+                helper.add_post_verify_required_notifications(
+                    company=user.active_company,
+                    job_post=job_post,
+                )
+            except Exception as e:
+                logger.error(f"Failed to send post verify notification: {str(e)}")
 
         return job_post
 
@@ -101,7 +105,6 @@ class JobActivityService:
     """Business logic for Job Applications and Saves."""
 
     @staticmethod
-    @transaction.atomic
     def apply_to_job(user: Any, validated_data: Dict[str, Any]) -> JobPostActivity:
         """
         Apply to a job post. Returns activity object.
@@ -128,16 +131,19 @@ class JobActivityService:
             raise ValueError("CV không thuộc về bạn.")
 
         existing = JobPostActivity.objects.filter(
-            user=user, job_post=job_post
+            user=user, job_post=job_post, is_deleted=False
         ).exists()
         if existing:
+            logger.info("Application rejected: User %s already applied to job %s", user.email, job_post.id)
             raise ValueError("Bạn đã ứng tuyển vào vị trí này rồi.")
 
-        activity = JobPostActivity.objects.create(
-            user=user,
-            **validated_data,
-            status=var_sys.ApplicationStatus.PENDING_CONFIRMATION
-        )
+        # Create the activity in its own atomic block
+        with transaction.atomic():
+            activity = JobPostActivity.objects.create(
+                user=user,
+                **validated_data,
+                status=var_sys.ApplicationStatus.PENDING_CONFIRMATION
+            )
 
         logger.info(
             "User %s applied to job %s (company: %s)",
@@ -146,13 +152,14 @@ class JobActivityService:
 
         from django.conf import settings
         from shared.helpers import helper
-        
+
+        # AI analysis runs separately so failures don't affect the application
         if settings.AI_RESUME_AUTO_ANALYZE:
             try:
                 from apps.jobs.tasks import analyze_resume_ai
                 activity.ai_analysis_status = 'processing'
                 activity.ai_analysis_progress = 5
-                activity.save()
+                activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress'])
                 analyze_resume_ai.delay(activity.id)
             except Exception as ex:
                 helper.print_log_error("auto analyze resume", ex)
@@ -169,10 +176,16 @@ class JobActivityService:
             "find_job_post_link": domain + "viec-lam",
         }
 
-        from console.jobs import queue_mail
-        queue_mail.send_email_confirm_application.delay(to=to, subject=subject, data=data)
+        try:
+            from console.jobs import queue_mail
+            queue_mail.send_email_confirm_application.delay(to=to, subject=subject, data=data)
+        except Exception as ex:
+            helper.print_log_error("send confirmation email", ex)
 
-        helper.add_apply_job_notifications(job_post_activity=activity)
+        try:
+            helper.add_apply_job_notifications(job_post_activity=activity)
+        except Exception as ex:
+            helper.print_log_error("add apply job notifications", ex)
 
         return activity
 
@@ -219,12 +232,15 @@ class JobActivityService:
         logo = activity.job_post.company.logo
         company_logo_url = logo.get_full_url() if logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
 
-        helper.add_apply_status_notifications(
-            notification_title,
-            notification_content,
-            company_logo_url,
-            activity.user_id,
-        )
+        try:
+            helper.add_apply_status_notifications(
+                notification_title,
+                notification_content,
+                company_logo_url,
+                activity.user_id,
+            )
+        except Exception as e:
+            logger.error(f"Failed to send apply status notification: {str(e)}")
         return activity
 
     @staticmethod
@@ -232,7 +248,11 @@ class JobActivityService:
         from shared.configs import variable_system as var_sys
         from console.jobs import queue_mail
 
-        company = user.company
+        company = user.active_company
+        if not company:
+            logger.error("Cannot send email: Recruiter %s has no active company", user.email)
+            return
+
         to = [validated_data.get("email")]
         is_send_me = validated_data.get("isSendMe", False)
 

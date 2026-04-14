@@ -32,7 +32,6 @@ function AutoConnect({ onError }: { onError?: (err: unknown) => void }) {
   useEffect(() => {
     // Only attempt to start once per mount
     if (!isConnected && !hasStarted.current && !connectionAttempted.current) {
-      console.log('[VoiceAssistantApp] AutoConnect: calling start()');
       connectionAttempted.current = true;
       
       start().then(() => {

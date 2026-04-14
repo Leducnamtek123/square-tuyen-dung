@@ -54,7 +54,10 @@ class AdminCareerViewSet(viewsets.ModelViewSet):
 
     serializer_class = CareerSerializer
 
-    permission_classes = [perms_custom.IsAdminUser]
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        return [perms_custom.IsAdminUser()]
 
     pagination_class = paginations.CustomPagination
 
@@ -72,7 +75,10 @@ class AdminCityViewSet(viewsets.ModelViewSet):
 
     serializer_class = CitySerializer
 
-    permission_classes = [perms_custom.IsAdminUser]
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        return [perms_custom.IsAdminUser()]
 
     pagination_class = paginations.CustomPagination
 
@@ -82,7 +88,10 @@ class AdminDistrictViewSet(viewsets.ModelViewSet):
 
     serializer_class = DistrictSerializer
 
-    permission_classes = [perms_custom.IsAdminUser]
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        return [perms_custom.IsAdminUser()]
 
     pagination_class = paginations.CustomPagination
 
@@ -94,7 +103,10 @@ class AdminWardViewSet(viewsets.ModelViewSet):
 
     serializer_class = WardSerializer
 
-    permission_classes = [perms_custom.IsAdminUser]
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [IsAuthenticated()]
+        return [perms_custom.IsAdminUser()]
 
     pagination_class = paginations.CustomPagination
 

@@ -1,6 +1,3 @@
-// import 'swiper/css';
-// import 'swiper/css/grid';
-// import 'swiper/css/pagination';
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';

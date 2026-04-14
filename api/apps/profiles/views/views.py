@@ -65,7 +65,10 @@ class ProfileView(viewsets.ViewSet):
 
         try:
 
-            job_seeker_profile = request.user.job_seeker_profile
+            job_seeker_profile = getattr(request.user, 'job_seeker_profile', None)
+            if not job_seeker_profile:
+                return var_res.response_data(status=status.HTTP_400_BAD_REQUEST,
+                                             errors={"errorMessage": ["User does not have a job seeker profile."]})
 
             serializer = JobSeekerProfileSerializer(job_seeker_profile, data=data)
 

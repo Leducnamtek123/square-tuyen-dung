@@ -507,7 +507,7 @@ class ResumeViewSet(viewsets.ViewSet,
 
     def list(self, request, *args, **kwargs):
         user = request.user
-        company = getattr(user, 'company', None) if getattr(user, 'is_authenticated', False) else None
+        company = user.active_company if getattr(user, 'is_authenticated', False) else None
         queryset = self.filter_queryset(
             self.get_queryset()
             .filter(is_active=True)
@@ -564,7 +564,7 @@ class ResumeViewSet(viewsets.ViewSet,
 
         saved_resumes = ResumeSaved.objects.filter(
 
-            company=user.company, resume=self.get_object())
+            company=user.active_company, resume=self.get_object())
 
         is_saved = False
 
@@ -578,7 +578,7 @@ class ResumeViewSet(viewsets.ViewSet,
 
             ResumeSaved.objects.create(
 
-                company=request.user.company,
+                company=request.user.active_company,
 
                 resume=self.get_object()
 
@@ -588,7 +588,7 @@ class ResumeViewSet(viewsets.ViewSet,
 
         # send notification
 
-        company = user.company
+        company = user.active_company
 
         notification_content = NOTIFICATION_MESSAGES[
 
@@ -626,7 +626,7 @@ class ResumeViewSet(viewsets.ViewSet,
 
             resume=self.get_object(),
 
-            company=user.company
+            company=user.active_company
 
         )
 
@@ -640,7 +640,7 @@ class ResumeViewSet(viewsets.ViewSet,
 
             # send notification
 
-            company = user.company
+            company = user.active_company
 
             helper.add_employer_viewed_resume_notifications(
 
@@ -678,7 +678,7 @@ class ResumeViewSet(viewsets.ViewSet,
 
             user = request.user
 
-            company = user.company
+            company = user.active_company
 
             serializer = SendMailToJobSeekerSerializer(data=data)
 
@@ -710,7 +710,7 @@ class ResumeViewSet(viewsets.ViewSet,
 
                 'company_email': company.company_email,
 
-                'company_address': company.location.address,
+                'company_address': getattr(company.location, 'address', '') if company.location else '',
 
                 'company_website_url': company.website_url
 
@@ -883,6 +883,11 @@ class EducationDetailViewSet(viewsets.ViewSet,
 
     renderer_classes = [renderers.MyJSONRenderer]
 
+    permission_classes = [perms_custom.IsJobSeekerUser]
+
+    def get_queryset(self):
+        return self.queryset.filter(resume__user=self.request.user)
+
 class ExperienceDetailViewSet(viewsets.ViewSet,
 
                               generics.CreateAPIView,
@@ -894,6 +899,11 @@ class ExperienceDetailViewSet(viewsets.ViewSet,
     serializer_class = ExperienceSerializer
 
     renderer_classes = [renderers.MyJSONRenderer]
+
+    permission_classes = [perms_custom.IsJobSeekerUser]
+
+    def get_queryset(self):
+        return self.queryset.filter(resume__user=self.request.user)
 
 class CertificateDetailViewSet(viewsets.ViewSet,
 
@@ -907,6 +917,11 @@ class CertificateDetailViewSet(viewsets.ViewSet,
 
     renderer_classes = [renderers.MyJSONRenderer]
 
+    permission_classes = [perms_custom.IsJobSeekerUser]
+
+    def get_queryset(self):
+        return self.queryset.filter(resume__user=self.request.user)
+
 class LanguageSkillViewSet(viewsets.ViewSet,
 
                            generics.CreateAPIView,
@@ -919,6 +934,11 @@ class LanguageSkillViewSet(viewsets.ViewSet,
 
     renderer_classes = [renderers.MyJSONRenderer]
 
+    permission_classes = [perms_custom.IsJobSeekerUser]
+
+    def get_queryset(self):
+        return self.queryset.filter(resume__user=self.request.user)
+
 class AdvancedSkillViewSet(viewsets.ViewSet,
 
                            generics.CreateAPIView,
@@ -930,4 +950,9 @@ class AdvancedSkillViewSet(viewsets.ViewSet,
     serializer_class = AdvancedSkillSerializer
 
     renderer_classes = [renderers.MyJSONRenderer]
+
+    permission_classes = [perms_custom.IsJobSeekerUser]
+
+    def get_queryset(self):
+        return self.queryset.filter(resume__user=self.request.user)
 

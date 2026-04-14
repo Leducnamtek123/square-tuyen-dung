@@ -102,8 +102,7 @@ const UsersPage = () => {
                             size="small"
                             onClick={() => {
                                 if (window.confirm(t('pages.users.bulkSelect.deleteConfirm'))) {
-                                    // Handle bulk delete here
-                                    console.log('Bulk delete:', Object.keys(rowSelection));
+                                    // TODO: implement bulk delete API call
                                 }
                             }}
                         >

@@ -166,6 +166,12 @@ class EmployerJobPostActivityViewSet(
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        user = self.request.user
+        company = user.active_company if hasattr(user, 'active_company') else None
+        if company:
+            queryset = queryset.filter(job_post__company=company)
+        else:
+            queryset = queryset.none()
         if not has_ai_analysis_progress_column():
             return queryset.defer('ai_analysis_progress')
         return queryset

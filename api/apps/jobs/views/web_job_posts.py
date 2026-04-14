@@ -62,7 +62,7 @@ class PrivateJobPostViewSet(
     @action(methods=["get"], detail=False, url_path="job-posts-options", url_name="job-posts-options")
     def get_job_post_options(self, request):
         user = request.user
-        queryset = self.queryset.filter(user=user, company=user.company)
+        queryset = self.queryset.filter(company=user.active_company)
         serializer = JobPostSerializer(
             queryset,
             many=True,
@@ -173,7 +173,7 @@ class PrivateJobPostViewSet(
         queryset = (
             self.filter_queryset(
                 self.get_queryset()
-                .filter(user=request.user, company=request.user.company)
+                .filter(company=request.user.active_company)
                 .order_by('-update_at', '-create_at')
             )
         )
@@ -208,8 +208,7 @@ class PrivateJobPostViewSet(
                 self.get_queryset()
                 .filter(
                     status=var_sys.JobPostStatus.APPROVED,
-                    user=request.user,
-                    company=request.user.company,
+                    company=request.user.active_company,
                 )
                 .order_by('update_at', 'create_at')
             )
