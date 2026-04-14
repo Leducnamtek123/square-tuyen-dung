@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React from 'react';
 import { Provider } from 'react-redux';
@@ -14,10 +14,10 @@ import type { AxiosError } from 'axios';
 function makeQueryClient() {
   return new QueryClient({
     queryCache: new QueryCache({
-      onError: (error) => errorHandling(error as AxiosError<Record<string, unknown>>)
+      onError: (error) => errorHandling(error)
     }),
     mutationCache: new MutationCache({
-      onError: (error) => errorHandling(error as AxiosError<Record<string, unknown>>)
+      onError: (error) => errorHandling(error)
     }),
     defaultOptions: {
       queries: {

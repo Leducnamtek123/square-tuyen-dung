@@ -1,16 +1,15 @@
 import React from 'react';
 
-import { Control, Controller } from 'react-hook-form';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
 import { TextField, Typography } from "@mui/material";
 import ValidationError from '../ValidationError';
 
 import type { SxProps, Theme } from '@mui/material/styles';
-import type { FieldValues as ReactHookFormFieldValues } from 'react-hook-form';
 
-interface Props<T extends Record<string, unknown>> {
-  name: string;
-  control: Control<T | ReactHookFormFieldValues>;
+interface Props<T extends FieldValues> {
+  name: Path<T>;
+  control: Control<T>;
   title?: string | null;
   showRequired?: boolean;
   placeholder?: string;
@@ -20,7 +19,7 @@ interface Props<T extends Record<string, unknown>> {
   sx?: SxProps<Theme>;
 }
 
-const MultilineTextFieldCustom = <T extends Record<string, unknown>>({
+const MultilineTextFieldCustom = <T extends FieldValues>({
   name,
   control,
   title = null,

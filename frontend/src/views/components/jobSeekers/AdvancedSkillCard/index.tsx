@@ -34,11 +34,7 @@ import { Theme } from '@mui/material/styles';
 import { AxiosError } from 'axios';
 import { ApiError } from '@/types/api';
 
-interface AdvancedSkill {
-  id: string | number;
-  name: string;
-  level: number;
-}
+import type { AdvancedSkill } from '../../../../types/models';
 
 interface AdvancedSkillCardProps {
   title: string;
@@ -137,13 +133,13 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       try {
 
-        const resData = await resumeService.getAdvancedSkills(slug) as AdvancedSkill[];
+        const resData = await resumeService.getAdvancedSkills(slug);
 
         setAdvancedSkills(resData);
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -167,7 +163,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       try {
 
-        const resData = await advancedSkillService.getAdvancedSkillById(skillId) as AdvancedSkill;
+        const resData = await advancedSkillService.getAdvancedSkillById(skillId);
 
         setEditData(resData);
 
@@ -175,7 +171,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -207,7 +203,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       try {
 
-        await advancedSkillService.addAdvancedSkills(payload as any);
+        await advancedSkillService.addAdvancedSkills(payload);
 
         setOpenPopup(false);
 
@@ -217,7 +213,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as React.Dispatch<React.SetStateAction<Record<string, unknown> | null>>);
+        errorHandling(error, (errs) => setServerErrors(errs as Record<string, string[]>));
 
       } finally {
 
@@ -233,7 +229,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       try {
 
-        await advancedSkillService.updateAdvancedSkillById(payload.id as string | number, payload as any);
+        await advancedSkillService.updateAdvancedSkillById(payload.id as string | number, payload);
 
         setOpenPopup(false);
 
@@ -243,7 +239,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -289,7 +285,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -458,7 +454,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
       <FormPopup title={t('jobSeeker:profile.sections.skills')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
 
-        <AdvancedSkillForm handleAddOrUpdate={handleAddOrUpdate as (data: AdvancedSkillFormValues) => void} editData={editData as any} serverErrors={serverErrors} />
+        <AdvancedSkillForm handleAddOrUpdate={handleAddOrUpdate as (data: AdvancedSkillFormValues) => void} editData={editData} serverErrors={serverErrors} />
 
       </FormPopup>
 

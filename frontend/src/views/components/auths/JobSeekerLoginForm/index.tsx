@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from "yup";
 import { Box, Button, Stack, styled, Divider } from "@mui/material";
 import LoginIcon from "@mui/icons-material/Login";
@@ -138,7 +138,7 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeek
       email: "",
       password: "",
     },
-    resolver: yupResolver(schema) as any // TODO: fix yup schema inference to match form type,
+    resolver: typedYupResolver(schema),
   });
 
   const googleLogin = useGoogleLogin({

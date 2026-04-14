@@ -49,7 +49,7 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
         toastMessages.success(t('account.updateSuccess'))
       )
       .catch((error: unknown) => {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>, (errs) => setServerErrors(errs as Record<string, string[]>));
+        errorHandling(error, (errs) => setServerErrors(errs as Record<string, string[]>));
       });
   };
 
@@ -72,7 +72,7 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
             toastMessages.error(t('messages.genericError'));
           });
       } catch (error: unknown) {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>, (errs) => setServerErrors(errs as Record<string, string[]>));
+        errorHandling(error, (errs) => setServerErrors(errs as Record<string, string[]>));
       } finally {
         setIsFullScreenLoading(false);
       }

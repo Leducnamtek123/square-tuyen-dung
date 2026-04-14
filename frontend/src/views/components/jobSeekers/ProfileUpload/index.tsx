@@ -101,9 +101,9 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
         setResumes(resData?.results || []);
 
-      } catch (error: Error | unknown) {
+      } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<Record<string, unknown>>);
+        errorHandling(error);
 
       } finally {
 
@@ -113,8 +113,7 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
     };
 
-    const user = currentUser as any;
-    getOnlineProfile(user?.jobSeekerProfile?.id || user?.jobSeekerProfileId, {
+    getOnlineProfile(currentUser?.jobSeekerProfile?.id ?? currentUser?.jobSeekerProfileId ?? undefined, {
 
       resumeType: CV_TYPES.cvUpload,
 
@@ -138,9 +137,9 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.resumeUploadSuccess'));
 
-      } catch (error: Error | unknown) {
+      } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<Record<string, unknown>>);
+        errorHandling(error);
 
       } finally {
 
@@ -179,9 +178,9 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.resumeDeleteSuccess'));
 
-      } catch (error: Error | unknown) {
+      } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<Record<string, unknown>>);
+        errorHandling(error);
 
       } finally {
 
@@ -219,9 +218,9 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
         toastMessages.success(t('jobSeeker:profile.messages.profileStatusUpdateSuccess'));
 
-      } catch (error: Error | unknown) {
+      } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<Record<string, unknown>>);
+        errorHandling(error);
 
       } finally {
 

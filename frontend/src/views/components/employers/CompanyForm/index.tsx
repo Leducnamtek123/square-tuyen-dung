@@ -90,7 +90,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
     const loadDistricts = async (id: number | string) => {
       try {
         const resData = await commonService.getDistrictsByCityId(id);
-        const results = (resData as any)?.data || [];
+        const results = (Array.isArray(resData) ? resData : ((resData as { data?: SelectOption[] })?.data || [])) as SelectOption[];
         
         // Only clear district if the cityId has actually changed (user interaction)
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
@@ -99,7 +99,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
         setDistrictOptions(results);
         prevCityIdRef.current = id;
       } catch (error) {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
       }
     };
     if (cityId) loadDistricts(cityId);
@@ -119,7 +119,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
       try {
         const resData = await goongService.getPlaces(input);
         if (resData.predictions) {
-            setLocationOptions(resData.predictions as any);
+            setLocationOptions(resData.predictions as unknown as SelectOption[]);
         }
       } catch (error) {
           // Silent fail for autocomplete
@@ -131,7 +131,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   // Load edit data
   useEffect(() => {
     if (editData) {
-      reset((formValues) => ({ ...formValues, ...(editData as any) }));
+      reset((formValues) => ({ ...formValues, ...(editData as Partial<CompanyFormValues>) }));
     }
   }, [editData, reset]);
 
@@ -149,8 +149,8 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   const handleSelectLocation = async (e: React.SyntheticEvent, value: string | SelectOption | null) => {
     if (!value || typeof value !== 'object' || !('place_id' in value)) return;
     try {
-      const prediction = value as any;
-      const resData = await goongService.getPlaceDetailByPlaceId(prediction.place_id);
+      const placeId = value.place_id as string;
+      const resData = await goongService.getPlaceDetailByPlaceId(placeId);
       const resultObj = resData?.result;
       const geometryObj = resultObj?.geometry;
       if (!geometryObj?.location) return;
@@ -158,7 +158,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
       setValue('location.lat', location.lat);
       setValue('location.lng', location.lng);
     } catch (error) {
-      errorHandling(error as AxiosError<{ errors?: ApiError }>);
+      errorHandling(error);
     }
   };
 

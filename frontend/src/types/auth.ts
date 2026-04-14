@@ -1,11 +1,27 @@
 import type { EmployerSignUpFormData } from '../views/components/auths/EmployerSignUpForm';
-/** OAuth2 token pair returned by the Django backend. */
+/** OAuth2 token pair returned by the Django backend.
+ * NOTE: httpRequest interceptor auto-converts snake_case → camelCase,
+ * so we define these with camelCase names.
+ */
 export interface TokenPair {
-  access_token: string;
-  refresh_token: string;
-  token_type?: string;
-  expires_in?: number;
+  accessToken: string;
+  refreshToken: string;
+  backend?: string;
+  tokenType?: string;
+  expiresIn?: number;
   scope?: string;
+}
+
+/** Response from auth/check-creds/ */
+export interface CheckCredsResponse {
+  exists: boolean;
+  email: string;
+  emailVerified: boolean;
+}
+
+/** Response from auth/email-exists/ */
+export interface EmailExistsResponse {
+  exists: boolean;
 }
 
 /** Supported role names matching backend variable_system.py. */

@@ -55,15 +55,7 @@ import { FormValues } from '../EducationDetailForm';
 
 import { useTranslation } from 'react-i18next';
 
-interface EducationDetail {
-  id: string | number;
-  startDate: string;
-  completedDate: string | null;
-  degreeName: string;
-  trainingPlaceName: string;
-  major: string | null;
-  description: string | null;
-}
+import type { EducationDetail } from '../../../../types/models';
 
 interface EducationDetailCardProps {
   title: string;
@@ -166,13 +158,13 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       try {
 
-        const resData = await resumeService.getEducationsDetail(slug) as any;
+        const resData = await resumeService.getEducationsDetail(slug);
 
         setEducationsDetail(resData);
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -194,7 +186,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       try {
 
-        const resData = await educationDetailService.getEducationDetailById(eduId) as any;
+        const resData = await educationDetailService.getEducationDetailById(eduId);
 
         setEditData(resData);
 
@@ -202,7 +194,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -232,7 +224,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       try {
 
-        await educationDetailService.addEducationsDetail(payload as any);
+        await educationDetailService.addEducationsDetail(payload);
 
         setOpenPopup(false);
 
@@ -242,7 +234,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -258,7 +250,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       try {
 
-        await educationDetailService.updateEducationDetailById(payload.id as string | number, payload as any);
+        await educationDetailService.updateEducationDetailById(payload.id as string | number, payload);
 
         setOpenPopup(false);
 
@@ -268,7 +260,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -314,7 +306,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -498,7 +490,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                           >
 
-                            <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY" />{' '}
+                            {value.startDate && <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY" />}{' '}
 
                             -{' '}
 
@@ -750,7 +742,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
           handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
 
-          editData={editData as any}
+          editData={editData as unknown as Partial<FormValues> | null}
 
         />
 

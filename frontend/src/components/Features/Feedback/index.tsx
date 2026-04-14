@@ -68,7 +68,7 @@ const Feedback = (_props: FeedbackProps) => {
         toastMessages.success(t('feedback.success'));
       } catch (error) {
         // We use an explicit cast here because errorHandling expects AxiosError but catching produces unknown.
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
       } finally {
         setIsFullScreenLoading(false);
       }
@@ -250,7 +250,7 @@ const Feedback = (_props: FeedbackProps) => {
               <MultilineTextFieldCustom
                 name="content"
                 placeholder={t('feedback.placeholder')}
-                control={control as any}
+                control={control}
                 minRows={5}
                 maxRows={8}
                 sx={{

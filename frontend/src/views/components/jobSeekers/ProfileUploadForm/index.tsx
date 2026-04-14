@@ -3,7 +3,7 @@ import { useAppSelector } from '@/redux/hooks';
 
 import { useForm } from 'react-hook-form';
 
-import { yupResolver } from '@hookform/resolvers/yup';
+import { typedYupResolver } from '../../../../utils/formHelpers';
 
 import * as yup from 'yup';
 
@@ -200,7 +200,7 @@ const ProfileUploadForm = ({ handleAdd }: ProfileUploadFormProps) => {
 
   const { control, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as any,
+    resolver: typedYupResolver(schema),
 
   });
 
@@ -548,7 +548,7 @@ const ProfileUploadForm = ({ handleAdd }: ProfileUploadFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.objective')}
 
-            control={control as any}
+            control={control}
 
           />
 
@@ -564,7 +564,7 @@ const ProfileUploadForm = ({ handleAdd }: ProfileUploadFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.skillsSummary')}
 
-            control={control as any}
+            control={control}
 
           />
 

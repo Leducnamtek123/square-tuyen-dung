@@ -1,6 +1,6 @@
 import React, { useMemo, useEffect, useRef, useState } from 'react';
 import { useForm, useWatch, Resolver } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { typedYupResolver } from '../../../../utils/formHelpers';
 import { useTranslation } from 'react-i18next';
 import { EditorState } from 'draft-js';
 import useDebounce from '../../../../hooks/useDebounce';
@@ -37,7 +37,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
     reset,
     clearErrors,
   } = useForm<JobPostFormValues>({
-    resolver: yupResolver(schema) as any,
+    resolver: typedYupResolver(schema),
     defaultValues: {
       jobDescription: EditorState.createEmpty(),
       jobRequirement: EditorState.createEmpty(),
@@ -64,7 +64,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
     const loadDistricts = async (id: number | string) => {
       try {
         const resData = await commonService.getDistrictsByCityId(id);
-        const results = (((resData as any)?.results || (Array.isArray(resData) ? resData : [])) as Record<string, unknown>[]);
+        const results = Array.isArray(resData) ? resData : (((resData as { results?: unknown[] })?.results || []) as Record<string, unknown>[]);
         
         // Only clear district if the cityId has actually changed (user interaction)
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
@@ -73,7 +73,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
         setDistrictOptions(results);
         prevCityIdRef.current = id;
       } catch (error) {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
       }
     };
     if (cityId) loadDistricts(cityId);
@@ -142,7 +142,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
       setValue('location.lng', location.lng);
       setValue('location.lat', location.lat);
     } catch (error) {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
     }
   };
 

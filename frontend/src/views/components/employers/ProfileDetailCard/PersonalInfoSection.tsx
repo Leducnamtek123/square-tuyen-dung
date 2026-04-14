@@ -83,14 +83,14 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.cityProvince')} 
-                        value={tConfig(allConfig?.cityDict?.[profileDetail?.jobSeekerProfile?.location?.city as any])} 
+                        value={tConfig(allConfig?.cityDict?.[String(profileDetail?.jobSeekerProfile?.location?.city)])} 
                         icon={<LocationIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.district')} 
-                        value={(profileDetail?.jobSeekerProfile?.location as any)?.districtDict?.name}
+                        value={profileDetail?.jobSeekerProfile?.location?.districtDict?.name}
                         icon={<LocationIcon />}
                     />
                 </Grid>

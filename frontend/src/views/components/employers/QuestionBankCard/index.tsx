@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useCallback, useMemo, useState } from 'react';
 import { 
   Box, 
@@ -102,7 +102,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
             }
             handleClose();
         } catch (error) {
-            errorHandling(error as AxiosError<{ errors?: ApiError }>);
+            errorHandling(error);
         }
     };
 

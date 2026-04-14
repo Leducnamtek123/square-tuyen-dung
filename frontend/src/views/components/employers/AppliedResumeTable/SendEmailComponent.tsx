@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Button, Tooltip, alpha, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
@@ -57,7 +57,7 @@ const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
       setOpenSendMailPopup(false);
       toastMessages.success(t('appliedResume.email.sentSuccess'));
     } catch (error: unknown) {
-      errorHandling(error as AxiosError<{ errors?: ApiError }>);
+      errorHandling(error);
     } finally {
       setIsFullScreenLoading(false);
     }

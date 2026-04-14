@@ -141,7 +141,7 @@ const JobSeekerLogin = () => {
 
         const resData = await authService.getToken(email, password, roleName);
 
-        const { accessToken, refreshToken, backend } = resData as any;
+        const { accessToken, refreshToken, backend } = resData;
 
         const isSaveTokenToCookie =
 
@@ -215,7 +215,7 @@ const JobSeekerLogin = () => {
 
       try {
 
-        const resData = await authService.checkCreds(email, roleName) as { exists: boolean; email: string; emailVerified: boolean };
+        const resData = await authService.checkCreds(email, roleName);
 
         const { exists, email: resEmail, emailVerified } = resData;
 
@@ -294,7 +294,7 @@ const JobSeekerLogin = () => {
 
         redirectUri
 
-      ) as any;
+      );
 
       const { accessToken, refreshToken, backend } = resData;
 
@@ -380,7 +380,7 @@ const JobSeekerLogin = () => {
     setIsFullScreenLoading(true);
     try {
       const resData = await authService.firebaseLogin(idToken, ROLES_NAME.JOB_SEEKER as RoleName);
-      const { accessToken, refreshToken, backend } = resData as typeof resData & { accessToken: string; refreshToken: string; backend: string };
+      const { accessToken, refreshToken, backend } = resData;
 
       const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
         accessToken,

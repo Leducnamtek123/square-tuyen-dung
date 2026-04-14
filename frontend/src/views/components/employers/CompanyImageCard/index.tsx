@@ -46,7 +46,8 @@ const CompanyImageCard = () => {
   const [cropFileName, setCropFileName] = useState('');
 
   const fileList = useMemo<FileItem[]>(() => {
-    const results = (imagesData as any)?.results ?? imagesData ?? [];
+    const raw = imagesData as unknown;
+    const results = Array.isArray(raw) ? raw : ((raw as { results?: unknown[] } | undefined)?.results ?? []);
     return (results as Array<{ id: number | string; imageUrl: string }>).map((item) => ({
       uid: item.id,
       url: item.imageUrl,
@@ -75,7 +76,7 @@ const CompanyImageCard = () => {
       await addCompanyImages(formData);
       toastMessages.success(t('companyImage.uploadSuccess'));
     } catch (error) {
-      errorHandling(error as AxiosError<{ errors?: ApiError }>);
+      errorHandling(error);
     }
   };
 

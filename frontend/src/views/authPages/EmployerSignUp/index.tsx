@@ -133,7 +133,7 @@ const EmployerSignUp = () => {
           }
         }
 
-        errorHandling(error as AxiosError<{ errors?: Record<string, string[]> }>, (errs) => setServerErrors(errs as Record<string, string[]>));
+        errorHandling(error, (errs) => setServerErrors(errs as Record<string, string[]>));
 
       } finally {
 
@@ -195,7 +195,7 @@ const EmployerSignUp = () => {
 
     } catch (error) {
 
-      errorHandling(error as AxiosError<{ errors?: ApiError }>, undefined);
+      errorHandling(error);
 
       return false;
 

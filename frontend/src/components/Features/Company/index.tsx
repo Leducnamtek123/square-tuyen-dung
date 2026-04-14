@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTheme } from '@mui/material/styles';
 import defaultTheme from '@/themeConfigs/defaultTheme';
@@ -60,7 +60,7 @@ const FollowComponent = ({ slug, isFollowed }: FollowProps) => {
         );
 
       } catch (error) {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
       } finally {
 
         setIsLoadingFollow(false);

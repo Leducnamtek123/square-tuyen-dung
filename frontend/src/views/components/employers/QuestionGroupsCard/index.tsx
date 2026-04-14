@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
@@ -143,7 +143,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
             }
             handleCloseDialog();
         } catch (error) {
-            errorHandling(error as AxiosError<{ errors?: ApiError }>);
+            errorHandling(error);
         }
     };
 
@@ -158,7 +158,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
             setOpenCreateQuestion(false);
             setNewQuestionContent('');
         } catch (error) {
-            errorHandling(error as AxiosError<{ errors?: ApiError }>);
+            errorHandling(error);
         }
     };
 

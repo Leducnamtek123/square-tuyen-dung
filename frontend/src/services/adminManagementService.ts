@@ -35,20 +35,20 @@ const adminManagementService = {
 
   getCareers: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Career>> => {
     const url = 'common/admin/careers/';
-    return withPresign(httpRequest.get<PaginatedResponse<Career>>(url, { params }) as any);
+    return withPresign(httpRequest.get<PaginatedResponse<Career>>(url, { params }));
   },
 
   createCareer: (data: Record<string, unknown> | FormData): Promise<Career> => {
     const url = 'common/admin/careers/';
     return withPresign(
-      httpRequest.post<Career>(url, data, adminManagementService.buildMultipartConfig(data)) as any
+      httpRequest.post<Career>(url, data, adminManagementService.buildMultipartConfig(data))
     );
   },
 
   updateCareer: (id: IdType, data: Record<string, unknown> | FormData): Promise<Career> => {
     const url = `common/admin/careers/${id}/`;
     return withPresign(
-      httpRequest.patch<Career>(url, data, adminManagementService.buildMultipartConfig(data)) as any
+      httpRequest.patch<Career>(url, data, adminManagementService.buildMultipartConfig(data))
     );
   },
 
@@ -59,17 +59,17 @@ const adminManagementService = {
 
   getCities: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<City>> => {
     const url = 'common/admin/cities/';
-    return withPresign(httpRequest.get<PaginatedResponse<City>>(url, { params }) as any);
+    return withPresign(httpRequest.get<PaginatedResponse<City>>(url, { params }));
   },
 
   createCity: (data: Record<string, unknown>): Promise<City> => {
     const url = 'common/admin/cities/';
-    return withPresign(httpRequest.post<City>(url, data) as any);
+    return withPresign(httpRequest.post<City>(url, data));
   },
 
   updateCity: (id: IdType, data: Record<string, unknown>): Promise<City> => {
     const url = `common/admin/cities/${id}/`;
-    return withPresign(httpRequest.patch<City>(url, data) as any);
+    return withPresign(httpRequest.patch<City>(url, data));
   },
 
   deleteCity: (id: IdType): Promise<void> => {
@@ -79,17 +79,17 @@ const adminManagementService = {
 
   getDistricts: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<District>> => {
     const url = 'common/admin/districts/';
-    return withPresign(httpRequest.get<PaginatedResponse<District>>(url, { params }) as any);
+    return withPresign(httpRequest.get<PaginatedResponse<District>>(url, { params }));
   },
 
   createDistrict: (data: Record<string, unknown>): Promise<District> => {
     const url = 'common/admin/districts/';
-    return withPresign(httpRequest.post<District>(url, data) as any);
+    return withPresign(httpRequest.post<District>(url, data));
   },
 
   updateDistrict: (id: IdType, data: Record<string, unknown>): Promise<District> => {
     const url = `common/admin/districts/${id}/`;
-    return withPresign(httpRequest.patch<District>(url, data) as any);
+    return withPresign(httpRequest.patch<District>(url, data));
   },
 
   deleteDistrict: (id: IdType): Promise<void> => {

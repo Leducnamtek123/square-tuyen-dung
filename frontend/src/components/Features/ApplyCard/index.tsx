@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Stack, Typography } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
 import toastMessages from '@/utils/toastMessages';
@@ -37,7 +37,7 @@ const ApplyCard = ({
         setIsApplySuccess(true);
         setOpenPopup(false);
       } catch (error: unknown) {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
       } finally {
         setIsFullScreenLoading(false);
       }

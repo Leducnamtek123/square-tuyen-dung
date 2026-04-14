@@ -65,5 +65,5 @@ export const useCompanies = (params?: Record<string, unknown>): UseCompaniesResu
         updateCompany: updateMutation.mutateAsync,
         deleteCompany: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    } as any;
+    } as UseCompaniesResult;
 };

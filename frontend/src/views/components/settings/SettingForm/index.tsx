@@ -1,7 +1,7 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { typedYupResolver } from '../../../../utils/formHelpers';
 import { Grid2 as Grid } from "@mui/material";
 import CheckboxCustom from '../../../../components/Common/Controls/CheckboxCustom';
 import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
@@ -23,7 +23,7 @@ const SettingForm = ({ editData, handleUpdate }: SettingFormProps) => {
   });
 
   const { control, reset, handleSubmit } = useForm<FormValues>({
-    resolver: yupResolver(schema) as any,
+    resolver: typedYupResolver(schema),
   });
 
   React.useEffect(() => {

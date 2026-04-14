@@ -6,14 +6,35 @@ import i18n from '../i18n';
 type SetError = ((errors: Record<string, unknown>) => void) | null;
 
 /**
+ * Type guard: checks if an unknown value is an Axios error with a response.
+ */
+const isAxiosError = (error: unknown): error is AxiosError<{ errors?: ApiError }> =>
+  typeof error === 'object' &&
+  error !== null &&
+  'isAxiosError' in error &&
+  (error as AxiosError).isAxiosError === true;
+
+/**
  * Centralized error handler for API errors.
+ *
+ * Accepts `unknown` so callers don't need to cast their caught errors.
+ * Internally narrows the type to AxiosError when applicable.
+ *
  * Uses i18n for user-facing messages instead of hardcoded strings.
  */
 const errorHandling = (
-  error: AxiosError<{ errors?: ApiError }>,
+  error: unknown,
   setError: SetError = null,
 ): void => {
-  const res = error?.response;
+  // If it's not an Axios error, show a generic network/unknown error
+  if (!isAxiosError(error)) {
+    console.error('[errorHandling] Non-Axios error:', error);
+    toastMessages.error(i18n.t('common:errors.networkError', 'Unable to connect to server, please check your network.'));
+    setError && setError({ detail: 'Network error' });
+    return;
+  }
+
+  const res = error.response;
 
   // Network error or other non-response case
   if (!res) {

@@ -27,8 +27,7 @@ import { salaryString } from '../../../../utils/customData';
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { Theme } from '@mui/material/styles';
-import { AxiosError } from 'axios';
-import { ApiError } from '@/types/api';
+
 import { FormValues } from '../GeneralInfoForm';
 
 interface ResumeDetail {
@@ -221,13 +220,13 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
       try {
 
-        const resData = await resumeService.getResumeOwner(slug) as any;
+        const resData = await resumeService.getResumeOwner(slug);
 
-        setResumeDetail(resData);
+        setResumeDetail(resData as unknown as ResumeDetail);
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -250,7 +249,23 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
       try {
 
-        await resumeService.updateResume(slug, payload as any);
+        // Convert string|number fields to numbers for the API
+        const apiPayload = {
+          title: payload.title,
+          description: payload.description,
+          skillsSummary: payload.skillsSummary,
+          salaryMin: Number(payload.salaryMin) || undefined,
+          salaryMax: Number(payload.salaryMax) || undefined,
+          expectedSalary: Number(payload.expectedSalary) || undefined,
+          position: Number(payload.position) || undefined,
+          experience: Number(payload.experience) || undefined,
+          academicLevel: Number(payload.academicLevel) || undefined,
+          typeOfWorkplace: Number(payload.typeOfWorkplace) || undefined,
+          jobType: Number(payload.jobType) || undefined,
+          cityId: Number(payload.city) || undefined,
+          careerId: Number(payload.career) || undefined,
+        };
+        await resumeService.updateResume(slug, apiPayload);
 
         setIsSuccess(!isSuccess);
 
@@ -260,7 +275,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -521,7 +536,21 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
           handleUpdate={handleUpdateResumeDetail}
 
-          editData={resumeDetail as any}
+          editData={resumeDetail ? {
+            title: resumeDetail.title ?? undefined,
+            description: resumeDetail.description ?? undefined,
+            skillsSummary: resumeDetail.skillsSummary ?? undefined,
+            position: resumeDetail.position,
+            academicLevel: resumeDetail.academicLevel,
+            experience: resumeDetail.experience,
+            career: resumeDetail.career,
+            city: resumeDetail.city,
+            salaryMin: resumeDetail.salaryMin ?? undefined,
+            salaryMax: resumeDetail.salaryMax ?? undefined,
+            expectedSalary: resumeDetail.expectedSalary ?? undefined,
+            typeOfWorkplace: resumeDetail.typeOfWorkplace,
+            jobType: resumeDetail.jobType,
+          } : null}
 
         />
 

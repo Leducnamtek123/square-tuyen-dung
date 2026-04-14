@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useForm } from 'react-hook-form';
 
-import { yupResolver } from '@hookform/resolvers/yup';
+import { typedYupResolver } from '../../../../utils/formHelpers';
 
 import * as yup from 'yup';
 
@@ -56,7 +56,7 @@ const AdvancedSkillForm = ({
 
   const { control, reset, setError, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as any,
+    resolver: typedYupResolver(schema),
 
   });
 

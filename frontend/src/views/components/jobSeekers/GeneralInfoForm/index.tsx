@@ -3,7 +3,7 @@ import { useAppSelector } from '@/redux/hooks';
 
 import { useForm } from 'react-hook-form';
 
-import { yupResolver } from '@hookform/resolvers/yup';
+import { typedYupResolver } from '../../../../utils/formHelpers';
 
 import * as yup from 'yup';
 
@@ -17,9 +17,7 @@ import MultilineTextFieldCustom from '../../../../components/Common/Controls/Mul
 
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import { useConfig } from '@/hooks/useConfig';
-import type { Control as ReactHookFormControl } from 'react-hook-form';
-import type { FieldValues as ReactHookFormFieldValues } from 'react-hook-form';
-import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
+
 
 export interface FormValues {
   title: string;
@@ -186,7 +184,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
   const { control, reset, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as any,
+    resolver: typedYupResolver<FormValues>(schema),
 
   });
 
@@ -554,7 +552,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.objective')}
 
-            control={control as any}
+            control={control}
 
           />
 
@@ -570,7 +568,7 @@ const GeneralInfoForm = ({ handleUpdate, editData }: GeneralInfoFormProps) => {
 
             placeholder={t('jobSeeker:profile.placeholders.skillsSummary')}
 
-            control={control as any}
+            control={control}
 
           />
 

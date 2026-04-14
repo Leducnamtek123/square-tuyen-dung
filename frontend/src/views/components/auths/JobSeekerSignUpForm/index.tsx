@@ -1,6 +1,6 @@
 import React from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
+import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from "yup";
 import { Box, Button, Stack, styled, Divider } from "@mui/material";
 import HowToRegIcon from "@mui/icons-material/HowToReg";
@@ -164,7 +164,7 @@ const JobSeekerSignUpForm = ({
       password: "",
       confirmPassword: "",
     },
-    resolver: yupResolver(schema) as any // TODO: fix yup schema inference to match form type,
+    resolver: typedYupResolver(schema),
   });
 
   const email = useWatch({

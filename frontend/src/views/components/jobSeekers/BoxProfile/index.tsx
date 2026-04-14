@@ -28,6 +28,7 @@ import NoDataCard from "../../../../components/Common/NoDataCard";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 const PDFDownloadLinkAny = PDFDownloadLink as React.ElementType;
 import CVDoc from "../../../../components/Features/CVDoc";
+import type { ExtendedResume } from "../../../../components/Features/CVDoc";
 import { reloadResume } from "../../../../redux/profileSlice";
 import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
 import resumeService from "../../../../services/resumeService";
@@ -97,8 +98,8 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
   const blobRef = React.useRef<Blob | null>(null);
   const queryClient = useQueryClient();
 
-  const userPayload = currentUser as any;
-  const jobSeekerProfileId = userPayload?.jobSeekerProfile?.id || userPayload?.jobSeekerProfileId || undefined;
+  const rawProfileId = currentUser?.jobSeekerProfile?.id || currentUser?.jobSeekerProfileId || undefined;
+  const jobSeekerProfileId = rawProfileId ? String(rawProfileId) : undefined;
 
   const { data: resumes, isLoading: isLoadingResume } = useResumes(jobSeekerProfileId, {
     resumeType: CV_TYPES.cvWebsite,
@@ -123,8 +124,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
         dispatch(reloadResume());
         toastMessages.success(t("jobSeeker:profile.messages.profileStatusUpdateSuccess"));
       } catch (error) {
-        // Casting through unknown to satisfy errorHandling strict AxiosError<{errors: ApiError}> generic type requirements
-        errorHandling(error as AxiosError<{errors: ApiError}>);
+        errorHandling(error);
       } finally {
         setIsFullScreenLoading(false);
       }
@@ -192,7 +192,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                 </Stack>
                 {!isGeneratingPDF && (
                   <PDFDownloadLinkAny
-                    document={<CVDoc resume={resume as any} user={currentUser as any} themeColor={selectedColor} />}
+                    document={<CVDoc resume={resume as ExtendedResume} user={currentUser} themeColor={selectedColor} />}
                     fileName={`${APP_NAME}_CV_${currentUser?.fullName}-${toSlug(resume?.title || "title")}.pdf`}
                     style={{ textDecoration: "none" }}
                   >

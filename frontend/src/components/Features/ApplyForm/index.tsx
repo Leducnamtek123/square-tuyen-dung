@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/navigation';
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -75,7 +75,7 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
         const parsedResumes = Array.isArray(resData) ? resData : (resData.results || []);
         setResumes(parsedResumes);
       } catch (error) {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
       } finally {
         setIsLoadingResumes(false);
       }

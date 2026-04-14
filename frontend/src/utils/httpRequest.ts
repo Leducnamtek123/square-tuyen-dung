@@ -176,10 +176,9 @@ httpRequest.interceptors.response.use(
 
       const refreshData = unwrapResponse(
         refreshResponse as { data?: { data?: unknown } },
-      ) as Partial<TokenPair> & { accessToken?: string; refreshToken?: string };
-      const accessToken = refreshData.access_token || refreshData.accessToken || null;
-      const newRefreshToken =
-        refreshData.refresh_token || refreshData.refreshToken || refreshToken;
+      ) as Partial<TokenPair>;
+      const accessToken = refreshData.accessToken || null;
+      const newRefreshToken = refreshData.refreshToken || refreshToken;
 
       if (!accessToken) {
         tokenService.removeAccessTokenAndRefreshTokenFromCookie();

@@ -22,6 +22,10 @@ export interface User {
   workspaces?: Workspace[];
   canAccessEmployerPortal?: boolean;
   isActive?: boolean;
+  /** Job seeker profile object returned by backend (when roleName === 'JOB_SEEKER') */
+  jobSeekerProfile?: { id: number | string } | null;
+  /** Flat job seeker profile ID (alternative backend serialization) */
+  jobSeekerProfileId?: number | string | null;
 }
 
 export interface Workspace {
@@ -301,9 +305,11 @@ export interface Ward {
 
 export interface Location {
   id: number;
-  city?: City;
-  district?: District;
+  city?: number | string | { id: number; name: string };
+  district?: number | string | { id: number; name: string };
   address?: string;
+  /** Pre-resolved district dict from backend */
+  districtDict?: { id?: number; name?: string };
 }
 
 /* Interview */

@@ -3,7 +3,7 @@ import { useAppSelector } from '@/redux/hooks';
 
 import { useForm } from 'react-hook-form';
 
-import { yupResolver } from '@hookform/resolvers/yup';
+import { typedYupResolver } from '../../../../utils/formHelpers';
 
 import * as yup from 'yup';
 
@@ -194,7 +194,7 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
 
 
-    resolver: yupResolver(schema) as any,
+    resolver: typedYupResolver(schema),
 
 
 

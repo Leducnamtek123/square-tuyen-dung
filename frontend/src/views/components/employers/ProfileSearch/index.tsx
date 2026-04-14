@@ -29,6 +29,7 @@ import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import { resetSearchResume, searchResume } from '../../../../redux/filterSlice';
+import type { ResumeFilter } from '../../../../redux/filterSlice';
 import { useConfig } from '@/hooks/useConfig';
 
 export interface ProfileSearchValues {
@@ -58,7 +59,7 @@ const ProfileSearch: React.FC = () => {
     }, [resumeFilter, reset]);
 
     const handleFilter = (data: ProfileSearchValues) => {
-        dispatch(searchResume(data as any));
+        dispatch(searchResume({ ...data, page: 1, pageSize: 10 } as ResumeFilter));
     };
 
     const handleReset = () => {

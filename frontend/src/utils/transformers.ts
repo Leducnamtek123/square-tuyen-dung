@@ -1,5 +1,5 @@
 import i18n from '../i18n';
-import { Question, QuestionGroup, JobPost, InterviewSession } from '../types/models';
+import { Question, QuestionGroup, JobPost, InterviewSession, Location, Company } from '../types/models';
 
 const t = (key: string, options?: Record<string, unknown>) => i18n.t(key, options);
 
@@ -9,15 +9,17 @@ const t = (key: string, options?: Record<string, unknown>) => i18n.t(key, option
 export const transformQuestion = (q: Record<string, unknown> | null | undefined): Question | null => {
   if (!q) return null;
 
-  const text = q.text || q.questionText || q.content || '';
+  const text = (q.text || q.questionText || q.content || '') as string;
 
   return {
-    ...q,
-    id: q.id,
-    category: q.category || t('common:labels.uncategorized'),
-    questionType: q.questionType || q.type || 'TEXT',
+    id: q.id as number,
+    category: (q.category || 'Uncategorized') as string,
+    questionType: (q.questionType || q.type || 'TEXT') as string,
     text,
-  } as any;
+    content: q.content as string | undefined,
+    questionText: q.questionText as string | undefined,
+    type: q.type as string | undefined,
+  };
 };
 
 export const transformQuestionGroup = (
@@ -26,12 +28,11 @@ export const transformQuestionGroup = (
   if (!group) return null;
 
   return {
-    id: group.id,
-    name: group.name || '',
-    description: group.description || '',
+    id: group.id as number,
+    name: (group.name || '') as string,
+    description: (group.description || '') as string,
     questions: (Array.isArray(group.questions) ? group.questions : []).map((q) => transformQuestion(q as Record<string, unknown>)).filter((q: Question | null): q is Question => !!q),
-    ...group,
-  } as any;
+  };
 };
 
 export const transformInterviewSession = (
@@ -76,14 +77,7 @@ export const transformInterviewSession = (
   ) as string;
 
   return {
-    ...s,
     id: s.id as number,
-    jobPostId: (
-      s.jobPost || dicts.jobPostDict?.id || null
-    ) as number | null,
-    candidateId: (
-      s.candidate || dicts.candidateDict?.id || dicts.jobSeekerDict?.id
-    ) as number | undefined,
     candidateName,
     candidateEmail,
     companyName,
@@ -91,14 +85,12 @@ export const transformInterviewSession = (
     roomName: (s.roomName || s.room || '') as string,
     scheduledAt,
     status: (s.status as string) || 'PENDING',
-    interviewType: (s.interviewType || undefined) as string | undefined,
-    type: (s.type || s.interviewType || undefined) as string | undefined,
+    interview_type: (s.interviewType || undefined) as string | undefined,
+    type: ((s.type || s.interviewType || '') as string),
     inviteToken,
-    notes: (s.notes || '') as string,
     recordingUrl,
-    transcriptUrl,
     questions: (Array.isArray(s.questions) ? s.questions : []).map((q) => transformQuestion(q as Record<string, unknown>)).filter((q: Question | null): q is Question => !!q),
-  } as any;
+  };
 };
 
 export const transformJobPost = (job: Record<string, unknown> | null | undefined): JobPost | null => {
@@ -110,15 +102,16 @@ export const transformJobPost = (job: Record<string, unknown> | null | undefined
 
   return {
     id: job.id as number,
-    title: (job.jobName || job.title || '') as string,
-    companyName: (dicts.companyDict?.companyName || '') as string,
-    location: (dicts.locationDict?.city || '') as string,
-    salaryMin: job.salaryMin as number,
-    salaryMax: job.salaryMax as number,
-    deadline: job.deadline as string,
-    ...job,
     jobName: (job.jobName || job.title || '') as string,
-  } as any;
+    slug: (job.slug || '') as string,
+    company: dicts.companyDict ? { companyName: dicts.companyDict.companyName } as Company : null,
+    location: { id: 0, city: dicts.locationDict?.city || '', address: '' } as Location,
+    salaryMin: (job.salaryMin || 0) as number,
+    salaryMax: (job.salaryMax || 0) as number,
+    deadline: (job.deadline || '') as string,
+    quantity: (job.quantity || 0) as number,
+    status: (job.status || 'active') as JobPost['status'],
+  };
 };
 
 export const transformAppliedResume = (

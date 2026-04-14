@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from "@mui/material";
@@ -52,7 +52,7 @@ const CertificateForm = ({
       startDate: null,
       expirationDate: null,
     },
-    resolver: yupResolver(schema) as any,
+    resolver: typedYupResolver(schema),
   });
 
   React.useEffect(() => {

@@ -16,7 +16,6 @@ import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { JobSeekerProfile, Location } from '../../../../types/models';
-import type { AxiosError } from 'axios';
 
 type EnhancedJobSeekerProfile = JobSeekerProfile & {
   user?: { fullName: string };
@@ -137,11 +136,11 @@ const PersonalInfoCard = ({ title, sx }: PersonalInfoCardProps) => {
 
     const resData = await jobSeekerProfileService.getProfile();
 
-    setProfile((resData as any).data);
+    setProfile(resData as EnhancedJobSeekerProfile);
 
   } catch (error: unknown) {
 
-    errorHandling(error as AxiosError<Record<string, unknown>>);
+    errorHandling(error);
 
   } finally {
 
@@ -157,13 +156,13 @@ getProfile();
 
 const handleUpdateProfile = (data: PersonalProfileFormValues) => {
 
-const updateProfile = async (data: Partial<EnhancedJobSeekerProfile>) => {
+const updateProfile = async (data: PersonalProfileFormValues) => {
 
   setIsFullScreenLoading(true);
 
   try {
 
-    await jobSeekerProfileService.updateProfile(data);
+    await jobSeekerProfileService.updateProfile(data as unknown as Record<string, unknown>);
 
     dispatch(getUserInfo());
 
@@ -175,7 +174,7 @@ const updateProfile = async (data: Partial<EnhancedJobSeekerProfile>) => {
 
   } catch (error: unknown) {
 
-    errorHandling(error as AxiosError<Record<string, unknown>>);
+    errorHandling(error);
 
   } finally {
 
@@ -185,7 +184,7 @@ const updateProfile = async (data: Partial<EnhancedJobSeekerProfile>) => {
 
 };
 
-      updateProfile(data as any);
+      updateProfile(data);
 
 };
 
@@ -363,7 +362,7 @@ return (
 
                     t('common:city'),
 
-                    tConfig(allConfig?.cityDict?.[((profile?.location as any)?.city as keyof typeof allConfig.cityDict)])
+                    tConfig(allConfig?.cityDict?.[String(profile?.location?.city)])
 
                   )}
 
@@ -401,7 +400,7 @@ return (
 
         handleUpdateProfile={handleUpdateProfile}
 
-        editData={profile as any}
+        editData={profile as unknown as Partial<PersonalProfileFormValues> | null}
 
       />
 

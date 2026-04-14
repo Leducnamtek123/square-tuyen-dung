@@ -1,6 +1,6 @@
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from 'yup';
 import { Box, Button, Stack, Step, StepLabel, Stepper, styled } from "@mui/material";
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
@@ -138,7 +138,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
         },
       },
     },
-    resolver: yupResolver(schema) as any // TODO: fix yup schema inference to match form type,
+    resolver: typedYupResolver<EmployerSignUpFormData>(schema),
   });
 
   const cityId = useWatch({ control, name: 'company.location.city' });
@@ -239,7 +239,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
         setDistrictOptions(resData.data?.map(d => ({ id: d.id, name: d.name })) || []);
         prevCityIdRef.current = cityId;
       } catch (error) {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
       }
     };
     if (cityId) loadDistricts(Number(cityId));

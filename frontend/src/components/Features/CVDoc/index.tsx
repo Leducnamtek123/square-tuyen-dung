@@ -65,7 +65,7 @@ interface ExtraData {
   [key: string]: unknown;
 }
 
-interface ExtendedResume extends Resume {
+export interface ExtendedResume extends Resume {
   user?: User | null;
   positionChooseData?: ExtraData;
   experienceChooseData?: ExtraData;

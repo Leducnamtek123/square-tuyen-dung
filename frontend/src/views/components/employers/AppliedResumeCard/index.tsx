@@ -120,9 +120,9 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     setIsProcessing(true);
     try {
       const resData = await jobPostActivityService.exportAppliedResume(queryParams);
-      xlsxUtils.exportToXLSX(resData as any, 'AppliedProfilesList');
+      xlsxUtils.exportToXLSX(resData as Record<string, unknown>[], 'AppliedProfilesList');
     } catch (error) {
-      errorHandling(error as AxiosError<{ errors?: ApiError }>);
+      errorHandling(error);
     } finally {
       setIsProcessing(false);
     }

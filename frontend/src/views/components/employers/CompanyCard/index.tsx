@@ -59,7 +59,7 @@ const CompanyCard = () => {
       await updateCompany({ id: company.id, data: payload as Parameters<typeof updateCompany>[0]['data'] });
       toastMessages.success(t('companyProfile.success.update'));
     } catch (error) {
-      errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as Parameters<typeof errorHandling>[1]);
+      errorHandling(error, (errs) => setServerErrors(errs as Record<string, string[]>));
     }
   }, [company?.id, updateCompany, t]);
 
@@ -88,7 +88,7 @@ const CompanyCard = () => {
         toastMessages.success(t('companyProfile.success.coverUpdate'));
       }
     } catch (error) {
-      errorHandling(error as AxiosError<{ errors?: ApiError }>);
+      errorHandling(error);
     }
   };
 

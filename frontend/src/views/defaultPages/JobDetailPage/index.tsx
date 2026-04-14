@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
@@ -81,7 +81,7 @@ const JobDetailPage = () => {
             errorHandling(fallbackError as AxiosError<{ errors?: ApiError }>);
           }
         } else {
-          errorHandling(error as AxiosError<{ errors?: ApiError }>);
+          errorHandling(error);
         }
       } finally {
         setIsLoading(false);
@@ -161,7 +161,7 @@ const JobDetailPage = () => {
           isSaved ? t("jobDetail.savedSuccess") : t("jobDetail.unsavedSuccess")
         );
       } catch (error) {
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
       } finally {
         setIsLoadingSave(false);
       }

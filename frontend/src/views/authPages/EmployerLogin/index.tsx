@@ -76,7 +76,7 @@ const EmployerLogin = () => {
 
       try {
         const resData = await authService.getToken(email, password, roleName);
-        const { accessToken, refreshToken, backend } = resData as any;
+        const { accessToken, refreshToken, backend } = resData;
 
         const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
           accessToken,
@@ -119,7 +119,7 @@ const EmployerLogin = () => {
       setIsFullScreenLoading(true);
 
       try {
-        const resData = await authService.checkCreds(email, roleName) as { exists?: boolean; email: string; emailVerified?: boolean; };
+        const resData = await authService.checkCreds(email, roleName);
         const { exists, email: resEmail, emailVerified } = resData;
 
         if (exists === true && emailVerified === false) {
@@ -156,7 +156,7 @@ const EmployerLogin = () => {
     setIsFullScreenLoading(true);
 
     try {
-      const resData = await authService.convertToken(clientId, clientSecrect, provider, token, redirectUri) as any;
+      const resData = await authService.convertToken(clientId, clientSecrect, provider, token, redirectUri);
       const { accessToken, refreshToken, backend } = resData;
 
       const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(

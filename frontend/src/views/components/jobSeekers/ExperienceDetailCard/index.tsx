@@ -56,14 +56,7 @@ import { AxiosError } from 'axios';
 import { ApiError } from '@/types/api';
 import { FormValues } from '../ExperienceDetailForm';
 
-interface ExperienceDetail {
-  id: string | number;
-  startDate: string;
-  endDate: string | null;
-  jobName: string;
-  companyName: string;
-  description: string | null;
-}
+import type { ExperienceDetail } from '../../../../types/models';
 
 interface ExperienceDetailCardProps {
   title: string;
@@ -166,13 +159,13 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
       try {
 
-        const resData = await resumeService.getExperiencesDetail(slug) as any;
+        const resData = await resumeService.getExperiencesDetail(slug);
 
         setExperiencesDetail(resData);
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -198,7 +191,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
           experienceId
 
-        ) as any;
+        );
 
         setEditData(resData);
 
@@ -206,7 +199,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -236,7 +229,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
       try {
 
-        await experienceDetailService.addExperienceDetail(payload as any);
+        await experienceDetailService.addExperienceDetail(payload);
 
         setOpenPopup(false);
 
@@ -246,7 +239,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -262,7 +255,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
       try {
 
-        await experienceDetailService.updateExperienceDetailById(payload.id as string | number, payload as any);
+        await experienceDetailService.updateExperienceDetailById(payload.id as string | number, payload);
 
         setOpenPopup(false);
 
@@ -272,7 +265,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -318,7 +311,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -512,7 +505,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
                           >
 
-                            <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY" />{" "}
+                            {value.startDate && <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY" />}{" "}
 
                             -{" "}
 
@@ -756,7 +749,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
           handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
 
-          editData={editData as any}
+          editData={editData as unknown as Partial<FormValues> | null}
 
         />
 

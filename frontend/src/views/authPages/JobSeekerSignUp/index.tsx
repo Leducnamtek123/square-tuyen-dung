@@ -136,7 +136,7 @@ const JobSeekerSignUp = () => {
         const hasEmailExists = !!errors?.email;
         if (res?.status === 400 && hasEmailExists) {
           try {
-            const resData = (await authService.checkCreds(data?.email, ROLES_NAME.JOB_SEEKER as RoleName)) as { exists: boolean; emailVerified: boolean };
+            const resData = await authService.checkCreds(data?.email, ROLES_NAME.JOB_SEEKER as RoleName);
             if (resData?.exists === true && resData?.emailVerified === false) {
               dispatch(
                 updateVerifyEmail({
@@ -195,7 +195,7 @@ const JobSeekerSignUp = () => {
         token,
         redirectUri
 
-      )) as any;
+      ));
 
       const { accessToken, refreshToken, backend } = resData;
 
@@ -225,7 +225,7 @@ const JobSeekerSignUp = () => {
 
           .catch(() => {
 
-            errorHandling({ response: null } as any);
+            errorHandling(new Error('Login error'));
 
           });
 
@@ -233,7 +233,7 @@ const JobSeekerSignUp = () => {
 
     } catch (error) {
 
-      errorHandling(error as AxiosError<Record<string, unknown>>);
+      errorHandling(error);
 
     } finally {
 
@@ -290,7 +290,7 @@ const JobSeekerSignUp = () => {
 
     try {
 
-      const resData = (await authService.checkCreds(email, roleName)) as { exists: boolean; emailVerified: boolean };
+      const resData = await authService.checkCreds(email, roleName);
 
       const { exists, emailVerified } = resData;
 
@@ -322,7 +322,7 @@ const JobSeekerSignUp = () => {
 
     } catch (error) {
 
-      errorHandling(error as AxiosError<Record<string, unknown>>);
+      errorHandling(error);
 
       return false;
 

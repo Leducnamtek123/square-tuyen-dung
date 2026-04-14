@@ -165,7 +165,7 @@ export const useUserSettings = (enabled: boolean = true) => {
     return useQuery({
         queryKey: ['userSettings'],
         queryFn: async () => {
-            const response = await authService.getUserSettings() as any;
+            const response = await authService.getUserSettings();
             return response;
         },
         enabled,

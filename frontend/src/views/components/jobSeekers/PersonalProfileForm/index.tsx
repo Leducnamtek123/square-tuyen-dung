@@ -3,7 +3,7 @@ import { useAppSelector } from '@/redux/hooks';
 
 import { useForm, useWatch } from 'react-hook-form';
 
-import { yupResolver } from '@hookform/resolvers/yup';
+import { typedYupResolver } from '../../../../utils/formHelpers';
 
 import * as yup from 'yup';
 
@@ -24,8 +24,6 @@ import DatePickerCustom from '../../../../components/Common/Controls/DatePickerC
 import commonService from '../../../../services/commonService';
 import { useConfig } from '@/hooks/useConfig';
 import type { SelectOption } from '@/types/models';
-import type { AxiosError } from 'axios';
-import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface PersonalProfileFormValues {
   user: {
@@ -178,7 +176,7 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
 
   const { control, setValue, reset, handleSubmit } = useForm<PersonalProfileFormValues>({
 
-    resolver: yupResolver(schema) as any,
+    resolver: typedYupResolver<PersonalProfileFormValues>(schema),
 
   });
 
@@ -252,10 +250,11 @@ const PersonalProfileForm = ({ handleUpdateProfile, editData }: PersonalProfileF
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
           setValue('location.district', '');
         }
-        setDistrictOptions((resData as any)?.results || resData || []);
+        const results = (Array.isArray(resData) ? resData : ((resData as { results?: unknown[] })?.results || [])) as SelectOption[];
+        setDistrictOptions(results);
         prevCityIdRef.current = id;
       } catch (error) {
-        errorHandling(error as AxiosError<Record<string, unknown>>);
+        errorHandling(error);
       }
     };
     if (cityId) {

@@ -38,11 +38,7 @@ import type { Theme as StylesTheme } from '@mui/material/styles';
 import type { ApiError } from '@/types/api';
 import type { AxiosError } from 'axios';
 
-interface LanguageSkill {
-  id: string | number;
-  language: string | number;
-  level: number;
-}
+import type { LanguageSkill } from '../../../../types/models';
 
 interface LanguageSkillCardProps {
   title: string;
@@ -143,13 +139,13 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       try {
 
-        const resData = await resumeService.getLanguageSkills(slug) as LanguageSkill[];
+        const resData = await resumeService.getLanguageSkills(slug);
 
         setLanguageSkills(resData);
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -173,7 +169,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       try {
 
-        const resData = await languageSkillService.getLanguageSkillById(skillId) as LanguageSkill;
+        const resData = await languageSkillService.getLanguageSkillById(skillId);
 
         setEditData(resData);
 
@@ -181,7 +177,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -213,7 +209,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       try {
 
-        await languageSkillService.addLanguageSkills(payload as any);
+        await languageSkillService.addLanguageSkills(payload);
 
         setOpenPopup(false);
 
@@ -223,7 +219,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as any);
+        errorHandling(error, (errs) => setServerErrors(errs as Record<string, string[]>));
 
       } finally {
 
@@ -239,7 +235,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       try {
 
-        await languageSkillService.updateLanguageSkillById(payload.id as string | number, payload as any);
+        await languageSkillService.updateLanguageSkillById(payload.id as string | number, payload);
 
         setOpenPopup(false);
 
@@ -249,7 +245,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -295,7 +291,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -465,7 +461,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
       <FormPopup title={t('jobSeeker:profile.sections.language')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
 
-        <LanguageSkillForm handleAddOrUpdate={handleAddOrUpdate as (data: LanguageskillformFormValues) => void} editData={editData as any} serverErrors={serverErrors} />
+        <LanguageSkillForm handleAddOrUpdate={handleAddOrUpdate as (data: LanguageskillformFormValues) => void} editData={editData} serverErrors={serverErrors} />
 
       </FormPopup>
 

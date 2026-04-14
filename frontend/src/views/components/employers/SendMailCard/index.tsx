@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from 'yup';
 import { Grid2 as Grid, Box, Paper, alpha, useTheme } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
@@ -65,7 +65,7 @@ const SendMailCard: React.FC<SendMailCardProps> = ({
   });
 
   const { control, reset, handleSubmit } = useForm<SendMailFormData>({
-    resolver: yupResolver(schema) as any, // yup resolver workaround for drafted mixed types
+    resolver: typedYupResolver(schema),
     defaultValues: {
       fullName: '',
       email: '',

@@ -1,7 +1,7 @@
 import httpRequest from '../utils/httpRequest';
 import { AUTH_CONFIG } from '../configs/constants';
 import { ensurePresignedUrl } from '../utils/presignUrl';
-import type { AuthProvider, RoleName, TokenPair } from '../types/auth';
+import type { AuthProvider, RoleName, TokenPair, CheckCredsResponse, EmailExistsResponse } from '../types/auth';
 import type { User } from '../types/models';
 import type { ResetPasswordData } from '../types/auth';
 import type { ChangePasswordData } from '../types/auth';
@@ -74,22 +74,22 @@ const authService = {
     return httpRequest.post(url, data);
   },
 
-  checkCreds: (email: string, roleName: RoleName): Promise<unknown> => {
+  checkCreds: (email: string, roleName: RoleName): Promise<CheckCredsResponse> => {
     const url = 'auth/check-creds/';
     return httpRequest.post(url, { email, roleName });
   },
 
-  emailExists: (email: string): Promise<unknown> => {
+  emailExists: (email: string): Promise<EmailExistsResponse> => {
     const url = 'auth/email-exists/';
     return httpRequest.post(url, { email });
   },
 
-  jobSeekerRegister: (data: JobSeekerRegisterData): Promise<unknown> => {
+  jobSeekerRegister: (data: JobSeekerRegisterData): Promise<TokenResponse> => {
     const url = 'auth/job-seeker/register/';
     return httpRequest.post(url, data);
   },
 
-  employerRegister: (data: EmployerRegisterData): Promise<unknown> => {
+  employerRegister: (data: EmployerRegisterData): Promise<{ message?: string }> => {
     const url = 'auth/employer/register/';
     return httpRequest.post(url, data);
   },
@@ -159,12 +159,12 @@ const authService = {
     return httpRequest.post(url, data);
   },
 
-  getUserSettings: (): Promise<unknown> => {
+  getUserSettings: (): Promise<UserSettingsData> => {
     const url = 'auth/settings/';
     return httpRequest.get(url);
   },
 
-  updateUserSettings: (data: UserSettingsData): Promise<unknown> => {
+  updateUserSettings: (data: UserSettingsData): Promise<UserSettingsData> => {
     const url = 'auth/settings/';
     return httpRequest.put(url, data);
   },

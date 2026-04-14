@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+﻿import React, { Suspense, lazy } from "react";
 
 import { useParams } from 'next/navigation';
 
@@ -112,7 +112,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-        errorHandling(error as AxiosError<Record<string, unknown>>);
+        errorHandling(error);
 
 
 
@@ -187,7 +187,7 @@ const CVCard = ({ title }: CVCardProps) => {
 
 
 
-        errorHandling(error as AxiosError<Record<string, unknown>>);
+        errorHandling(error);
 
 
 

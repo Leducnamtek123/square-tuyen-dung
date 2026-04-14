@@ -3,7 +3,7 @@ import { useAppSelector } from '@/redux/hooks';
 
 import { useForm } from 'react-hook-form';
 
-import { yupResolver } from '@hookform/resolvers/yup';
+import { typedYupResolver } from '../../../../utils/formHelpers';
 
 import * as yup from 'yup';
 
@@ -59,7 +59,7 @@ const LanguageSkillForm = ({
 
   const { control, reset, setError, handleSubmit } = useForm<FormValues>({
 
-    resolver: yupResolver(schema) as any,
+    resolver: typedYupResolver(schema),
 
   });
 

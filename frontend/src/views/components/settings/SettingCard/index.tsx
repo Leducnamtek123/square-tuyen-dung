@@ -80,7 +80,7 @@ const SettingCard = ({ title, sx }: SettingCardProps) => {
                   }}
                 >
                   <SettingForm
-                    editData={editData}
+                    editData={editData ?? null}
                     handleUpdate={handleUpdateUserSetting}
                   />
                 </Box>

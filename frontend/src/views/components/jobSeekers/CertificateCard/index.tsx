@@ -53,13 +53,7 @@ import { Theme } from '@mui/material/styles';
 import { AxiosError } from 'axios';
 import { ApiError } from '@/types/api';
 
-interface Certificate {
-  id: string | number;
-  name: string;
-  trainingPlace: string;
-  startDate: string | Date;
-  expirationDate: string | Date | null;
-}
+import type { Certificate } from '../../../../types/models';
 
 interface CertificateCardProps {
   title: string;
@@ -164,13 +158,13 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       try {
 
-        const resData = await resumeService.getCertificates(slug) as any;
+        const resData = await resumeService.getCertificates(slug);
 
         setCertificates(resData);
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -194,7 +188,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       try {
 
-        const resData = await certificateService.getCertificateById(certId) as any;
+        const resData = await certificateService.getCertificateById(certId);
 
         setEditData(resData);
 
@@ -202,7 +196,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -234,7 +228,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       try {
 
-        await certificateService.addCertificates(payload as any);
+        await certificateService.addCertificates(payload);
 
         setOpenPopup(false);
 
@@ -244,7 +238,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>, setServerErrors as any);
+        errorHandling(error, (errs) => setServerErrors(errs as Record<string, string[]>));
 
       } finally {
 
@@ -260,7 +254,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       try {
 
-        await certificateService.updateCertificateById(payload.id as string | number, payload as any);
+        await certificateService.updateCertificateById(payload.id as string | number, payload);
 
         setOpenPopup(false);
 
@@ -270,7 +264,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -316,7 +310,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
       } catch (error: unknown) {
 
-        errorHandling(error as AxiosError<{ errors?: ApiError }>);
+        errorHandling(error);
 
       } finally {
 
@@ -500,7 +494,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
                           >
 
-                            <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY" />{' '}
+                            {value.startDate && <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY" />}{' '}
 
                             -{' '}
 
@@ -648,9 +642,9 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
         <CertificateForm
 
-          handleAddOrUpdate={handleAddOrUpdate as any}
+          handleAddOrUpdate={handleAddOrUpdate as (data: CertificateFormValues) => void}
 
-          editData={editData as any}
+          editData={editData as unknown as Partial<CertificateFormValues> | null}
 
           serverErrors={serverErrors}
 

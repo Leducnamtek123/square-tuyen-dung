@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Switch } from "@mui/material";
 import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
 import jobPostNotificationService from "../../../../services/jobPostNotificationService";
@@ -22,7 +22,7 @@ const ActiveButtonComponent = ({ id, isActive }: ActiveButtonComponentProps) => 
         const data = resData;
         setChecked(data.isActive);
       } catch (error) {
-        errorHandling(error as AxiosError<Record<string, unknown>>);
+        errorHandling(error);
       } finally {
         setIsFullScreenLoading(false);
       }
