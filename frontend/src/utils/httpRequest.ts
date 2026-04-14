@@ -2,6 +2,7 @@ import axios from 'axios';
 import queryString from 'query-string';
 import tokenService from '../services/tokenService';
 import { AUTH_CONFIG } from '../configs/constants';
+import { isPublicEndpoint, isAuthTokenEndpoint } from '../configs/apiEndpoints';
 import type { RetryAxiosRequestConfig } from '../types/api';
 import type { TokenPair } from '../types/auth';
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
@@ -17,21 +18,6 @@ export interface HttpServiceInstance extends Omit<AxiosInstance, 'get' | 'post' 
 }
 import { cleanParams } from './params';
 import { camelizeKeys } from './camelCase';
-
-// API endpoints that do not require authentication
-const notAuthenticationURL = [
-  'auth/token/',
-  'auth/convert-token/',
-  'auth/job-seeker/register/',
-  'auth/employer/register/',
-  'auth/check-creds/',
-  'auth/email-exists/',
-  'auth/forgot-password/',
-  'auth/reset-password/',
-  'auth/send-verify-email/',
-  'auth/firebase-login/',
-];
-const publicEndpointPrefixes = ['common/', 'job/web/job-posts/', 'job/web/search/', 'info/web/companies/', 'content/web/banner', 'content/web/feedbacks/', 'interview/web/sessions/invite/'];
 
 // Prefix for API endpoints
 const prefix = 'api';
@@ -61,21 +47,6 @@ export const refreshClient = axios.create({
   withCredentials: true,
   timeout: 30000,
 });
-
-const isPublicEndpoint = (url: string | undefined): boolean => {
-  const safeUrl = String(url || '');
-  if (!safeUrl) return false;
-  if (notAuthenticationURL.includes(safeUrl)) return true;
-  return publicEndpointPrefixes.some((pfx) => safeUrl.startsWith(pfx));
-};
-
-const isAuthTokenEndpoint = (url: string | undefined): boolean => {
-  const safeUrl = String(url || '');
-  return safeUrl === 'auth/token/' || safeUrl === '/auth/token/';
-};
-
-const isPlainObject = (val: unknown): val is Record<string, unknown> =>
-  !!val && typeof val === 'object' && !Array.isArray(val) && !(val instanceof FormData);
 
 const unwrapResponse = (response: { data?: { data?: unknown } }) =>
   response?.data?.data ?? response?.data;

@@ -125,8 +125,10 @@ describe('httpRequest', () => {
       mock.onGet('/protected-refresh').replyOnce(401);
       // 2. The refresh request succeeds
       refreshMock.onPost('auth/token/').replyOnce(200, {
-        access_token: 'new-access',
-        refresh_token: 'new-refresh'
+        data: {
+          accessToken: 'new-access',
+          refreshToken: 'new-refresh'
+        }
       });
       // 3. The retried request succeeds
       mock.onGet('/protected-refresh').replyOnce(200, { data: { success: true } });
