@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import sanitizeHtml from "../../../../utils/sanitizeHtml";
 
 import JobDetailInfoItem from "./JobDetailInfoItem";
 
@@ -24,7 +25,7 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
           <div
             className="mt-6 text-sm leading-6"
             dangerouslySetInnerHTML={{
-              __html: jobPostDetail?.jobDescription || '',
+              __html: sanitizeHtml(jobPostDetail?.jobDescription),
             }}
           />
         </div>
@@ -38,7 +39,7 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
           <div
             className="mt-6 text-sm leading-6"
             dangerouslySetInnerHTML={{
-              __html: jobPostDetail?.jobRequirement || '',
+              __html: sanitizeHtml(jobPostDetail?.jobRequirement),
             }}
           />
         </div>
@@ -52,7 +53,7 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
           <div
             className="mt-6 text-sm leading-6"
             dangerouslySetInnerHTML={{
-              __html: jobPostDetail?.benefitsEnjoyed || '',
+              __html: sanitizeHtml(jobPostDetail?.benefitsEnjoyed),
             }}
           />
         </div>

@@ -34,3 +34,14 @@ full_diff.txt
 *.log
 tsc_output*.txt
 tsc_errors*.txt
+ts_errors*.txt
+ts_validation*.txt
+temp_tsc_errors*.txt
+audit_result*.txt
+build_err*.txt
+expect_output*.txt
+expect_cli_output*.txt
+
+# Python cache
+.pytest_cache/
+*.egg-info/

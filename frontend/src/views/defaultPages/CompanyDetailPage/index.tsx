@@ -16,6 +16,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { AxiosError } from "axios";
 import useSEO from "../../../hooks/useSEO";
 import useStructuredData from "../../../hooks/useStructuredData";
+import sanitizeHtml from "../../../utils/sanitizeHtml";
 
 import CompanyHeader from "./CompanyHeader";
 import CompanyAbout from "./CompanyAbout";
@@ -36,22 +37,6 @@ export interface CompanyDetailProps extends Omit<Partial<Company>, 'location'> {
   [key: string]: unknown;
 }
 
-const sanitizeCompanyDescription = (rawHtml: string | undefined) => {
-  if (!rawHtml || typeof rawHtml !== "string") return "";
-  if (typeof window === "undefined") return rawHtml;
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(rawHtml, "text/html");
-  doc.querySelectorAll("script,style,iframe,object,embed,link,meta").forEach((node) => node.remove());
-  doc.querySelectorAll("*").forEach((element) => {
-    Array.from(element.attributes).forEach((attr) => {
-      const attrName = attr.name.toLowerCase();
-      const attrValue = (attr.value || "").trim().toLowerCase();
-      if (attrName.startsWith("on")) element.removeAttribute(attr.name);
-      if ((attrName === "href" || attrName === "src") && attrValue.startsWith("javascript:")) element.removeAttribute(attr.name);
-    });
-  });
-  return doc.body.innerHTML;
-};
 
 const CompanyDetailPage = () => {
   const { t } = useTranslation("public");
@@ -78,7 +63,7 @@ const CompanyDetailPage = () => {
     return companyDetail.companyImages.map((img: { imageUrl: string }) => ({ original: img.imageUrl, thumbnail: img.imageUrl }));
   }, [companyDetail?.companyImages]);
 
-  const safeDescriptionHtml = React.useMemo(() => sanitizeCompanyDescription(companyDetail?.description || undefined), [companyDetail?.description]);
+  const safeDescriptionHtml = React.useMemo(() => sanitizeHtml(companyDetail?.description), [companyDetail?.description]);
 
   const stripHtml = (html: string) => (html || '').replace(/<[^>]*>/g, '').slice(0, 160);
 
