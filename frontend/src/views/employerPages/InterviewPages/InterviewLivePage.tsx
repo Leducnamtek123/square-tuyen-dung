@@ -758,6 +758,26 @@ const InterviewLivePage = () => {
                       {t('common:actions.joinNow', { defaultValue: 'Join' })}
                     </Button>
                   )}
+                  {session.status === 'in_progress' && (
+                    <Button
+                      variant="text"
+                      size="small"
+                      startIcon={<VisibilityOffIcon sx={{ fontSize: 16 }} />}
+                      component={Link}
+                      href={getLink(ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', session.id.toString()))}
+                      {...({} as Record<string, unknown>)}
+                      onClick={(event: React.MouseEvent) => event.stopPropagation()}
+                      sx={{
+                        textTransform: 'none',
+                        fontWeight: 800,
+                        fontSize: '0.75rem',
+                        color: 'warning.main',
+                        '&:hover': { bgcolor: alpha(theme.palette.warning.main, 0.08) },
+                      }}
+                    >
+                      {t('common:actions.observe', { defaultValue: 'Observe' })}
+                    </Button>
+                  )}
                   {canForceEndSession(session.status) && (
                     <Button
                       variant="text"

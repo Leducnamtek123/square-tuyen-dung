@@ -638,6 +638,7 @@ class AdminStatisticViewSet(viewsets.ViewSet):
         total_job_posts = JobPost.objects.count()
         total_job_posts_pending = JobPost.objects.filter(status=var_sys.JobPostStatus.PENDING).count()
         total_applications = JobPostActivity.objects.count()
+        total_interviews = InterviewSession.objects.count()
 
         return var_res.response_data(
             data={
@@ -648,5 +649,6 @@ class AdminStatisticViewSet(viewsets.ViewSet):
                 "totalJobPosts": total_job_posts,
                 "totalJobPostsPending": total_job_posts_pending,
                 "totalApplications": total_applications,
+                "totalInterviews": total_interviews,
             }
         )

@@ -106,6 +106,7 @@ const JobPostCard = () => {
       experience: Number(formData.experience),
       academicLevel: Number(formData.academicLevel),
       jobType: Number(formData.jobType),
+      interviewTemplate: formData.interviewTemplate ? Number(formData.interviewTemplate) : null,
       typeOfWorkplace: Number(formData.typeOfWorkplace),
       genderRequired: formData.genderRequired,
       jobDescription: convertEditorStateToHTMLString(formData.jobDescription as EditorState),

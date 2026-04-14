@@ -30,9 +30,10 @@ import {
   RoomAudioRenderer, 
   TrackLoop, 
   useTracks, 
-  BarVisualizer 
+  BarVisualizer,
+  VideoTrack,
 } from '@livekit/components-react';
-import { Track } from 'livekit-client';
+import { Track, RoomEvent } from 'livekit-client';
 import type { SSETranscript } from '../../../employerPages/InterviewPages/hooks/useInterviewSSE';
 
 interface InterviewObserverDialogProps {
@@ -55,29 +56,131 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-/** Compact Visualizer for a more premium look */
+/** Live video + audio visualizer for observer mode */
 const LiveObserverVisualizer = () => {
-  const tracks = useTracks([Track.Source.Microphone]);
+  const audioTracks = useTracks([Track.Source.Microphone]);
+  const videoTracks = useTracks([Track.Source.Camera]);
+  const screenTracks = useTracks([Track.Source.ScreenShare]);
   
   return (
-    <Box sx={{ width: '100%', maxWidth: 400, px: 4 }}>
-      {tracks.length > 0 ? (
-        <Stack spacing={4} alignItems="center">
-          <Box sx={{ height: 100, width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-             <BarVisualizer barCount={15} style={{ height: '60px', width: '200px' }} />
-          </Box>
-          <Typography variant="caption" sx={{ color: '#22c55e', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2 }}>
-            <FiberManualRecordIcon sx={{ fontSize: 8, mr: 1, verticalAlign: 'middle', animation: 'pulse 1.5s infinite' }} />
-            Receiving Live Audio
-          </Typography>
-        </Stack>
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+      {/* Screen share - takes priority if present */}
+      {screenTracks.length > 0 && (
+        <Box sx={{ 
+          width: '100%', 
+          flex: 1, 
+          position: 'relative', 
+          borderRadius: 2, 
+          overflow: 'hidden',
+          border: '2px solid',
+          borderColor: alpha('#22c55e', 0.3),
+          bgcolor: '#000',
+        }}>
+          <VideoTrack
+            trackRef={screenTracks[0]}
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          />
+          <Chip
+            label="SCREEN SHARE"
+            size="small"
+            sx={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              fontWeight: 900,
+              fontSize: '0.6rem',
+              letterSpacing: 1,
+              bgcolor: alpha('#22c55e', 0.85),
+              color: '#fff',
+              height: 22,
+            }}
+          />
+        </Box>
+      )}
+
+      {/* Camera video */}
+      {videoTracks.length > 0 ? (
+        <Box sx={{ 
+          width: screenTracks.length > 0 ? 180 : '100%', 
+          height: screenTracks.length > 0 ? 135 : '100%',
+          maxHeight: screenTracks.length > 0 ? 135 : 320,
+          position: screenTracks.length > 0 ? 'absolute' : 'relative',
+          bottom: screenTracks.length > 0 ? 16 : 'auto',
+          right: screenTracks.length > 0 ? 16 : 'auto',
+          zIndex: 2,
+          borderRadius: 2,
+          overflow: 'hidden',
+          border: '2px solid',
+          borderColor: alpha('#a855f7', 0.4),
+          boxShadow: screenTracks.length > 0 ? '0 8px 32px rgba(0,0,0,0.6)' : 'none',
+          bgcolor: '#000',
+        }}>
+          <VideoTrack
+            trackRef={videoTracks[0]}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+          {screenTracks.length > 0 && (
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                position: 'absolute', 
+                bottom: 4, 
+                left: 8, 
+                color: '#fff', 
+                fontWeight: 800, 
+                fontSize: '0.55rem',
+                textShadow: '0 1px 4px rgba(0,0,0,0.8)',
+              }}
+            >
+              Candidate
+            </Typography>
+          )}
+        </Box>
       ) : (
-        <Stack spacing={3} alignItems="center">
-           <VolumeUpIcon sx={{ fontSize: 64, color: 'rgba(255,255,255,0.1)' }} />
-           <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.2)', fontWeight: 700 }}>
-             Waiting for Audio Tracks...
-           </Typography>
+        /* Fallback: audio visualization when no video */
+        <Stack spacing={3} alignItems="center" sx={{ py: 4 }}>
+          {audioTracks.length > 0 ? (
+            <>
+              <Box sx={{ height: 100, width: '100%', maxWidth: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <BarVisualizer barCount={15} style={{ height: '60px', width: '200px' }} />
+              </Box>
+              <Typography variant="caption" sx={{ color: '#22c55e', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <FiberManualRecordIcon sx={{ fontSize: 8, animation: 'pulse 1.5s infinite' }} />
+                Live Audio — No Video
+              </Typography>
+            </>
+          ) : (
+            <>
+              <VolumeUpIcon sx={{ fontSize: 64, color: 'rgba(255,255,255,0.1)' }} />
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.2)', fontWeight: 700 }}>
+                Waiting for Audio/Video Tracks...
+              </Typography>
+            </>
+          )}
         </Stack>
+      )}
+
+      {/* Live status indicator */}
+      {(videoTracks.length > 0 || screenTracks.length > 0) && (
+        <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 3 }}>
+          <Typography variant="caption" sx={{ 
+            color: '#22c55e', 
+            fontWeight: 900, 
+            textTransform: 'uppercase', 
+            letterSpacing: 2,
+            fontSize: '0.6rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            bgcolor: 'rgba(0,0,0,0.6)',
+            px: 1.5,
+            py: 0.5,
+            borderRadius: 1,
+          }}>
+            <FiberManualRecordIcon sx={{ fontSize: 8, animation: 'pulse 1.5s infinite', '@keyframes pulse': { '0%,100%': { opacity: 1 }, '50%': { opacity: 0.3 } } }} />
+            LIVE
+          </Typography>
+        </Box>
       )}
     </Box>
   );
@@ -212,10 +315,10 @@ const InterviewObserverDialog: React.FC<InterviewObserverDialogProps> = ({
 
       {/* Main Content */}
       <Box sx={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
-        {/* Left: Audio Visualizer */}
+        {/* Left: Video + Audio Visualizer */}
         <Box
           sx={{
-            width: { xs: '0%', md: '45%' },
+            width: { xs: '0%', md: '55%' },
             display: { xs: 'none', md: 'flex' },
             flexDirection: 'column',
             alignItems: 'center',
@@ -232,20 +335,22 @@ const InterviewObserverDialog: React.FC<InterviewObserverDialogProps> = ({
               background: 'radial-gradient(circle at center, rgba(56,189,248,0.08) 0%, transparent 70%)',
             }}
           />
-          <Box sx={{ position: 'relative', textAlign: 'center', width: '100%' }}>
+          <Box sx={{ position: 'relative', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             {connectionDetails ? (
               <LiveObserverVisualizer />
             ) : (
-              <Box sx={{ p: 4 }}>
+              <Box sx={{ p: 4, textAlign: 'center' }}>
                 <Typography variant="body2" sx={{ color: 'warning.main', fontWeight: 800, mb: 1 }}>{t('common:auto.InterviewObserverDialog_audio_disabled_a82b', `Audio Monitoring Disabled`)}</Typography>
                 <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 600 }}>{t('common:auto.InterviewObserverDialog_check_server_config_to_e_e72a', `Check server configuration to enable real-time listening.`)}</Typography>
               </Box>
             )}
             
-            <Box sx={{ mt: 6 }}>
-              <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700, mb: 1 }}>{t('common:auto.InterviewObserverDialog__hidden_observer_mode_72e9', `🔇 Hidden Observer Mode`)}</Typography>
-              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.25)', fontWeight: 600, maxWidth: 280, display: 'block', mx: 'auto' }}>{t('common:auto.InterviewObserverDialog_you_are_observing_this_intervi_7cb3', `You are observing this interview silently. The candidate cannot see or hear you.`)}</Typography>
-            </Box>
+            {!connectionDetails && (
+              <Box sx={{ mt: 6, textAlign: 'center' }}>
+                <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.4)', fontWeight: 700, mb: 1 }}>{t('common:auto.InterviewObserverDialog__hidden_observer_mode_72e9', `🔇 Hidden Observer Mode`)}</Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.25)', fontWeight: 600, maxWidth: 280, display: 'block', mx: 'auto' }}>{t('common:auto.InterviewObserverDialog_you_are_observing_this_intervi_7cb3', `You are observing this interview silently. The candidate cannot see or hear you.`)}</Typography>
+              </Box>
+            )}
             <RoomAudioRenderer />
           </Box>
         </Box>

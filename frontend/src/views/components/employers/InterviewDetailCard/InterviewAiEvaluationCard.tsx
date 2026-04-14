@@ -14,7 +14,7 @@ interface InterviewAiEvaluationCardProps {
 
 const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ session, effectiveStatus, t, onTriggerAi }) => {
     const theme = useTheme();
-    const hasResult = session.ai_overall_score !== null && session.ai_overall_score !== undefined;
+    const hasResult = (session.aiOverallScore ?? session.ai_overall_score) !== null && (session.aiOverallScore ?? session.ai_overall_score) !== undefined;
     const isProcessing = effectiveStatus === 'processing' || session.status === 'processing';
 
     return (
@@ -52,7 +52,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                 <Box sx={{ py: 1 }}>
                     <Box sx={{ textAlign: 'center', mb: 5 }}>
                         <Typography variant="h1" color="primary" sx={{ fontWeight: 900, mb: 0.5, letterSpacing: '-3px', fontSize: '4.5rem' }}>
-                            {session.ai_overall_score}<Box component="span" sx={{ fontSize: '1.5rem', fontWeight: 800, color: 'text.disabled', ml: 1, letterSpacing: 0 }}>/10</Box>
+                            {session.aiOverallScore ?? session.ai_overall_score}<Box component="span" sx={{ fontSize: '1.5rem', fontWeight: 800, color: 'text.disabled', ml: 1, letterSpacing: 0 }}>/10</Box>
                         </Typography>
                         <Chip 
                             label="AI OVERALL QUALITY" 
@@ -81,12 +81,12 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                                     <PsychologyIcon sx={{ fontSize: 18, color: 'primary.main' }} /> {t('interviewDetail.label.technicalScore')}
                                 </Typography>
                                 <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'primary.main', fontSize: '1rem' }}>
-                                    {session.ai_technical_score || 0}<Box component="span" sx={{ color: 'text.disabled', ml: 0.25, fontWeight: 700, fontSize: '0.8rem' }}>/10</Box>
+                                    {(session.aiTechnicalScore ?? session.ai_technical_score) || 0}<Box component="span" sx={{ color: 'text.disabled', ml: 0.25, fontWeight: 700, fontSize: '0.8rem' }}>/10</Box>
                                 </Typography>
                             </Stack>
                             <LinearProgress 
                                 variant="determinate" 
-                                value={(session.ai_technical_score || 0) * 10} 
+                                value={((session.aiTechnicalScore ?? session.ai_technical_score) || 0) * 10} 
                                 sx={{ 
                                     height: 10, 
                                     borderRadius: 5, 
@@ -105,12 +105,12 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                                     <AutoAwesomeIcon sx={{ fontSize: 18, color: 'info.main' }} /> {t('interviewDetail.label.communicationScore')}
                                 </Typography>
                                 <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'info.main', fontSize: '1rem' }}>
-                                    {session.ai_communication_score || 0}<Box component="span" sx={{ color: 'text.disabled', ml: 0.25, fontWeight: 700, fontSize: '0.8rem' }}>/10</Box>
+                                    {(session.aiCommunicationScore ?? session.ai_communication_score) || 0}<Box component="span" sx={{ color: 'text.disabled', ml: 0.25, fontWeight: 700, fontSize: '0.8rem' }}>/10</Box>
                                 </Typography>
                             </Stack>
                             <LinearProgress 
                                 variant="determinate" 
-                                value={(session.ai_communication_score || 0) * 10} 
+                                value={((session.aiCommunicationScore ?? session.ai_communication_score) || 0) * 10} 
                                 sx={{ 
                                     height: 10, 
                                     borderRadius: 5, 
@@ -135,7 +135,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                         position: 'relative'
                     }}>
                         <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', lineHeight: 2, fontStyle: 'italic', position: 'relative', zIndex: 1 }}>
-                            "{session.ai_summary || t('interviewDetail.messages.aiGenerating')}"
+                            "{session.aiSummary || session.ai_summary || t('interviewDetail.messages.aiGenerating')}"
                         </Typography>
                     </Box>
 

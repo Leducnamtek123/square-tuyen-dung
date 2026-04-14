@@ -163,6 +163,14 @@ class JobActivityService:
                 analyze_resume_ai.delay(activity.id)
             except Exception as ex:
                 helper.print_log_error("auto analyze resume", ex)
+        
+        # Auto-schedule AI Screening if Job Post has Interview Template
+        if job_post.interview_template_id:
+            try:
+                from apps.interviews.tasks import auto_schedule_screening_interview
+                auto_schedule_screening_interview.delay(activity.id)
+            except Exception as ex:
+                helper.print_log_error("auto schedule screening", ex)
 
         company = job_post.company
         domain = settings.DOMAIN_CLIENT["job_seeker"]

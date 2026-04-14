@@ -41,6 +41,7 @@ export interface JobPostInput {
   experience?: number;
   academicLevel?: number;
   jobType?: number;
+  interviewTemplate?: number | string | null;
   typeOfWorkplace?: number;
   genderRequired?: string;
   jobDescription?: string;

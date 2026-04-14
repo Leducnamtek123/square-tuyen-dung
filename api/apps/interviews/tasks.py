@@ -85,6 +85,20 @@ def end_interview_session(session_id, reason="max_duration"):
         session.status = "completed"
         session.save()
 
+        # Update Candidate Pipeline to INTERVIEWED if applicable
+        try:
+            from apps.jobs.models import JobPostActivity
+            activity = JobPostActivity.objects.filter(
+                user=session.candidate, 
+                job_post=session.job_post, 
+                is_deleted=False
+            ).first()
+            if activity:
+                activity.status = 4  # INTERVIEWED
+                activity.save(update_fields=['status'])
+        except Exception as err:
+            logger.error("Could not update JobPostActivity pipeline for session %s: %s", session_id, err)
+
         logger.info("Interview session %s ended by task (%s).", session_id, reason)
 
         chain(
@@ -197,24 +211,24 @@ def evaluate_interview_session(self, session_id):
             history_text += f"{role}: {transcript.content}\n"
 
         prompt = f"""
-Ban la mot chuyen gia tuyen dung chuyen nghiep. Hay phan tich noi dung buoi phong van sau day va dua ra danh gia khach quan.
+Bạn là một chuyên gia tuyển dụng chuyên nghiệp. Hãy phân tích nội dung buổi phỏng vấn sau đây và đưa ra đánh giá khách quan.
 
-NOI DUNG BUOI PHONG VAN:
+NỘI DUNG BUỔI PHỎNG VẤN:
 {history_text}
 
-Hay tra ve ket qua DUOI DANG JSON voi cac truong:
-- overall_score: diem tong quat (1-10)
-- technical_score: diem kien thuc chuyen mon (1-10)
-- communication_score: diem giao tiep (1-10)
-- summary: tom tat ngan gon (duoi 100 tu)
-- strengths: danh sach 3-5 diem manh (list string)
-- weaknesses: danh sach 2-3 diem can cai thien (list string)
-- detailed_feedback: object gom:
+Hãy trả về kết quả DƯỚI DẠNG JSON với các trường:
+- overall_score: điểm tổng quát (1-10)
+- technical_score: điểm kiến thức chuyên môn (1-10)
+- communication_score: điểm giao tiếp (1-10)
+- summary: tóm tắt ngắn gọn (dưới 100 từ)
+- strengths: danh sách 3-5 điểm mạnh (list string)
+- weaknesses: danh sách 2-3 điểm cần cải thiện (list string)
+- detailed_feedback: object gồm:
   - question_performance: list object {{question: string, feedback: string, score: 1-10}}
   - soft_skills: {{confidence: 1-10, clarity: 1-10, tone: string}}
   - cultural_fit: string
 
-Luu y: chi tra ve 1 JSON object hop le, khong them giai thich.
+Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
 """
 
         llama_url = config("LLAMA_BASE_URL", default="http://llama-cpp:11434/v1")
@@ -225,7 +239,7 @@ Luu y: chi tra ve 1 JSON object hop le, khong them giai thich.
             "messages": [
                 {
                     "role": "system",
-                    "content": "Ban la mot AI ho tro danh gia phong van tuyen dung chuyen nghiep.",
+                "content": "Bạn là một AI hỗ trợ đánh giá phỏng vấn tuyển dụng chuyên nghiệp. Hãy trả lời bằng JSON.",
                 },
                 {"role": "user", "content": prompt},
             ],
@@ -235,7 +249,7 @@ Luu y: chi tra ve 1 JSON object hop le, khong them giai thich.
 
         logger.info("Starting AI evaluation for session %s using %s", session_id, model_alias)
 
-        with httpx.Client(timeout=httpx.Timeout(timeout=45.0, connect=10.0)) as client:
+        with httpx.Client(timeout=httpx.Timeout(timeout=120.0, connect=15.0)) as client:
             resp = client.post(f"{llama_url}/chat/completions", json=payload)
 
         if resp.status_code != 200:
@@ -302,3 +316,49 @@ Luu y: chi tra ve 1 JSON object hop le, khong them giai thich.
         logger.error("Failed to revert session %s status to completed: %s", session_id, e2)
 
     return None
+
+@shared_task
+def auto_schedule_screening_interview(activity_id: int):
+    """Automatically schedules an AI interview if the job post has a template."""
+    from apps.jobs.models import JobPostActivity
+    from apps.interviews.models import InterviewSession
+    
+    try:
+        activity = JobPostActivity.objects.select_related('user', 'job_post', 'job_post__interview_template').get(id=activity_id)
+        job_post = activity.job_post
+        candidate = activity.user
+        
+        # Check if template exists
+        if not job_post.interview_template:
+            return
+            
+        # Check if session already exists
+        if InterviewSession.objects.filter(candidate=candidate, job_post=job_post).exists():
+            return
+            
+        # Create Session
+        from django.utils import timezone
+        # Schedule it loosely starting now
+        session = InterviewSession.objects.create(
+            candidate=candidate,
+            job_post=job_post,
+            type='mixed', # Mixed AI screening
+            status='scheduled',
+            scheduled_at=timezone.now(),
+            question_group=job_post.interview_template,
+            created_by=job_post.user, # The actual Employer
+        )
+        
+        # Add questions from group
+        session.questions.set(job_post.interview_template.questions.all())
+        
+        # Move pipeline to "Tested" to indicate an assessment was sent? Or leave in Pending
+        # Let's move it to "Contacted" (2) since we contacted them with an assessment
+        activity.status = 2 # CONTACTED
+        activity.save(update_fields=['status'])
+        
+        # Send Email
+        send_interview_invitation.delay(session.id)
+        logger.info(f"Auto-scheduled screening AI interview for candidate {candidate.id} on job {job_post.id}")
+    except Exception as e:
+        logger.error(f"Failed to auto-schedule screening interview: {e}")

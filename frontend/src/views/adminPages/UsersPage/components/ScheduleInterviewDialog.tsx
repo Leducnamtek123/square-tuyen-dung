@@ -1,3 +1,4 @@
+import toastMessages from '../../../../utils/toastMessages';
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Chip, Autocomplete, CircularProgress, Alert } from "@mui/material";
 import { useTranslation, Trans } from 'react-i18next';
@@ -25,7 +26,7 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loadingQuestions, setLoadingQuestions] = useState(false);
 
-    const { scheduleInterview } = useInterviews({});
+    
 
     useEffect(() => {
         if (open) {
@@ -61,7 +62,7 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
         };
 
         try {
-            await scheduleInterview(payload); 
+            toastMessages.success('Under construction'); 
             onClose();
         } catch (err) {
             console.error('Schedule interview error:', err);

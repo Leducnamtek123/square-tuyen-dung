@@ -357,3 +357,19 @@ class InterviewEvaluationViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(evaluator=self.request.user)
+
+class AdminInterviewSessionReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
+    """Admin-only read access to interview sessions for monitoring."""
+    queryset = InterviewSession.objects.select_related(
+        'candidate', 'job_post', 'created_by', 'question_group'
+    ).prefetch_related('questions', 'transcripts', 'evaluations').all()
+    permission_classes = [perms_custom.IsAdminUser]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = ['status', 'type']
+    search_fields = ['room_name', 'candidate__full_name', 'candidate__email', 'job_post__job_name']
+    ordering_fields = ['create_at', 'status', 'start_time']
+    
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return InterviewSessionDetailSerializer
+        return InterviewSessionListSerializer

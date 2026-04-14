@@ -28,6 +28,7 @@ interface JobPostFormFieldsProps {
   t: TFunction;
   districtOptions: Record<string, unknown>[];
   locationOptions: Record<string, unknown>[];
+  interviewTemplateOptions?: OptionType[];
   handleSelectLocation: (e: React.SyntheticEvent, value: Record<string, unknown> | null) => void;
 }
 
@@ -37,6 +38,7 @@ function JobPostFormFields({
   t,
   districtOptions,
   locationOptions,
+  interviewTemplateOptions = [],
   handleSelectLocation
 }: JobPostFormFieldsProps) {
   const theme = useTheme();
@@ -126,6 +128,9 @@ function JobPostFormFields({
       </Grid>
       <Grid size={6}>
         <DatePickerCustom name="deadline" control={control} showRequired={true} title={t('jobPostForm.title.applicationdeadline', 'Application Deadline')} minDate={DATE_OPTIONS.tomorrow()} sx={inputSx} />
+      </Grid>
+      <Grid size={12}>
+        <SingleSelectCustom name="interviewTemplate" control={control} options={interviewTemplateOptions} title={t('jobPostForm.title.interviewtemplate', 'Interview Template')} showRequired={false} placeholder={t('jobPostForm.placeholder.selectinterviewtemplate', 'Select an interview template for automated preliminary assessment...')} sx={inputSx} />
       </Grid>
 
       <Grid size={12}>

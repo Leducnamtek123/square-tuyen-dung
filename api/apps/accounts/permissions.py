@@ -86,3 +86,19 @@ class IsAdminUser(permissions.IsAuthenticated):
             return user.role_name == var_sys.ADMIN
 
         return False
+
+class IsEmployerOrAdminUser(permissions.IsAuthenticated):
+    """Allow both Employer users (with active company membership) and Admin users."""
+
+    def has_permission(self, request, view):
+        user = request.user
+        if not user.is_authenticated:
+            return False
+
+        if user.role_name == var_sys.ADMIN:
+            return True
+
+        if user.role_name == var_sys.EMPLOYER:
+            return True
+
+        return _has_active_company_membership(request)

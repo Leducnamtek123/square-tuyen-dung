@@ -72,6 +72,10 @@ class QuestionGroup(CommonBaseModel):
         blank=True, null=True,
         verbose_name="Mô tả"
     )
+    evaluation_rubric = models.JSONField(
+        blank=True, null=True,
+        verbose_name="Tiêu chí đánh giá (Rubric)"
+    )
     questions = models.ManyToManyField(
         Question,
         blank=True,

@@ -130,6 +130,14 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     isExpired = serializers.SerializerMethodField(method_name='check_is_expired', read_only=True)
 
+    from apps.interviews.models import QuestionGroup
+    interviewTemplate = serializers.PrimaryKeyRelatedField(
+        source='interview_template',
+        queryset=QuestionGroup.objects.all(),
+        required=False,
+        allow_null=True
+    )
+
     def get_salary(self, obj):
         return f"{obj.salary_min} - {obj.salary_max}"
 
@@ -228,7 +236,7 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
                   'isSaved', 'isApplied', 'companyDict', 'mobileCompanyDict', 'locationDict', 'views',
 
-                  'isExpired', 'salary', 'city')
+                  'isExpired', 'salary', 'city', 'interviewTemplate')
 
 
     def create(self, validated_data):

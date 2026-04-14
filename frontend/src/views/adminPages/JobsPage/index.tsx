@@ -31,7 +31,8 @@ const JobsPage = () => {
     const {
         data,
         isLoading,
-        updateJob,
+        approveJob,
+        rejectJob,
         deleteJob,
         isMutating
     } = useJobs({
@@ -49,12 +50,17 @@ const JobsPage = () => {
         onPaginationChange({ pageIndex: 0, pageSize: pageSize });
     };
 
-    const handleVerifyJob = async (id: string | number, isVerify: boolean) => {
+    const handleApprove = async (id: string | number) => {
         try {
-            await updateJob({
-                id,
-                data: { isVerify }
-            });
+            await approveJob(id);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleReject = async (id: string | number) => {
+        try {
+            await rejectJob(id);
         } catch (error) {
             console.error(error);
         }
@@ -79,13 +85,16 @@ const JobsPage = () => {
         }
     };
 
-    const getStatusLabel = (status: JobPost['status']) => {
+    const getStatusLabel = (status: JobPost['status'], isExpired?: boolean) => {
         const s = Number(status);
+        if (isExpired && s === 3) {
+            return <Chip label={t('pages.jobs.status.expired', 'Expired')} size="small" color="default" />;
+        }
         switch (s) {
-            case 1: return <Chip label={t('pages.jobs.status.draft')} size="small" variant="outlined" />;
-            case 2: return <Chip label={t('pages.jobs.status.active')} size="small" color="success" />;
-            case 3: return <Chip label={t('pages.jobs.status.expired')} size="small" color="error" />;
-            default: return <Chip label={t('pages.jobs.status.unknown')} size="small" />;
+            case 1: return <Chip label={t('pages.jobs.status.pending', 'Pending Review')} size="small" color="warning" />;
+            case 2: return <Chip label={t('pages.jobs.status.rejected', 'Rejected')} size="small" color="error" />;
+            case 3: return <Chip label={t('pages.jobs.status.approved', 'Approved')} size="small" color="success" />;
+            default: return <Chip label={t('pages.jobs.status.unknown', 'Unknown')} size="small" />;
         }
     };
 
@@ -105,7 +114,7 @@ const JobsPage = () => {
                         {info.getValue() as string}
                     </Typography>
                     <Typography variant="caption" color="textSecondary">
-                        {info.row.original.company?.companyName || '—'}
+                        {info.row.original.companyDict?.companyName || info.row.original.company?.companyName || '—'}
                     </Typography>
                 </Box>
             ),
@@ -113,19 +122,7 @@ const JobsPage = () => {
         {
             accessorKey: 'status',
             header: t('pages.jobs.table.status') as string,
-            cell: (info) => getStatusLabel(info.getValue() as JobPost['status']),
-        },
-        {
-            accessorKey: 'isVerify',
-            header: t('pages.jobs.table.verified') as string,
-            cell: (info) => (
-                <Chip 
-                    label={info.getValue() ? t('pages.jobs.verified.yes') : t('pages.jobs.verified.no')} 
-                    size="small" 
-                    variant={info.getValue() ? 'filled' : 'outlined'}
-                    color={info.getValue() ? 'primary' : 'default'}
-                />
-            ),
+            cell: (info) => getStatusLabel(info.getValue() as JobPost['status'], info.row.original.isExpired),
         },
         {
             accessorKey: 'createAt',
@@ -140,21 +137,29 @@ const JobsPage = () => {
                 const job = info.row.original;
                 return (
                     <Stack direction="row" spacing={0.5} justifyContent="flex-end">
-                        <Tooltip title={t('pages.jobs.table.view')}>
+                        <Tooltip title={t('pages.jobs.table.view', 'View Job')}>
                              <IconButton size="small" component="a" href={`/jobs/${job.slug}`} target="_blank" color="info">
                                 <VisibilityIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
-                        {job.isVerify ? (
-                            <Tooltip title={t('pages.jobs.table.unverify')}>
-                                <IconButton size="small" onClick={() => handleVerifyJob(job.id, false)} color="warning">
+                        {Number(job.status) === 1 && (
+                            <>
+                                <Tooltip title={t('pages.jobs.table.approve', 'Approve')}>
+                                    <IconButton size="small" onClick={() => handleApprove(job.id)} color="success">
+                                        <CheckCircleIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                                <Tooltip title={t('pages.jobs.table.reject', 'Reject')}>
+                                    <IconButton size="small" onClick={() => handleReject(job.id)} color="warning">
+                                        <CancelIcon fontSize="small" />
+                                    </IconButton>
+                                </Tooltip>
+                            </>
+                        )}
+                        {Number(job.status) === 3 && (
+                            <Tooltip title={t('pages.jobs.table.reject', 'Revoke/Reject')}>
+                                <IconButton size="small" onClick={() => handleReject(job.id)} color="warning">
                                     <CancelIcon fontSize="small" />
-                                </IconButton>
-                            </Tooltip>
-                        ) : (
-                            <Tooltip title={t('pages.jobs.table.verify')}>
-                                <IconButton size="small" onClick={() => handleVerifyJob(job.id, true)} color="success">
-                                    <CheckCircleIcon fontSize="small" />
                                 </IconButton>
                             </Tooltip>
                         )}

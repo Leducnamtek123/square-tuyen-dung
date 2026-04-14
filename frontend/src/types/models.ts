@@ -113,6 +113,7 @@ export interface JobPost {
   views?: number;
   position?: number;
   experience?: number;
+  companyDict?: { id?: number; companyName?: string; logoUrl?: string | null };
   academicLevel?: number;
   jobType?: number;
   typeOfWorkplace?: number;
@@ -329,9 +330,14 @@ export interface QuestionGroup {
   id: number;
   name: string;
   description?: string;
+  author?: UserDict;
+  company?: number;
+  evaluation_rubric?: any;
   questions?: Question[];
   questionIds?: number[];
   question_ids?: number[]; // Raw API payload field
+  createAt?: string;
+  updateAt?: string;
 }
 
 export interface InterviewSession {

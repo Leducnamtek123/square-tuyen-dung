@@ -8,6 +8,7 @@ import PeopleIcon from '@mui/icons-material/People';
 import WorkIcon from '@mui/icons-material/Work';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import VideocamIcon from '@mui/icons-material/Videocam';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, ChartOptions, TooltipItem } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
 import { useAdminStats } from './hooks/useAdminStats';

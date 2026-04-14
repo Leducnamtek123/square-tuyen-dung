@@ -26,7 +26,7 @@ import {
     Theme
 } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import toastMessages from '../../../../utils/toastMessages';
 import { useTranslation } from 'react-i18next';
@@ -76,13 +76,17 @@ const extractId = (field: unknown): string | number => {
 
 const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessionId }) => {
     const navigate = useRouter();
+    const searchParams = useSearchParams();
+    const candidateIdQuery = searchParams.get('candidate') || '';
+    const jobPostIdQuery = searchParams.get('jobPost') || '';
+
     const { t } = useTranslation(['employer', 'interview', 'common']);
     const theme = useTheme();
 
     const { control, handleSubmit, watch, setValue, reset, formState: { errors } } = useForm<FormValues>({
         defaultValues: {
-            job_post: '',
-            candidate: '',
+            job_post: jobPostIdQuery ? Number(jobPostIdQuery) : '',
+            candidate: candidateIdQuery ? Number(candidateIdQuery) : '',
             scheduled_at: '',
             selected_group: '',
             selected_questions: []

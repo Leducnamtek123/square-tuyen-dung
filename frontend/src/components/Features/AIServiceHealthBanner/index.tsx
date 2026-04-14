@@ -45,24 +45,33 @@ async function probeLLM(): Promise<ServiceState> {
 }
 
 async function probeSTT(): Promise<ServiceState> {
-  // STT needs a file — we just check if the endpoint responds at all
+  // STT needs a file — we just check if the endpoint responds at all.
+  // Use POST with empty body; a 400 (missing audio) still means the service is up.
   const t0 = Date.now();
   try {
-    // A GET to the service base (expect 404 or 405, not 0)
-    const res = await httpRequest.get('ai/transcribe/', { timeout: 5000 }).catch(() => null);
-    // Even a 405 means the service is up
+    await httpRequest.post('ai/transcribe/', {}, { timeout: 5000 });
     return { status: 'online', latencyMs: Date.now() - t0 };
-  } catch {
+  } catch (err: unknown) {
+    const status = (err as { response?: { status?: number } })?.response?.status;
+    // 400 (bad request) or 405 means the server IS responding — just invalid input
+    if (status && status < 500) {
+      return { status: 'online', latencyMs: Date.now() - t0 };
+    }
     return { status: 'offline' };
   }
 }
 
 async function probeTTS(): Promise<ServiceState> {
+  // Use POST with empty body; a 400 (missing text) still means the service is up.
   const t0 = Date.now();
   try {
-    await httpRequest.get('ai/tts/', { timeout: 5000 }).catch(() => null);
+    await httpRequest.post('ai/tts/', {}, { timeout: 5000 });
     return { status: 'online', latencyMs: Date.now() - t0 };
-  } catch {
+  } catch (err: unknown) {
+    const status = (err as { response?: { status?: number } })?.response?.status;
+    if (status && status < 500) {
+      return { status: 'online', latencyMs: Date.now() - t0 };
+    }
     return { status: 'offline' };
   }
 }

@@ -30,6 +30,7 @@ import {
 import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import EventIcon from '@mui/icons-material/Event';
 
 import type { JobPostActivity } from '@/types/models';
 import { useConfig } from '@/hooks/useConfig';
@@ -208,6 +209,11 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                                 <IconButton size="small" onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, item.resumeSlug || item.resume?.slug || '')}`)}>
                                                                                     <RemoveRedEyeIcon fontSize="small" />
                                                                                 </IconButton>
+                                                                             </Tooltip>
+                                                                             <Tooltip title={t('appliedResume.table.tooltips.scheduleInterview', 'Schedule Interview')} arrow>
+                                                                                 <IconButton size="small" onClick={() => nav.push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}/create?candidate=${item.userId ?? ''}&jobPost=${item.jobPost?.id ?? ''}`)}>
+                                                                                     <EventIcon fontSize="small" sx={{ color: 'info.main' }} />
+                                                                                 </IconButton>
                                                                              </Tooltip>
                                                                              <SendEmailComponent jobPostActivityId={String(item.id)} isSentEmail={item.isSentEmail || false} email={item.email || ''} fullName={item.fullName || ''} />
                                                                              <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>

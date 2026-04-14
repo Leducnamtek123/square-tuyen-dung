@@ -8,6 +8,7 @@ export interface JobPostFormValues {
   jobName?: string;
   career?: number | string;
   position?: number | string;
+  interviewTemplate?: number | string | null;
   experience?: number | string;
   typeOfWorkplace?: number | string;
   jobType?: number | string;
@@ -37,6 +38,7 @@ export interface JobPostFormValues {
 export const getJobPostSchema = (t: TFunction<string | string[], undefined>) => 
   yup.object().shape({
     jobName: yup.string().required(t('jobPostForm.validation.jobnameisrequired', 'Job name is required.')).max(200, t('jobPostForm.validation.jobnameexceededallowedlength', 'Job name exceeded allowed length.')),
+    interviewTemplate: yup.number().nullable().typeError(t('jobPostForm.validation.interviewtemplateinvalid', 'Invalid Interview Template selection.')),
     career: yup.number().required(t('jobPostForm.validation.careerisrequired', 'Career is required.')).typeError(t('jobPostForm.validation.careerisrequired', 'Career is required.')),
     position: yup.number().required(t('jobPostForm.validation.positionisrequired', 'Position is required.')).typeError(t('jobPostForm.validation.positionisrequired', 'Position is required.')),
     experience: yup.number().required(t('jobPostForm.validation.experienceisrequired', 'Experience is required.')).typeError(t('jobPostForm.validation.experienceisrequired', 'Experience is required.')),

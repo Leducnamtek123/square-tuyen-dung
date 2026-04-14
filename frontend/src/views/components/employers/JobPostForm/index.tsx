@@ -10,6 +10,7 @@ import goongService from '../../../../services/goongService';
 import { JobPostFormValues, getJobPostSchema } from './JobPostSchema';
 import JobPostFormFields from './JobPostFormFields';
 import { useConfig } from '@/hooks/useConfig';
+import { useQuestionGroups } from '../hooks/useEmployerQueries';
 import { PaginatedResponse } from '@/types/api';
 import type { AxiosError } from 'axios';
 import type { ApiError } from '../../../../types/api';
@@ -27,6 +28,19 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
   const [districtOptions, setDistrictOptions] = useState<Record<string, unknown>[]>([]);
   const [locationOptions, setLocationOptions] = useState<Record<string, unknown>[]>([]);
 
+  const { data: groupData } = useQuestionGroups({
+    page: 1,
+    pageSize: 100 // Load max
+  });
+
+  const questionGroupOptions = useMemo(() => {
+    if (!groupData?.results) return [];
+    return groupData.results.map((g: any) => ({
+      id: g.id,
+      name: g.name,
+    }));
+  }, [groupData]);
+
   const schema = useMemo(() => getJobPostSchema(t), [t]);
 
   const {
@@ -43,6 +57,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
       jobRequirement: EditorState.createEmpty(),
       benefitsEnjoyed: EditorState.createEmpty(),
       isUrgent: false,
+      interviewTemplate: null,
       location: {
         city: '',
         district: '',
@@ -112,6 +127,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
         jobRequirement: EditorState.createEmpty(),
         benefitsEnjoyed: EditorState.createEmpty(),
         isUrgent: false,
+        interviewTemplate: null,
         location: { city: '', district: '', address: '', lat: '', lng: '' },
       });
     }
@@ -154,6 +170,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
         t={t}
         districtOptions={districtOptions}
         locationOptions={locationOptions}
+        interviewTemplateOptions={questionGroupOptions}
         handleSelectLocation={handleSelectLocation}
       />
     </form>

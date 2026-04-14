@@ -71,10 +71,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
         <List component="div" disablePadding>
           <MenuItem text={t('admin:sidebar.jobPosts')} to={`/${ROUTES.ADMIN.JOBS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.JOBS}`} isChild />
           <MenuItem text={t('admin:sidebar.activityLogs')} to={`/${ROUTES.ADMIN.JOB_ACTIVITY}`} isSelected={location.pathname === `/${ROUTES.ADMIN.JOB_ACTIVITY}`} isChild />
-          <MenuItem text={t('admin:sidebar.questionBank')} to={`/${ROUTES.ADMIN.QUESTIONS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.QUESTIONS}`} isChild />
-          <MenuItem text={t('admin:sidebar.interviewQuestionSets')} to={`/${ROUTES.ADMIN.QUESTION_GROUPS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.QUESTION_GROUPS}`} isChild />
           <MenuItem text={t('admin:sidebar.interviewSchedule')} to={`/${ROUTES.ADMIN.INTERVIEWS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.INTERVIEWS}`} isChild />
-          <MenuItem text={t('admin:sidebar.interviewLive')} to={`/${ROUTES.ADMIN.INTERVIEW_LIVE}`} isSelected={location.pathname === `/${ROUTES.ADMIN.INTERVIEW_LIVE}`} isChild />
           <MenuItem text={t('admin:sidebar.jobNotifications')} to={`/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`} isChild />
         </List>
       </Collapse>

@@ -13,8 +13,12 @@ web_router.register('question-groups', views.QuestionGroupViewSet, basename='int
 web_router.register('sessions', views.InterviewSessionViewSet, basename='interview-sessions')
 web_router.register('evaluations', views.InterviewEvaluationViewSet, basename='interview-evaluations')
 
+admin_router = DefaultRouter()
+admin_router.register('sessions', views.AdminInterviewSessionReadOnlyViewSet, basename='admin-interview-sessions')
+
 urlpatterns = [
     path('web/', include(web_router.urls)),
+    path('admin/', include(admin_router.urls)),
     path('web/sessions/<int:session_id>/stream/', interview_event_stream, name='interview-sse-stream'),
     path(
         'web/statistics/admin-general-statistics/',

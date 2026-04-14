@@ -45,7 +45,7 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuestionGroup
         fields = [
-            'id', 'name', 'description', 'questions', 'questions_count',
+            'id', 'name', 'description', 'evaluation_rubric', 'questions', 'questions_count',
             'question_ids', 'author', 'company', 'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'author', 'company', 'create_at', 'update_at']

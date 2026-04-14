@@ -102,6 +102,8 @@ class JobPost(CommonBaseModel):
 
     peoples_applied = models.ManyToManyField(User, through='JobPostActivity', related_name="job_posts_activity")
 
+    interview_template = models.ForeignKey('interviews.QuestionGroup', on_delete=models.SET_NULL, null=True, blank=True, related_name='linked_job_posts')
+
     class Meta:
 
         db_table = "project_job_job_post"
