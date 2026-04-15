@@ -126,8 +126,8 @@ describe('httpRequest', () => {
       // 2. The refresh request succeeds
       refreshMock.onPost('auth/token/').replyOnce(200, {
         data: {
-          accessToken: 'new-access',
-          refreshToken: 'new-refresh'
+          access_token: 'new-access',
+          refresh_token: 'new-refresh'
         }
       });
       // 3. The retried request succeeds
@@ -151,6 +151,27 @@ describe('httpRequest', () => {
 
       await expect(httpRequest.get('/fail-refresh')).rejects.toThrow();
       expect(tokenService.removeAccessTokenAndRefreshTokenFromCookie).toHaveBeenCalled();
+    });
+
+    it('accepts legacy camelCase refresh payload', async () => {
+      (tokenService.getRefreshTokenFromCookie as jest.Mock).mockReturnValue('valid-refresh');
+
+      mock.onGet('/protected-refresh-legacy').replyOnce(401);
+      refreshMock.onPost('auth/token/').replyOnce(200, {
+        data: {
+          accessToken: 'legacy-access',
+          refreshToken: 'legacy-refresh'
+        }
+      });
+      mock.onGet('/protected-refresh-legacy').replyOnce(200, { data: { ok: true } });
+
+      const response = await httpRequest.get('/protected-refresh-legacy');
+      expect(response).toEqual({ ok: true });
+      expect(tokenService.saveAccessTokenAndRefreshTokenToCookie).toHaveBeenCalledWith(
+        'legacy-access',
+        'legacy-refresh',
+        undefined
+      );
     });
   });
 });

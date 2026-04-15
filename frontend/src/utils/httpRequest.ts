@@ -7,6 +7,11 @@ import type { RetryAxiosRequestConfig } from '../types/api';
 import type { TokenPair } from '../types/auth';
 import type { AxiosInstance, AxiosRequestConfig } from 'axios';
 
+type RefreshTokenPayload = Partial<TokenPair> & {
+  access_token?: string;
+  refresh_token?: string;
+};
+
 export interface HttpServiceInstance extends Omit<AxiosInstance, 'get' | 'post' | 'put' | 'patch' | 'delete'> {
   (config: AxiosRequestConfig): Promise<any>;
   (url: string, config?: AxiosRequestConfig): Promise<any>;
@@ -155,9 +160,15 @@ httpRequest.interceptors.response.use(
 
       const refreshData = unwrapResponse(
         refreshResponse as { data?: { data?: unknown } },
-      ) as Partial<TokenPair>;
-      const accessToken = refreshData.accessToken || null;
-      const newRefreshToken = refreshData.refreshToken || refreshToken;
+      ) as RefreshTokenPayload;
+      const accessToken =
+        refreshData.access_token ||
+        refreshData.accessToken ||
+        null;
+      const newRefreshToken =
+        refreshData.refresh_token ||
+        refreshData.refreshToken ||
+        refreshToken;
 
       if (!accessToken) {
         tokenService.removeAccessTokenAndRefreshTokenFromCookie();
@@ -175,10 +186,11 @@ httpRequest.interceptors.response.use(
       originalConfig.headers = originalConfig.headers || {};
       originalConfig.headers['Authorization'] = `Bearer ${accessToken}`;
       return httpRequest(originalConfig);
-    } catch (refreshError: any) {
+    } catch (refreshError: unknown) {
+      const refreshErrorResponse = (refreshError as { response?: { status?: number; data?: unknown } }).response;
       console.error(`[Auth Error] Refresh token failed for ${originalConfig.url}`, {
-        status: refreshError.response?.status,
-        data: refreshError.response?.data,
+        status: refreshErrorResponse?.status,
+        data: refreshErrorResponse?.data,
       });
       refreshPromise = null;
       tokenService.removeAccessTokenAndRefreshTokenFromCookie();
