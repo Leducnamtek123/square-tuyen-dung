@@ -5,6 +5,27 @@ import i18n from '../i18n';
 
 type SetError = ((errors: Record<string, unknown>) => void) | null;
 
+const normalizeErrorsToMessage = (errors: unknown): string | null => {
+  if (!errors || typeof errors !== 'object') return null;
+
+  const entries = Object.entries(errors as Record<string, unknown>);
+  if (entries.length === 0) return null;
+
+  const chunks: string[] = [];
+  for (const [, value] of entries) {
+    if (Array.isArray(value)) {
+      const text = value.map((v) => String(v)).join(' ');
+      if (text) chunks.push(text);
+      continue;
+    }
+    if (value !== null && value !== undefined && String(value).trim()) {
+      chunks.push(String(value));
+    }
+  }
+
+  return chunks.length > 0 ? chunks.join(' ') : null;
+};
+
 /**
  * Type guard: checks if an unknown value is an Axios error with a response.
  */
@@ -50,7 +71,13 @@ const errorHandling = (
         const msg = errors.errorMessage;
         toastMessages.error(Array.isArray(msg) ? msg.join(' ') : String(msg));
       } else {
-        setError && setError(errors as Record<string, unknown>);
+        const normalizedMessage = normalizeErrorsToMessage(errors);
+        if (normalizedMessage) {
+          toastMessages.error(normalizedMessage);
+        } else {
+          toastMessages.error(i18n.t('common:errors.generic', 'An error occurred, please try again.'));
+        }
+        setError && setError((errors || {}) as Record<string, unknown>);
       }
       break;
     }

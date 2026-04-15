@@ -3,11 +3,6 @@
  *
  * DEFAULT POLICY: all endpoints REQUIRE authentication.
  * Only endpoints explicitly listed here are treated as public.
- *
- * Why centralize?
- * - Avoids prefix-based guessing (e.g. "common/" is public but "common/admin/" is not)
- * - Single source of truth — easy to audit when adding new endpoints
- * - Eliminates an entire class of auth bypass bugs
  */
 
 /** Exact URLs that never need a token (login, register, etc.) */
@@ -30,10 +25,7 @@ export const PUBLIC_EXACT_URLS: ReadonlySet<string> = new Set([
 
 /**
  * URL prefixes for public endpoints (no token needed).
- *
- * IMPORTANT: keep these as SPECIFIC as possible.
- * Never add a broad prefix like 'common/' — always use the full
- * public sub-path (e.g. 'common/careers/' not 'common/').
+ * Keep these as specific as possible.
  */
 export const PUBLIC_PREFIX_URLS: readonly string[] = [
   // Public catalog data (read-only, no admin)
@@ -42,8 +34,7 @@ export const PUBLIC_PREFIX_URLS: readonly string[] = [
   'common/districts/',
   'common/wards/',
 
-  // Public job listings & search
-  'job/web/job-posts/',
+  // Public job search
   'job/web/search/',
 
   // Public company info
@@ -57,24 +48,40 @@ export const PUBLIC_PREFIX_URLS: readonly string[] = [
   'interview/web/sessions/invite/',
 ];
 
+/** Regex-based public endpoints for dynamic routes that must stay narrow. */
+export const PUBLIC_REGEX_URLS: readonly RegExp[] = [
+  // Public job listing page
+  /^job\/web\/job-posts\/(?:\?.*)?$/,
+  // Public job detail by slug/id (single segment only)
+  /^job\/web\/job-posts\/[^/]+\/(?:\?.*)?$/,
+];
+
+/** Prefixes that are always private, even if they overlap public patterns. */
+export const PRIVATE_PREFIX_OVERRIDES: readonly string[] = [
+  'job/web/job-posts/job-posts-saved/',
+];
+
 /**
  * Check if a URL is a public endpoint (no auth token needed).
  *
  * Logic:
- * 1. Any URL containing '/admin/' is ALWAYS private (even under public prefixes)
- * 2. Exact match against PUBLIC_EXACT_URLS
- * 3. Prefix match against PUBLIC_PREFIX_URLS
+ * 1. Any URL containing '/admin/' is always private.
+ * 2. Private overrides always win.
+ * 3. Exact match against PUBLIC_EXACT_URLS.
+ * 4. Prefix match against PUBLIC_PREFIX_URLS.
+ * 5. Regex match against PUBLIC_REGEX_URLS.
  */
 export const isPublicEndpoint = (url: string | undefined): boolean => {
   const safeUrl = String(url || '');
   if (!safeUrl) return false;
 
-  // Admin paths are NEVER public — short-circuit before other checks
   if (/(?:^|\/)admin\//.test(safeUrl)) return false;
+  if (PRIVATE_PREFIX_OVERRIDES.some((pfx) => safeUrl.startsWith(pfx))) return false;
 
   if (PUBLIC_EXACT_URLS.has(safeUrl)) return true;
+  if (PUBLIC_PREFIX_URLS.some((pfx) => safeUrl.startsWith(pfx))) return true;
 
-  return PUBLIC_PREFIX_URLS.some((pfx) => safeUrl.startsWith(pfx));
+  return PUBLIC_REGEX_URLS.some((pattern) => pattern.test(safeUrl));
 };
 
 /** Check if URL is the auth token endpoint (used for refresh logic). */

@@ -33,6 +33,7 @@ describe('apiEndpoints', () => {
       'common/wards/',
       'job/web/job-posts/',
       'job/web/job-posts/123/',
+      'job/web/job-posts/senior-react-dev/',
       'job/web/search/',
       'info/web/companies/',
       'info/web/companies/5/',
@@ -67,6 +68,9 @@ describe('apiEndpoints', () => {
     it.each([
       'info/web/job-seeker-profiles/',
       'job/web/employer/job-posts/',
+      'job/web/job-posts/job-posts-saved/',
+      'job/web/job-posts/job-posts-saved/?page=1&pageSize=10',
+      'job/web/job-posts/123/save/',
       'some/random/private/endpoint/',
     ])('returns false for non-public URL: %s', (url) => {
       expect(isPublicEndpoint(url)).toBe(false);
