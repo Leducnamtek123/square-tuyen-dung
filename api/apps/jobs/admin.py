@@ -3,8 +3,6 @@ from shared.helpers import helper
 
 from django.contrib import admin
 
-from django import forms
-
 from config.admin import custom_admin_site
 
 from .models import (
@@ -18,22 +16,6 @@ from .models import (
 )
 
 from django_admin_listfilter_dropdown.filters import (RelatedDropdownFilter, DropdownFilter, ChoiceDropdownFilter)
-
-class JobPostForm(forms.ModelForm):
-
-    class Meta:
-
-        model = JobPost
-
-        fields = '__all__'
-
-class JobPostActivityForm(forms.ModelForm):
-
-    class Meta:
-
-        model = JobPostActivity
-
-        fields = '__all__'
 
 class JobPostAdmin(admin.ModelAdmin):
 
@@ -115,8 +97,6 @@ class JobPostAdmin(admin.ModelAdmin):
 
     list_select_related = ('career',)
 
-    form = JobPostForm
-
     def save_model(self, request, obj, form, change):
 
         pre_status = None
@@ -178,8 +158,6 @@ class JobPostActivityAdmin(admin.ModelAdmin):
     list_per_page = 25
 
     readonly_fields = ('job_post', 'user', 'resume')
-
-    form = JobPostActivityForm
 
 custom_admin_site.register(JobPost, JobPostAdmin)
 
