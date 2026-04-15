@@ -22,6 +22,10 @@ export const PUBLIC_EXACT_URLS: ReadonlySet<string> = new Set([
   'auth/reset-password/',
   'auth/send-verify-email/',
   'auth/firebase-login/',
+  'common/configs/',
+  'common/top-careers/',
+  'common/all-careers/',
+  'common/health/',
 ]);
 
 /**

@@ -76,9 +76,6 @@ httpRequest.interceptors.request.use(
     if (accessToken && !isPublicEndpoint(config.url)) {
       config.headers = config.headers ?? {};
       config.headers.set('Authorization', `Bearer ${accessToken}`);
-    } else if (!accessToken && !isPublicEndpoint(config.url)) {
-      dispatchAuthExpired();
-      return Promise.reject(new Error('AUTH_REQUIRED'));
     }
     return config;
   },
