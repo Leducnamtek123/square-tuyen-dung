@@ -50,6 +50,8 @@ export const useSavedJobs = (params: GetJobPostsParams = {}): UseSavedJobsResult
         },
         enabled: !!currentUser?.id,
         retry: shouldRetryQuery,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
         placeholderData: keepPreviousData,
     });
 };
@@ -131,6 +133,8 @@ export const useResumes = (jobSeekerProfileId: string | undefined, params: Recor
         },
         enabled: !!jobSeekerProfileId,
         retry: shouldRetryQuery,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
     });
 };
 

@@ -4,7 +4,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import * as React from "react";
 import { usePathname } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { getUserInfo } from "../redux/userSlice";
+import { getUserInfo, removeUserInfo } from "../redux/userSlice";
 import { useConfig } from "@/hooks/useConfig";
 import { toast, ToastContainer, Bounce } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -108,14 +108,20 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
       );
     };
 
+    const handleAuthExpired = () => {
+      dispatch(removeUserInfo({ accessToken: '' }));
+    };
+
     window.addEventListener("error", handleError);
     window.addEventListener("unhandledrejection", handleRejection);
+    window.addEventListener("auth:expired", handleAuthExpired as EventListener);
 
     return () => {
       window.removeEventListener("error", handleError);
       window.removeEventListener("unhandledrejection", handleRejection);
+      window.removeEventListener("auth:expired", handleAuthExpired as EventListener);
     };
-  }, []);
+  }, [dispatch]);
 
   if (!hasMounted || isInitializing) {
     return null;

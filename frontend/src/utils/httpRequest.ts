@@ -51,6 +51,12 @@ export const refreshClient = axios.create({
 const unwrapResponse = (response: { data?: { data?: unknown } }) =>
   response?.data?.data ?? response?.data;
 
+const dispatchAuthExpired = () => {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('auth:expired'));
+  }
+};
+
 let refreshPromise: Promise<unknown> | null = null;
 
 httpRequest.interceptors.request.use(
@@ -123,12 +129,14 @@ httpRequest.interceptors.response.use(
 
     if (originalConfig._retry || isAuthTokenEndpoint(originalConfig.url)) {
       tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+      dispatchAuthExpired();
       return Promise.reject(error);
     }
 
     const refreshToken = tokenService.getRefreshTokenFromCookie();
     if (!refreshToken) {
       tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+      dispatchAuthExpired();
       return Promise.reject(error);
     }
 
@@ -153,6 +161,7 @@ httpRequest.interceptors.response.use(
 
       if (!accessToken) {
         tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+        dispatchAuthExpired();
         return Promise.reject(error);
       }
 
@@ -173,6 +182,7 @@ httpRequest.interceptors.response.use(
       });
       refreshPromise = null;
       tokenService.removeAccessTokenAndRefreshTokenFromCookie();
+      dispatchAuthExpired();
       return Promise.reject(refreshError);
     }
   },

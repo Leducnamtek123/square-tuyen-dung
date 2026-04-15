@@ -18,6 +18,8 @@ export const useMyInterviews = (params: InterviewParams) => {
         queryKey: ['my-interviews', queryParams],
         queryFn: () => interviewService.getSessions(queryParams),
         enabled: !!userId,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
         retry: (failureCount, error: unknown) => {
             const status = (error as AxiosError | undefined)?.response?.status;
             if (status === 401 || status === 403) return false;
