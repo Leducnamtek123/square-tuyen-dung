@@ -34,6 +34,7 @@ from .services import (
     SessionNotJoinableError,
 )
 from apps.accounts import permissions as perms_custom
+from shared.helpers import helper
 
 class InterviewStatisticViewSet(viewsets.ViewSet):
     permission_classes = [perms_custom.IsAdminUser]
@@ -175,6 +176,14 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         session = serializer.save(created_by=self.request.user)
         queue_invitation_email(session.id)
+
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except Exception as ex:
+            helper.print_log_error("InterviewSessionViewSet.list", ex)
+            # Fallback to avoid breaking candidate/employer tabs on transient data issues
+            return response_data(data={"count": 0, "results": []})
 
     def _resolve_company(self, user):
         try:

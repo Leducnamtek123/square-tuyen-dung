@@ -23,6 +23,7 @@ import type { JobSeekerActivityStats } from '../../../../services/statisticServi
 import type { JobPostNotification } from '../../../../services/jobPostNotificationService';
 import type { ResumeViewed } from '../../../../services/resumeViewedService';
 import { useAppSelector } from '@/redux/hooks';
+import tokenService from '@/services/tokenService';
 
 const shouldRetryQuery = (failureCount: number, error: Error): boolean => {
     const status = (error as AxiosError | undefined)?.response?.status;
@@ -42,13 +43,14 @@ export type UseJobPostNotificationsResult = UseQueryResult<PaginatedResponse<Job
 // ─── Saved Jobs ─────────────────────────────────────────────
 export const useSavedJobs = (params: GetJobPostsParams = {}): UseSavedJobsResult => {
     const { currentUser } = useAppSelector((state) => state.user);
+    const hasToken = !!tokenService.getAccessTokenFromCookie();
     return useQuery<PaginatedResponse<JobPost>, Error>({
         queryKey: ['savedJobs', params],
         queryFn: async () => {
             const response = await jobService.getJobPostsSaved(params);
             return response;
         },
-        enabled: !!currentUser?.id,
+        enabled: !!currentUser?.id && hasToken,
         retry: shouldRetryQuery,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
