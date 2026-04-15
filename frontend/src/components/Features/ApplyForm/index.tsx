@@ -20,6 +20,7 @@ import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 interface ApplyFormProps {
   handleApplyJob: (data: ApplyFormValues) => void;
+  formId?: string;
 }
 
 export interface ApplyFormValues {
@@ -29,7 +30,7 @@ export interface ApplyFormValues {
   resume: string;
 }
 
-const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
+const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) => {
   const { t } = useTranslation("public");
   const theme = useTheme();
   const nav = useRouter();
@@ -101,7 +102,7 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
 
   return (
     <>
-      <form id="modal-form" onSubmit={handleSubmit(handleApplyJob)}>
+      <form id={formId} onSubmit={handleSubmit(handleApplyJob)}>
         <Grid container spacing={2}>
           <Grid size={12}>
             <Stack spacing={1} justifyContent="center">

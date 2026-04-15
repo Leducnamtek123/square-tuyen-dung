@@ -25,10 +25,13 @@ const ApplyCard = ({
   setIsApplySuccess,
 }: ApplyCardProps) => {
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
+  const submitLockRef = React.useRef(false);
+  const formId = `apply-form-${String(jobPostId)}`;
 
   const handleApplyJob = async (data: ApplyFormValues) => {
-    if (isFullScreenLoading) return;
+    if (isFullScreenLoading || submitLockRef.current) return;
 
+    submitLockRef.current = true;
     setIsFullScreenLoading(true);
     try {
       await jobPostActivityService.applyJob({
@@ -42,6 +45,7 @@ const ApplyCard = ({
     } catch (error: unknown) {
       errorHandling(error);
     } finally {
+      submitLockRef.current = false;
       setIsFullScreenLoading(false);
     }
   };
@@ -62,10 +66,11 @@ const ApplyCard = ({
         buttonText="Ứng tuyển"
         buttonIcon={<SendIcon />}
         isSubmitting={isFullScreenLoading}
+        formId={formId}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
-        <ApplyForm handleApplyJob={handleApplyJob} />
+        <ApplyForm handleApplyJob={handleApplyJob} formId={formId} />
       </FormPopup>
       {isFullScreenLoading && <BackdropLoading />}
     </>

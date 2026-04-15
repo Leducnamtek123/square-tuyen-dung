@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useTheme } from '@mui/material/styles';
 import {
   Dialog,
@@ -23,6 +23,7 @@ interface Props {
   buttonText?: string;
   buttonIcon?: React.ReactNode;
   isSubmitting?: boolean;
+  formId?: string;
   children: React.ReactNode;
 }
 
@@ -34,6 +35,7 @@ const Popup = ({
   buttonText = 'Lưu',
   buttonIcon = <SaveIcon />,
   isSubmitting = false,
+  formId = 'modal-form',
   children,
 }: Props) => {
   const theme = useTheme();
@@ -120,7 +122,7 @@ const Popup = ({
                 },
               }}
               type="submit"
-              form="modal-form"
+              form={formId}
               disabled={isSubmitting}
             >
               {buttonText}

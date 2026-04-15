@@ -11,6 +11,7 @@ import type { JobSeekerRegisterData } from '../types/auth';
 
 type UserResponse = User & Record<string, unknown>;
 type TokenResponse = TokenPair & Record<string, unknown>;
+let userInfoInFlight: Promise<UserResponse> | null = null;
 
 const authService = {
   getToken: (
@@ -100,12 +101,24 @@ const authService = {
   },
 
   getUserInfo: async (): Promise<UserResponse> => {
-    const url = 'auth/user-info-basic/';
-    const data = (await httpRequest.get(url)) as UserResponse;
-    if (data?.avatarUrl) {
-      data.avatarUrl = await ensurePresignedUrl(data.avatarUrl);
+    if (userInfoInFlight) {
+      return userInfoInFlight;
     }
-    return data;
+
+    userInfoInFlight = (async () => {
+      const url = 'auth/user-info-basic/';
+      const data = (await httpRequest.get(url)) as UserResponse;
+      if (data?.avatarUrl) {
+        data.avatarUrl = await ensurePresignedUrl(data.avatarUrl);
+      }
+      return data;
+    })();
+
+    try {
+      return await userInfoInFlight;
+    } finally {
+      userInfoInFlight = null;
+    }
   },
 
   getUserWorkspaces: async (): Promise<UserResponse> => {

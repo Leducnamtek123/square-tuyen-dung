@@ -25,6 +25,10 @@ const getUserWorkspaces = createAsyncThunk<Partial<User>, void>(
 const getUserInfo = createAsyncThunk<User, void>(
   'user/getUserInfo',
   async (_, thunkAPI) => {
+    const accessToken = tokenService.getAccessTokenFromCookie();
+    if (!accessToken) {
+      return thunkAPI.rejectWithValue('Missing access token') as never;
+    }
     const resData = await authService.getUserInfo();
     thunkAPI.dispatch(getUserWorkspaces());
     return resData as User;
