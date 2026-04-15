@@ -282,9 +282,12 @@ class EmailVerificationService:
         Verify user email from encoded data + token.
         Returns (user, error_key) — error_key is None on success.
         """
-        uid, expiration_time = helper.urlsafe_base64_decode_with_encoded_data(
-            encoded_data
-        )
+        try:
+            uid, expiration_time = helper.urlsafe_base64_decode_with_encoded_data(
+                encoded_data
+            )
+        except Exception:
+            return None, "INVALID_EMAIL_VERIFICATION"
 
         if uid is None or expiration_time is None:
             return None, "INVALID_EMAIL_VERIFICATION"

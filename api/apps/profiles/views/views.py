@@ -1,8 +1,6 @@
 
 from shared.configs import variable_response as var_res
 
-from shared.helpers import helper
-
 from rest_framework import viewsets
 
 from rest_framework import permissions as perms_sys
@@ -41,51 +39,30 @@ class ProfileView(viewsets.ViewSet):
 
         user = request.user
 
-        try:
+        profile = JobSeekerProfile.objects.select_related(
+            'location', 'location__city'
+        ).get(user_id__exact=user.id)
 
-            profile = JobSeekerProfile.objects.select_related(
-                'location', 'location__city'
-            ).get(user_id__exact=user.id)
-
-            profile_serializer = JobSeekerProfileSerializer(profile)
-
-        except Exception as ex:
-
-            helper.print_log_error("get_profile_info", ex)
-
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        else:
-
-            return var_res.response_data(data=profile_serializer.data)
+        profile_serializer = JobSeekerProfileSerializer(profile)
+        return var_res.response_data(data=profile_serializer.data)
 
     def update_profile_info(self, request):
 
         data = request.data
 
-        try:
+        job_seeker_profile = getattr(request.user, 'job_seeker_profile', None)
+        if not job_seeker_profile:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["User does not have a job seeker profile."]},
+            )
 
-            job_seeker_profile = getattr(request.user, 'job_seeker_profile', None)
-            if not job_seeker_profile:
-                return var_res.response_data(status=status.HTTP_400_BAD_REQUEST,
-                                             errors={"errorMessage": ["User does not have a job seeker profile."]})
+        serializer = JobSeekerProfileSerializer(job_seeker_profile, data=data)
+        if not serializer.is_valid():
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors=serializer.errors,
+            )
 
-            serializer = JobSeekerProfileSerializer(job_seeker_profile, data=data)
-
-            if not serializer.is_valid():
-
-                return var_res.response_data(status=status.HTTP_400_BAD_REQUEST,
-
-                                             errors=serializer.errors)
-
-            serializer.save()
-
-        except Exception as ex:
-
-            helper.print_log_error("update_profile_info", ex)
-
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        else:
-
-            return var_res.response_data(data=serializer.data)
+        serializer.save()
+        return var_res.response_data(data=serializer.data)

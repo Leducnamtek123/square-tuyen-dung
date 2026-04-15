@@ -22,6 +22,10 @@ from shared.configs.messages import APPLICATION_STATUS_MESSAGES
 from shared.helpers import helper, utils
 
 from ..filters import AliasedOrderingFilter, EmployerJobPostActivityFilter
+from ..exceptions import (
+    InvalidApplicationStatusTransitionError,
+    JobsDomainError,
+)
 from ..models import JobPostActivity
 from ..serializers import (
     EmployerJobPostActivityExportSerializer,
@@ -122,7 +126,7 @@ class JobSeekerJobPostActivityViewSet(
 
             return self.get_paginated_response(res_data)
 
-        return var_res.response_data(res_data)
+        return var_res.response_data(data=res_data)
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -138,7 +142,7 @@ class JobSeekerJobPostActivityViewSet(
         except IntegrityError:
             # Handles race condition (double-click / concurrent requests) on unique_active_application.
             raise ValidationError({"errorMessage": ["Bạn đã ứng tuyển vào vị trí này rồi."]})
-        except ValueError as e:
+        except JobsDomainError as e:
             raise ValidationError({"errorMessage": [str(e)]})
 
         response_serializer = self.get_serializer(job_post_activity)
@@ -250,15 +254,10 @@ class EmployerJobPostActivityViewSet(
         return var_res.response_data(data=serializer.data)
 
     def destroy(self, request, *args, **kwargs):
-        try:
-            instance = self.get_object()
-            instance.is_deleted = True
-            instance.save()
-        except Exception as ex:
-            helper.print_log_error("delete job post activity", ex)
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        else:
-            return var_res.response_data(status=status.HTTP_204_NO_CONTENT)
+        instance = self.get_object()
+        instance.is_deleted = True
+        instance.save(update_fields=["is_deleted", "update_at"])
+        return var_res.response_data(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=["get"], detail=False, url_path="chat", url_name="employer-job-posts-activity-chat")
     def employer_job_posts_activity_chat(self, request):
@@ -296,7 +295,7 @@ class EmployerJobPostActivityViewSet(
                     avatar.get_full_url() if avatar else var_sys.AVATAR_DEFAULT["AVATAR"]
                 )
             return self.get_paginated_response(res_data)
-        return var_res.response_data(res_data)
+        return var_res.response_data(data=res_data)
 
     @action(methods=["get"], detail=False, url_path="export", url_name="job-posts-activity-export")
     def export_job_posts_activity(self, request):
@@ -348,57 +347,48 @@ class EmployerJobPostActivityViewSet(
             try:
                 JobActivityService.change_application_status(job_post_activity, stt)
                 return var_res.response_data(status=status.HTTP_200_OK)
-            except ValueError:
+            except InvalidApplicationStatusTransitionError:
                 return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
         return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=["post"], detail=True, url_path="send-email", url_name="send-email")
     def send_email(self, request, pk):
-        try:
-            data = request.data
-            serializer = SendMailToJobSeekerSerializer(data=data)
-            if not serializer.is_valid():
-                return var_res.response_data(
-                    status=status.HTTP_400_BAD_REQUEST,
-                    errors=serializer.errors,
-                )
-
-            from ..services import JobActivityService
-            activity = self.get_object()
-            if activity.job_post.company != request.user.active_company:
-                return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
-            JobActivityService.send_email_to_job_seeker(
-                activity=activity,
-                user=request.user,
-                validated_data=serializer.validated_data
+        serializer = SendMailToJobSeekerSerializer(data=request.data)
+        if not serializer.is_valid():
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors=serializer.errors,
             )
-            return var_res.response_data()
-        except Exception as ex:
-            helper.print_log_error("send_email", ex)
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        from ..services import JobActivityService
+        activity = self.get_object()
+        if activity.job_post.company != request.user.active_company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+        JobActivityService.send_email_to_job_seeker(
+            activity=activity,
+            user=request.user,
+            validated_data=serializer.validated_data
+        )
+        return var_res.response_data()
 
 
     @action(methods=["post"], detail=True, url_path="analyze-resume", url_name="analyze-resume")
     def analyze_resume(self, request, pk):
-        try:
-            if not has_ai_analysis_progress_column():
-                return var_res.response_data(
-                    status=status.HTTP_503_SERVICE_UNAVAILABLE,
-                    errors={"errorMessage": ["Database schema is outdated. Please run migrations first."]},
-                )
-            
-            job_post_activity = self.get_object()
-            if job_post_activity.job_post.company != request.user.active_company:
-                return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+        if not has_ai_analysis_progress_column():
+            return var_res.response_data(
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                errors={"errorMessage": ["Database schema is outdated. Please run migrations first."]},
+            )
 
-            from ..services import JobActivityService
-            JobActivityService.trigger_ai_analysis(job_post_activity)
-            
-            return var_res.response_data(data={"detail": "AI analysis task has been queued."}, status=status.HTTP_202_ACCEPTED)
-        except Exception as ex:
-            helper.print_log_error("analyze_resume", ex)
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        job_post_activity = self.get_object()
+        if job_post_activity.job_post.company != request.user.active_company:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+
+        from ..services import JobActivityService
+        JobActivityService.trigger_ai_analysis(job_post_activity)
+
+        return var_res.response_data(data={"detail": "AI analysis task has been queued."}, status=status.HTTP_202_ACCEPTED)
 
 
 

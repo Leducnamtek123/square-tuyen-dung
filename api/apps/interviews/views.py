@@ -146,7 +146,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         base_qs = InterviewSession.objects.select_related(
-            'candidate', 'job_post', 'created_by', 'question_group'
+            'candidate', 'job_post', 'created_by'
         ).prefetch_related('questions', 'transcripts', 'evaluations')
 
         if user.is_anonymous:
@@ -196,7 +196,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
     def retrieve_by_invite_token(self, request, invite_token=None):
         try:
             session = InterviewSession.objects.select_related(
-                'candidate', 'job_post', 'created_by', 'question_group'
+                'candidate', 'job_post', 'created_by'
             ).prefetch_related('questions', 'transcripts', 'evaluations').get(invite_token=invite_token)
         except InterviewSession.DoesNotExist:
             return response_data(
@@ -370,7 +370,7 @@ class InterviewEvaluationViewSet(viewsets.ModelViewSet):
 class AdminInterviewSessionReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     """Admin-only read access to interview sessions for monitoring."""
     queryset = InterviewSession.objects.select_related(
-        'candidate', 'job_post', 'created_by', 'question_group'
+        'candidate', 'job_post', 'created_by'
     ).prefetch_related('questions', 'transcripts', 'evaluations').all()
     permission_classes = [perms_custom.IsAdminUser]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]

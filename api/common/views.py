@@ -55,8 +55,6 @@ class AdminCareerViewSet(viewsets.ModelViewSet):
     serializer_class = CareerSerializer
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            return [IsAuthenticated()]
         return [perms_custom.IsAdminUser()]
 
     pagination_class = paginations.CustomPagination
@@ -76,8 +74,6 @@ class AdminCityViewSet(viewsets.ModelViewSet):
     serializer_class = CitySerializer
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            return [IsAuthenticated()]
         return [perms_custom.IsAdminUser()]
 
     pagination_class = paginations.CustomPagination
@@ -89,8 +85,6 @@ class AdminDistrictViewSet(viewsets.ModelViewSet):
     serializer_class = DistrictSerializer
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            return [IsAuthenticated()]
         return [perms_custom.IsAdminUser()]
 
     pagination_class = paginations.CustomPagination
@@ -104,8 +98,6 @@ class AdminWardViewSet(viewsets.ModelViewSet):
     serializer_class = WardSerializer
 
     def get_permissions(self):
-        if self.action in ['list', 'retrieve']:
-            return [IsAuthenticated()]
         return [perms_custom.IsAdminUser()]
 
     pagination_class = paginations.CustomPagination
@@ -125,210 +117,62 @@ def get_all_config(request):
 
     exclude_city_name = 'Toàn quốc'
 
-    try:
-
-        # system
-
-        gender_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.GENDER_CHOICES)
-
-        marital_status_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.MARITAL_STATUS_CHOICES)
-
-        language_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.LANGUAGE_CHOICES)
-
-        language_level_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.LANGUAGE_LEVEL_CHOICES)
-
-        position_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.POSITION_CHOICES)
-
-        type_of_workplace_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.TYPE_OF_WORKPLACE_CHOICES)
-
-        job_type_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.JOB_TYPE_CHOICES)
-
-        academic_level_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.ACADEMIC_LEVEL)
-
-        experience_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.EXPERIENCE_CHOICES)
-
-        employee_size_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.EMPLOYEE_SIZE_CHOICES)
-
-        application_status_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.APPLICATION_STATUS)
-
-        frequency_notification_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.FREQUENCY_NOTIFICATION)
-
-        job_post_status_tuple = utils.convert_tuple_or_list_to_options(
-
-            var_sys.JOB_POST_STATUS)
-
-        # database
-
-        cities = City.objects.exclude(
-
-            name__icontains=exclude_city_name).values_list("id", "name")
-
-        careers = Career.objects.values_list("id", "name")
-
-        city_tuple = utils.convert_tuple_or_list_to_options(cities)
-
-        career_tuple = utils.convert_tuple_or_list_to_options(careers)
-
-        gender_options = gender_tuple[0]
-
-        marital_status_options = marital_status_tuple[0]
-
-        language_options = language_tuple[0]
-
-        language_level_options = language_level_tuple[0]
-
-        position_options = position_tuple[0]
-
-        type_of_workplace_options = type_of_workplace_tuple[0]
-
-        job_type_options = job_type_tuple[0]
-
-        experience_options = experience_tuple[0]
-
-        academic_level_options = academic_level_tuple[0]
-
-        employee_size_options = employee_size_tuple[0]
-
-        application_status_options = application_status_tuple[0]
-
-        city_options = city_tuple[0]
-
-        career_options = career_tuple[0]
-
-        frequency_notification_options = frequency_notification_tuple[0]
-
-        job_post_status_options = job_post_status_tuple[0]
-
-        gender_dict = gender_tuple[1]
-
-        marital_status_dict = marital_status_tuple[1]
-
-        language_dict = language_tuple[1]
-
-        language_level_dict = language_level_tuple[1]
-
-        position_dict = position_tuple[1]
-
-        type_of_workplace_dict = type_of_workplace_tuple[1]
-
-        job_type_dict = job_type_tuple[1]
-
-        experience_dict = experience_tuple[1]
-
-        academic_level_dict = academic_level_tuple[1]
-
-        employee_size_dict = employee_size_tuple[1]
-
-        application_status_dict = application_status_tuple[1]
-
-        city_dict = city_tuple[1]
-
-        career_dict = career_tuple[1]
-
-        frequency_notification_dict = frequency_notification_tuple[1]
-
-        job_post_status_dict = job_post_status_tuple[1]
-
-        res_data = {
-
-            "genderOptions": gender_options,
-
-            "maritalStatusOptions": marital_status_options,
-
-            "languageOptions": language_options,
-
-            "languageLevelOptions": language_level_options,
-
-            "positionOptions": position_options,
-
-            "typeOfWorkplaceOptions": type_of_workplace_options,
-
-            "jobTypeOptions": job_type_options,
-
-            "experienceOptions": experience_options,
-
-            "academicLevelOptions": academic_level_options,
-
-            "employeeSizeOptions": employee_size_options,
-
-            "applicationStatusOptions": application_status_options,
-
-            "cityOptions": city_options,
-
-            "careerOptions": career_options,
-
-            "frequencyNotificationOptions": frequency_notification_options,
-
-            "jobPostStatusOptions": job_post_status_options,
-
-            "genderDict": gender_dict,
-
-            "maritalStatusDict": marital_status_dict,
-
-            "languageDict": language_dict,
-
-            "languageLevelDict": language_level_dict,
-
-            "positionDict": position_dict,
-
-            "typeOfWorkplaceDict": type_of_workplace_dict,
-
-            "jobTypeDict": job_type_dict,
-
-            "experienceDict": experience_dict,
-
-            "academicLevelDict": academic_level_dict,
-
-            "employeeSizeDict": employee_size_dict,
-
-            "applicationStatusDict": application_status_dict,
-
-            "cityDict": city_dict,
-
-            "careerDict": career_dict,
-
-            "frequencyNotificationDict": frequency_notification_dict,
-
-            "jobPostStatusDict": job_post_status_dict
-
-        }
-
-    except Exception as ex:
-
-        helper.print_log_error(func_name="get_all_config", error=ex)
-
-        return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-
-                                     data=None)
-
-    else:
-
-        django_cache.set(CACHE_KEY, res_data, CACHE_TTL)
-        return var_res.response_data(data=res_data)
+    # system
+    gender_tuple = utils.convert_tuple_or_list_to_options(var_sys.GENDER_CHOICES)
+    marital_status_tuple = utils.convert_tuple_or_list_to_options(var_sys.MARITAL_STATUS_CHOICES)
+    language_tuple = utils.convert_tuple_or_list_to_options(var_sys.LANGUAGE_CHOICES)
+    language_level_tuple = utils.convert_tuple_or_list_to_options(var_sys.LANGUAGE_LEVEL_CHOICES)
+    position_tuple = utils.convert_tuple_or_list_to_options(var_sys.POSITION_CHOICES)
+    type_of_workplace_tuple = utils.convert_tuple_or_list_to_options(var_sys.TYPE_OF_WORKPLACE_CHOICES)
+    job_type_tuple = utils.convert_tuple_or_list_to_options(var_sys.JOB_TYPE_CHOICES)
+    academic_level_tuple = utils.convert_tuple_or_list_to_options(var_sys.ACADEMIC_LEVEL)
+    experience_tuple = utils.convert_tuple_or_list_to_options(var_sys.EXPERIENCE_CHOICES)
+    employee_size_tuple = utils.convert_tuple_or_list_to_options(var_sys.EMPLOYEE_SIZE_CHOICES)
+    application_status_tuple = utils.convert_tuple_or_list_to_options(var_sys.APPLICATION_STATUS)
+    frequency_notification_tuple = utils.convert_tuple_or_list_to_options(var_sys.FREQUENCY_NOTIFICATION)
+    job_post_status_tuple = utils.convert_tuple_or_list_to_options(var_sys.JOB_POST_STATUS)
+
+    # database
+    cities = City.objects.exclude(name__icontains=exclude_city_name).values_list("id", "name")
+    careers = Career.objects.values_list("id", "name")
+    city_tuple = utils.convert_tuple_or_list_to_options(cities)
+    career_tuple = utils.convert_tuple_or_list_to_options(careers)
+
+    res_data = {
+        "genderOptions": gender_tuple[0],
+        "maritalStatusOptions": marital_status_tuple[0],
+        "languageOptions": language_tuple[0],
+        "languageLevelOptions": language_level_tuple[0],
+        "positionOptions": position_tuple[0],
+        "typeOfWorkplaceOptions": type_of_workplace_tuple[0],
+        "jobTypeOptions": job_type_tuple[0],
+        "experienceOptions": experience_tuple[0],
+        "academicLevelOptions": academic_level_tuple[0],
+        "employeeSizeOptions": employee_size_tuple[0],
+        "applicationStatusOptions": application_status_tuple[0],
+        "cityOptions": city_tuple[0],
+        "careerOptions": career_tuple[0],
+        "frequencyNotificationOptions": frequency_notification_tuple[0],
+        "jobPostStatusOptions": job_post_status_tuple[0],
+        "genderDict": gender_tuple[1],
+        "maritalStatusDict": marital_status_tuple[1],
+        "languageDict": language_tuple[1],
+        "languageLevelDict": language_level_tuple[1],
+        "positionDict": position_tuple[1],
+        "typeOfWorkplaceDict": type_of_workplace_tuple[1],
+        "jobTypeDict": job_type_tuple[1],
+        "experienceDict": experience_tuple[1],
+        "academicLevelDict": academic_level_tuple[1],
+        "employeeSizeDict": employee_size_tuple[1],
+        "applicationStatusDict": application_status_tuple[1],
+        "cityDict": city_tuple[1],
+        "careerDict": career_tuple[1],
+        "frequencyNotificationDict": frequency_notification_tuple[1],
+        "jobPostStatusDict": job_post_status_tuple[1],
+    }
+
+    django_cache.set(CACHE_KEY, res_data, CACHE_TTL)
+    return var_res.response_data(data=res_data)
 
 @api_view(http_method_names=["GET"])
 @permission_classes([AllowAny])
@@ -338,36 +182,20 @@ def get_districts(request):
 
     city_id_raw = params.get('cityId', None)
 
+    district_queryset = District.objects.all()
+
     try:
-
-        district_queryset = District.objects.all()
-
         if city_id_raw not in (None, ""):
-
             city_id = int(str(city_id_raw).strip())
-
             district_queryset = district_queryset.filter(city_id=city_id)
-
-        districts = district_queryset.values_list("id", "name")
-
-        district_options = utils.convert_tuple_or_list_to_options(districts)[0]
-
     except (TypeError, ValueError):
 
         # Invalid cityId should not break dependent forms.
         return var_res.response_data(data=[])
 
-    except Exception as ex:
-
-        helper.print_log_error(func_name="get_districts", error=ex)
-
-        return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-
-                                     data=None)
-
-    else:
-
-        return var_res.response_data(data=district_options)
+    districts = district_queryset.values_list("id", "name")
+    district_options = utils.convert_tuple_or_list_to_options(districts)[0]
+    return var_res.response_data(data=district_options)
 
 @api_view(http_method_names=["GET"])
 @permission_classes([AllowAny])
@@ -377,110 +205,71 @@ def get_wards(request):
 
     district_id_raw = params.get('districtId', None)
 
+    ward_queryset = Ward.objects.all()
+
     try:
-
-        ward_queryset = Ward.objects.all()
-
         if district_id_raw not in (None, ""):
-
             district_id = int(str(district_id_raw).strip())
-
             ward_queryset = ward_queryset.filter(district_id=district_id)
-
-        wards = ward_queryset.values_list("id", "name")
-
-        ward_options = utils.convert_tuple_or_list_to_options(wards)[0]
-
     except (TypeError, ValueError):
 
         return var_res.response_data(data=[])
 
-    except Exception as ex:
-
-        helper.print_log_error(func_name="get_wards", error=ex)
-
-        return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-
-                                     data=None)
-
-    else:
-
-        return var_res.response_data(data=ward_options)
+    wards = ward_queryset.values_list("id", "name")
+    ward_options = utils.convert_tuple_or_list_to_options(wards)[0]
+    return var_res.response_data(data=ward_options)
 
 @api_view(http_method_names=["GET"])
 @permission_classes([AllowAny])
 def get_top_10_careers(request):
-
     try:
-        try:
-            hot_qs = Career.objects.filter(is_hot=True).annotate(
-                num_job_posts=Count('job_posts')
-            ).order_by('-num_job_posts', 'id')
-            hot_ids = list(hot_qs.values_list('id', flat=True))
+        hot_qs = Career.objects.filter(is_hot=True).annotate(
+            num_job_posts=Count('job_posts')
+        ).order_by('-num_job_posts', 'id')
+        hot_ids = list(hot_qs.values_list('id', flat=True))
 
-            remaining = max(0, 10 - len(hot_ids))
-            normal_qs = Career.objects.exclude(id__in=hot_ids).annotate(
-                num_job_posts=Count('job_posts')
-            ).order_by('-num_job_posts', 'id')[:remaining]
+        remaining = max(0, 10 - len(hot_ids))
+        normal_qs = Career.objects.exclude(id__in=hot_ids).annotate(
+            num_job_posts=Count('job_posts')
+        ).order_by('-num_job_posts', 'id')[:remaining]
 
-            queryset = list(hot_qs[:10]) + list(normal_qs)
-        except Exception:
-            # Fallback path to keep homepage usable when aggregate query fails.
-            queryset = list(Career.objects.all().order_by('id')[:10])
-
-        serializer = CareerSerializer(
-            queryset,
-            many=True,
-            fields=['id', 'name', 'iconUrl', 'isHot', 'jobPostTotal']
-        )
-
+        queryset = list(hot_qs[:10]) + list(normal_qs)
     except Exception as ex:
+        helper.print_log_error("get_top_careers_fallback", ex)
+        # Fallback path to keep homepage usable when aggregate query fails.
+        queryset = list(Career.objects.all().order_by('id')[:10])
 
-        helper.print_log_error("get_top_careers", ex)
-
-        return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    serializer = CareerSerializer(
+        queryset,
+        many=True,
+        fields=['id', 'name', 'iconUrl', 'isHot', 'jobPostTotal']
+    )
 
     return var_res.response_data(data=serializer.data)
 
 @api_view(http_method_names=["GET"])
 @permission_classes([AllowAny])
 def get_all_careers(request):
+    paginator = paginations.CustomPagination()
+    queryset = Career.objects
 
-    try:
+    kw = request.query_params.get("kw", None)
+    if kw:
+        queryset = queryset.filter(name__icontains=kw)
 
-        paginator = paginations.CustomPagination()
+    queryset = queryset.all().order_by('id')
+    page = paginator.paginate_queryset(queryset, request)
 
-        queryset = Career.objects
+    if page is not None:
+        serializer = CareerSerializer(page, many=True, fields=[
+            'id', 'name', 'appIconName', 'isHot', 'jobPostTotal'
+        ])
+        return paginator.get_paginated_response(serializer.data)
 
-        kw = request.query_params.get("kw", None)
-
-        if kw:
-
-            queryset = queryset.filter(name__icontains=kw)
-
-        queryset = queryset.all().order_by('id')
-
-        page = paginator.paginate_queryset(queryset, request)
-
-        if page is not None:
-
-            serializer = CareerSerializer(page, many=True, fields=[
-
-                                          'id', 'name', 'appIconName', 'isHot', 'jobPostTotal'])
-
-            return paginator.get_paginated_response(serializer.data)
-
-        serializer = CareerSerializer(queryset, many=True, fields=[
-
-                                      'id', 'name', 'appIconName', 'isHot', 'jobPostTotal'])
-
-        return var_res.response_data(data=serializer.data)
-
-    except Exception as ex:
-
-        helper.print_log_error("get_all_careers", ex)
-
-        return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    serializer = CareerSerializer(queryset, many=True, fields=[
+        'id', 'name', 'appIconName', 'isHot', 'jobPostTotal'
+    ])
+    return var_res.response_data(data=serializer.data)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -518,7 +307,7 @@ def health_check(request):
 
         redis_status = redis_client.ping()
 
-    except:
+    except Exception:
 
         redis_status = False
 

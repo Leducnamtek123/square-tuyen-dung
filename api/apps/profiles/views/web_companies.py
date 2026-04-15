@@ -64,65 +64,53 @@ class CompanyView(viewsets.ViewSet):
 
         user = request.user
 
-        try:
+        company = user.active_company
+        if not company:
+            return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": "User has no active company."})
 
-            company = user.active_company
-            if not company:
-                return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": "User has no active company."})
-
-            company_serializer = CompanySerializer(company)
-
-        except Exception as ex:
-
-            helper.print_log_error("get_company_info", ex)
-
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        else:
-
-            return var_res.response_data(data=company_serializer.data)
+        company_serializer = CompanySerializer(company)
+        return var_res.response_data(data=company_serializer.data)
 
     def get_job_post_detail(self, request, pk):
+        user = request.user
+        company = user.active_company
+        if not company:
+            return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": "User has no active company."})
 
         try:
-
-            user = request.user
-            company = user.active_company
-            if not company:
-                return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": "User has no active company."})
-
-            job_post_queryset = JobPost.objects.get(
-
-                pk=pk, company=company)
-
-            job_post_serializer = job_serializers \
-                .JobPostSerializer(job_post_queryset,
-
-                                   fields=["id", "jobName", "academicLevel", "deadline", "quantity", "genderRequired",
-
-                                           "jobDescription", "jobRequirement", "benefitsEnjoyed", "career",
-
-                                           "position", "typeOfWorkplace", "experience",
-
-                                           "jobType", "salaryMin", "salaryMax", "isUrgent",
-
-                                           "contactPersonName", "contactPersonPhone", "contactPersonEmail",
-
-                                           "location"])
+            job_post_queryset = JobPost.objects.get(pk=pk, company=company)
 
         except JobPost.DoesNotExist:
 
             return var_res.response_data(data=None)
 
-        except Exception as ex:
-
-            helper.print_log_error("get_job_post_detail", ex)
-
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        else:
-
-            return var_res.response_data(data=job_post_serializer.data)
+        job_post_serializer = job_serializers.JobPostSerializer(
+            job_post_queryset,
+            fields=[
+                "id",
+                "jobName",
+                "academicLevel",
+                "deadline",
+                "quantity",
+                "genderRequired",
+                "jobDescription",
+                "jobRequirement",
+                "benefitsEnjoyed",
+                "career",
+                "position",
+                "typeOfWorkplace",
+                "experience",
+                "jobType",
+                "salaryMin",
+                "salaryMax",
+                "isUrgent",
+                "contactPersonName",
+                "contactPersonPhone",
+                "contactPersonEmail",
+                "location",
+            ],
+        )
+        return var_res.response_data(data=job_post_serializer.data)
 
 
 class PrivateCompanyViewSet(viewsets.ViewSet,
@@ -157,19 +145,8 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
             return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-
-            company_image_url_serializer.save()
-
-        except Exception as ex:
-
-            helper.print_log_error("update_company_image_url", ex)
-
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        else:
-
-            return var_res.response_data(status=status.HTTP_200_OK, data=company_image_url_serializer.data)
+        company_image_url_serializer.save()
+        return var_res.response_data(status=status.HTTP_200_OK, data=company_image_url_serializer.data)
 
     @action(methods=["put"], detail=False,
 
@@ -191,19 +168,8 @@ class PrivateCompanyViewSet(viewsets.ViewSet,
 
             return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-
-            company_cover_image_url_serializer.save()
-
-        except Exception as ex:
-
-            helper.print_log_error("update_company_cover_image_url", ex)
-
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        else:
-
-            return var_res.response_data(status=status.HTTP_200_OK, data=company_cover_image_url_serializer.data)
+        company_cover_image_url_serializer.save()
+        return var_res.response_data(status=status.HTTP_200_OK, data=company_cover_image_url_serializer.data)
 
 
 class CompanyViewSet(viewsets.ViewSet,
@@ -241,67 +207,61 @@ class CompanyViewSet(viewsets.ViewSet,
         return [perms_sys.AllowAny()]
 
     def list(self, request, *args, **kwargs):
-        try:
-            from shared.helpers.redis_service import RedisService
-            import hashlib
-            from urllib.parse import parse_qsl, urlencode
+        from shared.helpers.redis_service import RedisService
+        import hashlib
+        from urllib.parse import parse_qsl, urlencode
 
-            redis_obj = RedisService()
-            raw_query_str = request.GET.urlencode()
-            filtered_query = [(k, v) for k, v in parse_qsl(raw_query_str, keep_blank_values=False) if v != ""]
-            filtered_query.sort()
-            query_str = urlencode(filtered_query)
-            query_hash = hashlib.md5(query_str.encode("utf-8")).hexdigest()
-            cache_key = f'company_list_{query_hash}_{request.user.id if request.user.is_authenticated else 0}'
+        redis_obj = RedisService()
+        raw_query_str = request.GET.urlencode()
+        filtered_query = [(k, v) for k, v in parse_qsl(raw_query_str, keep_blank_values=False) if v != ""]
+        filtered_query.sort()
+        query_str = urlencode(filtered_query)
+        query_hash = hashlib.md5(query_str.encode("utf-8")).hexdigest()
+        cache_key = f'company_list_{query_hash}_{request.user.id if request.user.is_authenticated else 0}'
+        try:
             cached_res = redis_obj.get_json(cache_key)
             if cached_res:
                 return var_res.response_data(data=cached_res)
-
-            queryset = self.filter_queryset(self.get_queryset())
-            queryset = queryset.annotate(
-                follow_count=Count('companyfollowed', distinct=True),
-                active_job_post_count=Count(
-                    'job_posts',
-                    filter=Q(
-                        job_posts__deadline__gte=timezone.now().date(),
-                        job_posts__status=var_sys.JobPostStatus.APPROVED
-                    ),
-                    distinct=True
-                ),
-            )
-            if request.user.is_authenticated:
-                queryset = queryset.prefetch_related(
-                    Prefetch('companyfollowed_set', queryset=CompanyFollowed.objects.filter(user=request.user))
-                )
-            queryset = queryset.order_by('-id', 'update_at', 'create_at')
-
-            page = self.paginate_queryset(queryset)
-
-            if page is not None:
-
-                serializer = self.get_serializer(page, many=True, fields=[
-
-                    'id', 'slug', 'companyName', 'companyImageUrl',
-
-                    'companyCoverImageUrl',
-
-                    'fieldOperation', 'employeeSize', 'locationDict',
-
-                    'followNumber', 'jobPostNumber', 'isFollowed'
-
-                ])
-
-                paginated_response = self.get_paginated_response(serializer.data)
-                redis_obj.set_json(cache_key, paginated_response.data, 300)
-                return paginated_response
-
-            serializer = self.get_serializer(queryset, many=True)
-
-            return var_res.response_data(data=serializer.data)
-
         except Exception as ex:
-            helper.print_log_error("CompanyViewSet__list", ex)
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            helper.print_log_error("CompanyViewSet__list_get_cache", ex)
+
+        queryset = self.filter_queryset(self.get_queryset())
+        queryset = queryset.annotate(
+            follow_count=Count('companyfollowed', distinct=True),
+            active_job_post_count=Count(
+                'job_posts',
+                filter=Q(
+                    job_posts__deadline__gte=timezone.now().date(),
+                    job_posts__status=var_sys.JobPostStatus.APPROVED
+                ),
+                distinct=True
+            ),
+        )
+        if request.user.is_authenticated:
+            queryset = queryset.prefetch_related(
+                Prefetch('companyfollowed_set', queryset=CompanyFollowed.objects.filter(user=request.user))
+            )
+        queryset = queryset.order_by('-id', 'update_at', 'create_at')
+
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True, fields=[
+                'id', 'slug', 'companyName', 'companyImageUrl',
+                'companyCoverImageUrl',
+                'fieldOperation', 'employeeSize', 'locationDict',
+                'followNumber', 'jobPostNumber', 'isFollowed'
+            ])
+
+            paginated_response = self.get_paginated_response(serializer.data)
+            try:
+                redis_obj.set_json(cache_key, paginated_response.data, 300)
+            except Exception as ex:
+                helper.print_log_error("CompanyViewSet__list_set_cache", ex)
+            return paginated_response
+
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
 
     def retrieve(self, request, *args, **kwargs):
 
@@ -332,29 +292,15 @@ class CompanyViewSet(viewsets.ViewSet,
             url_path="top", url_name="companies-top")
 
     def get_top_companies(self, request):
-
-        try:
-
-            queryset = Company.objects.annotate(num_follow=Count('companyfollowed'),
-
-                                                num_job_post=Count('job_posts')
-
-                                                ) \
-                .order_by('-num_follow', '-num_job_post')[:10]
-
-            serializer = CompanySerializer(queryset, many=True,
-
-                                           fields=[
-
-                                               'id', 'slug', 'companyName', 'companyImageUrl'
-
-                                           ])
-
-        except Exception as ex:
-
-            helper.print_log_error("get_top_companies", ex)
-
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        queryset = Company.objects.annotate(
+            num_follow=Count('companyfollowed'),
+            num_job_post=Count('job_posts')
+        ).order_by('-num_follow', '-num_job_post')[:10]
+        serializer = CompanySerializer(
+            queryset,
+            many=True,
+            fields=['id', 'slug', 'companyName', 'companyImageUrl'],
+        )
 
         return var_res.response_data(data=serializer.data)
 
@@ -502,33 +448,16 @@ class CompanyImageViewSet(viewsets.ViewSet,
 
         instance = self.get_object()
 
-        try:
+        with transaction.atomic():
+            image = instance.image
+            if image:
+                is_destroy_success = CloudinaryService.delete_image(image.public_id)
+                if not is_destroy_success:
+                    helper.print_log_error("CompanyImageViewSet__destroy", ERROR_MESSAGES["CLOUDINARY_UPLOAD_ERROR"])
+                image.delete()
+            self.perform_destroy(instance)
 
-            with transaction.atomic():
-
-                image = instance.image
-
-                if image:
-
-                    is_destroy_success = CloudinaryService.delete_image(image.public_id)
-
-                    if not is_destroy_success:
-
-                        helper.print_log_error("CompanyImageViewSet__destroy", ERROR_MESSAGES["CLOUDINARY_UPLOAD_ERROR"])
-
-                    image.delete()
-
-                self.perform_destroy(instance)
-
-        except Exception as ex:
-
-            helper.print_log_error("destroy", ex)
-
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        else:
-
-            return var_res.response_data(status=status.HTTP_204_NO_CONTENT)
+        return var_res.response_data(status=status.HTTP_204_NO_CONTENT)
 
 
 class CompanyRoleViewSet(viewsets.ModelViewSet):

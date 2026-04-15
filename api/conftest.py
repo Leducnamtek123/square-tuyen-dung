@@ -6,9 +6,6 @@ import pytest
 from django.utils import timezone
 from datetime import timedelta
 
-from apps.accounts.models import User
-from shared.configs import variable_system as var_sys
-
 
 @pytest.fixture(autouse=True)
 def disable_elasticsearch(monkeypatch):
@@ -24,6 +21,8 @@ def disable_elasticsearch(monkeypatch):
 @pytest.fixture
 def job_seeker_user(db):
     """Create a job seeker user for testing."""
+    from apps.accounts.models import User
+    from shared.configs import variable_system as var_sys
     return User.objects.create_user_with_role_name(
         email='jobseeker@test.com',
         full_name='Test JobSeeker',
@@ -37,6 +36,8 @@ def job_seeker_user(db):
 @pytest.fixture
 def employer_user(db):
     """Create an employer user for testing."""
+    from apps.accounts.models import User
+    from shared.configs import variable_system as var_sys
     return User.objects.create_user_with_role_name(
         email='employer@test.com',
         full_name='Test Employer',
@@ -51,6 +52,8 @@ def employer_user(db):
 @pytest.fixture
 def admin_user(db):
     """Create an admin user for testing."""
+    from apps.accounts.models import User
+    from shared.configs import variable_system as var_sys
     return User.objects.create_user_with_role_name(
         email='admin@test.com',
         full_name='Test Admin',
@@ -134,6 +137,7 @@ def resume(db, job_seeker_user, job_seeker_profile, career, city):
 def job_post(db, employer_user, company, career, location):
     """Create a test job post."""
     from apps.jobs.models import JobPost
+    from shared.configs import variable_system as var_sys
     return JobPost.objects.create(
         job_name='Senior Python Developer',
         deadline=timezone.now().date() + timedelta(days=30),

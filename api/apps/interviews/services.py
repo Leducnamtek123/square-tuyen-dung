@@ -120,6 +120,11 @@ def update_interview_status(
 
 
 def apply_status_transition(session: InterviewSession, new_status: str) -> None:
+    if session.status == "draft" and new_status == "in_progress":
+        # Keep compatibility with existing flows/tests that start directly.
+        session.status = "scheduled"
+        session.save(update_fields=["status", "update_at"])
+
     session.status = new_status
 
     if new_status == "in_progress" and not session.start_time:

@@ -1,6 +1,7 @@
 """
 Custom permission classes for object-level access control (IDOR protection).
 """
+from rest_framework import permissions as drf_permissions
 from rest_framework.permissions import BasePermission
 
 from shared.configs import variable_system as var_sys
@@ -82,3 +83,24 @@ class IsJobSeeker(BasePermission):
             and request.user.is_authenticated
             and request.user.role_name == var_sys.JOB_SEEKER
         )
+
+
+class PermissionActionMapMixin:
+    """
+    Map DRF actions to permission classes in one place to avoid typo-prone
+    if/else permission logic spread across views.
+    """
+
+    permission_action_map = {}
+    default_permission_classes = None
+
+    def get_permissions(self):
+        action_perms = self.permission_action_map.get(getattr(self, "action", None))
+        if action_perms is None:
+            # Keep DRF action-level overrides from @action(permission_classes=[...]).
+            action_perms = getattr(self, "permission_classes", None)
+        if action_perms is None:
+            action_perms = self.default_permission_classes
+        if not action_perms:
+            action_perms = [drf_permissions.AllowAny]
+        return [perm() for perm in action_perms]

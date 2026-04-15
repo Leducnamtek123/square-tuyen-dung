@@ -197,11 +197,7 @@ def send_verify_email(request):
     if user.is_verify_email:
         return response_data(status=status.HTTP_200_OK, data={"emailVerified": True})
 
-    try:
-        helper.send_email_verify_email(request, user, platform=platform)
-    except Exception as ex:
-        helper.print_log_error("send_verify_email", ex)
-        return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    helper.send_email_verify_email(request, user, platform=platform)
 
     return response_data(status=status.HTTP_200_OK, data={"emailVerified": False})
 
@@ -224,11 +220,7 @@ def user_active(request, encoded_data, token):
         if redirect_login != settings.REDIRECT_LOGIN_CLIENT:
             return HttpResponseNotFound()
 
-    try:
-        user, error_key = EmailVerificationService.verify_user(encoded_data, token)
-    except Exception as ex:
-        helper.print_log_error("user_active", ex)
-        user, error_key = None, "INVALID_EMAIL_VERIFICATION"
+    user, error_key = EmailVerificationService.verify_user(encoded_data, token)
 
     domain_type = EmailVerificationService.get_domain_type(user)
 
@@ -284,9 +276,6 @@ def forgot_password(request):
             status=status.HTTP_400_BAD_REQUEST,
             errors={"errorMessage": [ERROR_MESSAGES["PASSWORD_RESET_EMAIL_COOLDOWN"]]},
         )
-    except Exception as ex:
-        helper.print_log_error("forgot_password", ex)
-        return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(http_method_names=["post"])
@@ -303,45 +292,39 @@ def reset_password(request):
 
     try:
         result = PasswordResetService.reset_password(serializer.validated_data)
-        return response_data(result, SUCCESS_MESSAGES["PASSWORD_RESET_SUCCESS"])
+        result["successMessage"] = SUCCESS_MESSAGES["PASSWORD_RESET_SUCCESS"]
+        return response_data(status=status.HTTP_200_OK, data=result)
     except (InvalidTokenError, TokenExpiredError) as e:
         return response_data(
             status=status.HTTP_400_BAD_REQUEST,
             errors=e.args[0] if e.args else str(e)
         )
-    except Exception as ex:
-        helper.print_log_error("reset_password", ex)
-        return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(http_method_names=["put"])
 @permission_classes(permission_classes=[IsAuthenticated])
 def change_password(request):
-    try:
-        data = request.data
-        serializer = UpdatePasswordSerializer(
-            request.user, data=data, context={"user": request.user}
+    data = request.data
+    serializer = UpdatePasswordSerializer(
+        request.user, data=data, context={"user": request.user}
+    )
+
+    if not serializer.is_valid():
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST, errors=serializer.errors
         )
 
-        if not serializer.is_valid():
-            return response_data(
-                status=status.HTTP_400_BAD_REQUEST, errors=serializer.errors
-            )
-
+    try:
         AccountService.update_password(
             user=request.user,
             old_password=serializer.validated_data.get("oldPassword"),
             new_password=serializer.validated_data.get("newPassword")
         )
-
     except ValueError as e:
         return response_data(
             status=status.HTTP_400_BAD_REQUEST,
             errors={"oldPassword": [str(e)]}
         )
-    except Exception as ex:
-        helper.print_log_error("change_password", ex)
-        return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return response_data(status=status.HTTP_200_OK)
 
@@ -349,27 +332,21 @@ def change_password(request):
 @api_view(http_method_names=["patch"])
 @permission_classes(permission_classes=[IsAuthenticated])
 def update_user_account(request):
-    try:
-        data = request.data
+    data = request.data
 
-        user = request.user
+    user = request.user
 
-        user_account_serializer = UserSerializer(
-            user, data=data, partial=True, fields=["id", "fullName"]
+    user_account_serializer = UserSerializer(
+        user, data=data, partial=True, fields=["id", "fullName"]
+    )
+
+    if not user_account_serializer.is_valid():
+        return response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors=user_account_serializer.errors,
         )
 
-        if not user_account_serializer.is_valid():
-            return response_data(
-                status=status.HTTP_400_BAD_REQUEST,
-                errors=user_account_serializer.errors,
-            )
-
-        user_account_serializer.save()
-
-    except Exception as ex:
-        helper.print_log_error("update_user_account", ex)
-
-        return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    user_account_serializer.save()
 
     user_info_serializer = UserSerializer(user)
 
@@ -390,27 +367,19 @@ def avatar(request):
                 status=status.HTTP_400_BAD_REQUEST, errors=avatar_serializer.errors
             )
 
-        try:
-            avatar_file = avatar_serializer.validated_data["file"]
-            avatar_url = AvatarService.update_avatar(request.user, avatar_file)
-            return response_data(
-                status=status.HTTP_200_OK,
-                data={"avatarUrl": avatar_url}
-            )
-        except Exception as ex:
-            helper.print_log_error("avatar_update", ex)
-            return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        avatar_file = avatar_serializer.validated_data["file"]
+        avatar_url = AvatarService.update_avatar(request.user, avatar_file)
+        return response_data(
+            status=status.HTTP_200_OK,
+            data={"avatarUrl": avatar_url}
+        )
 
     if request.method == "DELETE":
-        try:
-            avatar_url = AvatarService.delete_avatar(request.user)
-            return response_data(
-                status=status.HTTP_200_OK,
-                data={"avatarUrl": avatar_url}
-            )
-        except Exception as ex:
-            helper.print_log_error("avatar_delete", ex)
-            return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        avatar_url = AvatarService.delete_avatar(request.user)
+        return response_data(
+            status=status.HTTP_200_OK,
+            data={"avatarUrl": avatar_url}
+        )
 
     return response_data(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -426,17 +395,15 @@ def employer_register(request):
             status=status.HTTP_400_BAD_REQUEST, errors=serializer.errors
         )
 
-    try:
-        # Move business logic to RegistrationService
-        user = RegistrationService.register_employer(serializer.validated_data)
+    # Move business logic to RegistrationService
+    user = RegistrationService.register_employer(serializer.validated_data)
 
-        platform = serializer.validated_data.get("platform")
-        if user:
+    platform = serializer.validated_data.get("platform")
+    if user:
+        try:
             helper.send_email_verify_email(request, user, platform=platform)
-
-    except Exception as ex:
-        helper.print_log_error("employer_register", ex)
-        return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as ex:
+            helper.print_log_error("employer_register.send_verify_email", ex)
 
     return response_data(status=status.HTTP_201_CREATED)
 
@@ -452,17 +419,15 @@ def job_seeker_register(request):
             status=status.HTTP_400_BAD_REQUEST, errors=serializer.errors
         )
 
-    try:
-        # Move business logic to RegistrationService
-        user = RegistrationService.register_job_seeker(serializer.validated_data)
+    # Move business logic to RegistrationService
+    user = RegistrationService.register_job_seeker(serializer.validated_data)
 
-        platform = serializer.validated_data.get("platform")
-        if user:
+    platform = serializer.validated_data.get("platform")
+    if user:
+        try:
             helper.send_email_verify_email(request=request, user=user, platform=platform)
-
-    except Exception as ex:
-        helper.print_log_error("job_seeker_register", ex)
-        return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except Exception as ex:
+            helper.print_log_error("job_seeker_register.send_verify_email", ex)
 
     return response_data(status=status.HTTP_201_CREATED)
 
@@ -533,13 +498,7 @@ class UserSettingAPIView(APIView):
                 errors=user_settings_serializer.errors,
             )
 
-        try:
-            user_settings_serializer.save()
-
-        except Exception as ex:
-            helper.print_log_error("update_user_setting", ex)
-
-            return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        user_settings_serializer.save()
 
         return response_data(
             data=user_settings_serializer.data, status=status.HTTP_200_OK
@@ -607,6 +566,3 @@ class UserViewSet(
                 status=status.HTTP_404_NOT_FOUND,
                 errors={"detail": str(e)},
             )
-        except Exception as ex:
-            helper.print_log_error("toggle_active", ex)
-            return response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -10,6 +10,14 @@ from django.utils import timezone
 from typing import Optional, Dict, Any, Union
 
 from apps.jobs.models import JobPost, JobPostActivity
+from apps.jobs.exceptions import (
+    CompanyNotConfiguredError,
+    DuplicateApplicationError,
+    InvalidApplicationStatusTransitionError,
+    JobPostExpiredError,
+    JobPostInactiveError,
+    ResumeOwnershipError,
+)
 from shared.configs import variable_system as var_sys
 
 logger = logging.getLogger(__name__)
@@ -67,7 +75,7 @@ class JobPostService:
         # Ensure company is linked
         company = user.active_company
         if not company:
-            raise ValueError("Người dùng chưa có thông tin công ty.")
+            raise CompanyNotConfiguredError("Người dùng chưa có thông tin công ty.")
 
         job_post = JobPost.objects.create(
             user=user,
@@ -117,7 +125,7 @@ class JobActivityService:
         resume = validated_data.get('resume')
 
         if job_post.status != var_sys.JobPostStatus.APPROVED:
-            raise ValueError("Tin tuyển dụng không còn hoạt động.")
+            raise JobPostInactiveError("Tin tuyển dụng không còn hoạt động.")
 
         if hasattr(timezone, 'localdate'):
             current_date = timezone.localdate()
@@ -125,23 +133,30 @@ class JobActivityService:
             current_date = timezone.now().date()
 
         if job_post.deadline < current_date:
-            raise ValueError("Tin tuyển dụng đã hết hạn.")
+            raise JobPostExpiredError("Tin tuyển dụng đã hết hạn.")
 
         if resume and resume.user != user:
-            raise ValueError("CV không thuộc về bạn.")
+            raise ResumeOwnershipError("CV không thuộc về bạn.")
 
         existing = JobPostActivity.objects.filter(
             user=user, job_post=job_post, is_deleted=False
         ).exists()
         if existing:
             logger.info("Application rejected: User %s already applied to job %s", user.email, job_post.id)
-            raise ValueError("Bạn đã ứng tuyển vào vị trí này rồi.")
+            raise DuplicateApplicationError("Bạn đã ứng tuyển vào vị trí này rồi.")
 
         # Create the activity in its own atomic block
+        activity_payload = {
+            "job_post": job_post,
+            "resume": resume,
+            "full_name": validated_data.get("full_name", validated_data.get("fullName", user.full_name)),
+            "email": validated_data.get("email", user.email),
+            "phone": validated_data.get("phone", ""),
+        }
         with transaction.atomic():
             activity = JobPostActivity.objects.create(
                 user=user,
-                **validated_data,
+                **activity_payload,
                 status=var_sys.ApplicationStatus.PENDING_CONFIRMATION
             )
 
@@ -220,7 +235,9 @@ class JobActivityService:
         from shared.helpers import helper
 
         if activity.status > new_status:
-            raise ValueError("Cannot revert application status backwards arbitrarily.")
+            raise InvalidApplicationStatusTransitionError(
+                "Cannot revert application status backwards arbitrarily."
+            )
 
         activity.status = new_status
         activity.save()

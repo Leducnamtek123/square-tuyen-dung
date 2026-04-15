@@ -30,6 +30,10 @@ class UserManager(BaseUserManager):
 
             raise ValueError(self.invalid_full_name_message)
 
+        # Backward compatibility: some callers still pass `role` instead of `role_name`.
+        if "role" in extra_fields and "role_name" not in extra_fields:
+            extra_fields["role_name"] = extra_fields.pop("role")
+
         user = self.model(email=self.normalize_email(email), full_name=full_name, **extra_fields)
 
         user.set_password(password)

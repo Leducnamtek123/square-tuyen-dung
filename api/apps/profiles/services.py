@@ -5,13 +5,17 @@ Encapsulates business logic for resumes, companies, and profiles.
 import logging
 
 from django.db import transaction
+from django.db.models import F
 from django.db.models import Count, Q, QuerySet
 from typing import Optional, Tuple, Dict, Any, Union
 
 from apps.profiles.models import (
     Resume, Company, CompanyFollowed,
-    ResumeViewed, ResumeSaved
+    ResumeViewed, ResumeSaved, ContactProfile
 )
+from apps.profiles.exceptions import ActiveCompanyRequiredError
+from shared.configs import variable_system as var_sys
+from console.jobs import queue_mail
 
 logger = logging.getLogger(__name__)
 
@@ -74,6 +78,60 @@ class ResumeService:
             company=company, resume=resume
         )
         return created
+
+    @staticmethod
+    @transaction.atomic
+    def increment_resume_view(company: Company, resume: Resume) -> ResumeViewed:
+        """Increment resume view counter and return updated tracking row."""
+        viewed, _ = ResumeViewed.objects.get_or_create(
+            company=company,
+            resume=resume,
+        )
+        viewed.views = F("views") + 1
+        viewed.save(update_fields=["views", "update_at"])
+        viewed.refresh_from_db(fields=["id", "views"])
+        return viewed
+
+    @staticmethod
+    @transaction.atomic
+    def contact_resume_owner(
+        *,
+        requester: Any,
+        company: Optional[Company],
+        resume: Resume,
+        validated_data: Dict[str, Any],
+    ) -> None:
+        """
+        Queue contact email and persist contact trace.
+        Raises ActiveCompanyRequiredError when requester has no active company.
+        """
+        if company is None:
+            raise ActiveCompanyRequiredError("User has no active company.")
+
+        to = [validated_data.get("email")]
+        if validated_data.get("isSendMe", False):
+            to.append(requester.email)
+
+        email_data = {
+            "content": validated_data.get("content"),
+            "company_image": (
+                company.logo.get_full_url()
+                if company.logo
+                else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]
+            ),
+            "company_name": company.company_name,
+            "company_phone": company.company_phone,
+            "company_email": company.company_email,
+            "company_address": getattr(company.location, "address", "") if company.location else "",
+            "company_website_url": company.website_url,
+        }
+
+        queue_mail.send_email_reply_job_seeker_task.delay(
+            to=to,
+            subject=validated_data.get("title"),
+            data=email_data,
+        )
+        ContactProfile.objects.create(company=company, resume=resume)
 
 
 class CompanyService:

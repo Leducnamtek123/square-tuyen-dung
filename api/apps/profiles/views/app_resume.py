@@ -1,5 +1,6 @@
 from shared import pagination as paginations
 from shared import renderers
+from shared.permissions import PermissionActionMapMixin
 
 from shared.configs import variable_response as var_res
 
@@ -37,32 +38,28 @@ from ..serializers import (
 
 
 class PrivateResumeViewSet(
-    viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIView, generics.DestroyAPIView
+    PermissionActionMapMixin, viewsets.ViewSet, generics.CreateAPIView, generics.UpdateAPIView, generics.DestroyAPIView
 ):
     queryset = Resume.objects.all()
     serializer_class = ResumeSerializer
 
-    def get_permissions(self):
-        if self.action in [
-            "get_resume_detail_of_job_seeker",
-            "update",
-            "partial_update",
-            "active_resume",
-            "get_cv",
-            "update_cv_file",
-            "destroy",
-            "get_cv_pdf",
-            "get_experiences_detail",
-            "get_educations_detail",
-            "get_certificates_detail",
-            "get_language_skills",
-            "get_advanced_skills",
-        ]:
-            return [perms_custom.ResumeOwnerPerms()]
-        elif self.action in ["create"]:
-            return [perms_custom.IsJobSeekerUser()]
-
-        return [perms_sys.IsAuthenticated()]
+    permission_action_map = {
+        "get_resume_detail_of_job_seeker": [perms_custom.ResumeOwnerPerms],
+        "update": [perms_custom.ResumeOwnerPerms],
+        "partial_update": [perms_custom.ResumeOwnerPerms],
+        "active_resume": [perms_custom.ResumeOwnerPerms],
+        "get_cv": [perms_custom.ResumeOwnerPerms],
+        "update_cv_file": [perms_custom.ResumeOwnerPerms],
+        "destroy": [perms_custom.ResumeOwnerPerms],
+        "get_cv_pdf": [perms_custom.ResumeOwnerPerms],
+        "get_experiences_detail": [perms_custom.ResumeOwnerPerms],
+        "get_educations_detail": [perms_custom.ResumeOwnerPerms],
+        "get_certificates_detail": [perms_custom.ResumeOwnerPerms],
+        "get_language_skills": [perms_custom.ResumeOwnerPerms],
+        "get_advanced_skills": [perms_custom.ResumeOwnerPerms],
+        "create": [perms_custom.IsJobSeekerUser],
+    }
+    default_permission_classes = [perms_sys.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         data = request.data.copy()
@@ -219,13 +216,7 @@ class PrivateResumeViewSet(
                 status=status.HTTP_400_BAD_REQUEST, errors=cv_serializer.errors
             )
 
-        try:
-            cv_serializer.save()
-
-        except Exception as ex:
-            helper.print_log_error("update_cv_file", error=ex)
-
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        cv_serializer.save()
 
         return var_res.response_data()
 

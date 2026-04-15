@@ -1,7 +1,9 @@
 
 from django.urls import path
 
-# DialogFlow webhook routes removed (dead code — never called by frontend).
-# Active AI chat: /api/ai/chat/ → integrations.ai.views.ChatAPIView
+from .views import employer_webhook, jobseeker_webhook
 
-urlpatterns = []
+urlpatterns = [
+    path("jobseeker/webhook/", jobseeker_webhook, name="jobseeker-webhook"),
+    path("employer/webhook/", employer_webhook, name="employer-webhook"),
+]

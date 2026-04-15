@@ -1,7 +1,6 @@
 from shared import pagination as paginations
 from shared import renderers
-
-from console.jobs import queue_mail
+from shared.permissions import PermissionActionMapMixin
 
 from shared.helpers import utils
 
@@ -11,7 +10,7 @@ from shared.configs import variable_response as var_res
 
 from shared.configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
 
-from django.db.models import Count, F, Q, Prefetch
+from django.db.models import Count, Q, Prefetch
 
 from django.db import transaction
 from django.utils import timezone
@@ -58,6 +57,9 @@ from ..filters import (
     ResumeSavedFilter
 
 )
+
+from ..exceptions import ActiveCompanyRequiredError
+from ..services import ResumeService
 
 from ..serializers import (
 
@@ -113,10 +115,13 @@ class JobSeekerProfileViewSet(viewsets.ViewSet,
     serializer_class = JobSeekerProfileSerializer
     permission_classes = [perms_sys.IsAuthenticated]
 
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
     def get_permissions(self):
         if self.action in ["get_resumes"]:
             return [perms_custom.IsJobSeekerUser()]
-        return self.permission_classes
+        return [perm() for perm in self.permission_classes]
 
     @action(methods=["get"], detail=True,
 
@@ -190,7 +195,7 @@ class JobSeekerProfileViewSet(viewsets.ViewSet,
 
         return var_res.response_data(data=serializer.data)
 
-class PrivateResumeViewSet(viewsets.ViewSet,
+class PrivateResumeViewSet(PermissionActionMapMixin, viewsets.ViewSet,
 
                            generics.CreateAPIView,
 
@@ -207,35 +212,22 @@ class PrivateResumeViewSet(viewsets.ViewSet,
 
     lookup_field = 'slug'
 
-    def get_permissions(self):
-
-        if self.action in ["get_resume_detail_of_job_seeker",
-
-                           "update", "partial_update",
-
-                           "active_resume",
-                           "get_cv",
-                           "update_cv_file",
-
-                           "destroy",
-
-                           "get_experiences_detail",
-
-                           "get_educations_detail",
-
-                           "get_certificates_detail",
-
-                           "get_language_skills",
-
-                           "get_advanced_skills"]:
-
-            return [perms_custom.ResumeOwnerPerms()]
-
-        elif self.action in ["create"]:
-
-            return [perms_custom.IsJobSeekerUser()]
-
-        return [perms_sys.IsAuthenticated()]
+    permission_action_map = {
+        "get_resume_detail_of_job_seeker": [perms_custom.ResumeOwnerPerms],
+        "update": [perms_custom.ResumeOwnerPerms],
+        "partial_update": [perms_custom.ResumeOwnerPerms],
+        "active_resume": [perms_custom.ResumeOwnerPerms],
+        "get_cv": [perms_custom.ResumeOwnerPerms],
+        "update_cv_file": [perms_custom.ResumeOwnerPerms],
+        "destroy": [perms_custom.ResumeOwnerPerms],
+        "get_experiences_detail": [perms_custom.ResumeOwnerPerms],
+        "get_educations_detail": [perms_custom.ResumeOwnerPerms],
+        "get_certificates_detail": [perms_custom.ResumeOwnerPerms],
+        "get_language_skills": [perms_custom.ResumeOwnerPerms],
+        "get_advanced_skills": [perms_custom.ResumeOwnerPerms],
+        "create": [perms_custom.IsJobSeekerUser],
+    }
+    default_permission_classes = [perms_sys.IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
 
@@ -375,15 +367,7 @@ class PrivateResumeViewSet(viewsets.ViewSet,
 
                                          errors=cv_serializer.errors)
 
-        try:
-
-            cv_serializer.save()
-
-        except Exception as ex:
-
-            helper.print_log_error("update_cv_file", error=ex)
-
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        cv_serializer.save()
 
         return var_res.response_data()
 
@@ -624,49 +608,43 @@ class ResumeViewSet(viewsets.ViewSet,
 
         user = request.user
 
-        v, _ = ResumeViewed.objects.get_or_create(
+        company = user.active_company
 
-            resume=self.get_object(),
+        if company is None:
 
-            company=user.active_company
+            return var_res.response_data(
 
-        )
+                status=status.HTTP_400_BAD_REQUEST,
+
+                errors={"errorMessage": ["User has no active company."]},
+
+            )
+
+        resume = self.get_object()
+
+        ResumeService.increment_resume_view(company=company, resume=resume)
+
+        # Notification failure must not break the view-record operation.
 
         try:
-
-            v.views = F('views') + 1
-
-            v.save()
-
-            v.refresh_from_db()
-
-            # send notification
-
-            company = user.active_company
 
             helper.add_employer_viewed_resume_notifications(
 
                 company.company_name,
 
-                "Đã xem hồ sơ của bạn",
+                "Da xem ho so cua ban",
 
-                company.logo.get_full_url(
+                company.logo.get_full_url() if company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"],
 
-                ) if company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"],
-
-                self.get_object().user_id
+                resume.user_id
 
             )
 
         except Exception as ex:
 
-            helper.print_log_error("view_resume", ex)
+            helper.print_log_error("view_resume_notification", ex)
 
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        else:
-
-            return var_res.response_data(status=status.HTTP_200_OK)
+        return var_res.response_data(status=status.HTTP_200_OK)
 
     @action(methods=["post"], detail=True,
 
@@ -674,75 +652,43 @@ class ResumeViewSet(viewsets.ViewSet,
 
     def send_email(self, request, slug):
 
-        try:
+        serializer = SendMailToJobSeekerSerializer(data=request.data)
 
-            data = request.data
+        if not serializer.is_valid():
 
-            user = request.user
+            return var_res.response_data(
 
-            company = user.active_company
+                status=status.HTTP_400_BAD_REQUEST,
 
-            serializer = SendMailToJobSeekerSerializer(data=data)
-
-            if not serializer.is_valid():
-
-                return var_res.response_data(status=status.HTTP_400_BAD_REQUEST,
-
-                                             errors=serializer.errors)
-
-            validate_data = serializer.data
-
-            to = [validate_data.get("email")]
-
-            is_send_me = validate_data.pop("isSendMe")
-
-            if is_send_me:
-
-                to.append(user.email)
-
-            email_data = {
-
-                'content': validate_data.get("content"),
-
-                'company_image': company.logo.get_full_url() if company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"],
-
-                'company_name': company.company_name,
-
-                'company_phone': company.company_phone,
-
-                'company_email': company.company_email,
-
-                'company_address': getattr(company.location, 'address', '') if company.location else '',
-
-                'company_website_url': company.website_url
-
-            }
-
-            queue_mail.send_email_reply_job_seeker_task.delay(
-
-                to=to,
-
-                subject=validate_data.get("title"),
-
-                data=email_data
+                errors=serializer.errors,
 
             )
 
-            # save contact profile
+        try:
 
-            ContactProfile.objects.create(
+            ResumeService.contact_resume_owner(
 
-                company=company, resume=self.get_object())
+                requester=request.user,
 
-        except Exception as ex:
+                company=request.user.active_company,
 
-            helper.print_log_error("send_email", ex)
+                resume=self.get_object(),
 
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                validated_data=serializer.validated_data,
 
-        else:
+            )
 
-            return var_res.response_data()
+        except ActiveCompanyRequiredError as ex:
+
+            return var_res.response_data(
+
+                status=status.HTTP_400_BAD_REQUEST,
+
+                errors={"errorMessage": [str(ex)]},
+
+            )
+
+        return var_res.response_data()
 
 class ResumeViewedAPIView(views.APIView):
 
@@ -957,4 +903,3 @@ class AdvancedSkillViewSet(viewsets.ViewSet,
 
     def get_queryset(self):
         return self.queryset.filter(resume__user=self.request.user)
-

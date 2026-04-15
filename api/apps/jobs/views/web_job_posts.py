@@ -1,5 +1,6 @@
 import datetime
 
+from django.db import DatabaseError
 from django.db.models import Count, F, Prefetch
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions as perms_sys, status, viewsets
@@ -11,17 +12,20 @@ from apps.accounts import permissions as perms_custom
 from apps.profiles.models import Resume
 from shared import pagination as paginations
 from shared import renderers
+from shared.permissions import PermissionActionMapMixin
 from shared.configs import table_export
 from shared.configs import variable_response as var_res
 from shared.configs import variable_system as var_sys
 from shared.helpers import helper, utils
 
 from ..filters import AliasedOrderingFilter, JobPostFilter
+from ..exceptions import CompanyNotConfiguredError, JobsDomainError
 from ..models import JobPost, JobPostActivity, SavedJobPost
 from ..serializers import JobPostSerializer
 
 
 class PrivateJobPostViewSet(
+    PermissionActionMapMixin,
     viewsets.ViewSet,
     generics.ListAPIView,
     generics.CreateAPIView,
@@ -54,10 +58,10 @@ class PrivateJobPostViewSet(
         ('appliedTotal', 'applied_total'),
     )
 
-    def get_permissions(self):
-        if self.action in ["get_suggested_job_posts"]:
-            return [perms_sys.IsAuthenticated()]
-        return [perms_custom.JobPostOwnerPerms()]
+    permission_action_map = {
+        "get_suggested_job_posts": [perms_sys.IsAuthenticated],
+    }
+    default_permission_classes = [perms_custom.JobPostOwnerPerms]
 
     @action(methods=["get"], detail=False, url_path="job-posts-options", url_name="job-posts-options")
     def get_job_post_options(self, request):
@@ -137,14 +141,18 @@ class PrivateJobPostViewSet(
         return var_res.response_data(data=serializer.data)
 
     def create(self, request, *args, **kwargs):
+        from rest_framework.exceptions import ValidationError
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
         from ..services import JobPostService
-        job_post = JobPostService.create_job(
-            user=request.user,
-            validated_data=serializer.validated_data
-        )
+        try:
+            job_post = JobPostService.create_job(
+                user=request.user,
+                validated_data=serializer.validated_data
+            )
+        except CompanyNotConfiguredError as exc:
+            raise ValidationError({"errorMessage": [str(exc)]})
 
         response_serializer = self.get_serializer(job_post)
         return var_res.response_data(status=status.HTTP_201_CREATED, data=response_serializer.data)
@@ -265,7 +273,7 @@ class PrivateJobPostViewSet(
         return var_res.response_data(data=serializer.data)
 
 
-class JobPostViewSet(viewsets.GenericViewSet, generics.ListAPIView, generics.RetrieveAPIView):
+class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics.ListAPIView, generics.RetrieveAPIView):
     queryset = JobPost.objects.select_related(
         'company',
         'company__logo',
@@ -286,10 +294,10 @@ class JobPostViewSet(viewsets.GenericViewSet, generics.ListAPIView, generics.Ret
     filter_backends = [DjangoFilterBackend, AliasedOrderingFilter]
     lookup_field = "slug"
 
-    def get_permissions(self):
-        if self.action in ["get_job_posts_saved"]:
-            return [perms_sys.IsAuthenticated()]
-        return [perms_sys.AllowAny()]
+    permission_action_map = {
+        "get_job_posts_saved": [perms_sys.IsAuthenticated],
+    }
+    default_permission_classes = [perms_sys.AllowAny]
     ordering_fields = (
         ('jobName', 'job_name'),
         ('createAt', 'create_at'),
@@ -373,7 +381,7 @@ class JobPostViewSet(viewsets.GenericViewSet, generics.ListAPIView, generics.Ret
         try:
             JobPost.objects.filter(pk=instance.pk).update(views=F('views') + 1)
             instance.refresh_from_db()
-        except Exception as ex:
+        except DatabaseError as ex:
             helper.print_log_error("save views", ex)
 
         serializer = self.get_serializer(
@@ -456,7 +464,7 @@ class JobPostViewSet(viewsets.GenericViewSet, generics.ListAPIView, generics.Ret
         serializer = self.get_serializer(queryset, many=True)
         return var_res.response_data(data=serializer.data)
 
-    @action(methods=["post"], detail=True, url_path="save", url_name="save", permission_classes=[perms_sys.IsAuthenticated])
+    @action(methods=["post"], detail=True, url_path="save", url_name="save", permission_classes=[perms_custom.IsJobSeekerUser])
     def save_job(self, request, slug):
         from ..services import JobActivityService
         try:
@@ -465,7 +473,7 @@ class JobPostViewSet(viewsets.GenericViewSet, generics.ListAPIView, generics.Ret
                 job_post=self.get_object()
             )
             return var_res.response_data(data={"isSaved": is_saved})
-        except Exception as e:
+        except JobsDomainError as e:
             return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors={"errorMessage": [str(e)]})
 
 

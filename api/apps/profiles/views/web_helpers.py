@@ -4,7 +4,7 @@ from ..models import CompanyMember
 def _get_user_company(user):
     try:
         return user.get_active_company()
-    except Exception:
+    except AttributeError:
         return None
 
 

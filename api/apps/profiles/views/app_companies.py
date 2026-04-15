@@ -10,7 +10,6 @@ from django.db.models import Count, Q, Prefetch
 
 from django_filters.rest_framework import DjangoFilterBackend
 
-from shared.helpers import helper
 
 from rest_framework import viewsets, generics, views
 from rest_framework.decorators import action
@@ -121,30 +120,24 @@ class CompanyViewSet(viewsets.ViewSet, generics.ListAPIView, generics.RetrieveAP
 
     @action(methods=["get"], detail=False, url_path="top", url_name="companies-top")
     def get_top_companies(self, request):
-        try:
-            queryset = Company.objects.annotate(
-                num_follow=Count("companyfollowed"),
-                num_job_post=Count("job_posts"),
-            ).order_by("-num_follow", "-num_job_post")[:10]
+        queryset = Company.objects.annotate(
+            num_follow=Count("companyfollowed"),
+            num_job_post=Count("job_posts"),
+        ).order_by("-num_follow", "-num_job_post")[:10]
 
-            serializer = CompanySerializer(
-                queryset,
-                many=True,
-                fields=[
-                    "id",
-                    "companyName",
-                    "companyImageUrl",
-                    "followNumber",
-                    "jobPostNumber",
-                    "isFollowed",
-                ],
-                context={"request": request},
-            )
-
-        except Exception as ex:
-            helper.print_log_error("get_top_companies", ex)
-
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        serializer = CompanySerializer(
+            queryset,
+            many=True,
+            fields=[
+                "id",
+                "companyName",
+                "companyImageUrl",
+                "followNumber",
+                "jobPostNumber",
+                "isFollowed",
+            ],
+            context={"request": request},
+        )
 
         return var_res.response_data(data=serializer.data)
 

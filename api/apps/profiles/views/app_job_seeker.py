@@ -18,10 +18,13 @@ class JobSeekerProfileViewSet(
     serializer_class = JobSeekerProfileSerializer
     permission_classes = [perms_sys.IsAuthenticated]
 
+    def get_queryset(self):
+        return self.queryset.filter(user=self.request.user)
+
     def get_permissions(self):
         if self.action in ["get_resumes"]:
             return [perms_custom.IsJobSeekerUser()]
-        return self.permission_classes
+        return [perm() for perm in self.permission_classes]
 
     @action(methods=["get"], detail=True, url_path="resumes", url_name="get-resumes")
     def get_resumes(self, request, pk):

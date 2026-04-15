@@ -44,6 +44,7 @@ LIVEKIT_WEBHOOK_TOKEN = config("LIVEKIT_WEBHOOK_TOKEN", default="")
 LIVEKIT_WEBHOOK_STRICT = config("LIVEKIT_WEBHOOK_STRICT", default=True, cast=bool)
 APP_ENVIRONMENT = config("APP_ENVIRONMENT", default="development")
 STRICT_ENV_VALIDATION = config("STRICT_ENV_VALIDATION", default=False, cast=bool)
+API_RESPONSE_ENVELOPE_V2 = config("API_RESPONSE_ENVELOPE_V2", default=True, cast=bool)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config('SECRET_KEY')
@@ -198,6 +199,7 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
         'shared.renderers.MyJSONRenderer',
     ),
+    'EXCEPTION_HANDLER': 'shared.exceptions.api_exception_handler',
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),

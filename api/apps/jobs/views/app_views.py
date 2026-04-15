@@ -19,6 +19,7 @@ def _coerce_bool(value):
 
 from shared import pagination as paginations
 from shared import renderers
+from shared.permissions import PermissionActionMapMixin
 from shared.configs import app_setting, variable_response as var_res, variable_system as var_sys
 
 from shared.configs.messages import ERROR_MESSAGES
@@ -67,6 +68,10 @@ from ..filters import (
 
 )
 
+from ..exceptions import (
+    JobsDomainError,
+)
+
 from ..serializers import (
 
     JobPostSerializer,
@@ -81,7 +86,7 @@ from ..serializers import (
 
 )
 
-class JobPostViewSet(viewsets.ViewSet,
+class JobPostViewSet(PermissionActionMapMixin, viewsets.ViewSet,
 
                      generics.ListAPIView,
 
@@ -111,19 +116,13 @@ class JobPostViewSet(viewsets.ViewSet,
         'salary_min', 'salary_max'
     )
 
-    def get_permissions(self):
-
-        if self.action in ["get_job_posts_saved",
-
-                           "get_job_posts_applied",
-
-                           "save_job",
-
-                           "get_suggested_job_posts"]:
-
-            return [perms_custom.IsJobSeekerUser()]
-
-        return [perms_sys.AllowAny()]
+    permission_action_map = {
+        "get_job_posts_saved": [perms_custom.IsJobSeekerUser],
+        "get_job_posts_applied": [perms_custom.IsJobSeekerUser],
+        "save_job": [perms_custom.IsJobSeekerUser],
+        "get_suggested_job_posts": [perms_custom.IsJobSeekerUser],
+    }
+    default_permission_classes = [perms_sys.AllowAny]
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(
@@ -297,25 +296,14 @@ class JobPostViewSet(viewsets.ViewSet,
 
     @action(methods=["post"], detail=True, url_path="save", url_name="save", permission_classes=[perms_custom.IsJobSeekerUser])
     def save_job(self, request, pk):
+        from ..services import JobActivityService
         try:
-            saved_job_posts = SavedJobPost.objects.filter(user=request.user, job_post=self.get_object())
-
-            is_saved = False
-
-            if saved_job_posts.exists():
-                saved_job_post = saved_job_posts.first()
-                saved_job_post.delete()
-            else:
-                SavedJobPost.objects.create(
-                    user=request.user,
-                    job_post=self.get_object()
-                )
-                is_saved = True
-
-            return var_res.response_data(data={
-                "isSaved": is_saved
-            })
-        except Exception as e:
+            is_saved = JobActivityService.toggle_save_job(
+                user=request.user,
+                job_post=self.get_object()
+            )
+            return var_res.response_data(data={"isSaved": is_saved})
+        except JobsDomainError as e:
             return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors={"errorMessage": [str(e)]})
 
     @action(methods=["get"], detail=False,
@@ -323,16 +311,7 @@ class JobPostViewSet(viewsets.ViewSet,
             url_path="count-job-posts-by-job-type", url_name="count-job-posts-by-job-type")
 
     def count_job_posts_by_job_type(self, request):
-
-        try:
-
-            data = JobPost.objects.values(typeOfWorkplace=F('type_of_workplace')).annotate(total=Count('id')).order_by()
-
-        except Exception as ex:
-
-            helper.print_log_error("count_job_posts_by_job_type", ex)
-
-            return var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        data = JobPost.objects.values(typeOfWorkplace=F('type_of_workplace')).annotate(total=Count('id')).order_by()
 
         return var_res.response_data(data=data)
 
@@ -449,7 +428,7 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
             )
         except IntegrityError:
             raise ValidationError({"errorMessage": ["Bạn đã ứng tuyển vào vị trí này rồi."]})
-        except ValueError as e:
+        except JobsDomainError as e:
             raise ValidationError({"errorMessage": [str(e)]})
 
         response_serializer = self.get_serializer(job_post_activity)
