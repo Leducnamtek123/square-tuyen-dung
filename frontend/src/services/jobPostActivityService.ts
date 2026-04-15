@@ -3,6 +3,13 @@ import { presignInObject } from '../utils/presignUrl';
 
 
 type IdType = string | number;
+export interface ApplyJobPayload {
+  job_post: number;
+  resume: number;
+  fullName: string;
+  email: string;
+  phone: string;
+}
 
 type WithPresignInput = Promise<unknown>;
 
@@ -13,7 +20,7 @@ const withPresign = async (promise: WithPresignInput): Promise<unknown> => {
 
 const jobPostActivityService = {
   // job seeker
-  applyJob: (data: Record<string, unknown>): Promise<unknown> => {
+  applyJob: (data: ApplyJobPayload): Promise<unknown> => {
     const url = 'job/web/job-seeker-job-posts-activity/';
     return httpRequest.post(url, data);
   },

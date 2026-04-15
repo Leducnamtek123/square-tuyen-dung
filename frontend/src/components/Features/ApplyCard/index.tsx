@@ -8,8 +8,6 @@ import FormPopup from '@/components/Common/Controls/FormPopup';
 import ApplyForm from '@/components/Features/ApplyForm';
 import jobPostActivityService from '@/services/jobPostActivityService';
 import type { ApplyFormValues } from '@/components/Features/ApplyForm';
-import type { AxiosError } from 'axios';
-import type { ApiError } from '@/types/api';
 
 interface ApplyCardProps {
   title?: string;
@@ -28,22 +26,24 @@ const ApplyCard = ({
 }: ApplyCardProps) => {
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
-  const handleApplyJob = (data: ApplyFormValues) => {
-    const applyJob = async (applyData: ApplyFormValues & { job_post?: string | number }) => {
-      setIsFullScreenLoading(true);
-      try {
-        await jobPostActivityService.applyJob(applyData as unknown as Record<string, unknown>);
-        toastMessages.success('Applied successfully.');
-        setIsApplySuccess(true);
-        setOpenPopup(false);
-      } catch (error: unknown) {
-        errorHandling(error);
-      } finally {
-        setIsFullScreenLoading(false);
-      }
-    };
+  const handleApplyJob = async (data: ApplyFormValues) => {
+    if (isFullScreenLoading) return;
 
-    applyJob({ ...data, job_post: jobPostId });
+    setIsFullScreenLoading(true);
+    try {
+      await jobPostActivityService.applyJob({
+        ...data,
+        job_post: Number(jobPostId),
+        resume: Number(data.resume),
+      });
+      toastMessages.success('Applied successfully.');
+      setIsApplySuccess(true);
+      setOpenPopup(false);
+    } catch (error: unknown) {
+      errorHandling(error);
+    } finally {
+      setIsFullScreenLoading(false);
+    }
   };
 
   return (
@@ -61,6 +61,7 @@ const ApplyCard = ({
         }
         buttonText="Ứng tuyển"
         buttonIcon={<SendIcon />}
+        isSubmitting={isFullScreenLoading}
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >

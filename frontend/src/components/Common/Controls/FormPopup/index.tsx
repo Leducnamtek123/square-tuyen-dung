@@ -1,13 +1,18 @@
 import React from 'react';
-
 import { useTheme } from '@mui/material/styles';
-
-import { Dialog, DialogActions, DialogContent, DialogTitle, Divider, IconButton, Stack, Typography, useMediaQuery } from "@mui/material";
-
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  IconButton,
+  Stack,
+  Typography,
+  useMediaQuery,
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-
 import SaveIcon from '@mui/icons-material/Save';
-
 import { LoadingButton } from '@mui/lab';
 
 interface Props {
@@ -17,6 +22,7 @@ interface Props {
   showDialogAction?: boolean;
   buttonText?: string;
   buttonIcon?: React.ReactNode;
+  isSubmitting?: boolean;
   children: React.ReactNode;
 }
 
@@ -27,194 +33,103 @@ const Popup = ({
   showDialogAction = true,
   buttonText = 'Lưu',
   buttonIcon = <SaveIcon />,
+  isSubmitting = false,
   children,
 }: Props) => {
-
   const theme = useTheme();
-
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
-
     <div>
-
       <Dialog
-
         fullScreen={fullScreen}
-
         open={openPopup}
-
         onClose={() => setOpenPopup(false)}
-
         aria-labelledby="responsive-dialog-title"
-
         maxWidth="md"
-
         fullWidth
-
         slotProps={{
-
           paper: {
-
             elevation: 0,
-
             sx: {
-
               borderRadius: '16px',
-
               boxShadow: theme.customShadows.card,
-
               border: `1px solid ${theme.palette.grey[100]}`,
-
-              overflow: 'hidden'
-
-            }
-
-          }
-
+              overflow: 'hidden',
+            },
+          },
         }}
-
       >
-
-        <DialogTitle 
-
-          sx={{ 
-
+        <DialogTitle
+          sx={{
             p: 2.5,
-
-            background: theme.palette.grey[50]
-
+            background: theme.palette.grey[50],
           }}
-
         >
-
-          <Stack
-
-            direction="row"
-
-            justifyContent="space-between"
-
-            alignItems="center"
-
-          >
-
-            <Typography 
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Typography
               variant="h5"
               component="div"
               sx={{
-
                 color: theme.palette.grey[900],
-
-                fontWeight: 600
-
+                fontWeight: 600,
               }}
-
             >
-
               {title}
-
             </Typography>
 
             <IconButton
-
               onClick={() => setOpenPopup(false)}
-
               sx={{
-
                 color: theme.palette.grey[500],
-
                 '&:hover': {
-
-                  backgroundColor: theme.palette.grey[100]
-
-                }
-
+                  backgroundColor: theme.palette.grey[100],
+                },
               }}
-
             >
-
               <CloseIcon />
-
             </IconButton>
-
           </Stack>
-
         </DialogTitle>
 
         <Divider />
 
-        <DialogContent sx={{ p: 3 }}>
-
-          {children}
-
-        </DialogContent>
+        <DialogContent sx={{ p: 3 }}>{children}</DialogContent>
 
         {showDialogAction && (
-
-          <DialogActions 
-
-            sx={{ 
-
+          <DialogActions
+            sx={{
               py: 2.5,
-
               px: 3,
-
-              background: theme.palette.grey[50]
-
+              background: theme.palette.grey[50],
             }}
-
           >
-
             <LoadingButton
-
-              loading={false}
-
+              loading={isSubmitting}
               loadingPosition="start"
-
               startIcon={buttonIcon}
-
               variant="contained"
-
               sx={{
-
                 margin: '0 auto',
-
                 minWidth: 120,
-
                 background: theme.palette.primary.main,
-
                 '&:hover': {
-
                   background: theme.palette.primary.main,
-
                   opacity: 0.9,
-
-                  boxShadow: theme.customShadows.medium
-
-                }
-
+                  boxShadow: theme.customShadows.medium,
+                },
               }}
-
               type="submit"
-
               form="modal-form"
-
+              disabled={isSubmitting}
             >
-
               {buttonText}
-
             </LoadingButton>
-
           </DialogActions>
-
         )}
-
       </Dialog>
-
     </div>
-
   );
-
 };
 
 export default React.memo(Popup);

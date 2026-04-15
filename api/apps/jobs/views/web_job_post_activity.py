@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.db import connection
+from django.db import IntegrityError, connection
 from django.db.utils import OperationalError, ProgrammingError
 from django.db.models import Case, CharField, F, When
 from django_filters.rest_framework import DjangoFilterBackend
@@ -128,14 +128,17 @@ class JobSeekerJobPostActivityViewSet(
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
+        from rest_framework.exceptions import ValidationError
         from ..services import JobActivityService
         try:
             job_post_activity = JobActivityService.apply_to_job(
                 user=request.user,
                 validated_data=serializer.validated_data
             )
+        except IntegrityError:
+            # Handles race condition (double-click / concurrent requests) on unique_active_application.
+            raise ValidationError({"errorMessage": ["Bạn đã ứng tuyển vào vị trí này rồi."]})
         except ValueError as e:
-            from rest_framework.exceptions import ValidationError
             raise ValidationError({"errorMessage": [str(e)]})
 
         response_serializer = self.get_serializer(job_post_activity)

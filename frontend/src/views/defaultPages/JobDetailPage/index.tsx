@@ -170,6 +170,12 @@ const JobDetailPage = () => {
   };
 
   const handleShowApplyForm = () => {
+    if (typeof document !== 'undefined') {
+      const activeElement = document.activeElement;
+      if (activeElement instanceof HTMLElement) {
+        activeElement.blur();
+      }
+    }
     setOpenPopup(true);
   };
 

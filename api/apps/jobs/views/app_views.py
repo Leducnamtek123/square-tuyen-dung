@@ -14,6 +14,7 @@ from shared.helpers import helper
 from django.utils import timezone
 
 from django.db.models import F, Count, Prefetch
+from django.db import IntegrityError
 
 from django.db.models.functions import ACos, Cos, Radians, Sin
 
@@ -425,14 +426,16 @@ class JobSeekerJobPostActivityViewSet(viewsets.ViewSet,
 
         serializer.is_valid(raise_exception=True)
 
+        from rest_framework.exceptions import ValidationError
         from ..services import JobActivityService
         try:
             job_post_activity = JobActivityService.apply_to_job(
                 user=request.user,
                 validated_data=serializer.validated_data
             )
+        except IntegrityError:
+            raise ValidationError({"errorMessage": ["Bạn đã ứng tuyển vào vị trí này rồi."]})
         except ValueError as e:
-            from rest_framework.exceptions import ValidationError
             raise ValidationError({"errorMessage": [str(e)]})
 
         response_serializer = self.get_serializer(job_post_activity)

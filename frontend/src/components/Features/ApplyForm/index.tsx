@@ -13,8 +13,6 @@ import errorHandling from "@/utils/errorHandling";
 import { CV_TYPES, REGEX_VALIDATE, ROUTES } from "@/configs/constants";
 import TextFieldCustom from "@/components/Common/Controls/TextFieldCustom";
 import jobSeekerProfileService from "@/services/jobSeekerProfileService";
-import type { AxiosError } from "axios";
-import type { ApiError } from "@/types/api";
 import { formatRoute } from "@/utils/funcUtils";
 import { useAppSelector } from "@/hooks/useAppStore";
 import type { Resume } from "@/types/models";
@@ -54,10 +52,12 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
       .required(t("applyForm.validation.phoneRequired", { defaultValue: "Số điện thoại là bắt buộc." }))
       .matches(REGEX_VALIDATE.phoneRegExp, t("applyForm.validation.phoneInvalid", { defaultValue: "Số điện thoại không hợp lệ." }))
       .max(15, t("applyForm.validation.phoneMax", { defaultValue: "Số điện thoại vượt quá độ dài cho phép." })),
-    resume: yup.string().required(),
+    resume: yup
+      .string()
+      .required(t("applyForm.validation.resumeRequired", { defaultValue: "Vui lòng chọn hồ sơ ứng tuyển." })),
   });
 
-  const { control, setValue, handleSubmit } = useForm<ApplyFormValues>({
+  const { control, setValue, handleSubmit, watch, getValues } = useForm<ApplyFormValues>({
     defaultValues: {
       fullName: currentUser?.fullName || "",
       email: currentUser?.email || "",
@@ -83,6 +83,21 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
 
     getOnlineProfile((currentUser as { jobSeekerProfileId?: number | string })?.jobSeekerProfileId);
   }, [currentUser]);
+
+  const selectedResumeId = watch("resume");
+
+  React.useEffect(() => {
+    if (resumes.length === 0) return;
+
+    const currentResume = getValues("resume");
+    if (currentResume) return;
+
+    const defaultResume =
+      resumes.find((value) => value.type === CV_TYPES.cvWebsite) || resumes[0];
+    if (defaultResume?.id) {
+      setValue("resume", String(defaultResume.id), { shouldValidate: true });
+    }
+  }, [resumes, getValues, setValue]);
 
   return (
     <>
@@ -122,20 +137,9 @@ const ApplyForm = ({ handleApplyJob }: ApplyFormProps) => {
               ) : (
                 <RadioGroup
                   aria-labelledby="resume"
-                  defaultValue={() => {
-                    const defaultResumes = resumes.filter((value) => value.type === CV_TYPES.cvWebsite);
-                    if (defaultResumes.length > 0) {
-                      setValue("resume", `${defaultResumes[0].id}`);
-                      return defaultResumes[0].id;
-                    }
-                    if (resumes.length > 0) {
-                      setValue("resume", `${resumes[0].id}`);
-                      return resumes[0].id;
-                    }
-                    return "";
-                  }}
+                  value={selectedResumeId || ""}
                   name="resume"
-                  onChange={(event) => setValue("resume", event.target.value)}
+                  onChange={(event) => setValue("resume", event.target.value, { shouldValidate: true })}
                 >
                   <Stack spacing={1.5}>
                     {resumes.map((value) => (
