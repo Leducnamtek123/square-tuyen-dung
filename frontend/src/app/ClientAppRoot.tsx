@@ -65,13 +65,15 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
 
   React.useEffect(() => {
     if (!hasMounted || isJobSeekerInterviewRoute) return;
+    if (currentUser?.id) return;
+    if (isAdminPortal || pathname.startsWith('/employer') || pathname.startsWith('/nha-tuyen-dung')) return;
     const hasAccessToken = !!tokenService.getAccessTokenFromCookie();
     if (!hasAccessToken) return;
 
     dispatch(getUserInfo()).unwrap().catch(() => {
       // Ignore stale/invalid token errors at bootstrap.
     });
-  }, [dispatch, hasMounted, isJobSeekerInterviewRoute]);
+  }, [currentUser?.id, dispatch, hasMounted, isAdminPortal, isJobSeekerInterviewRoute, pathname]);
 
   React.useEffect(() => {
     let lastErrorToast = 0;

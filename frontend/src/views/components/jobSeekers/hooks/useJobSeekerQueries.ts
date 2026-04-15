@@ -42,7 +42,7 @@ export type UseJobPostNotificationsResult = UseQueryResult<PaginatedResponse<Job
 
 // ─── Saved Jobs ─────────────────────────────────────────────
 export const useSavedJobs = (params: GetJobPostsParams = {}): UseSavedJobsResult => {
-    const { currentUser } = useAppSelector((state) => state.user);
+    const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
     const hasToken = !!tokenService.getAccessTokenFromCookie();
     return useQuery<PaginatedResponse<JobPost>, Error>({
         queryKey: ['savedJobs', params],
@@ -50,7 +50,7 @@ export const useSavedJobs = (params: GetJobPostsParams = {}): UseSavedJobsResult
             const response = await jobService.getJobPostsSaved(params);
             return response;
         },
-        enabled: !!currentUser?.id && hasToken,
+        enabled: !!isAuthenticated && !!currentUser?.id && hasToken,
         retry: shouldRetryQuery,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
@@ -127,13 +127,15 @@ export const useJobSeekerActivityStatistics = (): UseJobSeekerActivityStatsResul
 
 // ─── Job Application (Resumes) ──────────────────────────────
 export const useResumes = (jobSeekerProfileId: string | undefined, params: Record<string, unknown> = {}): UseResumesResult => {
+    const { isAuthenticated } = useAppSelector((state) => state.user);
+    const hasToken = !!tokenService.getAccessTokenFromCookie();
     return useQuery<Resume[], Error>({
         queryKey: ['resumes', jobSeekerProfileId, params],
         queryFn: async () => {
             const response = await jobSeekerProfileService.getResumes(jobSeekerProfileId!, params) as PaginatedResponse<Resume>;
             return response?.results || [];
         },
-        enabled: !!jobSeekerProfileId,
+        enabled: !!isAuthenticated && !!jobSeekerProfileId && hasToken,
         retry: shouldRetryQuery,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,

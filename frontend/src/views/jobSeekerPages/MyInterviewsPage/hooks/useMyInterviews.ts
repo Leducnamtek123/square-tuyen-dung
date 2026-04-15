@@ -11,7 +11,7 @@ export interface InterviewParams extends GetSessionsParams {
 }
 
 export const useMyInterviews = (params: InterviewParams) => {
-    const { currentUser } = useAppSelector((state) => state.user);
+    const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
     const userId = currentUser?.id;
     const hasToken = !!tokenService.getAccessTokenFromCookie();
     const queryParams = { ...params };
@@ -19,7 +19,7 @@ export const useMyInterviews = (params: InterviewParams) => {
     const query = useQuery({
         queryKey: ['my-interviews', queryParams],
         queryFn: () => interviewService.getSessions(queryParams),
-        enabled: !!userId && hasToken,
+        enabled: !!isAuthenticated && !!userId && hasToken,
         refetchOnWindowFocus: false,
         refetchOnReconnect: false,
         retry: (failureCount, error: unknown) => {
