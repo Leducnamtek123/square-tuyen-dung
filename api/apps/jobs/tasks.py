@@ -232,7 +232,7 @@ def analyze_resume_ai(self, activity_id):
         activity.ai_analysis_progress = 70
         activity.save(update_fields=['ai_analysis_progress', 'update_at'])
 
-        with httpx.Client(timeout=httpx.Timeout(timeout=120.0, connect=10.0)) as client:
+        with httpx.Client(timeout=httpx.Timeout(timeout=600.0, connect=10.0)) as client:
             resp = client.post(f"{llama_url}/chat/completions", json=payload)
             if resp.status_code == 200:
                 content = resp.json()['choices'][0]['message']['content']
