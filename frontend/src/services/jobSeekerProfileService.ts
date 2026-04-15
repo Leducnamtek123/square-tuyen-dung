@@ -27,8 +27,28 @@ const jobSeekerProfileService = {
       return { count: 0, results: [] };
     }
     const url = `info/web/job-seeker-profiles/${jobSeekerProfileId}/resumes/`;
-    const data = await httpRequest.get<unknown, PaginatedResponse<Resume>>(url, { params: params });
-    return presignInObject(data);
+    const raw = await httpRequest.get<unknown, unknown>(url, { params: params });
+    const data = (await presignInObject(raw)) as unknown;
+
+    if (Array.isArray(data)) {
+      return {
+        count: data.length,
+        results: data as Resume[],
+      };
+    }
+
+    const obj = (data ?? {}) as Record<string, unknown>;
+    const results = Array.isArray(obj.results)
+      ? (obj.results as Resume[])
+      : Array.isArray(obj.data)
+        ? (obj.data as Resume[])
+        : [];
+    const count = typeof obj.count === 'number' ? obj.count : results.length;
+
+    return {
+      count,
+      results,
+    };
   },
 };
 
