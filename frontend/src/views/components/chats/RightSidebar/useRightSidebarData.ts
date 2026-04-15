@@ -35,9 +35,9 @@ export const useRightSidebarData = <T,>(fetchData: (params: { page: number; page
       setIsLoading(true);
       try {
         const resData = await fetchData({ page, pageSize });
-        const data = resData;
-        setCount(data.count);
-        setDataList(data.results);
+        const data = resData || { count: 0, results: [] };
+        setCount(typeof data.count === 'number' ? data.count : 0);
+        setDataList(Array.isArray(data.results) ? data.results : []);
       } catch (error) {
         // Error handled silently
       } finally {

@@ -9,7 +9,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteForever from '@mui/icons-material/DeleteForever';
 import downloadPdf, { formatRoute } from '@/utils/funcUtils';
-import { ROUTES } from '@/configs/constants';
+import { IMAGES, ROUTES } from '@/configs/constants';
 import defaultTheme from '@/themeConfigs/defaultTheme';
 
 interface ProfileUploadCardProps {
@@ -37,6 +37,12 @@ const ProfileUploadCard = ({
 }: ProfileUploadCardProps) => {
 
   const nav = useRouter();
+  const [hasImageError, setHasImageError] = React.useState(false);
+  const cardImageSrc = !hasImageError && resumeImage ? resumeImage : IMAGES.coverImageDefault;
+
+  React.useEffect(() => {
+    setHasImageError(false);
+  }, [resumeImage]);
 
   return (
 
@@ -66,8 +72,8 @@ const ProfileUploadCard = ({
     >
 
       <img
-
-        src={resumeImage}
+        src={cardImageSrc}
+        onError={() => setHasImageError(true)}
 
         style={{
 

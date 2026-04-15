@@ -162,8 +162,8 @@ class ResumeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     def get_cv_image_url(self, resume):
         cv_file = resume.file
-        if cv_file:
-            return cv_file.get_full_url().replace(f".{cv_file.format}", ".jpg")
+        if cv_file and cv_file.resource_type == "image":
+            return cv_file.get_full_url()
         return None
 
     def get_cv_file_url(self, resume):

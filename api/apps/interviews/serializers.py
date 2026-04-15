@@ -91,6 +91,8 @@ class InterviewEvaluationSerializer(serializers.ModelSerializer):
 
 class InterviewSessionListSerializer(serializers.ModelSerializer):
     """Serializer for list endpoint."""
+    candidate = serializers.SerializerMethodField()
+    job_post = serializers.SerializerMethodField()
     candidate_name = serializers.SerializerMethodField()
     candidate_email = serializers.SerializerMethodField()
     job_name = serializers.SerializerMethodField()
@@ -114,9 +116,21 @@ class InterviewSessionListSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
+    def get_candidate(self, obj):
+        try:
+            return obj.candidate_id
+        except Exception:
+            return None
+
     def get_candidate_email(self, obj):
         try:
             return obj.candidate.email if obj.candidate else None
+        except Exception:
+            return None
+
+    def get_job_post(self, obj):
+        try:
+            return obj.job_post_id
         except Exception:
             return None
 
@@ -150,6 +164,10 @@ class InterviewSessionListSerializer(serializers.ModelSerializer):
 
 class InterviewSessionDetailSerializer(serializers.ModelSerializer):
     """Serializer for detail endpoint."""
+    candidate = serializers.SerializerMethodField()
+    job_post = serializers.SerializerMethodField()
+    created_by = serializers.SerializerMethodField()
+    question_group = serializers.SerializerMethodField()
     candidate_name = serializers.SerializerMethodField()
     candidate_email = serializers.SerializerMethodField()
     job_name = serializers.SerializerMethodField()
@@ -183,9 +201,33 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
         except Exception:
             return None
 
+    def get_candidate(self, obj):
+        try:
+            return obj.candidate_id
+        except Exception:
+            return None
+
     def get_candidate_email(self, obj):
         try:
             return obj.candidate.email if obj.candidate else None
+        except Exception:
+            return None
+
+    def get_job_post(self, obj):
+        try:
+            return obj.job_post_id
+        except Exception:
+            return None
+
+    def get_created_by(self, obj):
+        try:
+            return obj.created_by_id
+        except Exception:
+            return None
+
+    def get_question_group(self, obj):
+        try:
+            return obj.question_group_id
         except Exception:
             return None
 

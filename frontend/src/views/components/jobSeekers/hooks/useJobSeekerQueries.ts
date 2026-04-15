@@ -22,6 +22,13 @@ import type { AxiosError } from 'axios';
 import type { JobSeekerActivityStats } from '../../../../services/statisticService';
 import type { JobPostNotification } from '../../../../services/jobPostNotificationService';
 import type { ResumeViewed } from '../../../../services/resumeViewedService';
+import { useAppSelector } from '@/redux/hooks';
+
+const shouldRetryQuery = (failureCount: number, error: Error): boolean => {
+    const status = (error as AxiosError | undefined)?.response?.status;
+    if (status === 401 || status === 403) return false;
+    return failureCount < 1;
+};
 
 export type UseSavedJobsResult = UseQueryResult<PaginatedResponse<JobPost>>;
 export type UseCompaniesFollowedResult = UseQueryResult<PaginatedResponse<{ id: number, company: Company }>>;
@@ -34,12 +41,15 @@ export type UseJobPostNotificationsResult = UseQueryResult<PaginatedResponse<Job
 
 // ─── Saved Jobs ─────────────────────────────────────────────
 export const useSavedJobs = (params: GetJobPostsParams = {}): UseSavedJobsResult => {
-    return useQuery({
+    const { currentUser } = useAppSelector((state) => state.user);
+    return useQuery<PaginatedResponse<JobPost>, Error>({
         queryKey: ['savedJobs', params],
         queryFn: async () => {
             const response = await jobService.getJobPostsSaved(params);
             return response;
         },
+        enabled: !!currentUser?.id,
+        retry: shouldRetryQuery,
         placeholderData: keepPreviousData,
     });
 };
@@ -113,13 +123,14 @@ export const useJobSeekerActivityStatistics = (): UseJobSeekerActivityStatsResul
 
 // ─── Job Application (Resumes) ──────────────────────────────
 export const useResumes = (jobSeekerProfileId: string | undefined, params: Record<string, unknown> = {}): UseResumesResult => {
-    return useQuery({
+    return useQuery<Resume[], Error>({
         queryKey: ['resumes', jobSeekerProfileId, params],
         queryFn: async () => {
             const response = await jobSeekerProfileService.getResumes(jobSeekerProfileId!, params) as PaginatedResponse<Resume>;
-            return response.results || [];
+            return response?.results || [];
         },
         enabled: !!jobSeekerProfileId,
+        retry: shouldRetryQuery,
     });
 };
 
