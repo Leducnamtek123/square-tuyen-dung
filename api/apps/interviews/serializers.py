@@ -90,10 +90,10 @@ class InterviewEvaluationSerializer(serializers.ModelSerializer):
         return attrs
 
 class InterviewSessionListSerializer(serializers.ModelSerializer):
-    """Serializer cho danh sách (nhẹ, không nested)."""
-    candidate_name = serializers.CharField(source='candidate.full_name', read_only=True)
-    candidate_email = serializers.CharField(source='candidate.email', read_only=True)
-    job_name = serializers.CharField(source='job_post.job_name', read_only=True, default=None)
+    """Serializer for list endpoint."""
+    candidate_name = serializers.SerializerMethodField()
+    candidate_email = serializers.SerializerMethodField()
+    job_name = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
     evaluations_count = serializers.SerializerMethodField()
 
@@ -108,21 +108,51 @@ class InterviewSessionListSerializer(serializers.ModelSerializer):
             'create_at', 'update_at'
         ]
 
+    def get_candidate_name(self, obj):
+        try:
+            return obj.candidate.full_name if obj.candidate else None
+        except Exception:
+            return None
+
+    def get_candidate_email(self, obj):
+        try:
+            return obj.candidate.email if obj.candidate else None
+        except Exception:
+            return None
+
+    def get_job_name(self, obj):
+        try:
+            return obj.job_post.job_name if obj.job_post else None
+        except Exception:
+            return None
+
     def get_company_name(self, obj):
-        if obj.job_post and obj.job_post.company:
-            return obj.job_post.company.company_name
-        if obj.question_group and obj.question_group.company:
-            return obj.question_group.company.company_name
+        try:
+            if obj.job_post and obj.job_post.company:
+                return obj.job_post.company.company_name
+        except Exception:
+            pass
+
+        try:
+            if obj.question_group and obj.question_group.company:
+                return obj.question_group.company.company_name
+        except Exception:
+            pass
+
         return None
 
     def get_evaluations_count(self, obj):
-        return obj.evaluations.count()
+        try:
+            return obj.evaluations.count()
+        except Exception:
+            return 0
+
 
 class InterviewSessionDetailSerializer(serializers.ModelSerializer):
-    """Serializer chi tiết (có nested transcripts, evaluations, questions)."""
-    candidate_name = serializers.CharField(source='candidate.full_name', read_only=True)
-    candidate_email = serializers.CharField(source='candidate.email', read_only=True)
-    job_name = serializers.CharField(source='job_post.job_name', read_only=True, default=None)
+    """Serializer for detail endpoint."""
+    candidate_name = serializers.SerializerMethodField()
+    candidate_email = serializers.SerializerMethodField()
+    job_name = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
     questions = QuestionSerializer(many=True, read_only=True)
     transcripts = InterviewTranscriptSerializer(many=True, read_only=True)
@@ -147,12 +177,39 @@ class InterviewSessionDetailSerializer(serializers.ModelSerializer):
             'created_by', 'create_at', 'update_at'
         ]
 
+    def get_candidate_name(self, obj):
+        try:
+            return obj.candidate.full_name if obj.candidate else None
+        except Exception:
+            return None
+
+    def get_candidate_email(self, obj):
+        try:
+            return obj.candidate.email if obj.candidate else None
+        except Exception:
+            return None
+
+    def get_job_name(self, obj):
+        try:
+            return obj.job_post.job_name if obj.job_post else None
+        except Exception:
+            return None
+
     def get_company_name(self, obj):
-        if obj.job_post and obj.job_post.company:
-            return obj.job_post.company.company_name
-        if obj.question_group and obj.question_group.company:
-            return obj.question_group.company.company_name
+        try:
+            if obj.job_post and obj.job_post.company:
+                return obj.job_post.company.company_name
+        except Exception:
+            pass
+
+        try:
+            if obj.question_group and obj.question_group.company:
+                return obj.question_group.company.company_name
+        except Exception:
+            pass
+
         return None
+
 
 class InterviewSessionCreateSerializer(serializers.ModelSerializer):
     """Serializer tạo mới interview."""
@@ -199,3 +256,4 @@ class UpdateStatusSerializer(serializers.Serializer):
     status = serializers.ChoiceField(
         choices=['scheduled', 'calibration', 'in_progress', 'completed', 'cancelled', 'interrupted']
     )
+
