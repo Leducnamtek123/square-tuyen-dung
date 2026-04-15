@@ -172,12 +172,16 @@ class JobActivityService:
         if settings.AI_RESUME_AUTO_ANALYZE:
             try:
                 from apps.jobs.tasks import analyze_resume_ai
+                analyze_resume_ai.delay(activity.id)
                 activity.ai_analysis_status = 'processing'
                 activity.ai_analysis_progress = 5
-                activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress'])
-                analyze_resume_ai.delay(activity.id)
+                activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'update_at'])
             except Exception as ex:
                 helper.print_log_error("auto analyze resume", ex)
+                activity.ai_analysis_status = 'failed'
+                activity.ai_analysis_progress = 0
+                activity.ai_analysis_summary = "Không thể khởi tạo tác vụ phân tích AI. Vui lòng thử lại."
+                activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
         
         # Auto-schedule AI Screening if Job Post has Interview Template
         if job_post.interview_template_id:
@@ -308,11 +312,18 @@ class JobActivityService:
     @staticmethod
     def trigger_ai_analysis(activity: JobPostActivity) -> None:
         from apps.jobs.tasks import analyze_resume_ai
-        
-        activity.ai_analysis_status = 'processing'
-        activity.ai_analysis_progress = 5
-        activity.save()
-        analyze_resume_ai.delay(activity.id)
+
+        try:
+            analyze_resume_ai.delay(activity.id)
+            activity.ai_analysis_status = 'processing'
+            activity.ai_analysis_progress = 5
+            activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'update_at'])
+        except Exception:
+            activity.ai_analysis_status = 'failed'
+            activity.ai_analysis_progress = 0
+            activity.ai_analysis_summary = "Không thể gửi tác vụ phân tích AI vào hàng đợi."
+            activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
+            raise
 
     @staticmethod
     def get_employer_job_stats(company: Any) -> Dict[str, int]:

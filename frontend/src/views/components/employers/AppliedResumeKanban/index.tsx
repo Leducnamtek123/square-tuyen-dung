@@ -156,6 +156,10 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                 {columns[safeStatusId]?.map((item, index) => (
                                                     <Draggable key={item.id} draggableId={String(item.id)} index={index}>
                                                         {(provided: DraggableProvided, snapshot: DraggableStateSnapshot) => (
+                                                            (() => {
+                                                                const resumeType = item.type || item.resume?.type;
+                                                                const isOnlineResume = resumeType === CV_TYPES.cvWebsite;
+                                                                return (
                                                             <Card
                                                                 ref={provided.innerRef}
                                                                 {...provided.draggableProps}
@@ -178,9 +182,9 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                             {item.fullName}
                                                                         </Typography>
                                                                         <Chip 
-                                                                            label={item.resume?.type === CV_TYPES.cvWebsite ? 'Online' : 'File'} 
+                                                                            label={isOnlineResume ? 'Online' : 'File'} 
                                                                             size="small" 
-                                                                            sx={{ height: 20, fontSize: '10px', fontWeight: 800, bgcolor: item.resume?.type === CV_TYPES.cvWebsite ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.error.main, 0.1), color: item.resume?.type === CV_TYPES.cvWebsite ? 'primary.main' : 'error.main' }}
+                                                                            sx={{ height: 20, fontSize: '10px', fontWeight: 800, bgcolor: isOnlineResume ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.error.main, 0.1), color: isOnlineResume ? 'primary.main' : 'error.main' }}
                                                                         />
                                                                     </Stack>
                                                                     
@@ -225,6 +229,8 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                     </Stack>
                                                                 </Stack>
                                                             </Card>
+                                                                );
+                                                            })()
                                                         )}
                                                     </Draggable>
                                                 ))}

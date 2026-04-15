@@ -139,6 +139,8 @@ export interface JobPostActivity {
   fullName?: string;
   email?: string;
   phone?: string;
+  title?: string;
+  type?: string;
   status: number;
   isSentEmail?: boolean;
   isDeleted?: boolean;

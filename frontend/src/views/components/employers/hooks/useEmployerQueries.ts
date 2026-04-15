@@ -190,6 +190,12 @@ export const useAppliedResumes = (params: Record<string, unknown>, enabled: bool
     },
     enabled,
     placeholderData: keepPreviousData,
+    refetchInterval: (query) => {
+      const data = query.state.data as PaginatedResponse<JobPostActivity> | undefined;
+      const hasProcessing = Array.isArray(data?.results)
+        && data.results.some((item) => item.aiAnalysisStatus === 'processing');
+      return hasProcessing ? 5000 : false;
+    },
   });
 };
 

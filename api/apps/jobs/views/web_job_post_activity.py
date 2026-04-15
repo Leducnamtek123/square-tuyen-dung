@@ -1,7 +1,9 @@
 from django.conf import settings
+from datetime import timedelta
 from django.db import IntegrityError, connection
 from django.db.utils import OperationalError, ProgrammingError
 from django.db.models import Case, CharField, F, When
+from django.utils import timezone
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status, viewsets
 from rest_framework.decorators import action
@@ -34,6 +36,7 @@ from ..serializers import (
 )
 
 logger = logging.getLogger(__name__)
+AI_PROCESSING_TIMEOUT_MINUTES = 20
 
 
 @lru_cache(maxsize=1)
@@ -179,6 +182,18 @@ class EmployerJobPostActivityViewSet(
             queryset = queryset.filter(job_post__company=company)
         else:
             queryset = queryset.none()
+
+        # Self-heal stale AI jobs that were left in "processing" due to worker/broker issues.
+        stale_before = timezone.now() - timedelta(minutes=AI_PROCESSING_TIMEOUT_MINUTES)
+        queryset.filter(
+            ai_analysis_status='processing',
+            update_at__lt=stale_before,
+        ).update(
+            ai_analysis_status='failed',
+            ai_analysis_progress=0,
+            ai_analysis_summary="Phân tích AI quá thời gian xử lý. Vui lòng thử lại.",
+        )
+
         if not has_ai_analysis_progress_column():
             return queryset.defer('ai_analysis_progress')
         return queryset
@@ -386,7 +401,14 @@ class EmployerJobPostActivityViewSet(
             return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
 
         from ..services import JobActivityService
-        JobActivityService.trigger_ai_analysis(job_post_activity)
+        try:
+            JobActivityService.trigger_ai_analysis(job_post_activity)
+        except Exception:
+            logger.exception("Failed to queue AI analysis for activity id=%s", job_post_activity.id)
+            return var_res.response_data(
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+                errors={"errorMessage": ["Không thể khởi tạo phân tích AI lúc này. Vui lòng thử lại sau."]},
+            )
 
         return var_res.response_data(data={"detail": "AI analysis task has been queued."}, status=status.HTTP_202_ACCEPTED)
 

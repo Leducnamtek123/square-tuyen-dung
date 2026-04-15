@@ -73,11 +73,16 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       enableSorting: true,
       cell: (info) => (
         <Box sx={{ py: 0.5 }}>
+          {(() => {
+            const resumeType = info.row.original.type || info.row.original.resume?.type;
+            const resumeTitle = info.row.original.title || info.row.original.resume?.title;
+            return (
+              <>
           <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'text.primary', mb: 0.75 }}>
             {String(info.getValue() ?? '')}
           </Typography>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {info.row.original.resume?.type === CV_TYPES.cvWebsite ? (
+            {resumeType === CV_TYPES.cvWebsite ? (
               <Tooltip title={t('appliedResume.table.onlineResume')} arrow>
                 <Box sx={{ 
                   display: 'flex', 
@@ -103,9 +108,12 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
               </Tooltip>
             )}
             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.2px' }}>
-              {info.row.original.resume?.title || t('appliedResume.table.notUpdated')}
+              {resumeTitle || t('appliedResume.table.notUpdated')}
             </Typography>
           </Box>
+              </>
+            );
+          })()}
         </Box>
       ),
     },
@@ -133,7 +141,8 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       id: 'type',
       header: t('appliedResume.table.profileType'),
       cell: (info) => {
-        const isOnline = info.row.original.resume?.type === CV_TYPES.cvWebsite;
+        const resumeType = info.row.original.type || info.row.original.resume?.type;
+        const isOnline = resumeType === CV_TYPES.cvWebsite;
         return (
           <Chip 
               label={isOnline ? t('appliedResume.table.onlineResume') : t('appliedResume.table.attachedResume')} 
