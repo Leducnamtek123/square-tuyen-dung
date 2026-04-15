@@ -128,13 +128,13 @@ class JobSeekerProfileViewSet(viewsets.ViewSet,
 
         resume_type = query_params.get("resumeType", None)
 
-        job_seeker_profile = self.get_object()
+        job_seeker_profile = JobSeekerProfile.objects.filter(pk=pk, user=request.user).first()
 
         if not job_seeker_profile:
-
-            raise Exception(
-
-                ERROR_MESSAGES["USER_DOESNT_HAVE_JOB_SEEKER_PROFILE"])
+            return var_res.response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                errors={"errorMessage": [ERROR_MESSAGES["USER_DOESNT_HAVE_JOB_SEEKER_PROFILE"]]},
+            )
 
         resumes = job_seeker_profile.resumes
 
@@ -213,7 +213,9 @@ class PrivateResumeViewSet(viewsets.ViewSet,
 
                            "update", "partial_update",
 
-                           "resume_active",
+                           "active_resume",
+                           "get_cv",
+                           "update_cv_file",
 
                            "destroy",
 

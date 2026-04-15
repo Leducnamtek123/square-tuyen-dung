@@ -12,6 +12,20 @@ from ..models import JobPostNotification
 from ..serializers import JobPostNotificationSerializer
 
 
+def _coerce_bool(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1", "yes", "on"}:
+            return True
+        if normalized in {"false", "0", "no", "off", ""}:
+            return False
+    raise ValueError("isActive must be a boolean value.")
+
+
 class JobPostNotificationViewSet(
     viewsets.ViewSet,
     generics.CreateAPIView,
@@ -74,7 +88,13 @@ class JobPostNotificationViewSet(
         if desired is None:
             desired = not job_post_notification.is_active
         else:
-            desired = bool(desired)
+            try:
+                desired = _coerce_bool(desired)
+            except ValueError as ex:
+                return var_res.response_data(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    errors={"errorMessage": [str(ex)]},
+                )
 
         if desired and not job_post_notification.is_active:
             active_count = JobPostNotification.objects.filter(user=user, is_active=True).exclude(

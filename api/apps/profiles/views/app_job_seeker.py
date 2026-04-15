@@ -29,10 +29,13 @@ class JobSeekerProfileViewSet(
 
         resume_type = query_params.get("resumeType", None)
 
-        job_seeker_profile = self.get_object()
+        job_seeker_profile = JobSeekerProfile.objects.filter(pk=pk, user=request.user).first()
 
         if not job_seeker_profile:
-            raise Exception("User doesn't have job_seeker_profile.")
+            return var_res.response_data(
+                status=status.HTTP_404_NOT_FOUND,
+                errors={"errorMessage": ["Không tìm thấy hồ sơ ứng viên của bạn."]},
+            )
 
         resumes = job_seeker_profile.resumes.select_related(
             "user", "job_seeker_profile", "file"

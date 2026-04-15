@@ -3,6 +3,20 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
+def _coerce_bool(value):
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    if isinstance(value, str):
+        normalized = value.strip().lower()
+        if normalized in {"true", "1", "yes", "on"}:
+            return True
+        if normalized in {"false", "0", "no", "off", ""}:
+            return False
+    raise ValueError("isActive must be a boolean value.")
+
 from shared import pagination as paginations
 from shared import renderers
 from shared.configs import app_setting, variable_response as var_res, variable_system as var_sys
@@ -103,7 +117,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
                            "get_job_posts_applied",
 
-                           "job_saved",
+                           "save_job",
 
                            "get_suggested_job_posts"]:
 
@@ -281,7 +295,7 @@ class JobPostViewSet(viewsets.ViewSet,
 
         return var_res.response_data(data=serializer.data)
 
-    @action(methods=["post"], detail=True, url_path="save", url_name="save", permission_classes=[perms_sys.IsAuthenticated])
+    @action(methods=["post"], detail=True, url_path="save", url_name="save", permission_classes=[perms_custom.IsJobSeekerUser])
     def save_job(self, request, pk):
         try:
             saved_job_posts = SavedJobPost.objects.filter(user=request.user, job_post=self.get_object())
@@ -539,7 +553,13 @@ class JobPostNotificationViewSet(viewsets.ViewSet,
         if desired is None:
             desired = not job_post_notification.is_active
         else:
-            desired = bool(desired)
+            try:
+                desired = _coerce_bool(desired)
+            except ValueError as ex:
+                return var_res.response_data(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    errors={"errorMessage": [str(ex)]},
+                )
 
         if desired and not job_post_notification.is_active:
             active_count = JobPostNotification.objects.filter(user=user, is_active=True).exclude(
