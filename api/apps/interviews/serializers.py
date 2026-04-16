@@ -37,6 +37,10 @@ class QuestionSerializer(serializers.ModelSerializer):
 class QuestionGroupSerializer(serializers.ModelSerializer):
     questions = serializers.SerializerMethodField()
     questions_count = serializers.SerializerMethodField()
+    evaluation_rubric = serializers.SerializerMethodField()
+    evaluation_rubric_input = serializers.JSONField(
+        write_only=True, required=False, allow_null=True
+    )
     question_ids = serializers.PrimaryKeyRelatedField(
         queryset=Question.objects.all(),
         many=True, write_only=True, required=False, source='questions'
@@ -46,9 +50,12 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
         model = QuestionGroup
         fields = [
             'id', 'name', 'description', 'evaluation_rubric', 'questions', 'questions_count',
-            'question_ids', 'author', 'company', 'create_at', 'update_at'
+            'evaluation_rubric_input', 'question_ids', 'author', 'company', 'create_at', 'update_at'
         ]
         read_only_fields = ['id', 'author', 'company', 'create_at', 'update_at']
+
+    def get_evaluation_rubric(self, obj):
+        return getattr(obj, "evaluation_rubric", None)
 
     def get_questions_count(self, obj):
         return obj.questions.count()
@@ -61,6 +68,28 @@ class QuestionGroupSerializer(serializers.ModelSerializer):
             except Exception:
                 continue
         return items
+
+    def to_internal_value(self, data):
+        payload = data.copy() if hasattr(data, "copy") else dict(data)
+        if "evaluation_rubric" in payload and "evaluation_rubric_input" not in payload:
+            payload["evaluation_rubric_input"] = payload.get("evaluation_rubric")
+        return super().to_internal_value(payload)
+
+    def create(self, validated_data):
+        rubric = validated_data.pop("evaluation_rubric_input", serializers.empty)
+        instance = super().create(validated_data)
+        if rubric is not serializers.empty and hasattr(instance, "evaluation_rubric"):
+            instance.evaluation_rubric = rubric
+            instance.save(update_fields=["evaluation_rubric", "update_at"])
+        return instance
+
+    def update(self, instance, validated_data):
+        rubric = validated_data.pop("evaluation_rubric_input", serializers.empty)
+        instance = super().update(instance, validated_data)
+        if rubric is not serializers.empty and hasattr(instance, "evaluation_rubric"):
+            instance.evaluation_rubric = rubric
+            instance.save(update_fields=["evaluation_rubric", "update_at"])
+        return instance
 
 class InterviewTranscriptSerializer(serializers.ModelSerializer):
     class Meta:

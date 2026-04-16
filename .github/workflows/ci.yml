@@ -40,6 +40,9 @@ jobs:
       - name: Check missing migrations
         run: python manage.py makemigrations --check --dry-run
 
+      - name: Backend guard
+        run: python scripts/backend_guard.py --skip-env-warning
+
   frontend-lint:
     runs-on: ubuntu-latest
     defaults:

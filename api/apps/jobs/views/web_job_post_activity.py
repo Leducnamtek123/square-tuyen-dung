@@ -143,7 +143,7 @@ class JobSeekerJobPostActivityViewSet(
                 validated_data=serializer.validated_data
             )
         except IntegrityError:
-            # Handles race condition (double-click / concurrent requests) on unique_active_application.
+            # Handles race condition (double-click / concurrent requests) on DB unique constraint.
             raise ValidationError({"errorMessage": ["Bạn đã ứng tuyển vào vị trí này rồi."]})
         except JobsDomainError as e:
             raise ValidationError({"errorMessage": [str(e)]})

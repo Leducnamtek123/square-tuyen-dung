@@ -199,9 +199,8 @@ class JobPostActivity(CommonBaseModel):
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=['user', 'job_post'],
-                condition=models.Q(is_deleted=False),
-                name='unique_active_application',
+                fields=['user', 'job_post', 'is_deleted'],
+                name='uq_jobpostactivity_user_jobpost_deleted_state',
             ),
         ]
 

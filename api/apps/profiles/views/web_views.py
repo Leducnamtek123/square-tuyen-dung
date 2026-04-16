@@ -748,76 +748,86 @@ class ResumeSavedViewSet(viewsets.ViewSet,
         ('createAt', 'create_at'),
     )
 
+    @staticmethod
+    def _empty_result():
+        return {"count": 0, "results": []}
+
     def list(self, request, *args, **kwargs):
 
         # danh sach ho so da luu cua nha tuyen dung
+        try:
+            user = request.user
 
-        user = request.user
+            company = user.get_active_company()
 
-        company = user.get_active_company()
+            if not company:
 
-        if not company:
+                return var_res.response_data(data=self._empty_result())
 
-            return var_res.response_data(data=[])
+            queryset = self.filter_queryset(self.get_queryset()
 
-        queryset = self.filter_queryset(self.get_queryset()
+                                            .filter(company=company, resume__is_active=True)
 
-                                        .filter(company=company, resume__is_active=True)
+                                            .select_related(
+                                                'resume', 'resume__user', 'resume__user__avatar',
+                                                'resume__city', 'resume__career', 'company'
+                                            )
 
-                                        .select_related(
-                                            'resume', 'resume__user', 'resume__user__avatar',
-                                            'resume__city', 'resume__career', 'company'
-                                        )
+                                            .order_by("-create_at"))
 
-                                        .order_by("-create_at"))
+            paginator = self.pagination_class()
 
-        paginator = self.pagination_class()
+            page = paginator.paginate_queryset(queryset, request)
 
-        page = paginator.paginate_queryset(queryset, request)
+            if page is not None:
 
-        if page is not None:
+                serializer = ResumeSavedSerializer(page, many=True, fields=[
 
-            serializer = ResumeSavedSerializer(page, many=True, fields=[
+                    "id", "resume", "createAt"
 
-                "id", "resume", "createAt"
+                ])
 
-            ])
+                return paginator.get_paginated_response(serializer.data)
 
-            return paginator.get_paginated_response(serializer.data)
+            serializer = ResumeSavedSerializer(queryset, many=True)
 
-        serializer = ResumeSavedSerializer(queryset, many=True)
-
-        return var_res.response_data(data=serializer.data)
+            return var_res.response_data(data=serializer.data)
+        except Exception as ex:
+            helper.print_log_error("ResumeSavedViewSet.list", ex)
+            return var_res.response_data(data=self._empty_result())
 
     @action(methods=["get"], detail=False,
 
             url_path="export", url_name="resumes-export")
 
     def export_resumes(self, request):
+        try:
+            user = request.user
 
-        user = request.user
+            company = user.get_active_company()
 
-        company = user.get_active_company()
+            if not company:
 
-        if not company:
+                return var_res.response_data(data=[])
 
+            queryset = self.filter_queryset(self.get_queryset()
+
+                                            .filter(company=company,
+
+                                                    resume__is_active=True)
+
+                                            .order_by("-create_at"))
+
+            serializer = ResumeSavedExportSerializer(queryset, many=True)
+
+            result_data = utils.convert_data_with_en_key_to_vn_kew(serializer.data,
+
+                                                                   table_export.RESUMES_EXPORT_FIELD)
+
+            return var_res.response_data(data=result_data)
+        except Exception as ex:
+            helper.print_log_error("ResumeSavedViewSet.export_resumes", ex)
             return var_res.response_data(data=[])
-
-        queryset = self.filter_queryset(self.get_queryset()
-
-                                        .filter(company=company,
-
-                                                resume__is_active=True)
-
-                                        .order_by("-create_at"))
-
-        serializer = ResumeSavedExportSerializer(queryset, many=True)
-
-        result_data = utils.convert_data_with_en_key_to_vn_kew(serializer.data,
-
-                                                               table_export.RESUMES_EXPORT_FIELD)
-
-        return var_res.response_data(data=result_data)
 
 class EducationDetailViewSet(viewsets.ViewSet,
 

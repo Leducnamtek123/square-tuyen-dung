@@ -131,6 +131,13 @@ class QuestionGroupViewSet(viewsets.ModelViewSet):
         else:
             serializer.save(author=user)
 
+    def list(self, request, *args, **kwargs):
+        try:
+            return super().list(request, *args, **kwargs)
+        except Exception as ex:
+            helper.print_log_error("QuestionGroupViewSet.list", ex)
+            return response_data(data={"count": 0, "results": []})
+
 class InterviewSessionViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
