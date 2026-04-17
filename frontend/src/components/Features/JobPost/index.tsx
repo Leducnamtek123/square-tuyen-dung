@@ -89,17 +89,11 @@ const JobPost = ({
         cursor: 'pointer',
 
         px: 2,
-
         pt: 2,
-
         pb: 1,
-
         transition: 'all 0.3s ease',
-
-        borderRadius: 2,
-
+        borderRadius: '24px 8px 24px 8px',
         border: `1px solid ${theme.palette.divider}`,
-
         position: 'relative',
 
         overflow: 'hidden',
@@ -121,15 +115,10 @@ const JobPost = ({
             top: 0,
 
             bottom: 0,
-
             width: '4px',
-
             background: theme.palette.secondary.main,
-
-            borderRadius: '4px',
-
+            borderRadius: '24px 0 0 8px',
             boxShadow: `0 0 8px ${theme.palette.secondary.main}40`,
-
           },
 
         }),
@@ -254,13 +243,9 @@ const JobPost = ({
               fallbackSrc={IMAGES.companyLogoDefault}
 
               sx={{
-
                 border: 1,
-
-                borderRadius: 2,
-
+                borderRadius: '12px 4px 12px 4px',
                 borderColor: theme.palette.grey[200],
-
                 p: 1,
 
                 backgroundColor: theme.palette.common.white,

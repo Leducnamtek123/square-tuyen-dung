@@ -108,12 +108,12 @@ const defaultTheme = {
   customShadows,
   typography: {
     fontFamily: "'Be Vietnam Pro', var(--font-be-vietnam-pro), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-    h1: { fontFamily: "'Syne', var(--font-syne), sans-serif", fontWeight: 700, letterSpacing: '-0.02em' },
-    h2: { fontFamily: "'Syne', var(--font-syne), sans-serif", fontWeight: 700, letterSpacing: '-0.02em' },
-    h3: { fontFamily: "'Syne', var(--font-syne), sans-serif", fontWeight: 600, letterSpacing: '-0.01em' },
-    h4: { fontFamily: "'Syne', var(--font-syne), sans-serif", fontWeight: 600 },
-    h5: { fontFamily: "'Syne', var(--font-syne), sans-serif", fontWeight: 500 },
-    h6: { fontFamily: "'Syne', var(--font-syne), sans-serif", fontWeight: 500 },
+    h1: { fontFamily: "'Outfit', var(--font-outfit), sans-serif", fontWeight: 700, letterSpacing: '-0.01em' },
+    h2: { fontFamily: "'Outfit', var(--font-outfit), sans-serif", fontWeight: 700, letterSpacing: '-0.01em' },
+    h3: { fontFamily: "'Outfit', var(--font-outfit), sans-serif", fontWeight: 600, letterSpacing: '-0.005em' },
+    h4: { fontFamily: "'Outfit', var(--font-outfit), sans-serif", fontWeight: 600 },
+    h5: { fontFamily: "'Outfit', var(--font-outfit), sans-serif", fontWeight: 500 },
+    h6: { fontFamily: "'Outfit', var(--font-outfit), sans-serif", fontWeight: 500 },
   },
 } as const;
 
