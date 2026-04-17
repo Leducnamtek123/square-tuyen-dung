@@ -88,18 +88,18 @@ const colors = {
 } as const;
 
 const customShadows = {
-  small:    '0px 2px 4px rgba(26, 64, 125, 0.06)',
-  medium:   '0px 4px 10px rgba(26, 64, 125, 0.10)',
-  large:    '0px 8px 24px rgba(26, 64, 125, 0.14)',
-  card:     '0px 4px 20px rgba(26, 64, 125, 0.08)',
-  feedback: '0 8px 32px rgba(42, 169, 225, 0.18)',
+  small:    '0px 2px 8px rgba(26, 64, 125, 0.04), 0px 1px 2px rgba(26, 64, 125, 0.02)',
+  medium:   '0px 8px 24px rgba(26, 64, 125, 0.06), 0px 2px 8px rgba(26, 64, 125, 0.04)',
+  large:    '0px 24px 48px rgba(26, 64, 125, 0.08), 0px 12px 24px rgba(26, 64, 125, 0.06)',
+  card:     '0px 12px 32px rgba(26, 64, 125, 0.06), 0px 4px 12px rgba(26, 64, 125, 0.04), inset 0px 1px 0px rgba(255, 255, 255, 0.6)',
+  feedback: '0 16px 48px rgba(42, 169, 225, 0.15), 0 8px 24px rgba(26, 64, 125, 0.1)',
   // Standard elevation levels for premium components
-  z1:  '0px 2px 8px rgba(26, 64, 125, 0.08)',
-  z8:  '0px 8px 16px rgba(26, 64, 125, 0.10)',
-  z12: '0px 12px 24px rgba(26, 64, 125, 0.12)',
-  z16: '0px 16px 32px rgba(26, 64, 125, 0.14)',
-  z20: '0px 20px 40px rgba(26, 64, 125, 0.16)',
-  z24: '0px 24px 48px rgba(26, 64, 125, 0.18)',
+  z1:  '0px 4px 12px rgba(26, 64, 125, 0.04)',
+  z8:  '0px 12px 24px rgba(26, 64, 125, 0.06)',
+  z12: '0px 16px 32px rgba(26, 64, 125, 0.08)',
+  z16: '0px 24px 48px rgba(26, 64, 125, 0.1)',
+  z20: '0px 32px 64px rgba(26, 64, 125, 0.12)',
+  z24: '0px 40px 80px rgba(26, 64, 125, 0.14)',
 } as const;
 
 const defaultTheme = {
@@ -108,6 +108,12 @@ const defaultTheme = {
   customShadows,
   typography: {
     fontFamily: "'Be Vietnam Pro', var(--font-be-vietnam-pro), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    h1: { fontFamily: "'Syne', var(--font-syne), sans-serif", fontWeight: 700, letterSpacing: '-0.02em' },
+    h2: { fontFamily: "'Syne', var(--font-syne), sans-serif", fontWeight: 700, letterSpacing: '-0.02em' },
+    h3: { fontFamily: "'Syne', var(--font-syne), sans-serif", fontWeight: 600, letterSpacing: '-0.01em' },
+    h4: { fontFamily: "'Syne', var(--font-syne), sans-serif", fontWeight: 600 },
+    h5: { fontFamily: "'Syne', var(--font-syne), sans-serif", fontWeight: 500 },
+    h6: { fontFamily: "'Syne', var(--font-syne), sans-serif", fontWeight: 500 },
   },
 } as const;
 

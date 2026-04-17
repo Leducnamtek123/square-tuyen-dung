@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Be_Vietnam_Pro } from 'next/font/google';
+import { Be_Vietnam_Pro, Syne } from 'next/font/google';
 import ThemeRegistry from '../components/ThemeRegistry/ThemeRegistry';
 import { Providers } from './providers';
 import ClientAppRoot from './ClientAppRoot';
@@ -12,6 +12,13 @@ const beVietnamPro = Be_Vietnam_Pro({
   style: ['normal', 'italic'],
   display: 'swap',
   variable: '--font-be-vietnam-pro',
+});
+
+const syne = Syne({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-syne',
 });
 
 export const metadata: Metadata = {
@@ -38,11 +45,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={beVietnamPro.variable} suppressHydrationWarning>
+    <html lang="vi" className={`${beVietnamPro.variable} ${syne.variable}`} suppressHydrationWarning>
       <head>
         <link rel="icon" type="image/svg+xml" href="/square-icons/icon.svg" />
       </head>
       <body style={{ fontFamily: 'var(--font-be-vietnam-pro), sans-serif' }} suppressHydrationWarning>
+        {/* Background Atmosphere Layers */}
+        <div className="bg-atmosphere" />
+        <div className="bg-noise" />
+        
         <ThemeRegistry>
           <Providers>
             <ClientAppRoot>

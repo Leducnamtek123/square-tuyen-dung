@@ -133,6 +133,7 @@ code {
 
 @theme inline {
   --font-sans: var(--font-be-vietnam-pro), 'Be Vietnam Pro', sans-serif;
+  --font-display: var(--font-syne), 'Syne', sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -184,6 +185,104 @@ code {
   display: none !important;
 }
 
-/* Note: removed @layer base { * { @apply border-border } } to prevent
-   Tailwind from overriding MUI component border colors globally.
-   MUI manages its own borders via the theme's divider/palette system. */
+/* === ENHANCED AESTHETICS & MOTION === */
+
+/* Topography & Fonts */
+h1, h2, h3, h4, h5, .display-text {
+  font-family: var(--font-syne), 'Syne', sans-serif !important;
+  letter-spacing: -0.02em;
+}
+
+/* Depth & Atmosphere Layers */
+.bg-atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-color: var(--background);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(42, 169, 225, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(26, 64, 125, 0.1) 0px, transparent 50%);
+}
+
+.dark .bg-atmosphere {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(42, 169, 225, 0.15) 0px, transparent 40%),
+    radial-gradient(at 80% -20%, rgba(16, 185, 129, 0.1) 0px, transparent 40%),
+    radial-gradient(at 100% 100%, rgba(42, 169, 225, 0.12) 0px, transparent 50%);
+}
+
+/* Authentic Noise Texture overlaying the background loosely */
+.bg-noise {
+  position: fixed;
+  inset: -10rem;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+  opacity: 0.15;
+  mix-blend-mode: overlay;
+  will-change: transform;
+}
+
+/* Refined Glassmorphism Cards */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 30px rgba(26, 64, 125, 0.05);
+}
+
+.dark .glass-panel {
+  background: rgba(15, 32, 64, 0.6);
+  border: 1px solid rgba(42, 169, 225, 0.12);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Animations: Staggered Fade Up */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 0;
+}
+
+.anim-delay-100 { animation-delay: 100ms; }
+.anim-delay-200 { animation-delay: 200ms; }
+.anim-delay-300 { animation-delay: 300ms; }
+.anim-delay-400 { animation-delay: 400ms; }
+.anim-delay-500 { animation-delay: 500ms; }
+
+/* Interactive Hover States */
+.hover-lift {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 12px 32px rgba(42, 169, 225, 0.15);
+}
+
+/* Diagonal Layout Highlight / Accent Ribbon */
+.diagonal-ribbon {
+  position: relative;
+  overflow: hidden;
+}
+.diagonal-ribbon::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(115deg, transparent 40%, rgba(42, 169, 225, 0.08) 50%, transparent 60%);
+  transform: translate(-100%, -100%) rotate(45deg);
+  transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+  pointer-events: none;
+}
+.diagonal-ribbon:hover::after {
+  transform: translate(100%, 100%) rotate(45deg);
+}
