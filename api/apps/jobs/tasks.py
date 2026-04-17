@@ -6,11 +6,53 @@ import tempfile
 import fitz  # PyMuPDF
 import docx
 from celery import shared_task
-from django.conf import settings
+from django.core.cache import cache
 from decouple import config
 from .models import JobPostActivity
 
 logger = logging.getLogger(__name__)
+
+
+def _truncate_text(value: str, max_chars: int) -> str:
+    text = (value or "").strip()
+    if max_chars <= 0 or len(text) <= max_chars:
+        return text
+
+    truncated = text[:max_chars].rsplit(" ", 1)[0].strip()
+    return f"{truncated}\n...[truncated]"
+
+
+def _acquire_analysis_slot(activity_id: int, max_slots: int, ttl_seconds: int) -> str | None:
+    if max_slots <= 0:
+        return None
+
+    for idx in range(max_slots):
+        slot_key = f"ai:resume-analysis:slot:{idx}"
+        if cache.add(slot_key, str(activity_id), timeout=ttl_seconds):
+            return slot_key
+
+    return None
+
+
+def _release_analysis_slot(slot_key: str | None):
+    if slot_key:
+        cache.delete(slot_key)
+
+
+def _strip_code_fences(text: str) -> str:
+    value = (text or "").strip()
+    if "```json" in value:
+        value = value.split("```json", 1)[1].split("```", 1)[0].strip()
+    elif "```" in value:
+        value = value.split("```", 1)[1].split("```", 1)[0].strip()
+    return value
+
+
+def _parse_llm_json_content(raw_text: str) -> dict:
+    cleaned = _strip_code_fences(raw_text)
+    if not cleaned:
+        raise ValueError("Empty model content")
+    return json.loads(cleaned)
 
 
 @shared_task(
@@ -67,7 +109,7 @@ def es_delete_job_post(self, job_post_id: int):
 
 
 def extract_text_from_pdf(file_path):
-    """Trích xuất văn bản từ file PDF."""
+    """Extract text from PDF file."""
     text = ""
     try:
         doc = fitz.open(file_path)
@@ -79,7 +121,7 @@ def extract_text_from_pdf(file_path):
     return text
 
 def extract_text_from_docx(file_path):
-    """Trích xuất văn bản từ file DOCX."""
+    """Extract text from DOCX file."""
     text = ""
     try:
         doc = docx.Document(file_path)
@@ -93,48 +135,66 @@ def extract_text_from_docx(file_path):
              retry_backoff=True, retry_kwargs={'max_retries': 3})
 def analyze_resume_ai(self, activity_id):
     """
-    Task phân tích CV bằng AI.
-    Tự động retry lên đến 3 lần với exponential backoff khi LLM timeout.
+    Task phan tich CV bang AI.
+    Tu dong retry toi da 3 lan voi exponential backoff khi LLM timeout/connect error.
     """
     temp_file = None
+    slot_key = None
+
     try:
+        max_slots = config("AI_RESUME_ANALYSIS_MAX_CONCURRENCY", default=2, cast=int)
+        slot_wait_seconds = config("AI_RESUME_ANALYSIS_SLOT_WAIT_SECONDS", default=20, cast=int)
+        slot_ttl_seconds = config("AI_RESUME_ANALYSIS_SLOT_TTL_SECONDS", default=1800, cast=int)
+
+        slot_key = _acquire_analysis_slot(
+            activity_id=activity_id,
+            max_slots=max_slots,
+            ttl_seconds=slot_ttl_seconds,
+        )
+        if max_slots > 0 and not slot_key:
+            logger.info(
+                "Activity %s waiting AI slot (limit=%s), retry in %ss",
+                activity_id,
+                max_slots,
+                slot_wait_seconds,
+            )
+            raise self.retry(countdown=slot_wait_seconds)
+
         activity = JobPostActivity.objects.select_related('job_post', 'resume', 'resume__file').get(id=activity_id)
-        
+
         if not activity.resume or not activity.resume.file:
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0
-            activity.ai_analysis_summary = "Không tìm thấy file CV để phân tích."
-            activity.save()
+            activity.ai_analysis_summary = "Khong tim thay file CV de phan tich."
+            activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
             return
 
         activity.ai_analysis_status = 'processing'
         activity.ai_analysis_progress = 5
-        activity.save()
+        activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'update_at'])
 
         file_obj = activity.resume.file
         file_format = file_obj.format.lower() if file_obj.format else 'pdf'
-        
         resume_text = ""
-        
-        # Strategy 1: Download directly from MinIO (more reliable inside Docker)
+
+        # Strategy 1: direct MinIO fetch inside Docker network
         try:
             from shared.helpers.cloudinary_service import CloudinaryService
             from django.conf import settings as django_settings
-            
+
             minio_client = CloudinaryService._get_client()
             bucket = django_settings.MINIO_BUCKET
             object_name = file_obj.public_id.lstrip('/')
-            
-            # If public_id is a full URL, extract the object path
+
             if object_name.startswith("http://") or object_name.startswith("https://"):
                 from urllib.parse import urlparse
                 parsed = urlparse(object_name)
                 object_name = parsed.path.lstrip("/")
                 if object_name.startswith(f"{bucket}/"):
                     object_name = object_name[len(bucket) + 1:]
-            
-            logger.info(f"Downloading CV from MinIO: bucket={bucket}, object={object_name}")
-            
+
+            logger.info("Downloading CV from MinIO: bucket=%s, object=%s", bucket, object_name)
+
             response = minio_client.get_object(bucket, object_name)
             with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
                 for chunk in response.stream(1024 * 32):
@@ -142,26 +202,28 @@ def analyze_resume_ai(self, activity_id):
                 temp_file = tf.name
             response.close()
             response.release_conn()
+
             activity.ai_analysis_progress = 25
             activity.save(update_fields=['ai_analysis_progress', 'update_at'])
-            
+
         except Exception as minio_err:
-            logger.warning(f"MinIO direct download failed: {minio_err}. Falling back to HTTP URL.")
-            # Strategy 2: Fallback to HTTP URL download
+            logger.warning("MinIO direct download failed: %s. Falling back to HTTP URL.", minio_err)
+
             resume_url = file_obj.get_full_url()
-            logger.info(f"Downloading CV from URL: {resume_url}")
+            logger.info("Downloading CV from URL: %s", resume_url)
             with httpx.Client(timeout=30.0) as client:
                 response = client.get(resume_url)
-                if response.status_code == 200:
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
-                        tf.write(response.content)
-                        temp_file = tf.name
-                    activity.ai_analysis_progress = 25
-                    activity.save(update_fields=['ai_analysis_progress', 'update_at'])
-                else:
+                if response.status_code != 200:
                     raise Exception(f"Failed to download resume file: HTTP {response.status_code}")
-        
-        # Extract text from the downloaded file
+
+                with tempfile.NamedTemporaryFile(delete=False, suffix=f".{file_format}") as tf:
+                    tf.write(response.content)
+                    temp_file = tf.name
+
+            activity.ai_analysis_progress = 25
+            activity.save(update_fields=['ai_analysis_progress', 'update_at'])
+
+        # Extract text from downloaded file
         if temp_file:
             if file_format == 'pdf':
                 resume_text = extract_text_from_pdf(temp_file)
@@ -170,126 +232,167 @@ def analyze_resume_ai(self, activity_id):
             else:
                 with open(temp_file, 'r', errors='ignore') as f:
                     resume_text = f.read()
+
             activity.ai_analysis_progress = 45
             activity.save(update_fields=['ai_analysis_progress', 'update_at'])
 
         if not resume_text or len(resume_text.strip()) < 50:
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0
-            activity.ai_analysis_summary = "Không thể đọc được nội dung CV (File có thể là ảnh hoặc bị lỗi)."
-            activity.save()
+            activity.ai_analysis_summary = "Khong the doc duoc noi dung CV (co the la file anh hoac file loi)."
+            activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
             return
 
-        # 2. Chuẩn bị prompt
-        job_description = activity.job_post.job_description
-        job_requirement = activity.job_post.job_requirement or ""
-        
+        # Compact prompt to reduce token use and improve throughput
+        max_resume_chars = config("AI_RESUME_PROMPT_MAX_CV_CHARS", default=2600, cast=int)
+        max_jd_chars = config("AI_RESUME_PROMPT_MAX_JD_CHARS", default=900, cast=int)
+        max_req_chars = config("AI_RESUME_PROMPT_MAX_REQUIREMENT_CHARS", default=700, cast=int)
+
+        job_description = _truncate_text(activity.job_post.job_description or "", max_jd_chars)
+        job_requirement = _truncate_text(activity.job_post.job_requirement or "", max_req_chars)
+        resume_excerpt = _truncate_text(resume_text, max_resume_chars)
+
         prompt = f"""
-        Bạn là một chuyên gia tuyển dụng AI cấp cao. Hãy phân tích CV của ứng viên so với yêu cầu công việc.
+        Analyze candidate CV fit for this role and return ONLY one valid JSON object.
 
-        THÔNG TIN CÔNG VIỆC:
-        - Tên vị trí: {activity.job_post.job_name}
-        - Mô tả: {job_description}
-        - Yêu cầu: {job_requirement}
+        Job title: {activity.job_post.job_name}
+        Job description: {job_description}
+        Job requirements: {job_requirement}
 
-        NỘI DUNG CV ỨNG VIÊN:
-        {resume_text[:4000]}
+        Candidate CV:
+        {resume_excerpt}
 
-        Nhiệm vụ của bạn:
-        1. Chấm điểm độ phù hợp (0-100) dựa trên kỹ năng, kinh nghiệm và học vấn.
-        2. Tóm tắt ngắn gọn lý do tại sao ứng viên này phù hợp hoặc không phù hợp (headhunter style).
-        3. Liệt kê các kỹ năng chính mà ứng viên có.
-        4. Liệt kê các điểm mạnh vượt trội (pros).
-        5. Liệt kê các điểm yếu hoặc điểm cần lưu ý (cons).
-        6. Xác định các kỹ năng khớp với JD (matching_skills).
-        7. Xác định các kỹ năng còn thiếu so với JD (missing_skills).
+        Required JSON schema:
+        {{
+          "score": 0-100 integer,
+          "summary": "short Vietnamese summary",
+          "skills": ["..."],
+          "pros": ["..."],
+          "cons": ["..."],
+          "matching_skills": ["..."],
+          "missing_skills": ["..."]
+        }}
 
-        HÃY TRẢ VỀ JSON HỢP LỆ VỚI CÁC TRƯỜNG:
-        - score: (số nguyên 0-100)
-        - summary: (chuỗi văn bản tiếng Việt)
-        - skills: (mảng các chuỗi kỹ năng)
-        - pros: (mảng các chuỗi điểm mạnh)
-        - cons: (mảng các chuỗi điểm yếu)
-        - matching_skills: (mảng các kỹ năng khớp JD)
-        - missing_skills: (mảng các kỹ năng thiếu so với JD)
-
-        LƯU Ý: Không giải thích gì thêm, chỉ trả về JSON.
+        Constraints:
+        - summary max 70 words.
+        - each list max 8 items.
+        - no markdown, no extra text outside JSON.
         """
 
-        # 3. Gọi LLM
         llama_url = config('LLAMA_BASE_URL', default="http://llama-cpp:11434/v1")
-        model_alias = config('LLAMA_MODEL_ALIAS', default="qwen2-7b")
+        model_alias = config(
+            "AI_RESUME_LLM_MODEL",
+            default=config("AI_LLM_MODEL", default=config('LLAMA_MODEL_ALIAS', default="qwen2-7b")),
+        )
+        llm_temperature = config("AI_RESUME_LLM_TEMPERATURE", default=0.1, cast=float)
+        llm_top_p = config("AI_RESUME_LLM_TOP_P", default=0.9, cast=float)
+        llm_max_tokens = config("AI_RESUME_LLM_MAX_TOKENS", default=420, cast=int)
+        llm_timeout = config("AI_RESUME_LLM_TIMEOUT_SECONDS", default=240.0, cast=float)
+        llm_connect_timeout = config("AI_RESUME_LLM_CONNECT_TIMEOUT_SECONDS", default=10.0, cast=float)
 
         payload = {
             "model": model_alias,
             "messages": [
-                {"role": "system", "content": "Bạn là AI phân tích hồ sơ chuyên nghiệp, luôn trả về JSON."},
-                {"role": "user", "content": prompt}
+                {"role": "system", "content": "Ban la AI tuyen dung. Luon tra ve JSON object hop le."},
+                {"role": "user", "content": prompt},
             ],
-            "temperature": 0.2,
+            "temperature": llm_temperature,
+            "top_p": llm_top_p,
+            "max_tokens": llm_max_tokens,
+            "stream": False,
             "response_format": {"type": "json_object"},
         }
+
         activity.ai_analysis_progress = 70
         activity.save(update_fields=['ai_analysis_progress', 'update_at'])
 
-        with httpx.Client(timeout=httpx.Timeout(timeout=600.0, connect=10.0)) as client:
+        with httpx.Client(timeout=httpx.Timeout(timeout=llm_timeout, connect=llm_connect_timeout)) as client:
             resp = client.post(f"{llama_url}/chat/completions", json=payload)
-            if resp.status_code == 200:
-                content = resp.json()['choices'][0]['message']['content']
-                
-                # Extract JSON from possible markdown fences
-                if "```json" in content:
-                    content = content.split("```json")[1].split("```")[0].strip()
-                elif "```" in content:
-                    content = content.split("```")[1].split("```")[0].strip()
-                
-                result = json.loads(content)
-                
-                activity.ai_analysis_score = result.get('score', 0)
-                activity.ai_analysis_summary = result.get('summary', '')
-                activity.ai_analysis_skills = ", ".join(result.get('skills', []))
-                
-                activity.ai_analysis_pros = ", ".join(result.get('pros', []))
-                activity.ai_analysis_cons = ", ".join(result.get('cons', []))
-                activity.ai_analysis_matching_skills = result.get('matching_skills', [])
-                activity.ai_analysis_missing_skills = result.get('missing_skills', [])
-                
-                activity.ai_analysis_status = 'completed'
-                activity.ai_analysis_progress = 100
-                activity.save()
-                
-                logger.info(f"AI Analysis completed for Activity {activity_id}. Score: {activity.ai_analysis_score}")
-            else:
-                raise Exception(f"LLM API failed with status {resp.status_code}")
+
+        if resp.status_code != 200:
+            raise Exception(f"LLM API failed with status {resp.status_code}")
+
+        response_json = resp.json()
+        message = (response_json.get("choices") or [{}])[0].get("message") or {}
+        content = message.get("content") or ""
+        reasoning = message.get("reasoning") or ""
+
+        # Ollama + some reasoning models may return empty "content" on /v1/chat/completions.
+        # Fallback to native /api/chat to force JSON output when needed.
+        try:
+            result = _parse_llm_json_content(content)
+        except Exception:
+            result = None
+            if reasoning:
+                try:
+                    result = _parse_llm_json_content(reasoning)
+                except Exception:
+                    result = None
+
+            if result is None and config("AI_RESUME_OLLAMA_FALLBACK_ENABLED", default=True, cast=bool):
+                native_base = llama_url[:-3] if llama_url.endswith("/v1") else llama_url
+                native_payload = {
+                    "model": model_alias,
+                    "messages": payload["messages"],
+                    "stream": False,
+                    "think": False,
+                    "format": "json",
+                    "options": {
+                        "temperature": llm_temperature,
+                    },
+                }
+                with httpx.Client(timeout=httpx.Timeout(timeout=llm_timeout, connect=llm_connect_timeout)) as native_client:
+                    native_resp = native_client.post(f"{native_base}/api/chat", json=native_payload)
+                if native_resp.status_code == 200:
+                    native_json = native_resp.json()
+                    native_content = (native_json.get("message") or {}).get("content") or ""
+                    result = _parse_llm_json_content(native_content)
+
+            if result is None:
+                raise ValueError("Model response does not contain valid JSON.")
+
+        activity.ai_analysis_score = result.get('score', 0)
+        activity.ai_analysis_summary = result.get('summary', '')
+        activity.ai_analysis_skills = ", ".join(result.get('skills', []))
+        activity.ai_analysis_pros = ", ".join(result.get('pros', []))
+        activity.ai_analysis_cons = ", ".join(result.get('cons', []))
+        activity.ai_analysis_matching_skills = result.get('matching_skills', [])
+        activity.ai_analysis_missing_skills = result.get('missing_skills', [])
+        activity.ai_analysis_status = 'completed'
+        activity.ai_analysis_progress = 100
+        activity.save()
+
+        logger.info("AI Analysis completed for Activity %s. Score: %s", activity_id, activity.ai_analysis_score)
 
     except (httpx.TimeoutException, httpx.ConnectError) as exc:
-        # On final retry, update DB so status doesn't stay stuck at 'processing'
         max_r = 3  # matches retry_kwargs['max_retries']
         if (self.request.retries or 0) >= max_r:
             try:
                 act = JobPostActivity.objects.get(id=activity_id)
                 act.ai_analysis_status = 'failed'
                 act.ai_analysis_progress = 0
-                act.ai_analysis_summary = f"LLM không phản hồi sau nhiều lần thử: {str(exc)[:300]}"
-                act.save()
+                act.ai_analysis_summary = f"LLM khong phan hoi sau nhieu lan thu: {str(exc)[:300]}"
+                act.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
             except Exception:
-                logger.error(f"Failed to update activity {activity_id} after final retry")
-        raise  # Let Celery autoretry handle
+                logger.error("Failed to update activity %s after final retry", activity_id)
+        raise
+
     except Exception as e:
-        logger.error(f"Error in analyze_resume_ai for activity {activity_id}: {e}")
+        logger.error("Error in analyze_resume_ai for activity %s: %s", activity_id, e)
         try:
             activity = JobPostActivity.objects.get(id=activity_id)
             activity.ai_analysis_status = 'failed'
             activity.ai_analysis_progress = 0
             activity.ai_analysis_summary = str(e)[:500]
-            activity.save()
+            activity.save(update_fields=['ai_analysis_status', 'ai_analysis_progress', 'ai_analysis_summary', 'update_at'])
         except Exception:
-            logger.error(f"Failed to update activity {activity_id} status after error")
+            logger.error("Failed to update activity %s status after error", activity_id)
+
     finally:
-        # Always cleanup temp files
+        _release_analysis_slot(slot_key)
+
         if temp_file and os.path.exists(temp_file):
             try:
                 os.unlink(temp_file)
             except OSError:
                 pass
-

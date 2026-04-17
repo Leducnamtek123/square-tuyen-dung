@@ -134,7 +134,7 @@ services:
     build:
       context: ./api
       dockerfile: ${BACKEND_DOCKERFILE:-Dockerfile.prod}
-    command: celery -A config worker -l info --concurrency=1
+    command: celery -A config worker -l info --concurrency=${CELERY_WORKER_CONCURRENCY:-2} --prefetch-multiplier=${CELERY_WORKER_PREFETCH_MULTIPLIER:-1} -Ofair
     env_file:
       - .env
     restart: always
