@@ -10,9 +10,10 @@ interface InterviewAiEvaluationCardProps {
   effectiveStatus?: string;
   t: TFunction;
   onTriggerAi: () => void;
+  isTriggeringAi?: boolean;
 }
 
-const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ session, effectiveStatus, t, onTriggerAi }) => {
+const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ session, effectiveStatus, t, onTriggerAi, isTriggeringAi = false }) => {
     const theme = useTheme();
     const hasResult = (session.aiOverallScore ?? session.ai_overall_score) !== null && (session.aiOverallScore ?? session.ai_overall_score) !== undefined;
     const isProcessing = effectiveStatus === 'processing' || session.status === 'processing';
@@ -143,6 +144,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                         variant="outlined"
                         fullWidth
                         onClick={onTriggerAi}
+                        disabled={isTriggeringAi}
                         startIcon={<AutoAwesomeIcon />}
                         sx={{ 
                             mt: 5, 
@@ -192,6 +194,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                                 <Button
                                     variant="contained"
                                     onClick={onTriggerAi}
+                                    disabled={isTriggeringAi}
                                     startIcon={<AutoAwesomeIcon />}
                                     sx={{ 
                                         borderRadius: 3, 

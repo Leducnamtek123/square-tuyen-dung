@@ -39,6 +39,7 @@ import errorHandling from '../../../../utils/errorHandling';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 import type { AxiosError } from 'axios';
 import type { ApiError } from '../../../../types/api';
+import type { InterviewSession } from '../../../../types/models';
 
 export interface EvalFormType {
   attitude_score: number | string;
@@ -131,6 +132,11 @@ const InterviewDetailCard = () => {
         setIsTriggeringAi(true);
         try {
             await interviewService.triggerAiEvaluation(session.id);
+            queryClient.setQueryData<InterviewSession>(['interviewDetail', id], (prev) => (
+                prev ? { ...prev, status: 'processing' } : prev
+            ));
+            queryClient.invalidateQueries({ queryKey: ['interviewDetail', id] });
+            queryClient.invalidateQueries({ queryKey: ['interviewSessions'] });
             toastMessages.success(t('interview:interviewDetail.messages.aiTriggerSuccess'));
         } catch (e) {
             errorHandling(e as AxiosError<{ errors?: ApiError }>);
@@ -475,6 +481,7 @@ const InterviewDetailCard = () => {
                             effectiveStatus={effectiveStatus}
                             t={t}
                             onTriggerAi={handleTriggerAi}
+                            isTriggeringAi={isTriggeringAi}
                         />
                         <InterviewHrEvaluationForm
                             evalForm={evalForm}
