@@ -82,8 +82,14 @@ async def entrypoint(ctx: JobContext) -> None:
         client=openai_lib.AsyncOpenAI(
             api_key=config.TTS_API_KEY,
             base_url=config.TTS_BASE_URL,
+            max_retries=config.TTS_MAX_RETRIES,
             http_client=httpx.AsyncClient(
-                timeout=httpx.Timeout(120.0, connect=10.0)
+                timeout=httpx.Timeout(
+                    connect=config.TTS_CONNECT_TIMEOUT_SECONDS,
+                    read=config.TTS_READ_TIMEOUT_SECONDS,
+                    write=config.TTS_WRITE_TIMEOUT_SECONDS,
+                    pool=config.TTS_POOL_TIMEOUT_SECONDS,
+                )
             ),
         ),
         model=config.TTS_MODEL,
@@ -135,7 +141,7 @@ async def entrypoint(ctx: JobContext) -> None:
         turn_handling=TurnHandlingOptions(
             turn_detection=MultilingualModel(),
         ),
-        preemptive_generation=True,
+        preemptive_generation=config.PREEMPTIVE_GENERATION,
     )
 
     # 5. Event Handlers

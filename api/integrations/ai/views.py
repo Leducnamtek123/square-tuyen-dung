@@ -381,51 +381,59 @@ class ChatAPIView(APIView):
                 if t.get("function", {}).get("name") != "create_interview_invitation"
             ]
 
-        payload = {
+        base_payload = {
             "model": model,
-            "messages": messages,
         }
         if available_tools:
-            payload["tools"] = available_tools
-            payload["tool_choice"] = "auto"
+            base_payload["tools"] = available_tools
+            base_payload["tool_choice"] = "auto"
         if "temperature" in body:
-            payload["temperature"] = body.get("temperature")
+            base_payload["temperature"] = body.get("temperature")
         if "max_tokens" in body:
-            payload["max_tokens"] = body.get("max_tokens")
+            base_payload["max_tokens"] = body.get("max_tokens")
 
         try:
-            # 1. First call to LLM
-            upstream = requests.post(url, json=payload, timeout=(10, 120))
-            if upstream.status_code >= 400:
-                return Response(
-                    data_response(errors={}, data={"reply": _LLM_FALLBACK_REPLY, "model": model}),
-                    status=200,
-                )
+            max_tool_rounds = int(body.get("max_tool_rounds", 4))
+        except (TypeError, ValueError):
+            max_tool_rounds = 4
+        max_tool_rounds = max(1, min(max_tool_rounds, 8))
 
-            upstream_json = upstream.json()
-            message_obj = upstream_json.get("choices", [{}])[0].get("message", {})
+        try:
+            upstream_json = {}
+            current_messages = list(messages)
 
-            # 2. Check for tool calls
-            tool_calls = message_obj.get("tool_calls")
-            if tool_calls:
-                messages.append(message_obj)
+            for _ in range(max_tool_rounds):
+                payload = {
+                    **base_payload,
+                    "messages": current_messages,
+                }
+                upstream = requests.post(url, json=payload, timeout=(10, 120))
+                if upstream.status_code >= 400:
+                    return Response(
+                        data_response(errors={}, data={"reply": _LLM_FALLBACK_REPLY, "model": model}),
+                        status=200,
+                    )
+
+                upstream_json = upstream.json()
+                choices = upstream_json.get("choices") or []
+                message_obj = choices[0].get("message", {}) if choices else {}
+                tool_calls = message_obj.get("tool_calls") or []
+
+                # No tool call means assistant has final answer for this round.
+                if not tool_calls:
+                    break
+
+                current_messages.append(message_obj)
                 for tool_call in tool_calls:
                     result = execute_tool_call(tool_call, request)
-                    messages.append({
-                        "role": "tool",
-                        "tool_call_id": tool_call.get("id"),
-                        "name": tool_call.get("function", {}).get("name"),
-                        "content": result,
-                    })
-
-                # 3. Second call to LLM with tool results
-                final_payload = {"model": model, "messages": messages}
-                try:
-                    final_upstream = requests.post(url, json=final_payload, timeout=(10, 120))
-                    if final_upstream.status_code == 200:
-                        upstream_json = final_upstream.json()
-                except requests.RequestException:
-                    pass  # Use first response if second call fails
+                    current_messages.append(
+                        {
+                            "role": "tool",
+                            "tool_call_id": tool_call.get("id"),
+                            "name": tool_call.get("function", {}).get("name"),
+                            "content": result,
+                        }
+                    )
 
         except (requests.ConnectionError, requests.Timeout):
             # LLM not reachable — return friendly fallback
@@ -433,7 +441,7 @@ class ChatAPIView(APIView):
                 data_response(errors={}, data={"reply": _LLM_FALLBACK_REPLY, "model": model}),
                 status=200,
             )
-        except requests.RequestException as e:
+        except requests.RequestException:
             return Response(
                 data_response(errors={}, data={"reply": _LLM_FALLBACK_REPLY, "model": model}),
                 status=200,

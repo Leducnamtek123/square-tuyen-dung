@@ -44,6 +44,13 @@ class Config:
     TTS_MODEL: str = os.getenv("TTS_MODEL", "tts-1")
     TTS_VOICE: str = os.getenv("TTS_VOICE", "Bình (nam miền Bắc)")
     TTS_API_KEY: str = os.getenv("TTS_API_KEY", "no-key-needed")
+    TTS_CONNECT_TIMEOUT_SECONDS: float = _get_float(
+        "TTS_CONNECT_TIMEOUT_SECONDS", 15.0
+    )
+    TTS_READ_TIMEOUT_SECONDS: float = _get_float("TTS_READ_TIMEOUT_SECONDS", 300.0)
+    TTS_WRITE_TIMEOUT_SECONDS: float = _get_float("TTS_WRITE_TIMEOUT_SECONDS", 30.0)
+    TTS_POOL_TIMEOUT_SECONDS: float = _get_float("TTS_POOL_TIMEOUT_SECONDS", 30.0)
+    TTS_MAX_RETRIES: int = _get_int("TTS_MAX_RETRIES", 3)
 
 
     # Streaming/latency tuning

@@ -18,11 +18,10 @@ from rest_framework.response import Response
 
 from django.db import connections
 
-from django.db.utils import OperationalError
-
 from redis import Redis
 
 from django.conf import settings
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from urllib.parse import urlparse
 
 from django.core.cache import cache as django_cache
@@ -275,58 +274,47 @@ def get_all_careers(request):
 @permission_classes([AllowAny])
 def health_check(request):
 
-    # Check database connection
+    def _check_database():
+        try:
+            db_conn = connections['default']
+            with db_conn.cursor() as cursor:
+                cursor.execute("SELECT 1")
+            return True
+        except Exception:
+            return False
 
-    try:
+    def _check_redis():
+        try:
+            redis_client = Redis(
+                host=settings.SERVICE_REDIS_HOST,
+                port=settings.SERVICE_REDIS_PORT,
+                db=settings.SERVICE_REDIS_DB,
+                password=settings.SERVICE_REDIS_PASSWORD,
+            )
+            return bool(redis_client.ping())
+        except Exception:
+            return False
 
-        db_conn = connections['default']
+    def _run_check(check_func, timeout=3):
+        # Run blocking I/O checks in a worker thread to avoid async-context
+        # safety errors when this sync endpoint is served under ASGI workers.
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(check_func)
+            try:
+                return bool(future.result(timeout=timeout))
+            except (FuturesTimeoutError, Exception):
+                return False
 
-        db_conn.cursor()
-
-        db_status = True
-
-    except OperationalError:
-
-        db_status = False
-
-    # Test Redis connection
-
-    try:
-
-        redis_client = Redis(
-
-            host=settings.SERVICE_REDIS_HOST,
-
-            port=settings.SERVICE_REDIS_PORT,
-
-            db=settings.SERVICE_REDIS_DB,
-
-            password=settings.SERVICE_REDIS_PASSWORD,
-
-        )
-
-        redis_status = redis_client.ping()
-
-    except Exception:
-
-        redis_status = False
-
-    # Overall status
+    db_status = _run_check(_check_database)
+    redis_status = _run_check(_check_redis)
 
     is_healthy = all([db_status, redis_status])
-
     response_data = {
-
         "status": "healthy" if is_healthy else "unhealthy",
-
         "database": "connected" if db_status else "disconnected",
-
         "redis": "connected" if redis_status else "disconnected",
-
     }
-
     status_code = status.HTTP_200_OK if is_healthy else status.HTTP_503_SERVICE_UNAVAILABLE
-
     return Response(response_data, status=status_code)
 
 @api_view(["GET"])
