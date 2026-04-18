@@ -282,7 +282,7 @@ def analyze_resume_ai(self, activity_id):
         ollama_url = config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")
         model_alias = config(
             "AI_RESUME_LLM_MODEL",
-            default=config("AI_LLM_MODEL", default=config("OLLAMA_MODEL", default="qwen2-7b")),
+            default=config("AI_LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b")),
         )
         llm_temperature = config("AI_RESUME_LLM_TEMPERATURE", default=0.1, cast=float)
         llm_top_p = config("AI_RESUME_LLM_TOP_P", default=0.9, cast=float)

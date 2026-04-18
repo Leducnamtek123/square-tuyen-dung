@@ -6,12 +6,6 @@ services:
         MIRROR_PREFIX: ${DOCKER_MIRROR:-nvidia}
     gpus: all
 
-  llama_cpp:
-    image: ghcr.io/ggml-org/llama.cpp:server-cuda
-    gpus: all
-    environment:
-      - LLAMA_ARG_N_GPU_LAYERS=${LLAMA_N_GPU_LAYERS:-35}
-
   whisper:
     build:
       context: ./inference/whisper
@@ -21,3 +15,4 @@ services:
     gpus: all
     environment:
       - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cuda:0}
+

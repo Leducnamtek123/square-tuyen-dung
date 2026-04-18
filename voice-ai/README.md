@@ -13,7 +13,7 @@ This repo contains everything needed to run a real-time AI voice assistant local
 - **LiveKit Agents (Python)** to orchestrate the STT → LLM → TTS pipeline.
 - **Nemotron Speech (default)** for speech-to-text, exposed via an OpenAI-compatible API.
 - **Whisper (via VoxBox)** as an optional fallback STT backend.
-- **llama.cpp (llama-server)** for running local LLMs (OpenAI-compatible API).
+- **Ollama** for running local LLMs (OpenAI-compatible API).
 - **Kokoro** for text-to-speech voice synthesis.
 - **Next.js + Tailwind** frontend UI.
 - Fully containerized via Docker Compose.
@@ -37,9 +37,9 @@ Once it's up, visit [http://localhost:3000](http://localhost:3000) in your brows
 
 ### Notes on models and resources
 
-- The LLM runs via `llama-server` and auto-downloads from Hugging Face on first boot (no manual model download needed).
-- The default repo is `unsloth/Qwen3-4B-Instruct-2507-GGUF` (change `LLAMA_HF_REPO` to use a different model or quant).
-- The API exposes the model under an alias (default `qwen3-4b` via `LLAMA_MODEL_ALIAS`); the agent uses that via `LLAMA_MODEL`.
+- The LLM runs via Ollama. Pull your model first (for example `ollama pull gemma4:e4b`).
+- Default model is `gemma4:e4b` (change `OLLAMA_MODEL` if needed).
+- `OLLAMA_MODEL` is the tag the agent requests from Ollama.
 - STT defaults to Nemotron (`NEMOTRON_MODEL_NAME`, `NEMOTRON_MODEL_ID`, `STT_*` env vars).
 - If you switch to Whisper fallback, configure `VOXBOX_HF_REPO_ID` and run compose with `--profile whisper`.
 - You can swap out the LLM/STT/TTS URLs to use cloud models if you want (see `livekit_agent/src/agent.py`).
@@ -49,7 +49,7 @@ Once it's up, visit [http://localhost:3000](http://localhost:3000) in your brows
 
 ### Startup readiness
 
-`llama_cpp` returns 503s while the model is downloading/loading/warming up. Nemotron also needs startup time on first boot to download weights. The Compose stack includes healthchecks, and `livekit_agent` waits for both `llama_cpp` and `nemotron` to be healthy before starting.
+Ollama may respond slowly while loading/warming the model. Nemotron also needs startup time on first boot.
 
 ## Architecture
 
@@ -59,7 +59,7 @@ Each service is containerized and communicates over a shared Docker network:
 - `livekit_agent`: Python agent (LiveKit Agents SDK)
 - `nemotron`: Speech-to-text (NVIDIA Nemotron Speech, OpenAI-compatible API)
 - `whisper` (optional profile): Fallback STT backend (VoxBox + Whisper)
-- `llama_cpp`: Local LLM provider (`llama-server`)
+- `ollama` (external): Local LLM provider
 - `kokoro`: TTS engine
 - `frontend`: Next.js client UI
 
@@ -69,7 +69,7 @@ The agent entrypoint is `livekit_agent/src/agent.py`. It uses the LiveKit Agents
 
 - `openai.STT` → Nemotron by default (configurable via `STT_PROVIDER` / `STT_BASE_URL` / `STT_MODEL`)
 - Optional `whisper` profile can be selected as a fallback STT backend.
-- `openai.LLM` → `llama_cpp` (`llama-server`)
+- `openai.LLM` -> Ollama (`OLLAMA_BASE_URL`)
 - `openai.TTS` → the Kokoro container
 - `silero.VAD` for voice activity detection
 
@@ -95,17 +95,14 @@ The LiveKit URL is used in two different contexts:
 
 The frontend only signs tokens; it does not connect to LiveKit directly. The browser connects using the `serverUrl` returned by `/api/connection-details`, so make sure `NEXT_PUBLIC_LIVEKIT_URL` points to a reachable LiveKit endpoint.
 
-### LLM (llama.cpp) settings
+### LLM (Ollama) settings
 
-The Compose stack runs `llama-server` with `--hf-repo` so models are fetched automatically and cached on disk:
+This stack connects to an existing Ollama server:
 
-- `LLAMA_HF_REPO`: Hugging Face repo, optionally with `:quant` (e.g. `unsloth/Qwen3-4B-Instruct-2507-GGUF:q4_k_m`)
-- `LLAMA_MODEL_ALIAS`: Name exposed via the API (and returned from `/v1/models`)
-- `LLAMA_MODEL`: What the agent requests (should match `LLAMA_MODEL_ALIAS`)
-- `LLAMA_BASE_URL`: LLM base URL for the agent (default `http://llama_cpp:11434/v1`)
-- `LLAMA_HOST_PORT`: Host port mapping for llama-server (default `11436`)
+- `OLLAMA_MODEL`: Name exposed via the API (and returned from `/v1/models`)
+- `OLLAMA_BASE_URL`: LLM base URL for the agent (default `http://host.docker.internal:11434/v1`)
 
-Models are cached under `inference/llama/models` (mounted into the container as `/models`).
+Ensure `OLLAMA_BASE_URL` is reachable from the `livekit_agent` container.
 
 ### STT settings (Nemotron default)
 
@@ -144,7 +141,7 @@ docker compose up --build
 ```
 .
 ├─ frontend/        # Next.js UI client
-├─ inference/       # Local inference services (llama/nemotron/whisper/kokoro)
+├─ inference/       # Local inference services (nemotron/whisper/kokoro)
 ├─ livekit/         # LiveKit server config
 ├─ livekit_agent/   # Python voice agent (LiveKit Agents)
 ├─ docker-compose.yml
@@ -163,5 +160,5 @@ docker compose up --build
 - Uses LiveKit Agents: https://docs.livekit.io/agents/
 - STT via NVIDIA Nemotron Speech: https://huggingface.co/nvidia/nemotron-speech-streaming-en-0.6b
 - Whisper fallback via VoxBox: https://pypi.org/project/vox-box/
-- Local LLM via llama.cpp: https://github.com/ggml-org/llama.cpp
+- Local LLM via Ollama: https://ollama.com/
 - TTS via Kokoro: https://github.com/remsky/kokoro

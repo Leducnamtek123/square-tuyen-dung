@@ -232,7 +232,7 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
 """
 
         ollama_url = config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")
-        model_alias = config("OLLAMA_MODEL", default="qwen2-7b")
+        model_alias = config("OLLAMA_MODEL", default="gemma4:e4b")
 
         payload = {
             "model": model_alias,

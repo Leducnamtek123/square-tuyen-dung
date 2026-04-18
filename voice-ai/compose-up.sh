@@ -25,7 +25,7 @@ fi
 
 # macOS-specific settings
 if [[ "$(uname -s)" == "Darwin" ]]; then
-  export LLAMA_CTX_SIZE="${LLAMA_CTX_SIZE:-16384}"
+  export OLLAMA_CTX_SIZE="${OLLAMA_CTX_SIZE:-16384}"
 fi
 
 compose_files=(-f docker-compose.yml)

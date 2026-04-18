@@ -35,35 +35,6 @@ services:
     networks:
       - agent_network
   
-  llama_cpp:
-    image: ghcr.io/ggml-org/llama.cpp:server
-    command:
-      - --host
-      - 0.0.0.0
-      - --port
-      - "11434"
-      - --hf-repo
-      - "${LLAMA_HF_REPO:-Qwen/Qwen2-7B-Instruct-GGUF}"
-      - --alias
-      - "${LLAMA_MODEL_ALIAS:-qwen2-7b}"
-      - --ctx-size
-      - "${LLAMA_CTX_SIZE:-16384}"
-    ports:
-      - "${LLAMA_HOST_PORT:-11436}:11434"
-    volumes:
-      - ./inference/llama/models:/models
-    environment:
-      - XDG_CACHE_HOME=/models
-      - HF_HOME=/models
-    networks:
-      - agent_network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:11434/v1/models > /dev/null"]
-      interval: 10s
-      timeout: 5s
-      retries: 120
-      start_period: 30s
-
   livekit:
     image: livekit/livekit-server:latest
     command: --dev --config /etc/livekit.yaml
@@ -91,6 +62,8 @@ services:
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}
       - LIVEKIT_AGENT_PORT=${LIVEKIT_AGENT_PORT:-7880}
       - STT_LANGUAGE=${STT_LANGUAGE:-vi}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434/v1}
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma4:e4b}
       - TTS_VOICE=${TTS_VOICE:-Bình (nam miền Bắc)}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-no-key-needed}
       - GROQ_API_KEY=${GROQ_API_KEY:-no-key-needed}
@@ -101,8 +74,6 @@ services:
         condition: service_healthy
       whisper:
         condition: service_healthy
-      llama_cpp:
-        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8081/ > /dev/null"]
       interval: 5s
@@ -134,3 +105,5 @@ volumes:
 networks:
   agent_network:
     driver: bridge
+
+

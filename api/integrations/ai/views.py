@@ -364,7 +364,7 @@ class ChatAPIView(APIView):
             messages.append({"role": "user", "content": message})
 
         base_url = getattr(settings, "AI_LLM_BASE_URL", "http://ollama:11434/v1").rstrip("/")
-        model = body.get("model") or getattr(settings, "AI_LLM_MODEL", "qwen2-7b")
+        model = body.get("model") or getattr(settings, "AI_LLM_MODEL", "gemma4:e4b")
         url = f"{base_url}/chat/completions"
 
         # Determine which tools to make available.
