@@ -362,6 +362,8 @@ services:
         condition: service_healthy
       whisper:
         condition: service_healthy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: always
     networks:
       - app-net
