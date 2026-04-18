@@ -35,8 +35,8 @@
     "transcript": "Bản ghi cuộc hội thoại"
   },
   "voiceAi": {
-    "pageTitle": "Trợ lý Phỏng vấn Voice AI",
-    "pageDescription": "Trợ lý phỏng vấn ảo được xây dựng bởi LiveKit",
+    "pageTitle": "Tr? l� ph?ng v?n",
+    "pageDescription": "Tr? l� ph?ng v?n tr?c tuy?n",
     "companyName": "Square AI",
     "startCall": "Bắt đầu cuộc gọi",
     "startAudio": "Bật âm thanh",
@@ -88,7 +88,7 @@
     "CLOSING": "Kết thúc",
     "currentQuestion": "Câu hỏi {{current}} / {{total}}"
   },
-  "loading": "Đang kết nối đến phòng phỏng vấn...",
+  "loading": "�ang ch? h? th?ng...",
   "errors": {
     "missingInvite": "Thiếu mã mời phỏng vấn.",
     "missingSessionId": "Thiếu ID phiên phỏng vấn.",
@@ -250,3 +250,4 @@
     }
   }
 }
+

@@ -35,9 +35,9 @@
     "transcript": "Chat Transcript"
   },
   "voiceAi": {
-    "pageTitle": "LiveKit Voice Agent",
-    "pageDescription": "A voice agent built with LiveKit",
-    "companyName": "LiveKit",
+    "pageTitle": "Interview Assistant",
+    "pageDescription": "Virtual interview assistant",
+    "companyName": "Interview System",
     "startCall": "Start call",
     "startAudio": "Start audio",
     "welcome": {
@@ -88,7 +88,7 @@
     "CLOSING": "Closing",
     "currentQuestion": "Question {{current}} / {{total}}"
   },
-  "loading": "Connecting to interview room...",
+  "loading": "Waiting for system...",
   "errors": {
     "missingInvite": "Missing interview invite code.",
     "missingSessionId": "Missing interview session ID.",

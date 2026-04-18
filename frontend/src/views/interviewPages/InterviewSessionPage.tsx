@@ -258,7 +258,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
       <main className="grid min-h-screen place-items-center bg-slate-950 px-6 text-slate-100">
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="h-10 w-10 animate-spin rounded-full border-2 border-cyan-300/30 border-t-cyan-300" />
-          <p className="text-sm text-slate-300">{t("loading", { defaultValue: "Connecting..." })}</p>
+          <p className="text-sm text-slate-300">{t("loading", { defaultValue: "Waiting for system..." })}</p>
         </div>
       </main>
     );
@@ -369,7 +369,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                   <p className="mx-auto max-w-md text-sm leading-relaxed text-slate-400">
                     {isJoinable
                       ? t("readyBody", {
-                          defaultValue: "Join the secure interview room with AI. Your camera and microphone will only be shared when you choose.",
+                          defaultValue: "Join the interview room. Your camera and microphone will only be shared when you choose.",
                         })
                       : t(`errors.unjoinableByStatus.${statusKey}`, {
                           defaultValue: t("sessionNotJoinableBody", {
@@ -389,7 +389,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                         className="h-14 rounded-2xl bg-cyan-500 px-12 text-sm font-black uppercase tracking-[0.2em] shadow-2xl shadow-cyan-500/20 hover:bg-cyan-400 hover:shadow-cyan-400/30 transition-all active:scale-[0.98] disabled:opacity-50"
                       >
                         {starting
-                          ? t("loading", { defaultValue: "Connecting..." })
+                          ? t("loading", { defaultValue: "Waiting for system..." })
                           : t("startInterview", { defaultValue: "Start Connecting" })}
                       </Button>
                       <Button
