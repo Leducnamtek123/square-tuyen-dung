@@ -392,8 +392,9 @@ class ChatAPIView(APIView):
         if "max_tokens" in body:
             base_payload["max_tokens"] = body.get("max_tokens")
 
+        max_tool_rounds = getattr(settings, "AI_CHAT_MAX_TOOL_ROUNDS", 4)
         try:
-            max_tool_rounds = int(body.get("max_tool_rounds", 4))
+            max_tool_rounds = int(max_tool_rounds)
         except (TypeError, ValueError):
             max_tool_rounds = 4
         max_tool_rounds = max(1, min(max_tool_rounds, 8))
