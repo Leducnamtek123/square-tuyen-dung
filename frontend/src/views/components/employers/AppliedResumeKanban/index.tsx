@@ -16,6 +16,7 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
+import { tConfig } from '../../../../utils/tConfig';
 import {
     DragDropContext,
     Droppable,
@@ -152,7 +153,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                         >
                                             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
                                                 <Typography variant="subtitle1" fontWeight={800} color="text.primary">
-                                                    {status.name}
+                                                    {tConfig(status.name as string)}
                                                 </Typography>
                                                 <Chip label={columnCount} size="small" sx={{ fontWeight: 900, bgcolor: 'background.paper', boxShadow: theme.customShadows?.z1 }} />
                                             </Stack>

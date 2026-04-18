@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
 
@@ -29,6 +30,7 @@ const RadioCustom = <T extends FieldValues = FieldValues>({
   showRequired = false,
   options = [],
 }: Props<T>) => {
+  const { t } = useTranslation('common');
 
   return (
 
@@ -82,7 +84,7 @@ const RadioCustom = <T extends FieldValues = FieldValues>({
 
                     control={<Radio />}
 
-                    label={value.name}
+                    label={typeof value.name === 'string' ? t(`choices.${value.name}`, { defaultValue: value.name }) : value.name}
 
                   />
 

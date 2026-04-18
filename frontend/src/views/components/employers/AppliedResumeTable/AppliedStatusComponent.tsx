@@ -108,7 +108,7 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
             {options.map((option) => (
                 <MenuItem key={option.id as string | number} value={option.id as string | number}>
                     <Typography variant="body2" sx={{ fontWeight: 800, fontSize: '0.8125rem' }}>
-                        {option.name}
+                        {tConfig(option.name as string)}
                     </Typography>
                 </MenuItem>
             ))}

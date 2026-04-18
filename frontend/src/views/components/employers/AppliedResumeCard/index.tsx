@@ -19,6 +19,7 @@ import {
   ToggleButtonGroup
 } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { tConfig } from '../../../../utils/tConfig';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -327,7 +328,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               </Grid>
               <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                   <Autocomplete
-                      getOptionLabel={(option) => option.name}
+                      getOptionLabel={(option) => tConfig(option.name as string)}
                       value={allConfig?.applicationStatusOptions?.find(o => String(o.id) === applicationStatusSelect) || null}
                       onChange={(e, value) => {
                           setApplicationStatusSelect(value?.id ? String(value.id) : '');
