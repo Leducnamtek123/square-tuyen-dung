@@ -279,10 +279,10 @@ def analyze_resume_ai(self, activity_id):
         - no markdown, no extra text outside JSON.
         """
 
-        llama_url = config('LLAMA_BASE_URL', default="http://llama-cpp:11434/v1")
+        ollama_url = config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")
         model_alias = config(
             "AI_RESUME_LLM_MODEL",
-            default=config("AI_LLM_MODEL", default=config('LLAMA_MODEL_ALIAS', default="qwen2-7b")),
+            default=config("AI_LLM_MODEL", default=config("OLLAMA_MODEL", default="qwen2-7b")),
         )
         llm_temperature = config("AI_RESUME_LLM_TEMPERATURE", default=0.1, cast=float)
         llm_top_p = config("AI_RESUME_LLM_TOP_P", default=0.9, cast=float)
@@ -307,7 +307,7 @@ def analyze_resume_ai(self, activity_id):
         activity.save(update_fields=['ai_analysis_progress', 'update_at'])
 
         with httpx.Client(timeout=httpx.Timeout(timeout=llm_timeout, connect=llm_connect_timeout)) as client:
-            resp = client.post(f"{llama_url}/chat/completions", json=payload)
+            resp = client.post(f"{ollama_url}/chat/completions", json=payload)
 
         if resp.status_code != 200:
             raise Exception(f"LLM API failed with status {resp.status_code}")
@@ -330,7 +330,7 @@ def analyze_resume_ai(self, activity_id):
                     result = None
 
             if result is None and config("AI_RESUME_OLLAMA_FALLBACK_ENABLED", default=True, cast=bool):
-                native_base = llama_url[:-3] if llama_url.endswith("/v1") else llama_url
+                native_base = ollama_url[:-3] if ollama_url.endswith("/v1") else ollama_url
                 native_payload = {
                     "model": model_alias,
                     "messages": payload["messages"],

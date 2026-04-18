@@ -363,7 +363,7 @@ class ChatAPIView(APIView):
                 messages.append({"role": "system", "content": system_prompt})
             messages.append({"role": "user", "content": message})
 
-        base_url = getattr(settings, "AI_LLM_BASE_URL", "http://llama-cpp:11434/v1").rstrip("/")
+        base_url = getattr(settings, "AI_LLM_BASE_URL", "http://ollama:11434/v1").rstrip("/")
         model = body.get("model") or getattr(settings, "AI_LLM_MODEL", "qwen2-7b")
         url = f"{base_url}/chat/completions"
 

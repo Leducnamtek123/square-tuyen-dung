@@ -30,8 +30,8 @@ class Config:
     LIVEKIT_API_SECRET: str = os.getenv("LIVEKIT_API_SECRET", "secret")
 
     # LLM
-    LLAMA_MODEL: str = os.getenv("LLAMA_MODEL", "qwen2-7b")
-    LLAMA_BASE_URL: str = os.getenv("LLAMA_BASE_URL", "http://llama-cpp:11434/v1")
+    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "qwen2-7b")
+    OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://ollama:11434/v1")
 
     STT_PROVIDER: str = os.getenv("STT_PROVIDER", "whisper").lower()
 

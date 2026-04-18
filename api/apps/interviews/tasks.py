@@ -231,8 +231,8 @@ Hãy trả về kết quả DƯỚI DẠNG JSON với các trường:
 Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
 """
 
-        llama_url = config("LLAMA_BASE_URL", default="http://llama-cpp:11434/v1")
-        model_alias = config("LLAMA_MODEL_ALIAS", default="qwen2-7b")
+        ollama_url = config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")
+        model_alias = config("OLLAMA_MODEL", default="qwen2-7b")
 
         payload = {
             "model": model_alias,
@@ -250,7 +250,7 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
         logger.info("Starting AI evaluation for session %s using %s", session_id, model_alias)
 
         with httpx.Client(timeout=httpx.Timeout(timeout=120.0, connect=15.0)) as client:
-            resp = client.post(f"{llama_url}/chat/completions", json=payload)
+            resp = client.post(f"{ollama_url}/chat/completions", json=payload)
 
         if resp.status_code != 200:
             logger.error("LLM API call failed with status %s: %s", resp.status_code, resp.text)
