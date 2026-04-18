@@ -40,8 +40,7 @@ import jobPostActivityService from '../../../../services/jobPostActivityService'
 import { useAppliedResumes, useJobPostOptions, useDeleteJobPostActivity, useUpdateApplicationStatus } from '../hooks/useEmployerQueries';
 import { useDataTable } from '../../../../hooks';
 import { useConfig } from '@/hooks/useConfig';
-import type { AxiosError } from 'axios';
-import type { ApiError } from '../../../../types/api';
+import type { JobPostActivity } from '@/types/models';
 import type { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
 
 import { AppliedResumeFilterData } from '../AppliedResumeFilterForm';
@@ -87,6 +86,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   const [isProcessing, setIsProcessing] = useState(false);
   const [jobPostIdSelect, setJobPostIdSelect] = useState('');
   const [applicationStatusSelect, setApplicationStatusSelect] = useState('');
+  const [optimisticAnalysis, setOptimisticAnalysis] = useState<Record<string, Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>>>({});
 
   const { data: jobPostOptions = [] } = useJobPostOptions();
 
@@ -103,8 +103,44 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   const { deleteJobPostActivity, isMutating: isDeleting } = useDeleteJobPostActivity();
   const { updateStatus, isMutating: isUpdatingStatus } = useUpdateApplicationStatus();
 
-  const resumes = queryData?.results || [];
+  const resumes = useMemo(() => {
+    const sourceRows = queryData?.results || [];
+    if (!Object.keys(optimisticAnalysis).length) return sourceRows;
+
+    return sourceRows.map((row) => {
+      const patch = optimisticAnalysis[String(row.id)];
+      return patch ? { ...row, ...patch } : row;
+    });
+  }, [queryData?.results, optimisticAnalysis]);
   const count = queryData?.count || 0;
+
+  React.useEffect(() => {
+    const sourceRows = queryData?.results || [];
+    if (!sourceRows.length || !Object.keys(optimisticAnalysis).length) return;
+
+    setOptimisticAnalysis((prev) => {
+      let changed = false;
+      const next = { ...prev };
+
+      Object.keys(prev).forEach((id) => {
+        const row = sourceRows.find((item) => String(item.id) === id);
+        const status = row?.aiAnalysisStatus;
+        if (!row || status === 'processing' || status === 'completed' || status === 'failed') {
+          delete next[id];
+          changed = true;
+        }
+      });
+
+      return changed ? next : prev;
+    });
+  }, [queryData?.results, optimisticAnalysis]);
+
+  const handleAnalysisStateChange = useCallback((id: string | number, nextState: Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>) => {
+    setOptimisticAnalysis((prev) => ({
+      ...prev,
+      [String(id)]: nextState,
+    }));
+  }, []);
 
   const numbersFilter = useMemo(() => {
     return Object.values(filterData).filter(v => v !== '').length;
@@ -391,6 +427,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               onSortingChange={onSortingChange as OnChangeFn<SortingState>}
               handleChangeApplicationStatus={handleChangeApplicationStatus}
               handleDelete={handleDelete}
+              onAnalysisStateChange={handleAnalysisStateChange}
             />
         ) : (
             <AppliedResumeKanban
@@ -398,6 +435,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               isLoading={isLoading}
               handleChangeApplicationStatus={handleChangeApplicationStatus}
               handleDelete={handleDelete}
+              onAnalysisStateChange={handleAnalysisStateChange}
             />
         )}
 

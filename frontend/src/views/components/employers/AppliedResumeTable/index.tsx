@@ -36,6 +36,7 @@ export interface AppliedResumeTableProps {
   isLoading: boolean;
   handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;
   handleDelete: (id: string | number) => void;
+  onAnalysisStateChange?: (id: string | number, nextState: Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>) => void;
   rowCount: number;
   pagination: PaginationState;
   onPaginationChange: OnChangeFn<PaginationState>;
@@ -52,6 +53,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     isLoading, 
     handleChangeApplicationStatus, 
     handleDelete,
+    onAnalysisStateChange,
     rowCount,
     pagination,
     onPaginationChange,
@@ -234,6 +236,10 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
           open={Boolean(openDrawerId)}
           onClose={() => setOpenDrawerId(null)}
           activityId={openDrawerId}
+          onAnalysisStateChange={(nextState) => {
+            if (!openDrawerId || !onAnalysisStateChange) return;
+            onAnalysisStateChange(openDrawerId, nextState);
+          }}
           initialData={{
             ...selectedActivityInfo,
             aiAnalysisSummary: selectedActivityInfo.aiAnalysisSummary ?? undefined

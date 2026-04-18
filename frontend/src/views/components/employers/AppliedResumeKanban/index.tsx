@@ -45,9 +45,10 @@ export interface AppliedResumeKanbanProps {
     isLoading: boolean;
     handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;
     handleDelete: (id: string | number) => void;
+    onAnalysisStateChange?: (id: string | number, nextState: Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>) => void;
 }
 
-const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoading, handleChangeApplicationStatus, handleDelete }) => {
+const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoading, handleChangeApplicationStatus, handleDelete, onAnalysisStateChange }) => {
     const { t } = useTranslation(['employer', 'common']);
     const { allConfig } = useConfig();
     const nav = useRouter();
@@ -113,6 +114,10 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                     open={Boolean(openDrawerId)}
                     onClose={() => setOpenDrawerId(null)}
                     activityId={openDrawerId}
+                    onAnalysisStateChange={(nextState) => {
+                        if (!openDrawerId || !onAnalysisStateChange) return;
+                        onAnalysisStateChange(openDrawerId, nextState);
+                    }}
                     initialData={
                         {
                             ...selectedActivityInfo,

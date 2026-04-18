@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
+import type { JobPostActivity } from '@/types/models';
 
 import { ScoreGauge } from './ScoreGauge';
 import { SkillChipList } from './SkillChipList';
@@ -57,6 +58,10 @@ interface AIAnalysisDrawerProps {
   onClose: () => void;
   activityId: string | number | null;
   initialData?: AIAnalysisData | null;
+  onAnalysisStateChange?: (nextState: {
+    aiAnalysisStatus?: JobPostActivity['aiAnalysisStatus'];
+    aiAnalysisProgress?: number;
+  }) => void;
 }
 
 const renderIcon = (
@@ -94,6 +99,13 @@ const toSkillArray = (skills: unknown): string[] => {
   return [];
 };
 
+const normalizeAiStatus = (status: unknown): JobPostActivity['aiAnalysisStatus'] => {
+  if (status === 'pending' || status === 'processing' || status === 'completed' || status === 'failed') {
+    return status;
+  }
+  return undefined;
+};
+
 const canEmbedUrl = (url: string): boolean => {
   if (!url || typeof window === 'undefined') return false;
 
@@ -110,6 +122,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
   onClose,
   activityId,
   initialData,
+  onAnalysisStateChange,
 }) => {
   const { t } = useTranslation('employer');
   const theme = useTheme();
@@ -155,6 +168,10 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
         const newData = res as AIAnalysisData;
         if (newData) {
           setData(newData);
+          onAnalysisStateChange?.({
+            aiAnalysisStatus: normalizeAiStatus(newData.aiAnalysisStatus),
+            aiAnalysisProgress: newData.aiAnalysisProgress,
+          });
         }
         if (newData && newData.aiAnalysisStatus !== 'processing') {
           setAnalyzing(false);
@@ -166,7 +183,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [open, activityId, data?.aiAnalysisStatus]);
+  }, [open, activityId, data?.aiAnalysisStatus, onAnalysisStateChange]);
 
   React.useEffect(() => {
     if (!open || data?.aiAnalysisStatus !== 'processing') {
@@ -201,12 +218,14 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
     try {
       setAnalyzing(true);
       setData((prev) => ({ ...(prev || {}), aiAnalysisStatus: 'processing', aiAnalysisProgress: 5 }));
+      onAnalysisStateChange?.({ aiAnalysisStatus: 'processing', aiAnalysisProgress: 5 });
       await jobPostActivityService.analyzeResume(activityId);
       toastMessages.success(t('appliedResume.ai.analysisStarted'));
     } catch (err: unknown) {
       errorHandling(err as AxiosError<Record<string, unknown>>);
       setAnalyzing(false);
       setData((prev) => ({ ...(prev || {}), aiAnalysisStatus: 'failed' }));
+      onAnalysisStateChange?.({ aiAnalysisStatus: 'failed', aiAnalysisProgress: 0 });
     }
   };
 
