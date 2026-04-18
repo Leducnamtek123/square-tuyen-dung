@@ -64,6 +64,7 @@ async def entrypoint(ctx: JobContext) -> None:
         api_key=config.STT_API_KEY,
         base_url=config.STT_BASE_URL,
         model=config.STT_MODEL,
+        language=config.STT_LANGUAGE,
     )
 
     llm_model = openai.LLM(
