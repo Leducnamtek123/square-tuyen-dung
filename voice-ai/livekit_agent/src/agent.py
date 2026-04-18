@@ -93,7 +93,7 @@ async def entrypoint(ctx: JobContext) -> None:
     # 2. Context Preparation from room metadata
     agent_context = {
         "candidateName": "Ứng viên",
-        "jobTitle": "Vị trí này",
+        "jobTitle": "đang ứng tuyển",
         "jobDescription": "",
         "backendApiUrl": config.BACKEND_API_URL,
         "roomName": ctx.room.name,
@@ -105,7 +105,7 @@ async def entrypoint(ctx: JobContext) -> None:
             agent_context.update(
                 {
                     "candidateName": pm.get("candidate_name", "Ứng viên"),
-                    "jobTitle": pm.get("job_title", "Vị trí này"),
+                    "jobTitle": pm.get("job_title", "đang ứng tuyển"),
                     "jobDescription": pm.get("job_description", ""),
                 }
             )

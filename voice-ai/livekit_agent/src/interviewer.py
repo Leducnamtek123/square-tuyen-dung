@@ -28,7 +28,7 @@ class Interviewer(Agent):
         instructions = INTERVIEWER_INSTRUCTIONS
         if context:
             candidate_name = context.get("candidateName", "Ứng viên")
-            job_title = context.get("jobTitle", "Vị trí này")
+            job_title = context.get("jobTitle", "đang ứng tuyển")
             job_desc = context.get("jobDescription", "")
             instructions += (
                 f"\n\nThông tin ngữ cảnh:\n"
@@ -69,10 +69,10 @@ class Interviewer(Agent):
         """Called when the agent joins the session. Triggers the initial greeting."""
         logger.info("Interviewer agent entered session. Generating initial greeting...")
         candidate_name = "ứng viên"
-        job_title = "vị trí này"
+        job_title = "đang ứng tuyển"
         if self._context:
             candidate_name = self._context.get("candidateName", "ứng viên")
-            job_title = self._context.get("jobTitle", "vị trí này")
+            job_title = self._context.get("jobTitle", "đang ứng tuyển")
 
         self.session.generate_reply(
             instructions=(
