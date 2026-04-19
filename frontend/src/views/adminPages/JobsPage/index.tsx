@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Tooltip, IconButton, Stack, Chip, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
@@ -50,26 +50,26 @@ const JobsPage = () => {
         onPaginationChange({ pageIndex: 0, pageSize: pageSize });
     };
 
-    const handleApprove = async (id: string | number) => {
+    const handleApprove = useCallback(async (id: string | number) => {
         try {
             await approveJob(id);
         } catch (error) {
             console.error(error);
         }
-    };
+    }, [approveJob]);
 
-    const handleReject = async (id: string | number) => {
+    const handleReject = useCallback(async (id: string | number) => {
         try {
             await rejectJob(id);
         } catch (error) {
             console.error(error);
         }
-    };
+    }, [rejectJob]);
 
-    const handleOpenDelete = (job: JobPost) => {
+    const handleOpenDelete = useCallback((job: JobPost) => {
         setCurrentJob(job);
         setOpenDeleteDialog(true);
-    };
+    }, []);
 
     const handleCloseDialog = () => {
         setOpenDeleteDialog(false);
@@ -85,7 +85,7 @@ const JobsPage = () => {
         }
     };
 
-    const getStatusLabel = (status: JobPost['status'], isExpired?: boolean) => {
+    const getStatusLabel = useCallback((status: JobPost['status'], isExpired?: boolean) => {
         const s = Number(status);
         if (isExpired && s === 3) {
             return <Chip label={t('pages.jobs.status.expired', 'Expired')} size="small" color="default" />;
@@ -96,7 +96,7 @@ const JobsPage = () => {
             case 3: return <Chip label={t('pages.jobs.status.approved', 'Approved')} size="small" color="success" />;
             default: return <Chip label={t('pages.jobs.status.unknown', 'Unknown')} size="small" />;
         }
-    };
+    }, [t]);
 
     const columns = useMemo<ColumnDef<JobPost>[]>(() => [
         {
@@ -172,7 +172,7 @@ const JobsPage = () => {
                 );
             },
         },
-    ], [t]);
+    ], [getStatusLabel, handleApprove, handleOpenDelete, handleReject, t]);
 
     return (
         <Box>

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Typography, Chip, Tooltip, IconButton, Stack } from "@mui/material";
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import EditIcon from '@mui/icons-material/Edit';
@@ -52,7 +52,7 @@ const JobTable = ({
 }: JobTableProps) => {
     const { t } = useTranslation('admin');
 
-    const getStatusChip = (status: number) => {
+    const getStatusChip = useCallback((status: number) => {
         switch (status) {
             case 1:
                 return <Chip label={t('pages.jobs.table.status.pending')} color="warning" size="small" />;
@@ -63,7 +63,7 @@ const JobTable = ({
             default:
                 return <Chip label={t('pages.jobs.table.status.unknown')} size="small" />;
         }
-    };
+    }, [t]);
 
     const columns = useMemo<ColumnDef<JobPostExt>[]>(() => [
         {
@@ -136,7 +136,7 @@ const JobTable = ({
                 </Stack>
             ),
         },
-    ], [t, onView, onEdit, onApprove, onReject, onDelete]);
+    ], [getStatusChip, onApprove, onDelete, onEdit, onReject, onView, t]);
 
     return (
         <DataTable

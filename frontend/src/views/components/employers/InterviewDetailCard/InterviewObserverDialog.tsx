@@ -477,11 +477,13 @@ const InterviewObserverDialog: React.FC<InterviewObserverDialogProps> = ({
       open={open}
       onClose={onClose}
       fullScreen
-      TransitionComponent={Transition}
-      PaperProps={{
-        sx: {
-          bgcolor: '#0a0e1a',
-          backgroundImage: 'radial-gradient(ellipse at top, rgba(56,189,248,0.07) 0%, transparent 60%)',
+      slots={{ transition: Transition }}
+      slotProps={{
+        paper: {
+          sx: {
+            bgcolor: '#0a0e1a',
+            backgroundImage: 'radial-gradient(ellipse at top, rgba(56,189,248,0.07) 0%, transparent 60%)',
+          },
         },
       }}
     >

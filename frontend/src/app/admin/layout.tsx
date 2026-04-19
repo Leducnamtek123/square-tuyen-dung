@@ -67,7 +67,7 @@ export default function AdminSectionLayout({
     };
 
     checkAuth();
-  }, [dispatch, isAuthPage, pathname, router]);
+  }, [currentUser, dispatch, isAuthPage, pathname, router]);
 
   // Second effect to handle role verification once currentUser is available
   useEffect(() => {

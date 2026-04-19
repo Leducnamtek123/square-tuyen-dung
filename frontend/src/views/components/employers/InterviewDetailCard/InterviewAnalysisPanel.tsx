@@ -73,7 +73,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                     <ListItemIcon sx={{ minWidth: 32, mt: 0.5 }}>
                                         <CheckCircleOutlineIcon sx={{ fontSize: 16, color: 'success.main' }} />
                                     </ListItemIcon>
-                                    <ListItemText primary={item} primaryTypographyProps={{ variant: 'body2', lineHeight: 1.6, fontWeight: 700, color: 'success.dark' }} />
+                                    <ListItemText primary={item} slotProps={{ primary: { variant: 'body2', lineHeight: 1.6, fontWeight: 700, color: 'success.dark' } }} />
                                 </ListItem>
                             )) : (
                                 <Box sx={{ py: 6, textAlign: 'center', bgcolor: alpha(theme.palette.action.disabled, 0.03), borderRadius: 3, border: '1px dashed', borderColor: 'divider' }}>
@@ -108,7 +108,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                     <ListItemIcon sx={{ minWidth: 32, mt: 0.5 }}>
                                         <ErrorOutlineIcon sx={{ fontSize: 16, color: 'error.main' }} />
                                     </ListItemIcon>
-                                    <ListItemText primary={item} primaryTypographyProps={{ variant: 'body2', lineHeight: 1.6, fontWeight: 700, color: 'error.dark' }} />
+                                    <ListItemText primary={item} slotProps={{ primary: { variant: 'body2', lineHeight: 1.6, fontWeight: 700, color: 'error.dark' } }} />
                                 </ListItem>
                             )) : (
                                 <Box sx={{ py: 6, textAlign: 'center', bgcolor: alpha(theme.palette.action.disabled, 0.03), borderRadius: 3, border: '1px dashed', borderColor: 'divider' }}>

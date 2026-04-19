@@ -204,7 +204,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
         </Stack>
       ),
     },
-  ], [allConfig, handleUnsave, nav, t]);
+  ], [allConfig, handleUnsave, nav, t, theme]);
 
   return (
     <DataTable

@@ -50,7 +50,7 @@ export function TrackSelector({
           <BarVisualizer
             barCount={3}
             options={{ minHeight: 5 }}
-            trackRef={audioTrackRef}
+            track={audioTrackRef}
             className="audiovisualizer flex h-6 w-auto items-center justify-center gap-0.5"
           >
             <span

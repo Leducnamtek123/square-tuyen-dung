@@ -44,7 +44,7 @@ const MuiImageCustom = (props: MuiImageCustomProps) => {
         onError(event);
       }
     },
-    [fallbackSrc, imageSrc, onError]
+    [imageSrc, onError, resolvedFallback]
   );
 
   return (

@@ -134,10 +134,9 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
   // Synchronize with initialData ONLY when drawer opens or initialData changes ID.
   // This prevents infinite re-render loops if initialData changes due to parent cache updates.
   React.useEffect(() => {
-    if (open && initialData && (!data || initialData.id !== data.id)) {
-      setData(initialData);
-    }
-  }, [initialData, open, data?.id]);
+    if (!open || !initialData) return;
+    setData((prev) => (!prev || initialData.id !== prev.id ? initialData : prev));
+  }, [initialData, open]);
 
   // Fetch full detail when drawer opens
   React.useEffect(() => {
@@ -257,12 +256,14 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
       anchor="right"
       open={open}
       onClose={onClose}
-      PaperProps={{
-        sx: {
-          width: { xs: '100%', sm: DRAWER_WIDTH },
-          bgcolor: 'background.default',
-          backgroundImage: 'none',
-          boxShadow: (theme: Theme) => theme.customShadows?.z24
+      slotProps={{
+        paper: {
+          sx: {
+            width: { xs: '100%', sm: DRAWER_WIDTH },
+            bgcolor: 'background.default',
+            backgroundImage: 'none',
+            boxShadow: (theme: Theme) => theme.customShadows?.z24
+          },
         },
       }}
     >

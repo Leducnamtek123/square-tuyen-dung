@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   Box, Typography, Breadcrumbs, Link, Paper, IconButton,
   Chip, Switch, Dialog, DialogTitle, DialogContent, DialogActions,
@@ -34,11 +34,11 @@ const FeedbacksPage = () => {
 
   const feedbacks = data?.results || [];
 
-  const handleToggleActive = async (fb: Feedback) => {
+  const handleToggleActive = useCallback(async (fb: Feedback) => {
     try {
       await updateFeedback({ id: fb.id, data: { is_active: !fb.is_active } });
     } catch (e) { console.error(e); }
-  };
+  }, [updateFeedback]);
 
   const handleDelete = async () => {
     if (!current) return;
@@ -127,7 +127,7 @@ const FeedbacksPage = () => {
         </Tooltip>
       ),
     },
-  ], [t, isMutating]);
+  ], [handleToggleActive, isMutating, t]);
 
   return (
     <Box>

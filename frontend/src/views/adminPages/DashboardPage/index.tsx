@@ -116,7 +116,7 @@ const DashboardPage = () => {
                     <Card elevation={0} sx={{ height: '100%', borderRadius: '16px', border: '1px solid', borderColor: 'divider' }}>
                         <CardHeader 
                             title={t('dashboard.userDistribution')} 
-                            titleTypographyProps={{ variant: 'h6', fontWeight: 700 }}
+                            slotProps={{ title: { variant: 'h6', fontWeight: 700 } }}
                         />
                         <CardContent sx={{ height: 350, pt: 0 }}>
                             {isLoading ? (

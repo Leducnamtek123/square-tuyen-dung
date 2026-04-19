@@ -573,12 +573,14 @@ const InterviewLivePage = () => {
           placeholder={t('interviewLive.searchPlaceholder', { defaultValue: 'Tìm ?ng viên, v? trí, phòng...' })}
           size="small"
           fullWidth
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            },
           }}
         />
         <FormControl size="small" sx={{ minWidth: 220 }}>

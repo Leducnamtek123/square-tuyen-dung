@@ -69,9 +69,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
 
   React.useEffect(() => {
     const getSuggestTitle = async (kw: string) => {
-      if (!isLoading) {
-        setIsLoading(true);
-      }
+      setIsLoading(true);
       try {
         const resData = await jobService.searchJobSuggestTitle(kw);
         const data = Array.isArray(resData) ? resData : ((resData as { results?: string[] })?.results || (resData as { data?: string[] })?.data || []);
@@ -86,7 +84,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
     if (debounded) {
       getSuggestTitle(debounded);
     }
-  }, [debounded, isLoading]);
+  }, [debounded]);
 
   const handleHideResult = () => {
     setShowResult(false);

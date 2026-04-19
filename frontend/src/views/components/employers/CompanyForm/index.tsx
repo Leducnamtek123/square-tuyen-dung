@@ -31,7 +31,7 @@ export interface CompanyFormValues {
     lat: number | string; 
     lng: number | string 
   };
-  since?: Date | null;
+  since?: string | Date | null;
   companyEmail: string;
   companyPhone: string;
   websiteUrl?: string;

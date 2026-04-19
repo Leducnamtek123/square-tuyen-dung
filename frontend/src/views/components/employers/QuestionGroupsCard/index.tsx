@@ -314,7 +314,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
                 onClose={handleCloseDialog} 
                 fullWidth 
                 maxWidth="sm" 
-                PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+                slotProps={{ paper: { sx: { borderRadius: 3, p: 1 } } }}
             >
                 <DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3, fontSize: '1.5rem' }}>
                     {dialogMode === 'add' ? t('employer:questionGroupsCard.dialog.addTitle') : t('employer:questionGroupsCard.dialog.editTitle')}
@@ -362,7 +362,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
                                         })}
                                     </Box>
                                 )}
-                                MenuProps={{ PaperProps: { sx: { borderRadius: 2, mt: 1, maxHeight: 300, boxShadow: (theme: Theme) => theme.customShadows?.z8 } } }}
+                                MenuProps={{ slotProps: { paper: { sx: { borderRadius: 2, mt: 1, maxHeight: 300, boxShadow: (theme: Theme) => theme.customShadows?.z8 } } } }}
                             >
                                 {allQuestions.map((q) => (
                                     <MenuItem key={q.id} value={q.id}>
@@ -409,7 +409,7 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
                 onClose={() => setOpenCreateQuestion(false)} 
                 fullWidth 
                 maxWidth="xs" 
-                PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+                slotProps={{ paper: { sx: { borderRadius: 3, p: 1 } } }}
             >
                 <DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3 }}>{t('employer:questionGroupsCard.dialog.createNewQuestion')}</DialogTitle>
                 <DialogContent sx={{ px: 3, pb: 0 }}>

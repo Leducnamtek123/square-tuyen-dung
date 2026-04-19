@@ -54,7 +54,7 @@ const useFirebaseFireStore = (
     });
 
     return unsubscribe;
-  }, [collectionName, condition, sort]);
+  }, [collectionName, condition, limitNum, sort]);
 
   return docs;
 };

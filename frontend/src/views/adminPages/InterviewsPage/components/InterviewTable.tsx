@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Typography, Chip, Tooltip, IconButton, Stack } from "@mui/material";
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
@@ -52,7 +52,7 @@ const InterviewTable = ({
 }: InterviewTableProps) => {
     const { t } = useTranslation(['interview', 'admin']);
 
-    const getStatusChip = (status: unknown) => {
+    const getStatusChip = useCallback((status: unknown) => {
         const lowerStatus = String(status ?? '').toLowerCase();
         switch (lowerStatus) {
             case 'completed':
@@ -70,16 +70,16 @@ const InterviewTable = ({
             default:
                 return <Chip label={(status || t('common.status.unknown', { ns: 'admin' })) as string} size="small" />;
         }
-    };
+    }, [t]);
 
-    const getTypeChip = (type: unknown) => {
+    const getTypeChip = useCallback((type: unknown) => {
         switch (typeof type === 'string' ? type.toUpperCase() : '') {
             case 'VETTING':
                 return <Chip label={t('pages.interviews.type.vetting', { ns: 'admin' }) as string} color="warning" size="small" variant="outlined" />;
             default:
                 return <Chip label={t('pages.interviews.type.recruitment', { ns: 'admin' }) as string} color="primary" size="small" variant="outlined" />;
         }
-    };
+    }, [t]);
 
     const columns = useMemo<ColumnDef<InterviewTableRow>[]>(() => [
         {
@@ -157,7 +157,7 @@ const InterviewTable = ({
                 </Stack>
             ),
         },
-    ], [t, onView, onUpdateStatus, onDelete]);
+    ], [getStatusChip, getTypeChip, onDelete, onUpdateStatus, onView, t]);
 
     return (
         <DataTable

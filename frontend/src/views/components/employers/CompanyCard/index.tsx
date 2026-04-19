@@ -21,6 +21,41 @@ import ImageCropDialog from '@/components/Common/ImageCropDialog';
 import { useCompanyProfile, useCompanyMutations } from '../hooks/useEmployerQueries';
 import type { CompanyFormValues } from '../CompanyForm';
 import type { EditorState } from 'draft-js';
+import type { Company } from '@/types/models';
+
+const normalizeId = (value: number | string | { id: number; name: string } | undefined): number | string | undefined => {
+  if (typeof value === 'number' || typeof value === 'string') return value;
+  if (value && typeof value === 'object' && 'id' in value) return value.id;
+  return undefined;
+};
+
+const normalizeCompanyForForm = (company: Company): Partial<CompanyFormValues> => {
+  const location = company.location || undefined;
+  return {
+    companyName: company.companyName || '',
+    taxCode: company.taxCode || '',
+    employeeSize: company.employeeSize ?? undefined,
+    fieldOperation: company.fieldOperation || '',
+    companyEmail: company.companyEmail || '',
+    companyPhone: company.companyPhone || '',
+    websiteUrl: company.websiteUrl || '',
+    facebookUrl: company.facebookUrl || '',
+    youtubeUrl: company.youtubeUrl || '',
+    linkedinUrl: company.linkedinUrl || '',
+    since: company.since || null,
+    location: location
+      ? {
+          ...location,
+          city: normalizeId(location.city) ?? '',
+          district: normalizeId(location.district) ?? '',
+          address: location.address || '',
+          lat: location.lat ?? '',
+          lng: location.lng ?? '',
+        }
+      : { city: '', district: '', address: '', lat: '', lng: '' },
+    description: createEditorStateFromHTMLString(company.description || ''),
+  };
+};
 
 const CompanyCard = () => {
   const { t } = useTranslation('employer');
@@ -42,10 +77,7 @@ const CompanyCard = () => {
   // Transform data for the form
   const editData = useMemo(() => {
     if (!company) return null;
-    return {
-      ...company,
-      description: createEditorStateFromHTMLString(company.description || ''),
-    };
+    return normalizeCompanyForForm(company);
   }, [company]);
 
   const handleUpdate = useCallback(async (formData: CompanyFormValues) => {
@@ -56,7 +88,7 @@ const CompanyCard = () => {
         ...formData,
         description: convertEditorStateToHTMLString(formData.description as EditorState),
       };
-      await updateCompany({ id: company.id, data: payload as Parameters<typeof updateCompany>[0]['data'] });
+      await updateCompany({ id: company.id, data: payload });
       toastMessages.success(t('companyProfile.success.update'));
     } catch (error) {
       errorHandling(error, (errs) => setServerErrors(errs as Record<string, string[]>));
@@ -160,7 +192,7 @@ const CompanyCard = () => {
                 </Typography>
                 <Box sx={{ position: 'relative' }}>
                     <MuiImageCustom
-                        src={company?.coverImageUrl || ''}
+                        src={company?.companyCoverImageUrl || company?.coverImageUrl || ''}
                         height={170}
                         width="100%"
                         sx={{
@@ -197,7 +229,7 @@ const CompanyCard = () => {
         <Box>
             <CompanyForm
                 handleUpdate={handleUpdate}
-                editData={editData as Parameters<typeof CompanyForm>[0]['editData']}
+                editData={editData}
                 serverErrors={serverErrors}
             />
             <Box sx={{ mt: 6, display: 'flex', justifyContent: 'flex-end' }}>

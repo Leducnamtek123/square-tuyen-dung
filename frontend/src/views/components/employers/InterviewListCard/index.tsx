@@ -1,5 +1,5 @@
 'use client';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { 
     Box, 
     Typography, 
@@ -65,7 +65,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
     const sessions = queryData?.results || [];
     const count = queryData?.count || 0;
 
-    const handleDelete = (id: string | number) => {
+    const handleDelete = useCallback((id: string | number) => {
         confirmModal(
             async () => {
                 try {
@@ -79,9 +79,9 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             t('interview:interviewListCard.confirmDeleteMessage'),
             'warning'
         );
-    };
+    }, [deleteSession, t]);
 
-    const handleCancel = (roomName: string) => {
+    const handleCancel = useCallback((roomName: string) => {
         confirmModal(
             async () => {
                 try {
@@ -95,9 +95,9 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             t('interview:interviewListCard.confirmCancelMessage'),
             'warning'
         );
-    };
+    }, [t, updateStatus]);
 
-    const getStatusColor = (status: string): "success" | "primary" | "info" | "error" | "warning" | "default" => {
+    const getStatusColor = useCallback((status: string): "success" | "primary" | "info" | "error" | "warning" | "default" => {
         switch (status) {
             case 'completed': return 'success';
             case 'in_progress': return 'primary';
@@ -106,7 +106,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
             case 'processing': return 'warning';
             default: return 'default';
         }
-    };
+    }, []);
 
     const columns = useMemo<ColumnDef<InterviewSession>[]>(() => [
         {
@@ -282,7 +282,7 @@ const InterviewListCard = ({ title }: InterviewListCardProps) => {
                 );
             },
         },
-    ], [t, theme.palette]);
+    ], [getStatusColor, handleCancel, handleDelete, t, theme.palette]);
 
     return (
         <Paper 

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Chip, Tooltip, Switch, Typography, Stack, Select, MenuItem, SelectChangeEvent, Avatar, Box } from "@mui/material";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useTranslation } from 'react-i18next';
@@ -41,7 +41,7 @@ const UserTable = ({
 }: UserTableProps) => {
     const { t } = useTranslation('admin');
 
-    const getRoleLabel = (roleName: string) => {
+    const getRoleLabel = useCallback((roleName: string) => {
         switch (roleName) {
             case ROLES_NAME.ADMIN:
                 return t('pages.users.roles.admin');
@@ -52,13 +52,13 @@ const UserTable = ({
             default:
                 return t('common.na');
         }
-    };
+    }, [t]);
 
-    const getRoleColor = (roleName: string) => {
+    const getRoleColor = useCallback((roleName: string) => {
         if (roleName === ROLES_NAME.ADMIN) return 'error';
         if (roleName === ROLES_NAME.EMPLOYER) return 'primary';
         return 'default';
-    };
+    }, []);
 
     const columns = useMemo<ColumnDef<UserModel>[]>(() => [
         {
@@ -155,7 +155,7 @@ const UserTable = ({
                 </Stack>
             ),
         },
-    ], [t, onRoleChange, onToggleStatus, disableRoleActions, currentUserId]);
+    ], [currentUserId, disableRoleActions, getRoleColor, getRoleLabel, onRoleChange, onToggleStatus, t]);
 
     return (
         <DataTable

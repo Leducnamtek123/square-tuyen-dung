@@ -21,10 +21,10 @@ interface InterviewTranscriptPanelProps {
 const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n, liveTranscripts = [], isLive = false }) => {
     const theme = useTheme();
     const transcriptEndRef = useRef<HTMLDivElement>(null);
-    const existingTranscripts = session.transcripts || [];
 
     // Merge existing + live transcripts, deduplicate by id
     const mergedTranscripts = React.useMemo(() => {
+        const existingTranscripts = session.transcripts || [];
         const existingIds = new Set(existingTranscripts.map((t: Record<string, any>) => t.id));
         const liveOnly = liveTranscripts.filter((lt) => !existingIds.has(lt.id));
         const mapped = existingTranscripts.map((t: Record<string, any>) => ({
@@ -42,7 +42,7 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
             _isLive: true,
         }));
         return [...mapped, ...liveMapped];
-    }, [existingTranscripts, liveTranscripts]);
+    }, [liveTranscripts, session.transcripts]);
 
     // Auto-scroll when new live transcripts appear
     useEffect(() => {

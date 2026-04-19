@@ -132,7 +132,7 @@ const JobSeekerProfile = ({
                         >
                             {user?.fullName || t('common:labels.notUpdated')}
                             <Box component="span" sx={{ fontWeight: 700, color: 'text.secondary', ml: 1, fontSize: '0.9rem', opacity: 0.7 }}>
-                                ({jobSeekerProfile?.old || '---'} {t('employer:profileCard.label.yearsOld')})
+                                ({t('employer:profileCard.label.yearsOld', { age: jobSeekerProfile?.old || '---' })})
                             </Box>
                         </Typography>
                         

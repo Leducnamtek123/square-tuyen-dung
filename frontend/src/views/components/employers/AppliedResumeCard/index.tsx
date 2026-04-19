@@ -306,14 +306,16 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
                           <TextField 
                               {...params} 
                               placeholder={t('employer:appliedResume.allJobPosts')}
-                              InputProps={{
-                                ...params.InputProps,
-                                startAdornment: (
-                                  <>
-                                    <WorkOutlineIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />
-                                    {params.InputProps.startAdornment}
-                                  </>
-                                ),
+                              slotProps={{
+                                input: {
+                                  ...params.InputProps,
+                                  startAdornment: (
+                                    <>
+                                      <WorkOutlineIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />
+                                      {params.InputProps.startAdornment}
+                                    </>
+                                  ),
+                                },
                               }}
                               sx={{ 
                                 '& .MuiOutlinedInput-root': { 
@@ -341,14 +343,16 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
                           <TextField 
                               {...params} 
                               placeholder={t('employer:appliedResume.allStatuses')}
-                              InputProps={{
-                                ...params.InputProps,
-                                startAdornment: (
-                                  <>
-                                    <AssignmentTurnedInIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />
-                                    {params.InputProps.startAdornment}
-                                  </>
-                                ),
+                              slotProps={{
+                                input: {
+                                  ...params.InputProps,
+                                  startAdornment: (
+                                    <>
+                                      <AssignmentTurnedInIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />
+                                      {params.InputProps.startAdornment}
+                                    </>
+                                  ),
+                                },
                               }}
                               sx={{ 
                                 '& .MuiOutlinedInput-root': { 

@@ -134,7 +134,7 @@ def check_email_exists(request):
     if not email:
         return response_data(
             status=status.HTTP_400_BAD_REQUEST,
-            errors={"email": ["Email lÃƒÂ  bÃ¡ÂºÂ¯t buÃ¡Â»â„¢c."]},
+            errors={"email": ["Email là bắt buộc."]},
         )
     exists = User.objects.filter(email__iexact=email).exists()
     return response_data(status=status.HTTP_200_OK, data={"exists": exists})

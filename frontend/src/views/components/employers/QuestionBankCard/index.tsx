@@ -211,7 +211,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                 onClose={handleClose} 
                 fullWidth 
                 maxWidth="sm"
-                PaperProps={{ sx: { borderRadius: 3, p: 1 } }}
+                slotProps={{ paper: { sx: { borderRadius: 3, p: 1 } } }}
             >
                 <DialogTitle sx={{ fontWeight: 900, pt: 3, px: 3, fontSize: '1.5rem' }}>
                     {isEdit ? t('interview:employer.questionBank.editTitle') : t('interview:employer.questionBank.createTitle')}

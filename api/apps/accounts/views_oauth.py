@@ -162,7 +162,7 @@ class CustomConvertTokenView(ConvertTokenView):
             allowed_redirect_uris = self._get_allowed_redirect_uris()
             if normalized_redirect_uri:
                 if normalized_redirect_uri not in allowed_redirect_uris:
-                    raise BadRequest("redirect_uri khÃƒÂ´ng hÃƒÂ³p lÃ¡Â»â€¡")
+                    raise BadRequest("redirect_uri không hợp lệ")
                 redirect_uri_value = normalized_redirect_uri
             else:
                 redirect_uri_value = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI
@@ -183,7 +183,7 @@ class CustomConvertTokenView(ConvertTokenView):
 
             # Check response status
             if response.status_code != 200:
-                raise BadRequest("XÃ¡c thá»±c tháº¥t báº¡i")
+                raise BadRequest("Xác thực thất bại")
 
             # Parse response JSON
             response_data = response.json()
@@ -191,13 +191,13 @@ class CustomConvertTokenView(ConvertTokenView):
             access_token = response_data.get("access_token")
 
             if not access_token:
-                raise BadRequest("XÃ¡c thá»±c tháº¥t báº¡i")
+                raise BadRequest("Xác thực thất bại")
 
             return access_token
 
         except Exception as ex:
             helper.print_log_error("get_google_access_token", ex)
-            raise BadRequest("XÃ¡c thá»±c tháº¥t báº¡i")
+            raise BadRequest("Xác thực thất bại")
 
     def post(self, request, *args, **kwargs):
         try:
@@ -377,7 +377,7 @@ class FirebaseLoginView(TokenView):
         except Application.DoesNotExist:
             return response_data(
                 status=status.HTTP_400_BAD_REQUEST,
-                errors={"client_id": ["Application khÃ´ng tá»“n táº¡i."]},
+                errors={"client_id": ["Application không tồn tại."]},
             )
 
         # Generate tokens

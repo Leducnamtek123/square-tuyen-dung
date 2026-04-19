@@ -136,7 +136,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                     barCount={5}
                     state={agentState}
                     options={{ minHeight: 5 }}
-                    trackRef={agentAudioTrack}
+                    track={agentAudioTrack}
                     className={cn('flex h-full items-center justify-center gap-1')}
                   >
                     <span

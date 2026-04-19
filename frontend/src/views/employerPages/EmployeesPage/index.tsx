@@ -287,7 +287,7 @@ const EmployeesPage = () => {
         </Button>
       ),
     },
-  ], [t, roles, deleteMemberMutation.isPending, updateMemberMutation]);
+  ], [t, roles, deleteMemberMutation, updateMemberMutation]);
 
   return (
     <Box>

@@ -50,11 +50,15 @@ export interface Company {
   companyEmail?: string;
   companyPhone?: string;
   websiteUrl?: string | null;
+  facebookUrl?: string | null;
+  youtubeUrl?: string | null;
+  linkedinUrl?: string | null;
   description?: string | null;
   employeeSize?: number | null;
   since?: string | null;
   logoUrl?: string | null;
   coverImageUrl?: string | null;
+  companyCoverImageUrl?: string | null;
   location?: Location | null;
   fieldOperation?: string | null;
   followersCount?: number;
@@ -311,6 +315,8 @@ export interface Location {
   city?: number | string | { id: number; name: string };
   district?: number | string | { id: number; name: string };
   address?: string;
+  lat?: number | string | null;
+  lng?: number | string | null;
   /** Pre-resolved district dict from backend */
   districtDict?: { id?: number; name?: string };
 }

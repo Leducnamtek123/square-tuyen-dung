@@ -37,7 +37,6 @@ interface NotificationItem {
   [key: string]: unknown;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface NotificationCardProps {
   [key: string]: unknown;
 }

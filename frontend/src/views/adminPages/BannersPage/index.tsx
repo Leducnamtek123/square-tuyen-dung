@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo, useEffect } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
   Box, Typography, Breadcrumbs, Link, Button, Paper,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField,
@@ -39,22 +39,22 @@ interface BannerFormData {
 const BannersPage = () => {
   const { t } = useTranslation('admin');
 
-  const PLATFORM_OPTIONS = [
+  const PLATFORM_OPTIONS = useMemo(() => [
     { value: 'WEB', label: t('pages.banners.form.platformOptions.web') },
     { value: 'APP', label: t('pages.banners.form.platformOptions.app') },
-  ];
+  ], [t]);
 
-  const TYPE_OPTIONS = [
+  const TYPE_OPTIONS = useMemo(() => [
     { value: 1, label: t('pages.banners.form.typeOptions.home') },
     { value: 2, label: t('pages.banners.form.typeOptions.mainJobRight') },
-  ];
+  ], [t]);
 
-  const DESCRIPTION_LOCATIONS = [
+  const DESCRIPTION_LOCATIONS = useMemo(() => [
     { value: 1, label: t('pages.banners.form.descLocationOptions.topLeft') },
     { value: 2, label: t('pages.banners.form.descLocationOptions.topRight') },
     { value: 3, label: t('pages.banners.form.descLocationOptions.bottomLeft') },
     { value: 4, label: t('pages.banners.form.descLocationOptions.bottomRight') },
-  ];
+  ], [t]);
   const [openDialog, setOpenDialog] = useState(false);
   const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
   const [current, setCurrent] = useState<Banner | null>(null);
@@ -299,7 +299,7 @@ const BannersPage = () => {
         </Stack>
       ),
     },
-  ], [t]);
+  ], [TYPE_OPTIONS, t]);
 
   return (
     <Box>

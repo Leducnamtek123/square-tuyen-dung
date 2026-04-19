@@ -550,14 +550,16 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                 onClose={() => setIsQuestionDialogOpen(false)} 
                 fullWidth 
                 maxWidth="sm"
-                PaperProps={{ 
-                    sx: { 
-                        borderRadius: 4, 
-                        p: 1,
-                        boxShadow: (theme: Theme) => theme.customShadows?.z24,
-                        border: '1px solid',
-                        borderColor: 'divider'
-                    } 
+                slotProps={{
+                    paper: {
+                        sx: {
+                            borderRadius: 4,
+                            p: 1,
+                            boxShadow: (theme: Theme) => theme.customShadows?.z24,
+                            border: '1px solid',
+                            borderColor: 'divider'
+                        }
+                    }
                 }}
             >
                 <DialogTitle sx={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: '-1px', pt: 3, px: 4 }}>

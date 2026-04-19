@@ -78,10 +78,10 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
             backdropFilter: 'blur(4px)',
             backgroundColor: 'rgba(0, 0, 0, 0.3)',
           }
-        }
-      }}
-      TransitionProps={{
-        timeout: 300,
+        },
+        transition: {
+          timeout: 300,
+        },
       }}
     >
       <DialogTitle
