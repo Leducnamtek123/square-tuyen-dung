@@ -75,6 +75,13 @@ type MessageResponseInnerProps = {
   enableRich?: boolean;
 } & HTMLAttributes<HTMLDivElement>;
 
+type StreamdownPlugins = {
+  cjk: unknown;
+  code?: unknown;
+  math?: unknown;
+  mermaid?: unknown;
+};
+
 const MessageResponseInner = memo(({
   className,
   children,
@@ -94,7 +101,7 @@ const MessageResponseInner = memo(({
 
   const [streamdownState, setStreamdownState] = useState<{
     Streamdown: React.ElementType | null;
-    plugins: Record<string, unknown> | null;
+    plugins: StreamdownPlugins | null;
   }>({
     Streamdown: null,
     plugins: null,
@@ -113,7 +120,7 @@ const MessageResponseInner = memo(({
           import("@streamdown/cjk"),
         ]);
 
-        const plugins: Record<string, unknown> = { cjk };
+        const plugins: StreamdownPlugins = { cjk };
 
         if (needsCode) {
           const { code } = await import("@streamdown/code");
@@ -192,3 +199,5 @@ const MessageResponseInner = memo(({
 MessageResponseInner.displayName = "MessageResponseInner";
 
 export default MessageResponseInner;
+
+

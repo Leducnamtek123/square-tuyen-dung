@@ -13,10 +13,6 @@ import { localizeRoutePath } from '@/configs/routeLocalization';
 import { useTranslation } from 'react-i18next';
 import type { Company } from '@/types/models';
 
-interface Props {
-  [key: string]: unknown;
-}
-
 import type { Theme } from '@mui/material/styles';
 
 const styles = {
@@ -42,7 +38,7 @@ const styles = {
   },
 };
 
-const Loading = (_props: Props) => {
+const Loading = () => {
   return (
     <>
       <div id="top-company-carousel-loading">
@@ -94,7 +90,7 @@ const TopCompanyCarousel = () => {
       // httpRequest interceptor already unwraps response.data.data
       // so resData is the companies array directly
       if (Array.isArray(resData)) return resData as Company[];
-      const fallback = resData as unknown as { data?: Company[], results?: Company[] };
+      const fallback = resData as { data?: Company[]; results?: Company[] };
       return fallback?.data || fallback?.results || [];
     },
     staleTime: 5 * 60_000,

@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { useAppSelector } from '@/redux/hooks';
 
 import { useDispatch } from "react-redux";
@@ -41,6 +41,7 @@ import NoDataCard from "../../../../components/Common/NoDataCard";
 
 import { reloadResume } from "../../../../redux/profileSlice";
 import type { FormValues as ProfileuploadformFormValues } from '../ProfileUploadForm';
+import type { JobSeekerProfileResumeParams } from "../../../../services/jobSeekerProfileService";
 
 interface Resume {
   id: string | number;
@@ -84,7 +85,7 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 
   React.useEffect(() => {
 
-    const getOnlineProfile = async (jobSeekerProfileId: string | number | undefined, params: Record<string, unknown>) => {
+    const getOnlineProfile = async (jobSeekerProfileId: string | number | undefined, params: JobSeekerProfileResumeParams) => {
       if (!jobSeekerProfileId) return;
 
       setIsLoadingResumes(true);
@@ -419,3 +420,4 @@ const ProfileUpload = ({ title }: ProfileUploadProps) => {
 };
 
 export default ProfileUpload;
+

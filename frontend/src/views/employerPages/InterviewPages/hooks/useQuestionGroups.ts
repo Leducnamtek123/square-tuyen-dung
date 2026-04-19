@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import questionGroupService from '../../../../services/questionGroupService';
+import type { QuestionGroupListParams, QuestionGroupPayload } from '../../../../services/questionGroupService';
 import toastMessages from '../../../../utils/toastMessages';
 import type { QuestionGroup } from '../../../../types/models';
 import type { PaginatedResponse } from '../../../../types/api';
 
-export const useQuestionGroups = (params: Record<string, unknown>) => {
+export const useQuestionGroups = (params: QuestionGroupListParams) => {
     const { t } = useTranslation('employer');
     const queryClient = useQueryClient();
 
@@ -16,8 +17,8 @@ export const useQuestionGroups = (params: Record<string, unknown>) => {
         retry: false,
     });
 
-    const createMutation = useMutation<QuestionGroup, Error, Record<string, unknown>>({
-        mutationFn: (data: Record<string, unknown>) => questionGroupService.createQuestionGroup(data),
+    const createMutation = useMutation<QuestionGroup, Error, QuestionGroupPayload>({
+        mutationFn: (data: QuestionGroupPayload) => questionGroupService.createQuestionGroup(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
             toastMessages.success(t('questionGroupsCard.messages.addSuccess'));
@@ -28,8 +29,8 @@ export const useQuestionGroups = (params: Record<string, unknown>) => {
         }
     });
 
-    const updateMutation = useMutation<QuestionGroup, Error, { id: string | number, data: Record<string, unknown> }>({
-        mutationFn: ({ id, data }: { id: string | number, data: Record<string, unknown> }) => questionGroupService.updateQuestionGroup(id, data),
+    const updateMutation = useMutation<QuestionGroup, Error, { id: string | number, data: Partial<QuestionGroupPayload> }>({
+        mutationFn: ({ id, data }: { id: string | number, data: Partial<QuestionGroupPayload> }) => questionGroupService.updateQuestionGroup(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['employer-question-groups'] });
             toastMessages.success(t('questionGroupsCard.messages.updateSuccess'));

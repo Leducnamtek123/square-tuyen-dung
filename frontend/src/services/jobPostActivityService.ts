@@ -1,82 +1,109 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
+import type { ExportTableRow, PaginatedResponse } from '../types/api';
+import type { JobPostActivity } from '../types/models';
+import { cleanParams } from '../utils/params';
 
 
 type IdType = string | number;
 export interface ApplyJobPayload {
-  job_post: number;
+  jobPost: number;
   resume: number;
   fullName: string;
   email: string;
   phone: string;
 }
 
-type WithPresignInput = Promise<unknown>;
+export type JobPostActivityListParams = {
+  page?: number;
+  pageSize?: number;
+  ordering?: string;
+  kw?: string;
+  status?: number | string;
+  jobPost?: number | string;
+  jobPostId?: number | string;
+};
 
-const withPresign = async (promise: WithPresignInput): Promise<unknown> => {
+export interface SendEmailPayload {
+  subject?: string;
+  content?: string;
+}
+
+export interface ChangeApplicationStatusPayload {
+  status: number | string;
+}
+
+export interface ActionResponse {
+  success?: boolean;
+  message?: string;
+}
+
+const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
   const data = await promise;
-  return presignInObject(data);
+  return presignInObject(data) as T;
 };
 
 const jobPostActivityService = {
   // job seeker
-  applyJob: (data: ApplyJobPayload): Promise<unknown> => {
+  applyJob: (data: ApplyJobPayload): Promise<ActionResponse> => {
     const url = 'job/web/job-seeker-job-posts-activity/';
     return httpRequest.post(url, data);
   },
 
-  getJobPostActivity: (params: Record<string, unknown> = {}): Promise<unknown> => {
+  getJobPostActivity: (params: JobPostActivityListParams = {}): Promise<PaginatedResponse<JobPostActivity>> => {
     const url = 'job/web/job-seeker-job-posts-activity/';
-    return httpRequest.get(url, { params: params });
+    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<JobPostActivity>>;
   },
 
-  getJobPostChatActivity: (params: Record<string, unknown> = {}): Promise<unknown> => {
+  getJobPostChatActivity: <T = JobPostActivity>(params: JobPostActivityListParams = {}): Promise<PaginatedResponse<T>> => {
     const url = 'job/web/job-seeker-job-posts-activity/chat/';
-    return httpRequest.get(url, { params: params });
+    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<T>>;
   },
 
   // employer
 
-  sendEmail: (id: IdType, data: Record<string, unknown>): Promise<unknown> => {
+  sendEmail: (id: IdType, data: SendEmailPayload): Promise<ActionResponse> => {
     const url = `job/web/employer-job-posts-activity/${id}/send-email/`;
     return httpRequest.post(url, data);
   },
 
-  getAppliedResume: (params: Record<string, unknown> = {}): Promise<unknown> => {
+  getAppliedResume: (params: JobPostActivityListParams = {}): Promise<PaginatedResponse<JobPostActivity>> => {
     const url = 'job/web/employer-job-posts-activity/';
-    return withPresign(httpRequest.get(url, { params: params }));
+    return withPresign(httpRequest.get(url, { params: cleanParams(params) })) as Promise<PaginatedResponse<JobPostActivity>>;
   },
 
-  getAppliedResumeChat: (params: Record<string, unknown> = {}): Promise<unknown> => {
+  getAppliedResumeChat: <T = JobPostActivity>(params: JobPostActivityListParams = {}): Promise<PaginatedResponse<T>> => {
     const url = 'job/web/employer-job-posts-activity/chat/';
-    return withPresign(httpRequest.get(url, { params: params }));
+    return withPresign(httpRequest.get(url, { params: cleanParams(params) })) as Promise<PaginatedResponse<T>>;
   },
 
-  exportAppliedResume: (params: Record<string, unknown> = {}): Promise<unknown> => {
+  exportAppliedResume: (params: JobPostActivityListParams = {}): Promise<ExportTableRow[]> => {
     const url = 'job/web/employer-job-posts-activity/export/';
-    return withPresign(httpRequest.get(url, { params: params }));
+    return withPresign(httpRequest.get(url, { params: cleanParams(params) })) as Promise<ExportTableRow[]>;
   },
 
-  changeApplicationStatus: (id: IdType, data: Record<string, unknown>): Promise<unknown> => {
+  changeApplicationStatus: (id: IdType, data: ChangeApplicationStatusPayload): Promise<JobPostActivity> => {
     const url = `job/web/employer-job-posts-activity/${id}/application-status/`;
-    return httpRequest.put(url, data);
+    return httpRequest.put(url, data) as Promise<JobPostActivity>;
   },
 
-  deleteJobPostActivity: (id: IdType): Promise<unknown> => {
+  deleteJobPostActivity: (id: IdType): Promise<void> => {
     const url = `job/web/employer-job-posts-activity/${id}/`;
     return httpRequest.delete(url);
   },
 
-  getJobPostActivityDetail: (id: IdType): Promise<unknown> => {
+  getJobPostActivityDetail: (id: IdType): Promise<JobPostActivity> => {
     const url = `job/web/employer-job-posts-activity/${id}/`;
-    return withPresign(httpRequest.get(url));
+    return withPresign(httpRequest.get(url)) as Promise<JobPostActivity>;
   },
 
-  analyzeResume: (id: IdType): Promise<unknown> => {
+  analyzeResume: (id: IdType): Promise<ActionResponse> => {
     const url = `job/web/employer-job-posts-activity/${id}/analyze-resume/`;
     return httpRequest.post(url);
   },
 };
 
 export default jobPostActivityService;
+
+
 

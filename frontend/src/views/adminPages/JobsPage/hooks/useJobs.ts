@@ -3,16 +3,17 @@ import adminJobService from '../../../../services/adminJobService';
 import toastMessages from '../../../../utils/toastMessages';
 import { JobPost } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import type { AdminListParams } from '../../../../services/adminManagementService';
 
 export type UseJobsResult = UseQueryResult<PaginatedResponse<JobPost>> & {
-    updateJob: (args: { id: string | number; data: Partial<JobPost> | Record<string, unknown> }) => Promise<JobPost>;
+    updateJob: (args: { id: string | number; data: Partial<JobPost> }) => Promise<JobPost>;
     approveJob: (id: string | number) => Promise<JobPost>;
     rejectJob: (id: string | number) => Promise<JobPost>;
     deleteJob: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
 
-export const useJobs = (params: Record<string, unknown>): UseJobsResult => {
+export const useJobs = (params: AdminListParams): UseJobsResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -25,8 +26,8 @@ export const useJobs = (params: Record<string, unknown>): UseJobsResult => {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPost> | Record<string, unknown> }) => 
-            adminJobService.updateJob(id, data as Record<string, unknown>),
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPost> }) =>
+            adminJobService.updateJob(id, data),
         onSuccess: () => {
             toastMessages.success('Job post updated successfully');
             queryClient.invalidateQueries({ queryKey: ['admin-jobs'] });

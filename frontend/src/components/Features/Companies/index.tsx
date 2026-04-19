@@ -9,13 +9,8 @@ import Company from "@/components/Features/Company";
 import companyService from "@/services/companyService";
 import { RootState } from "@/redux/store";
 import type { Company as ModelsCompany } from '@/types/models';
-import type { PaginatedResponse } from '@/types/api';
 
-interface Props {
-  [key: string]: unknown;
-}
-
-const Companies = (_props: Props) => {
+const Companies = () => {
   const { t } = useTranslation('public');
   const { companyFilter } = useSelector((state: RootState) => state.filter);
   const { pageSize } = companyFilter;
@@ -31,10 +26,10 @@ const Companies = (_props: Props) => {
   const { data, isLoading } = useQuery({
     queryKey: ['companies', filterKey, page],
     queryFn: async () => {
-      const resData = (await companyService.getCompanies({
+      const resData = await companyService.getCompanies({
         ...companyFilter,
         page: page,
-      })) as PaginatedResponse<ModelsCompany>;
+      });
       return {
         results: resData?.results || [],
         count: resData?.count || 0,
@@ -137,14 +132,14 @@ const Companies = (_props: Props) => {
                     id={value.id as number}
                     slug={value.slug as string}
                     companyImageUrl={value.companyImageUrl || ''}
-                    companyCoverImageUrl={(value as unknown as Record<string, unknown>).companyCoverImageUrl as string}
+                    companyCoverImageUrl={value.companyCoverImageUrl || ''}
                     companyName={value.companyName || ''}
                     employeeSize={value.employeeSize as string | number}
                     fieldOperation={value.fieldOperation as string}
-                    city={(value.locationDict as unknown as Record<string, unknown>)?.city as string}
-                    followNumber={(value as unknown as Record<string, unknown>).followNumber as number}
-                    jobPostNumber={(value as unknown as Record<string, unknown>).jobPostNumber as number}
-                    isFollowed={(value as unknown as Record<string, unknown>).isFollowed as boolean}
+                    city={value.locationDict?.city as string}
+                    followNumber={value.followNumber as number}
+                    jobPostNumber={value.jobPostNumber as number}
+                    isFollowed={value.isFollowed as boolean}
                   />
                 </Grid>
               ))}

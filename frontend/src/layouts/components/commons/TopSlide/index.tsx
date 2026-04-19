@@ -6,6 +6,7 @@ import HomeSearch from '../../../../views/components/defaults/HomeSearch';
 import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 import contentService from '../../../../services/contentService';
 import { BANNER_TYPES, IMAGES } from '../../../../configs/constants';
+import type { Banner } from '../../../../types/models';
 
 const styles = {
   ".swiper-pagination-bullet": {
@@ -21,7 +22,7 @@ const styles = {
   },
 };
 
-const RenderItem = ({ item }: { item: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string } }) => {
+const RenderItem = ({ item }: { item: Banner }) => {
   return (
     <Box
       component="img"
@@ -41,7 +42,7 @@ const RenderItem = ({ item }: { item: { targetUrl?: string; imageUrl?: string; d
 };
 
 const TopSlide = () => {
-  const [banners, setBanners] = React.useState<{ targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[]>([]);
+  const [banners, setBanners] = React.useState<Banner[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
@@ -49,8 +50,7 @@ const TopSlide = () => {
       try {
         setIsLoading(true);
         const resData = await contentService.getBanners({ type: BANNER_TYPES.HOME });
-        const data = Array.isArray(resData) ? resData : ((resData as { results?: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[]; data?: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[] })?.results || (resData as { results?: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[]; data?: { targetUrl?: string; imageUrl?: string; description?: string; id?: string | number; buttonLink?: string }[] })?.data || []);
-        setBanners(data);
+        setBanners(resData);
       } catch (error) {
         // Error handled silently
       } finally {

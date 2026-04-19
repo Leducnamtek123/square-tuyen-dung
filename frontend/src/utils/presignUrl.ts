@@ -99,7 +99,7 @@ export const presignInObject = async <T>(
 
     const entries = Array.isArray(node)
       ? node.map((v, i) => [i, v] as const)
-      : Object.entries(node as Record<string, unknown>);
+      : Object.entries(node as object);
 
     for (const [key, val] of entries) {
       if (locations.length >= maxItems) break;
@@ -139,3 +139,5 @@ export const presignInObject = async <T>(
 
   return clone;
 };
+
+

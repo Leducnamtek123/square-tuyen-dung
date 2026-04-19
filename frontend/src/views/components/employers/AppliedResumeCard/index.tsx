@@ -157,7 +157,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     setIsProcessing(true);
     try {
       const resData = await jobPostActivityService.exportAppliedResume(queryParams);
-      xlsxUtils.exportToXLSX(resData as Record<string, unknown>[], 'AppliedProfilesList');
+      xlsxUtils.exportToXLSX(resData, 'AppliedProfilesList');
     } catch (error) {
       errorHandling(error);
     } finally {

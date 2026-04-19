@@ -1,17 +1,18 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
+import type { AdminListParams, DistrictPayload } from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
 import { District } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
 export type UseDistrictsResult = UseQueryResult<PaginatedResponse<District>> & {
-    createDistrict: (data: Partial<District>) => Promise<District>;
-    updateDistrict: (args: { id: string | number; data: Partial<District> }) => Promise<District>;
+    createDistrict: (data: DistrictPayload) => Promise<District>;
+    updateDistrict: (args: { id: string | number; data: Partial<DistrictPayload> }) => Promise<District>;
     deleteDistrict: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
 
-export const useDistricts = (params?: Record<string, unknown>): UseDistrictsResult => {
+export const useDistricts = (params?: (AdminListParams & { city?: number })): UseDistrictsResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery<PaginatedResponse<District>>({
@@ -25,7 +26,7 @@ export const useDistricts = (params?: Record<string, unknown>): UseDistrictsResu
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: Partial<District>) => adminManagementService.createDistrict(data as Record<string, unknown>),
+        mutationFn: (data: DistrictPayload) => adminManagementService.createDistrict(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-districts'] });
             toastMessages.success('District added successfully');
@@ -37,7 +38,7 @@ export const useDistricts = (params?: Record<string, unknown>): UseDistrictsResu
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string | number; data: Partial<District> }) => adminManagementService.updateDistrict(id, data as Record<string, unknown>),
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<DistrictPayload> }) => adminManagementService.updateDistrict(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-districts'] });
             toastMessages.success('District updated successfully');

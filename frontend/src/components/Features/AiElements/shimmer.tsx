@@ -10,7 +10,7 @@ const motionComponentCache = new Map<ElementType, React.ElementType>();
 const getMotionComponent = (element: ElementType) => {
   let component = motionComponentCache.get(element);
   if (!component) {
-    component = motion.create(element as keyof React.JSX.IntrinsicElements) as unknown as React.ElementType;
+    component = motion.create(element as keyof React.JSX.IntrinsicElements) as React.ElementType;
     motionComponentCache.set(element, component);
   }
   return component;

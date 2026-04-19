@@ -113,6 +113,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
   const { slug: resumeSlug } = useParams<{ slug: string }>();
 
   const { allConfig } = useConfig();
+  const languageDict = (allConfig as { languageDict?: Record<string, string> } | null)?.languageDict;
 
   const [openPopup, setOpenPopup] = React.useState(false);
 
@@ -329,7 +330,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
           p: 3,
 
-          boxShadow: (theme: StylesTheme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
+          boxShadow: (theme: StylesTheme) => theme.customShadows.card,
 
         }}
 
@@ -365,7 +366,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: StylesTheme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
+                    boxShadow: (theme: StylesTheme) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -396,7 +397,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
                     {
                       header: t('jobSeeker:profile.fields.language'),
                       accessorKey: 'language',
-                      cell: (info) => tConfig((allConfig as { languageDict?: Record<string, unknown> })?.languageDict?.[info.getValue() as string ?? ''] as string),
+                      cell: (info) => tConfig(languageDict?.[String(info.getValue() ?? '')]),
                     },
                     {
                       header: t('jobSeeker:profile.fields.level'),
@@ -480,3 +481,4 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
 };
 
 export default LanguageSkillCard;
+

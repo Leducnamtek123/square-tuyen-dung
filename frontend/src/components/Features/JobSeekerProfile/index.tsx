@@ -30,6 +30,7 @@ import { formatRoute } from '@/utils/funcUtils';
 import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import type { Theme as StylesTheme } from '@mui/material/styles';
+import type { UserDict } from '@/types/models';
 
 interface JobSeekerProfileProps {
   id: string | number;
@@ -42,14 +43,9 @@ interface JobSeekerProfileProps {
   isSaved?: boolean;
   viewEmployerNumber?: number;
   city: number | string;
-  user?: {
-    fullName?: string;
-    avatar?: string;
-    [key: string]: unknown;
-  };
+  user?: UserDict & { avatar?: string };
   jobSeekerProfile?: {
     old?: number | string;
-    [key: string]: unknown;
   };
   type?: string;
   lastViewedDate?: string | Date;
@@ -107,7 +103,7 @@ const JobSeekerProfile = ({
         >
             <Stack direction={{ xs: 'column', md: 'row' }} spacing={3} alignItems={{ xs: 'flex-start', md: 'center' }}>
                 <Avatar 
-                    src={user?.avatar} 
+                    src={user?.avatar || user?.avatarUrl || undefined} 
                     variant="rounded"
                     sx={{ 
                         width: 72, 
@@ -189,7 +185,7 @@ const JobSeekerProfile = ({
                         <Chip
                             size="small"
                             icon={<WorkOutlineOutlinedIcon sx={{ fontSize: '16px !important', color: 'inherit' }} />}
-                            label={tConfig(allConfig?.experienceDict?.[experience] as unknown as string) || t('common:labels.notUpdated')}
+                            label={tConfig(String(allConfig?.experienceDict?.[experience] || '')) || t('common:labels.notUpdated')}
                             sx={{ 
                                 fontWeight: 800, 
                                 bgcolor: alpha(theme.palette.primary.main, 0.08), 
@@ -201,7 +197,7 @@ const JobSeekerProfile = ({
                         <Chip
                             size="small"
                             icon={<RoomIcon sx={{ fontSize: '16px !important', color: 'inherit' }} />}
-                            label={tConfig(allConfig?.cityDict?.[city] as unknown as string) || t('common:labels.notUpdated')}
+                            label={tConfig(String(allConfig?.cityDict?.[city] || '')) || t('common:labels.notUpdated')}
                             sx={{ 
                                 fontWeight: 800, 
                                 bgcolor: alpha(theme.palette.info.main, 0.08), 

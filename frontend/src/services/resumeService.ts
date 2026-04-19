@@ -40,8 +40,8 @@ export interface ResumeInput {
   academicLevel?: number;
   typeOfWorkplace?: number;
   jobType?: number;
-  cityId?: number;
-  careerId?: number;
+  city?: number;
+  career?: number;
   isActive?: boolean;
 }
 

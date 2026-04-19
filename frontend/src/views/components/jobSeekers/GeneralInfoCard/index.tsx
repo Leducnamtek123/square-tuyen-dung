@@ -222,7 +222,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
         const resData = await resumeService.getResumeOwner(slug);
 
-        setResumeDetail(resData as unknown as ResumeDetail);
+        setResumeDetail(resData as ResumeDetail);
 
       } catch (error: unknown) {
 
@@ -262,8 +262,8 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
           academicLevel: Number(payload.academicLevel) || undefined,
           typeOfWorkplace: Number(payload.typeOfWorkplace) || undefined,
           jobType: Number(payload.jobType) || undefined,
-          cityId: Number(payload.city) || undefined,
-          careerId: Number(payload.career) || undefined,
+          city: Number(payload.city) || undefined,
+          career: Number(payload.career) || undefined,
         };
         await resumeService.updateResume(slug, apiPayload);
 
@@ -299,7 +299,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
       p: 3,
 
-      boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
+      boxShadow: (theme: Theme) => theme.customShadows.card,
 
     }}>
 
@@ -361,7 +361,7 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
+                    boxShadow: (theme: Theme) => theme.customShadows.medium,
 
                     '&:hover': {
 
@@ -571,3 +571,4 @@ const GeneralInfoCard = ({ title }: GeneralInfoCardProps) => {
 };
 
 export default GeneralInfoCard;
+

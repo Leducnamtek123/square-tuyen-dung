@@ -19,22 +19,22 @@ export interface GetSessionsParams {
 
 export interface ScheduleSessionInput {
   candidate?: number;
-  job_post?: number;
-  scheduled_at?: string;
+  jobPost?: number;
+  scheduledAt?: string;
   type?: 'technical' | 'behavioral' | 'mixed';
-  question_ids?: number[];
-  question_group?: number;
+  questionIds?: number[];
+  questionGroup?: number;
   notes?: string;
 }
 
 export interface SubmitEvaluationInput {
   interview: number;
-  attitude_score?: number;
-  professional_score?: number;
-  overall_score?: number;
+  attitudeScore?: number;
+  professionalScore?: number;
+  overallScore?: number;
   result?: 'passed' | 'failed' | 'pending';
   comments?: string;
-  proposed_salary?: number;
+  proposedSalary?: number;
 }
 
 /* ── Response Types ───────────────────────────────────────────────────── */

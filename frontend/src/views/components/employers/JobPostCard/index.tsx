@@ -27,6 +27,8 @@ import type { ApiError } from '../../../../types/api';
 import type { EditorState } from 'draft-js';
 import type { JobPostInput } from '../../../../services/jobService';
 
+type JobPostEditData = Partial<JobPostFormValues> & { id?: string | number };
+
 const JobPostCard = () => {
   const { t } = useTranslation('employer');
 
@@ -62,7 +64,7 @@ const JobPostCard = () => {
   const { addJobPost, updateJobPost, deleteJobPost, isMutating } = useJobPostMutations();
 
   const [openPopup, setOpenPopup] = useState(false);
-  const [editData, setEditData] = useState<Record<string, unknown> | null>(null);
+  const [editData, setEditData] = useState<JobPostEditData | null>(null);
   const [serverErrors, setServerErrors] = useState<Record<string, string[]> | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -70,13 +72,27 @@ const JobPostCard = () => {
     setIsProcessing(true);
     try {
       const resData = await jobService.getEmployerJobPostDetailById(slugOrId);
-      const data = {
+      const data: JobPostEditData = {
         ...resData,
+        career: resData.career?.id ?? '',
+        position: resData.position ?? '',
+        experience: resData.experience ?? '',
+        typeOfWorkplace: resData.typeOfWorkplace ?? '',
+        jobType: resData.jobType ?? '',
+        academicLevel: resData.academicLevel ?? '',
+        genderRequired: resData.genderRequired ?? '',
         jobDescription: createEditorStateFromHTMLString(resData.jobDescription || ''),
         jobRequirement: createEditorStateFromHTMLString(resData.jobRequirement || ''),
         benefitsEnjoyed: createEditorStateFromHTMLString(resData.benefitsEnjoyed || ''),
+        location: {
+          city: (typeof resData.location?.city === 'object' ? resData.location?.city?.id : resData.location?.city) ?? '',
+          district: (typeof resData.location?.district === 'object' ? resData.location?.district?.id : resData.location?.district) ?? '',
+          address: resData.location?.address || '',
+          lat: resData.location?.lat ?? '',
+          lng: resData.location?.lng ?? '',
+        },
       };
-      setEditData(data as Record<string, unknown>);
+      setEditData(data);
       setOpenPopup(true);
     } catch (error) {
       errorHandling(error);
@@ -101,7 +117,7 @@ const JobPostCard = () => {
       salaryMax: Number(formData.salaryMax),
       isHot: formData.isHot,
       isUrgent: formData.isUrgent,
-      careerId: Number(formData.career),
+      career: Number(formData.career),
       position: Number(formData.position),
       experience: Number(formData.experience),
       academicLevel: Number(formData.academicLevel),
@@ -115,14 +131,18 @@ const JobPostCard = () => {
       contactPersonName: formData.contactPersonName,
       contactPersonPhone: formData.contactPersonPhone,
       contactPersonEmail: formData.contactPersonEmail,
-      cityId: Number(formData.location.city),
-      districtId: Number(formData.location.district),
-      address: formData.location.address,
+      location: {
+        city: Number(formData.location.city),
+        district: Number(formData.location.district),
+        address: formData.location.address,
+        lat: null,
+        lng: null,
+      },
     };
 
     try {
-      if (editData && 'id' in editData) {
-        await updateJobPost({ id: editData.id as string | number, data: payload });
+      if (editData?.id != null) {
+        await updateJobPost({ id: editData.id, data: payload });
         toastMessages.success(t('jobPost.messages.updateSuccess'));
       } else {
         await addJobPost(payload);
@@ -171,7 +191,7 @@ const JobPostCard = () => {
         status: filterData.statusId === '' ? undefined : filterData.statusId,
       };
       const resData = await jobService.exportEmployerJobPosts(params);
-      xlsxUtils.exportToXLSX(resData as unknown as Record<string, unknown>[], 'JobList');
+      xlsxUtils.exportToXLSX(resData, 'JobList');
     } catch (error) {
       errorHandling(error);
     } finally {

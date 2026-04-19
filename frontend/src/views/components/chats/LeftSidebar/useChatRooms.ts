@@ -72,11 +72,11 @@ export const useChatRooms = () => {
             } else {
               partnerId = chatRoomData?.members[0];
             }
-            const userAccount = await getUserAccount('accounts', `${partnerId}`) as UserAccount;
+            const userAccount = await getUserAccount('accounts', `${partnerId}`) as UserAccount | null;
             chatRoomsData.push({
               ...(chatRoomData as Omit<ChatRoomData, "id" | "user">),
               id: doc.id,
-              user: userAccount,
+              user: userAccount || undefined,
             });
           } catch (error) {
             console.error(error);
@@ -119,11 +119,11 @@ export const useChatRooms = () => {
             } else {
               partnerId = chatRoomData?.members[0];
             }
-            const userAccount = await getUserAccount('accounts', `${partnerId}`) as UserAccount;
+            const userAccount = await getUserAccount('accounts', `${partnerId}`) as UserAccount | null;
             chatRoomsData.push({
               ...(chatRoomData as Omit<ChatRoomData, "id" | "user">),
               id: doc.id,
-              user: userAccount,
+              user: userAccount || undefined,
             });
           } catch (error) {
             console.error(error);

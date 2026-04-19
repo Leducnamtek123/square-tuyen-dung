@@ -9,6 +9,12 @@ import {
 
 /** Local type matching the expected toggle sources for useTrackToggle */
 type ToggleSource = Track.Source.Camera | Track.Source.Microphone | Track.Source.ScreenShare;
+type PersistentChoices = {
+  saveAudioInputEnabled?: (v: boolean) => void;
+  saveVideoInputEnabled?: (v: boolean) => void;
+  saveAudioInputDeviceId?: (v: string) => void;
+  saveVideoInputDeviceId?: (v: string) => void;
+};
 
 export type DeviceErrorHandler = (error: { source: Track.Source; error: unknown }) => void;
 
@@ -112,19 +118,11 @@ export function useInputControls(
   const screenShareToggle = useTrackToggle(screenShareToggleOptions);
   const persistentChoices = usePersistentUserChoices(persistentChoicesOptions);
 
-  const persistentData = persistentChoices || {} as Record<string, unknown>;
-  const saveAudioInputEnabled = 'saveAudioInputEnabled' in persistentData
-    ? (persistentData as { saveAudioInputEnabled: (v: boolean) => void }).saveAudioInputEnabled
-    : undefined;
-  const saveVideoInputEnabled = 'saveVideoInputEnabled' in persistentData
-    ? (persistentData as { saveVideoInputEnabled: (v: boolean) => void }).saveVideoInputEnabled
-    : undefined;
-  const saveAudioInputDeviceId = 'saveAudioInputDeviceId' in persistentData
-    ? (persistentData as { saveAudioInputDeviceId: (v: string) => void }).saveAudioInputDeviceId
-    : undefined;
-  const saveVideoInputDeviceId = 'saveVideoInputDeviceId' in persistentData
-    ? (persistentData as { saveVideoInputDeviceId: (v: string) => void }).saveVideoInputDeviceId
-    : undefined;
+  const persistentData = (persistentChoices || {}) as PersistentChoices;
+  const saveAudioInputEnabled = persistentData.saveAudioInputEnabled;
+  const saveVideoInputEnabled = persistentData.saveVideoInputEnabled;
+  const saveAudioInputDeviceId = persistentData.saveAudioInputDeviceId;
+  const saveVideoInputDeviceId = persistentData.saveVideoInputDeviceId;
 
   // 6. Callbacks
   const handleAudioDeviceChange = useCallback(
@@ -236,4 +234,6 @@ export function useInputControls(
     ]
   );
 }
+
+
 

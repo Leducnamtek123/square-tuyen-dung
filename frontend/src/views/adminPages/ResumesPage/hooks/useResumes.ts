@@ -3,15 +3,16 @@ import adminManagementService from '../../../../services/adminManagementService'
 import toastMessages from '../../../../utils/toastMessages';
 import { Resume } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import type { AdminListParams, ResumePayload } from '../../../../services/adminManagementService';
 
 export type UseResumesResult = UseQueryResult<PaginatedResponse<Resume>> & {
-    createResume: (data: Record<string, unknown>) => Promise<Resume>;
-    updateResume: (args: { id: string | number; data: Record<string, unknown> }) => Promise<Resume>;
+    createResume: (data: ResumePayload) => Promise<Resume>;
+    updateResume: (args: { id: string | number; data: ResumePayload }) => Promise<Resume>;
     deleteResume: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
 
-export const useResumes = (params?: Record<string, unknown>): UseResumesResult => {
+export const useResumes = (params?: AdminListParams): UseResumesResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -24,7 +25,7 @@ export const useResumes = (params?: Record<string, unknown>): UseResumesResult =
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: Partial<Resume> | Record<string, unknown>) => adminManagementService.createResume(data),
+        mutationFn: (data: ResumePayload) => adminManagementService.createResume(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-resumes'] });
             toastMessages.success('Resume added successfully');
@@ -36,7 +37,7 @@ export const useResumes = (params?: Record<string, unknown>): UseResumesResult =
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string | number; data: Partial<Resume> | Record<string, unknown> }) => adminManagementService.updateResume(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: ResumePayload }) => adminManagementService.updateResume(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-resumes'] });
             toastMessages.success('Resume updated successfully');
@@ -65,5 +66,5 @@ export const useResumes = (params?: Record<string, unknown>): UseResumesResult =
         updateResume: updateMutation.mutateAsync,
         deleteResume: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending
-    } as UseResumesResult;
+    };
 };

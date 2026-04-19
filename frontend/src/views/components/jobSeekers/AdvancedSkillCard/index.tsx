@@ -323,7 +323,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
           p: 3,
 
-          boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
+          boxShadow: (theme: Theme) => theme.customShadows.card,
 
         }}
 
@@ -359,7 +359,7 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
+                    boxShadow: (theme: Theme) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -473,3 +473,4 @@ const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
 };
 
 export default AdvancedSkillCard;
+

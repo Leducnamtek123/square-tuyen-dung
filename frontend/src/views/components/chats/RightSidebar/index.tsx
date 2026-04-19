@@ -28,7 +28,7 @@ export const RightSidebar = () => {
     <RightSidebarRenderer
       titleKey="appliedJobs"
       noDataKey="noAppliedJobs"
-      fetchData={(params) => jobPostActivityService.getJobPostChatActivity(params) as Promise<{ count: number; results: JobPostChatActivityData[] }>}
+      fetchData={(params) => jobPostActivityService.getJobPostChatActivity<JobPostChatActivityData>(params)}
       mapDataToUI={(value) => ({
         id: value.id,
         imageUrl: value?.companyImageUrl || '',
@@ -57,7 +57,7 @@ export const EmployerSidebar = () => {
     <RightSidebarRenderer
       titleKey="candidates"
       noDataKey="noCandidates"
-      fetchData={(params) => jobPostActivityService.getAppliedResumeChat(params) as Promise<{ count: number; results: AppliedResumeChatData[] }>}
+      fetchData={(params) => jobPostActivityService.getAppliedResumeChat<AppliedResumeChatData>(params)}
       mapDataToUI={(value) => ({
         id: value.id,
         imageUrl: value?.avatarUrl || '',

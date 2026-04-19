@@ -3,20 +3,9 @@ import { useSelector } from 'react-redux';
 import { ChatContext } from '../../../../context/ChatProvider';
 import { addDocument, checkChatRoomExists, checkExists, createUser } from '../../../../services/firebaseService';
 import { RootState } from '../../../../redux/store';
+import type { ChatAccountData, ChatRoomDocument } from '../../../../services/firebaseService';
 
-export interface UserDataPayload {
-  userId?: string;
-  name?: string;
-  email?: string;
-  avatarUrl?: string;
-  company?: {
-    companyId?: string;
-    slug?: string;
-    companyName?: string;
-    imageUrl?: string;
-  } | null;
-  [key: string]: unknown;
-}
+export type UserDataPayload = ChatAccountData;
 
 export const useRightSidebarData = <T,>(fetchData: (params: { page: number; pageSize: number }) => Promise<{ count: number; results: T[] }>, pageSize: number = 12) => {
   const context = React.useContext(ChatContext);
@@ -64,13 +53,14 @@ export const useRightSidebarData = <T,>(fetchData: (params: { page: number; page
     if (allowCreateNewChatRoom) {
       let chatRoomId = await checkChatRoomExists('chatRooms', userId, partnerId);
       if (chatRoomId === null) {
-        chatRoomId = await addDocument('chatRooms', {
+        const newRoom: ChatRoomDocument = {
           members: [`${userId}`, `${partnerId}`],
           membersString: [`${userId}-${partnerId}`, `${partnerId}-${userId}`],
           recipientId: `${partnerId}`,
           createdBy: `${userId}`,
           unreadCount: 0
-        });
+        };
+        chatRoomId = await addDocument('chatRooms', newRoom);
       }
       setSelectedRoomId(chatRoomId);
     }

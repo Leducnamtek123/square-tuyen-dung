@@ -5,8 +5,10 @@ import FilterJobPostCard from "../../../components/defaults/FilterJobPostCard";
 import type { Company } from '@/types/models';
 import type { JobPost } from '@/types/models';
 
+type JobPostDetail = Partial<JobPost> & { companyDict?: Company };
+
 interface JobDetailSidebarProps {
-  jobPostDetail: Record<string, unknown> | JobPost & { companyDict?: Company };
+  jobPostDetail: JobPostDetail;
 }
 
 const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) => {
@@ -31,3 +33,5 @@ const JobDetailSidebar: React.FC<JobDetailSidebarProps> = ({ jobPostDetail }) =>
 };
 
 export default JobDetailSidebar;
+
+

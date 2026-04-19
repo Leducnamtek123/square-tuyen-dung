@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Box, Card, Typography, Button, Avatar, Chip, CircularProgress, useTheme, type Theme } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 
@@ -20,7 +20,9 @@ const MyInterviewsPage = () => {
     const navigate = useRouter();
     const { data: interviewsData, isLoading, isError } = useMyInterviews({ pageSize: 50 });
 
-    const interviews = (interviewsData?.results || []).map((session) => transformInterviewSession(session as unknown as Record<string, unknown>)).filter((s): s is InterviewSession => s !== null);
+    const interviews = (interviewsData?.results || [])
+        .map((session) => transformInterviewSession(session))
+        .filter((s): s is InterviewSession => s !== null);
 
     const handleJoin = (inviteToken: string) => {
         navigate.push(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM.replace(':id', inviteToken)}`);
@@ -119,3 +121,4 @@ const MyInterviewsPage = () => {
 };
 
 export default MyInterviewsPage;
+

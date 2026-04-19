@@ -23,9 +23,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import Link from 'next/link';
 import interviewService from '../../../services/interviewService';
-import { transformInterviewSession } from '../../../utils/transformers';
 import { type InterviewSession } from '../../../types/models';
-import { type PaginatedResponse } from '../../../types/api';
 import { ROUTES } from '../../../configs/constants';
 import DataTable from '../../../components/Common/DataTable';
 import AIToolsCard from '../../../components/Features/AIToolsCard';
@@ -117,10 +115,9 @@ const InterviewLivePage = () => {
         page: page + 1,
         pageSize: rowsPerPage,
       });
-      const rawSessions = (data as PaginatedResponse<InterviewSession> & PaginatedResponse<Record<string, unknown>>)?.results || [];
-      const mapped = rawSessions.map((session: Record<string, unknown>) => transformInterviewSession(session) as InterviewSession).filter(Boolean);
-      setSessions(mapped);
-      setCount(typeof data?.count === 'number' ? data.count : rawSessions.length);
+      const fetchedSessions = Array.isArray(data?.results) ? data.results : [];
+      setSessions(fetchedSessions);
+      setCount(typeof data?.count === 'number' ? data.count : fetchedSessions.length);
     } catch (fetchError) {
       console.error('Error fetching realtime sessions', fetchError);
       setError(t('common:messages.loadFailed', { defaultValue: 'Không th? t?i d? li?u ph?ng v?n live. Vui lòng th? l?i.' }));
@@ -346,7 +343,6 @@ const InterviewLivePage = () => {
                   <IconButton
                     component={Link}
                     href={getLink(ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id.toString()))}
-                    {...({} as Record<string, unknown>)}
                     color="success"
                     size="small"
                     sx={{ bgcolor: alpha(theme.palette.success.main, 0.08), '&:hover': { bgcolor: alpha(theme.palette.success.main, 0.16) } }}
@@ -375,7 +371,6 @@ const InterviewLivePage = () => {
                   <IconButton
                     component={Link}
                     href={getLink(ROUTES.EMPLOYER.INTERVIEW_EDIT.replace(':id', session.id.toString()))}
-                    {...({} as Record<string, unknown>)}
                     color="info"
                     size="small"
                     sx={{ bgcolor: alpha(theme.palette.info.main, 0.08), '&:hover': { bgcolor: alpha(theme.palette.info.main, 0.16) } }}
@@ -403,7 +398,6 @@ const InterviewLivePage = () => {
                 <IconButton
                   component={Link}
                   href={getLink(ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', session.id.toString()))}
-                  {...({} as Record<string, unknown>)}
                   color="primary"
                   size="small"
                   sx={{
@@ -550,7 +544,6 @@ const InterviewLivePage = () => {
             startIcon={<AddIcon />}
             component={Link}
             href={getLink(ROUTES.EMPLOYER.INTERVIEW_CREATE)}
-            {...({} as Record<string, unknown>)}
             sx={{
               borderRadius: 2,
               px: 3,
@@ -747,7 +740,6 @@ const InterviewLivePage = () => {
                       startIcon={<PlayArrowIcon sx={{ fontSize: 16 }} />}
                       component={Link}
                       href={getLink(ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id.toString()))}
-                      {...({} as Record<string, unknown>)}
                       onClick={(event: React.MouseEvent) => event.stopPropagation()}
                       sx={{
                         textTransform: 'none',
@@ -767,7 +759,6 @@ const InterviewLivePage = () => {
                       startIcon={<VisibilityOffIcon sx={{ fontSize: 16 }} />}
                       component={Link}
                       href={getLink(ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', session.id.toString()))}
-                      {...({} as Record<string, unknown>)}
                       onClick={(event: React.MouseEvent) => event.stopPropagation()}
                       sx={{
                         textTransform: 'none',
@@ -808,7 +799,6 @@ const InterviewLivePage = () => {
                       startIcon={<EditIcon sx={{ fontSize: 16 }} />}
                       component={Link}
                       href={getLink(ROUTES.EMPLOYER.INTERVIEW_EDIT.replace(':id', session.id.toString()))}
-                      {...({} as Record<string, unknown>)}
                       onClick={(event: React.MouseEvent) => event.stopPropagation()}
                       sx={{
                         textTransform: 'none',
@@ -848,7 +838,6 @@ const InterviewLivePage = () => {
                     startIcon={<VisibilityIcon sx={{ fontSize: 16 }} />}
                     component={Link}
                     href={getLink(ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', session.id.toString()))}
-                    {...({} as Record<string, unknown>)}
                     onClick={(event: React.MouseEvent) => event.stopPropagation()}
                     sx={{
                       textTransform: 'none',

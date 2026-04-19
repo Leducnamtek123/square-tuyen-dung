@@ -1,47 +1,38 @@
 import httpRequest from '../utils/httpRequest';
 import type { PaginatedResponse } from '../types/api';
 import type { QuestionGroup } from '../types/models';
+import { cleanParams } from '../utils/params';
 
 
 type IdType = string | number;
-
-const normalizeParams = (params: Record<string, unknown> = {}): Record<string, unknown> => {
-  const normalized: Record<string, unknown> = { ...params };
-
-  if (normalized.page_size && !normalized.pageSize) {
-    normalized.pageSize = normalized.page_size;
-    delete normalized.page_size;
-  }
-
-  if (normalized.kw && !normalized.search) {
-    normalized.search = normalized.kw;
-    delete normalized.kw;
-  }
-
-  Object.keys(normalized).forEach((key) => {
-    const value = normalized[key];
-    if (value === undefined || value === null || value === '') {
-      delete normalized[key];
-    }
-  });
-
-  return normalized;
+export type QuestionGroupListParams = {
+  page?: number;
+  pageSize?: number;
+  ordering?: string;
+  search?: string;
 };
 
+export interface QuestionGroupPayload {
+  name: string;
+  description?: string;
+  evaluationRubricInput?: unknown;
+  questionIds?: number[];
+}
+
 const questionGroupService = {
-  getQuestionGroups: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<QuestionGroup>> => {
+  getQuestionGroups: (params: QuestionGroupListParams = {}): Promise<PaginatedResponse<QuestionGroup>> => {
     return httpRequest
-      .get('interview/web/question-groups/', { params: normalizeParams(params) });
+      .get('interview/web/question-groups/', { params: cleanParams(params) });
   },
   getQuestionGroupDetail: (id: IdType): Promise<QuestionGroup> => {
     return httpRequest
       .get(`interview/web/question-groups/${id}/`);
   },
-  createQuestionGroup: (data: Record<string, unknown>): Promise<QuestionGroup> => {
+  createQuestionGroup: (data: QuestionGroupPayload): Promise<QuestionGroup> => {
     return httpRequest
       .post('interview/web/question-groups/', data);
   },
-  updateQuestionGroup: (id: IdType, data: Record<string, unknown>): Promise<QuestionGroup> => {
+  updateQuestionGroup: (id: IdType, data: Partial<QuestionGroupPayload>): Promise<QuestionGroup> => {
     return httpRequest
       .patch(`interview/web/question-groups/${id}/`, data);
   },
@@ -52,4 +43,5 @@ const questionGroupService = {
 };
 
 export default questionGroupService;
+
 

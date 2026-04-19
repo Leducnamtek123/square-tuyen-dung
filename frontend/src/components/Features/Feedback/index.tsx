@@ -14,10 +14,6 @@ import RatingCustom from '@/components/Common/Controls/RatingCustom';
 import MultilineTextFieldCustom from '@/components/Common/Controls/MultilineTextFieldCustom';
 import contentService from '@/services/contentService';
 import { FEEDBACK_IMAGES } from '@/configs/constants';
-import type { Control as ReactHookFormControl } from 'react-hook-form';
-import type { ApiError } from '@/types/api';
-import type { FieldValues as ReactHookFormFieldValues } from 'react-hook-form';
-import type { AxiosError } from 'axios';
 
 interface FeedbackProps {}
 
@@ -63,7 +59,7 @@ const Feedback = (_props: FeedbackProps) => {
     const sendFeedback = async (payload: FeedbackData) => {
       setIsFullScreenLoading(true);
       try {
-        await contentService.createFeedback(payload as unknown as Record<string, unknown>);
+        await contentService.createFeedback(payload);
         handleClose();
         toastMessages.success(t('feedback.success'));
       } catch (error) {

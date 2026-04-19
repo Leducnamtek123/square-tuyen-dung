@@ -33,7 +33,7 @@ export interface AppNotification {
   is_deleted?: boolean;
   time?: { seconds: number; nanoseconds?: number };
   link?: string;
-  [field: string]: unknown;
+  APPLY_JOB?: { resume_slug?: string };
 }
 
 interface UseNotificationsReturn {

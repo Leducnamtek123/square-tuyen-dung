@@ -1,17 +1,18 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
+import type { AdminListParams, CareerPayload } from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
 import { Career } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
 export type UseCareersResult = UseQueryResult<PaginatedResponse<Career>> & {
-    createCareer: (data: Partial<Career>) => Promise<Career>;
-    updateCareer: (args: { id: string | number; data: Partial<Career> }) => Promise<Career>;
+    createCareer: (data: CareerPayload) => Promise<Career>;
+    updateCareer: (args: { id: string | number; data: Partial<CareerPayload> }) => Promise<Career>;
     deleteCareer: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
 
-export const useCareers = (params?: Record<string, unknown>): UseCareersResult => {
+export const useCareers = (params?: AdminListParams): UseCareersResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery<PaginatedResponse<Career>>({
@@ -24,7 +25,7 @@ export const useCareers = (params?: Record<string, unknown>): UseCareersResult =
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: Partial<Career>) => adminManagementService.createCareer(data as Record<string, unknown>),
+        mutationFn: (data: CareerPayload) => adminManagementService.createCareer(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
             toastMessages.success('Career added successfully');
@@ -36,7 +37,7 @@ export const useCareers = (params?: Record<string, unknown>): UseCareersResult =
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string | number; data: Partial<Career> }) => adminManagementService.updateCareer(id, data as Record<string, unknown>),
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<CareerPayload> }) => adminManagementService.updateCareer(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
             toastMessages.success('Career updated successfully');

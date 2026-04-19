@@ -142,7 +142,7 @@ const CareerCarousel = () => {
                     transition: "all 0.3s ease",
                     "&:hover": {
                       transform: "translateY(-4px)",
-                      boxShadow: (theme: Theme) => (theme as unknown as { customShadows: Record<string, string> }).customShadows.medium,
+                      boxShadow: (theme: Theme) => theme.customShadows?.medium,
                       "& .career-icon": {
                         transform: "scale(1.05)",
                       },

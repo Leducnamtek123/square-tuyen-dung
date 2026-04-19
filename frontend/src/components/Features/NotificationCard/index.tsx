@@ -25,7 +25,7 @@ import { formatRoute } from '@/utils/funcUtils';
 import { useAppSelector } from '@/hooks/useAppStore';
 import type { QueryDocumentSnapshot } from 'firebase/firestore';
 
-interface NotificationItem {
+type NotificationItem = {
   key: string;
   type?: string;
   title?: string;
@@ -34,17 +34,15 @@ interface NotificationItem {
   is_read?: boolean;
   is_deleted?: boolean;
   time?: { seconds: number };
-  [key: string]: unknown;
-}
-
-interface NotificationCardProps {
-  [key: string]: unknown;
-}
+  APPLY_JOB?: {
+    resume_slug?: string;
+  };
+};
 
 const PAGE_SIZE = 5;
 const MAX_NOTIFICATIONS = 50;
 
-const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
+const NotificationCard: React.FC = () => {
 
   const nav = useRouter();
 
@@ -790,3 +788,4 @@ const NotificationCard: React.FC<NotificationCardProps> = (_props) => {
 };
 
 export default NotificationCard;
+

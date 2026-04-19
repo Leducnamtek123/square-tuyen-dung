@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { Box, Button, Card, IconButton, Stack, Typography } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
@@ -187,7 +187,7 @@ const JobPostSearch = () => {
     }
   };
 
-  const handleFilter = (data: Partial<JobPostFilter> & Record<string, unknown>) => {
+  const handleFilter = (data: Partial<JobPostFilter>) => {
 
     handleSaveKeywordLocalStorage(data?.kw);
 
@@ -457,3 +457,4 @@ const JobPostSearch = () => {
 };
 
 export default JobPostSearch;
+

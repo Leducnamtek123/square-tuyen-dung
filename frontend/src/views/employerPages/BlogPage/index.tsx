@@ -46,7 +46,7 @@ const BlogPage = () => {
                 aria-label="breadcrumb"
                 sx={{ mb: 3 }}
             >
-                <MuiLink component={Link} underline="hover" color="inherit" href="/employer/dashboard" {...({} as Record<string, unknown>)}>
+                <MuiLink component={Link} underline="hover" color="inherit" href="/employer/dashboard">
                     {t('sidebar.dashboard')}
                 </MuiLink>
                 <Typography color="text.primary">{t('blog.title')}</Typography>
@@ -99,3 +99,5 @@ const BlogPage = () => {
 };
 
 export default BlogPage;
+
+

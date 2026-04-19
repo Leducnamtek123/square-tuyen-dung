@@ -1,50 +1,45 @@
 import httpRequest from '../utils/httpRequest';
 import type { PaginatedResponse } from '../types/api';
 import type { Question } from '../types/models';
+import { cleanParams } from '../utils/params';
 
 
 type IdType = string | number;
-
-const normalizeParams = (params: Record<string, unknown> = {}): Record<string, unknown> => {
-  const normalized: Record<string, unknown> = { ...params };
-
-  if (normalized.page_size && !normalized.pageSize) {
-    normalized.pageSize = normalized.page_size;
-    delete normalized.page_size;
-  }
-
-  Object.keys(normalized).forEach((key) => {
-    const value = normalized[key];
-    if (value === undefined || value === null || value === '') {
-      delete normalized[key];
-    }
-  });
-
-  return normalized;
+export type QuestionListParams = {
+  page?: number;
+  pageSize?: number;
+  ordering?: string;
+  search?: string;
 };
 
+export interface QuestionPayload {
+  text: string;
+  difficulty?: string;
+  career?: number | null;
+}
+
 const questionService = {
-  getQuestions: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Question>> => {
+  getQuestions: (params: QuestionListParams = {}): Promise<PaginatedResponse<Question>> => {
     return httpRequest
-      .get('interview/web/questions/', { params: normalizeParams(params) });
+      .get('interview/web/questions/', { params: cleanParams(params) });
   },
 
   // Alias for better clarity in Admin contexts
 
-  getAllQuestions: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Question>> => {
+  getAllQuestions: (params: QuestionListParams = {}): Promise<PaginatedResponse<Question>> => {
     return httpRequest
-      .get('interview/web/questions/', { params: normalizeParams(params) });
+      .get('interview/web/questions/', { params: cleanParams(params) });
   },
 
   getQuestionDetail: (id: IdType): Promise<Question> => {
     return httpRequest.get(`interview/web/questions/${id}/`);
   },
 
-  createQuestion: (data: Record<string, unknown>): Promise<Question> => {
+  createQuestion: (data: QuestionPayload): Promise<Question> => {
     return httpRequest.post('interview/web/questions/', data);
   },
 
-  updateQuestion: (id: IdType, data: Record<string, unknown>): Promise<Question> => {
+  updateQuestion: (id: IdType, data: Partial<QuestionPayload>): Promise<Question> => {
     // Using PATCH for more flexible partial updates
     return httpRequest
       .patch(`interview/web/questions/${id}/`, data);
@@ -56,4 +51,5 @@ const questionService = {
 };
 
 export default questionService;
+
 

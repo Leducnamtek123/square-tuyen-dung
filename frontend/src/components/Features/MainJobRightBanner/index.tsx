@@ -3,19 +3,7 @@ import { Box, Button, Stack, styled, useTheme } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { BANNER_TYPES } from "@/configs/constants";
 import contentService from "@/services/contentService";
-
-interface Banner {
-  id: string | number;
-  imageUrl: string;
-  description?: string;
-  buttonLink?: string;
-  buttonText?: string;
-  isShowButton?: boolean;
-}
-
-interface MainJobRightBannerProps {
-  [key: string]: unknown;
-}
+import type { Banner } from "@/types/models";
 
 const StyledBannerImage = styled("img")({
   width: "100%",
@@ -33,7 +21,7 @@ const StyledBannerLink = styled("a")({
   },
 });
 
-const MainJobRightBanner = (_props: MainJobRightBannerProps) => {
+const MainJobRightBanner = () => {
   const { t } = useTranslation("common");
   const [rightBanners, setRightBanners] = React.useState<Banner[]>([]);
   const theme = useTheme();
@@ -44,8 +32,7 @@ const MainJobRightBanner = (_props: MainJobRightBannerProps) => {
         const resData = await contentService.getBanners({
           type: BANNER_TYPES.MAIN_JOB_RIGHT,
         });
-        const data = Array.isArray(resData) ? resData : ((resData as { results?: Banner[] })?.results || (resData as { data?: Banner[] })?.data || []);
-        setRightBanners(data);
+        setRightBanners(resData);
       } catch (error) {}
     };
     getRightBanners();
@@ -81,7 +68,7 @@ const MainJobRightBanner = (_props: MainJobRightBannerProps) => {
                 bottom: '20px',
                 left: '50%',
                 transform: 'translateX(-50%)',
-                zIndex: (theme.zIndex as unknown as Record<string, number>).card + 1
+                zIndex: theme.zIndex.appBar + 1
               }}
             >
               <Button

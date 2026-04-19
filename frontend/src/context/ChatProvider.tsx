@@ -5,6 +5,7 @@ import {
   createUser,
   getUserAccount,
 } from '../services/firebaseService';
+import type { ChatAccountData } from '../services/firebaseService';
 import type { RootState } from '../redux/store';
 import type { User } from '../types/models';
 
@@ -72,7 +73,7 @@ const ChatProvider = ({ children }: ChatProviderProps) => {
         const isExists = await checkExists('accounts', userId);
 
         if (!isExists) {
-          let userData: Record<string, unknown>;
+          let userData: ChatAccountData;
 
           if (activeWorkspace?.type !== 'company') {
             userData = {
@@ -101,9 +102,9 @@ const ChatProvider = ({ children }: ChatProviderProps) => {
           await createUser('accounts', userData, userId);
         }
 
-        const userChat = (await getUserAccount('accounts', userId)) as unknown as ChatUser;
+        const userChat = (await getUserAccount('accounts', userId)) as ChatUser | null;
         if (!cancelled) {
-          setCurrentUserChat(userChat);
+          setCurrentUserChat(userChat || null);
         }
       } catch {
         // Silently fail for chat initialization

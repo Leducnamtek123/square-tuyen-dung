@@ -33,7 +33,31 @@ const DatePickerCustom = <T extends FieldValues = FieldValues>({
 
   const parseDate = (date: Dayjs | string | null | undefined) => {
     if (!date) return undefined;
+    if (dayjs.isDayjs(date)) {
+      return date.isValid() ? date : undefined;
+    }
     try {
+      if (typeof date === 'string') {
+        const normalized = date.trim();
+        if (!normalized) return undefined;
+
+        const parsedByKnownFormat = dayjs(normalized, [
+          'YYYY-MM-DD',
+          'DD-MM-YYYY',
+          'YYYY/MM/DD',
+          'DD/MM/YYYY',
+          'YYYY-MM-DDTHH:mm',
+          'YYYY-MM-DDTHH:mm:ss',
+          'YYYY-MM-DDTHH:mm:ssZ',
+          'YYYY-MM-DDTHH:mm:ss.SSSZ',
+        ], true);
+
+        if (parsedByKnownFormat.isValid()) return parsedByKnownFormat;
+
+        const parsedDate = dayjs(normalized);
+        return parsedDate.isValid() ? parsedDate : undefined;
+      }
+
       const parsedDate = dayjs(date);
       return parsedDate.isValid() ? parsedDate : undefined;
     } catch {

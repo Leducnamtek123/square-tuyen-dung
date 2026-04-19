@@ -12,6 +12,7 @@ import { useDistricts } from '../DistrictsPage/hooks/useDistricts';
 import { useCities } from '../CitiesPage/hooks/useCities';
 import { useDataTable } from '../../../hooks';
 import { Ward, District, City } from '../../../types/models';
+import type { WardPayload } from '../../../services/adminManagementService';
 
 const WardsPage = () => {
     const { t } = useTranslation('admin');
@@ -41,14 +42,14 @@ const WardsPage = () => {
         page: page + 1,
         pageSize,
         kw: searchTerm,
-        district: districtFilter || undefined,
+        district: districtFilter ? Number(districtFilter) : undefined,
         ordering
     });
 
     const { data: citiesData } = useCities({ pageSize: 100 });
     const { data: districtsData } = useDistricts({ 
         pageSize: 500, 
-        city: cityFilter || undefined 
+        city: cityFilter ? Number(cityFilter) : undefined 
     });
 
     const cities = citiesData?.results || [];
@@ -57,7 +58,7 @@ const WardsPage = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
     const [currentWard, setCurrentWard] = useState<Ward | null>(null);
-    const [formData, setFormData] = useState<Partial<Ward>>({
+    const [formData, setFormData] = useState<Partial<WardPayload>>({
         name: '',
         code: '',
         district: undefined
@@ -109,13 +110,21 @@ const WardsPage = () => {
     };
 
     const handleSave = async () => {
+        if (!formData.name || !formData.code || !formData.district) return;
+
+        const payload: WardPayload = {
+            name: formData.name,
+            code: formData.code,
+            district: Number(formData.district),
+        };
+
         try {
             if (dialogMode === 'add') {
-                await createWard(formData);
+                await createWard(payload);
             } else if (currentWard) {
                 await updateWard({
                     id: currentWard.id,
-                    data: formData
+                    data: payload
                 });
             }
             handleCloseDialog();

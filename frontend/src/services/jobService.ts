@@ -1,14 +1,16 @@
 import httpRequest from '../utils/httpRequest';
 import { cleanParams } from '../utils/params';
 import type { JobPost } from '../types/models';
-import type { PaginatedResponse } from '../types/api';
+import type { ExportTableRow, PaginatedResponse } from '../types/api';
 
 type IdType = string | number;
 
 /* ── Request DTOs ─────────────────────────────────────────────────────── */
 
-export interface GetJobPostsParams {
+export type GetJobPostsParams = {
   kw?: string;
+  companyId?: string | number;
+  excludeSlug?: string;
   careerId?: string | number;
   cityId?: string | number;
   districtId?: string | number;
@@ -24,8 +26,7 @@ export interface GetJobPostsParams {
   isUrgent?: boolean;
   isHot?: boolean;
   status?: number | string;
-  [key: string]: unknown;
-}
+};
 
 export interface JobPostInput {
   jobName: string;
@@ -36,7 +37,6 @@ export interface JobPostInput {
   isHot?: boolean;
   isUrgent?: boolean;
   status?: number;
-  careerId?: number;
   position?: number;
   experience?: number;
   academicLevel?: number;
@@ -50,9 +50,15 @@ export interface JobPostInput {
   contactPersonName?: string;
   contactPersonPhone?: string;
   contactPersonEmail?: string;
-  cityId?: number;
-  districtId?: number;
-  address?: string;
+  career?: number;
+  location: {
+    city?: number;
+    district?: number;
+    ward?: number;
+    address: string;
+    lat?: number | null;
+    lng?: number | null;
+  };
 }
 
 /* ── Response Types ───────────────────────────────────────────────────── */
@@ -61,10 +67,9 @@ export interface SuggestTitleResponse {
   results: string[];
 }
 
-export interface JobPostOptionsResponse {
+export type JobPostOptionsResponse = {
   statusOptions?: { id: number; name: string }[];
-  [key: string]: unknown;
-}
+};
 
 /* ── Service ──────────────────────────────────────────────────────────── */
 
@@ -79,9 +84,9 @@ const jobService = {
     return httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<JobPost>>;
   },
 
-  exportEmployerJobPosts: (params: GetJobPostsParams = {}): Promise<Blob> => {
+  exportEmployerJobPosts: (params: GetJobPostsParams = {}): Promise<ExportTableRow[]> => {
     const url = 'job/web/private-job-posts/export/';
-    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<Blob>;
+    return httpRequest.get(url, { params: cleanParams(params) }) as Promise<ExportTableRow[]>;
   },
 
   getEmployerJobPostDetailById: (slug: IdType): Promise<JobPost> => {
@@ -136,3 +141,5 @@ const jobService = {
 };
 
 export default jobService;
+
+

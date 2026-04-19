@@ -4,13 +4,12 @@ import { DropzoneDialog } from 'mui-file-dropzone';
 import { IconButton, Typography, Stack } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 
-interface Props {
+type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;
   handleUpload: (files: File[]) => void;
   title?: string;
-  [key: string]: unknown;
-}
+};
 
 const DropzoneDialogCustom = (props: Props) => {
   const { open, setOpen, handleUpload, title = 'Tiêu đề', ...others } = props;
@@ -85,3 +84,4 @@ const DropzoneDialogCustom = (props: Props) => {
 };
 
 export default DropzoneDialogCustom;
+

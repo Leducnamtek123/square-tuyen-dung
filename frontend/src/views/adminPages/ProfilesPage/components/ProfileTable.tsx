@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
-interface ProfileTableRow {
+type ProfileTableRow = {
     id?: number | string;
     userDict?: {
         avatar?: string;
@@ -16,10 +16,8 @@ interface ProfileTableRow {
         phone?: string;
         gender?: string;
         birthday?: string;
-        [key: string]: unknown;
     };
-    [key: string]: unknown;
-}
+};
 
 interface ProfileTableProps {
     data: ProfileTableRow[];
@@ -133,3 +131,4 @@ const ProfileTable = ({
 };
 
 export default ProfileTable;
+

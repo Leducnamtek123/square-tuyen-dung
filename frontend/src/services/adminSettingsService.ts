@@ -1,16 +1,24 @@
 import httpRequest from '../utils/httpRequest';
 
+export type SystemSettingsPayload = {
+  maintenanceMode?: boolean;
+  autoApproveJobs?: boolean;
+  emailNotifications?: boolean;
+  googleApiKey?: string;
+  supportEmail?: string;
+};
 
 const adminSettingsService = {
-  getSystemSettings: (): Promise<Record<string, unknown>> => {
+  getSystemSettings: (): Promise<SystemSettingsPayload> => {
     const url = 'admin/web/system-settings/';
-    return httpRequest.get<Record<string, unknown>>(url);
+    return httpRequest.get<SystemSettingsPayload>(url);
   },
-  updateSystemSettings: (data: Record<string, unknown>): Promise<Record<string, unknown>> => {
+  updateSystemSettings: (data: Partial<SystemSettingsPayload>): Promise<SystemSettingsPayload> => {
     const url = 'admin/web/system-settings/';
-    return httpRequest.put<Record<string, unknown>>(url, data);
+    return httpRequest.put<SystemSettingsPayload>(url, data);
   },
 };
 
 export default adminSettingsService;
+
 

@@ -1,4 +1,5 @@
 import Swal from 'sweetalert2';
+import type { SweetAlertResult } from 'sweetalert2';
 
 // Modern icon definitions using Material Symbols (filled, rounded)
 // Colors aligned with MUI theme
@@ -76,7 +77,7 @@ const confirmModal = (
   });
 };
 
-const errorModal = (title = '', text = ''): Promise<unknown> => {
+const errorModal = (title = '', text = ''): Promise<SweetAlertResult> => {
   return Swal.fire({
     iconHtml: getIconHtml('error'),
     customClass: {

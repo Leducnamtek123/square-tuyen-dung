@@ -1,8 +1,33 @@
 import httpRequest from '../utils/httpRequest';
 
+export interface TTSPayload {
+  text: string;
+  voice?: string;
+  speed?: number;
+  format?: 'mp3' | 'wav';
+}
+
+export interface TranscribeParams {
+  model?: string;
+  language?: string;
+}
+
+export type TranscribeResponse = {
+  transcription?: string;
+  text?: string;
+  language?: string;
+  duration?: number;
+};
+
+export type ScreeningResult = {
+  id?: number | string;
+  status?: string;
+  score?: number;
+  summary?: string;
+};
 
 const aiService = {
-  tts: async (payload: Record<string, unknown>): Promise<Blob> => {
+  tts: async (payload: TTSPayload): Promise<Blob> => {
     const url = 'ai/tts/';
     const response = await httpRequest.post<ArrayBuffer>(url, payload, {
       responseType: 'arraybuffer',
@@ -18,13 +43,13 @@ const aiService = {
     return httpRequest.get<ArrayBuffer>(url, { responseType: 'arraybuffer' });
   },
 
-  transcribe: async (file: File, params: Record<string, unknown> = {}): Promise<Record<string, unknown>> => {
+  transcribe: async (file: File, params: TranscribeParams = {}): Promise<TranscribeResponse> => {
     const url = 'ai/transcribe/';
     const formData = new FormData();
     formData.append('audio', file);
     if (params.model) formData.append('model', String(params.model));
     if (params.language) formData.append('language', String(params.language));
-    const response = await httpRequest.post<Record<string, unknown>>(url, formData, {
+    const response = await httpRequest.post<TranscribeResponse>(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -32,9 +57,10 @@ const aiService = {
     return response ?? {};
   },
 
-  getScreeningResult: async (id: string | number): Promise<Record<string, unknown>> => {
-    return httpRequest.get<Record<string, unknown>>(`interview/web/screening-results/${id}/`);
+  getScreeningResult: async (id: string | number): Promise<ScreeningResult> => {
+    return httpRequest.get<ScreeningResult>(`interview/web/screening-results/${id}/`);
   },
 };
 
 export default aiService;
+

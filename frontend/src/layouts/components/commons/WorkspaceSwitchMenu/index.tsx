@@ -7,16 +7,11 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { HOST_NAME, ROUTES } from "../../../../configs/constants";
 import { setActiveWorkspace } from "../../../../redux/userSlice";
 
-export interface WorkspaceItem {
+export type WorkspaceItem = {
   type: "company" | "job_seeker";
   companyId?: number | null;
   label?: string;
-  [key: string]: unknown;
-}
-
-interface WorkspaceSwitchMenuProps {
-  [key: string]: unknown;
-}
+};
 
 const WorkspaceSwitchMenu = () => {
   const dispatch = useDispatch();
@@ -102,3 +97,4 @@ const WorkspaceSwitchMenu = () => {
 };
 
 export default WorkspaceSwitchMenu;
+

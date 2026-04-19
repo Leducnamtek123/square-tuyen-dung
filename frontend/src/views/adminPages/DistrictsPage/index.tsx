@@ -11,6 +11,7 @@ import { useDistricts } from './hooks/useDistricts';
 import { useCities } from '../CitiesPage/hooks/useCities';
 import { useDataTable } from '../../../hooks';
 import { District, City } from '../../../types/models';
+import type { DistrictPayload } from '../../../services/adminManagementService';
 
 const DistrictsPage = () => {
     const { t } = useTranslation('admin');
@@ -39,7 +40,7 @@ const DistrictsPage = () => {
         page: page + 1,
         pageSize,
         kw: searchTerm,
-        city: cityFilter || undefined,
+        city: cityFilter ? Number(cityFilter) : undefined,
         ordering
     });
 
@@ -49,7 +50,7 @@ const DistrictsPage = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
     const [currentDistrict, setCurrentDistrict] = useState<District | null>(null);
-    const [formData, setFormData] = useState<Partial<District>>({
+    const [formData, setFormData] = useState<Partial<DistrictPayload>>({
         name: '',
         code: '',
         city: undefined
@@ -79,7 +80,7 @@ const DistrictsPage = () => {
         setFormData({
             name: district.name || '',
             code: district.code || '',
-            city: (typeof district.city === 'object' ? district.city?.id : district.city)
+            city: district.city ? Number(typeof district.city === 'object' ? district.city?.id : district.city) : undefined
         });
         setOpenDialog(true);
     };
@@ -95,13 +96,21 @@ const DistrictsPage = () => {
     };
 
     const handleSave = async () => {
+        if (!formData.name || !formData.code || !formData.city) return;
+
+        const payload: DistrictPayload = {
+            name: formData.name,
+            code: formData.code,
+            city: Number(formData.city),
+        };
+
         try {
             if (dialogMode === 'add') {
-                await createDistrict(formData);
+                await createDistrict(payload);
             } else if (currentDistrict) {
                 await updateDistrict({
                     id: currentDistrict.id,
-                    data: formData
+                    data: payload
                 });
             }
             handleCloseDialog();

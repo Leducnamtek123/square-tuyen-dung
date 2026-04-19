@@ -9,7 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useConfig } from '@/hooks/useConfig';
 import type { TFunction } from 'i18next';
 interface CareerOption {
-  id: string;
+  id: string | number;
   name: string;
   isHot?: boolean;
 }
@@ -18,7 +18,7 @@ interface SubHeaderDialogProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   topCareers: CareerOption[];
-  handleFilter: (id: string) => void;
+  handleFilter: (id: string | number) => void;
 }
 
 
@@ -26,7 +26,7 @@ interface SubHeaderDialogProps {
 const DesktopContent = (
   setOpen: (open: boolean) => void,
   careers: CareerOption[],
-  handleFilter: (id: string) => void,
+  handleFilter: (id: string | number) => void,
   t: TFunction
 ) => {
   const theme = useTheme();
@@ -136,7 +136,7 @@ const DesktopContent = (
 const MobileContent = (
   setOpen: (open: boolean) => void,
   careers: CareerOption[],
-  handleFilter: (id: string) => void,
+  handleFilter: (id: string | number) => void,
   t: TFunction
 ) => {
   return (
@@ -209,11 +209,22 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
     return careerResult;
   }, []);
 
-  const careersSource = React.useMemo(() => {
+  const careersSource = React.useMemo<CareerOption[]>(() => {
     if (Array.isArray(allConfig?.careers) && allConfig.careers.length > 0) {
-      return allConfig.careers as unknown as CareerOption[];
+      return allConfig.careers.map((career) => ({
+        id: career.id,
+        name: career.name,
+        isHot: career.isHot,
+      }));
     }
-    return (allConfig?.careerOptions || []) as unknown as CareerOption[];
+    if (Array.isArray(allConfig?.careerOptions)) {
+      return allConfig.careerOptions.map((option) => ({
+        id: option.id ?? '',
+        name: option.name,
+        isHot: Boolean(option.isHot),
+      }));
+    }
+    return [];
   }, [allConfig?.careers, allConfig?.careerOptions]);
 
   const careers = React.useMemo(

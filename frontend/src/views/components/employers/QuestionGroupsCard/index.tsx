@@ -151,8 +151,8 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
         if (!newQuestionContent.trim()) return;
         try {
             const res = await createQuestion({ text: newQuestionContent.trim() });
-            if (res && (res as { id?: number }).id) {
-                setSelectedQuestions((prev: number[]) => [...prev, (res as { id: number }).id]);
+            if (res?.id) {
+                setSelectedQuestions((prev: number[]) => [...prev, res.id]);
                 toastMessages.success(t('interview:employer.questionBank.createSuccess'));
             }
             setOpenCreateQuestion(false);

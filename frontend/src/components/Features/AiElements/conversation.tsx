@@ -10,13 +10,11 @@ import type { ComponentProps, ReactNode, HTMLAttributes } from "react";
 export type ConversationMessagePart = {
   type?: string;
   text?: string;
-  [key: string]: unknown;
 };
 
 export type ConversationMessage = {
   role: string;
   parts?: ConversationMessagePart[];
-  [key: string]: unknown;
 };
 
 type ConversationProps = ComponentProps<typeof StickToBottom> & {
@@ -180,3 +178,4 @@ export const ConversationDownload = ({
     </Button>
   );
 };
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useMemo } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +40,7 @@ const ProfileCard: React.FC = () => {
 
     const handleSave = (slug: string) => {
         toggleSave(slug, {
-            onSuccess: (resData: Record<string, unknown>) => {
+            onSuccess: (resData: { isSaved?: boolean }) => {
                 const isSaved = resData.isSaved;
                 toastMessages.success(
                     isSaved ? t('profileCard.messages.saveSuccess') : t('profileCard.messages.unsaveSuccess')
@@ -109,7 +109,7 @@ const ProfileCard: React.FC = () => {
                                                 updateAt={resume.updateAt || ''}
                                                 isSaved={resume.isSaved || false}
                                                 viewEmployerNumber={resume.viewEmployerNumber || 0}
-                                                user={resume.userDict as Record<string, unknown>}
+                                                user={resume.userDict}
                                                 city={resume.city?.id ?? ''}
                                                 jobSeekerProfile={resume.jobSeekerProfileDict || {}}
                                                 type={resume.type?.toString()}
@@ -162,3 +162,4 @@ const ProfileCard: React.FC = () => {
 };
 
 export default ProfileCard;
+

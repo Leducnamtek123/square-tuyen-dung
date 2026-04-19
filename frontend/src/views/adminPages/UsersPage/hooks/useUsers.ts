@@ -6,8 +6,10 @@ import { User as UserModel } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 import { RoleName } from '../../../../types/auth';
 import type { AxiosError } from 'axios';
+import type { AdminListParams } from '../../../../services/adminManagementService';
+import type { TOptions } from 'i18next';
 
-const t = (key: string, options?: Record<string, unknown>) => i18n.t(key, { ns: 'admin', ...options });
+const t = (key: string, options?: TOptions) => i18n.t(key, { ns: 'admin', ...options });
 
 export type UseUsersResult = UseQueryResult<PaginatedResponse<UserModel>> & {
     toggleUserStatus: (user: UserModel) => Promise<UserModel>;
@@ -16,7 +18,7 @@ export type UseUsersResult = UseQueryResult<PaginatedResponse<UserModel>> & {
     isMutating: boolean;
 };
 
-export const useUsers = (params: Record<string, unknown>): UseUsersResult => {
+export const useUsers = (params: AdminListParams): UseUsersResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -82,3 +84,5 @@ export const useUsers = (params: Record<string, unknown>): UseUsersResult => {
         isMutating: toggleStatusMutation.isPending || updateRoleMutation.isPending || deleteMutation.isPending
     } as UseUsersResult;
 };
+
+

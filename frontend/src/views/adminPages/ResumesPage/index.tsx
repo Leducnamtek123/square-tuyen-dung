@@ -88,7 +88,7 @@ const ResumesPage = () => {
             ),
         },
         {
-            accessorKey: 'isDefault',
+            accessorKey: 'isActive',
             header: t('pages.resumes.table.default') as string,
             cell: (info) => info.getValue() ? t('common.yes') : t('common.no'),
         },

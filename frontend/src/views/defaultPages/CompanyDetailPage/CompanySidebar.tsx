@@ -19,7 +19,7 @@ interface CompanySidebarProps {
 
 const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageList, t }) => {
   return (
-    <Card sx={{ p: 3, boxShadow: (theme: StylesTheme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.small || 1 }}>
+    <Card sx={{ p: 3, boxShadow: (theme: StylesTheme) => theme.customShadows?.small || 1 }}>
       <Stack spacing={3}>
         {/* Website */}
         <Box>
@@ -105,3 +105,5 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageLis
   );
 };
 export default CompanySidebar;
+
+

@@ -1,4 +1,4 @@
-import httpRequest from '../utils/httpRequest';
+﻿import httpRequest from '../utils/httpRequest';
 import { AUTH_CONFIG } from '../configs/constants';
 import { ensurePresignedUrl } from '../utils/presignUrl';
 import type { AuthProvider, RoleName, TokenPair, CheckCredsResponse, EmailExistsResponse } from '../types/auth';
@@ -9,8 +9,20 @@ import type { UserSettingsData } from '../types/auth';
 import type { EmployerRegisterData } from '../types/auth';
 import type { JobSeekerRegisterData } from '../types/auth';
 
-type UserResponse = User & Record<string, unknown>;
-type TokenResponse = TokenPair & Record<string, unknown>;
+type UserResponse = User;
+type TokenResponse = TokenPair;
+interface ConvertTokenPayload {
+  grant_type: string;
+  client_id: string;
+  client_secret: string;
+  backend: AuthProvider;
+  token: string;
+  redirect_uri?: string;
+}
+interface ActionResponse {
+  success?: boolean;
+  message?: string;
+}
 let userInfoInFlight: Promise<UserResponse> | null = null;
 
 const authService = {
@@ -39,7 +51,7 @@ const authService = {
     redirectUri?: string,
   ): Promise<TokenResponse> => {
     const url = 'auth/convert-token/';
-    const data: Record<string, unknown> = {
+    const data: ConvertTokenPayload = {
       grant_type: AUTH_CONFIG.CONVERT_TOKEN_KEY,
       client_id: clientId,
       client_secret: clientSecret,
@@ -64,7 +76,7 @@ const authService = {
     return httpRequest.post(url, data);
   },
 
-  revokeToken: (accessToken: string, backend?: AuthProvider): Promise<unknown> => {
+  revokeToken: (accessToken: string, backend?: AuthProvider): Promise<ActionResponse> => {
     const url = 'auth/revoke-token/';
     const data = {
       client_id: AUTH_CONFIG.CLIENT_ID,
@@ -95,7 +107,7 @@ const authService = {
     return httpRequest.post(url, data);
   },
 
-  sendVerifyEmail: (email: string, platform = 'WEB'): Promise<unknown> => {
+  sendVerifyEmail: (email: string, platform = 'WEB'): Promise<ActionResponse> => {
     const url = 'auth/send-verify-email/';
     return httpRequest.post(url, { email, platform });
   },
@@ -157,17 +169,17 @@ const authService = {
     return resData;
   },
 
-  changePassword: (data: ChangePasswordData): Promise<unknown> => {
+  changePassword: (data: ChangePasswordData): Promise<ActionResponse> => {
     const url = 'auth/change-password/';
     return httpRequest.put(url, data);
   },
 
-  forgotPassword: (data: { email: string; platform?: string }): Promise<unknown> => {
+  forgotPassword: (data: { email: string; platform?: string }): Promise<ActionResponse> => {
     const url = 'auth/forgot-password/';
     return httpRequest.post(url, data);
   },
 
-  resetPassword: (data: ResetPasswordData): Promise<unknown> => {
+  resetPassword: (data: ResetPasswordData): Promise<ActionResponse> => {
     const url = 'auth/reset-password/';
     return httpRequest.post(url, data);
   },
@@ -184,3 +196,4 @@ const authService = {
 };
 
 export default authService;
+

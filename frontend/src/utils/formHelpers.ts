@@ -32,8 +32,7 @@ import type * as yup from 'yup';
 export function typedYupResolver<TFormValues extends FieldValues>(
   schema: yup.ObjectSchema<any>,
 ): Resolver<TFormValues> {
-  // Cast through unknown to bridge yup's inferred type to the form's expected type.
+  // Cast to bridge yup's inferred type to the form's expected type.
   // This is safe because yup will still validate at runtime.
-  return yupResolver(schema) as unknown as Resolver<TFormValues>;
+  return yupResolver(schema) as Resolver<TFormValues>;
 }
-

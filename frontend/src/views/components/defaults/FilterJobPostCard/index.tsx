@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Pagination, Stack } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
@@ -6,9 +6,10 @@ import jobService from '../../../../services/jobService';
 import JobPost from '../../../../components/Features/JobPost';
 import NoDataCard from '../../../../components/Common/NoDataCard';
 import type { JobPost as ModelsJobPost } from '../../../../types/models';
+import type { GetJobPostsParams } from '../../../../services/jobService';
 
 interface FilterJobPostCardProps {
-  params?: Record<string, unknown>;
+  params?: GetJobPostsParams;
 }
 
 const pageSize = 12;
@@ -19,10 +20,10 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
   const [col, setCol] = React.useState(12);
 
   const paramsKey = React.useMemo(() => JSON.stringify(params || {}), [params]);
-  const resolvedParams = React.useMemo(() => {
+  const resolvedParams = React.useMemo<GetJobPostsParams>(() => {
     try {
-      return JSON.parse(paramsKey);
-    } catch (error) {
+      return JSON.parse(paramsKey) as GetJobPostsParams;
+    } catch {
       return {};
     }
   }, [paramsKey]);
@@ -60,9 +61,9 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
     queryFn: async () => {
       const resData = await jobService.getJobPosts({
         ...resolvedParams,
-        pageSize: pageSize,
-        page: page,
-      }) as { results?: Array<ModelsJobPost & { companyDict?: any; locationDict?: any; }>, count?: number };
+        pageSize,
+        page,
+      });
       return {
         results: resData?.results || [],
         count: resData?.count || 0,
@@ -75,7 +76,7 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
   const jobPosts = data?.results || [];
   const count = data?.count || 0;
 
-  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
+  const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
   };
 
@@ -95,9 +96,8 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
         ) : (
           <>
             <Grid container spacing={2}>
-              {jobPosts.map((value: ModelsJobPost & { companyDict?: any; locationDict?: any; }) => (
+              {jobPosts.map((value: ModelsJobPost & { companyDict?: { companyImageUrl?: string; companyName?: string }; locationDict?: { city?: number | string } }) => (
                 <Grid key={value.id} size={col}>
-                  {/* Start: Job post */}
                   <JobPost
                     id={value.id}
                     slug={value.slug}
@@ -111,7 +111,6 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
                     salaryMin={value.salaryMin}
                     salaryMax={value.salaryMax}
                   />
-                  {/* End: Job post */}
                 </Grid>
               ))}
             </Grid>

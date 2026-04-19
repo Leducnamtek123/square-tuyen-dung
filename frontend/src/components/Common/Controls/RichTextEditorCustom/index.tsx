@@ -44,7 +44,7 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
       <Controller
         control={control}
         name={name as Path<T>}
-        defaultValue={EditorState.createEmpty() as unknown as PathValue<T, Path<T>>}
+        defaultValue={EditorState.createEmpty() as PathValue<T, Path<T>>}
         render={({ field, fieldState }) => {
           const safeEditorState = field.value?.getCurrentContent
             ? field.value

@@ -2,10 +2,11 @@ import { useQuery, keepPreviousData, UseQueryResult } from '@tanstack/react-quer
 import adminInterviewService from '../../../../services/adminInterviewService';
 import { InterviewSession } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import type { AdminListParams } from '../../../../services/adminManagementService';
 
 export type UseInterviewsResult = UseQueryResult<PaginatedResponse<InterviewSession>>;
 
-export const useInterviews = (params: Record<string, unknown>): UseInterviewsResult => {
+export const useInterviews = (params: AdminListParams): UseInterviewsResult => {
     const query = useQuery({
         queryKey: ['admin-interviews', params],
         queryFn: async () => {

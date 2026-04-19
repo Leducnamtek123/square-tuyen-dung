@@ -24,6 +24,7 @@ import bannerExplorePcImport from '../../../assets/images/banner-explore-pc.webp
 import { useAppSelector } from "../../../hooks/useAppStore";
 import type { SvgIconComponent } from "@mui/icons-material";
 import LazyLoadSection from "../../../components/Common/LazyLoadSection";
+import type { TFunction } from "i18next";
 
 // Next.js image imports return objects; extract string src
 const toSrc = (img: string | { src?: string; default?: { src?: string } } | null | undefined): string => typeof img === 'string' ? img : img?.src || img?.default?.src || '';
@@ -36,7 +37,7 @@ const CareerJobSection = ({
   t,
 }: {
   career: (typeof HOME_FILTER_CAREER)[number];
-  t: (key: string, options?: Record<string, unknown>) => string;
+  t: TFunction<'public'>;
 }) => {
   const Icon = career.titleIcon;
   return (
@@ -243,3 +244,5 @@ export default function HomePage() {
     </>
   );
 }
+
+

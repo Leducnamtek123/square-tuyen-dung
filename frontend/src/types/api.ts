@@ -12,6 +12,9 @@ export interface PaginatedResponse<T = unknown> {
   results: T[];
 }
 
+/** Generic table row for export/download payloads. */
+export type ExportTableRow = Record<string, string | number | boolean | null | undefined>;
+
 /** Shape of error payloads returned by the backend. */
 export interface ApiError {
   errorMessage?: string[] | string;

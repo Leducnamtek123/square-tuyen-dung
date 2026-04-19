@@ -18,7 +18,21 @@ import db from '../configs/firebase-config';
 type Condition = {
   fieldName: string;
   operator: WhereFilterOp;
-  compareValue: unknown;
+  compareValue: string | number | boolean | null;
+};
+
+type ChatRoomDoc = {
+  userId1?: string;
+  userId2?: string;
+};
+
+type ChatUserDoc = {
+  id: string;
+};
+
+type ChatRoomWithUser = ChatRoomDoc & {
+  id: string;
+  user: ChatUserDoc | null;
 };
 
 const useFireStoreGetChatRoom = (
@@ -26,8 +40,8 @@ const useFireStoreGetChatRoom = (
   userId: string | number,
   sort: OrderByDirection = 'desc',
   limitNum: number | null = null
-): Record<string, unknown>[] => {
-  const [docs, setDocs] = React.useState<Record<string, unknown>[]>([]);
+): ChatRoomWithUser[] => {
+  const [docs, setDocs] = React.useState<ChatRoomWithUser[]>([]);
 
   React.useEffect(() => {
     const collectionRef = collection(db, 'chatRooms');
@@ -54,23 +68,23 @@ const useFireStoreGetChatRoom = (
 
     const unsubscribe = onSnapshot(q, async (querySnapshot) => {
       // Collect all partner IDs first
-      const roomsData: { docId: string; data: Record<string, unknown>; partnerId: string }[] = [];
+      const roomsData: { docId: string; data: ChatRoomDoc; partnerId: string }[] = [];
       const partnerIds = new Set<string>();
 
       querySnapshot.docs.forEach((doc) => {
-        const chatRoomData = doc.data() as Record<string, unknown>;
+        const chatRoomData = doc.data() as ChatRoomDoc;
         let partnerId = '';
-        if (chatRoomData?.userId1 === `${userId}`) {
-          partnerId = chatRoomData?.userId2 as string;
+        if (chatRoomData.userId1 === `${userId}`) {
+          partnerId = chatRoomData.userId2 || '';
         } else {
-          partnerId = chatRoomData?.userId1 as string;
+          partnerId = chatRoomData.userId1 || '';
         }
         partnerIds.add(partnerId);
         roomsData.push({ docId: doc.id, data: chatRoomData, partnerId });
       });
 
       // Batch fetch all partner accounts in one query (max 30 per `in` query)
-      const userMap = new Map<string, Record<string, unknown>>();
+      const userMap = new Map<string, ChatUserDoc>();
       const idArray = Array.from(partnerIds).filter(Boolean);
 
       if (idArray.length > 0) {
@@ -98,7 +112,7 @@ const useFireStoreGetChatRoom = (
       }
 
       // Merge rooms with user data
-      const chatRoomsData: Record<string, unknown>[] = roomsData.map((room) => ({
+      const chatRoomsData: ChatRoomWithUser[] = roomsData.map((room) => ({
         ...room.data,
         id: room.docId,
         user: userMap.get(room.partnerId) || null,
@@ -114,4 +128,5 @@ const useFireStoreGetChatRoom = (
 };
 
 export default useFireStoreGetChatRoom;
+
 

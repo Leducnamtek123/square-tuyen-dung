@@ -54,6 +54,9 @@ type StructuredDataSchema =
   | WebSiteSchema
   | BreadcrumbSchema;
 
+type JsonLdValue = string | number | boolean | null | JsonLdObject | JsonLdValue[];
+type JsonLdObject = { [key: string]: JsonLdValue };
+
 /** Map job type strings to schema.org employment types */
 const mapJobType = (type?: string): string => {
   if (!type || typeof type !== 'string') return 'FULL_TIME';
@@ -74,10 +77,10 @@ const mapJobType = (type?: string): string => {
   return map[type.toLowerCase()] || 'FULL_TIME';
 };
 
-const buildSchema = (data: StructuredDataSchema): object => {
+const buildSchema = (data: StructuredDataSchema): JsonLdObject => {
   switch (data.type) {
     case 'JobPosting': {
-      const schema: Record<string, unknown> = {
+      const schema: JsonLdObject = {
         '@context': 'https://schema.org',
         '@type': 'JobPosting',
         title: data.title,
@@ -121,7 +124,7 @@ const buildSchema = (data: StructuredDataSchema): object => {
     }
 
     case 'Organization': {
-      const schema: Record<string, unknown> = {
+      const schema: JsonLdObject = {
         '@context': 'https://schema.org',
         '@type': 'Organization',
         name: data.name,
@@ -153,7 +156,7 @@ const buildSchema = (data: StructuredDataSchema): object => {
     }
 
     case 'WebSite': {
-      const schema: Record<string, unknown> = {
+      const schema: JsonLdObject = {
         '@context': 'https://schema.org',
         '@type': 'WebSite',
         name: data.name,
@@ -186,7 +189,7 @@ const buildSchema = (data: StructuredDataSchema): object => {
     }
 
     default:
-      return {};
+      return {} as JsonLdObject;
   }
 };
 

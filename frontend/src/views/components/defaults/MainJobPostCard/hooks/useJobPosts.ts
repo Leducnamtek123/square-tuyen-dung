@@ -1,7 +1,7 @@
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
+﻿import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import jobService from '../../../../../services/jobService';
 import type { JobPostFilter } from '../../../../../redux/filterSlice';
-
+import type { GetJobPostsParams } from '../../../../../services/jobService';
 
 export const useJobPosts = (params: JobPostFilter, page: number) => {
     return useQuery({
@@ -17,7 +17,7 @@ export const useJobPosts = (params: JobPostFilter, page: number) => {
     });
 };
 
-export const useSuggestedJobPosts = (params: Record<string, unknown>, enabled: boolean = true) => {
+export const useSuggestedJobPosts = (params: GetJobPostsParams, enabled: boolean = true) => {
     return useQuery({
         queryKey: ['suggestedJobPosts', params],
         queryFn: async () => {
@@ -28,4 +28,3 @@ export const useSuggestedJobPosts = (params: Record<string, unknown>, enabled: b
         enabled,
     });
 };
-

@@ -10,6 +10,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useCareers } from './hooks/useCareers';
 import { useDataTable } from '../../../hooks';
 import { Career } from '../../../types/models';
+import type { CareerPayload } from '../../../services/adminManagementService';
 
 const CareersPage = () => {
     const { t } = useTranslation('admin');
@@ -43,7 +44,7 @@ const CareersPage = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
     const [currentCareer, setCurrentCareer] = useState<Career | null>(null);
-    const [formData, setFormData] = useState<Partial<Career>>({
+    const [formData, setFormData] = useState<CareerPayload>({
         name: ''
     });
 

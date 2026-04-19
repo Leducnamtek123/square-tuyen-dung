@@ -30,13 +30,14 @@ import { searchJobPost } from '../../../../redux/filterSlice';
 import { ROUTES } from '../../../../configs/constants';
 
 interface CareerItem {
-  id: string;
+  id: string | number;
   name: string;
+  metadata?: object;
 }
 
 
 
-const listItems = (items: CareerItem[], handleFilter: (id: string) => void) => (
+const listItems = (items: CareerItem[], handleFilter: (id: string | number) => void) => (
 
   <Stack
 
@@ -135,7 +136,7 @@ const SubHeader = () => {
 
         const resData = await commonService.getTop10Careers();
 
-        setTopCareers(resData.map((item: { name: string; metadata?: Record<string, unknown>; id?: number | string }) => ({
+        setTopCareers(resData.map((item: { name: string; metadata?: object; id?: number | string }) => ({
           ...item,
           id: String(item.id)
         })));
@@ -152,9 +153,9 @@ const SubHeader = () => {
 
   }, []);
 
-  const handleFilter = (id: string) => {
+  const handleFilter = (id: string | number) => {
 
-    dispatch(searchJobPost({ ...jobPostFilter, careerId: id }));
+    dispatch(searchJobPost({ ...jobPostFilter, careerId: String(id) }));
 
     nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
 
@@ -292,3 +293,5 @@ const SubHeader = () => {
 };
 
 export default SubHeader;
+
+

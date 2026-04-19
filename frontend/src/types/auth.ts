@@ -58,13 +58,12 @@ export interface BotConfig {
 }
 
 /** Auth DTOs */
-export interface JobSeekerRegisterData {
+export type JobSeekerRegisterData = {
   email: string;
   fullName: string;
   password?: string;
   platform?: string;
-  [key: string]: unknown;
-}
+};
 
 export interface EmployerRegisterData extends Omit<EmployerSignUpFormData, 'confirmPassword'> {
   platform?: string;
@@ -83,9 +82,9 @@ export interface ChangePasswordData {
   confirmPassword?: string;
 }
 
-export interface UserSettingsData {
+export type UserSettingsData = {
   emailNotificationActive?: boolean;
   smsNotificationActive?: boolean;
-  [key: string]: unknown;
-}
+};
+
 

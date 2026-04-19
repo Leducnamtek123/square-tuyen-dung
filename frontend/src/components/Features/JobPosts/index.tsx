@@ -3,11 +3,7 @@ import { Box, Pagination, Stack } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import JobPost from '@/components/Features/JobPost';
 
-interface JobPostsProps {
-  [key: string]: unknown;
-}
-
-const JobPosts = (_props: JobPostsProps) => {
+const JobPosts = () => {
 
   return (
 

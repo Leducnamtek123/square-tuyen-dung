@@ -51,9 +51,10 @@ export interface EmployerSignUpFormData {
 
 interface EmployerSignUpFormProps {
   onSignUp: (data: EmployerSignUpFormData) => void;
-  serverErrors?: Record<string, string[]>;
+  serverErrors?: Record<string, string[] | NestedServerErrors>;
   checkCreds: (email: string, roleName: RoleName) => Promise<boolean>;
 }
+type NestedServerErrors = Record<string, string[] | Record<string, string[]>>;
 
 const StyledButton = styled(Button)(({ theme }) => ({
   padding: '8px 16px',
@@ -151,8 +152,9 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
 
   React.useEffect(() => {
     for (const err in serverErrors) {
-      if (err === 'company' && typeof serverErrors[err] === 'object') {
-        const companyErrors = serverErrors[err] as unknown as Record<string, string[] | Record<string, string[]>>;
+      const errValue = serverErrors[err];
+      if (err === 'company' && errValue && typeof errValue === 'object' && !Array.isArray(errValue)) {
+        const companyErrors = errValue as NestedServerErrors;
         for (const companyErr in companyErrors) {
           if (companyErr === 'location' && typeof companyErrors[companyErr] === 'object') {
             const locationErrors = companyErrors[companyErr] as Record<string, string[]>;
@@ -164,7 +166,8 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
           }
         }
       } else {
-        setError(err as keyof EmployerSignUpFormData, { type: 'manual', message: serverErrors[err]?.join(' ') });
+        const plainErrors = Array.isArray(errValue) ? errValue : [];
+        setError(err as keyof EmployerSignUpFormData, { type: 'manual', message: plainErrors.join(' ') });
       }
     }
   }, [serverErrors, setError]);

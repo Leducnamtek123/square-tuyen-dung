@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { useForm } from "react-hook-form";
 import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from "yup";
@@ -16,10 +16,11 @@ interface JobSeekerLoginFormData {
   email: string;
   password?: string;
 }
+type FacebookAuthResult = { data?: { accessToken?: string } };
 
 interface JobSeekerLoginFormProps {
   onLogin: (data: JobSeekerLoginFormData) => void;
-  onFacebookLogin?: (result: Record<string, unknown>) => void;
+  onFacebookLogin?: (result: FacebookAuthResult) => void;
   onGoogleLogin: (result: Omit<CodeResponse, "error" | "error_description" | "error_uri">) => void;
 }
 
@@ -346,3 +347,4 @@ const JobSeekerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: JobSeek
 };
 
 export default JobSeekerLoginForm;
+

@@ -10,6 +10,8 @@ import chatbotService from "@/services/chatbotService";
 import { MessageResponse } from "@/components/Features/AiElements/message";
 import { useAppSelector } from "@/hooks/useAppStore";
 import type { BotConfig } from "@/types/auth";
+import type { ChatPayload } from "@/services/chatbotService";
+import type { ChatMessagePayload } from "@/services/chatbotService";
 import "./chatbot.css";
 
 type ChatRole = "assistant" | "user" | "system";
@@ -41,7 +43,7 @@ const ChatBot = () => {
   const [error, setError] = useState("");
   const [canRetry, setCanRetry] = useState(false);
   const listRef = useRef<HTMLDivElement | null>(null);
-  const lastPayloadRef = useRef<Record<string, unknown> | null>(null);
+  const lastPayloadRef = useRef<ChatPayload | null>(null);
 
   const fullPathname = typeof window !== 'undefined' ? window.location.pathname : "/";
   const isEmployerRoute = isEmployerPortalPath(fullPathname);
@@ -84,8 +86,8 @@ const ChatBot = () => {
     listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages, isSending]);
 
-  const buildPayload = (nextMessages: ChatMessage[]) => {
-    const history = nextMessages
+  const buildPayload = (nextMessages: ChatMessage[]): ChatPayload => {
+    const history: ChatMessagePayload[] = nextMessages
       .filter((message) => message.role !== "system")
       .slice(-MAX_HISTORY)
       .map((message) => ({ role: message.role, content: message.content }));
@@ -94,9 +96,7 @@ const ChatBot = () => {
     };
   };
 
-  const sendChat = async (
-    payload: Record<string, unknown>,
-  ) => {
+  const sendChat = async (payload: ChatPayload) => {
     try {
       const response = await chatbotService.chat(payload);
       const reply =

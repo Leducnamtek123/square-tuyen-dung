@@ -9,12 +9,13 @@ import JobPostAction from '../../../../components/Features/JobPostAction';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFile, faFilePdf } from '@fortawesome/free-solid-svg-icons';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
+import type { JobPostActivity } from '../../../../types/models';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 
 const pageSize = 10;
 
-interface JobPostActivity {
+interface AppliedJobActivityItem {
   id: number;
   createAt: string;
   jobPostDict: {
@@ -50,10 +51,36 @@ const AppliedJobCard = () => {
         pageSize: pageSize,
         page: page,
       });
-      const result = (resData as { data: { results: JobPostActivity[]; count: number } }).data;
+      const results: AppliedJobActivityItem[] = (Array.isArray(resData?.results) ? resData.results : [])
+        .map((item: JobPostActivity) => {
+          const raw = item as JobPostActivity & { jobPostDict?: AppliedJobActivityItem['jobPostDict']; resumeDict?: AppliedJobActivityItem['resumeDict'] };
+          const jobPostDict = raw.jobPostDict || {
+            id: item.jobPost?.id || 0,
+            slug: item.jobPost?.slug || '',
+            jobName: item.jobPost?.jobName || '',
+            deadline: item.jobPost?.deadline || '',
+            isUrgent: Boolean(item.jobPost?.isUrgent),
+            isHot: Boolean(item.jobPost?.isHot),
+            salaryMin: item.jobPost?.salaryMin || 0,
+            salaryMax: item.jobPost?.salaryMax || 0,
+            companyDict: item.jobPost?.companyDict ? {
+              companyImageUrl: item.jobPost.companyDict.logoUrl || '',
+              companyName: item.jobPost.companyDict.companyName || '',
+            } : undefined,
+            locationDict: item.jobPost?.location?.city ? {
+              city: Number(typeof item.jobPost.location.city === 'object' ? item.jobPost.location.city.id : item.jobPost.location.city) || 0,
+            } : undefined,
+          };
+          return {
+            id: item.id,
+            createAt: item.createAt || '',
+            jobPostDict,
+            resumeDict: raw.resumeDict,
+          };
+        });
       return {
-        results: result.results || [],
-        count: result.count || 0,
+        results,
+        count: resData.count || 0,
       };
     },
     staleTime: 2 * 60_000,
@@ -93,7 +120,7 @@ const AppliedJobCard = () => {
           </NoDataCard>
         ) : (
           <Stack spacing={2}>
-            {jobPostsApplied.map((value: JobPostActivity) => (
+            {jobPostsApplied.map((value: AppliedJobActivityItem) => (
               <JobPostAction
                 key={value.id}
                 id={value?.jobPostDict.id}

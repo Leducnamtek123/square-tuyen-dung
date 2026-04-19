@@ -58,6 +58,9 @@ interface Props<TData> {
   hidePagination?: boolean;
 }
 
+type CellAlign = 'left' | 'center' | 'right' | 'justify' | 'inherit';
+type ColumnMeta = { align?: CellAlign };
+
 const DataTable = <TData,>({
     columns: userColumns,
     data,
@@ -161,7 +164,7 @@ const DataTable = <TData,>({
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {
-                                    const meta = header.column.columnDef.meta as Record<string, unknown> | undefined;
+                                    const meta = header.column.columnDef.meta as ColumnMeta | undefined;
                                     const canSort = header.column.getCanSort();
                                     
                                     return (
@@ -212,7 +215,7 @@ const DataTable = <TData,>({
                                         <TableCell 
                                             key={cell.id} 
                                             sx={{ py: 1.5 }}
-                                            align={((cell.column.columnDef.meta as Record<string, unknown>)?.align as 'left' | 'center' | 'right' | 'justify' | 'inherit') || 'left'}
+                                            align={((cell.column.columnDef.meta as ColumnMeta | undefined)?.align) || 'left'}
                                         >
                                             {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                         </TableCell>
@@ -250,3 +253,5 @@ const DataTable = <TData,>({
 };
 
 export default DataTable;
+
+

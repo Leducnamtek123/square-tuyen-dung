@@ -349,7 +349,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
           p: 3,
 
-          boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
+          boxShadow: (theme: Theme) => theme.customShadows.card,
 
         }}
 
@@ -403,7 +403,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
+                    boxShadow: (theme: Theme) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -473,7 +473,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
                               theme.palette.primary.main,
 
-                            boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.small,
+                            boxShadow: (theme: Theme) => theme.customShadows.small,
 
                           }}
 
@@ -749,7 +749,13 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 
           handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
 
-          editData={editData as unknown as Partial<FormValues> | null}
+          editData={editData ? {
+            jobName: editData.jobName || '',
+            companyName: editData.companyName || '',
+            startDate: editData.startDate ? new Date(editData.startDate) : null,
+            endDate: editData.endDate ? new Date(editData.endDate) : null,
+            description: editData.description || null,
+          } : null}
 
         />
 
@@ -770,3 +776,4 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
 };
 
 export default ExperienceDetailCard;
+

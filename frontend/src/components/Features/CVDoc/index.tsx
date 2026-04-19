@@ -60,12 +60,11 @@ export type CVDocCertificate = {
   expirationDate?: string;
 };
 
-interface ExtraData {
+type ExtraData = {
   name?: string;
-  [key: string]: unknown;
-}
+};
 
-export interface ExtendedResume extends Resume {
+export type ExtendedResume = Resume & {
   user?: User | null;
   positionChooseData?: ExtraData;
   experienceChooseData?: ExtraData;
@@ -74,13 +73,12 @@ export interface ExtendedResume extends Resume {
   jobTypeChooseData?: ExtraData;
   salaryMin?: number;
   salaryMax?: number;
-  experienceDetails?: Record<string, unknown>[];
-  educationDetails?: Record<string, unknown>[];
-  advancedSkills?: Record<string, unknown>[];
-  languageSkills?: Record<string, unknown>[];
-  certificateDetails?: Record<string, unknown>[];
-  [key: string]: unknown;
-}
+  experienceDetails?: CVDocExperience[];
+  educationDetails?: CVDocEducation[];
+  advancedSkills?: CVDocAdvancedSkill[];
+  languageSkills?: CVDocLanguageSkill[];
+  certificateDetails?: CVDocCertificate[];
+};
 
 interface Props {
   resume: ExtendedResume;
@@ -889,3 +887,6 @@ const CVDoc = ({ resume, user, themeColor }: Props) => {
 };
 
 export default CVDoc;
+
+
+

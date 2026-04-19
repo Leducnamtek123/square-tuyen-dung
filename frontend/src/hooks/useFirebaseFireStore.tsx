@@ -11,20 +11,23 @@ import {
   type WhereFilterOp,
 } from 'firebase/firestore';
 
-
 type Condition = {
   fieldName: string;
   operator: WhereFilterOp;
-  compareValue: unknown;
+  compareValue: string | number | boolean | null;
 };
 
-const useFirebaseFireStore = (
+type FirestoreDoc = {
+  id: string;
+};
+
+const useFirebaseFireStore = <T extends FirestoreDoc = FirestoreDoc>(
   collectionName: string,
   condition?: Condition,
   sort: OrderByDirection = 'desc',
   limitNum: number = 50
-): Record<string, unknown>[] => {
-  const [docs, setDocs] = React.useState<Record<string, unknown>[]>([]);
+): T[] => {
+  const [docs, setDocs] = React.useState<T[]>([]);
 
   React.useEffect(() => {
     const collectionRef = collection(db, collectionName);
@@ -48,9 +51,9 @@ const useFirebaseFireStore = (
       const documents = snapshot.docs.map((doc) => ({
         ...doc.data(),
         id: doc.id,
-      }));
+      })) as T[];
 
-      setDocs(documents as Record<string, unknown>[]);
+      setDocs(documents);
     });
 
     return unsubscribe;

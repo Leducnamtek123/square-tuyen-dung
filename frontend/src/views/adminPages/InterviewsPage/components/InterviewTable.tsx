@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { ColumnDef, SortingState, OnChangeFn, RowSelectionState } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
-interface InterviewTableRow {
+type InterviewTableRow = {
     id: number | string;
     candidateName?: string;
     candidateEmail?: string;
@@ -18,8 +18,7 @@ interface InterviewTableRow {
     interviewType?: string;
     scheduledAt?: string;
     status?: string;
-    [key: string]: unknown;
-}
+};
 
 interface InterviewTableProps {
     interviews: InterviewTableRow[];
@@ -179,3 +178,4 @@ const InterviewTable = ({
 };
 
 export default InterviewTable;
+

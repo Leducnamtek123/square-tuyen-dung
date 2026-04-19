@@ -9,7 +9,7 @@ import MenuItem from './MenuItem';
 
 interface AdminMenuProps {
   t: (key: string) => string;
-  location: Record<string, unknown>;
+  location: { pathname?: string };
   expandedItems: Record<string, boolean>;
   handleExpand: (section: string) => void;
 }
@@ -80,3 +80,5 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
 };
 
 export default AdminMenu;
+
+

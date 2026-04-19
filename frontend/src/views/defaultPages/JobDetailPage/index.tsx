@@ -41,7 +41,7 @@ const JobDetailPage = () => {
   const [isLoading, setIsLoading] = React.useState(true);
   const [isLoadingSave, setIsLoadingSave] = React.useState(false);
 
-  interface ExtendedJobPost extends JobPost {
+  type ExtendedJobPost = JobPost & {
     companyName?: string;
     companyImageUrl?: string;
     companySlug?: string;
@@ -51,8 +51,7 @@ const JobDetailPage = () => {
     isSaved?: boolean;
     isApplied?: boolean;
     companyDict?: Company;
-    [key: string]: unknown;
-  }
+  };
 
   const [jobPostDetail, setJobPostDetail] = React.useState<ExtendedJobPost | null>(null);
   const canApply =
@@ -97,13 +96,13 @@ const JobDetailPage = () => {
   useSEO({
     title: jobPostDetail?.jobName,
     description: jobPostDetail
-      ? `Tuyển dụng: ${jobPostDetail.jobName} tại ${jobPostDetail.companyName || 'công ty uy tín'}. ${stripHtml(jobDescription)}`
+      ? `Tuy?n d?ng: ${jobPostDetail.jobName} t?i ${jobPostDetail.companyName || 'công ty uy tín'}. ${stripHtml(jobDescription)}`
       : undefined,
     image: jobPostDetail?.companyImageUrl || undefined,
     url: (typeof window !== 'undefined' ? window.location.href : ''),
     type: 'article',
     keywords: jobPostDetail
-      ? `${jobPostDetail.jobName}, ${jobPostDetail.companyName || ''}, tuyển dụng, việc làm`
+      ? `${jobPostDetail.jobName}, ${jobPostDetail.companyName || ''}, tuy?n d?ng, vi?c làm`
       : undefined,
   });
 
@@ -133,8 +132,8 @@ const JobDetailPage = () => {
           {
             type: 'BreadcrumbList' as const,
             items: [
-              { name: 'Trang chủ', url: (typeof window !== 'undefined' ? window.location.origin : '') },
-              { name: 'Việc làm', url: `${(typeof window !== 'undefined' ? window.location.origin : '')}/viec-lam` },
+              { name: 'Trang ch?', url: (typeof window !== 'undefined' ? window.location.origin : '') },
+              { name: 'Vi?c làm', url: `${(typeof window !== 'undefined' ? window.location.origin : '')}/viec-lam` },
               { name: jobPostDetail.jobName, url: (typeof window !== 'undefined' ? window.location.href : '') },
             ],
           },
@@ -278,4 +277,5 @@ const JobDetailPage = () => {
 };
 
 export default JobDetailPage;
+
 

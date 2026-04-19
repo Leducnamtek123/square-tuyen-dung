@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { useForm } from "react-hook-form";
 import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from "yup";
@@ -9,17 +9,19 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useTranslation } from 'react-i18next';
 import TextFieldCustom from "../../../../components/Common/Controls/TextFieldCustom";
 import PasswordTextFieldCustom from "../../../../components/Common/Controls/PasswordTextFieldCustom";
+import type { CodeResponse } from '@react-oauth/google';
 
 
 export interface EmployerLoginFormData {
   email?: string;
   password?: string;
 }
+type FacebookAuthResult = { data?: { accessToken?: string } };
 
 interface EmployerLoginFormProps {
   onLogin: (data: EmployerLoginFormData) => void;
-  onFacebookLogin?: (result: Record<string, unknown>) => void;
-  onGoogleLogin: (result: Record<string, unknown>) => void;
+  onFacebookLogin?: (result: FacebookAuthResult) => void;
+  onGoogleLogin: (result: Omit<CodeResponse, "error" | "error_description" | "error_uri">) => void;
 }
 
 
@@ -345,3 +347,4 @@ const EmployerLoginForm = ({ onLogin, onFacebookLogin, onGoogleLogin }: Employer
 };
 
 export default EmployerLoginForm;
+

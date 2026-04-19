@@ -52,6 +52,7 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
   const { allConfig } = useConfig();
   const [districtOptions, setDistrictOptions] = useState<SelectOption[]>([]);
   const [locationOptions, setLocationOptions] = useState<SelectOption[]>([]);
+  type PlaceOption = SelectOption & { place_id: string };
 
   const schema = yup.object().shape({
     companyName: yup.string().required(t('companyForm.validation.companyNameRequired', 'Company name is required.')).max(255, t('common:validation.max255')),
@@ -118,9 +119,13 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
       }
       try {
         const resData = await goongService.getPlaces(input);
-        if (resData.predictions) {
-            setLocationOptions(resData.predictions as unknown as SelectOption[]);
-        }
+        const predictions = Array.isArray(resData.predictions) ? resData.predictions : [];
+        const mappedOptions: PlaceOption[] = predictions.map((prediction: PlacePrediction) => ({
+          id: prediction.place_id,
+          name: prediction.description,
+          place_id: prediction.place_id,
+        }));
+        setLocationOptions(mappedOptions);
       } catch (error) {
           // Silent fail for autocomplete
       }

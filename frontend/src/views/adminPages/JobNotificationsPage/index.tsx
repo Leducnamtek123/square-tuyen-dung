@@ -1,21 +1,20 @@
 import React, { useState, useMemo } from 'react';
-import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton, Stack } from "@mui/material";
+import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, Tooltip, IconButton, Stack, MenuItem } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../components/Common/DataTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import dayjs from '../../../configs/dayjs-config';
-
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useJobNotifications } from './hooks/useJobNotifications';
 import { useDataTable } from '../../../hooks';
-import { Notification } from '../../../types/models';
+import { JobPostNotification } from '../../../types/models';
+import type { JobPostNotificationPayload } from '../../../services/adminManagementService';
 
 const JobNotificationsPage = () => {
     const { t } = useTranslation('admin');
-    
+
     const {
         page,
         pageSize,
@@ -38,17 +37,22 @@ const JobNotificationsPage = () => {
     } = useJobNotifications({
         page: page + 1,
         pageSize,
-        kw: searchTerm,
+        search: searchTerm,
         ordering
     });
 
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-    const [currentNotification, setCurrentNotification] = useState<Notification | null>(null);
-    const [formData, setFormData] = useState({
-        title: '',
-        content: '',
-        imageUrl: ''
+    const [currentNotification, setCurrentNotification] = useState<JobPostNotification | null>(null);
+    const [formData, setFormData] = useState<JobPostNotificationPayload>({
+        jobName: '',
+        salary: null,
+        frequency: 7,
+        position: null,
+        experience: null,
+        career: null,
+        city: null,
+        isActive: false,
     });
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -60,22 +64,36 @@ const JobNotificationsPage = () => {
 
     const handleOpenAdd = () => {
         setDialogMode('add');
-        setFormData({ title: '', content: '', imageUrl: '' });
-        setOpenDialog(true);
-    };
-
-    const handleOpenEdit = (notification: Notification) => {
-        setDialogMode('edit');
-        setCurrentNotification(notification);
         setFormData({
-            title: notification.title || '',
-            content: notification.content || '',
-            imageUrl: notification.imageUrl || ''
+            jobName: '',
+            salary: null,
+            frequency: 7,
+            position: null,
+            experience: null,
+            career: null,
+            city: null,
+            isActive: false,
         });
         setOpenDialog(true);
     };
 
-    const handleOpenDelete = (notification: Notification) => {
+    const handleOpenEdit = (notification: JobPostNotification) => {
+        setDialogMode('edit');
+        setCurrentNotification(notification);
+        setFormData({
+            jobName: notification.jobName || '',
+            salary: notification.salary ?? null,
+            frequency: notification.frequency ?? 7,
+            position: notification.position ?? null,
+            experience: notification.experience ?? null,
+            career: notification.career ?? null,
+            city: notification.city ?? null,
+            isActive: !!notification.isActive,
+        });
+        setOpenDialog(true);
+    };
+
+    const handleOpenDelete = (notification: JobPostNotification) => {
         setCurrentNotification(notification);
         setOpenDeleteDialog(true);
     };
@@ -111,24 +129,15 @@ const JobNotificationsPage = () => {
         }
     };
 
-    const columns = useMemo<ColumnDef<Notification>[]>(() => [
+    const columns = useMemo<ColumnDef<JobPostNotification>[]>(() => [
         {
             accessorKey: 'id',
             header: 'ID',
             enableSorting: true,
         },
         {
-            accessorKey: 'imageUrl',
-            header: t('pages.jobNotifications.table.image') as string,
-            cell: (info) => (
-                info.getValue() ? (
-                    <Box component="img" src={info.getValue() as string} sx={{ width: 60, height: 40, objectFit: 'cover', borderRadius: 1 }} />
-                ) : '—'
-            ),
-        },
-        {
-            accessorKey: 'title',
-            header: t('pages.jobNotifications.table.title') as string,
+            accessorKey: 'jobName',
+            header: t('pages.jobNotifications.table.title', { defaultValue: 'Job Name' }) as string,
             enableSorting: true,
             cell: (info) => (
                 <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
@@ -137,19 +146,20 @@ const JobNotificationsPage = () => {
             ),
         },
         {
-            accessorKey: 'content',
-            header: t('pages.jobNotifications.table.content') as string,
-            cell: (info) => (
-                <Typography variant="body2" sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                    {info.getValue() as string}
-                </Typography>
-            ),
+            accessorKey: 'salary',
+            header: t('pages.jobNotifications.form.salary', { defaultValue: 'Salary' }) as string,
+            cell: (info) => info.getValue() ?? '-',
         },
         {
-            accessorKey: 'createAt',
-            header: t('pages.jobNotifications.table.createdAt') as string,
+            accessorKey: 'frequency',
+            header: t('pages.jobNotifications.form.frequency', { defaultValue: 'Frequency' }) as string,
             enableSorting: true,
-            cell: (info) => info.getValue() ? dayjs(info.getValue() as string).format('DD/MM/YYYY HH:mm') : '—',
+            cell: (info) => info.getValue() ?? '-',
+        },
+        {
+            accessorKey: 'isActive',
+            header: t('pages.jobNotifications.form.isActive', { defaultValue: 'Active' }) as string,
+            cell: (info) => (info.getValue() ? t('common.yes', { defaultValue: 'Yes' }) : t('common.no', { defaultValue: 'No' })),
         },
         {
             id: 'actions',
@@ -224,7 +234,6 @@ const JobNotificationsPage = () => {
                 />
             </Paper>
 
-            {/* Add/Edit Dialog */}
             <Dialog open={openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
                 <DialogTitle>
                     {dialogMode === 'add' ? t('pages.jobNotifications.addNotification') : t('pages.jobNotifications.editNotification')}
@@ -232,27 +241,69 @@ const JobNotificationsPage = () => {
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
                         <TextField
-                            label={t('pages.jobNotifications.form.title')}
+                            label={t('pages.jobNotifications.form.title', { defaultValue: 'Job Name' })}
                             fullWidth
-                            value={formData.title}
-                            onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                            value={formData.jobName}
+                            onChange={(e) => setFormData(prev => ({ ...prev, jobName: e.target.value }))}
                             required
                         />
                         <TextField
-                            label={t('pages.jobNotifications.form.imageUrl')}
+                            label={t('pages.jobNotifications.form.salary', { defaultValue: 'Salary' })}
                             fullWidth
-                            value={formData.imageUrl}
-                            onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+                            type="number"
+                            value={formData.salary ?? ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, salary: e.target.value ? Number(e.target.value) : null }))}
                         />
                         <TextField
-                            label={t('pages.jobNotifications.form.content')}
+                            label={t('pages.jobNotifications.form.frequency', { defaultValue: 'Frequency' })}
                             fullWidth
-                            multiline
-                            rows={4}
-                            value={formData.content}
-                            onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                            select
+                            value={formData.frequency}
+                            onChange={(e) => setFormData(prev => ({ ...prev, frequency: Number(e.target.value) }))}
                             required
+                        >
+                            <MenuItem value={1}>1</MenuItem>
+                            <MenuItem value={7}>7</MenuItem>
+                            <MenuItem value={30}>30</MenuItem>
+                        </TextField>
+                        <TextField
+                            label={t('pages.jobNotifications.form.position', { defaultValue: 'Position' })}
+                            fullWidth
+                            type="number"
+                            value={formData.position ?? ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, position: e.target.value ? Number(e.target.value) : null }))}
                         />
+                        <TextField
+                            label={t('pages.jobNotifications.form.experience', { defaultValue: 'Experience' })}
+                            fullWidth
+                            type="number"
+                            value={formData.experience ?? ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, experience: e.target.value ? Number(e.target.value) : null }))}
+                        />
+                        <TextField
+                            label={t('pages.jobNotifications.form.careerId', { defaultValue: 'Career ID' })}
+                            fullWidth
+                            type="number"
+                            value={formData.career ?? ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, career: e.target.value ? Number(e.target.value) : null }))}
+                        />
+                        <TextField
+                            label={t('pages.jobNotifications.form.cityId', { defaultValue: 'City ID' })}
+                            fullWidth
+                            type="number"
+                            value={formData.city ?? ''}
+                            onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value ? Number(e.target.value) : null }))}
+                        />
+                        <TextField
+                            label={t('pages.jobNotifications.form.isActive', { defaultValue: 'Active' })}
+                            fullWidth
+                            select
+                            value={formData.isActive ? 'true' : 'false'}
+                            onChange={(e) => setFormData(prev => ({ ...prev, isActive: e.target.value === 'true' }))}
+                        >
+                            <MenuItem value="true">{t('common.yes', { defaultValue: 'Yes' })}</MenuItem>
+                            <MenuItem value="false">{t('common.no', { defaultValue: 'No' })}</MenuItem>
+                        </TextField>
                     </Box>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>
@@ -260,19 +311,18 @@ const JobNotificationsPage = () => {
                     <Button
                         onClick={handleSave}
                         variant="contained"
-                        disabled={isMutating || !formData.title || !formData.content}
+                        disabled={isMutating || !formData.jobName || !formData.frequency}
                     >
                         {isMutating ? t('common.saving') : t('common.save')}
                     </Button>
                 </DialogActions>
             </Dialog>
 
-            {/* Delete Confirmation */}
             <Dialog open={openDeleteDialog} onClose={handleCloseDialog}>
                 <DialogTitle>{t('pages.jobNotifications.deleteTitle')}</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        {t('pages.jobNotifications.deleteConfirm', { title: currentNotification?.title })}
+                        {t('pages.jobNotifications.deleteConfirm', { title: currentNotification?.jobName })}
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>

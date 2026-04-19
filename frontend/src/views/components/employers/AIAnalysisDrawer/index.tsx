@@ -30,6 +30,7 @@ import jobPostActivityService from '../../../../services/jobPostActivityService'
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
 import type { JobPostActivity } from '@/types/models';
+import type { SvgIconProps } from '@mui/material/SvgIcon';
 
 import { ScoreGauge } from './ScoreGauge';
 import { SkillChipList } from './SkillChipList';
@@ -50,7 +51,16 @@ export type AIAnalysisData = {
   aiAnalysisPros?: string | string[];
   aiAnalysisCons?: string | string[];
   aiAnalysisScore?: number;
-  [key: string]: unknown;
+};
+
+type ActivityRawFields = JobPostActivity & {
+  jobPostDict?: { jobName?: string };
+  resumeFileUrl?: string;
+  aiAnalysisMatchingSkills?: string | string[];
+  aiAnalysisMissingSkills?: string | string[];
+  aiAnalysisSkills?: string | string[];
+  aiAnalysisPros?: string | string[];
+  aiAnalysisCons?: string | string[];
 };
 
 interface AIAnalysisDrawerProps {
@@ -65,17 +75,24 @@ interface AIAnalysisDrawerProps {
 }
 
 const renderIcon = (
-  IconComponent: React.ElementType | { default: React.ElementType } | unknown,
-  props?: Record<string, unknown>,
+  IconComponent: React.ElementType<SvgIconProps> | { default: React.ElementType<SvgIconProps> } | unknown,
+  props?: SvgIconProps,
 ): React.ReactElement | null => {
   if (!IconComponent) return null;
-  // Handle ESM default export interop
-  const Component = (IconComponent as { default: React.ElementType }).default || (IconComponent as React.ElementType);
-  // Final check to prevent Error #130 if Component is still invalid
-  if (typeof Component !== 'function' && typeof Component !== 'string' && typeof (Component as Record<string, unknown>)?.render !== 'function') {
+  const maybeDefault = IconComponent as { default?: React.ElementType<SvgIconProps> };
+  const Component = maybeDefault.default || IconComponent;
+  const isRenderable =
+    typeof Component === 'function' ||
+    typeof Component === 'string' ||
+    (typeof Component === 'object' &&
+      Component !== null &&
+      'render' in Component &&
+      typeof (Component as { render?: unknown }).render === 'function');
+
+  if (!isRenderable) {
     return null;
   }
-  return <Component {...props} />;
+  return React.createElement(Component as React.ElementType<SvgIconProps>, props);
 };
 
 const DRAWER_WIDTH = 520;
@@ -104,6 +121,34 @@ const normalizeAiStatus = (status: unknown): JobPostActivity['aiAnalysisStatus']
     return status;
   }
   return undefined;
+};
+
+const toStringOrStringArray = (value: unknown): string | string[] | undefined => {
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value)) return value.map((item) => String(item));
+  return undefined;
+};
+
+const toAIAnalysisData = (activity: JobPostActivity): AIAnalysisData => {
+  const raw = activity as ActivityRawFields;
+  const jobPostDict = raw.jobPostDict || {};
+  const aiAnalysisScoreRaw = raw.aiAnalysisScore;
+
+  return {
+    id: activity.id,
+    fullName: activity.fullName,
+    jobName: activity.jobPost?.jobName || jobPostDict.jobName,
+    aiAnalysisStatus: activity.aiAnalysisStatus,
+    aiAnalysisProgress: activity.aiAnalysisProgress,
+    resumeFileUrl: typeof raw.resumeFileUrl === 'string' ? raw.resumeFileUrl : undefined,
+    aiAnalysisMatchingSkills: toStringOrStringArray(raw.aiAnalysisMatchingSkills),
+    aiAnalysisMissingSkills: toStringOrStringArray(raw.aiAnalysisMissingSkills),
+    aiAnalysisSkills: toStringOrStringArray(raw.aiAnalysisSkills),
+    aiAnalysisSummary: typeof activity.aiAnalysisSummary === 'string' ? activity.aiAnalysisSummary : undefined,
+    aiAnalysisPros: toStringOrStringArray(raw.aiAnalysisPros),
+    aiAnalysisCons: toStringOrStringArray(raw.aiAnalysisCons),
+    aiAnalysisScore: typeof aiAnalysisScoreRaw === 'number' ? aiAnalysisScoreRaw : undefined,
+  };
 };
 
 const canEmbedUrl = (url: string): boolean => {
@@ -146,7 +191,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
       setLoading(true);
       try {
         const res = await jobPostActivityService.getJobPostActivityDetail(activityId);
-        setData((res as AIAnalysisData) || null);
+        setData(res ? toAIAnalysisData(res) : null);
       } catch {
         // use initial data if fetch fails
       } finally {
@@ -164,7 +209,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
     const interval = setInterval(async () => {
       try {
         const res = await jobPostActivityService.getJobPostActivityDetail(activityId);
-        const newData = res as AIAnalysisData;
+        const newData = toAIAnalysisData(res);
         if (newData) {
           setData(newData);
           onAnalysisStateChange?.({
@@ -221,7 +266,7 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
       await jobPostActivityService.analyzeResume(activityId);
       toastMessages.success(t('appliedResume.ai.analysisStarted'));
     } catch (err: unknown) {
-      errorHandling(err as AxiosError<Record<string, unknown>>);
+      errorHandling(err as AxiosError);
       setAnalyzing(false);
       setData((prev) => ({ ...(prev || {}), aiAnalysisStatus: 'failed' }));
       onAnalysisStateChange?.({ aiAnalysisStatus: 'failed', aiAnalysisProgress: 0 });
@@ -646,3 +691,6 @@ const AIAnalysisDrawer: React.FC<AIAnalysisDrawerProps> = ({
 };
 
 export default AIAnalysisDrawer;
+
+
+

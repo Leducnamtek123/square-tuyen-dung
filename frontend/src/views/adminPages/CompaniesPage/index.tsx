@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Box, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, Typography, Avatar, Chip, Tooltip, IconButton, Stack, Breadcrumbs, Link } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { Grid2 as Grid } from "@mui/material";
@@ -10,21 +10,29 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
-import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { useCompanies } from './hooks/useCompanies';
 import { Company } from '../../../types/models';
 import { IMAGES } from '../../../configs/constants';
+import type { AdminCompanyPayload } from './hooks/useCompanies';
 
-interface CompanyFormData {
+interface CompanyFormData extends AdminCompanyPayload {
+    id?: number;
     companyName: string;
     taxCode: string;
     companyEmail: string;
     companyPhone: string;
     employeeSize: number;
     fieldOperation: string;
-    websiteUrl: string;
-    description: string;
+    websiteUrl?: string | null;
+    description?: string | null;
+    since?: string | null;
 }
+
+const toNumberOrNull = (value: unknown): number | null => {
+    if (value === undefined || value === null || value === '') return null;
+    const num = Number(value);
+    return Number.isFinite(num) ? num : null;
+};
 
 const CompaniesPage = () => {
     const { t } = useTranslation('admin');
@@ -67,11 +75,18 @@ const CompaniesPage = () => {
         fieldOperation: '',
         websiteUrl: '',
         description: '',
+        since: '',
+        location: {
+            city: null,
+            district: null,
+            ward: null,
+            address: '',
+            lat: null,
+            lng: null,
+        },
     });
 
-    const [logoFile, setLogoFile] = useState<File | null>(null);
     const [logoPreview, setLogoPreview] = useState<string>('');
-    const logoInputRef = useRef<HTMLInputElement>(null);
 
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
@@ -79,7 +94,7 @@ const CompaniesPage = () => {
         onSearchChange(e.target.value);
     };
 
-    const handleOpenAdd = () => {
+    const handleOpenAdd = useCallback(() => {
         setDialogMode('add');
         setFormData({
             companyName: '',
@@ -90,14 +105,22 @@ const CompaniesPage = () => {
             fieldOperation: '',
             websiteUrl: '',
             description: '',
+            since: '',
+            location: {
+                city: null,
+                district: null,
+                ward: null,
+                address: '',
+                lat: null,
+                lng: null,
+            },
         });
-        setLogoFile(null);
         setLogoPreview('');
         setCurrentCompany(null);
         setOpenDialog(true);
-    };
+    }, []);
 
-    const handleOpenEdit = (company: Company) => {
+    const handleOpenEdit = useCallback((company: Company) => {
         setDialogMode('edit');
         setCurrentCompany(company);
         setFormData({
@@ -109,11 +132,19 @@ const CompaniesPage = () => {
             fieldOperation: company.fieldOperation || '',
             websiteUrl: company.websiteUrl || '',
             description: company.description || '',
+            since: company.since || '',
+            location: {
+                city: toNumberOrNull(company.location?.city),
+                district: toNumberOrNull(company.location?.district),
+                ward: null,
+                address: company.location?.address || '',
+                lat: toNumberOrNull(company.location?.lat),
+                lng: toNumberOrNull(company.location?.lng),
+            },
         });
-        setLogoFile(null);
         setLogoPreview(company.companyImageUrl || '');
         setOpenDialog(true);
-    };
+    }, []);
 
     const handleOpenDelete = (company: Company) => {
         setCurrentCompany(company);
@@ -126,43 +157,37 @@ const CompaniesPage = () => {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: name === 'employeeSize' ? Number(value) : value }));
-    };
-
-    const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            setLogoFile(file);
-            setLogoPreview(URL.createObjectURL(file));
-        }
+        setFormData((prev) => ({ ...prev, [name]: name === 'employeeSize' ? Number(value) : value }));
     };
 
     const handleSave = async () => {
-        const dataToSend = new FormData();
-        Object.entries(formData).forEach(([key, value]) => {
-            dataToSend.append(key, String(value));
-        });
-        
-        if (logoFile) {
-            dataToSend.append('companyImageFile', logoFile);
-        }
-
-        // Add default location for new companies if needed by API
-        if (dialogMode === 'add') {
-             // If API requires a flat location object or ID
-             dataToSend.append('cityId', '1'); 
-             dataToSend.append('districtId', '1');
-             dataToSend.append('wardId', '1');
-             dataToSend.append('address', 'N/A');
-        }
+        const payload: AdminCompanyPayload = {
+            companyName: formData.companyName.trim(),
+            taxCode: formData.taxCode.trim(),
+            companyEmail: formData.companyEmail.trim(),
+            companyPhone: formData.companyPhone.trim(),
+            employeeSize: Number(formData.employeeSize),
+            fieldOperation: formData.fieldOperation.trim(),
+            websiteUrl: formData.websiteUrl?.trim() || null,
+            description: formData.description?.trim() || null,
+            since: formData.since || null,
+            location: {
+                city: toNumberOrNull(formData.location.city),
+                district: toNumberOrNull(formData.location.district),
+                ward: toNumberOrNull(formData.location.ward),
+                address: formData.location.address.trim(),
+                lat: toNumberOrNull(formData.location.lat),
+                lng: toNumberOrNull(formData.location.lng),
+            },
+        };
 
         try {
             if (dialogMode === 'add') {
-                await createCompany(dataToSend);
+                await createCompany(payload);
             } else if (currentCompany) {
                 await updateCompany({
                     id: currentCompany.id,
-                    data: dataToSend
+                    data: payload
                 });
             }
             handleCloseDialog();
@@ -261,7 +286,7 @@ const CompaniesPage = () => {
                 </Box>
             ),
         },
-    ], [t]);
+    ], [handleOpenEdit, t]);
 
     return (
         <Box>
@@ -332,21 +357,6 @@ const CompaniesPage = () => {
                                     sx={{ width: 100, height: 100, border: '2px solid', borderColor: 'primary.main', borderRadius: '12px' }}
                                     variant="rounded"
                                 />
-                                <IconButton 
-                                    component="label"
-                                    sx={{ 
-                                        position: 'absolute', 
-                                        bottom: -10, 
-                                        right: -10, 
-                                        bgcolor: 'primary.main', 
-                                        color: 'white',
-                                        '&:hover': { bgcolor: 'primary.dark' }
-                                    }}
-                                    size="small"
-                                >
-                                    <input type="file" hidden accept="image/*" onChange={handleLogoSelect} ref={logoInputRef} />
-                                    <PhotoCameraIcon fontSize="small" />
-                                </IconButton>
                              </Box>
                         </Grid>
                         
@@ -423,6 +433,77 @@ const CompaniesPage = () => {
                         </Grid>
                         <Grid size={12}>
                             <TextField
+                                label={t('pages.companies.form.since', 'Founded date')}
+                                fullWidth
+                                type="date"
+                                name="since"
+                                value={formData.since || ''}
+                                onChange={handleInputChange}
+                                slotProps={{ inputLabel: { shrink: true } }}
+                            />
+                        </Grid>
+                        <Grid size={4}>
+                            <TextField
+                                label={t('pages.companies.form.cityId', 'City ID')}
+                                fullWidth
+                                type="number"
+                                name="location.city"
+                                value={formData.location.city ?? ''}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, location: { ...prev.location, city: toNumberOrNull(e.target.value) } }))}
+                            />
+                        </Grid>
+                        <Grid size={4}>
+                            <TextField
+                                label={t('pages.companies.form.districtId', 'District ID')}
+                                fullWidth
+                                type="number"
+                                name="location.district"
+                                value={formData.location.district ?? ''}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, location: { ...prev.location, district: toNumberOrNull(e.target.value) } }))}
+                            />
+                        </Grid>
+                        <Grid size={4}>
+                            <TextField
+                                label={t('pages.companies.form.wardId', 'Ward ID')}
+                                fullWidth
+                                type="number"
+                                name="location.ward"
+                                value={formData.location.ward ?? ''}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, location: { ...prev.location, ward: toNumberOrNull(e.target.value) } }))}
+                            />
+                        </Grid>
+                        <Grid size={12}>
+                            <TextField
+                                label={t('pages.companies.form.address', 'Address')}
+                                fullWidth
+                                name="location.address"
+                                value={formData.location.address}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, location: { ...prev.location, address: e.target.value } }))}
+                                required
+                            />
+                        </Grid>
+                        <Grid size={6}>
+                            <TextField
+                                label={t('pages.companies.form.latitude', 'Latitude')}
+                                fullWidth
+                                type="number"
+                                name="location.lat"
+                                value={formData.location.lat ?? ''}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, location: { ...prev.location, lat: toNumberOrNull(e.target.value) } }))}
+                            />
+                        </Grid>
+                        <Grid size={6}>
+                            <TextField
+                                label={t('pages.companies.form.longitude', 'Longitude')}
+                                fullWidth
+                                type="number"
+                                name="location.lng"
+                                value={formData.location.lng ?? ''}
+                                onChange={(e) => setFormData((prev) => ({ ...prev, location: { ...prev.location, lng: toNumberOrNull(e.target.value) } }))}
+                            />
+                        </Grid>
+                        <Grid size={12}>
+                            <TextField
                                 label={t('pages.companies.descriptionLabel')}
                                 fullWidth
                                 multiline
@@ -439,7 +520,7 @@ const CompaniesPage = () => {
                     <Button
                         onClick={handleSave}
                         variant="contained"
-                        disabled={isMutating || !formData.companyName || !formData.taxCode}
+                        disabled={isMutating || !formData.companyName || !formData.taxCode || !formData.location.address}
                         sx={{ px: 4 }}
                     >
                         {isMutating ? t('pages.companies.savingBtn') : t('pages.companies.saveBtn')}

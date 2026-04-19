@@ -3,12 +3,12 @@ import { useTranslation } from 'react-i18next';
 
 import adminSettingsService from '../../../../services/adminSettingsService';
 import toastMessages from '../../../../utils/toastMessages';
+import type { SystemSettingsPayload } from '../../../../services/adminSettingsService';
 
-export interface SystemSettings {
+export interface SystemSettings extends SystemSettingsPayload {
     maintenanceMode: boolean;
     autoApproveJobs: boolean;
     emailNotifications: boolean;
-    [key: string]: unknown;
 }
 
 export type UseSystemSettingsResult = UseQueryResult<SystemSettings> & {
@@ -24,7 +24,12 @@ export const useSystemSettings = (): UseSystemSettingsResult => {
         queryKey: ['system-settings'],
         queryFn: async () => {
             const res = await adminSettingsService.getSystemSettings();
-            return res as SystemSettings;
+            return {
+                maintenanceMode: !!res.maintenanceMode,
+                autoApproveJobs: !!res.autoApproveJobs,
+                emailNotifications: res.emailNotifications ?? true,
+                ...res,
+            } as SystemSettings;
         },
         initialData: {
             maintenanceMode: false,
@@ -34,7 +39,15 @@ export const useSystemSettings = (): UseSystemSettingsResult => {
     });
 
     const updateMutation = useMutation({
-        mutationFn: (data: Partial<SystemSettings>) => adminSettingsService.updateSystemSettings(data as Record<string, unknown>),
+        mutationFn: async (data: Partial<SystemSettings>): Promise<SystemSettings> => {
+            const res = await adminSettingsService.updateSystemSettings(data);
+            return {
+                maintenanceMode: !!res.maintenanceMode,
+                autoApproveJobs: !!res.autoApproveJobs,
+                emailNotifications: res.emailNotifications ?? true,
+                ...res,
+            } as SystemSettings;
+        },
         onSuccess: () => {
             toastMessages.success(t('pages.settings.toast.saveSuccess'));
             queryClient.invalidateQueries({ queryKey: ['system-settings'] });
@@ -46,5 +59,5 @@ export const useSystemSettings = (): UseSystemSettingsResult => {
         ...query,
         updateSystemSettings: updateMutation.mutateAsync,
         isMutating: updateMutation.isPending
-    } as UseSystemSettingsResult;
+    };
 };

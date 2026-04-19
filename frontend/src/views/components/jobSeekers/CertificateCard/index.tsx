@@ -348,7 +348,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
           p: 3,
 
-          boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
+          boxShadow: (theme: Theme) => theme.customShadows.card,
 
         }}
 
@@ -402,7 +402,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
+                    boxShadow: (theme: Theme) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -470,7 +470,7 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
                             background: (theme: Theme) => theme.palette.primary.main,
 
-                            boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.small,
+                            boxShadow: (theme: Theme) => theme.customShadows.small,
 
                           }}
 
@@ -644,7 +644,12 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 
           handleAddOrUpdate={handleAddOrUpdate as (data: CertificateFormValues) => void}
 
-          editData={editData as unknown as Partial<CertificateFormValues> | null}
+          editData={editData ? {
+            name: editData.name || '',
+            trainingPlace: editData.trainingPlace || '',
+            startDate: editData.startDate ? new Date(editData.startDate) : null,
+            expirationDate: editData.expirationDate ? new Date(editData.expirationDate) : null,
+          } : null}
 
           serverErrors={serverErrors}
 
@@ -667,3 +672,4 @@ const CertificateCard = ({ title }: CertificateCardProps) => {
 };
 
 export default CertificateCard;
+

@@ -37,6 +37,14 @@ import tokenService from '../../../services/tokenService';
 
 import { JobSeekerSignUpFormData } from '../../components/auths/JobSeekerSignUpForm';
 import type { JobSeekerRegisterData } from '../../../types/auth';
+import type { CodeResponse } from '@react-oauth/google';
+
+type RegisterErrorPayload = {
+  errors?: {
+    email?: string[];
+    errorMessage?: string[];
+  };
+};
 
 
 
@@ -130,9 +138,9 @@ const JobSeekerSignUp = () => {
 
       } catch (error) {
 
-        const axiosError = error as AxiosError<Record<string, unknown>>;
+        const axiosError = error as AxiosError<RegisterErrorPayload>;
         const res = axiosError?.response;
-        const errors = res?.data?.errors as Record<string, unknown> | undefined;
+        const errors = res?.data?.errors;
         const hasEmailExists = !!errors?.email;
         if (res?.status === 400 && hasEmailExists) {
           try {
@@ -243,7 +251,7 @@ const JobSeekerSignUp = () => {
 
   };
 
-  const handleFacebookRegister = (result: { data?: { accessToken: string } }) => {
+  const handleFacebookRegister = (result: { data?: { accessToken?: string } }) => {
     const accessToken = result?.data?.accessToken;
 
     if (accessToken) {
@@ -264,9 +272,8 @@ const JobSeekerSignUp = () => {
 
   };
 
-  const handleGoogleRegister = (result: Record<string, unknown>) => {
-
-    const code = result?.code as string;
+  const handleGoogleRegister = (result: Omit<CodeResponse, "error" | "error_description" | "error_uri">) => {
+    const code = result?.code;
 
     if (code) {
 
@@ -495,3 +502,4 @@ const JobSeekerSignUp = () => {
 };
 
 export default JobSeekerSignUp;
+

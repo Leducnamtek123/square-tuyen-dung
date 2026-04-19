@@ -1,17 +1,18 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
+import type { AdminListParams, JobPostNotificationPayload } from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
-import { Notification } from '../../../../types/models';
+import { JobPostNotification } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
-export type UseJobNotificationsResult = UseQueryResult<PaginatedResponse<Notification>> & {
-    createJobNotification: (data: Partial<Notification> | Record<string, unknown>) => Promise<Notification>;
-    updateJobNotification: (args: { id: string | number; data: Partial<Notification> | Record<string, unknown> }) => Promise<Notification>;
+export type UseJobNotificationsResult = UseQueryResult<PaginatedResponse<JobPostNotification>> & {
+    createJobNotification: (data: JobPostNotificationPayload) => Promise<JobPostNotification>;
+    updateJobNotification: (args: { id: string | number; data: Partial<JobPostNotificationPayload> }) => Promise<JobPostNotification>;
     deleteJobNotification: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
 
-export const useJobNotifications = (params?: Record<string, unknown>): UseJobNotificationsResult => {
+export const useJobNotifications = (params?: AdminListParams): UseJobNotificationsResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -24,7 +25,7 @@ export const useJobNotifications = (params?: Record<string, unknown>): UseJobNot
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: Partial<Notification> | Record<string, unknown>) => adminManagementService.createJobNotification(data),
+        mutationFn: (data: JobPostNotificationPayload) => adminManagementService.createJobNotification(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-notifications'] });
             toastMessages.success('Notification created successfully');
@@ -36,7 +37,7 @@ export const useJobNotifications = (params?: Record<string, unknown>): UseJobNot
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string | number; data: Partial<Notification> | Record<string, unknown> }) => adminManagementService.updateJobNotification(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPostNotificationPayload> }) => adminManagementService.updateJobNotification(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-notifications'] });
             toastMessages.success('Notification updated successfully');

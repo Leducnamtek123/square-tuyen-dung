@@ -344,7 +344,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
           p: 3,
 
-          boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
+          boxShadow: (theme: Theme) => theme.customShadows.card,
 
         }}
 
@@ -398,7 +398,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                   sx={{
 
-                    boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.medium,
+                    boxShadow: (theme: Theme) => theme.customShadows.medium,
 
                     "&:hover": {
 
@@ -466,7 +466,7 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
                             background: (theme: Theme) => theme.palette.primary.main,
 
-                            boxShadow: (theme: Theme & { customShadows: Record<string, unknown> }) => theme.customShadows.small,
+                            boxShadow: (theme: Theme) => theme.customShadows.small,
 
                           }}
 
@@ -742,7 +742,14 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 
           handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
 
-          editData={editData as unknown as Partial<FormValues> | null}
+          editData={editData ? {
+            degreeName: editData.degreeName || '',
+            major: editData.major || '',
+            trainingPlaceName: editData.trainingPlaceName || '',
+            startDate: editData.startDate ? new Date(editData.startDate) : null,
+            completedDate: editData.completedDate ? new Date(editData.completedDate) : null,
+            description: editData.description || null,
+          } : null}
 
         />
 
@@ -763,3 +770,4 @@ const EducationDetailCard = ({ title }: EducationDetailCardProps) => {
 };
 
 export default EducationDetailCard;
+

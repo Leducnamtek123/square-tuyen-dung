@@ -22,11 +22,11 @@ const FeedbackCard = ({ avatarUrl = '', fullName = '', content = '' }: FeedbackC
         p: 3,
         py: 3,
         mb: 1,
-        boxShadow: (t: StylesTheme & { customShadows: Record<string, unknown> }) => t.customShadows.card,
+        boxShadow: (t: StylesTheme) => t.customShadows.card,
         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
         '&:hover': {
           transform: 'translateY(-4px)',
-          boxShadow: (t: StylesTheme & { customShadows: Record<string, unknown> }) => t.customShadows.large,
+          boxShadow: (t: StylesTheme) => t.customShadows.large,
         },
       }}
     >
@@ -35,7 +35,7 @@ const FeedbackCard = ({ avatarUrl = '', fullName = '', content = '' }: FeedbackC
           sx={{
             borderRadius: '50%',
             border: (t: StylesTheme) => `4px solid ${t.palette.primary.light}`,
-            boxShadow: (t: StylesTheme & { customShadows: Record<string, unknown> }) => t.customShadows.medium,
+            boxShadow: (t: StylesTheme) => t.customShadows.medium,
             objectFit: 'contain',
           }}
           width={120}
@@ -97,7 +97,7 @@ const Loading = () => (
       p: 3,
       py: 3,
       mb: 1,
-      boxShadow: (theme: StylesTheme & { customShadows: Record<string, unknown> }) => theme.customShadows.card,
+      boxShadow: (theme: StylesTheme) => theme.customShadows.card,
     }}
   >
     <Skeleton
@@ -142,3 +142,5 @@ const Loading = () => (
 FeedbackCard.Loading = Loading;
 
 export default FeedbackCard;
+
+

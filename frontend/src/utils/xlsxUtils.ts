@@ -1,8 +1,9 @@
 ﻿import dayjs from 'dayjs';
 import { utils, writeFileXLSX } from 'xlsx';
+import type { ExportTableRow } from '../types/api';
 
 const xlsxUtils = {
-  exportToXLSX: (data: Record<string, unknown>[], fileName = 'data'): void => {
+  exportToXLSX: (data: ExportTableRow[], fileName = 'data'): void => {
     const ws = utils.json_to_sheet(data);
     const wb = utils.book_new();
     utils.book_append_sheet(wb, ws, 'Data');

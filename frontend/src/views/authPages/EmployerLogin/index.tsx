@@ -17,6 +17,7 @@ import tokenService from '../../../services/tokenService';
 import { useAppDispatch } from '../../../hooks/useAppStore';
 import type { RoleName, AuthProvider } from '../../../types/auth';
 import type { AxiosError } from 'axios';
+import type { CodeResponse } from '@react-oauth/google';
 
 
 
@@ -196,8 +197,8 @@ const EmployerLogin = () => {
     }
   };
 
-  const handleGoogleLogin = (result: Record<string, unknown>) => {
-    const code = result?.code as string;
+  const handleGoogleLogin = (result: Omit<CodeResponse, "error" | "error_description" | "error_uri">) => {
+    const code = result?.code;
 
     if (code) {
       handleSocialLogin(

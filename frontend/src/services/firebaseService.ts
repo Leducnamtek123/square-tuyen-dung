@@ -21,10 +21,38 @@ import db, { serverTimestamp, auth } from '../configs/firebase-config';
 
 
 type IdType = string | number;
+export type ChatAccountData = {
+  userId?: string | number;
+  name?: string;
+  email?: string;
+  avatarUrl?: string | null;
+  company?: {
+    companyId?: number | string;
+    slug?: string;
+    companyName?: string;
+    imageUrl?: string;
+  } | null;
+  createdAt?: unknown;
+};
+
+export type ChatRoomDocument = {
+  members?: string[];
+  membersString?: string[];
+  recipientId?: string;
+  createdBy?: string;
+  unreadCount?: number;
+  updatedAt?: unknown;
+  createdAt?: unknown;
+};
+
+export interface ChatRoomWithUser extends ChatRoomDocument {
+  id: string;
+  user: ChatAccountData | null;
+}
 
 export const addDocument = async (
   collectionName: string,
-  data: Record<string, unknown>
+  data: ChatRoomDocument
 ): Promise<string> => {
   const queryRef = collection(db, collectionName);
 
@@ -61,7 +89,7 @@ export const checkExists = async (
 
 export const createUser = async (
   collectionName: string,
-  userData: Record<string, unknown>,
+  userData: ChatAccountData,
   userId: IdType
 ): Promise<boolean> => {
   try {
@@ -98,15 +126,15 @@ export const checkChatRoomExists = async (
 export const getChatRoomById = async (
   chatRoomId: IdType,
   currentUserId: IdType
-): Promise<Record<string, unknown>> => {
+): Promise<ChatRoomWithUser | null> => {
   const chatRoomRef = doc(db, 'chatRooms', `${chatRoomId}`);
   const docSnap = await getDoc(chatRoomRef);
 
   if (docSnap.exists()) {
     let partnerId = '';
-    const chatRoomData = docSnap.data() as Record<string, unknown>;
+    const chatRoomData = docSnap.data() as ChatRoomDocument;
 
-    const members = (chatRoomData as { members?: string[] }).members || [];
+    const members = chatRoomData.members || [];
     if (members[0] === `${currentUserId}`) {
       partnerId = members[1] || '';
     } else {
@@ -118,21 +146,21 @@ export const getChatRoomById = async (
       ...chatRoomData,
       id: docSnap.id,
       user: userAccount,
-    } as Record<string, unknown>;
+    };
   }
 
-  return {} as Record<string, unknown>;
+  return null;
 };
 
 export const getUserAccount = async (
   collectionName: string,
   userId: IdType
-): Promise<Record<string, unknown> | null> => {
+): Promise<ChatAccountData | null> => {
   const userRef = doc(db, collectionName, `${userId}`);
   const docSnap = await getDoc(userRef);
 
   if (docSnap.exists()) {
-    return docSnap.data() as Record<string, unknown>;
+    return docSnap.data() as ChatAccountData;
   }
 
   return null;
@@ -220,4 +248,5 @@ export const verifyCode = async (
   const user = result.user;
   return user.getIdToken();
 };
+
 

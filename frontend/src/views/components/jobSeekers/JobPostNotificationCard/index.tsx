@@ -16,9 +16,8 @@ import ItemLoading from "./ItemLoading";
 import ItemComponent from "./ItemComponent";
 import { useJobPostNotifications, useJobPostNotificationMutations } from "../hooks/useJobSeekerQueries";
 
-import type { JobPostNotification } from "../../../../services/jobPostNotificationService";
+import type { JobPostNotification, JobPostNotificationPayload } from "../../../../services/jobPostNotificationService";
 import type { Theme as MaterialTheme } from '@mui/material';
-import type { AxiosError } from 'axios';
 
 const pageSize = 12;
 
@@ -45,7 +44,16 @@ const JobPostNotificationCard = () => {
     setIsFullScreenLoading(true);
     try {
       const resData = await jobPostNotificationService.getJobPostNotificationDetailById(id);
-      setEditData(resData as unknown as Partial<JobPostNotificationFormValues> & { id?: number });
+      setEditData({
+        id: resData.id,
+        jobName: resData.jobName,
+        frequency: resData.frequency ?? null,
+        career: resData.career ?? 0,
+        city: resData.city ?? 0,
+        position: resData.position ?? null,
+        experience: resData.experience ?? null,
+        salary: resData.salary ?? null,
+      });
       setOpenPopup(true);
     } catch (error) {
       errorHandling(error);
@@ -59,16 +67,26 @@ const JobPostNotificationCard = () => {
     setOpenPopup(true);
   };
 
-  const handleAddOrUpdate = (formData: JobPostNotificationFormValues & { id?: number }) => {
-    if ("id" in formData && formData.id) {
-      updateMutation.mutate({ id: formData.id, data: { ...formData } as Record<string, unknown> }, {
+  const handleAddOrUpdate = (formData: JobPostNotificationFormValues) => {
+    const payload: JobPostNotificationPayload = {
+      jobName: formData.jobName,
+      frequency: Number(formData.frequency || 0),
+      career: Number(formData.career),
+      city: Number(formData.city),
+      position: formData.position ?? null,
+      experience: formData.experience ?? null,
+      salary: formData.salary ?? null,
+    };
+
+    if (editData?.id) {
+      updateMutation.mutate({ id: editData.id, data: payload }, {
         onSuccess: () => {
           setOpenPopup(false);
           toastMessages.success(t("jobSeeker:jobManagement.notifications.updatedSuccess"));
         },
       });
     } else {
-      addMutation.mutate({ ...formData } as Record<string, unknown>, {
+      addMutation.mutate(payload, {
         onSuccess: () => {
           setOpenPopup(false);
           toastMessages.success(t("jobSeeker:jobManagement.notifications.addedSuccess"));

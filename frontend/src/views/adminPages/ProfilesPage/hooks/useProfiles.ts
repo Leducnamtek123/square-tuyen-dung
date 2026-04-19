@@ -3,15 +3,16 @@ import adminManagementService from '../../../../services/adminManagementService'
 import toastMessages from '../../../../utils/toastMessages';
 import { JobSeekerProfile } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import type { AdminListParams, JobSeekerProfilePayload } from '../../../../services/adminManagementService';
 
 export type UseProfilesResult = UseQueryResult<PaginatedResponse<JobSeekerProfile>> & {
-    createProfile: (data: Partial<JobSeekerProfile> | Record<string, unknown>) => Promise<JobSeekerProfile>;
-    updateProfile: (args: { id: string | number; data: Partial<JobSeekerProfile> | Record<string, unknown> }) => Promise<JobSeekerProfile>;
+    createProfile: (data: JobSeekerProfilePayload) => Promise<JobSeekerProfile>;
+    updateProfile: (args: { id: string | number; data: JobSeekerProfilePayload }) => Promise<JobSeekerProfile>;
     deleteProfile: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
 
-export const useProfiles = (params?: Record<string, unknown>): UseProfilesResult => {
+export const useProfiles = (params?: AdminListParams): UseProfilesResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery<PaginatedResponse<JobSeekerProfile>>({
@@ -23,7 +24,7 @@ export const useProfiles = (params?: Record<string, unknown>): UseProfilesResult
         placeholderData: keepPreviousData,
     });
 
-    const createMutation = useMutation<JobSeekerProfile, Error, Partial<JobSeekerProfile> | Record<string, unknown>>({
+    const createMutation = useMutation<JobSeekerProfile, Error, JobSeekerProfilePayload>({
         mutationFn: (data) => adminManagementService.createProfile(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-profiles'] });
@@ -35,7 +36,7 @@ export const useProfiles = (params?: Record<string, unknown>): UseProfilesResult
         }
     });
 
-    const updateMutation = useMutation<JobSeekerProfile, Error, { id: string | number; data: Partial<JobSeekerProfile> | Record<string, unknown> }>({
+    const updateMutation = useMutation<JobSeekerProfile, Error, { id: string | number; data: JobSeekerProfilePayload }>({
         mutationFn: ({ id, data }) => adminManagementService.updateProfile(id, data),
         onSuccess: () => {
             toastMessages.success('Profile updated');
@@ -59,5 +60,5 @@ export const useProfiles = (params?: Record<string, unknown>): UseProfilesResult
         updateProfile: updateMutation.mutateAsync,
         deleteProfile: deleteMutation.mutateAsync,
         isMutating: createMutation.isPending || updateMutation.isPending || deleteMutation.isPending,
-    } as UseProfilesResult;
+    };
 };

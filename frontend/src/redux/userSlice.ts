@@ -35,7 +35,7 @@ const getUserInfo = createAsyncThunk<User, void>(
   }
 );
 
-const updateUserInfo = createAsyncThunk<User, Record<string, unknown>>(
+const updateUserInfo = createAsyncThunk<User, Partial<User>>(
   'user/updateUser',
   async (data) => {
     const resData = await authService.updateUser(data);
@@ -212,3 +212,5 @@ export {
   deleteAvatar,
   setActiveWorkspace,
 };
+
+

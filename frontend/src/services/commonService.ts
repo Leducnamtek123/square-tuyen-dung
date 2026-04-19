@@ -15,6 +15,23 @@ export interface WardsResponse {
   data: { id: number; name: string; district?: District }[];
 }
 
+interface PaginatedLike<T> {
+  count?: number;
+  results?: T[];
+  data?: T[] | { results?: T[] };
+}
+
+const extractResults = <T>(raw: unknown): T[] => {
+  if (Array.isArray(raw)) return raw as T[];
+  const obj = (raw || {}) as PaginatedLike<T>;
+  if (Array.isArray(obj.results)) return obj.results;
+  if (Array.isArray(obj.data)) return obj.data;
+  if (obj.data && Array.isArray((obj.data as { results?: T[] }).results)) {
+    return (obj.data as { results?: T[] }).results || [];
+  }
+  return [];
+};
+
 /* ── Service ──────────────────────────────────────────────────────────── */
 
 const commonService = {
@@ -68,18 +85,11 @@ const commonService = {
    */
   getAllCareersSimple: async (params: { pageSize?: number } = {}): Promise<Career[]> => {
     const url = 'common/all-careers/';
-    const res = (await httpRequest.get(url, {
+    const res = await httpRequest.get(url, {
       params: { page: 1, pageSize: Number(params.pageSize || 1000) },
-    })) as Record<string, unknown>;
+    });
 
-    return (
-      (Array.isArray(res?.results) && res.results) ||
-      (Array.isArray((res as Record<string, unknown>)?.data) &&
-        Array.isArray(((res as Record<string, unknown>).data as Record<string, unknown>)?.results) &&
-        ((res as Record<string, unknown>).data as Record<string, unknown>).results) ||
-      (Array.isArray(res) && res) ||
-      []
-    ) as Career[];
+    return extractResults<Career>(res);
   },
 
   getAllCareers: async (params: { page?: number; pageSize?: number; kw?: string } = {}): Promise<Career[]> => {
@@ -91,20 +101,13 @@ const commonService = {
     let total = 0;
 
     while (true) {
-      const res = (await httpRequest.get(url, {
+      const res = await httpRequest.get(url, {
         params: { page, pageSize, kw },
-      })) as Record<string, unknown>;
+      }) as PaginatedLike<Career>;
 
-      const pageResults = (
-        (Array.isArray(res?.results) && res.results) ||
-        (Array.isArray(res) && res) ||
-        []
-      ) as Career[];
+      const pageResults = extractResults<Career>(res);
 
-      const count =
-        typeof res?.count === 'number'
-          ? (res.count as number)
-          : null;
+      const count = typeof res?.count === 'number' ? res.count : null;
 
       if (typeof count === 'number') total = count;
 

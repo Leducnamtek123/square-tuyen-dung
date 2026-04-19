@@ -2,15 +2,15 @@ import React from 'react';
 import Image from 'mui-image';
 import type { StaticImageData } from 'next/image';
 
-interface MuiImageCustomProps {
+const ImageWithLoading = Image as React.ElementType;
+type MuiImageBaseProps = React.ComponentPropsWithoutRef<typeof ImageWithLoading>;
+
+type MuiImageCustomProps = Omit<MuiImageBaseProps, 'src' | 'onError'> & {
   loading?: 'lazy' | 'eager';
   src: string | StaticImageData | null | undefined;
   fallbackSrc?: string | StaticImageData;
-  onError?: (event: Record<string, unknown>) => void;
-  [key: string]: unknown;
-}
-
-const ImageWithLoading = Image as React.ElementType;
+  onError?: MuiImageBaseProps['onError'];
+};
 
 const resolveSrc = (src: string | StaticImageData | null | undefined): string => {
   if (!src) return '';
@@ -36,7 +36,7 @@ const MuiImageCustom = (props: MuiImageCustomProps) => {
   }, [src, resolvedFallback]);
 
   const handleError = React.useCallback(
-    (event: Record<string, unknown>) => {
+    (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
       if (resolvedFallback && imageSrc !== resolvedFallback) {
         setImageSrc(resolvedFallback);
       }
@@ -68,3 +68,6 @@ const MuiImageCustom = (props: MuiImageCustomProps) => {
 };
 
 export default React.memo(MuiImageCustom);
+
+
+

@@ -10,6 +10,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useCities } from './hooks/useCities';
 import { useDataTable } from '../../../hooks';
 import { City } from '../../../types/models';
+import type { CityPayload } from '../../../services/adminManagementService';
 
 const CitiesPage = () => {
     const { t } = useTranslation('admin');
@@ -43,7 +44,7 @@ const CitiesPage = () => {
     const [openDialog, setOpenDialog] = useState(false);
     const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
     const [currentCity, setCurrentCity] = useState<City | null>(null);
-    const [formData, setFormData] = useState<Partial<City>>({
+    const [formData, setFormData] = useState<CityPayload>({
         name: '',
         code: ''
     });

@@ -21,12 +21,6 @@ import { deleteAvatar, updateAvatar } from '../../../../redux/userSlice';
 import { compressImageFile } from '../../../../utils/imageCompression';
 import ImageCropDialog from '../../../../components/Common/ImageCropDialog';
 
-interface AvatarCardProps {
-  [key: string]: unknown;
-}
-
-
-
 const AvatarCard = () => {
 
   const { t } = useTranslation('auth');

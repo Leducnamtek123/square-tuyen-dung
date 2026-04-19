@@ -32,7 +32,7 @@ interface UserMenuProps {
 }
 
 interface WorkspaceItem {
-  type: "company" | "candidate";
+  type: "company" | "candidate" | "job_seeker";
   companyId?: number | string;
   label: string;
   roleCode?: string;
@@ -80,7 +80,12 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
             ? `${workspace.label} (${workspace.roleCode || "member"})`
             : t("nav.accountManagement"),
         onClick: () => {
-          dispatch(setActiveWorkspace(workspace as unknown as Workspace));
+          const normalizedWorkspace: Workspace = {
+            type: workspace.type === "candidate" ? "job_seeker" : workspace.type,
+            companyId: workspace.type === "company" ? Number(workspace.companyId || 0) : null,
+            label: workspace.label,
+          };
+          dispatch(setActiveWorkspace(normalizedWorkspace));
           if (workspace.type === "company") {
             openPortal(true, ROUTES.EMPLOYER.DASHBOARD);
             return;

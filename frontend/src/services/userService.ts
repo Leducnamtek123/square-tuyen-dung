@@ -2,6 +2,8 @@ import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 import { User as UserModel } from '../types/models';
 import { PaginatedResponse } from '../types/api';
+import { cleanParams } from '../utils/params';
+import type { AdminListParams } from './adminManagementService';
 
 type IdType = string | number;
 
@@ -11,9 +13,9 @@ const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
 };
 
 const userService = {
-  getAllUsers: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<UserModel>> => {
+  getAllUsers: (params: AdminListParams = {}): Promise<PaginatedResponse<UserModel>> => {
     const url = 'auth/users/';
-    return withPresign(httpRequest.get(url, { params }) as Promise<PaginatedResponse<UserModel>>);
+    return withPresign(httpRequest.get(url, { params: cleanParams(params) }) as Promise<PaginatedResponse<UserModel>>);
   },
   updateUser: (id: IdType, data: Partial<UserModel>): Promise<UserModel> => {
     const url = `auth/users/${id}/`;

@@ -26,16 +26,24 @@ import { Theme } from "@mui/material/styles";
 
 import type { Company } from "../../../types/models";
 
-export interface CompanyDetailProps extends Omit<Partial<Company>, 'location'> {
-  location?: { address?: string; lat?: number; lng?: number; city?: number; district?: number; ward?: number; [key: string]: unknown } | null;
+type CompanyDetailLocation = {
+  address?: string;
+  lat?: number;
+  lng?: number;
+  city?: number;
+  district?: number;
+  ward?: number;
+};
+
+export type CompanyDetailProps = Omit<Partial<Company>, 'location'> & {
+  location?: CompanyDetailLocation | null;
   facebookUrl?: string;
   youtubeUrl?: string;
   linkedinUrl?: string;
   followNumber?: number;
   isFollowed?: boolean;
   companyImages?: { imageUrl: string }[];
-  [key: string]: unknown;
-}
+};
 
 
 const CompanyDetailPage = () => {
@@ -84,10 +92,10 @@ const CompanyDetailPage = () => {
         url: companyDetail.websiteUrl || (typeof window !== 'undefined' ? window.location.href : ''),
         logoUrl: companyDetail.companyImageUrl || '',
         description: companyDetail.description || '',
-        email: typeof companyDetail.email === 'string' ? companyDetail.email : undefined,
-        phone: typeof companyDetail.phone === 'string' ? companyDetail.phone : undefined,
-        address: typeof companyDetail.address === 'string' ? companyDetail.address : undefined,
-        city: typeof companyDetail.cityName === 'string' ? companyDetail.cityName : undefined,
+        email: companyDetail.companyEmail,
+        phone: companyDetail.companyPhone,
+        address: companyDetail.location?.address,
+        city: typeof companyDetail.locationDict?.city === 'string' ? companyDetail.locationDict.city : undefined,
         country: 'VN',
         foundingDate: companyDetail.since ? dayjs(companyDetail.since).format('YYYY') : undefined,
         numberOfEmployees: companyDetail.employeeSize ? String(companyDetail.employeeSize) : undefined,
@@ -106,15 +114,14 @@ const CompanyDetailPage = () => {
 
   const followMutation = useMutation({
     mutationFn: (companySlug: string) => companyService.followCompany(companySlug),
-    onSuccess: (resData: unknown) => {
-      const isFollowed = (resData as { isFollowed: boolean }).isFollowed;
-      queryClient.setQueryData(['companyDetail', slug], (old: unknown) => {
+    onSuccess: (resData: { isFollowed: boolean }) => {
+      const isFollowed = resData.isFollowed;
+      queryClient.setQueryData<CompanyDetailProps | null>(['companyDetail', slug], (old) => {
         if (!old) return old;
-        const oldData = old as Record<string, unknown> & CompanyDetailProps;
         return {
-          ...oldData,
+          ...old,
           isFollowed,
-          followNumber: isFollowed ? (oldData.followNumber || 0) + 1 : (oldData.followNumber || 0) - 1
+          followNumber: isFollowed ? (old.followNumber || 0) + 1 : (old.followNumber || 0) - 1
         };
       });
       toastMessages.success(isFollowed ? t("companyDetail.followedSuccessfully") : t("companyDetail.unfollowedSuccessfully"));
@@ -170,3 +177,4 @@ const CompanyDetailPage = () => {
 };
 
 export default CompanyDetailPage;
+

@@ -1,17 +1,18 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
+import type { AdminBannerPayload, AdminListParams } from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
 import { Banner } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
 export type UseBannersResult = UseQueryResult<PaginatedResponse<Banner>> & {
-    createBanner: (data: FormData | Record<string, unknown>) => Promise<Banner>;
-    updateBanner: (args: { id: string | number; data: FormData | Record<string, unknown> }) => Promise<Banner>;
+    createBanner: (data: FormData | AdminBannerPayload) => Promise<Banner>;
+    updateBanner: (args: { id: string | number; data: FormData | Partial<AdminBannerPayload> }) => Promise<Banner>;
     deleteBanner: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
 
-export const useBanners = (params?: Record<string, unknown>): UseBannersResult => {
+export const useBanners = (params?: AdminListParams): UseBannersResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery<PaginatedResponse<Banner>>({
@@ -23,8 +24,8 @@ export const useBanners = (params?: Record<string, unknown>): UseBannersResult =
         placeholderData: keepPreviousData,
     });
 
-    const createMutation = useMutation<Banner, Error, FormData | Record<string, unknown>>({
-        mutationFn: (data: FormData | Record<string, unknown>) => adminManagementService.createBanner(data),
+    const createMutation = useMutation<Banner, Error, FormData | AdminBannerPayload>({
+        mutationFn: (data: FormData | AdminBannerPayload) => adminManagementService.createBanner(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-banners'] });
             toastMessages.success('Banner added successfully');
@@ -35,8 +36,8 @@ export const useBanners = (params?: Record<string, unknown>): UseBannersResult =
         }
     });
 
-    const updateMutation = useMutation<Banner, Error, { id: string | number; data: FormData | Record<string, unknown> }>({
-        mutationFn: ({ id, data }: { id: string | number; data: FormData | Record<string, unknown> }) => 
+    const updateMutation = useMutation<Banner, Error, { id: string | number; data: FormData | Partial<AdminBannerPayload> }>({
+        mutationFn: ({ id, data }: { id: string | number; data: FormData | Partial<AdminBannerPayload> }) => 
             adminManagementService.updateBanner(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-banners'] });

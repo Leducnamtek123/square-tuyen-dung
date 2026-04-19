@@ -1,40 +1,67 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
+import type { Banner, Feedback } from '../types/models';
+import { cleanParams } from '../utils/params';
 
 
-type WithPresignInput = Promise<unknown>;
-
-const withPresign = async (promise: WithPresignInput): Promise<unknown> => {
+const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
   const data = await promise;
-  return presignInObject(data);
+  return presignInObject(data) as T;
+};
+
+export interface FeedbackPayload {
+  rating: number;
+  content: string;
+}
+
+export interface SMSDownloadAppPayload {
+  phone: string;
+}
+
+export type BannerListParams = {
+  type?: number | string;
+  platform?: string;
+  isActive?: boolean;
+};
+
+const toListData = <T>(raw: unknown): T[] => {
+  if (Array.isArray(raw)) return raw as T[];
+  const obj = (raw || {}) as { results?: unknown[]; data?: unknown[] };
+  if (Array.isArray(obj.results)) return obj.results as T[];
+  if (Array.isArray(obj.data)) return obj.data as T[];
+  return [];
 };
 
 const contentService = {
-  getFeedbacks: (): Promise<unknown> => {
+  getFeedbacks: async (): Promise<Feedback[]> => {
     const url = 'content/web/feedbacks/';
-    return httpRequest.get(url);
+    const response = await httpRequest.get(url);
+    return toListData<Feedback>(response);
   },
 
-  createFeedback: (data: Record<string, unknown>): Promise<unknown> => {
+  createFeedback: (data: FeedbackPayload): Promise<Feedback> => {
     const url = 'content/web/feedbacks/';
-    return httpRequest.post(url, data);
+    return httpRequest.post(url, data) as Promise<Feedback>;
   },
 
-  sendSMSDownloadApp: (data: Record<string, unknown>): Promise<unknown> => {
+  sendSMSDownloadApp: (data: SMSDownloadAppPayload): Promise<{ sent?: boolean; message?: string }> => {
     const url = 'content/web/sms-download-app/';
-    return httpRequest.post(url, data);
+    return httpRequest.post(url, data) as Promise<{ sent?: boolean; message?: string }>;
   },
 
-  getBanners: (params: Record<string, unknown> = {}): Promise<unknown> => {
+  getBanners: async (params: BannerListParams = {}): Promise<Banner[]> => {
     const url = 'content/web/banner/';
-    return withPresign(httpRequest.get(url, { params: params }));
+    const response = await withPresign(httpRequest.get(url, { params: cleanParams(params) }));
+    return toListData<Banner>(response);
   },
 
-  sendNotificationDemo: (): Promise<unknown> => {
+  sendNotificationDemo: (): Promise<{ success?: boolean; message?: string }> => {
     const url = 'content/send-noti-demo/';
     return httpRequest.post(url);
   },
 };
 
 export default contentService;
+
+
 

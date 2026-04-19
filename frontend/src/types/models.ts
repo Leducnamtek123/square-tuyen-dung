@@ -68,6 +68,7 @@ export interface Company {
   companyImageUrl?: string | null;
   jobPostNumber?: number;
   followNumber?: number;
+  isFollowed?: boolean;
   locationDict?: {
     city?: string;
     district?: string;
@@ -204,19 +205,23 @@ export interface Resume {
   lastViewedDate?: string | null;
   userDict?: UserDict;
   user?: User | null;
-  jobSeekerProfileDict?: Record<string, unknown> & { old?: string | number };
+  jobSeekerProfileDict?: {
+    old?: string | number;
+    id?: number | string;
+    fullName?: string;
+    email?: string;
+  };
   // Search-related fields
   searchScore?: number;
   isFeatured?: boolean;
 }
 
-export interface ResumeSaved {
+export type ResumeSaved = {
   id: number;
   resume: Resume;
   resumeSlug?: string;
   createAt: string;
-  [key: string]: unknown;
-}
+};
 
 export interface JobSeekerProfile {
   id: number;
@@ -326,6 +331,8 @@ export interface Location {
 export interface Question {
   id: number;
   text: string;
+  difficulty?: string;
+  career?: number | null;
   category?: string;
   questionType?: string;
   // Fallbacks for raw API response or transformer mapped fields
@@ -380,15 +387,32 @@ export interface InterviewSession {
   ai_strengths?: string[] | string | null;
   aiWeaknesses?: string[] | string | null;
   ai_weaknesses?: string[] | string | null;
-  aiDetailedFeedback?: Record<string, unknown>;
-  ai_detailed_feedback?: Record<string, unknown>;
+  aiDetailedFeedback?: InterviewAiDetailedFeedback;
+  ai_detailed_feedback?: InterviewAiDetailedFeedback;
   recordingUrl?: string | null;
   recording_url?: string | null;
   evaluations?: InterviewEvaluation[];
   questions?: Question[];
   questionGroup?: number | string | QuestionGroup | null;
   question_group?: number | string | QuestionGroup | null;
-  transcripts?: Record<string, unknown>[];
+  transcripts?: InterviewTranscript[];
+}
+
+export interface InterviewTranscript {
+  id: number | string;
+  speakerRole?: 'ai_agent' | 'candidate' | string;
+  content?: string;
+  text?: string;
+  createAt?: string | null;
+}
+
+export interface InterviewAiDetailedFeedback {
+  technical?: string;
+  communication?: string;
+  attitude?: string;
+  strengths?: string[];
+  weaknesses?: string[];
+  recommendations?: string[];
 }
 
 export interface InterviewEvaluation {
@@ -416,6 +440,18 @@ export interface Notification {
   type?: string;
   isRead?: boolean;
   createAt?: string;
+}
+
+export interface JobPostNotification {
+  id: number;
+  jobName: string;
+  position?: number | null;
+  experience?: number | null;
+  salary?: number | null;
+  frequency: number;
+  isActive?: boolean;
+  career?: number | null;
+  city?: number | null;
 }
 
 /* Chat */
@@ -459,6 +495,11 @@ export interface Banner {
   description?: string;
   bannerType: number;
   imageMobileUrl?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  isShowButton?: boolean;
+  isActive?: boolean;
+  descriptionLocation?: number;
   button_text?: string;
   button_link?: string;
   is_show_button?: boolean;
@@ -468,11 +509,16 @@ export interface Banner {
   description_location?: number;
 }
 
-export interface SelectOption {
+export type SelectOption = {
   id: number | string | null;
   name: string;
-  [key: string]: unknown;
-}
+  description?: string;
+  isHot?: boolean;
+  place_id?: string;
+  code?: string;
+  slug?: string;
+  value?: string | number;
+};
 
 export interface SystemConfig {
   careers?: Career[];
@@ -508,3 +554,6 @@ export interface SystemConfig {
   applicationStatusOptions?: SelectOption[];
   jobPostStatusOptions?: SelectOption[];
 }
+
+
+

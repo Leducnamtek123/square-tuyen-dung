@@ -1,28 +1,109 @@
 import httpRequest from '../utils/httpRequest';
 import { presignInObject } from '../utils/presignUrl';
 import { PaginatedResponse } from '../types/api';
-import { Career, City, District, Ward, Company, JobSeekerProfile, Resume, JobPostActivity, Notification, QuestionGroup, Banner, Feedback, Question } from '../types/models';
+import { cleanParams } from '../utils/params';
+import {
+  Career,
+  City,
+  District,
+  Ward,
+  Company,
+  JobSeekerProfile,
+  Resume,
+  JobPostActivity,
+  QuestionGroup,
+  Banner,
+  Feedback,
+  Question,
+  JobPostNotification,
+} from '../types/models';
 
 type IdType = string | number;
+
+export type AdminListParams = {
+  page?: number;
+  pageSize?: number;
+  ordering?: string;
+  kw?: string;
+  search?: string;
+  roleName?: string;
+};
+
+export interface CareerPayload {
+  name: string;
+  appIconName?: string | null;
+  isHot?: boolean;
+  iconFile?: File;
+}
+
+export interface CityPayload {
+  name: string;
+  code: string;
+}
+
+export interface DistrictPayload {
+  name: string;
+  code: string;
+  city: number;
+}
+
+export interface WardPayload {
+  name: string;
+  code: string;
+  district: number;
+}
+
+export interface AdminBannerPayload {
+  button_text?: string;
+  description?: string;
+  button_link?: string | null;
+  is_show_button?: boolean;
+  description_location?: number;
+  platform?: string;
+  type?: number;
+  is_active?: boolean;
+  image?: File;
+  image_mobile?: File;
+}
+
+export interface AdminFeedbackPayload {
+  content?: string;
+  rating?: number;
+  is_active?: boolean;
+  user?: number;
+}
+
+export interface JobPostNotificationPayload {
+  jobName: string;
+  position?: number | null;
+  experience?: number | null;
+  salary?: number | null;
+  frequency: number;
+  isActive?: boolean;
+  career?: number | null;
+  city?: number | null;
+}
+
+export interface QuestionPayload {
+  text: string;
+  difficulty?: string;
+  career?: number | null;
+}
+
+export interface QuestionGroupPayload {
+  name: string;
+  description?: string;
+  evaluation_rubric_input?: unknown;
+  question_ids?: number[];
+}
+
+export type JobSeekerProfilePayload = Partial<JobSeekerProfile>;
+export type ResumePayload = Partial<Resume>;
+export type JobPostActivityPayload = Partial<JobPostActivity>;
 
 const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
   const data = await promise;
   return presignInObject(data) as T;
-};
-
-const normalizeInterviewListParams = (params: Record<string, unknown> = {}): Record<string, unknown> => {
-  const normalized: Record<string, unknown> = { ...params };
-  if (normalized.kw && !normalized.search) {
-    normalized.search = normalized.kw;
-    delete normalized.kw;
-  }
-  Object.keys(normalized).forEach((key) => {
-    const value = normalized[key];
-    if (value === undefined || value === null || value === '') {
-      delete normalized[key];
-    }
-  });
-  return normalized;
 };
 
 const adminManagementService = {
@@ -33,19 +114,19 @@ const adminManagementService = {
     return undefined;
   },
 
-  getCareers: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Career>> => {
+  getCareers: (params: AdminListParams = {}): Promise<PaginatedResponse<Career>> => {
     const url = 'common/admin/careers/';
-    return withPresign(httpRequest.get<PaginatedResponse<Career>>(url, { params }));
+    return withPresign(httpRequest.get<PaginatedResponse<Career>>(url, { params: cleanParams(params) }));
   },
 
-  createCareer: (data: Record<string, unknown> | FormData): Promise<Career> => {
+  createCareer: (data: CareerPayload | FormData): Promise<Career> => {
     const url = 'common/admin/careers/';
     return withPresign(
       httpRequest.post<Career>(url, data, adminManagementService.buildMultipartConfig(data))
     );
   },
 
-  updateCareer: (id: IdType, data: Record<string, unknown> | FormData): Promise<Career> => {
+  updateCareer: (id: IdType, data: Partial<CareerPayload> | FormData): Promise<Career> => {
     const url = `common/admin/careers/${id}/`;
     return withPresign(
       httpRequest.patch<Career>(url, data, adminManagementService.buildMultipartConfig(data))
@@ -57,17 +138,17 @@ const adminManagementService = {
     return httpRequest.delete(url);
   },
 
-  getCities: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<City>> => {
+  getCities: (params: AdminListParams = {}): Promise<PaginatedResponse<City>> => {
     const url = 'common/admin/cities/';
-    return withPresign(httpRequest.get<PaginatedResponse<City>>(url, { params }));
+    return withPresign(httpRequest.get<PaginatedResponse<City>>(url, { params: cleanParams(params) }));
   },
 
-  createCity: (data: Record<string, unknown>): Promise<City> => {
+  createCity: (data: CityPayload): Promise<City> => {
     const url = 'common/admin/cities/';
     return withPresign(httpRequest.post<City>(url, data));
   },
 
-  updateCity: (id: IdType, data: Record<string, unknown>): Promise<City> => {
+  updateCity: (id: IdType, data: Partial<CityPayload>): Promise<City> => {
     const url = `common/admin/cities/${id}/`;
     return withPresign(httpRequest.patch<City>(url, data));
   },
@@ -77,17 +158,17 @@ const adminManagementService = {
     return httpRequest.delete(url);
   },
 
-  getDistricts: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<District>> => {
+  getDistricts: (params: AdminListParams & { city?: number } = {}): Promise<PaginatedResponse<District>> => {
     const url = 'common/admin/districts/';
-    return withPresign(httpRequest.get<PaginatedResponse<District>>(url, { params }));
+    return withPresign(httpRequest.get<PaginatedResponse<District>>(url, { params: cleanParams(params) }));
   },
 
-  createDistrict: (data: Record<string, unknown>): Promise<District> => {
+  createDistrict: (data: DistrictPayload): Promise<District> => {
     const url = 'common/admin/districts/';
     return withPresign(httpRequest.post<District>(url, data));
   },
 
-  updateDistrict: (id: IdType, data: Record<string, unknown>): Promise<District> => {
+  updateDistrict: (id: IdType, data: Partial<DistrictPayload>): Promise<District> => {
     const url = `common/admin/districts/${id}/`;
     return withPresign(httpRequest.patch<District>(url, data));
   },
@@ -97,17 +178,17 @@ const adminManagementService = {
     return httpRequest.delete(url);
   },
 
-  getWards: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Ward>> => {
+  getWards: (params: AdminListParams & { district?: number } = {}): Promise<PaginatedResponse<Ward>> => {
     const url = 'common/admin/wards/';
-    return httpRequest.get<PaginatedResponse<Ward>>(url, { params });
+    return httpRequest.get<PaginatedResponse<Ward>>(url, { params: cleanParams(params) });
   },
 
-  createWard: (data: Record<string, unknown>): Promise<Ward> => {
+  createWard: (data: WardPayload): Promise<Ward> => {
     const url = 'common/admin/wards/';
     return httpRequest.post<Ward>(url, data);
   },
 
-  updateWard: (id: string | number, data: Record<string, unknown>): Promise<Ward> => {
+  updateWard: (id: string | number, data: Partial<WardPayload>): Promise<Ward> => {
     const url = `common/admin/wards/${id}/`;
     return httpRequest.patch<Ward>(url, data);
   },
@@ -117,9 +198,9 @@ const adminManagementService = {
     return httpRequest.delete(url);
   },
 
-  getCompanies: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Company>> => {
+  getCompanies: (params: AdminListParams = {}): Promise<PaginatedResponse<Company>> => {
     const url = 'info/web/admin/companies/';
-    return withPresign(httpRequest.get<PaginatedResponse<Company>>(url, { params }));
+    return withPresign(httpRequest.get<PaginatedResponse<Company>>(url, { params: cleanParams(params) }));
   },
 
   getCompanyDetail: (id: IdType): Promise<Company> => {
@@ -127,12 +208,12 @@ const adminManagementService = {
     return withPresign(httpRequest.get<Company>(url));
   },
 
-  createCompany: (data: Record<string, unknown> | FormData): Promise<Company> => {
+  createCompany: <T extends object | FormData>(data: T): Promise<Company> => {
     const url = 'info/web/admin/companies/';
     return withPresign(httpRequest.post<Company>(url, data, adminManagementService.buildMultipartConfig(data)));
   },
 
-  updateCompany: (id: IdType, data: Record<string, unknown> | FormData): Promise<Company> => {
+  updateCompany: <T extends object | FormData>(id: IdType, data: T): Promise<Company> => {
     const url = `info/web/admin/companies/${id}/`;
     return withPresign(httpRequest.patch<Company>(url, data, adminManagementService.buildMultipartConfig(data)));
   },
@@ -142,17 +223,17 @@ const adminManagementService = {
     return httpRequest.delete(url);
   },
 
-  getBanners: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Banner>> => {
+  getBanners: (params: AdminListParams = {}): Promise<PaginatedResponse<Banner>> => {
     const url = 'content/web/admin/banners/';
-    return withPresign(httpRequest.get<PaginatedResponse<Banner>>(url, { params }));
+    return withPresign(httpRequest.get<PaginatedResponse<Banner>>(url, { params: cleanParams(params) }));
   },
 
-  createBanner: (data: Record<string, unknown> | FormData): Promise<Banner> => {
+  createBanner: (data: AdminBannerPayload | FormData): Promise<Banner> => {
     const url = 'content/web/admin/banners/';
     return withPresign(httpRequest.post<Banner>(url, data, adminManagementService.buildMultipartConfig(data)));
   },
 
-  updateBanner: (id: IdType, data: Record<string, unknown> | FormData): Promise<Banner> => {
+  updateBanner: (id: IdType, data: Partial<AdminBannerPayload> | FormData): Promise<Banner> => {
     const url = `content/web/admin/banners/${id}/`;
     return withPresign(httpRequest.patch<Banner>(url, data, adminManagementService.buildMultipartConfig(data)));
   },
@@ -162,12 +243,12 @@ const adminManagementService = {
     return httpRequest.delete(url);
   },
 
-  getFeedbacks: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Feedback>> => {
+  getFeedbacks: (params: AdminListParams = {}): Promise<PaginatedResponse<Feedback>> => {
     const url = 'content/web/admin/feedbacks/';
-    return withPresign(httpRequest.get<PaginatedResponse<Feedback>>(url, { params }));
+    return withPresign(httpRequest.get<PaginatedResponse<Feedback>>(url, { params: cleanParams(params) }));
   },
 
-  updateFeedback: (id: IdType, data: Record<string, unknown>): Promise<Feedback> => {
+  updateFeedback: (id: IdType, data: Partial<AdminFeedbackPayload>): Promise<Feedback> => {
     const url = `content/web/admin/feedbacks/${id}/`;
     return withPresign(httpRequest.patch<Feedback>(url, data));
   },
@@ -179,9 +260,9 @@ const adminManagementService = {
 
   // Job Seeker Profiles
 
-  getProfiles: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<JobSeekerProfile>> => {
+  getProfiles: (params: AdminListParams = {}): Promise<PaginatedResponse<JobSeekerProfile>> => {
     const url = 'info/web/admin/job-seeker-profiles/';
-    return withPresign(httpRequest.get<PaginatedResponse<JobSeekerProfile>>(url, { params }));
+    return withPresign(httpRequest.get<PaginatedResponse<JobSeekerProfile>>(url, { params: cleanParams(params) }));
   },
 
   getProfileDetail: (id: string | number): Promise<JobSeekerProfile> => {
@@ -189,12 +270,12 @@ const adminManagementService = {
     return withPresign(httpRequest.get<JobSeekerProfile>(url));
   },
 
-  createProfile: (data: Record<string, unknown>): Promise<JobSeekerProfile> => {
+  createProfile: (data: JobSeekerProfilePayload): Promise<JobSeekerProfile> => {
     const url = 'info/web/admin/job-seeker-profiles/';
     return withPresign(httpRequest.post<JobSeekerProfile>(url, data));
   },
 
-  updateProfile: (id: string | number, data: Record<string, unknown>): Promise<JobSeekerProfile> => {
+  updateProfile: (id: string | number, data: JobSeekerProfilePayload): Promise<JobSeekerProfile> => {
     const url = `info/web/admin/job-seeker-profiles/${id}/`;
     return withPresign(httpRequest.patch<JobSeekerProfile>(url, data));
   },
@@ -204,9 +285,9 @@ const adminManagementService = {
     return httpRequest.delete(url);
   },
 
-  getResumes: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Resume>> => {
+  getResumes: (params: AdminListParams = {}): Promise<PaginatedResponse<Resume>> => {
     const url = 'info/web/admin/resumes/';
-    return withPresign(httpRequest.get<PaginatedResponse<Resume>>(url, { params }));
+    return withPresign(httpRequest.get<PaginatedResponse<Resume>>(url, { params: cleanParams(params) }));
   },
 
   getResumeDetail: (id: string | number): Promise<Resume> => {
@@ -214,12 +295,12 @@ const adminManagementService = {
     return withPresign(httpRequest.get<Resume>(url));
   },
 
-  createResume: (data: Record<string, unknown>): Promise<Resume> => {
+  createResume: (data: ResumePayload): Promise<Resume> => {
     const url = 'info/web/admin/resumes/';
     return withPresign(httpRequest.post<Resume>(url, data));
   },
 
-  updateResume: (id: string | number, data: Record<string, unknown>): Promise<Resume> => {
+  updateResume: (id: string | number, data: ResumePayload): Promise<Resume> => {
     const url = `info/web/admin/resumes/${id}/`;
     return withPresign(httpRequest.patch<Resume>(url, data));
   },
@@ -231,17 +312,17 @@ const adminManagementService = {
 
   // Job Activity
 
-  getJobActivities: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<JobPostActivity>> => {
+  getJobActivities: (params: AdminListParams = {}): Promise<PaginatedResponse<JobPostActivity>> => {
     const url = 'job/web/admin/job-posts-activity/';
-    return httpRequest.get<PaginatedResponse<JobPostActivity>>(url, { params });
+    return httpRequest.get<PaginatedResponse<JobPostActivity>>(url, { params: cleanParams(params) });
   },
 
-  createJobActivity: (data: Record<string, unknown>): Promise<JobPostActivity> => {
+  createJobActivity: (data: JobPostActivityPayload): Promise<JobPostActivity> => {
     const url = 'job/web/admin/job-posts-activity/';
     return httpRequest.post<JobPostActivity>(url, data);
   },
 
-  updateJobActivity: (id: IdType, data: Record<string, unknown>): Promise<JobPostActivity> => {
+  updateJobActivity: (id: IdType, data: JobPostActivityPayload): Promise<JobPostActivity> => {
     const url = `job/web/admin/job-posts-activity/${id}/`;
     return httpRequest.patch<JobPostActivity>(url, data);
   },
@@ -251,19 +332,19 @@ const adminManagementService = {
     return httpRequest.delete(url);
   },
 
-  getJobNotifications: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Notification>> => {
+  getJobNotifications: (params: AdminListParams = {}): Promise<PaginatedResponse<JobPostNotification>> => {
     const url = 'job/web/admin/job-post-notifications/';
-    return httpRequest.get<PaginatedResponse<Notification>>(url, { params });
+    return httpRequest.get<PaginatedResponse<JobPostNotification>>(url, { params: cleanParams(params) });
   },
 
-  createJobNotification: (data: Record<string, unknown>): Promise<Notification> => {
+  createJobNotification: (data: JobPostNotificationPayload): Promise<JobPostNotification> => {
     const url = 'job/web/admin/job-post-notifications/';
-    return httpRequest.post<Notification>(url, data);
+    return httpRequest.post<JobPostNotification>(url, data);
   },
 
-  updateJobNotification: (id: IdType, data: Record<string, unknown>): Promise<Notification> => {
+  updateJobNotification: (id: IdType, data: Partial<JobPostNotificationPayload>): Promise<JobPostNotification> => {
     const url = `job/web/admin/job-post-notifications/${id}/`;
-    return httpRequest.patch<Notification>(url, data);
+    return httpRequest.patch<JobPostNotification>(url, data);
   },
 
   deleteJobNotification: (id: IdType): Promise<void> => {
@@ -271,17 +352,17 @@ const adminManagementService = {
     return httpRequest.delete(url);
   },
 
-  getQuestionGroups: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<QuestionGroup>> => {
+  getQuestionGroups: (params: AdminListParams = {}): Promise<PaginatedResponse<QuestionGroup>> => {
     const url = 'interview/web/question-groups/';
-    return httpRequest.get<PaginatedResponse<QuestionGroup>>(url, { params: normalizeInterviewListParams(params) });
+    return httpRequest.get<PaginatedResponse<QuestionGroup>>(url, { params: cleanParams(params) });
   },
 
-  createQuestionGroup: (data: Record<string, unknown>): Promise<QuestionGroup> => {
+  createQuestionGroup: (data: QuestionGroupPayload): Promise<QuestionGroup> => {
     const url = 'interview/web/question-groups/';
     return httpRequest.post<QuestionGroup>(url, data);
   },
 
-  updateQuestionGroup: (id: string | number, data: Record<string, unknown>): Promise<QuestionGroup> => {
+  updateQuestionGroup: (id: string | number, data: Partial<QuestionGroupPayload>): Promise<QuestionGroup> => {
     const url = `interview/web/question-groups/${id}/`;
     return httpRequest.patch<QuestionGroup>(url, data);
   },
@@ -292,17 +373,17 @@ const adminManagementService = {
   },
 
   // Questions (Admin)
-  getQuestions: (params: Record<string, unknown> = {}): Promise<PaginatedResponse<Question>> => {
+  getQuestions: (params: AdminListParams = {}): Promise<PaginatedResponse<Question>> => {
     const url = 'interview/web/questions/';
-    return httpRequest.get<PaginatedResponse<Question>>(url, { params: normalizeInterviewListParams(params) });
+    return httpRequest.get<PaginatedResponse<Question>>(url, { params: cleanParams(params) });
   },
 
-  createQuestion: (data: Record<string, unknown>): Promise<Question> => {
+  createQuestion: (data: QuestionPayload): Promise<Question> => {
     const url = 'interview/web/questions/';
     return httpRequest.post<Question>(url, data);
   },
 
-  updateQuestion: (id: string | number, data: Record<string, unknown>): Promise<Question> => {
+  updateQuestion: (id: string | number, data: Partial<QuestionPayload>): Promise<Question> => {
     const url = `interview/web/questions/${id}/`;
     return httpRequest.patch<Question>(url, data);
   },
@@ -314,3 +395,4 @@ const adminManagementService = {
 };
 
 export default adminManagementService;
+

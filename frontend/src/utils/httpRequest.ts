@@ -5,7 +5,8 @@ import { AUTH_CONFIG } from '../configs/constants';
 import { isPublicEndpoint, isAuthTokenEndpoint } from '../configs/apiEndpoints';
 import type { RetryAxiosRequestConfig } from '../types/api';
 import type { TokenPair } from '../types/auth';
-import type { AxiosInstance, AxiosRequestConfig } from 'axios';
+import type { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import type { ParamsRecord } from './params';
 
 type RefreshTokenPayload = Partial<TokenPair> & {
   access_token?: string;
@@ -62,13 +63,14 @@ const dispatchAuthExpired = () => {
   }
 };
 
-let refreshPromise: Promise<unknown> | null = null;
+type RefreshTokenResponse = AxiosResponse<{ data?: unknown }>;
+let refreshPromise: Promise<RefreshTokenResponse> | null = null;
 
 httpRequest.interceptors.request.use(
   (config) => {
     const retryConfig = config as RetryAxiosRequestConfig;
     if (retryConfig.params && !retryConfig.keepEmptyParams) {
-      retryConfig.params = cleanParams(retryConfig.params as Record<string, unknown>);
+      retryConfig.params = cleanParams(retryConfig.params as ParamsRecord);
     }
 
     // NOTE: Do NOT auto-convert to snake_case here.
@@ -201,3 +203,5 @@ httpRequest.interceptors.response.use(
 );
 
 export default httpRequest;
+
+

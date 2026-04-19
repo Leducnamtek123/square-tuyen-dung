@@ -92,7 +92,7 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
 
           borderRadius: 3,
 
-          boxShadow: (theme: Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.card,
+          boxShadow: (theme: Theme) => theme.customShadows?.card,
 
           p: 3,
 
@@ -219,7 +219,7 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
 
                         opacity: 0.9,
 
-                        boxShadow: (theme: Theme & { customShadows?: Record<string, unknown> }) => theme.customShadows?.medium,
+                        boxShadow: (theme: Theme) => theme.customShadows?.medium,
 
                       },
 
@@ -272,3 +272,4 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
 };
 
 export default AccountCard;
+

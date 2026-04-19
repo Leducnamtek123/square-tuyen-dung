@@ -1,14 +1,14 @@
-import type { AxiosError } from 'axios';
+﻿import type { AxiosError } from 'axios';
 import type { ApiError } from '../types/api';
 import toastMessages from './toastMessages';
 import i18n from '../i18n';
 
-type SetError = ((errors: Record<string, unknown>) => void) | null;
+type SetError = ((errors: ApiError) => void) | null;
 
 const normalizeErrorsToMessage = (errors: unknown): string | null => {
   if (!errors || typeof errors !== 'object') return null;
 
-  const entries = Object.entries(errors as Record<string, unknown>);
+  const entries = Object.entries(errors as ApiError);
   if (entries.length === 0) return null;
 
   const chunks: string[] = [];
@@ -77,7 +77,7 @@ const errorHandling = (
         } else {
           toastMessages.error(i18n.t('common:errors.generic', 'An error occurred, please try again.'));
         }
-        setError && setError((errors || {}) as Record<string, unknown>);
+        setError && setError((errors || {}) as ApiError);
       }
       break;
     }
@@ -106,3 +106,4 @@ const errorHandling = (
 };
 
 export default errorHandling;
+

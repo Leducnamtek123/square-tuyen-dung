@@ -1,16 +1,17 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
+import type { AdminFeedbackPayload, AdminListParams } from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
 import { Feedback } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
 export type UseFeedbacksResult = UseQueryResult<PaginatedResponse<Feedback>> & {
-    updateFeedback: (args: { id: string | number; data: Partial<Feedback> | Record<string, unknown> }) => Promise<Feedback>;
+    updateFeedback: (args: { id: string | number; data: Partial<AdminFeedbackPayload> }) => Promise<Feedback>;
     deleteFeedback: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
 
-export const useFeedbacks = (params?: Record<string, unknown>): UseFeedbacksResult => {
+export const useFeedbacks = (params?: AdminListParams): UseFeedbacksResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery<PaginatedResponse<Feedback>>({
@@ -22,7 +23,7 @@ export const useFeedbacks = (params?: Record<string, unknown>): UseFeedbacksResu
         placeholderData: keepPreviousData,
     });
 
-    const updateMutation = useMutation<Feedback, Error, { id: string | number; data: Partial<Feedback> | Record<string, unknown> }>({
+    const updateMutation = useMutation<Feedback, Error, { id: string | number; data: Partial<AdminFeedbackPayload> }>({
         mutationFn: ({ id, data }) => adminManagementService.updateFeedback(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-feedbacks'] });

@@ -37,6 +37,7 @@ import type { CompanyRole, CompanyMember } from '../../../types/models';
 import companyTeamService from "../../../services/companyTeamService";
 import toastMessages from "../../../utils/toastMessages";
 import DataTable from "../../../components/Common/DataTable";
+import type { CompanyMemberPayload, CompanyMemberUpdatePayload, CompanyRolePayload } from "../../../services/companyTeamService";
 
 const COMPANY_PERMISSION_OPTIONS = [
   { key: "manage_company_profile", label: "Company profile" },
@@ -105,7 +106,7 @@ const EmployeesPage = () => {
   const members = useMemo(() => memberPayload?.results || [], [memberPayload]);
 
   const createRoleMutation = useMutation({
-    mutationFn: (data: Omit<CompanyRole, "id" | "company"> & { is_active?: boolean }) => companyTeamService.createRole(data),
+    mutationFn: (data: CompanyRolePayload) => companyTeamService.createRole(data),
     onSuccess: () => {
       toastMessages.success(t("employees.toast.createRoleSuccess"));
       queryClient.invalidateQueries({ queryKey: ["company-roles"] });
@@ -131,7 +132,7 @@ const EmployeesPage = () => {
   });
 
   const createMemberMutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) => companyTeamService.createMember(data),
+    mutationFn: (data: CompanyMemberPayload) => companyTeamService.createMember(data),
     onSuccess: () => {
       toastMessages.success(t("employees.toast.createMemberSuccess"));
       queryClient.invalidateQueries({ queryKey: ["company-members"] });
@@ -145,7 +146,7 @@ const EmployeesPage = () => {
   });
 
   const updateMemberMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Record<string, unknown> }) => companyTeamService.updateMember(id, data),
+    mutationFn: ({ id, data }: { id: number; data: CompanyMemberUpdatePayload }) => companyTeamService.updateMember(id, data),
     onSuccess: () => {
       toastMessages.success(t("employees.toast.updateMemberSuccess"));
       queryClient.invalidateQueries({ queryKey: ["company-members"] });

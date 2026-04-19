@@ -56,8 +56,6 @@ const TextFieldAutoCompleteCustom = <T extends FieldValues = FieldValues>({
 
         name={name as Path<T>}
 
-        defaultValue={"" as unknown as undefined}
-
         render={({ field, fieldState }) => (
 
           <>

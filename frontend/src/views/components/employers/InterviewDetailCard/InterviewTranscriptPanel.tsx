@@ -9,6 +9,7 @@ import { InterviewSession } from '@/types/models';
 
 import { i18n, TFunction } from 'i18next';
 import type { SSETranscript } from '../../../employerPages/InterviewPages/hooks/useInterviewSSE';
+import type { InterviewTranscript } from '@/types/models';
 
 interface InterviewTranscriptPanelProps {
   session: InterviewSession;
@@ -18,28 +19,36 @@ interface InterviewTranscriptPanelProps {
   isLive?: boolean;
 }
 
+type TranscriptItem = {
+  speaker: 'interviewer' | 'candidate';
+  text: string;
+  timestamp: string;
+  id: number | string;
+  isLive: boolean;
+};
+
 const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n, liveTranscripts = [], isLive = false }) => {
     const theme = useTheme();
     const transcriptEndRef = useRef<HTMLDivElement>(null);
 
     // Merge existing + live transcripts, deduplicate by id
     const mergedTranscripts = React.useMemo(() => {
-        const existingTranscripts = session.transcripts || [];
-        const existingIds = new Set(existingTranscripts.map((t: Record<string, any>) => t.id));
+        const existingTranscripts = Array.isArray(session.transcripts) ? session.transcripts : [];
+        const existingIds = new Set(existingTranscripts.map((transcript: InterviewTranscript) => transcript.id));
         const liveOnly = liveTranscripts.filter((lt) => !existingIds.has(lt.id));
-        const mapped = existingTranscripts.map((t: Record<string, any>) => ({
-            speaker: (t.speaker_role || t.speakerRole) === 'ai_agent' ? 'interviewer' : 'candidate',
-            text: t.content || t.text,
-            timestamp: (t.create_at || t.createAt) ? new Date(t.create_at || t.createAt).toLocaleTimeString() : '',
-            id: t.id,
-            _isLive: false,
+        const mapped: TranscriptItem[] = existingTranscripts.map((transcript: InterviewTranscript) => ({
+            speaker: transcript.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
+            text: transcript.content || transcript.text || '',
+            timestamp: transcript.createAt ? new Date(transcript.createAt).toLocaleTimeString() : '',
+            id: transcript.id,
+            isLive: false,
         }));
-        const liveMapped = liveOnly.map((lt) => ({
+        const liveMapped: TranscriptItem[] = liveOnly.map((lt) => ({
             speaker: lt.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
             text: lt.content,
             timestamp: lt.createAt ? new Date(lt.createAt).toLocaleTimeString() : '',
             id: lt.id,
-            _isLive: true,
+            isLive: true,
         }));
         return [...mapped, ...liveMapped];
     }, [liveTranscripts, session.transcripts]);
@@ -139,9 +148,8 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                 {mergedTranscripts.length > 0 ? (
                     <Stack spacing={6}>
                         {mergedTranscripts.map((item, idx) => {
-                            const record = item as Record<string, unknown>;
-                            const isInterviewer = record.speaker === 'interviewer';
-                            const isNewLive = Boolean(record._isLive);
+                            const isInterviewer = item.speaker === 'interviewer';
+                            const isNewLive = item.isLive;
                             return (
                                 <Stack
                                     key={idx}
@@ -190,7 +198,7 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                                             <Stack direction="row" alignItems="center" spacing={0.5} sx={{ color: 'text.disabled' }}>
                                                 <AccessTimeIcon sx={{ fontSize: 14 }} />
                                                 <Typography variant="caption" sx={{ fontWeight: 800 }}>
-                                                    {(record.timestamp as string) || ''}
+                                                    {item.timestamp}
                                                 </Typography>
                                             </Stack>
                                         </Stack>
@@ -206,7 +214,7 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                                             }}
                                         >
                                             <Typography variant="body2" sx={{ lineHeight: 2, color: 'text.primary', fontWeight: 700, fontSize: '0.95rem' }}>
-                                                {record.text as string}
+                                                {item.text}
                                             </Typography>
                                         </Paper>
                                     </Box>
@@ -232,3 +240,5 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
 };
 
 export default InterviewTranscriptPanel;
+
+

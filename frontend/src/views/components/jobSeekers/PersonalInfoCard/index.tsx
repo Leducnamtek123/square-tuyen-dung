@@ -16,10 +16,20 @@ import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { JobSeekerProfile, Location } from '../../../../types/models';
+import type { JobSeekerProfileUpdatePayload } from '../../../../services/jobSeekerProfileService';
 
 type EnhancedJobSeekerProfile = JobSeekerProfile & {
   user?: { fullName: string };
   location?: Location & { districtDict?: { name: string } };
+  idCardNumber?: string;
+  idCardIssueDate?: Date | string | null;
+  idCardIssuePlace?: string;
+  taxCode?: string;
+  socialInsuranceNo?: string;
+  permanentAddress?: string;
+  contactAddress?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
 };
 
 interface PersonalInfoCardProps {
@@ -162,7 +172,7 @@ const updateProfile = async (data: PersonalProfileFormValues) => {
 
   try {
 
-    await jobSeekerProfileService.updateProfile(data as unknown as Record<string, unknown>);
+    await jobSeekerProfileService.updateProfile(data as JobSeekerProfileUpdatePayload);
 
     dispatch(getUserInfo());
 
@@ -400,7 +410,35 @@ return (
 
         handleUpdateProfile={handleUpdateProfile}
 
-        editData={profile as unknown as Partial<PersonalProfileFormValues> | null}
+        editData={profile ? {
+          user: {
+            fullName: profile.user?.fullName || '',
+          },
+          phone: profile.phone || '',
+          birthday: profile.birthday || null,
+          gender: profile.gender || '',
+          maritalStatus: profile.maritalStatus || '',
+          location: {
+            city: typeof profile.location?.city === 'object'
+              ? profile.location.city.id
+              : (profile.location?.city || ''),
+            district: typeof profile.location?.district === 'object'
+              ? profile.location.district.id
+              : (profile.location?.district || ''),
+            address: profile.location?.address || '',
+          },
+          idCardNumber: profile.idCardNumber || '',
+          idCardIssueDate: profile.idCardIssueDate
+            ? (typeof profile.idCardIssueDate === 'string' ? new Date(profile.idCardIssueDate) : profile.idCardIssueDate)
+            : null,
+          idCardIssuePlace: profile.idCardIssuePlace || '',
+          taxCode: profile.taxCode || '',
+          socialInsuranceNo: profile.socialInsuranceNo || '',
+          permanentAddress: profile.permanentAddress || '',
+          contactAddress: profile.contactAddress || '',
+          emergencyContactName: profile.emergencyContactName || '',
+          emergencyContactPhone: profile.emergencyContactPhone || '',
+        } : null}
 
       />
 

@@ -7,12 +7,9 @@ import { useTranslation } from "react-i18next";
 import FeedbackCard from '@/components/Features/FeedbackCard';
 import contentService from '@/services/contentService';
 import NoDataCard from '@/components/Common/NoDataCard';
+import type { Feedback } from '@/types/models';
 
-interface FeedbackCarouselProps {
-  [key: string]: unknown;
-}
-
-const styles: Record<string, unknown> = {
+const styles = {
   ".swiper-pagination": {
     bottom: "-5px !important",
   },
@@ -32,17 +29,14 @@ const styles: Record<string, unknown> = {
   },
 };
 
-const FeedbackCarousel = (_props: FeedbackCarouselProps) => {
+const FeedbackCarousel = () => {
   const { t } = useTranslation('public');
   const [parentWidth, setParentWidth] = React.useState(0);
   const [col, setCol] = React.useState(5);
 
   const { data: feedbacks = [], isLoading } = useQuery({
     queryKey: ['feedbacks'],
-    queryFn: async () => {
-      const resData = await contentService.getFeedbacks() as { id: string | number; userDict?: { avatarUrl?: string; fullName?: string }; content?: string; [key: string]: unknown }[];
-      return resData || [];
-    },
+    queryFn: () => contentService.getFeedbacks(),
     staleTime: 10 * 60_000, // feedbacks change rarely, cache 10 min
   });
 
@@ -105,7 +99,7 @@ const FeedbackCarousel = (_props: FeedbackCarouselProps) => {
             }}
             modules={[Pagination, Autoplay]}
           >
-            {feedbacks.map((value: { id: string | number; userDict?: { avatarUrl?: string; fullName?: string }; content?: string; [key: string]: unknown }) => (
+            {feedbacks.map((value: Feedback) => (
               <SwiperSlide key={value.id}>
                 <FeedbackCard
                   avatarUrl={value?.userDict?.avatarUrl}
@@ -122,3 +116,5 @@ const FeedbackCarousel = (_props: FeedbackCarouselProps) => {
 };
 
 export default FeedbackCarousel;
+
+

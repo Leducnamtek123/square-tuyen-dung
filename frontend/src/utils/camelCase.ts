@@ -6,6 +6,10 @@
 const snakeToCamel = (str: string): string =>
   str.replace(/_([a-z0-9])/gi, (_, char: string) => char.toUpperCase());
 
+type JsonPrimitive = string | number | boolean | null;
+type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
+type JsonObject = { [key: string]: JsonValue };
+
 /**
  * Recursively convert all keys in an object/array from snake_case to camelCase.
  * Handles nested objects, arrays, and null/undefined gracefully.
@@ -18,8 +22,8 @@ export function camelizeKeys<T = unknown>(data: unknown): T {
   }
 
   if (typeof data === 'object' && !(data instanceof Date) && !(data instanceof File) && !(data instanceof Blob)) {
-    const result: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+    const result: JsonObject = {};
+    for (const [key, value] of Object.entries(data as JsonObject)) {
       result[snakeToCamel(key)] = camelizeKeys(value);
     }
     return result as T;
@@ -46,8 +50,8 @@ export function snakizeKeys<T = unknown>(data: unknown): T {
   }
 
   if (typeof data === 'object' && !(data instanceof Date) && !(data instanceof File) && !(data instanceof Blob) && !(data instanceof FormData)) {
-    const result: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(data as Record<string, unknown>)) {
+    const result: JsonObject = {};
+    for (const [key, value] of Object.entries(data as JsonObject)) {
       result[camelToSnake(key)] = snakizeKeys(value);
     }
     return result as T;
@@ -55,3 +59,5 @@ export function snakizeKeys<T = unknown>(data: unknown): T {
 
   return data as T;
 }
+
+

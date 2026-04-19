@@ -11,7 +11,7 @@ import MenuItem from './MenuItem';
 
 interface EmployerMenuProps {
   t: (key: string) => string;
-  location: Record<string, unknown>;
+  location: { pathname?: string };
   expandedItems: Record<string, boolean>;
   handleExpand: (section: string) => void;
 }
@@ -73,3 +73,5 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand }: EmployerMenu
 };
 
 export default EmployerMenu;
+
+

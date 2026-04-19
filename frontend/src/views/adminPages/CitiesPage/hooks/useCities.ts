@@ -1,17 +1,18 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
+import type { AdminListParams, CityPayload } from '../../../../services/adminManagementService';
 import toastMessages from '../../../../utils/toastMessages';
 import { City } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
 export type UseCitiesResult = UseQueryResult<PaginatedResponse<City>> & {
-    createCity: (data: Partial<City>) => Promise<City>;
-    updateCity: (args: { id: string | number; data: Partial<City> }) => Promise<City>;
+    createCity: (data: CityPayload) => Promise<City>;
+    updateCity: (args: { id: string | number; data: Partial<CityPayload> }) => Promise<City>;
     deleteCity: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
 
-export const useCities = (params?: Record<string, unknown>): UseCitiesResult => {
+export const useCities = (params?: AdminListParams): UseCitiesResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery<PaginatedResponse<City>>({
@@ -23,8 +24,8 @@ export const useCities = (params?: Record<string, unknown>): UseCitiesResult => 
         placeholderData: keepPreviousData,
     });
 
-    const createMutation = useMutation<City, Error, Partial<City>>({
-        mutationFn: (data: Partial<City>) => adminManagementService.createCity(data as Record<string, unknown>),
+    const createMutation = useMutation<City, Error, CityPayload>({
+        mutationFn: (data: CityPayload) => adminManagementService.createCity(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-cities'] });
             toastMessages.success('City added successfully');
@@ -35,8 +36,8 @@ export const useCities = (params?: Record<string, unknown>): UseCitiesResult => 
         }
     });
 
-    const updateMutation = useMutation<City, Error, { id: string | number; data: Partial<City> }>({
-        mutationFn: ({ id, data }: { id: string | number; data: Partial<City> }) => adminManagementService.updateCity(id, data as Record<string, unknown>),
+    const updateMutation = useMutation<City, Error, { id: string | number; data: Partial<CityPayload> }>({
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<CityPayload> }) => adminManagementService.updateCity(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-cities'] });
             toastMessages.success('City updated successfully');

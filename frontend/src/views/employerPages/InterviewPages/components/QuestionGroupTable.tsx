@@ -6,10 +6,9 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { ColumnDef } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
-interface Question {
+type Question = {
     id: string | number;
-    [key: string]: unknown;
-}
+};
 
 interface QuestionGroup {
     id: string | number;
@@ -89,3 +88,4 @@ const QuestionGroupTable = ({ data, loading, onEdit, onDelete }: QuestionGroupTa
 };
 
 export default QuestionGroupTable;
+

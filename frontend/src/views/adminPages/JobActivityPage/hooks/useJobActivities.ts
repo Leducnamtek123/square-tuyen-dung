@@ -3,14 +3,15 @@ import adminManagementService from '../../../../services/adminManagementService'
 import toastMessages from '../../../../utils/toastMessages';
 import { JobPostActivity } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
+import type { AdminListParams, JobPostActivityPayload } from '../../../../services/adminManagementService';
 
 export type UseJobActivitiesResult = UseQueryResult<PaginatedResponse<JobPostActivity>> & {
-    updateJobActivity: (args: { id: string | number; data: Partial<JobPostActivity> | Record<string, unknown> }) => Promise<unknown>;
-    deleteJobActivity: (id: string | number) => Promise<unknown>;
+    updateJobActivity: (args: { id: string | number; data: JobPostActivityPayload }) => Promise<JobPostActivity>;
+    deleteJobActivity: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
 
-export const useJobActivities = (params: Record<string, unknown>): UseJobActivitiesResult => {
+export const useJobActivities = (params: AdminListParams): UseJobActivitiesResult => {
     const queryClient = useQueryClient();
 
     const query = useQuery({
@@ -23,7 +24,7 @@ export const useJobActivities = (params: Record<string, unknown>): UseJobActivit
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPostActivity> | Record<string, unknown> }) => adminManagementService.updateJobActivity(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: JobPostActivityPayload }) => adminManagementService.updateJobActivity(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-job-activities'] });
             toastMessages.success('Activity updated successfully');
@@ -51,5 +52,5 @@ export const useJobActivities = (params: Record<string, unknown>): UseJobActivit
         updateJobActivity: updateMutation.mutateAsync,
         deleteJobActivity: deleteMutation.mutateAsync,
         isMutating: updateMutation.isPending || deleteMutation.isPending
-    } as UseJobActivitiesResult;
+    };
 };

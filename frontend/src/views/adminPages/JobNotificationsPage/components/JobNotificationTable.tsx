@@ -7,7 +7,7 @@ import dayjs from '../../../../configs/dayjs-config';
 import { ColumnDef, SortingState, OnChangeFn } from '@tanstack/react-table';
 import DataTable from '../../../../components/Common/DataTable';
 
-interface JobNotificationRow {
+type JobNotificationRow = {
   title?: string;
   content?: string;
   createAt?: string;
@@ -15,8 +15,7 @@ interface JobNotificationRow {
     fullName?: string;
     email?: string;
   };
-  [key: string]: unknown;
-}
+};
 
 interface JobNotificationTableProps {
     data: JobNotificationRow[];
@@ -112,3 +111,4 @@ const JobNotificationTable = ({
 };
 
 export default JobNotificationTable;
+

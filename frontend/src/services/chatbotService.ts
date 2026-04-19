@@ -1,14 +1,23 @@
 import httpRequest from "../utils/httpRequest";
 
-export interface ChatResponse {
-  reply: string;
-  [key: string]: unknown;
+export interface ChatMessagePayload {
+  role: 'assistant' | 'user' | 'system';
+  content: string;
 }
 
+export interface ChatPayload {
+  messages: ChatMessagePayload[];
+}
+
+export type ChatResponse = {
+  reply: string;
+};
+
 const chatbotService = {
-  async chat(payload: Record<string, unknown>): Promise<ChatResponse> {
+  async chat(payload: ChatPayload): Promise<ChatResponse> {
     return httpRequest.post('ai/chat/', payload);
   },
 };
 
 export default chatbotService;
+

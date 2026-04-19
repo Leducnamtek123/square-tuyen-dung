@@ -14,14 +14,16 @@ import errorHandling from '../../../../utils/errorHandling';
 import type { UserSettingsData } from '../../../../types/auth';
 
 // ─── Query Helpers ──────────────────────────────────────────
-import type { UseQueryResult, UseMutationResult } from '@tanstack/react-query';
+import type { UseQueryResult } from '@tanstack/react-query';
 import type { JobSeekerTotalViewStats } from '../../../../services/statisticService';
 import type { GetJobPostsParams } from '../../../../services/jobService';
-import type { ApiError } from '@/types/api';
 import type { AxiosError } from 'axios';
 import type { JobSeekerActivityStats } from '../../../../services/statisticService';
 import type { JobPostNotification } from '../../../../services/jobPostNotificationService';
 import type { ResumeViewed } from '../../../../services/resumeViewedService';
+import type { CompanyFollowedListParams } from '../../../../services/companyFollowed';
+import type { JobSeekerProfileResumeParams } from '../../../../services/jobSeekerProfileService';
+import type { JobPostNotificationListParams, JobPostNotificationPayload } from '../../../../services/jobPostNotificationService';
 import { useAppSelector } from '@/redux/hooks';
 import tokenService from '@/services/tokenService';
 
@@ -70,11 +72,11 @@ export const useToggleSaveJob = () => {
 };
 
 // ─── Companies Followed ─────────────────────────────────────
-export const useCompaniesFollowed = (params: Record<string, unknown> = {}): UseCompaniesFollowedResult => {
+export const useCompaniesFollowed = (params: CompanyFollowedListParams = {}): UseCompaniesFollowedResult => {
     return useQuery({
         queryKey: ['companiesFollowed', params],
         queryFn: async () => {
-            const response = await companyFollowed.getCompaniesFollowed(params) as PaginatedResponse<{ id: number, company: Company }>;
+            const response = await companyFollowed.getCompaniesFollowed(params);
             return response;
         },
         placeholderData: keepPreviousData,
@@ -93,7 +95,7 @@ export const useToggleFollowCompany = () => {
 };
 
 // ─── Companies Viewed (Resume) ──────────────────────────────
-export const useResumeViewed = (params: Record<string, unknown> = {}): UseResumeViewedResult => {
+export const useResumeViewed = (params: { page?: number; pageSize?: number; ordering?: string } = {}): UseResumeViewedResult => {
     return useQuery({
         queryKey: ['resumeViewed', params],
         queryFn: async () => {
@@ -126,13 +128,13 @@ export const useJobSeekerActivityStatistics = (): UseJobSeekerActivityStatsResul
 };
 
 // ─── Job Application (Resumes) ──────────────────────────────
-export const useResumes = (jobSeekerProfileId: string | undefined, params: Record<string, unknown> = {}): UseResumesResult => {
+export const useResumes = (jobSeekerProfileId: string | undefined, params: JobSeekerProfileResumeParams = {}): UseResumesResult => {
     const { isAuthenticated } = useAppSelector((state) => state.user);
     const hasToken = !!tokenService.getAccessTokenFromCookie();
     return useQuery<Resume[], Error>({
         queryKey: ['resumes', jobSeekerProfileId, params],
         queryFn: async () => {
-            const response = await jobSeekerProfileService.getResumes(jobSeekerProfileId!, params) as PaginatedResponse<Resume>;
+            const response = await jobSeekerProfileService.getResumes(jobSeekerProfileId!, params);
             return response?.results || [];
         },
         enabled: !!isAuthenticated && !!jobSeekerProfileId && hasToken,
@@ -143,7 +145,7 @@ export const useResumes = (jobSeekerProfileId: string | undefined, params: Recor
 };
 
 // ─── Job Post Notifications ─────────────────────────────────
-export const useJobPostNotifications = (params: Record<string, unknown> = {}): UseJobPostNotificationsResult => {
+export const useJobPostNotifications = (params: JobPostNotificationListParams = {}): UseJobPostNotificationsResult => {
     return useQuery({
         queryKey: ['jobPostNotifications', params],
         queryFn: async () => {
@@ -159,13 +161,13 @@ export const useJobPostNotificationMutations = () => {
     const invalidate = () => queryClient.invalidateQueries({ queryKey: ['jobPostNotifications'] });
 
     const addMutation = useMutation({
-        mutationFn: (data: Parameters<typeof jobPostNotificationService.addJobPostNotification>[0]) => jobPostNotificationService.addJobPostNotification(data),
+        mutationFn: (data: JobPostNotificationPayload) => jobPostNotificationService.addJobPostNotification(data),
         onSuccess: () => invalidate(),
 
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string | number; data: Parameters<typeof jobPostNotificationService.updateJobPostNotificationById>[1] }) => jobPostNotificationService.updateJobPostNotificationById(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPostNotificationPayload> }) => jobPostNotificationService.updateJobPostNotificationById(id, data),
         onSuccess: () => invalidate(),
 
     });

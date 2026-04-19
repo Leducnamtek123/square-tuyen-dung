@@ -7,26 +7,29 @@ import useDebounce from '../../../../hooks/useDebounce';
 import errorHandling from '../../../../utils/errorHandling';
 import commonService from '../../../../services/commonService';
 import goongService from '../../../../services/goongService';
+import type { PlacePrediction } from '../../../../services/goongService';
 import { JobPostFormValues, getJobPostSchema } from './JobPostSchema';
 import JobPostFormFields from './JobPostFormFields';
 import { useConfig } from '@/hooks/useConfig';
 import { useQuestionGroups } from '../hooks/useEmployerQueries';
-import { PaginatedResponse } from '@/types/api';
-import type { AxiosError } from 'axios';
-import type { ApiError } from '../../../../types/api';
+import type { SelectOption } from '@/types/models';
 
 interface JobPostFormProps {
   handleAddOrUpdate: (data: JobPostFormValues) => void;
-  editData: Record<string, unknown> | null;
+  editData: Partial<JobPostFormValues> | null;
   serverErrors: Record<string, string[]> | null;
+}
+
+interface PlaceOption extends SelectOption {
+  place_id: string;
 }
 
 const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormProps) => {
   const { t } = useTranslation('employer');
   const { allConfig } = useConfig();
   
-  const [districtOptions, setDistrictOptions] = useState<Record<string, unknown>[]>([]);
-  const [locationOptions, setLocationOptions] = useState<Record<string, unknown>[]>([]);
+  const [districtOptions, setDistrictOptions] = useState<SelectOption[]>([]);
+  const [locationOptions, setLocationOptions] = useState<PlaceOption[]>([]);
 
   const { data: groupData } = useQuestionGroups({
     page: 1,
@@ -35,7 +38,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
 
   const questionGroupOptions = useMemo(() => {
     if (!groupData?.results) return [];
-    return groupData.results.map((g: any) => ({
+    return groupData.results.map((g) => ({
       id: g.id,
       name: g.name,
     }));
@@ -79,7 +82,10 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
     const loadDistricts = async (id: number | string) => {
       try {
         const resData = await commonService.getDistrictsByCityId(id);
-        const results = Array.isArray(resData) ? resData : (((resData as { results?: unknown[] })?.results || []) as Record<string, unknown>[]);
+        const results = (Array.isArray(resData?.data) ? resData.data : []).map((district) => ({
+          id: district.id,
+          name: district.name,
+        }));
         
         // Only clear district if the cityId has actually changed (user interaction)
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
@@ -107,9 +113,14 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
       }
       try {
         const resData = await goongService.getPlaces(input);
-        if ((resData as Record<string, unknown>)?.predictions) {
-            setLocationOptions((resData as Record<string, unknown>).predictions as Record<string, unknown>[]);
-        }
+        const predictions = Array.isArray(resData?.predictions) ? resData.predictions : [];
+        setLocationOptions(
+          predictions.map((prediction: PlacePrediction) => ({
+            id: prediction.place_id,
+            name: prediction.description,
+            place_id: prediction.place_id,
+          }))
+        );
       } catch (error) {
           // Silent fail for autocomplete
       }
@@ -147,10 +158,10 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
     }
   }, [serverErrors, setError, clearErrors]);
 
-  const handleSelectLocation = async (_e: React.SyntheticEvent, value: Record<string, unknown> | null) => {
-    if (!value || !value.place_id) return;
+  const handleSelectLocation = async (_e: React.SyntheticEvent, value: PlaceOption | null) => {
+    if (!value?.place_id) return;
     try {
-      const resData = await goongService.getPlaceDetailByPlaceId(value.place_id as string);
+      const resData = await goongService.getPlaceDetailByPlaceId(value.place_id);
       if (!resData) return;
       const geometryObj = resData.result.geometry;
       if (!geometryObj?.location) return;

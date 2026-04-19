@@ -1,4 +1,4 @@
-﻿import React from 'react';
+import React from 'react';
 import { Stack, Typography } from "@mui/material";
 import SendIcon from '@mui/icons-material/Send';
 import toastMessages from '@/utils/toastMessages';
@@ -36,7 +36,7 @@ const ApplyCard = ({
     try {
       await jobPostActivityService.applyJob({
         ...data,
-        job_post: Number(jobPostId),
+        jobPost: Number(jobPostId),
         resume: Number(data.resume),
       });
       toastMessages.success('Applied successfully.');

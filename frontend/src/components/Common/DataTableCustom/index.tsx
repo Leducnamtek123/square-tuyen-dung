@@ -129,7 +129,7 @@ EnhancedTableHead.propTypes = {
 
 interface DataTableCustomProps {
   headCells?: HeadCell[];
-  rows?: Record<string, unknown>[];
+  rows?: unknown[];
   order?: 'asc' | 'desc';
   orderBy?: string;
   page?: number;
@@ -246,3 +246,5 @@ const Loading = () => {
 DataTableCustom.Loading = Loading;
 
 export default React.memo(DataTableCustom);
+
+

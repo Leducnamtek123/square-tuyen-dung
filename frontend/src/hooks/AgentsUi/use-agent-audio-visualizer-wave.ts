@@ -17,11 +17,11 @@ function useAnimatedValue(initialValue: AnimatedValue) {
   useMotionValueEvent(motionValue, 'change', (nextValue) => setValue(nextValue));
 
   const animateFn = useCallback(
-    (targetValue: AnimatedValue, transition: Record<string, unknown>) => {
+    (targetValue: AnimatedValue, transition: Parameters<typeof animate>[2]) => {
       controlsRef.current = animate(
         motionValue as Parameters<typeof animate>[0],
         targetValue as Parameters<typeof animate>[1],
-        transition as Parameters<typeof animate>[2]
+        transition
       );
     },
     [motionValue]
@@ -101,4 +101,6 @@ export function useAgentAudioVisualizerWave({
     opacity,
   };
 }
+
+
 

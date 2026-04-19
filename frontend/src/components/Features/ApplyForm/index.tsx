@@ -1,7 +1,6 @@
 ﻿import React from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/navigation';
-import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Button, Card, CircularProgress, FormControlLabel, Link, Radio, RadioGroup, Stack, Typography } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
@@ -16,7 +15,7 @@ import jobSeekerProfileService from "@/services/jobSeekerProfileService";
 import { formatRoute } from "@/utils/funcUtils";
 import { useAppSelector } from "@/hooks/useAppStore";
 import type { Resume } from "@/types/models";
-import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
+import { typedYupResolver } from "@/utils/formHelpers";
 
 interface ApplyFormProps {
   handleApplyJob: (data: ApplyFormValues) => void;
@@ -65,7 +64,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
       phone: (currentUser as { jobSeekerProfile?: { phone?: string } })?.jobSeekerProfile?.phone || "",
       resume: "",
     },
-    resolver: yupResolver(schema) as unknown as ReactHookFormResolver<ApplyFormValues>,
+    resolver: typedYupResolver<ApplyFormValues>(schema),
   });
 
   React.useEffect(() => {

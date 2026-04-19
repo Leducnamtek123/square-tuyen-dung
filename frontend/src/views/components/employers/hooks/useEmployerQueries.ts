@@ -1,5 +1,4 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import statisticService from '../../../../services/statisticService';
 import resumeSavedService from '../../../../services/resumeSavedService';
 import resumeService from '../../../../services/resumeService';
@@ -10,9 +9,8 @@ import questionService from '../../../../services/questionService';
 import questionGroupService from '../../../../services/questionGroupService';
 import companyService from '../../../../services/companyService';
 import companyImageService from '../../../../services/companyImageService';
-import errorHandling from '../../../../utils/errorHandling';
 import { PaginatedResponse } from '@/types/api';
-import { JobPost, JobPostActivity, Resume, ResumeSaved, InterviewSession, Question, QuestionGroup } from '@/types/models';
+import { JobPost, JobPostActivity, Resume, ResumeSaved, InterviewSession, Question, QuestionGroup, CompanyImage } from '@/types/models';
 import type { ScheduleSessionInput } from '../../../../services/interviewService';
 import type { EmployerCandidateStats } from '../../../../services/statisticService';
 import type { JobPostInput } from '../../../../services/jobService';
@@ -24,6 +22,12 @@ import type { EmployerGeneralStats } from '../../../../services/statisticService
 import type { SubmitEvaluationInput } from '../../../../services/interviewService';
 import type { EmployerRecruitmentByRankStats } from '../../../../services/statisticService';
 import type { EmployerInterviewStats } from '../../../../services/statisticService';
+import type { EmployerStatsParams } from '../../../../services/statisticService';
+import type { QuestionPayload, QuestionListParams } from '../../../../services/questionService';
+import type { QuestionGroupPayload, QuestionGroupListParams } from '../../../../services/questionGroupService';
+import type { ResumeSavedListParams } from '../../../../services/resumeSavedService';
+import type { JobPostActivityListParams } from '../../../../services/jobPostActivityService';
+import type { GetResumesParams } from '../../../../services/resumeService';
 
 // ─── Types ───────────────────────────────────────────────────
 export type UseEmployerGeneralStatsResult = UseQueryResult<EmployerGeneralStats>;
@@ -41,11 +45,10 @@ export type UseInterviewDetailResult = UseQueryResult<InterviewSession>;
 export type UseEmployerQuestionsResult = UseQueryResult<PaginatedResponse<Question>>;
 export type UseQuestionGroupsResult = UseQueryResult<PaginatedResponse<QuestionGroup>>;
 
-export interface JobPostOption {
+export type JobPostOption = {
   id: string | number;
   jobName: string;
-  [key: string]: unknown;
-}
+};
 
 // ─── Employer Statistics ─────────────────────────────────────
 export const useEmployerGeneralStatistics = (): UseEmployerGeneralStatsResult => {
@@ -58,7 +61,7 @@ export const useEmployerGeneralStatistics = (): UseEmployerGeneralStatsResult =>
   });
 };
 
-export const useEmployerApplicationStatistics = (params: Record<string, unknown> = {}): UseEmployerApplicationStatsResult => {
+export const useEmployerApplicationStatistics = (params: EmployerStatsParams = {}): UseEmployerApplicationStatsResult => {
   return useQuery({
     queryKey: ['employerApplicationStatistics', params],
     queryFn: async () => {
@@ -68,7 +71,7 @@ export const useEmployerApplicationStatistics = (params: Record<string, unknown>
   });
 };
 
-export const useEmployerCandidateStatistics = (params: Record<string, unknown> = {}): UseEmployerCandidateStatsResult => {
+export const useEmployerCandidateStatistics = (params: EmployerStatsParams = {}): UseEmployerCandidateStatsResult => {
   return useQuery({
     queryKey: ['employerCandidateStatistics', params],
     queryFn: async () => {
@@ -78,7 +81,7 @@ export const useEmployerCandidateStatistics = (params: Record<string, unknown> =
   });
 };
 
-export const useEmployerRecruitmentStatistics = (params: Record<string, unknown> = {}): UseEmployerRecruitmentStatsResult => {
+export const useEmployerRecruitmentStatistics = (params: EmployerStatsParams = {}): UseEmployerRecruitmentStatsResult => {
   return useQuery({
     queryKey: ['employerRecruitmentStatistics', params],
     queryFn: async () => {
@@ -88,7 +91,7 @@ export const useEmployerRecruitmentStatistics = (params: Record<string, unknown>
   });
 };
 
-export const useEmployerRecruitmentByRank = (params: Record<string, unknown> = {}): UseEmployerRecruitmentByRankStatsResult => {
+export const useEmployerRecruitmentByRank = (params: EmployerStatsParams = {}): UseEmployerRecruitmentByRankStatsResult => {
   return useQuery({
     queryKey: ['employerRecruitmentByRank', params],
     queryFn: async () => {
@@ -98,7 +101,7 @@ export const useEmployerRecruitmentByRank = (params: Record<string, unknown> = {
   });
 };
 
-export const useEmployerInterviewStatistics = (params: Record<string, unknown> = {}): UseEmployerInterviewStatsResult => {
+export const useEmployerInterviewStatistics = (params: EmployerStatsParams = {}): UseEmployerInterviewStatsResult => {
   return useQuery({
     queryKey: ['employerInterviewStatistics', params],
     queryFn: async () => {
@@ -153,12 +156,12 @@ export const useJobPostMutations = () => {
 };
 
 // ─── Saved Resumes ──────────────────────────────────────────
-export const useSavedResumes = (params: Record<string, unknown>): UseSavedResumesResult => {
+export const useSavedResumes = (params: ResumeSavedListParams): UseSavedResumesResult => {
   return useQuery({
     queryKey: ['savedResumes', params],
     queryFn: async () => {
       const res = await resumeSavedService.getResumesSaved(params);
-      return res as PaginatedResponse<ResumeSaved>;
+      return res;
     },
     placeholderData: keepPreviousData,
   });
@@ -181,12 +184,12 @@ export const useToggleSaveResume = () => {
 };
 
 // ─── Applied Resumes ────────────────────────────────────────
-export const useAppliedResumes = (params: Record<string, unknown>, enabled: boolean = true): UseAppliedResumesResult => {
+export const useAppliedResumes = (params: JobPostActivityListParams, enabled: boolean = true): UseAppliedResumesResult => {
   return useQuery({
     queryKey: ['appliedResumes', params],
     queryFn: async () => {
       const res = await jobPostActivityService.getAppliedResume(params);
-      return res as PaginatedResponse<JobPostActivity>;
+      return res;
     },
     enabled,
     placeholderData: keepPreviousData,
@@ -245,12 +248,12 @@ export const useUpdateApplicationStatus = () => {
 };
 
 // ─── Employer Profile Search ────────────────────────────────
-export const useEmployerResumes = (params: Record<string, unknown>): UseEmployerResumesResult => {
+export const useEmployerResumes = (params: GetResumesParams): UseEmployerResumesResult => {
   return useQuery({
     queryKey: ['employerResumes', params],
     queryFn: async () => {
       const res = await resumeService.getResumes(params);
-      return res as PaginatedResponse<Resume>;
+      return res;
     },
     placeholderData: keepPreviousData,
   });
@@ -349,7 +352,7 @@ export const useInterviewMutations = () => {
 };
 
 // ─── Questions & Groups ──────────────────────────────────────
-export const useEmployerQuestions = (params: Record<string, unknown> = {}): UseEmployerQuestionsResult => {
+export const useEmployerQuestions = (params: QuestionListParams = {}): UseEmployerQuestionsResult => {
   return useQuery({
     queryKey: ['employerQuestions', params],
     queryFn: () => questionService.getQuestions(params),
@@ -357,7 +360,7 @@ export const useEmployerQuestions = (params: Record<string, unknown> = {}): UseE
   });
 };
 
-export const useQuestionGroups = (params: Record<string, unknown> = {}): UseQuestionGroupsResult => {
+export const useQuestionGroups = (params: QuestionGroupListParams = {}): UseQuestionGroupsResult => {
   return useQuery({
     queryKey: ['questionGroups', params],
     queryFn: () => questionGroupService.getQuestionGroups(params),
@@ -369,14 +372,14 @@ export const useQuestionMutations = () => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) => questionService.createQuestion(data),
+    mutationFn: (data: QuestionPayload) => questionService.createQuestion(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerQuestions'] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> }) => questionService.updateQuestion(id, data),
+    mutationFn: ({ id, data }: { id: string | number; data: Partial<QuestionPayload> }) => questionService.updateQuestion(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['employerQuestions'] });
     },
@@ -401,14 +404,14 @@ export const useQuestionGroupMutations = () => {
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (data: Record<string, unknown>) => questionGroupService.createQuestionGroup(data),
+    mutationFn: (data: QuestionGroupPayload) => questionGroupService.createQuestionGroup(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['questionGroups'] });
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string | number; data: Record<string, unknown> }) => questionGroupService.updateQuestionGroup(id, data),
+    mutationFn: ({ id, data }: { id: string | number; data: Partial<QuestionGroupPayload> }) => questionGroupService.updateQuestionGroup(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['questionGroups'] });
     },
@@ -470,7 +473,7 @@ export const useCompanyMutations = () => {
 };
 
 export const useCompanyImages = () => {
-  return useQuery({
+  return useQuery<PaginatedResponse<CompanyImage>>({
     queryKey: ['companyImages'],
     queryFn: () => companyImageService.getCompanyImages(),
   });
@@ -499,3 +502,4 @@ export const useCompanyImageMutations = () => {
     isMutating: addMutation.isPending || deleteMutation.isPending,
   };
 };
+

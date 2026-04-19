@@ -39,7 +39,7 @@ declare module '@mui/material/styles' {
   }
   interface TypeText {
     placeholder?: string;
-    italic?: React.CSSProperties | Record<string, unknown>;
+    italic?: React.CSSProperties | object;
   }
   interface Theme {
     customShadows: {
@@ -87,7 +87,11 @@ declare module '@mui/material/styles' {
 
 declare module 'js-cookie' {
   export interface CookieAttributes {
-    [key: string]: unknown;
+    expires?: number | Date;
+    path?: string;
+    domain?: string;
+    secure?: boolean;
+    sameSite?: 'strict' | 'lax' | 'none';
   }
 
   const Cookies: {
@@ -122,11 +126,11 @@ declare module 'draft-js' {
     createFromBlockArray(blocks: unknown[]): ContentState;
   };
   export function convertFromHTML(html: string): { contentBlocks: unknown[]; entityMap: unknown };
-  export function convertToRaw(contentState: ContentState): Record<string, unknown>;
+  export function convertToRaw(contentState: ContentState): object;
 }
 
 declare module 'draftjs-to-html' {
-  const draftToHtml: (raw: Record<string, unknown>) => string;
+  const draftToHtml: (raw: object) => string;
   export default draftToHtml;
 }
 
@@ -144,7 +148,7 @@ declare module 'react-color' {
     disableAlpha?: boolean;
     width?: string | number;
     className?: string;
-    styles?: Record<string, unknown>;
+    styles?: object;
   }
   export const SketchPicker: ComponentType<ColorPickerProps>;
   export const ChromePicker: ComponentType<ColorPickerProps>;
@@ -162,7 +166,6 @@ declare module 'mui-file-dropzone' {
     onDelete?: (file: File) => void;
     showPreviews?: boolean;
     showPreviewsInDropzone?: boolean;
-    [key: string]: unknown;
   }
   export const MuiFileDropzone: ComponentType<MuiFileDropzoneProps>;
 }
@@ -172,13 +175,12 @@ declare module 'react-draft-wysiwyg' {
   interface EditorProps {
     editorState?: unknown;
     onEditorStateChange?: (state: unknown) => void;
-    toolbar?: Record<string, unknown>;
+    toolbar?: object;
     wrapperClassName?: string;
     editorClassName?: string;
     toolbarClassName?: string;
     placeholder?: string;
     readOnly?: boolean;
-    [key: string]: unknown;
   }
   export const Editor: ComponentType<EditorProps>;
 }
@@ -199,7 +201,6 @@ declare module 'mui-image' {
     shiftDuration?: number;
     className?: string;
     style?: React.CSSProperties;
-    [key: string]: unknown;
   }
   const Image: ComponentType<MuiImageProps>;
   export default Image;
@@ -218,7 +219,6 @@ declare module '@fortawesome/react-fontawesome' {
     pulse?: boolean;
     fixedWidth?: boolean;
     style?: React.CSSProperties;
-    [key: string]: unknown;
   }
   export const FontAwesomeIcon: ComponentType<FontAwesomeIconProps>;
 }
@@ -243,3 +243,5 @@ declare module '@fortawesome/fontawesome-svg-core' {
     icon: [number, number, string[], string, string | string[]];
   }
 }
+
+
