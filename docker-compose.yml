@@ -121,7 +121,8 @@ services:
       - DEBUG=${DEBUG:-False}
       - AUTO_MIGRATE=${AUTO_MIGRATE:-1}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - app-net
       - data-net
