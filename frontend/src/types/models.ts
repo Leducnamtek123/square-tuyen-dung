@@ -509,6 +509,18 @@ export interface Banner {
   description_location?: number;
 }
 
+export interface BannerType {
+  id: number;
+  code: string;
+  name: string;
+  value: number;
+  web_aspect_ratio?: string;
+  mobile_aspect_ratio?: string;
+  is_active?: boolean;
+  create_at?: string;
+  update_at?: string;
+}
+
 export type SelectOption = {
   id: number | string | null;
   name: string;

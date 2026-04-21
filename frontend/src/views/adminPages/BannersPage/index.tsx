@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import {
   Box, Typography, Breadcrumbs, Link, Button, Paper,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField,
@@ -18,12 +18,7 @@ import DataTable from '../../../components/Common/DataTable';
 import { useDataTable } from '../../../hooks';
 import { Banner } from '../../../types/models';
 import { useBanners } from './hooks/useBanners';
-
-/** Aspect ratios per banner type */
-const ASPECT_RATIOS: Record<number, { ratio: number; label: string }> = {
-  1: { ratio: 16 / 5, label: '16:5' },  // Home banner (wide)
-  2: { ratio: 1 / 1, label: '1:1' },     // Main Job Right (square)
-};
+import { useBannerTypes } from '../BannerTypesPage/hooks/useBannerTypes';
 
 interface BannerFormData {
     description: string;
@@ -39,15 +34,42 @@ interface BannerFormData {
 const BannersPage = () => {
   const { t } = useTranslation('admin');
 
+  const parseAspectRatio = (value?: string): { ratio: number; label: string } => {
+    if (!value) return { ratio: 16 / 5, label: '16:5' };
+    const [w, h] = value.split(':').map((s) => Number(s.trim()));
+    if (!Number.isFinite(w) || !Number.isFinite(h) || h === 0) {
+      return { ratio: 16 / 5, label: '16:5' };
+    }
+    return { ratio: w / h, label: `${w}:${h}` };
+  };
+
   const PLATFORM_OPTIONS = useMemo(() => [
     { value: 'WEB', label: t('pages.banners.form.platformOptions.web') },
     { value: 'APP', label: t('pages.banners.form.platformOptions.app') },
   ], [t]);
 
-  const TYPE_OPTIONS = useMemo(() => [
-    { value: 1, label: t('pages.banners.form.typeOptions.home') },
-    { value: 2, label: t('pages.banners.form.typeOptions.mainJobRight') },
-  ], [t]);
+  const { data: bannerTypesData } = useBannerTypes({
+    page: 1,
+    pageSize: 200,
+    ordering: 'value',
+  });
+
+  const TYPE_OPTIONS = useMemo(() => {
+    const apiTypes = (bannerTypesData?.results || [])
+      .filter((item) => item.is_active !== false)
+      .map((item) => ({
+        value: item.value,
+        label: item.name || item.code,
+        webAspectRatio: item.web_aspect_ratio || '',
+      }));
+
+    if (apiTypes.length > 0) return apiTypes;
+
+    return [
+      { value: 1, label: t('pages.banners.form.typeOptions.home'), webAspectRatio: '16:5' },
+      { value: 2, label: t('pages.banners.form.typeOptions.mainJobRight'), webAspectRatio: '1:1' },
+    ];
+  }, [bannerTypesData?.results, t]);
 
   const DESCRIPTION_LOCATIONS = useMemo(() => [
     { value: 1, label: t('pages.banners.form.descLocationOptions.topLeft') },
@@ -145,6 +167,14 @@ const BannersPage = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  useEffect(() => {
+    if (TYPE_OPTIONS.length === 0) return;
+    const hasCurrentType = TYPE_OPTIONS.some((item) => item.value === formData.type);
+    if (!hasCurrentType) {
+      handleInputChange('type', TYPE_OPTIONS[0].value);
+    }
+  }, [TYPE_OPTIONS, formData.type]);
+
   const handleSave = async () => {
     const dataToSend = new FormData();
     dataToSend.append('description', formData.description);
@@ -210,7 +240,10 @@ const BannersPage = () => {
     setCropImageSrc('');
   };
 
-  const cropAspect = ASPECT_RATIOS[formData.type] || ASPECT_RATIOS[1];
+  const cropAspect = useMemo(() => {
+    const selected = TYPE_OPTIONS.find((item) => item.value === formData.type);
+    return parseAspectRatio(selected?.webAspectRatio);
+  }, [TYPE_OPTIONS, formData.type]);
 
   const columns = useMemo<ColumnDef<Banner>[]>(() => [
     {

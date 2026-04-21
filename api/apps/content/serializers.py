@@ -6,7 +6,8 @@ from .models import (
 
     Feedback,
 
-    Banner
+    Banner,
+    BannerType,
 
 )
 
@@ -146,4 +147,21 @@ class AdminFeedbackSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             'user', 'userDict', 'create_at', 'update_at',
         )
         read_only_fields = ('id', 'create_at', 'update_at', 'userDict')
+
+
+class AdminBannerTypeSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    class Meta:
+        model = BannerType
+        fields = (
+            'id',
+            'code',
+            'name',
+            'value',
+            'web_aspect_ratio',
+            'mobile_aspect_ratio',
+            'is_active',
+            'create_at',
+            'update_at',
+        )
+        read_only_fields = ('id', 'create_at', 'update_at')
 

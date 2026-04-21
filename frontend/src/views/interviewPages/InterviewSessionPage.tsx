@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslation } from "react-i18next";
 
@@ -180,7 +180,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
       if (!JOINABLE_STATUSES.includes(latestSession.status)) {
         throw new Error(
           t("errors.sessionNotReadyForJoin", {
-            defaultValue: "KhÃ´ng thá»ƒ vÃ o phÃ²ng lÃºc nÃ y vÃ¬ phiÃªn Ä‘ang á»Ÿ tráº¡ng thÃ¡i {{status}}.",
+            defaultValue: "Không thể vào phòng lúc này vì phiên đang ở trạng thái {{status}}.",
             status: t(`interviewListCard.statuses.${latestSession.status}`, {
               defaultValue: latestSession.status?.replaceAll("_", " "),
             }),
@@ -357,7 +357,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
                 <div className="relative group">
                   <div className="absolute inset-0 blur-[80px] rounded-full bg-cyan-500/10 group-hover:bg-cyan-500/20 transition-all duration-1000" />
                   <div className="h-[220px] w-[220px] md:h-[320px] md:w-[320px] relative z-10 opacity-70 transition-all duration-1000 group-hover:opacity-100 flex items-center justify-center">
-                     <span className="text-6xl">ðŸ¤–</span>
+                     <span className="text-6xl">🤖</span>
                   </div>
                 </div>
 
@@ -421,7 +421,7 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
 
         {formattedSchedule && (
           <p className="text-xs text-slate-300">
-            {t("common:labels.time", { defaultValue: "Time" })} â€¢ {formattedSchedule}
+            {t("common:labels.time", { defaultValue: "Time" })} • {formattedSchedule}
           </p>
         )}
       </div>

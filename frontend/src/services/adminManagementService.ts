@@ -13,6 +13,7 @@ import {
   JobPostActivity,
   QuestionGroup,
   Banner,
+  BannerType,
   Feedback,
   Question,
   JobPostNotification,
@@ -71,6 +72,15 @@ export interface AdminFeedbackPayload {
   rating?: number;
   is_active?: boolean;
   user?: number;
+}
+
+export interface AdminBannerTypePayload {
+  code: string;
+  name: string;
+  value: number;
+  web_aspect_ratio?: string;
+  mobile_aspect_ratio?: string;
+  is_active?: boolean;
 }
 
 export interface JobPostNotificationPayload {
@@ -240,6 +250,26 @@ const adminManagementService = {
 
   deleteBanner: (id: IdType): Promise<void> => {
     const url = `content/web/admin/banners/${id}/`;
+    return httpRequest.delete(url);
+  },
+
+  getBannerTypes: (params: AdminListParams = {}): Promise<PaginatedResponse<BannerType>> => {
+    const url = 'content/web/admin/banner-types/';
+    return withPresign(httpRequest.get<PaginatedResponse<BannerType>>(url, { params: cleanParams(params) }));
+  },
+
+  createBannerType: (data: AdminBannerTypePayload): Promise<BannerType> => {
+    const url = 'content/web/admin/banner-types/';
+    return withPresign(httpRequest.post<BannerType>(url, data));
+  },
+
+  updateBannerType: (id: IdType, data: Partial<AdminBannerTypePayload>): Promise<BannerType> => {
+    const url = `content/web/admin/banner-types/${id}/`;
+    return withPresign(httpRequest.patch<BannerType>(url, data));
+  },
+
+  deleteBannerType: (id: IdType): Promise<void> => {
+    const url = `content/web/admin/banner-types/${id}/`;
     return httpRequest.delete(url);
   },
 

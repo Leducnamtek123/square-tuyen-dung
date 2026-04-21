@@ -55,7 +55,8 @@ from .models import (
 
     Feedback,
 
-    Banner
+    Banner,
+    BannerType
 
 )
 
@@ -313,6 +314,14 @@ class BannerAdmin(admin.ModelAdmin):
 
             banner.save()
 
+
+class BannerTypeAdmin(admin.ModelAdmin):
+    list_display = ("id", "code", "name", "value", "is_active")
+    list_display_links = ("id",)
+    list_editable = ("is_active",)
+    search_fields = ("code", "name")
+    list_filter = [("is_active", DropdownFilter)]
+
 class CustomPeriodicTaskForm(forms.ModelForm):
 
     """Form that lets you create and modify periodic tasks."""
@@ -476,6 +485,7 @@ admin.site.unregister(ClockedSchedule)
 custom_admin_site.register(Feedback, FeedbackAdmin)
 
 custom_admin_site.register(Banner, BannerAdmin)
+custom_admin_site.register(BannerType, BannerTypeAdmin)
 
 custom_admin_site.register(IntervalSchedule, IntervalScheduleAdmin)
 

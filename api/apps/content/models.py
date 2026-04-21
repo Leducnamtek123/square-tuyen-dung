@@ -53,9 +53,7 @@ class Banner(ProjectBaseModel):
 
                                 default=var_sys.DescriptionLocation.TOP_LEFT)
 
-    type = models.IntegerField(choices=var_sys.BANNER_TYPE,
-
-                               default=var_sys.BannerType.HOME)
+    type = models.IntegerField(default=var_sys.BannerType.HOME, db_index=True)
 
     is_active = models.BooleanField(default=False)
 
@@ -70,6 +68,22 @@ class Banner(ProjectBaseModel):
     def __str__(self):
 
         return str(self.id)
+
+
+class BannerType(ProjectBaseModel):
+    code = models.CharField(max_length=50, unique=True, db_index=True)
+    name = models.CharField(max_length=100)
+    value = models.PositiveIntegerField(unique=True)
+    web_aspect_ratio = models.CharField(max_length=20, blank=True, default='')
+    mobile_aspect_ratio = models.CharField(max_length=20, blank=True, default='')
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "project_project_banner_type"
+        ordering = ["value"]
+
+    def __str__(self):
+        return f"{self.code} ({self.value})"
 
 
 class SystemSetting(models.Model):

@@ -89,6 +89,7 @@ export const SEGMENT_MAP = {
   'nhat-ky-tin-tuyen-dung': 'job-activity',
   'thong-bao-viec-lam': 'job-notifications',
   'phong-van-cong-ty-truc-tiep': 'interviews/live',
+  'quan-ly-loai-banner': 'banner-types',
 
   // Interview (candidate)
   'phong-van': 'interview',
@@ -228,6 +229,7 @@ export const ROUTES = {
     INTERVIEW_LIVE: 'admin/interviews/live',
     INTERVIEW_SESSION: 'admin/interviews/session/:id',
     BANNERS: 'admin/banners',
+    BANNER_TYPES: 'admin/banner-types',
     FEEDBACKS: 'admin/feedbacks',
     CHAT: 'admin/chat',
   },
@@ -333,6 +335,7 @@ export function generateRewrites(): RewriteRule[] {
     ['/quan-tri/nhat-ky-tin-tuyen-dung', '/admin/job-activity'],
     ['/quan-tri/thong-bao-viec-lam', '/admin/job-notifications'],
     ['/quan-tri/phong-van-cong-ty-truc-tiep', '/admin/interviews/live'],
+    ['/quan-tri/quan-ly-loai-banner', '/admin/banner-types'],
     // Catch-all for admin
     ['/quan-tri', '/admin/dashboard'],
     ['/quan-tri/:path*', '/admin/:path*'],

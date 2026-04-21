@@ -6,6 +6,50 @@ from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
+def _load_env_file(path: Path) -> None:
+    if not path.exists():
+        return
+
+    try:
+        for raw_line in path.read_text(encoding="utf-8", errors="ignore").splitlines():
+            line = raw_line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+
+            key, value = line.split("=", 1)
+            key = key.strip()
+            value = value.strip()
+            if not key:
+                continue
+
+            if len(value) >= 2 and value[0] == value[-1] and value[0] in {"'", '"'}:
+                value = value[1:-1]
+
+            os.environ.setdefault(key, value)
+    except OSError:
+        return
+
+
+_load_env_file(BASE_DIR.parent / ".env")
+
+
+def _to_bool(value) -> bool:
+    if isinstance(value, bool):
+        return value
+
+    normalized = str(value).strip().lower()
+    return normalized in {"1", "true", "yes", "on", "y", "t"}
+
+
+def _mysql_driver_available() -> bool:
+    try:
+        import MySQLdb  # noqa: F401
+
+        return True
+    except Exception:
+        return False
+
 COMPANY_NAME = "Project"
 COMPANY_CONTACT_EMAIL = config("COMPANY_CONTACT_EMAIL", default=config("SUPPORT_CONTACT_EMAIL", default="support@squaregroup.vn"))
 COMPANY_CONTACT_PHONE = config("COMPANY_CONTACT_PHONE", default="0888-425-094")
@@ -41,17 +85,17 @@ LIVEKIT_API_SECRET = config("LIVEKIT_API_SECRET", default="")
 API_VERSION = config("API_VERSION", default="v1")
 SUPPORT_CONTACT_EMAIL = config("SUPPORT_CONTACT_EMAIL", default="support@squaregroup.vn")
 LIVEKIT_WEBHOOK_TOKEN = config("LIVEKIT_WEBHOOK_TOKEN", default="")
-LIVEKIT_WEBHOOK_STRICT = config("LIVEKIT_WEBHOOK_STRICT", default=True, cast=bool)
+LIVEKIT_WEBHOOK_STRICT = config("LIVEKIT_WEBHOOK_STRICT", default=True, cast=_to_bool)
 APP_ENVIRONMENT = config("APP_ENVIRONMENT", default="development")
-STRICT_ENV_VALIDATION = config("STRICT_ENV_VALIDATION", default=False, cast=bool)
-API_RESPONSE_ENVELOPE_V2 = config("API_RESPONSE_ENVELOPE_V2", default=True, cast=bool)
+STRICT_ENV_VALIDATION = config("STRICT_ENV_VALIDATION", default=False, cast=_to_bool)
+API_RESPONSE_ENVELOPE_V2 = config("API_RESPONSE_ENVELOPE_V2", default=True, cast=_to_bool)
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = config("SECRET_KEY", default="django-insecure-square-tuyen-dung-local-only")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = config('DEBUG', default=False, cast=bool)
-APPEND_SLASH = config('APPEND_SLASH', default=True, cast=bool)
+DEBUG = config("DEBUG", default=False, cast=_to_bool)
+APPEND_SLASH = config("APPEND_SLASH", default=True, cast=_to_bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
 CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost', cast=lambda v: [s.strip() for s in v.split(',') if s.strip()])
@@ -159,20 +203,32 @@ CKEDITOR_CONFIGS = {
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 # Bo khi su dung sqlclient: mysqlclient==2.1.1
 
-DATABASES = {
-    'default': {
-        'ENGINE': config('DB_ENGINE'),
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
-        'OPTIONS': {
-            'charset': 'utf8mb4',
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES', NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'",
-        },
+DB_ENGINE = config("DB_ENGINE", default="django.db.backends.sqlite3")
+if DB_ENGINE == "django.db.backends.mysql" and not _mysql_driver_available() and APP_ENVIRONMENT != "production":
+    DB_ENGINE = "django.db.backends.sqlite3"
+
+if DB_ENGINE == "django.db.backends.sqlite3":
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": config("DB_NAME", default=str(BASE_DIR / "db.sqlite3")),
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": config("DB_NAME", default=""),
+            "USER": config("DB_USER", default=""),
+            "PASSWORD": config("DB_PASSWORD", default=""),
+            "HOST": config("DB_HOST", default=""),
+            "PORT": config("DB_PORT", default=""),
+            "OPTIONS": {
+                "charset": "utf8mb4",
+                "init_command": "SET sql_mode='STRICT_TRANS_TABLES', NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'",
+            },
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

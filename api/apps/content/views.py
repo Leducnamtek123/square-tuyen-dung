@@ -4,6 +4,7 @@ from console.jobs import queue_notification
 # from infobip_channels.sms.channel import SMSChannel
 
 from django.conf import settings
+from django.db import models
 
 from shared.helpers import helper, utils
 
@@ -26,7 +27,8 @@ from .models import (
 
     Feedback,
 
-    Banner
+    Banner,
+    BannerType,
 
 )
 
@@ -34,9 +36,23 @@ from .serializers import (
 
     FeedbackSerializer,
 
-    BannerSerializer
+    BannerSerializer,
+    AdminBannerTypeSerializer
 
 )
+
+
+def get_banner_type_value_map():
+    type_map = {
+        str(item[1]).upper(): int(item[0]) for item in var_sys.BANNER_TYPE
+    }
+    db_types = BannerType.objects.all().values("code", "value")
+    for row in db_types:
+        code = str(row.get("code", "")).upper()
+        value = row.get("value")
+        if code and value is not None:
+            type_map[code] = int(value)
+    return type_map
 
 class FeedbackViewSet(viewsets.ViewSet,
 
@@ -132,12 +148,8 @@ def get_web_banner(request):
 
     query_params = request.GET
 
-    # Get banner type options
-
-    banner_type_options = {item[1]: item[0] for item in var_sys.BANNER_TYPE}
-
-    banner_type_param = query_params.get("type", None)  
-
+    banner_type_options = get_banner_type_value_map()
+    banner_type_param = str(query_params.get("type", "")).upper()
     banner_type = banner_type_options.get(banner_type_param, None)
 
     banner_queryset = Banner.objects.filter(is_active=True, platform="WEB")
@@ -160,13 +172,17 @@ def get_web_banner(request):
 @permission_classes([perms_sys.AllowAny])
 def get_mobile_banner(request):
 
-    banner_type = request.GET.get("type", "HOME")
-
-    if banner_type not in [x[1] for x in var_sys.BANNER_TYPE]:
-
-        return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
+    banner_type_param = str(request.GET.get("type", "HOME")).upper()
+    banner_type_options = get_banner_type_value_map()
+    banner_type = banner_type_options.get(banner_type_param, None)
+    if banner_type is None:
+        return var_res.response_data(
+            status=status.HTTP_400_BAD_REQUEST,
+            errors={"type": ["Invalid banner type."]},
+        )
 
     banner_queryset = Banner.objects.filter(is_active=True, platform="APP")
+    banner_queryset = banner_queryset.filter(type=banner_type)
 
     serializer = BannerSerializer(banner_queryset, many=True, fields=[
 
@@ -362,6 +378,44 @@ class AdminFeedbackViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         return var_res.response_data(data=serializer.data)
+
+
+class AdminBannerTypeViewSet(viewsets.ModelViewSet):
+    queryset = BannerType.objects.all().order_by('value')
+    permission_classes = [perms_sys.IsAdminUser]
+    renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
+    serializer_class = AdminBannerTypeSerializer
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        kw = request.GET.get('kw') or request.GET.get('search')
+        ordering = request.GET.get('ordering')
+        is_active = request.GET.get('is_active', None)
+        if kw:
+            queryset = queryset.filter(
+                models.Q(code__icontains=kw) | models.Q(name__icontains=kw)
+            )
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active in ['true', '1', 'True'])
+        if ordering:
+            queryset = queryset.order_by(ordering)
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        banner_type = self.get_object()
+        in_use = Banner.objects.filter(type=banner_type.value).exists()
+        if in_use:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": ["Cannot delete banner type that is in use."]},
+            )
+        return super().destroy(request, *args, **kwargs)
 
 
 @api_view(http_method_names=['GET', 'PUT'])

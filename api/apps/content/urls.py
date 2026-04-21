@@ -14,6 +14,7 @@ web_router.register(r'feedbacks', views.FeedbackViewSet, basename='feedback')
 admin_router = DefaultRouter()
 admin_router.register(r'banners', views.AdminBannerViewSet, basename='admin-banner')
 admin_router.register(r'feedbacks', views.AdminFeedbackViewSet, basename='admin-feedback')
+admin_router.register(r'banner-types', views.AdminBannerTypeViewSet, basename='admin-banner-type')
 
 urlpatterns = [
 
