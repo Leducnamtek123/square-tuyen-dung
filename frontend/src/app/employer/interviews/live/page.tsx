@@ -1,6 +1,7 @@
-import { redirect } from 'next/navigation';
-import { ROUTES } from '@/configs/constants';
+'use client';
+
+import InterviewLivePage from '@/views/employerPages/InterviewPages/InterviewLivePage';
 
 export default function Page() {
-  redirect(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`);
+  return <InterviewLivePage />;
 }

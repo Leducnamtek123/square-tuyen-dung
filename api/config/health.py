@@ -1,47 +1,50 @@
-"""
-Health check endpoint for load balancers and monitoring.
-"""
-import logging
-
 from django.http import JsonResponse
-from django.db import connection
+from django.db import connections
+from django.core.cache import cache
+import logging
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 
 logger = logging.getLogger(__name__)
 
+def _check_database():
+    try:
+        with connections['default'].cursor() as cursor:
+            cursor.execute("SELECT 1")
+        return True
+    except Exception:
+        return False
+
+def _check_cache():
+    try:
+        cache.set("health_check_ping", "ok", 5)
+        return cache.get("health_check_ping") == "ok"
+    except Exception:
+        return False
 
 def health_check(request):
     """
     GET /health/ — Returns system health status.
-    Checks: database connectivity, basic app responsiveness.
+    Uses a ThreadPoolExecutor to avoid SynchronousOnlyOperation in async-capable environments.
     """
-    status = {
-        "status": "ok",
-        "checks": {}
+    def _run(func):
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(func)
+            try:
+                return future.result(timeout=5)
+            except (FuturesTimeoutError, Exception):
+                return False
+
+    db_ok = _run(_check_database)
+    cache_ok = _run(_check_cache)
+
+    is_healthy = db_ok and cache_ok
+    
+    status_data = {
+        "status": "ok" if is_healthy else "degraded",
+        "checks": {
+            "database": "ok" if db_ok else "error",
+            "cache": "ok" if cache_ok else "error",
+        }
     }
-    overall_ok = True
-
-    # Database check
-    try:
-        with connection.cursor() as cursor:
-            cursor.execute("SELECT 1")
-        status["checks"]["database"] = "ok"
-    except Exception as e:
-        status["checks"]["database"] = f"error: {str(e)}"
-        overall_ok = False
-        logger.error("Health check - DB failed: %s", e)
-
-    # Redis check
-    try:
-        from django.core.cache import cache
-        cache.set("health_check", "ok", 10)
-        val = cache.get("health_check")
-        status["checks"]["cache"] = "ok" if val == "ok" else "degraded"
-    except Exception as e:
-        status["checks"]["cache"] = f"error: {str(e)}"
-        logger.warning("Health check - Cache failed: %s", e)
-
-    if not overall_ok:
-        status["status"] = "degraded"
-
-    http_status = 200 if overall_ok else 503
-    return JsonResponse(status, status=http_status)
+    
+    return JsonResponse(status_data, status=200 if is_healthy else 503)

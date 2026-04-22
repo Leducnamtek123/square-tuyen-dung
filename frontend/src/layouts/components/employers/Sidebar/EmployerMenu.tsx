@@ -10,7 +10,7 @@ import { ROUTES, APP_NAME } from '@/configs/constants';
 import MenuItem from './MenuItem';
 
 interface EmployerMenuProps {
-  t: (key: string) => string;
+  t: (key: string, options?: any) => string;
   location: { pathname?: string };
   expandedItems: Record<string, boolean>;
   handleExpand: (section: string) => void;
@@ -44,6 +44,8 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand }: EmployerMenu
       <Collapse in={expandedItems.interviews} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           <MenuItem text={t('employer:sidebar.interviewList')} to={`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`} isSelected={location.pathname === `/${ROUTES.EMPLOYER.INTERVIEW_LIST}`} isChild />
+          <MenuItem text={t('employer:sidebar.interviewLive')} to={`/${ROUTES.EMPLOYER.INTERVIEW_LIVE}`} isSelected={location.pathname === `/${ROUTES.EMPLOYER.INTERVIEW_LIVE}`} isChild />
+          <MenuItem text={t('employer:sidebar.interviewHistory')} to={`/${ROUTES.EMPLOYER.INTERVIEW_HISTORY}`} isSelected={location.pathname === `/${ROUTES.EMPLOYER.INTERVIEW_HISTORY}`} isChild />
           <MenuItem text={t('employer:sidebar.questionBank')} to={`/${ROUTES.EMPLOYER.QUESTION_BANK}`} isSelected={location.pathname === `/${ROUTES.EMPLOYER.QUESTION_BANK}`} isChild />
           <MenuItem text={t('employer:sidebar.questionSets')} to={`/${ROUTES.EMPLOYER.QUESTION_GROUPS}`} isSelected={location.pathname === `/${ROUTES.EMPLOYER.QUESTION_GROUPS}`} isChild />
         </List>

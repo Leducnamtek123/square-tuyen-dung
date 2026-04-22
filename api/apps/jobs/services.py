@@ -124,7 +124,14 @@ class JobActivityService:
         job_post = validated_data.get('job_post')
         resume = validated_data.get('resume')
 
+        logger.info("Apply attempt: user=%s, job=%s, resume=%s", user.email, job_post.id if job_post else None, resume.id if resume else None)
+
+        if not job_post:
+             logger.error("Apply failed: job_post is missing")
+             raise JobPostInactiveError("Tin tuyển dụng không tồn tại.")
+
         if job_post.status != var_sys.JobPostStatus.APPROVED:
+            logger.warning("Apply failed: job %s status is %s", job_post.id, job_post.status)
             raise JobPostInactiveError("Tin tuyển dụng không còn hoạt động.")
 
         if hasattr(timezone, 'localdate'):
@@ -133,9 +140,11 @@ class JobActivityService:
             current_date = timezone.now().date()
 
         if job_post.deadline < current_date:
+            logger.warning("Apply failed: job %s expired on %s", job_post.id, job_post.deadline)
             raise JobPostExpiredError("Tin tuyển dụng đã hết hạn.")
 
         if resume and resume.user != user:
+            logger.error("Apply failed: resume %s belongs to user %s, not %s", resume.id, resume.user_id, user.id)
             raise ResumeOwnershipError("CV không thuộc về bạn.")
 
         existing = JobPostActivity.objects.filter(

@@ -136,6 +136,7 @@ class InterviewSessionListSerializer(serializers.ModelSerializer):
             'job_post', 'job_name', 'company_name',
             'scheduled_at', 'start_time', 'end_time', 'duration',
             'ai_overall_score', 'evaluations_count',
+            'recording_url',
             'create_at', 'update_at'
         ]
 

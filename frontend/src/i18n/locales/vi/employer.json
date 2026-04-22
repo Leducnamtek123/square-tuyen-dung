@@ -629,6 +629,7 @@
     "onlineInterviews": "Phỏng vấn Online",
     "interviewList": "Danh sách PV",
     "interviewLive": "Phỏng vấn Live",
+    "interviewHistory": "Thư viện Video",
     "questionBank": "Ngân hàng QA",
     "questionSets": "Bộ câu hỏi",
     "notifications": "Thông báo",
@@ -645,7 +646,10 @@
     "stats": {
       "inProgress": "Đang diễn ra: {{count}}",
       "scheduled": "Đã lên lịch: {{count}}",
-      "completed": "Đã hoàn thành: {{count}}"
+      "completed": "Đã hoàn thành: {{count}}",
+      "inProgressLabel": "Đang diễn ra",
+      "scheduledLabel": "Đã lên lịch",
+      "completedLabel": "Đã hoàn thành"
     },
     "table": {
       "candidate": "Ứng viên",

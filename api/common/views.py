@@ -289,7 +289,7 @@ def health_check(request):
                 host=settings.SERVICE_REDIS_HOST,
                 port=settings.SERVICE_REDIS_PORT,
                 db=settings.SERVICE_REDIS_DB,
-                password=settings.SERVICE_REDIS_PASSWORD,
+                password=settings.SERVICE_REDIS_PASSWORD or None,
             )
             return bool(redis_client.ping())
         except Exception:
