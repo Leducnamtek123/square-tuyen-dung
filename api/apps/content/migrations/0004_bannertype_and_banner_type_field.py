@@ -2,7 +2,7 @@ from django.db import migrations, models
 
 
 def seed_banner_types(apps, schema_editor):
-    BannerType = apps.get_model('content', 'BannerType')
+    BannerType = apps.get_model('Project', 'BannerType')
     defaults = [
         {
             'code': 'HOME',
@@ -26,14 +26,14 @@ def seed_banner_types(apps, schema_editor):
 
 
 def unseed_banner_types(apps, schema_editor):
-    BannerType = apps.get_model('content', 'BannerType')
+    BannerType = apps.get_model('Project', 'BannerType')
     BannerType.objects.filter(code__in=['HOME', 'MAIN_JOB_RIGHT']).delete()
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('content', '0003_systemsetting'),
+        ('Project', '0003_systemsetting'),
     ]
 
     operations = [
