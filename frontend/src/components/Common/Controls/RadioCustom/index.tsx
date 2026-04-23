@@ -15,6 +15,8 @@ import { FormLabel, Typography } from "@mui/material";
 import FormControl from '@mui/material/FormControl';
 import ValidationError from '../ValidationError';
 
+const EMPTY_OPTIONS: SelectOption[] = [];
+
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
   control: Control<T>;
@@ -28,7 +30,7 @@ const RadioCustom = <T extends FieldValues = FieldValues>({
   control,
   title = '',
   showRequired = false,
-  options = [],
+  options = EMPTY_OPTIONS,
 }: Props<T>) => {
   const { t } = useTranslation('common');
 

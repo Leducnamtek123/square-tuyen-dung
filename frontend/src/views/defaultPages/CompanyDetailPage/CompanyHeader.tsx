@@ -14,7 +14,7 @@ import MuiImageCustom from "../../../components/Common/MuiImageCustom";
 import { tConfig } from '../../../utils/tConfig';
 import { Theme } from "@mui/material/styles";
 import type { TFunction } from "i18next";
-import type { CompanyDetailProps } from "./index";
+import type { CompanyDetailProps } from "./types";
 import type { SystemConfig, User } from '@/types/models';
 
 interface CompanyHeaderProps {

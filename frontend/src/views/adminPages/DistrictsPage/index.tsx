@@ -9,7 +9,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useDistricts } from './hooks/useDistricts';
 import { useCities } from '../CitiesPage/hooks/useCities';
-import { useDataTable } from '../../../hooks';
+import { useDataTable, useDebounce } from '../../../hooks';
 import { District, City } from '../../../types/models';
 import type { DistrictPayload } from '../../../services/adminManagementService';
 
@@ -27,6 +27,7 @@ const DistrictsPage = () => {
     } = useDataTable({ initialPageSize: 10 });
 
     const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearch = useDebounce(searchTerm, 500);
     const [cityFilter, setCityFilter] = useState<string | number>('');
 
     const {
@@ -39,7 +40,7 @@ const DistrictsPage = () => {
     } = useDistricts({
         page: page + 1,
         pageSize,
-        kw: searchTerm,
+        kw: debouncedSearch,
         city: cityFilter ? Number(cityFilter) : undefined,
         ordering
     });

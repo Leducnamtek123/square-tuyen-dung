@@ -10,6 +10,8 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { useTranslation } from 'react-i18next';
 import type { SelectOption } from '@/types/models';
 
+const EMPTY_OPTIONS: SelectOption[] = [];
+
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
   control: Control<T>;
@@ -22,7 +24,7 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
   placeholder = '',
   name,
   control,
-  options = [],
+  options = EMPTY_OPTIONS,
   noOptionsText,
 }: Props<T>) => {
 

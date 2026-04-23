@@ -9,7 +9,7 @@ import ImageGalleryCustom from "../../../components/Common/ImageGalleryCustom";
 import type { Theme as StylesTheme } from '@mui/material/styles';
 import type { Company } from '@/types/models';
 import type { TFunction } from 'i18next';
-import { CompanyDetailProps } from './index';
+import type { CompanyDetailProps } from './types';
 
 interface CompanySidebarProps {
   companyDetail: CompanyDetailProps;

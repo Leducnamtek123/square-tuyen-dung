@@ -1,476 +1,262 @@
 import React from 'react';
-
 import { useParams } from 'next/navigation';
-
-import { useTranslation } from "react-i18next";
-
-import { Box, Divider, Fab, IconButton, Rating, Skeleton, Stack, Typography } from "@mui/material";
-import DataTable from '../../../../components/Common/DataTable';
-
+import { useTranslation } from 'react-i18next';
+import { Box, Divider, Fab, Stack, Typography } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
-
-import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
-
-import ModeEditOutlineOutlinedIcon from '@mui/icons-material/ModeEditOutlineOutlined';
+import { Theme } from '@mui/material/styles';
 
 import { confirmModal } from '../../../../utils/sweetalert2Modal';
-
 import toastMessages from '../../../../utils/toastMessages';
-
 import errorHandling from '../../../../utils/errorHandling';
-
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-
 import EmptyCard from '../../../../components/Common/EmptyCard';
-
 import FormPopup from '../../../../components/Common/Controls/FormPopup';
-
 import AdvancedSkillForm, { FormValues as AdvancedSkillFormValues } from '../AdvancedSkillForm';
-
 import resumeService from '../../../../services/resumeService';
-
 import advancedSkillService from '../../../../services/advancedSkillService';
-import { Theme } from '@mui/material/styles';
-import { AxiosError } from 'axios';
-import { ApiError } from '@/types/api';
-
 import type { AdvancedSkill } from '../../../../types/models';
+import AdvancedSkillCardLoading from './AdvancedSkillCardLoading';
+import AdvancedSkillCardTable from './AdvancedSkillCardTable';
 
 interface AdvancedSkillCardProps {
   title: string;
 }
 
+type UiState = {
+  openPopup: boolean;
+  isLoadingAdvancedSkills: boolean;
+  isFullScreenLoading: boolean;
+  refreshToken: number;
+  serverErrors: Record<string, string[]> | null;
+  editData: Partial<AdvancedSkillFormValues> | null;
+};
 
+type UiAction =
+  | { type: 'open_popup' }
+  | { type: 'close_popup' }
+  | { type: 'set_loading'; payload: boolean }
+  | { type: 'set_full_screen_loading'; payload: boolean }
+  | { type: 'refresh' }
+  | { type: 'set_server_errors'; payload: Record<string, string[]> | null }
+  | { type: 'set_edit_data'; payload: Partial<AdvancedSkillFormValues> | null };
 
-const Loading = (
+const initialUiState: UiState = {
+  openPopup: false,
+  isLoadingAdvancedSkills: true,
+  isFullScreenLoading: false,
+  refreshToken: 0,
+  serverErrors: null,
+  editData: null,
+};
 
-  <Stack>
+const reducer = (state: UiState, action: UiAction): UiState => {
+  switch (action.type) {
+    case 'open_popup':
+      return { ...state, openPopup: true };
+    case 'close_popup':
+      return { ...state, openPopup: false };
+    case 'set_loading':
+      return { ...state, isLoadingAdvancedSkills: action.payload };
+    case 'set_full_screen_loading':
+      return { ...state, isFullScreenLoading: action.payload };
+    case 'refresh':
+      return { ...state, refreshToken: state.refreshToken + 1 };
+    case 'set_server_errors':
+      return { ...state, serverErrors: action.payload };
+    case 'set_edit_data':
+      return { ...state, editData: action.payload };
+    default:
+      return state;
+  }
+};
 
-    <Box>
-
-      <Stack
-
-        direction="row"
-
-        justifyContent="space-between"
-
-        alignItems="center"
-
-        spacing={2}
-
-      >
-
-        <Typography variant="h6" flex={1}>
-
-          <Skeleton />
-
-        </Typography>
-
-        <Box>
-
-          <Skeleton variant="circular" width={50} height={50} />
-
-        </Box>
-
-      </Stack>
-
-    </Box>
-
-    <Box sx={{ px: 1 }}>
-
-      <Box sx={{ py: 2 }}>
-
-        <Skeleton height={5} />
-
-      </Box>
-
-      {Array(4)
-
-        .fill(0)
-
-        .map((_, index) => (<Box sx={{ py: 0.5 }} key={index}>
-
-          <Skeleton height={30} />
-
-        </Box>
-
-        ))}
-
-    </Box>
-
-  </Stack>
-
-);
+const toFormValues = (skill: AdvancedSkill | null): Partial<AdvancedSkillFormValues> | null => {
+  if (!skill) return null;
+  return {
+    name: skill.name || skill.skillName || '',
+    level: typeof skill.level === 'number' ? skill.level : Number(skill.point || 0),
+  };
+};
 
 const AdvancedSkillCard = ({ title }: AdvancedSkillCardProps) => {
-
   const { t } = useTranslation(['jobSeeker', 'common']);
-
   const { slug: resumeSlug } = useParams<{ slug: string }>();
-
-  const [openPopup, setOpenPopup] = React.useState(false);
-
-  const [isSuccess, setIsSuccess] = React.useState(false);
-
-  const [isLoadingAdvancedSkills, setIsLoadingAdvancedSkills] =
-
-    React.useState(true);
-
-  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-
+  const [uiState, dispatch] = React.useReducer(reducer, initialUiState);
   const [advancedSkills, setAdvancedSkills] = React.useState<AdvancedSkill[]>([]);
 
-  const [editData, setEditData] = React.useState<AdvancedSkill | null>(null);
-
-  const [serverErrors, setServerErrors] = React.useState<Record<string, string[]> | null>(null);
-
   React.useEffect(() => {
-
     const loadAdvancedSkills = async (slug: string | undefined) => {
       if (!slug) return;
 
-      setIsLoadingAdvancedSkills(true);
-
+      dispatch({ type: 'set_loading', payload: true });
       try {
-
         const resData = await resumeService.getAdvancedSkills(slug);
-
         setAdvancedSkills(resData);
-
       } catch (error: unknown) {
-
         errorHandling(error);
-
       } finally {
-
-        setIsLoadingAdvancedSkills(false);
-
+        dispatch({ type: 'set_loading', payload: false });
       }
-
     };
 
     loadAdvancedSkills(resumeSlug);
+  }, [resumeSlug, uiState.refreshToken]);
 
-  }, [resumeSlug, isSuccess]);
+  const handleShowAdd = () => {
+    dispatch({ type: 'set_server_errors', payload: null });
+    dispatch({ type: 'set_edit_data', payload: null });
+    dispatch({ type: 'open_popup' });
+  };
 
   const handleShowUpdate = (id: string | number) => {
-
-    setServerErrors(null);
-
     const loadAdvancedSkillById = async (skillId: string | number) => {
-
-      setIsFullScreenLoading(true);
-
+      dispatch({ type: 'set_full_screen_loading', payload: true });
+      dispatch({ type: 'set_server_errors', payload: null });
       try {
-
         const resData = await advancedSkillService.getAdvancedSkillById(skillId);
-
-        setEditData(resData);
-
-        setOpenPopup(true);
-
+        dispatch({ type: 'set_edit_data', payload: toFormValues(resData) });
+        dispatch({ type: 'open_popup' });
       } catch (error: unknown) {
-
         errorHandling(error);
-
       } finally {
-
-        setIsFullScreenLoading(false);
-
+        dispatch({ type: 'set_full_screen_loading', payload: false });
       }
-
     };
 
     loadAdvancedSkillById(id);
-
-  };
-
-  const handleShowAdd = () => {
-
-    setServerErrors(null);
-
-    setEditData(null);
-
-    setOpenPopup(true);
-
   };
 
   const handleAddOrUpdate = (data: AdvancedSkillFormValues & { id?: string | number }) => {
-
     const create = async (payload: AdvancedSkillFormValues & { resume?: string }) => {
-
-      setIsFullScreenLoading(true);
-
+      dispatch({ type: 'set_full_screen_loading', payload: true });
       try {
-
         await advancedSkillService.addAdvancedSkills(payload);
-
-        setOpenPopup(false);
-
-        setIsSuccess(!isSuccess);
-
+        dispatch({ type: 'close_popup' });
+        dispatch({ type: 'refresh' });
         toastMessages.success(t('jobSeeker:profile.messages.skillAddSuccess'));
-
       } catch (error: unknown) {
-
-        errorHandling(error, (errs) => setServerErrors(errs as Record<string, string[]>));
-
+        errorHandling(error, (errs) => dispatch({ type: 'set_server_errors', payload: errs as Record<string, string[]> }));
       } finally {
-
-        setIsFullScreenLoading(false);
-
+        dispatch({ type: 'set_full_screen_loading', payload: false });
       }
-
     };
 
     const update = async (payload: AdvancedSkillFormValues & { id?: string | number }) => {
-
-      setIsFullScreenLoading(true);
-
+      dispatch({ type: 'set_full_screen_loading', payload: true });
       try {
-
         await advancedSkillService.updateAdvancedSkillById(payload.id as string | number, payload);
-
-        setOpenPopup(false);
-
-        setIsSuccess(!isSuccess);
-
+        dispatch({ type: 'close_popup' });
+        dispatch({ type: 'refresh' });
         toastMessages.success(t('jobSeeker:profile.messages.skillUpdateSuccess'));
-
       } catch (error: unknown) {
-
         errorHandling(error);
-
       } finally {
-
-        setIsFullScreenLoading(false);
-
+        dispatch({ type: 'set_full_screen_loading', payload: false });
       }
-
     };
 
     if ('id' in data) {
-
       update(data);
-
     } else {
-
-      // create
-
-      const dataCustom = {
-
+      create({
         ...data,
-
         resume: resumeSlug,
-
-      };
-
-      create(dataCustom);
-
+      });
     }
-
   };
 
   const handleDeleteAdvancedSkill = (id: string | number) => {
-
     const del = async (skillId: string | number) => {
-
       try {
-
         await advancedSkillService.deleteAdvancedSkillById(skillId);
-
-        setIsSuccess(!isSuccess);
-
+        dispatch({ type: 'refresh' });
         toastMessages.success(t('jobSeeker:profile.messages.skillDeleteSuccess'));
-
       } catch (error: unknown) {
-
         errorHandling(error);
-
       } finally {
-
-        setIsFullScreenLoading(false);
-
+        dispatch({ type: 'set_full_screen_loading', payload: false });
       }
-
     };
 
     confirmModal(
-
       () => del(id),
-
       t('jobSeeker:profile.messages.deleteConfirmTitle', { item: t('jobSeeker:profile.sections.skills') }),
-
       t('jobSeeker:profile.messages.deleteConfirmWarning'),
-
-      'warning'
-
+      'warning',
     );
-
   };
 
   return (
-
     <>
-
       <Box
-
         sx={{
-
           backgroundColor: 'background.paper',
-
           borderRadius: 3,
-
           p: 3,
-
           boxShadow: (theme: Theme) => theme.customShadows.card,
-
         }}
-
       >
-
-        {isLoadingAdvancedSkills ? (
-
-          Loading
-
+        {uiState.isLoadingAdvancedSkills ? (
+          <AdvancedSkillCardLoading />
         ) : (
-
           <Stack spacing={3}>
-
             <Box>
-
               <Stack direction="row" justifyContent="space-between" alignItems="center">
-
                 <Typography variant="h5" sx={{ fontWeight: 600 }}>
-
                   {title}
-
                 </Typography>
-
                 <Fab
-
                   size="small"
-
                   color="primary"
-
-                  aria-label={t("common:actions.add")}
-
+                  aria-label={t('common:actions.add')}
                   onClick={handleShowAdd}
-
                   sx={{
-
                     boxShadow: (theme: Theme) => theme.customShadows.medium,
-
-                    "&:hover": {
-
-                      transform: "scale(1.1)",
-
+                    '&:hover': {
+                      transform: 'scale(1.1)',
                     },
-
-                    transition: "all 0.2s ease-in-out",
-
+                    transition: 'all 0.2s ease-in-out',
                   }}
-
                 >
-
                   <AddIcon />
-
                 </Fab>
-
               </Stack>
-
             </Box>
 
             <Divider sx={{ my: 0, borderColor: 'grey.500' }} />
 
             <Box>
-
-                <DataTable
-                  columns={[
-                    {
-                      header: t('jobSeeker:profile.fields.skill'),
-                      accessorKey: 'name',
-                    },
-                    {
-                      header: t('jobSeeker:profile.fields.level'),
-                      accessorKey: 'level',
-                      cell: (info: { getValue: () => unknown }) => (
-                        <Rating name="level-read-only" value={info.getValue() as number || 0} size="large" readOnly />
-                      ),
-                    },
-                    {
-                      header: t('jobSeeker:profile.fields.actions'),
-                      id: 'actions',
-                      meta: { align: 'right' },
-                      cell: (info: { row: { original: AdvancedSkill } }) => (
-                        <Stack direction="row" spacing={1} justifyContent="flex-end">
-                          <IconButton
-                            size="small"
-                            sx={{
-                              color: 'secondary.main',
-                              bgcolor: 'secondary.background',
-                              '&:hover': {
-                                bgcolor: 'secondary.light',
-                                color: 'white',
-                              },
-                            }}
-                            onClick={() => handleShowUpdate(info.row.original.id)}
-                          >
-                            <ModeEditOutlineOutlinedIcon fontSize="small" />
-                          </IconButton>
-                          <IconButton
-                            size="small"
-                            sx={{
-                              color: 'error.main',
-                              bgcolor: 'error.background',
-                              '&:hover': {
-                                bgcolor: 'error.main',
-                                color: 'white',
-                              },
-                            }}
-                            onClick={() => handleDeleteAdvancedSkill(info.row.original.id)}
-                          >
-                            <DeleteOutlineOutlinedIcon fontSize="small" />
-                          </IconButton>
-                        </Stack>
-                      ),
-                    },
-                  ]}
+              {advancedSkills.length === 0 ? (
+                <EmptyCard content={t('jobSeeker:profile.messages.noSkillData')} onClick={handleShowAdd} />
+              ) : (
+                <AdvancedSkillCardTable
                   data={advancedSkills}
-                  isLoading={isLoadingAdvancedSkills}
-                  hidePagination
-                  emptyMessage={t('jobSeeker:profile.messages.noSkillData')}
+                  onEdit={handleShowUpdate}
+                  onDelete={handleDeleteAdvancedSkill}
+                  t={t}
                 />
-
+              )}
             </Box>
-
           </Stack>
-
         )}
-
       </Box>
 
-      {/* Start: form  */}
-
-      <FormPopup title={t('jobSeeker:profile.sections.skills')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
-
-        <AdvancedSkillForm handleAddOrUpdate={handleAddOrUpdate as (data: AdvancedSkillFormValues) => void} editData={editData} serverErrors={serverErrors} />
-
+      <FormPopup
+        title={t('jobSeeker:profile.sections.skills')}
+        openPopup={uiState.openPopup}
+        setOpenPopup={(open) => dispatch({ type: open ? 'open_popup' : 'close_popup' })}
+      >
+        <AdvancedSkillForm
+          key={`${uiState.openPopup ? 'open' : 'closed'}-${uiState.editData?.name || uiState.editData?.level || 'new'}`}
+          handleAddOrUpdate={handleAddOrUpdate as (data: AdvancedSkillFormValues) => void}
+          editData={uiState.editData}
+          serverErrors={uiState.serverErrors}
+        />
       </FormPopup>
 
-      {/* End: form */}
-
-      {/* Start: full screen loading */}
-
-      {isFullScreenLoading && <BackdropLoading />}
-
-      {/* End: full screen loading */}
-
+      {uiState.isFullScreenLoading && <BackdropLoading />}
     </>
-
   );
-
 };
 
 export default AdvancedSkillCard;
-

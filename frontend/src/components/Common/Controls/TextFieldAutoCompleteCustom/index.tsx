@@ -6,6 +6,8 @@ import { Autocomplete, TextField, Typography } from "@mui/material";
 import { SxProps, Theme } from '@mui/material/styles';
 import ValidationError from '../ValidationError';
 import type { SelectOption } from '@/types/models';
+
+const EMPTY_SX = {};
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
   control: Control<T>;
@@ -31,7 +33,7 @@ const TextFieldAutoCompleteCustom = <T extends FieldValues = FieldValues>({
   loading,
   handleSelect,
   helperText = '',
-  sx = {},
+  sx = EMPTY_SX,
 }: Props<T>) => {
 
   const [open, setOpen] = React.useState(false);

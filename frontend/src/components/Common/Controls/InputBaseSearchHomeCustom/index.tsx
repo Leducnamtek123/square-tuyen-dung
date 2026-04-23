@@ -1,35 +1,18 @@
 import * as React from 'react';
-
 import { useDispatch } from 'react-redux';
-
 import { useRouter } from 'next/navigation';
-
 import { useTheme } from '@mui/material/styles';
-
 import InputBase from '@mui/material/InputBase';
-
 import Button from '@mui/material/Button';
-
 import SearchIcon from '@mui/icons-material/Search';
-
 import ClearIcon from '@mui/icons-material/Clear';
-
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-
-import { Box, ClickAwayListener, List, ListItem, ListItemIcon, ListItemText, Popper, Stack, Typography } from "@mui/material";
-
-import { CircularProgress, IconButton, InputAdornment } from "@mui/material";
-
 import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
-
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
-
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { Box, ClickAwayListener, List, ListItem, ListItemIcon, ListItemText, Popper, Stack, Typography, CircularProgress, IconButton, InputAdornment } from '@mui/material';
 import { useDebounce } from '@/hooks';
-
 import { searchJobPostWithKeyword } from '@/redux/filterSlice';
-
 import jobService from '@/services/jobService';
-
 import { ROUTES } from '@/configs/constants';
 
 interface Props<T extends FieldValues = FieldValues> {
@@ -38,6 +21,46 @@ interface Props<T extends FieldValues = FieldValues> {
   placeholder?: string;
   showSubmitButton?: boolean;
   location?: 'HOME' | string;
+}
+
+type SearchState = {
+  showResult: boolean;
+  searchValue: string;
+  searchResult: string[];
+  recentSearch: string[];
+  isLoading: boolean;
+};
+
+type SearchAction =
+  | { type: 'show_result'; value: boolean }
+  | { type: 'set_search_value'; value: string }
+  | { type: 'set_search_result'; value: string[] }
+  | { type: 'set_recent_search'; value: string[] }
+  | { type: 'set_loading'; value: boolean };
+
+const initialState: SearchState = {
+  showResult: false,
+  searchValue: '',
+  searchResult: [],
+  recentSearch: [],
+  isLoading: false,
+};
+
+function reducer(state: SearchState, action: SearchAction): SearchState {
+  switch (action.type) {
+    case 'show_result':
+      return { ...state, showResult: action.value };
+    case 'set_search_value':
+      return { ...state, searchValue: action.value };
+    case 'set_search_result':
+      return { ...state, searchResult: action.value };
+    case 'set_recent_search':
+      return { ...state, recentSearch: action.value };
+    case 'set_loading':
+      return { ...state, isLoading: action.value };
+    default:
+      return state;
+  }
 }
 
 const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
@@ -50,55 +73,76 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
   const theme = useTheme();
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const inputSearchRef = React.useRef<HTMLDivElement | null>(null);
-
   const nav = useRouter();
-
   const dispatch = useDispatch();
-
-  const [showResult, setShowResult] = React.useState(false);
-
-  const [searchValue, setSearchValue] = React.useState('');
-
-  const [searchResult, setSearchResult] = React.useState<string[]>([]);
-
-  const [recentSearch, setRecentSearch] = React.useState<string[]>([]);
-
-  const debounded = useDebounce(searchValue, 300);
-
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [state, dispatchSearch] = React.useReducer(reducer, initialState);
+  const debounced = useDebounce(state.searchValue, 300);
 
   React.useEffect(() => {
-    const getSuggestTitle = async (kw: string) => {
-      setIsLoading(true);
+    try {
+      const stored = localStorage.getItem('recentSearch');
+      if (!stored) return;
+      const parsed = JSON.parse(stored) as unknown;
+      dispatchSearch({
+        type: 'set_recent_search',
+        value: Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [],
+      });
+    } catch {
+      dispatchSearch({ type: 'set_recent_search', value: [] });
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (!debounced) {
+      dispatchSearch({ type: 'set_loading', value: false });
+      return;
+    }
+
+    let active = true;
+    dispatchSearch({ type: 'set_loading', value: true });
+
+    const loadSuggestions = async () => {
       try {
-        const resData = await jobService.searchJobSuggestTitle(kw);
-        const data = Array.isArray(resData) ? resData : ((resData as { results?: string[] })?.results || (resData as { data?: string[] })?.data || []);
-        setSearchResult(data.flat());
+        const resData = await jobService.searchJobSuggestTitle(debounced);
+        const data = Array.isArray(resData)
+          ? resData
+          : ((resData as { results?: string[] })?.results || (resData as { data?: string[] })?.data || []);
+        if (active) {
+          dispatchSearch({ type: 'set_search_result', value: data.flat() });
+        }
       } catch (error) {
         console.error('Search failed: ', error);
       } finally {
-        setIsLoading(false);
+        if (active) {
+          dispatchSearch({ type: 'set_loading', value: false });
+        }
       }
     };
 
-    if (debounded) {
-      getSuggestTitle(debounded);
-    }
-  }, [debounded]);
+    loadSuggestions();
+
+    return () => {
+      active = false;
+    };
+  }, [debounced]);
 
   const handleHideResult = () => {
-    setShowResult(false);
+    dispatchSearch({ type: 'show_result', value: false });
   };
 
   const handleClickItem = (kw: string) => {
-    dispatch(searchJobPostWithKeyword({ kw: kw }));
+    dispatch(searchJobPostWithKeyword({ kw }));
+    const nextRecent = [kw, ...state.recentSearch.filter((item) => item !== kw)].slice(0, 6);
+    dispatchSearch({ type: 'set_recent_search', value: nextRecent });
+    dispatchSearch({ type: 'show_result', value: false });
+    try {
+      localStorage.setItem('recentSearch', JSON.stringify(nextRecent));
+    } catch {
+      // ignore storage errors
+    }
 
-    switch (location) {
-      case 'HOME':
-        nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
-        break;
-      default:
-        break;
+    if (location === 'HOME') {
+      nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
     }
   };
 
@@ -113,12 +157,10 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
             display: 'flex',
             alignItems: 'center',
             width: '100%',
-            backgroundColor:
-              theme.palette.mode === 'light' ? 'white' : '#121212',
+            backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212',
           }}
         >
           <SearchIcon color="disabled" />
-
           <Controller
             name={name as Path<T>}
             control={control}
@@ -130,32 +172,27 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                 placeholder={placeholder}
                 slotProps={{ input: { 'aria-label': 'search' } }}
                 value={field.value ?? ''}
-                onFocus={() => setShowResult(true)}
+                onFocus={() => dispatchSearch({ type: 'show_result', value: true })}
                 onChange={(e) => {
                   const textValue = e.target.value;
                   field.onChange(textValue);
-                  setSearchResult([]);
-                  setSearchValue(textValue);
-                  if (!isLoading) {
-                    setIsLoading(true);
-                  }
+                  dispatchSearch({ type: 'set_search_result', value: [] });
+                  dispatchSearch({ type: 'set_search_value', value: textValue });
+                  dispatchSearch({ type: 'set_loading', value: true });
                 }}
                 onBlur={field.onBlur}
                 endAdornment={
                   <InputAdornment
                     position="end"
                     sx={{
-                      visibility:
-                        field.value !== '' && field.value !== null
-                          ? 'visible'
-                          : 'hidden',
+                      visibility: field.value !== '' && field.value !== null ? 'visible' : 'hidden',
                     }}
                   >
                     <IconButton
                       size="small"
                       onClick={() => {
                         field.onChange('');
-                        setSearchValue('');
+                        dispatchSearch({ type: 'set_search_value', value: '' });
                         inputRef.current?.focus();
                       }}
                     >
@@ -166,19 +203,18 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
               />
             )}
           />
-
           {showSubmitButton && (
             <Button variant="contained" type="submit" color="primary">
-              Tìm kiếm
+              TÃ¬m kiáº¿m
             </Button>
           )}
         </Box>
 
         <Popper
-          open={showResult}
+          open={state.showResult}
           anchorEl={inputSearchRef.current}
           placement="bottom-start"
-          style={{ zIndex: 1300, width: inputSearchRef.current?.offsetWidth }}
+          style={{ zIndex: 20, width: inputSearchRef.current?.offsetWidth }}
         >
           <Box
             sx={{
@@ -194,27 +230,22 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
             <Stack>
               <Box>
                 <Typography fontWeight="bold" fontSize={17} color="#2C95FF">
-                  Gợi ý tìm kiếm
+                  Gá»£i Ã½ tÃ¬m kiáº¿m
                 </Typography>
-
                 <Stack>
-                  {isLoading ? (
+                  {state.isLoading ? (
                     <Stack sx={{ py: 2 }} justifyContent="center" alignItems="center">
                       <CircularProgress size={20} />
                     </Stack>
-                  ) : searchResult.length === 0 ? (
-                    <Typography
-                      my={1}
-                      textAlign="center"
-                      color={'#bdbdbd'}
-                      variant="caption"
-                    >
-                      Không có dữ liệu
+                  ) : state.searchResult.length === 0 ? (
+                    <Typography my={1} textAlign="center" color="#bdbdbd" variant="caption">
+                      KhÃ´ng cÃ³ dá»¯ liá»‡u
                     </Typography>
                   ) : (
                     <List>
-                      {searchResult.map((value) => (
+                      {state.searchResult.map((value) => (
                         <ListItem
+                          key={value}
                           sx={{
                             '&:hover': {
                               backgroundColor: '#E9F4FF',
@@ -225,12 +256,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                           }}
                           onClick={() => handleClickItem(value)}
                         >
-                          <ListItemIcon
-                            sx={{
-                              minWidth: 0,
-                              mr: 1,
-                            }}
-                          >
+                          <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
                             <LightbulbOutlinedIcon sx={{ color: '#FCC67B' }} />
                           </ListItemIcon>
                           <ListItemText primary={`${value}`} secondary={null} />
@@ -241,17 +267,16 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                 </Stack>
               </Box>
 
-              {(recentSearch || [])?.length > 0 && (
+              {state.recentSearch.length > 0 && (
                 <Box>
                   <Typography fontWeight="bold" fontSize={17} color="#2C95FF">
-                    Tìm kiếm gần đây
+                    TÃ¬m kiáº¿m gáº§n Ä‘Ã¢y
                   </Typography>
-
                   <Stack>
                     <List>
-                      {recentSearch.map((value, index) => (
+                      {state.recentSearch.map((value) => (
                         <ListItem
-                          key={index}
+                          key={value}
                           sx={{
                             '&:hover': {
                               backgroundColor: '#E9F4FF',
@@ -262,12 +287,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                           }}
                           onClick={() => handleClickItem(value)}
                         >
-                          <ListItemIcon
-                            sx={{
-                              minWidth: 0,
-                              mr: 1,
-                            }}
-                          >
+                          <ListItemIcon sx={{ minWidth: 0, mr: 1 }}>
                             <QueryBuilderIcon sx={{ color: '#2C95FF' }} />
                           </ListItemIcon>
                           <ListItemText primary={`${value}`} secondary={null} />
@@ -286,6 +306,3 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
 };
 
 export default InputBaseSearchHomeCustom;
-
-
-

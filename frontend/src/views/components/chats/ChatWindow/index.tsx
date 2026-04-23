@@ -1,24 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import {
-  Box,
-  CircularProgress,
-  IconButton,
-  InputBase,
-  Paper,
-  Stack,
-  Typography,
-  Avatar,
-  Divider,
-} from "@mui/material";
-import SendIcon from '@mui/icons-material/Send';
-import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
-import AttachFileIcon from '@mui/icons-material/AttachFile';
-import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
-import CloseIcon from '@mui/icons-material/Close';
-import Popover from '@mui/material/Popover';
-import EmojiPicker from 'emoji-picker-react';
+import { Box, Stack } from '@mui/material';
 import {
   collection,
   onSnapshot,
@@ -36,15 +19,15 @@ import {
   QueryDocumentSnapshot,
   DocumentData,
 } from 'firebase/firestore';
+import type { Timestamp } from 'firebase/firestore';
+import type { FieldValue } from 'firebase/firestore';
 import db from '../../../../configs/firebase-config';
-import Message from '../Message';
 import { RootState } from '../../../../redux/store';
 import { useChatContext } from '../../../../context/ChatProvider';
 import commonService from '../../../../services/commonService';
-import type { Timestamp } from 'firebase/firestore';
-import type { FieldValue } from 'firebase/firestore';
+import { ChatWindowComposer } from './ChatWindowComposer';
+import { ChatWindowMessagePanel, type ChatWindowMessage } from './ChatWindowMessagePanel';
 
-// Types
 interface ChatRoom {
   id: string;
   members: string[];
@@ -54,53 +37,104 @@ interface ChatRoom {
   unreadCount?: number;
 }
 
-interface MessageData {
-  id: string;
-  text: string;
-  senderId: string;
-  createdAt: { seconds: number; nanoseconds: number } | null;
-  attachmentUrl?: string;
-  attachmentType?: string;
-  fileName?: string;
-}
+type ChatWindowState = {
+  inputValue: string;
+  selectedRoom: ChatRoom | null;
+  partnerId: string | null;
+  isLoading: boolean;
+  hasMore: boolean;
+  lastDocument: QueryDocumentSnapshot<DocumentData> | null;
+  messages: ChatWindowMessage[];
+  count: number;
+  isUploading: boolean;
+  uploadProgress: number;
+  emojiAnchorEl: HTMLButtonElement | null;
+};
+
+type ChatWindowAction =
+  | { type: 'set-input-value'; value: string }
+  | { type: 'set-selected-room'; value: ChatRoom | null }
+  | { type: 'set-partner-id'; value: string | null }
+  | { type: 'set-loading'; value: boolean }
+  | { type: 'set-has-more'; value: boolean }
+  | { type: 'set-last-document'; value: QueryDocumentSnapshot<DocumentData> | null }
+  | { type: 'set-messages'; value: ChatWindowMessage[] }
+  | { type: 'prepend-messages'; value: ChatWindowMessage[] }
+  | { type: 'set-count'; value: number }
+  | { type: 'set-uploading'; value: boolean }
+  | { type: 'set-upload-progress'; value: number }
+  | { type: 'set-emoji-anchor'; value: HTMLButtonElement | null };
 
 const LIMIT_MESSAGE = 20;
 const messageCollectionRef = collection(db, 'messages');
 
+const initialState: ChatWindowState = {
+  inputValue: '',
+  selectedRoom: null,
+  partnerId: null,
+  isLoading: true,
+  hasMore: true,
+  lastDocument: null,
+  messages: [],
+  count: 0,
+  isUploading: false,
+  uploadProgress: 0,
+  emojiAnchorEl: null,
+};
+
+const reducer = (state: ChatWindowState, action: ChatWindowAction): ChatWindowState => {
+  switch (action.type) {
+    case 'set-input-value':
+      return { ...state, inputValue: action.value };
+    case 'set-selected-room':
+      return { ...state, selectedRoom: action.value };
+    case 'set-partner-id':
+      return { ...state, partnerId: action.value };
+    case 'set-loading':
+      return { ...state, isLoading: action.value };
+    case 'set-has-more':
+      return { ...state, hasMore: action.value };
+    case 'set-last-document':
+      return { ...state, lastDocument: action.value };
+    case 'set-messages':
+      return { ...state, messages: action.value };
+    case 'prepend-messages':
+      return { ...state, messages: [...action.value, ...state.messages] };
+    case 'set-count':
+      return { ...state, count: action.value };
+    case 'set-uploading':
+      return { ...state, isUploading: action.value };
+    case 'set-upload-progress':
+      return { ...state, uploadProgress: action.value };
+    case 'set-emoji-anchor':
+      return { ...state, emojiAnchorEl: action.value };
+    default:
+      return state;
+  }
+};
+
 const ChatWindow = () => {
   const { t } = useTranslation('chat');
   const { currentUser } = useSelector((state: RootState) => state.user);
-  const { currentUserChat, selectedRoomId, setSelectedRoomId } = useChatContext();
+  const { currentUserChat, selectedRoomId } = useChatContext();
 
   const inputRef = React.useRef<HTMLInputElement>(null);
   const messageListRef = React.useRef<HTMLDivElement>(null);
-
-  const [inputValue, setInputValue] = React.useState('');
-  const [selectedRoom, setSelectedRoom] = React.useState<ChatRoom | null>(null);
-  const [partnerId, setPartnerId] = React.useState<string | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [hasMore, setHasMore] = React.useState(true);
-  const [lastDocument, setLastDocument] = React.useState<QueryDocumentSnapshot<DocumentData> | null>(null);
-  const [messages, setMessages] = React.useState<MessageData[]>([]);
-  const [count, setCount] = React.useState(0);
-  
-  // File upload & Emoji states
   const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const [isUploading, setIsUploading] = React.useState(false);
-  const [uploadProgress, setUploadProgress] = React.useState(0);
-  const [emojiAnchorEl, setEmojiAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+  const [state, dispatch] = React.useReducer(reducer, initialState);
 
   const handleEmojiClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setEmojiAnchorEl(event.currentTarget);
-  };
-  const handleEmojiClose = () => {
-    setEmojiAnchorEl(null);
-  };
-  const onEmojiSelect = (emojiObject: any) => {
-    setInputValue(prev => prev + emojiObject.emoji);
+    dispatch({ type: 'set-emoji-anchor', value: event.currentTarget });
   };
 
-  // Update unreadCount
+  const handleEmojiClose = () => {
+    dispatch({ type: 'set-emoji-anchor', value: null });
+  };
+
+  const onEmojiSelect = (emojiObject: any) => {
+    dispatch({ type: 'set-input-value', value: state.inputValue + emojiObject.emoji });
+  };
+
   React.useEffect(() => {
     if (selectedRoomId && currentUserChat) {
       const chatRoomRef = doc(db, 'chatRooms', selectedRoomId);
@@ -111,146 +145,140 @@ const ChatWindow = () => {
     }
   }, [selectedRoomId, currentUserChat]);
 
-  // Load chat room details
   React.useEffect(() => {
-    if (selectedRoomId) {
-      const chatRoomRef = doc(db, 'chatRooms', selectedRoomId);
-      const unsubscribeChatRoom = onSnapshot(chatRoomRef, (doc) => {
-        if (doc.exists()) {
-          const roomData = { id: doc.id, ...doc.data() } as ChatRoom;
-          setSelectedRoom(roomData);
-          if (currentUserChat) {
-            const partner = roomData.members.find(
-              (member) => member !== `${currentUserChat.userId}`
-            );
-            setPartnerId(partner || null);
-          }
+    if (!selectedRoomId) return;
+
+    const chatRoomRef = doc(db, 'chatRooms', selectedRoomId);
+    const unsubscribeChatRoom = onSnapshot(chatRoomRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const roomData = { id: snapshot.id, ...snapshot.data() } as ChatRoom;
+        dispatch({ type: 'set-selected-room', value: roomData });
+        if (currentUserChat) {
+          const partner = roomData.members.find((member) => member !== `${currentUserChat.userId}`);
+          dispatch({ type: 'set-partner-id', value: partner || null });
         }
-      });
-      return () => unsubscribeChatRoom();
-    }
+      }
+    });
+
+    return () => unsubscribeChatRoom();
   }, [selectedRoomId, currentUserChat]);
 
-  // Listen to messages (real-time)
   React.useEffect(() => {
-    if (selectedRoomId) {
-      setIsLoading(true);
-      const q = query(
-        messageCollectionRef,
-        where('chatRoomId', '==', selectedRoomId),
-        orderBy('createdAt', 'desc'),
-        limit(LIMIT_MESSAGE)
-      );
+    if (!selectedRoomId) return;
 
-      const unsubscribeMessages = onSnapshot(q, (querySnapshot) => {
-        const messagesData: MessageData[] = [];
-        querySnapshot.forEach((doc) => {
-          messagesData.push({ id: doc.id, ...doc.data() } as MessageData);
-        });
-        setMessages(messagesData.reverse());
-        if (querySnapshot.docs.length > 0) {
-          setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
-        }
-        setIsLoading(false);
-        setHasMore(querySnapshot.docs.length === LIMIT_MESSAGE);
+    dispatch({ type: 'set-loading', value: true });
+    const q = query(
+      messageCollectionRef,
+      where('chatRoomId', '==', selectedRoomId),
+      orderBy('createdAt', 'desc'),
+      limit(LIMIT_MESSAGE),
+    );
+
+    const unsubscribeMessages = onSnapshot(q, (querySnapshot) => {
+      const messagesData: ChatWindowMessage[] = [];
+      querySnapshot.forEach((messageDoc) => {
+        messagesData.push({ id: messageDoc.id, ...messageDoc.data() } as ChatWindowMessage);
       });
+      dispatch({ type: 'set-messages', value: messagesData.reverse() });
+      dispatch({
+        type: 'set-last-document',
+        value: querySnapshot.docs.length > 0 ? querySnapshot.docs[querySnapshot.docs.length - 1] : null,
+      });
+      dispatch({ type: 'set-loading', value: false });
+      dispatch({ type: 'set-has-more', value: querySnapshot.docs.length === LIMIT_MESSAGE });
+    });
 
-      return () => unsubscribeMessages();
-    }
+    return () => unsubscribeMessages();
   }, [selectedRoomId]);
 
-  // Load total message count (without downloading all docs)
   React.useEffect(() => {
-    if (selectedRoomId) {
-      const q = query(
-        messageCollectionRef,
-        where('chatRoomId', '==', selectedRoomId)
-      );
-      getCountFromServer(q).then((snap) => {
-        setCount(snap.data().count);
-      }).catch(() => {
-        // Fallback: use getDocs if getCountFromServer not available
-        getDocs(q).then((s) => setCount(s.size));
+    if (!selectedRoomId) return;
+
+    const q = query(messageCollectionRef, where('chatRoomId', '==', selectedRoomId));
+    getCountFromServer(q)
+      .then((snap) => {
+        dispatch({ type: 'set-count', value: snap.data().count });
+      })
+      .catch(() => {
+        getDocs(q).then((snapshot) => dispatch({ type: 'set-count', value: snapshot.size }));
       });
-    }
   }, [selectedRoomId]);
 
   const sendNotificationToPartner = async (messageText: string) => {
-    if (!partnerId || !currentUser) return;
+    if (!state.partnerId || !currentUser) return;
+
     try {
-      const notificationRef = collection(db, 'users', partnerId, 'notifications');
+      const notificationRef = collection(db, 'users', state.partnerId, 'notifications');
       await addDoc(notificationRef, {
         is_deleted: false,
         is_read: false,
         image: currentUser?.avatarUrl || '',
-        title: "Tin nhắn mới",
-        content: `${currentUser?.fullName || 'Ai đó'} gửi một tin nhắn.`,
+        title: 'Tin nhan moi',
+        content: `${currentUser?.fullName || 'Ai do'} gui mot tin nhan.`,
         time: serverTimestamp(),
-        type: "NEW_MESSAGE",
+        type: 'NEW_MESSAGE',
         NEW_MESSAGE: {
           chatRoomId: selectedRoomId,
           text: messageText,
-        }
+        },
       });
     } catch (err) {
-      console.error("Error creating notification: ", err);
+      console.error('Error creating notification: ', err);
     }
   };
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputValue.trim() || !selectedRoomId || !currentUserChat) return;
+    if (!state.inputValue.trim() || !selectedRoomId || !currentUserChat) return;
 
     const messageData = {
       chatRoomId: selectedRoomId,
       senderId: `${currentUserChat.userId}`,
-      text: inputValue,
+      text: state.inputValue,
       createdAt: serverTimestamp(),
     };
 
     try {
-      setInputValue('');
+      dispatch({ type: 'set-input-value', value: '' });
       await addDoc(messageCollectionRef, messageData);
-      
+
       const chatRoomRef = doc(db, 'chatRooms', selectedRoomId);
       await updateDoc(chatRoomRef, {
         updatedAt: serverTimestamp(),
-        lastMessage: inputValue,
-        recipientId: partnerId,
-        unreadCount: (selectedRoom?.unreadCount || 0) + 1,
+        lastMessage: messageData.text,
+        recipientId: state.partnerId,
+        unreadCount: (state.selectedRoom?.unreadCount || 0) + 1,
       });
-      sendNotificationToPartner(inputValue);
+      sendNotificationToPartner(messageData.text);
     } catch (error) {
-      console.error("Error sending message: ", error);
+      console.error('Error sending message: ', error);
     }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !selectedRoomId || !currentUserChat) return;
-    
-    // reset input
+
     if (fileInputRef.current) fileInputRef.current.value = '';
 
     const isImage = file.type.startsWith('image/');
     const attachmentType = isImage ? 'image' : 'document';
     const fileName = file.name;
 
-    setIsUploading(true);
-    setUploadProgress(10); // Start with some progress
+    dispatch({ type: 'set-uploading', value: true });
+    dispatch({ type: 'set-upload-progress', value: 10 });
 
     try {
-      // Use backend upload instead of Firebase
       const res = await commonService.uploadFile(file, 'OTHER');
       const downloadURL = res.url;
-      
-      setIsUploading(false);
-      setUploadProgress(100);
+
+      dispatch({ type: 'set-uploading', value: false });
+      dispatch({ type: 'set-upload-progress', value: 100 });
 
       const messageData = {
         chatRoomId: selectedRoomId,
         senderId: `${currentUserChat.userId}`,
-        text: isImage ? 'Đã gửi một hình ảnh' : `Đã gửi file: ${fileName}`,
+        text: isImage ? 'Da gui mot hinh anh' : `Da gui file: ${fileName}`,
         createdAt: serverTimestamp(),
         attachmentUrl: downloadURL,
         attachmentType,
@@ -258,196 +286,89 @@ const ChatWindow = () => {
       };
 
       await addDoc(messageCollectionRef, messageData);
-      
+
       const chatRoomRef = doc(db, 'chatRooms', selectedRoomId);
       await updateDoc(chatRoomRef, {
         updatedAt: serverTimestamp(),
         lastMessage: messageData.text,
-        recipientId: partnerId,
-        unreadCount: (selectedRoom?.unreadCount || 0) + 1,
+        recipientId: state.partnerId,
+        unreadCount: (state.selectedRoom?.unreadCount || 0) + 1,
       });
       sendNotificationToPartner(messageData.text);
     } catch (error) {
-      console.error("Upload or save failed: ", error);
-      setIsUploading(false);
+      console.error('Upload or save failed: ', error);
+      dispatch({ type: 'set-uploading', value: false });
     }
   };
 
   const handleLoadMore = async () => {
-    if (!lastDocument || !selectedRoomId) return;
+    if (!state.lastDocument || !selectedRoomId) return;
 
     const q = query(
       messageCollectionRef,
       where('chatRoomId', '==', selectedRoomId),
       orderBy('createdAt', 'desc'),
-      startAfter(lastDocument),
-      limit(LIMIT_MESSAGE)
+      startAfter(state.lastDocument),
+      limit(LIMIT_MESSAGE),
     );
 
     const querySnapshot = await getDocs(q);
-    const moreMessages: MessageData[] = [];
-    querySnapshot.forEach((doc) => {
-      moreMessages.push({ id: doc.id, ...doc.data() } as MessageData);
+    const moreMessages: ChatWindowMessage[] = [];
+    querySnapshot.forEach((messageDoc) => {
+      moreMessages.push({ id: messageDoc.id, ...messageDoc.data() } as ChatWindowMessage);
     });
 
     if (querySnapshot.docs.length > 0) {
-      setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
-      setMessages((prev) => [...moreMessages.reverse(), ...prev]);
+      dispatch({
+        type: 'set-last-document',
+        value: querySnapshot.docs[querySnapshot.docs.length - 1],
+      });
+      dispatch({ type: 'prepend-messages', value: moreMessages.reverse() });
     }
-    setHasMore(querySnapshot.docs.length === LIMIT_MESSAGE);
+    dispatch({ type: 'set-has-more', value: querySnapshot.docs.length === LIMIT_MESSAGE });
   };
 
-  // Scroll to bottom when messages change
   React.useEffect(() => {
     if (messageListRef.current) {
       messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
     }
-  }, [messages]);
-
-  if (!currentUserChat || !selectedRoomId) {
-    return (
-      <Box 
-        sx={{ 
-          height: '100%', 
-          display: 'flex', 
-          flexDirection: 'column',
-          alignItems: 'center', 
-          justifyContent: 'center',
-          bgcolor: 'background.default',
-          borderLeft: 1,
-          borderRight: 1,
-          borderColor: 'divider',
-        }}
-      >
-        <ChatBubbleOutlineIcon sx={{ fontSize: 64, mb: 2, color: 'text.disabled' }} />
-        <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 500 }}>
-          {t('noConversationSelected')}
-        </Typography>
-        <Typography variant="body2" color="text.disabled" sx={{ mt: 1 }}>{t('auto.index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32', `Chọn một cuộc hội thoại ở danh sách bên trái để bắt đầu nhắn tin`)}</Typography>
-      </Box>
-    );
-  }
+  }, [state.messages]);
 
   return (
     <Stack sx={{ height: '100%', bgcolor: 'background.paper' }}>
-      {/* Messages list */}
-      <Box
-        ref={messageListRef}
-        sx={{
-          flexGrow: 1,
-          overflowY: 'auto',
-          p: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 1,
-          '&::-webkit-scrollbar': {
-            width: '6px',
-          },
-          '&::-webkit-scrollbar-thumb': {
-            backgroundColor: 'rgba(0,0,0,0.1)',
-            borderRadius: '10px',
-          },
-        }}
-      >
-        {isLoading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-            <CircularProgress size={24} />
-          </Box>
-        ) : (
-          <>
-            {hasMore && (
-              <Box sx={{ display: 'flex', justifyContent: 'center', py: 1 }}>
-                <Typography 
-                  variant="caption" 
-                  sx={{ cursor: 'pointer', color: 'primary.main' }}
-                  onClick={handleLoadMore}
-                >
-                  {t('loadPreviousMessages')}
-                </Typography>
-              </Box>
-            )}
-            {messages.map((msg) => (
-              <Message
-                key={msg.id}
-                userId={msg.senderId}
-                text={msg.text}
-                createdAt={msg.createdAt}
-                attachmentUrl={msg.attachmentUrl}
-                attachmentType={msg.attachmentType}
-                fileName={msg.fileName}
-              />
-            ))}
-          </>
+      <ChatWindowMessagePanel
+        showEmptyState={!currentUserChat || !selectedRoomId}
+        isLoading={state.isLoading}
+        hasMore={state.hasMore}
+        messages={state.messages}
+        onLoadMore={handleLoadMore}
+        messageListRef={messageListRef}
+        noConversationSelectedText={t('noConversationSelected')}
+        chooseConversationText={t(
+          'auto.index_chn_mt_cuc_hi_thoi_danh_sch_bn_5d32',
+          'Chon mot cuoc hoi thoai o danh sach ben trai de bat dau nhan tin',
         )}
-      </Box>
+        loadPreviousMessagesText={t('loadPreviousMessages')}
+      />
 
-      {/* Input area */}
-      <Paper
-        component="form"
-        onSubmit={handleSendMessage}
-        elevation={0}
-        sx={{
-          p: '12px 16px',
-          display: 'flex',
-          alignItems: 'center',
-          borderTop: 1,
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-        }}
-      >
-        <input 
-          type="file" 
-          ref={fileInputRef} 
-          style={{ display: 'none' }} 
-          onChange={handleFileUpload} 
-        />
-        <IconButton size="small" sx={{ mr: 1 }} disabled={isUploading} onClick={() => fileInputRef.current?.click()}>
-          {isUploading ? <CircularProgress size={20} variant="determinate" value={uploadProgress} /> : <AttachFileIcon fontSize="small" />}
-        </IconButton>
-        <IconButton size="small" sx={{ mr: 1 }} onClick={handleEmojiClick}>
-          <SentimentSatisfiedAltIcon fontSize="small" />
-        </IconButton>
-        
-        <Popover
-          open={Boolean(emojiAnchorEl)}
-          anchorEl={emojiAnchorEl}
-          onClose={handleEmojiClose}
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'center',
-          }}
-          transformOrigin={{
-            vertical: 'top',
-            horizontal: 'center',
-          }}
-        >
-          <EmojiPicker onEmojiClick={onEmojiSelect} />
-        </Popover>
-        <InputBase
-          sx={{ ml: 1, flex: 1, fontSize: 14 }}
-          placeholder={t('typeAMessage')}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
+      {currentUserChat && selectedRoomId && (
+        <ChatWindowComposer
           inputRef={inputRef}
+          fileInputRef={fileInputRef}
+          inputValue={state.inputValue}
+          isUploading={state.isUploading}
+          uploadProgress={state.uploadProgress}
+          emojiAnchorEl={state.emojiAnchorEl}
+          onSubmit={handleSendMessage}
+          onFileUpload={handleFileUpload}
+          onOpenFilePicker={() => fileInputRef.current?.click()}
+          onEmojiClick={handleEmojiClick}
+          onEmojiClose={handleEmojiClose}
+          onEmojiSelect={onEmojiSelect}
+          onInputChange={(value) => dispatch({ type: 'set-input-value', value })}
+          placeholderText={t('typeAMessage')}
         />
-        <IconButton 
-          type="submit" 
-          disabled={!inputValue.trim()}
-          sx={{ 
-            ml: 1,
-            bgcolor: inputValue.trim() ? 'primary.main' : 'action.hover',
-            color: inputValue.trim() ? 'white' : 'action.disabled',
-            '&:hover': {
-              bgcolor: inputValue.trim() ? 'primary.dark' : 'action.hover'
-            },
-            transition: 'all 0.2s',
-            width: 40,
-            height: 40,
-          }}
-        >
-          <SendIcon fontSize="small" sx={{ transform: 'translateX(2px)' }} />
-        </IconButton>
-      </Paper>
+      )}
     </Stack>
   );
 };

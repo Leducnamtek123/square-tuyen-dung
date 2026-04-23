@@ -22,8 +22,7 @@ import type { SelectOption } from '@/types/models';
 import AccountInfoStep from './AccountInfoStep';
 import CompanyInfoStep from './CompanyInfoStep';
 import type { FieldErrors } from 'react-hook-form';
-import type { ApiError } from '../../../../types/api';
-import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
+import type { UseFormSetError } from 'react-hook-form';
 
 export interface EmployerSignUpFormData {
   fullName: string;
@@ -56,6 +55,66 @@ interface EmployerSignUpFormProps {
 }
 type NestedServerErrors = Record<string, string[] | Record<string, string[]>>;
 
+const EMPTY_SERVER_ERRORS: Record<string, string[] | NestedServerErrors> = {};
+
+const applyEmployerServerErrors = (
+  serverErrors: Record<string, string[] | NestedServerErrors>,
+  setError: UseFormSetError<EmployerSignUpFormData>
+) => {
+  for (const err in serverErrors) {
+    const errValue = serverErrors[err];
+    if (err === 'company' && errValue && typeof errValue === 'object' && !Array.isArray(errValue)) {
+      const companyErrors = errValue as NestedServerErrors;
+      for (const companyErr in companyErrors) {
+        if (companyErr === 'location' && typeof companyErrors[companyErr] === 'object') {
+          const locationErrors = companyErrors[companyErr] as Record<string, string[]>;
+          for (const locationErr in locationErrors) {
+            setError(`company.location.${locationErr}` as keyof EmployerSignUpFormData, {
+              type: 'manual',
+              message: locationErrors[locationErr]?.join(' '),
+            });
+          }
+        } else {
+          setError(`company.${companyErr}` as keyof EmployerSignUpFormData, {
+            type: 'manual',
+            message: (companyErrors[companyErr] as string[])?.join(' '),
+          });
+        }
+      }
+    } else {
+      const plainErrors = Array.isArray(errValue) ? errValue : [];
+      setError(err as keyof EmployerSignUpFormData, {
+        type: 'manual',
+        message: plainErrors.join(' '),
+      });
+    }
+  }
+};
+
+const syncLocationOptions = async (
+  input: string,
+  setLocationOptions: React.Dispatch<React.SetStateAction<SelectOption[]>>
+) => {
+  if (!input || input.trim().length < 3) {
+    setLocationOptions([]);
+    return;
+  }
+
+  try {
+    const resData = await goongService.getPlaces(input);
+    if (resData.predictions) {
+      const mappedOptions: SelectOption[] = resData.predictions.map((p) => ({
+        id: p.place_id,
+        name: p.description,
+        place_id: p.place_id,
+      }));
+      setLocationOptions(mappedOptions);
+    }
+  } catch {
+    setLocationOptions([]);
+  }
+};
+
 const StyledButton = styled(Button)(({ theme }) => ({
   padding: '8px 16px',
   borderRadius: '8px',
@@ -83,7 +142,7 @@ const StyledStepper = styled(Stepper)(({ theme }) => ({
   },
 }));
 
-const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: EmployerSignUpFormProps) => {
+const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, checkCreds }: EmployerSignUpFormProps) => {
   const { t } = useTranslation('auth');
   const steps = [t('steps.loginInfo'), t('steps.companyInfo')];
   const [activeStep, setActiveStep] = React.useState(0);
@@ -151,46 +210,11 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
   const [emailExistsError, setEmailExistsError] = React.useState(false);
 
   React.useEffect(() => {
-    for (const err in serverErrors) {
-      const errValue = serverErrors[err];
-      if (err === 'company' && errValue && typeof errValue === 'object' && !Array.isArray(errValue)) {
-        const companyErrors = errValue as NestedServerErrors;
-        for (const companyErr in companyErrors) {
-          if (companyErr === 'location' && typeof companyErrors[companyErr] === 'object') {
-            const locationErrors = companyErrors[companyErr] as Record<string, string[]>;
-            for (const locationErr in locationErrors) {
-              setError(`company.location.${locationErr}` as keyof EmployerSignUpFormData, { type: 'manual', message: locationErrors[locationErr]?.join(' ') });
-            }
-          } else {
-            setError(`company.${companyErr}` as keyof EmployerSignUpFormData, { type: 'manual', message: (companyErrors[companyErr] as string[])?.join(' ') });
-          }
-        }
-      } else {
-        const plainErrors = Array.isArray(errValue) ? errValue : [];
-        setError(err as keyof EmployerSignUpFormData, { type: 'manual', message: plainErrors.join(' ') });
-      }
-    }
+    applyEmployerServerErrors(serverErrors, setError);
   }, [serverErrors, setError]);
 
   React.useEffect(() => {
-    const loadLocation = async (input: string) => {
-      if (!input || input.trim().length < 3) {
-        setLocationOptions([]);
-        return;
-      }
-      try {
-        const resData = await goongService.getPlaces(input);
-        if (resData.predictions) {
-          const mappedOptions: SelectOption[] = resData.predictions.map(p => ({
-            id: p.place_id,
-            name: p.description,
-            place_id: p.place_id
-          }));
-          setLocationOptions(mappedOptions);
-        }
-      } catch (error) { }
-    };
-    loadLocation(addressDebounce);
+    void syncLocationOptions(addressDebounce, setLocationOptions);
   }, [addressDebounce]);
 
   React.useEffect(() => {
@@ -261,11 +285,11 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = {}, checkCreds }: Employe
     const checkCredsResult = await checkCreds(email, 'EMPLOYER');
     if (checkCredsResult === true) {
       clearErrors();
-      setActiveStep(activeStep + 1);
+      setActiveStep((currentStep) => currentStep + 1);
     }
   };
 
-  const handleBack = () => setActiveStep(activeStep - 1);
+  const handleBack = () => setActiveStep((currentStep) => currentStep - 1);
 
   return (
     <Box

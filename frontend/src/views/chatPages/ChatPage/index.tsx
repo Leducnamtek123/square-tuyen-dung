@@ -14,6 +14,23 @@ import ChatWindow from '../../components/chats/ChatWindow';
 import LeftSidebar from '../../components/chats/LeftSidebar';
 import SidebarHeader from '../../../components/Features/Chats/SidebarHeader';
 
+const ChatLeftSidebar = ({ isJobSeeker }: { isJobSeeker: boolean }) => (
+  <Box px={2} py={2} sx={{ height: '100%', bgcolor: 'background.paper' }}>
+    <Stack spacing={2}>
+      <Box>
+        <SidebarHeader />
+      </Box>
+      <Box>{isJobSeeker ? <LeftSidebar /> : <LeftSidebar.Employer />}</Box>
+    </Stack>
+  </Box>
+);
+
+const ChatRightSidebar = ({ isJobSeeker }: { isJobSeeker: boolean }) => (
+  <Box px={2} py={2}>
+    {isJobSeeker ? <RightSidebar /> : <RightSidebar.Employer />}
+  </Box>
+);
+
 const ChatPage = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -25,30 +42,7 @@ const ChatPage = () => {
   const [openLeftDrawer, setOpenLeftDrawer] = React.useState(false);
   const [openRightDrawer, setOpenRightDrawer] = React.useState(false);
 
-  const renderLeftSidebar = () => {
-    const isJobSeeker = currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
-    return (
-      <Box px={2} py={2} sx={{ height: '100%', bgcolor: 'background.paper' }}>
-        <Stack spacing={2}>
-          <Box>
-            <SidebarHeader />
-          </Box>
-          <Box>
-            {isJobSeeker ? <LeftSidebar /> : <LeftSidebar.Employer />}
-          </Box>
-        </Stack>
-      </Box>
-    );
-  };
-
-  const renderRightSidebar = () => {
-    const isJobSeeker = currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
-    return (
-      <Box px={2} py={2}>
-        {isJobSeeker ? <RightSidebar /> : <RightSidebar.Employer />}
-      </Box>
-    );
-  };
+  const isJobSeeker = currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
 
   return (
     <Grid container sx={{ height: '100vh', bgcolor: 'background.default' }}>
@@ -68,7 +62,7 @@ const ChatPage = () => {
             },
           }}
         >
-          {renderLeftSidebar()}
+          <ChatLeftSidebar isJobSeeker={isJobSeeker} />
         </Drawer>
       ) : (
         <Grid
@@ -83,7 +77,7 @@ const ChatPage = () => {
             sm: 4,
             md: 3
           }}>
-          {renderLeftSidebar()}
+          <ChatLeftSidebar isJobSeeker={isJobSeeker} />
         </Grid>
       )}
 
@@ -180,7 +174,7 @@ const ChatPage = () => {
             },
           }}
         >
-          {renderRightSidebar()}
+          <ChatRightSidebar isJobSeeker={isJobSeeker} />
         </Drawer>
       ) : (
         <Grid
@@ -194,7 +188,7 @@ const ChatPage = () => {
           size={{
             md: 3
           }}>
-          {renderRightSidebar()}
+          <ChatRightSidebar isJobSeeker={isJobSeeker} />
         </Grid>
       )}
     </Grid>

@@ -260,7 +260,12 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
             }}
           >
             <Stack direction="row" spacing={2} alignItems="center">
-              <img src={lang.flagUrl} alt={lang.label} width={20} height={15} style={{ borderRadius: 2, objectFit: 'cover' }} />
+              <Avatar
+                src={lang.flagUrl}
+                alt={lang.label}
+                sx={{ width: 20, height: 15, borderRadius: 0.5, '& img': { objectFit: 'cover' } }}
+                variant="rounded"
+              />
               <Typography variant="body2" sx={{ fontWeight: currentLangCode === lang.code ? 600 : 400 }}>
                 {lang.label}
               </Typography>

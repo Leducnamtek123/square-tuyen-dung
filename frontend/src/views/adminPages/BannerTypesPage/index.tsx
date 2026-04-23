@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useReducer, useState } from 'react';
 import {
   Box,
   Typography,
@@ -27,7 +27,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DataTable from '../../../components/Common/DataTable';
 import { BannerType } from '../../../types/models';
-import { useDataTable } from '../../../hooks';
+import { useDataTable, useDebounce } from '../../../hooks';
 import { useBannerTypes } from './hooks/useBannerTypes';
 
 interface BannerTypeFormData {
@@ -48,8 +48,86 @@ const defaultForm: BannerTypeFormData = {
   is_active: true,
 };
 
+type BannerTypesDialogState = {
+  openDialog: boolean;
+  dialogMode: 'add' | 'edit';
+  current: BannerType | null;
+  formData: BannerTypeFormData;
+  openDelete: boolean;
+};
+
+type BannerTypesDialogAction =
+  | { type: 'open-add' }
+  | { type: 'open-edit'; item: BannerType }
+  | { type: 'open-delete'; item: BannerType }
+  | { type: 'close' }
+  | {
+      type: 'set-field';
+      field: keyof BannerTypeFormData;
+      value: BannerTypeFormData[keyof BannerTypeFormData];
+    };
+
+const defaultDialogState: BannerTypesDialogState = {
+  openDialog: false,
+  dialogMode: 'add',
+  current: null,
+  formData: defaultForm,
+  openDelete: false,
+};
+
+const bannerTypesDialogReducer = (
+  state: BannerTypesDialogState,
+  action: BannerTypesDialogAction
+): BannerTypesDialogState => {
+  switch (action.type) {
+    case 'open-add':
+      return {
+        ...defaultDialogState,
+        openDialog: true,
+      };
+    case 'open-edit':
+      return {
+        ...state,
+        openDialog: true,
+        dialogMode: 'edit',
+        current: action.item,
+        formData: {
+          code: action.item.code || '',
+          name: action.item.name || '',
+          value: action.item.value || 1,
+          web_aspect_ratio: action.item.web_aspect_ratio || '',
+          mobile_aspect_ratio: action.item.mobile_aspect_ratio || '',
+          is_active: action.item.is_active !== false,
+        },
+      };
+    case 'open-delete':
+      return {
+        ...state,
+        current: action.item,
+        openDelete: true,
+      };
+    case 'close':
+      return {
+        ...state,
+        openDialog: false,
+        openDelete: false,
+      };
+    case 'set-field':
+      return {
+        ...state,
+        formData: {
+          ...state.formData,
+          [action.field]: action.value,
+        },
+      };
+    default:
+      return state;
+  }
+};
+
 const BannerTypesPage = () => {
   const { t } = useTranslation('admin');
+  const [dialogState, dispatchDialog] = useReducer(bannerTypesDialogReducer, defaultDialogState);
   const {
     page,
     pageSize,
@@ -61,11 +139,8 @@ const BannerTypesPage = () => {
   } = useDataTable({ initialPageSize: 10 });
 
   const [searchTerm, setSearchTerm] = useState('');
-  const [openDialog, setOpenDialog] = useState(false);
-  const [dialogMode, setDialogMode] = useState<'add' | 'edit'>('add');
-  const [current, setCurrent] = useState<BannerType | null>(null);
-  const [formData, setFormData] = useState<BannerTypeFormData>(defaultForm);
-  const [openDelete, setOpenDelete] = useState(false);
+  const debouncedSearch = useDebounce(searchTerm, 500);
+  const { openDialog, dialogMode, current, formData, openDelete } = dialogState;
 
   const {
     data,
@@ -77,7 +152,7 @@ const BannerTypesPage = () => {
   } = useBannerTypes({
     page: page + 1,
     pageSize,
-    kw: searchTerm,
+    kw: debouncedSearch,
     ordering,
   });
 
@@ -87,29 +162,15 @@ const BannerTypesPage = () => {
   };
 
   const handleOpenAdd = () => {
-    setDialogMode('add');
-    setCurrent(null);
-    setFormData(defaultForm);
-    setOpenDialog(true);
+    dispatchDialog({ type: 'open-add' });
   };
 
   const handleOpenEdit = (item: BannerType) => {
-    setDialogMode('edit');
-    setCurrent(item);
-    setFormData({
-      code: item.code || '',
-      name: item.name || '',
-      value: item.value || 1,
-      web_aspect_ratio: item.web_aspect_ratio || '',
-      mobile_aspect_ratio: item.mobile_aspect_ratio || '',
-      is_active: item.is_active !== false,
-    });
-    setOpenDialog(true);
+    dispatchDialog({ type: 'open-edit', item });
   };
 
   const handleClose = () => {
-    setOpenDialog(false);
-    setOpenDelete(false);
+    dispatchDialog({ type: 'close' });
   };
 
   const handleSave = async () => {
@@ -140,6 +201,10 @@ const BannerTypesPage = () => {
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleDeleteRequest = (item: BannerType) => {
+    dispatchDialog({ type: 'open-delete', item });
   };
 
   const columns = useMemo<ColumnDef<BannerType>[]>(() => [
@@ -176,7 +241,7 @@ const BannerTypesPage = () => {
             </IconButton>
           </Tooltip>
           <Tooltip title={t('common.delete')}>
-            <IconButton size="small" color="error" onClick={() => { setCurrent(info.row.original); setOpenDelete(true); }}>
+            <IconButton size="small" color="error" onClick={() => handleDeleteRequest(info.row.original)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -239,27 +304,37 @@ const BannerTypesPage = () => {
         </DialogTitle>
         <DialogContent>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
-            <TextField label="Code" value={formData.code} onChange={(e) => setFormData((prev) => ({ ...prev, code: e.target.value }))} required />
-            <TextField label="Name" value={formData.name} onChange={(e) => setFormData((prev) => ({ ...prev, name: e.target.value }))} required />
+            <TextField
+              label="Code"
+              value={formData.code}
+              onChange={(e) => dispatchDialog({ type: 'set-field', field: 'code', value: e.target.value })}
+              required
+            />
+            <TextField
+              label="Name"
+              value={formData.name}
+              onChange={(e) => dispatchDialog({ type: 'set-field', field: 'name', value: e.target.value })}
+              required
+            />
             <TextField
               label="Value"
               type="number"
               value={formData.value}
-              onChange={(e) => setFormData((prev) => ({ ...prev, value: Number(e.target.value) || 1 }))}
+              onChange={(e) => dispatchDialog({ type: 'set-field', field: 'value', value: Number(e.target.value) || 1 })}
               required
             />
             <TextField
               label="Web Aspect Ratio"
               value={formData.web_aspect_ratio}
-              onChange={(e) => setFormData((prev) => ({ ...prev, web_aspect_ratio: e.target.value }))}
+              onChange={(e) => dispatchDialog({ type: 'set-field', field: 'web_aspect_ratio', value: e.target.value })}
             />
             <TextField
               label="Mobile Aspect Ratio"
               value={formData.mobile_aspect_ratio}
-              onChange={(e) => setFormData((prev) => ({ ...prev, mobile_aspect_ratio: e.target.value }))}
+              onChange={(e) => dispatchDialog({ type: 'set-field', field: 'mobile_aspect_ratio', value: e.target.value })}
             />
             <FormControlLabel
-              control={<Switch checked={formData.is_active} onChange={(e) => setFormData((prev) => ({ ...prev, is_active: e.target.checked }))} />}
+              control={<Switch checked={formData.is_active} onChange={(e) => dispatchDialog({ type: 'set-field', field: 'is_active', value: e.target.checked })} />}
               label="Active"
             />
           </Box>

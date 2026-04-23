@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import EmployerLayout from '@/layouts/EmployerLayout';
 import DefaultLayout from '@/layouts/DefaultLayout';
@@ -45,7 +44,6 @@ export default function EmployerSectionLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname() || '';
-  const router = useRouter();
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.user);
   const [isChecking, setIsChecking] = useState(true);
@@ -80,7 +78,7 @@ export default function EmployerSectionLayout({
             pathname.includes('/reset-password/');
 
           if (role === ROLES_NAME.EMPLOYER && isAuthPage) {
-            router.replace(dashboardPath);
+            window.location.replace(dashboardPath);
             return;
           }
         }
@@ -90,7 +88,7 @@ export default function EmployerSectionLayout({
       }
 
       if (!token) {
-        router.replace(loginPath);
+        window.location.replace(loginPath);
         return;
       }
 
@@ -99,14 +97,14 @@ export default function EmployerSectionLayout({
         try {
           user = await dispatch(getUserInfo()).unwrap();
         } catch {
-          router.replace(loginPath);
+          window.location.replace(loginPath);
           return;
         }
       }
 
       const role = user?.roleName;
       if (role !== ROLES_NAME.EMPLOYER) {
-        router.replace('/');
+        window.location.replace('/');
         return;
       }
 
@@ -114,7 +112,7 @@ export default function EmployerSectionLayout({
     };
 
     checkAuth();
-  }, [currentUser, dispatch, isPublicPage, pathname, router]);
+  }, [currentUser, dispatch, isPublicPage, pathname]);
 
   if (isChecking) {
     return null;

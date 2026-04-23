@@ -21,6 +21,8 @@ interface PlaceOption extends SelectOption {
   place_id: string;
 }
 
+const EMPTY_SELECT_OPTIONS: SelectOption[] = [];
+
 interface JobPostFormFieldsProps {
   control: Control<JobPostFormValues>;
   allConfig: SystemConfig | null;
@@ -37,7 +39,7 @@ function JobPostFormFields({
   t,
   districtOptions,
   locationOptions,
-  interviewTemplateOptions = [],
+  interviewTemplateOptions = EMPTY_SELECT_OPTIONS,
   handleSelectLocation
 }: JobPostFormFieldsProps) {
   const theme = useTheme();

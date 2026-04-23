@@ -26,6 +26,17 @@ const nextConfig = {
     'sweetalert2',
     'react-easy-crop',
   ],
+  experimental: {
+    optimizePackageImports: [
+      '@mui/material',
+      '@mui/icons-material',
+      '@mui/lab',
+      '@mui/x-date-pickers',
+      '@phosphor-icons/react',
+      'lucide-react',
+      '@fortawesome/react-fontawesome',
+    ],
+  },
   async redirects() {
     return [
       { source: '/admin/bang-dieu-khien', destination: '/admin/dashboard', permanent: false },

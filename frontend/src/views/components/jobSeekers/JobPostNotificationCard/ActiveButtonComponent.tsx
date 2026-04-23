@@ -11,7 +11,7 @@ interface ActiveButtonComponentProps {
 }
 
 const ActiveButtonComponent = ({ id, isActive }: ActiveButtonComponentProps) => {
-  const [checked, setChecked] = React.useState(isActive);
+  const [checked, setChecked] = React.useState(() => isActive);
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
   const handleUpdateActive = () => {

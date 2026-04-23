@@ -173,17 +173,20 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
 
                   >
 
-                    <span
-
-                      style={{ cursor: "pointer" }}
-
+                    <button
+                      type="button"
                       onClick={() => setOpenPopup(true)}
-
+                      style={{
+                        cursor: 'pointer',
+                        background: 'transparent',
+                        border: 0,
+                        padding: 0,
+                        color: 'inherit',
+                        font: 'inherit',
+                      }}
                     >
-
                       {t('account.changePassword')}
-
-                    </span>
+                    </button>
 
                   </Typography>
 

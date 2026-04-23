@@ -1,8 +1,7 @@
 import React from 'react';
-import { useAppSelector } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
-import { Box, Card, Skeleton, Stack, Tooltip, Typography } from "@mui/material";
+import { Box, Card, Skeleton, Stack, Tooltip, Typography, useMediaQuery } from "@mui/material";
 import { useTheme } from '@mui/material/styles';
 import { salaryString } from '@/utils/customData';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,7 +17,7 @@ import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 
 interface JobPostActionProps {
-  id: string | number;
+  id?: string | number;
   slug: string;
   companyImageUrl?: string;
   companyName: string;
@@ -35,7 +34,6 @@ interface JobPostActionProps {
 
 
 const JobPostAction = ({
-  id,
   slug,
   companyImageUrl,
   companyName,
@@ -53,45 +51,8 @@ const JobPostAction = ({
 
   const { allConfig } = useConfig();
 
-  const [parentWidth, setParentWidth] = React.useState(0);
-
-  const [stackDirection, setStackDirection] = React.useState<'column' | 'row'>('column');
-
   const theme = useTheme();
-
-  React.useEffect(() => {
-
-    const handleResize = () => {
-
-      const element = document.getElementById('job-post-action');
-      if (element) {
-        const newWidth = element.offsetWidth;
-        setParentWidth(newWidth);
-      }
-
-    };
-
-    handleResize();
-
-    window.addEventListener('resize', handleResize);
-
-    return () => window.removeEventListener('resize', handleResize);
-
-  }, []);
-
-  React.useEffect(() => {
-
-    if (parentWidth < 600) {
-
-      setStackDirection('column');
-
-    } else {
-
-      setStackDirection('row');
-
-    }
-
-  }, [parentWidth]);
+  const stackDirection = useMediaQuery(theme.breakpoints.down('sm')) ? 'column' : 'row';
 
   return (
 
@@ -344,46 +305,8 @@ const JobPostAction = ({
 };
 
 const Loading = () => {
-
-  const [parentWidth, setParentWidth] = React.useState(0);
-
-  const [stackDirection, setStackDirection] = React.useState<'column' | 'row'>('column');
-
   const theme = useTheme();
-
-  React.useEffect(() => {
-
-    const handleResize = () => {
-
-      const element = document.getElementById('job-post-action-loading');
-      if (element) {
-        const newWidth = element.offsetWidth;
-        setParentWidth(newWidth);
-      }
-
-    };
-
-    handleResize();
-
-    window.addEventListener('resize', handleResize);
-
-    return () => window.removeEventListener('resize', handleResize);
-
-  }, []);
-
-  React.useEffect(() => {
-
-    if (parentWidth < 600) {
-
-      setStackDirection('column');
-
-    } else {
-
-      setStackDirection('row');
-
-    }
-
-  }, [parentWidth]);
+  const stackDirection = useMediaQuery(theme.breakpoints.down('sm')) ? 'column' : 'row';
 
   return (
 

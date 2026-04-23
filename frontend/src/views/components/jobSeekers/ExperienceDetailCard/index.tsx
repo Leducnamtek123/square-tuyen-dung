@@ -1,779 +1,265 @@
-import React from "react";
-
+import React from 'react';
 import { useParams } from 'next/navigation';
-
-import { useTranslation } from "react-i18next";
-
-import { Accordion, AccordionDetails, AccordionSummary, Box, Divider, Fab, IconButton, Skeleton, Stack, Typography } from "@mui/material";
-
-import {
-
-  Timeline,
-
-  TimelineConnector,
-
-  TimelineContent,
-
-  TimelineDot,
-
-  TimelineItem,
-
-  timelineItemClasses,
-
-  TimelineSeparator,
-
-} from "@mui/lab";
-
-import AddIcon from "@mui/icons-material/Add";
-
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-
-import { confirmModal } from "../../../../utils/sweetalert2Modal";
-
-import toastMessages from "../../../../utils/toastMessages";
-
-import errorHandling from "../../../../utils/errorHandling";
-
-import BackdropLoading from "../../../../components/Common/Loading/BackdropLoading";
-
-import EmptyCard from "../../../../components/Common/EmptyCard";
-
-import FormPopup from "../../../../components/Common/Controls/FormPopup";
-
-import ExperienceDetaiForm from "../ExperienceDetailForm";
-
-import TimeAgo from '../../../../components/Common/TimeAgo';
-
-import resumeService from "../../../../services/resumeService";
-
-import experienceDetailService from "../../../../services/experienceDetailService";
+import { useTranslation } from 'react-i18next';
+import { Box, Divider, Fab, Stack, Typography } from '@mui/material';
+import { Timeline, timelineItemClasses } from '@mui/lab';
+import AddIcon from '@mui/icons-material/Add';
 import { Theme } from '@mui/material/styles';
-import { AxiosError } from 'axios';
-import { ApiError } from '@/types/api';
-import { FormValues } from '../ExperienceDetailForm';
 
+import { confirmModal } from '../../../../utils/sweetalert2Modal';
+import toastMessages from '../../../../utils/toastMessages';
+import errorHandling from '../../../../utils/errorHandling';
+import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
+import EmptyCard from '../../../../components/Common/EmptyCard';
+import FormPopup from '../../../../components/Common/Controls/FormPopup';
+import ExperienceDetaiForm, { FormValues } from '../ExperienceDetailForm';
+import resumeService from '../../../../services/resumeService';
+import experienceDetailService from '../../../../services/experienceDetailService';
 import type { ExperienceDetail } from '../../../../types/models';
+import ExperienceDetailCardLoading from './ExperienceDetailCardLoading';
+import ExperienceDetailTimelineItem from './ExperienceDetailTimelineItem';
 
 interface ExperienceDetailCardProps {
   title: string;
 }
 
+type UiState = {
+  openPopup: boolean;
+  isLoadingExperiencesDetail: boolean;
+  isFullScreenLoading: boolean;
+  refreshToken: number;
+};
 
+type UiAction =
+  | { type: 'open_popup' }
+  | { type: 'close_popup' }
+  | { type: 'set_loading'; payload: boolean }
+  | { type: 'set_full_screen_loading'; payload: boolean }
+  | { type: 'refresh' };
 
-const Loading = (
+const initialUiState: UiState = {
+  openPopup: false,
+  isLoadingExperiencesDetail: true,
+  isFullScreenLoading: false,
+  refreshToken: 0,
+};
 
-  <Stack>
-
-    <Box>
-
-      <Stack
-
-        direction="row"
-
-        justifyContent="space-between"
-
-        alignItems="center"
-
-        spacing={2}
-
-      >
-
-        <Typography variant="h6" flex={1}>
-
-          <Skeleton />
-
-        </Typography>
-
-        <Box>
-
-          <Skeleton variant="circular" width={50} height={50} />
-
-        </Box>
-
-      </Stack>
-
-    </Box>
-
-    <Box sx={{ px: 1 }}>
-
-      <Box sx={{ py: 2 }}>
-
-        <Skeleton height={5} />
-
-      </Box>
-
-      {Array(2)
-
-        .fill(0)
-
-        .map((_, index) => (
-
-          <Box sx={{ py: 1 }} key={index}>
-
-            <Skeleton />
-
-            <Skeleton />
-
-            <Skeleton />
-
-          </Box>
-
-        ))}
-
-    </Box>
-
-  </Stack>
-
-);
+const reducer = (state: UiState, action: UiAction): UiState => {
+  switch (action.type) {
+    case 'open_popup':
+      return { ...state, openPopup: true };
+    case 'close_popup':
+      return { ...state, openPopup: false };
+    case 'set_loading':
+      return { ...state, isLoadingExperiencesDetail: action.payload };
+    case 'set_full_screen_loading':
+      return { ...state, isFullScreenLoading: action.payload };
+    case 'refresh':
+      return { ...state, refreshToken: state.refreshToken + 1 };
+    default:
+      return state;
+  }
+};
 
 const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
-
   const { t } = useTranslation(['jobSeeker', 'common']);
-
   const { slug: resumeSlug } = useParams<{ slug: string }>();
-
-  const [openPopup, setOpenPopup] = React.useState(false);
-
-  const [isSuccess, setIsSuccess] = React.useState(false);
-
-  const [isLoadingExperiencesDetail, setIsLoadingExperiencesDetail] =
-
-    React.useState(true);
-
-  const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
-
+  const [uiState, dispatch] = React.useReducer(reducer, initialUiState);
   const [experiencesDetail, setExperiencesDetail] = React.useState<ExperienceDetail[]>([]);
-
   const [editData, setEditData] = React.useState<ExperienceDetail | null>(null);
 
   React.useEffect(() => {
-
     const loadExperiencesDetail = async (slug: string | undefined) => {
       if (!slug) return;
 
-      setIsLoadingExperiencesDetail(true);
-
+      dispatch({ type: 'set_loading', payload: true });
       try {
-
         const resData = await resumeService.getExperiencesDetail(slug);
-
         setExperiencesDetail(resData);
-
       } catch (error: unknown) {
-
         errorHandling(error);
-
       } finally {
-
-        setIsLoadingExperiencesDetail(false);
-
+        dispatch({ type: 'set_loading', payload: false });
       }
-
     };
 
     loadExperiencesDetail(resumeSlug);
-
-  }, [resumeSlug, isSuccess]);
+  }, [resumeSlug, uiState.refreshToken]);
 
   const handleShowUpdate = (id: string | number) => {
-
     const loadExperienceDetailById = async (experienceId: string | number) => {
-
-      setIsFullScreenLoading(true);
-
+      dispatch({ type: 'set_full_screen_loading', payload: true });
       try {
-
-        const resData = await experienceDetailService.getExperienceDetailById(
-
-          experienceId
-
-        );
-
+        const resData = await experienceDetailService.getExperienceDetailById(experienceId);
         setEditData(resData);
-
-        setOpenPopup(true);
-
+        dispatch({ type: 'open_popup' });
       } catch (error: unknown) {
-
         errorHandling(error);
-
       } finally {
-
-        setIsFullScreenLoading(false);
-
+        dispatch({ type: 'set_full_screen_loading', payload: false });
       }
-
     };
 
     loadExperienceDetailById(id);
-
   };
 
   const handleShowAdd = () => {
-
     setEditData(null);
-
-    setOpenPopup(true);
-
+    dispatch({ type: 'open_popup' });
   };
 
   const handleAddOrUpdate = (data: FormValues & { id?: string | number }) => {
-
     const create = async (payload: FormValues & { resume?: string }) => {
-
-      setIsFullScreenLoading(true);
-
+      dispatch({ type: 'set_full_screen_loading', payload: true });
       try {
-
         await experienceDetailService.addExperienceDetail(payload);
-
-        setOpenPopup(false);
-
-        setIsSuccess(!isSuccess);
-
+        dispatch({ type: 'close_popup' });
+        dispatch({ type: 'refresh' });
         toastMessages.success(t('jobSeeker:profile.messages.experienceAddSuccess'));
-
       } catch (error: unknown) {
-
         errorHandling(error);
-
       } finally {
-
-        setIsFullScreenLoading(false);
-
+        dispatch({ type: 'set_full_screen_loading', payload: false });
       }
-
     };
 
     const update = async (payload: FormValues & { id?: string | number }) => {
-
-      setIsFullScreenLoading(true);
-
+      dispatch({ type: 'set_full_screen_loading', payload: true });
       try {
-
         await experienceDetailService.updateExperienceDetailById(payload.id as string | number, payload);
-
-        setOpenPopup(false);
-
-        setIsSuccess(!isSuccess);
-
+        dispatch({ type: 'close_popup' });
+        dispatch({ type: 'refresh' });
         toastMessages.success(t('jobSeeker:profile.messages.experienceUpdateSuccess'));
-
       } catch (error: unknown) {
-
         errorHandling(error);
-
       } finally {
-
-        setIsFullScreenLoading(false);
-
+        dispatch({ type: 'set_full_screen_loading', payload: false });
       }
-
     };
 
-    if ("id" in data) {
-
+    if ('id' in data) {
       update(data);
-
     } else {
-
-      // create
-
-      const dataCustom = {
-
+      create({
         ...data,
-
         resume: resumeSlug,
-
-      };
-
-      create(dataCustom);
-
+      });
     }
-
   };
 
   const handleDeleteExperiencesDetail = (id: string | number) => {
-
     const del = async (experienceId: string | number) => {
-
       try {
-
         await experienceDetailService.deleteExperienceDetailById(experienceId);
-
-        setIsSuccess(!isSuccess);
-
+        dispatch({ type: 'refresh' });
         toastMessages.success(t('jobSeeker:profile.messages.experienceDeleteSuccess'));
-
       } catch (error: unknown) {
-
         errorHandling(error);
-
-      } finally {
-
-        setIsFullScreenLoading(false);
-
       }
-
     };
 
     confirmModal(
-
       () => del(id),
-
       t('jobSeeker:profile.messages.deleteConfirmTitle', { item: t('jobSeeker:profile.sections.experience') }),
-
       t('jobSeeker:profile.messages.deleteConfirmWarning'),
-
-      "warning"
-
+      'warning',
     );
-
   };
 
   return (
-
     <>
-
       <Box
-
         sx={{
-
-          backgroundColor: "background.paper",
-
+          backgroundColor: 'background.paper',
           borderRadius: 3,
-
           p: 3,
-
           boxShadow: (theme: Theme) => theme.customShadows.card,
-
         }}
-
       >
-
-        {isLoadingExperiencesDetail ? (
-
-          Loading
-
+        {uiState.isLoadingExperiencesDetail ? (
+          <ExperienceDetailCardLoading />
         ) : (
-
           <Stack spacing={3}>
-
             <Box>
-
-              <Stack
-
-                direction="row"
-
-                justifyContent="space-between"
-
-                alignItems="center"
-
-              >
-
-                <Typography
-
-                  variant="h5"
-
-                  sx={{
-
-                    fontWeight: 600,
-
-                  }}
-
-                >
-
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>
                   {title}
-
                 </Typography>
-
                 <Fab
-
                   size="small"
-
                   color="primary"
-
                   aria-label={t('common:actions.add')}
-
                   onClick={handleShowAdd}
-
                   sx={{
-
                     boxShadow: (theme: Theme) => theme.customShadows.medium,
-
-                    "&:hover": {
-
-                      transform: "scale(1.1)",
-
+                    '&:hover': {
+                      transform: 'scale(1.1)',
                     },
-
-                    transition: "all 0.2s ease-in-out",
-
+                    transition: 'all 0.2s ease-in-out',
                   }}
-
                 >
-
                   <AddIcon />
-
                 </Fab>
-
               </Stack>
-
             </Box>
 
-            <Divider sx={{ my: 0, borderColor: "grey.500" }} />
+            <Divider sx={{ my: 0, borderColor: 'grey.500' }} />
 
             <Box>
-
               {experiencesDetail.length === 0 ? (
-
-                <EmptyCard
-
-                  content={t('jobSeeker:profile.messages.noExperienceData')}
-
-                  onClick={handleShowAdd}
-
-                />
-
+                <EmptyCard content={t('jobSeeker:profile.messages.noExperienceData')} onClick={handleShowAdd} />
               ) : (
-
                 <Timeline
-
                   sx={{
-
                     [`& .${timelineItemClasses.root}:before`]: {
-
                       flex: 0,
-
                       padding: 0,
-
                     },
-
                     mt: 0,
-
                   }}
-
                 >
-
                   {experiencesDetail.map((value) => (
-
-                    <TimelineItem key={value.id}>
-
-                      <TimelineSeparator>
-
-                        <TimelineDot
-
-                          sx={{
-
-                            background: (theme: Theme) =>
-
-                              theme.palette.primary.main,
-
-                            boxShadow: (theme: Theme) => theme.customShadows.small,
-
-                          }}
-
-                        />
-
-                        <TimelineConnector sx={{ bgcolor: "primary.light" }} />
-
-                      </TimelineSeparator>
-
-                      <TimelineContent>
-
-                        <Box
-
-                          sx={{
-
-                            p: 1,
-
-                          }}
-
-                        >
-
-                          <Typography
-
-                            variant="body2"
-
-                            color="primary.main"
-
-                            sx={{ fontWeight: 600, mb: 1 }}
-
-                          >
-
-                            {value.startDate && <TimeAgo date={value.startDate} type="format" format="DD/MM/YYYY" />}{" "}
-
-                            -{" "}
-
-                            {value.endDate ? (
-
-                              <TimeAgo date={value.endDate} type="format" format="DD/MM/YYYY" />
-
-                            ) : (
-
-                              t('jobSeeker:profile.fields.present')
-
-                            )}
-
-                          </Typography>
-
-                          <Typography
-
-                            variant="h6"
-
-                            gutterBottom
-
-                            sx={{
-
-                              fontWeight: "bold",
-
-                              color: "text.primary",
-
-                            }}
-
-                          >
-
-                            {value.jobName}
-
-                          </Typography>
-
-                          <Typography
-
-                            variant="body1"
-
-                            sx={{
-
-                              color: "text.secondary",
-
-                              mb: 2,
-
-                            }}
-
-                          >
-
-                            {value.companyName}
-
-                          </Typography>
-
-                          <Stack direction="row" spacing={1}>
-
-                            <IconButton
-
-                              size="small"
-
-                              sx={{
-
-                                color: "secondary.main",
-
-                                bgcolor: "secondary.background",
-
-                                "&:hover": {
-
-                                  bgcolor: "secondary.light",
-
-                                  color: "white",
-
-                                },
-
-                              }}
-
-                              onClick={() => handleShowUpdate(value.id)}
-
-                            >
-
-                              <ModeEditOutlineOutlinedIcon fontSize="small" />
-
-                            </IconButton>
-
-                            <IconButton
-
-                              size="small"
-
-                              sx={{
-
-                                color: "error.main",
-
-                                bgcolor: "error.background",
-
-                                "&:hover": {
-
-                                  bgcolor: "error.main",
-
-                                  color: "white",
-
-                                },
-
-                              }}
-
-                              onClick={() =>
-
-                                handleDeleteExperiencesDetail(value.id)
-
-                              }
-
-                            >
-
-                              <DeleteOutlineOutlinedIcon fontSize="small" />
-
-                            </IconButton>
-
-                          </Stack>
-
-                          <Accordion
-
-                            sx={{
-
-                              boxShadow: "none",
-
-                              bgcolor: "transparent",
-
-                              "&:before": {
-
-                                display: "none",
-
-                              },
-
-                            }}
-
-                          >
-
-                            <AccordionSummary
-
-                              expandIcon={
-
-                                <ExpandMoreIcon
-
-                                  sx={{
-
-                                    color: "primary.main",
-
-                                    fontSize: 20,
-
-                                  }}
-
-                                />
-
-                              }
-
-                            >
-
-                              <Typography
-
-                                variant="body2"
-
-                                sx={{
-
-                                  color: "text.secondary",
-
-                                  fontWeight: 500,
-
-                                }}
-
-                              >
-
-                                {t('jobSeeker:profile.fields.description')}
-
-                              </Typography>
-
-                            </AccordionSummary>
-
-                            <AccordionDetails>
-
-                              <Typography
-
-                                variant="body2"
-
-                                sx={{
-
-                                  color: value.description
-
-                                    ? "text.primary"
-
-                                    : "text.placeholder",
-
-                                  fontStyle: value.description
-
-                                    ? "normal"
-
-                                    : "italic",
-
-                                }}
-
-                              >
-
-                                {value.description || t('common:noData')}
-
-                              </Typography>
-
-                            </AccordionDetails>
-
-                          </Accordion>
-
-                        </Box>
-
-                      </TimelineContent>
-
-                    </TimelineItem>
-
+                    <ExperienceDetailTimelineItem
+                      key={value.id}
+                      value={value}
+                      onEdit={handleShowUpdate}
+                      onDelete={handleDeleteExperiencesDetail}
+                      t={t}
+                    />
                   ))}
-
                 </Timeline>
-
               )}
-
             </Box>
-
           </Stack>
-
         )}
-
       </Box>
 
-      {/* Start: form  */}
-
       <FormPopup
-
         title={t('jobSeeker:profile.sections.experience')}
-
-        openPopup={openPopup}
-
-        setOpenPopup={setOpenPopup}
-
+        openPopup={uiState.openPopup}
+        setOpenPopup={(open) => dispatch({ type: open ? 'open_popup' : 'close_popup' })}
       >
-
         <ExperienceDetaiForm
-
           handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
-
-          editData={editData ? {
-            jobName: editData.jobName || '',
-            companyName: editData.companyName || '',
-            startDate: editData.startDate ? new Date(editData.startDate) : null,
-            endDate: editData.endDate ? new Date(editData.endDate) : null,
-            description: editData.description || null,
-          } : null}
-
+          editData={
+            editData
+              ? {
+                  jobName: editData.jobName || '',
+                  companyName: editData.companyName || '',
+                  startDate: editData.startDate ? new Date(editData.startDate) : null,
+                  endDate: editData.endDate ? new Date(editData.endDate) : null,
+                  description: editData.description || null,
+                  lastSalary: null,
+                  leaveReason: null,
+                }
+              : null
+          }
         />
-
       </FormPopup>
 
-      {/* End: form */}
-
-      {/* Start: full screen loading */}
-
-      {isFullScreenLoading && <BackdropLoading />}
-
-      {/* End: full screen loading */}
-
+      {uiState.isFullScreenLoading && <BackdropLoading />}
     </>
-
   );
-
 };
 
 export default ExperienceDetailCard;
-

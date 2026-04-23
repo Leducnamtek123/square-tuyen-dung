@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Button, Divider, LinearProgress, Stack, Typography, Paper, Tooltip, Theme } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
@@ -29,6 +29,51 @@ import type { JobPostInput } from '../../../../services/jobService';
 
 type JobPostEditData = Partial<JobPostFormValues> & { id?: string | number };
 
+type FilterState = { kw: string; isUrgent: boolean | ''; statusId: string | number };
+
+type JobPostCardState = {
+  filterData: FilterState;
+  openPopup: boolean;
+  editData: JobPostEditData | null;
+  serverErrors: Record<string, string[]> | null;
+  isProcessing: boolean;
+};
+
+type JobPostCardAction =
+  | { type: 'setFilter'; value: FilterState }
+  | { type: 'openAdd' }
+  | { type: 'openEdit'; value: JobPostEditData }
+  | { type: 'closePopup' }
+  | { type: 'setErrors'; value: Record<string, string[]> | null }
+  | { type: 'setProcessing'; value: boolean };
+
+const initialState: JobPostCardState = {
+  filterData: { kw: '', isUrgent: '', statusId: '' },
+  openPopup: false,
+  editData: null,
+  serverErrors: null,
+  isProcessing: false,
+};
+
+function reducer(state: JobPostCardState, action: JobPostCardAction): JobPostCardState {
+  switch (action.type) {
+    case 'setFilter':
+      return { ...state, filterData: action.value };
+    case 'openAdd':
+      return { ...state, openPopup: true, editData: null, serverErrors: null };
+    case 'openEdit':
+      return { ...state, openPopup: true, editData: action.value };
+    case 'closePopup':
+      return { ...state, openPopup: false };
+    case 'setErrors':
+      return { ...state, serverErrors: action.value };
+    case 'setProcessing':
+      return { ...state, isProcessing: action.value };
+    default:
+      return state;
+  }
+}
+
 const JobPostCard = () => {
   const { t } = useTranslation('employer');
 
@@ -45,31 +90,22 @@ const JobPostCard = () => {
     initialPageSize: 10
   });
 
-  const [filterData, setFilterData] = useState<{ kw: string; isUrgent: boolean | ''; statusId: string | number }>({
-    kw: '',
-    isUrgent: '',
-    statusId: '',
-  });
+  const [state, dispatch] = React.useReducer(reducer, initialState);
 
   // Data Fetching & Mutations
   const { data, isLoading } = useEmployerJobPosts({
     page: page + 1,
     pageSize,
     ordering,
-    kw: filterData.kw,
-    isUrgent: filterData.isUrgent === '' ? undefined : filterData.isUrgent,
-    status: filterData.statusId === '' ? undefined : filterData.statusId,
+    kw: state.filterData.kw,
+    isUrgent: state.filterData.isUrgent === '' ? undefined : state.filterData.isUrgent,
+    status: state.filterData.statusId === '' ? undefined : state.filterData.statusId,
   });
 
   const { addJobPost, updateJobPost, deleteJobPost, isMutating } = useJobPostMutations();
 
-  const [openPopup, setOpenPopup] = useState(false);
-  const [editData, setEditData] = useState<JobPostEditData | null>(null);
-  const [serverErrors, setServerErrors] = useState<Record<string, string[]> | null>(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-
   const handleShowUpdate = useCallback(async (slugOrId: string | number) => {
-    setIsProcessing(true);
+    dispatch({ type: 'setProcessing', value: true });
     try {
       const resData = await jobService.getEmployerJobPostDetailById(slugOrId);
       const data: JobPostEditData = {
@@ -92,23 +128,21 @@ const JobPostCard = () => {
           lng: resData.location?.lng ?? '',
         },
       };
-      setEditData(data);
-      setOpenPopup(true);
+      dispatch({ type: 'openEdit', value: data });
     } catch (error) {
       errorHandling(error);
     } finally {
-      setIsProcessing(false);
+      dispatch({ type: 'setProcessing', value: false });
     }
   }, []);
 
   const handleShowAdd = useCallback(() => {
-    setEditData(null);
-    setServerErrors(null);
-    setOpenPopup(true);
+    dispatch({ type: 'openAdd' });
   }, []);
 
   const handleAddOrUpdate = async (formData: JobPostFormValues) => {
-    setServerErrors(null);
+    dispatch({ type: 'setErrors', value: null });
+    const editId = state.editData?.id;
     const payload: JobPostInput = {
       jobName: formData.jobName || '',
       deadline: formData.deadline ? (typeof formData.deadline === 'string' ? formData.deadline : formData.deadline.toISOString()) : '',
@@ -141,16 +175,16 @@ const JobPostCard = () => {
     };
 
     try {
-      if (editData?.id != null) {
-        await updateJobPost({ id: editData.id, data: payload });
+      if (editId != null) {
+        await updateJobPost({ id: editId, data: payload });
         toastMessages.success(t('jobPost.messages.updateSuccess'));
       } else {
         await addJobPost(payload);
         toastMessages.success(t('jobPost.messages.addSuccess'));
       }
-      setOpenPopup(false);
+      dispatch({ type: 'closePopup' });
     } catch (error) {
-      errorHandling(error, (errs) => setServerErrors(errs as Record<string, string[]>));
+      errorHandling(error, (errs) => dispatch({ type: 'setErrors', value: errs as Record<string, string[]> }));
     }
   };
 
@@ -170,32 +204,35 @@ const JobPostCard = () => {
     );
   }, [deleteJobPost, t]);
 
-  const handleFilter = useCallback((data: { kw: string, isUrgent: number | string, statusId: string | number }) => {
-    setFilterData({
+    const handleFilter = useCallback((data: { kw: string, isUrgent: number | string, statusId: string | number }) => {
+    dispatch({
+      type: 'setFilter',
+      value: {
       kw: data.kw,
       isUrgent: data.isUrgent === 1 ? true : data.isUrgent === 2 ? false : '',
       statusId: data.statusId,
+      },
     });
     onPaginationChange({ pageIndex: 0, pageSize });
   }, [onPaginationChange, pageSize]);
 
   const handleExport = async () => {
-    setIsProcessing(true);
+    dispatch({ type: 'setProcessing', value: true });
     try {
       const params = {
         page: page + 1,
         pageSize,
         ordering,
-        kw: filterData.kw,
-        isUrgent: filterData.isUrgent === '' ? undefined : filterData.isUrgent,
-        status: filterData.statusId === '' ? undefined : filterData.statusId,
+        kw: state.filterData.kw,
+        isUrgent: state.filterData.isUrgent === '' ? undefined : state.filterData.isUrgent,
+        status: state.filterData.statusId === '' ? undefined : state.filterData.statusId,
       };
       const resData = await jobService.exportEmployerJobPosts(params);
       xlsxUtils.exportToXLSX(resData, 'JobList');
     } catch (error) {
       errorHandling(error);
     } finally {
-      setIsProcessing(false);
+      dispatch({ type: 'setProcessing', value: false });
     }
   };
 
@@ -307,11 +344,15 @@ const JobPostCard = () => {
           handleUpdate={handleShowUpdate}
         />
 
-        <FormPopup title={t('jobPost.popupTitle')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
-          <JobPostForm handleAddOrUpdate={handleAddOrUpdate} editData={editData} serverErrors={serverErrors} />
+        <FormPopup
+          title={t('jobPost.popupTitle')}
+          openPopup={state.openPopup}
+          setOpenPopup={(open) => dispatch({ type: open ? 'openAdd' : 'closePopup' })}
+        >
+          <JobPostForm handleAddOrUpdate={handleAddOrUpdate} editData={state.editData} serverErrors={state.serverErrors} />
         </FormPopup>
 
-        {(isProcessing || isMutating) && <BackdropLoading />}
+        {(state.isProcessing || isMutating) && <BackdropLoading />}
       </Paper>
     </Box>
   );

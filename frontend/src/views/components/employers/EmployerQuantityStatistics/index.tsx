@@ -156,8 +156,8 @@ const EmployerQuantityStatistics = () => {
 
   return (
     <Grid container spacing={3}>
-      {statItems.map((item, idx) => (
-        <Grid key={idx} size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
+      {statItems.map((item) => (
+        <Grid key={item.title} size={{ xs: 12, sm: 6, md: 6, lg: 3 }}>
           <StatItem
             title={item.title}
             value={item.value}

@@ -112,7 +112,6 @@ export const options: ChartOptions<'bar'> = {
 const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
   const { t } = useTranslation('employer');
   const theme = useTheme();
-  const [isLoading, setIsLoading] = React.useState(true);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[Dayjs | null, Dayjs | null]>([
     dayjs(new Date()).subtract(1, "month"),
@@ -125,8 +124,6 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
   }), [selectedDateRange]);
 
   const { data, isLoading: queryLoading } = useEmployerRecruitmentStatistics(queryParams);
-
-  React.useEffect(() => { setIsLoading(queryLoading); }, [queryLoading]);
 
   const dataOptions = React.useMemo<ChartData<'bar'>>(() => {
     const safeData = data || [];
@@ -191,7 +188,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
           </Stack>
 
           <Box sx={{ position: 'relative', minHeight: 320 }}>
-            {isLoading ? (
+            {queryLoading ? (
               <Stack alignItems="center" justifyContent="center" sx={{ height: 320 }}>
                 <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
               </Stack>

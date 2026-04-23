@@ -13,9 +13,9 @@ const JobsByJobTypePage = () => {
 
   useSEO({
     title: t('jobsByCategoryPage.jobTypeTitle'),
-    description: 'Tìm kiếm việc làm theo hình thức: toàn thời gian, bán thời gian, thực tập, hợp đồng. Nhiều cơ hội việc làm chất lượng tại Square.',
+    description: t('seo.jobsByJobType.description'),
     url: `${(typeof window !== 'undefined' ? window.location.origin : '')}/viec-lam-theo-hinh-thuc-lam-viec`,
-    keywords: 'việc làm toàn thời gian, việc làm bán thời gian, thực tập, hợp đồng, remote',
+    keywords: t('seo.jobsByJobType.keywords'),
   });
 
   const { allConfig } = useConfig();

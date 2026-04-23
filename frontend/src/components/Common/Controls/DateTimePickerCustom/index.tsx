@@ -15,6 +15,8 @@ import { Typography, Box, SxProps, Theme } from "@mui/material";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import type { Dayjs } from 'dayjs';
 
+const EMPTY_SX: SxProps<Theme> = {};
+
 interface Props<T extends FieldValues = FieldValues> {
     name: string;
     control: Control<T>;
@@ -34,7 +36,7 @@ const DateTimePickerCustom = <T extends FieldValues = FieldValues>({
     minDateTime = null,
     maxDateTime = null,
     fullWidth = true,
-    sx = {},
+    sx = EMPTY_SX,
 }: Props<T>) => {
 
     const parseDate = (date: Dayjs | string | null | undefined) => {

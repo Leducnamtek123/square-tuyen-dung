@@ -9,7 +9,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import { useJobs } from './hooks/useJobs';
-import { useDataTable } from '../../../hooks';
+import { useDataTable, useDebounce } from '../../../hooks';
 import { JobPost } from '../../../types/models';
 import dayjs from '../../../configs/dayjs-config';
 
@@ -27,6 +27,7 @@ const JobsPage = () => {
     } = useDataTable({ initialPageSize: 10 });
 
     const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearch = useDebounce(searchTerm, 500);
 
     const {
         data,
@@ -38,7 +39,7 @@ const JobsPage = () => {
     } = useJobs({
         page: page + 1,
         pageSize,
-        kw: searchTerm,
+        kw: debouncedSearch,
         ordering
     });
 

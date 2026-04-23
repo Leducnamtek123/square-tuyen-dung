@@ -17,9 +17,10 @@ interface ResetPasswordFormProps {
   serverErrors?: Record<string, string[]>;
 }
 
+const EMPTY_SERVER_ERRORS: Record<string, string[]> = {};
 
 
-const ResetPasswordForm = ({ handleResetPassword, serverErrors = {} }: ResetPasswordFormProps) => {
+const ResetPasswordForm = ({ handleResetPassword, serverErrors = EMPTY_SERVER_ERRORS }: ResetPasswordFormProps) => {
 
   const { t } = useTranslation('auth');
 

@@ -783,7 +783,7 @@ class ResumeSavedViewSet(viewsets.ViewSet,
 
                 serializer = ResumeSavedSerializer(page, many=True, fields=[
 
-                    "id", "resume", "createAt"
+                    "id", "resume", "resumeSlug", "createAt"
 
                 ])
 

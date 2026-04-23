@@ -17,7 +17,7 @@ const VoiceAiInterviewRedirectPage = () => {
 
   React.useEffect(() => {
     if (!id) return;
-    navigate.replace(targetUrl);
+    window.location.replace(targetUrl);
   }, [id, targetUrl, navigate]);
 
   return (

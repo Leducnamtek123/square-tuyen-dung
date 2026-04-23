@@ -78,9 +78,9 @@ const SupportPage = () => {
       </Box>
 
       <Grid container spacing={4} sx={{ mb: 8 }}>
-        {supportChannels.map((item, index) => (
+        {supportChannels.map((item) => (
           <Grid
-            key={index}
+            key={item.title}
             size={{
               xs: 12,
               sm: 6,
@@ -126,9 +126,9 @@ const SupportPage = () => {
           {t('support.faq.title')}
         </Typography>
         <Grid container spacing={3}>
-          {faqs.map((faq, index) => (
+          {faqs.map((faq) => (
             <Grid
-              key={index}
+              key={faq.question}
               size={{
                 xs: 12,
                 md: 4,

@@ -16,6 +16,8 @@ import { Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import ValidationError from '../ValidationError';
 import type { SelectOption } from '@/types/models';
+
+const EMPTY_OPTIONS: SelectOption[] = [];
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
   control: Control<T>;
@@ -32,7 +34,7 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 const MultiSelectCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
-  options = [],
+  options = EMPTY_OPTIONS,
   title = null,
   showRequired = false,
   placeholder = '',

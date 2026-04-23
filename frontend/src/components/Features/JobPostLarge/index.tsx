@@ -1,46 +1,20 @@
-import React from "react";
-import { useAppSelector } from '@/redux/hooks';
-import { alpha, useTheme } from "@mui/material/styles";
+import React from 'react';
+import { alpha, useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/navigation';
-import dayjs from "dayjs";
-import { Box, Card, Skeleton, Stack, Typography, Tooltip, Divider } from "@mui/material";
-import {
-  faCalendarDays,
-  faCircleDollarToSlot,
-  faLocationDot,
-  faBolt,
-  faFire,
-  faClock,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { salaryString } from "@/utils/customData";
-import MuiImageCustom from "@/components/Common/MuiImageCustom";
-import { formatRoute } from "@/utils/funcUtils";
+import { Box, Card, Skeleton, Stack, Typography } from '@mui/material';
+import MuiImageCustom from '@/components/Common/MuiImageCustom';
+import { formatRoute } from '@/utils/funcUtils';
 import { localizeRoutePath } from '@/configs/routeLocalization';
-import { ROUTES, IMAGES } from "@/configs/constants";
-import TimeAgo from '@/components/Common/TimeAgo';
+import { ROUTES, IMAGES } from '@/configs/constants';
 import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { useTranslation } from 'react-i18next';
-
-interface JobPostLargeProps {
-  id: string | number;
-  slug: string;
-  companyImageUrl?: string;
-  companyName: string;
-  jobName: string;
-  cityId: number | string | undefined;
-  deadline: string | Date;
-  isUrgent?: boolean;
-  isHot?: boolean;
-  salaryMin?: number;
-  salaryMax?: number;
-}
-
-
+import { JobPostLargeFooter } from './JobPostLargeFooter';
+import { JobPostLargeInfoChips } from './JobPostLargeInfoChips';
+import { HotBadge, UrgentBadge } from './JobPostLargeStatusBadges';
+import type { JobPostLargeProps } from './types';
 
 const JobPostLarge = ({
-  id,
   slug,
   companyImageUrl,
   companyName,
@@ -52,691 +26,169 @@ const JobPostLarge = ({
   salaryMin,
   salaryMax,
 }: JobPostLargeProps) => {
-
   const theme = useTheme();
-
   const nav = useRouter();
-
   const { allConfig } = useConfig();
-  const { t, i18n } = useTranslation('public');
+  const { i18n } = useTranslation('public');
+
   const goToDetail = () => {
-    nav.push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language));
+    nav.push(
+      localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language),
+    );
   };
 
   const handleCardKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" || event.key === " ") {
+    if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       goToDetail();
     }
   };
 
+  const cityLabel =
+    tConfig(allConfig?.cityDict?.[String(cityId)]) || (
+      <span style={{ fontStyle: 'italic', opacity: 0.7 }}>Chua cap nhat</span>
+    );
+
   return (
-
     <Card
-
       variant="outlined"
-
       sx={{
-
         boxShadow: 0,
-
-        cursor: "pointer",
-
+        cursor: 'pointer',
         px: 2,
-
         pt: 2,
-
         pb: 1,
-
-        transition: "all 0.3s ease",
-
+        transition: 'all 0.3s ease',
         borderRadius: 2.5,
-
         border: `1px solid ${theme.palette.divider}`,
-
-        position: "relative",
-
-        overflow: "hidden",
-
+        position: 'relative',
+        overflow: 'hidden',
         backgroundColor:
-
-          theme.palette.mode === "light"
-
+          theme.palette.mode === 'light'
             ? theme.palette.common.white
-
             : theme.palette.grey[900],
-
         ...(isUrgent && {
-
-          "&::after": {
-
+          '&::after': {
             content: '""',
-
-            position: "absolute",
-
+            position: 'absolute',
             top: 0,
-
             right: 0,
-
-            width: "100%",
-
-            height: "4px",
-
+            width: '100%',
+            height: '4px',
             background: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.light})`,
-
           },
-
         }),
-
-        "&:hover": {
-
-          transform: "translateY(-3px)",
-
+        '&:hover': {
+          transform: 'translateY(-3px)',
           boxShadow: theme.customShadows.large,
-
-          borderColor: isUrgent
-
-            ? theme.palette.secondary.main
-
-            : theme.palette.primary.main,
-
+          borderColor: isUrgent ? theme.palette.secondary.main : theme.palette.primary.main,
           backgroundColor:
-
-            theme.palette.mode === "light"
-
+            theme.palette.mode === 'light'
               ? isUrgent
-
                 ? theme.palette.secondary.backgroundHover
-
                 : alpha(theme.palette.primary.main, 0.02)
-
               : theme.palette.grey[800],
-
         },
-
       }}
-
       onClick={goToDetail}
       role="link"
       tabIndex={0}
       onKeyDown={handleCardKeyDown}
-      aria-label={jobName || "Job detail"}
-
+      aria-label={jobName || 'Job detail'}
     >
-
       <Stack spacing={1.5}>
-
         <Stack direction="row" spacing={2} alignItems="flex-start">
-
-          <Box sx={{ position: "relative" }}>
-
+          <Box sx={{ position: 'relative' }}>
             <MuiImageCustom
-
               width={100}
-
               height={100}
-
               src={companyImageUrl || IMAGES.companyLogoDefault}
               fallbackSrc={IMAGES.companyLogoDefault}
-
               sx={{
-
                 border: 1,
-
                 borderRadius: 2.5,
-
                 borderColor: theme.palette.grey[200],
-
                 p: 1,
-
                 backgroundColor: theme.palette.common.white,
-
-                transition: "all 0.2s ease",
-
-                "&:hover": {
-
-                  transform: "scale(1.05)",
-
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  transform: 'scale(1.05)',
                   boxShadow: theme.customShadows.medium,
-
                 },
-
               }}
-
             />
-
-            {isUrgent && (
-
-              <Tooltip title="Tuyển gấp" placement="top">
-
-                <Box
-
-                  sx={{
-
-                    position: "absolute",
-
-                    top: -6,
-
-                    right: -6,
-
-                    backgroundColor: theme.palette.warning.main,
-
-                    borderRadius: "50%",
-
-                    width: 28,
-
-                    height: 28,
-
-                    display: "flex",
-
-                    alignItems: "center",
-
-                    justifyContent: "center",
-
-                    boxShadow: `0 0 12px ${theme.palette.warning.main}80`,
-
-                    animation: "pulse 2s infinite",
-
-                    "@keyframes pulse": {
-
-                      "0%": {
-
-                        transform: "scale(1)",
-
-                        boxShadow: `0 0 0 0 ${theme.palette.warning.main}80`,
-
-                      },
-
-                      "70%": {
-
-                        transform: "scale(1.05)",
-
-                        boxShadow: `0 0 0 10px ${theme.palette.warning.main}00`,
-
-                      },
-
-                      "100%": {
-
-                        transform: "scale(1)",
-
-                        boxShadow: `0 0 0 0 ${theme.palette.warning.main}00`,
-
-                      },
-
-                    },
-
-                  }}
-
-                >
-
-                  <FontAwesomeIcon
-
-                    icon={faBolt}
-
-                    style={{
-
-                      fontSize: "14px",
-
-                      color: theme.palette.common.white,
-
-                    }}
-
-                  />
-
-                </Box>
-
-              </Tooltip>
-
-            )}
-
+            {isUrgent && <UrgentBadge theme={theme} />}
           </Box>
 
           <Stack flex={1} spacing={0.75}>
-
-            <Stack
-
-              direction="row"
-
-              justifyContent="space-between"
-
-              alignItems="flex-start"
-
-            >
-
+            <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
               <Box flex={1}>
-
                 <Typography
-
                   sx={{
-
                     fontSize: 18,
-
                     fontWeight: 700,
-
                     color: theme.palette.grey[900],
-
                     lineHeight: 1.3,
-
                     mb: 0.5,
-
                   }}
-
                 >
-
                   {jobName}
-
                 </Typography>
-
                 <Typography
-
                   variant="h6"
-
                   sx={{
-
                     color: theme.palette.primary.main,
-
                     fontSize: 14,
-
                     fontWeight: 600,
-
                   }}
-
                 >
-
                   {companyName}
-
                 </Typography>
-
               </Box>
-
-              {isHot && (
-
-                <Box
-
-                  sx={{
-
-                    backgroundColor: theme.palette.hot.background,
-
-                    padding: "4px 10px",
-
-                    borderRadius: "16px",
-
-                    display: "flex",
-
-                    alignItems: "center",
-
-                    gap: "6px",
-
-                    boxShadow: `0 0 12px ${theme.palette.hot.main}40`,
-
-                    animation: "pulse 2s infinite",
-
-                    "@keyframes pulse": {
-
-                      "0%": {
-
-                        transform: "scale(1)",
-
-                        boxShadow: `0 0 0 0 ${theme.palette.hot.main}40`,
-
-                      },
-
-                      "70%": {
-
-                        transform: "scale(1.05)",
-
-                        boxShadow: `0 0 0 10px ${theme.palette.hot.main}00`,
-
-                      },
-
-                      "100%": {
-
-                        transform: "scale(1)",
-
-                        boxShadow: `0 0 0 0 ${theme.palette.hot.main}00`,
-
-                      },
-
-                    },
-
-                  }}
-
-                >
-
-                  <FontAwesomeIcon
-
-                    icon={faFire}
-
-                    style={{
-
-                      fontSize: "14px",
-
-                      color: theme.palette.hot.main,
-
-                    }}
-
-                  />
-
-                  <Typography
-
-                    sx={{
-
-                      fontSize: "12px",
-
-                      fontWeight: "bold",
-
-                      color: theme.palette.hot.main,
-
-                      textTransform: "uppercase",
-
-                      letterSpacing: "0.5px",
-
-                    }}
-
-                  >
-
-                    Hot
-
-                  </Typography>
-
-                </Box>
-
-              )}
-
+              {isHot && <HotBadge theme={theme} />}
             </Stack>
 
-            {/* Info Cards Section */}
-
-            <Stack direction="row" spacing={1.5} sx={{ mt: 1, flexWrap: 'wrap', gap: 1 }}>
-
-              <Box
-
-                sx={{
-
-                  backgroundColor: theme.palette.primary.background,
-
-                  borderRadius: 1.5,
-
-                  px: 1.5,
-
-                  py: 0.75,
-
-                  display: "flex",
-
-                  alignItems: "center",
-
-                  gap: 0.75,
-
-                }}
-
-              >
-
-                <FontAwesomeIcon
-
-                  icon={faCircleDollarToSlot}
-
-                  style={{
-
-                    fontSize: "16px",
-
-                    color: theme.palette.primary.main,
-
-                  }}
-
-                />
-
-                <Typography
-
-                  sx={{
-
-                    fontWeight: 600,
-
-                    fontSize: 13,
-
-                    color: theme.palette.primary.main,
-
-                  }}
-
-                >
-
-                  {salaryString(salaryMin, salaryMax)}
-
-                </Typography>
-
-              </Box>
-
-              <Box
-
-                sx={{
-
-                  backgroundColor: theme.palette.info.background,
-
-                  borderRadius: 1.5,
-
-                  px: 1.5,
-
-                  py: 0.75,
-
-                  display: "flex",
-
-                  alignItems: "center",
-
-                  gap: 0.75,
-
-                }}
-
-              >
-
-                <FontAwesomeIcon
-
-                  icon={faLocationDot}
-
-                  style={{
-
-                    fontSize: "16px",
-
-                    color: theme.palette.info.main,
-
-                  }}
-
-                />
-
-                <Typography
-
-                  sx={{
-
-                    fontWeight: 600,
-
-                    fontSize: 13,
-
-                    color: theme.palette.info.main,
-
-                  }}
-
-                >
-
-                  {tConfig(allConfig?.cityDict?.[String(cityId)]) || (
-
-                    <span style={{ fontStyle: "italic", opacity: 0.7 }}>
-
-                      Chưa cập nhật
-
-                    </span>
-
-                  )}
-
-                </Typography>
-
-              </Box>
-
-              <Box
-
-                sx={{
-
-                  backgroundColor: theme.palette.success.background,
-
-                  borderRadius: 1.5,
-
-                  px: 1.5,
-
-                  py: 0.75,
-
-                  display: "flex",
-
-                  alignItems: "center",
-
-                  gap: 0.75,
-
-                }}
-
-              >
-
-                <FontAwesomeIcon
-
-                  icon={faCalendarDays}
-
-                  style={{
-
-                    fontSize: "16px",
-
-                    color: theme.palette.success.main,
-
-                  }}
-
-                />
-
-                <Typography
-
-                  sx={{
-
-                    fontWeight: 600,
-
-                    fontSize: 13,
-
-                    color: theme.palette.success.main,
-
-                  }}
-
-                >
-
-                  {dayjs(deadline).format("DD/MM/YYYY")}
-
-                </Typography>
-
-              </Box>
-
-            </Stack>
-
+            <JobPostLargeInfoChips
+              theme={theme}
+              salaryMin={salaryMin}
+              salaryMax={salaryMax}
+              cityLabel={cityLabel}
+              deadline={deadline}
+            />
           </Stack>
-
         </Stack>
-
       </Stack>
 
-      <Divider sx={{ mt: 1, mb: 0.75, borderColor: theme.palette.grey[400] }} />
-
-      <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
-
-        <Box
-
-          sx={{
-
-            display: "flex",
-
-            alignItems: "center",
-
-            gap: 0.8,
-
-            color: theme.palette.grey[600],
-
-          }}
-
-        >
-
-          <FontAwesomeIcon
-
-            icon={faClock}
-
-            style={{ fontSize: "14px" }}
-
-            color={theme.palette.grey[400]}
-
-          />
-
-          <Typography
-
-            sx={{
-
-              fontWeight: 500,
-
-              fontSize: 13,
-
-              color: theme.palette.grey[600],
-
-            }}
-
-            variant="body2"
-
-          >
-
-            {t('jobPost.timeLeft', 'Còn')}{" "}
-
-            <TimeAgo date={deadline} type="fromNow" />
-
-          </Typography>
-
-        </Box>
-
+      <Box sx={{ my: 0.75 }}>
+        <Box sx={{ borderTop: `1px solid ${theme.palette.grey[400]}` }} />
       </Box>
 
+      <JobPostLargeFooter theme={theme} deadline={deadline} />
     </Card>
-
   );
-
 };
 
 const Loading = () => (
-
   <>
-
     <Card sx={{ p: 1, boxShadow: 0 }}>
-
       <Stack direction="row" spacing={2}>
-
         <Box>
-
           <Skeleton variant="rounded" width={100} height={100} />
-
         </Box>
-
         <Stack flex={1} justifyContent="center" spacing={0.8}>
-
           <Typography variant="subtitle2">
-
             <Skeleton height={40} />
-
           </Typography>
-
           <Typography variant="subtitle2">
-
             <Skeleton height={30} />
-
           </Typography>
-
           <Typography variant="body1">
-
             <Skeleton height={25} />
-
           </Typography>
-
         </Stack>
-
       </Stack>
-
     </Card>
-
   </>
-
 );
 
 const MemoizedJobPostLarge = Object.assign(React.memo(JobPostLarge), { Loading });

@@ -1,16 +1,11 @@
 import * as React from 'react';
 import { useAppSelector } from '@/redux/hooks';
 
-import { usePathname, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
-import { AppBar, Avatar, Box, Collapse, CssBaseline, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from "@mui/material";
+import { AppBar, Avatar, Box, CssBaseline, Divider, Drawer, IconButton, List, Stack, Toolbar, Typography } from "@mui/material";
 
 import MenuIcon from '@mui/icons-material/Menu';
-
-import ExpandLessIcon from '@mui/icons-material/ExpandLess';
-
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 import AccountSwitchMenu from './commons/AccountSwitchMenu';
 
@@ -24,23 +19,13 @@ import LanguageSwitcher from './commons/LanguageSwitcher';
 
 import { IMAGES } from '../../configs/constants';
 
-interface NavItem {
-  id: string;
-  type?: 'section' | 'item';
-  label: string;
-  icon?: React.ElementType;
-  to?: string;
-  children?: NavItem[];
-}
+import MuiShellNavList, { type NavItem } from './MuiShellNavList';
 
 interface MuiShellLayoutProps {
   title?: string;
   navItems: NavItem[];
   children: React.ReactNode;
 }
-
-
-
 const drawerWidth = 240;
 
 const createInitialExpanded = (items: NavItem[]) => {
@@ -63,8 +48,6 @@ const createInitialExpanded = (items: NavItem[]) => {
 const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const location = { pathname, search: searchParams.toString(), state: null, key: '' };
 
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
 
@@ -98,138 +81,6 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
   };
 
-  const renderNavItems = (items: NavItem[], isChild = false) =>
-
-    items.map((item) => {
-
-      if (item.type === 'section') {
-
-        return (
-
-          <ListItem key={item.id} disablePadding>
-
-            <ListItemButton onClick={() => handleToggleGroup(item.id)}>
-
-              {item.icon ? (
-
-                <ListItemIcon>
-
-                  <item.icon fontSize="small" />
-
-                </ListItemIcon>
-
-              ) : null}
-
-              <ListItemText
-
-                primary={item.label}
-
-                slotProps={{
-
-                  primary: { variant: 'body2', fontWeight: 600 }
-
-                }}
-
-              />
-
-              {expandedItems[item.id] ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
-
-            </ListItemButton>
-
-          </ListItem>
-
-        );
-
-      }
-
-      if (item.children && item.children.length) {
-
-        return (
-
-          <Box key={item.id}>
-
-            <ListItem disablePadding>
-
-              <ListItemButton onClick={() => handleToggleGroup(item.id)}>
-
-                {item.icon ? (
-
-                  <ListItemIcon>
-
-                    <item.icon fontSize="small" />
-
-                  </ListItemIcon>
-
-                ) : null}
-
-                <ListItemText primary={item.label} slotProps={{
-
-                  primary: { variant: 'body2' }
-
-                }} />
-
-                {expandedItems[item.id] ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />}
-
-              </ListItemButton>
-
-            </ListItem>
-
-            <Collapse in={expandedItems[item.id]} timeout="auto" unmountOnExit>
-
-              <List component="div" disablePadding>
-
-                {renderNavItems(item.children, true)}
-
-              </List>
-
-            </Collapse>
-
-          </Box>
-
-        );
-
-      }
-
-      return (
-
-        <ListItem key={item.id} disablePadding>
-
-          <ListItemButton
-
-            component={item.to ? Link : 'div'}
-
-            href={item.to || ''}
-
-            selected={Boolean(item.to && location.pathname === item.to)}
-
-            sx={{ pl: isChild ? 4 : 2 }}
-
-          >
-
-            {item.icon && !isChild ? (
-
-              <ListItemIcon>
-
-                <item.icon fontSize="small" />
-
-              </ListItemIcon>
-
-            ) : null}
-
-            <ListItemText primary={item.label} slotProps={{
-
-              primary: { variant: 'body2' }
-
-            }} />
-
-          </ListItemButton>
-
-        </ListItem>
-
-      );
-
-    });
-
   const drawer = (
 
     <Box>
@@ -244,7 +95,12 @@ const MuiShellLayout = ({ title, navItems, children }: MuiShellLayoutProps) => {
 
       <List>
 
-        {renderNavItems(navItems)}
+        <MuiShellNavList
+          items={navItems}
+          expandedItems={expandedItems}
+          onToggleGroup={handleToggleGroup}
+          currentPathname={pathname}
+        />
 
       </List>
 

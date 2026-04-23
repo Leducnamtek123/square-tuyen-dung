@@ -30,7 +30,7 @@ const RangePickerCustom = ({
   setSelectedDateRange,
 }: Props) => {
 
-  const [maxDate, setMaxDate] = React.useState(dayjs());
+  const [maxDate, setMaxDate] = React.useState(() => dayjs());
 
   const handleDateRangeChange = (startValue: dayjs.Dayjs | null, endValue: dayjs.Dayjs | null) => {
     if (startValue && endValue) {

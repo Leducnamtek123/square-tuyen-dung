@@ -12,14 +12,6 @@ export const SkillChipList: React.FC<{
 
   if (!skills) return <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic', opacity: 0.7 }}>{t('appliedResume.ai.noData')}</Typography>;
 
-  const skillArray = Array.isArray(skills)
-    ? skills
-    : typeof skills === 'string'
-      ? skills.split(',').map(s => s.trim()).filter(Boolean)
-      : [];
-
-  if (skillArray.length === 0) return <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic', opacity: 0.7 }}>{t('appliedResume.ai.noData')}</Typography>;
-
   const getChipColor = () => {
     switch(color) {
       case 'success': return theme.palette.success.main;
@@ -30,12 +22,26 @@ export const SkillChipList: React.FC<{
   };
 
   const mainColor = getChipColor();
+  const EMPTY_SKILLS: string[] = [];
+  const normalizedSkills = Array.isArray(skills)
+    ? skills.flatMap((skill) => {
+        const text = String(skill || '').trim();
+        return text ? [text] : [];
+      })
+    : typeof skills === 'string'
+      ? skills.split(',').flatMap((skill) => {
+          const text = skill.trim();
+          return text ? [text] : [];
+      })
+      : EMPTY_SKILLS;
+
+  if (normalizedSkills.length === 0) return <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic', opacity: 0.7 }}>{t('appliedResume.ai.noData')}</Typography>;
 
   return (
     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-      {skillArray.map((skill, idx) => (
+      {normalizedSkills.map((skill) => (
         <Chip
-          key={idx}
+          key={skill}
           label={skill}
           size="small"
           variant="filled"

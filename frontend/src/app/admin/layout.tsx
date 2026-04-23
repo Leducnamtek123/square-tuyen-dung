@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import AdminLayout from '@/layouts/AdminLayout';
 import AdminLoginLayout from '@/layouts/AdminLoginLayout';
@@ -20,7 +20,6 @@ export default function AdminSectionLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname() || '';
-  const router = useRouter();
   const dispatch = useAppDispatch();
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
   const [isChecking, setIsChecking] = useState(true);
@@ -41,7 +40,7 @@ export default function AdminSectionLayout({
       // 1. If no token, redirect to login if not already on an auth page
       if (!token) {
         if (!isAuthPage) {
-          router.replace(`${adminPrefix}/login`);
+          window.location.replace(`${adminPrefix}/login`);
         } else {
           setIsChecking(false);
         }
@@ -55,7 +54,7 @@ export default function AdminSectionLayout({
         } catch (error) {
           // If fetching user info fails, token might be invalid/expired
           if (!isAuthPage) {
-            router.replace(`${adminPrefix}/login`);
+            window.location.replace(`${adminPrefix}/login`);
           } else {
             setIsChecking(false);
           }
@@ -67,7 +66,7 @@ export default function AdminSectionLayout({
     };
 
     checkAuth();
-  }, [currentUser, dispatch, isAuthPage, pathname, router]);
+  }, [currentUser, dispatch, isAuthPage, pathname]);
 
   // Second effect to handle role verification once currentUser is available
   useEffect(() => {
@@ -80,20 +79,20 @@ export default function AdminSectionLayout({
         // Not an admin: if on an admin page, redirect away
         if (!isAuthPage) {
           // Redirect to a forbidden page or home if not authorized
-          router.replace('/'); 
+          window.location.replace('/');
         } else {
           setIsChecking(false);
         }
       } else {
         // Is admin: if on login page, redirect to dashboard
         if (isAuthPage && (pathname.endsWith('/login') || pathname.endsWith('/quan-tri'))) {
-           router.replace(`${adminPrefix}/dashboard`);
+           window.location.replace(`${adminPrefix}/dashboard`);
         } else {
           setIsChecking(false);
         }
       }
     }
-  }, [currentUser, isAuthPage, pathname, router]);
+  }, [currentUser, isAuthPage, pathname]);
 
   if (isChecking) {
     // Show nothing or a loading spinner while checking auth/roles

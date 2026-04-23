@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useReducer } from 'react';
 import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Button, Dialog, DialogTitle, DialogContent, DialogActions, MenuItem, Tooltip, IconButton, Chip, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { ColumnDef } from '@tanstack/react-table';
@@ -9,7 +9,7 @@ import dayjs from '../../../configs/dayjs-config';
 
 import SearchIcon from '@mui/icons-material/Search';
 import { useJobActivities } from './hooks/useJobActivities';
-import { useDataTable } from '../../../hooks';
+import { useDataTable, useDebounce } from '../../../hooks';
 import { JobPostActivity } from '../../../types/models';
 
 const JobActivityPage = () => {
@@ -25,7 +25,61 @@ const JobActivityPage = () => {
         onPaginationChange
     } = useDataTable({ initialPageSize: 10 });
 
-    const [searchTerm, setSearchTerm] = useState('');
+    type JobActivityPageState = {
+        searchTerm: string;
+        openEditDialog: boolean;
+        openDeleteDialog: boolean;
+        currentActivity: JobPostActivity | null;
+        statusValue: number;
+    };
+
+    type JobActivityPageAction =
+        | { type: 'set-search-term'; value: string }
+        | { type: 'open-edit'; activity: JobPostActivity }
+        | { type: 'open-delete'; activity: JobPostActivity }
+        | { type: 'close-dialogs' }
+        | { type: 'set-status'; value: number };
+
+    const [state, dispatch] = useReducer(
+        (current: JobActivityPageState, action: JobActivityPageAction): JobActivityPageState => {
+            switch (action.type) {
+                case 'set-search-term':
+                    return { ...current, searchTerm: action.value };
+                case 'open-edit':
+                    return {
+                        ...current,
+                        openEditDialog: true,
+                        currentActivity: action.activity,
+                        statusValue: action.activity.status || 0,
+                    };
+                case 'open-delete':
+                    return {
+                        ...current,
+                        openDeleteDialog: true,
+                        currentActivity: action.activity,
+                    };
+                case 'close-dialogs':
+                    return {
+                        ...current,
+                        openEditDialog: false,
+                        openDeleteDialog: false,
+                    };
+                case 'set-status':
+                    return { ...current, statusValue: action.value };
+                default:
+                    return current;
+            }
+        },
+        {
+            searchTerm: '',
+            openEditDialog: false,
+            openDeleteDialog: false,
+            currentActivity: null,
+            statusValue: 0,
+        }
+    );
+
+    const debouncedSearch = useDebounce(state.searchTerm, 500);
 
     const {
         data,
@@ -36,43 +90,33 @@ const JobActivityPage = () => {
     } = useJobActivities({
         page: page + 1,
         pageSize: rowsPerPage,
-        kw: searchTerm,
+        kw: debouncedSearch,
         ordering
     });
 
-    const [openEditDialog, setOpenEditDialog] = useState(false);
-    const [currentActivity, setCurrentActivity] = useState<JobPostActivity | null>(null);
-    const [statusValue, setStatusValue] = useState<number>(0);
-
-    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearchTerm(e.target.value);
+        dispatch({ type: 'set-search-term', value: e.target.value });
         onPaginationChange({ pageIndex: 0, pageSize: rowsPerPage });
     };
 
     const handleOpenEdit = (activity: JobPostActivity) => {
-        setCurrentActivity(activity);
-        setStatusValue(activity.status || 0);
-        setOpenEditDialog(true);
+        dispatch({ type: 'open-edit', activity });
     };
 
     const handleOpenDelete = (activity: JobPostActivity) => {
-        setCurrentActivity(activity);
-        setOpenDeleteDialog(true);
+        dispatch({ type: 'open-delete', activity });
     };
 
     const handleCloseDialogs = () => {
-        setOpenEditDialog(false);
-        setOpenDeleteDialog(false);
+        dispatch({ type: 'close-dialogs' });
     };
 
     const handleSaveStatus = async () => {
-        if (!currentActivity) return;
+        if (!state.currentActivity) return;
         try {
             await updateJobActivity({
-                id: currentActivity.id,
-                data: { status: statusValue }
+                id: state.currentActivity.id,
+                data: { status: state.statusValue }
             });
             handleCloseDialogs();
         } catch (error) {
@@ -81,9 +125,9 @@ const JobActivityPage = () => {
     };
 
     const handleDelete = async () => {
-        if (!currentActivity) return;
+        if (!state.currentActivity) return;
         try {
-            await deleteJobActivity(currentActivity.id);
+            await deleteJobActivity(state.currentActivity.id);
             handleCloseDialogs();
         } catch (error) {
             console.error(error);
@@ -186,7 +230,7 @@ const JobActivityPage = () => {
                     <TextField
                         size="small"
                         placeholder={t('pages.jobActivity.searchPlaceholder')}
-                        value={searchTerm}
+                        value={state.searchTerm}
                         onChange={handleSearch}
                         sx={{ width: 400 }}
                         slotProps={{
@@ -214,7 +258,7 @@ const JobActivityPage = () => {
                 />
             </Paper>
             {/* Edit Status Dialog */}
-            <Dialog open={openEditDialog} onClose={handleCloseDialogs} fullWidth maxWidth="xs">
+            <Dialog open={state.openEditDialog} onClose={handleCloseDialogs} fullWidth maxWidth="xs">
                 <DialogTitle>{t('pages.jobActivity.editStatusTitle')}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ pt: 1 }}>
@@ -222,8 +266,8 @@ const JobActivityPage = () => {
                             select
                             fullWidth
                             label={t('pages.jobActivity.statusLabel')}
-                            value={statusValue}
-                            onChange={(e) => setStatusValue(Number(e.target.value))}
+                            value={state.statusValue}
+                            onChange={(e) => dispatch({ type: 'set-status', value: Number(e.target.value) })}
                         >
                             <MenuItem value={1}>{t('pages.jobActivity.statusOptions.applied')}</MenuItem>
                             <MenuItem value={2}>{t('pages.jobActivity.statusOptions.pending')}</MenuItem>
@@ -244,11 +288,11 @@ const JobActivityPage = () => {
                 </DialogActions>
             </Dialog>
             {/* Delete Confirmation */}
-            <Dialog open={openDeleteDialog} onClose={handleCloseDialogs}>
+            <Dialog open={state.openDeleteDialog} onClose={handleCloseDialogs}>
                 <DialogTitle>{t('pages.jobActivity.deleteTitle')}</DialogTitle>
                 <DialogContent>
                     <Typography>
-                        {t('pages.jobActivity.deleteText', { name: currentActivity?.fullName })}
+                        {t('pages.jobActivity.deleteText', { name: state.currentActivity?.fullName })}
                     </Typography>
                 </DialogContent>
                 <DialogActions sx={{ px: 3, pb: 2 }}>

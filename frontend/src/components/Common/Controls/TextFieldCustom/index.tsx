@@ -6,6 +6,8 @@ import { InputAdornment, TextField, Typography } from "@mui/material";
 import { SxProps, Theme } from '@mui/material/styles';
 import ValidationError from '../ValidationError';
 
+const EMPTY_SX: SxProps<Theme> = {};
+
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
   control: Control<T>;
@@ -29,7 +31,7 @@ const TextFieldCustom = <T extends FieldValues = FieldValues>({
   disabled = false,
   icon = null,
   type = 'text',
-  sx = {},
+  sx = EMPTY_SX,
 }: Props<T>) => {
 
   // Format display number with comma

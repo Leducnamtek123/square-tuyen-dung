@@ -27,16 +27,17 @@ const toStringValue = (value: unknown): string | null => {
 
 const toStringArray = (value: unknown): string[] => {
     if (Array.isArray(value)) {
-        return value
-            .map((item) => toStringValue(item))
-            .filter((item): item is string => Boolean(item));
+        return value.flatMap((item) => {
+            const text = toStringValue(item);
+            return text ? [text] : [];
+        });
     }
 
     if (typeof value === 'string') {
         return value
             .split('\n')
             .map((item) => item.trim())
-            .filter(Boolean);
+            .filter((item): item is string => Boolean(item));
     }
 
     return [];
@@ -45,14 +46,10 @@ const toStringArray = (value: unknown): string[] => {
 const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session, t }) => {
     const theme = useTheme();
     const strengthsRaw = session.aiStrengths || session.ai_strengths;
-    const strengths: string[] = Array.isArray(strengthsRaw) 
-        ? strengthsRaw.filter((s): s is string => typeof s === 'string') 
-        : (typeof strengthsRaw === 'string' ? strengthsRaw.split('\n').filter(Boolean) : []);
+    const strengths: string[] = toStringArray(strengthsRaw);
         
     const weaknessesRaw = session.aiWeaknesses || session.ai_weaknesses;
-    const weaknesses: string[] = Array.isArray(weaknessesRaw)
-        ? weaknessesRaw.filter((w): w is string => typeof w === 'string')
-        : (typeof weaknessesRaw === 'string' ? weaknessesRaw.split('\n').filter(Boolean) : []);
+    const weaknesses: string[] = toStringArray(weaknessesRaw);
 
     const detailedFeedbackRaw = session.aiDetailedFeedback || session.ai_detailed_feedback;
     const detailedFeedback = isRecord(detailedFeedbackRaw) ? detailedFeedbackRaw : null;
@@ -124,9 +121,9 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                             {t('interviewDetail.label.strengths')}
                         </Typography>
                         <List dense sx={{ py: 0 }}>
-                            {strengths.length > 0 ? strengths.map((item, idx) => (
+                            {strengths.length > 0 ? strengths.map((item) => (
                                 <ListItem 
-                                    key={idx} 
+                                    key={item} 
                                     sx={{ 
                                         px: 2.5, 
                                         py: 2, 
@@ -159,9 +156,9 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                             {t('interviewDetail.label.weaknesses')}
                         </Typography>
                         <List dense sx={{ py: 0 }}>
-                            {weaknesses.length > 0 ? weaknesses.map((item, idx) => (
+                            {weaknesses.length > 0 ? weaknesses.map((item) => (
                                 <ListItem 
-                                    key={idx} 
+                                    key={item} 
                                     sx={{ 
                                         px: 2.5, 
                                         py: 2, 
@@ -279,7 +276,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
 
                                                 return (
                                                     <Box
-                                                        key={`${idx}-${question}`}
+                                                        key={`${question}-${feedback}-${score ?? 'na'}`}
                                                         sx={{
                                                             p: 2.5,
                                                             borderRadius: 2.5,

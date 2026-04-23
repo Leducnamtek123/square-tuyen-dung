@@ -24,9 +24,10 @@ interface UpdatePasswordFormProps {
   serverErrors?: Record<string, string[]>;
 }
 
+const EMPTY_SERVER_ERRORS: Record<string, string[]> = {};
 
 
-const UpdatePasswordForm = ({ handleUpdatePassword, serverErrors = {} }: UpdatePasswordFormProps) => {
+const UpdatePasswordForm = ({ handleUpdatePassword, serverErrors = EMPTY_SERVER_ERRORS }: UpdatePasswordFormProps) => {
 
   const { t } = useTranslation('auth');
 

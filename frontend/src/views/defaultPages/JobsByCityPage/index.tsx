@@ -13,9 +13,9 @@ const JobsByCityPage = () => {
 
   useSEO({
     title: t('jobsByCategoryPage.cityTitle'),
-    description: 'Tìm kiếm việc làm theo tỉnh thành trên toàn quốc tại Square. Việc làm tại Hà Nội, TP.HCM và các tỉnh thành khác.',
+    description: t('seo.jobsByCity.description'),
     url: `${(typeof window !== 'undefined' ? window.location.origin : '')}/viec-lam-theo-tinh-thanh`,
-    keywords: 'việc làm Hà Nội, việc làm TP.HCM, việc làm theo tỉnh thành, tuyển dụng địa phương',
+    keywords: t('seo.jobsByCity.keywords'),
   });
 
   const { allConfig } = useConfig();

@@ -18,28 +18,7 @@ import type { AxiosError } from 'axios';
 import type { ApiError } from '../../../../types/api';
 import type { SelectOption } from '../../../../types/models';
 import type { PlacePrediction } from '../../../../services/goongService';
-
-export interface CompanyFormValues {
-  companyName: string;
-  taxCode: string;
-  employeeSize: number;
-  fieldOperation: string;
-  location: { 
-    city: number | string; 
-    district: number | string; 
-    address: string; 
-    lat: number | string; 
-    lng: number | string 
-  };
-  since?: string | Date | null;
-  companyEmail: string;
-  companyPhone: string;
-  websiteUrl?: string;
-  facebookUrl?: string;
-  youtubeUrl?: string;
-  linkedinUrl?: string;
-  description?: EditorState;
-}
+import type { CompanyFormValues } from './types';
 
 interface CompanyFormProps {
   handleUpdate: (data: CompanyFormValues) => void;
@@ -69,6 +48,42 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
     since: yup.date().nullable(),
     companyEmail: yup.string().required(t('jobPostForm.validation.contactpersonemailisrequired')).email(t('jobPostForm.validation.invalidemail')).max(100),
     companyPhone: yup.string().required(t('jobPostForm.validation.contactpersonphoneisrequired')).matches(REGEX_VALIDATE.phoneRegExp, t('jobPostForm.validation.invalidphonenumber')).max(15),
+    websiteUrl: yup
+      .string()
+      .transform((value, originalValue) => {
+        if (typeof originalValue === 'string' && originalValue.trim() === '') return null;
+        return value?.trim() || value;
+      })
+      .nullable()
+      .notRequired()
+      .url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
+    facebookUrl: yup
+      .string()
+      .transform((value, originalValue) => {
+        if (typeof originalValue === 'string' && originalValue.trim() === '') return null;
+        return value?.trim() || value;
+      })
+      .nullable()
+      .notRequired()
+      .url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
+    youtubeUrl: yup
+      .string()
+      .transform((value, originalValue) => {
+        if (typeof originalValue === 'string' && originalValue.trim() === '') return null;
+        return value?.trim() || value;
+      })
+      .nullable()
+      .notRequired()
+      .url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
+    linkedinUrl: yup
+      .string()
+      .transform((value, originalValue) => {
+        if (typeof originalValue === 'string' && originalValue.trim() === '') return null;
+        return value?.trim() || value;
+      })
+      .nullable()
+      .notRequired()
+      .url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
     description: yup.mixed().notRequired(),
   });
 
@@ -76,6 +91,11 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
     resolver: yupResolver(schema) as Resolver<CompanyFormValues>,
     defaultValues: {
       description: EditorState.createEmpty(),
+      since: null,
+      websiteUrl: '',
+      facebookUrl: '',
+      youtubeUrl: '',
+      linkedinUrl: '',
       location: { city: '', district: '', address: '', lat: '', lng: '' },
     },
   });

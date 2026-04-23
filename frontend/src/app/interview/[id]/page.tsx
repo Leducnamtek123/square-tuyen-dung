@@ -1,12 +1,10 @@
-'use client';
+import InterviewRoomPageClient from './page.client';
 
-import dynamic from 'next/dynamic';
-
-const InterviewRoomPage = dynamic(
-  () => import('@/views/jobSeekerPages/InterviewRoomPage'),
-  { ssr: false }
-);
+export const metadata = {
+  title: 'Interview',
+  description: 'Join the interview room.',
+};
 
 export default function Page() {
-  return <InterviewRoomPage />;
+  return <InterviewRoomPageClient />;
 }

@@ -8,7 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import { useJobNotifications } from './hooks/useJobNotifications';
-import { useDataTable } from '../../../hooks';
+import { useDataTable, useDebounce } from '../../../hooks';
 import { JobPostNotification } from '../../../types/models';
 import type { JobPostNotificationPayload } from '../../../services/adminManagementService';
 
@@ -26,6 +26,7 @@ const JobNotificationsPage = () => {
     } = useDataTable({ initialPageSize: 10 });
 
     const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearch = useDebounce(searchTerm, 500);
 
     const {
         data,
@@ -37,7 +38,7 @@ const JobNotificationsPage = () => {
     } = useJobNotifications({
         page: page + 1,
         pageSize,
-        search: searchTerm,
+        search: debouncedSearch,
         ordering
     });
 

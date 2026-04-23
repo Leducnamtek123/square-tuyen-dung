@@ -169,5 +169,53 @@
   "jobPost": {
     "remaining": "Còn {{days}} ngày",
     "timeLeft": "Còn"
+  },
+  "seo": {
+    "home": {
+      "title": "Tìm việc nhanh, tuyển dụng hiệu quả",
+      "description": "Square - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, ứng tuyển nhanh chóng và kết nối với nhà tuyển dụng uy tín.",
+      "keywords": "tìm việc, tuyển dụng, việc làm, ứng tuyển, nhà tuyển dụng, Square",
+      "appName": "Square Tuyển Dụng",
+      "appDescription": "Nền tảng tuyển dụng trực tuyến hàng đầu Việt Nam"
+    },
+    "jobsByCareer": {
+      "description": "Khám phá việc làm theo ngành nghề tại Square. Chọn ngành nghề bạn yêu thích và tìm công việc phù hợp ngay hôm nay.",
+      "keywords": "việc làm theo ngành nghề, ngành IT, ngành kế toán, ngành marketing, tuyển dụng"
+    },
+    "jobsByJobType": {
+      "description": "Tìm kiếm việc làm theo hình thức: toàn thời gian, bán thời gian, thực tập, hợp đồng. Nhiều cơ hội việc làm chất lượng tại Square.",
+      "keywords": "việc làm toàn thời gian, việc làm bán thời gian, thực tập, hợp đồng, remote"
+    },
+    "jobsByCity": {
+      "description": "Tìm kiếm việc làm theo tỉnh thành trên toàn quốc tại Square. Việc làm tại Hà Nội, TP.HCM và các tỉnh thành khác.",
+      "keywords": "việc làm Hà Nội, việc làm TP.HCM, việc làm theo tỉnh thành, tuyển dụng địa phương"
+    },
+    "jobList": {
+      "description": "Tìm kiếm hàng nghìn việc làm mới nhất tại Square. Lọc theo ngành nghề, mức lương, địa điểm. Ứng tuyển nhanh chóng, dễ dàng.",
+      "keywords": "tìm việc làm, việc làm mới nhất, tuyển dụng, ứng tuyển online, việc làm tốt"
+    },
+    "jobDetail": {
+      "titlePrefix": "Tuyển dụng",
+      "at": "tại",
+      "reputableCompany": "công ty uy tín",
+      "keywordsSuffix": "tuyển dụng, việc làm",
+      "breadcrumb": {
+        "home": "Trang chủ",
+        "jobs": "Việc làm"
+      }
+    },
+    "companySearch": {
+      "description": "Khám phá hàng trăm công ty hàng đầu tuyển dụng tại Square. Tìm hiểu văn hóa doanh nghiệp, xem việc làm đang tuyển và ứng tuyển ngay.",
+      "keywords": "công ty tuyển dụng, nhà tuyển dụng uy tín, doanh nghiệp tuyển dụng, hồ sơ công ty"
+    },
+    "companyDetail": {
+      "recruitingCompany": "Công ty tuyển dụng",
+      "hiringLabel": "Xem việc làm đang tuyển.",
+      "keywordsSuffix": "tuyển dụng, việc làm",
+      "breadcrumb": {
+        "home": "Trang chủ",
+        "company": "Công ty"
+      }
+    }
   }
 }

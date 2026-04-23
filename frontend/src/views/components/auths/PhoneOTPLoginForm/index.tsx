@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Box, Button, Stack, styled, TextField, Typography, Alert } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { setupRecaptcha, signInWithPhone, verifyCode } from '../../../../services/firebaseService';
@@ -20,6 +20,52 @@ const StyledButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+type PhoneOTPLoginFormState = {
+  phoneNumber: string;
+  otpCode: string;
+  confirmationResult: ConfirmationResult | null;
+  error: string | null;
+  resendTimer: number;
+};
+
+type PhoneOTPLoginFormAction =
+  | { type: 'set-phone-number'; value: string }
+  | { type: 'set-otp-code'; value: string }
+  | { type: 'set-confirmation-result'; value: ConfirmationResult | null }
+  | { type: 'set-error'; value: string | null }
+  | { type: 'set-resend-timer'; value: number }
+  | { type: 'tick-resend-timer' };
+
+const initialState: PhoneOTPLoginFormState = {
+  phoneNumber: '',
+  otpCode: '',
+  confirmationResult: null,
+  error: null,
+  resendTimer: 0,
+};
+
+const reducer = (
+  state: PhoneOTPLoginFormState,
+  action: PhoneOTPLoginFormAction
+): PhoneOTPLoginFormState => {
+  switch (action.type) {
+    case 'set-phone-number':
+      return { ...state, phoneNumber: action.value };
+    case 'set-otp-code':
+      return { ...state, otpCode: action.value };
+    case 'set-confirmation-result':
+      return { ...state, confirmationResult: action.value };
+    case 'set-error':
+      return { ...state, error: action.value };
+    case 'set-resend-timer':
+      return { ...state, resendTimer: action.value };
+    case 'tick-resend-timer':
+      return { ...state, resendTimer: Math.max(0, state.resendTimer - 1) };
+    default:
+      return state;
+  }
+};
+
 interface PhoneOTPLoginFormProps {
   onLogin: (idToken: string) => void;
   isLoading?: boolean;
@@ -27,56 +73,54 @@ interface PhoneOTPLoginFormProps {
 
 const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
   const { t } = useTranslation('auth');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [otpCode, setOtpCode] = useState('');
-  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [resendTimer, setResendTimer] = useState(0);
+  const [state, dispatch] = React.useReducer(reducer, initialState);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (resendTimer > 0) {
-      interval = setInterval(() => {
-        setResendTimer((prev) => prev - 1);
-      }, 1000);
+  React.useEffect(() => {
+    if (state.resendTimer <= 0) {
+      return;
     }
+
+    const interval = setInterval(() => {
+      dispatch({ type: 'tick-resend-timer' });
+    }, 1000);
+
     return () => clearInterval(interval);
-  }, [resendTimer]);
+  }, [state.resendTimer]);
 
   const handleSendOTP = async () => {
     try {
-      setError(null);
+      dispatch({ type: 'set-error', value: null });
       const appVerifier = setupRecaptcha('recaptcha-container');
-      const result = await signInWithPhone(phoneNumber, appVerifier);
-      setConfirmationResult(result);
-      setResendTimer(60);
+      const result = await signInWithPhone(state.phoneNumber, appVerifier);
+      dispatch({ type: 'set-confirmation-result', value: result });
+      dispatch({ type: 'set-resend-timer', value: 60 });
     } catch (err: unknown) {
       console.error(err);
-      setError((err as Error).message || 'Failed to send OTP');
+      dispatch({ type: 'set-error', value: (err as Error).message || 'Failed to send OTP' });
     }
   };
 
   const handleVerifyOTP = async () => {
-    if (!confirmationResult) return;
+    if (!state.confirmationResult) return;
     try {
-      setError(null);
-      const idToken = await verifyCode(confirmationResult, otpCode);
+      dispatch({ type: 'set-error', value: null });
+      const idToken = await verifyCode(state.confirmationResult, state.otpCode);
       onLogin(idToken);
     } catch (err: unknown) {
       console.error(err);
-      setError((err as Error).message || 'Invalid OTP code');
+      dispatch({ type: 'set-error', value: (err as Error).message || 'Invalid OTP code' });
     }
   };
 
   return (
     <Box sx={{ width: '100%' }}>
-      {error && (
+      {state.error && (
         <Alert severity="error" sx={{ mb: 2, borderRadius: '8px' }}>
-          {error}
+          {state.error}
         </Alert>
       )}
 
-      {!confirmationResult ? (
+      {!state.confirmationResult ? (
         <Stack spacing={2}>
           <Typography variant="body2" color="text.secondary">
             {t('login.phoneIntro', 'Nhập số điện thoại của bạn để nhận mã xác thực.')}
@@ -85,8 +129,8 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
             fullWidth
             label={t('form.phoneNumber', 'Số điện thoại')}
             placeholder="+84..."
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
+            value={state.phoneNumber}
+            onChange={(e) => dispatch({ type: 'set-phone-number', value: e.target.value })}
             disabled={isLoading}
             variant="outlined"
             sx={{
@@ -100,7 +144,7 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
             fullWidth
             variant="contained"
             onClick={handleSendOTP}
-            disabled={!phoneNumber || isLoading}
+            disabled={!state.phoneNumber || isLoading}
             startIcon={<PhoneIcon />}
           >
             {t('actions.sendOTP', 'Gửi mã OTP')}
@@ -116,8 +160,8 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
             fullWidth
             label={t('form.otpCode', 'Mã OTP')}
             placeholder="123456"
-            value={otpCode}
-            onChange={(e) => setOtpCode(e.target.value)}
+            value={state.otpCode}
+            onChange={(e) => dispatch({ type: 'set-otp-code', value: e.target.value })}
             disabled={isLoading}
             variant="outlined"
             sx={{
@@ -131,7 +175,7 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
             fullWidth
             variant="contained"
             onClick={handleVerifyOTP}
-            disabled={otpCode.length < 6 || isLoading}
+            disabled={state.otpCode.length < 6 || isLoading}
             startIcon={<VerifiedUserIcon />}
           >
             {t('actions.verifyOTP', 'Xác thực & Đăng nhập')}
@@ -139,15 +183,15 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
           <Button
             fullWidth
             variant="text"
-            onClick={() => setConfirmationResult(null)}
+            onClick={() => dispatch({ type: 'set-confirmation-result', value: null })}
             disabled={isLoading}
             size="small"
           >
             {t('actions.changePhone', 'Thay đổi số điện thoại')}
           </Button>
-          {resendTimer > 0 ? (
+          {state.resendTimer > 0 ? (
             <Typography variant="caption" align="center" display="block">
-              {t('login.resendIn', 'Gửi lại sau')} {resendTimer}s
+              {t('login.resendIn', 'Gửi lại sau')} {state.resendTimer}s
             </Typography>
           ) : (
             <Button

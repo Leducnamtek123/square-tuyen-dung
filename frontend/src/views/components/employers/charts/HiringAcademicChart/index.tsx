@@ -1,27 +1,11 @@
-/*
-
-Project Recruitment System - Part of Project Platform
-
-Author: Bui Khanh Huy
-
-Email: khuy220@gmail.com
-
-Copyright (c) 2023 Bui Khanh Huy
-
-License: MIT License
-
-See the LICENSE file in the project root for full license information.
-
-*/
-
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { 
-  Box, 
-  Divider, 
-  Stack, 
-  Tooltip as MuiTooltip, 
-  Typography, 
+import {
+  Box,
+  Divider,
+  Stack,
+  Tooltip as MuiTooltip,
+  Typography,
   CircularProgress,
   Paper,
   alpha,
@@ -71,7 +55,6 @@ const options = {
 const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
   const { t } = useTranslation('employer');
   const theme = useTheme();
-  const [isLoading, setIsLoading] = React.useState(true);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([
     dayjs(new Date()).subtract(1, 'month'),
@@ -84,8 +67,6 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
   }), [selectedDateRange]);
 
   const { data, isLoading: queryLoading } = useEmployerRecruitmentByRank(queryParams);
-
-  React.useEffect(() => { setIsLoading(queryLoading); }, [queryLoading]);
 
   const dataOptions = React.useMemo(() => {
     const labels = data?.labels?.map((label: string) => {
@@ -117,9 +98,9 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
   }, [data, t]);
 
   return (
-    <Paper 
+    <Paper
       elevation={0}
-      sx={{ 
+      sx={{
         p: { xs: 2.5, sm: 4 },
         borderRadius: 4,
         boxShadow: (theme) => theme.customShadows?.z1,
@@ -152,7 +133,7 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
           </Stack>
 
           <Box sx={{ position: 'relative', minHeight: 320 }}>
-            {isLoading ? (
+            {queryLoading ? (
               <Stack alignItems="center" justifyContent="center" sx={{ height: 320 }}>
                 <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
               </Stack>

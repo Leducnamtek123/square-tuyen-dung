@@ -1,37 +1,11 @@
 'use client';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { 
-    Box, 
-    Typography, 
-    Button, 
-    Paper, 
-    TextField, 
-    MenuItem, 
-    FormControl, 
-    InputLabel, 
-    Select, 
-    OutlinedInput, 
-    Chip, 
-    CircularProgress, 
-    Stack, 
-    Divider, 
-    Dialog, 
-    DialogTitle, 
-    DialogContent, 
-    DialogActions,
-    Skeleton,
-    InputAdornment,
-    alpha,
-    useTheme,
-    Theme
-} from "@mui/material";
-import { Grid2 as Grid } from "@mui/material";
+import { Box, Button, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Skeleton, TextField, Typography, alpha, useTheme, type Theme } from "@mui/material";
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import toastMessages from '../../../../utils/toastMessages';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../../../configs/constants';
-import DateTimePickerCustom from '../../../../components/Common/Controls/DateTimePickerCustom';
 import { 
     useEmployerJobPosts, 
     useAppliedResumes, 
@@ -42,24 +16,10 @@ import {
     useQuestionMutations 
 } from '../hooks/useEmployerQueries';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import EditIcon from '@mui/icons-material/Edit';
-import EventIcon from '@mui/icons-material/Event';
-import WorkIcon from '@mui/icons-material/Work';
-import PersonIcon from '@mui/icons-material/Person';
-import QuizIcon from '@mui/icons-material/Quiz';
-import CategoryIcon from '@mui/icons-material/Category';
-import SendIcon from '@mui/icons-material/Send';
 import CloseIcon from '@mui/icons-material/Close';
-import type { InterviewSession, Question, QuestionGroup, User } from '../../../../types/models';
-
-interface FormValues {
-  job_post: string | number;
-  candidate: string | number;
-  scheduled_at: string;
-  selected_group: string | number;
-  selected_questions: number[];
-}
+import InterviewCreateCardForm from './InterviewCreateCardForm';
+import type { FormValues } from './types';
+import type { JobPostActivity, Question, QuestionGroup } from '../../../../types/models';
 
 interface InterviewCreateCardProps {
   title?: string;
@@ -113,7 +73,7 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
     const jobs = useMemo(() => jobData?.results ?? [], [jobData]);
     const questions = useMemo(() => questionData?.results ?? [], [questionData]);
     const questionGroups = useMemo(() => groupData?.results ?? [], [groupData]);
-    const candidates = useMemo(() => candidateData?.results ?? [], [candidateData]);
+    const candidates = useMemo(() => candidateData?.results ?? [], [candidateData]) as JobPostActivity[];
 
     // ── Local state — only for dialog ──────────────────────────
     const [isQuestionDialogOpen, setIsQuestionDialogOpen] = useState(false);
@@ -145,10 +105,9 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
     // ── Handlers ───────────────────────────────────────────────
     const handleJobPostChange = useCallback((
-        onChange: (value: string | number) => void,
         value: string | number
     ) => {
-        onChange(value);
+        setValue('job_post', value, { shouldValidate: true });
         // Reset candidate when job post is changed
         setValue('candidate', '', { shouldValidate: false });
     }, [setValue]);
@@ -234,315 +193,30 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
 
     return (
         <Box sx={{ p: { xs: 2, md: 4 } }}>
-            <Paper
-                elevation={0}
-                sx={{
-                    p: { xs: 3, md: 5 },
-                    borderRadius: 4,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    boxShadow: (theme: Theme) => theme.customShadows?.z1,
-                    bgcolor: 'background.paper',
-                    position: 'relative',
-                    overflow: 'hidden'
-                }}
-            >
-                <Stack direction="row" alignItems="center" spacing={2.5} mb={6}>
-                    <Box sx={{ 
-                        width: 48,
-                        height: 48, 
-                        borderRadius: 2, 
-                        bgcolor: 'primary.extralight', 
-                        color: 'primary.main',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: (theme: Theme) => alpha(theme.palette.primary.main, 0.1)
-                    }}>
-                        <EventIcon sx={{ fontSize: 28 }} />
-                    </Box>
-                    <Box>
-                        <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px' }}>
-                            {title || (sessionId ? t('interview:interviewCreateCard.title.editOnlineInterview') : t('interview:interviewCreateCard.title.scheduleOnlineInterview'))}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600, mt: 0.5, opacity: 0.8 }}>
-                            {t('interview:interviewCreateCard.description.schedulingHelper')}
-                        </Typography>
-                    </Box>
-                </Stack>
-
-                <form onSubmit={handleSubmit(onSubmit)}>
-                    <Grid container spacing={5}>
-                        <Grid size={12}>
-                            <Divider sx={{ mb: 1, borderStyle: 'dashed' }}>
-                                <Chip 
-                                    label={t('interview:interviewCreateCard.label.basicInfo').toUpperCase()} 
-                                    size="small" 
-                                    sx={{ fontWeight: 900, bgcolor: 'background.neutral', color: 'text.secondary', letterSpacing: 1.5, px: 2 }} 
-                                />
-                            </Divider>
-                        </Grid>
-
-                        {/* Job Post Select */}
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <Controller
-                                name="job_post"
-                                control={control}
-                                rules={{ required: t('interview:interviewCreateCard.validation.selectJobPost') }}
-                                render={({ field }) => (
-                                    <TextField 
-                                        {...field}
-                                        onChange={(e) => handleJobPostChange(field.onChange, e.target.value)}
-                                        select 
-                                        fullWidth 
-                                        label={t('interview:interviewCreateCard.label.selectjobpost')} 
-                                        error={!!errors.job_post} 
-                                        helperText={errors.job_post?.message}
-                                        disabled={isLoadingJobs}
-                                        sx={inputSx}
-                                        slotProps={{
-                                            input: {
-                                                startAdornment: (
-                                                    <InputAdornment position="start">
-                                                        <WorkIcon sx={{ fontSize: 20, color: 'primary.main' }} />
-                                                    </InputAdornment>
-                                                ),
-                                            },
-                                            inputLabel: { sx: { fontWeight: 600 } }
-                                        }}
-                                    >
-                                        {jobs.map((job) => <MenuItem key={job.id} value={job.id} sx={{ fontWeight: 600 }}>{job.jobName}</MenuItem>)}
-                                    </TextField>
-                                )}
-                            />
-                        </Grid>
-
-                        {/* Candidate Select */}
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <Controller
-                                name="candidate"
-                                control={control}
-                                rules={{ required: t('interview:interviewCreateCard.validation.selectCandidate') }}
-                                render={({ field }) => (
-                                    <TextField 
-                                        {...field} 
-                                        select 
-                                        fullWidth 
-                                        label={t('interview:interviewCreateCard.label.selectcandidate')} 
-                                        disabled={!selectedJobPostId || isLoadingCandidates} 
-                                        error={!!errors.candidate} 
-                                        helperText={errors.candidate?.message}
-                                        sx={inputSx}
-                                        slotProps={{
-                                            input: {
-                                                startAdornment: (
-                                                    <InputAdornment position="start">
-                                                        <PersonIcon sx={{ fontSize: 20, color: 'secondary.main' }} />
-                                                    </InputAdornment>
-                                                ),
-                                            },
-                                            inputLabel: { sx: { fontWeight: 600 } }
-                                        }}
-                                    >
-                                        {candidates.length === 0 && !isLoadingCandidates && selectedJobPostId ? (
-                                            <MenuItem disabled value="">
-                                                <em>{t('interview:interviewCreateCard.noCandidates')}</em>
-                                            </MenuItem>
-                                        ) : null}
-                                        {candidates.map((c) => (
-                                            <MenuItem key={c.userId ?? c.id} value={c.userId ?? c.id} sx={{ fontWeight: 600 }}>
-                                                {c.fullName} - {c.email}
-                                            </MenuItem>
-                                        ))}
-                                    </TextField>
-                                )}
-                            />
-                        </Grid>
-
-                        {/* Scheduled Time */}
-                        <Grid size={{ xs: 12, md: 6 }}>
-                            <DateTimePickerCustom 
-                                name="scheduled_at" 
-                                control={control} 
-                                title={t('interview:interviewCreateCard.title.scheduledtime')} 
-                                showRequired 
-                                minDateTime={new Date().toISOString()} 
-                            />
-                        </Grid>
-                        
-                        <Grid size={12}>
-                            <Divider sx={{ my: 2, borderStyle: 'dashed' }}>
-                                <Chip 
-                                    label={t('interview:interviewCreateCard.label.questions').toUpperCase()} 
-                                    size="small" 
-                                    sx={{ fontWeight: 900, bgcolor: 'background.neutral', color: 'text.secondary', letterSpacing: 1.5, px: 2 }} 
-                                />
-                            </Divider>
-                        </Grid>
-
-                        {/* Question Group */}
-                        <Grid size={12}>
-                            <Controller
-                                name="selected_group"
-                                control={control}
-                                render={({ field }) => (
-                                    <TextField 
-                                        {...field} 
-                                        select 
-                                        fullWidth 
-                                        label={t('interview:interviewCreateCard.label.selectquestiongroupoptional')} 
-                                        variant="outlined" 
-                                        helperText={t('interview:interviewCreateCard.helperText.selectaquestiongrouptoautomaticallyfillthequestions below')}
-                                        sx={inputSx}
-                                        slotProps={{
-                                            input: {
-                                                startAdornment: (
-                                                    <InputAdornment position="start">
-                                                        <CategoryIcon sx={{ fontSize: 20, color: 'info.main' }} />
-                                                    </InputAdornment>
-                                                ),
-                                            },
-                                            inputLabel: { sx: { fontWeight: 600 } },
-                                            formHelperText: { sx: { fontWeight: 700, fontStyle: 'italic', color: 'info.main', opacity: 0.8 } }
-                                        }}
-                                    >
-                                        <MenuItem value="" sx={{ fontWeight: 600 }}><em>{t('common:none')}</em></MenuItem>
-                                        {questionGroups.map((group) => <MenuItem key={group.id} value={group.id} sx={{ fontWeight: 600 }}>{group.name}</MenuItem>)}
-                                    </TextField>
-                                )}
-                            />
-                        </Grid>
-
-                        {/* Questions Multi-Select */}
-                        <Grid size={12}>
-                            <FormControl fullWidth error={!!errors.selected_questions} sx={inputSx}>
-                                <InputLabel sx={{ fontWeight: 600 }}>{t('interview:interviewCreateCard.label.selectinterviewquestions')}</InputLabel>
-                                <Controller
-                                    name="selected_questions"
-                                    control={control}
-                                    render={({ field }) => (
-                                        <Select 
-                                            {...field} 
-                                            multiple 
-                                            input={<OutlinedInput label={t('interview:interviewCreateCard.label.selectinterviewquestions')} />} 
-                                            renderValue={(selected: number[]) => (
-                                                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                                                    {selected.map((val) => {
-                                                        const q = questions.find(item => item.id === val);
-                                                        return (
-                                                            <Chip 
-                                                                key={val} 
-                                                                label={(q?.text ?? `Q#${val}`).substring(0, 50)} 
-                                                                size="small" 
-                                                                sx={{ 
-                                                                    fontWeight: 900, 
-                                                                    borderRadius: 1.5,
-                                                                    bgcolor: alpha(theme.palette.primary.main, 0.08),
-                                                                    color: 'primary.main',
-                                                                    border: '1px solid',
-                                                                    borderColor: alpha(theme.palette.primary.main, 0.1),
-                                                                    fontSize: '0.75rem'
-                                                                }} 
-                                                            />
-                                                        );
-                                                    })}
-                                                </Box>
-                                            )}
-                                            startAdornment={
-                                                <InputAdornment position="start">
-                                                    <QuizIcon sx={{ fontSize: 20, color: 'warning.main', ml: 1 }} />
-                                                </InputAdornment>
-                                            }
-                                        >
-                                            <MenuItem disabled value="">
-                                                <em>{t('interview:interviewCreateCard.label.selectquestions')}</em>
-                                            </MenuItem>
-                                            {questions.map((q) => (
-                                                <MenuItem key={q.id} value={q.id} sx={{ py: 1.5, borderBottom: '1px solid', borderColor: 'divider', '&:last-child': { borderBottom: 0 } }}>
-                                                    <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary' }}>{q.text}</Typography>
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    )}
-                                />
-                                {errors.selected_questions && <Typography variant="caption" color="error" sx={{ mt: 1, fontWeight: 800 }}>{errors.selected_questions.message}</Typography>}
-                            </FormControl>
-                        </Grid>
-
-                        {/* Question Buttons */}
-                        <Grid size={12}>
-                            <Stack direction="row" spacing={2.5} justifyContent="flex-end">
-                                <Button 
-                                    variant="outlined" 
-                                    size="medium"
-                                    startIcon={<AddCircleOutlineIcon />}
-                                    onClick={handleOpenAddQuestion}
-                                    sx={{ 
-                                        textTransform: 'none', 
-                                        borderRadius: 2.5, 
-                                        fontWeight: 900,
-                                        borderStyle: 'dashed',
-                                        px: 3
-                                    }}
-                                >
-                                    {t('interview:employer.questions.add')}
-                                </Button>
-                                <Button 
-                                    variant="outlined" 
-                                    size="medium"
-                                    color="secondary"
-                                    startIcon={<EditIcon />}
-                                    disabled={(watch('selected_questions') ?? []).length !== 1} 
-                                    onClick={handleOpenEditQuestion}
-                                    sx={{ 
-                                        textTransform: 'none', 
-                                        borderRadius: 2.5, 
-                                        fontWeight: 900,
-                                        borderStyle: 'dashed',
-                                        px: 3
-                                    }}
-                                >
-                                    {t('interview:employer.questions.edit')}
-                                </Button>
-                            </Stack>
-                        </Grid>
-                        
-                        {/* Submit */}
-                        <Grid size={12}>
-                            <Divider sx={{ mt: 4, mb: 2, borderStyle: 'dashed' }} />
-                            <Stack direction="row" spacing={2} justifyContent="flex-end">
-                                <Button 
-                                    onClick={() => navigate.back()} 
-                                    variant="text" 
-                                    color="inherit"
-                                    startIcon={<CloseIcon />}
-                                    sx={{ fontWeight: 900, px: 4, py: 1.5, textTransform: 'none', borderRadius: 3 }}
-                                >
-                                    {t('common:cancel')}
-                                </Button>
-                                <Button 
-                                    type="submit" 
-                                    variant="contained" 
-                                    color="primary"
-                                    disabled={isInterviewMutating}
-                                    startIcon={!isInterviewMutating && <SendIcon />}
-                                    sx={{ 
-                                        borderRadius: 3, 
-                                        px: 8, 
-                                        py: 1.5,
-                                        fontWeight: 900, 
-                                        boxShadow: (theme: Theme) => theme.customShadows?.primary,
-                                        textTransform: 'none',
-                                        fontSize: '1.05rem'
-                                    }}
-                                >
-                                    {isInterviewMutating ? <CircularProgress size={24} color="inherit" /> : (sessionId ? t('common:save') : t('interview:interviewCreateCard.scheduleNow'))}
-                                </Button>
-                            </Stack>
-                        </Grid>
-                    </Grid>
-                </form>
-            </Paper>
+            <InterviewCreateCardForm
+                title={title}
+                sessionId={sessionId}
+                t={t}
+                theme={theme}
+                inputSx={inputSx}
+                control={control}
+                errors={errors}
+                handleSubmit={handleSubmit}
+                onSubmit={onSubmit}
+                jobs={jobs}
+                questions={questions}
+                questionGroups={questionGroups}
+                candidates={candidates}
+                isLoadingJobs={isLoadingJobs}
+                isLoadingCandidates={isLoadingCandidates}
+                isInterviewMutating={isInterviewMutating}
+                selectedJobPostId={selectedJobPostId}
+                selectedQuestionsCount={(watch('selected_questions') ?? []).length}
+                onCancel={() => navigate.back()}
+                onJobPostChange={handleJobPostChange}
+                onOpenAddQuestion={handleOpenAddQuestion}
+                onOpenEditQuestion={handleOpenEditQuestion}
+            />
 
             {/* Question Dialog */}
             <Dialog 

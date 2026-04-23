@@ -18,15 +18,16 @@ import tokenService from "../services/tokenService";
 import ErrorBoundary from "../components/ErrorBoundary";
 
 export default function ClientAppRoot({ children }: { children: React.ReactNode }) {
-  const [hasMounted, setHasMounted] = React.useState(false);
+  const hasMounted = React.useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const dispatch = useAppDispatch();
   const { allConfig, isLoadingConfig } = useConfig();
   const hasCachedConfig = !!allConfig;
   const [isInitializing, setIsInitializing] = React.useState(true);
   const { isAuthenticated, currentUser, activeWorkspace } = useAppSelector((state) => state.user);
-
-  // Prevent hydration mismatch: render nothing until client has mounted
-  React.useEffect(() => { setHasMounted(true); }, []);
 
   const isAdminAccount = currentUser?.roleName === ROLES_NAME.ADMIN;
   const workspaceType = activeWorkspace?.type || null;

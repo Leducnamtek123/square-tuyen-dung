@@ -85,7 +85,6 @@ const options: ChartOptions<'bar'> = {
 const ApplicationChart = ({ title }: ApplicationChartProps) => {
   const { t } = useTranslation('employer');
   const theme = useTheme();
-  const [isLoading, setIsLoading] = React.useState(true);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([
     dayjs(new Date()).subtract(1, 'month'),
@@ -98,8 +97,6 @@ const ApplicationChart = ({ title }: ApplicationChartProps) => {
   }), [selectedDateRange]);
 
   const { data, isLoading: queryLoading } = useEmployerApplicationStatistics(queryParams);
-
-  React.useEffect(() => { setIsLoading(queryLoading); }, [queryLoading]);
 
   const dataOptions = React.useMemo<ChartData<'bar' | 'line'>>(() => {
     const title2 = String(data?.title2 ?? '');
@@ -173,7 +170,7 @@ const ApplicationChart = ({ title }: ApplicationChartProps) => {
           </Stack>
 
           <Box sx={{ position: 'relative', minHeight: 320 }}>
-            {isLoading ? (
+            {queryLoading ? (
               <Stack alignItems="center" justifyContent="center" sx={{ height: 320 }}>
                 <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
               </Stack>

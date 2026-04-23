@@ -5,7 +5,7 @@ import PasswordTextFieldCustom from '../../../../components/Common/Controls/Pass
 
 import type { Control } from 'react-hook-form';
 import type { TFunction } from 'i18next';
-import type { EmployerSignUpFormData } from './index';
+import type { EmployerSignUpFormData } from './types';
 
 interface AccountInfoStepProps {
   control: Control<EmployerSignUpFormData>;

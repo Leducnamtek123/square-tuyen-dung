@@ -118,6 +118,7 @@ const ElapsedTimer: React.FC<{ startTime: string | null | undefined }> = ({ star
 };
 
 const LiveObserverVisualizer: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
+  const { t } = useTranslation(['employer', 'interview', 'common']);
   const audioTracks = useTracks([Track.Source.Microphone]);
   const videoTracks = useTracks([Track.Source.Camera]);
   const screenTracks = useTracks([Track.Source.ScreenShare]);
@@ -232,10 +233,10 @@ const LiveObserverVisualizer: React.FC<{ compact?: boolean }> = ({ compact = fal
           >
             <Box sx={{ textAlign: 'center' }}>
               <Typography variant="subtitle2" sx={{ color: 'white', fontWeight: 900, mb: 0.5 }}>
-                Đang chờ tín hiệu
+                {t('employer:interviewLive.candidateCard.waitingSignal')}
               </Typography>
               <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                Khi ứng viên bật camera hoặc mic, preview sẽ hiện ở đây
+                {t('employer:interviewLive.candidateCard.waitingSignalHint')}
               </Typography>
             </Box>
           </Box>
@@ -293,7 +294,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
       } catch (err) {
         if (!alive) return;
         setConnectionDetails(null);
-        setTokenError(err instanceof Error ? err.message : 'Không thể lấy token quan sát.');
+        setTokenError(err instanceof Error ? err.message : t('employer:interviewLive.candidateCard.tokenError'));
       } finally {
         if (alive) setLoadingToken(false);
       }
@@ -358,7 +359,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
                 <PersonIcon sx={{ fontSize: 18 }} />
               </Avatar>
               <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary' }}>
-                {session.candidateName || 'Unknown candidate'}
+                {session.candidateName || t('employer:interviewLive.candidateCard.unknownCandidate')}
               </Typography>
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1}>
@@ -399,7 +400,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
               <Stack spacing={1.5} alignItems="center">
                 <CircularProgress size={28} />
                 <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-                  Đang kết nối realtime...
+                  {t('employer:interviewLive.candidateCard.connecting')}
                 </Typography>
               </Stack>
             </Box>
@@ -440,7 +441,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
                       onClick={() => setFullscreenOpen(true)}
                       sx={{ fontWeight: 800, textTransform: 'none' }}
                     >
-                      Phóng to
+                      {t('employer:interviewLive.candidateCard.maximize')}
                     </Button>
               {normalizedStatus === 'in_progress' && (
                       <Button
@@ -452,7 +453,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
                         disabled={isForceEnding}
                         sx={{ fontWeight: 800, textTransform: 'none' }}
                       >
-                        Kết thúc
+                        {t('employer:interviewLive.candidateCard.end')}
                       </Button>
                     )}
                   </Stack>
@@ -464,7 +465,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
           ) : (
             <Box sx={{ minHeight: 280, display: 'grid', placeItems: 'center', p: 2 }}>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                Phiên này chưa sẵn sàng để kết nối realtime.
+                {t('employer:interviewLive.candidateCard.notReady')}
               </Typography>
             </Box>
           )}
@@ -497,7 +498,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
           >
             <Box>
               <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 900 }}>
-                {session.candidateName || 'Unknown candidate'}
+                {session.candidateName || t('employer:interviewLive.candidateCard.unknownCandidate')}
               </Typography>
                       <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)' }}>
                           {session.jobName || 'N/A'} · {statusLabel}
@@ -542,20 +543,20 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
                     }}
                   >
                     <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900, mb: 1 }}>
-                      Phiên live
+                      {t('employer:interviewLive.candidateCard.liveSession')}
                     </Typography>
                     <Stack spacing={1.5}>
                       <Box>
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)', display: 'block' }}>
-                          Ứng viên
+                          {t('employer:interviewLive.candidateCard.candidate')}
                         </Typography>
                         <Typography variant="body2" sx={{ color: '#fff', fontWeight: 700 }}>
-                          {session.candidateName || 'Unknown candidate'}
+                          {session.candidateName || t('employer:interviewLive.candidateCard.unknownCandidate')}
                         </Typography>
                       </Box>
                       <Box>
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)', display: 'block' }}>
-                          Vị trí
+                          {t('employer:interviewLive.candidateCard.position')}
                         </Typography>
                         <Typography variant="body2" sx={{ color: '#fff', fontWeight: 700 }}>
                           {session.jobName || 'N/A'}
@@ -563,7 +564,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
                       </Box>
                       <Box>
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)', display: 'block' }}>
-                          Phòng
+                          {t('employer:interviewLive.candidateCard.room')}
                         </Typography>
                         <Typography variant="body2" sx={{ color: '#fff', fontWeight: 700 }}>
                           {session.roomName || 'N/A'}
@@ -571,7 +572,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
                       </Box>
                       <Box>
                         <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)', display: 'block' }}>
-                          Thời gian
+                          {t('employer:interviewLive.candidateCard.time')}
                         </Typography>
                         <Typography variant="body2" sx={{ color: '#fff', fontWeight: 700 }}>
                           <ElapsedTimer startTime={session.startTime} />
@@ -586,7 +587,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
                           disabled={isForceEnding}
                           sx={{ textTransform: 'none', fontWeight: 800 }}
                         >
-                          Kết thúc phiên
+                          {t('employer:interviewLive.candidateCard.endSession')}
                         </Button>
                       )}
                     </Stack>
@@ -594,7 +595,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
                 </Box>
               </LiveKitRoom>
             ) : (
-              <Alert severity="warning">Chưa có connection details để mở fullscreen.</Alert>
+              <Alert severity="warning">{t('employer:interviewLive.candidateCard.noConnectionDetails')}</Alert>
             )}
           </Box>
         </DialogContent>

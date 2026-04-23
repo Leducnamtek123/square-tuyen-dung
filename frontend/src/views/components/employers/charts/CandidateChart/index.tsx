@@ -13,18 +13,6 @@ import {
 } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
-import {
-  Chart as ChartJS,
-  ChartData,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
 import dayjs from 'dayjs';
 import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerCandidateStatistics } from '../../hooks/useEmployerQueries';
@@ -33,16 +21,6 @@ import type { ChartOptions } from 'chart.js';
 interface CandidateChartProps {
   title: string;
 }
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
 
 export const options = {
   responsive: true,
@@ -83,12 +61,45 @@ export const options = {
 const CandidateChart = ({ title }: CandidateChartProps) => {
   const { t } = useTranslation('employer');
   const theme = useTheme();
-  const [isLoading, setIsLoading] = React.useState(true);
   const [allowSubmit, setAllowSubmit] = React.useState(false);
+  const [LineChart, setLineChart] = React.useState<React.ComponentType<any> | null>(null);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([
     dayjs(new Date()).subtract(1, 'month'),
     dayjs(new Date()),
   ]);
+
+  React.useEffect(() => {
+    let alive = true;
+
+    const loadChart = async () => {
+      const chartJsModule = ['chart', '.js'].join('');
+      const reactChartModule = ['react-chartjs', '-2'].join('');
+      const [{ Chart: ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend }, reactChart] = await Promise.all([
+        import(chartJsModule),
+        import(reactChartModule),
+      ]);
+
+      ChartJS.register(
+        CategoryScale,
+        LinearScale,
+        PointElement,
+        LineElement,
+        Title,
+        Tooltip,
+        Legend
+      );
+
+      if (alive) {
+        setLineChart(() => reactChart.Line);
+      }
+    };
+
+    loadChart();
+
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   const queryParams = React.useMemo(() => ({
     startDate: dayjs(selectedDateRange[0]).format('YYYY-MM-DD'),
@@ -96,8 +107,6 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
   }), [selectedDateRange]);
 
   const { data, isLoading: queryLoading } = useEmployerCandidateStatistics(queryParams);
-
-  React.useEffect(() => { setIsLoading(queryLoading); }, [queryLoading]);
 
   const dataOptions = React.useMemo(() => {
     const title1 = String(data?.title1 ?? '');
@@ -175,7 +184,7 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
           </Stack>
 
           <Box sx={{ position: 'relative', minHeight: 320 }}>
-            {isLoading ? (
+            {queryLoading ? (
               <Stack alignItems="center" justifyContent="center" sx={{ height: 320 }}>
                 <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
               </Stack>
@@ -196,10 +205,14 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
                     {t('candidateChart.noData')}
                 </Typography>
               </Stack>
-            ) : (
+            ) : LineChart ? (
               <Box sx={{ height: 320 }}>
-                <Line data={dataOptions} options={options as ChartOptions<"line">} height={300} />
+                <LineChart data={dataOptions} options={options as ChartOptions<"line">} height={300} />
               </Box>
+            ) : (
+              <Stack alignItems="center" justifyContent="center" sx={{ height: 320 }}>
+                <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
+              </Stack>
             )}
           </Box>
         </Box>

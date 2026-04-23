@@ -15,6 +15,9 @@ import type { Company } from '@/types/models';
 
 import type { Theme } from '@mui/material/styles';
 
+const LOADING_SLIDE_KEYS = ['loading-1', 'loading-2', 'loading-3', 'loading-4', 'loading-5', 'loading-6', 'loading-7', 'loading-8', 'loading-9', 'loading-10'];
+const STAR_KEYS = ['star-1', 'star-2', 'star-3', 'star-4', 'star-5'];
+
 const styles = {
   ".swiper-pagination": {
     bottom: "-5px !important",
@@ -81,7 +84,7 @@ const TopCompanyCarousel = () => {
   const nav = useRouter();
   const { i18n } = useTranslation();
   const [parentWidth, setParentWidth] = React.useState(0);
-  const [col, setCol] = React.useState(5);
+  const col = parentWidth < 600 ? 2 : parentWidth < 900 ? 3 : parentWidth < 1200 ? 4 : 5;
 
   const { data: companies = [], isLoading } = useQuery({
     queryKey: ['top-companies'],
@@ -108,18 +111,6 @@ const TopCompanyCarousel = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  React.useEffect(() => {
-    if (parentWidth < 600) {
-      setCol(2);
-    } else if (parentWidth < 900) {
-      setCol(3);
-    } else if (parentWidth < 1200) {
-      setCol(4);
-    } else {
-      setCol(5);
-    }
-  }, [parentWidth]);
-
   return (
     <div id="top-company-carousel">
       <Box sx={styles}>
@@ -136,8 +127,8 @@ const TopCompanyCarousel = () => {
           modules={[Pagination, Autoplay]}
         >
           {isLoading
-            ? Array.from(Array(10).keys()).map((value) => (
-                <SwiperSlide key={value}>
+            ? LOADING_SLIDE_KEYS.map((key) => (
+                <SwiperSlide key={key}>
                   <Loading />
                 </SwiperSlide>
               ))
@@ -245,8 +236,8 @@ const TopCompanyCarousel = () => {
                       }}
                     >
                       <Stack direction="row" spacing={0.3}>
-                        {[1, 2, 3, 4, 5].map((i) => (
-                          <StarIcon key={i} sx={{ color: 'primary.main', fontSize: 18 }} />
+                        {STAR_KEYS.map((key) => (
+                          <StarIcon key={key} sx={{ color: 'primary.main', fontSize: 18 }} />
                         ))}
                       </Stack>
                       <Button 

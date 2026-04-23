@@ -1,7 +1,10 @@
-'use client';
+import SavedProfilesPageClient from './page.client';
 
-import SavedProfilePage from '@/views/employerPages/SavedProfilePage';
+export const metadata = {
+  title: 'Saved profiles',
+  description: 'View the profiles you have saved.',
+};
 
 export default function Page() {
-  return <SavedProfilePage />;
+  return <SavedProfilesPageClient />;
 }

@@ -69,7 +69,7 @@ const CareerCarousel = () => {
   const nav = useRouter();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [parentWidth, setParentWidth] = React.useState(0);
-  const [col, setCol] = React.useState(5);
+  const col = parentWidth < 600 ? 2 : parentWidth < 900 ? 3 : parentWidth < 1200 ? 4 : 5;
 
   const { data: topCareers = [], isLoading } = useQuery({
     queryKey: ['top-careers'],
@@ -91,18 +91,6 @@ const CareerCarousel = () => {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  React.useEffect(() => {
-    if (parentWidth < 600) {
-      setCol(2);
-    } else if (parentWidth < 900) {
-      setCol(3);
-    } else if (parentWidth < 1200) {
-      setCol(4);
-    } else {
-      setCol(5);
-    }
-  }, [parentWidth]);
 
   const handleFilter = (id: string | number) => {
     dispatch(searchJobPost({ ...jobPostFilter, careerId: String(id) }));

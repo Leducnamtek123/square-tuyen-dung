@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Box, 
@@ -30,6 +30,53 @@ interface FileItem {
   url: string;
 }
 
+type CompanyImageCardState = {
+  previewVisible: boolean;
+  previewImage: string;
+  cropOpen: boolean;
+  cropImageSrc: string;
+  cropFileName: string;
+};
+
+type CompanyImageCardAction =
+  | { type: 'openPreview'; value: string }
+  | { type: 'closePreview' }
+  | { type: 'openCrop'; fileName: string; imageSrc: string }
+  | { type: 'closeCrop' };
+
+const initialState: CompanyImageCardState = {
+  previewVisible: false,
+  previewImage: '',
+  cropOpen: false,
+  cropImageSrc: '',
+  cropFileName: '',
+};
+
+function reducer(state: CompanyImageCardState, action: CompanyImageCardAction): CompanyImageCardState {
+  switch (action.type) {
+    case 'openPreview':
+      return { ...state, previewVisible: true, previewImage: action.value };
+    case 'closePreview':
+      return { ...state, previewVisible: false, previewImage: '' };
+    case 'openCrop':
+      return {
+        ...state,
+        cropOpen: true,
+        cropFileName: action.fileName,
+        cropImageSrc: action.imageSrc,
+      };
+    case 'closeCrop':
+      return {
+        ...state,
+        cropOpen: false,
+        cropImageSrc: '',
+        cropFileName: '',
+      };
+    default:
+      return state;
+  }
+}
+
 const CompanyImageCard = () => {
   const { t } = useTranslation('employer');
   
@@ -37,13 +84,8 @@ const CompanyImageCard = () => {
   const { data: imagesData, isLoading } = useCompanyImages();
   const { addCompanyImages, deleteCompanyImage, isMutating } = useCompanyImageMutations();
 
-  const [previewVisible, setPreviewVisible] = useState(false);
-  const [previewImage, setPreviewImage] = useState('');
+  const [state, dispatch] = React.useReducer(reducer, initialState);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [cropOpen, setCropOpen] = useState(false);
-  const [cropImageSrc, setCropImageSrc] = useState('');
-  const [cropFileName, setCropFileName] = useState('');
 
   const fileList = useMemo<FileItem[]>(() => {
     const results = imagesData?.results ?? [];
@@ -54,14 +96,13 @@ const CompanyImageCard = () => {
   }, [imagesData]);
 
   const handleCropConfirm = async (croppedFile: File) => {
-    setCropOpen(false);
+    dispatch({ type: 'closeCrop' });
     await handleUploadFiles([croppedFile]);
   };
 
   const handleCropCancel = () => {
-    setCropOpen(false);
-    if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
-    setCropImageSrc('');
+    if (state.cropImageSrc) URL.revokeObjectURL(state.cropImageSrc);
+    dispatch({ type: 'closeCrop' });
   };
 
   const handleUploadFiles = async (files: File[]) => {
@@ -96,8 +137,7 @@ const CompanyImageCard = () => {
   };
 
   const handlePreview = (file: FileItem) => {
-    setPreviewImage(file.url);
-    setPreviewVisible(true);
+    dispatch({ type: 'openPreview', value: file.url });
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,9 +145,11 @@ const CompanyImageCard = () => {
     if (files.length === 0) return;
 
     const file = files[0];
-    setCropFileName(file.name);
-    setCropImageSrc(URL.createObjectURL(file));
-    setCropOpen(true);
+    dispatch({
+      type: 'openCrop',
+      fileName: file.name,
+      imageSrc: URL.createObjectURL(file),
+    });
     event.target.value = '';
   };
 
@@ -210,12 +252,12 @@ const CompanyImageCard = () => {
         onChange={handleFileChange}
       />
 
-      <Dialog open={previewVisible} onClose={() => setPreviewVisible(false)} maxWidth="md" fullWidth>
+      <Dialog open={state.previewVisible} onClose={() => dispatch({ type: 'closePreview' })} maxWidth="md" fullWidth>
         <DialogTitle sx={{ fontWeight: 700 }}>{t('companyImage.preview')}</DialogTitle>
         <DialogContent>
           <Box
             component="img"
-            src={previewImage}
+            src={state.previewImage}
             alt="Preview"
             sx={{ width: '100%', borderRadius: 2, boxShadow: (theme) => theme.customShadows?.z8 }}
           />
@@ -225,9 +267,9 @@ const CompanyImageCard = () => {
       <BackdropLoading open={isMutating} />
 
       <ImageCropDialog
-        open={cropOpen}
-        imageSrc={cropImageSrc}
-        fileName={cropFileName}
+        open={state.cropOpen}
+        imageSrc={state.cropImageSrc}
+        fileName={state.cropFileName}
         aspectRatio={16 / 9}
         aspectLabel="16:9"
         onConfirm={handleCropConfirm}

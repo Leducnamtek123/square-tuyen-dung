@@ -403,7 +403,7 @@ class ResumeSavedSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
     class Meta:
         model = ResumeSaved
-        fields = ("id", "resume", "createAt", "updateAt")
+        fields = ("id", "resume", "resumeSlug", "createAt", "updateAt")
 
 
 class ResumeSavedExportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):

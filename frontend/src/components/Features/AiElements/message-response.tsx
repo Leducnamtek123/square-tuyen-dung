@@ -89,11 +89,7 @@ const MessageResponseInner = memo(({
   ...props
 }: MessageResponseInnerProps) => {
   const content = typeof children === "string" ? children : "";
-  const [canRunStreamdown, setCanRunStreamdown] = useState(false);
-
-  useEffect(() => {
-    setCanRunStreamdown(supportsAdvancedRegex());
-  }, []);
+  const canRunStreamdown = supportsAdvancedRegex();
 
   const needsMermaid = useMemo(() => canRunStreamdown && hasMermaid(content), [canRunStreamdown, content]);
   const needsCode = useMemo(() => canRunStreamdown && hasCode(content), [canRunStreamdown, content]);

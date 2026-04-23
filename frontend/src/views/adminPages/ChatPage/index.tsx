@@ -30,13 +30,14 @@ const AdminChatPage = () => {
   const { t } = useTranslation('admin');
   const {
       searchTerm: search,
+      debouncedSearchTerm: debouncedSearch,
       onSearchChange: setSearch
   } = useDataTable();
 
   const {
       data,
       isLoading
-  } = useChat({ kw: search });
+  } = useChat({ kw: debouncedSearch });
 
   const conversations = data?.results || [];
 
@@ -174,9 +175,9 @@ const AdminChatPage = () => {
 
       {/* Stats Cards */}
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 3 }}>
-        {stats.map((s, i) => (
+        {stats.map((s) => (
           <Paper
-            key={i}
+            key={s.label}
             elevation={0}
             sx={{
               flex: 1,

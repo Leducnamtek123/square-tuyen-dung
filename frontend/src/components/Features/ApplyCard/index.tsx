@@ -15,6 +15,7 @@ interface ApplyCardProps {
   openPopup: boolean;
   setOpenPopup: (open: boolean) => void;
   setIsApplySuccess: (success: boolean) => void;
+  onApplySuccess?: () => void;
 }
 
 const ApplyCard = ({
@@ -23,6 +24,7 @@ const ApplyCard = ({
   openPopup,
   setOpenPopup,
   setIsApplySuccess,
+  onApplySuccess,
 }: ApplyCardProps) => {
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const submitLockRef = React.useRef(false);
@@ -41,6 +43,7 @@ const ApplyCard = ({
       });
       toastMessages.success('Applied successfully.');
       setIsApplySuccess(true);
+      onApplySuccess?.();
       setOpenPopup(false);
     } catch (error: unknown) {
       errorHandling(error);

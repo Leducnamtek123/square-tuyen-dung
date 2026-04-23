@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer } from 'react';
 import {
   Alert,
   Avatar,
@@ -28,25 +28,81 @@ const ACTIVE_STATUSES = new Set(['in_progress', 'calibration', 'connecting', 'ac
 
 const normalizeStatus = (status: string) => status.trim().toLowerCase();
 
+type InterviewLivePageState = {
+  allSessions: InterviewSession[];
+  loading: boolean;
+  refreshing: boolean;
+  error: string | null;
+  autoRefresh: boolean;
+  actionLoadingId: number | null;
+};
+
+type InterviewLivePageAction =
+  | { type: 'set-all-sessions'; value: InterviewSession[] }
+  | { type: 'set-loading'; value: boolean }
+  | { type: 'set-refreshing'; value: boolean }
+  | { type: 'set-error'; value: string | null }
+  | { type: 'toggle-auto-refresh' }
+  | { type: 'set-action-loading-id'; value: number | null };
+
+const initialState: InterviewLivePageState = {
+  allSessions: [],
+  loading: true,
+  refreshing: false,
+  error: null,
+  autoRefresh: true,
+  actionLoadingId: null,
+};
+
+const reducer = (
+  state: InterviewLivePageState,
+  action: InterviewLivePageAction,
+): InterviewLivePageState => {
+  switch (action.type) {
+    case 'set-all-sessions':
+      return { ...state, allSessions: action.value };
+    case 'set-loading':
+      return { ...state, loading: action.value };
+    case 'set-refreshing':
+      return { ...state, refreshing: action.value };
+    case 'set-error':
+      return { ...state, error: action.value };
+    case 'toggle-auto-refresh':
+      return { ...state, autoRefresh: !state.autoRefresh };
+    case 'set-action-loading-id':
+      return { ...state, actionLoadingId: action.value };
+    default:
+      return state;
+  }
+};
+
 const InterviewLivePage = () => {
   const { t } = useTranslation(['employer', 'interview', 'common']);
   const theme = useTheme();
-  const [allSessions, setAllSessions] = useState<InterviewSession[]>([]);
-  const [activeSessions, setActiveSessions] = useState<InterviewSession[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [autoRefresh, setAutoRefresh] = useState(true);
-  const [actionLoadingId, setActionLoadingId] = useState<number | null>(null);
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const activeSessions = useMemo(
+    () => state.allSessions.filter((session) => ACTIVE_STATUSES.has(normalizeStatus(session.status))),
+    [state.allSessions],
+  );
+
+  const stats = useMemo(
+    () => ({
+      active: activeSessions.length,
+      scheduled: state.allSessions.filter((session) => normalizeStatus(session.status) === 'scheduled').length,
+      completed: state.allSessions.filter((session) => normalizeStatus(session.status) === 'completed').length,
+    }),
+    [activeSessions.length, state.allSessions],
+  );
 
   const fetchSessions = useCallback(async (opts?: { silent?: boolean }) => {
     const silent = opts?.silent ?? false;
 
     if (silent) {
-      setRefreshing(true);
+      dispatch({ type: 'set-refreshing', value: true });
     } else {
-      setLoading(true);
-      setError(null);
+      dispatch({ type: 'set-loading', value: true });
+      dispatch({ type: 'set-error', value: null });
     }
 
     try {
@@ -55,17 +111,18 @@ const InterviewLivePage = () => {
         ordering: '-create_at',
       });
 
-      const sessions = data.results || [];
-      setAllSessions(sessions);
-      setActiveSessions(sessions.filter((session) => ACTIVE_STATUSES.has(normalizeStatus(session.status))));
+      dispatch({ type: 'set-all-sessions', value: data.results || [] });
     } catch (fetchError) {
       console.error('Error fetching live interview sessions', fetchError);
-      setError(t('common:messages.loadFailed', { defaultValue: 'Không thể tải dữ liệu phỏng vấn live. Vui lòng thử lại.' }));
+      dispatch({
+        type: 'set-error',
+        value: t('common:messages.loadFailed', { defaultValue: 'Khong the tai du lieu phong van live. Vui long thu lai.' }),
+      });
     } finally {
       if (silent) {
-        setRefreshing(false);
+        dispatch({ type: 'set-refreshing', value: false });
       } else {
-        setLoading(false);
+        dispatch({ type: 'set-loading', value: false });
       }
     }
   }, [t]);
@@ -75,52 +132,55 @@ const InterviewLivePage = () => {
   }, [fetchSessions]);
 
   useEffect(() => {
-    if (!autoRefresh) return undefined;
+    if (!state.autoRefresh) return undefined;
     if (activeSessions.length === 0) return undefined;
     const interval = setInterval(() => fetchSessions({ silent: true }), 5000);
     return () => clearInterval(interval);
-  }, [activeSessions.length, autoRefresh, fetchSessions]);
-
-  const stats = useMemo(() => ({
-    active: activeSessions.length,
-    scheduled: allSessions.filter((session) => normalizeStatus(session.status) === 'scheduled').length,
-    completed: allSessions.filter((session) => normalizeStatus(session.status) === 'completed').length,
-  }), [activeSessions.length, allSessions]);
+  }, [activeSessions.length, state.autoRefresh, fetchSessions]);
 
   const handleForceEnd = useCallback(async (session: InterviewSession) => {
     if (!session.roomName) return;
-    setActionLoadingId(session.id);
+    dispatch({ type: 'set-action-loading-id', value: session.id });
     try {
       await interviewService.updateSessionStatus(session.roomName, 'completed');
       await fetchSessions();
     } catch (updateError) {
       console.error('Error force ending session', updateError);
-      setError(t('common:messages.actionFailed', { defaultValue: 'Không thể thao tác lúc này. Vui lòng thử lại.' }));
+      dispatch({
+        type: 'set-error',
+        value: t('common:messages.actionFailed', { defaultValue: 'Khong the thao tac luc nay. Vui long thu lai.' }),
+      });
     } finally {
-      setActionLoadingId(null);
+      dispatch({ type: 'set-action-loading-id', value: null });
     }
   }, [fetchSessions, t]);
 
   return (
     <Box sx={{ px: { xs: 1, sm: 2 }, py: { xs: 2, sm: 2 }, backgroundColor: 'background.paper', borderRadius: 2 }}>
-      <Stack direction={{ xs: 'column', sm: 'row' }} alignItems={{ xs: 'flex-start', sm: 'center' }} justifyContent="space-between" spacing={{ xs: 2, sm: 0 }} mb={3}>
+      <Stack
+        direction={{ xs: 'column', sm: 'row' }}
+        alignItems={{ xs: 'flex-start', sm: 'center' }}
+        justifyContent="space-between"
+        spacing={{ xs: 2, sm: 0 }}
+        mb={3}
+      >
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            {t('interviewLive.title', { defaultValue: 'Phỏng vấn Trực tiếp' })}
+            {t('interviewLive.title', { defaultValue: 'Phong van Truc tiep' })}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            Chỉ hiển thị các phiên đang live và preview realtime của ứng viên.
+            {t('employer:interviewLive.subtitle')}
           </Typography>
         </Box>
 
         <Stack direction="row" spacing={1.5} alignItems="center">
           <Button
             variant="outlined"
-            color={autoRefresh ? 'primary' : 'inherit'}
-            onClick={() => setAutoRefresh((prev) => !prev)}
+            color={state.autoRefresh ? 'primary' : 'inherit'}
+            onClick={() => dispatch({ type: 'toggle-auto-refresh' })}
             sx={{ borderRadius: 2, px: 2, textTransform: 'none' }}
           >
-            {autoRefresh ? 'Auto refresh: ON' : 'Auto refresh: OFF'}
+            {state.autoRefresh ? t('employer:interviewLive.autoRefresh.on') : t('employer:interviewLive.autoRefresh.off')}
           </Button>
           <Button
             variant="outlined"
@@ -129,14 +189,22 @@ const InterviewLivePage = () => {
             startIcon={<RefreshIcon />}
             sx={{ borderRadius: 2, px: 2, textTransform: 'none' }}
           >
-            {refreshing ? 'Đang cập nhật...' : t('common:actions.refresh', { defaultValue: 'Làm mới' })}
+            {state.refreshing ? t('employer:interviewLive.updating') : t('common:actions.refresh', { defaultValue: 'Lam moi' })}
           </Button>
         </Stack>
       </Stack>
 
-      {error && (
-        <Alert severity="error" action={<Button color="inherit" size="small" onClick={() => fetchSessions()}>{t('common:actions.retry', { defaultValue: 'Thử lại' })}</Button>} sx={{ mb: 2 }}>
-          {error}
+      {state.error && (
+        <Alert
+          severity="error"
+          action={
+            <Button color="inherit" size="small" onClick={() => fetchSessions()}>
+              {t('common:actions.retry', { defaultValue: 'Thu lai' })}
+            </Button>
+          }
+          sx={{ mb: 2 }}
+        >
+          {state.error}
         </Alert>
       )}
 
@@ -147,7 +215,7 @@ const InterviewLivePage = () => {
               <TrendingUpIcon sx={{ fontSize: 20 }} />
             </Avatar>
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
-              Đang diễn ra
+              {t('employer:interviewLive.stats.inProgressLabel')}
             </Typography>
           </Stack>
           <Typography variant="h3" sx={{ fontWeight: 900, color: theme.palette.primary.main }}>
@@ -161,7 +229,7 @@ const InterviewLivePage = () => {
               <ScheduleIcon sx={{ fontSize: 20 }} />
             </Avatar>
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
-              Đã lên lịch
+              {t('employer:interviewLive.stats.scheduledLabel')}
             </Typography>
           </Stack>
           <Typography variant="h3" sx={{ fontWeight: 900, color: theme.palette.info.main }}>
@@ -175,7 +243,7 @@ const InterviewLivePage = () => {
               <CheckCircleIcon sx={{ fontSize: 20 }} />
             </Avatar>
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
-              Đã hoàn thành
+              {t('employer:interviewLive.stats.completedLabel')}
             </Typography>
           </Stack>
           <Typography variant="h3" sx={{ fontWeight: 900, color: theme.palette.success.main }}>
@@ -184,7 +252,7 @@ const InterviewLivePage = () => {
         </Paper>
       </Stack>
 
-      {loading && (
+      {state.loading && (
         <Box sx={{ width: '100%', mb: 2 }}>
           <LinearProgress color="primary" sx={{ height: 4, borderRadius: 3 }} />
         </Box>
@@ -193,11 +261,11 @@ const InterviewLivePage = () => {
       <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
         <FiberManualRecordIcon sx={{ fontSize: 12, color: theme.palette.primary.main, animation: 'liveDot 2s infinite', '@keyframes liveDot': { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.35 } } }} />
         <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary' }}>
-          Active Now
+          {t('employer:interviewLive.activeNow')}
         </Typography>
       </Stack>
 
-      {activeSessions.length === 0 && !loading ? (
+      {activeSessions.length === 0 && !state.loading ? (
         <Paper
           elevation={0}
           sx={{
@@ -210,10 +278,10 @@ const InterviewLivePage = () => {
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>
-            Chưa có phiên live nào
+            {t('employer:interviewLive.noData.title')}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            Khi ứng viên bật camera hoặc mic, card realtime sẽ xuất hiện ở đây.
+            {t('employer:interviewLive.noData.subtitle')}
           </Typography>
         </Paper>
       ) : (
@@ -223,7 +291,7 @@ const InterviewLivePage = () => {
               key={session.id}
               session={session}
               onForceEnd={handleForceEnd}
-              isForceEnding={actionLoadingId === session.id}
+              isForceEnding={state.actionLoadingId === session.id}
             />
           ))}
         </Stack>

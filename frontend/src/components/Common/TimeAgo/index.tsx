@@ -8,24 +8,10 @@ interface Props {
 }
 
 const TimeAgo = ({ date, type = 'fromNow', format = 'DD/MM/YYYY HH:mm' }: Props) => {
-  const [timeString, setTimeString] = React.useState('');
-
-  React.useEffect(() => {
-    if (!date) return;
-
-    const updateTime = () => {
-      const dayjsDate = dayjs(date);
-      if (type === 'fromNow') {
-        setTimeString(dayjsDate.fromNow(true));
-      } else {
-        setTimeString(dayjsDate.format(format));
-      }
-    };
-
-    updateTime();
-    const timer = setInterval(updateTime, 60000);
-
-    return () => clearInterval(timer);
+  const timeString = React.useMemo(() => {
+    if (!date) return '';
+    const dayjsDate = dayjs(date);
+    return type === 'fromNow' ? dayjsDate.fromNow(true) : dayjsDate.format(format);
   }, [date, type, format]);
 
   if (!date) return null;

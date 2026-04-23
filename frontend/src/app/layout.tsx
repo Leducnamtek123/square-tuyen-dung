@@ -45,9 +45,8 @@ export default function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/square-icons/icon.svg" />
       </head>
       <body style={{ fontFamily: 'var(--font-be-vietnam-pro), sans-serif' }} suppressHydrationWarning>
-        {/* Background Atmosphere Layers */}
+        {/* Background Atmosphere Layer (Optimized) */}
         <div className="bg-atmosphere" />
-        <div className="bg-noise" />
         
         <ThemeRegistry>
           <Providers>

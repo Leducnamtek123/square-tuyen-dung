@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Box, Typography, Card, CardHeader, CardContent, Skeleton, Paper, Stack, Chip } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import { useTheme } from "@mui/material/styles";
@@ -20,25 +20,25 @@ const DashboardPage = () => {
     const { t } = useTranslation('admin');
     const theme = useTheme();
 
-    const BRAND_COLORS = [
+    const { data: stats, isLoading } = useAdminStats();
+
+    const BRAND_COLORS = useMemo(() => [
         theme.palette.primary.main,
         theme.palette.info.main,
         theme.palette.secondary.main,
         theme.palette.warning.main,
         theme.palette.primary.dark,
-    ];
+    ], [theme.palette.primary.main, theme.palette.info.main, theme.palette.secondary.main, theme.palette.warning.main, theme.palette.primary.dark]);
 
-    const { data: stats, isLoading } = useAdminStats();
-
-    const userRoleData = stats
+    const userRoleData = useMemo(() => stats
         ? [
             { name: t('dashboard.roles.employer'), value: stats.totalEmployers || 0 },
             { name: t('dashboard.roles.jobSeeker'), value: stats.totalJobSeekers || 0 },
             { name: t('dashboard.roles.admin'), value: stats.totalAdmins || 0 },
         ]
-        : [];
+        : [], [stats, t]);
 
-    const pieData = {
+    const pieData = useMemo(() => ({
         labels: userRoleData.map((item) => item.name),
         datasets: [
             {
@@ -47,9 +47,9 @@ const DashboardPage = () => {
                 borderWidth: 0,
             },
         ],
-    };
+    }), [userRoleData, BRAND_COLORS]);
 
-    const pieOptions: ChartOptions<'pie'> = {
+    const pieOptions: ChartOptions<'pie'> = useMemo(() => ({
         plugins: {
             legend: {
                 position: 'bottom',
@@ -69,7 +69,7 @@ const DashboardPage = () => {
             },
         },
         maintainAspectRatio: false,
-    };
+    }), [theme.typography.fontFamily]);
 
     return (
         <Box>

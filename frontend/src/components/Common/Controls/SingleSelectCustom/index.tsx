@@ -9,6 +9,9 @@ import ValidationError from '../ValidationError';
 
 import type { SelectOption } from '@/types/models';
 
+const EMPTY_SX: SxProps<Theme> = {};
+const EMPTY_OPTIONS: SelectOption[] = [];
+
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
   control: Control<T>;
@@ -22,11 +25,11 @@ interface Props<T extends FieldValues = FieldValues> {
 const SingleSelectCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
-  options = [],
+  options = EMPTY_OPTIONS,
   title = null,
   showRequired = false,
   placeholder = '',
-  sx = {},
+  sx = EMPTY_SX,
 }: Props<T>) => {
   const { t } = useTranslation('common');
 

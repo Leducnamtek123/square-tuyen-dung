@@ -18,7 +18,7 @@ import MonetizationOnIcon from '@mui/icons-material/MonetizationOn';
 import EmojiEmotionsIcon from '@mui/icons-material/EmojiEmotions';
 import SchoolIcon from '@mui/icons-material/School';
 import SendIcon from '@mui/icons-material/Send';
-import { EvalFormType } from './index';
+import type { EvalFormType } from './types';
 import { TFunction } from 'i18next';
 
 interface InterviewHrEvaluationFormProps {

@@ -9,7 +9,7 @@ import type { Control } from "react-hook-form";
 import type { TFunction } from "i18next";
 import type { SystemConfig, SelectOption } from "../../../../types/models";
 
-import type { CompanyFormValues } from './index';
+import type { CompanyFormValues } from './types';
 
 interface CompanyFormFieldsProps {
   control: Control<CompanyFormValues>;

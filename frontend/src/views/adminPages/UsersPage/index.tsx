@@ -23,6 +23,7 @@ const UsersPage = () => {
         rowSelection,
         onRowSelectionChange,
         searchTerm: search,
+        debouncedSearchTerm,
         onSearchChange: handleSearchChange,
     } = useDataTable();
     
@@ -40,7 +41,7 @@ const UsersPage = () => {
     } = useUsers({
         page: page + 1,
         pageSize: resolvedPageSize,
-        search: search || undefined,
+        search: debouncedSearchTerm || undefined,
         roleName: roleFilter || undefined,
         ordering,
     });

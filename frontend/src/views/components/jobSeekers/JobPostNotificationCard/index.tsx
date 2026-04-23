@@ -169,7 +169,7 @@ const JobPostNotificationCard = () => {
               <Stack spacing={4}>
                 {jobPostNotifications.map((value) => (
                   <ItemComponent
-                    key={value.id}
+                    key={`${value.id}-${value.isActive ? 'on' : 'off'}`}
                     id={value.id}
                     jobName={value.jobName}
                     salary={value.salary || null}
@@ -229,7 +229,11 @@ const JobPostNotificationCard = () => {
         openPopup={openPopup}
         setOpenPopup={setOpenPopup}
       >
-        <JobPostNotificationForm handleAddOrUpdate={handleAddOrUpdate} editData={editData} />
+        <JobPostNotificationForm
+          key={`${editData?.id ?? 'new'}-${openPopup ? 'open' : 'closed'}`}
+          handleAddOrUpdate={handleAddOrUpdate}
+          editData={editData}
+        />
       </FormPopup>
 
       {(isFullScreenLoading || isMutating) && <BackdropLoading />}

@@ -13,9 +13,9 @@ const CompanyPage = () => {
 
   useSEO({
     title: t('companySearch.tabTitle'),
-    description: 'Khám phá hàng trăm công ty hàng đầu tuyển dụng tại Square. Tìm hiểu văn hóa doanh nghiệp, xem việc làm đang tuyển và ứng tuyển ngay.',
+    description: t('seo.companySearch.description'),
     url: `${(typeof window !== 'undefined' ? window.location.origin : '')}/cong-ty`,
-    keywords: 'công ty tuyển dụng, nhà tuyển dụng uy tín, doanh nghiệp tuyển dụng, hồ sơ công ty',
+    keywords: t('seo.companySearch.keywords'),
   });
 
   return (

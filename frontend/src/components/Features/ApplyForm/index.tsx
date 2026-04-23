@@ -29,13 +29,22 @@ export interface ApplyFormValues {
   resume: string;
 }
 
+type ApplyFormState = {
+  isLoadingResumes: boolean;
+  resumes: Resume[];
+};
+
+const initialState: ApplyFormState = {
+  isLoadingResumes: false,
+  resumes: [],
+};
+
 const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) => {
   const { t } = useTranslation("public");
   const theme = useTheme();
   const nav = useRouter();
   const { currentUser } = useAppSelector((state) => state.user);
-  const [isLoadingResumes, setIsLoadingResumes] = React.useState(false);
-  const [resumes, setResumes] = React.useState<Resume[]>([]);
+  const [state, setState] = React.useState<ApplyFormState>(initialState);
 
   const schema = yup.object().shape({
     fullName: yup
@@ -69,15 +78,14 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
 
   React.useEffect(() => {
     const getOnlineProfile = async (jobSeekerProfileId: number | string | undefined) => {
-      setIsLoadingResumes(true);
+      setState((prev) => ({ ...prev, isLoadingResumes: true }));
       try {
         const resData = await jobSeekerProfileService.getResumes(jobSeekerProfileId);
         const parsedResumes = Array.isArray(resData) ? resData : (resData.results || []);
-        setResumes(parsedResumes);
+        setState({ isLoadingResumes: false, resumes: parsedResumes });
       } catch (error) {
         errorHandling(error);
-      } finally {
-        setIsLoadingResumes(false);
+        setState((prev) => ({ ...prev, isLoadingResumes: false }));
       }
     };
 
@@ -87,17 +95,17 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
   const selectedResumeId = watch("resume");
 
   React.useEffect(() => {
-    if (resumes.length === 0) return;
+    if (state.resumes.length === 0) return;
 
     const currentResume = getValues("resume");
     if (currentResume) return;
 
     const defaultResume =
-      resumes.find((value) => value.type === CV_TYPES.cvWebsite) || resumes[0];
+      state.resumes.find((value) => value.type === CV_TYPES.cvWebsite) || state.resumes[0];
     if (defaultResume?.id) {
       setValue("resume", String(defaultResume.id), { shouldValidate: true });
     }
-  }, [resumes, getValues, setValue]);
+  }, [state.resumes, getValues, setValue]);
 
   return (
     <>
@@ -105,9 +113,9 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
         <Grid container spacing={2}>
           <Grid size={12}>
             <Stack spacing={1} justifyContent="center">
-              {isLoadingResumes ? (
+              {state.isLoadingResumes ? (
                 <CircularProgress color="secondary" sx={{ margin: "0 auto" }} />
-              ) : resumes.length === 0 ? (
+              ) : state.resumes.length === 0 ? (
                 <Card
                   variant="outlined"
                   sx={{
@@ -142,7 +150,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                   onChange={(event) => setValue("resume", event.target.value, { shouldValidate: true })}
                 >
                   <Stack spacing={1.5}>
-                    {resumes.map((value) => (
+                    {state.resumes.map((value) => (
                       <Card
                         sx={{
                           p: 1.5,

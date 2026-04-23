@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
 import { Box, IconButton, Typography, Stack, Chip, Skeleton, Tooltip, Theme } from "@mui/material";
@@ -24,6 +25,26 @@ interface ProfileUploadCardProps {
   handleActive: (slug: string) => void;
 }
 
+interface ProfileUploadImageProps {
+  resumeImage: string;
+}
+
+const ProfileUploadImage = ({ resumeImage }: ProfileUploadImageProps) => {
+  const [hasImageError, setHasImageError] = React.useState(false);
+  const cardImageSrc = !hasImageError && resumeImage ? resumeImage : IMAGES.coverImageDefault;
+
+  return (
+    <Image
+      src={cardImageSrc}
+      onError={() => setHasImageError(true)}
+      fill
+      sizes="100vw"
+      style={{ objectFit: 'cover', position: 'absolute', inset: 0, zIndex: 1 }}
+      alt="BG"
+    />
+  );
+};
+
 const ProfileUploadCard = ({
   resumeImage,
   fileUrl,
@@ -37,12 +58,6 @@ const ProfileUploadCard = ({
 }: ProfileUploadCardProps) => {
 
   const nav = useRouter();
-  const [hasImageError, setHasImageError] = React.useState(false);
-  const cardImageSrc = !hasImageError && resumeImage ? resumeImage : IMAGES.coverImageDefault;
-
-  React.useEffect(() => {
-    setHasImageError(false);
-  }, [resumeImage]);
 
   return (
 
@@ -71,31 +86,7 @@ const ProfileUploadCard = ({
 
     >
 
-      <img
-        src={cardImageSrc}
-        onError={() => setHasImageError(true)}
-
-        style={{
-
-          objectFit: 'cover',
-
-          position: 'absolute',
-
-          top: 0,
-
-          left: 0,
-
-          zIndex: 1,
-
-          width: '100%',
-
-          height: '100%',
-
-        }}
-
-        alt="BG"
-
-      />
+      <ProfileUploadImage key={resumeImage} resumeImage={resumeImage} />
 
       <Box
 

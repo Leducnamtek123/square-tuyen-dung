@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useRef, useState, useMemo } from 'react';
+import React, { useCallback, useRef, useMemo } from 'react';
 import { Box, Button, Stack, Typography, Paper, Divider, Theme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined';
@@ -19,7 +19,7 @@ import { compressImageFile } from '@/utils/imageCompression';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import ImageCropDialog from '@/components/Common/ImageCropDialog';
 import { useCompanyProfile, useCompanyMutations } from '../hooks/useEmployerQueries';
-import type { CompanyFormValues } from '../CompanyForm';
+import type { CompanyFormValues } from '../CompanyForm/types';
 import type { EditorState } from 'draft-js';
 import type { Company } from '@/types/models';
 
@@ -57,6 +57,51 @@ const normalizeCompanyForForm = (company: Company): Partial<CompanyFormValues> =
   };
 };
 
+type CompanyCardState = {
+  cropOpen: boolean;
+  cropImageSrc: string;
+  cropFileName: string;
+  cropTarget: 'logo' | 'cover';
+  serverErrors: Record<string, string[]> | null;
+};
+
+type CompanyCardAction =
+  | { type: 'openCrop'; target: 'logo' | 'cover'; fileName: string; imageSrc: string }
+  | { type: 'closeCrop' }
+  | { type: 'setErrors'; errors: Record<string, string[]> | null };
+
+const initialState: CompanyCardState = {
+  cropOpen: false,
+  cropImageSrc: '',
+  cropFileName: '',
+  cropTarget: 'logo',
+  serverErrors: null,
+};
+
+function reducer(state: CompanyCardState, action: CompanyCardAction): CompanyCardState {
+  switch (action.type) {
+    case 'openCrop':
+      return {
+        ...state,
+        cropOpen: true,
+        cropTarget: action.target,
+        cropFileName: action.fileName,
+        cropImageSrc: action.imageSrc,
+      };
+    case 'closeCrop':
+      return {
+        ...state,
+        cropOpen: false,
+        cropImageSrc: '',
+        cropFileName: '',
+      };
+    case 'setErrors':
+      return { ...state, serverErrors: action.errors };
+    default:
+      return state;
+  }
+}
+
 const CompanyCard = () => {
   const { t } = useTranslation('employer');
   
@@ -64,12 +109,7 @@ const CompanyCard = () => {
   const { data: company, isLoading } = useCompanyProfile();
   const { updateCompany, updateLogo, updateCover, isMutating } = useCompanyMutations();
 
-  // Local State
-  const [cropOpen, setCropOpen] = useState(false);
-  const [cropImageSrc, setCropImageSrc] = useState('');
-  const [cropFileName, setCropFileName] = useState('');
-  const [cropTarget, setCropTarget] = useState<'logo' | 'cover'>('logo');
-  const [serverErrors, setServerErrors] = useState<Record<string, string[]> | null>(null);
+  const [state, dispatch] = React.useReducer(reducer, initialState);
 
   const logoInputRef = useRef<HTMLInputElement>(null);
   const coverInputRef = useRef<HTMLInputElement>(null);
@@ -82,7 +122,7 @@ const CompanyCard = () => {
 
   const handleUpdate = useCallback(async (formData: CompanyFormValues) => {
     if (!company?.id) return;
-    setServerErrors(null);
+    dispatch({ type: 'setErrors', errors: null });
     try {
       const payload = {
         ...formData,
@@ -91,28 +131,30 @@ const CompanyCard = () => {
       await updateCompany({ id: company.id, data: payload });
       toastMessages.success(t('companyProfile.success.update'));
     } catch (error) {
-      errorHandling(error, (errs) => setServerErrors(errs as Record<string, string[]>));
+      errorHandling(error, (errs) => dispatch({ type: 'setErrors', errors: errs as Record<string, string[]> }));
     }
   }, [company?.id, updateCompany, t]);
 
   const handleFileSelect = (target: 'logo' | 'cover') => (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    setCropTarget(target);
-    setCropFileName(file.name);
-    setCropImageSrc(URL.createObjectURL(file));
-    setCropOpen(true);
+    dispatch({
+      type: 'openCrop',
+      target,
+      fileName: file.name,
+      imageSrc: URL.createObjectURL(file),
+    });
     event.target.value = '';
   };
 
   const handleCropConfirm = async (croppedFile: File) => {
-    setCropOpen(false);
+    dispatch({ type: 'closeCrop' });
     try {
       const compressed = await compressImageFile(croppedFile);
       const formData = new FormData();
       formData.append('file', compressed);
 
-      if (cropTarget === 'logo') {
+      if (state.cropTarget === 'logo') {
         await updateLogo(formData);
         toastMessages.success(t('companyProfile.success.logoUpdate'));
       } else {
@@ -125,9 +167,10 @@ const CompanyCard = () => {
   };
 
   const handleCropCancel = () => {
-    setCropOpen(false);
-    if (cropImageSrc) URL.revokeObjectURL(cropImageSrc);
-    setCropImageSrc('');
+    if (state.cropImageSrc) {
+      URL.revokeObjectURL(state.cropImageSrc);
+    }
+    dispatch({ type: 'closeCrop' });
   };
 
   if (isLoading) return <CompanyFormLoading />;
@@ -227,10 +270,10 @@ const CompanyCard = () => {
         <Divider sx={{ borderStyle: 'dashed' }} />
 
         <Box>
-            <CompanyForm
+                <CompanyForm
                 handleUpdate={handleUpdate}
                 editData={editData}
-                serverErrors={serverErrors}
+                serverErrors={state.serverErrors}
             />
             <Box sx={{ mt: 6, display: 'flex', justifyContent: 'flex-end' }}>
                 <Button
@@ -275,11 +318,11 @@ const CompanyCard = () => {
       {isMutating && <BackdropLoading />}
 
       <ImageCropDialog
-        open={cropOpen}
-        imageSrc={cropImageSrc}
-        fileName={cropFileName}
-        aspectRatio={cropTarget === 'logo' ? 1 : 16 / 9}
-        aspectLabel={cropTarget === 'logo' ? '1:1' : '16:9'}
+        open={state.cropOpen}
+        imageSrc={state.cropImageSrc}
+        fileName={state.cropFileName}
+        aspectRatio={state.cropTarget === 'logo' ? 1 : 16 / 9}
+        aspectLabel={state.cropTarget === 'logo' ? '1:1' : '16:9'}
         onConfirm={handleCropConfirm}
         onCancel={handleCropCancel}
       />

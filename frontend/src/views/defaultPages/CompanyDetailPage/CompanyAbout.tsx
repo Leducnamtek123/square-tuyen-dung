@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography } from "@mui/material";
 import type { TFunction } from 'i18next';
-import { CompanyDetailProps } from './index';
+import type { CompanyDetailProps } from './types';
 
 interface CompanyAboutProps {
   companyDetail: CompanyDetailProps;

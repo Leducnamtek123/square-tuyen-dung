@@ -36,9 +36,18 @@ interface EducationDetailFormProps {
   editData: Partial<FormValues> | null;
 }
 
+const getDefaultValues = (editData: Partial<FormValues> | null): FormValues => ({
+  degreeName: '',
+  major: '',
+  trainingPlaceName: '',
+  startDate: null,
+  completedDate: null,
+  gradeOrRank: null,
+  description: null,
+  ...(editData || {}),
+});
 
-
-const EducationDetailForm = ({ handleAddOrUpdate, editData }: EducationDetailFormProps) => {
+const EducationDetailFormContent = ({ handleAddOrUpdate, editData }: EducationDetailFormProps) => {
 
   const { t } = useTranslation(['jobSeeker']);
 
@@ -82,31 +91,11 @@ const EducationDetailForm = ({ handleAddOrUpdate, editData }: EducationDetailFor
 
   });
 
-  const { control, reset, handleSubmit } = useForm<FormValues>({
-
+  const { control, handleSubmit } = useForm<FormValues>({
+    defaultValues: getDefaultValues(editData),
     resolver: typedYupResolver(schema),
 
   });
-
-  React.useEffect(() => {
-
-    if (editData) {
-
-      reset((formValues) => ({
-
-        ...formValues,
-
-        ...editData,
-
-      }));
-
-    } else {
-
-      reset();
-
-    }
-
-  }, [editData, reset]);
 
   return (
 
@@ -256,6 +245,12 @@ const EducationDetailForm = ({ handleAddOrUpdate, editData }: EducationDetailFor
 
   );
 
+};
+
+const EducationDetailForm = (props: EducationDetailFormProps) => {
+  const formKey = React.useMemo(() => JSON.stringify(props.editData || {}), [props.editData]);
+
+  return <EducationDetailFormContent key={formKey} {...props} />;
 };
 
 export default EducationDetailForm;

@@ -10,18 +10,15 @@ import companyService from "@/services/companyService";
 import { RootState } from "@/redux/store";
 import type { Company as ModelsCompany } from '@/types/models';
 
-const Companies = () => {
+interface CompaniesContentProps {
+  filterKey: string;
+}
+
+const CompaniesContent: React.FC<CompaniesContentProps> = ({ filterKey }) => {
   const { t } = useTranslation('public');
   const { companyFilter } = useSelector((state: RootState) => state.filter);
   const { pageSize } = companyFilter;
   const [page, setPage] = React.useState(1);
-
-  const filterKey = React.useMemo(() => JSON.stringify(companyFilter), [companyFilter]);
-
-  // Reset page when filter changes
-  React.useEffect(() => {
-    setPage(1);
-  }, [filterKey]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['companies', filterKey, page],
@@ -162,6 +159,13 @@ const Companies = () => {
       </Stack>
     </>
   );
+};
+
+const Companies = () => {
+  const { companyFilter } = useSelector((state: RootState) => state.filter);
+  const filterKey = React.useMemo(() => JSON.stringify(companyFilter), [companyFilter]);
+
+  return <CompaniesContent key={filterKey} filterKey={filterKey} />;
 };
 
 export default Companies;

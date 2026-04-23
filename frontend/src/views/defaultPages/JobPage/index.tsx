@@ -22,9 +22,9 @@ const JobPage = () => {
 
   useSEO({
     title: t("jobSearch.tabTitle"),
-    description: 'Tìm kiếm hàng nghìn việc làm mới nhất tại Square. Lọc theo ngành nghề, mức lương, địa điểm. Ứng tuyển nhanh chóng, dễ dàng.',
+    description: t('seo.jobList.description'),
     url: `${(typeof window !== 'undefined' ? window.location.origin : '')}/viec-lam`,
-    keywords: 'tìm việc làm, việc làm mới nhất, tuyển dụng, ứng tuyển online, việc làm tốt',
+    keywords: t('seo.jobList.keywords'),
   });
 
   return (

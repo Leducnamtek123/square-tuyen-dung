@@ -2,6 +2,7 @@ import * as React from 'react';
 import type { AppDispatch } from '../../../redux/store';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import {
   Alert,
   AlertTitle,
@@ -219,10 +220,12 @@ const AdminLogin: React.FC = () => {
         {/* ─── LEFT: Form ─── */}
         <LeftPanel>
           <Box sx={{ mb: 1 }}>
-            <img
+            <Image
               src="/square-icons/logo square svg-black.svg"
               alt="Square Logo"
-              style={{ height: 42 }}
+              width={160}
+              height={42}
+              style={{ height: 42, width: 'auto' }}
             />
           </Box>
 

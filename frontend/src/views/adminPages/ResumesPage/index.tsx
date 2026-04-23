@@ -8,7 +8,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import DownloadIcon from '@mui/icons-material/Download';
 import { useResumes } from './hooks/useResumes';
-import { useDataTable } from '../../../hooks';
+import { useDataTable, useDebounce } from '../../../hooks';
 import { Resume } from '../../../types/models';
 import dayjs from '../../../configs/dayjs-config';
 
@@ -26,6 +26,7 @@ const ResumesPage = () => {
     } = useDataTable({ initialPageSize: 10 });
 
     const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearch = useDebounce(searchTerm, 500);
 
     const {
         data,
@@ -35,7 +36,7 @@ const ResumesPage = () => {
     } = useResumes({
         page: page + 1,
         pageSize,
-        kw: searchTerm,
+        kw: debouncedSearch,
         ordering
     });
 

@@ -7,7 +7,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useProfiles } from './hooks/useProfiles';
-import { useDataTable } from '../../../hooks';
+import { useDataTable, useDebounce } from '../../../hooks';
 import { JobSeekerProfile } from '../../../types/models';
 import dayjs from '../../../configs/dayjs-config';
 
@@ -25,6 +25,7 @@ const ProfilesPage = () => {
     } = useDataTable({ initialPageSize: 10 });
 
     const [searchTerm, setSearchTerm] = useState('');
+    const debouncedSearch = useDebounce(searchTerm, 500);
 
     const {
         data,
@@ -34,7 +35,7 @@ const ProfilesPage = () => {
     } = useProfiles({
         page: page + 1,
         pageSize,
-        kw: searchTerm,
+        kw: debouncedSearch,
         ordering
     });
 

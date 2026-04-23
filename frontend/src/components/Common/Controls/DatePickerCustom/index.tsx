@@ -11,6 +11,8 @@ import { SxProps, Theme } from '@mui/material/styles';
 import type { Dayjs } from 'dayjs';
 import ValidationError from '../ValidationError';
 
+const EMPTY_SX: SxProps<Theme> = {};
+
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
   control: Control<T>;
@@ -28,7 +30,7 @@ const DatePickerCustom = <T extends FieldValues = FieldValues>({
   showRequired = false,
   minDate = null,
   maxDate = null,
-  sx = {},
+  sx = EMPTY_SX,
 }: Props<T>) => {
 
   const parseDate = (date: Dayjs | string | null | undefined) => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { cva } from 'class-variance-authority';
 import { LocalAudioTrack, LocalVideoTrack } from 'livekit-client';
 import { useMaybeRoomContext, useMediaDeviceSelect } from '@livekit/components-react';
@@ -50,7 +50,7 @@ export function TrackDeviceSelect({
 }: DeviceSelectProps) {
   const room = useMaybeRoomContext();
   const [open, setOpen] = useState(false);
-  const [requestPermissionsState, setRequestPermissionsState] = useState(requestPermissions);
+  const requestPermissionsState = requestPermissions || open;
   const { devices, activeDeviceId, setActiveMediaDevice } = useMediaDeviceSelect({
     room,
     kind,
@@ -62,14 +62,6 @@ export function TrackDeviceSelect({
   useEffect(() => {
     onDeviceListChange?.(devices);
   }, [devices, onDeviceListChange]);
-
-  // When the select opens, ensure that media devices are re-requested in case when they were last
-  // requested, permissions were not granted
-  useLayoutEffect(() => {
-    if (open) {
-      setRequestPermissionsState(true);
-    }
-  }, [open]);
 
   const handleActiveDeviceChange = (deviceId: string) => {
     setActiveMediaDevice(deviceId);

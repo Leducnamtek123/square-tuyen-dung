@@ -16,6 +16,8 @@ import type { SelectOption } from '@/types/models';
 
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
+const EMPTY_OPTIONS: SelectOption[] = [];
+
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
   control: Control<T>;
@@ -31,7 +33,7 @@ const MultiSelectSearchCustom = <T extends FieldValues = FieldValues>({
   name,
   control,
   placeholder = '',
-  options = [],
+  options = EMPTY_OPTIONS,
 }: Props<T>) => {
 
   const theme = useTheme();

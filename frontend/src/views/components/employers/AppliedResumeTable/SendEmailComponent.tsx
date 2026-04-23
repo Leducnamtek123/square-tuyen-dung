@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+﻿import React, { useState } from 'react';
 import { Button, Tooltip, alpha, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
@@ -31,11 +31,8 @@ const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
   const [isFullScreenLoading, setIsFullScreenLoading] = useState(false);
   const [openSendMailPopup, setOpenSendMailPopup] = useState(false);
   const [sendMailData, setSendMailData] = useState<SendMailData | null>(null);
-  const [sentEmail, setSentEmail] = useState(isSentEmail);
-
-  useEffect(() => {
-    setSentEmail(isSentEmail);
-  }, [isSentEmail]);
+  const [didSendEmail, setDidSendEmail] = useState(false);
+  const sentEmail = isSentEmail || didSendEmail;
 
   const handleOpenSendMail = (email: string, fullName: string) => {
     setSendMailData({
@@ -53,7 +50,7 @@ const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
         content: convertEditorStateToHTMLString(data.content),
       };
       await jobPostActivityService.sendEmail(jobPostActivityId, newData);
-      setSentEmail(true);
+      setDidSendEmail(true);
       setOpenSendMailPopup(false);
       toastMessages.success(t('appliedResume.email.sentSuccess'));
     } catch (error: unknown) {
@@ -110,3 +107,4 @@ const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
 };
 
 export default SendEmailComponent;
+

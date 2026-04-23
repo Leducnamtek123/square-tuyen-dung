@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Typography, Avatar } from "@mui/material";
+import Image from 'next/image';
 import { formatMessageDate } from "../../../../utils/dateHelper";
 import defaultTheme from "../../../../themeConfigs/defaultTheme";
 import { useTranslation } from 'react-i18next';
@@ -66,10 +67,13 @@ const Message = ({ userId, text, avatarUrl, createdAt, attachmentUrl, attachment
         {attachmentUrl && (
           <Box sx={{ mb: 1, p: 0.5, bgcolor: isMe ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)", borderRadius: 1 }}>
             {attachmentType === 'image' ? (
-              <img 
-                src={attachmentUrl} 
-                alt="attachment" 
-                style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8, cursor: 'pointer' }} 
+              <Image
+                src={attachmentUrl}
+                alt="attachment"
+                width={800}
+                height={200}
+                unoptimized
+                style={{ maxWidth: '100%', maxHeight: 200, borderRadius: 8, cursor: 'pointer' }}
                 onClick={() => window.open(attachmentUrl, '_blank')}
               />
             ) : (

@@ -11,16 +11,12 @@ import JobSeekerProfile from '../../../../components/Features/JobSeekerProfile';
 import { useEmployerResumes, useToggleSaveResumeOptimistic } from '../hooks/useEmployerQueries';
 import type { Resume } from '@/types/models';
 
-const ProfileCard: React.FC = () => {
+const ProfileCardContent: React.FC = () => {
     const { t } = useTranslation('employer');
     const theme = useTheme();
     const { resumeFilter } = useAppSelector((state) => state.filter);
     const { pageSize } = resumeFilter;
     const [page, setPage] = React.useState(1);
-
-    React.useEffect(() => {
-        setPage(1);
-    }, [resumeFilter]);
 
     const queryParams = useMemo(() => ({
         ...resumeFilter,
@@ -159,6 +155,13 @@ const ProfileCard: React.FC = () => {
             </Grid>
         </Grid>
     );
+};
+
+const ProfileCard: React.FC = () => {
+    const { resumeFilter } = useAppSelector((state) => state.filter);
+    const filterKey = useMemo(() => JSON.stringify(resumeFilter), [resumeFilter]);
+
+    return <ProfileCardContent key={filterKey} />;
 };
 
 export default ProfileCard;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React from 'react';
 import { TextField, MenuItem, Box, Typography, alpha, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { confirmModal, errorModal } from '../../../../utils/sweetalert2Modal';
@@ -22,11 +22,7 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
   const { t } = useTranslation('employer');
   const { allConfig } = useConfig();
   const theme = useTheme();
-  const [applyStatus, setApplyStatus] = useState(defaultStatus);
-
-  useEffect(() => {
-    setApplyStatus(defaultStatus);
-  }, [defaultStatus]);
+  const applyStatus = defaultStatus;
 
   const handleChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const chooseValue = parseInt(e.target.value, 10);
@@ -45,12 +41,7 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
     if (chooseValue === applyStatus) return;
 
     confirmModal(
-      () =>
-        handleChangeApplicationStatus(id, chooseValue, (result: boolean) => {
-          if (result) {
-            setApplyStatus(chooseValue);
-          }
-        }),
+      () => handleChangeApplicationStatus(id, chooseValue, () => undefined),
       t('appliedResume.status.updateTitle'),
       t('appliedResume.status.updateConfirm', { 
         statusName: tConfig(allConfig?.applicationStatusDict?.[chooseValue]) || '---' 
@@ -118,3 +109,4 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
 };
 
 export default AppliedStatusComponent;
+

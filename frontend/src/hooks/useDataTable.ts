@@ -1,19 +1,30 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { SortingState, RowSelectionState, OnChangeFn } from '@tanstack/react-table';
 
 interface UseDataTableOptions {
   initialPageSize?: number;
   initialSorting?: SortingState;
+  debounceMs?: number;
 }
 
 export const useDataTable = (options: UseDataTableOptions = {}) => {
-  const { initialPageSize = 10, initialSorting = [] } = options;
+  const { initialPageSize = 10, initialSorting = [], debounceMs = 500 } = options;
   
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(initialPageSize);
   const [sorting, setSorting] = useState<SortingState>(initialSorting);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+  // Handle debouncing
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, debounceMs);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm, debounceMs]);
 
   const ordering = useMemo(() => {
     if (sorting.length === 0) return undefined;
@@ -48,6 +59,7 @@ export const useDataTable = (options: UseDataTableOptions = {}) => {
     setRowSelection,
     searchTerm,
     setSearchTerm,
+    debouncedSearchTerm,
     
     // Computed
     ordering,

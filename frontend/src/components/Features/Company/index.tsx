@@ -3,8 +3,7 @@ import { useSelector } from 'react-redux';
 import { useTheme } from '@mui/material/styles';
 import defaultTheme from '@/themeConfigs/defaultTheme';
 import Link from 'next/link';
-import { Avatar, Box, Card, Skeleton, Stack, Typography } from "@mui/material";
-import { LoadingButton } from '@mui/lab';
+import { Box, Card, Stack, Typography } from "@mui/material";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faBriefcase,
@@ -13,131 +12,16 @@ import {
   faUser,
   faUsers,
 } from '@fortawesome/free-solid-svg-icons';
-import BookmarkIcon from '@mui/icons-material/Bookmark';
-import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import { IMAGES, ROLES_NAME, ROUTES } from '@/configs/constants';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
-import companyService from '@/services/companyService';
-import toastMessages from '@/utils/toastMessages';
-import errorHandling from '@/utils/errorHandling';
 import { formatRoute } from '@/utils/funcUtils';
 import { localizeRoutePath } from '@/configs/routeLocalization';
 import { RootState } from '@/redux/store';
 import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { useTranslation } from 'react-i18next';
-import type { ApiError } from '@/types/api';
-import type { AxiosError } from 'axios';
-
-interface FollowProps {
-  slug: string;
-  isFollowed: boolean;
-}
-
-const FollowComponent = ({ slug, isFollowed }: FollowProps) => {
-  const { t } = useTranslation('public');
-  const { isAuthenticated, currentUser } = useSelector((state: RootState) => state.user);
-  const [isLoadingFollow, setIsLoadingFollow] = React.useState(false);
-  const [followed, setFollowed] = React.useState(isFollowed);
-
-  const handleFollow = (slug: string) => {
-    const follow = async (slugCompany: string) => {
-
-      setIsLoadingFollow(true);
-
-      try {
-
-        const resData = await companyService.followCompany(slugCompany);
-
-        const isFollowed = resData.isFollowed;
-
-        setFollowed(isFollowed);
-
-        toastMessages.success(
-
-          isFollowed ? 'Followed successfully.' : 'Unfollowed successfully.'
-
-        );
-
-      } catch (error) {
-        errorHandling(error);
-      } finally {
-
-        setIsLoadingFollow(false);
-
-      }
-
-    };
-
-    follow(slug);
-
-  };
-
-  return (
-
-    <>
-
-      {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
-
-        <Stack justifyContent="flex-end" sx={{ py: 1, px: 2, height: '100%' }}>
-
-          <LoadingButton
-
-            fullWidth
-
-            onClick={() => handleFollow(slug)}
-
-            startIcon={
-
-              followed ? (
-
-                <BookmarkIcon sx={{ color: 'common.white' }} />
-
-              ) : (
-
-                <BookmarkBorderIcon />
-
-              )
-
-            }
-
-            loading={isLoadingFollow}
-
-            loadingPosition="start"
-
-            variant={followed ? 'contained' : 'outlined'}
-
-            color="warning"
-
-            sx={{ textTransform: 'inherit' }}
-
-          >
-
-            <span>
-
-              {followed ? (
-
-                <span style={{ color: 'white' }}>{t('company.following', 'Đang theo dõi')}</span>
-
-              ) : (
-
-                t('company.follow', 'Theo dõi')
-
-              )}
-
-            </span>
-
-          </LoadingButton>
-
-        </Stack>
-
-      )}
-
-    </>
-
-  );
-
-};
+import CompanyFollowButton from './CompanyFollowButton';
+import CompanyLoading from './CompanyLoading';
 
 interface CompanyProps {
   id: string | number;
@@ -475,7 +359,7 @@ const Company = ({
 
         </Box>
 
-        <FollowComponent slug={slug} isFollowed={isFollowed} />
+        <CompanyFollowButton slug={slug} isFollowed={isFollowed} />
 
       </Stack>
 
@@ -485,118 +369,6 @@ const Company = ({
 
 };
 
-const Loading = () => (
-
-  <>
-
-    <Card
-
-      sx={{
-
-        p: 2,
-
-        boxShadow: 0,
-
-      }}
-
-    >
-
-      <Stack>
-
-        <Box>
-
-          <Skeleton variant="rounded" height={150} />
-
-        </Box>
-
-        <Box sx={{ px: 2 }}>
-
-          <Stack direction="row" justifyContent="space-between" spacing={2}>
-
-            <Avatar
-
-              sx={{
-
-                width: 85,
-
-                height: 85,
-
-                marginTop: -5,
-
-                backgroundColor: 'white',
-
-              }}
-
-              variant="rounded"
-
-            >
-
-              <Skeleton variant="rounded" sx={{ width: 85, height: 85 }} />
-
-            </Avatar>
-
-            <Box flex={1} sx={{ py: 1 }}>
-
-              <Typography variant="caption" display="block">
-
-                <Skeleton />
-
-              </Typography>
-
-            </Box>
-
-          </Stack>
-
-        </Box>
-
-        <Box sx={{ p: 2 }}>
-
-          <Typography variant="h6" gutterBottom>
-
-            <Skeleton />
-
-          </Typography>
-
-          <Typography variant="body2" gutterBottom>
-
-            <Skeleton />
-
-          </Typography>
-
-          <Typography variant="body2" gutterBottom>
-
-            <Skeleton />
-
-          </Typography>
-
-          <Typography variant="body2" gutterBottom>
-
-            <Skeleton />
-
-          </Typography>
-
-          <Typography variant="body2" gutterBottom>
-
-            <Skeleton />
-
-          </Typography>
-
-        </Box>
-
-        <Box sx={{ px: 2 }}>
-
-          <Skeleton variant="rounded" height={30} />
-
-        </Box>
-
-      </Stack>
-
-    </Card>
-
-  </>
-
-);
-
-const MemoizedCompany = Object.assign(React.memo(Company), { Loading });
+const MemoizedCompany = Object.assign(React.memo(Company), { Loading: CompanyLoading });
 
 export default MemoizedCompany;

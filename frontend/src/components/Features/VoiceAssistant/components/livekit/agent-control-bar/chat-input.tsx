@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { LazyMotion, m, domAnimation } from 'motion/react';
 import { PaperPlaneRightIcon, SpinnerIcon } from '@phosphor-icons/react/dist/ssr';
 import { Button } from '@/components/Features/VoiceAssistant/components/livekit/button';
 import { cn } from '@/lib/utils';
@@ -62,43 +62,44 @@ export function ChatInput({
   }, [chatOpen, isAgentAvailable]);
 
   return (
-    <motion.div
-      inert={!chatOpen}
-      {...MOTION_PROPS}
-      animate={chatOpen ? 'visible' : 'hidden'}
-      className="border-input/50 flex w-full items-start overflow-hidden border-b"
-    >
-      <form
-        onSubmit={handleSubmit}
-        className="mb-3 flex grow items-end gap-2 rounded-md pl-1 text-sm"
+    <LazyMotion features={domAnimation}>
+      <m.div
+        inert={!chatOpen}
+        {...MOTION_PROPS}
+        animate={chatOpen ? 'visible' : 'hidden'}
+        className="border-input/50 flex w-full items-start overflow-hidden border-b"
       >
-        <input
-          autoFocus
-          ref={inputRef}
-          type="text"
-          value={message}
-          disabled={!chatOpen}
-          placeholder="Type a message..."
-          onChange={(e) => setMessage(e.target.value)}
-          className={cn(
-            'h-10 flex-1 bg-transparent px-2 text-slate-100 placeholder:text-slate-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
-          )}
-        />
-        <Button
-          size="icon"
-          type="submit"
-          disabled={isDisabled}
-          variant={isDisabled ? 'secondary' : 'primary'}
-          title={isSending ? 'Sending...' : 'Send'}
-          className="self-start"
+        <form
+          onSubmit={handleSubmit}
+          className="mb-3 flex grow items-end gap-2 rounded-md pl-1 text-sm"
         >
-          {isSending ? (
-            <SpinnerIcon className="animate-spin" weight="bold" />
-          ) : (
-            <PaperPlaneRightIcon weight="bold" />
-          )}
-        </Button>
-      </form>
-    </motion.div>
+          <input
+            ref={inputRef}
+            type="text"
+            value={message}
+            disabled={!chatOpen}
+            placeholder="Type a message..."
+            onChange={(e) => setMessage(e.target.value)}
+            className={cn(
+              'h-10 flex-1 bg-transparent px-2 text-slate-100 placeholder:text-slate-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+            )}
+          />
+          <Button
+            size="icon"
+            type="submit"
+            disabled={isDisabled}
+            variant={isDisabled ? 'secondary' : 'primary'}
+            title={isSending ? 'Sending...' : 'Send'}
+            className="self-start"
+          >
+            {isSending ? (
+              <SpinnerIcon className="animate-spin" weight="bold" />
+            ) : (
+              <PaperPlaneRightIcon weight="bold" />
+            )}
+          </Button>
+        </form>
+      </m.div>
+    </LazyMotion>
   );
 }

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Backdrop from '@mui/material/Backdrop';
 import Fade from '@mui/material/Fade';
+import Image from 'next/image';
 import { LOADING_IMAGES } from '@/configs/constants';
 
 interface BackdropLoadingProps {
@@ -31,22 +32,16 @@ const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: Backdr
       transitionDuration={100}
     >
 
-      <img 
-
+      <Image
         src={LOADING_IMAGES.LOADING_SPINNER}
-
         alt="Loading ..."
-
+        width={100}
+        height={100}
         style={{
-
           width: '100px',
-
           height: 'auto',
-
-          animation: 'spin 2s linear infinite'
-
+          animation: 'spin 2s linear infinite',
         }}
-
       />
 
     </Backdrop>

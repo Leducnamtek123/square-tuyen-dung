@@ -169,7 +169,7 @@ export const MessageBranch = ({
   className,
   ...props
 }: MessageBranchProps) => {
-  const [currentBranch, setCurrentBranch] = useState(defaultBranch);
+  const [currentBranch, setCurrentBranch] = useState(() => defaultBranch);
   const [branches, setBranches] = useState<ReactNode[]>([]);
 
   const handleBranchChange = useCallback((newBranch: number) => {

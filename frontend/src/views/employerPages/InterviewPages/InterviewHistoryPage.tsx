@@ -1,5 +1,5 @@
 'use client';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import {
   Box, Typography, Chip, Stack, Divider, Button, IconButton,
   Paper, Avatar, alpha, useTheme, type Theme, TextField, InputAdornment,
@@ -22,38 +22,188 @@ import { ROUTES } from '../../../configs/constants';
 import DataTable from '../../../components/Common/DataTable';
 import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
 import type { CellContext as ReactTableCellContext } from '@tanstack/react-table';
+import useDebounce from '../../../hooks/useDebounce';
+
+interface VideoCardProps {
+  session: InterviewSession;
+}
+
+const VideoCard = ({ session }: VideoCardProps) => {
+  const theme = useTheme();
+  const { t } = useTranslation('common');
+  const recordingUrl = session.recordingUrl || session.recording_url;
+
+  return (
+    <Paper
+      elevation={0}
+      sx={{
+        p: 3,
+        borderRadius: 4,
+        border: '1px solid',
+        borderColor: 'divider',
+        bgcolor: 'background.paper',
+        transition: 'all 0.3s',
+        '&:hover': {
+          transform: 'translateY(-4px)',
+          boxShadow: theme.customShadows?.z12,
+          borderColor: 'primary.main',
+        },
+      }}
+    >
+      <Box
+        sx={{
+          width: '100%',
+          aspectRatio: '16/9',
+          bgcolor: 'common.black',
+          borderRadius: 2,
+          mb: 2,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          position: 'relative',
+        }}
+      >
+        {recordingUrl ? (
+          <Box
+            component="video"
+            src={recordingUrl}
+            preload="metadata"
+            sx={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }}
+          />
+        ) : (
+          <VideoLibraryIcon sx={{ fontSize: 48, color: 'rgba(255,255,255,0.1)' }} />
+        )}
+        <Box
+          sx={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            bgcolor: 'rgba(0,0,0,0.3)',
+          }}
+          component={Link}
+          href={`/${ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', session.id.toString())}`}
+        >
+          <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
+            <VisibilityIcon />
+          </Avatar>
+        </Box>
+      </Box>
+
+      <Typography variant="subtitle1" noWrap sx={{ fontWeight: 900, mb: 0.5 }}>
+        {session.candidateName || '---'}
+      </Typography>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, mb: 2 }}
+      >
+        <WorkIcon sx={{ fontSize: 12 }} /> {session.jobName || '---'}
+      </Typography>
+
+      <Stack direction="row" alignItems="center" justifyContent="space-between">
+        <Typography variant="caption" color="text.disabled" sx={{ fontWeight: 600 }}>
+          {session.endTime ? new Date(session.endTime).toLocaleDateString('vi-VN') : '---'}
+        </Typography>
+        {recordingUrl && (
+          <Button
+            size="small"
+            variant="outlined"
+            startIcon={<DownloadIcon />}
+            component="a"
+            href={recordingUrl}
+            download
+            sx={{ borderRadius: 2, fontWeight: 800, textTransform: 'none' }}
+          >
+            {t('common:actions.download')}
+          </Button>
+        )}
+      </Stack>
+    </Paper>
+  );
+};
+
+type InterviewHistoryPageState = {
+  sessions: InterviewSession[];
+  count: number;
+  page: number;
+  rowsPerPage: number;
+  loading: boolean;
+  searchTerm: string;
+  viewMode: 'grid' | 'table';
+};
+
+type InterviewHistoryPageAction =
+  | { type: 'set-sessions'; value: InterviewSession[] }
+  | { type: 'set-count'; value: number }
+  | { type: 'set-page'; value: number }
+  | { type: 'set-rows-per-page'; value: number }
+  | { type: 'set-loading'; value: boolean }
+  | { type: 'set-search-term'; value: string }
+  | { type: 'set-view-mode'; value: 'grid' | 'table' };
+
+const initialState: InterviewHistoryPageState = {
+  sessions: [],
+  count: 0,
+  page: 0,
+  rowsPerPage: 12,
+  loading: true,
+  searchTerm: '',
+  viewMode: 'grid',
+};
+
+const reducer = (
+  state: InterviewHistoryPageState,
+  action: InterviewHistoryPageAction
+): InterviewHistoryPageState => {
+  switch (action.type) {
+    case 'set-sessions':
+      return { ...state, sessions: action.value };
+    case 'set-count':
+      return { ...state, count: action.value };
+    case 'set-page':
+      return { ...state, page: action.value };
+    case 'set-rows-per-page':
+      return { ...state, rowsPerPage: action.value };
+    case 'set-loading':
+      return { ...state, loading: action.value };
+    case 'set-search-term':
+      return { ...state, searchTerm: action.value };
+    case 'set-view-mode':
+      return { ...state, viewMode: action.value };
+    default:
+      return state;
+  }
+};
 
 const InterviewHistoryPage = () => {
   const { t } = useTranslation(['employer', 'interview', 'common']);
   const theme = useTheme();
-  const [sessions, setSessions] = useState<InterviewSession[]>([]);
-  const [count, setCount] = useState(0);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(12);
-  const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
+  const [state, dispatch] = React.useReducer(reducer, initialState);
+  const debouncedSearch = useDebounce(state.searchTerm, 500);
 
   const fetchSessions = useCallback(async () => {
-    setLoading(true);
+    dispatch({ type: 'set-loading', value: true });
     try {
       const data = await interviewService.getSessions({
-        page: page + 1,
-        pageSize: rowsPerPage,
+        page: state.page + 1,
+        pageSize: state.rowsPerPage,
         status: 'completed',
-        search: searchTerm,
+        search: debouncedSearch,
       });
-      setSessions(data.results || []);
-      setCount(data.count || 0);
+      dispatch({ type: 'set-sessions', value: data.results || [] });
+      dispatch({ type: 'set-count', value: data.count || 0 });
     } catch (error) {
       console.error('Error fetching interview history', error);
     } finally {
-      setLoading(false);
+      dispatch({ type: 'set-loading', value: false });
     }
-  }, [page, rowsPerPage, searchTerm]);
+  }, [state.page, state.rowsPerPage, debouncedSearch]);
 
   useEffect(() => {
-    fetchSessions();
+    void fetchSessions();
   }, [fetchSessions]);
 
   const columns = useMemo(
@@ -106,7 +256,7 @@ const InterviewHistoryPage = () => {
               rel="noreferrer"
               sx={{ fontWeight: 800, textTransform: 'none' }}
             >
-              Download
+              {t('common:actions.download')}
             </Button>
           );
         },
@@ -132,105 +282,15 @@ const InterviewHistoryPage = () => {
     [t, theme.palette.primary.main]
   );
 
-  const VideoCard = ({ session }: { session: InterviewSession }) => {
-    const recordingUrl = session.recordingUrl || session.recording_url;
-    return (
-      <Paper
-        elevation={0}
-        sx={{
-          p: 3,
-          borderRadius: 4,
-          border: '1px solid',
-          borderColor: 'divider',
-          bgcolor: 'background.paper',
-          transition: 'all 0.3s',
-          '&:hover': {
-            transform: 'translateY(-4px)',
-            boxShadow: (theme) => theme.customShadows?.z12,
-            borderColor: 'primary.main',
-          },
-        }}
-      >
-        <Box
-          sx={{
-            width: '100%',
-            aspectRatio: '16/9',
-            bgcolor: 'common.black',
-            borderRadius: 2,
-            mb: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden',
-            position: 'relative',
-          }}
-        >
-          {recordingUrl ? (
-            <Box
-              component="video"
-              src={recordingUrl}
-              preload="metadata"
-              sx={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.8 }}
-            />
-          ) : (
-            <VideoLibraryIcon sx={{ fontSize: 48, color: 'rgba(255,255,255,0.1)' }} />
-          )}
-          <Box
-            sx={{
-              position: 'absolute',
-              inset: 0,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              bgcolor: 'rgba(0,0,0,0.3)',
-            }}
-            component={Link}
-            href={`/${ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', session.id.toString())}`}
-          >
-            <Avatar sx={{ bgcolor: 'primary.main', width: 48, height: 48 }}>
-              <VisibilityIcon />
-            </Avatar>
-          </Box>
-        </Box>
-
-        <Typography variant="subtitle1" noWrap sx={{ fontWeight: 900, mb: 0.5 }}>
-          {session.candidateName || '---'}
-        </Typography>
-        <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 700, display: 'flex', alignItems: 'center', gap: 0.5, mb: 2 }}>
-          <WorkIcon sx={{ fontSize: 12 }} /> {session.jobName || '---'}
-        </Typography>
-
-        <Stack direction="row" alignItems="center" justifyContent="space-between">
-          <Typography variant="caption" color="text.disabled" sx={{ fontWeight: 600 }}>
-            {session.endTime ? new Date(session.endTime).toLocaleDateString('vi-VN') : '---'}
-          </Typography>
-          {recordingUrl && (
-            <Button
-              size="small"
-              variant="outlined"
-              startIcon={<DownloadIcon />}
-              component="a"
-              href={recordingUrl}
-              download
-              sx={{ borderRadius: 2, fontWeight: 800, textTransform: 'none' }}
-            >
-              Tải về
-            </Button>
-          )}
-        </Stack>
-      </Paper>
-    );
-  };
-
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>
       <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" alignItems="flex-start" spacing={3} mb={5}>
         <Box>
           <Typography variant="h3" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1.5px' }}>
-            {t('sidebar.interviewHistory', { defaultValue: 'Thư viện Video' })}
+            {t('employer:interviewHistory.title')}
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-            Xem lại và tải về các buổi phỏng vấn đã hoàn thành.
+            {t('employer:interviewHistory.subtitle')}
           </Typography>
         </Box>
         <Stack direction="row" spacing={2}>
@@ -240,7 +300,7 @@ const InterviewHistoryPage = () => {
             startIcon={<RefreshIcon />}
             sx={{ borderRadius: 2.5, fontWeight: 800 }}
           >
-            Làm mới
+            {t('common:actions.refresh', { defaultValue: 'Làm mới' })}
           </Button>
         </Stack>
       </Stack>
@@ -260,9 +320,9 @@ const InterviewHistoryPage = () => {
           <TextField
             fullWidth
             size="small"
-            placeholder="Tìm kiếm ứng viên, vị trí..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder={t('employer:interviewHistory.searchPlaceholder')}
+            value={state.searchTerm}
+            onChange={(e) => dispatch({ type: 'set-search-term', value: e.target.value })}
             slotProps={{
               input: {
                 startAdornment: (
@@ -276,21 +336,21 @@ const InterviewHistoryPage = () => {
           />
           <FormControl size="small" sx={{ minWidth: 150 }}>
             <Select
-              value={viewMode}
-              onChange={(e) => setViewMode(e.target.value as 'grid' | 'table')}
+              value={state.viewMode}
+              onChange={(e) => dispatch({ type: 'set-view-mode', value: e.target.value as 'grid' | 'table' })}
               sx={{ bgcolor: 'background.paper', borderRadius: 2 }}
             >
-              <MenuItem value="grid">Dạng lưới</MenuItem>
-              <MenuItem value="table">Dạng bảng</MenuItem>
+              <MenuItem value="grid">{t('employer:interviewHistory.viewMode.grid')}</MenuItem>
+              <MenuItem value="table">{t('employer:interviewHistory.viewMode.table')}</MenuItem>
             </Select>
           </FormControl>
         </Stack>
       </Paper>
 
-      {loading && sessions.length === 0 ? (
+      {state.loading && state.sessions.length === 0 ? (
         <Grid container spacing={3}>
-          {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Grid key={i} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
+          {['a', 'b', 'c', 'd', 'e', 'f'].map((item) => (
+            <Grid key={item} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
               <Box sx={{ p: 2, bgcolor: 'background.paper', borderRadius: 4, height: 300, display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <Box sx={{ flex: 1, bgcolor: 'action.hover', borderRadius: 2 }} />
                 <Box sx={{ height: 20, bgcolor: 'action.hover', borderRadius: 1, width: '60%' }} />
@@ -299,7 +359,7 @@ const InterviewHistoryPage = () => {
             </Grid>
           ))}
         </Grid>
-      ) : sessions.length === 0 ? (
+      ) : state.sessions.length === 0 ? (
         <Paper
           elevation={0}
           sx={{
@@ -313,15 +373,15 @@ const InterviewHistoryPage = () => {
         >
           <VideoLibraryIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2, opacity: 0.2 }} />
           <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 800 }}>
-            Chưa có video nào
+            {t('employer:interviewHistory.noData.title')}
           </Typography>
           <Typography variant="body2" color="text.disabled" sx={{ fontWeight: 600 }}>
-            Các buổi phỏng vấn sau khi hoàn thành sẽ xuất hiện tại đây.
+            {t('employer:interviewHistory.noData.subtitle')}
           </Typography>
         </Paper>
-      ) : viewMode === 'grid' ? (
+      ) : state.viewMode === 'grid' ? (
         <Grid container spacing={3}>
-          {sessions.map((session) => (
+          {state.sessions.map((session) => (
             <Grid key={session.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
               <VideoCard session={session} />
             </Grid>
@@ -330,18 +390,18 @@ const InterviewHistoryPage = () => {
       ) : (
         <DataTable
           columns={columns}
-          data={sessions}
-          isLoading={loading}
-          rowCount={count}
-          pagination={{ pageIndex: page, pageSize: rowsPerPage }}
+          data={state.sessions}
+          isLoading={state.loading}
+          rowCount={state.count}
+          pagination={{ pageIndex: state.page, pageSize: state.rowsPerPage }}
           onPaginationChange={(newState) => {
-            setPage(newState.pageIndex);
-            setRowsPerPage(newState.pageSize);
+            dispatch({ type: 'set-page', value: newState.pageIndex });
+            dispatch({ type: 'set-rows-per-page', value: newState.pageSize });
           }}
         />
       )}
 
-      {loading && <BackdropLoading />}
+      {state.loading && <BackdropLoading />}
     </Box>
   );
 };

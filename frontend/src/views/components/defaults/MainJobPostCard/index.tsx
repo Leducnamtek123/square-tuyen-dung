@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Box, Pagination, Stack, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import JobPostLarge from '../../../../components/Features/JobPostLarge';
@@ -7,15 +7,11 @@ import { useAppSelector } from '../../../../hooks/useAppStore';
 import { useJobPosts } from './hooks/useJobPosts';
 import type { JobPost } from '../../../../types/models';
 
-const MainJobPostCard = () => {
+const MainJobPostCardContent = () => {
   const { t } = useTranslation('public');
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const { pageSize } = jobPostFilter;
   const [page, setPage] = React.useState(1);
-
-  React.useEffect(() => {
-    setPage(1);
-  }, [jobPostFilter]);
 
   const { data, isLoading } = useJobPosts(jobPostFilter, page);
   const jobPosts = data?.results || [];
@@ -150,4 +146,11 @@ const MainJobPostCard = () => {
 
 };
 
+const MainJobPostCard = () => {
+  const { jobPostFilter } = useAppSelector((state) => state.filter);
+  const filterKey = React.useMemo(() => JSON.stringify(jobPostFilter), [jobPostFilter]);
+
+  return <MainJobPostCardContent key={filterKey} />;
+};
 export default MainJobPostCard;
+

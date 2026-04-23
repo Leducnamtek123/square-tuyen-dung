@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useRef, useState } from 'react';
+import React, { useMemo, useEffect, useRef } from 'react';
 import { useForm, useWatch, Resolver } from 'react-hook-form';
 import { typedYupResolver } from '../../../../utils/formHelpers';
 import { useTranslation } from 'react-i18next';
@@ -24,12 +24,35 @@ interface PlaceOption extends SelectOption {
   place_id: string;
 }
 
+type JobPostFormState = {
+  districtOptions: SelectOption[];
+  locationOptions: PlaceOption[];
+};
+
+type JobPostFormAction =
+  | { type: 'setDistrictOptions'; value: SelectOption[] }
+  | { type: 'setLocationOptions'; value: PlaceOption[] };
+
+const initialState: JobPostFormState = {
+  districtOptions: [],
+  locationOptions: [],
+};
+
+function reducer(state: JobPostFormState, action: JobPostFormAction): JobPostFormState {
+  switch (action.type) {
+    case 'setDistrictOptions':
+      return { ...state, districtOptions: action.value };
+    case 'setLocationOptions':
+      return { ...state, locationOptions: action.value };
+    default:
+      return state;
+  }
+}
+
 const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormProps) => {
   const { t } = useTranslation('employer');
   const { allConfig } = useConfig();
-  
-  const [districtOptions, setDistrictOptions] = useState<SelectOption[]>([]);
-  const [locationOptions, setLocationOptions] = useState<PlaceOption[]>([]);
+  const [state, dispatch] = React.useReducer(reducer, initialState);
 
   const { data: groupData } = useQuestionGroups({
     page: 1,
@@ -91,7 +114,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
           setValue('location.district', '');
         }
-        setDistrictOptions(results);
+        dispatch({ type: 'setDistrictOptions', value: results });
         prevCityIdRef.current = id;
       } catch (error) {
         errorHandling(error);
@@ -99,7 +122,7 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
     };
     if (cityId) loadDistricts(cityId);
     else {
-        setDistrictOptions([]);
+        dispatch({ type: 'setDistrictOptions', value: [] });
         prevCityIdRef.current = null;
     }
   }, [cityId, setValue]);
@@ -108,19 +131,20 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
   useEffect(() => {
     const loadLocation = async (input: string) => {
       if (!input || input.trim().length < 3) {
-        setLocationOptions([]);
+        dispatch({ type: 'setLocationOptions', value: [] });
         return;
       }
       try {
         const resData = await goongService.getPlaces(input);
         const predictions = Array.isArray(resData?.predictions) ? resData.predictions : [];
-        setLocationOptions(
-          predictions.map((prediction: PlacePrediction) => ({
+        dispatch({
+          type: 'setLocationOptions',
+          value: predictions.map((prediction: PlacePrediction) => ({
             id: prediction.place_id,
             name: prediction.description,
             place_id: prediction.place_id,
-          }))
-        );
+          })),
+        });
       } catch (error) {
           // Silent fail for autocomplete
       }
@@ -179,8 +203,8 @@ const JobPostForm = ({ handleAddOrUpdate, editData, serverErrors }: JobPostFormP
         control={control}
         allConfig={allConfig}
         t={t}
-        districtOptions={districtOptions}
-        locationOptions={locationOptions}
+        districtOptions={state.districtOptions}
+        locationOptions={state.locationOptions}
         interviewTemplateOptions={questionGroupOptions}
         handleSelectLocation={handleSelectLocation}
       />

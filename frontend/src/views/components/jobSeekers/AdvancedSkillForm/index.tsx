@@ -40,6 +40,14 @@ const AdvancedSkillForm = ({
 
   const { t } = useTranslation(['jobSeeker', 'common']);
 
+  const defaultValues = React.useMemo<FormValues>(
+    () => ({
+      name: editData?.name ?? '',
+      level: editData?.level ?? 0,
+    }),
+    [editData],
+  );
+
   const schema = yup.object().shape({
 
     name: yup
@@ -54,31 +62,12 @@ const AdvancedSkillForm = ({
 
   });
 
-  const { control, reset, setError, handleSubmit } = useForm<FormValues>({
+  const { control, setError, handleSubmit } = useForm<FormValues>({
 
     resolver: typedYupResolver(schema),
+    defaultValues,
 
   });
-
-  React.useEffect(() => {
-
-    if (editData) {
-
-      reset((formValues) => ({
-
-        ...formValues,
-
-        ...editData,
-
-      }));
-
-    } else {
-
-      reset();
-
-    }
-
-  }, [editData, reset]);
 
   // show server errors
 

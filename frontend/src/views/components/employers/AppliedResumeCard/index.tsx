@@ -1,33 +1,7 @@
 'use client';
-import React, { useState, useMemo, useCallback } from 'react';
-import { 
-  Autocomplete, 
-  Box, 
-  Button, 
-  Divider, 
-  IconButton, 
-  LinearProgress, 
-  Stack, 
-  TextField, 
-  Tooltip, 
-  Typography, 
-  Grid2 as Grid,
-  Paper,
-  alpha,
-  useTheme,
-  ToggleButton,
-  ToggleButtonGroup
-} from "@mui/material";
+import React, { useMemo, useCallback, useReducer } from 'react';
+import { Box, Paper } from "@mui/material";
 import { useTranslation } from 'react-i18next';
-import { tConfig } from '../../../../utils/tConfig';
-import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import ViewListIcon from '@mui/icons-material/ViewList';
-import ViewKanbanIcon from '@mui/icons-material/ViewKanban';
 import errorHandling from '../../../../utils/errorHandling';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 import xlsxUtils from '../../../../utils/xlsxUtils';
@@ -45,6 +19,7 @@ import type { JobPostActivity } from '@/types/models';
 import type { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-table';
 
 import { AppliedResumeFilterData } from '../AppliedResumeFilterForm';
+import AppliedResumeToolbar from './AppliedResumeToolbar';
 
 interface AppliedResumeCardProps {
   title: string;
@@ -62,12 +37,66 @@ const defaultFilterData: AppliedResumeFilterData = {
   maritalStatusId: '',
 };
 
+type AppliedResumeState = {
+  viewMode: 'table' | 'board';
+  filterData: AppliedResumeFilterData;
+  openPopup: boolean;
+  isProcessing: boolean;
+  jobPostIdSelect: string;
+  applicationStatusSelect: string;
+};
+
+type AppliedResumeAction =
+  | { type: 'set_view_mode'; payload: 'table' | 'board' }
+  | { type: 'set_filter_data'; payload: AppliedResumeFilterData }
+  | { type: 'open_popup' }
+  | { type: 'close_popup' }
+  | { type: 'set_processing'; payload: boolean }
+  | { type: 'set_job_post_id'; payload: string }
+  | { type: 'set_application_status'; payload: string }
+  | { type: 'reset_filters' };
+
+const initialState: AppliedResumeState = {
+  viewMode: 'table',
+  filterData: defaultFilterData,
+  openPopup: false,
+  isProcessing: false,
+  jobPostIdSelect: '',
+  applicationStatusSelect: '',
+};
+
+const reducer = (state: AppliedResumeState, action: AppliedResumeAction): AppliedResumeState => {
+  switch (action.type) {
+    case 'set_view_mode':
+      return { ...state, viewMode: action.payload };
+    case 'set_filter_data':
+      return { ...state, filterData: action.payload };
+    case 'open_popup':
+      return { ...state, openPopup: true };
+    case 'close_popup':
+      return { ...state, openPopup: false };
+    case 'set_processing':
+      return { ...state, isProcessing: action.payload };
+    case 'set_job_post_id':
+      return { ...state, jobPostIdSelect: action.payload };
+    case 'set_application_status':
+      return { ...state, applicationStatusSelect: action.payload };
+    case 'reset_filters':
+      return {
+        ...state,
+        filterData: defaultFilterData,
+        jobPostIdSelect: '',
+        applicationStatusSelect: '',
+      };
+    default:
+      return state;
+  }
+};
+
 const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle }) => {
   const { t } = useTranslation(['employer', 'common']);
   const { allConfig } = useConfig();
-  const theme = useTheme();
-  
-  const [viewMode, setViewMode] = useState<'table' | 'board'>('table');
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   const {
     page,
@@ -82,23 +111,18 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     initialPageSize: 10
   });
 
-  const [filterData, setFilterData] = useState(defaultFilterData);
-  const [openPopup, setOpenPopup] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [jobPostIdSelect, setJobPostIdSelect] = useState('');
-  const [applicationStatusSelect, setApplicationStatusSelect] = useState('');
-  const [optimisticAnalysis, setOptimisticAnalysis] = useState<Record<string, Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>>>({});
+  const [optimisticAnalysis, setOptimisticAnalysis] = React.useState<Record<string, Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>>>({});
 
   const { data: jobPostOptions = [] } = useJobPostOptions();
 
   const queryParams = useMemo(() => ({
-    page: viewMode === 'board' ? 1 : page + 1,
-    pageSize: viewMode === 'board' ? 100 : pageSize,
+    page: state.viewMode === 'board' ? 1 : page + 1,
+    pageSize: state.viewMode === 'board' ? 100 : pageSize,
     ordering,
-    ...filterData,
-    jobPostId: jobPostIdSelect,
-    status: applicationStatusSelect,
-  }), [page, pageSize, ordering, filterData, jobPostIdSelect, applicationStatusSelect, viewMode]);
+    ...state.filterData,
+    jobPostId: state.jobPostIdSelect,
+    status: state.applicationStatusSelect,
+  }), [page, pageSize, ordering, state.filterData, state.jobPostIdSelect, state.applicationStatusSelect, state.viewMode]);
 
   const { data: queryData, isLoading } = useAppliedResumes(queryParams);
   const { deleteJobPostActivity, isMutating: isDeleting } = useDeleteJobPostActivity();
@@ -143,25 +167,21 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
     }));
   }, []);
 
-  const numbersFilter = useMemo(() => {
-    return Object.values(filterData).filter(v => v !== '').length;
-  }, [filterData]);
-
   const handleFilter = useCallback((data: AppliedResumeFilterData) => {
-    setOpenPopup(false);
-    setFilterData({ ...data });
+    dispatch({ type: 'close_popup' });
+    dispatch({ type: 'set_filter_data', payload: { ...data } });
     onPaginationChange({ pageIndex: 0, pageSize });
   }, [onPaginationChange, pageSize]);
 
   const handleExport = async () => {
-    setIsProcessing(true);
+    dispatch({ type: 'set_processing', payload: true });
     try {
       const resData = await jobPostActivityService.exportAppliedResume(queryParams);
       xlsxUtils.exportToXLSX(resData, 'AppliedProfilesList');
     } catch (error) {
       errorHandling(error);
     } finally {
-      setIsProcessing(false);
+      dispatch({ type: 'set_processing', payload: false });
     }
   };
 
@@ -193,9 +213,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   }, [deleteJobPostActivity, t]);
 
   const handleResetFilterData = useCallback(() => {
-    setFilterData(defaultFilterData);
-    setJobPostIdSelect('');
-    setApplicationStatusSelect('');
+    dispatch({ type: 'reset_filters' });
     onPaginationChange({ pageIndex: 0, pageSize });
   }, [onPaginationChange, pageSize]);
 
@@ -212,216 +230,30 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
           bgcolor: 'background.paper'
         }}
       >
-        <Stack 
-          direction={{ xs: 'column', sm: 'row' }} 
-          alignItems={{ xs: 'flex-start', sm: 'center' }} 
-          justifyContent="space-between" 
-          spacing={3} 
-          mb={5}
-        >
-          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px', mb: 0.5 }}>
-              {cardTitle}
-            </Typography>
-            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-              {t('employer:appliedResume.manageSubtitle', 'Track and manage candidate applications efficiently across all job postings.')}
-            </Typography>
-          </Box>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-            <ToggleButtonGroup
-              value={viewMode}
-              exclusive
-              onChange={(_, newValue) => {
-                if (newValue) setViewMode(newValue);
-              }}
-              size="small"
-              sx={{ bgcolor: 'background.neutral', '& .MuiToggleButton-root': { borderRadius: 3 } }}
-            >
-              <ToggleButton value="table" sx={{ fontWeight: 800, px: 2, textTransform: 'none' }}>
-                <ViewListIcon sx={{ mr: 1, fontSize: 18 }} /> {t('employer:appliedResume.tableView', { defaultValue: 'Table' })}
-              </ToggleButton>
-              <ToggleButton value="board" sx={{ fontWeight: 800, px: 2, textTransform: 'none' }}>
-                <ViewKanbanIcon sx={{ mr: 1, fontSize: 18 }} /> {t('employer:appliedResume.boardView', { defaultValue: 'Board' })}
-              </ToggleButton>
-            </ToggleButtonGroup>
-
-            <Button 
-                variant="contained" 
-                color="primary" 
-                startIcon={<FileDownloadOutlinedIcon />} 
-                onClick={handleExport} 
-                sx={{ 
-                  borderRadius: 3, 
-                  px: 4, 
-                  py: 1.25,
-                  boxShadow: (theme) => theme.customShadows?.primary, 
-                  fontWeight: 900,
-                  textTransform: 'none'
-                }}
-            >
-              {t('employer:appliedResume.downloadList')}
-            </Button>
-          </Stack>
-        </Stack>
-
-        <Paper
-          elevation={0}
-          sx={{
-            p: 3,
-            mb: 5,
-            borderRadius: 3,
-            bgcolor: 'background.neutral',
-            border: '1px solid',
-            borderColor: 'divider'
+        <AppliedResumeToolbar
+          title={cardTitle}
+          t={t}
+          allConfig={allConfig}
+          viewMode={state.viewMode}
+          onViewModeChange={(nextValue) => dispatch({ type: 'set_view_mode', payload: nextValue })}
+          jobPostOptions={jobPostOptions}
+          jobPostIdSelect={state.jobPostIdSelect}
+          onJobPostSelect={(value) => {
+            dispatch({ type: 'set_job_post_id', payload: value });
+            onPaginationChange({ pageIndex: 0, pageSize });
           }}
-        >
-          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3 }}>
-            <Box sx={{ 
-              p: 0.75, 
-              borderRadius: 1.5, 
-              bgcolor: 'primary.extralight', 
-              color: 'primary.main',
-              display: 'flex'
-            }}>
-              <FilterListIcon sx={{ fontSize: 20 }} />
-            </Box>
-            <Typography variant="subtitle1" sx={{ color: 'text.primary', fontWeight: 900, letterSpacing: '0.5px' }}>
-                {t('employer:appliedResume.filters').toUpperCase()}
-            </Typography>
-          </Stack>
-          
-          <Grid container spacing={3} alignItems="center">
-              <Grid size={{ xs: 12, sm: 6, md: 5 }}>
-                  <Autocomplete
-                      getOptionLabel={(option) => option.jobName}
-                      value={jobPostOptions.find((o) => String(o.id) === jobPostIdSelect) || null}
-                      onChange={(e, value) => {
-                          setJobPostIdSelect(value?.id ? String(value.id) : '');
-                          onPaginationChange({ pageIndex: 0, pageSize });
-                      }}
-                      disablePortal
-                      size="small"
-                      options={jobPostOptions}
-                      renderInput={(params) => (
-                          <TextField 
-                              {...params} 
-                              placeholder={t('employer:appliedResume.allJobPosts')}
-                              slotProps={{
-                                input: {
-                                  ...params.InputProps,
-                                  startAdornment: (
-                                    <>
-                                      <WorkOutlineIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />
-                                      {params.InputProps.startAdornment}
-                                    </>
-                                  ),
-                                },
-                              }}
-                              sx={{ 
-                                '& .MuiOutlinedInput-root': { 
-                                  borderRadius: 2, 
-                                  bgcolor: 'background.paper',
-                                  fontWeight: 600
-                                } 
-                              }} 
-                          />
-                      )}
-                  />
-              </Grid>
-              <Grid size={{ xs: 12, sm: 6, md: 4 }}>
-                  <Autocomplete
-                      getOptionLabel={(option) => tConfig(option.name as string)}
-                      value={allConfig?.applicationStatusOptions?.find(o => String(o.id) === applicationStatusSelect) || null}
-                      onChange={(e, value) => {
-                          setApplicationStatusSelect(value?.id ? String(value.id) : '');
-                          onPaginationChange({ pageIndex: 0, pageSize });
-                      }}
-                      disablePortal
-                      size="small"
-                      options={allConfig?.applicationStatusOptions || []}
-                      renderInput={(params) => (
-                          <TextField 
-                              {...params} 
-                              placeholder={t('employer:appliedResume.allStatuses')}
-                              slotProps={{
-                                input: {
-                                  ...params.InputProps,
-                                  startAdornment: (
-                                    <>
-                                      <AssignmentTurnedInIcon sx={{ color: 'text.disabled', mr: 1, fontSize: 20 }} />
-                                      {params.InputProps.startAdornment}
-                                    </>
-                                  ),
-                                },
-                              }}
-                              sx={{ 
-                                '& .MuiOutlinedInput-root': { 
-                                  borderRadius: 2, 
-                                  bgcolor: 'background.paper',
-                                  fontWeight: 600
-                                } 
-                              }} 
-                          />
-                      )}
-                  />
-              </Grid>
-              <Grid size={{ xs: 12, md: 3 }}>
-                  <Stack direction="row" spacing={1.5} justifyContent={{ xs: 'flex-end', md: 'flex-end' }}>
-                      <Tooltip title={t('common:reset')} arrow>
-                          <IconButton 
-                              onClick={handleResetFilterData} 
-                              sx={{ 
-                                  bgcolor: 'background.paper', 
-                                  borderRadius: 2,
-                                  border: '1px solid',
-                                  borderColor: 'divider',
-                                  '&:hover': { bgcolor: 'action.hover' }
-                              }}
-                          >
-                              <RefreshIcon sx={{ fontSize: 20 }} />
-                          </IconButton>
-                      </Tooltip>
-                      <Button
-                          variant="outlined"
-                          color="inherit"
-                          startIcon={<FilterListIcon />}
-                          endIcon={<ExpandMoreIcon />}
-                          onClick={() => setOpenPopup(true)}
-                          sx={{ 
-                              borderRadius: 2.5, 
-                              px: 3, 
-                              fontWeight: 800,
-                              textTransform: 'none',
-                              bgcolor: 'background.paper',
-                              borderStyle: 'dashed',
-                              '&:hover': { bgcolor: 'primary.extralight', borderColor: 'primary.main', borderStyle: 'solid' }
-                          }}
-                      >
-                          {t('employer:appliedResume.advancedFilter')} 
-                          {numbersFilter > 0 && (
-                            <Box 
-                              component="span" 
-                              sx={{ 
-                                ml: 1, 
-                                px: 1, 
-                                py: 0.25, 
-                                borderRadius: 1, 
-                                bgcolor: 'primary.main', 
-                                color: 'white',
-                                fontSize: '0.75rem',
-                                fontWeight: 900
-                              }}
-                            >
-                              {numbersFilter}
-                            </Box>
-                          )}
-                      </Button>
-                  </Stack>
-              </Grid>
-          </Grid>
-        </Paper>
+          applicationStatusSelect={state.applicationStatusSelect}
+          onApplicationStatusSelect={(value) => {
+            dispatch({ type: 'set_application_status', payload: value });
+            onPaginationChange({ pageIndex: 0, pageSize });
+          }}
+          numbersFilter={Object.values(state.filterData).filter((v) => v !== '').length}
+          onResetFilterData={handleResetFilterData}
+          onOpenFilterPopup={() => dispatch({ type: 'open_popup' })}
+          onExport={handleExport}
+        />
 
-        {viewMode === 'table' ? (
+        {state.viewMode === 'table' ? (
             <AppliedResumeTable
               rows={resumes}
               isLoading={isLoading}
@@ -435,7 +267,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               onAnalysisStateChange={handleAnalysisStateChange}
             />
         ) : (
-            <AppliedResumeKanban
+          <AppliedResumeKanban
               rows={resumes}
               isLoading={isLoading}
               handleChangeApplicationStatus={handleChangeApplicationStatus}
@@ -444,11 +276,11 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
             />
         )}
 
-        <FormPopup title={t('employer:appliedResume.advancedFilter')} openPopup={openPopup} setOpenPopup={setOpenPopup}>
-          <AppliedResumeFilterForm handleFilter={handleFilter} filterData={filterData} />
+        <FormPopup title={t('employer:appliedResume.advancedFilter')} openPopup={state.openPopup} setOpenPopup={(open) => dispatch({ type: open ? 'open_popup' : 'close_popup' })}>
+          <AppliedResumeFilterForm handleFilter={handleFilter} filterData={state.filterData} />
         </FormPopup>
 
-        {(isProcessing || isDeleting || isUpdatingStatus) && <BackdropLoading />}
+        {(state.isProcessing || isDeleting || isUpdatingStatus) && <BackdropLoading />}
       </Paper>
     </Box>
   );

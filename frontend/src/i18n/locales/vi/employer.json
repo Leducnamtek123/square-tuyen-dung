@@ -640,6 +640,19 @@
     "settings": "Cài đặt",
     "employeeRoles": "Nhân viên & Vai trò"
   },
+  "interviewHistory": {
+    "title": "Thư viện Video",
+    "subtitle": "Xem lại và tải về các buổi phỏng vấn đã hoàn thành.",
+    "searchPlaceholder": "Tìm kiếm ứng viên, vị trí...",
+    "viewMode": {
+      "grid": "Dạng lưới",
+      "table": "Dạng bảng"
+    },
+    "noData": {
+      "title": "Chưa có video nào",
+      "subtitle": "Các buổi phỏng vấn sau khi hoàn thành sẽ xuất hiện tại đây."
+    }
+  },
   "interviewLive": {
     "title": "Phỏng vấn Trực tiếp",
     "scheduleBtn": "Lên lịch Phỏng vấn",
@@ -650,6 +663,17 @@
       "inProgressLabel": "Đang diễn ra",
       "scheduledLabel": "Đã lên lịch",
       "completedLabel": "Đã hoàn thành"
+    },
+    "subtitle": "Chỉ hiển thị các phiên đang live và preview realtime của ứng viên.",
+    "autoRefresh": {
+      "on": "Auto refresh: ON",
+      "off": "Auto refresh: OFF"
+    },
+    "updating": "Đang cập nhật...",
+    "activeNow": "Active Now",
+    "noData": {
+      "title": "Chưa có phiên live nào",
+      "subtitle": "Khi ứng viên bật camera hoặc mic, card realtime sẽ xuất hiện ở đây."
     },
     "table": {
       "candidate": "Ứng viên",
@@ -670,6 +694,23 @@
       "active": "Hoạt động",
       "draft": "Bản nháp",
       "interrupted": "Bị gián đoạn"
+    },
+    "candidateCard": {
+      "waitingSignal": "Đang chờ tín hiệu",
+      "waitingSignalHint": "Khi ứng viên bật camera hoặc mic, preview sẽ hiện ở đây",
+      "tokenError": "Không thể lấy token quan sát.",
+      "unknownCandidate": "Ứng viên không xác định",
+      "connecting": "Đang kết nối realtime...",
+      "maximize": "Phóng to",
+      "end": "Kết thúc",
+      "notReady": "Phiên này chưa sẵn sàng để kết nối realtime.",
+      "liveSession": "Phiên live",
+      "candidate": "Ứng viên",
+      "position": "Vị trí",
+      "room": "Phòng",
+      "time": "Thời gian",
+      "endSession": "Kết thúc phiên",
+      "noConnectionDetails": "Chưa có connection details để mở fullscreen."
     }
   },
   "verification": {

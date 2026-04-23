@@ -1,4 +1,6 @@
+import React from 'react';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+
 import jobService from '../../../../services/jobService';
 import companyFollowed from '../../../../services/companyFollowed';
 import companyService from '../../../../services/companyService';
@@ -46,7 +48,7 @@ export type UseJobPostNotificationsResult = UseQueryResult<PaginatedResponse<Job
 export const useSavedJobs = (params: GetJobPostsParams = {}): UseSavedJobsResult => {
     const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
     const hasToken = !!tokenService.getAccessTokenFromCookie();
-    return useQuery<PaginatedResponse<JobPost>, Error>({
+    const query = useQuery<PaginatedResponse<JobPost>, Error>({
         queryKey: ['savedJobs', params],
         queryFn: async () => {
             const response = await jobService.getJobPostsSaved(params);
@@ -58,6 +60,19 @@ export const useSavedJobs = (params: GetJobPostsParams = {}): UseSavedJobsResult
         refetchOnReconnect: false,
         placeholderData: keepPreviousData,
     });
+
+    const queryClient = useQueryClient();
+    React.useEffect(() => {
+        if (query.data?.count && (params.page || 1) * (params.pageSize || 10) < query.data.count) {
+            const nextParams = { ...params, page: (params.page || 1) + 1 };
+            queryClient.prefetchQuery({
+                queryKey: ['savedJobs', nextParams],
+                queryFn: () => jobService.getJobPostsSaved(nextParams),
+            });
+        }
+    }, [query.data, params, queryClient]);
+
+    return query;
 };
 
 export const useToggleSaveJob = () => {

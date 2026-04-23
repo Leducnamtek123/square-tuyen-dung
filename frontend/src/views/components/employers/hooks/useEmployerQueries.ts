@@ -208,7 +208,10 @@ export const useJobPostOptions = () => {
     queryFn: async (): Promise<JobPostOption[]> => {
       const response = await jobService.getJobPostOptions();
       const statusOptions = response.statusOptions || [];
-      return statusOptions as typeof statusOptions & JobPostOption[];
+      return statusOptions.map((option) => ({
+        id: option.id,
+        jobName: option.name,
+      }));
     },
     staleTime: 5 * 60_000,
   });

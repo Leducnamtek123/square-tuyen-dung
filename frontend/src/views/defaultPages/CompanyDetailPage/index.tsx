@@ -77,11 +77,11 @@ const CompanyDetailPage = () => {
 
   useSEO({
     title: companyDetail?.companyName,
-    description: companyDetail ? `${companyDetail.companyName} - ${companyDetail.fieldOperation || 'Công ty tuyển dụng'}. ${stripHtml(companyDetail.description || '')} Xem việc làm đang tuyển.` : undefined,
+    description: companyDetail ? `${companyDetail.companyName} - ${companyDetail.fieldOperation || t('seo.companyDetail.recruitingCompany')}. ${stripHtml(companyDetail.description || '')} ${t('seo.companyDetail.hiringLabel')}` : undefined,
     image: companyDetail?.companyImageUrl || undefined,
     url: (typeof window !== 'undefined' ? window.location.href : ''),
     type: 'article',
-    keywords: companyDetail ? `${companyDetail.companyName}, tuyển dụng, việc làm, ${companyDetail.fieldOperation || ''}` : undefined,
+    keywords: companyDetail ? `${companyDetail.companyName}, ${t('seo.companyDetail.keywordsSuffix')}, ${companyDetail.fieldOperation || ''}` : undefined,
   });
 
   useStructuredData(
@@ -104,8 +104,8 @@ const CompanyDetailPage = () => {
       {
         type: 'BreadcrumbList' as const,
         items: [
-          { name: 'Trang chủ', url: (typeof window !== 'undefined' ? window.location.origin : '') },
-          { name: 'Công ty', url: `${(typeof window !== 'undefined' ? window.location.origin : '')}/cong-ty` },
+          { name: t('seo.companyDetail.breadcrumb.home'), url: (typeof window !== 'undefined' ? window.location.origin : '') },
+          { name: t('seo.companyDetail.breadcrumb.company'), url: `${(typeof window !== 'undefined' ? window.location.origin : '')}/cong-ty` },
           { name: companyDetail.companyName || '', url: (typeof window !== 'undefined' ? window.location.href : '') },
         ],
       },
@@ -177,4 +177,3 @@ const CompanyDetailPage = () => {
 };
 
 export default CompanyDetailPage;
-

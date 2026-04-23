@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 
 interface Props extends React.HTMLAttributes<HTMLDivElement> {
   src: string;
@@ -7,7 +8,7 @@ interface Props extends React.HTMLAttributes<HTMLDivElement> {
 const SvgIcon = ({ src, ...props }: Props) => {
   return (
     <div style={{ display: 'inline-block' }} {...props}>
-      <img src={src} alt="" style={{ width: '100%', height: '100%' }} />
+      <Image src={src} alt="" width={1} height={1} unoptimized style={{ width: '100%', height: '100%' }} />
     </div>
   );
 };

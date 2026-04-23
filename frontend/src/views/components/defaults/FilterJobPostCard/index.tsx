@@ -13,11 +13,12 @@ interface FilterJobPostCardProps {
 }
 
 const pageSize = 12;
+const EMPTY_PARAMS: GetJobPostsParams = {};
 
-const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) => {
+const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = EMPTY_PARAMS }) => {
   const [page, setPage] = React.useState(1);
   const [parentWidth, setParentWidth] = React.useState(0);
-  const [col, setCol] = React.useState(12);
+  const col = parentWidth < 600 ? 12 : parentWidth < 1200 ? 6 : 4;
 
   const paramsKey = React.useMemo(() => JSON.stringify(params || {}), [params]);
   const resolvedParams = React.useMemo<GetJobPostsParams>(() => {
@@ -39,22 +40,6 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  React.useEffect(() => {
-    if (parentWidth < 600) {
-      setCol(12);
-    } else if (parentWidth < 900) {
-      setCol(6);
-    } else if (parentWidth < 1200) {
-      setCol(6);
-    } else {
-      setCol(4);
-    }
-  }, [parentWidth]);
-
-  React.useEffect(() => {
-    setPage(1);
-  }, [paramsKey]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['filtered-job-posts', paramsKey, page],
@@ -132,6 +117,12 @@ const FilterJobPostCard: React.FC<FilterJobPostCardProps> = ({ params = {} }) =>
       </Stack>
     </div>
   );
+};
+
+const FilterJobPostCard: React.FC<FilterJobPostCardProps> = (props) => {
+  const paramsKey = React.useMemo(() => JSON.stringify(props.params || {}), [props.params]);
+
+  return <FilterJobPostCardContent key={paramsKey} {...props} />;
 };
 
 export default React.memo(FilterJobPostCard);

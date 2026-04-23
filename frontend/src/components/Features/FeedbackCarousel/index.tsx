@@ -32,7 +32,7 @@ const styles = {
 const FeedbackCarousel = () => {
   const { t } = useTranslation('public');
   const [parentWidth, setParentWidth] = React.useState(0);
-  const [col, setCol] = React.useState(5);
+  const col = parentWidth < 600 ? 2 : parentWidth < 900 ? 3 : 4;
 
   const { data: feedbacks = [], isLoading } = useQuery({
     queryKey: ['feedbacks'],
@@ -51,16 +51,6 @@ const FeedbackCarousel = () => {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
-  React.useEffect(() => {
-    if (parentWidth < 600) {
-      setCol(2);
-    } else if (parentWidth < 900) {
-      setCol(3);
-    } else {
-      setCol(4);
-    }
-  }, [parentWidth]);
 
   return (
     <div id="feed-back-carousel">

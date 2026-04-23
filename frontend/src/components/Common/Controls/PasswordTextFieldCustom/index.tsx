@@ -7,6 +7,8 @@ import { SxProps, Theme } from '@mui/material/styles';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import ValidationError from '../ValidationError';
 
+const EMPTY_SX = {};
+
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
   control: Control<T>;
@@ -22,7 +24,7 @@ const PasswordTextFieldCustom = <T extends FieldValues = FieldValues>({
   title = null,
   showRequired = false,
   placeholder = '',
-  sx = {},
+  sx = EMPTY_SX,
 }: Props<T>) => {
 
   const [showPassword, setShowPassword] = React.useState(false);

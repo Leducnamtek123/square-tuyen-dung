@@ -1,4 +1,5 @@
 import React from 'react';
+import { Suspense } from 'react';
 import { Drawer, useTheme, Theme } from "@mui/material";
 import DrawerContent from './DrawerContent';
 import type { Theme as StylesTheme } from '@mui/material/styles';
@@ -39,7 +40,9 @@ const Sidebar = ({ drawerWidth, isAdmin }: SidebarProps) => {
       }}
       open
     >
-      <DrawerContent isAdmin={isAdmin} />
+      <Suspense fallback={null}>
+        <DrawerContent isAdmin={isAdmin} />
+      </Suspense>
     </Drawer>
   );
 };
@@ -80,7 +83,9 @@ const MobileSidebar = ({
         },
       }}
     >
-      <DrawerContent isAdmin={isAdmin} />
+      <Suspense fallback={null}>
+        <DrawerContent isAdmin={isAdmin} />
+      </Suspense>
     </Drawer>
   );
 };
