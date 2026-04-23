@@ -48,10 +48,8 @@ const Loading = (
       <Box sx={{ py: 2 }}>
         <Skeleton height={5} />
       </Box>
-      {Array(2)
-        .fill(0)
-        .map((_, index) => (
-          <Box sx={{ py: 1 }} key={index}>
+      {['certificate-loading-1', 'certificate-loading-2'].map((key) => (
+          <Box sx={{ py: 1 }} key={key}>
             <Skeleton />
             <Skeleton />
             <Skeleton />

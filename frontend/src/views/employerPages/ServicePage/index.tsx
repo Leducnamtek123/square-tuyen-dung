@@ -66,9 +66,9 @@ const ServicePage = () => {
       </Box>
 
       <Grid container spacing={4}>
-        {services.map((service, index) => (
+        {services.map((service) => (
           <Grid
-            key={index}
+            key={service.title}
             size={{
               xs: 12,
               sm: 6,

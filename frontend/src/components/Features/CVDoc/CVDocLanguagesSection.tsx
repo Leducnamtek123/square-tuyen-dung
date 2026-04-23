@@ -1,8 +1,8 @@
 import React from 'react';
-import { Text, View } from '@react-pdf/renderer';
 import i18next from 'i18next';
 import type { CVDocLanguageSkill } from './types';
-import { renderLanguageLevel } from './utils';
+import { LanguageLevelDots } from './utils';
+import { Text, View } from './pdf';
 
 type Props = {
   title: string;
@@ -17,11 +17,11 @@ const CVDocLanguagesSection = ({ title, items, styles }: Props) => {
     <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.languageWrapper}>
-        {items.map((lang, index) => (
-          <View key={`${lang?.language || 'language'}-${index}`} style={styles.languageItem}>
+        {items.map((lang) => (
+          <View key={`${lang?.language || 'language'}-${lang?.level || 'level'}`} style={styles.languageItem}>
             <Text style={styles.languageName}>{i18next.t('common:cvDoc.labels.languagePrefix')}{lang?.language}</Text>
             <View style={styles.languageLevel}>
-              {renderLanguageLevel(lang?.level, styles.levelDot, styles.levelDotEmpty)}
+              <LanguageLevelDots level={lang?.level} levelDot={styles.levelDot} levelDotEmpty={styles.levelDotEmpty} />
             </View>
           </View>
         ))}

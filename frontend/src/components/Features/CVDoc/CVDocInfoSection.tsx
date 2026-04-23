@@ -1,8 +1,8 @@
 import React from 'react';
-import { Text, View } from '@react-pdf/renderer';
 import i18next from 'i18next';
 import { salaryString } from '@/utils/customData';
 import type { ExtendedResume } from './types';
+import { Text, View } from './pdf';
 
 type Props = {
   resume: ExtendedResume;

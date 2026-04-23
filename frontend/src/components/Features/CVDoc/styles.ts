@@ -1,4 +1,4 @@
-import { StyleSheet } from '@react-pdf/renderer';
+import { StyleSheet } from './pdf';
 
 export const DEFAULT_THEME_COLOR = '#140861';
 

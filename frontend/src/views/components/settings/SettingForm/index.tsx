@@ -24,21 +24,11 @@ const SettingForm = ({ editData, handleUpdate }: SettingFormProps) => {
 
   const { control, reset, handleSubmit } = useForm<FormValues>({
     resolver: typedYupResolver(schema),
+    defaultValues: {
+      emailNotificationActive: editData?.emailNotificationActive ?? false,
+      smsNotificationActive: editData?.smsNotificationActive ?? false,
+    },
   });
-
-  React.useEffect(() => {
-    if (editData) {
-      reset((formValues) => ({
-        ...formValues,
-        ...editData,
-      }));
-    } else {
-      reset({
-        emailNotificationActive: false,
-        smsNotificationActive: false,
-      });
-    }
-  }, [editData, reset]);
 
   return (
     <form id="setting-form" onSubmit={handleSubmit(handleUpdate)}>

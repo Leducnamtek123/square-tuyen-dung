@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from '@react-pdf/renderer';
+import { View } from './pdf';
 
 export const formatDate = (dateString?: string) => {
   if (!dateString) return '';
@@ -7,13 +7,23 @@ export const formatDate = (dateString?: string) => {
   return `${date.getMonth() + 1}/${date.getFullYear()}`;
 };
 
-export const renderLanguageLevel = (level?: string | number, levelDot?: any, levelDotEmpty?: any) => {
-  const maxLevel = 5;
-  const dots = [];
+type LanguageLevelDotsProps = {
+  level?: string | number;
+  levelDot?: any;
+  levelDotEmpty?: any;
+};
 
-  for (let i = 0; i < maxLevel; i++) {
-    dots.push(<View key={`level-dot-${i}`} style={i < Number(level) ? levelDot : levelDotEmpty} />);
-  }
+export const LanguageLevelDots = ({ level, levelDot, levelDotEmpty }: LanguageLevelDotsProps) => {
+  const dotLabels = ['one', 'two', 'three', 'four', 'five'] as const;
 
-  return dots;
+  return (
+    <>
+      {dotLabels.map((dotLabel, index) => (
+        <View
+          key={`level-dot-${dotLabel}`}
+          style={index < Number(level) ? levelDot : levelDotEmpty}
+        />
+      ))}
+    </>
+  );
 };

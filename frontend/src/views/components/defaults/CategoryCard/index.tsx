@@ -19,14 +19,16 @@ const CategoryCard = ({ options, type }: CategoryCardProps) => {
   const dispatch = useDispatch();
   const nav = useRouter();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
-  const [items, setItems] = React.useState(options);
-
-  const handleFilterChange = (value: string) => {
-    const safeValue = String(value ?? '').toLowerCase();
-    let filterItems = options.filter((option) =>
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const items = React.useMemo(() => {
+    const safeValue = String(searchTerm ?? '').toLowerCase();
+    return options.filter((option) =>
       String(option?.name ?? '').toLowerCase().includes(safeValue)
     );
-    setItems(filterItems);
+  }, [options, searchTerm]);
+
+  const handleFilterChange = (value: string) => {
+    setSearchTerm(value);
   };
 
   const handleFilter = (id: string | number | null) => {

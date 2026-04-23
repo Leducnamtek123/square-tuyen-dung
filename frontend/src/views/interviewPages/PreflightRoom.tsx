@@ -185,9 +185,9 @@ export const PreflightRoom = ({ onJoin, onCancel, starting }: PreflightRoomProps
           }}
         >
           {state.stream &&
-            Array.from({ length: 3 }).map((_, index) => (
+            ['ring-1', 'ring-2', 'ring-3'].map((ringKey, index) => (
               <Box
-                key={index}
+                key={ringKey}
                 sx={{
                   position: 'absolute',
                   inset: -10 * (index + 1),

@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Box, Button, CircularProgress, Dialog, DialogTitle, DialogContent, DialogActions, Skeleton, TextField, Typography, alpha, useTheme, type Theme } from "@mui/material";
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import toastMessages from '../../../../utils/toastMessages';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +36,12 @@ const extractId = (field: unknown): string | number => {
 
 const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessionId }) => {
     const navigate = useRouter();
-    const searchParams = useSearchParams();
+    const searchParams = React.useMemo(() => {
+        if (typeof window === 'undefined') {
+            return new URLSearchParams('');
+        }
+        return new URLSearchParams(window.location.search);
+    }, []);
     const candidateIdQuery = searchParams.get('candidate') || '';
     const jobPostIdQuery = searchParams.get('jobPost') || '';
 
@@ -242,7 +247,6 @@ const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessio
                 <DialogContent sx={{ px: 4 }}>
                     <Box sx={{ mt: 2 }}>
                         <TextField 
-                            autoFocus
                             value={questionDraft} 
                             onChange={(e) => setQuestionDraft(e.target.value)} 
                             label={t('interview:employer.questions.textLabel')} 

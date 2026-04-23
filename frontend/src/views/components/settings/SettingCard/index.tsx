@@ -80,6 +80,7 @@ const SettingCard = ({ title, sx }: SettingCardProps) => {
                   }}
                 >
                   <SettingForm
+                    key={JSON.stringify(editData ?? {})}
                     editData={editData ?? null}
                     handleUpdate={handleUpdateUserSetting}
                   />

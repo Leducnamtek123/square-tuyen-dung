@@ -205,10 +205,10 @@ const Footer = () => {
                   {[
                     { Icon: WebsiteIcon,  link: LINKS.WEBSITE_LINK },
                     { Icon: FacebookIcon, link: LINKS.FACEBOOK_LINK },
-                  ].map((social, index) => (
+                  ].map((social) => (
 
                     <Link
-                      key={index}
+                      key={social.link}
                       href={social.link}
                       target="_blank"
                       sx={{

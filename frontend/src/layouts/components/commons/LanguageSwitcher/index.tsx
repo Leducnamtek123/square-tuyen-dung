@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Button, Menu, MenuItem, Stack, Typography, useTheme, Avatar } from '@mui/material';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -147,9 +147,6 @@ const localizeCanonicalChildPath = (
 
 const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
   const { i18n } = useTranslation();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const location = { pathname, search: searchParams.toString() ? `?${searchParams.toString()}` : '', hash: typeof window !== 'undefined' ? window.location.hash : '' };
   const navigate = useRouter();
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -166,6 +163,8 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
   const changeLanguage = (lng: string) => {
     window.localStorage?.setItem('i18nextLng', lng);
     const currentPath = window.location.pathname || '/';
+    const currentSearch = window.location.search || '';
+    const currentHash = window.location.hash || '';
     const portal = detectPortalFromPath(currentPath);
     if (portal !== 'jobseeker') {
       const childPath = stripPortalPrefix(currentPath);
@@ -173,16 +172,16 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
       const localizedChildPath = localizeCanonicalChildPath(portal, canonicalChildPath, lng);
       const nextFullPath = buildPortalPath(portal, localizedChildPath, lng);
       if (nextFullPath !== currentPath) {
-        window.location.assign(`${nextFullPath}${location.search}${location.hash}`);
+        window.location.assign(`${nextFullPath}${currentSearch}${currentHash}`);
       }
     } else {
-      const localizedPath = localizeRoutePath(location.pathname, lng);
-      if (localizedPath === location.pathname) {
+      const localizedPath = localizeRoutePath(currentPath, lng);
+      if (localizedPath === currentPath) {
         i18n.changeLanguage(lng);
         handleClose();
         return;
       }
-      window.location.assign(`${localizedPath}${location.search}${location.hash}`);
+      window.location.assign(`${localizedPath}${currentSearch}${currentHash}`);
     }
     i18n.changeLanguage(lng);
     handleClose();

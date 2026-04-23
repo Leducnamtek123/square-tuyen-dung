@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { TabTitle } from '../../../utils/generalFunction';
 import {
@@ -31,7 +31,6 @@ const JobSeekerLogin = () => {
 
   const dispatch = useAppDispatch();
   const nav = useRouter();
-  const searchParams = useSearchParams();
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
@@ -39,12 +38,14 @@ const JobSeekerLogin = () => {
   const [loginMode, setLoginMode] = React.useState<'email' | 'phone'>('email');
 
   React.useEffect(() => {
-    const successMsg = searchParams.get('successMessage');
-    const errorMsg = searchParams.get('errorMessage');
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const successMsg = params.get('successMessage');
+    const errorMsg = params.get('errorMessage');
 
     if (successMsg !== null) setSuccessMessage(successMsg);
     setErrorMessage(errorMsg);
-  }, [searchParams]);
+  }, []);
 
   const navigateHome = async () => {
     await dispatch(getUserInfo()).unwrap();

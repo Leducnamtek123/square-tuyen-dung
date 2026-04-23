@@ -1,27 +1,15 @@
-﻿import React from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { useTheme } from '@mui/material/styles';
-import defaultTheme from '@/themeConfigs/defaultTheme';
-import Link from 'next/link';
-import { Box, Card, Stack, Typography } from "@mui/material";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import {
-  faBriefcase,
-  faFontAwesome,
-  faMapLocation,
-  faUser,
-  faUsers,
-} from '@fortawesome/free-solid-svg-icons';
-import { IMAGES, ROLES_NAME, ROUTES } from '@/configs/constants';
-import MuiImageCustom from '@/components/Common/MuiImageCustom';
-import { formatRoute } from '@/utils/funcUtils';
-import { localizeRoutePath } from '@/configs/routeLocalization';
+import { Box, Card, Stack } from "@mui/material";
+import { ROLES_NAME } from '@/configs/constants';
 import { RootState } from '@/redux/store';
-import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { useTranslation } from 'react-i18next';
 import CompanyFollowButton from './CompanyFollowButton';
 import CompanyLoading from './CompanyLoading';
+import CompanyHero from './CompanyHero';
+import CompanyInfoSection from './CompanyInfoSection';
 
 interface CompanyProps {
   id: string | number;
@@ -38,7 +26,6 @@ interface CompanyProps {
 }
 
 const Company = ({
-  id,
   slug,
   companyImageUrl,
   companyCoverImageUrl,
@@ -56,317 +43,55 @@ const Company = ({
   const { isAuthenticated, currentUser } = useSelector((state: RootState) => state.user);
 
   return (
-
     <Card
-
       sx={{
-
         p: 2,
-
         transition: 'all 0.3s ease-in-out',
-
         '&:hover': {
-
-          borderColor: (theme) => theme.palette.primary.main,
-
+          borderColor: (muiTheme) => muiTheme.palette.primary.main,
           transform: 'translateY(-4px)',
-
-          boxShadow: (theme) => theme.customShadows.large,
-
+          boxShadow: (muiTheme) => muiTheme.customShadows.large,
         },
-
       }}
-
       variant="outlined"
-
     >
-
       <Stack
-
         style={{
-
           height:
-
             isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER
-
               ? 480
-
               : 420,
-
         }}
-
         direction="column"
-
-        justifyContent={'space-between'}
-
+        justifyContent="space-between"
       >
-
         <Box>
-
-          <Box sx={{ position: 'relative' }}>
-
-            <MuiImageCustom
-
-              width="100%"
-
-              height={180}
-
-              fit="cover"
-
-              src={companyCoverImageUrl || IMAGES.companyCoverDefault || IMAGES.coverImageDefault}
-              fallbackSrc={IMAGES.companyCoverDefault || IMAGES.coverImageDefault}
-
-              sx={{
-
-                borderRadius: 2,
-
-                filter: 'brightness(0.9)',
-
-              }}
-
-              duration={1500}
-
-            />
-
-            <Box
-
-              sx={{
-
-                position: 'absolute',
-
-                bottom: -40,
-
-                left: 16,
-
-                width: 85,
-
-                height: 85,
-
-                transition: 'transform 0.3s ease',
-
-                '&:hover': {
-
-                  transform: 'scale(1.05)',
-
-                },
-
-              }}
-
-              component={Link}
-
-              href={localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, slug)}`, i18n.language)}
-
-            >
-
-              <MuiImageCustom
-
-                width={80}
-
-                height={80}
-
-                src={companyImageUrl || IMAGES.companyLogoDefault}
-                fallbackSrc={IMAGES.companyLogoDefault}
-
-                sx={{
-
-                  bgcolor: 'white',
-
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-
-                  p: 0.75,
-
-                  borderRadius: 3,
-
-                }}
-
-              />
-
-            </Box>
-
-            <Box
-
-              sx={{
-
-                position: 'absolute',
-
-                top: 12,
-
-                right: 12,
-
-                bgcolor: 'rgba(255,255,255,0.9)',
-
-                borderRadius: 2,
-
-                px: 1.5,
-
-                py: 0.5,
-
-              }}
-
-            >
-
-              <Typography variant="caption" sx={{ fontWeight: 500 }}>
-
-                <FontAwesomeIcon
-
-                  icon={faUsers}
-
-                  style={{ marginRight: 4 }}
-
-                  color={theme.palette.text.secondary}
-
-                />
-
-                {t('company.followers', { count: followNumber })}
-
-              </Typography>
-
-            </Box>
-
-          </Box>
-
-          <Box sx={{ p: 2, pt: 5, width: '100%' }}>
-
-            <Box mb={2}>
-
-              <Typography
-
-                variant="h6"
-
-                component={Link}
-
-                href={localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, slug)}`, i18n.language)}
-
-                sx={{
-
-                  textDecoration: 'none',
-
-                  color: 'inherit',
-
-                  fontWeight: 600,
-
-                  transition: 'color 0.2s ease',
-
-                  '&:hover': {
-
-                    color: (theme) => theme.palette.primary.main,
-
-                  },
-
-                }}
-
-              >
-
-                {companyName.substring(0, 55)}
-
-                {companyName.length > 55 && '...'}
-
-              </Typography>
-
-            </Box>
-
-            <Stack spacing={1.5}>
-
-              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-
-                <FontAwesomeIcon
-                  icon={faFontAwesome}
-                  style={{ width: 16, color: '#757575' }}
-                />
-
-                {fieldOperation || (
-
-                  <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
-
-                    {t('company.notUpdated', 'Chưa cập nhật')}
-
-                  </span>
-
-                )}
-
-              </Typography>
-
-              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-
-                <FontAwesomeIcon
-                  icon={faMapLocation}
-                  style={{ width: 16, color: '#757575' }}
-                />
-
-                {tConfig((allConfig as { cityDict?: Record<string, string> })?.cityDict?.[city]) || (
-
-                  <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
-
-                    {t('company.notUpdated', 'Chưa cập nhật')}
-
-                  </span>
-
-                )}
-
-              </Typography>
-
-              <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-
-                <FontAwesomeIcon
-                  icon={faUser}
-                  style={{ width: 16, color: '#757575' }}
-                />
-
-                {tConfig((allConfig as { employeeSizeDict?: Record<string, string> })?.employeeSizeDict?.[employeeSize]) || (
-
-                  <span style={{ color: '#9e9e9e', fontStyle: 'italic', fontSize: 13 }}>
-
-                    {t('company.notUpdated', 'Chưa cập nhật')}
-
-                  </span>
-
-                )}
-
-              </Typography>
-
-              <Typography
-
-                variant="body2"
-
-                sx={{
-
-                  display: 'flex',
-
-                  alignItems: 'center',
-
-                  gap: 1,
-
-                  color: 'primary.main',
-
-                  fontWeight: 500
-
-                }}
-
-              >
-
-                <FontAwesomeIcon
-                  icon={faBriefcase}
-                  style={{ width: 16, color: defaultTheme.palette.primary.main }}
-                />
-
-                {t('company.jobCount', { count: jobPostNumber })}
-
-              </Typography>
-
-            </Stack>
-
-          </Box>
-
+          <CompanyHero
+            slug={slug}
+            companyImageUrl={companyImageUrl}
+            companyCoverImageUrl={companyCoverImageUrl}
+            language={i18n.language}
+          />
+
+          <CompanyInfoSection
+            slug={slug}
+            companyName={companyName}
+            employeeSize={employeeSize}
+            fieldOperation={fieldOperation}
+            city={city}
+            followNumber={followNumber}
+            jobPostNumber={jobPostNumber}
+            language={i18n.language}
+            allConfig={allConfig}
+            theme={theme}
+            t={t}
+          />
         </Box>
 
         <CompanyFollowButton slug={slug} isFollowed={isFollowed} />
-
       </Stack>
-
     </Card>
-
   );
-
 };
 
 const MemoizedCompany = Object.assign(React.memo(Company), { Loading: CompanyLoading });

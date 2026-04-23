@@ -22,20 +22,34 @@ const GeneralInfoCardLoading = () => (
 
       <Grid container spacing={4}>
         <Grid size={6}>
-          {Array(8)
-            .fill(0)
-            .map((_, index) => (
-              <Typography component="div" variant="h5" key={index}>
+          {[
+            'general-info-loading-left-1',
+            'general-info-loading-left-2',
+            'general-info-loading-left-3',
+            'general-info-loading-left-4',
+            'general-info-loading-left-5',
+            'general-info-loading-left-6',
+            'general-info-loading-left-7',
+            'general-info-loading-left-8',
+          ].map((key) => (
+              <Typography component="div" variant="h5" key={key}>
                 <Skeleton />
               </Typography>
             ))}
         </Grid>
 
         <Grid size={6}>
-          {Array(8)
-            .fill(0)
-            .map((_, index) => (
-              <Typography component="div" variant="h5" key={index}>
+          {[
+            'general-info-loading-right-1',
+            'general-info-loading-right-2',
+            'general-info-loading-right-3',
+            'general-info-loading-right-4',
+            'general-info-loading-right-5',
+            'general-info-loading-right-6',
+            'general-info-loading-right-7',
+            'general-info-loading-right-8',
+          ].map((key) => (
+              <Typography component="div" variant="h5" key={key}>
                 <Skeleton />
               </Typography>
             ))}

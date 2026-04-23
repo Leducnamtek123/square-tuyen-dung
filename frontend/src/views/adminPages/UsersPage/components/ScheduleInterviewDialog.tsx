@@ -1,5 +1,5 @@
 import toastMessages from '../../../../utils/toastMessages';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Chip, Autocomplete, CircularProgress, Alert } from "@mui/material";
 import { useTranslation, Trans } from 'react-i18next';
 
@@ -19,45 +19,84 @@ interface ScheduleInterviewDialogProps {
 
 const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialogProps) => {
     const { t } = useTranslation('admin');
-    const [scheduledAt, setScheduledAt] = useState<Dayjs | null>(dayjs().add(1, 'day'));
-    const [notes, setNotes] = useState('');
-    const [selectedQuestions, setSelectedQuestions] = useState<Question[]>([]);
-    const [questions, setQuestions] = useState<Question[]>([]);
-    const [loadingQuestions, setLoadingQuestions] = useState(false);
-
-    
+    const [state, dispatch] = useReducer(
+        (
+            current: {
+                scheduledAt: Dayjs | null;
+                notes: string;
+                selectedQuestions: Question[];
+                questions: Question[];
+                loadingQuestions: boolean;
+            },
+            action:
+                | { type: 'set_scheduled_at'; value: Dayjs | null }
+                | { type: 'set_notes'; value: string }
+                | { type: 'set_selected_questions'; value: Question[] }
+                | { type: 'set_questions'; value: Question[] }
+                | { type: 'set_loading_questions'; value: boolean }
+                | { type: 'reset_form' }
+        ) => {
+            switch (action.type) {
+                case 'set_scheduled_at':
+                    return { ...current, scheduledAt: action.value };
+                case 'set_notes':
+                    return { ...current, notes: action.value };
+                case 'set_selected_questions':
+                    return { ...current, selectedQuestions: action.value };
+                case 'set_questions':
+                    return { ...current, questions: action.value };
+                case 'set_loading_questions':
+                    return { ...current, loadingQuestions: action.value };
+                case 'reset_form':
+                    return {
+                        scheduledAt: dayjs().add(1, 'day'),
+                        notes: '',
+                        selectedQuestions: [],
+                        questions: [],
+                        loadingQuestions: false,
+                    };
+                default:
+                    return current;
+            }
+        },
+        {
+            scheduledAt: dayjs().add(1, 'day'),
+            notes: '',
+            selectedQuestions: [],
+            questions: [],
+            loadingQuestions: false,
+        }
+    );
 
     useEffect(() => {
         if (open) {
-            setLoadingQuestions(true);
+            dispatch({ type: 'set_loading_questions', value: true });
             questionService.getQuestions({ pageSize: 100 })
                 .then((res) => {
                     const items = res?.results || [];
-                    setQuestions(items);
+                    dispatch({ type: 'set_questions', value: items });
                 })
                 .catch(console.error)
-                .finally(() => setLoadingQuestions(false));
+                .finally(() => dispatch({ type: 'set_loading_questions', value: false }));
         }
     }, [open]);
 
     useEffect(() => {
         if (!open) {
-            setScheduledAt(dayjs().add(1, 'day'));
-            setNotes('');
-            setSelectedQuestions([]);
+            dispatch({ type: 'reset_form' });
         }
     }, [open]);
 
     const handleSubmit = async () => {
-        if (!scheduledAt || !user) return;
+        if (!state.scheduledAt || !user) return;
         const payload = {
             candidate: user.id,
             candidate_name: user.fullName || user.email,
             candidate_email: user.email,
-            scheduled_at: scheduledAt.toISOString(),
+            scheduled_at: state.scheduledAt.toISOString(),
             interview_type: 'VETTING',
-            notes,
-            question_ids: selectedQuestions.map(q => q.id),
+            notes: state.notes,
+            question_ids: state.selectedQuestions.map(q => q.id),
         };
 
         try {
@@ -94,8 +133,8 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DateTimePicker
                             label={t('pages.users.scheduleInterviewDialog.timeLabel')}
-                            value={scheduledAt}
-                            onChange={(v) => setScheduledAt(v)}
+                            value={state.scheduledAt}
+                            onChange={(v) => dispatch({ type: 'set_scheduled_at', value: v })}
                             minDateTime={dayjs()}
                             slotProps={{
                                 textField: { fullWidth: true }
@@ -103,14 +142,14 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                         />
                     </LocalizationProvider>
 
-                    <Autocomplete
-                        multiple
-                        options={questions}
-                        getOptionLabel={(opt) => opt.content || opt.text || `Question #${opt.id}`}
-                        value={selectedQuestions}
-                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                        onChange={(_, v) => setSelectedQuestions(v)}
-                        loading={loadingQuestions}
+                        <Autocomplete
+                            multiple
+                        options={state.questions}
+                            getOptionLabel={(opt) => opt.content || opt.text || `Question #${opt.id}`}
+                        value={state.selectedQuestions}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                        onChange={(_, v) => dispatch({ type: 'set_selected_questions', value: v })}
+                        loading={state.loadingQuestions}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -121,7 +160,7 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                                         ...params.InputProps,
                                         endAdornment: (
                                             <>
-                                                {loadingQuestions && <CircularProgress size={20} />}
+                                                {state.loadingQuestions && <CircularProgress size={20} />}
                                                 {params.InputProps.endAdornment}
                                             </>
                                         ),
@@ -143,12 +182,12 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                         }
                     />
 
-                    <TextField
+                        <TextField
                         label={t('pages.users.scheduleInterviewDialog.notesLabel')}
                         multiline
                         rows={3}
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
+                        value={state.notes}
+                        onChange={(e) => dispatch({ type: 'set_notes', value: e.target.value })}
                         placeholder={t('pages.users.scheduleInterviewDialog.notesPlaceholder')}
                         fullWidth
                     />
@@ -158,13 +197,13 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                 <Button onClick={onClose} color="inherit">
                     {t('pages.users.scheduleInterviewDialog.cancelBtn')}
                 </Button>
-                <Button
-                    onClick={handleSubmit}
-                    variant="contained"
-                    disabled={!scheduledAt}
-                >
-                    {t('pages.users.scheduleInterviewDialog.submitBtn')}
-                </Button>
+                    <Button
+                        onClick={handleSubmit}
+                        variant="contained"
+                    disabled={!state.scheduledAt}
+                    >
+                        {t('pages.users.scheduleInterviewDialog.submitBtn')}
+                    </Button>
             </DialogActions>
         </Dialog>
     );

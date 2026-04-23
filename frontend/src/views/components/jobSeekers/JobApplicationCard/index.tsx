@@ -62,8 +62,8 @@ const JobApplicationCard = () => {
       <Box>
         {isLoading ? (
           <Stack spacing={1}>
-            {Array.from({ length: 3 }).map((_, idx) => (
-              <Skeleton key={idx} variant="rounded" height={72} />
+            {['application-skeleton-1', 'application-skeleton-2', 'application-skeleton-3'].map((key) => (
+              <Skeleton key={key} variant="rounded" height={72} />
             ))}
           </Stack>
         ) : (

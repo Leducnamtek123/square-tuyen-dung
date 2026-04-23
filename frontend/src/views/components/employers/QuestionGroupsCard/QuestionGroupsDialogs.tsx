@@ -192,7 +192,6 @@ const QuestionGroupsDialogs = ({
               value={newQuestionContent}
               onChange={(e) => onNewQuestionContentChange(e.target.value)}
               required
-              autoFocus
               sx={inputSx}
             />
           </Box>

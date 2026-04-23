@@ -1,6 +1,5 @@
 import React from 'react';
 import i18next from 'i18next';
-import { Document, Font, Page } from '@react-pdf/renderer';
 import { ExtendedResume, CVDocProps } from './types';
 import { createCVDocStyles, DEFAULT_THEME_COLOR } from './styles';
 import CVDocHeader from './CVDocHeader';
@@ -10,6 +9,7 @@ import CVDocEducationSection from './CVDocEducationSection';
 import CVDocSkillsSection from './CVDocSkillsSection';
 import CVDocLanguagesSection from './CVDocLanguagesSection';
 import CVDocCertificatesSection from './CVDocCertificatesSection';
+import { Document, Font, Page } from './pdf';
 
 Font.register({
   family: 'Roboto',

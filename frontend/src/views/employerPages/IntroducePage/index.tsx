@@ -85,9 +85,9 @@ const IntroducePage = () => {
       </Box>
 
       <Grid container spacing={4} sx={{ mb: 8 }}>
-        {highlights.map((item, index) => (
+        {highlights.map((item) => (
           <Grid
-            key={index}
+            key={item.title}
             size={{
               xs: 12,
               sm: 6,
@@ -139,7 +139,7 @@ const IntroducePage = () => {
         <Grid container spacing={3}>
           {steps.map((step, index) => (
             <Grid
-              key={index}
+              key={step.title}
               size={{
                 xs: 12,
                 sm: 6,

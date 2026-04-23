@@ -1,8 +1,8 @@
 import React from 'react';
-import { Text, View } from '@react-pdf/renderer';
 import i18next from 'i18next';
 import type { CVDocCertificate } from './types';
 import { formatDate } from './utils';
+import { Text, View } from './pdf';
 
 type Props = {
   title: string;
@@ -16,8 +16,8 @@ const CVDocCertificatesSection = ({ title, items, styles }: Props) => {
   return (
     <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
       <Text style={styles.sectionTitle}>{title}</Text>
-      {items.map((cert, index) => (
-        <View key={`${cert?.name || 'cert'}-${cert?.trainingPlace || 'place'}-${index}`} style={styles.experienceItem}>
+      {items.map((cert) => (
+        <View key={`${cert?.name || 'cert'}-${cert?.trainingPlace || 'place'}-${cert?.startDate || 'start'}-${cert?.expirationDate || 'end'}`} style={styles.experienceItem}>
           <View style={styles.experienceHeader}>
             <View>
               <Text style={styles.experienceTitle}>{cert?.name}</Text>

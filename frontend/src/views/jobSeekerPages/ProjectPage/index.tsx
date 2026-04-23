@@ -8,17 +8,16 @@ import SavedJobCard from "../../components/jobSeekers/SavedJobCard";
 import AppliedJobCard from "../../components/jobSeekers/AppliedJobCard";
 import SuggestedJobPostCard from "../../components/defaults/SuggestedJobPostCard";
 import JobPostNotificationCard from "../../components/jobSeekers/JobPostNotificationCard";
-import { useSearchParams } from 'next/navigation';
-
 const ProjectPage = () => {
 
     const { t } = useTranslation('jobSeeker');
 
     TabTitle(t("jobManagement.title"));
 
-    const searchParams = useSearchParams();
-
-    const [value, setValue] = React.useState(searchParams.get("tab") || "1");
+    const [value, setValue] = React.useState(() => {
+        if (typeof window === 'undefined') return "1";
+        return new URLSearchParams(window.location.search).get("tab") || "1";
+    });
 
     const handleChange = (event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);

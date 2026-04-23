@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Box from "@mui/material/Box";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
@@ -15,8 +15,6 @@ import { ROUTES, APP_NAME } from "../../../../configs/constants";
 
 const TabBar = () => {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const location = { pathname, search: searchParams.toString(), state: null, key: '' };
   const nav = useRouter();
   const { t } = useTranslation(['jobSeeker', 'common']);
 
@@ -61,7 +59,7 @@ const TabBar = () => {
   ];
 
   const activeTabIndex = tabItems.findLastIndex((tab) =>
-    location.pathname.includes(tab.path)
+    pathname.includes(tab.path)
   );
 
   const [value, setValue] = React.useState(activeTabIndex !== -1 ? activeTabIndex : 0);

@@ -10,6 +10,7 @@ import TextFieldAutoCompleteCustom from '../../../../components/Common/Controls/
 import { DATE_OPTIONS } from '../../../../configs/constants';
 import type { Control } from 'react-hook-form';
 import { TFunction } from 'i18next';
+import type { Theme } from '@mui/material/styles';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import BusinessCenterIcon from '@mui/icons-material/BusinessCenter';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -22,6 +23,32 @@ interface PlaceOption extends SelectOption {
 }
 
 const EMPTY_SELECT_OPTIONS: SelectOption[] = [];
+
+type SectionHeaderProps = {
+  theme: Theme;
+  icon: React.ReactElement;
+  title: string;
+};
+
+const SectionHeader = ({ theme, icon, title }: SectionHeaderProps) => (
+  <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3, mt: 1 }}>
+    <Box
+      sx={{
+        p: 0.75,
+        borderRadius: 1.25,
+        bgcolor: 'primary.extralight',
+        color: 'primary.main',
+        display: 'flex',
+        boxShadow: alpha(theme.palette.primary.main, 0.1),
+      }}
+    >
+      {icon}
+    </Box>
+    <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '0.5px' }}>
+      {title.toUpperCase()}
+    </Typography>
+  </Stack>
+);
 
 interface JobPostFormFieldsProps {
   control: Control<JobPostFormValues>;
@@ -53,24 +80,6 @@ function JobPostFormFields({
     }
   };
 
-  const renderSectionHeader = (icon: React.ReactNode, title: string) => (
-    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 3, mt: 1 }}>
-      <Box sx={{ 
-        p: 0.75, 
-        borderRadius: 1.25, 
-        bgcolor: 'primary.extralight', 
-        color: 'primary.main',
-        display: 'flex',
-        boxShadow: alpha(theme.palette.primary.main, 0.1)
-      }}>
-        {icon}
-      </Box>
-      <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '0.5px' }}>
-        {title.toUpperCase()}
-      </Typography>
-    </Stack>
-  );
-
   return (
     <Grid container spacing={4}>
       <Grid size={12}>
@@ -91,7 +100,7 @@ function JobPostFormFields({
       </Grid>
 
       <Grid size={12}>
-        {renderSectionHeader(<BusinessCenterIcon sx={{ fontSize: 20 }} />, t('jobPostForm.section.basicInfo', 'Basic Information'))}
+        <SectionHeader theme={theme} icon={<BusinessCenterIcon sx={{ fontSize: 20 }} />} title={t('jobPostForm.section.basicInfo', 'Basic Information')} />
       </Grid>
 
       <Grid size={12}>
@@ -156,7 +165,7 @@ function JobPostFormFields({
 
       <Grid size={12}>
         <Box sx={{ mt: 2 }}>
-          {renderSectionHeader(<LocationOnIcon sx={{ fontSize: 20 }} />, t('jobPostForm.section.location', 'Job Location'))}
+          <SectionHeader theme={theme} icon={<LocationOnIcon sx={{ fontSize: 20 }} />} title={t('jobPostForm.section.location', 'Job Location')} />
         </Box>
       </Grid>
 
@@ -183,7 +192,7 @@ function JobPostFormFields({
 
       <Grid size={12}>
         <Box sx={{ mt: 2 }}>
-          {renderSectionHeader(<ContactPhoneIcon sx={{ fontSize: 20 }} />, t('jobPostForm.section.contact', 'Contact Information'))}
+          <SectionHeader theme={theme} icon={<ContactPhoneIcon sx={{ fontSize: 20 }} />} title={t('jobPostForm.section.contact', 'Contact Information')} />
         </Box>
       </Grid>
 

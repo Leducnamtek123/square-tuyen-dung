@@ -219,7 +219,6 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                 <DialogContent sx={{ px: 3, pb: 0 }}>
                     <Box sx={{ pt: 2 }}>
                         <TextField
-                            autoFocus
                             margin="dense"
                             label={t('interview:employer.questionBank.textLabel')}
                             fullWidth

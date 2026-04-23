@@ -25,9 +25,9 @@ import errorHandling from "../../../../utils/errorHandling";
 import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
 import toSlug, { salaryString } from "../../../../utils/customData";
 import NoDataCard from "../../../../components/Common/NoDataCard";
-import { PDFDownloadLink } from "@react-pdf/renderer";
+import dynamic from "next/dynamic";
+import { PDFDownloadLink } from "../../../../components/Features/CVDoc/pdf";
 const PDFDownloadLinkAny = PDFDownloadLink as React.ElementType;
-import CVDoc from "../../../../components/Features/CVDoc";
 import type { ExtendedResume } from "../../../../components/Features/CVDoc";
 import { reloadResume } from "../../../../redux/profileSlice";
 import jobSeekerProfileService from "../../../../services/jobSeekerProfileService";
@@ -43,6 +43,8 @@ import type { AxiosError } from "axios";
 import type { ApiError } from '@/types/api';
 
 import type { Resume } from '../../../../types/models';
+const CVDoc = dynamic(() => import("../../../../components/Features/CVDoc"), { ssr: false });
+
 const Loading = () => {
   return (
     <Grid container spacing={3}>
@@ -301,8 +303,8 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                         { icon: faUser, label: t("jobSeeker:profile.summary.position"), value: tConfig(allConfig?.positionDict?.[String(resume.position)]) },
                         { icon: faDollarSign, label: t("jobSeeker:profile.summary.desiredSalary"), value: salaryString(resume.salaryMin, resume.salaryMax) },
                         { icon: faCalendar, label: t("jobSeeker:profile.summary.lastUpdated"), value: dayjs(resume.updateAt).format("DD/MM/YYYY HH:mm:ss") }
-                      ].map((item, idx) => (
-                        <Box key={idx} sx={{ display: "flex", alignItems: "center", color: "text.secondary", "& svg": { fontSize: "1.25rem", mr: 2, color: "primary.main" } }}>
+                      ].map((item) => (
+                        <Box key={item.label} sx={{ display: "flex", alignItems: "center", color: "text.secondary", "& svg": { fontSize: "1.25rem", mr: 2, color: "primary.main" } }}>
                           <FontAwesomeIcon icon={item.icon} />
                           <Typography>
                             {item.label}:{" "}

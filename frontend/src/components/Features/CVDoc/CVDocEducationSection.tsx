@@ -1,8 +1,8 @@
 import React from 'react';
-import { Text, View } from '@react-pdf/renderer';
 import i18next from 'i18next';
 import type { CVDocEducation } from './types';
 import { formatDate } from './utils';
+import { Text, View } from './pdf';
 
 type Props = {
   title: string;
@@ -16,8 +16,8 @@ const CVDocEducationSection = ({ title, items, styles }: Props) => {
   return (
     <View style={[styles.section, styles.sectionPageBreak]} wrap={false}>
       <Text style={styles.sectionTitle}>{title}</Text>
-      {items.map((edu, index) => (
-        <View key={`${edu?.trainingPlaceName || 'school'}-${edu?.degreeName || 'degree'}-${index}`} style={styles.experienceItem}>
+      {items.map((edu) => (
+        <View key={`${edu?.trainingPlaceName || 'school'}-${edu?.degreeName || 'degree'}-${edu?.startDate || 'start'}-${edu?.completedDate || 'end'}`} style={styles.experienceItem}>
           <View style={styles.experienceHeader}>
             <View>
               <Text style={styles.experienceTitle}>{edu?.degreeName}</Text>

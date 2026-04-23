@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { Box, Stack, Typography, Divider, alpha, useTheme } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import type { Theme } from '@mui/material/styles';
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import { useConfig } from '@/hooks/useConfig';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -32,6 +33,31 @@ interface AppliedResumeFilterFormProps {
   filterData: Partial<AppliedResumeFilterData> | null;
 }
 
+type SectionHeaderProps = {
+  theme: Theme;
+  icon: React.ReactElement;
+  title: string;
+};
+
+const SectionHeader = ({ theme, icon, title }: SectionHeaderProps) => (
+  <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        p: 0.5,
+        borderRadius: 1,
+        bgcolor: alpha(theme.palette.primary.main, 0.1),
+        color: 'primary.main',
+      }}
+    >
+      {React.cloneElement(icon, { fontSize: 'small' })}
+    </Box>
+    <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+      {title}
+    </Typography>
+  </Stack>
+);
+
 const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handleFilter, filterData }) => {
   const { t } = useTranslation('common');
   const theme = useTheme();
@@ -54,30 +80,13 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
     }
   };
 
-  const renderSectionHeader = (icon: React.ReactNode, title: string) => (
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
-      <Box sx={{ 
-        display: 'flex', 
-        p: 0.5, 
-        borderRadius: 1, 
-        bgcolor: alpha(theme.palette.primary.main, 0.1), 
-        color: 'primary.main' 
-      }}>
-        {React.cloneElement(icon as React.ReactElement, { fontSize: 'small' })}
-      </Box>
-      <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-        {title}
-      </Typography>
-    </Stack>
-  );
-
   return (
     <form id="modal-form" onSubmit={handleSubmit(handleFilter)}>
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 6 }}>
           <Stack spacing={2.5}>
             <Box>
-              {renderSectionHeader(<LocationOnIcon />, t('city'))}
+              <SectionHeader theme={theme} icon={<LocationOnIcon />} title={t('city')} />
               <SingleSelectCustom
                 name="cityId"
                 control={control}
@@ -88,7 +97,7 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
             </Box>
 
             <Box>
-              {renderSectionHeader(<BusinessCenterIcon />, t('career'))}
+              <SectionHeader theme={theme} icon={<BusinessCenterIcon />} title={t('career')} />
               <SingleSelectCustom
                 name="careerId"
                 control={control}
@@ -99,7 +108,7 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
             </Box>
 
             <Box>
-              {renderSectionHeader(<PsychologyIcon />, t('experience'))}
+              <SectionHeader theme={theme} icon={<PsychologyIcon />} title={t('experience')} />
               <SingleSelectCustom
                 name="experienceId"
                 control={control}
@@ -110,7 +119,7 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
             </Box>
 
             <Box>
-              {renderSectionHeader(<PeopleIcon />, t('position'))}
+              <SectionHeader theme={theme} icon={<PeopleIcon />} title={t('position')} />
               <SingleSelectCustom
                 name="positionId"
                 control={control}
@@ -125,7 +134,7 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
         <Grid size={{ xs: 12, md: 6 }}>
           <Stack spacing={2.5}>
             <Box>
-              {renderSectionHeader(<GraduationCapIcon />, t('academicLevel'))}
+              <SectionHeader theme={theme} icon={<GraduationCapIcon />} title={t('academicLevel')} />
               <SingleSelectCustom
                 name="academicLevelId"
                 control={control}
@@ -136,7 +145,7 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
             </Box>
 
             <Box>
-              {renderSectionHeader(<ApartmentIcon />, t('typeOfWorkplace'))}
+              <SectionHeader theme={theme} icon={<ApartmentIcon />} title={t('typeOfWorkplace')} />
               <SingleSelectCustom
                 name="typeOfWorkplaceId"
                 control={control}
@@ -147,7 +156,7 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
             </Box>
 
             <Box>
-              {renderSectionHeader(<EngineeringIcon />, t('jobType'))}
+              <SectionHeader theme={theme} icon={<EngineeringIcon />} title={t('jobType')} />
               <SingleSelectCustom
                 name="jobTypeId"
                 control={control}
@@ -160,7 +169,7 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
             <Grid container spacing={2}>
               <Grid size={6}>
                 <Box>
-                  {renderSectionHeader(<WcIcon />, t('gender'))}
+                  <SectionHeader theme={theme} icon={<WcIcon />} title={t('gender')} />
                   <SingleSelectCustom
                     name="genderId"
                     control={control}
@@ -172,7 +181,7 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
               </Grid>
               <Grid size={6}>
                 <Box>
-                  {renderSectionHeader(<FavoriteIcon />, t('maritalStatus'))}
+                  <SectionHeader theme={theme} icon={<FavoriteIcon />} title={t('maritalStatus')} />
                   <SingleSelectCustom
                     name="maritalStatusId"
                     control={control}

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Alert, AlertTitle, Avatar, Box, Card, Container, Typography, styled } from '@mui/material';
 import { Grid2 as Grid } from "@mui/material";
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
@@ -54,22 +54,23 @@ const EmployerLogin = () => {
 
   const dispatch = useAppDispatch();
   const nav = useRouter();
-  const searchParams = useSearchParams();
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   const [successMessage, setSuccessMessage] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    const successMsg = searchParams.get('successMessage');
-    const errorMsg = searchParams.get('errorMessage');
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const successMsg = params.get('successMessage');
+    const errorMsg = params.get('errorMessage');
 
     if (successMsg !== null) {
       setSuccessMessage(successMsg);
     }
 
     setErrorMessage(errorMsg);
-  }, [searchParams]);
+  }, []);
 
   const handleLogin = (data: EmployerLoginFormData) => {
     const getAccessToken = async (email: string, password: string, roleName: RoleName) => {

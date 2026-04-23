@@ -71,9 +71,9 @@ const PricingPage = () => {
       </Box>
 
       <Grid container spacing={4}>
-        {plans.map((plan, index) => (
+        {plans.map((plan) => (
           <Grid
-            key={index}
+            key={plan.title}
             size={{
               xs: 12,
               sm: 6,
@@ -101,9 +101,9 @@ const PricingPage = () => {
                   {plan.description}
                 </Typography>
                 <Stack spacing={1}>
-                  {plan.features.map((feature, featureIndex) => (
+                  {plan.features.map((feature) => (
                     <Typography
-                      key={featureIndex}
+                      key={feature}
                       sx={{ color: "text.secondary" }}
                     >
                       • {feature}

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Image, Text, View } from '@react-pdf/renderer';
 import i18next from 'i18next';
 import { LOGO_IMAGES } from '@/configs/constants';
 import type { CVDocProps } from './types';
 import { formatDate } from './utils';
+import { Image, Text, View } from './pdf';
 
 type Props = Pick<CVDocProps, 'resume' | 'user'> & {
   styles: any;

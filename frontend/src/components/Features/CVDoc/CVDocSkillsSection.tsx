@@ -1,6 +1,6 @@
 import React from 'react';
-import { Text, View } from '@react-pdf/renderer';
 import type { CVDocAdvancedSkill } from './types';
+import { Text, View } from './pdf';
 
 type Props = {
   title: string;
@@ -16,8 +16,8 @@ const CVDocSkillsSection = ({ title, items, styles }: Props) => {
       <Text style={styles.sectionTitle}>{title}</Text>
       <View style={styles.skillsWrapper}>
         <View style={styles.skillsGrid}>
-          {items.map((skill, index) => (
-            <View key={`${skill?.name || 'skill'}-${index}`} style={styles.skillItem}>
+          {items.map((skill) => (
+            <View key={`${skill?.name || 'skill'}-${skill?.level ?? 'level'}`} style={styles.skillItem}>
               <Text>{skill?.name} ({skill?.level}/5)</Text>
             </View>
           ))}

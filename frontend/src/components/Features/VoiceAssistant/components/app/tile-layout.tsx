@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Track } from 'livekit-client';
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, m } from 'motion/react';
 import {
   BarVisualizer,
   type TrackReference,
@@ -11,7 +11,7 @@ import {
 } from '@livekit/components-react';
 import { cn } from '@/lib/utils';
 
-const MotionContainer = motion.create('div');
+const MotionContainer = m.div;
 
 const ANIMATION_TRANSITION = {
   type: 'spring',
@@ -117,7 +117,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                   layoutId="agent"
                   initial={{
                     opacity: 0,
-                    scale: 0,
+                    scale: 0.95,
                   }}
                   animate={{
                     opacity: 1,
@@ -156,11 +156,11 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                   key="avatar"
                   layoutId="avatar"
                   initial={{
-                    scale: 1,
-                    opacity: 1,
+                    scale: 0.95,
+                    opacity: 0,
                     maskImage:
                       'radial-gradient(circle, rgba(0, 0, 0, 1) 0, rgba(0, 0, 0, 1) 20px, transparent 20px)',
-                    filter: 'blur(20px)',
+                    filter: 'blur(8px)',
                   }}
                   animate={{
                     maskImage:
@@ -210,7 +210,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                   layoutId="camera"
                   initial={{
                     opacity: 0,
-                    scale: 0,
+                    scale: 0.95,
                   }}
                   animate={{
                     opacity: 1,
@@ -218,7 +218,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                   }}
                   exit={{
                     opacity: 0,
-                    scale: 0,
+                    scale: 0.95,
                   }}
                   transition={{
                     ...ANIMATION_TRANSITION,

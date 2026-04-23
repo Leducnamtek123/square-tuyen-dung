@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import { Avatar, Box, Divider, List, Toolbar, useTheme } from "@mui/material";
 import { IMAGES, ROUTES } from '@/configs/constants';
@@ -10,8 +10,7 @@ import EmployerMenu from './EmployerMenu';
 const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
   const { t } = useTranslation(['admin', 'employer']);
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const location = { pathname, search: searchParams.toString(), state: null, key: '' };
+  const location = { pathname, search: '', state: null, key: '' };
   const theme = useTheme();
 
   const [expandedItems, setExpandedItems] = useState({

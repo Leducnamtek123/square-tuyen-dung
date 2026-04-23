@@ -272,7 +272,7 @@ const AdminLogin: React.FC = () => {
         <RightPanel>
           {SLIDES.map((slide, idx) => (
             <SlideImage
-              key={idx}
+              key={slide.title}
               src={slide.image}
               alt={slide.title}
               sx={{
@@ -309,9 +309,9 @@ const AdminLogin: React.FC = () => {
             </Typography>
 
             <Stack direction="row" spacing={1} alignItems="center">
-              {SLIDES.map((_, idx) => (
+              {SLIDES.map((slide, idx) => (
                 <Dot
-                  key={idx}
+                  key={slide.title}
                   active={idx === currentSlide}
                   onClick={() => goToSlide(idx)}
                   aria-label={`Slide ${idx + 1}`}
