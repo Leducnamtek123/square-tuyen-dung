@@ -78,6 +78,7 @@ AI_LLM_BASE_URL = config(
     default=config("LLM_BASE_URL", default=config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")),
 )
 AI_LLM_MODEL = config("AI_LLM_MODEL", default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b")))
+AI_LLM_API_KEY = config("AI_LLM_API_KEY", default=config("LLM_API_KEY", default=config("GROQ_API_KEY", default="")))
 AI_RESUME_AUTO_ANALYZE = config("AI_RESUME_AUTO_ANALYZE", default=True, cast=bool)
 LIVEKIT_PUBLIC_URL = config("LIVEKIT_PUBLIC_URL", default="")
 LIVEKIT_API_KEY = config("LIVEKIT_API_KEY", default="")
