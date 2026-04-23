@@ -22,6 +22,7 @@ import openai as openai_lib
 
 from .config import config
 from .interviewer import Interviewer
+from .session_settings import build_session_kwargs
 
 load_dotenv()
 
@@ -141,7 +142,7 @@ async def entrypoint(ctx: JobContext) -> None:
         turn_handling=TurnHandlingOptions(
             turn_detection=MultilingualModel(),
         ),
-        preemptive_generation=config.PREEMPTIVE_GENERATION,
+        **build_session_kwargs(),
     )
 
     # 5. Event Handlers
