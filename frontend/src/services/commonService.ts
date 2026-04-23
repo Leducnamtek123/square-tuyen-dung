@@ -131,6 +131,7 @@ const commonService = {
   uploadFile: async (
     file: File,
     fileType: string = 'OTHER',
+    options: { onUploadProgress?: (progress: number) => void } = {},
   ): Promise<{ id: number; url: string; name: string }> => {
     const url = 'common/upload-file/';
     const formData = new FormData();
@@ -139,6 +140,16 @@ const commonService = {
     return httpRequest.post(url, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
+      },
+      onUploadProgress: (event) => {
+        if (!options.onUploadProgress) return;
+        if (!event.total) {
+          options.onUploadProgress(0);
+          return;
+        }
+
+        const progress = Math.round((event.loaded / event.total) * 100);
+        options.onUploadProgress(progress);
       },
     }) as Promise<{ id: number; url: string; name: string }>;
   },

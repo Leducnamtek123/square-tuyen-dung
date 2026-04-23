@@ -140,7 +140,12 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         throw new Error(t("errors.invalidSession"));
       }
       setSession(mappedSession);
-      setSessionInviteToken(inviteToken || "");
+      setSessionInviteToken(
+        inviteToken ||
+          mappedSession.inviteToken ||
+          (detailRaw as { invite_token?: string } | null)?.invite_token ||
+          ""
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : t("errors.invalidSession"));
     } finally {
@@ -176,6 +181,11 @@ const InterviewSessionPage = ({ role = "jobseeker" }: InterviewSessionPageProps)
         throw new Error(t("errors.invalidSession"));
       }
       setSession(latestSession);
+      setSessionInviteToken(
+        latestSession.inviteToken ||
+          (latestRaw as { invite_token?: string } | null)?.invite_token ||
+          sessionInviteToken
+      );
 
       if (!JOINABLE_STATUSES.includes(latestSession.status)) {
         throw new Error(

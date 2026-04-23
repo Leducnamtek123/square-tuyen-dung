@@ -19,8 +19,19 @@ type QuestionLike = Partial<Question> & {
 };
 
 type InterviewSessionLike = Partial<InterviewSession> & {
+  sessionId?: number;
   room?: string;
+  room_name?: string;
   jobPostName?: string;
+  invite_token?: string;
+  candidate_name?: string;
+  candidate_email?: string;
+  job_name?: string;
+  company_name?: string;
+  scheduled_at?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  recording_url?: string | null;
   interviewType?: string;
   transcriptUrl?: string | null;
   candidateDict?: { fullName?: string; email?: string; id?: number };
@@ -96,44 +107,59 @@ export const transformInterviewSession = (session: unknown): InterviewSession | 
 
   const candidateName =
     (typeof s.candidateName === 'string' && s.candidateName) ||
+    (typeof s.candidate_name === 'string' && s.candidate_name) ||
     (typeof s.candidateDict?.fullName === 'string' && s.candidateDict.fullName) ||
     (typeof s.jobSeekerDict?.fullName === 'string' && s.jobSeekerDict.fullName) ||
     '';
   const candidateEmail =
     (typeof s.candidateEmail === 'string' && s.candidateEmail) ||
+    (typeof s.candidate_email === 'string' && s.candidate_email) ||
     (typeof s.candidateDict?.email === 'string' && s.candidateDict.email) ||
     (typeof s.jobSeekerDict?.email === 'string' && s.jobSeekerDict.email) ||
     '';
   const jobName =
     (typeof s.jobName === 'string' && s.jobName) ||
+    (typeof s.job_name === 'string' && s.job_name) ||
     (typeof s.jobPostName === 'string' && s.jobPostName) ||
     (typeof s.jobPostDict?.jobName === 'string' && s.jobPostDict.jobName) ||
     '';
   const scheduledAt =
     (typeof s.scheduledAt === 'string' && s.scheduledAt) ||
+    (typeof s.scheduled_at === 'string' && s.scheduled_at) ||
     (typeof s.startTime === 'string' && s.startTime) ||
+    (typeof s.start_time === 'string' && s.start_time) ||
     '';
   const companyName =
     (typeof s.companyName === 'string' && s.companyName) ||
+    (typeof s.company_name === 'string' && s.company_name) ||
     (typeof s.companyDict?.companyName === 'string' && s.companyDict.companyName) ||
     (typeof s.jobPostDict?.companyName === 'string' && s.jobPostDict.companyName) ||
     '';
+  const roomName =
+    (typeof s.roomName === 'string' && s.roomName) ||
+    (typeof s.room_name === 'string' && s.room_name) ||
+    (typeof s.room === 'string' ? s.room : '');
+  const inviteToken =
+    (typeof s.inviteToken === 'string' && s.inviteToken) ||
+    (typeof s.invite_token === 'string' && s.invite_token) ||
+    undefined;
 
   return {
-    id: typeof s.id === 'number' ? s.id : 0,
+    id: typeof s.id === 'number' ? s.id : typeof s.sessionId === 'number' ? s.sessionId : 0,
     candidateName,
     candidateEmail,
     companyName,
     jobName,
-    roomName:
-      (typeof s.roomName === 'string' && s.roomName) ||
-      (typeof s.room === 'string' ? s.room : ''),
+    roomName,
     scheduledAt,
-    status: typeof s.status === 'string' ? s.status : 'PENDING',
+    status: typeof s.status === 'string' ? s.status.trim() : 'PENDING',
     interview_type: typeof s.interviewType === 'string' ? s.interviewType : undefined,
     type: typeof (s.type || s.interviewType) === 'string' ? (s.type || s.interviewType)! : '',
-    inviteToken: typeof s.inviteToken === 'string' ? s.inviteToken : undefined,
-    recordingUrl: typeof s.recordingUrl === 'string' ? s.recordingUrl : null,
+    inviteToken,
+    recordingUrl:
+      (typeof s.recordingUrl === 'string' && s.recordingUrl) ||
+      (typeof s.recording_url === 'string' && s.recording_url) ||
+      null,
     questions: (Array.isArray(s.questions) ? s.questions : [])
       .map((item) => transformQuestion(item))
       .filter((item): item is Question => !!item),

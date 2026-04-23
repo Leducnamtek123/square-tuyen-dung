@@ -19,7 +19,10 @@ const createEditorStateFromHTMLString = (htmlString: string): EditorState => {
     return EditorState.createEmpty();
   }
   const blocksFromHTML = convertFromHTML(htmlString);
-  const content = ContentState.createFromBlockArray(blocksFromHTML.contentBlocks);
+  const content = ContentState.createFromBlockArray(
+    blocksFromHTML.contentBlocks,
+    blocksFromHTML.entityMap,
+  );
   return EditorState.createWithContent(content);
 };
 
