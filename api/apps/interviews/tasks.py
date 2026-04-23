@@ -242,15 +242,6 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
                 "content": "Bạn là một AI hỗ trợ đánh giá phỏng vấn tuyển dụng chuyên nghiệp. Hãy trả lời bằng JSON.",
                 },
                 {"role": "user", "content": prompt},
-
-        payload = {
-            "model": model_alias,
-            "messages": [
-                {
-                    "role": "system",
-                "content": "Bạn là một AI hỗ trợ đánh giá phỏng vấn tuyển dụng chuyên nghiệp. Hãy trả lời bằng JSON.",
-                },
-                {"role": "user", "content": prompt},
             ],
             "temperature": 0.3,
             "response_format": {"type": "json_object"},

@@ -398,6 +398,10 @@ class ChatAPIView(APIView):
         except (TypeError, ValueError):
             max_tool_rounds = 4
         max_tool_rounds = max(1, min(max_tool_rounds, 8))
+        llm_api_key = getattr(settings, "AI_LLM_API_KEY", "") or getattr(settings, "LLM_API_KEY", "") or getattr(settings, "GROQ_API_KEY", "")
+        headers = {}
+        if llm_api_key:
+            headers["Authorization"] = f"Bearer {llm_api_key}"
 
         try:
             upstream_json = {}
@@ -408,7 +412,7 @@ class ChatAPIView(APIView):
                     **base_payload,
                     "messages": current_messages,
                 }
-                upstream = requests.post(url, json=payload, timeout=(10, 120))
+                upstream = requests.post(url, json=payload, headers=headers, timeout=(10, 120))
                 if upstream.status_code >= 400:
                     return Response(
                         data_response(errors={}, data={"reply": _LLM_FALLBACK_REPLY, "model": model}),
