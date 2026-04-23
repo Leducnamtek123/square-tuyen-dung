@@ -62,8 +62,8 @@ services:
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET:-secret}
       - LIVEKIT_AGENT_PORT=${LIVEKIT_AGENT_PORT:-7880}
       - STT_LANGUAGE=${STT_LANGUAGE:-vi}
-      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://host.docker.internal:11434/v1}
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-gemma4:e4b}
+      - LLM_BASE_URL=${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
+      - LLM_MODEL=${LLM_MODEL:-gemma4:e4b}
       - TTS_VOICE=${TTS_VOICE:-Bình (nam miền Bắc)}
       - OPENAI_API_KEY=${OPENAI_API_KEY:-no-key-needed}
       - GROQ_API_KEY=${GROQ_API_KEY:-no-key-needed}

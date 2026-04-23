@@ -8,7 +8,7 @@ from shared.configs import variable_response as var_res
 
 from django.db.models import Count
 
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
 
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
@@ -104,6 +104,7 @@ class AdminWardViewSet(viewsets.ModelViewSet):
     filterset_fields = ['district']
 
 @api_view(http_method_names=["GET"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def get_all_config(request):
 
@@ -174,6 +175,7 @@ def get_all_config(request):
     return var_res.response_data(data=res_data)
 
 @api_view(http_method_names=["GET"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def get_districts(request):
 
@@ -197,6 +199,7 @@ def get_districts(request):
     return var_res.response_data(data=district_options)
 
 @api_view(http_method_names=["GET"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def get_wards(request):
 
@@ -219,6 +222,7 @@ def get_wards(request):
     return var_res.response_data(data=ward_options)
 
 @api_view(http_method_names=["GET"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def get_top_10_careers(request):
     try:
@@ -247,6 +251,7 @@ def get_top_10_careers(request):
     return var_res.response_data(data=serializer.data)
 
 @api_view(http_method_names=["GET"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def get_all_careers(request):
     paginator = paginations.CustomPagination()
@@ -271,6 +276,7 @@ def get_all_careers(request):
     return var_res.response_data(data=serializer.data)
 
 @api_view(['GET'])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def health_check(request):
 
@@ -318,6 +324,7 @@ def health_check(request):
     return Response(response_data, status=status_code)
 
 @api_view(["GET"])
+@authentication_classes([])
 @permission_classes([AllowAny])
 def presign_url(request):
     """

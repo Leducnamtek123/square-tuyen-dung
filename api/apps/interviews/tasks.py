@@ -231,8 +231,17 @@ Hãy trả về kết quả DƯỚI DẠNG JSON với các trường:
 Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
 """
 
-        ollama_url = config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")
-        model_alias = config("OLLAMA_MODEL", default="gemma4:e4b")
+        llm_base_url = config("LLM_BASE_URL", default=config("OLLAMA_BASE_URL", default="http://ollama:11434/v1"))
+        model_alias = config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b"))
+
+        payload = {
+            "model": model_alias,
+            "messages": [
+                {
+                    "role": "system",
+                "content": "Bạn là một AI hỗ trợ đánh giá phỏng vấn tuyển dụng chuyên nghiệp. Hãy trả lời bằng JSON.",
+                },
+                {"role": "user", "content": prompt},
 
         payload = {
             "model": model_alias,
@@ -249,8 +258,13 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
 
         logger.info("Starting AI evaluation for session %s using %s", session_id, model_alias)
 
+        llm_api_key = config("AI_LLM_API_KEY", default="")
+        headers = {}
+        if llm_api_key:
+            headers["Authorization"] = f"Bearer {llm_api_key}"
+
         with httpx.Client(timeout=httpx.Timeout(timeout=120.0, connect=15.0)) as client:
-            resp = client.post(f"{ollama_url}/chat/completions", json=payload)
+            resp = client.post(f"{llm_base_url}/chat/completions", json=payload, headers=headers)
 
         if resp.status_code != 200:
             logger.error("LLM API call failed with status %s: %s", resp.status_code, resp.text)

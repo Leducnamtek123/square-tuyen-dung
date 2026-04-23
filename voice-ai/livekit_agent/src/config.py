@@ -30,8 +30,9 @@ class Config:
     LIVEKIT_API_SECRET: str = os.getenv("LIVEKIT_API_SECRET", "secret")
 
     # LLM
-    OLLAMA_MODEL: str = os.getenv("OLLAMA_MODEL", "gemma4:e4b")
-    OLLAMA_BASE_URL: str = os.getenv("OLLAMA_BASE_URL", "http://ollama:11434/v1")
+    LLM_MODEL: str = os.getenv("LLM_MODEL", "gemma4:e4b")
+    LLM_BASE_URL: str = os.getenv("LLM_BASE_URL", "http://ollama:11434/v1")
+    LLM_API_KEY: str = os.getenv("LLM_API_KEY", "no-key-needed")
 
     STT_PROVIDER: str = os.getenv("STT_PROVIDER", "whisper").lower()
 

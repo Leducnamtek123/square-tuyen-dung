@@ -69,13 +69,13 @@ async def entrypoint(ctx: JobContext) -> None:
 
     llm_model = openai.LLM(
         client=openai_lib.AsyncOpenAI(
-            api_key="no-key-needed",
-            base_url=config.OLLAMA_BASE_URL,
+            api_key=config.LLM_API_KEY,
+            base_url=config.LLM_BASE_URL,
             http_client=httpx.AsyncClient(
                 timeout=httpx.Timeout(600.0, connect=15.0)
             ),
         ),
-        model=config.OLLAMA_MODEL,
+        model=config.LLM_MODEL,
     )
 
     tts_model = openai.TTS(

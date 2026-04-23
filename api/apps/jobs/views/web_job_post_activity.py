@@ -133,7 +133,10 @@ class JobSeekerJobPostActivityViewSet(
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        if not serializer.is_valid():
+            from shared.helpers import helper
+            helper.print_log_error("JobApplicationValidationError", serializer.errors)
+            serializer.is_valid(raise_exception=True)
 
         from rest_framework.exceptions import ValidationError
         from ..services import JobActivityService

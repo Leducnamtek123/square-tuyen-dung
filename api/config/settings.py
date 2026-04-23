@@ -75,9 +75,9 @@ AI_STT_MODEL = config("AI_STT_MODEL", default="openai/whisper-large-v3")
 AI_STT_LANGUAGE = config("AI_STT_LANGUAGE", default="vi")
 AI_LLM_BASE_URL = config(
     "AI_LLM_BASE_URL",
-    default=config("OLLAMA_BASE_URL", default="http://ollama:11434/v1"),
+    default=config("LLM_BASE_URL", default=config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")),
 )
-AI_LLM_MODEL = config("AI_LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b"))
+AI_LLM_MODEL = config("AI_LLM_MODEL", default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b")))
 AI_RESUME_AUTO_ANALYZE = config("AI_RESUME_AUTO_ANALYZE", default=True, cast=bool)
 LIVEKIT_PUBLIC_URL = config("LIVEKIT_PUBLIC_URL", default="")
 LIVEKIT_API_KEY = config("LIVEKIT_API_KEY", default="")
