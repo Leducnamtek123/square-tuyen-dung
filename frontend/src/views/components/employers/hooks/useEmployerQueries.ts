@@ -298,6 +298,16 @@ export const useInterviewDetail = (id: string | number): UseInterviewDetailResul
     queryKey: ['interviewDetail', id],
     queryFn: () => interviewService.getSessionDetail(id),
     enabled: !!id,
+    refetchInterval: (query) => {
+      const data = query.state.data as InterviewSession | undefined;
+      const hasRecording = Boolean(data?.recordingUrl || data?.recording_url);
+
+      if (data?.status === 'completed' && !hasRecording) {
+        return 5000;
+      }
+
+      return false;
+    },
   });
 };
 

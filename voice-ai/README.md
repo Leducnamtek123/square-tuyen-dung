@@ -14,7 +14,7 @@ This repo contains everything needed to run a real-time AI voice assistant local
 - **Nemotron Speech (default)** for speech-to-text, exposed via an OpenAI-compatible API.
 - **Whisper (via VoxBox)** as an optional fallback STT backend.
 - **Ollama** for running local LLMs (OpenAI-compatible API).
-- **Kokoro** for text-to-speech voice synthesis.
+- **VieNeu-TTS** for text-to-speech voice synthesis.
 - **Next.js + Tailwind** frontend UI.
 - Fully containerized via Docker Compose.
 
@@ -60,7 +60,7 @@ Each service is containerized and communicates over a shared Docker network:
 - `nemotron`: Speech-to-text (NVIDIA Nemotron Speech, OpenAI-compatible API)
 - `whisper` (optional profile): Fallback STT backend (VoxBox + Whisper)
 - `ollama` (external): Local LLM provider
-- `kokoro`: TTS engine
+- `vieneu-tts`: TTS engine
 - `frontend`: Next.js client UI
 
 ## Agent
@@ -70,7 +70,7 @@ The agent entrypoint is `livekit_agent/src/agent.py`. It uses the LiveKit Agents
 - `openai.STT` → Nemotron by default (configurable via `STT_PROVIDER` / `STT_BASE_URL` / `STT_MODEL`)
 - Optional `whisper` profile can be selected as a fallback STT backend.
 - `openai.LLM` -> Ollama (`OLLAMA_BASE_URL`)
-- `openai.TTS` → the Kokoro container
+- `openai.TTS` → the VieNeu-TTS container
 - `silero.VAD` for voice activity detection
 
 ## Environment variables
@@ -141,7 +141,7 @@ docker compose up --build
 ```
 .
 ├─ frontend/        # Next.js UI client
-├─ inference/       # Local inference services (nemotron/whisper/kokoro)
+├─ inference/       # Local inference services (nemotron/whisper/vieneu-tts)
 ├─ livekit/         # LiveKit server config
 ├─ livekit_agent/   # Python voice agent (LiveKit Agents)
 ├─ docker-compose.yml
@@ -161,4 +161,4 @@ docker compose up --build
 - STT via NVIDIA Nemotron Speech: https://huggingface.co/nvidia/nemotron-speech-streaming-en-0.6b
 - Whisper fallback via VoxBox: https://pypi.org/project/vox-box/
 - Local LLM via Ollama: https://ollama.com/
-- TTS via Kokoro: https://github.com/remsky/kokoro
+- TTS via VieNeu-TTS: https://github.com/pnnbao97/VieNeu-TTS

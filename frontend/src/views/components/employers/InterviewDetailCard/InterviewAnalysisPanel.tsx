@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Divider, Paper, Typography, Stack, List, ListItem, ListItemIcon, ListItemText, alpha, useTheme } from '@mui/material';
+import { Box, Divider, Paper, Typography, Stack, List, ListItem, ListItemIcon, ListItemText, Chip, alpha, useTheme } from '@mui/material';
 import { Grid2 as Grid } from "@mui/material";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -13,6 +13,35 @@ interface InterviewAnalysisPanelProps {
   t: TFunction;
 }
 
+type DetailedFeedbackRecord = Record<string, unknown>;
+
+const isRecord = (value: unknown): value is DetailedFeedbackRecord => Boolean(value && typeof value === 'object' && !Array.isArray(value));
+
+const getFirstDefined = (...values: unknown[]) => values.find((value) => value !== undefined && value !== null && value !== '');
+
+const toStringValue = (value: unknown): string | null => {
+    if (typeof value === 'string' && value.trim()) return value.trim();
+    if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+    return null;
+};
+
+const toStringArray = (value: unknown): string[] => {
+    if (Array.isArray(value)) {
+        return value
+            .map((item) => toStringValue(item))
+            .filter((item): item is string => Boolean(item));
+    }
+
+    if (typeof value === 'string') {
+        return value
+            .split('\n')
+            .map((item) => item.trim())
+            .filter(Boolean);
+    }
+
+    return [];
+};
+
 const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session, t }) => {
     const theme = useTheme();
     const strengthsRaw = session.aiStrengths || session.ai_strengths;
@@ -24,6 +53,45 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
     const weaknesses: string[] = Array.isArray(weaknessesRaw)
         ? weaknessesRaw.filter((w): w is string => typeof w === 'string')
         : (typeof weaknessesRaw === 'string' ? weaknessesRaw.split('\n').filter(Boolean) : []);
+
+    const detailedFeedbackRaw = session.aiDetailedFeedback || session.ai_detailed_feedback;
+    const detailedFeedback = isRecord(detailedFeedbackRaw) ? detailedFeedbackRaw : null;
+
+    const questionPerformance = detailedFeedback
+        ? toStringArray(getFirstDefined(
+            detailedFeedback.questionPerformance,
+            detailedFeedback.question_performance,
+        ))
+        : [];
+
+    const structuredQuestionPerformance = detailedFeedback && Array.isArray(getFirstDefined(
+        detailedFeedback.questionPerformance,
+        detailedFeedback.question_performance,
+    ))
+        ? (getFirstDefined(
+            detailedFeedback.questionPerformance,
+            detailedFeedback.question_performance,
+        ) as Array<Record<string, unknown>>)
+        : [];
+
+    const softSkills = detailedFeedback && isRecord(getFirstDefined(
+        detailedFeedback.softSkills,
+        detailedFeedback.soft_skills,
+    ))
+        ? (getFirstDefined(
+            detailedFeedback.softSkills,
+            detailedFeedback.soft_skills,
+        ) as DetailedFeedbackRecord)
+        : null;
+
+    const culturalFit = detailedFeedback
+        ? toStringValue(getFirstDefined(
+            detailedFeedback.culturalFit,
+            detailedFeedback.cultural_fit,
+        ))
+        : null;
+
+    const hasStructuredFeedback = Boolean(detailedFeedback && (softSkills || culturalFit || questionPerformance.length));
 
     return (
         <Paper
@@ -138,9 +206,119 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                             </Typography>
                         </Stack>
                         <Divider sx={{ mb: 3, opacity: 0.5 }} />
-                        <Typography variant="body2" sx={{ lineHeight: 2, color: 'text.primary', fontWeight: 700, whiteSpace: 'pre-wrap' }}>
-                            {typeof session.aiDetailedFeedback === 'string' ? session.aiDetailedFeedback : typeof session.ai_detailed_feedback === 'string' ? session.ai_detailed_feedback : JSON.stringify(session.aiDetailedFeedback || session.ai_detailed_feedback || t('interviewDetail.messages.noDetails'), null, 2)}
-                        </Typography>
+                        {typeof detailedFeedbackRaw === 'string' ? (
+                            <Typography variant="body2" sx={{ lineHeight: 2, color: 'text.primary', fontWeight: 700, whiteSpace: 'pre-wrap' }}>
+                                {detailedFeedbackRaw}
+                            </Typography>
+                        ) : hasStructuredFeedback ? (
+                            <Stack spacing={3}>
+                                {softSkills && (
+                                    <Box
+                                        sx={{
+                                            p: 3,
+                                            borderRadius: 3,
+                                            bgcolor: alpha(theme.palette.common.white, 0.65),
+                                            border: '1px solid',
+                                            borderColor: alpha(theme.palette.primary.main, 0.08),
+                                        }}
+                                    >
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'primary.main', textTransform: 'uppercase', letterSpacing: 1 }}>
+                                            {t('interviewDetail.label.softSkills', { defaultValue: 'Soft skills' })}
+                                        </Typography>
+                                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mt: 2, flexWrap: 'wrap' }}>
+                                            {toStringValue(getFirstDefined(softSkills.confidence, softSkills.confidence_score)) && (
+                                                <Chip label={`Confidence: ${toStringValue(getFirstDefined(softSkills.confidence, softSkills.confidence_score))}`} size="small" sx={{ fontWeight: 800 }} />
+                                            )}
+                                            {toStringValue(getFirstDefined(softSkills.clarity, softSkills.clarity_score)) && (
+                                                <Chip label={`Clarity: ${toStringValue(getFirstDefined(softSkills.clarity, softSkills.clarity_score))}`} size="small" sx={{ fontWeight: 800 }} />
+                                            )}
+                                            {toStringValue(getFirstDefined(softSkills.tone, softSkills.voice)) && (
+                                                <Chip label={`Tone: ${toStringValue(getFirstDefined(softSkills.tone, softSkills.voice))}`} size="small" sx={{ fontWeight: 800 }} />
+                                            )}
+                                        </Stack>
+                                    </Box>
+                                )}
+
+                                {culturalFit && (
+                                    <Box
+                                        sx={{
+                                            p: 3,
+                                            borderRadius: 3,
+                                            bgcolor: alpha(theme.palette.info.main, 0.04),
+                                            border: '1px solid',
+                                            borderColor: alpha(theme.palette.info.main, 0.12),
+                                        }}
+                                    >
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'info.main', textTransform: 'uppercase', letterSpacing: 1 }}>
+                                            {t('interviewDetail.label.culturalFit', { defaultValue: 'Cultural fit' })}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ mt: 1.5, lineHeight: 2, color: 'text.primary', fontWeight: 600 }}>
+                                            {culturalFit}
+                                        </Typography>
+                                    </Box>
+                                )}
+
+                                {structuredQuestionPerformance.length > 0 && (
+                                    <Box
+                                        sx={{
+                                            p: 3,
+                                            borderRadius: 3,
+                                            bgcolor: alpha(theme.palette.action.disabled, 0.03),
+                                            border: '1px solid',
+                                            borderColor: 'divider',
+                                        }}
+                                    >
+                                        <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'text.primary', textTransform: 'uppercase', letterSpacing: 1 }}>
+                                            {t('interviewDetail.label.questionPerformance', { defaultValue: 'Question performance' })}
+                                        </Typography>
+                                        <Stack spacing={2.5} sx={{ mt: 2.5 }}>
+                                            {structuredQuestionPerformance.map((item, idx) => {
+                                                const question = toStringValue(getFirstDefined(item.question, item.question_text, item.text)) || `${t('interviewDetail.label.question', { defaultValue: 'Question' })} ${idx + 1}`;
+                                                const feedback = toStringValue(getFirstDefined(item.feedback, item.comment, item.answer)) || t('interviewDetail.messages.noDetails', { defaultValue: 'No details available' });
+                                                const score = toStringValue(getFirstDefined(item.score, item.points));
+
+                                                return (
+                                                    <Box
+                                                        key={`${idx}-${question}`}
+                                                        sx={{
+                                                            p: 2.5,
+                                                            borderRadius: 2.5,
+                                                            bgcolor: alpha(theme.palette.background.paper, 0.9),
+                                                            border: '1px solid',
+                                                            borderColor: alpha(theme.palette.divider, 0.9),
+                                                        }}
+                                                    >
+                                                        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
+                                                            <Typography variant="body2" sx={{ fontWeight: 900, color: 'text.primary', lineHeight: 1.7 }}>
+                                                                {question}
+                                                            </Typography>
+                                                            {score && (
+                                                                <Chip
+                                                                    label={score}
+                                                                    size="small"
+                                                                    sx={{
+                                                                        fontWeight: 900,
+                                                                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                                                        color: 'primary.main',
+                                                                    }}
+                                                                />
+                                                            )}
+                                                        </Stack>
+                                                        <Typography variant="body2" sx={{ mt: 1.25, lineHeight: 1.9, color: 'text.secondary', fontWeight: 600, whiteSpace: 'pre-wrap' }}>
+                                                            {feedback}
+                                                        </Typography>
+                                                    </Box>
+                                                );
+                                            })}
+                                        </Stack>
+                                    </Box>
+                                )}
+                            </Stack>
+                        ) : (
+                            <Typography variant="body2" sx={{ lineHeight: 2, color: 'text.primary', fontWeight: 700, whiteSpace: 'pre-wrap' }}>
+                                {t('interviewDetail.messages.noDetails')}
+                            </Typography>
+                        )}
                     </Box>
                 </Grid>
             </Grid>

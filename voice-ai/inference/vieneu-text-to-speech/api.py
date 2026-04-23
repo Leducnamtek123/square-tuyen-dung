@@ -64,18 +64,30 @@ def get_tts():
     if tts is None:
         try:
             # Detect device: prefer environment variable, fallback to auto-detection
-            device = os.getenv("TTS_DEVICE", "cuda" if torch.cuda.is_available() else "cpu")
+            device_setting = os.getenv("TTS_DEVICE", "auto").strip().lower()
+            if device_setting in ("", "auto"):
+                device = "cuda" if torch.cuda.is_available() else "cpu"
+            else:
+                device = device_setting
+
+            codec_device_setting = os.getenv("TTS_CODEC_DEVICE", "").strip().lower()
+            codec_device = device if codec_device_setting in ("", "auto") else codec_device_setting
+            mode = os.getenv("TTS_MODE", "standard")
+            backbone_repo = os.getenv("TTS_BACKBONE_REPO", "pnnbao-ump/VieNeu-TTS")
             
-            logger.info(f"🚀 Initializing VieNeu-TTS (Mode: standard, Device: {device})...")
+            logger.info(
+                "🚀 Initializing VieNeu-TTS "
+                f"(Mode: {mode}, Device: {device}, Backbone: {backbone_repo})..."
+            )
             
             # Initialize TTS 
             # Switching to 'standard' mode for maximum stability 
             # as 'fast' mode (LMDeploy) is hitting a fatal buffer error on this system.
             tts = Vieneu(
-                mode='standard', 
-                backbone_repo="pnnbao-ump/VieNeu-TTS",
+                mode=mode,
+                backbone_repo=backbone_repo,
                 backbone_device=device,
-                codec_device=device
+                codec_device=codec_device,
             )
             
             # DEBUG: List all available voices at startup
