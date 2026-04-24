@@ -8,6 +8,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import { IMAGES, ROUTES } from '@/configs/constants';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import LanguageSwitcher from '@/layouts/components/commons/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarHeaderProps {
   // Add specific props if needed
@@ -16,6 +17,7 @@ interface SidebarHeaderProps {
 const SidebarHeader = (_props: SidebarHeaderProps) => {
   const { activeWorkspace } = useAppSelector((state) => state.user);
   const nav = useRouter();
+  const { t } = useTranslation('common');
 
   const isEmployer = React.useMemo(() => {
     return activeWorkspace?.type === "company";
@@ -43,7 +45,7 @@ const SidebarHeader = (_props: SidebarHeaderProps) => {
           <LanguageSwitcher />
           <Chip
             icon={!isEmployer ? <HomeIcon /> : <GridViewIcon />}
-            label={!isEmployer ? 'Vá» trang chá»§' : 'Vá» trang quáº£n trá»‹'}
+            label={!isEmployer ? t('sidebarHeader.backToHome') : t('sidebarHeader.backToAdmin')}
             onClick={handleRedirect}
           />
         </Box>

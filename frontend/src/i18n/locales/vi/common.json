@@ -865,5 +865,9 @@
   "interview": {
     "forceEndSuccess": "Đã yêu cầu kết thúc buổi phỏng vấn",
     "recordingWaiting": "Buổi phỏng vấn đã kết thúc, hệ thống đang chờ video ghi hình đồng bộ về để hiển thị tại đây."
+  },
+  "sidebarHeader": {
+    "backToHome": "Về trang chủ",
+    "backToAdmin": "Về trang quản trị"
   }
 }

@@ -211,18 +211,37 @@ h1, h2, h3, h4, h5, .display-text {
     radial-gradient(at 100% 100%, rgba(42, 169, 225, 0.08) 0px, transparent 50%);
 }
 
-/* Rich text editor images */
+/* Rich text editor images — override inline width/height set by the editor insert dialog */
 .rdw-editor-main img,
 .rdw-editor-main .public-DraftStyleDefault-block img,
 .rdw-editor-main .public-DraftEditor-content img {
-  display: block;
-  max-width: 100%;
-  height: auto;
+  display: block !important;
+  max-width: 100% !important;
+  width: auto !important;
+  height: auto !important;
   margin: 12px 0;
+  border-radius: 6px;
 }
 
+/* Figure wrapper also gets inline width — must override */
+.rdw-editor-main figure,
 .rdw-editor-main .rdw-image-alignment {
-  display: block;
+  display: block !important;
+  max-width: 100% !important;
+  width: auto !important;
+  margin: 12px 0 !important;
+}
+
+.rdw-editor-main .rdw-image-center {
+  justify-content: center;
+}
+
+.rdw-editor-main .rdw-image-left {
+  justify-content: flex-start;
+}
+
+.rdw-editor-main .rdw-image-right {
+  justify-content: flex-end;
 }
 
 /* Removed SVG Noise Filter as it is extremely expensive for rendering */

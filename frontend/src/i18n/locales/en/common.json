@@ -841,5 +841,9 @@
   "interview": {
     "forceEndSuccess": "Interview end requested",
     "recordingWaiting": "The interview has ended, the system is waiting for the recording to sync before displaying here."
+  },
+  "sidebarHeader": {
+    "backToHome": "Back to Home",
+    "backToAdmin": "Back to Admin"
   }
 }
