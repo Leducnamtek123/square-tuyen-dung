@@ -93,7 +93,7 @@ const HomeSearch = () => {
             <InputBaseSearchHomeCustom
               name="kw"
               control={control}
-              placeholder={t("common:search")}
+              placeholder={t("common:search.button")}
               showSubmitButton={true}
               location='HOME'
             />
