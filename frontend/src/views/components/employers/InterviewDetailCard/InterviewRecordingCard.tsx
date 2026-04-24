@@ -4,6 +4,7 @@ import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
 import { TFunction } from 'i18next';
+import pc from '@/utils/muiColors';
 
 interface InterviewRecordingCardProps {
   recordingUrl: string | null;
@@ -86,7 +87,7 @@ const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordi
                                 fontSize: '1rem',
                                 '&:hover': {
                                     borderWidth: '1.5px',
-                                    bgcolor: alpha(theme.palette.primary.main, 0.04)
+                                    bgcolor: pc.primary( 0.04)
                                 }
                             }}
                         >
@@ -99,8 +100,8 @@ const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordi
                             p: 4,
                             borderRadius: 3,
                             border: '1px dashed',
-                            borderColor: alpha(theme.palette.primary.main, 0.18),
-                            bgcolor: alpha(theme.palette.primary.main, 0.03),
+                            borderColor: pc.primary( 0.18),
+                            bgcolor: pc.primary( 0.03),
                             textAlign: 'center',
                         }}
                     >

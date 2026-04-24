@@ -40,6 +40,7 @@ import { formatRoute } from '@/utils/funcUtils';
 
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import SendEmailComponent from '../AppliedResumeTable/SendEmailComponent';
+import pc from '@/utils/muiColors';
 
 interface AppliedResumeKanbanProps {
     rows: JobPostActivity[];
@@ -142,7 +143,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                             {...provided.droppableProps}
                                             sx={{
                                                 width: 320,
-                                                bgcolor: snapshot.isDraggingOver ? alpha(theme.palette.primary.main, 0.05) : 'background.neutral',
+                                                bgcolor: snapshot.isDraggingOver ? pc.primary( 0.05) : 'background.neutral',
                                                 borderRadius: 3,
                                                 p: 2,
                                                 border: '1px dashed',
@@ -190,7 +191,7 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                         <Chip 
                                                                             label={isOnlineResume ? 'Online' : 'File'} 
                                                                             size="small" 
-                                                                            sx={{ height: 20, fontSize: '10px', fontWeight: 800, bgcolor: isOnlineResume ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.error.main, 0.1), color: isOnlineResume ? 'primary.main' : 'error.main' }}
+                                                                            sx={{ height: 20, fontSize: '10px', fontWeight: 800, bgcolor: isOnlineResume ? pc.primary( 0.1) : pc.error( 0.1), color: isOnlineResume ? 'primary.main' : 'error.main' }}
                                                                         />
                                                                     </Stack>
                                                                     

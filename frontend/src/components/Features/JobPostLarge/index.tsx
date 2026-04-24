@@ -14,6 +14,7 @@ import { JobPostLargeFooter } from './JobPostLargeFooter';
 import { JobPostLargeInfoChips } from './JobPostLargeInfoChips';
 import { HotBadge, UrgentBadge } from './JobPostLargeStatusBadges';
 import type { JobPostLargeProps } from './types';
+import pc from '@/utils/muiColors';
 
 const JobPostLarge = ({
   slug,
@@ -87,7 +88,7 @@ const JobPostLarge = ({
             theme.palette.mode === 'light'
               ? isUrgent
                 ? theme.palette.secondary.backgroundHover
-                : alpha(theme.palette.primary.main, 0.02)
+                : pc.primary( 0.02)
               : theme.palette.grey[800],
         },
       }}

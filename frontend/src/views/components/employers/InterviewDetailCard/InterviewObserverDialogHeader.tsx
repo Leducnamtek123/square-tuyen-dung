@@ -2,6 +2,7 @@ import React from 'react';
 import { alpha, Box, Button, Chip, Stack, Typography, useTheme } from '@mui/material';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import pc from '@/utils/muiColors';
 
 type Props = {
   candidateName?: string | null;
@@ -36,9 +37,9 @@ const InterviewObserverDialogHeader = ({ candidateName, jobName, liveStatus, sse
             display: 'flex',
             alignItems: 'center',
             gap: 1,
-            bgcolor: alpha(theme.palette.warning.main, 0.1),
+            bgcolor: pc.warning( 0.1),
             border: '1px solid',
-            borderColor: alpha(theme.palette.warning.main, 0.2),
+            borderColor: pc.warning( 0.2),
             px: 2,
             py: 0.75,
             borderRadius: 2,

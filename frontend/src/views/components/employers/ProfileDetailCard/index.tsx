@@ -23,6 +23,7 @@ import CertificateSection from './CertificateSection';
 import LanguageSection from './LanguageSection';
 import AdvancedSkillSection from './AdvancedSkillSection';
 import type { ResumeDetailResponse as ModelsResumeDetailResponse } from '../../../../types/models';
+import pc from '@/utils/muiColors';
 
 const LazyPdf = lazy(() => import("../../../../components/Common/Pdf"));
 
@@ -93,7 +94,7 @@ const ProfileDetailCard: React.FC = () => {
               py: 2.5,
               borderBottom: '1px solid',
               borderColor: 'divider',
-              bgcolor: alpha(theme.palette.primary.main, 0.04),
+              bgcolor: pc.primary( 0.04),
             }}
           >
             <Stack direction="row" alignItems="center" spacing={1.5}>
@@ -101,7 +102,7 @@ const ProfileDetailCard: React.FC = () => {
                 sx={{
                   p: 1,
                   borderRadius: 1.5,
-                  bgcolor: alpha(theme.palette.error.main, 0.1),
+                  bgcolor: pc.error( 0.1),
                   color: 'error.main',
                   display: 'flex',
                 }}
@@ -125,10 +126,10 @@ const ProfileDetailCard: React.FC = () => {
                   fontWeight: 900,
                   fontSize: '0.65rem',
                   height: 20,
-                  bgcolor: alpha(theme.palette.error.main, 0.08),
+                  bgcolor: pc.error( 0.08),
                   color: 'error.main',
                   border: '1px solid',
-                  borderColor: alpha(theme.palette.error.main, 0.15),
+                  borderColor: pc.error( 0.15),
                 }}
               />
             </Stack>

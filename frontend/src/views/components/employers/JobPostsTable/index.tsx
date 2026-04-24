@@ -11,6 +11,7 @@ import { JOB_POST_STATUS_BG_COLOR } from '../../../../configs/constants';
 import { useConfig } from '@/hooks/useConfig';
 import type { JobPost } from '../../../../types/models';
 import type { ColumnDef, SortingState, Updater, PaginationState } from '@tanstack/react-table';
+import pc from '@/utils/muiColors';
 
 interface JobPostsTableProps {
   rows: JobPost[];
@@ -59,10 +60,10 @@ const JobPostsTable = ({
                 height: 20, 
                 fontSize: '0.65rem', 
                 borderRadius: 1,
-                bgcolor: alpha(theme.palette.error.main, 0.12),
+                bgcolor: pc.error( 0.12),
                 color: 'error.main',
                 border: '1px solid',
-                borderColor: alpha(theme.palette.error.main, 0.24),
+                borderColor: pc.error( 0.24),
                 letterSpacing: 0.5
               }}
             />
@@ -93,7 +94,7 @@ const JobPostsTable = ({
             sx={{ 
               color: isExpired ? 'error.main' : 'primary.main', 
               fontWeight: 800,
-              bgcolor: isExpired ? alpha(theme.palette.error.main, 0.08) : alpha(theme.palette.primary.main, 0.08),
+              bgcolor: isExpired ? pc.error( 0.08) : pc.primary( 0.08),
               px: 1.5,
               py: 0.5,
               borderRadius: 1.5,
@@ -161,8 +162,8 @@ const JobPostsTable = ({
               onClick={() => handleUpdate(info.row.original.slug || info.row.original.id)}
               sx={{ 
                 color: 'primary.main',
-                bgcolor: alpha(theme.palette.primary.main, 0.08),
-                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.16) },
+                bgcolor: pc.primary( 0.08),
+                '&:hover': { bgcolor: pc.primary( 0.16) },
                 borderRadius: 1.5
               }}
             >
@@ -175,8 +176,8 @@ const JobPostsTable = ({
               onClick={() => handleDelete(info.row.original.slug || info.row.original.id)}
               sx={{ 
                 color: 'error.main',
-                bgcolor: alpha(theme.palette.error.main, 0.08),
-                '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.16) },
+                bgcolor: pc.error( 0.08),
+                '&:hover': { bgcolor: pc.error( 0.16) },
                 borderRadius: 1.5
               }}
             >

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import React, { useCallback, useMemo, useState } from 'react';
 import { 
   Box, 
@@ -32,6 +32,7 @@ import { useEmployerQuestions, useQuestionMutations } from '../hooks/useEmployer
 import type { AxiosError } from 'axios';
 import type { ApiError } from '../../../../types/api';
 import type { Question } from '../../../../types/models';
+import pc from '@/utils/muiColors';
 
 interface QuestionBankCardProps {
   title?: string;
@@ -45,9 +46,9 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
     const inputSx = {
         '& .MuiOutlinedInput-root': {
             borderRadius: 2.5,
-            backgroundColor: alpha(theme.palette.action.disabled, 0.03),
-            '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
-            '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) }
+            backgroundColor: pc.actionDisabled( 0.03),
+            '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
+            '& fieldset': { borderColor: pc.divider( 0.8) }
         }
     };
 
@@ -153,7 +154,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                             size="small" 
                             onClick={() => handleOpen(row.original)} 
                             color="primary"
-                            sx={{ bgcolor: alpha(theme.palette.primary.main, 0.08), '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.15) } }}
+                            sx={{ bgcolor: pc.primary( 0.08), '&:hover': { bgcolor: pc.primary( 0.15) } }}
                         >
                             <EditIcon fontSize="small" />
                         </IconButton>
@@ -163,7 +164,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                             size="small" 
                             onClick={() => handleDelete(row.original.id)} 
                             color="error"
-                            sx={{ bgcolor: alpha(theme.palette.error.main, 0.08), '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.15) } }}
+                            sx={{ bgcolor: pc.error( 0.08), '&:hover': { bgcolor: pc.error( 0.15) } }}
                         >
                             <DeleteIcon fontSize="small" />
                         </IconButton>

@@ -35,6 +35,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import InterviewCreateCardForm from './InterviewCreateCardForm';
 import type { FormValues } from './types';
 import type { JobPostActivity, Question, QuestionGroup } from '../../../../types/models';
+import pc from '@/utils/muiColors';
 
 interface InterviewCreateCardProps {
   title?: string;
@@ -179,9 +180,9 @@ const InterviewCreateCardInner = ({
   const inputSx = useMemo(() => ({
     '& .MuiOutlinedInput-root': {
       borderRadius: 2.5,
-      backgroundColor: alpha(theme.palette.action.disabled, 0.03),
-      '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
-      '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) },
+      backgroundColor: pc.actionDisabled( 0.03),
+      '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
+      '& fieldset': { borderColor: pc.divider( 0.8) },
     },
   }), [theme]);
 

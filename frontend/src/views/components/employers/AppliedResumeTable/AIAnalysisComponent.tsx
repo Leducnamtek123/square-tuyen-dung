@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import { JobPostActivity } from '@/types/models';
+import pc from '@/utils/muiColors';
 
 interface AIAnalysisComponentProps {
   row: JobPostActivity;
@@ -69,12 +70,12 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
             borderRadius: 1.5,
             fontWeight: 800,
             fontSize: '0.7rem',
-            bgcolor: alpha(theme.palette.info.main, 0.08),
+            bgcolor: pc.info( 0.08),
             color: 'info.main',
-            borderColor: alpha(theme.palette.info.main, 0.2),
+            borderColor: pc.info( 0.2),
             '& .MuiChip-icon': { ml: 0.5 },
             '&:hover': {
-                bgcolor: alpha(theme.palette.info.main, 0.15),
+                bgcolor: pc.info( 0.15),
                 borderColor: 'info.main'
             }
           }}
@@ -94,13 +95,13 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
             fontWeight: 900, 
             cursor: 'pointer',
             borderRadius: 1.5,
-            bgcolor: alpha(theme.palette.error.main, 0.08),
+            bgcolor: pc.error( 0.08),
             color: 'error.main',
             border: '1px solid',
-            borderColor: alpha(theme.palette.error.main, 0.1),
+            borderColor: pc.error( 0.1),
             '& .MuiChip-icon': { color: 'inherit', ml: 0.5 },
             '&:hover': {
-                bgcolor: alpha(theme.palette.error.main, 0.15),
+                bgcolor: pc.error( 0.15),
                 borderColor: 'error.main'
             }
           }}
@@ -123,10 +124,10 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
         px: 1.5,
         fontWeight: 900,
         color: 'primary.main',
-        borderColor: alpha(theme.palette.primary.main, 0.3),
+        borderColor: pc.primary( 0.3),
         borderStyle: 'dashed',
         '&:hover': {
-            bgcolor: alpha(theme.palette.primary.main, 0.06),
+            bgcolor: pc.primary( 0.06),
             borderColor: 'primary.main',
             borderStyle: 'solid'
         }

@@ -15,6 +15,7 @@ import InfoItem from './InfoItem';
 import { useConfig } from '@/hooks/useConfig';
 
 import { ResumeDetailResponse } from '@/types/models';
+import pc from '@/utils/muiColors';
 
 interface PersonalInfoSectionProps {
   profileDetail: ResumeDetailResponse;
@@ -32,7 +33,7 @@ const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail
                     sx={{ 
                         p: 1.25, 
                         borderRadius: 2, 
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        bgcolor: pc.primary( 0.1),
                         color: 'primary.main',
                         display: 'flex'
                     }}

@@ -30,6 +30,7 @@ import AppliedStatusComponent from './AppliedStatusComponent';
 import AIAnalysisComponent from './AIAnalysisComponent';
 import { useConfig } from '@/hooks/useConfig';
 import type { JobPostActivity } from '@/types/models';
+import pc from '@/utils/muiColors';
 
 interface AppliedResumeTableProps {
   rows: JobPostActivity[];
@@ -93,7 +94,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                         display: 'flex', 
                         p: 0.5, 
                         borderRadius: 1, 
-                        bgcolor: alpha(theme.palette.primary.main, 0.08), 
+                        bgcolor: pc.primary( 0.08), 
                         color: 'primary.main' 
                       }}>
                         <DescriptionIcon sx={{ fontSize: 14 }} />
@@ -117,11 +118,11 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                           display: 'flex', 
                           p: 0.5, 
                           borderRadius: 1, 
-                          bgcolor: alpha(theme.palette.error.main, 0.08), 
+                          bgcolor: pc.error( 0.08), 
                           color: 'error.main',
                           cursor: cvFileUrl ? 'pointer' : 'default',
                           textDecoration: 'none',
-                          '&:hover': cvFileUrl ? { bgcolor: alpha(theme.palette.error.main, 0.16) } : {},
+                          '&:hover': cvFileUrl ? { bgcolor: pc.error( 0.16) } : {},
                           transition: 'background-color 0.15s',
                         }}
                         {...(cvFileUrl ? {
@@ -190,10 +191,10 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
                   fontWeight: 900, 
                   fontSize: '0.7rem',
                   borderRadius: 1.5,
-                  bgcolor: isOnline ? alpha(theme.palette.primary.main, 0.08) : alpha(theme.palette.error.main, 0.08),
+                  bgcolor: isOnline ? pc.primary( 0.08) : pc.error( 0.08),
                   color: isOnline ? 'primary.main' : 'error.main',
                   border: '1px solid',
-                  borderColor: isOnline ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.error.main, 0.1),
+                  borderColor: isOnline ? pc.primary( 0.1) : pc.error( 0.1),
                   '& .MuiChip-label': { px: 1.5 },
                   cursor: !isOnline && cvFileUrl ? 'pointer' : 'default',
                 }}
@@ -239,9 +240,9 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
               size="small"
               onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`)}
               sx={{ 
-                bgcolor: alpha(theme.palette.primary.main, 0.06),
+                bgcolor: pc.primary( 0.06),
                 borderRadius: 1.5,
-                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.12) }
+                '&:hover': { bgcolor: pc.primary( 0.12) }
               }}
             >
               <RemoveRedEyeIcon fontSize="small" />
@@ -261,9 +262,9 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
               color="error"
               onClick={() => handleDelete(info.row.original.id)}
               sx={{ 
-                bgcolor: alpha(theme.palette.error.main, 0.06),
+                bgcolor: pc.error( 0.06),
                 borderRadius: 1.5,
-                '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.12) }
+                '&:hover': { bgcolor: pc.error( 0.12) }
               }}
             >
               <DeleteIcon fontSize="small" />

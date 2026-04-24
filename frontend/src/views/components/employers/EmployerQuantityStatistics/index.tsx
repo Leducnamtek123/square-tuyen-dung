@@ -19,6 +19,7 @@ import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import TrendingUpOutlinedIcon from '@mui/icons-material/TrendingUpOutlined';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
 import { useEmployerGeneralStatistics } from '../hooks/useEmployerQueries';
+import pc from '@/utils/muiColors';
 
 interface StatItemProps {
   title: string;
@@ -39,7 +40,7 @@ const StatItem = ({ title, value, suffix, color, Icon, loading }: StatItemProps)
         p: 3,
         borderRadius: 4,
         border: '1px solid',
-        borderColor: alpha(theme.palette.divider, 0.5),
+        borderColor: pc.divider( 0.5),
         boxShadow: (theme) => theme.customShadows?.z1,
         height: '100%',
         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',

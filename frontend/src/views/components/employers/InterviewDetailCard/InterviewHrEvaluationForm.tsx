@@ -20,6 +20,7 @@ import SchoolIcon from '@mui/icons-material/School';
 import SendIcon from '@mui/icons-material/Send';
 import type { EvalFormType } from './types';
 import { TFunction } from 'i18next';
+import pc from '@/utils/muiColors';
 
 interface InterviewHrEvaluationFormProps {
   evalForm: EvalFormType;
@@ -36,9 +37,9 @@ const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({ e
     const inputSx = {
         '& .MuiOutlinedInput-root': {
             borderRadius: 2.5,
-            backgroundColor: alpha(theme.palette.action.disabled, 0.03),
-            '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
-            '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) }
+            backgroundColor: pc.actionDisabled( 0.03),
+            '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
+            '& fieldset': { borderColor: pc.divider( 0.8) }
         }
     };
 
@@ -122,8 +123,8 @@ const InterviewHrEvaluationForm: React.FC<InterviewHrEvaluationFormProps> = ({ e
                     }}
                 >
                     <MenuItem value="pending" sx={{ fontWeight: 600 }}>{t('interviewDetail.actions.pending')}</MenuItem>
-                    <MenuItem value="passed" sx={{ fontWeight: 800, color: 'success.main', bgcolor: alpha(theme.palette.success.main, 0.04) }}>{t('interviewDetail.actions.passed')}</MenuItem>
-                    <MenuItem value="failed" sx={{ fontWeight: 800, color: 'error.main', bgcolor: alpha(theme.palette.error.main, 0.04) }}>{t('interviewDetail.actions.failed')}</MenuItem>
+                    <MenuItem value="passed" sx={{ fontWeight: 800, color: 'success.main', bgcolor: pc.success( 0.04) }}>{t('interviewDetail.actions.passed')}</MenuItem>
+                    <MenuItem value="failed" sx={{ fontWeight: 800, color: 'error.main', bgcolor: pc.error( 0.04) }}>{t('interviewDetail.actions.failed')}</MenuItem>
                 </TextField>
 
                 <TextField

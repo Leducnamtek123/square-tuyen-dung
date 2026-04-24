@@ -17,6 +17,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import ContactPhoneIcon from '@mui/icons-material/ContactPhone';
 import type { JobPostFormValues } from './JobPostSchema';
 import type { SelectOption, SystemConfig } from '@/types/models';
+import pc from '@/utils/muiColors';
 
 interface PlaceOption extends SelectOption {
   place_id: string;
@@ -39,7 +40,7 @@ const SectionHeader = ({ theme, icon, title }: SectionHeaderProps) => (
         bgcolor: 'primary.extralight',
         color: 'primary.main',
         display: 'flex',
-        boxShadow: alpha(theme.palette.primary.main, 0.1),
+        boxShadow: pc.primary( 0.1),
       }}
     >
       {icon}
@@ -74,9 +75,9 @@ function JobPostFormFields({
   const inputSx = {
     '& .MuiOutlinedInput-root': {
         borderRadius: 2.5,
-        backgroundColor: alpha(theme.palette.action.disabled, 0.03),
-        '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
-        '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) }
+        backgroundColor: pc.actionDisabled( 0.03),
+        '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
+        '& fieldset': { borderColor: pc.divider( 0.8) }
     }
   };
 
@@ -90,8 +91,8 @@ function JobPostFormFields({
             borderRadius: 2.5, 
             fontWeight: 700,
             border: '1px solid',
-            borderColor: alpha(theme.palette.warning.main, 0.3),
-            bgcolor: alpha(theme.palette.warning.main, 0.05),
+            borderColor: pc.warning( 0.3),
+            bgcolor: pc.warning( 0.05),
             '& .MuiAlert-message': { color: 'warning.dark' }
           }}
         >
@@ -148,17 +149,17 @@ function JobPostFormFields({
       </Grid>
       
       <Grid size={12}>
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 2.5, border: '1px solid', borderColor: 'divider', bgcolor: alpha(theme.palette.action.disabled, 0.03) }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 2.5, border: '1px solid', borderColor: 'divider', bgcolor: pc.actionDisabled( 0.03) }}>
           <RichTextEditorCustom name="jobDescription" control={control} title={t('jobPostForm.title.jobdescription', 'Job Description')} showRequired={true} />
         </Paper>
       </Grid>
       <Grid size={12}>
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 2.5, border: '1px solid', borderColor: 'divider', bgcolor: alpha(theme.palette.action.disabled, 0.03) }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 2.5, border: '1px solid', borderColor: 'divider', bgcolor: pc.actionDisabled( 0.03) }}>
           <RichTextEditorCustom name="jobRequirement" control={control} title={t('jobPostForm.title.jobrequirement', 'Job Requirement')} showRequired={true} />
         </Paper>
       </Grid>
       <Grid size={12}>
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 2.5, border: '1px solid', borderColor: 'divider', bgcolor: alpha(theme.palette.action.disabled, 0.03) }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 2.5, border: '1px solid', borderColor: 'divider', bgcolor: pc.actionDisabled( 0.03) }}>
           <RichTextEditorCustom name="benefitsEnjoyed" control={control} title={t('jobPostForm.title.benefits', 'Benefits')} showRequired={true} />
         </Paper>
       </Grid>
@@ -182,9 +183,9 @@ function JobPostFormFields({
         <Box sx={{ 
           p: 2.5, 
           borderRadius: 2.5, 
-          bgcolor: alpha(theme.palette.primary.main, 0.05),
+          bgcolor: pc.primary( 0.05),
           border: '1px solid',
-          borderColor: alpha(theme.palette.primary.main, 0.1)
+          borderColor: pc.primary( 0.1)
         }}>
           <CheckboxCustom name="isUrgent" control={control} title={t('jobPostForm.label.isUrgent', 'Is Urgent')} />
         </Box>

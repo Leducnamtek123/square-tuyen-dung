@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, CircularProgress, Typography, useTheme, alpha } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import pc from '@/utils/muiColors';
 
 export const ScoreGauge: React.FC<{ score: number }> = ({ score }) => {
   const { t } = useTranslation('employer');
@@ -37,7 +38,7 @@ export const ScoreGauge: React.FC<{ score: number }> = ({ score }) => {
           value={100}
           size={140}
           thickness={5}
-          sx={{ color: alpha(theme.palette.divider, 0.4), position: 'absolute' }}
+          sx={{ color: pc.divider( 0.4), position: 'absolute' }}
         />
         <CircularProgress
           variant="determinate"

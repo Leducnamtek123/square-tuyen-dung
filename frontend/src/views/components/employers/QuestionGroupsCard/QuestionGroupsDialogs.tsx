@@ -22,6 +22,7 @@ import AddIcon from '@mui/icons-material/Add';
 import type { QuestionGroup, Question } from '../../../../types/models';
 import type { TFunction } from 'i18next';
 import type { SelectChangeEvent } from '@mui/material';
+import pc from '@/utils/muiColors';
 
 type Props = {
   openDialog: boolean;
@@ -126,10 +127,10 @@ const QuestionGroupsDialogs = ({
                           sx={{
                             borderRadius: 1.5,
                             fontWeight: 700,
-                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                            bgcolor: pc.primary( 0.08),
                             color: 'primary.main',
                             border: '1px solid',
-                            borderColor: alpha(theme.palette.primary.main, 0.1),
+                            borderColor: pc.primary( 0.1),
                           }}
                         />
                       );
@@ -152,7 +153,7 @@ const QuestionGroupsDialogs = ({
               startIcon={<AddIcon />}
               onClick={onOpenCreateQuestion}
               color="primary"
-              sx={{ alignSelf: 'flex-start', borderRadius: 1.5, textTransform: 'none', fontWeight: 800, px: 2, py: 1, bgcolor: alpha(theme.palette.primary.main, 0.05), '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.1) } }}
+              sx={{ alignSelf: 'flex-start', borderRadius: 1.5, textTransform: 'none', fontWeight: 800, px: 2, py: 1, bgcolor: pc.primary( 0.05), '&:hover': { bgcolor: pc.primary( 0.1) } }}
             >
               {t('employer:questionGroupsCard.actions.createNewQuestion')}
             </Button>

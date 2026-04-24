@@ -10,6 +10,7 @@ import interviewService from '../../../services/interviewService';
 import { type InterviewSession } from '../../../types/models';
 import { ACTIVE_STATUSES, getSafeLiveKitUrl, normalizeStatus } from './InterviewLiveCandidateCard/InterviewLiveCandidateCardPresence';
 import InterviewLiveCandidateCardPanel from './InterviewLiveCandidateCard/InterviewLiveCandidateCardPanel';
+import pc from '@/utils/muiColors';
 
 interface InterviewLiveCandidateCardProps {
   session: InterviewSession;
@@ -125,14 +126,14 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
         p: 2.5,
         borderRadius: 4,
         border: '1px solid',
-        borderColor: alpha(theme.palette.primary.main, 0.12),
-        bgcolor: alpha(theme.palette.background.paper, 0.9),
+        borderColor: pc.primary( 0.12),
+        bgcolor: pc.bgPaper( 0.9),
         overflow: 'hidden',
         position: 'relative',
         transition: 'all 0.25s ease',
         '&:hover': {
           transform: 'translateY(-2px)',
-          boxShadow: `0 16px 40px ${alpha(theme.palette.primary.main, 0.08)}`,
+          boxShadow: `0 16px 40px ${pc.primary( 0.08)}`,
         },
       }}
     >
@@ -144,15 +145,15 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
           right: 0,
           height: 3,
           background: isLive
-            ? `linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.2)}, ${theme.palette.primary.main}, ${alpha(theme.palette.primary.main, 0.2)})`
-            : `linear-gradient(90deg, ${alpha(theme.palette.success.main, 0.15)}, ${theme.palette.success.main}, ${alpha(theme.palette.success.main, 0.15)})`,
+            ? `linear-gradient(90deg, ${pc.primary( 0.2)}, ${theme.palette.primary.main}, ${pc.primary( 0.2)})`
+            : `linear-gradient(90deg, ${pc.success( 0.15)}, ${theme.palette.success.main}, ${pc.success( 0.15)})`,
         }}
       />
 
       <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={2} sx={{ mb: 1.75 }}>
         <Box>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
-            <Avatar sx={{ width: 28, height: 28, bgcolor: alpha(theme.palette.primary.main, 0.1), color: 'primary.main' }}>
+            <Avatar sx={{ width: 28, height: 28, bgcolor: pc.primary( 0.1), color: 'primary.main' }}>
               <PersonIcon sx={{ fontSize: 18 }} />
             </Avatar>
             <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary' }}>

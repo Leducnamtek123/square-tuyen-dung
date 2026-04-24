@@ -17,6 +17,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import type { QuestionGroup, Question } from '../../../../types/models';
 import QuestionGroupsDialogs from './QuestionGroupsDialogs';
 import type { SelectChangeEvent } from '@mui/material';
+import pc from '@/utils/muiColors';
 
 interface QuestionGroupsCardProps {
   title?: string;
@@ -99,9 +100,9 @@ const QuestionGroupsCard: React.FC<QuestionGroupsCardProps> = ({ title }) => {
   const inputSx = {
     '& .MuiOutlinedInput-root': {
       borderRadius: 2.5,
-      backgroundColor: alpha(theme.palette.action.disabled, 0.03),
-      '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
-      '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) },
+      backgroundColor: pc.actionDisabled( 0.03),
+      '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
+      '& fieldset': { borderColor: pc.divider( 0.8) },
     },
   };
 

@@ -4,6 +4,7 @@ import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import QuizIcon from '@mui/icons-material/Quiz';
 import { InterviewSession } from '@/types/models';
 import { TFunction } from 'i18next';
+import pc from '@/utils/muiColors';
 
 interface InterviewQuestionsCardProps {
   session: InterviewSession;
@@ -39,12 +40,12 @@ const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session
                     sx={{ 
                         ml: 1, 
                         fontWeight: 900, 
-                        bgcolor: alpha(theme.palette.primary.main, 0.08), 
+                        bgcolor: pc.primary( 0.08), 
                         color: 'primary.main',
                         height: 20,
                         fontSize: '0.75rem',
                         border: '1px solid',
-                        borderColor: alpha(theme.palette.primary.main, 0.1)
+                        borderColor: pc.primary( 0.1)
                     }} 
                 />
             </Stack>
@@ -58,13 +59,13 @@ const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session
                             key={q.id} 
                             sx={{ 
                                 p: 3, 
-                                bgcolor: alpha(theme.palette.action.disabled, 0.03), 
+                                bgcolor: pc.actionDisabled( 0.03), 
                                 borderRadius: 3,
                                 border: '1px solid',
                                 borderColor: 'divider',
                                 '&:hover': {
-                                    bgcolor: alpha(theme.palette.primary.main, 0.02),
-                                    borderColor: alpha(theme.palette.primary.main, 0.2),
+                                    bgcolor: pc.primary( 0.02),
+                                    borderColor: pc.primary( 0.2),
                                     transform: 'translateX(4px)',
                                     boxShadow: (theme) => theme.customShadows?.z8
                                 },
@@ -97,7 +98,7 @@ const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session
                         </Box>
                     ))
                 ) : (
-                    <Box sx={{ textAlign: 'center', py: 8, bgcolor: alpha(theme.palette.action.disabled, 0.04), borderRadius: 4, border: '1px dashed', borderColor: 'divider' }}>
+                    <Box sx={{ textAlign: 'center', py: 8, bgcolor: pc.actionDisabled( 0.04), borderRadius: 4, border: '1px dashed', borderColor: 'divider' }}>
                         <HelpOutlineIcon sx={{ fontSize: 48, color: 'text.disabled', mb: 2, opacity: 0.2 }} />
                         <Typography variant="subtitle2" color="text.secondary" sx={{ fontWeight: 800 }}>
                             {t('interviewDetail.messages.noQuestions')}

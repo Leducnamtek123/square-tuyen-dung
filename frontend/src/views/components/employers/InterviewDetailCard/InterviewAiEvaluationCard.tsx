@@ -4,6 +4,7 @@ import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import { InterviewSession } from '@/types/models';
 import { TFunction } from 'i18next';
+import pc from '@/utils/muiColors';
 
 interface InterviewAiEvaluationCardProps {
   session: InterviewSession;
@@ -25,8 +26,8 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                 p: { xs: 3, md: 5 },
                 borderRadius: 4,
                 background: (theme) => theme.palette.mode === 'dark' 
-                    ? `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.2)} 0%, ${alpha(theme.palette.background.paper, 0.8)} 100%)`
-                    : `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.05)} 0%, ${alpha(theme.palette.background.paper, 1)} 100%)`,
+                    ? `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.2)} 0%, ${pc.bgPaper( 0.8)} 100%)`
+                    : `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.05)} 0%, ${pc.bgPaper( 1)} 100%)`,
                 border: '1px solid',
                 borderColor: 'divider',
                 boxShadow: (theme) => theme.customShadows?.z1,
@@ -38,7 +39,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                 <Box sx={{ 
                     p: 0.75, 
                     borderRadius: 1.5, 
-                    bgcolor: alpha(theme.palette.primary.main, 0.1), 
+                    bgcolor: pc.primary( 0.1), 
                     color: 'primary.main',
                     display: 'flex'
                 }}>
@@ -64,10 +65,10 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                                 height: 22, 
                                 letterSpacing: 1.5, 
                                 borderRadius: 1.5,
-                                bgcolor: alpha(theme.palette.primary.main, 0.1),
+                                bgcolor: pc.primary( 0.1),
                                 color: 'primary.main',
                                 border: '1px solid',
-                                borderColor: alpha(theme.palette.primary.main, 0.15),
+                                borderColor: pc.primary( 0.15),
                                 px: 1
                             }} 
                         />
@@ -91,7 +92,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                                 sx={{ 
                                     height: 10, 
                                     borderRadius: 5, 
-                                    bgcolor: alpha(theme.palette.primary.main, 0.05),
+                                    bgcolor: pc.primary( 0.05),
                                     '& .MuiLinearProgress-bar': {
                                         borderRadius: 5,
                                         backgroundImage: (theme) => `linear-gradient(to right, ${theme.palette.primary.light}, ${theme.palette.primary.main})`
@@ -115,7 +116,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                                 sx={{ 
                                     height: 10, 
                                     borderRadius: 5, 
-                                    bgcolor: alpha(theme.palette.info.main, 0.05),
+                                    bgcolor: pc.info( 0.05),
                                     '& .MuiLinearProgress-bar': {
                                         borderRadius: 5,
                                         backgroundImage: (theme) => `linear-gradient(to right, ${theme.palette.info.light}, ${theme.palette.info.main})`,
@@ -129,7 +130,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                     <Box sx={{ 
                         mt: 6, 
                         p: 3, 
-                        bgcolor: alpha(theme.palette.action.disabled, 0.05), 
+                        bgcolor: pc.actionDisabled( 0.05), 
                         borderRadius: 3, 
                         border: '1px solid', 
                         borderColor: 'divider',
@@ -157,7 +158,7 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                             borderWidth: '1.5px',
                             '&:hover': {
                                 borderWidth: '1.5px',
-                                bgcolor: alpha(theme.palette.primary.main, 0.04)
+                                bgcolor: pc.primary( 0.04)
                             }
                         }}
                     >

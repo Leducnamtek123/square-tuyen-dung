@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { TabTitle } from '../../../utils/generalFunction';
 import ProfileDetailCard from '../../components/employers/ProfileDetailCard';
+import pc from '@/utils/muiColors';
 
 const ProfileDetailPage = () => {
   const { t } = useTranslation('employer');
@@ -23,7 +24,7 @@ const ProfileDetailPage = () => {
             fontWeight: 800,
             color: 'text.secondary',
             '&:hover': {
-              bgcolor: alpha(theme.palette.primary.main, 0.08),
+              bgcolor: pc.primary( 0.08),
               color: 'primary.main',
             },
             transition: 'all 0.2s ease-in-out',

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from "react";
 import { useForm } from "react-hook-form";
@@ -9,7 +9,8 @@ import { Grid2 as Grid } from "@mui/material";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faFile, faFilePdf } from "@fortawesome/free-regular-svg-icons";
 import { useTranslation } from "react-i18next";
-import { alpha, useTheme } from "@mui/material/styles";
+import { useTheme } from "@mui/material/styles";
+import pc from "@/utils/muiColors";
 import errorHandling from "@/utils/errorHandling";
 import { CV_TYPES, REGEX_VALIDATE, ROUTES } from "@/configs/constants";
 import TextFieldCustom from "@/components/Common/Controls/TextFieldCustom";
@@ -122,7 +123,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                     textAlign: "center",
                     borderStyle: "dashed",
                     borderColor: "error.main",
-                    bgcolor: alpha(theme.palette.error.main, 0.02),
+                    bgcolor: pc.error( 0.02),
                   }}
                 >
                   <Typography variant="body1" color="error" sx={{ fontWeight: 600, mb: 1 }}>
@@ -156,7 +157,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                           transition: "all 0.2s",
                           "&:hover": {
                             borderColor: "primary.main",
-                            bgcolor: alpha(theme.palette.primary.main, 0.02),
+                            bgcolor: pc.primary( 0.02),
                           },
                         }}
                         variant="outlined"

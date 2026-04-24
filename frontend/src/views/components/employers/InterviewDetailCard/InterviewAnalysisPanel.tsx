@@ -7,6 +7,7 @@ import AnalyticsIcon from '@mui/icons-material/Analytics';
 import FeedIcon from '@mui/icons-material/Feed';
 import { InterviewSession } from '@/types/models';
 import { TFunction } from 'i18next';
+import pc from '@/utils/muiColors';
 
 interface InterviewAnalysisPanelProps {
   session: InterviewSession;
@@ -128,11 +129,11 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                         px: 2.5, 
                                         py: 2, 
                                         alignItems: 'flex-start', 
-                                        bgcolor: alpha(theme.palette.success.main, 0.04), 
+                                        bgcolor: pc.success( 0.04), 
                                         borderRadius: 3, 
                                         mb: 1.5, 
                                         border: '1px solid', 
-                                        borderColor: alpha(theme.palette.success.main, 0.1) 
+                                        borderColor: pc.success( 0.1) 
                                     }}
                                 >
                                     <ListItemIcon sx={{ minWidth: 32, mt: 0.5 }}>
@@ -141,7 +142,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                     <ListItemText primary={item} slotProps={{ primary: { variant: 'body2', lineHeight: 1.6, fontWeight: 700, color: 'success.dark' } }} />
                                 </ListItem>
                             )) : (
-                                <Box sx={{ py: 6, textAlign: 'center', bgcolor: alpha(theme.palette.action.disabled, 0.03), borderRadius: 3, border: '1px dashed', borderColor: 'divider' }}>
+                                <Box sx={{ py: 6, textAlign: 'center', bgcolor: pc.actionDisabled( 0.03), borderRadius: 3, border: '1px dashed', borderColor: 'divider' }}>
                                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, letterSpacing: '0.5px' }}>{t('interviewDetail.messages.noData')}</Typography>
                                 </Box>
                             )}
@@ -163,11 +164,11 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                         px: 2.5, 
                                         py: 2, 
                                         alignItems: 'flex-start', 
-                                        bgcolor: alpha(theme.palette.error.main, 0.04), 
+                                        bgcolor: pc.error( 0.04), 
                                         borderRadius: 3, 
                                         mb: 1.5, 
                                         border: '1px solid', 
-                                        borderColor: alpha(theme.palette.error.main, 0.1) 
+                                        borderColor: pc.error( 0.1) 
                                     }}
                                 >
                                     <ListItemIcon sx={{ minWidth: 32, mt: 0.5 }}>
@@ -176,7 +177,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                     <ListItemText primary={item} slotProps={{ primary: { variant: 'body2', lineHeight: 1.6, fontWeight: 700, color: 'error.dark' } }} />
                                 </ListItem>
                             )) : (
-                                <Box sx={{ py: 6, textAlign: 'center', bgcolor: alpha(theme.palette.action.disabled, 0.03), borderRadius: 3, border: '1px dashed', borderColor: 'divider' }}>
+                                <Box sx={{ py: 6, textAlign: 'center', bgcolor: pc.actionDisabled( 0.03), borderRadius: 3, border: '1px dashed', borderColor: 'divider' }}>
                                     <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800, letterSpacing: '0.5px' }}>{t('interviewDetail.messages.noData')}</Typography>
                                 </Box>
                             )}
@@ -187,13 +188,13 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                 <Grid size={12}>
                     <Box sx={{ 
                         p: 5, 
-                        bgcolor: alpha(theme.palette.primary.main, 0.02), 
+                        bgcolor: pc.primary( 0.02), 
                         borderRadius: 4, 
                         borderLeft: '8px solid', 
                         borderLeftColor: 'primary.main', 
                         boxShadow: (theme) => theme.customShadows?.z1,
                         border: '1px solid',
-                        borderColor: alpha(theme.palette.primary.main, 0.1),
+                        borderColor: pc.primary( 0.1),
                         borderLeftWidth: '8px'
                     }}>
                         <Stack direction="row" alignItems="center" spacing={1.5} mb={2.5}>
@@ -216,7 +217,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                             borderRadius: 3,
                                             bgcolor: alpha(theme.palette.common.white, 0.65),
                                             border: '1px solid',
-                                            borderColor: alpha(theme.palette.primary.main, 0.08),
+                                            borderColor: pc.primary( 0.08),
                                         }}
                                     >
                                         <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'primary.main', textTransform: 'uppercase', letterSpacing: 1 }}>
@@ -241,9 +242,9 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                         sx={{
                                             p: 3,
                                             borderRadius: 3,
-                                            bgcolor: alpha(theme.palette.info.main, 0.04),
+                                            bgcolor: pc.info( 0.04),
                                             border: '1px solid',
-                                            borderColor: alpha(theme.palette.info.main, 0.12),
+                                            borderColor: pc.info( 0.12),
                                         }}
                                     >
                                         <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'info.main', textTransform: 'uppercase', letterSpacing: 1 }}>
@@ -260,7 +261,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                         sx={{
                                             p: 3,
                                             borderRadius: 3,
-                                            bgcolor: alpha(theme.palette.action.disabled, 0.03),
+                                            bgcolor: pc.actionDisabled( 0.03),
                                             border: '1px solid',
                                             borderColor: 'divider',
                                         }}
@@ -280,9 +281,9 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                                         sx={{
                                                             p: 2.5,
                                                             borderRadius: 2.5,
-                                                            bgcolor: alpha(theme.palette.background.paper, 0.9),
+                                                            bgcolor: pc.bgPaper( 0.9),
                                                             border: '1px solid',
-                                                            borderColor: alpha(theme.palette.divider, 0.9),
+                                                            borderColor: pc.divider( 0.9),
                                                         }}
                                                     >
                                                         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
@@ -295,7 +296,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                                                     size="small"
                                                                     sx={{
                                                                         fontWeight: 900,
-                                                                        bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                                                        bgcolor: pc.primary( 0.08),
                                                                         color: 'primary.main',
                                                                     }}
                                                                 />

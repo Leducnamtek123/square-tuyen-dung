@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 
 import { ResumeDetailResponse } from '@/types/models';
+import pc from '@/utils/muiColors';
 
 interface CareerGoalsSectionProps {
   profileDetail: ResumeDetailResponse;
@@ -20,7 +21,7 @@ const CareerGoalsSection: React.FC<CareerGoalsSectionProps> = ({ profileDetail }
                     sx={{ 
                         p: 1.25, 
                         borderRadius: 2, 
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        bgcolor: pc.primary( 0.1),
                         color: 'primary.main',
                         display: 'flex'
                     }}
@@ -36,7 +37,7 @@ const CareerGoalsSection: React.FC<CareerGoalsSectionProps> = ({ profileDetail }
                 variant="outlined"
                 sx={{
                     p: 4,
-                    bgcolor: alpha(theme.palette.action.disabled, 0.04),
+                    bgcolor: pc.actionDisabled( 0.04),
                     border: '1px solid',
                     borderColor: 'divider',
                     borderRadius: 3,

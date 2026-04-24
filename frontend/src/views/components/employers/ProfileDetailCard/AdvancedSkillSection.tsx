@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 
 import { ResumeDetailResponse } from '@/types/models';
+import pc from '@/utils/muiColors';
 
 interface AdvancedSkillSectionProps {
   profileDetail: ResumeDetailResponse;
@@ -22,7 +23,7 @@ const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDeta
                     sx={{ 
                         p: 1.25, 
                         borderRadius: 2, 
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        bgcolor: pc.primary( 0.1),
                         color: 'primary.main',
                         display: 'flex'
                     }}
@@ -58,7 +59,7 @@ const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDeta
                                 sx={{ 
                                     height: 8, 
                                     borderRadius: 4,
-                                    bgcolor: alpha(theme.palette.secondary.main, 0.08),
+                                    bgcolor: pc.secondary( 0.08),
                                     '& .MuiLinearProgress-bar': {
                                         borderRadius: 4,
                                         backgroundImage: (theme) => `linear-gradient(to right, ${theme.palette.secondary.light}, ${theme.palette.secondary.main})`
@@ -67,7 +68,7 @@ const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDeta
                             />
                             
                             {index < (profileDetail.skillDetails?.length || 0) - 1 && (
-                                <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: alpha(theme.palette.divider, 0.8) }} />
+                                <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: pc.divider( 0.8) }} />
                             )}
                         </Box>
                     ))}

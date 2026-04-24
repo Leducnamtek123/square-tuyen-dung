@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import React, { useMemo } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import ProfileSearch from '../ProfileSearch';
 import JobSeekerProfile from '../../../../components/Features/JobSeekerProfile';
 import { useEmployerResumes, useToggleSaveResumeOptimistic } from '../hooks/useEmployerQueries';
 import type { Resume } from '@/types/models';
+import pc from '@/utils/muiColors';
 
 const ProfileCardContent: React.FC = () => {
     const { t } = useTranslation('employer');
@@ -79,9 +80,9 @@ const ProfileCardContent: React.FC = () => {
                                     textAlign: 'center', 
                                     py: 15, 
                                     borderRadius: 4, 
-                                    bgcolor: alpha(theme.palette.action.disabled, 0.04),
+                                    bgcolor: pc.actionDisabled( 0.04),
                                     border: '2px dashed',
-                                    borderColor: alpha(theme.palette.divider, 0.6)
+                                    borderColor: pc.divider( 0.6)
                                 }}
                             >
                                 <SearchOffIcon sx={{ fontSize: 80, color: 'text.disabled', mb: 3, opacity: 0.3 }} />
@@ -130,7 +131,7 @@ const ProfileCardContent: React.FC = () => {
                                                     backgroundColor: 'background.paper',
                                                     fontWeight: 800,
                                                     borderRadius: 2,
-                                                    borderColor: alpha(theme.palette.divider, 0.8),
+                                                    borderColor: pc.divider( 0.8),
                                                     height: 44,
                                                     minWidth: 44,
                                                     '&.Mui-selected': {
@@ -140,7 +141,7 @@ const ProfileCardContent: React.FC = () => {
                                                         fontWeight: 1000
                                                     },
                                                     '&:hover': {
-                                                        bgcolor: alpha(theme.palette.primary.main, 0.04),
+                                                        bgcolor: pc.primary( 0.04),
                                                         borderColor: 'primary.main'
                                                     }
                                                 }
@@ -165,4 +166,3 @@ const ProfileCard: React.FC = () => {
 };
 
 export default ProfileCard;
-

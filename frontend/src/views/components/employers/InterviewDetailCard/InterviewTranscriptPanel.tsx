@@ -10,6 +10,7 @@ import { InterviewSession } from '@/types/models';
 import { i18n, TFunction } from 'i18next';
 import type { SSETranscript } from '../../../employerPages/InterviewPages/hooks/useInterviewSSE';
 import type { InterviewTranscript } from '@/types/models';
+import pc from '@/utils/muiColors';
 
 interface InterviewTranscriptPanelProps {
   session: InterviewSession;
@@ -126,11 +127,11 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                             fontWeight: 900, 
                             height: 24, 
                             fontSize: '0.75rem',
-                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                            bgcolor: pc.primary( 0.08),
                             color: 'primary.main',
                             letterSpacing: '0.5px',
                             border: '1px solid',
-                            borderColor: alpha(theme.palette.primary.main, 0.1)
+                            borderColor: pc.primary( 0.1)
                         }} 
                     />
                 )}
@@ -144,7 +145,7 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                 pr: 2, 
                 mr: -2,
                 '&::-webkit-scrollbar': { width: '6px' }, 
-                '&::-webkit-scrollbar-thumb': { bgcolor: alpha(theme.palette.divider, 0.5), borderRadius: '10px' },
+                '&::-webkit-scrollbar-thumb': { bgcolor: pc.divider( 0.5), borderRadius: '10px' },
                 '&::-webkit-scrollbar-track': { bgcolor: 'transparent' }
             }}>
                 {mergedTranscripts.length > 0 ? (
@@ -208,10 +209,10 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                                             elevation={0}
                                             sx={{ 
                                                 p: 3, 
-                                                bgcolor: isInterviewer ? alpha(theme.palette.primary.main, 0.03) : alpha(theme.palette.action.disabled, 0.03), 
+                                                bgcolor: isInterviewer ? pc.primary( 0.03) : pc.actionDisabled( 0.03), 
                                                 borderRadius: isInterviewer ? '0px 20px 20px 20px' : '20px 0px 20px 20px',
                                                 border: '1px solid',
-                                                borderColor: isInterviewer ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.divider, 0.5),
+                                                borderColor: isInterviewer ? pc.primary( 0.1) : pc.divider( 0.5),
                                                 boxShadow: (theme) => isInterviewer ? 'none' : theme.customShadows?.z1
                                             }}
                                         >

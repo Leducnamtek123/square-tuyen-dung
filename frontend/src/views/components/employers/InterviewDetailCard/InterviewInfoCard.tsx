@@ -8,6 +8,7 @@ import AssignmentIcon from '@mui/icons-material/Assignment';
 import EmailIcon from '@mui/icons-material/Email';
 import { InterviewSession } from '@/types/models';
 import { i18n, TFunction } from 'i18next';
+import pc from '@/utils/muiColors';
 
 interface InterviewInfoCardProps {
   session: InterviewSession;
@@ -90,12 +91,12 @@ const InterviewInfoCard: React.FC<InterviewInfoCardProps> = ({ session, t, i18n 
                             sx={{ 
                                 fontWeight: 900, 
                                 borderRadius: 1.5, 
-                                bgcolor: alpha(theme.palette.info.main, 0.08),
+                                bgcolor: pc.info( 0.08),
                                 color: 'info.main',
                                 fontSize: '0.7rem',
                                 letterSpacing: '0.5px',
                                 border: '1px solid',
-                                borderColor: alpha(theme.palette.info.main, 0.1)
+                                borderColor: pc.info( 0.1)
                             }}
                         />
                     </Box>

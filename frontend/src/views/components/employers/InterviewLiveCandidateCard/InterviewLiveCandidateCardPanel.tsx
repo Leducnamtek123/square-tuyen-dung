@@ -21,6 +21,7 @@ import { LiveKitRoom } from '@livekit/components-react';
 import { useTranslation } from 'react-i18next';
 import { type InterviewSession } from '../../../../types/models';
 import { ElapsedTimer, LiveObserverVisualizer, normalizeStatus } from './InterviewLiveCandidateCardPresence';
+import pc from '@/utils/muiColors';
 
 type Props = {
   session: InterviewSession;
@@ -65,7 +66,7 @@ const InterviewLiveCandidateCardPanel = ({
           borderRadius: 3,
           overflow: 'hidden',
           border: '1px solid',
-          borderColor: alpha(theme.palette.divider, 0.9),
+          borderColor: pc.divider( 0.9),
           bgcolor: alpha('#020617', 0.98),
           minHeight: 280,
         }}

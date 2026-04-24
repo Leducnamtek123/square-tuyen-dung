@@ -4,6 +4,7 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import DescriptionIcon from '@mui/icons-material/Description';
 import { SectionCard } from './SectionCard';
 import type { TFunction } from 'i18next';
+import pc from '@/utils/muiColors';
 
 type Props = {
   resumeFileUrl: string;
@@ -61,15 +62,15 @@ const AIAnalysisDrawerResumeSection = ({
       <Box
         sx={{
           border: '1px solid',
-          borderColor: alpha(theme.palette.info.main, 0.2),
+          borderColor: pc.info( 0.2),
           borderRadius: 3,
           overflow: 'hidden',
           height: { xs: 260, sm: 380 },
           bgcolor: '#0f172a',
           position: 'relative',
           backgroundImage: `
-            linear-gradient(${alpha(theme.palette.info.main, 0.08)} 1px, transparent 1px),
-            linear-gradient(90deg, ${alpha(theme.palette.info.main, 0.08)} 1px, transparent 1px),
+            linear-gradient(${pc.info( 0.08)} 1px, transparent 1px),
+            linear-gradient(90deg, ${pc.info( 0.08)} 1px, transparent 1px),
             radial-gradient(110% 90% at 10% 5%, rgba(15,23,42,0.55) 0%, rgba(2,6,23,0.98) 100%)
           `,
           backgroundSize: '22px 22px, 22px 22px, cover',
@@ -101,10 +102,10 @@ const AIAnalysisDrawerResumeSection = ({
           </Stack>
         )}
 
-        <Box sx={{ position: 'absolute', top: 12, left: 12, width: 24, height: 24, borderTop: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, borderLeft: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, pointerEvents: 'none' }} />
-        <Box sx={{ position: 'absolute', top: 12, right: 12, width: 24, height: 24, borderTop: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, borderRight: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, pointerEvents: 'none' }} />
-        <Box sx={{ position: 'absolute', bottom: 12, left: 12, width: 24, height: 24, borderBottom: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, borderLeft: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, pointerEvents: 'none' }} />
-        <Box sx={{ position: 'absolute', bottom: 12, right: 12, width: 24, height: 24, borderBottom: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, borderRight: `2px solid ${alpha(theme.palette.info.main, 0.5)}`, pointerEvents: 'none' }} />
+        <Box sx={{ position: 'absolute', top: 12, left: 12, width: 24, height: 24, borderTop: `2px solid ${pc.info( 0.5)}`, borderLeft: `2px solid ${pc.info( 0.5)}`, pointerEvents: 'none' }} />
+        <Box sx={{ position: 'absolute', top: 12, right: 12, width: 24, height: 24, borderTop: `2px solid ${pc.info( 0.5)}`, borderRight: `2px solid ${pc.info( 0.5)}`, pointerEvents: 'none' }} />
+        <Box sx={{ position: 'absolute', bottom: 12, left: 12, width: 24, height: 24, borderBottom: `2px solid ${pc.info( 0.5)}`, borderLeft: `2px solid ${pc.info( 0.5)}`, pointerEvents: 'none' }} />
+        <Box sx={{ position: 'absolute', bottom: 12, right: 12, width: 24, height: 24, borderBottom: `2px solid ${pc.info( 0.5)}`, borderRight: `2px solid ${pc.info( 0.5)}`, pointerEvents: 'none' }} />
 
         {isProcessing && (
           <Box
@@ -114,8 +115,8 @@ const AIAnalysisDrawerResumeSection = ({
               right: 0,
               top: `calc(${scanLinePosition}% - 18px)`,
               height: 34,
-              background: `linear-gradient(180deg, transparent 0%, ${alpha(theme.palette.info.main, 0.4)} 45%, transparent 100%)`,
-              boxShadow: `0 0 20px ${alpha(theme.palette.info.main, 0.4)}, 0 0 40px ${alpha(theme.palette.info.main, 0.2)}`,
+              background: `linear-gradient(180deg, transparent 0%, ${pc.info( 0.4)} 45%, transparent 100%)`,
+              boxShadow: `0 0 20px ${pc.info( 0.4)}, 0 0 40px ${pc.info( 0.2)}`,
               pointerEvents: 'none',
             }}
           />

@@ -17,6 +17,7 @@ import dayjs from 'dayjs';
 import PieChartClient from '@/components/Common/Charts/PieChartClient';
 import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerRecruitmentByRank } from '../../hooks/useEmployerQueries';
+import pc from '@/utils/muiColors';
 
 interface HiringAcademicChartProps {
   title: string;
@@ -139,7 +140,7 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
                 justifyContent="center"
                 sx={{
                   height: 320,
-                  bgcolor: alpha(theme.palette.action.disabled, 0.05),
+                  bgcolor: pc.actionDisabled( 0.05),
                   borderRadius: 3,
                   border: '1px dashed',
                   borderColor: 'divider'

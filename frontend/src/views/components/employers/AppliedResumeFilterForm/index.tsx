@@ -15,6 +15,7 @@ import ApartmentIcon from '@mui/icons-material/Apartment';
 import EngineeringIcon from '@mui/icons-material/Engineering';
 import WcIcon from '@mui/icons-material/Wc';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import pc from '@/utils/muiColors';
 
 export interface AppliedResumeFilterData {
   cityId?: number | string | null;
@@ -46,7 +47,7 @@ const SectionHeader = ({ theme, icon, title }: SectionHeaderProps) => (
         display: 'flex',
         p: 0.5,
         borderRadius: 1,
-        bgcolor: alpha(theme.palette.primary.main, 0.1),
+        bgcolor: pc.primary( 0.1),
         color: 'primary.main',
       }}
     >
@@ -74,9 +75,9 @@ const AppliedResumeFilterForm: React.FC<AppliedResumeFilterFormProps> = ({ handl
   const inputSx = {
     '& .MuiOutlinedInput-root': {
         borderRadius: 2.5,
-        backgroundColor: alpha(theme.palette.action.disabled, 0.03),
-        '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
-        '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) }
+        backgroundColor: pc.actionDisabled( 0.03),
+        '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
+        '& fieldset': { borderColor: pc.divider( 0.8) }
     }
   };
 

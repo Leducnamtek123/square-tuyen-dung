@@ -10,6 +10,7 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 import RichTextEditorCustom from '../../../../components/Common/Controls/RichTextEditorCustom';
 import CheckboxCustom from '../../../../components/Common/Controls/CheckboxCustom';
 import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
+import pc from '@/utils/muiColors';
 
 export interface SendMailData {
   fullName?: string;
@@ -75,9 +76,9 @@ const SendMailCardContent = ({
   const inputSx = {
     '& .MuiOutlinedInput-root': {
       borderRadius: 2.5,
-      backgroundColor: alpha(theme.palette.action.disabled, 0.03),
-      '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
-      '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) },
+      backgroundColor: pc.actionDisabled( 0.03),
+      '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
+      '& fieldset': { borderColor: pc.divider( 0.8) },
     },
   };
 
@@ -133,9 +134,9 @@ const SendMailCardContent = ({
               sx={{
                 p: 2,
                 borderRadius: 2,
-                bgcolor: alpha(theme.palette.primary.main, 0.05),
+                bgcolor: pc.primary( 0.05),
                 border: '1px solid',
-                borderColor: alpha(theme.palette.primary.main, 0.1),
+                borderColor: pc.primary( 0.1),
               }}
             >
               <CheckboxCustom

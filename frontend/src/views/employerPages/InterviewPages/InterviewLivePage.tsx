@@ -23,6 +23,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import interviewService from '../../../services/interviewService';
 import { type InterviewSession } from '../../../types/models';
 import InterviewLiveCandidateCard from '../../../views/components/employers/InterviewLiveCandidateCard';
+import pc from '@/utils/muiColors';
 
 const ACTIVE_STATUSES = new Set(['in_progress', 'calibration', 'connecting', 'active']);
 
@@ -209,9 +210,9 @@ const InterviewLivePage = () => {
       )}
 
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} mb={4}>
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.primary.main, 0.15), bgcolor: alpha(theme.palette.primary.main, 0.04), flex: 1, minWidth: 160 }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: pc.primary( 0.15), bgcolor: pc.primary( 0.04), flex: 1, minWidth: 160 }}>
           <Stack direction="row" alignItems="center" spacing={1.5} mb={1.5}>
-            <Avatar sx={{ width: 36, height: 36, bgcolor: alpha(theme.palette.primary.main, 0.12), color: theme.palette.primary.main }}>
+            <Avatar sx={{ width: 36, height: 36, bgcolor: pc.primary( 0.12), color: theme.palette.primary.main }}>
               <TrendingUpIcon sx={{ fontSize: 20 }} />
             </Avatar>
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
@@ -223,9 +224,9 @@ const InterviewLivePage = () => {
           </Typography>
         </Paper>
 
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.info.main, 0.15), bgcolor: alpha(theme.palette.info.main, 0.04), flex: 1, minWidth: 160 }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: pc.info( 0.15), bgcolor: pc.info( 0.04), flex: 1, minWidth: 160 }}>
           <Stack direction="row" alignItems="center" spacing={1.5} mb={1.5}>
-            <Avatar sx={{ width: 36, height: 36, bgcolor: alpha(theme.palette.info.main, 0.12), color: theme.palette.info.main }}>
+            <Avatar sx={{ width: 36, height: 36, bgcolor: pc.info( 0.12), color: theme.palette.info.main }}>
               <ScheduleIcon sx={{ fontSize: 20 }} />
             </Avatar>
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
@@ -237,9 +238,9 @@ const InterviewLivePage = () => {
           </Typography>
         </Paper>
 
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: alpha(theme.palette.success.main, 0.15), bgcolor: alpha(theme.palette.success.main, 0.04), flex: 1, minWidth: 160 }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid', borderColor: pc.success( 0.15), bgcolor: pc.success( 0.04), flex: 1, minWidth: 160 }}>
           <Stack direction="row" alignItems="center" spacing={1.5} mb={1.5}>
-            <Avatar sx={{ width: 36, height: 36, bgcolor: alpha(theme.palette.success.main, 0.12), color: theme.palette.success.main }}>
+            <Avatar sx={{ width: 36, height: 36, bgcolor: pc.success( 0.12), color: theme.palette.success.main }}>
               <CheckCircleIcon sx={{ fontSize: 20 }} />
             </Avatar>
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
@@ -273,7 +274,7 @@ const InterviewLivePage = () => {
             borderRadius: 4,
             border: '1px dashed',
             borderColor: 'divider',
-            bgcolor: alpha(theme.palette.background.paper, 0.8),
+            bgcolor: pc.bgPaper( 0.8),
             textAlign: 'center',
           }}
         >

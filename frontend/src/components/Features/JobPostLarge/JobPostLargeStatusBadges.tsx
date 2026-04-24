@@ -3,6 +3,7 @@ import { Box, Typography, Tooltip } from '@mui/material';
 import { alpha, type Theme } from '@mui/material/styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBolt, faFire } from '@fortawesome/free-solid-svg-icons';
+import pc from '@/utils/muiColors';
 
 type StatusBadgeProps = {
   theme: Theme;
@@ -22,20 +23,20 @@ export const UrgentBadge = ({ theme }: StatusBadgeProps) => (
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: `0 0 12px ${alpha(theme.palette.warning.main, 0.5)}`,
+        boxShadow: `0 0 12px ${pc.warning( 0.5)}`,
         animation: 'pulse 2s infinite',
         '@keyframes pulse': {
           '0%': {
             transform: 'scale(1)',
-            boxShadow: `0 0 0 0 ${alpha(theme.palette.warning.main, 0.5)}`,
+            boxShadow: `0 0 0 0 ${pc.warning( 0.5)}`,
           },
           '70%': {
             transform: 'scale(1.05)',
-            boxShadow: `0 0 0 10px ${alpha(theme.palette.warning.main, 0)}`,
+            boxShadow: `0 0 0 10px ${pc.warning( 0)}`,
           },
           '100%': {
             transform: 'scale(1)',
-            boxShadow: `0 0 0 0 ${alpha(theme.palette.warning.main, 0)}`,
+            boxShadow: `0 0 0 0 ${pc.warning( 0)}`,
           },
         },
       }}

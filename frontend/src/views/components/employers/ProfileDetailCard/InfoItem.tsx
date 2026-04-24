@@ -1,6 +1,7 @@
 import React from 'react';
 import { Box, Typography, Stack, alpha, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import pc from '@/utils/muiColors';
 
 interface InfoItemProps {
   label: string;
@@ -20,7 +21,7 @@ const InfoItem: React.FC<InfoItemProps> = ({ label, value, icon }) => {
             sx={{ 
               color: 'primary.main', 
               display: 'flex',
-              bgcolor: alpha(theme.palette.primary.main, 0.08),
+              bgcolor: pc.primary( 0.08),
               p: 0.5,
               borderRadius: 1,
               fontSize: 18

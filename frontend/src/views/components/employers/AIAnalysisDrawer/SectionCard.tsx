@@ -1,5 +1,6 @@
 import React from 'react';
 import { Paper, Stack, Box, Typography, alpha, useTheme, Theme } from '@mui/material';
+import pc from '@/utils/muiColors';
 
 export const SectionCard: React.FC<{
   title: string;
@@ -17,7 +18,7 @@ export const SectionCard: React.FC<{
         p: 2.5,
         mb: 2,
         border: '1px solid',
-        borderColor: alpha(theme.palette.divider, 0.8),
+        borderColor: pc.divider( 0.8),
         borderRadius: 3,
         bgcolor: 'background.paper',
         transition: 'all 0.2s ease-in-out',

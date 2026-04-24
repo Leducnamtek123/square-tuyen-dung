@@ -17,6 +17,7 @@ import { useConfig } from '@/hooks/useConfig';
 import { JobSeekerProfile } from '../../../../types/models';
 import type { Career } from '../../../../types/models';
 import type { City } from '../../../../types/models';
+import pc from '@/utils/muiColors';
 
 type ConfigDict = Record<string, string>;
 
@@ -49,7 +50,7 @@ const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }
                     sx={{ 
                         p: 1.25, 
                         borderRadius: 2, 
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        bgcolor: pc.primary( 0.1),
                         color: 'primary.main',
                         display: 'flex'
                     }}

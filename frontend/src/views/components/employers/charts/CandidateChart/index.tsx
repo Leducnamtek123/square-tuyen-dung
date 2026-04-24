@@ -17,6 +17,7 @@ import dayjs from 'dayjs';
 import LineChartClient from '@/components/Common/Charts/LineChartClient';
 import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerCandidateStatistics } from '../../hooks/useEmployerQueries';
+import pc from '@/utils/muiColors';
 
 interface CandidateChartProps {
   title: string;
@@ -160,7 +161,7 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
                 justifyContent="center"
                 sx={{
                   height: 320,
-                  bgcolor: alpha(theme.palette.action.disabled, 0.05),
+                  bgcolor: pc.actionDisabled( 0.05),
                   borderRadius: 3,
                   border: '1px dashed',
                   borderColor: 'divider'

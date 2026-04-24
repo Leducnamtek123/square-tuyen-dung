@@ -15,6 +15,7 @@ import RefreshIcon from '@mui/icons-material/Refresh';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import { useConfig } from '@/hooks/useConfig';
+import pc from '@/utils/muiColors';
 
 export interface SavedResumeFilterValues {
   kw: string;
@@ -54,9 +55,9 @@ const SavedResumeFilterForm: React.FC<SavedResumeFilterFormProps> = ({ handleFil
   const inputSx = {
     '& .MuiOutlinedInput-root': {
         borderRadius: 2.5,
-        backgroundColor: alpha(theme.palette.action.disabled, 0.03),
-        '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
-        '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) }
+        backgroundColor: pc.actionDisabled( 0.03),
+        '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
+        '& fieldset': { borderColor: pc.divider( 0.8) }
     }
   };
 

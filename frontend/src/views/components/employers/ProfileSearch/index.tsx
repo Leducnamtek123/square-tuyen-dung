@@ -32,6 +32,7 @@ import SingleSelectCustom from '../../../../components/Common/Controls/SingleSel
 import { resetSearchResume, searchResume } from '../../../../redux/filterSlice';
 import type { ResumeFilter } from '../../../../redux/filterSlice';
 import { useConfig } from '@/hooks/useConfig';
+import pc from '@/utils/muiColors';
 
 interface ProfileSearchValues {
   kw: string;
@@ -89,9 +90,9 @@ const FilterGroup = ({
       sx={{
         '& .MuiOutlinedInput-root': {
           borderRadius: 2.5,
-          backgroundColor: alpha(theme.palette.action.disabled, 0.03),
-          '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
-          '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) },
+          backgroundColor: pc.actionDisabled( 0.03),
+          '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
+          '& fieldset': { borderColor: pc.divider( 0.8) },
         },
       }}
     />
@@ -143,7 +144,7 @@ const ProfileSearch: React.FC = () => {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 3.5,
-                    backgroundColor: alpha(theme.palette.action.disabled, 0.05),
+                    backgroundColor: pc.actionDisabled( 0.05),
                     border: 'none',
                     '& fieldset': { border: 'none' },
                     height: 56,
@@ -161,7 +162,7 @@ const ProfileSearch: React.FC = () => {
                 sx={{
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 3.5,
-                    backgroundColor: alpha(theme.palette.action.disabled, 0.05),
+                    backgroundColor: pc.actionDisabled( 0.05),
                     border: 'none',
                     '& fieldset': { border: 'none' },
                     height: 56,
@@ -224,7 +225,7 @@ const ProfileSearch: React.FC = () => {
                     height: 44,
                     borderRadius: 2.5,
                     p: 0,
-                    bgcolor: alpha(theme.palette.error.main, 0.08),
+                    bgcolor: pc.error( 0.08),
                     color: 'error.main',
                     '&:hover': { bgcolor: 'error.main', color: '#fff' },
                   }}

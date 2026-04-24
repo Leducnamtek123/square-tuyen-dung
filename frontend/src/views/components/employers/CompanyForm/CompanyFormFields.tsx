@@ -10,6 +10,7 @@ import type { TFunction } from "i18next";
 import type { SystemConfig, SelectOption } from "../../../../types/models";
 
 import type { CompanyFormValues } from './types';
+import pc from '@/utils/muiColors';
 
 interface CompanyFormFieldsProps {
   control: Control<CompanyFormValues>;
@@ -33,9 +34,9 @@ const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
   const inputSx = {
     '& .MuiOutlinedInput-root': {
         borderRadius: 2.5,
-        backgroundColor: alpha(theme.palette.action.disabled, 0.03),
-        '&:hover': { bgcolor: alpha(theme.palette.action.disabled, 0.06) },
-        '& fieldset': { borderColor: alpha(theme.palette.divider, 0.8) }
+        backgroundColor: pc.actionDisabled( 0.03),
+        '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
+        '& fieldset': { borderColor: pc.divider( 0.8) }
     }
   };
 
@@ -90,7 +91,7 @@ const CompanyFormFields: React.FC<CompanyFormFieldsProps> = ({
         <TextFieldCustom name="location.lng" title={t('companyForm.title.longitude', 'Longitude')} showRequired={true} placeholder={t('companyForm.placeholder.enterlongitudecoordinateonthemap', 'Enter longitude coordinate on the map.')} helperText={t('companyForm.helperText.automaticallyfilledifyouchooseasuggestedaddress', 'Automatically filled if you choose a suggested address.')} control={control} sx={inputSx} />
       </Grid>
       <Grid size={12}>
-        <Paper elevation={0} sx={{ p: 3, borderRadius: 2.5, border: '1px solid', borderColor: 'divider', bgcolor: alpha(theme.palette.action.disabled, 0.03) }}>
+        <Paper elevation={0} sx={{ p: 3, borderRadius: 2.5, border: '1px solid', borderColor: 'divider', bgcolor: pc.actionDisabled( 0.03) }}>
           <RichTextEditorCustom name="description" control={control} title={t('companyForm.title.additionaldescription', 'Additional Description')} />
         </Paper>
       </Grid>

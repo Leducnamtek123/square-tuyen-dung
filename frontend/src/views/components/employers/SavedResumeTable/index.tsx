@@ -28,6 +28,7 @@ import { salaryString } from '../../../../utils/customData';
 import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import type { ResumeSaved } from '@/types/models';
+import pc from '@/utils/muiColors';
 
 interface SavedResumeTableProps {
   rows: ResumeSaved[];
@@ -64,11 +65,11 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
       cell: (info) => (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
           {info.row.original.resume?.type === CV_TYPES.cvWebsite ? (
-            <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: alpha(theme.palette.primary.main, 0.08), color: 'primary.main', display: 'flex' }}>
+            <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: pc.primary( 0.08), color: 'primary.main', display: 'flex' }}>
               <DescriptionIcon sx={{ fontSize: 18 }} />
             </Box>
           ) : (
-            <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: alpha(theme.palette.error.main, 0.08), color: 'error.main', display: 'flex' }}>
+            <Box sx={{ p: 0.5, borderRadius: 1, bgcolor: pc.error( 0.08), color: 'error.main', display: 'flex' }}>
               <PictureAsPdfIcon sx={{ fontSize: 18 }} />
             </Box>
           )}
@@ -123,10 +124,10 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
               borderRadius: 1.5,
               textTransform: 'uppercase',
               letterSpacing: '0.5px',
-              bgcolor: alpha(theme.palette.primary.main, 0.08),
+              bgcolor: pc.primary( 0.08),
               color: 'primary.main',
               border: '1px solid',
-              borderColor: alpha(theme.palette.primary.main, 0.1)
+              borderColor: pc.primary( 0.1)
             }} 
           />
         ) : (
@@ -174,9 +175,9 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
               color="primary"
               onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`)}
               sx={{ 
-                bgcolor: alpha(theme.palette.primary.main, 0.06), 
+                bgcolor: pc.primary( 0.06), 
                 borderRadius: 1.5,
-                '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.12) }
+                '&:hover': { bgcolor: pc.primary( 0.12) }
               }}
             >
               <RemoveRedEyeIcon fontSize="small" />

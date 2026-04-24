@@ -8,6 +8,7 @@ import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import TimeAgo from '../../../../components/Common/TimeAgo';
 
 import { ResumeDetailResponse } from '@/types/models';
+import pc from '@/utils/muiColors';
 
 interface ExperienceSectionProps {
   profileDetail: ResumeDetailResponse;
@@ -26,7 +27,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ profileDetail }) 
                     sx={{ 
                         p: 1.25, 
                         borderRadius: 2, 
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        bgcolor: pc.primary( 0.1),
                         color: 'primary.main',
                         display: 'flex'
                     }}
@@ -92,7 +93,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ profileDetail }) 
                                 </Grid>
                             </Grid>
                             {index < (profileDetail.experiencesDetails?.length || 0) - 1 && (
-                                <Divider sx={{ mt: 5, borderStyle: 'dashed', borderColor: alpha(theme.palette.divider, 0.8) }} />
+                                <Divider sx={{ mt: 5, borderStyle: 'dashed', borderColor: pc.divider( 0.8) }} />
                             )}
                         </Box>
                     ))}

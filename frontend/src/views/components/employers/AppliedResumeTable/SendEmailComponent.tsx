@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Tooltip, alpha, useTheme } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import ForwardToInboxIcon from '@mui/icons-material/ForwardToInbox';
@@ -12,6 +12,7 @@ import BackdropLoading from '../../../../components/Common/Loading/BackdropLoadi
 import jobPostActivityService from '../../../../services/jobPostActivityService';
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
+import pc from '@/utils/muiColors';
 
 interface SendEmailComponentProps {
   jobPostActivityId: string;
@@ -75,12 +76,12 @@ const SendEmailComponent: React.FC<SendEmailComponentProps> = ({
             boxShadow: 'none',
             fontSize: '0.7rem',
             py: 0.6,
-            bgcolor: sentEmail ? alpha(theme.palette.success.main, 0.1) : alpha(theme.palette.secondary.main, 0.1),
+            bgcolor: sentEmail ? pc.success( 0.1) : pc.secondary( 0.1),
             color: sentEmail ? 'success.main' : 'secondary.main',
             border: '1px solid',
-            borderColor: sentEmail ? alpha(theme.palette.success.main, 0.1) : alpha(theme.palette.secondary.main, 0.1),
+            borderColor: sentEmail ? pc.success( 0.1) : pc.secondary( 0.1),
             '&:hover': {
-                bgcolor: sentEmail ? alpha(theme.palette.success.main, 0.15) : alpha(theme.palette.secondary.main, 0.15),
+                bgcolor: sentEmail ? pc.success( 0.15) : pc.secondary( 0.15),
                 borderColor: sentEmail ? 'success.main' : 'secondary.main',
                 boxShadow: 'none'
             },

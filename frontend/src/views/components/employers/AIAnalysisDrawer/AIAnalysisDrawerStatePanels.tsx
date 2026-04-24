@@ -23,6 +23,7 @@ import { SkillChipList } from './SkillChipList';
 import { SectionCard } from './SectionCard';
 import type { AIAnalysisData } from './types';
 import type { TFunction } from 'i18next';
+import pc from '@/utils/muiColors';
 
 type Props = {
   data: AIAnalysisData | null;
@@ -57,7 +58,7 @@ const AIAnalysisDrawerStatePanels = ({
           p: 3,
           mb: 2,
           border: '1px solid',
-          borderColor: alpha(theme.palette.info.main, 0.3),
+          borderColor: pc.info( 0.3),
           borderRadius: 3,
           background: `linear-gradient(135deg, ${theme.palette.info.dark} 0%, ${alpha(theme.palette.info.dark, 0.8)} 100%)`,
           boxShadow: (muiTheme) => muiTheme.customShadows?.info,
@@ -106,9 +107,9 @@ const AIAnalysisDrawerStatePanels = ({
           p: 4,
           mb: 2,
           border: '1px solid',
-          borderColor: alpha(theme.palette.error.main, 0.2),
+          borderColor: pc.error( 0.2),
           borderRadius: 3,
-          bgcolor: alpha(theme.palette.error.main, 0.04),
+          bgcolor: pc.error( 0.04),
           textAlign: 'center',
         }}
       >
@@ -144,14 +145,14 @@ const AIAnalysisDrawerStatePanels = ({
           p: 5,
           mb: 2,
           border: '2px dashed',
-          borderColor: alpha(theme.palette.primary.main, 0.3),
+          borderColor: pc.primary( 0.3),
           borderRadius: 4,
           textAlign: 'center',
-          background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.02)} 0%, ${alpha(theme.palette.primary.main, 0.05)} 100%)`,
+          background: `linear-gradient(135deg, ${pc.primary( 0.02)} 0%, ${pc.primary( 0.05)} 100%)`,
           transition: 'all 0.3s ease',
           '&:hover': {
             borderColor: 'primary.main',
-            bgcolor: alpha(theme.palette.primary.main, 0.06),
+            bgcolor: pc.primary( 0.06),
           },
         }}
       >
@@ -159,7 +160,7 @@ const AIAnalysisDrawerStatePanels = ({
           sx={{
             p: 2,
             borderRadius: '50%',
-            bgcolor: alpha(theme.palette.primary.main, 0.1),
+            bgcolor: pc.primary( 0.1),
             display: 'inline-flex',
             mb: 2,
           }}
@@ -205,9 +206,9 @@ const AIAnalysisDrawerStatePanels = ({
           p: 2.5,
           mb: 2,
           border: '1px solid',
-          borderColor: alpha(theme.palette.success.main, 0.2),
+          borderColor: pc.success( 0.2),
           borderRadius: 3,
-          background: `linear-gradient(135deg, ${alpha(theme.palette.success.main, 0.04)} 0%, ${alpha(theme.palette.success.main, 0.08)} 100%)`,
+          background: `linear-gradient(135deg, ${pc.success( 0.04)} 0%, ${pc.success( 0.08)} 100%)`,
           boxShadow: (muiTheme) => muiTheme.customShadows?.success,
         }}
       >
@@ -232,7 +233,7 @@ const AIAnalysisDrawerStatePanels = ({
         sx={{
           mb: 2,
           border: '1px solid',
-          borderColor: alpha(theme.palette.divider, 0.8),
+          borderColor: pc.divider( 0.8),
           borderRadius: 3,
           bgcolor: 'background.paper',
           boxShadow: (muiTheme) => muiTheme.customShadows?.z1,

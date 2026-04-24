@@ -33,6 +33,7 @@ import dayjs, { Dayjs } from "dayjs";
 import BarChartClient from '@/components/Common/Charts/BarChartClient';
 import RangePickerCustom from "../../../../../components/Common/Controls/RangePickerCustom";
 import { useEmployerRecruitmentStatistics } from '../../hooks/useEmployerQueries';
+import pc from '@/utils/muiColors';
 
 interface RecruitmentChartProps {
   title: string;
@@ -186,7 +187,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
                 justifyContent="center"
                 sx={{
                   height: 320,
-                  bgcolor: alpha(theme.palette.action.disabled, 0.05),
+                  bgcolor: pc.actionDisabled( 0.05),
                   borderRadius: 3,
                   border: '1px dashed',
                   borderColor: 'divider'

@@ -23,6 +23,7 @@ import DataTable from '../../../components/Common/DataTable';
 import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
 import type { CellContext as ReactTableCellContext } from '@tanstack/react-table';
 import useDebounce from '../../../hooks/useDebounce';
+import pc from '@/utils/muiColors';
 
 interface VideoCardProps {
   session: InterviewSession;
@@ -271,7 +272,7 @@ const InterviewHistoryPage = () => {
               href={`/${ROUTES.EMPLOYER.INTERVIEW_DETAIL.replace(':id', row.original.id.toString())}`}
               color="primary"
               size="small"
-              sx={{ bgcolor: alpha(theme.palette.primary.main, 0.08) }}
+              sx={{ bgcolor: pc.primary( 0.08) }}
             >
               <VisibilityIcon fontSize="small" />
             </IconButton>
@@ -311,7 +312,7 @@ const InterviewHistoryPage = () => {
           p: 3,
           mb: 4,
           borderRadius: 3,
-          bgcolor: alpha(theme.palette.background.default, 0.5),
+          bgcolor: pc.bgDefault( 0.5),
           border: '1px solid',
           borderColor: 'divider',
         }}

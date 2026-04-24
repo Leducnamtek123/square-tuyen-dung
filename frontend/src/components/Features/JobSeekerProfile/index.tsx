@@ -31,6 +31,7 @@ import { tConfig } from '@/utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import type { Theme as StylesTheme } from '@mui/material/styles';
 import type { UserDict } from '@/types/models';
+import pc from '@/utils/muiColors';
 
 interface JobSeekerProfileProps {
   id: string | number;
@@ -94,7 +95,7 @@ const JobSeekerProfile = ({
                 overflow: 'visible',
                 '&:hover': {
                     borderColor: 'primary.main',
-                    bgcolor: alpha(theme.palette.primary.main, 0.02),
+                    bgcolor: pc.primary( 0.02),
                     transform: 'translateY(-4px)',
                     boxShadow: (theme: StylesTheme & { customShadows?: Record<string, string> }) => theme.customShadows?.z12,
                     '& .profile-actions': { opacity: 1, transform: 'translateX(0)' }
@@ -142,10 +143,10 @@ const JobSeekerProfile = ({
                                     fontWeight: 800, 
                                     height: 22, 
                                     fontSize: '0.65rem',
-                                    bgcolor: alpha(theme.palette.success.main, 0.08),
+                                    bgcolor: pc.success( 0.08),
                                     color: 'success.dark',
                                     border: '1px solid',
-                                    borderColor: alpha(theme.palette.success.main, 0.1)
+                                    borderColor: pc.success( 0.1)
                                 }}
                             />
                         )}
@@ -176,7 +177,7 @@ const JobSeekerProfile = ({
                             label={salaryString(salaryMin, salaryMax) || t('common:labels.notUpdated')}
                             sx={{ 
                                 fontWeight: 800, 
-                                bgcolor: alpha(theme.palette.secondary.main, 0.08), 
+                                bgcolor: pc.secondary( 0.08), 
                                 color: 'secondary.main', 
                                 border: 'none',
                                 px: 0.5
@@ -188,7 +189,7 @@ const JobSeekerProfile = ({
                             label={tConfig(String(allConfig?.experienceDict?.[experience] || '')) || t('common:labels.notUpdated')}
                             sx={{ 
                                 fontWeight: 800, 
-                                bgcolor: alpha(theme.palette.primary.main, 0.08), 
+                                bgcolor: pc.primary( 0.08), 
                                 color: 'primary.main', 
                                 border: 'none',
                                 px: 0.5
@@ -200,7 +201,7 @@ const JobSeekerProfile = ({
                             label={tConfig(String(allConfig?.cityDict?.[city] || '')) || t('common:labels.notUpdated')}
                             sx={{ 
                                 fontWeight: 800, 
-                                bgcolor: alpha(theme.palette.info.main, 0.08), 
+                                bgcolor: pc.info( 0.08), 
                                 color: 'info.main', 
                                 border: 'none',
                                 px: 0.5
@@ -233,7 +234,7 @@ const JobSeekerProfile = ({
                                 }}
                                 sx={{
                                     color: isSaved ? 'error.main' : 'text.disabled',
-                                    bgcolor: isSaved ? alpha(theme.palette.error.main, 0.08) : alpha(theme.palette.action.disabled, 0.05),
+                                    bgcolor: isSaved ? pc.error( 0.08) : pc.actionDisabled( 0.05),
                                     '&:hover': { 
                                         bgcolor: isSaved ? 'error.main' : 'text.primary', 
                                         color: '#fff',
@@ -249,7 +250,7 @@ const JobSeekerProfile = ({
                                 size="small"
                                 sx={{
                                     color: 'primary.main',
-                                    bgcolor: alpha(theme.palette.primary.main, 0.08),
+                                    bgcolor: pc.primary( 0.08),
                                     '&:hover': { 
                                         bgcolor: 'primary.main', 
                                         color: '#fff',
@@ -275,12 +276,12 @@ const JobSeekerProfile = ({
                                 display: 'flex', 
                                 alignItems: 'center', 
                                 gap: 0.75, 
-                                bgcolor: alpha(theme.palette.primary.main, 0.05), 
+                                bgcolor: pc.primary( 0.05), 
                                 px: 1.5, 
                                 py: 0.5, 
                                 borderRadius: 1.5,
                                 border: '1px solid',
-                                borderColor: alpha(theme.palette.primary.main, 0.1)
+                                borderColor: pc.primary( 0.1)
                             }}
                         >
                             <RemoveRedEyeOutlinedIcon sx={{ fontSize: 14 }} />

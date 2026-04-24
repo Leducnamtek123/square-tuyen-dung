@@ -29,6 +29,7 @@ import DateTimePickerCustom from '../../../../components/Common/Controls/DateTim
 import type { FormValues } from './types';
 import type { Question, QuestionGroup } from '../../../../types/models';
 import type { TFunction } from 'i18next';
+import pc from '@/utils/muiColors';
 
 type Props = {
   t: TFunction;
@@ -149,10 +150,10 @@ const InterviewCreateCardQuestionSection = ({
                           sx={{
                             fontWeight: 900,
                             borderRadius: 1.5,
-                            bgcolor: alpha(theme.palette.primary.main, 0.08),
+                            bgcolor: pc.primary( 0.08),
                             color: 'primary.main',
                             border: '1px solid',
-                            borderColor: alpha(theme.palette.primary.main, 0.1),
+                            borderColor: pc.primary( 0.1),
                             fontSize: '0.75rem',
                           }}
                         />

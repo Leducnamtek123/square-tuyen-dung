@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, IconButton, Stack, Typography, alpha, useTheme } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import PsychologyIcon from '@mui/icons-material/Psychology';
+import pc from '@/utils/muiColors';
 
 type Props = {
   title: React.ReactNode;
@@ -29,7 +30,7 @@ const AIAnalysisDrawerHeader = ({ title, subtitle, onClose }: Props) => {
     <Box
       sx={{
         ...DRAWER_HEADER_STYLES,
-        borderColor: alpha(theme.palette.divider, 0.8),
+        borderColor: pc.divider( 0.8),
       }}
     >
       <Stack direction="row" spacing={2} alignItems="center">
@@ -37,7 +38,7 @@ const AIAnalysisDrawerHeader = ({ title, subtitle, onClose }: Props) => {
           sx={{
             p: 1,
             borderRadius: 1.5,
-            bgcolor: alpha(theme.palette.primary.main, 0.1),
+            bgcolor: pc.primary( 0.1),
             color: 'primary.main',
             display: 'flex',
           }}
@@ -62,8 +63,8 @@ const AIAnalysisDrawerHeader = ({ title, subtitle, onClose }: Props) => {
         onClick={onClose}
         size="small"
         sx={{
-          bgcolor: alpha(theme.palette.action.disabled, 0.05),
-          '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.1), color: 'error.main' },
+          bgcolor: pc.actionDisabled( 0.05),
+          '&:hover': { bgcolor: pc.error( 0.1), color: 'error.main' },
         }}
       >
         <CloseIcon fontSize="small" />
