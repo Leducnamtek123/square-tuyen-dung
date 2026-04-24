@@ -349,7 +349,18 @@
       "detailedFeedback": "Detailed Feedback",
       "strengths": "Strengths",
       "weaknesses": "Weaknesses",
-      "feedback": "Detailed Feedback"
+      "feedback": "Detailed Feedback",
+      "softSkills": "Soft Skills",
+      "confidence": "Confidence",
+      "clarity": "Clarity",
+      "tone": "Tone",
+      "culturalFit": "Cultural Fit",
+      "questionPerformance": "Question Performance",
+      "question": "Question"
+    },
+    "tooltips": {
+      "cannotJoin": "Cannot join at this time",
+      "forceEndNow": "End this interview immediately"
     },
     "messages": {
       "notFound": "Interview session information not found",

@@ -245,8 +245,8 @@
       "aiTriggerSuccess": "Bắt đầu đánh giá AI",
       "notFound": "Không tìm thấy phỏng vấn",
       "notFoundDesc": "Phỏng vấn bạn đang tìm không tồn tại",
-      "recordingPending": "Video ?ang ???c x? l?",
-      "recordingPendingDesc": "B?n ghi video s? hi?n th? ? ??y sau khi x? l? xong"
+      "recordingPending": "Video đang được xử lý",
+      "recordingPendingDesc": "Bản ghi video sẽ hiển thị ở đây sau khi xử lý xong"
     },
     "actions": {
       "backToList": "Quay lại danh sách"
@@ -254,17 +254,17 @@
     "title": "Chi tiết phỏng vấn",
     "label": {
       "roomCode": "Mã phòng",
-      "softSkills": "K? n?ng m?m",
-      "confidence": "?? tin c?y",
-      "clarity": "?? r? r?ng",
-      "tone": "Gi?ng ?i?u",
-      "culturalFit": "M?c ?? ph? h?p v?n ho?",
-      "questionPerformance": "Hi?u su?t c?u h?i",
-      "question": "C?u h?i"
+      "softSkills": "Kỹ năng mềm",
+      "confidence": "Độ tự tin",
+      "clarity": "Độ rõ ràng",
+      "tone": "Giọng điệu",
+      "culturalFit": "Mức độ phù hợp văn hoá",
+      "questionPerformance": "Hiệu suất câu hỏi",
+      "question": "Câu hỏi"
     },
     "tooltips": {
       "cannotJoin": "Chưa thể tham gia lúc này",
-      "forceEndNow": "K?t th?c ngay l?p t?c bu?i ph?ng v?n n?y"
+      "forceEndNow": "Kết thúc ngay lập tức buổi phỏng vấn này"
     }
   }
 }

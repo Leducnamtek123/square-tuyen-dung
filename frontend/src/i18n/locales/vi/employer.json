@@ -354,7 +354,18 @@
       "detailedFeedback": "Nhận xét chi tiết",
       "strengths": "Điểm mạnh",
       "weaknesses": "Điểm yếu",
-      "feedback": "Nhận xét chi tiết"
+      "feedback": "Nhận xét chi tiết",
+      "softSkills": "Kỹ năng mềm",
+      "confidence": "Độ tự tin",
+      "clarity": "Độ rõ ràng",
+      "tone": "Giọng điệu",
+      "culturalFit": "Mức độ phù hợp văn hoá",
+      "questionPerformance": "Hiệu suất câu hỏi",
+      "question": "Câu hỏi"
+    },
+    "tooltips": {
+      "cannotJoin": "Chưa thể tham gia lúc này",
+      "forceEndNow": "Kết thúc ngay lập tức buổi phỏng vấn này"
     },
     "messages": {
       "notFound": "Không tìm thấy thông tin phiên phỏng vấn",
