@@ -11,15 +11,15 @@ import NoDataCard from "../../../../components/Common/NoDataCard";
 import TimeAgo from "../../../../components/Common/TimeAgo";
 import { formatRoute } from "../../../../utils/funcUtils";
 import { useNotifications } from "../../../../hooks/useNotifications";
+import { useTranslation } from 'react-i18next';
 
 interface NotificationCardProps {
   title: React.ReactNode;
 }
 
-
-
 const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
   const nav = useRouter();
+  const { t } = useTranslation('common');
   const {
     isLoading,
     notifications,
@@ -90,7 +90,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                   onClick={handleMakeAllRead}
                 >
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    ÄÃ¡nh dáº¥u táº¥t cáº£ lÃ  Ä‘Ã£ Ä‘á»c
+                    {t('notification.markAllRead')}
                   </Typography>
                 </Button>
                 <Button
@@ -106,7 +106,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                   onClick={handleRemoveAll}
                 >
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    XÃ³a táº¥t cáº£
+                    {t('clearAll')}
                   </Typography>
                 </Button>
               </>
@@ -116,7 +116,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
         <Divider />
         <Stack spacing={2}>
           {notifications.length === 0 && !isLoading && (
-            <NoDataCard title="ChÆ°a cÃ³ thÃ´ng bÃ¡o nÃ o!" />
+            <NoDataCard title={t('notification.empty')} />
           )}
 
           {notifications.map((value) => (
@@ -177,7 +177,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                     </Typography>
                     {!value?.is_read && (
                       <Box sx={{ px: 1, py: 0.25, backgroundColor: "error.main", color: "white", borderRadius: 1, fontSize: "0.7rem", fontWeight: "bold" }}>
-                        Má»šI
+                        {t('common.hot', { defaultValue: 'MỚI' })}
                       </Box>
                     )}
                   </Stack>
@@ -198,7 +198,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
           {hasMore && (
             <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
               <Button onClick={loadMore} variant="contained" disabled={isLoading}>
-                {isLoading ? <CircularProgress size={24} /> : "Táº£i thÃªm"}
+                {isLoading ? <CircularProgress size={24} /> : t('loading')}
               </Button>
             </Stack>
           )}

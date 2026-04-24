@@ -109,7 +109,7 @@ const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordi
                         </Typography>
                         <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600, lineHeight: 1.9 }}>
                             {t('interviewDetail.messages.recordingPendingDesc', {
-                                defaultValue: 'Buổi phỏng vấn đã kết thúc, hệ thống đang chờ video ghi hình đồng bộ về để hiển thị tại đây.',
+                                defaultValue: t('common:interview.recordingWaiting'),
                             })}
                         </Typography>
                     </Box>
