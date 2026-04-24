@@ -99,9 +99,7 @@ const ArticleDetailPage = () => {
     image: article?.thumbnailUrl || undefined,
     url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}/${slug}`,
     type: 'article',
-    keywords: article
-      ? `${article.title}, ${article.category === 'news' ? t('nav.news', { ns: 'common' }) : t('nav.blog', { ns: 'common' })}`
-      : undefined,
+    keywords: article ? `${article.title}, ${t('nav.blog', { ns: 'common' })}` : undefined,
   });
 
   useStructuredData(
@@ -111,7 +109,7 @@ const ArticleDetailPage = () => {
             type: 'BreadcrumbList' as const,
             items: [
               { name: t('seo.articleDetail.breadcrumb.home', { ns: 'public' }), url: typeof window !== 'undefined' ? window.location.origin : '' },
-              { name: t('nav.news', { ns: 'common' }), url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}` },
+              { name: t('nav.blog', { ns: 'common' }), url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}` },
               { name: article.title, url: `${typeof window !== 'undefined' ? window.location.origin : ''}/${ROUTES.JOB_SEEKER.NEWS}/${slug}` },
             ],
           },
@@ -137,7 +135,7 @@ const ArticleDetailPage = () => {
   }
 
   const publishedDate = formatDate(article.publishedAt || article.create_at || article.update_at);
-  const categoryLabel = article.category === 'news' ? t('nav.news', { ns: 'common' }) : t('nav.blog', { ns: 'common' });
+  const categoryLabel = t('nav.blog', { ns: 'common' });
 
   return (
     <Box sx={{ py: { xs: 3, md: 6 } }}>

@@ -1,8 +1,8 @@
 ﻿import BlogPage from '@/views/employerPages/BlogPage';
 
 export const metadata = {
-  title: 'Blog tuyển dụng',
-  description: 'Browse Employer Blog.',
+  title: 'Quản lý bài viết tuyển dụng',
+  description: 'Quản lý bài viết blog của nhà tuyển dụng.',
 };
 
 export default function Page() {

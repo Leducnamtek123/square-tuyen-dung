@@ -32,8 +32,8 @@ const DEFAULT_LAYOUT_PATHS = [
   '/nha-tuyen-dung/bao-gia',
   '/employer/support',
   '/nha-tuyen-dung/ho-tro',
-  // NOTE: /employer/blog is now a protected employer management page (NOT public)
-  // The public blog listing is served from /tin-tuc-blog or similar public routes
+  // NOTE: /employer/blog is a protected employer management page.
+  // Public readers should use /tin-tuc (localized as /blog on the EN route set).
 ];
 
 const CHAT_LAYOUT_PATHS = ['/employer/chat', '/nha-tuyen-dung/ket-noi-voi-ung-vien', '/nha-tuyen-dung/chat'];

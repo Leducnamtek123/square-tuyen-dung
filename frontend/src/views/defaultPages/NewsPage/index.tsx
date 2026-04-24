@@ -24,17 +24,16 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import NewspaperIcon from '@mui/icons-material/Newspaper';
 import ArticleIcon from '@mui/icons-material/Article';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { IMAGES } from '@/configs/constants';
-import contentService, { type Article, type ArticleCategory } from '@/services/contentService';
+import contentService, { type Article } from '@/services/contentService';
 import useSEO from '@/hooks/useSEO';
 import errorHandling from '@/utils/errorHandling';
 import NoDataCard from '@/components/Common/NoDataCard';
 import { ROUTES } from '@/configs/constants';
 
-type NewsCategory = 'all' | ArticleCategory;
+type NewsCategory = 'blog';
 
 const PAGE_SIZE = 9;
 
@@ -43,8 +42,6 @@ const categoryOptions: Array<{
   labelKey: string;
   icon: React.ReactElement;
 }> = [
-  { value: 'all', labelKey: 'all', icon: <ArticleIcon fontSize="small" /> },
-  { value: 'news', labelKey: 'nav.news', icon: <NewspaperIcon fontSize="small" /> },
   { value: 'blog', labelKey: 'nav.blog', icon: <ArticleIcon fontSize="small" /> },
 ];
 
@@ -63,19 +60,17 @@ const formatDate = (value?: string | null) => {
 const ArticleCard = ({
   article,
   featured = false,
-  newsLabel,
   blogLabel,
   ctaLabel,
 }: {
   article: Article;
   featured?: boolean;
-  newsLabel: string;
   blogLabel: string;
   ctaLabel: string;
 }) => {
   const href = `/${ROUTES.JOB_SEEKER.NEWS}/${article.slug}`;
   const publishedDate = formatDate(article.publishedAt || article.create_at || article.update_at);
-  const badgeLabel = article.category === 'news' ? newsLabel : blogLabel;
+  const badgeLabel = blogLabel;
 
   return (
     <Card
@@ -106,7 +101,7 @@ const ArticleCard = ({
             <Chip
               label={badgeLabel}
               size="small"
-              icon={article.category === 'news' ? <NewspaperIcon fontSize="small" /> : <ArticleIcon fontSize="small" />}
+              icon={<ArticleIcon fontSize="small" />}
               sx={{
                 position: 'absolute',
                 top: 16,
@@ -174,7 +169,7 @@ const ArticleSkeleton = () => (
 
 const NewsPage = () => {
   const { t } = useTranslation(['common', 'public']);
-  const [category, setCategory] = React.useState<NewsCategory>('all');
+  const [category, setCategory] = React.useState<NewsCategory>('blog');
   const [inputValue, setInputValue] = React.useState('');
   const [searchValue, setSearchValue] = React.useState('');
   const [page, setPage] = React.useState(1);
@@ -198,7 +193,7 @@ const NewsPage = () => {
       setIsLoading(true);
       try {
         const response = await contentService.getPublicArticles({
-          category: category === 'all' ? undefined : category,
+          category: 'blog',
           search: searchValue || undefined,
           page,
           page_size: PAGE_SIZE,
@@ -229,7 +224,6 @@ const NewsPage = () => {
   const featuredArticle = articles[0] || null;
   const remainingArticles = featuredArticle ? articles.slice(1) : articles;
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const newsLabel = t('nav.news', { ns: 'common' });
   const blogLabel = t('nav.blog', { ns: 'common' });
   const ctaLabel = t('viewDetails', { ns: 'common' });
 
@@ -266,7 +260,7 @@ const NewsPage = () => {
         />
         <Stack spacing={2.5} sx={{ position: 'relative', maxWidth: 760 }}>
           <Chip
-            label={t('nav.news', { ns: 'common' })}
+            label={blogLabel}
             sx={{ alignSelf: 'flex-start', bgcolor: 'rgba(255,255,255,0.16)', color: 'common.white' }}
           />
           <Typography variant="h3" fontWeight={800} sx={{ fontSize: { xs: 34, md: 52 }, lineHeight: 1.08 }}>
@@ -317,7 +311,7 @@ const NewsPage = () => {
               value={option.value}
               icon={option.icon}
               iconPosition="start"
-              label={option.labelKey === 'all' ? t('all', { ns: 'common' }) : t(option.labelKey, { ns: option.labelKey.startsWith('nav.') ? 'common' : 'common' })}
+              label={t(option.labelKey, { ns: 'common' })}
             />
           ))}
         </Tabs>
@@ -374,14 +368,12 @@ const NewsPage = () => {
             />
           ) : (
             <Stack spacing={3}>
-              {featuredArticle && (
-                <ArticleCard article={featuredArticle} featured newsLabel={newsLabel} blogLabel={blogLabel} ctaLabel={ctaLabel} />
-              )}
+              {featuredArticle && <ArticleCard article={featuredArticle} featured blogLabel={blogLabel} ctaLabel={ctaLabel} />}
 
               <Grid container spacing={3}>
                 {remainingArticles.map((article) => (
                   <Grid key={article.id} size={{ xs: 12, md: 6 }}>
-                    <ArticleCard article={article} newsLabel={newsLabel} blogLabel={blogLabel} ctaLabel={ctaLabel} />
+                    <ArticleCard article={article} blogLabel={blogLabel} ctaLabel={ctaLabel} />
                   </Grid>
                 ))}
               </Grid>
@@ -420,7 +412,7 @@ const NewsPage = () => {
                     {total.toLocaleString('vi-VN')} bài viết đang hiển thị trong kho nội dung công khai.
                   </Typography>
                   <Stack spacing={1}>
-                    {categoryOptions.slice(1).map((option) => (
+                    {categoryOptions.map((option) => (
                       <Box
                         key={option.value}
                         sx={{
@@ -436,7 +428,7 @@ const NewsPage = () => {
                         <Stack direction="row" spacing={1} alignItems="center">
                           {option.icon}
                           <Typography variant="body2" fontWeight={600}>
-                            {option.value === 'news' ? newsLabel : blogLabel}
+                            {blogLabel}
                           </Typography>
                         </Stack>
                       </Box>
