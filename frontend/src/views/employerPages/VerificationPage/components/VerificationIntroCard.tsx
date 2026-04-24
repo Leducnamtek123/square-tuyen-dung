@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { Box, Button, Card, Chip, Typography } from '@mui/material';
 import { ROUTES } from '../../../../configs/constants';

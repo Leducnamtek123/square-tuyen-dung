@@ -1,3 +1,4 @@
+ 'use client';
 import React from 'react';
 import { Box, Card, Tab } from "@mui/material";
 import { TabTitle } from '../../../utils/generalFunction';

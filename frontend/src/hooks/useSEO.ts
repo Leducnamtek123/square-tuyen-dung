@@ -1,3 +1,4 @@
+'use client';
 import { useEffect } from 'react';
 
 interface SEOProps {
@@ -10,10 +11,10 @@ interface SEOProps {
   noIndex?: boolean;
 }
 
-const SITE_NAME = 'Square Tuyển Dụng';
+const SITE_NAME = 'Square Tuyá»ƒn Dá»¥ng';
 const DEFAULT_IMAGE = 'https://sqstudio.vn/square-icons/logo.svg';
 const DEFAULT_DESCRIPTION =
-  'Square - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín.';
+  'Square - Ná»n táº£ng tuyá»ƒn dá»¥ng hÃ ng Ä‘áº§u Viá»‡t Nam. TÃ¬m kiáº¿m hÃ ng nghÃ¬n viá»‡c lÃ m phÃ¹ há»£p, káº¿t ná»‘i vá»›i cÃ¡c nhÃ  tuyá»ƒn dá»¥ng uy tÃ­n.';
 
 /** Upsert a <meta> tag by name or property attribute */
 const upsertMeta = (attrName: string, attrValue: string, content: string) => {
@@ -40,7 +41,7 @@ const upsertLink = (rel: string, href: string) => {
 };
 
 /**
- * useSEO — Dynamic SEO meta tag manager.
+ * useSEO â€” Dynamic SEO meta tag manager.
  * Updates title, description, OG, Twitter Card, and canonical link per page.
  */
 const useSEO = ({
@@ -53,7 +54,7 @@ const useSEO = ({
   noIndex = false,
 }: SEOProps = {}) => {
   useEffect(() => {
-    const resolvedTitle = title ? `${title} | Square` : 'Square | Tìm việc nhanh, tuyển dụng hiệu quả';
+    const resolvedTitle = title ? `${title} | Square` : 'Square | TÃ¬m viá»‡c nhanh, tuyá»ƒn dá»¥ng hiá»‡u quáº£';
     const resolvedDesc = description || DEFAULT_DESCRIPTION;
     const resolvedImage = image || DEFAULT_IMAGE;
     const resolvedUrl = url || window.location.href;

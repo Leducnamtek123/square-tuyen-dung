@@ -1,3 +1,4 @@
+'use client';
 import React, { useEffect, useReducer, useRef } from 'react';
 import { Box, Button, Typography, Stack, CircularProgress } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

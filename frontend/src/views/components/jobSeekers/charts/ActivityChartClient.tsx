@@ -1,7 +1,19 @@
+'use client';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Stack, CircularProgress, Typography } from '@mui/material';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
 import { useJobSeekerActivityStatistics } from '../hooks/useJobSeekerQueries';
 import defaultTheme from '../../../../themeConfigs/defaultTheme';
 
@@ -45,39 +57,10 @@ const options = {
 const ActivityChartClient = () => {
   const { t } = useTranslation('jobSeeker');
   const { data, isLoading } = useJobSeekerActivityStatistics();
-  const [LineChart, setLineChart] = React.useState<React.ComponentType<any> | null>(null);
 
   React.useEffect(() => {
-    let alive = true;
+    ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
-    const loadChart = async () => {
-      const chartJsModule = ['chart', '.js'].join('');
-      const reactChartModule = ['react-chartjs', '-2'].join('');
-      const [{ Chart: ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend }, reactChart] = await Promise.all([
-        import(chartJsModule),
-        import(reactChartModule),
-      ]);
-
-      ChartJS.register(
-        CategoryScale,
-        LinearScale,
-        PointElement,
-        LineElement,
-        Title,
-        Tooltip,
-        Legend
-      );
-
-      if (alive) {
-        setLineChart(() => reactChart.Line);
-      }
-    };
-
-    loadChart();
-
-    return () => {
-      alive = false;
-    };
   }, []);
 
   const dataOptions = React.useMemo(() => {
@@ -133,10 +116,8 @@ const ActivityChartClient = () => {
               {t('noDataForStatistics')}
             </Typography>
           </Stack>
-        ) : LineChart ? (
-          <LineChart options={options} data={dataOptions} height={320} />
         ) : (
-          <CircularProgress sx={{ color: 'primary.main' }} />
+          <Line options={options} data={dataOptions} height={320} />
         )}
       </Stack>
     </Box>

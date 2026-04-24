@@ -1,3 +1,4 @@
+ 'use client';
 import * as React from "react";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
 import { Box, Card, Stack, Tab, Typography } from "@mui/material";

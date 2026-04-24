@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
@@ -125,7 +126,7 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
 
               <Typography variant="subtitle1" sx={{ color: 'text.primary', mb: 0.5 }}>
 
-                Kéo thả file vào đây hoặc
+                KÃ©o tháº£ file vÃ o Ä‘Ã¢y hoáº·c
 
               </Typography>
 
@@ -151,13 +152,13 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
 
               >
 
-                Chọn file
+                Chá»n file
 
               </Button>
 
               <Typography variant="caption" sx={{ display: 'block', mt: 1, color: 'text.secondary' }}>
 
-                Chỉ chấp nhận file PDF
+                Chá»‰ cháº¥p nháº­n file PDF
 
               </Typography>
 
@@ -213,7 +214,7 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
 
               >
 
-                Xóa
+                XÃ³a
 
               </Button>
 

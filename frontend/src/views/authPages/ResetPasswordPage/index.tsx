@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { Alert, AlertTitle, Card, Container, Typography } from "@mui/material";

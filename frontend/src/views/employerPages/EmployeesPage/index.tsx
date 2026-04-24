@@ -1,3 +1,4 @@
+ 'use client';
 import React from 'react';
 import { Box, Paper } from '@mui/material';
 import { useTranslation } from 'react-i18next';

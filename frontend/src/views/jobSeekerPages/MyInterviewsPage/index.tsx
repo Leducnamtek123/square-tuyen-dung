@@ -1,4 +1,5 @@
-﻿import React from 'react';
+'use client';
+import React from 'react';
 import { Box, Card, Typography, Button, Avatar, Chip, CircularProgress, useTheme, type Theme } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 

@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import { useAppSelector } from '@/redux/hooks';
 
@@ -165,7 +166,7 @@ const SubHeader = () => {
 
     <>
 
-      {/* SubHeader ẩn trên xs vì HomeSearch đã nằm dưới TopSlide; hiện từ sm+ */}
+      {/* SubHeader áº©n trÃªn xs vÃ¬ HomeSearch Ä‘Ã£ náº±m dÆ°á»›i TopSlide; hiá»‡n tá»« sm+ */}
       <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
 
         <AppBar

@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Card, Stack, Tooltip, Typography, Skeleton } from '@mui/material';
@@ -102,7 +103,7 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                       fontStyle: 'italic',
                       fontSize: 13
                     }}>
-                      Chưa cập nhật
+                      ChÆ°a cáº­p nháº­t
                     </span>
                   )}
                 </Typography>
@@ -124,7 +125,7 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                       style={{ fontSize: 14 }}
                       color={theme.palette.grey[400]}
                     />
-                    {company?.followNumber} theo dõi
+                    {company?.followNumber} theo dÃµi
                   </Typography>
                   <Typography variant="body2">
                     <FontAwesomeIcon
@@ -132,7 +133,7 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                       style={{ fontSize: 14 }}
                       color={theme.palette.grey[400]}
                     />
-                    {company?.jobPostNumber} việc làm
+                    {company?.jobPostNumber} viá»‡c lÃ m
                   </Typography>
                 </Stack>
               </Stack>

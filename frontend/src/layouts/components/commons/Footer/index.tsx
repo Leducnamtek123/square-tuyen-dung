@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 
 import { useRouter } from 'next/navigation';
@@ -68,7 +69,7 @@ const Footer = () => {
 
         <Grid container spacing={4}>
 
-          {/* Col 1 — Brand */}
+          {/* Col 1 â€” Brand */}
           <Grid
             size={{
               xs: 12,
@@ -109,7 +110,7 @@ const Footer = () => {
 
           </Grid>
 
-          {/* Col 2 — Employers */}
+          {/* Col 2 â€” Employers */}
           <Grid
             size={{
               xs: 12,
@@ -145,7 +146,7 @@ const Footer = () => {
 
           </Grid>
 
-          {/* Col 3 — Candidates */}
+          {/* Col 3 â€” Candidates */}
           <Grid
             size={{
               xs: 12,
@@ -181,7 +182,7 @@ const Footer = () => {
 
           </Grid>
 
-          {/* Col 4 — Social */}
+          {/* Col 4 â€” Social */}
           <Grid
             size={{
               xs: 12,

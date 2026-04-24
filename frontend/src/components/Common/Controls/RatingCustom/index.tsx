@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { Controller, Control, FieldValues, Path, PathValue } from 'react-hook-form';
 import Rating from '@mui/material/Rating';

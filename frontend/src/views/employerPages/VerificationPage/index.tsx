@@ -1,3 +1,4 @@
+'use client';
 import React, { useMemo, useState } from 'react';
 import { Box, Snackbar, Alert, Typography } from '@mui/material';
 import dayjs, { type Dayjs } from 'dayjs';

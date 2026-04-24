@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { alpha, useTheme } from '@mui/material/styles';
 import { useRouter } from 'next/navigation';

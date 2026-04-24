@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
@@ -350,7 +351,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
                 <div className="relative group">
                   <div className="absolute inset-0 rounded-full bg-cyan-500/10 blur-[80px] transition-all duration-1000 group-hover:bg-cyan-500/20" />
                   <div className="relative z-10 flex h-[220px] w-[220px] items-center justify-center opacity-70 transition-all duration-1000 group-hover:opacity-100 md:h-[320px] md:w-[320px]">
-                    <span className="text-6xl">🤖</span>
+                    <span className="text-6xl">ðŸ¤–</span>
                   </div>
                 </div>
 
@@ -412,7 +413,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
         {formattedSchedule && (
           <p className="text-xs text-slate-300">
-            {t('common:labels.time', { defaultValue: 'Time' })} • {formattedSchedule}
+            {t('common:labels.time', { defaultValue: 'Time' })} â€¢ {formattedSchedule}
           </p>
         )}
       </div>

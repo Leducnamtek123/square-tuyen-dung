@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 
 import { useTheme } from '@mui/material/styles';
@@ -140,7 +141,7 @@ const InputBaseSearchCompanyCustom = <T extends FieldValues = FieldValues>({
 
           <Button variant="contained" type="submit" color="primary">
 
-            Tìm kiếm
+            TÃ¬m kiáº¿m
 
           </Button>
 

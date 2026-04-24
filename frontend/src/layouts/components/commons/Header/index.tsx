@@ -1,3 +1,4 @@
+'use client';
 import * as React from "react";
 import { useAppSelector } from '@/redux/hooks';
 
@@ -146,7 +147,7 @@ const Header = (_props: HeaderProps) => {
 
           <Toolbar disableGutters sx={{ minHeight: { xs: 56, sm: 64 }, overflow: 'hidden' }}>
 
-            {/* ── Mobile: Hamburger icon TRƯỚC logo (chuẩn MUI) ── */}
+            {/* â”€â”€ Mobile: Hamburger icon TRÆ¯á»šC logo (chuáº©n MUI) â”€â”€ */}
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -157,7 +158,7 @@ const Header = (_props: HeaderProps) => {
               <MenuIcon />
             </IconButton>
 
-            {/* ── Logo ── */}
+            {/* â”€â”€ Logo â”€â”€ */}
             <Box
               component={Link}
               href="/"
@@ -196,17 +197,17 @@ const Header = (_props: HeaderProps) => {
               }}
             />
 
-            {/* ── Desktop: nav links (flex grow) ── */}
+            {/* â”€â”€ Desktop: nav links (flex grow) â”€â”€ */}
             <HeaderNavLinks
               pages={pages[currentPortalHost] || []}
               activePathname={pathname}
               onClose={handleCloseNavMenu}
             />
 
-            {/* ── Mobile: spacer để đẩy icons sang phải ── */}
+            {/* â”€â”€ Mobile: spacer Ä‘á»ƒ Ä‘áº©y icons sang pháº£i â”€â”€ */}
             <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }} />
 
-            {/* ── Right side: icons + auth ── */}
+            {/* â”€â”€ Right side: icons + auth â”€â”€ */}
             <Stack
               direction="row"
               alignItems="center"
@@ -217,7 +218,7 @@ const Header = (_props: HeaderProps) => {
 
               {isAuthenticated && <WorkspaceSwitchMenu />}
 
-              {/* Notification + Chat: chỉ hiện từ sm trở lên trên mobile */}
+              {/* Notification + Chat: chá»‰ hiá»‡n tá»« sm trá»Ÿ lÃªn trÃªn mobile */}
               {isAuthenticated && (
                 <React.Suspense fallback={<Box width={40} height={40} />}>
                   <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
@@ -233,7 +234,7 @@ const Header = (_props: HeaderProps) => {
                 </React.Suspense>
               )}
 
-              {/* Auth buttons — hide on xs when not authenticated (available in drawer) */}
+              {/* Auth buttons â€” hide on xs when not authenticated (available in drawer) */}
               {!isAdminPortal && (
                 <Box sx={{ display: isAuthenticated ? 'flex' : { xs: 'none', sm: 'flex' } }}>
                   <HeaderAuthArea

@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
@@ -176,7 +177,7 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
                 >
 
-                  Đã xem hồ sơ {resume?.title} {views} lần
+                  ÄÃ£ xem há»“ sÆ¡ {resume?.title} {views} láº§n
 
                 </Typography>
 
@@ -198,7 +199,7 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
                 >
 
-                  Lần xem cuối {dayjs(createAt).format('DD/MM/YYYY HH:mm')}
+                  Láº§n xem cuá»‘i {dayjs(createAt).format('DD/MM/YYYY HH:mm')}
 
                 </Typography>
 

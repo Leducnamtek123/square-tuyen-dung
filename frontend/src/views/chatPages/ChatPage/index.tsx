@@ -1,3 +1,4 @@
+ 'use client';
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Box, Stack, Typography, Drawer, IconButton, useTheme, useMediaQuery, Theme } from "@mui/material";

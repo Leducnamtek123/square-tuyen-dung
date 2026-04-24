@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';
@@ -42,7 +43,7 @@ const SidebarHeader = (_props: SidebarHeaderProps) => {
           <LanguageSwitcher />
           <Chip
             icon={!isEmployer ? <HomeIcon /> : <GridViewIcon />}
-            label={!isEmployer ? 'Về trang chủ' : 'Về trang quản trị'}
+            label={!isEmployer ? 'Vá» trang chá»§' : 'Vá» trang quáº£n trá»‹'}
             onClick={handleRedirect}
           />
         </Box>

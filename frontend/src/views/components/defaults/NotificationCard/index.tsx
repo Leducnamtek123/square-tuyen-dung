@@ -1,3 +1,4 @@
+'use client';
 import React from "react";
 import { useRouter } from 'next/navigation';
 import { Box, Button, CircularProgress, Divider, IconButton, Stack, Typography } from "@mui/material";
@@ -89,7 +90,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                   onClick={handleMakeAllRead}
                 >
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    Đánh dấu tất cả là đã đọc
+                    ÄÃ¡nh dáº¥u táº¥t cáº£ lÃ  Ä‘Ã£ Ä‘á»c
                   </Typography>
                 </Button>
                 <Button
@@ -105,7 +106,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                   onClick={handleRemoveAll}
                 >
                   <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                    Xóa tất cả
+                    XÃ³a táº¥t cáº£
                   </Typography>
                 </Button>
               </>
@@ -115,7 +116,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
         <Divider />
         <Stack spacing={2}>
           {notifications.length === 0 && !isLoading && (
-            <NoDataCard title="Chưa có thông báo nào!" />
+            <NoDataCard title="ChÆ°a cÃ³ thÃ´ng bÃ¡o nÃ o!" />
           )}
 
           {notifications.map((value) => (
@@ -176,7 +177,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
                     </Typography>
                     {!value?.is_read && (
                       <Box sx={{ px: 1, py: 0.25, backgroundColor: "error.main", color: "white", borderRadius: 1, fontSize: "0.7rem", fontWeight: "bold" }}>
-                        MỚI
+                        Má»šI
                       </Box>
                     )}
                   </Stack>
@@ -197,7 +198,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
           {hasMore && (
             <Stack direction="row" justifyContent="center" sx={{ mt: 2 }}>
               <Button onClick={loadMore} variant="contained" disabled={isLoading}>
-                {isLoading ? <CircularProgress size={24} /> : "Tải thêm"}
+                {isLoading ? <CircularProgress size={24} /> : "Táº£i thÃªm"}
               </Button>
             </Stack>
           )}

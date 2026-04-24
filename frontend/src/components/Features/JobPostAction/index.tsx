@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import dayjs from 'dayjs';
@@ -252,7 +253,7 @@ const JobPostAction = ({
 
                       }}>
 
-                        Chưa cập nhật
+                        ChÆ°a cáº­p nháº­t
 
                       </span>
 

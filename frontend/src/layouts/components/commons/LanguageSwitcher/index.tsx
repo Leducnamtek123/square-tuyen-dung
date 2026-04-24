@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
@@ -20,7 +21,7 @@ const languages = [
   },
   {
     code: 'vi',
-    label: 'Tiếng Việt',
+    label: 'Tiáº¿ng Viá»‡t',
     shortLabel: 'VI',
     flagUrl: 'https://flagcdn.com/w40/vn.png'
   }

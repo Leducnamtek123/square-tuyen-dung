@@ -1,3 +1,4 @@
+ 'use client';
 import React from 'react';
 import { Container, Divider, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';

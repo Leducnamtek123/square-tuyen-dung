@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { useWatch, type Control } from 'react-hook-form';
 import type { SelectOption } from '@/types/models';

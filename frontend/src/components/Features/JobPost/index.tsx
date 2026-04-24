@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
@@ -168,7 +169,7 @@ const JobPost = ({
             }}
           />
           {isUrgent && (
-            <Tooltip title="Tuyển gấp" placement="top">
+            <Tooltip title="Tuyá»ƒn gáº¥p" placement="top">
               <Box
                 sx={{
                   position: 'absolute',
@@ -226,7 +227,7 @@ const JobPost = ({
           {salaryString(salaryMin, salaryMax)}
         </MetaItem>
         <MetaItem icon={<FontAwesomeIcon icon={faLocationDot} color={theme.palette.primary.main} />}>
-          {tConfig(allConfig?.cityDict?.[cityId]) || <span style={{ fontStyle: 'italic', color: theme.palette.grey[500] }}>Chưa cập nhật</span>}
+          {tConfig(allConfig?.cityDict?.[cityId]) || <span style={{ fontStyle: 'italic', color: theme.palette.grey[500] }}>ChÆ°a cáº­p nháº­t</span>}
         </MetaItem>
         <MetaItem icon={<FontAwesomeIcon icon={faCalendarDays} color={theme.palette.primary.main} />}>
           {dayjs(deadline).format('DD/MM/YYYY')}
@@ -237,7 +238,7 @@ const JobPost = ({
 
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <MetaItem icon={<FontAwesomeIcon icon={faClock} style={{ fontSize: 14 }} color={theme.palette.grey[400]} />}>
-          {t('jobPost.timeLeft', { defaultValue: 'Còn' })} <TimeAgo date={deadline} type="fromNow" />
+          {t('jobPost.timeLeft', { defaultValue: 'CÃ²n' })} <TimeAgo date={deadline} type="fromNow" />
         </MetaItem>
       </Box>
     </Card>

@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Box, Button, Drawer, Stack, Avatar, Divider, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';

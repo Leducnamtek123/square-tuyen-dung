@@ -1,3 +1,4 @@
+'use client';
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import { SortingState, RowSelectionState, OnChangeFn } from '@tanstack/react-table';
 

@@ -1,3 +1,4 @@
+ 'use client';
 import { useTranslation } from 'react-i18next';
 import QuestionBankCard from '../../components/employers/QuestionBankCard';
 

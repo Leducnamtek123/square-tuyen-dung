@@ -1,4 +1,5 @@
-﻿import React from 'react';
+'use client';
+import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { Box, Button, Card, Stack } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";

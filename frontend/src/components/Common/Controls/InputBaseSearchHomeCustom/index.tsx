@@ -1,3 +1,4 @@
+'use client';
 import * as React from 'react';
 import { useDispatch } from 'react-redux';
 import { useRouter } from 'next/navigation';
@@ -205,7 +206,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
           />
           {showSubmitButton && (
             <Button variant="contained" type="submit" color="primary">
-              TÃ¬m kiáº¿m
+              TÃƒÂ¬m kiÃ¡ÂºÂ¿m
             </Button>
           )}
         </Box>
@@ -230,7 +231,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
             <Stack>
               <Box>
                 <Typography fontWeight="bold" fontSize={17} color="#2C95FF">
-                  Gá»£i Ã½ tÃ¬m kiáº¿m
+                  GÃ¡Â»Â£i ÃƒÂ½ tÃƒÂ¬m kiÃ¡ÂºÂ¿m
                 </Typography>
                 <Stack>
                   {state.isLoading ? (
@@ -239,7 +240,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                     </Stack>
                   ) : state.searchResult.length === 0 ? (
                     <Typography my={1} textAlign="center" color="#bdbdbd" variant="caption">
-                      KhÃ´ng cÃ³ dá»¯ liá»‡u
+                      KhÃƒÂ´ng cÃƒÂ³ dÃ¡Â»Â¯ liÃ¡Â»â€¡u
                     </Typography>
                   ) : (
                     <List>
@@ -270,7 +271,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
               {state.recentSearch.length > 0 && (
                 <Box>
                   <Typography fontWeight="bold" fontSize={17} color="#2C95FF">
-                    TÃ¬m kiáº¿m gáº§n Ä‘Ã¢y
+                    TÃƒÂ¬m kiÃ¡ÂºÂ¿m gÃ¡ÂºÂ§n Ã„â€˜ÃƒÂ¢y
                   </Typography>
                   <Stack>
                     <List>
