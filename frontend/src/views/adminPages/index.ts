@@ -19,3 +19,4 @@ export { default as BannersPage } from './BannersPage';
 export { default as BannerTypesPage } from './BannerTypesPage';
 export { default as FeedbacksPage } from './FeedbacksPage';
 export { default as ChatPage } from './ChatPage';
+export { default as ArticlesPage } from './ArticlesPage';

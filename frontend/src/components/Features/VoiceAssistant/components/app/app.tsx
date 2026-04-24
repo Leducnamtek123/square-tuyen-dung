@@ -69,13 +69,23 @@ export function App({ appConfig, connectionDetails, onDisconnect }: AppProps) {
     <SessionProvider session={session}>
       <AppSetup />
       <AutoConnect onError={onDisconnect} />
-      <main className="grid h-full grid-cols-1 place-content-center">
+      <main className="relative grid h-full min-h-full grid-cols-1 overflow-hidden bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.12),transparent_42%),linear-gradient(180deg,#020617_0%,#020617_100%)]">
         {session.isConnected ? (
           <SessionView appConfig={appConfig} className="w-full h-full" onDisconnect={onDisconnect} />
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center p-8 text-center text-slate-400 gap-4">
-             <div className="h-10 w-10 animate-spin rounded-full border-2 border-cyan-300/30 border-t-cyan-300" />
-             <p className="text-sm font-mono tracking-widest text-cyan-300">CONNECTING VOICE AI...</p>
+          <div className="flex h-full w-full items-center justify-center px-6 py-10">
+            <div className="relative w-full max-w-xl overflow-hidden rounded-[32px] border border-white/10 bg-slate-900/55 p-8 text-center shadow-2xl shadow-black/50 backdrop-blur-2xl md:p-10">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.16),transparent_55%)]" />
+              <div className="relative mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-cyan-300/20 bg-cyan-400/10">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-cyan-300/25 border-t-cyan-300" />
+              </div>
+              <p className="relative mt-5 text-xs font-black uppercase tracking-[0.35em] text-cyan-200/80">
+                Connecting voice AI
+              </p>
+              <p className="relative mt-3 text-sm leading-6 text-slate-300">
+                Đang vào phòng phỏng vấn, đồng bộ mic, chat và visualizer theo kiểu Agent Session View.
+              </p>
+            </div>
           </div>
         )}
       </main>

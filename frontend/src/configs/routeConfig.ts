@@ -173,6 +173,8 @@ export const ROUTES = {
     PRICING: 'employer/pricing',
     SUPPORT: 'employer/support',
     BLOG: 'employer/blog',
+    BLOG_CREATE: 'employer/blog/create',
+    BLOG_DETAIL: 'employer/blog/:id',
     DASHBOARD: 'employer/dashboard',
     JOB_POST: 'employer/job-posts',
     APPLIED_PROFILE: 'employer/applied-profiles',
@@ -234,6 +236,9 @@ export const ROUTES = {
     BANNER_TYPES: 'admin/banner-types',
     FEEDBACKS: 'admin/feedbacks',
     CHAT: 'admin/chat',
+    ARTICLES: 'admin/articles',
+    ARTICLE_CREATE: 'admin/articles/create',
+    ARTICLE_DETAIL: 'admin/articles/:id',
   },
 } as const;
 

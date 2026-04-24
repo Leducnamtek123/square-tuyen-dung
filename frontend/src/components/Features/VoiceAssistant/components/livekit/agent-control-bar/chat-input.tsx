@@ -69,11 +69,11 @@ export function ChatInput({
         inert={!chatOpen}
         {...MOTION_PROPS}
         animate={chatOpen ? 'visible' : 'hidden'}
-        className="border-input/50 flex w-full items-start overflow-hidden border-b"
+        className="border-input/40 flex w-full items-start overflow-hidden border-b"
       >
         <form
           onSubmit={handleSubmit}
-          className="mb-3 flex grow items-end gap-2 rounded-md pl-1 text-sm"
+          className="mb-3 flex grow items-end gap-2 rounded-[24px] border border-white/8 bg-slate-950/50 p-2 text-sm shadow-inner shadow-black/20"
         >
           <input
             ref={inputRef}
@@ -83,7 +83,7 @@ export function ChatInput({
             placeholder="Type a message..."
             onChange={(e) => setMessage(e.target.value)}
             className={cn(
-              'h-10 flex-1 bg-transparent px-2 text-slate-100 placeholder:text-slate-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+              'h-11 flex-1 bg-transparent px-3 text-slate-100 placeholder:text-slate-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
             )}
           />
           <Button
@@ -92,7 +92,7 @@ export function ChatInput({
             disabled={isDisabled}
             variant={isDisabled ? 'secondary' : 'primary'}
             title={isSending ? 'Sending...' : 'Send'}
-            className="self-start"
+            className="self-start rounded-[18px]"
           >
             {isSending ? (
               <SpinnerIcon className="animate-spin" weight="bold" />

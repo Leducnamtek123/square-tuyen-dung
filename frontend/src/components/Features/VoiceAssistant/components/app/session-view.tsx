@@ -48,7 +48,7 @@ function Fade({ top = false, bottom = false, className }: FadeProps) {
   return (
     <div
       className={cn(
-        'from-background pointer-events-none h-4 bg-linear-to-b to-transparent',
+        'from-slate-950/95 via-slate-950/60 pointer-events-none h-4 bg-linear-to-b to-transparent',
         top && 'bg-linear-to-b',
         bottom && 'bg-linear-to-t',
         className
@@ -90,7 +90,7 @@ export const SessionView = ({
 
   return (
     <LazyMotion features={domAnimation}>
-      <section className="bg-background relative z-10 h-full w-full overflow-hidden" {...props}>
+      <section className="relative z-10 h-full w-full overflow-hidden bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.08),transparent_42%)]" {...props}>
         {/* Chat Transcript */}
         <div
           className={cn(
@@ -98,12 +98,15 @@ export const SessionView = ({
             !chatOpen && 'pointer-events-none'
           )}
         >
-          <Fade top className="absolute inset-x-4 top-0 h-40" />
-          <ScrollArea ref={scrollAreaRef} className="px-4 pt-40 pb-[150px] md:px-6 md:pb-[200px]">
+          <Fade top className="absolute inset-x-0 top-0 h-40" />
+          <ScrollArea
+            ref={scrollAreaRef}
+            className="mx-auto w-full max-w-3xl px-4 pt-40 pb-[150px] md:px-6 md:pb-[200px]"
+          >
             <ChatTranscript
               hidden={!chatOpen}
               messages={messages}
-              className="mx-auto max-w-2xl space-y-3 transition-opacity duration-300 ease-out"
+              className="space-y-3 rounded-[28px] border border-white/8 bg-slate-950/30 p-4 backdrop-blur-xl transition-opacity duration-300 ease-out md:p-6"
             />
           </ScrollArea>
         </div>
@@ -119,7 +122,7 @@ export const SessionView = ({
           {appConfig.isPreConnectBufferEnabled && (
             <PreConnectMessage messages={messages} className="pb-4" />
           )}
-          <div className="bg-background relative mx-auto max-w-2xl pb-3 md:pb-12">
+          <div className="relative mx-auto max-w-3xl pb-3 md:pb-12">
             <Fade bottom className="absolute inset-x-0 top-0 h-4 -translate-y-full" />
             <AgentControlBar
               controls={controls}

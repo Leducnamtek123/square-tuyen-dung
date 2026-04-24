@@ -82,7 +82,7 @@ export function AgentControlBar({
     <div
       aria-label="Voice assistant controls"
       className={cn(
-        'bg-slate-900/40 backdrop-blur-2xl border-white/10 flex flex-col rounded-[31px] border p-3 shadow-2xl shadow-black/50',
+        'bg-slate-950/60 backdrop-blur-2xl border-white/10 flex flex-col rounded-[32px] border p-3 shadow-2xl shadow-black/60',
         className
       )}
       {...props}
@@ -148,6 +148,7 @@ export function AgentControlBar({
             aria-label="Toggle transcript"
             pressed={chatOpen}
             onPressedChange={handleToggleTranscript}
+            className="shrink-0"
           >
             <ChatTextIcon weight="bold" />
           </Toggle>
@@ -159,7 +160,7 @@ export function AgentControlBar({
             variant="destructive"
             onClick={onDisconnect}
             disabled={!isConnected}
-            className="font-mono"
+            className="font-mono shrink-0"
           >
             <PhoneDisconnectIcon weight="bold" />
             <span className="hidden md:inline">END CALL</span>

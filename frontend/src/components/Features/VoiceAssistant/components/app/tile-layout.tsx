@@ -27,8 +27,8 @@ const classNames = {
   // 2 Columns x 3 Rows
   grid: [
     'h-full w-full',
-    'grid gap-x-2 place-content-center',
-    'grid-cols-[1fr_1fr] grid-rows-[90px_1fr_90px]',
+    'grid gap-4 place-content-center',
+    'grid-cols-[1fr_1fr] grid-rows-[120px_1fr_120px]',
   ],
   // Agent
   // chatOpen: true,
@@ -130,7 +130,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                     delay: animationDelay,
                   }}
                   className={cn(
-                    'bg-slate-800/60 backdrop-blur-md aspect-square h-[90px] rounded-2xl border border-white/5 transition-[border,drop-shadow]',
+                    'bg-slate-800/55 backdrop-blur-xl aspect-square h-[120px] rounded-[28px] border border-white/8 transition-[border,drop-shadow]',
                     chatOpen && 'border-white/10 shadow-2xl shadow-black/50 delay-200'
                   )}
                 >
@@ -182,14 +182,14 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                   }}
                   className={cn(
                     'overflow-hidden bg-black drop-shadow-xl/80',
-                    chatOpen ? 'h-[90px]' : 'h-auto w-full'
+                    chatOpen ? 'h-[120px]' : 'h-auto w-full'
                   )}
                 >
                   <VideoTrack
                     width={videoWidth}
                     height={videoHeight}
                     trackRef={agentVideoTrack}
-                    className={cn(chatOpen && 'size-[90px] object-cover')}
+                    className={cn(chatOpen && 'size-[120px] object-cover')}
                   />
                 </MotionContainer>
               )}
@@ -230,7 +230,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                 >
                   <VideoTrack
                     trackRef={cameraTrack || screenShareTrack}
-                    className="bg-slate-800/60 backdrop-blur-md aspect-square !w-[90px] !h-[90px] rounded-2xl border border-white/10 object-cover shadow-2xl shadow-black/50 overflow-hidden"
+                    className="bg-slate-800/55 backdrop-blur-xl aspect-square !w-[120px] !h-[120px] rounded-[28px] border border-white/10 object-cover shadow-2xl shadow-black/50 overflow-hidden"
                   />
                 </MotionContainer>
               )}

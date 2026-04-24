@@ -3,14 +3,17 @@ import React, { useState, useCallback, useEffect } from 'react';
 import {
   Box, Button, Chip, IconButton, Stack, Tooltip, Typography,
   TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel,
+  ToggleButton, ToggleButtonGroup,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import ArticleIcon from '@mui/icons-material/Article';
+import NewspaperIcon from '@mui/icons-material/Newspaper';
 import { useRouter } from 'next/navigation';
-import { useTranslation } from 'react-i18next';
-import contentService, { Article, ArticleStatus } from '@/services/contentService';
+import { ColumnDef } from '@tanstack/react-table';
+import contentService, { Article, ArticleCategory, ArticleStatus } from '@/services/contentService';
 import DataTable from '@/components/Common/DataTable';
 import toastMessages from '@/utils/toastMessages';
 import dayjs from '@/configs/dayjs-config';
@@ -29,12 +32,12 @@ const STATUS_LABEL: Record<ArticleStatus, string> = {
   archived: 'Lưu trữ',
 };
 
-const EmployerBlogListPage = () => {
-  const { t } = useTranslation('employer');
+const AdminArticlesPage = () => {
   const router = useRouter();
+  const [category, setCategory] = useState<ArticleCategory | 'all'>('all');
   const [statusFilter, setStatusFilter] = useState<ArticleStatus | 'all'>('all');
-  const [searchInput, setSearchInput] = useState('');
   const [search, setSearch] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const [articles, setArticles] = useState<Article[]>([]);
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +46,8 @@ const EmployerBlogListPage = () => {
   const fetchArticles = useCallback(async () => {
     setIsLoading(true);
     try {
-      const res = await contentService.employerGetBlogs({
+      const res = await contentService.adminGetArticles({
+        category: category === 'all' ? undefined : category,
         status: statusFilter === 'all' ? undefined : statusFilter,
         search: search || undefined,
         page: pagination.pageIndex + 1,
@@ -52,18 +56,18 @@ const EmployerBlogListPage = () => {
       setArticles(res.results || []);
       setTotal(res.count || 0);
     } catch {
-      toastMessages.error('Không thể tải danh sách blog');
+      toastMessages.error('Không thể tải danh sách bài viết');
     } finally {
       setIsLoading(false);
     }
-  }, [statusFilter, search, pagination]);
+  }, [category, statusFilter, search, pagination]);
 
   useEffect(() => { fetchArticles(); }, [fetchArticles]);
 
   const handleDelete = async (id: number, title: string) => {
     if (!window.confirm(`Bạn có chắc muốn xóa "${title}"?`)) return;
     try {
-      await contentService.employerDeleteBlog(id);
+      await contentService.adminDeleteArticle(id);
       toastMessages.success('Đã xóa bài viết');
       fetchArticles();
     } catch {
@@ -71,26 +75,38 @@ const EmployerBlogListPage = () => {
     }
   };
 
-  const columns = [
+  const columns: ColumnDef<Article>[] = [
     {
       accessorKey: 'title',
       header: 'Tiêu đề',
-      cell: ({ row }: { row: { original: Article } }) => (
+      cell: ({ row }) => (
         <Box>
           <Typography variant="body2" fontWeight={700} sx={{ mb: 0.5 }}>
             {row.original.title}
           </Typography>
-          <Typography variant="caption" color="text.secondary"
-            sx={{ display: 'block', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <Typography variant="caption" color="text.secondary" sx={{ display: 'block', maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {row.original.excerpt}
           </Typography>
         </Box>
       ),
     },
     {
+      accessorKey: 'category',
+      header: 'Danh mục',
+      cell: ({ row }) => (
+        <Chip
+          icon={row.original.category === 'news' ? <NewspaperIcon fontSize="small" /> : <ArticleIcon fontSize="small" />}
+          label={row.original.category === 'news' ? 'Tin tức' : 'Blog'}
+          size="small"
+          variant="outlined"
+          color={row.original.category === 'news' ? 'primary' : 'secondary'}
+        />
+      ),
+    },
+    {
       accessorKey: 'status',
       header: 'Trạng thái',
-      cell: ({ row }: { row: { original: Article } }) => (
+      cell: ({ row }) => (
         <Chip
           label={STATUS_LABEL[row.original.status]}
           size="small"
@@ -99,28 +115,31 @@ const EmployerBlogListPage = () => {
       ),
     },
     {
+      accessorKey: 'authorName',
+      header: 'Tác giả',
+      cell: ({ row }) => <Typography variant="body2">{row.original.authorName || '—'}</Typography>,
+    },
+    {
       accessorKey: 'publishedAt',
       header: 'Ngày đăng',
-      cell: ({ row }: { row: { original: Article } }) => (
+      cell: ({ row }) => (
         <Typography variant="body2">
-          {row.original.publishedAt ? dayjs(row.original.publishedAt).format('DD/MM/YYYY') : '—'}
+          {row.original.publishedAt ? dayjs(row.original.publishedAt).format('DD/MM/YYYY HH:mm') : '—'}
         </Typography>
       ),
     },
     {
       accessorKey: 'viewCount',
       header: 'Lượt xem',
-      cell: ({ row }: { row: { original: Article } }) => (
-        <Typography variant="body2">{row.original.viewCount?.toLocaleString()}</Typography>
-      ),
+      cell: ({ row }) => <Typography variant="body2">{row.original.viewCount?.toLocaleString()}</Typography>,
     },
     {
       id: 'actions',
       header: 'Thao tác',
-      cell: ({ row }: { row: { original: Article } }) => (
+      cell: ({ row }) => (
         <Stack direction="row" spacing={0.5}>
           <Tooltip title="Chỉnh sửa">
-            <IconButton size="small" onClick={() => router.push(`/employer/blog/${row.original.id}`)}>
+            <IconButton size="small" onClick={() => router.push(`/admin/articles/${row.original.id}`)}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -140,29 +159,36 @@ const EmployerBlogListPage = () => {
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={4}>
         <Box>
           <Typography variant="h4" fontWeight={900} letterSpacing="-0.5px">
-            Blog tuyển dụng
+            Tin tức & Blog
           </Typography>
           <Typography variant="body2" color="text.secondary" mt={0.5}>
-            Chia sẻ kinh nghiệm, tips tuyển dụng của doanh nghiệp bạn
+            Quản lý bài viết tin tức và blog tuyển dụng
           </Typography>
         </Box>
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => router.push('/employer/blog/create')}
+          onClick={() => router.push('/admin/articles/create')}
           sx={{ borderRadius: 2, fontWeight: 700, px: 3 }}
         >
           Viết bài mới
         </Button>
       </Stack>
 
-      {/* Info banner */}
-      <Box sx={{ bgcolor: 'info.main', color: 'white', p: 2, borderRadius: 2, mb: 3, fontSize: '0.85rem' }}>
-        💡 Bài viết sẽ được gửi cho Admin duyệt trước khi hiển thị trên website. Thời gian duyệt thường trong 24 giờ.
-      </Box>
-
       {/* Filters */}
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} mb={3}>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} mb={3} alignItems="center">
+        <ToggleButtonGroup
+          value={category}
+          exclusive
+          onChange={(_, v) => { if (v) setCategory(v); }}
+          size="small"
+          sx={{ height: 40 }}
+        >
+          <ToggleButton value="all">Tất cả</ToggleButton>
+          <ToggleButton value="news">Tin tức</ToggleButton>
+          <ToggleButton value="blog">Blog</ToggleButton>
+        </ToggleButtonGroup>
+
         <FormControl size="small" sx={{ minWidth: 160 }}>
           <InputLabel>Trạng thái</InputLabel>
           <Select
@@ -174,6 +200,7 @@ const EmployerBlogListPage = () => {
             <MenuItem value="draft">Bản nháp</MenuItem>
             <MenuItem value="pending">Chờ duyệt</MenuItem>
             <MenuItem value="published">Đã đăng</MenuItem>
+            <MenuItem value="archived">Lưu trữ</MenuItem>
           </Select>
         </FormControl>
 
@@ -192,6 +219,9 @@ const EmployerBlogListPage = () => {
           }}
           sx={{ flex: 1, maxWidth: 400 }}
         />
+        <Button variant="outlined" onClick={() => setSearch(searchInput)} sx={{ height: 40 }}>
+          Tìm kiếm
+        </Button>
       </Stack>
 
       {/* Table */}
@@ -207,4 +237,4 @@ const EmployerBlogListPage = () => {
   );
 };
 
-export default EmployerBlogListPage;
+export default AdminArticlesPage;

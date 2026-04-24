@@ -1,8 +1,6 @@
 
 from console.jobs import queue_notification
 
-# from infobip_channels.sms.channel import SMSChannel
-
 from django.conf import settings
 from django.db import models
 
@@ -24,21 +22,20 @@ from rest_framework import generics
 from rest_framework import permissions as perms_sys
 
 from .models import (
-
     Feedback,
-
     Banner,
     BannerType,
-
+    Article,
 )
 
 from .serializers import (
-
     FeedbackSerializer,
-
     BannerSerializer,
-    AdminBannerTypeSerializer
-
+    AdminBannerTypeSerializer,
+    ArticleListSerializer,
+    ArticleDetailSerializer,
+    AdminArticleSerializer,
+    EmployerArticleSerializer,
 )
 
 
@@ -53,6 +50,7 @@ def get_banner_type_value_map():
         if code and value is not None:
             type_map[code] = int(value)
     return type_map
+
 
 class FeedbackViewSet(viewsets.ViewSet,
 
@@ -86,6 +84,7 @@ class FeedbackViewSet(viewsets.ViewSet,
 
         return var_res.response_data(data=serializer.data)
 
+
 @api_view(http_method_names=['post'])
 @permission_classes([perms_sys.AllowAny])
 def send_sms_download_app(request):
@@ -107,31 +106,6 @@ def send_sms_download_app(request):
                                      errors={"phone": [ERROR_MESSAGES["INVALID_PHONE"]]})
 
     try:
-
-        # Initialize the SMS channel with your credentials.
-
-        # channel = SMSChannel.from_auth_params(
-
-        #         "base_url": settings.SMS_BASE_URL,
-
-        #         "api_key": settings.SMS_API_KEY,
-
-        # # Send a message with the desired fields.
-
-        # sms_response = channel.send_sms_message(
-
-        #         "messages": [
-
-        #                 "destinations": [{"to": phone}],
-
-        #                 "text": NOTIFICATION_MESSAGES["DOWNLOAD_APP_MESSAGE"].format(
-
-        #                     company_name=settings.COMPANY_NAME,
-
-        #                     link_google_play=var_sys.LINK_GOOGLE_PLAY,
-
-        #                     link_appstore=var_sys.LINK_APPSTORE
-
         sms_response = "Mocked Response"
 
     except Exception as ex:
@@ -141,6 +115,7 @@ def send_sms_download_app(request):
         var_res.response_data(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     return var_res.response_data()
+
 
 @api_view(http_method_names=['get'])
 @permission_classes([perms_sys.AllowAny])
@@ -168,6 +143,7 @@ def get_web_banner(request):
 
     return var_res.response_data(data=serializer.data)
 
+
 @api_view(http_method_names=['get'])
 @permission_classes([perms_sys.AllowAny])
 def get_mobile_banner(request):
@@ -194,11 +170,10 @@ def get_mobile_banner(request):
 
     return var_res.response_data(data=serializer.data)
 
+
 @api_view(http_method_names=['post'])
 @permission_classes([perms_sys.AllowAny])
 def send_notification_demo(request):
-
-    # Only allow in development environment
 
     if settings.APP_ENVIRONMENT == app_set.ENV_PROD:
 
@@ -292,27 +267,20 @@ class AdminBannerViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         banner = serializer.save()
 
-        # Handle web image upload
         web_image = request.FILES.get('imageFile')
         if web_image:
-            file_record = self._handle_image_upload(
-                web_image, File.WEB_BANNER_TYPE
-            )
+            file_record = self._handle_image_upload(web_image, File.WEB_BANNER_TYPE)
             if file_record:
                 banner.image = file_record
                 banner.save()
 
-        # Handle mobile image upload
         mobile_image = request.FILES.get('imageMobileFile')
         if mobile_image:
-            file_record = self._handle_image_upload(
-                mobile_image, File.MOBILE_BANNER_TYPE
-            )
+            file_record = self._handle_image_upload(mobile_image, File.MOBILE_BANNER_TYPE)
             if file_record:
                 banner.image_mobile = file_record
                 banner.save()
 
-        # Re-serialize with image URLs
         banner.refresh_from_db()
         output = self.get_serializer(banner)
         return var_res.response_data(data=output.data)
@@ -325,22 +293,16 @@ class AdminBannerViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        # Handle web image upload
         web_image = request.FILES.get('imageFile')
         if web_image:
-            file_record = self._handle_image_upload(
-                web_image, File.WEB_BANNER_TYPE, banner.image
-            )
+            file_record = self._handle_image_upload(web_image, File.WEB_BANNER_TYPE, banner.image)
             if file_record:
                 banner.image = file_record
                 banner.save()
 
-        # Handle mobile image upload
         mobile_image = request.FILES.get('imageMobileFile')
         if mobile_image:
-            file_record = self._handle_image_upload(
-                mobile_image, File.MOBILE_BANNER_TYPE, banner.image_mobile
-            )
+            file_record = self._handle_image_upload(mobile_image, File.MOBILE_BANNER_TYPE, banner.image_mobile)
             if file_record:
                 banner.image_mobile = file_record
                 banner.save()
@@ -431,7 +393,6 @@ def system_settings_view(request):
     }
 
     if request.method == 'GET':
-        # Ensure defaults exist
         for key, (default_val, desc) in DEFAULTS.items():
             SystemSetting.objects.get_or_create(
                 key=key, defaults={'value': default_val, 'description': desc}
@@ -439,7 +400,6 @@ def system_settings_view(request):
         settings_qs = SystemSetting.objects.all()
         data = {}
         for s in settings_qs:
-            # Convert string booleans
             if s.value.lower() in ('true', 'false'):
                 data[s.key] = s.value.lower() == 'true'
             else:
@@ -453,3 +413,196 @@ def system_settings_view(request):
                 key=key, defaults={'value': str_value}
             )
         return var_res.response_data()
+
+
+# ===== Article ViewSets =====
+
+class ArticlePublicViewSet(viewsets.ReadOnlyModelViewSet):
+    """Public read-only access to published articles."""
+    permission_classes = [perms_sys.AllowAny]
+    renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
+    lookup_field = 'slug'
+
+    def get_queryset(self):
+        qs = Article.objects.filter(status=Article.STATUS_PUBLISHED).select_related('author', 'thumbnail')
+        category = self.request.GET.get('category')
+        tag = self.request.GET.get('tag')
+        search = self.request.GET.get('search') or self.request.GET.get('kw')
+        if category:
+            qs = qs.filter(category=category)
+        if tag:
+            qs = qs.filter(tags__icontains=tag)
+        if search:
+            qs = qs.filter(
+                models.Q(title__icontains=search) | models.Q(excerpt__icontains=search)
+            )
+        return qs
+
+    def get_serializer_class(self):
+        if self.action == 'retrieve':
+            return ArticleDetailSerializer
+        return ArticleListSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        # Increment view count
+        Article.objects.filter(pk=instance.pk).update(view_count=models.F('view_count') + 1)
+        instance.refresh_from_db()
+        serializer = self.get_serializer(instance)
+        return var_res.response_data(data=serializer.data)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
+
+
+class AdminArticleViewSet(viewsets.ModelViewSet):
+    """Admin full CRUD for articles (news + blog)."""
+    queryset = Article.objects.all().select_related('author', 'thumbnail').order_by('-create_at')
+    permission_classes = [perms_sys.IsAdminUser]
+    renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
+    serializer_class = AdminArticleSerializer
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        category = self.request.GET.get('category')
+        status_filter = self.request.GET.get('status')
+        search = self.request.GET.get('search') or self.request.GET.get('kw')
+        if category:
+            qs = qs.filter(category=category)
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        if search:
+            qs = qs.filter(
+                models.Q(title__icontains=search) | models.Q(excerpt__icontains=search)
+            )
+        return qs
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        article = serializer.save(author=request.user if not request.data.get('author') else None)
+        self._handle_thumbnail(request, article)
+        article.refresh_from_db()
+        return var_res.response_data(data=self.get_serializer(article).data)
+
+    def update(self, request, *args, **kwargs):
+        article = self.get_object()
+        serializer = self.get_serializer(article, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        self._handle_thumbnail(request, article)
+        article.refresh_from_db()
+        return var_res.response_data(data=self.get_serializer(article).data)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return var_res.response_data(data=serializer.data)
+
+    def _handle_thumbnail(self, request, article):
+        from shared.helpers.cloudinary_service import CloudinaryService
+        from apps.files.models import File
+        thumb_file = request.FILES.get('thumbnailFile')
+        if thumb_file:
+            upload_result = CloudinaryService.upload_image(thumb_file, 'articles')
+            if upload_result:
+                file_record = File.update_or_create_file_with_cloudinary(
+                    article.thumbnail, upload_result, 'ARTICLE_THUMBNAIL'
+                )
+                if file_record:
+                    article.thumbnail = file_record
+                    article.save()
+
+
+class EmployerArticleViewSet(viewsets.ModelViewSet):
+    """Employer CRUD for their own blog posts."""
+    permission_classes = [perms_sys.IsAuthenticated]
+    renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
+    serializer_class = EmployerArticleSerializer
+    lookup_field = 'pk'
+
+    def get_queryset(self):
+        qs = Article.objects.filter(
+            category=Article.CATEGORY_BLOG,
+            author=self.request.user
+        ).select_related('thumbnail').order_by('-create_at')
+        status_filter = self.request.GET.get('status')
+        search = self.request.GET.get('search') or self.request.GET.get('kw')
+        if status_filter:
+            qs = qs.filter(status=status_filter)
+        if search:
+            qs = qs.filter(models.Q(title__icontains=search))
+        return qs
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        article = serializer.save()
+        self._handle_thumbnail(request, article)
+        article.refresh_from_db()
+        return var_res.response_data(data=self.get_serializer(article).data)
+
+    def update(self, request, *args, **kwargs):
+        article = self.get_object()
+        if article.author != request.user:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+        serializer = self.get_serializer(article, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        self._handle_thumbnail(request, article)
+        article.refresh_from_db()
+        return var_res.response_data(data=self.get_serializer(article).data)
+
+    def destroy(self, request, *args, **kwargs):
+        article = self.get_object()
+        if article.author != request.user:
+            return var_res.response_data(status=status.HTTP_403_FORBIDDEN)
+        article.delete()
+        return var_res.response_data()
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return var_res.response_data(data=serializer.data)
+
+    def _handle_thumbnail(self, request, article):
+        from shared.helpers.cloudinary_service import CloudinaryService
+        from apps.files.models import File
+        thumb_file = request.FILES.get('thumbnailFile')
+        if thumb_file:
+            upload_result = CloudinaryService.upload_image(thumb_file, 'articles')
+            if upload_result:
+                file_record = File.update_or_create_file_with_cloudinary(
+                    article.thumbnail, upload_result, 'ARTICLE_THUMBNAIL'
+                )
+                if file_record:
+                    article.thumbnail = file_record
+                    article.save()

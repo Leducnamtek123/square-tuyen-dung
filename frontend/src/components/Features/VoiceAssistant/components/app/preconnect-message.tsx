@@ -47,9 +47,9 @@ export function PreConnectMessage({ className, messages = EMPTY_MESSAGES }: PreC
           <MotionMessage
             {...VIEW_MOTION_PROPS}
             aria-hidden={messages.length > 0}
-            className={cn('pointer-events-none text-center', className)}
+            className={cn('pointer-events-none text-center text-white/80', className)}
           >
-            <ShimmerText className="text-sm font-semibold">
+            <ShimmerText className="text-xs font-black uppercase tracking-[0.28em]">
               Agent is listening, ask it a question
             </ShimmerText>
           </MotionMessage>

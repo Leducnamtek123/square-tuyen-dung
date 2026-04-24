@@ -124,16 +124,17 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
       elevation={0}
       sx={{
         p: 2.5,
-        borderRadius: 4,
+        borderRadius: 5,
         border: '1px solid',
-        borderColor: pc.primary( 0.12),
-        bgcolor: pc.bgPaper( 0.9),
+        borderColor: pc.primary(0.12),
+        bgcolor: pc.bgPaper(0.92),
         overflow: 'hidden',
         position: 'relative',
         transition: 'all 0.25s ease',
+        boxShadow: '0 24px 60px rgba(15, 23, 42, 0.10)',
         '&:hover': {
           transform: 'translateY(-2px)',
-          boxShadow: `0 16px 40px ${pc.primary( 0.08)}`,
+          boxShadow: `0 22px 50px ${pc.primary(0.08)}`,
         },
       }}
     >
@@ -153,7 +154,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
       <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={2} sx={{ mb: 1.75 }}>
         <Box>
           <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 0.5 }}>
-            <Avatar sx={{ width: 28, height: 28, bgcolor: pc.primary( 0.1), color: 'primary.main' }}>
+            <Avatar sx={{ width: 30, height: 30, bgcolor: pc.primary(0.1), color: 'primary.main' }}>
               <PersonIcon sx={{ fontSize: 18 }} />
             </Avatar>
             <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary' }}>
@@ -169,18 +170,18 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
         </Box>
       </Stack>
 
-        <InterviewLiveCandidateCardPanel
-          session={session}
-          connectionDetails={state.connectionDetails}
-          loadingToken={state.loadingToken}
-          tokenError={state.tokenError}
-          isForceEnding={isForceEnding}
-          fullscreenOpen={state.fullscreenOpen}
-          isLive={isLive}
-          onForceEnd={onForceEnd}
-          onOpenFullscreen={() => dispatch({ type: 'set_fullscreen_open', value: true })}
-          onCloseFullscreen={() => dispatch({ type: 'set_fullscreen_open', value: false })}
-        />
+      <InterviewLiveCandidateCardPanel
+        session={session}
+        connectionDetails={state.connectionDetails}
+        loadingToken={state.loadingToken}
+        tokenError={state.tokenError}
+        isForceEnding={isForceEnding}
+        fullscreenOpen={state.fullscreenOpen}
+        isLive={isLive}
+        onForceEnd={onForceEnd}
+        onOpenFullscreen={() => dispatch({ type: 'set_fullscreen_open', value: true })}
+        onCloseFullscreen={() => dispatch({ type: 'set_fullscreen_open', value: false })}
+      />
     </Paper>
   );
 };

@@ -52,6 +52,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
           <MenuItem text={t('admin:sidebar.bannersManagement')} to={`/${ROUTES.ADMIN.BANNERS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.BANNERS}`} isChild />
           <MenuItem text="Banner Types" to={`/${ROUTES.ADMIN.BANNER_TYPES}`} isSelected={location.pathname === `/${ROUTES.ADMIN.BANNER_TYPES}`} isChild />
           <MenuItem text={t('admin:sidebar.feedbacksManagement')} to={`/${ROUTES.ADMIN.FEEDBACKS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.FEEDBACKS}`} isChild />
+          <MenuItem text={t('admin:sidebar.articlesManagement')} to={`/${ROUTES.ADMIN.ARTICLES}`} isSelected={location.pathname?.startsWith(`/${ROUTES.ADMIN.ARTICLES}`) ?? false} isChild />
           <MenuItem text={t('admin:sidebar.chatWithEmployers')} to={`/${ROUTES.ADMIN.CHAT}`} isSelected={location.pathname === `/${ROUTES.ADMIN.CHAT}`} isChild />
         </List>
       </Collapse>
