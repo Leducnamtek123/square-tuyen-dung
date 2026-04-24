@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Divider, Paper, Typography, Stack, List, ListItem, ListItemIcon, ListItemText, Chip, alpha, useTheme } from '@mui/material';
+import { Box, Divider, Paper, Typography, Stack, List, ListItem, ListItemIcon, ListItemText, Chip } from '@mui/material';
 import { Grid2 as Grid } from "@mui/material";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
@@ -45,7 +45,6 @@ const toStringArray = (value: unknown): string[] => {
 };
 
 const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session, t }) => {
-    const theme = useTheme();
     const strengthsRaw = session.aiStrengths || session.ai_strengths;
     const strengths: string[] = toStringArray(strengthsRaw);
         
@@ -215,7 +214,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                         sx={{
                                             p: 3,
                                             borderRadius: 3,
-                                            bgcolor: alpha(theme.palette.common.white, 0.65),
+                                            bgcolor: 'rgba(255, 255, 255, 0.65)',
                                             border: '1px solid',
                                             borderColor: pc.primary( 0.08),
                                         }}

@@ -227,7 +227,7 @@ const JobPost = ({
           {salaryString(salaryMin, salaryMax)}
         </MetaItem>
         <MetaItem icon={<FontAwesomeIcon icon={faLocationDot} color={theme.palette.primary.main} />}>
-          {tConfig(allConfig?.cityDict?.[cityId]) || <span style={{ fontStyle: 'italic', color: theme.palette.grey[500] }}>{t('labels.notUpdated')}</span>}
+          {tConfig(allConfig?.cityDict?.[cityId]) || <span style={{ fontStyle: 'italic', color: theme.palette.grey[500] }}>{t('common:labels.notUpdated')}</span>}
         </MetaItem>
         <MetaItem icon={<FontAwesomeIcon icon={faCalendarDays} color={theme.palette.primary.main} />}>
           {dayjs(deadline).format('DD/MM/YYYY')}

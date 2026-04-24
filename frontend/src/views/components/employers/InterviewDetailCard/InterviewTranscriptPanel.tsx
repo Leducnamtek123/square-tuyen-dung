@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Box, Paper, Stack, Typography, Divider, Avatar, Chip, alpha, useTheme } from '@mui/material';
+import { Box, Paper, Stack, Typography, Divider, Avatar, Chip } from '@mui/material';
 import ForumIcon from '@mui/icons-material/Forum';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
@@ -31,7 +31,6 @@ type TranscriptItem = {
 const EMPTY_LIVE_TRANSCRIPTS: SSETranscript[] = [];
 
 const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n, liveTranscripts = EMPTY_LIVE_TRANSCRIPTS, isLive = false }) => {
-    const theme = useTheme();
     const transcriptEndRef = useRef<HTMLDivElement>(null);
 
     // Merge existing + live transcripts, deduplicate by id
@@ -110,10 +109,10 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                             height: 24,
                             fontSize: '0.65rem',
                             letterSpacing: 1.5,
-                            bgcolor: alpha('#22c55e', 0.08),
+                            bgcolor: 'rgba(34, 197, 94, 0.08)',
                             color: '#22c55e',
                             border: '1px solid',
-                            borderColor: alpha('#22c55e', 0.15),
+                            borderColor: 'rgba(34, 197, 94, 0.15)',
                         }}
                     />
                 )}
@@ -173,7 +172,7 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                                         bgcolor: isInterviewer ? 'primary.main' : 'secondary.main',
                                         boxShadow: (theme) => isInterviewer ? theme.customShadows?.primary : theme.customShadows?.secondary,
                                         border: '2.5px solid',
-                                        borderColor: isInterviewer ? alpha(theme.palette.primary.light, 0.5) : alpha(theme.palette.secondary.light, 0.5)
+                                        borderColor: isInterviewer ? 'rgba(42, 169, 225, 0.5)' : 'rgba(16, 185, 129, 0.5)'
                                     }}>
                                         {isInterviewer ? <SmartToyIcon sx={{ fontSize: 24 }} /> : <PersonIcon sx={{ fontSize: 24 }} />}
                                     </Avatar>
@@ -191,10 +190,10 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                                                         fontSize: '0.55rem',
                                                         fontWeight: 900,
                                                         letterSpacing: 1,
-                                                        bgcolor: alpha('#f59e0b', 0.1),
+                                                        bgcolor: 'rgba(245, 158, 11, 0.1)',
                                                         color: '#f59e0b',
                                                         border: '1px solid',
-                                                        borderColor: alpha('#f59e0b', 0.2),
+                                                        borderColor: 'rgba(245, 158, 11, 0.2)',
                                                     }}
                                                 />
                                             )}

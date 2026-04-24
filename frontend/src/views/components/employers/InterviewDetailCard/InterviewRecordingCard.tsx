@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Divider, Paper, Typography, Stack, alpha, useTheme } from '@mui/material';
+import { Box, Button, Divider, Paper, Typography, Stack } from '@mui/material';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 
@@ -13,7 +13,6 @@ interface InterviewRecordingCardProps {
 }
 
 const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordingUrl, isCompleted = false, t }) => {
-    const theme = useTheme();
     if (!recordingUrl && !isCompleted) return null;
 
     return (
@@ -54,7 +53,7 @@ const InterviewRecordingCard: React.FC<InterviewRecordingCardProps> = ({ recordi
                                 justifyContent: 'center',
                                 boxShadow: (theme) => theme.customShadows?.z12,
                                 border: '1px solid',
-                                borderColor: alpha(theme.palette.common.white, 0.1)
+                                borderColor: 'rgba(255, 255, 255, 0.1)'
                             }}
                         >
                             <Box

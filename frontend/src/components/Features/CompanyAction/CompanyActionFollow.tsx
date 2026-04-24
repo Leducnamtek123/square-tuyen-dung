@@ -90,7 +90,7 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                   <FontAwesomeIcon icon={faFontAwesome} style={{ fontSize: 14 }} color={theme.palette.grey[400]} />
                   {company?.fieldOperation || (
                     <span style={{ color: theme.palette.grey[400], fontStyle: 'italic', fontSize: 13 }}>
-                      {t('labels.notUpdated')}
+                      {t('common:labels.notUpdated')}
                     </span>
                   )}
                 </Typography>
@@ -108,11 +108,11 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                 >
                   <Typography variant="body2">
                     <FontAwesomeIcon icon={faUsers} style={{ fontSize: 14 }} color={theme.palette.grey[400]} />
-                    {company?.followNumber} {t('companyDetail.followed', { defaultValue: 'theo dõi' })}
+                    {company?.followNumber} {t('companyDetail.followed')}
                   </Typography>
                   <Typography variant="body2">
                     <FontAwesomeIcon icon={faBriefcase} style={{ fontSize: 14 }} color={theme.palette.grey[400]} />
-                    {company?.jobPostNumber} {t('nav.jobs', { defaultValue: 'việc làm' })}
+                    {company?.jobPostNumber} {t('nav.jobs')}
                   </Typography>
                 </Stack>
               </Stack>

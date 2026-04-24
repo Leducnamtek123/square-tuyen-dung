@@ -8,7 +8,6 @@ import {
   Paper,
   Stack,
   Typography,
-  alpha,
   useTheme,
 } from '@mui/material';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
@@ -60,7 +59,7 @@ const AIAnalysisDrawerStatePanels = ({
           border: '1px solid',
           borderColor: pc.info( 0.3),
           borderRadius: 3,
-          background: `linear-gradient(135deg, ${theme.palette.info.dark} 0%, ${alpha(theme.palette.info.dark, 0.8)} 100%)`,
+          background: `linear-gradient(135deg, #0369a1 0%, rgba(3, 105, 161, 0.8) 100%)`,
           boxShadow: (muiTheme) => muiTheme.customShadows?.info,
         }}
       >
@@ -85,7 +84,7 @@ const AIAnalysisDrawerStatePanels = ({
           sx={{
             height: 10,
             borderRadius: 5,
-            bgcolor: alpha(theme.palette.info.light, 0.2),
+            bgcolor: 'rgba(186, 230, 253, 0.2)',
             '& .MuiLinearProgress-bar': {
               borderRadius: 5,
               background: `linear-gradient(90deg, ${theme.palette.info.light} 0%, white 100%)`,

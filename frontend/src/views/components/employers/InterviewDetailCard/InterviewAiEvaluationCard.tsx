@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Button, Chip, CircularProgress, Divider, Paper, Stack, Typography, LinearProgress, alpha, useTheme } from '@mui/material';
+import { Box, Button, Chip, CircularProgress, Divider, Paper, Stack, Typography, LinearProgress } from '@mui/material';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import { InterviewSession } from '@/types/models';
@@ -15,7 +15,6 @@ interface InterviewAiEvaluationCardProps {
 }
 
 const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ session, effectiveStatus, t, onTriggerAi, isTriggeringAi = false }) => {
-    const theme = useTheme();
     const hasResult = (session.aiOverallScore ?? session.ai_overall_score) !== null && (session.aiOverallScore ?? session.ai_overall_score) !== undefined;
     const isProcessing = effectiveStatus === 'processing' || session.status === 'processing';
 
@@ -26,8 +25,8 @@ const InterviewAiEvaluationCard: React.FC<InterviewAiEvaluationCardProps> = ({ s
                 p: { xs: 3, md: 5 },
                 borderRadius: 4,
                 background: (theme) => theme.palette.mode === 'dark' 
-                    ? `linear-gradient(135deg, ${alpha(theme.palette.primary.dark, 0.2)} 0%, ${pc.bgPaper( 0.8)} 100%)`
-                    : `linear-gradient(135deg, ${alpha(theme.palette.primary.light, 0.05)} 0%, ${pc.bgPaper( 1)} 100%)`,
+                    ? `linear-gradient(135deg, rgba(15, 57, 127, 0.2) 0%, ${pc.bgPaper(0.8)} 100%)`
+                    : `linear-gradient(135deg, rgba(42, 169, 225, 0.05) 0%, ${pc.bgPaper(1)} 100%)`,
                 border: '1px solid',
                 borderColor: 'divider',
                 boxShadow: (theme) => theme.customShadows?.z1,

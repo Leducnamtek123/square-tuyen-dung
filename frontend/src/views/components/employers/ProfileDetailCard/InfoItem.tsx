@@ -55,7 +55,7 @@ const InfoItem: React.FC<InfoItemProps> = ({ label, value, icon }) => {
             lineHeight: 1.4
         }}
       >
-        {value || t('labels.notUpdated')}
+        {value || t('common:labels.notUpdated')}
       </Typography>
     </Box>
   );

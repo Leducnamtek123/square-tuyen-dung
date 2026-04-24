@@ -1,7 +1,7 @@
 'use client';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Box, Chip, IconButton, Tooltip, Stack, Typography, alpha, useTheme } from "@mui/material";
+import { Box, Chip, IconButton, Tooltip, Stack, Typography } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import LaunchIcon from '@mui/icons-material/Launch';
@@ -39,7 +39,6 @@ const JobPostsTable = ({
 
   const { t } = useTranslation('employer');
   const { allConfig } = useConfig();
-  const theme = useTheme();
 
   const columns = useMemo<ColumnDef<JobPost>[]>(() => [
     {
@@ -135,6 +134,16 @@ const JobPostsTable = ({
         const colorKey = ((JOB_POST_STATUS_BG_COLOR as Record<string, string>)[val]) || 'default';
         const muiColor = colorKey === 'default' ? 'default' : colorKey;
         
+        // pc.X() is used here to avoid alpha(theme.palette[dynamic].main) which crashes in MUI v6
+        const STATUS_CHIP_COLORS: Record<string, { bg: string; border: string }> = {
+          primary:   { bg: pc.primary(0.12),   border: pc.primary(0.24) },
+          secondary: { bg: pc.secondary(0.12), border: pc.secondary(0.24) },
+          error:     { bg: pc.error(0.12),     border: pc.error(0.24) },
+          info:      { bg: pc.info(0.12),      border: pc.info(0.24) },
+          success:   { bg: pc.success(0.12),   border: pc.success(0.24) },
+          warning:   { bg: pc.warning(0.12),   border: pc.warning(0.24) },
+        };
+        const chipColors = muiColor !== 'default' ? STATUS_CHIP_COLORS[muiColor] : null;
         return (
           <Chip
             label={label}
@@ -142,10 +151,10 @@ const JobPostsTable = ({
             sx={{ 
               fontWeight: 800, 
               borderRadius: 1.5,
-              bgcolor: muiColor !== 'default' ? alpha(theme.palette[muiColor as 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'].main, 0.12) : 'action.selected',
+              bgcolor: chipColors ? chipColors.bg : 'action.selected',
               color: muiColor !== 'default' ? `${muiColor}.main` : 'text.secondary',
               border: '1px solid',
-              borderColor: muiColor !== 'default' ? alpha(theme.palette[muiColor as 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning'].main, 0.24) : 'divider',
+              borderColor: chipColors ? chipColors.border : 'divider',
             }}
           />
         );
@@ -187,7 +196,7 @@ const JobPostsTable = ({
         </Stack>
       ),
     },
-  ], [allConfig, handleDelete, handleUpdate, t, theme]);
+  ], [allConfig, handleDelete, handleUpdate, t]);
 
   return (
     <DataTable
