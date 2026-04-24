@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from "react";
 import { Avatar, Box, Button, Card, Stack, Typography } from "@mui/material";
 import UserMenu from "../UserMenu";

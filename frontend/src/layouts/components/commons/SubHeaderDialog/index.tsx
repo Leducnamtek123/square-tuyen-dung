@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import useMediaQuery from '@mui/material/useMediaQuery';

@@ -1,4 +1,6 @@
-﻿import React from "react";
+﻿'use client';
+
+import React from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from 'next/navigation';
 import * as yup from "yup";
@@ -49,39 +51,39 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
   const schema = yup.object().shape({
     fullName: yup
       .string()
-      .required(t("applyForm.validation.fullNameRequired", { defaultValue: "Họ và tên là bắt buộc." }))
-      .max(100, t("applyForm.validation.fullNameMax", { defaultValue: "Họ và tên vượt quá độ dài cho phép." })),
+      .required(t("applyForm.validation.fullNameRequired", { defaultValue: "Ho va ten la bat buoc." }))
+      .max(100, t("applyForm.validation.fullNameMax", { defaultValue: "Ho va ten vuot qua do dai cho phep." })),
     email: yup
       .string()
-      .required(t("applyForm.validation.emailRequired", { defaultValue: "Email là bắt buộc." }))
-      .email(t("applyForm.validation.emailInvalid", { defaultValue: "Email không hợp lệ." }))
-      .max(100, t("applyForm.validation.emailMax", { defaultValue: "Email vượt quá độ dài cho phép." })),
+      .required(t("applyForm.validation.emailRequired", { defaultValue: "Email la bat buoc." }))
+      .email(t("applyForm.validation.emailInvalid", { defaultValue: "Email khong hop le." }))
+      .max(100, t("applyForm.validation.emailMax", { defaultValue: "Email vuot qua do dai cho phep." })),
     phone: yup
       .string()
-      .required(t("applyForm.validation.phoneRequired", { defaultValue: "Số điện thoại là bắt buộc." }))
-      .matches(REGEX_VALIDATE.phoneRegExp, t("applyForm.validation.phoneInvalid", { defaultValue: "Số điện thoại không hợp lệ." }))
-      .max(15, t("applyForm.validation.phoneMax", { defaultValue: "Số điện thoại vượt quá độ dài cho phép." })),
+      .required(t("applyForm.validation.phoneRequired", { defaultValue: "So dien thoai la bat buoc." }))
+      .matches(REGEX_VALIDATE.phoneRegExp, t("applyForm.validation.phoneInvalid", { defaultValue: "So dien thoai khong hop le." })),
     resume: yup
       .string()
-      .required(t("applyForm.validation.resumeRequired", { defaultValue: "Vui lòng chọn hồ sơ ứng tuyển." })),
+      .required(t("applyForm.validation.resumeRequired", { defaultValue: "Vui long chon ho so." })),
   });
 
-  const { control, setValue, handleSubmit, watch, getValues } = useForm<ApplyFormValues>({
-    defaultValues: {
-      fullName: currentUser?.fullName || "",
-      email: currentUser?.email || "",
-      phone: (currentUser as { jobSeekerProfile?: { phone?: string } })?.jobSeekerProfile?.phone || "",
-      resume: "",
-    },
-    resolver: typedYupResolver<ApplyFormValues>(schema),
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    getValues,
+  } = useForm<ApplyFormValues>({
+    resolver: typedYupResolver(schema),
+    defaultValues: { fullName: "", email: "", phone: "", resume: "" },
   });
 
   React.useEffect(() => {
-    const getOnlineProfile = async (jobSeekerProfileId: number | string | undefined) => {
+    const getOnlineProfile = async (jobSeekerProfileId?: number | string) => {
       try {
+        setState((prev) => ({ ...prev, isLoadingResumes: true }));
         const resData = await jobSeekerProfileService.getResumes(jobSeekerProfileId);
-        const parsedResumes = Array.isArray(resData) ? resData : (resData.results || []);
-        setState({ isLoadingResumes: false, resumes: parsedResumes });
+        setState((prev) => ({ ...prev, resumes: resData.results || [], isLoadingResumes: false }));
       } catch (error) {
         errorHandling(error);
         setState((prev) => ({ ...prev, isLoadingResumes: false }));
@@ -95,10 +97,8 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
 
   React.useEffect(() => {
     if (state.resumes.length === 0) return;
-
     const currentResume = getValues("resume");
     if (currentResume) return;
-
     const defaultResume =
       state.resumes.find((value) => value.type === CV_TYPES.cvWebsite) || state.resumes[0];
     if (defaultResume?.id) {
@@ -126,10 +126,10 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                   }}
                 >
                   <Typography variant="body1" color="error" sx={{ fontWeight: 600, mb: 1 }}>
-                    {t("applyForm.resume.empty", { defaultValue: "Bạn chưa có hồ sơ nào." })}
+                    {t("applyForm.resume.empty", { defaultValue: "Ban chua co ho so nao." })}
                   </Typography>
                   <Typography variant="body2" sx={{ mb: 2 }}>
-                    {t("applyForm.resume.pleaseUpload", { defaultValue: "Vui lòng tải lên hoặc tạo hồ sơ để ứng tuyển." })}
+                    {t("applyForm.resume.pleaseUpload", { defaultValue: "Vui long tai len hoac tao ho so de ung tuyen." })}
                   </Typography>
                   <Button
                     variant="contained"
@@ -138,7 +138,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                     onClick={() => nav.push(`/${ROUTES.JOB_SEEKER.PROFILE}`)}
                     sx={{ textTransform: "none" }}
                   >
-                    {t("applyForm.resume.createNow", { defaultValue: "Tạo hồ sơ ngay" })}
+                    {t("applyForm.resume.createNow", { defaultValue: "Tao ho so ngay" })}
                   </Button>
                 </Card>
               ) : (
@@ -191,9 +191,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                               flex: 1,
                               ml: 0,
                               mr: 0,
-                              "& .MuiFormControlLabel-label": {
-                                flex: 1,
-                              },
+                              "& .MuiFormControlLabel-label": { flex: 1 },
                             }}
                           />
                           <Link
@@ -206,9 +204,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                             sx={{
                               textDecoration: "none",
                               color: "primary.main",
-                              "&:hover": {
-                                opacity: 0.8,
-                              },
+                              "&:hover": { opacity: 0.8 },
                             }}
                           >
                             <Stack direction="row" spacing={0.5} alignItems="center">
@@ -230,9 +226,9 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
           <Grid size={12}>
             <TextFieldCustom
               name="fullName"
-              title={t("applyForm.fields.fullName", { defaultValue: "Họ và tên" })}
+              title={t("applyForm.fields.fullName", { defaultValue: "Ho va ten" })}
               showRequired={true}
-              placeholder={t("applyForm.placeholders.fullName", { defaultValue: "Nhập họ và tên" })}
+              placeholder={t("applyForm.placeholders.fullName", { defaultValue: "Nhap ho va ten" })}
               control={control}
             />
           </Grid>
@@ -242,7 +238,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
               name="email"
               title={t("applyForm.fields.email", { defaultValue: "Email" })}
               showRequired={true}
-              placeholder={t("applyForm.placeholders.email", { defaultValue: "Nhập email" })}
+              placeholder={t("applyForm.placeholders.email", { defaultValue: "Nhap email" })}
               control={control}
             />
           </Grid>
@@ -250,9 +246,9 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
           <Grid size={12}>
             <TextFieldCustom
               name="phone"
-              title={t("applyForm.fields.phone", { defaultValue: "Số điện thoại" })}
+              title={t("applyForm.fields.phone", { defaultValue: "So dien thoai" })}
               showRequired={true}
-              placeholder={t("applyForm.placeholders.phone", { defaultValue: "Nhập số điện thoại" })}
+              placeholder={t("applyForm.placeholders.phone", { defaultValue: "Nhap so dien thoai" })}
               control={control}
             />
           </Grid>
@@ -260,7 +256,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
           <Grid size={12}>
             <Typography color="GrayText" variant="caption">
               {t("applyForm.note", {
-                defaultValue: "Lưu ý: Họ tên, email và số điện thoại cần chính xác để nhà tuyển dụng liên hệ với bạn.",
+                defaultValue: "Luu y: Ho ten, email va so dien thoai can chinh xac de nha tuyen dung lien he voi ban.",
               })}
             </Typography>
           </Grid>

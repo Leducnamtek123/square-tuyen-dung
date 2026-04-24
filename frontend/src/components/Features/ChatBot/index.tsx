@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useEffect, useMemo, useRef, useReducer } from 'react';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';

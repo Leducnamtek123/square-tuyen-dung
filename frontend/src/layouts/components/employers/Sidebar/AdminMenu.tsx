@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Collapse, List, ListItem } from '@mui/material';
 import GridViewIcon from '@mui/icons-material/GridView';

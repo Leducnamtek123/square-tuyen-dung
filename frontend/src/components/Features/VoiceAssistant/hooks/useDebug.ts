@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { LogLevel, setLogLevel } from 'livekit-client';
 import { useRoomContext } from '@livekit/components-react';

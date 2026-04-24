@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Box, Stack, Typography } from "@mui/material";
 import { ChromePicker, ColorResult } from 'react-color';

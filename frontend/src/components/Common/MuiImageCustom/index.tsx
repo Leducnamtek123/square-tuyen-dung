@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Image from 'mui-image';
 import type { StaticImageData } from 'next/image';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect } from 'react';
 import { useAgent, useSessionContext } from '@livekit/components-react';
 import { toastAlert } from '@/components/Features/VoiceAssistant/components/livekit/alert-toast';

@@ -1,3 +1,5 @@
+'use client';
+
 import { memo, useEffect, useMemo, useState } from "react";
 import type { HTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
