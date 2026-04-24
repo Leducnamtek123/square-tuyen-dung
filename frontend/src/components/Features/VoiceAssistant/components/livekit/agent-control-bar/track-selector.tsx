@@ -1,12 +1,12 @@
 'use client';
 
 import {
-  BarVisualizer,
   type TrackReferenceOrPlaceholder,
   useTrackToggle,
 } from '@livekit/components-react';
 import { TrackDeviceSelect } from '@/components/Features/VoiceAssistant/components/livekit/agent-control-bar/track-device-select';
 import { TrackToggle } from '@/components/Features/VoiceAssistant/components/livekit/agent-control-bar/track-toggle';
+import { AgentAudioVisualizerAura } from '@/components/Features/VoiceAssistant/components/livekit/agent-audio-visualizer-aura';
 import { cn } from '@/lib/utils';
 
 interface TrackSelectorProps {
@@ -47,20 +47,12 @@ export function TrackSelector({
         className="peer/track group/track has-[.audiovisualizer]:w-auto has-[.audiovisualizer]:px-3 has-[~_button]:rounded-r-none has-[~_button]:pr-2 has-[~_button]:pl-3"
       >
         {audioTrackRef && (
-          <BarVisualizer
-            barCount={3}
-            options={{ minHeight: 5 }}
-            track={audioTrackRef}
-            className="audiovisualizer flex h-6 w-auto items-center justify-center gap-0.5"
-          >
-            <span
-              className={cn([
-                'h-full w-0.5 origin-center rounded-2xl',
-                'group-data-[state=on]/track:bg-foreground group-data-[state=off]/track:bg-destructive',
-                'data-lk-muted:bg-muted',
-              ])}
-            />
-          </BarVisualizer>
+          <AgentAudioVisualizerAura
+            audioTrack={audioTrackRef}
+            variant="compact"
+            color="#38bdf8"
+            className="audiovisualizer h-6 w-[44px]"
+          />
         )}
       </TrackToggle>
       <hr className="bg-border peer-data-[state=off]/track:bg-destructive/20 relative z-10 -mr-px hidden h-4 w-px border-none has-[~_button]:block" />

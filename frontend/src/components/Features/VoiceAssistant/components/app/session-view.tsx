@@ -48,7 +48,7 @@ function Fade({ top = false, bottom = false, className }: FadeProps) {
   return (
     <div
       className={cn(
-        'from-slate-950/95 via-slate-950/60 pointer-events-none h-4 bg-linear-to-b to-transparent',
+        'from-background via-background/60 pointer-events-none h-4 bg-linear-to-b to-transparent',
         top && 'bg-linear-to-b',
         bottom && 'bg-linear-to-t',
         className
@@ -94,7 +94,7 @@ export const SessionView = ({
         {/* Chat Transcript */}
         <div
           className={cn(
-            'fixed inset-0 grid grid-cols-1 grid-rows-1',
+            'absolute top-0 bottom-[135px] flex w-full flex-col md:bottom-[170px]',
             !chatOpen && 'pointer-events-none'
           )}
         >
@@ -117,7 +117,7 @@ export const SessionView = ({
         {/* Bottom */}
         <MotionBottom
           {...BOTTOM_VIEW_MOTION_PROPS}
-          className="fixed inset-x-3 bottom-0 z-50 md:inset-x-12"
+          className="absolute inset-x-3 bottom-0 z-50 md:inset-x-12"
         >
           {appConfig.isPreConnectBufferEnabled && (
             <PreConnectMessage messages={messages} className="pb-4" />

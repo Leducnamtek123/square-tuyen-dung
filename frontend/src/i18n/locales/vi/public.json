@@ -216,6 +216,17 @@
         "home": "Trang chủ",
         "company": "Công ty"
       }
+    },
+    "newsList": {
+      "title": "Tin tức & Blog tuyển dụng",
+      "description": "Cập nhật xu hướng tuyển dụng, kinh nghiệm ứng tuyển và chia sẻ từ doanh nghiệp trên Square.",
+      "keywords": "tin tức tuyển dụng, blog tuyển dụng, kinh nghiệm xin việc, xu hướng tuyển dụng"
+    },
+    "articleDetail": {
+      "description": "Bài viết chi tiết trên Square Tuyển Dụng.",
+      "breadcrumb": {
+        "home": "Trang chủ"
+      }
     }
   }
 }

@@ -43,6 +43,7 @@ const PUBLIC_PREFIX_URLS: readonly string[] = [
   // Public content
   'content/web/banner',
   'content/web/feedbacks/',
+  'content/web/articles/',
 
   // Interview invite (public token-based access)
   'interview/web/sessions/invite/',

@@ -2,6 +2,7 @@
 
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'motion/react';
 import { type ReceivedMessage } from '@livekit/components-react';
+import { useTranslation } from 'react-i18next';
 import { ShimmerText } from '@/components/Features/VoiceAssistant/components/livekit/shimmer-text';
 import { cn } from '@/lib/utils';
 
@@ -40,6 +41,8 @@ interface PreConnectMessageProps {
 }
 
 export function PreConnectMessage({ className, messages = EMPTY_MESSAGES }: PreConnectMessageProps) {
+  const { t } = useTranslation('voiceAssistant');
+
   return (
     <LazyMotion features={domAnimation}>
       <AnimatePresence>
@@ -50,7 +53,7 @@ export function PreConnectMessage({ className, messages = EMPTY_MESSAGES }: PreC
             className={cn('pointer-events-none text-center text-white/80', className)}
           >
             <ShimmerText className="text-xs font-black uppercase tracking-[0.28em]">
-              Agent is listening, ask it a question
+              {t('preconnectMessage')}
             </ShimmerText>
           </MotionMessage>
         )}

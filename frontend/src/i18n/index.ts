@@ -13,6 +13,7 @@ import en_chat from './locales/en/chat.json';
 import en_candidate from './locales/en/candidate.json';
 import en_interview from './locales/en/interview.json';
 import en_about from './locales/en/about.json';
+import en_voiceAssistant from './locales/en/voiceAssistant.json';
 
 // Vietnamese
 import vi_common from './locales/vi/common.json';
@@ -26,6 +27,7 @@ import vi_chat from './locales/vi/chat.json';
 import vi_candidate from './locales/vi/candidate.json';
 import vi_interview from './locales/vi/interview.json';
 import vi_about from './locales/vi/about.json';
+import vi_voiceAssistant from './locales/vi/voiceAssistant.json';
 
 const resources = {
   en: {
@@ -40,6 +42,7 @@ const resources = {
     candidate: en_candidate,
     interview: en_interview,
     about: en_about,
+    voiceAssistant: en_voiceAssistant,
   },
   vi: {
     common: vi_common,
@@ -53,6 +56,7 @@ const resources = {
     candidate: vi_candidate,
     interview: vi_interview,
     about: vi_about,
+    voiceAssistant: vi_voiceAssistant,
   },
 } as const;
 
@@ -84,6 +88,7 @@ i18n.use(initReactI18next).init({
     'candidate',
     'interview',
     'about',
+    'voiceAssistant',
   ],
   defaultNS: 'common',
   interpolation: {

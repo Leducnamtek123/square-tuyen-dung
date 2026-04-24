@@ -45,6 +45,7 @@ export const SEGMENT_MAP = {
   'thong-bao': 'notifications',
   'tai-khoan': 'account',
   'ket-noi-voi-nha-tuyen-dung': 'chat',
+  'tin-tuc': 'blog',
 
   // Employer
   'nha-tuyen-dung': 'employer',
@@ -152,6 +153,8 @@ export const ROUTES = {
     JOBS_BY_CAREER: 'jobs-by-career',
     JOBS_BY_CITY: 'jobs-by-city',
     JOBS_BY_TYPE: 'jobs-by-type',
+    NEWS: 'tin-tuc',
+    NEWS_DETAIL: 'tin-tuc/:slug',
     DASHBOARD: 'dashboard',
     PROFILE: 'profile',
     STEP_PROFILE: 'online-profile/:slug',

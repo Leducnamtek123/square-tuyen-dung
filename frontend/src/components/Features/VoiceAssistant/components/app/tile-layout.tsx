@@ -4,7 +4,6 @@ import React, { useMemo } from 'react';
 import { Track } from 'livekit-client';
 import { AnimatePresence, m } from 'motion/react';
 import {
-  BarVisualizer,
   type TrackReference,
   VideoTrack,
   useLocalParticipant,
@@ -12,6 +11,7 @@ import {
   useVoiceAssistant,
 } from '@livekit/components-react';
 import { cn } from '@/lib/utils';
+import { AgentAudioVisualizerAura } from '@/components/Features/VoiceAssistant/components/livekit/agent-audio-visualizer-aura';
 
 const MotionContainer = m.div;
 
@@ -27,8 +27,8 @@ const classNames = {
   // 2 Columns x 3 Rows
   grid: [
     'h-full w-full',
-    'grid gap-4 place-content-center',
-    'grid-cols-[1fr_1fr] grid-rows-[120px_1fr_120px]',
+    'grid gap-x-2 place-content-center',
+    'grid-cols-[1fr_1fr] grid-rows-[90px_1fr_90px]',
   ],
   // Agent
   // chatOpen: true,
@@ -77,7 +77,6 @@ interface TileLayoutProps {
 
 export function TileLayout({ chatOpen }: TileLayoutProps) {
   const {
-    state: agentState,
     audioTrack: agentAudioTrack,
     videoTrack: agentVideoTrack,
   } = useVoiceAssistant();
@@ -99,7 +98,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
   const videoHeight = agentVideoTrack?.publication.dimensions?.height ?? 0;
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-8 bottom-32 z-50 md:top-12 md:bottom-40">
+    <div className="pointer-events-none absolute inset-x-0 top-8 bottom-32 z-50 md:top-12 md:bottom-40">
       <div className="relative mx-auto h-full max-w-2xl px-4 md:px-0">
         <div className={cn(classNames.grid)}>
           {/* Agent */}
@@ -129,26 +128,16 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                     ...ANIMATION_TRANSITION,
                     delay: animationDelay,
                   }}
-                  className={cn(
-                    'bg-slate-800/55 backdrop-blur-xl aspect-square h-[120px] rounded-[28px] border border-white/8 transition-[border,drop-shadow]',
-                    chatOpen && 'border-white/10 shadow-2xl shadow-black/50 delay-200'
-                  )}
+                  className={cn('aspect-square h-[90px]', chatOpen && 'delay-200')}
                 >
-                  <BarVisualizer
-                    barCount={5}
-                    state={agentState}
-                    options={{ minHeight: 5 }}
-                    track={agentAudioTrack}
-                    className={cn('flex h-full items-center justify-center gap-1')}
-                  >
-                    <span
-                      className={cn([
-                        'bg-slate-700 min-h-2.5 w-2.5 rounded-full',
-                        'origin-center transition-colors duration-250 ease-linear',
-                        'data-[lk-highlighted=true]:bg-cyan-400 data-[lk-muted=true]:bg-slate-700',
-                      ])}
-                    />
-                  </BarVisualizer>
+                  <AgentAudioVisualizerAura
+                    audioTrack={agentAudioTrack}
+                    color="#38bdf8"
+                    className={cn(
+                      'h-[90px] w-[90px] rounded-[30px] border-white/10 shadow-2xl shadow-black/40',
+                      chatOpen && 'border-white/15'
+                    )}
+                  />
                 </MotionContainer>
               )}
 
@@ -182,14 +171,14 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                   }}
                   className={cn(
                     'overflow-hidden bg-black drop-shadow-xl/80',
-                    chatOpen ? 'h-[120px]' : 'h-auto w-full'
+                    chatOpen ? 'h-[90px]' : 'h-auto w-full'
                   )}
                 >
                   <VideoTrack
                     width={videoWidth}
                     height={videoHeight}
                     trackRef={agentVideoTrack}
-                    className={cn(chatOpen && 'size-[120px] object-cover')}
+                    className={cn(chatOpen && 'size-[90px] object-cover')}
                   />
                 </MotionContainer>
               )}
@@ -227,10 +216,10 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                     delay: animationDelay,
                   }}
                   className="drop-shadow-lg/20"
-                >
+                  >
                   <VideoTrack
                     trackRef={cameraTrack || screenShareTrack}
-                    className="bg-slate-800/55 backdrop-blur-xl aspect-square !w-[120px] !h-[120px] rounded-[28px] border border-white/10 object-cover shadow-2xl shadow-black/50 overflow-hidden"
+                    className="bg-slate-800/55 backdrop-blur-xl aspect-square !w-[90px] !h-[90px] rounded-[28px] border border-white/10 object-cover shadow-2xl shadow-black/50 overflow-hidden"
                   />
                 </MotionContainer>
               )}

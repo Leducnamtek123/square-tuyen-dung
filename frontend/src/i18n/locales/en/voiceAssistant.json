@@ -1,0 +1,10 @@
+{
+  "connectingTitle": "Connecting voice AI",
+  "connectingDescription": "Joining the interview room, syncing mic, chat, and visualizer with the Agent Session View.",
+  "startAudio": "Start Audio",
+  "welcomeMessage": "Chat live with your voice AI agent",
+  "startCall": "Start call",
+  "setupHelpPrefix": "Need help getting set up? Check out the",
+  "setupHelpLink": "Voice AI quickstart",
+  "preconnectMessage": "Agent is listening, ask it a question"
+}
