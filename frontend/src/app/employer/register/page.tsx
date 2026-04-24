@@ -1,7 +1,7 @@
-import EmployerSignUp from '@/views/authPages/EmployerSignUp';
+﻿import EmployerSignUp from '@/views/authPages/EmployerSignUp';
 
 export const metadata = {
-  title: 'Employer Register',
+  title: 'Đăng ký nhà tuyển dụng',
   description: 'Browse Employer Register.',
 };
 

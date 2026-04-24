@@ -1,7 +1,7 @@
-import ForgotPasswordPage from '@/views/authPages/ForgotPasswordPage';
+﻿import ForgotPasswordPage from '@/views/authPages/ForgotPasswordPage';
 
 export const metadata = {
-  title: 'Employer Forgot Password',
+  title: 'Quên mật khẩu',
   description: 'Browse Employer Forgot Password.',
 };
 

@@ -1,7 +1,7 @@
-import ServicePage from '@/views/employerPages/ServicePage';
+﻿import ServicePage from '@/views/employerPages/ServicePage';
 
 export const metadata = {
-  title: 'Employer Service',
+  title: 'Dịch vụ tuyển dụng',
   description: 'Browse Employer Service.',
 };
 

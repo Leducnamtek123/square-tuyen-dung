@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
+import { useTranslation } from 'react-i18next';
 
 export default function Error({
   error,
@@ -11,6 +12,8 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { t } = useTranslation('common');
+
   useEffect(() => {
     console.error('App Error:', error);
   }, [error]);
@@ -29,10 +32,10 @@ export default function Error({
     >
       <ErrorOutlineIcon sx={{ fontSize: 64, color: 'error.main', mb: 2 }} />
       <Typography variant="h4" fontWeight={700} gutterBottom>
-        Đã có lỗi xảy ra
+        {t('errorBoundary.title')}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 480 }}>
-        Hệ thống gặp sự cố không mong muốn. Vui lòng thử lại hoặc liên hệ hỗ trợ nếu lỗi vẫn tiếp tục.
+        {t('errorBoundary.message')}
       </Typography>
       <Button
         variant="contained"
@@ -40,7 +43,7 @@ export default function Error({
         onClick={reset}
         sx={{ textTransform: 'none', borderRadius: 2 }}
       >
-        Thử lại
+        {t('errorBoundary.retry')}
       </Button>
     </Box>
   );

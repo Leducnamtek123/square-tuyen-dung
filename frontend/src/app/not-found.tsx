@@ -3,9 +3,11 @@
 import { Box, Typography, Button } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import SearchOffIcon from '@mui/icons-material/SearchOff';
+import { useTranslation } from 'react-i18next';
 
 export default function NotFound() {
   const router = useRouter();
+  const { t } = useTranslation('common');
 
   return (
     <Box
@@ -24,10 +26,10 @@ export default function NotFound() {
         404
       </Typography>
       <Typography variant="h5" color="text.secondary" gutterBottom>
-        Trang bạn tìm kiếm không tồn tại
+        {t('notFound.title')}
       </Typography>
       <Typography variant="body1" color="text.secondary" sx={{ mb: 4, maxWidth: 480 }}>
-        Đường dẫn có thể đã bị thay đổi hoặc trang đã bị xóa. Vui lòng kiểm tra lại URL hoặc quay về trang chủ.
+        {t('notFound.message')}
       </Typography>
       <Button
         variant="contained"
@@ -35,7 +37,7 @@ export default function NotFound() {
         onClick={() => router.push('/')}
         sx={{ textTransform: 'none', borderRadius: 2 }}
       >
-        Về trang chủ
+        {t('notFound.backHome')}
       </Button>
     </Box>
   );

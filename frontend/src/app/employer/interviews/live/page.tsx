@@ -1,7 +1,7 @@
-import InterviewLivePage from '@/views/employerPages/InterviewPages/InterviewLivePage';
+﻿import InterviewLivePage from '@/views/employerPages/InterviewPages/InterviewLivePage';
 
 export const metadata = {
-  title: 'Employer Interviews Live',
+  title: 'Phỏng vấn trực tiếp',
   description: 'Browse Employer Interviews Live.',
 };
 

@@ -17,7 +17,10 @@ const beVietnamPro = Be_Vietnam_Pro({
 
 
 export const metadata: Metadata = {
-  title: 'Square | Tìm việc nhanh, tuyển dụng hiệu quả',
+  title: {
+    template: '%s | Square Tuyển Dụng',
+    default: 'Square | Tìm việc nhanh, tuyển dụng hiệu quả',
+  },
   description: 'Square - Nền tảng tuyển dụng hàng đầu Việt Nam. Tìm kiếm hàng nghìn việc làm phù hợp, kết nối với các nhà tuyển dụng uy tín. Ứng tuyển nhanh chóng, hiệu quả',
   keywords: 'tìm việc, tuyển dụng, việc làm, ứng tuyển, nhà tuyển dụng, CV, hồ sơ xin việc, Square, tuyển dụng Việt Nam',
   openGraph: {

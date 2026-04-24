@@ -1,7 +1,7 @@
-import QuestionGroupsPage from '@/views/employerPages/InterviewPages/QuestionGroupsPage';
+﻿import QuestionGroupsPage from '@/views/employerPages/InterviewPages/QuestionGroupsPage';
 
 export const metadata = {
-  title: 'Employer Question Groups',
+  title: 'Nhóm câu hỏi',
   description: 'Browse Employer Question Groups.',
 };
 

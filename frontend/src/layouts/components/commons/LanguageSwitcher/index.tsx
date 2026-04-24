@@ -8,6 +8,7 @@ import LanguageIcon from '@mui/icons-material/Language';
 import { localizeRoutePath } from '../../../../configs/routeLocalization';
 import { buildPortalPath, detectPortalFromPath, stripPortalPrefix } from '../../../../configs/portalRouting';
 
+
 interface LanguageSwitcherProps {
   color?: string;
 }
@@ -21,7 +22,7 @@ const languages = [
   },
   {
     code: 'vi',
-    label: 'Tiáº¿ng Viá»‡t',
+    label: 'Tiếng Việt',
     shortLabel: 'VI',
     flagUrl: 'https://flagcdn.com/w40/vn.png'
   }

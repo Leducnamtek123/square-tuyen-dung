@@ -810,5 +810,48 @@
     "index_active_18ff": "ACTIVE",
     "index_invited_3792": "INVITED",
     "index_disabled_055c": "DISABLED"
+  },
+  "fileUpload": {
+    "dragDropOrSelect": "Kéo thả file vào đây hoặc",
+    "selectFile": "Chọn file",
+    "pdfOnly": "Chỉ chấp nhận file PDF",
+    "delete": "Xóa"
+  },
+  "search": {
+    "button": "Tìm kiếm",
+    "suggestions": "Gợi ý tìm kiếm",
+    "recent": "Tìm kiếm gần đây",
+    "noResults": "Không có dữ liệu"
+  },
+  "notFound": {
+    "title": "Trang không tồn tại",
+    "message": "Đường dẫn có thể đã bị thay đổi hoặc trang đã bị xóa. Vui lòng kiểm tra lại URL hoặc quay về trang chủ.",
+    "backHome": "Quay về trang chủ"
+  },
+  "systemError": {
+    "occurred": "Đã có lỗi xảy ra.",
+    "tryAgain": "Vui lòng thử lại sau.",
+    "reload": "Tải lại trang."
+  },
+  "language": {
+    "vietnamese": "Tiếng Việt",
+    "english": "English"
+  },
+  "notification": {
+    "markAllRead": "Đánh dấu tất cả là đã đọc",
+    "empty": "Không có thông báo mới"
+  },
+  "jobPost": {
+    "urgentHiring": "Tuyển gấp",
+    "jobsCount": "{{count}} việc làm"
+  },
+  "profileUpload": {
+    "lastUpdated": "Cập nhật lần cuối: {{date}}",
+    "download": "Tải xuống",
+    "previewColor": "Xem trước màu đã chọn"
+  },
+  "interview": {
+    "forceEndSuccess": "Đã yêu cầu kết thúc buổi phỏng vấn",
+    "recordingWaiting": "Buổi phỏng vấn đã kết thúc, hệ thống đang chờ video ghi hình đồng bộ về để hiển thị tại đây."
   }
 }

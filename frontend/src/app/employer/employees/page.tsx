@@ -1,7 +1,7 @@
-import EmployeesPage from '@/views/employerPages/EmployeesPage';
+﻿import EmployeesPage from '@/views/employerPages/EmployeesPage';
 
 export const metadata = {
-  title: 'Employer Employees',
+  title: 'Quản lý nhân viên',
   description: 'Browse Employer Employees.',
 };
 

@@ -1,7 +1,7 @@
-import SavedProfilesPageClient from './page.client';
+﻿import SavedProfilesPageClient from './page.client';
 
 export const metadata = {
-  title: 'Saved profiles',
+  title: 'Hồ sơ đã lưu',
   description: 'View the profiles you have saved.',
 };
 

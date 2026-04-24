@@ -1,7 +1,7 @@
-import JobPostPage from '@/views/employerPages/JobPostPage';
+﻿import JobPostPage from '@/views/employerPages/JobPostPage';
 
 export const metadata = {
-  title: 'Employer Job Posts',
+  title: 'Quản lý tin tuyển dụng',
   description: 'Browse Employer Job Posts.',
 };
 

@@ -1,7 +1,7 @@
-import ProfileDetailPage from '@/views/employerPages/ProfileDetailPage';
+﻿import ProfileDetailPage from '@/views/employerPages/ProfileDetailPage';
 
 export const metadata = {
-  title: 'Employer Candidates',
+  title: 'Chi tiết ứng viên',
   description: 'Browse Employer Candidates.',
 };
 

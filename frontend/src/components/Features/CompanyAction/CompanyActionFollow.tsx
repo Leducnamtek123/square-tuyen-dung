@@ -1,14 +1,15 @@
 'use client';
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Box, Card, Stack, Tooltip, Typography, Skeleton } from '@mui/material';
+import { Box, Card, Stack, Tooltip, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBriefcase, faFontAwesome, faUsers } from '@fortawesome/free-solid-svg-icons';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
-import {ROUTES } from '@/configs/constants';
+import { ROUTES } from '@/configs/constants';
 import { formatRoute } from '@/utils/funcUtils';
 import type { Company } from '@/types/models';
+import { useTranslation } from 'react-i18next';
 
 interface CompanyActionFollowProps {
   company: Partial<Company> | null;
@@ -17,6 +18,7 @@ interface CompanyActionFollowProps {
 
 const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) => {
   const nav = useRouter();
+  const { t } = useTranslation('common');
   const followRef = React.useRef<HTMLDivElement>(null);
   const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>('column');
   const theme = useTheme();
@@ -73,9 +75,7 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                         cursor: 'pointer',
                         color: theme.palette.primary.main,
                         transition: 'color 0.2s ease',
-                        '&:hover': {
-                          color: theme.palette.primary.dark
-                        }
+                        '&:hover': { color: theme.palette.primary.dark }
                       }}
                       onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug || '')}`)}
                     >
@@ -83,32 +83,19 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                     </Typography>
                   </Tooltip>
                 </Box>
-                <Typography 
+                <Typography
                   variant="body2"
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 1,
-                    color: theme.palette.text.secondary
-                  }}
+                  sx={{ display: 'flex', alignItems: 'center', gap: 1, color: theme.palette.text.secondary }}
                 >
-                  <FontAwesomeIcon
-                    icon={faFontAwesome}
-                    style={{ fontSize: 14 }}
-                    color={theme.palette.grey[400]}
-                  />
+                  <FontAwesomeIcon icon={faFontAwesome} style={{ fontSize: 14 }} color={theme.palette.grey[400]} />
                   {company?.fieldOperation || (
-                    <span style={{ 
-                      color: theme.palette.grey[400],
-                      fontStyle: 'italic',
-                      fontSize: 13
-                    }}>
-                      ChÆ°a cáº­p nháº­t
+                    <span style={{ color: theme.palette.grey[400], fontStyle: 'italic', fontSize: 13 }}>
+                      {t('labels.notUpdated')}
                     </span>
                   )}
                 </Typography>
-                <Stack 
-                  direction="row" 
+                <Stack
+                  direction="row"
                   spacing={3}
                   sx={{
                     '& .MuiTypography-root': {
@@ -120,32 +107,18 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                   }}
                 >
                   <Typography variant="body2">
-                    <FontAwesomeIcon
-                      icon={faUsers}
-                      style={{ fontSize: 14 }}
-                      color={theme.palette.grey[400]}
-                    />
-                    {company?.followNumber} theo dÃµi
+                    <FontAwesomeIcon icon={faUsers} style={{ fontSize: 14 }} color={theme.palette.grey[400]} />
+                    {company?.followNumber} {t('companyDetail.followed', { defaultValue: 'theo dõi' })}
                   </Typography>
                   <Typography variant="body2">
-                    <FontAwesomeIcon
-                      icon={faBriefcase}
-                      style={{ fontSize: 14 }}
-                      color={theme.palette.grey[400]}
-                    />
-                    {company?.jobPostNumber} viá»‡c lÃ m
+                    <FontAwesomeIcon icon={faBriefcase} style={{ fontSize: 14 }} color={theme.palette.grey[400]} />
+                    {company?.jobPostNumber} {t('nav.jobs', { defaultValue: 'việc làm' })}
                   </Typography>
                 </Stack>
               </Stack>
             </Stack>
           </Box>
-          <Stack
-            direction="row"
-            justifyContent="flex-end"
-            alignItems="center"
-            flex={1}
-            spacing={2}
-          >
+          <Stack direction="row" justifyContent="flex-end" alignItems="center" flex={1} spacing={2}>
             {children}
           </Stack>
         </Stack>

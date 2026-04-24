@@ -1,7 +1,7 @@
-import IntroducePage from '@/views/employerPages/IntroducePage';
+﻿import IntroducePage from '@/views/employerPages/IntroducePage';
 
 export const metadata = {
-  title: 'Employer Introduce',
+  title: 'Giới thiệu',
   description: 'Browse Employer Introduce.',
 };
 

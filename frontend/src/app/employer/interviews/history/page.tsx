@@ -1,7 +1,7 @@
-import InterviewHistoryPage from '@/views/employerPages/InterviewPages/InterviewHistoryPage';
+﻿import InterviewHistoryPage from '@/views/employerPages/InterviewPages/InterviewHistoryPage';
 
 export const metadata = {
-  title: 'Employer Interviews History',
+  title: 'Lịch sử phỏng vấn',
   description: 'Browse Employer Interviews History.',
 };
 

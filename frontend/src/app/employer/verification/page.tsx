@@ -1,7 +1,7 @@
-import VerificationPage from '@/views/employerPages/VerificationPage';
+﻿import VerificationPage from '@/views/employerPages/VerificationPage';
 
 export const metadata = {
-  title: 'Employer Verification',
+  title: 'Xác minh công ty',
   description: 'Browse Employer Verification.',
 };
 

@@ -1,7 +1,7 @@
-import InterviewSessionPage from '@/views/employerPages/InterviewPages/InterviewSessionPage';
+﻿import InterviewSessionPage from '@/views/employerPages/InterviewPages/InterviewSessionPage';
 
 export const metadata = {
-  title: 'Employer Interviews Session',
+  title: 'Phiên phỏng vấn',
   description: 'Browse Employer Interviews Session.',
 };
 

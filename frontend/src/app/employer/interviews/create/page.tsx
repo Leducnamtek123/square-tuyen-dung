@@ -1,7 +1,7 @@
-import InterviewCreatePage from '@/views/employerPages/InterviewPages/InterviewCreatePage';
+﻿import InterviewCreatePage from '@/views/employerPages/InterviewPages/InterviewCreatePage';
 
 export const metadata = {
-  title: 'Employer Interviews Create',
+  title: 'Tạo lịch phỏng vấn',
   description: 'Browse Employer Interviews Create.',
 };
 

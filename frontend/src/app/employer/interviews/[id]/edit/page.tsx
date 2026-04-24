@@ -1,7 +1,7 @@
-import InterviewEditPage from "@/views/employerPages/InterviewPages/InterviewEditPage";
+﻿import InterviewEditPage from "@/views/employerPages/InterviewPages/InterviewEditPage";
 
 export const metadata = {
-  title: 'Employer Interviews Edit',
+  title: 'Chỉnh sửa phỏng vấn',
   description: 'Browse Employer Interviews Edit.',
 };
 

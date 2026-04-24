@@ -1,7 +1,7 @@
-import PricingPage from '@/views/employerPages/PricingPage';
+﻿import PricingPage from '@/views/employerPages/PricingPage';
 
 export const metadata = {
-  title: 'Employer Pricing',
+  title: 'Bảng giá dịch vụ',
   description: 'Browse Employer Pricing.',
 };
 

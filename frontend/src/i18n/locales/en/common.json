@@ -786,5 +786,48 @@
       "languages": "LANGUAGES",
       "certificates": "CERTIFICATES"
     }
+  },
+  "fileUpload": {
+    "dragDropOrSelect": "Drag and drop file here or",
+    "selectFile": "Select file",
+    "pdfOnly": "Only PDF files accepted",
+    "delete": "Delete"
+  },
+  "search": {
+    "button": "Search",
+    "suggestions": "Search suggestions",
+    "recent": "Recent searches",
+    "noResults": "No results found"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "message": "The URL may have changed or the page has been deleted. Please check the URL or return to home.",
+    "backHome": "Back to home"
+  },
+  "systemError": {
+    "occurred": "An error occurred.",
+    "tryAgain": "Please try again later.",
+    "reload": "Reload page."
+  },
+  "language": {
+    "vietnamese": "Tiếng Việt",
+    "english": "English"
+  },
+  "notification": {
+    "markAllRead": "Mark all as read",
+    "empty": "No new notifications"
+  },
+  "jobPost": {
+    "urgentHiring": "Urgent Hiring",
+    "jobsCount": "{{count}} jobs"
+  },
+  "profileUpload": {
+    "lastUpdated": "Last updated: {{date}}",
+    "download": "Download",
+    "previewColor": "Preview selected color"
+  },
+  "interview": {
+    "forceEndSuccess": "Interview end requested",
+    "recordingWaiting": "The interview has ended, the system is waiting for the recording to sync before displaying here."
   }
 }

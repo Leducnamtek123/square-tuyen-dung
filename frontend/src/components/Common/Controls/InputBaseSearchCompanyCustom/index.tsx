@@ -12,10 +12,9 @@ import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-
 import { Box } from "@mui/material";
-
 import { IconButton, InputAdornment } from "@mui/material";
+import { useTranslation } from 'react-i18next';
 
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
@@ -32,6 +31,7 @@ const InputBaseSearchCompanyCustom = <T extends FieldValues = FieldValues>({
 }: Props<T>) => {
 
   const theme = useTheme();
+  const { t } = useTranslation('common');
 
   return (
 
@@ -138,13 +138,9 @@ const InputBaseSearchCompanyCustom = <T extends FieldValues = FieldValues>({
         />
 
         {showSubmitButton && (
-
           <Button variant="contained" type="submit" color="primary">
-
-            TÃ¬m kiáº¿m
-
+            {t('search.button')}
           </Button>
-
         )}
 
       </Box>

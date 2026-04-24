@@ -1,7 +1,7 @@
-import CompanyPage from '@/views/employerPages/CompanyPage';
+﻿import CompanyPage from '@/views/employerPages/CompanyPage';
 
 export const metadata = {
-  title: 'Employer Company',
+  title: 'Thông tin công ty',
   description: 'Browse Employer Company.',
 };
 

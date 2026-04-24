@@ -1,7 +1,7 @@
-import SupportPage from '@/views/employerPages/SupportPage';
+﻿import SupportPage from '@/views/employerPages/SupportPage';
 
 export const metadata = {
-  title: 'Employer Support',
+  title: 'Hỗ trợ',
   description: 'Browse Employer Support.',
 };
 

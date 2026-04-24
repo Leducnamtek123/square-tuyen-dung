@@ -1,7 +1,7 @@
-import BlogPage from '@/views/employerPages/BlogPage';
+﻿import BlogPage from '@/views/employerPages/BlogPage';
 
 export const metadata = {
-  title: 'Employer Blog',
+  title: 'Blog tuyển dụng',
   description: 'Browse Employer Blog.',
 };
 

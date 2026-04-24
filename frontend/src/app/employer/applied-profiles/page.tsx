@@ -1,7 +1,7 @@
-import ProfileAppliedPage from '@/views/employerPages/ProfileAppliedPage';
+﻿import ProfileAppliedPage from '@/views/employerPages/ProfileAppliedPage';
 
 export const metadata = {
-  title: 'Employer Applied Profiles',
+  title: 'Hồ sơ ứng tuyển',
   description: 'Browse Employer Applied Profiles.',
 };
 

@@ -1,7 +1,7 @@
-import ResetPasswordPage from '@/views/authPages/ResetPasswordPage';
+﻿import ResetPasswordPage from '@/views/authPages/ResetPasswordPage';
 
 export const metadata = {
-  title: 'Reset password',
+  title: 'Đặt lại mật khẩu',
   description: 'Reset your account password.',
 };
 

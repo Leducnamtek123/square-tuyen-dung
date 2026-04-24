@@ -15,6 +15,7 @@ import { useDebounce } from '@/hooks';
 import { searchJobPostWithKeyword } from '@/redux/filterSlice';
 import jobService from '@/services/jobService';
 import { ROUTES } from '@/configs/constants';
+import { useTranslation } from 'react-i18next';
 
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
@@ -72,6 +73,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
   location = 'HOME',
 }: Props<T>) => {
   const theme = useTheme();
+  const { t } = useTranslation('common');
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const inputSearchRef = React.useRef<HTMLDivElement | null>(null);
   const nav = useRouter();
@@ -206,7 +208,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
           />
           {showSubmitButton && (
             <Button variant="contained" type="submit" color="primary">
-              TÃƒÂ¬m kiÃ¡ÂºÂ¿m
+              {t('search.button')}
             </Button>
           )}
         </Box>
@@ -231,7 +233,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
             <Stack>
               <Box>
                 <Typography fontWeight="bold" fontSize={17} color="#2C95FF">
-                  GÃ¡Â»Â£i ÃƒÂ½ tÃƒÂ¬m kiÃ¡ÂºÂ¿m
+                  {t('search.suggestions')}
                 </Typography>
                 <Stack>
                   {state.isLoading ? (
@@ -240,7 +242,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                     </Stack>
                   ) : state.searchResult.length === 0 ? (
                     <Typography my={1} textAlign="center" color="#bdbdbd" variant="caption">
-                      KhÃƒÂ´ng cÃƒÂ³ dÃ¡Â»Â¯ liÃ¡Â»â€¡u
+                      {t('search.noResults')}
                     </Typography>
                   ) : (
                     <List>
@@ -271,7 +273,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
               {state.recentSearch.length > 0 && (
                 <Box>
                   <Typography fontWeight="bold" fontSize={17} color="#2C95FF">
-                    TÃƒÂ¬m kiÃ¡ÂºÂ¿m gÃ¡ÂºÂ§n Ã„â€˜ÃƒÂ¢y
+                    {t('search.recent')}
                   </Typography>
                   <Stack>
                     <List>

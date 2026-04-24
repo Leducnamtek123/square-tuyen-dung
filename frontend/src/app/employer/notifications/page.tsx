@@ -1,7 +1,7 @@
-import NotificationPage from '@/views/defaultPages/NotificationPage';
+﻿import NotificationPage from '@/views/defaultPages/NotificationPage';
 
 export const metadata = {
-  title: 'Employer Notifications',
+  title: 'Thông báo',
   description: 'Browse Employer Notifications.',
 };
 
