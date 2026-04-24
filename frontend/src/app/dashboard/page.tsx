@@ -1,7 +1,10 @@
-﻿import type { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import DashboardPage from '@/views/jobSeekerPages/DashboardPage';
 
-export const metadata: Metadata = { title: 'Dashboard' };
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('dashboard');
+}
 
 export default function Page() {
   return <DashboardPage />;

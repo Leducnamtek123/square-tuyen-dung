@@ -1,7 +1,10 @@
-﻿import type { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import BannerTypesPage from '@/views/adminPages/BannerTypesPage';
 
-export const metadata: Metadata = { title: 'Banner Types' };
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('admin.banner-types');
+}
 
 export default function Page() {
   return <BannerTypesPage />;

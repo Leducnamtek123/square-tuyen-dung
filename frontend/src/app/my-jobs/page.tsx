@@ -1,10 +1,11 @@
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import JobSeekerLayout from '@/layouts/JobSeekerLayout';
 import ProjectPage from '@/views/jobSeekerPages/ProjectPage';
 
-export const metadata = {
-  title: 'My Jobs',
-  description: 'Browse My Jobs.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('my-jobs');
+}
 
 export default function Page() {
   return (

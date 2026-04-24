@@ -164,6 +164,8 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
 
   const changeLanguage = (lng: string) => {
     window.localStorage?.setItem('i18nextLng', lng);
+    // Sync to cookie so Server Components (generateMetadata) can read locale
+    document.cookie = `i18nextLng=${lng}; path=/; max-age=31536000; SameSite=Lax`;
     const currentPath = window.location.pathname || '/';
     const currentSearch = window.location.search || '';
     const currentHash = window.location.hash || '';
@@ -188,6 +190,7 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
     i18n.changeLanguage(lng);
     handleClose();
   };
+
 
   const getLangCode = (lang: string) => {
     if (!lang) return 'vi';

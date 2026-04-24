@@ -1,11 +1,11 @@
-﻿import type { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import HomeLayout from '@/layouts/HomeLayout';
 import HomePage from '@/views/defaultPages/HomePage';
 
-export const metadata: Metadata = {
-  title: 'Square - Tim viec nhanh, tuyen dung hieu qua',
-  description: 'Square - Nen tang tuyen dung hang dau Viet Nam',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('home');
+}
 
 export default function Page() {
   return (

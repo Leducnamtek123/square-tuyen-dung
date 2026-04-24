@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import SendRoundedIcon from '@mui/icons-material/SendRounded';
-import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
+import { LOGO_IMAGES } from '@/configs/images';
 import { AUTH_CONFIG } from '@/configs/constants';
 import { CHATBOT_ICONS } from '@/configs/images';
 import { isEmployerPortalPath } from '@/configs/portalRouting';
@@ -197,7 +197,7 @@ const ChatBot = () => {
         <header className="sq-chatbot__header">
           <div className="sq-chatbot__title">
             <span className="sq-chatbot__badge">
-              <SmartToyOutlinedIcon fontSize="small" />
+              <Image src={LOGO_IMAGES.LOGO_WITH_BG} alt="Square" width={28} height={28} style={{ borderRadius: 6, objectFit: 'contain' }} />
             </span>
             <div>
               <div className="sq-chatbot__name">{botConfig.CHAT_TITLE || 'Square AI'}</div>

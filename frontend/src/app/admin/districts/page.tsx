@@ -1,7 +1,10 @@
-﻿import type { Metadata } from 'next';
+import type { Metadata } from 'next';
+import { buildPageMetadata } from '@/utils/serverI18n';
 import DistrictsPage from '@/views/adminPages/DistrictsPage';
 
-export const metadata: Metadata = { title: 'Districts' };
+export async function generateMetadata(): Promise<Metadata> {
+  return buildPageMetadata('admin.districts');
+}
 
 export default function Page() {
   return <DistrictsPage />;
