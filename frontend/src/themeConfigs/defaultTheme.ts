@@ -31,23 +31,28 @@ const colors = {
     main: '#059669',
     light: '#10b981',
     dark: '#047857',
+    contrastText: '#ffffff',
     background: 'rgba(5, 150, 105, 0.06)',
   },
   error: {
     main: '#dc2626',
     light: '#ef4444',
     dark: '#b91c1c',
+    contrastText: '#ffffff',
     background: 'rgba(220, 38, 38, 0.06)',
+    '50': 'rgba(220, 38, 38, 0.06)',
   },
   warning: {
     main: '#f59e0b',
     light: '#fbbf24',
     dark: '#d97706',
+    contrastText: '#ffffff',
   },
   info: {
     main: '#2aa9e1',     // matches primary.light — cohesive
     light: '#38bdf8',
     dark: '#1a407d',
+    contrastText: '#ffffff',
     background: 'rgba(42, 169, 225, 0.06)',
   },
   grey: {

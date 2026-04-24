@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-import { Stack, Alert, Box, Button, Typography } from "@mui/material";
+import { Stack, Box, Button, Typography, Chip } from "@mui/material";
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import FilePresentIcon from '@mui/icons-material/FilePresent';
@@ -43,7 +43,7 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
           gutterBottom
           sx={{ fontWeight: 500, color: 'text.primary', mb: 1 }}
         >
-          {title} {showRequired && <span style={{ color: 'error.main' }}>*</span>}
+          {title} {showRequired && <span style={{ color: '#dc2626' }}>*</span>}
         </Typography>
       )}
 
@@ -60,7 +60,7 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
             transition: 'all 0.2s ease-in-out',
             '&:hover': {
               borderColor: 'primary.main',
-              bgcolor: 'primary.background'
+              bgcolor: 'rgba(42, 169, 225, 0.04)'
             }
           }}
           onClick={handleInputClick}
@@ -83,25 +83,36 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
               </Typography>
             </>
           ) : (
-            <Alert
-              icon={<FilePresentIcon fontSize="inherit" />}
-              severity="success"
-              sx={{ '& .MuiAlert-message': { display: 'flex', alignItems: 'center', gap: 1 } }}
+            /* Custom file chip — avoids MUI Alert's internal alpha() on success color */
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 1.5,
+                p: 1.5,
+                borderRadius: 2,
+                bgcolor: 'rgba(5, 150, 105, 0.06)',
+                border: '1px solid rgba(5, 150, 105, 0.3)',
+              }}
             >
-              <Typography variant="body2">{selectedFile?.name}</Typography>
+              <FilePresentIcon sx={{ color: '#059669', fontSize: 22 }} />
+              <Typography variant="body2" noWrap sx={{ color: '#059669', fontWeight: 500, flex: 1, textAlign: 'left' }}>
+                {selectedFile?.name}
+              </Typography>
               <Button
                 size="small"
+                variant="outlined"
                 color="error"
-                variant="text"
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedFile(null);
                 }}
-                sx={{ ml: 2 }}
+                sx={{ minWidth: 'auto', px: 1.5, borderRadius: 1.5, textTransform: 'none' }}
               >
                 {t('fileUpload.delete')}
               </Button>
-            </Alert>
+            </Box>
           )}
         </Box>
       </Stack>
