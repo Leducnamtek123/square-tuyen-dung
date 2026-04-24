@@ -135,7 +135,7 @@ const JobSeekerLoginView = ({
                   },
                 }}
               >
-                {t('auto.index_email_ce8a', { defaultValue: 'Email' })}
+                {t('common:labels.email')}
               </Button>
               <Button
                 onClick={() => onSetLoginMode('phone')}
@@ -154,7 +154,7 @@ const JobSeekerLoginView = ({
                   },
                 }}
               >
-                {t('login.phone', { defaultValue: 'Phone' })}
+                {t('login.phone')}
               </Button>
             </Box>
           </Box>

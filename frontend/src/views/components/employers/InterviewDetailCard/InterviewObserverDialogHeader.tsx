@@ -46,12 +46,12 @@ const InterviewObserverDialogHeader = ({ candidateName, jobName, liveStatus, sse
         >
           <VisibilityOffIcon sx={{ fontSize: 18, color: 'warning.main' }} />
           <Typography variant="caption" sx={{ fontWeight: 900, color: 'warning.main', letterSpacing: 1, textTransform: 'uppercase', fontSize: '0.7rem' }}>
-            {t('common:auto.InterviewObserverDialog_observer_mode_daff', { defaultValue: 'Observer Mode' })}
+            {t('employer:interviewLive.candidateCard.observerMode')}
           </Typography>
         </Box>
         <Box>
           <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 800 }}>
-            {candidateName || 'Candidate'} - {jobName || 'Interview'}
+            {candidateName || t('employer:interviewLive.candidateCard.unknownCandidate')} - {jobName || t('employer:interviewLive.candidateCard.unknownJob')}
           </Typography>
           <Stack direction="row" alignItems="center" spacing={1}>
             <FiberManualRecordIcon
@@ -66,7 +66,7 @@ const InterviewObserverDialogHeader = ({ candidateName, jobName, liveStatus, sse
               }}
             />
             <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.5)', fontWeight: 700 }}>
-              {sseConnected ? 'Live' : 'Reconnecting...'} - {elapsedLabel}
+              {sseConnected ? t('employer:interviewLive.candidateCard.live') : t('employer:interviewLive.candidateCard.reconnecting')} - {elapsedLabel}
             </Typography>
           </Stack>
         </Box>
@@ -103,7 +103,7 @@ const InterviewObserverDialogHeader = ({ candidateName, jobName, liveStatus, sse
             '&:hover': { bgcolor: alpha('#ef4444', 0.25) },
           }}
         >
-          {t('common:auto.InterviewObserverDialog_end_observation_130a', { defaultValue: 'End Observation' })}
+          {t('employer:interviewLive.candidateCard.endObservation')}
         </Button>
       </Stack>
     </Box>

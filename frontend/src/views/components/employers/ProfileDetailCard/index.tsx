@@ -110,7 +110,7 @@ const ProfileDetailCard: React.FC = () => {
               </Box>
               <Box>
                 <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary' }}>
-                  {t('common:labels.attachedResume', { defaultValue: 'Hồ sơ đính kèm' })}
+                  {t('common:labels.attachedResume')}
                 </Typography>
                 {profileDetail.title && (
                   <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
@@ -149,7 +149,7 @@ const ProfileDetailCard: React.FC = () => {
                   fontSize: '0.8rem',
                 }}
               >
-                {t('common:actions.openNewTab', { defaultValue: 'Mở tab mới' })}
+                {t('common:actions.openNewTab')}
               </Button>
               <Button
                 size="small"
@@ -166,7 +166,7 @@ const ProfileDetailCard: React.FC = () => {
                   boxShadow: theme.customShadows?.primary,
                 }}
               >
-                {t('common:actions.download', { defaultValue: 'Tải xuống' })}
+                {t('common:actions.download')}
               </Button>
             </Stack>
           </Stack>
@@ -179,7 +179,7 @@ const ProfileDetailCard: React.FC = () => {
                   <Stack alignItems="center" justifyContent="center" sx={{ height: 400 }}>
                     <ArticleIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2 }} />
                     <Typography variant="subtitle1" color="text.secondary" sx={{ fontWeight: 600 }}>
-                      {t('profileDetailCard.messages.loadingPdf', { defaultValue: 'Đang tải hồ sơ...' })}
+                      {t('profileDetailCard.messages.loadingPdf')}
                     </Typography>
                   </Stack>
                 }
@@ -191,7 +191,7 @@ const ProfileDetailCard: React.FC = () => {
             <Stack alignItems="center" justifyContent="center" sx={{ py: 10 }}>
               <DescriptionIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 2, opacity: 0.3 }} />
               <Typography variant="h6" color="text.secondary" sx={{ fontWeight: 800 }}>
-                {t('profileDetailCard.messages.noAttachedFile', { defaultValue: 'Không tìm thấy file hồ sơ' })}
+                {t('profileDetailCard.messages.noAttachedFile')}
               </Typography>
             </Stack>
           )}

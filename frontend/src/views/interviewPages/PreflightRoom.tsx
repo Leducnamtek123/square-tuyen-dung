@@ -104,9 +104,7 @@ export const PreflightRoom = ({ onJoin, onCancel, starting }: PreflightRoomProps
         dispatch({ type: 'stream', value: null });
         dispatch({
           type: 'error',
-          value: t('errors.mic_denied', {
-            defaultValue: 'Microphone permission was denied. Please allow microphone access to continue.',
-          }),
+          value: t('errors.mic_denied'),
         });
       } finally {
         dispatch({ type: 'loading', value: false });
@@ -159,12 +157,10 @@ export const PreflightRoom = ({ onJoin, onCancel, starting }: PreflightRoomProps
         variant="h4"
         sx={{ fontWeight: 900, color: 'white', mb: 1, textTransform: 'uppercase', letterSpacing: '2px' }}
       >
-        {t('preflight.title', { defaultValue: 'Device check' })}
+            {t('preflight.title')}
       </Typography>
       <Typography variant="body1" sx={{ color: 'rgba(255,255,255,0.6)', mb: 5 }}>
-        {t('preflight.subtitle', {
-          defaultValue: 'Make sure your microphone works before starting the AI interview.',
-        })}
+          {t('preflight.subtitle')}
       </Typography>
 
       <Stack alignItems="center" spacing={4} sx={{ mb: 6 }}>
@@ -247,7 +243,7 @@ export const PreflightRoom = ({ onJoin, onCancel, starting }: PreflightRoomProps
           >
             <FontAwesomeIcon icon={faCheckCircle} color="#34d399" />
             <Typography sx={{ color: '#34d399', fontWeight: 600, fontSize: '0.9rem' }}>
-              {t('preflight.mic_ready', { defaultValue: 'Microphone is ready' })}
+              {t('preflight.mic_ready')}
             </Typography>
           </Stack>
         )}
@@ -267,7 +263,7 @@ export const PreflightRoom = ({ onJoin, onCancel, starting }: PreflightRoomProps
             '&:hover': { borderColor: 'white', background: 'rgba(255,255,255,0.05)' },
           }}
         >
-          {t('common:actions.cancel', { defaultValue: 'Cancel' })}
+          {t('common:actions.cancel')}
         </Button>
         <Button
           variant="contained"
@@ -293,7 +289,7 @@ export const PreflightRoom = ({ onJoin, onCancel, starting }: PreflightRoomProps
             },
           }}
         >
-          {starting ? <CircularProgress size={24} color="inherit" /> : t('preflight.join', { defaultValue: 'Join interview' })}
+          {starting ? <CircularProgress size={24} color="inherit" /> : t('preflight.join')}
         </Button>
       </Stack>
     </Box>

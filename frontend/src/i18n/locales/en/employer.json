@@ -6,6 +6,8 @@
     "allJobPosts": "All job posts",
     "allStatuses": "All recruitment statuses",
     "advancedFilter": "Advanced Filter",
+    "tableView": "Table",
+    "boardView": "Board",
     "table": {
       "noCandidates": "No candidates have applied yet",
       "onlineResume": "Online Resume",
@@ -628,6 +630,20 @@
     "settings": "Settings",
     "employeeRoles": "Employees & Roles"
   },
+  "interviewHistory": {
+    "title": "Video Library",
+    "subtitle": "Review and download completed interview sessions.",
+    "searchPlaceholder": "Search candidate, position...",
+    "noRecording": "No recording",
+    "viewMode": {
+      "grid": "Grid",
+      "table": "Table"
+    },
+    "noData": {
+      "title": "No videos yet",
+      "subtitle": "Completed interview sessions will appear here."
+    }
+  },
   "interviewLive": {
     "title": "Live Interviews",
     "scheduleBtn": "Schedule Interview",
@@ -655,6 +671,35 @@
       "active": "Active",
       "draft": "Draft",
       "interrupted": "Interrupted"
+    },
+    "candidateCard": {
+      "observerMode": "Observer mode",
+      "endObservation": "End observation",
+      "live": "Live",
+      "reconnecting": "Reconnecting...",
+      "aiInterviewer": "AI interviewer",
+      "unknownJob": "Unknown job",
+      "liveTranscript": "Live transcript",
+      "waitingForConversation": "Waiting for conversation to begin...",
+      "newBadge": "New",
+      "screenShare": "Screen share",
+      "liveAudioNoVideo": "Live audio - No video",
+      "waitingForMediaTracks": "Waiting for audio/video tracks...",
+      "waitingSignal": "Waiting for signal",
+      "waitingSignalHint": "When the candidate turns on camera or mic, the preview will appear here",
+      "tokenError": "Unable to fetch observer token.",
+      "unknownCandidate": "Unknown candidate",
+      "connecting": "Connecting in real time...",
+      "maximize": "Maximize",
+      "end": "End",
+      "notReady": "This session is not ready for real-time connection yet.",
+      "liveSession": "Live session",
+      "candidate": "Candidate",
+      "position": "Position",
+      "room": "Room",
+      "time": "Time",
+      "endSession": "End session",
+      "noConnectionDetails": "No connection details available for fullscreen."
     }
   },
   "verification": {

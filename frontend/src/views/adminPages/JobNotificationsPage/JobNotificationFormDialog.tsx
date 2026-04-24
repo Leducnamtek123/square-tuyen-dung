@@ -32,21 +32,21 @@ const JobNotificationFormDialog = ({
       <DialogContent>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2.5, pt: 1 }}>
           <TextField
-            label={t('pages.jobNotifications.form.title', { defaultValue: 'Job Name' })}
+            label={t('pages.jobNotifications.form.title')}
             fullWidth
             value={formData.jobName}
             onChange={(e) => onChange({ ...formData, jobName: e.target.value })}
             required
           />
           <TextField
-            label={t('pages.jobNotifications.form.salary', { defaultValue: 'Salary' })}
+            label={t('pages.jobNotifications.form.salary')}
             fullWidth
             type="number"
             value={formData.salary ?? ''}
             onChange={(e) => onChange({ ...formData, salary: e.target.value ? Number(e.target.value) : null })}
           />
           <TextField
-            label={t('pages.jobNotifications.form.frequency', { defaultValue: 'Frequency' })}
+            label={t('pages.jobNotifications.form.frequency')}
             fullWidth
             select
             value={formData.frequency}
@@ -58,42 +58,42 @@ const JobNotificationFormDialog = ({
             <MenuItem value={30}>30</MenuItem>
           </TextField>
           <TextField
-            label={t('pages.jobNotifications.form.position', { defaultValue: 'Position' })}
+            label={t('pages.jobNotifications.form.position')}
             fullWidth
             type="number"
             value={formData.position ?? ''}
             onChange={(e) => onChange({ ...formData, position: e.target.value ? Number(e.target.value) : null })}
           />
           <TextField
-            label={t('pages.jobNotifications.form.experience', { defaultValue: 'Experience' })}
+            label={t('pages.jobNotifications.form.experience')}
             fullWidth
             type="number"
             value={formData.experience ?? ''}
             onChange={(e) => onChange({ ...formData, experience: e.target.value ? Number(e.target.value) : null })}
           />
           <TextField
-            label={t('pages.jobNotifications.form.careerId', { defaultValue: 'Career ID' })}
+            label={t('pages.jobNotifications.form.careerId')}
             fullWidth
             type="number"
             value={formData.career ?? ''}
             onChange={(e) => onChange({ ...formData, career: e.target.value ? Number(e.target.value) : null })}
           />
           <TextField
-            label={t('pages.jobNotifications.form.cityId', { defaultValue: 'City ID' })}
+            label={t('pages.jobNotifications.form.cityId')}
             fullWidth
             type="number"
             value={formData.city ?? ''}
             onChange={(e) => onChange({ ...formData, city: e.target.value ? Number(e.target.value) : null })}
           />
           <TextField
-            label={t('pages.jobNotifications.form.isActive', { defaultValue: 'Active' })}
+            label={t('pages.jobNotifications.form.isActive')}
             fullWidth
             select
             value={formData.isActive ? 'true' : 'false'}
             onChange={(e) => onChange({ ...formData, isActive: e.target.value === 'true' })}
           >
-            <MenuItem value="true">{t('common.yes', { defaultValue: 'Yes' })}</MenuItem>
-            <MenuItem value="false">{t('common.no', { defaultValue: 'No' })}</MenuItem>
+            <MenuItem value="true">{t('common.yes')}</MenuItem>
+            <MenuItem value="false">{t('common.no')}</MenuItem>
           </TextField>
         </Box>
       </DialogContent>
@@ -110,4 +110,3 @@ const JobNotificationFormDialog = ({
 };
 
 export default JobNotificationFormDialog;
-

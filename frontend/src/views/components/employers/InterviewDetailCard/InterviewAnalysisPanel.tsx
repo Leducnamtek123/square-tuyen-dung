@@ -220,17 +220,17 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                         }}
                                     >
                                         <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'primary.main', textTransform: 'uppercase', letterSpacing: 1 }}>
-                                            {t('interviewDetail.label.softSkills', { defaultValue: 'Soft skills' })}
+                                            {t('interviewDetail.label.softSkills')}
                                         </Typography>
                                         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.5} sx={{ mt: 2, flexWrap: 'wrap' }}>
                                             {toStringValue(getFirstDefined(softSkills.confidence, softSkills.confidence_score)) && (
-                                                <Chip label={`Confidence: ${toStringValue(getFirstDefined(softSkills.confidence, softSkills.confidence_score))}`} size="small" sx={{ fontWeight: 800 }} />
+                                                <Chip label={`${t('interviewDetail.label.confidence')}: ${toStringValue(getFirstDefined(softSkills.confidence, softSkills.confidence_score))}`} size="small" sx={{ fontWeight: 800 }} />
                                             )}
                                             {toStringValue(getFirstDefined(softSkills.clarity, softSkills.clarity_score)) && (
-                                                <Chip label={`Clarity: ${toStringValue(getFirstDefined(softSkills.clarity, softSkills.clarity_score))}`} size="small" sx={{ fontWeight: 800 }} />
+                                                <Chip label={`${t('interviewDetail.label.clarity')}: ${toStringValue(getFirstDefined(softSkills.clarity, softSkills.clarity_score))}`} size="small" sx={{ fontWeight: 800 }} />
                                             )}
                                             {toStringValue(getFirstDefined(softSkills.tone, softSkills.voice)) && (
-                                                <Chip label={`Tone: ${toStringValue(getFirstDefined(softSkills.tone, softSkills.voice))}`} size="small" sx={{ fontWeight: 800 }} />
+                                                <Chip label={`${t('interviewDetail.label.tone')}: ${toStringValue(getFirstDefined(softSkills.tone, softSkills.voice))}`} size="small" sx={{ fontWeight: 800 }} />
                                             )}
                                         </Stack>
                                     </Box>
@@ -247,7 +247,7 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                         }}
                                     >
                                         <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'info.main', textTransform: 'uppercase', letterSpacing: 1 }}>
-                                            {t('interviewDetail.label.culturalFit', { defaultValue: 'Cultural fit' })}
+                                            {t('interviewDetail.label.culturalFit')}
                                         </Typography>
                                         <Typography variant="body2" sx={{ mt: 1.5, lineHeight: 2, color: 'text.primary', fontWeight: 600 }}>
                                             {culturalFit}
@@ -266,12 +266,12 @@ const InterviewAnalysisPanel: React.FC<InterviewAnalysisPanelProps> = ({ session
                                         }}
                                     >
                                         <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'text.primary', textTransform: 'uppercase', letterSpacing: 1 }}>
-                                            {t('interviewDetail.label.questionPerformance', { defaultValue: 'Question performance' })}
+                                            {t('interviewDetail.label.questionPerformance')}
                                         </Typography>
                                         <Stack spacing={2.5} sx={{ mt: 2.5 }}>
                                             {structuredQuestionPerformance.map((item, idx) => {
-                                                const question = toStringValue(getFirstDefined(item.question, item.question_text, item.text)) || `${t('interviewDetail.label.question', { defaultValue: 'Question' })} ${idx + 1}`;
-                                                const feedback = toStringValue(getFirstDefined(item.feedback, item.comment, item.answer)) || t('interviewDetail.messages.noDetails', { defaultValue: 'No details available' });
+                                                const question = toStringValue(getFirstDefined(item.question, item.question_text, item.text)) || `${t('interviewDetail.label.question')} ${idx + 1}`;
+                                                const feedback = toStringValue(getFirstDefined(item.feedback, item.comment, item.answer)) || t('interviewDetail.messages.noDetails');
                                                 const score = toStringValue(getFirstDefined(item.score, item.points));
 
                                                 return (

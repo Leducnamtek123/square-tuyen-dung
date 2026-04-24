@@ -102,7 +102,7 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                                 }}
                             />
                         }
-                        label="LIVE"
+                        label={t('employer:interviewLive.candidateCard.live')}
                         size="small"
                         sx={{
                             fontWeight: 900,
@@ -118,8 +118,8 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                 )}
 
                 {mergedTranscripts.length > 0 && (
-                    <Chip 
-                        label={`${mergedTranscripts.length} ${t('common:labels.messages', { defaultValue: 'messages' })}`} 
+                        <Chip 
+                        label={`${mergedTranscripts.length} ${t('common:labels.messages')}`} 
                         size="small" 
                         sx={{ 
                             ml: 'auto', 
@@ -183,7 +183,7 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                                             </Typography>
                                             {isNewLive && (
                                                 <Chip
-                                                    label="NEW"
+                                                    label={t('employer:interviewLive.candidateCard.newBadge')}
                                                     size="small"
                                                     sx={{
                                                         height: 18,
@@ -232,7 +232,7 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
                             {t('interviewDetail.messages.noTranscript')}
                         </Typography>
                         <Typography variant="body2" color="text.disabled" sx={{ mt: 1, fontWeight: 600 }}>
-                            {t('interviewDetail.messages.noTranscriptDesc', { defaultValue: 'No conversations recorded for this session.' })}
+                            {t('interviewDetail.messages.noTranscriptDesc')}
                         </Typography>
                     </Box>
                 )}

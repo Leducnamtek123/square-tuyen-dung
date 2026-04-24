@@ -18,6 +18,9 @@
   "loading": "Loading...",
   "noData": "No data",
   "viewDetails": "View details",
+  "company": {
+    "defaultDescription": "A dynamic, creative workplace with many opportunities for advancement and career growth."
+  },
   "nav": {
     "jobs": "Jobs",
     "companies": "Companies",
@@ -74,6 +77,12 @@
     "close": "Close",
     "backHome": "Back to home",
     "joinNow": "Join now",
+    "openNewTab": "Open in new tab",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "details": "Details",
+    "stop": "Stop",
+    "observe": "Observe",
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
@@ -254,7 +263,8 @@
     "message": "The application encountered an unexpected error. Please try again or reload the page.",
     "copyError": "Copy error",
     "retry": "Retry",
-    "reload": "Reload page"
+    "reload": "Reload page",
+    "unknownError": "Unknown error"
   },
   "common": {
     "hot": "Hot",
@@ -272,7 +282,9 @@
     "invalidDate": "Invalid date"
   },
   "messages": {
-    "loadingPdf": "Loading PDF..."
+    "loadingPdf": "Loading PDF...",
+    "loadFailed": "Unable to load data. Please try again.",
+    "actionFailed": "Unable to perform this action right now. Please try again."
   },
   "breadcrumbs": {
     "employer": "Employer"

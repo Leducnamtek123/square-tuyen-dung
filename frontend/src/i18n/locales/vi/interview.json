@@ -8,6 +8,13 @@
   "sessionNotJoinable": "Buổi phỏng vấn này đã kết thúc hoặc đã bị hủy.",
   "sessionNotJoinableBody": "Buổi phỏng vấn này đã kết thúc hoặc đã bị hủy. Vui lòng liên hệ nhà tuyển dụng để biết thêm chi tiết.",
   "startInterview": "Bắt đầu phỏng vấn",
+  "preflight": {
+    "title": "Kiểm tra thiết bị",
+    "subtitle": "Hãy đảm bảo microphone của bạn hoạt động trước khi bắt đầu buổi phỏng vấn AI.",
+    "mic_ready": "Microphone sẵn sàng",
+    "join": "Tham gia phỏng vấn",
+    "mic_denied": "Quyền truy cập microphone bị từ chối. Vui lòng cho phép truy cập microphone để tiếp tục."
+  },
   "transcriptTitle": "Bản ghi âm",
   "noMessages": "Chưa có tin nhắn nào.",
   "chatPlaceholder": "Nhập tin nhắn...",
@@ -93,7 +100,8 @@
     "missingInvite": "Thiếu mã mời phỏng vấn.",
     "missingSessionId": "Thiếu ID phiên phỏng vấn.",
     "tokenMissing": "Không thể lấy token để tham gia phỏng vấn.",
-    "invalidSession": "Lỗi kết nối hoặc phiên phỏng vấn không hợp lệ."
+    "invalidSession": "Lỗi kết nối hoặc phiên phỏng vấn không hợp lệ.",
+    "sessionNotReadyForJoin": "Không thể vào phòng lúc này vì phiên đang ở trạng thái {{status}}."
   },
   "employer": {
     "questions": {
@@ -236,17 +244,27 @@
       "evaluationSuccess": "Lưu đánh giá thành công",
       "aiTriggerSuccess": "Bắt đầu đánh giá AI",
       "notFound": "Không tìm thấy phỏng vấn",
-      "notFoundDesc": "Phỏng vấn bạn đang tìm không tồn tại"
+      "notFoundDesc": "Phỏng vấn bạn đang tìm không tồn tại",
+      "recordingPending": "Video ?ang ???c x? l?",
+      "recordingPendingDesc": "B?n ghi video s? hi?n th? ? ??y sau khi x? l? xong"
     },
     "actions": {
       "backToList": "Quay lại danh sách"
     },
     "title": "Chi tiết phỏng vấn",
     "label": {
-      "roomCode": "Mã phòng"
+      "roomCode": "Mã phòng",
+      "softSkills": "K? n?ng m?m",
+      "confidence": "?? tin c?y",
+      "clarity": "?? r? r?ng",
+      "tone": "Gi?ng ?i?u",
+      "culturalFit": "M?c ?? ph? h?p v?n ho?",
+      "questionPerformance": "Hi?u su?t c?u h?i",
+      "question": "C?u h?i"
     },
     "tooltips": {
-      "cannotJoin": "Chưa thể tham gia lúc này"
+      "cannotJoin": "Chưa thể tham gia lúc này",
+      "forceEndNow": "K?t th?c ngay l?p t?c bu?i ph?ng v?n n?y"
     }
   }
 }

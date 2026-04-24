@@ -6,6 +6,8 @@
     "allJobPosts": "Tất cả tin tuyển dụng",
     "allStatuses": "Tất cả trạng thái tuyển dụng",
     "advancedFilter": "Bộ lọc nâng cao",
+    "tableView": "Bảng",
+    "boardView": "Thẻ",
     "table": {
       "noCandidates": "Chưa có ứng viên nào ứng tuyển",
       "onlineResume": "Hồ sơ Trực tuyến",
@@ -644,6 +646,7 @@
     "title": "Thư viện Video",
     "subtitle": "Xem lại và tải về các buổi phỏng vấn đã hoàn thành.",
     "searchPlaceholder": "Tìm kiếm ứng viên, vị trí...",
+    "noRecording": "Không có bản ghi",
     "viewMode": {
       "grid": "Dạng lưới",
       "table": "Dạng bảng"
@@ -696,6 +699,18 @@
       "interrupted": "Bị gián đoạn"
     },
     "candidateCard": {
+      "observerMode": "Chế độ quan sát",
+      "endObservation": "Kết thúc quan sát",
+      "live": "Trực tiếp",
+      "reconnecting": "Đang kết nối lại...",
+      "aiInterviewer": "Người phỏng vấn AI",
+      "unknownJob": "Công việc chưa xác định",
+      "liveTranscript": "Bản ghi trực tiếp",
+      "waitingForConversation": "Đang chờ cuộc trò chuyện bắt đầu...",
+      "newBadge": "Mới",
+      "screenShare": "Chia sẻ màn hình",
+      "liveAudioNoVideo": "Âm thanh trực tiếp - Không có video",
+      "waitingForMediaTracks": "Đang chờ luồng âm thanh/video...",
       "waitingSignal": "Đang chờ tín hiệu",
       "waitingSignalHint": "Khi ứng viên bật camera hoặc mic, preview sẽ hiện ở đây",
       "tokenError": "Không thể lấy token quan sát.",

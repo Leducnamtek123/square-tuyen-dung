@@ -134,9 +134,9 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
   const isJoinable = !!state.session && JOINABLE_STATUSES.includes(state.session.status);
 
   const sessionTitle = React.useMemo(() => {
-    if (!isJoinable) return t('unavailableTitle', { defaultValue: 'Session Unavailable' });
-    if (normalizedRole === 'jobseeker') return t('readyTitle', { defaultValue: 'Ready to start interview' });
-    return t('interviewDetail.title', { ns: 'employer', defaultValue: 'Interview session' });
+    if (!isJoinable) return t('unavailableTitle');
+    if (normalizedRole === 'jobseeker') return t('readyTitle');
+    return t('interviewDetail.title', { ns: 'employer' });
   }, [normalizedRole, t, isJoinable]);
 
   const fetchSessionDetails = React.useCallback(async () => {
@@ -152,7 +152,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
         if (!inviteToken) throw new Error(t('errors.missingInvite'));
         detailRaw = await interviewService.getSessionDetailByInviteToken(inviteToken);
       } else {
-        if (!routeId) throw new Error(t('errors.missingSessionId', { defaultValue: 'Missing session ID.' }));
+        if (!routeId) throw new Error(t('errors.missingSessionId'));
         detailRaw = await interviewService.getSessionDetail(routeId);
         inviteToken = (detailRaw as { inviteToken?: string } | null)?.inviteToken || '';
       }
@@ -182,11 +182,11 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
       dispatch({ type: 'set-error', value: '' });
 
       if (!state.sessionInviteToken) {
-        throw new Error(t('errors.missingInvite', { defaultValue: 'Missing interview invite code.' }));
+        throw new Error(t('errors.missingInvite'));
       }
 
       if (normalizedRole !== 'jobseeker' && !routeId) {
-        throw new Error(t('errors.missingSessionId', { defaultValue: 'Missing session ID.' }));
+        throw new Error(t('errors.missingSessionId'));
       }
 
       const latestRaw =
@@ -203,19 +203,12 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
       });
 
       if (!JOINABLE_STATUSES.includes(latestSession.status)) {
-        throw new Error(
-          t('errors.sessionNotReadyForJoin', {
-            defaultValue: 'Khong the vao phong luc nay vi phien dang o trang thai {{status}}.',
-            status: t(`interviewListCard.statuses.${latestSession.status}`, {
-              defaultValue: latestSession.status?.replaceAll('_', ' '),
-            }),
-          }),
-        );
+        throw new Error(t('errors.sessionNotReadyForJoin', { status: t(`interviewListCard.statuses.${latestSession.status}`) }));
       }
 
       const tokenData = await interviewService.getLiveKitToken(state.sessionInviteToken);
       if (!tokenData?.token) {
-        throw new Error(t('errors.tokenMissing', { defaultValue: 'Connection token missing. Please try again.' }));
+        throw new Error(t('errors.tokenMissing'));
       }
 
       let urlToUse = getSafeLiveKitUrl();
@@ -238,7 +231,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
       dispatch({ type: 'set-connection-details', value: { token: tokenData.token, serverUrl: urlToUse } });
       dispatch({ type: 'set-connect-room', value: true });
     } catch (err) {
-      dispatch({ type: 'set-error', value: getErrorDetail(err) || t('errors.invalidSession', { defaultValue: 'Cannot start interview.' }) });
+      dispatch({ type: 'set-error', value: getErrorDetail(err) || t('errors.invalidSession') });
     } finally {
       dispatch({ type: 'set-starting', value: false });
     }
@@ -264,7 +257,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
       <main className="grid min-h-screen place-items-center bg-slate-950 px-6 text-slate-100">
         <div className="flex flex-col items-center gap-3 text-center">
           <div className="h-10 w-10 animate-spin rounded-full border-2 border-cyan-300/30 border-t-cyan-300" />
-          <p className="text-sm text-slate-300">{t('loading', { defaultValue: 'Waiting for system...' })}</p>
+          <p className="text-sm text-slate-300">{t('loading')}</p>
         </div>
       </main>
     );
@@ -276,7 +269,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
         <section className="w-full max-w-lg rounded-2xl border border-rose-400/30 bg-rose-500/10 p-8 text-center text-rose-100">
           <p className="mb-6 text-lg font-medium">{state.error}</p>
           <Button variant="contained" className="bg-rose-600 hover:bg-rose-700" onClick={() => navigate.push('/')}>
-            {t('common:actions.backHome', { defaultValue: 'Back home' })}
+            {t('common:actions.backHome')}
           </Button>
         </section>
       </main>
@@ -289,8 +282,8 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
   const formattedSchedule =
     state.session?.scheduledAt && new Date(state.session.scheduledAt).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US');
 
-  const jobLabel = state.session?.jobName || t('common:labels.job', { defaultValue: 'Job' });
-  const candidateLabel = state.session?.candidateName || t('interviewListCard.candidate', { defaultValue: 'Candidate' });
+  const jobLabel = state.session?.jobName || t('common:labels.job');
+  const candidateLabel = state.session?.candidateName || t('interviewListCard.candidate');
 
   return (
     <main className="dark min-h-screen bg-slate-950 px-4 py-4 text-slate-100 md:px-8 md:py-6">
@@ -317,7 +310,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
                     onClick={terminateInterviewSession}
                     className="h-9 rounded-xl px-4 text-xs font-black uppercase tracking-widest shadow-lg shadow-rose-500/20 transition-all hover:bg-rose-600 active:scale-95"
                   >
-                    {t('controls.end', { defaultValue: 'End call' })}
+                    {t('controls.end')}
                   </Button>
                 </>
               )}
@@ -365,20 +358,12 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
                 <div className="space-y-4">
                   <h2 className="text-3xl font-black tracking-tight text-white md:text-4xl">
                     {isJoinable
-                      ? t('readyTitle', { defaultValue: 'Ready to start interview' })
-                      : t('sessionNotJoinable', { defaultValue: 'Session Unavailable' })}
+                      ? t('readyTitle')
+                      : t('sessionNotJoinable')}
                   </h2>
                   {state.error && <p className="text-sm font-bold uppercase tracking-widest text-rose-400">{state.error}</p>}
                   <p className="mx-auto max-w-md text-sm leading-relaxed text-slate-400">
-                    {isJoinable
-                      ? t('readyBody', {
-                          defaultValue: 'Join the interview room. Your camera and microphone will only be shared when you choose.',
-                        })
-                      : t(`errors.unjoinableByStatus.${statusKey}`, {
-                          defaultValue: t('sessionNotJoinableBody', {
-                            defaultValue: 'This interview session has already ended or been cancelled.',
-                          }),
-                        })}
+                    {isJoinable ? t('readyBody') : t('sessionNotJoinableBody')}
                   </p>
                 </div>
 
@@ -391,16 +376,14 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
                         disabled={state.starting}
                         className="h-14 rounded-2xl bg-cyan-500 px-12 text-sm font-black uppercase tracking-[0.2em] shadow-2xl shadow-cyan-500/20 transition-all hover:bg-cyan-400 hover:shadow-cyan-400/30 active:scale-[0.98] disabled:opacity-50"
                       >
-                        {state.starting
-                          ? t('loading', { defaultValue: 'Waiting for system...' })
-                          : t('startInterview', { defaultValue: 'Start Connecting' })}
+                        {state.starting ? t('loading') : t('startInterview')}
                       </Button>
                       <Button
                         variant="text"
                         onClick={() => navigate.back()}
                         className="text-[10px] font-black uppercase tracking-[0.2em] text-white/30 transition-colors hover:text-white"
                       >
-                        {t('common:actions.back', { defaultValue: 'Go back' })}
+                        {t('common:actions.back')}
                       </Button>
                     </>
                   ) : (
@@ -409,7 +392,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
                       onClick={() => navigate.push('/')}
                       className="h-12 rounded-2xl bg-slate-800 px-10 text-xs font-black uppercase tracking-widest shadow-xl transition-all hover:bg-slate-700"
                     >
-                      {t('common:actions.backHome', { defaultValue: 'Back home' })}
+                      {t('common:actions.backHome')}
                     </Button>
                   )}
                 </div>
@@ -420,7 +403,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
         {formattedSchedule && (
           <p className="text-xs text-slate-300">
-            {t('common:labels.time', { defaultValue: 'Time' })} &bull; {formattedSchedule}
+            {t('common:labels.time')} &bull; {formattedSchedule}
           </p>
         )}
       </div>

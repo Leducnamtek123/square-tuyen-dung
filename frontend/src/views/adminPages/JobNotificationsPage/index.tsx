@@ -173,7 +173,7 @@ const JobNotificationsPage = () => {
         },
         {
             accessorKey: 'jobName',
-            header: t('pages.jobNotifications.table.title', { defaultValue: 'Job Name' }) as string,
+            header: t('pages.jobNotifications.table.title') as string,
             enableSorting: true,
             cell: (info) => (
                 <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
@@ -183,19 +183,19 @@ const JobNotificationsPage = () => {
         },
         {
             accessorKey: 'salary',
-            header: t('pages.jobNotifications.form.salary', { defaultValue: 'Salary' }) as string,
+            header: t('pages.jobNotifications.form.salary') as string,
             cell: (info) => info.getValue() ?? '-',
         },
         {
             accessorKey: 'frequency',
-            header: t('pages.jobNotifications.form.frequency', { defaultValue: 'Frequency' }) as string,
+            header: t('pages.jobNotifications.form.frequency') as string,
             enableSorting: true,
             cell: (info) => info.getValue() ?? '-',
         },
         {
             accessorKey: 'isActive',
-            header: t('pages.jobNotifications.form.isActive', { defaultValue: 'Active' }) as string,
-            cell: (info) => (info.getValue() ? t('common.yes', { defaultValue: 'Yes' }) : t('common.no', { defaultValue: 'No' })),
+            header: t('pages.jobNotifications.form.isActive') as string,
+            cell: (info) => (info.getValue() ? t('common.yes') : t('common.no')),
         },
         {
             id: 'actions',

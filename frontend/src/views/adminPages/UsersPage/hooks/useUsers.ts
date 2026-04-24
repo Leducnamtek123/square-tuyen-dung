@@ -69,13 +69,13 @@ export const useUsers = (params: AdminListParams): UseUsersResult => {
     const deleteMutation = useMutation({
         mutationFn: (id: string | number) => userService.deleteUser(id),
         onSuccess: () => {
-            toastMessages.success('User deleted successfully');
+            toastMessages.success(t('pages.users.toast.deleteSuccess'));
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
         onError: (error: unknown) => {
             const err = error as AxiosError<{ errors?: { detail?: string } }>;
             toastMessages.error(
-                err.response?.data?.errors?.detail || 'Delete failed'
+                err.response?.data?.errors?.detail || t('pages.users.toast.actionFailed')
             );
         }
     });

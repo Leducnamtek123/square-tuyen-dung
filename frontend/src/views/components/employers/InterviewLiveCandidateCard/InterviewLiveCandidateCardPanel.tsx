@@ -57,7 +57,7 @@ const InterviewLiveCandidateCardPanel = ({
   return (
     <>
       <Typography variant="body2" sx={{ color: 'text.secondary', mb: 1.5 }}>
-        {session.roomName || t('interview:interviewDetail.label.roomCode', { defaultValue: 'Room' })}
+        {session.roomName || t('interview:interviewDetail.label.roomCode')}
       </Typography>
 
       <Box
@@ -88,7 +88,7 @@ const InterviewLiveCandidateCardPanel = ({
               <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 1.5 }}>
                 <Chip
                   icon={<FiberManualRecordIcon sx={{ fontSize: '10px !important', color: '#22c55e !important' }} />}
-                  label="LIVE"
+                  label={t('employer:interviewLive.candidateCard.live')}
                   size="small"
                   sx={{
                     fontWeight: 900,
@@ -235,4 +235,3 @@ const InterviewLiveCandidateCardPanel = ({
 };
 
 export default InterviewLiveCandidateCardPanel;
-

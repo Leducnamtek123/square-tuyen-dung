@@ -568,6 +568,7 @@
       "toast": {
         "blockSuccess": "Account blocked.",
         "unblockSuccess": "Account unblocked.",
+        "deleteSuccess": "User deleted successfully.",
         "actionFailed": "Operation failed.",
         "roleUpdated": "Role updated.",
         "roleUpdateFailed": "Role update failed."

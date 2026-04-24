@@ -84,7 +84,7 @@ const Loading = () => {
 
 const TopCompanyCarousel = () => {
   const nav = useRouter();
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation('common');
   const [parentWidth, setParentWidth] = React.useState(0);
   const col = parentWidth < 600 ? 2 : parentWidth < 900 ? 3 : parentWidth < 1200 ? 4 : 5;
 
@@ -224,7 +224,7 @@ const TopCompanyCarousel = () => {
                         height: 42, 
                       }}
                     >
-                      {(value?.shortDescription as React.ReactNode) || "Môi trường làm việc năng động, sáng tạo với nhiều cơ hội thăng tiến và phát triển sự nghiệp..."}
+                      {(value?.shortDescription as React.ReactNode) || t('company.defaultDescription')}
                     </Typography>
 
                     <Stack 
@@ -253,7 +253,7 @@ const TopCompanyCarousel = () => {
                           fontSize: '0.85rem',
                         }}
                       >
-                        {i18n.language === 'en' ? 'View details' : 'Xem chi tiết'}
+                        {t('viewDetails')}
                       </Button>
                     </Stack>
                   </Card>

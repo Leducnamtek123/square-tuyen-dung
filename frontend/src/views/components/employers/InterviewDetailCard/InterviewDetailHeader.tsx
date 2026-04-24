@@ -131,7 +131,7 @@ const InterviewDetailHeader = ({
                     }}
                   />
                 }
-                label="LIVE"
+                label={t('employer:interviewLive.candidateCard.live')}
                 size="small"
                 sx={{
                   fontWeight: 900,
@@ -161,7 +161,7 @@ const InterviewDetailHeader = ({
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: { xs: '100%', md: 'auto' } }}>
           {canObserve && (
-            <Tooltip title="Kết thúc ngay lập tức buổi phỏng vấn này" arrow placement="top">
+            <Tooltip title={t('interview:interviewDetail.tooltips.forceEndNow')} arrow placement="top">
               <Button
                 variant="outlined"
                 onClick={onForceEndInterview}
@@ -184,7 +184,7 @@ const InterviewDetailHeader = ({
                   },
                 }}
               >
-                {t('common:actions.stop', { defaultValue: 'Kết thúc' })}
+                {t('common:actions.stop')}
               </Button>
             </Tooltip>
           )}
@@ -214,7 +214,7 @@ const InterviewDetailHeader = ({
                   },
                 }}
               >
-                {t('common:actions.observe', { defaultValue: 'Observer Mode' })}
+                {t('common:actions.observe')}
               </Button>
             </Tooltip>
           )}

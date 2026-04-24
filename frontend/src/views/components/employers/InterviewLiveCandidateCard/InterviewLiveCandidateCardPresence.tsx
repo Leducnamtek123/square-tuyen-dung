@@ -136,7 +136,7 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
             style={{ width: '100%', height: '100%', objectFit: 'contain' }}
           />
           <Chip
-            label="SCREEN"
+            label={t('employer:interviewLive.candidateCard.screenShare')}
             size="small"
             sx={{
               position: 'absolute',
@@ -194,7 +194,7 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
             }}
           >
             <FiberManualRecordIcon sx={{ fontSize: 8, animation: 'pulse 1.5s infinite' }} />
-            Live Audio
+            {t('employer:interviewLive.candidateCard.liveAudioNoVideo')}
           </Typography>
         </Stack>
       ) : (

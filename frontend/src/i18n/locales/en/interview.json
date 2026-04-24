@@ -8,6 +8,13 @@
   "sessionNotJoinable": "This interview session has already ended or been cancelled.",
   "sessionNotJoinableBody": "This interview session has already ended or been cancelled. Please contact the employer for details.",
   "startInterview": "Start interview",
+  "preflight": {
+    "title": "Device check",
+    "subtitle": "Make sure your microphone works before starting the AI interview.",
+    "mic_ready": "Microphone is ready",
+    "join": "Join interview",
+    "mic_denied": "Microphone permission was denied. Please allow microphone access to continue."
+  },
   "transcriptTitle": "Transcript",
   "noMessages": "No messages yet.",
   "chatPlaceholder": "Type a message...",
@@ -93,7 +100,8 @@
     "missingInvite": "Missing interview invite code.",
     "missingSessionId": "Missing interview session ID.",
     "tokenMissing": "Unable to fetch token to join the interview.",
-    "invalidSession": "Connection error or invalid interview session."
+    "invalidSession": "Connection error or invalid interview session.",
+    "sessionNotReadyForJoin": "Cannot join this room right now because the session is currently {{status}}."
   },
   "employer": {
     "questions": {
@@ -236,17 +244,27 @@
       "evaluationSuccess": "Evaluation saved successfully",
       "aiTriggerSuccess": "AI evaluation started",
       "notFound": "Interview not found",
-      "notFoundDesc": "The interview you are looking for does not exist"
+      "notFoundDesc": "The interview you are looking for does not exist",
+      "recordingPending": "Video is being processed",
+      "recordingPendingDesc": "The recording will appear here once processing is complete"
     },
     "actions": {
       "backToList": "Back to List"
     },
     "title": "Interview Details",
     "label": {
-      "roomCode": "Room Code"
+      "roomCode": "Room Code",
+      "softSkills": "Soft skills",
+      "confidence": "Confidence",
+      "clarity": "Clarity",
+      "tone": "Tone",
+      "culturalFit": "Cultural fit",
+      "questionPerformance": "Question performance",
+      "question": "Question"
     },
     "tooltips": {
-      "cannotJoin": "Cannot join at this time"
+      "cannotJoin": "Cannot join at this time",
+      "forceEndNow": "End this interview immediately"
     }
   }
 }

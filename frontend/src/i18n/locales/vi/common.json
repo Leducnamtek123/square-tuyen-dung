@@ -21,6 +21,12 @@
     "close": "Đóng",
     "backHome": "Quay lại trang chủ",
     "joinNow": "Tham gia ngay",
+    "openNewTab": "Mở tab mới",
+    "refresh": "Làm mới",
+    "retry": "Thử lại",
+    "details": "Chi tiết",
+    "stop": "Kết thúc",
+    "observe": "Quan sát",
     "cancel": "Hủy",
     "save": "Lưu",
     "delete": "Xóa",
@@ -41,6 +47,9 @@
   "loading": "Đang tải...",
   "noData": "Không có dữ liệu",
   "viewDetails": "Xem chi tiết",
+  "company": {
+    "defaultDescription": "Môi trường làm việc năng động, sáng tạo với nhiều cơ hội thăng tiến và phát triển sự nghiệp."
+  },
   "status": {
     "pending": "Đang chờ",
     "active": "Đang hoạt động",
@@ -254,7 +263,8 @@
     "message": "Ứng dụng gặp sự cố không mong muốn. Vui lòng thử lại hoặc tải lại trang.",
     "copyError": "Copy lỗi",
     "retry": "Thử lại",
-    "reload": "Tải lại trang"
+    "reload": "Tải lại trang",
+    "unknownError": "Lỗi không xác định"
   },
   "saving": "Đang lưu...",
   "save": "Lưu",
@@ -598,7 +608,9 @@
     }
   },
   "messages": {
-    "loadingPdf": "Đang tải PDF..."
+    "loadingPdf": "Đang tải PDF...",
+    "loadFailed": "Không thể tải dữ liệu. Vui lòng thử lại.",
+    "actionFailed": "Không thể thao tác lúc này. Vui lòng thử lại."
   },
   "breadcrumbs": {
     "employer": "Nhà tuyển dụng"

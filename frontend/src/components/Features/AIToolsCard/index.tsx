@@ -85,7 +85,7 @@ const AIToolsCard = () => {
 
   const handleGenerateTts = async () => {
     if (!state.ttsText.trim()) {
-      dispatch({ type: 'set_tts_error', payload: t('aiTools.tts.validation', { defaultValue: 'Please enter text to synthesize.' }) });
+      dispatch({ type: 'set_tts_error', payload: t('aiTools.tts.validation') });
       return;
     }
     dispatch({ type: 'set_tts_loading', payload: true });
@@ -108,7 +108,7 @@ const AIToolsCard = () => {
         type: 'set_tts_error',
         payload:
           axiosError.response?.data?.detail ||
-          t('aiTools.tts.error', { defaultValue: 'Unable to generate audio right now.' })
+          t('aiTools.tts.error')
       });
     } finally {
       dispatch({ type: 'set_tts_loading', payload: false });
@@ -117,7 +117,7 @@ const AIToolsCard = () => {
 
   const handleTranscribe = async () => {
     if (!state.transcribeFile) {
-      dispatch({ type: 'set_transcribe_error', payload: t('aiTools.transcribe.validation', { defaultValue: 'Please select an audio file.' }) });
+      dispatch({ type: 'set_transcribe_error', payload: t('aiTools.transcribe.validation') });
       return;
     }
     dispatch({ type: 'set_transcribe_loading', payload: true });
@@ -132,7 +132,7 @@ const AIToolsCard = () => {
         type: 'set_transcribe_error',
         payload:
           axiosError.response?.data?.errors?.detail ||
-          t('aiTools.transcribe.error', { defaultValue: 'Unable to transcribe audio right now.' })
+          t('aiTools.transcribe.error')
       });
     } finally {
       dispatch({ type: 'set_transcribe_loading', payload: false });
@@ -142,16 +142,16 @@ const AIToolsCard = () => {
   return (
     <Card sx={{ p: 3, mt: 3, boxShadow: 2 }}>
       <Typography variant="h6" sx={{ mb: 2 }}>
-        {t('aiTools.title', { defaultValue: 'AI Tools' })}
+        {t('aiTools.title')}
       </Typography>
 
       <Stack spacing={2}>
         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-          {t('aiTools.tts.title', { defaultValue: 'Text-to-Speech' })}
+          {t('aiTools.tts.title')}
         </Typography>
         <TextField
-          label={t('aiTools.tts.textLabel', { defaultValue: 'Text' })}
-          placeholder={t('aiTools.tts.textPlaceholder', { defaultValue: 'Enter text to synthesize...' })}
+          label={t('aiTools.tts.textLabel')}
+          placeholder={t('aiTools.tts.textPlaceholder')}
           value={state.ttsText}
           onChange={(e) => dispatch({ type: 'set_tts_text', payload: e.target.value })}
           multiline
@@ -159,14 +159,14 @@ const AIToolsCard = () => {
         />
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
           <TextField
-            label={t('aiTools.tts.voiceLabel', { defaultValue: 'Voice (optional)' })}
-            placeholder={t('aiTools.tts.voicePlaceholder', { defaultValue: 'e.g. Ly' })}
+            label={t('aiTools.tts.voiceLabel')}
+            placeholder={t('aiTools.tts.voicePlaceholder')}
             value={state.ttsVoice}
             onChange={(e) => dispatch({ type: 'set_tts_voice', payload: e.target.value })}
             fullWidth
           />
           <TextField
-            label={t('aiTools.tts.speedLabel', { defaultValue: 'Speed' })}
+            label={t('aiTools.tts.speedLabel')}
             value={state.ttsSpeed}
             onChange={(e) => dispatch({ type: 'set_tts_speed', payload: e.target.value })}
             type="number"
@@ -177,8 +177,8 @@ const AIToolsCard = () => {
         <Stack direction="row" spacing={2} alignItems="center">
           <Button variant="contained" onClick={handleGenerateTts} disabled={state.ttsLoading}>
             {state.ttsLoading
-              ? t('aiTools.tts.generating', { defaultValue: 'Generating...' })
-              : t('aiTools.tts.generate', { defaultValue: 'Generate Audio' })}
+              ? t('aiTools.tts.generating')
+              : t('aiTools.tts.generate')}
           </Button>
           {state.ttsError && (
             <Typography variant="body2" color="error">
@@ -197,12 +197,12 @@ const AIToolsCard = () => {
 
       <Stack spacing={2}>
         <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-          {t('aiTools.transcribe.title', { defaultValue: 'Speech-to-Text' })}
+          {t('aiTools.transcribe.title')}
         </Typography>
         <Button variant="outlined" component="label">
           {state.transcribeFile
-            ? t('aiTools.transcribe.changeFile', { defaultValue: 'Change audio file' })
-            : t('aiTools.transcribe.selectFile', { defaultValue: 'Select audio file' })}
+            ? t('aiTools.transcribe.changeFile')
+            : t('aiTools.transcribe.selectFile')}
           <input
             type="file"
             hidden
@@ -218,8 +218,8 @@ const AIToolsCard = () => {
         <Stack direction="row" spacing={2} alignItems="center">
           <Button variant="contained" onClick={handleTranscribe} disabled={state.transcribeLoading}>
             {state.transcribeLoading
-              ? t('aiTools.transcribe.transcribing', { defaultValue: 'Transcribing...' })
-              : t('aiTools.transcribe.run', { defaultValue: 'Transcribe' })}
+              ? t('aiTools.transcribe.transcribing')
+              : t('aiTools.transcribe.run')}
           </Button>
           {state.transcribeError && (
             <Typography variant="body2" color="error">
@@ -229,7 +229,7 @@ const AIToolsCard = () => {
         </Stack>
         {state.transcription && (
           <TextField
-            label={t('aiTools.transcribe.resultLabel', { defaultValue: 'Transcription' })}
+            label={t('aiTools.transcribe.resultLabel')}
             value={state.transcription}
             multiline
             minRows={3}

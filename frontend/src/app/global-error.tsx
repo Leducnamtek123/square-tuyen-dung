@@ -30,13 +30,13 @@ export default function GlobalError({
           }}
         >
           <Typography component="h1" sx={{ fontSize: '2rem', mb: 1, fontWeight: 700 }}>
-            {i18n.t('errors.system.title', { defaultValue: 'Hệ thống gặp sự cố / System Error' })}
+            {i18n.t('common:errorBoundary.title')}
           </Typography>
           <Typography component="p" sx={{ color: 'text.secondary', maxWidth: 480, mb: 4 }}>
-            {i18n.t('errors.system.message', { defaultValue: 'Đã xảy ra lỗi nghiêm trọng. Vui lòng thử tải lại trang. / A critical error has occurred. Please try reloading the page.' })}
+            {i18n.t('common:errorBoundary.message')}
           </Typography>
           <Button onClick={reset} variant="contained" sx={{ px: 4, py: 1.5, borderRadius: 2 }}>
-            {i18n.t('common:actions.reload', { defaultValue: 'Tải lại trang / Reload Page' })}
+            {i18n.t('common:errorBoundary.reload')}
           </Button>
         </Box>
       </body>

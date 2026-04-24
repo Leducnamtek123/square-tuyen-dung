@@ -116,7 +116,7 @@ const InterviewLivePage = () => {
       console.error('Error fetching live interview sessions', fetchError);
       dispatch({
         type: 'set-error',
-        value: t('common:messages.loadFailed', { defaultValue: 'Khong the tai du lieu phong van live. Vui long thu lai.' }),
+        value: t('common:messages.loadFailed'),
       });
     } finally {
       if (silent) {
@@ -148,7 +148,7 @@ const InterviewLivePage = () => {
       console.error('Error force ending session', updateError);
       dispatch({
         type: 'set-error',
-        value: t('common:messages.actionFailed', { defaultValue: 'Khong the thao tac luc nay. Vui long thu lai.' }),
+        value: t('common:messages.actionFailed'),
       });
     } finally {
       dispatch({ type: 'set-action-loading-id', value: null });
@@ -166,7 +166,7 @@ const InterviewLivePage = () => {
       >
         <Box>
           <Typography variant="h5" sx={{ fontWeight: 700, color: 'text.primary', fontSize: { xs: '1.25rem', sm: '1.5rem' } }}>
-            {t('interviewLive.title', { defaultValue: 'Phong van Truc tiep' })}
+            {t('interviewLive.title')}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
             {t('employer:interviewLive.subtitle')}
@@ -189,7 +189,7 @@ const InterviewLivePage = () => {
             startIcon={<RefreshIcon />}
             sx={{ borderRadius: 2, px: 2, textTransform: 'none' }}
           >
-            {state.refreshing ? t('employer:interviewLive.updating') : t('common:actions.refresh', { defaultValue: 'Lam moi' })}
+            {state.refreshing ? t('employer:interviewLive.updating') : t('common:actions.refresh')}
           </Button>
         </Stack>
       </Stack>
@@ -199,7 +199,7 @@ const InterviewLivePage = () => {
           severity="error"
           action={
             <Button color="inherit" size="small" onClick={() => fetchSessions()}>
-              {t('common:actions.retry', { defaultValue: 'Thu lai' })}
+              {t('common:actions.retry')}
             </Button>
           }
           sx={{ mb: 2 }}

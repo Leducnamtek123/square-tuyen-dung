@@ -96,7 +96,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
                   variant="text"
                   size="small"
                   onClick={() => {
-                    const errMsg = this.state.error?.message || 'Unknown error';
+                    const errMsg = this.state.error?.message || i18next.t('common:errorBoundary.unknownError', 'Unknown error');
                     const errStack = this.state.error?.stack || '';
                     const compStack = this.state.componentStack || '';
                     navigator.clipboard.writeText(`Error: ${errMsg}\n${errStack}\n\nComponent Stack:${compStack}`);

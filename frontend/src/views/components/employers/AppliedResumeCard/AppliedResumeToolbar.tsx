@@ -77,7 +77,7 @@ const AppliedResumeToolbar: React.FC<Props> = ({
             {title}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-            {t('employer:appliedResume.manageSubtitle', 'Track and manage candidate applications efficiently across all job postings.')}
+            {t('employer:appliedResume.manageSubtitle')}
           </Typography>
         </Box>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
@@ -91,10 +91,10 @@ const AppliedResumeToolbar: React.FC<Props> = ({
             sx={{ bgcolor: 'background.neutral', '& .MuiToggleButton-root': { borderRadius: 3 } }}
           >
             <ToggleButton value="table" sx={{ fontWeight: 800, px: 2, textTransform: 'none' }}>
-              <ViewListIcon sx={{ mr: 1, fontSize: 18 }} /> {t('employer:appliedResume.tableView', { defaultValue: 'Table' })}
+              <ViewListIcon sx={{ mr: 1, fontSize: 18 }} /> {t('employer:appliedResume.tableView')}
             </ToggleButton>
             <ToggleButton value="board" sx={{ fontWeight: 800, px: 2, textTransform: 'none' }}>
-              <ViewKanbanIcon sx={{ mr: 1, fontSize: 18 }} /> {t('employer:appliedResume.boardView', { defaultValue: 'Board' })}
+              <ViewKanbanIcon sx={{ mr: 1, fontSize: 18 }} /> {t('employer:appliedResume.boardView')}
             </ToggleButton>
           </ToggleButtonGroup>
 

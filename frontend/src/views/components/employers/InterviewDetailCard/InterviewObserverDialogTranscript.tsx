@@ -14,10 +14,10 @@ const InterviewObserverDialogTranscript = ({ liveTranscripts, t }: Props) => (
     <Box sx={{ px: 3, py: 2, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
       <Stack direction="row" alignItems="center" spacing={1}>
         <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900 }}>
-          {t('common:auto.InterviewObserverDialog_live_transcript_b857', { defaultValue: 'Live Transcript' })}
+          {t('employer:interviewLive.candidateCard.liveTranscript')}
         </Typography>
         <Chip
-          label={`${liveTranscripts.length} messages`}
+          label={`${liveTranscripts.length} ${t('common:labels.messages')}`}
           size="small"
           sx={{
             height: 20,
@@ -61,7 +61,7 @@ const InterviewObserverDialogTranscript = ({ liveTranscripts, t }: Props) => (
                 </Avatar>
                 <Box sx={{ flex: 1 }}>
                   <Typography variant="caption" sx={{ fontWeight: 900, color: isAI ? '#0ea5e9' : '#a855f7', textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: 1.5 }}>
-                    {isAI ? 'AI Interviewer' : 'Candidate'}
+                    {isAI ? t('employer:interviewLive.candidateCard.aiInterviewer') : t('employer:interviewLive.candidateCard.candidate')}
                   </Typography>
                   <Paper
                     elevation={0}
@@ -86,7 +86,7 @@ const InterviewObserverDialogTranscript = ({ liveTranscripts, t }: Props) => (
       ) : (
         <Box sx={{ textAlign: 'center', py: 10 }}>
           <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.3)', fontWeight: 700 }}>
-            {t('common:auto.InterviewObserverDialog_waiting_for_conversation_to_be_3e38', { defaultValue: 'Waiting for conversation to begin...' })}
+            {t('employer:interviewLive.candidateCard.waitingForConversation')}
           </Typography>
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 1 }}>
             {['dot-1', 'dot-2', 'dot-3'].map((key, index) => (

@@ -4,8 +4,10 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import { BarVisualizer, RoomAudioRenderer, useTracks, VideoTrack } from '@livekit/components-react';
 import { Track } from 'livekit-client';
+import { useTranslation } from 'react-i18next';
 
 const InterviewObserverDialogVisualizer = () => {
+  const { t } = useTranslation(['employer']);
   const audioTracks = useTracks([Track.Source.Microphone]);
   const videoTracks = useTracks([Track.Source.Camera]);
   const screenTracks = useTracks([Track.Source.ScreenShare]);
@@ -16,7 +18,7 @@ const InterviewObserverDialogVisualizer = () => {
         <Box sx={{ width: '100%', flex: 1, position: 'relative', borderRadius: 2, overflow: 'hidden', border: '2px solid', borderColor: alpha('#22c55e', 0.3), bgcolor: '#000' }}>
           <VideoTrack trackRef={screenTracks[0]} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
           <Chip
-            label="SCREEN SHARE"
+            label={t('employer:interviewLive.candidateCard.screenShare')}
             size="small"
             sx={{ position: 'absolute', top: 8, left: 8, fontWeight: 900, fontSize: '0.6rem', letterSpacing: 1, bgcolor: alpha('#22c55e', 0.85), color: '#fff', height: 22 }}
           />
@@ -36,14 +38,14 @@ const InterviewObserverDialogVisualizer = () => {
               </Box>
               <Typography variant="caption" sx={{ color: '#22c55e', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                 <FiberManualRecordIcon sx={{ fontSize: 8, animation: 'pulse 1.5s infinite' }} />
-                Live Audio - No Video
+                {t('employer:interviewLive.candidateCard.liveAudioNoVideo')}
               </Typography>
             </>
           ) : (
             <>
               <VolumeUpIcon sx={{ fontSize: 64, color: 'rgba(255,255,255,0.1)' }} />
               <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.2)', fontWeight: 700 }}>
-                Waiting for Audio/Video Tracks...
+                {t('employer:interviewLive.candidateCard.waitingForMediaTracks')}
               </Typography>
             </>
           )}
@@ -54,7 +56,7 @@ const InterviewObserverDialogVisualizer = () => {
         <Box sx={{ position: 'absolute', top: 8, right: 8, zIndex: 3 }}>
           <Typography variant="caption" sx={{ color: '#22c55e', fontWeight: 900, textTransform: 'uppercase', letterSpacing: 2, fontSize: '0.6rem', display: 'flex', alignItems: 'center', gap: 0.5, bgcolor: 'rgba(0,0,0,0.6)', px: 1.5, py: 0.5, borderRadius: 1 }}>
             <FiberManualRecordIcon sx={{ fontSize: 8, animation: 'pulse 1.5s infinite', '@keyframes pulse': { '0%,100%': { opacity: 1 }, '50%': { opacity: 0.3 } } }} />
-            LIVE
+            {t('employer:interviewLive.candidateCard.live')}
           </Typography>
         </Box>
       )}

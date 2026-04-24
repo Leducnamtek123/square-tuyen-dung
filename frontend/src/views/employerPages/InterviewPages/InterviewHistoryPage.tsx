@@ -245,7 +245,7 @@ const InterviewHistoryPage = () => {
         accessorKey: 'recordingUrl',
         cell: ({ row }: ReactTableCellContext<InterviewSession, unknown>) => {
           const url = row.original.recordingUrl || row.original.recording_url;
-          if (!url) return <Typography variant="caption" color="text.disabled">No Recording</Typography>;
+          if (!url) return <Typography variant="caption" color="text.disabled">{t('employer:interviewHistory.noRecording')}</Typography>;
           return (
             <Button
               size="small"
@@ -300,7 +300,7 @@ const InterviewHistoryPage = () => {
             startIcon={<RefreshIcon />}
             sx={{ borderRadius: 2.5, fontWeight: 800 }}
           >
-            {t('common:actions.refresh', { defaultValue: 'Làm mới' })}
+            {t('common:actions.refresh')}
           </Button>
         </Stack>
       </Stack>

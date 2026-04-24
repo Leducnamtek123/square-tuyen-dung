@@ -96,7 +96,7 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
       dispatch({ type: 'set-resend-timer', value: 60 });
     } catch (err: unknown) {
       console.error(err);
-      dispatch({ type: 'set-error', value: (err as Error).message || 'Failed to send OTP' });
+      dispatch({ type: 'set-error', value: (err as Error).message || t('login.phoneSendFailed') });
     }
   };
 
@@ -108,7 +108,7 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
       onLogin(idToken);
     } catch (err: unknown) {
       console.error(err);
-      dispatch({ type: 'set-error', value: (err as Error).message || 'Invalid OTP code' });
+      dispatch({ type: 'set-error', value: (err as Error).message || t('login.invalidOtpCode') });
     }
   };
 
@@ -123,11 +123,11 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
       {!state.confirmationResult ? (
         <Stack spacing={2}>
           <Typography variant="body2" color="text.secondary">
-            {t('login.phoneIntro', 'Nhập số điện thoại của bạn để nhận mã xác thực.')}
+          {t('login.phoneIntro')}
           </Typography>
           <TextField
             fullWidth
-            label={t('form.phoneNumber', 'Số điện thoại')}
+            label={t('form.phoneNumber')}
             placeholder="+84..."
             value={state.phoneNumber}
             onChange={(e) => dispatch({ type: 'set-phone-number', value: e.target.value })}
@@ -147,18 +147,18 @@ const PhoneOTPLoginForm = ({ onLogin, isLoading }: PhoneOTPLoginFormProps) => {
             disabled={!state.phoneNumber || isLoading}
             startIcon={<PhoneIcon />}
           >
-            {t('actions.sendOTP', 'Gửi mã OTP')}
+            {t('actions.sendOTP')}
           </StyledButton>
           <Box id="recaptcha-container" sx={{ mt: 2, display: 'flex', justifyContent: 'center' }}></Box>
         </Stack>
       ) : (
         <Stack spacing={2}>
           <Typography variant="body2" color="text.secondary">
-            {t('login.otpIntro', 'Nhập mã 6 chữ số đã được gửi đến điện thoại của bạn.')}
+            {t('login.otpIntro')}
           </Typography>
           <TextField
             fullWidth
-            label={t('form.otpCode', 'Mã OTP')}
+            label={t('form.otpCode')}
             placeholder="123456"
             value={state.otpCode}
             onChange={(e) => dispatch({ type: 'set-otp-code', value: e.target.value })}

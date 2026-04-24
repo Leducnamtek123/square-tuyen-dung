@@ -28,7 +28,7 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
     const color = getScoreColor(score);
     return (
       <Tooltip
-        title={t('appliedResume.ai.viewAnalysis', 'View detailed AI analysis')}
+        title={t('appliedResume.ai.viewAnalysis')}
         arrow
         placement="top"
       >
@@ -58,10 +58,10 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
 
   if (isProcessing) {
     return (
-      <Tooltip title={t('appliedResume.ai.processing', 'AI Analysis in progress')} arrow>
+      <Tooltip title={t('appliedResume.ai.processing')} arrow>
         <Chip
           icon={<CircularProgress size={12} color="inherit" thickness={5} />}
-          label={t('appliedResume.ai.processing', 'Processing...')}
+          label={t('appliedResume.ai.processing')}
           onClick={onOpenDrawer}
           variant="outlined"
           sx={{ 
@@ -85,10 +85,10 @@ const AIAnalysisComponent: React.FC<AIAnalysisComponentProps> = ({ row, onOpenDr
 
   if (isFailed) {
     return (
-      <Tooltip title={t('appliedResume.ai.failed', 'Analysis failed. Click to retry.')} arrow>
+      <Tooltip title={t('appliedResume.ai.failed')} arrow>
         <Chip
           icon={<AutoFixHighIcon sx={{ fontSize: '1rem !important' }} />}
-          label={t('appliedResume.ai.retry', 'Retry')}
+          label={t('appliedResume.ai.retry')}
           onClick={onOpenDrawer}
           sx={{ 
             fontWeight: 900, 

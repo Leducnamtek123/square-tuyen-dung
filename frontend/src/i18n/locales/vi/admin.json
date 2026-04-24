@@ -568,6 +568,7 @@
       "toast": {
         "blockSuccess": "Đã khóa tài khoản.",
         "unblockSuccess": "Đã mở khóa tài khoản.",
+        "deleteSuccess": "Xóa người dùng thành công.",
         "actionFailed": "Thao tác thất bại.",
         "roleUpdated": "Đã cập nhật vai trò.",
         "roleUpdateFailed": "Cập nhật vai trò thất bại."

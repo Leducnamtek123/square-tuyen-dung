@@ -12,10 +12,13 @@ from apps.interviews.services import (
     update_interview_status,
 )
 
-from asgiref.sync import sync_to_async
+# NOTE: All views here are SYNC (not async) because the backend runs on
+# Gunicorn + WSGI (config.wsgi:application), which does NOT support async views.
+# Django async views require an ASGI server (e.g. uvicorn/daphne).
+# Using async def under WSGI causes: "view returned an unawaited coroutine".
 
 @csrf_exempt
-async def interview_context(request: HttpRequest, room_name: str):
+def interview_context(request: HttpRequest, room_name: str):
     """
     GET /api/v1/interview/compat/{room_name}/context
 
@@ -26,19 +29,20 @@ async def interview_context(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
     try:
-        session = await sync_to_async(
-            lambda: InterviewSession.objects.select_related("candidate", "job_post")
+        session = (
+            InterviewSession.objects.select_related("candidate", "job_post")
             .prefetch_related("questions")
             .get(room_name=room_name)
-        )()
+        )
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
-    context_data = await sync_to_async(build_interview_context)(session)
+    context_data = build_interview_context(session)
     return JsonResponse(context_data, status=200)
 
+
 @csrf_exempt
-async def interview_next_question(request: HttpRequest, room_name: str):
+def interview_next_question(request: HttpRequest, room_name: str):
     """
     POST /api/v1/interview/compat/{room_name}/next-question
     Body: { "advance": true|false }
@@ -50,9 +54,7 @@ async def interview_next_question(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
     try:
-        session = await sync_to_async(
-            lambda: InterviewSession.objects.prefetch_related("questions").get(room_name=room_name)
-        )()
+        session = InterviewSession.objects.prefetch_related("questions").get(room_name=room_name)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
@@ -61,21 +63,22 @@ async def interview_next_question(request: HttpRequest, room_name: str):
         advance = request.GET.get("advance", "1").lower() in ("1", "true", "yes")
     else:
         try:
-            payload = json.loads(request.body.decode("utf-8") or "{}")
+            body = json.loads(request.body.decode("utf-8") or "{}")
         except Exception:
-            payload = {}
-        advance = bool(payload.get("advance", True))
+            body = {}
+        advance = bool(body.get("advance", True))
 
-    payload = await sync_to_async(get_next_question_payload)(session)
+    payload = get_next_question_payload(session)
     if advance and not payload.get("done"):
-        await sync_to_async(advance_question_cursor)(session)
+        advance_question_cursor(session)
         payload["advance"] = True
     else:
         payload["advance"] = False
     return JsonResponse(payload, status=200)
 
+
 @csrf_exempt
-async def interview_status(request: HttpRequest, room_name: str):
+def interview_status(request: HttpRequest, room_name: str):
     """
     PATCH /api/v1/interview/compat/{room_name}/status
     Body: { "status": "in_progress"|"completed"|... }
@@ -87,8 +90,7 @@ async def interview_status(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
     try:
-        # Use sync_to_async for the ORM call to avoid SynchronousOnlyOperation
-        session = await sync_to_async(InterviewSession.objects.get)(room_name=room_name)
+        session = InterviewSession.objects.get(room_name=room_name)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
@@ -101,12 +103,12 @@ async def interview_status(request: HttpRequest, room_name: str):
     if not new_status:
         return JsonResponse({"detail": "Missing `status`."}, status=400)
 
-    # Wrap the service call as well
-    updated_status = await sync_to_async(update_interview_status)(session, new_status)
+    updated_status = update_interview_status(session, new_status)
     return JsonResponse({"status": updated_status}, status=200)
 
+
 @csrf_exempt
-async def interview_append_transcription(request: HttpRequest, room_name: str):
+def interview_append_transcription(request: HttpRequest, room_name: str):
     """
     POST /api/v1/interview/compat/{room_name}/append-transcription
     Body: { "speaker_role": "ai_agent"|"candidate", "content": "...", "speech_duration_ms": 123 }
@@ -118,7 +120,7 @@ async def interview_append_transcription(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
     try:
-        session = await sync_to_async(InterviewSession.objects.get)(room_name=room_name)
+        session = InterviewSession.objects.get(room_name=room_name)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
@@ -136,8 +138,7 @@ async def interview_append_transcription(request: HttpRequest, room_name: str):
     if not isinstance(content, str) or not content.strip():
         return JsonResponse({"detail": "Missing `content`."}, status=400)
 
-    # Wrap service call
-    transcript = await sync_to_async(append_transcript)(
+    transcript = append_transcript(
         session,
         {
             "speaker_role": speaker_role,

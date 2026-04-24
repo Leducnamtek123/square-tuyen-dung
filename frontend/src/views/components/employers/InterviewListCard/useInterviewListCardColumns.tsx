@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Chip, IconButton, Stack, Typography, Tooltip, alpha, useTheme } from '@mui/material';
+import { Box, Chip, IconButton, Stack, Typography, Tooltip } from '@mui/material';
 import Link from 'next/link';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
@@ -36,9 +36,22 @@ const getStatusColor = (status: string): StatusColor => {
   }
 };
 
+/**
+ * Hardcoded rgba values matching the theme palette.
+ * Required because MUI v6 returns CSS variable strings (e.g. var(--mui-palette-info-main, #64748b))
+ * from theme.palette[color].main, which alpha() cannot process → MUI error #9.
+ */
+const STATUS_BG_COLORS: Record<StatusColor, { bg: string; border: string; text: string }> = {
+  success:  { bg: 'rgba(5, 150, 105, 0.08)',   border: 'rgba(5, 150, 105, 0.15)',   text: '#047857' },
+  primary:  { bg: 'rgba(26, 64, 125, 0.08)',   border: 'rgba(26, 64, 125, 0.15)',   text: '#1a407d' },
+  info:     { bg: 'rgba(42, 169, 225, 0.08)',  border: 'rgba(42, 169, 225, 0.15)',  text: '#2aa9e1' },
+  error:    { bg: 'rgba(220, 38, 38, 0.08)',   border: 'rgba(220, 38, 38, 0.15)',   text: '#dc2626' },
+  warning:  { bg: 'rgba(245, 158, 11, 0.08)',  border: 'rgba(245, 158, 11, 0.15)',  text: '#d97706' },
+  default:  { bg: 'rgba(0, 0, 0, 0.06)',       border: 'rgba(0, 0, 0, 0.10)',       text: '#64748b' },
+};
+
 export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseInterviewListCardColumnsArgs) => {
   const { t } = useTranslation(['interview', 'common', 'employer']);
-  const theme = useTheme();
 
   return React.useMemo<ColumnDef<InterviewSession>[]>(
     () => [
@@ -103,16 +116,10 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
                 textTransform: 'uppercase',
                 fontSize: '0.7rem',
                 letterSpacing: '0.5px',
-                bgcolor:
-                  statusColor === 'default'
-                    ? alpha(theme.palette.action.disabled, 0.08)
-                    : alpha(theme.palette[statusColor].main, 0.08),
-                color: statusColor === 'default' ? 'text.secondary' : `${statusColor}.main`,
+                bgcolor: STATUS_BG_COLORS[statusColor].bg,
+                color: STATUS_BG_COLORS[statusColor].text,
                 border: '1px solid',
-                borderColor:
-                  statusColor === 'default'
-                    ? alpha(theme.palette.action.disabled, 0.1)
-                    : alpha(theme.palette[statusColor].main, 0.1),
+                borderColor: STATUS_BG_COLORS[statusColor].border,
               }}
             />
           );
@@ -144,7 +151,7 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
         },
       },
       {
-        header: t('common:actionsLabel', { defaultValue: 'Action' }),
+        header: t('common:actionsLabel'),
         id: 'actions',
         meta: { align: 'right' },
         cell: ({ row }) => {
@@ -161,9 +168,9 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
                   color="primary"
                   size="small"
                   sx={{
-                    bgcolor: alpha(theme.palette.primary.main, 0.06),
+                    bgcolor: 'rgba(26, 64, 125, 0.06)',
                     borderRadius: 1.5,
-                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.12) },
+                    '&:hover': { bgcolor: 'rgba(26, 64, 125, 0.12)' },
                   }}
                 >
                   <VisibilityIcon fontSize="small" />
@@ -178,9 +185,9 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
                     color="info"
                     size="small"
                     sx={{
-                      bgcolor: alpha(theme.palette.info.main, 0.06),
+                      bgcolor: 'rgba(42, 169, 225, 0.06)',
                       borderRadius: 1.5,
-                      '&:hover': { bgcolor: alpha(theme.palette.info.main, 0.12) },
+                      '&:hover': { bgcolor: 'rgba(42, 169, 225, 0.12)' },
                     }}
                   >
                     <EditIcon fontSize="small" />
@@ -195,9 +202,9 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
                     color="warning"
                     size="small"
                     sx={{
-                      bgcolor: alpha(theme.palette.warning.main, 0.06),
+                      bgcolor: 'rgba(245, 158, 11, 0.06)',
                       borderRadius: 1.5,
-                      '&:hover': { bgcolor: alpha(theme.palette.warning.main, 0.12) },
+                      '&:hover': { bgcolor: 'rgba(245, 158, 11, 0.12)' },
                     }}
                   >
                     <BlockIcon fontSize="small" />
@@ -211,9 +218,9 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
                   color="error"
                   size="small"
                   sx={{
-                    bgcolor: alpha(theme.palette.error.main, 0.06),
+                    bgcolor: 'rgba(220, 38, 38, 0.06)',
                     borderRadius: 1.5,
-                    '&:hover': { bgcolor: alpha(theme.palette.error.main, 0.12) },
+                    '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.12)' },
                   }}
                 >
                   <DeleteIcon fontSize="small" />
@@ -224,6 +231,6 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
         },
       },
     ],
-    [onCancel, onDelete, t, theme]
+    [onCancel, onDelete, t]
   );
 };
