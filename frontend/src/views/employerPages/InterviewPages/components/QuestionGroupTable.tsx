@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React, { useMemo } from 'react';
 import { Typography, Tooltip, IconButton, Stack } from "@mui/material";
 import { useTranslation } from 'react-i18next';

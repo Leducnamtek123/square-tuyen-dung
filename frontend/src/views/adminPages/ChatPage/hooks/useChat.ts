@@ -1,3 +1,5 @@
+﻿'use client';
+
 import { useState, useCallback, useEffect } from 'react';
 import { useQuery, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import { ChatConversation } from '../../../../types/models';

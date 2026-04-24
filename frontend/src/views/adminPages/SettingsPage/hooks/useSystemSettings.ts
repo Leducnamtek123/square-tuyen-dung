@@ -1,3 +1,5 @@
+﻿'use client';
+
 import { useQuery, useMutation, useQueryClient, UseQueryResult } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 

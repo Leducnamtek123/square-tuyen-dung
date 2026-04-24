@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React, { useMemo } from 'react';
 import {
   Box, Typography, Breadcrumbs, Link, Paper,

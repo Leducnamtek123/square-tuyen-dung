@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React, { useCallback, useMemo } from 'react';
 import { Typography, Chip, Tooltip, IconButton, Stack } from "@mui/material";
 import VisibilityOutlinedIcon from '@mui/icons-material/VisibilityOutlined';

@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React, { useState, useMemo } from 'react';
 import { Box, Typography, Breadcrumbs, Link, Paper, TextField, InputAdornment, Tooltip, IconButton, Stack, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, Button } from "@mui/material";
 import { useTranslation } from 'react-i18next';

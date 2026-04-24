@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React, { useMemo, useReducer, useState } from 'react';
 import {
   Box,

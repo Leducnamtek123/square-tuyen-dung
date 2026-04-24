@@ -1,3 +1,5 @@
+﻿'use client';
+
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminJobService from '../../../../services/adminJobService';
 import toastMessages from '../../../../utils/toastMessages';

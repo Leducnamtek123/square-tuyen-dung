@@ -1,3 +1,5 @@
+﻿'use client';
+
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService from '../../../../services/adminManagementService';
 import type { AdminListParams, DistrictPayload } from '../../../../services/adminManagementService';

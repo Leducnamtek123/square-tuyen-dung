@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React from "react";
 import { useAppSelector } from '@/redux/hooks';
 import { useRouter } from 'next/navigation';

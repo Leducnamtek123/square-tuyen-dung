@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React from 'react';
 import { Box, Typography, Chip, Tooltip, IconButton } from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';

@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React from "react";
 import { Card, Stack, Typography, Theme } from "@mui/material";
 import { useTranslation } from "react-i18next";

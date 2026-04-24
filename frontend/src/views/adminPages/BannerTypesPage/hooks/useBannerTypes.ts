@@ -1,3 +1,5 @@
+﻿'use client';
+
 import { useMutation, useQuery, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminManagementService, { AdminBannerTypePayload, AdminListParams } from '../../../../services/adminManagementService';
 import { BannerType } from '../../../../types/models';

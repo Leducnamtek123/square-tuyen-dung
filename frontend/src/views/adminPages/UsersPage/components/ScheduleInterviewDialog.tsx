@@ -1,3 +1,5 @@
+﻿'use client';
+
 import toastMessages from '../../../../utils/toastMessages';
 import React, { useEffect, useReducer } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Chip, Autocomplete, CircularProgress, Alert } from "@mui/material";

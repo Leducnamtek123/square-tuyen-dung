@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React from 'react';
 import { Button, Chip, Select, MenuItem, Stack, type SelectChangeEvent } from '@mui/material';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';

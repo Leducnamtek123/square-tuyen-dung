@@ -1,3 +1,5 @@
+﻿'use client';
+
 import { useQuery, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 import adminInterviewService from '../../../../services/adminInterviewService';
 import { InterviewSession } from '../../../../types/models';

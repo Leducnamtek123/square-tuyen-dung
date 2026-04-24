@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React from 'react';
 import { Box, Chip, IconButton, Stack, Typography } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';

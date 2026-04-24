@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React from "react";
 import { Box, Card, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Typography } from "@mui/material";
 import { useTranslation } from 'react-i18next';

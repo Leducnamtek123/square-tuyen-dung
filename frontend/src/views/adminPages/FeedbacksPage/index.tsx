@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React, { useState, useMemo, useCallback } from 'react';
 import {
   Box, Typography, Breadcrumbs, Link, Paper, IconButton,

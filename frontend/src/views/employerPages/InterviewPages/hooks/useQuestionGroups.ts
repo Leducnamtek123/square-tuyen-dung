@@ -1,3 +1,5 @@
+﻿'use client';
+
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import questionGroupService from '../../../../services/questionGroupService';

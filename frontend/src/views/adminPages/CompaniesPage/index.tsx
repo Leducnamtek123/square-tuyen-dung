@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React, { useCallback, useMemo, useReducer } from 'react';
 import { Box, Paper, TextField, InputAdornment, Button, Typography, Avatar, Chip, Tooltip, IconButton, Breadcrumbs, Link } from '@mui/material';
 import { useTranslation } from 'react-i18next';

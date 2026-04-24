@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React, { useState } from 'react';
 import { useAppSelector } from '@/redux/hooks';
 import { Box, Paper, Typography, Button, Breadcrumbs, Link } from "@mui/material";

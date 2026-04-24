@@ -1,3 +1,5 @@
+﻿'use client';
+
 import * as React from 'react';
 import type { AppDispatch } from '../../../redux/store';
 import { useDispatch } from 'react-redux';

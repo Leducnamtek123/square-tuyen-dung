@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React from 'react';
 import { useQuery, useMutation, useQueryClient, keepPreviousData, UseQueryResult } from '@tanstack/react-query';
 

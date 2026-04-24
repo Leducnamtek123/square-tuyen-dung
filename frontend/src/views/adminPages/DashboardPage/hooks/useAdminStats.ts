@@ -1,3 +1,5 @@
+﻿'use client';
+
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import statisticService, { AdminGeneralStats } from '../../../../services/statisticService';
 

@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React, { useCallback, useMemo } from 'react';
 import { Chip, Tooltip, Switch, Typography, Stack, Select, MenuItem, SelectChangeEvent, Avatar, Box } from "@mui/material";
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';

@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React, { useMemo } from 'react';
 import { IconButton, Tooltip, Avatar, Typography, Stack } from "@mui/material";
 import VisibilityIcon from '@mui/icons-material/Visibility';

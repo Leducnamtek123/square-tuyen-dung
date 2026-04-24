@@ -1,3 +1,5 @@
+﻿'use client';
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 import tokenService from '../../../../services/tokenService';
 

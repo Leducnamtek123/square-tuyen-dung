@@ -1,3 +1,5 @@
+﻿'use client';
+
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Box, Typography, Breadcrumbs, Link, Button } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
