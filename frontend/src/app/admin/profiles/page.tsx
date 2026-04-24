@@ -1,6 +1,4 @@
-﻿'use client';
-
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 export const metadata: Metadata = { title: 'Hồ sơ ứng viên' };
 
 import ProfilesPage from '@/views/adminPages/ProfilesPage';

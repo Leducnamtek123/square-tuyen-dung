@@ -1,6 +1,4 @@
-﻿'use client';
-
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 export const metadata: Metadata = { title: 'Tài khoản' };
 
 import AccountPage from '@/views/employerPages/AccountPage';

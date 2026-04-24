@@ -1,6 +1,4 @@
-﻿'use client';
-
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 export const metadata: Metadata = { title: 'Loại banner' };
 
 import BannerTypesPage from '@/views/adminPages/BannerTypesPage';
