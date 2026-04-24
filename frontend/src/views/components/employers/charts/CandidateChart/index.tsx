@@ -22,7 +22,7 @@ interface CandidateChartProps {
   title: string;
 }
 
-export const options = {
+const options = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {

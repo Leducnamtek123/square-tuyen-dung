@@ -6,7 +6,7 @@ import type { CompanyRole, CompanyMember } from '../types/models';
 
 
 type IdType = string | number;
-export type CompanyTeamListParams = {
+type CompanyTeamListParams = {
   page?: number;
   pageSize?: number;
   ordering?: string;

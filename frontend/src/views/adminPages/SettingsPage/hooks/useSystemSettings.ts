@@ -11,7 +11,7 @@ export interface SystemSettings extends SystemSettingsPayload {
     emailNotifications: boolean;
 }
 
-export type UseSystemSettingsResult = UseQueryResult<SystemSettings> & {
+type UseSystemSettingsResult = UseQueryResult<SystemSettings> & {
     updateSystemSettings: (data: Partial<SystemSettings>) => Promise<SystemSettings>;
     isMutating: boolean;
 };

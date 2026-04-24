@@ -6,7 +6,7 @@
  */
 
 /** Exact URLs that never need a token (login, register, etc.) */
-export const PUBLIC_EXACT_URLS: ReadonlySet<string> = new Set([
+const PUBLIC_EXACT_URLS: ReadonlySet<string> = new Set([
   'auth/token/',
   'auth/convert-token/',
   'auth/job-seeker/register/',
@@ -27,7 +27,7 @@ export const PUBLIC_EXACT_URLS: ReadonlySet<string> = new Set([
  * URL prefixes for public endpoints (no token needed).
  * Keep these as specific as possible.
  */
-export const PUBLIC_PREFIX_URLS: readonly string[] = [
+const PUBLIC_PREFIX_URLS: readonly string[] = [
   // Public catalog data (read-only, no admin)
   'common/careers/',
   'common/cities/',
@@ -49,7 +49,7 @@ export const PUBLIC_PREFIX_URLS: readonly string[] = [
 ];
 
 /** Regex-based public endpoints for dynamic routes that must stay narrow. */
-export const PUBLIC_REGEX_URLS: readonly RegExp[] = [
+const PUBLIC_REGEX_URLS: readonly RegExp[] = [
   // Public job listing page
   /^job\/web\/job-posts\/(?:\?.*)?$/,
   // Public job detail by slug/id (single segment only)
@@ -57,7 +57,7 @@ export const PUBLIC_REGEX_URLS: readonly RegExp[] = [
 ];
 
 /** Prefixes that are always private, even if they overlap public patterns. */
-export const PRIVATE_PREFIX_OVERRIDES: readonly string[] = [
+const PRIVATE_PREFIX_OVERRIDES: readonly string[] = [
   'job/web/job-posts/job-posts-saved/',
 ];
 

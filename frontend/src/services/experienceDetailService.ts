@@ -4,7 +4,7 @@ import type { ExperienceDetail } from '../types/models';
 type IdType = string | number;
 
 /** Input for creating/updating experience detail — id is optional (only for update). */
-export interface ExperienceDetailInput {
+interface ExperienceDetailInput {
   id?: string | number;
   jobName?: string;
   companyName?: string;

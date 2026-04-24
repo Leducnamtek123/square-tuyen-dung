@@ -47,7 +47,7 @@ const colors = [
   "rgba(255, 99, 132, 0.9)",
 ];
 
-export const options = {
+const options = {
   plugins: {
     legend: {
       position: "bottom" as const,

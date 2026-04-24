@@ -41,7 +41,7 @@ import { formatRoute } from '@/utils/funcUtils';
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import SendEmailComponent from '../AppliedResumeTable/SendEmailComponent';
 
-export interface AppliedResumeKanbanProps {
+interface AppliedResumeKanbanProps {
     rows: JobPostActivity[];
     isLoading: boolean;
     handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;

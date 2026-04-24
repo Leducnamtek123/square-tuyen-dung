@@ -6,7 +6,7 @@ import tokenService from '../../../../services/tokenService';
 
 import type { GetSessionsParams } from '../../../../services/interviewService';
 
-export interface InterviewParams extends GetSessionsParams {
+interface InterviewParams extends GetSessionsParams {
     candidate?: number;
 }
 

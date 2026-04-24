@@ -45,7 +45,7 @@ export type ChatRoomDocument = {
   createdAt?: unknown;
 };
 
-export interface ChatRoomWithUser extends ChatRoomDocument {
+interface ChatRoomWithUser extends ChatRoomDocument {
   id: string;
   user: ChatAccountData | null;
 }
@@ -65,7 +65,7 @@ export const addDocument = async (
   return docRef.id;
 };
 
-export const updateChatRoomByPartnerId = (
+const updateChatRoomByPartnerId = (
   partnerId: IdType,
   chatRoomId: IdType
 ): void => {
@@ -123,7 +123,7 @@ export const checkChatRoomExists = async (
   return null;
 };
 
-export const getChatRoomById = async (
+const getChatRoomById = async (
   chatRoomId: IdType,
   currentUserId: IdType
 ): Promise<ChatRoomWithUser | null> => {
@@ -167,7 +167,7 @@ export const getUserAccount = async (
 };
 
 // tao keywords cho displayName, su dung cho search
-export const generateKeywords = (displayName: string): string[] => {
+const generateKeywords = (displayName: string): string[] => {
   // liet ke tat cac hoan vi. vd: name = ["David", "Van", "Teo"]
   // => ["David", "Van", "Teo"], ["David", "Teo", "Van"], ["Teo", "David", "Van"],...
   const name = displayName.split(' ').filter((word) => word);

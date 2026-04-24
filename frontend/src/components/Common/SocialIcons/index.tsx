@@ -121,7 +121,7 @@ export const YoutubeIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
 // ============================================================
 // Instagram — gradient purple-orange
 // ============================================================
-export const InstagramIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
+const InstagramIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
   <svg width={size} height={size} viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="ig-gradient" x1="5" y1="39" x2="39" y2="5" gradientUnits="userSpaceOnUse">
@@ -140,7 +140,7 @@ export const InstagramIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
 // ============================================================
 // TikTok — black with neon accents
 // ============================================================
-export const TiktokIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
+const TiktokIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
   <svg width={size} height={size} viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
     <circle cx="22" cy="22" r="21" fill="#000000" />
     <path

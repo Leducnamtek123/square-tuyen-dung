@@ -8,7 +8,7 @@ import type { TFunction } from 'i18next';
 import PersonalProfileFormFields from './PersonalProfileFormFields';
 import { usePersonalProfileDistrictOptions } from './usePersonalProfileDistrictOptions';
 import type { PersonalProfileFormProps, PersonalProfileFormValues } from './types';
-export type { PersonalProfileFormProps, PersonalProfileFormValues } from './types';
+export type { PersonalProfileFormValues } from './types';
 import { DATE_OPTIONS, REGEX_VALIDATE } from '../../../../configs/constants';
 
 const createPersonalProfileSchema = (t: TFunction) =>

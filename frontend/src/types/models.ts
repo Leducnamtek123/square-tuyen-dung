@@ -4,7 +4,7 @@ import type { RoleName } from './auth';
 export type JobPostStatus = 'draft' | 'active' | 'expired';
 
 /** Maps legacy numeric status to semantic status */
-export const JOB_POST_STATUS_MAP: Record<number, JobPostStatus> = {
+const JOB_POST_STATUS_MAP: Record<number, JobPostStatus> = {
   1: 'draft',
   2: 'active',
   3: 'expired',
@@ -432,7 +432,7 @@ export interface InterviewEvaluation {
 
 /* Misc */
 
-export interface Notification {
+interface Notification {
   id: number;
   title: string;
   content: string;

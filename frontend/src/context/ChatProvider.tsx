@@ -13,7 +13,7 @@ interface ChatProviderProps {
   children: React.ReactNode;
 }
 
-export interface ChatUser {
+interface ChatUser {
   userId: string;
   name: string;
   email: string;
@@ -21,14 +21,14 @@ export interface ChatUser {
   company?: ChatCompany | null;
 }
 
-export interface ChatCompany {
+interface ChatCompany {
   companyId?: number;
   slug?: string;
   companyName?: string;
   imageUrl?: string;
 }
 
-export interface ChatContextValue {
+interface ChatContextValue {
   currentUserChat: ChatUser | null;
   selectedRoomId: string;
   setSelectedRoomId: (id: string) => void;

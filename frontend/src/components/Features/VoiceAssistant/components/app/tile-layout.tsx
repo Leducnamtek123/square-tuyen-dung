@@ -59,7 +59,7 @@ const classNames = {
   secondTileChatClosed: ['col-start-2 row-start-3', 'place-content-end'],
 };
 
-export function useLocalTrackRef(source: Track.Source) {
+function useLocalTrackRef(source: Track.Source) {
   const { localParticipant } = useLocalParticipant();
   const publication = localParticipant.getTrackPublication(source);
   const trackRef = useMemo<TrackReference | undefined>(

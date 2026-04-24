@@ -7,11 +7,11 @@ type DistrictInput = { id?: number | string } | number | string | null | undefin
 
 /* ── Response Types ───────────────────────────────────────────────────── */
 
-export interface DistrictsResponse {
+interface DistrictsResponse {
   data: District[];
 }
 
-export interface WardsResponse {
+interface WardsResponse {
   data: { id: number; name: string; district?: District }[];
 }
 

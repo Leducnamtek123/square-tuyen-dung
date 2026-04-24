@@ -24,10 +24,10 @@ export interface EmployerSignUpFormData {
   };
 }
 
-export interface EmployerSignUpFormProps {
+interface EmployerSignUpFormProps {
   onSignUp: (data: EmployerSignUpFormData) => void;
   serverErrors?: Record<string, string[] | NestedServerErrors>;
   checkCreds: (email: string, roleName: RoleName) => Promise<boolean>;
 }
 
-export type NestedServerErrors = Record<string, string[] | Record<string, string[]>>;
+type NestedServerErrors = Record<string, string[] | Record<string, string[]>>;

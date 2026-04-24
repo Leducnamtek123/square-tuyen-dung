@@ -1,11 +1,5 @@
 import type { AxiosRequestConfig } from 'axios';
 
-/** Standard API response wrapper used by Django's MyJSONRenderer. */
-export interface ApiResponse<T = unknown> {
-  data: T;
-  errors: Record<string, string[]> | null;
-}
-
 /** Paginated list response from DRF CustomPagination. */
 export interface PaginatedResponse<T = unknown> {
   count: number;

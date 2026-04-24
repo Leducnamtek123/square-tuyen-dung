@@ -9,16 +9,16 @@ const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
   return presignInObject(data) as T;
 };
 
-export interface FeedbackPayload {
+interface FeedbackPayload {
   rating: number;
   content: string;
 }
 
-export interface SMSDownloadAppPayload {
+interface SMSDownloadAppPayload {
   phone: string;
 }
 
-export type BannerListParams = {
+type BannerListParams = {
   type?: number | string;
   platform?: string;
   isActive?: boolean;

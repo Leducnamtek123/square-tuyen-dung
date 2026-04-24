@@ -5,7 +5,7 @@ import { JobPost } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 import type { AdminListParams } from '../../../../services/adminManagementService';
 
-export type UseJobsResult = UseQueryResult<PaginatedResponse<JobPost>> & {
+type UseJobsResult = UseQueryResult<PaginatedResponse<JobPost>> & {
     updateJob: (args: { id: string | number; data: Partial<JobPost> }) => Promise<JobPost>;
     approveJob: (id: string | number) => Promise<JobPost>;
     rejectJob: (id: string | number) => Promise<JobPost>;

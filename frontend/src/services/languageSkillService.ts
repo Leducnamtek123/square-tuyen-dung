@@ -3,7 +3,7 @@ import type { LanguageSkill } from '../types/models';
 
 type IdType = string | number;
 
-export interface LanguageSkillInput {
+interface LanguageSkillInput {
   id?: string | number;
   language?: string | number;
   level?: number;

@@ -63,11 +63,11 @@ export interface JobPostInput {
 
 /* ── Response Types ───────────────────────────────────────────────────── */
 
-export interface SuggestTitleResponse {
+interface SuggestTitleResponse {
   results: string[];
 }
 
-export type JobPostOptionsResponse = {
+type JobPostOptionsResponse = {
   statusOptions?: { id: number; name: string }[];
 };
 

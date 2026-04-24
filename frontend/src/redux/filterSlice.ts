@@ -80,7 +80,7 @@ const initialResumeFilter: ResumeFilter = {
   pageSize: 10,
 };
 
-export const filterSlice = createSlice({
+const filterSlice = createSlice({
   name: 'filter',
   initialState: {
     jobPostFilter: initialJobPostFilter,

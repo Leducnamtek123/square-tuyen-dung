@@ -31,7 +31,7 @@ import AIAnalysisComponent from './AIAnalysisComponent';
 import { useConfig } from '@/hooks/useConfig';
 import type { JobPostActivity } from '@/types/models';
 
-export interface AppliedResumeTableProps {
+interface AppliedResumeTableProps {
   rows: JobPostActivity[];
   isLoading: boolean;
   handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;

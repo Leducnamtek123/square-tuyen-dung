@@ -30,7 +30,7 @@ export interface GetResumesParams {
   ordering?: string;
 }
 
-export interface ResumeInput {
+interface ResumeInput {
   title?: string;
   description?: string;
   salaryMin?: number;
@@ -45,7 +45,7 @@ export interface ResumeInput {
   isActive?: boolean;
 }
 
-export interface SendEmailInput {
+interface SendEmailInput {
   subject?: string;
   content?: string;
   toEmail?: string;
@@ -53,14 +53,14 @@ export interface SendEmailInput {
 
 /* ── Response Types ───────────────────────────────────────────────────── */
 
-export interface ResumeOwner {
+interface ResumeOwner {
   fullName?: string;
   email?: string;
   phone?: string;
   avatarUrl?: string | null;
 }
 
-export interface ResumeCV {
+interface ResumeCV {
   fileUrl?: string | null;
   type?: string;
 }

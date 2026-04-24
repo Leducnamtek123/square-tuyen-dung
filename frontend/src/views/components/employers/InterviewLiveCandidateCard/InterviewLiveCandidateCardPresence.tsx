@@ -226,4 +226,4 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
   );
 };
 
-export { ACTIVE_STATUSES, normalizeStatus, getSafeLiveKitUrl, getStatusColor };
+export { ACTIVE_STATUSES, normalizeStatus, getSafeLiveKitUrl };

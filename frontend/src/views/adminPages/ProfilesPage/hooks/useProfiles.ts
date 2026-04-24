@@ -5,7 +5,7 @@ import { JobSeekerProfile } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 import type { AdminListParams, JobSeekerProfilePayload } from '../../../../services/adminManagementService';
 
-export type UseProfilesResult = UseQueryResult<PaginatedResponse<JobSeekerProfile>> & {
+type UseProfilesResult = UseQueryResult<PaginatedResponse<JobSeekerProfile>> & {
     createProfile: (data: JobSeekerProfilePayload) => Promise<JobSeekerProfile>;
     updateProfile: (args: { id: string | number; data: JobSeekerProfilePayload }) => Promise<JobSeekerProfile>;
     deleteProfile: (id: string | number) => Promise<void>;

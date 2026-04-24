@@ -25,7 +25,7 @@ export interface AdminCompanyPayload {
     };
 }
 
-export type UseCompaniesResult = UseQueryResult<PaginatedResponse<Company>> & {
+type UseCompaniesResult = UseQueryResult<PaginatedResponse<Company>> & {
     createCompany: (data: AdminCompanyPayload) => Promise<Company>;
     updateCompany: (args: { id: string | number; data: Partial<AdminCompanyPayload> }) => Promise<Company>;
     deleteCompany: (id: string | number) => Promise<void>;

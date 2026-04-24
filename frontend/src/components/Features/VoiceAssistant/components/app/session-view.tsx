@@ -44,7 +44,7 @@ interface FadeProps {
   className?: string;
 }
 
-export function Fade({ top = false, bottom = false, className }: FadeProps) {
+function Fade({ top = false, bottom = false, className }: FadeProps) {
   return (
     <div
       className={cn(

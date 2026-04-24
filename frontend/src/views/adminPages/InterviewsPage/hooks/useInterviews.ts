@@ -4,7 +4,7 @@ import { InterviewSession } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 import type { AdminListParams } from '../../../../services/adminManagementService';
 
-export type UseInterviewsResult = UseQueryResult<PaginatedResponse<InterviewSession>>;
+type UseInterviewsResult = UseQueryResult<PaginatedResponse<InterviewSession>>;
 
 export const useInterviews = (params: AdminListParams): UseInterviewsResult => {
     const query = useQuery({

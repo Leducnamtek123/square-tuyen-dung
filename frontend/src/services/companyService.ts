@@ -7,7 +7,7 @@ import type { Company, JobPost } from '../types/models';
 
 
 type IdType = string | number;
-export type CompanyListParams = {
+type CompanyListParams = {
   kw?: string;
   cityId?: string | number;
   page?: number;
@@ -15,7 +15,7 @@ export type CompanyListParams = {
   ordering?: string;
 };
 
-export interface CompanyUpdatePayload {
+interface CompanyUpdatePayload {
   companyName?: string;
   taxCode?: string;
   employeeSize?: number | string;

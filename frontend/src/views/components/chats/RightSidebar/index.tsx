@@ -23,7 +23,7 @@ interface AppliedResumeChatData {
   jobPostTitle?: string;
 }
 
-export const RightSidebar = () => {
+const RightSidebar = () => {
   return (
     <RightSidebarRenderer
       titleKey="appliedJobs"
@@ -52,7 +52,7 @@ export const RightSidebar = () => {
   );
 };
 
-export const EmployerSidebar = () => {
+const EmployerSidebar = () => {
   return (
     <RightSidebarRenderer
       titleKey="candidates"

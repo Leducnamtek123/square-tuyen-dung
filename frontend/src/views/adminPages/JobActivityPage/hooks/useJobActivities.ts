@@ -5,7 +5,7 @@ import { JobPostActivity } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 import type { AdminListParams, JobPostActivityPayload } from '../../../../services/adminManagementService';
 
-export type UseJobActivitiesResult = UseQueryResult<PaginatedResponse<JobPostActivity>> & {
+type UseJobActivitiesResult = UseQueryResult<PaginatedResponse<JobPostActivity>> & {
     updateJobActivity: (args: { id: string | number; data: JobPostActivityPayload }) => Promise<JobPostActivity>;
     deleteJobActivity: (id: string | number) => Promise<void>;
     isMutating: boolean;

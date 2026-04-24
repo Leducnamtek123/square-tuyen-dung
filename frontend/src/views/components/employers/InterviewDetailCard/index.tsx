@@ -25,7 +25,7 @@ import type { AxiosError } from 'axios';
 import type { ApiError } from '../../../../types/api';
 import type { InterviewSession } from '../../../../types/models';
 
-export interface EvalFormType {
+interface EvalFormType {
   attitude_score: number | string;
   professional_score: number | string;
   result: 'passed' | 'failed' | 'pending';

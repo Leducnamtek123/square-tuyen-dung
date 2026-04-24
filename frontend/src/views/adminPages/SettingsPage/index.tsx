@@ -34,11 +34,7 @@ type SettingsFormProps = {
 
 const SettingsForm = ({ initialSettings, onSave, isMutating }: SettingsFormProps) => {
   const { t } = useTranslation('admin');
-  const [formData, setFormData] = useState<SystemSettings>(INITIAL_SETTINGS);
-
-  React.useEffect(() => {
-    setFormData(initialSettings);
-  }, [initialSettings]);
+  const [formData, setFormData] = useState<SystemSettings>(() => initialSettings);
 
   const handleToggleChange = (name: keyof SystemSettings) => (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [name]: event.target.checked }));
@@ -194,7 +190,12 @@ const SettingsPage = () => {
   const initialSettings = settings ?? INITIAL_SETTINGS;
 
   return (
-    <SettingsForm initialSettings={initialSettings} onSave={updateSystemSettings} isMutating={isMutating} />
+    <SettingsForm
+      key={settings ? 'loaded' : 'default'}
+      initialSettings={initialSettings}
+      onSave={updateSystemSettings}
+      isMutating={isMutating}
+    />
   );
 };
 

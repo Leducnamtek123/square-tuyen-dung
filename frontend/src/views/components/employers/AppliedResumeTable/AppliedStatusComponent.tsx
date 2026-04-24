@@ -6,7 +6,7 @@ import { tConfig } from '../../../../utils/tConfig';
 import { useConfig } from '@/hooks/useConfig';
 import { SelectOption } from '@/types/models';
 
-export interface AppliedStatusComponentProps {
+interface AppliedStatusComponentProps {
   options: SelectOption[];
   defaultStatus: number;
   id: string;

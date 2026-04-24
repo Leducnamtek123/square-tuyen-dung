@@ -15,7 +15,7 @@ const trackSourceToProtocol = (source: Track.Source) => {
   }
 };
 
-export interface PublishPermissions {
+interface PublishPermissions {
   camera: boolean;
   microphone: boolean;
   screenShare: boolean;

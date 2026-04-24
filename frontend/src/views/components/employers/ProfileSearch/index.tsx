@@ -33,7 +33,7 @@ import { resetSearchResume, searchResume } from '../../../../redux/filterSlice';
 import type { ResumeFilter } from '../../../../redux/filterSlice';
 import { useConfig } from '@/hooks/useConfig';
 
-export interface ProfileSearchValues {
+interface ProfileSearchValues {
   kw: string;
   cityId: string | number;
   careerId: string | number;

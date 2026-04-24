@@ -5,7 +5,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import { Career } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
-export type UseCareersResult = UseQueryResult<PaginatedResponse<Career>> & {
+type UseCareersResult = UseQueryResult<PaginatedResponse<Career>> & {
     createCareer: (data: CareerPayload) => Promise<Career>;
     updateCareer: (args: { id: string | number; data: Partial<CareerPayload> }) => Promise<Career>;
     deleteCareer: (id: string | number) => Promise<void>;

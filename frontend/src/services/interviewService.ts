@@ -39,7 +39,7 @@ export interface SubmitEvaluationInput {
 
 /* ── Response Types ───────────────────────────────────────────────────── */
 
-export interface LiveKitTokenResponse {
+interface LiveKitTokenResponse {
   token: string;
   url?: string;
   serverUrl?: string;
@@ -47,7 +47,7 @@ export interface LiveKitTokenResponse {
   roomName: string;
 }
 
-export interface SessionMetrics {
+interface SessionMetrics {
   sessionId: number;
   status: string;
   startTime: string | null;

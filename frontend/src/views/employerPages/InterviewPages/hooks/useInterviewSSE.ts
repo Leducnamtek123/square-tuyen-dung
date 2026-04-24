@@ -12,7 +12,7 @@ export interface SSETranscript {
   createAt: string | null;
 }
 
-export interface SSEStatusEvent {
+interface SSEStatusEvent {
   sessionId: number;
   oldStatus: string;
   newStatus: string;
@@ -21,7 +21,7 @@ export interface SSEStatusEvent {
   duration: number | null;
 }
 
-export interface SSETranscriptEvent {
+interface SSETranscriptEvent {
   sessionId: number;
   transcript: SSETranscript;
 }

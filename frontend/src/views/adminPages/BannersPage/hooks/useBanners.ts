@@ -5,7 +5,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import { Banner } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
-export type UseBannersResult = UseQueryResult<PaginatedResponse<Banner>> & {
+type UseBannersResult = UseQueryResult<PaginatedResponse<Banner>> & {
     createBanner: (data: FormData | AdminBannerPayload) => Promise<Banner>;
     updateBanner: (args: { id: string | number; data: FormData | Partial<AdminBannerPayload> }) => Promise<Banner>;
     deleteBanner: (id: string | number) => Promise<void>;

@@ -39,7 +39,7 @@ const initialState: AuthState = {
   roleName: storedVerify?.roleName || '',
 };
 
-export const authSlice = createSlice({
+const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {

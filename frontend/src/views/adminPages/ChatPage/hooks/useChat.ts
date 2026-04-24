@@ -3,11 +3,11 @@ import { useQuery, keepPreviousData, UseQueryResult } from '@tanstack/react-quer
 import { ChatConversation } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
-export type UseChatResult = UseQueryResult<PaginatedResponse<ChatConversation>> & {
+type UseChatResult = UseQueryResult<PaginatedResponse<ChatConversation>> & {
     isMutating: boolean;
 };
 
-export type ChatListParams = {
+type ChatListParams = {
     page?: number;
     pageSize?: number;
     ordering?: string;

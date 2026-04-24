@@ -7,7 +7,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { HOST_NAME, ROUTES } from "../../../../configs/constants";
 import { setActiveWorkspace } from "../../../../redux/userSlice";
 
-export type WorkspaceItem = {
+type WorkspaceItem = {
   type: "company" | "job_seeker";
   companyId?: number | null;
   label?: string;

@@ -5,7 +5,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import { City } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
-export type UseCitiesResult = UseQueryResult<PaginatedResponse<City>> & {
+type UseCitiesResult = UseQueryResult<PaginatedResponse<City>> & {
     createCity: (data: CityPayload) => Promise<City>;
     updateCity: (args: { id: string | number; data: Partial<CityPayload> }) => Promise<City>;
     deleteCity: (id: string | number) => Promise<void>;

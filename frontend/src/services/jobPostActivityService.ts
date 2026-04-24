@@ -6,7 +6,7 @@ import { cleanParams } from '../utils/params';
 
 
 type IdType = string | number;
-export interface ApplyJobPayload {
+interface ApplyJobPayload {
   jobPost: number;
   resume: number;
   fullName: string;
@@ -24,16 +24,16 @@ export type JobPostActivityListParams = {
   jobPostId?: number | string;
 };
 
-export interface SendEmailPayload {
+interface SendEmailPayload {
   subject?: string;
   content?: string;
 }
 
-export interface ChangeApplicationStatusPayload {
+interface ChangeApplicationStatusPayload {
   status: number | string;
 }
 
-export interface ActionResponse {
+interface ActionResponse {
   success?: boolean;
   message?: string;
 }

@@ -30,20 +30,20 @@ import type { JobPostActivityListParams } from '../../../../services/jobPostActi
 import type { GetResumesParams } from '../../../../services/resumeService';
 
 // ─── Types ───────────────────────────────────────────────────
-export type UseEmployerGeneralStatsResult = UseQueryResult<EmployerGeneralStats>;
-export type UseEmployerApplicationStatsResult = UseQueryResult<EmployerApplicationStats>;
-export type UseEmployerCandidateStatsResult = UseQueryResult<EmployerCandidateStats>;
-export type UseEmployerRecruitmentStatsResult = UseQueryResult<EmployerRecruitmentStatItem[]>;
-export type UseEmployerRecruitmentByRankStatsResult = UseQueryResult<EmployerRecruitmentByRankStats>;
-export type UseEmployerInterviewStatsResult = UseQueryResult<EmployerInterviewStats>;
-export type UseSavedResumesResult = UseQueryResult<PaginatedResponse<ResumeSaved>>;
-export type UseAppliedResumesResult = UseQueryResult<PaginatedResponse<JobPostActivity>>;
-export type UseEmployerResumesResult = UseQueryResult<PaginatedResponse<Resume>>;
-export type UseEmployerJobPostsResult = UseQueryResult<PaginatedResponse<JobPost>>;
-export type UseInterviewSessionsResult = UseQueryResult<PaginatedResponse<InterviewSession>>;
-export type UseInterviewDetailResult = UseQueryResult<InterviewSession>;
-export type UseEmployerQuestionsResult = UseQueryResult<PaginatedResponse<Question>>;
-export type UseQuestionGroupsResult = UseQueryResult<PaginatedResponse<QuestionGroup>>;
+type UseEmployerGeneralStatsResult = UseQueryResult<EmployerGeneralStats>;
+type UseEmployerApplicationStatsResult = UseQueryResult<EmployerApplicationStats>;
+type UseEmployerCandidateStatsResult = UseQueryResult<EmployerCandidateStats>;
+type UseEmployerRecruitmentStatsResult = UseQueryResult<EmployerRecruitmentStatItem[]>;
+type UseEmployerRecruitmentByRankStatsResult = UseQueryResult<EmployerRecruitmentByRankStats>;
+type UseEmployerInterviewStatsResult = UseQueryResult<EmployerInterviewStats>;
+type UseSavedResumesResult = UseQueryResult<PaginatedResponse<ResumeSaved>>;
+type UseAppliedResumesResult = UseQueryResult<PaginatedResponse<JobPostActivity>>;
+type UseEmployerResumesResult = UseQueryResult<PaginatedResponse<Resume>>;
+type UseEmployerJobPostsResult = UseQueryResult<PaginatedResponse<JobPost>>;
+type UseInterviewSessionsResult = UseQueryResult<PaginatedResponse<InterviewSession>>;
+type UseInterviewDetailResult = UseQueryResult<InterviewSession>;
+type UseEmployerQuestionsResult = UseQueryResult<PaginatedResponse<Question>>;
+type UseQuestionGroupsResult = UseQueryResult<PaginatedResponse<QuestionGroup>>;
 
 export type JobPostOption = {
   id: string | number;

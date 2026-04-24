@@ -9,7 +9,7 @@ export interface ChatPayload {
   messages: ChatMessagePayload[];
 }
 
-export type ChatResponse = {
+type ChatResponse = {
   reply: string;
 };
 

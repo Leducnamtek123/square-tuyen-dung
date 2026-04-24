@@ -33,7 +33,7 @@ export const formatRoute = (
   return localizeRoutePath(builtRoute, language);
 };
 
-export const buildURL = (hostname: string): string => {
+const buildURL = (hostname: string): string => {
   const protocol = window.location.protocol;
   const port = window.location.port ? `:${window.location.port}` : '';
   return `${protocol}//${hostname}${port}`;

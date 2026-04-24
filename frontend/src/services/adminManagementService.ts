@@ -94,13 +94,13 @@ export interface JobPostNotificationPayload {
   city?: number | null;
 }
 
-export interface QuestionPayload {
+interface QuestionPayload {
   text: string;
   difficulty?: string;
   career?: number | null;
 }
 
-export interface QuestionGroupPayload {
+interface QuestionGroupPayload {
   name: string;
   description?: string;
   evaluation_rubric_input?: unknown;

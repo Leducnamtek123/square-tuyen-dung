@@ -13,7 +13,7 @@ import type { TOptions } from 'i18next';
 
 const t = (key: string, options?: TOptions) => i18n.t(key, { ns: 'admin', ...options });
 
-export type UseUsersResult = UseQueryResult<PaginatedResponse<UserModel>> & {
+type UseUsersResult = UseQueryResult<PaginatedResponse<UserModel>> & {
     toggleUserStatus: (user: UserModel) => Promise<UserModel>;
     updateUserRole: (args: { userId: string | number; roleName: RoleName }) => Promise<UserModel>;
     deleteUser: (id: string | number) => Promise<void>;

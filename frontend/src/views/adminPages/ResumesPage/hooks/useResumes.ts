@@ -5,7 +5,7 @@ import { Resume } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 import type { AdminListParams, ResumePayload } from '../../../../services/adminManagementService';
 
-export type UseResumesResult = UseQueryResult<PaginatedResponse<Resume>> & {
+type UseResumesResult = UseQueryResult<PaginatedResponse<Resume>> & {
     createResume: (data: ResumePayload) => Promise<Resume>;
     updateResume: (args: { id: string | number; data: ResumePayload }) => Promise<Resume>;
     deleteResume: (id: string | number) => Promise<void>;

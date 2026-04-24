@@ -5,7 +5,7 @@ import PsychologyIcon from '@mui/icons-material/Psychology';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import { JobPostActivity } from '@/types/models';
 
-export interface AIAnalysisComponentProps {
+interface AIAnalysisComponentProps {
   row: JobPostActivity;
   onOpenDrawer: () => void;
 }

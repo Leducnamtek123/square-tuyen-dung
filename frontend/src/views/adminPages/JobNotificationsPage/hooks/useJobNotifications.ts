@@ -5,7 +5,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import { JobPostNotification } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
-export type UseJobNotificationsResult = UseQueryResult<PaginatedResponse<JobPostNotification>> & {
+type UseJobNotificationsResult = UseQueryResult<PaginatedResponse<JobPostNotification>> & {
     createJobNotification: (data: JobPostNotificationPayload) => Promise<JobPostNotification>;
     updateJobNotification: (args: { id: string | number; data: Partial<JobPostNotificationPayload> }) => Promise<JobPostNotification>;
     deleteJobNotification: (id: string | number) => Promise<void>;

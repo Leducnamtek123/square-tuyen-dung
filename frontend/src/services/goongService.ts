@@ -10,7 +10,7 @@ export interface PlacePrediction {
   };
 }
 
-export interface PlaceDetail {
+interface PlaceDetail {
   result: {
     geometry: {
       location: {

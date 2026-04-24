@@ -1,7 +1,7 @@
 import { useQuery, UseQueryResult } from '@tanstack/react-query';
 import statisticService, { AdminGeneralStats } from '../../../../services/statisticService';
 
-export type UseAdminStatsResult = UseQueryResult<AdminGeneralStats>;
+type UseAdminStatsResult = UseQueryResult<AdminGeneralStats>;
 
 export const useAdminStats = (): UseAdminStatsResult => {
     return useQuery({

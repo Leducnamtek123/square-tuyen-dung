@@ -19,7 +19,6 @@ export {
   FEEDBACK_IMAGES,
   LOGO_IMAGES,
   SVG_IMAGES,
-  CHATBOT_ICONS,
 } from './images';
 
 // ROUTES — centralized in routeConfig.ts
@@ -157,16 +156,7 @@ const JOB_POST_STATUS_BG_COLOR = {
   3: 'success',
 } as const;
 
-export type HostNameConfig = typeof HOST_NAME;
-export type AuthProviderConfig = typeof AUTH_PROVIDER;
-export type AuthConfig = typeof AUTH_CONFIG;
-export type RolesNameConfig = typeof ROLES_NAME;
-// Routes type is now defined in routeConfig.ts
-// export type Routes = typeof ROUTES;
-export type RegexConfig = typeof REGEX_VALIDATE;
-
 export {
-  ENV,
   PLATFORM,
   APP_NAME,
   HOST_NAME,

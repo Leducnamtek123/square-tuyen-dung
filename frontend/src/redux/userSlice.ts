@@ -134,7 +134,7 @@ const initialState: UserState = {
   activeWorkspace: storedWorkspace,
 };
 
-export const userSlice = createSlice({
+const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {

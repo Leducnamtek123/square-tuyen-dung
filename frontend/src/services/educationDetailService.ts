@@ -3,7 +3,7 @@ import type { EducationDetail } from '../types/models';
 
 type IdType = string | number;
 
-export interface EducationDetailInput {
+interface EducationDetailInput {
   id?: string | number;
   degreeName?: string;
   major?: string;

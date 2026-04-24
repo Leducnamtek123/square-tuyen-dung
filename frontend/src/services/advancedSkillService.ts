@@ -3,7 +3,7 @@ import type { AdvancedSkill } from '../types/models';
 
 type IdType = string | number;
 
-export interface AdvancedSkillInput {
+interface AdvancedSkillInput {
   id?: string | number;
   name?: string;
   level?: number;

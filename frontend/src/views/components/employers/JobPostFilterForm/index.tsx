@@ -9,7 +9,7 @@ import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCus
 import SingleSelectCustom from '../../../../components/Common/Controls/SingleSelectCustom';
 import { useConfig } from '@/hooks/useConfig';
 
-export interface JobPostFilterFormValues {
+interface JobPostFilterFormValues {
   kw: string;
   isUrgent: string;
   statusId: string;

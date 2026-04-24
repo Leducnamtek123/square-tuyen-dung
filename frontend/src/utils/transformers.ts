@@ -63,7 +63,7 @@ const asMap = (value: unknown): GenericMap | null => {
   return value as GenericMap;
 };
 
-export const transformQuestion = (q: unknown): Question | null => {
+const transformQuestion = (q: unknown): Question | null => {
   const map = asMap(q) as QuestionLike | null;
   if (!map) return null;
 
@@ -87,7 +87,7 @@ export const transformQuestion = (q: unknown): Question | null => {
   };
 };
 
-export const transformQuestionGroup = (group: unknown): QuestionGroup | null => {
+const transformQuestionGroup = (group: unknown): QuestionGroup | null => {
   const map = asMap(group) as (Partial<QuestionGroup> & { questions?: unknown[] }) | null;
   if (!map) return null;
 
@@ -166,7 +166,7 @@ export const transformInterviewSession = (session: unknown): InterviewSession | 
   };
 };
 
-export const transformJobPost = (job: unknown): JobPost | null => {
+const transformJobPost = (job: unknown): JobPost | null => {
   const map = asMap(job) as JobPostLike | null;
   if (!map) return null;
 
@@ -186,7 +186,7 @@ export const transformJobPost = (job: unknown): JobPost | null => {
   };
 };
 
-export const transformAppliedResume = (resume: unknown): GenericMap | null => {
+const transformAppliedResume = (resume: unknown): GenericMap | null => {
   const map = asMap(resume) as AppliedResumeLike | null;
   if (!map) return null;
 

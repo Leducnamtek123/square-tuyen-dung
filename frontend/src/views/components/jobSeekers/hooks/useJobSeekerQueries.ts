@@ -35,13 +35,13 @@ const shouldRetryQuery = (failureCount: number, error: Error): boolean => {
     return failureCount < 1;
 };
 
-export type UseSavedJobsResult = UseQueryResult<PaginatedResponse<JobPost>>;
-export type UseCompaniesFollowedResult = UseQueryResult<PaginatedResponse<{ id: number, company: Company }>>;
-export type UseResumeViewedResult = UseQueryResult<PaginatedResponse<ResumeViewed>>;
-export type UseJobSeekerTotalViewResult = UseQueryResult<JobSeekerTotalViewStats>;
-export type UseJobSeekerActivityStatsResult = UseQueryResult<JobSeekerActivityStats>;
-export type UseResumesResult = UseQueryResult<Resume[]>;
-export type UseJobPostNotificationsResult = UseQueryResult<PaginatedResponse<JobPostNotification>>;
+type UseSavedJobsResult = UseQueryResult<PaginatedResponse<JobPost>>;
+type UseCompaniesFollowedResult = UseQueryResult<PaginatedResponse<{ id: number, company: Company }>>;
+type UseResumeViewedResult = UseQueryResult<PaginatedResponse<ResumeViewed>>;
+type UseJobSeekerTotalViewResult = UseQueryResult<JobSeekerTotalViewStats>;
+type UseJobSeekerActivityStatsResult = UseQueryResult<JobSeekerActivityStats>;
+type UseResumesResult = UseQueryResult<Resume[]>;
+type UseJobPostNotificationsResult = UseQueryResult<PaginatedResponse<JobPostNotification>>;
 
 
 // ─── Saved Jobs ─────────────────────────────────────────────

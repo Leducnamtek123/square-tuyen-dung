@@ -3,7 +3,7 @@ import type { Certificate } from '../types/models';
 
 type IdType = string | number;
 
-export interface CertificateInput {
+interface CertificateInput {
   id?: string | number;
   name?: string;
   trainingPlace?: string;

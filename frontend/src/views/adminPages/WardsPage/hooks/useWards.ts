@@ -6,7 +6,7 @@ import i18next from 'i18next';
 import { Ward } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
-export type UseWardsResult = UseQueryResult<PaginatedResponse<Ward>> & {
+type UseWardsResult = UseQueryResult<PaginatedResponse<Ward>> & {
     createWard: (data: WardPayload) => Promise<Ward>;
     updateWard: (args: { id: string | number; data: Partial<WardPayload> }) => Promise<Ward>;
     deleteWard: (id: string | number) => Promise<void>;

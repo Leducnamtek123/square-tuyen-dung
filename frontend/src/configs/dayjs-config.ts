@@ -17,5 +17,4 @@ dayjs.locale('vi');
 // Set default timezone to Asia/Ho_Chi_Minh
 dayjs.tz.setDefault('Asia/Ho_Chi_Minh');
 
-export { dayjs };
 export default dayjs;

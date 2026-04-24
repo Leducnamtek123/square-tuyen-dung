@@ -4,7 +4,7 @@ import { BannerType } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 import toastMessages from '../../../../utils/toastMessages';
 
-export type UseBannerTypesResult = UseQueryResult<PaginatedResponse<BannerType>> & {
+type UseBannerTypesResult = UseQueryResult<PaginatedResponse<BannerType>> & {
   createBannerType: (data: AdminBannerTypePayload) => Promise<BannerType>;
   updateBannerType: (args: { id: string | number; data: Partial<AdminBannerTypePayload> }) => Promise<BannerType>;
   deleteBannerType: (id: string | number) => Promise<void>;

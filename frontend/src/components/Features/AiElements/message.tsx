@@ -55,7 +55,7 @@ type MessageProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
 };
 
-export const Message = ({
+const Message = ({
   className,
   from,
   ...props
@@ -74,7 +74,7 @@ type MessageContentProps = HTMLAttributes<HTMLDivElement> & {
   children?: ReactNode;
 };
 
-export const MessageContent = ({
+const MessageContent = ({
   children,
   className,
   ...props
@@ -96,7 +96,7 @@ type MessageActionsProps = HTMLAttributes<HTMLDivElement> & {
   children?: ReactNode;
 };
 
-export const MessageActions = ({
+const MessageActions = ({
   className,
   children,
   ...props
@@ -114,7 +114,7 @@ type MessageActionProps = {
   children?: ReactNode;
 } & Omit<ComponentProps<typeof Button>, "size" | "variant">;
 
-export const MessageAction = ({
+const MessageAction = ({
   tooltip,
   children,
   label,
@@ -163,7 +163,7 @@ type MessageBranchProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
 };
 
-export const MessageBranch = ({
+const MessageBranch = ({
   defaultBranch = 0,
   onBranchChange,
   className,
@@ -209,7 +209,7 @@ type MessageBranchContentProps = HTMLAttributes<HTMLDivElement> & {
   children?: ReactNode;
 };
 
-export const MessageBranchContent = ({
+const MessageBranchContent = ({
   children,
   ...props
 }: MessageBranchContentProps) => {
@@ -247,7 +247,7 @@ type MessageBranchSelectorProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
 };
 
-export const MessageBranchSelector = ({
+const MessageBranchSelector = ({
   className,
   ...props
 }: MessageBranchSelectorProps) => {
@@ -274,7 +274,7 @@ type MessageBranchNavProps = Omit<ComponentProps<typeof Button>, "size" | "varia
   children?: ReactNode;
 };
 
-export const MessageBranchPrevious = ({
+const MessageBranchPrevious = ({
   children,
   ...props
 }: MessageBranchNavProps) => {
@@ -293,7 +293,7 @@ export const MessageBranchPrevious = ({
   );
 };
 
-export const MessageBranchNext = ({
+const MessageBranchNext = ({
   children,
   ...props
 }: MessageBranchNavProps) => {
@@ -316,7 +316,7 @@ type MessageBranchPageProps = HTMLAttributes<HTMLDivElement> & {
   className?: string;
 };
 
-export const MessageBranchPage = ({
+const MessageBranchPage = ({
   className,
   ...props
 }: MessageBranchPageProps) => {
@@ -379,7 +379,7 @@ type MessageToolbarProps = HTMLAttributes<HTMLDivElement> & {
   children?: ReactNode;
 };
 
-export const MessageToolbar = ({
+const MessageToolbar = ({
   className,
   children,
   ...props

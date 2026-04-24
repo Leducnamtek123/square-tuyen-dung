@@ -37,4 +37,4 @@ const toSlug = (str?: string): string => {
 
 export default toSlug;
 
-export { convertMoney, salaryString, toSlug };
+export { convertMoney, salaryString };

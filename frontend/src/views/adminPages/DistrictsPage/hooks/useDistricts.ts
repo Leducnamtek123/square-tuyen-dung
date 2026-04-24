@@ -5,7 +5,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import { District } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
-export type UseDistrictsResult = UseQueryResult<PaginatedResponse<District>> & {
+type UseDistrictsResult = UseQueryResult<PaginatedResponse<District>> & {
     createDistrict: (data: DistrictPayload) => Promise<District>;
     updateDistrict: (args: { id: string | number; data: Partial<DistrictPayload> }) => Promise<District>;
     deleteDistrict: (id: string | number) => Promise<void>;

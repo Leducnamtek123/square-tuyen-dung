@@ -2,7 +2,7 @@ import httpRequest from '../utils/httpRequest';
 import { cleanParams } from '../utils/params';
 
 // --- INTERFACES: Job Seeker Statistics ---
-export interface JobSeekerGeneralStats {
+interface JobSeekerGeneralStats {
   totalApply: number;
   totalSave: number;
   totalView: number;

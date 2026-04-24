@@ -5,7 +5,7 @@ import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import { useJobSeekerActivityStatistics } from '../hooks/useJobSeekerQueries';
 import defaultTheme from '../../../../themeConfigs/defaultTheme';
 
-export const options = {
+const options = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {

@@ -8,7 +8,7 @@ import { styled } from '@mui/material/styles';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 
-export interface MenuItemProps {
+interface MenuItemProps {
   icon?: React.ElementType;
   text: string;
   to?: string;

@@ -229,10 +229,3 @@ const useStructuredData = (schemas: StructuredDataSchema | StructuredDataSchema[
 };
 
 export default useStructuredData;
-export type {
-  JobPostingSchema,
-  OrganizationSchema,
-  WebSiteSchema,
-  BreadcrumbSchema,
-  StructuredDataSchema,
-};

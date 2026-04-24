@@ -9,7 +9,7 @@ import {ROUTES } from '@/configs/constants';
 import { formatRoute } from '@/utils/funcUtils';
 import type { Company } from '@/types/models';
 
-export interface CompanyActionFollowProps {
+interface CompanyActionFollowProps {
   company: Partial<Company> | null;
   children?: React.ReactNode;
 }

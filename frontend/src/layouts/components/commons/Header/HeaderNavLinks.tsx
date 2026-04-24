@@ -2,7 +2,7 @@ import * as React from "react";
 import Link from "next/link";
 import { Box, Button } from "@mui/material";
 
-export type HeaderNavLink = {
+type HeaderNavLink = {
   id: string;
   label: string;
   path: string;
@@ -39,4 +39,3 @@ const HeaderNavLinks = ({ pages, activePathname, onClose }: HeaderNavLinksProps)
 };
 
 export default HeaderNavLinks;
-

@@ -13,7 +13,7 @@ import jobPostActivityService from '../../../../services/jobPostActivityService'
 import toastMessages from '../../../../utils/toastMessages';
 import errorHandling from '../../../../utils/errorHandling';
 
-export interface SendEmailComponentProps {
+interface SendEmailComponentProps {
   jobPostActivityId: string;
   isSentEmail: boolean;
   email: string;

@@ -21,7 +21,7 @@ export interface ControlBarControls {
   chat?: boolean;
 }
 
-export interface AgentControlBarProps extends UseInputControlsProps {
+interface AgentControlBarProps extends UseInputControlsProps {
   controls?: ControlBarControls;
   isConnected?: boolean;
   onChatOpenChange?: (open: boolean) => void;

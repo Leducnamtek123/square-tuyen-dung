@@ -22,7 +22,7 @@ const MAX_NOTIFICATIONS = 50;
 
 /* ── Types ────────────────────────────────────────────────────────────── */
 
-export interface AppNotification {
+interface AppNotification {
   key: string;
   title?: string;
   content?: string;

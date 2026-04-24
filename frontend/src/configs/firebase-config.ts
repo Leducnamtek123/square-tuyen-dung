@@ -38,5 +38,5 @@ const db = enableLongPolling
 const auth = getAuth(app);
 const storage = getStorage(app);
 
-export { serverTimestamp, auth, storage };
+export { serverTimestamp, auth };
 export default db;

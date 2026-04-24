@@ -13,7 +13,7 @@ type RefreshTokenPayload = Partial<TokenPair> & {
   refresh_token?: string;
 };
 
-export interface HttpServiceInstance extends Omit<AxiosInstance, 'get' | 'post' | 'put' | 'patch' | 'delete'> {
+interface HttpServiceInstance extends Omit<AxiosInstance, 'get' | 'post' | 'put' | 'patch' | 'delete'> {
   (config: AxiosRequestConfig): Promise<any>;
   (url: string, config?: AxiosRequestConfig): Promise<any>;
   get<T = any, R = T, D = any>(url: string, config?: AxiosRequestConfig<D>): Promise<R>;

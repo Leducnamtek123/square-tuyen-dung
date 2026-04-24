@@ -31,7 +31,7 @@ function getSourceIcon(source: Track.Source, enabled: boolean, pending = false) 
   }
 }
 
-export type TrackToggleProps = React.ComponentProps<typeof Toggle> & {
+type TrackToggleProps = React.ComponentProps<typeof Toggle> & {
   source: Parameters<typeof useTrackToggle>[0]['source'];
   pending?: boolean;
 };

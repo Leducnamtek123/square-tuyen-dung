@@ -20,7 +20,7 @@ import type { City } from '../../../../types/models';
 
 type ConfigDict = Record<string, string>;
 
-export interface GeneralInfoProfileExt extends Partial<JobSeekerProfile> {
+interface GeneralInfoProfileExt extends Partial<JobSeekerProfile> {
   title?: string;
   position?: string | number | null;
   academicLevel?: string | number | null;

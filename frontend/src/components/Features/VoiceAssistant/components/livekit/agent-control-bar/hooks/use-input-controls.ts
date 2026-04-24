@@ -13,7 +13,7 @@ export interface UseInputControlsProps {
   onDeviceError?: (error: { source: Track.Source; error: Error }) => void;
 }
 
-export interface UseInputControlsReturn {
+interface UseInputControlsReturn {
   micTrackRef: TrackReferenceOrPlaceholder;
   microphoneToggle: ReturnType<typeof useTrackToggle<Track.Source.Microphone>>;
   cameraToggle: ReturnType<typeof useTrackToggle<Track.Source.Camera>>;

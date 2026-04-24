@@ -11,7 +11,7 @@ const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
   return presignInObject(data) as T;
 };
 
-export type AdminUserListParams = {
+type AdminUserListParams = {
   page?: number;
   pageSize?: number;
   ordering?: string;

@@ -5,7 +5,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import { Feedback } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
-export type UseFeedbacksResult = UseQueryResult<PaginatedResponse<Feedback>> & {
+type UseFeedbacksResult = UseQueryResult<PaginatedResponse<Feedback>> & {
     updateFeedback: (args: { id: string | number; data: Partial<AdminFeedbackPayload> }) => Promise<Feedback>;
     deleteFeedback: (id: string | number) => Promise<void>;
     isMutating: boolean;

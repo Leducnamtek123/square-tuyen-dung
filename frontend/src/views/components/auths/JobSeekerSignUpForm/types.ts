@@ -8,9 +8,9 @@ export interface JobSeekerSignUpFormData {
   confirmPassword?: string;
 }
 
-export type FacebookAuthResult = { data?: { accessToken?: string } };
+type FacebookAuthResult = { data?: { accessToken?: string } };
 
-export interface JobSeekerSignUpFormProps {
+interface JobSeekerSignUpFormProps {
   onRegister: (data: JobSeekerSignUpFormData) => void;
   onFacebookRegister: (result: FacebookAuthResult) => void;
   onGoogleRegister: (result: Omit<CodeResponse, 'error' | 'error_description' | 'error_uri'>) => void;
