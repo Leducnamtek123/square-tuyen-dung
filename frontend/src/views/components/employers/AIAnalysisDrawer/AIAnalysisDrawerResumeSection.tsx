@@ -7,6 +7,7 @@ import type { TFunction } from 'i18next';
 
 type Props = {
   resumeFileUrl: string;
+  onlineProfileUrl?: string;
   canEmbedResume: boolean;
   isProcessing: boolean;
   scanLinePosition: number;
@@ -15,12 +16,43 @@ type Props = {
 
 const AIAnalysisDrawerResumeSection = ({
   resumeFileUrl,
+  onlineProfileUrl,
   canEmbedResume,
   isProcessing,
   scanLinePosition,
   t,
 }: Props) => {
   const theme = useTheme();
+
+  // Show online profile link if no attached file
+  if (!resumeFileUrl && onlineProfileUrl) {
+    return (
+      <SectionCard title={t('appliedResume.ai.resumeTitle')} icon={<DescriptionIcon fontSize="small" />} iconColor={theme.palette.primary.main}>
+        <Stack alignItems="center" justifyContent="center" spacing={2} sx={{ py: 4, textAlign: 'center' }}>
+          <DescriptionIcon sx={{ fontSize: 48, color: 'primary.main', opacity: 0.7 }} />
+          <Box>
+            <Typography variant="subtitle2" sx={{ fontWeight: 800, color: 'text.primary', mb: 0.5 }}>
+              {t('appliedResume.ai.onlineResumeLabel', { defaultValue: 'Hồ sơ trực tuyến' })}
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600, display: 'block', mb: 2 }}>
+              {t('appliedResume.ai.onlineResumeHint', { defaultValue: 'AI sẽ phân tích hồ sơ trực tuyến của ứng viên.' })}
+            </Typography>
+          </Box>
+          <Button
+            href={onlineProfileUrl}
+            target="_blank"
+            rel="noreferrer"
+            variant="outlined"
+            size="small"
+            startIcon={<OpenInNewIcon fontSize="small" />}
+            sx={{ textTransform: 'none', fontSize: '0.8rem', fontWeight: 900, borderRadius: 2 }}
+          >
+            {t('appliedResume.ai.viewOnlineProfile', { defaultValue: 'Xem hồ sơ trực tuyến' })}
+          </Button>
+        </Stack>
+      </SectionCard>
+    );
+  }
 
   if (!resumeFileUrl) return null;
 

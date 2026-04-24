@@ -17,13 +17,13 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import DeleteIcon from '@mui/icons-material/Delete';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import DownloadIcon from '@mui/icons-material/Download';
 import type { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
 
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
 import { CV_TYPES, ROUTES } from '../../../../configs/constants';
 import DataTable from '../../../../components/Common/DataTable';
 import { formatRoute } from '@/utils/funcUtils';
-
 
 import SendEmailComponent from './SendEmailComponent';
 import AppliedStatusComponent from './AppliedStatusComponent';
@@ -78,41 +78,67 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
           {(() => {
             const resumeType = info.row.original.type || info.row.original.resume?.type;
             const resumeTitle = info.row.original.title || info.row.original.resume?.title;
+            // File URL for attached CV download
+            const cvFileUrl = info.row.original.resume?.fileUrl || '';
             return (
               <>
-          <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'text.primary', mb: 0.75 }}>
-            {String(info.getValue() ?? '')}
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            {resumeType === CV_TYPES.cvWebsite ? (
-              <Tooltip title={t('appliedResume.table.onlineResume')} arrow>
-                <Box sx={{ 
-                  display: 'flex', 
-                  p: 0.5, 
-                  borderRadius: 1, 
-                  bgcolor: alpha(theme.palette.primary.main, 0.08), 
-                  color: 'primary.main' 
-                }}>
-                  <DescriptionIcon sx={{ fontSize: 14 }} />
+                <Typography variant="subtitle2" sx={{ fontWeight: 900, color: 'text.primary', mb: 0.75 }}>
+                  {String(info.getValue() ?? '')}
+                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  {resumeType === CV_TYPES.cvWebsite ? (
+                    /* Online CV – informational only */
+                    <Tooltip title={t('appliedResume.table.onlineResume')} arrow>
+                      <Box sx={{ 
+                        display: 'flex', 
+                        p: 0.5, 
+                        borderRadius: 1, 
+                        bgcolor: alpha(theme.palette.primary.main, 0.08), 
+                        color: 'primary.main' 
+                      }}>
+                        <DescriptionIcon sx={{ fontSize: 14 }} />
+                      </Box>
+                    </Tooltip>
+                  ) : (
+                    /* Attached CV – click or hover to download */
+                    <Tooltip
+                      title={
+                        cvFileUrl ? (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                            <span>{t('appliedResume.table.attachedResume')}</span>
+                            <DownloadIcon sx={{ fontSize: 13 }} />
+                          </Box>
+                        ) : t('appliedResume.table.attachedResume')
+                      }
+                      arrow
+                    >
+                      <Box
+                        sx={{ 
+                          display: 'flex', 
+                          p: 0.5, 
+                          borderRadius: 1, 
+                          bgcolor: alpha(theme.palette.error.main, 0.08), 
+                          color: 'error.main',
+                          cursor: cvFileUrl ? 'pointer' : 'default',
+                          textDecoration: 'none',
+                          '&:hover': cvFileUrl ? { bgcolor: alpha(theme.palette.error.main, 0.16) } : {},
+                          transition: 'background-color 0.15s',
+                        }}
+                        {...(cvFileUrl ? {
+                          component: 'a' as const,
+                          href: cvFileUrl,
+                          download: true,
+                          onClick: (e: React.MouseEvent) => e.stopPropagation(),
+                        } : {})}
+                      >
+                        <PictureAsPdfIcon sx={{ fontSize: 14 }} />
+                      </Box>
+                    </Tooltip>
+                  )}
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.2px' }}>
+                    {resumeTitle || t('appliedResume.table.notUpdated')}
+                  </Typography>
                 </Box>
-              </Tooltip>
-            ) : (
-              <Tooltip title={t('appliedResume.table.attachedResume')} arrow>
-                <Box sx={{ 
-                  display: 'flex', 
-                  p: 0.5, 
-                  borderRadius: 1, 
-                  bgcolor: alpha(theme.palette.error.main, 0.08), 
-                  color: 'error.main' 
-                }}>
-                  <PictureAsPdfIcon sx={{ fontSize: 14 }} />
-                </Box>
-              </Tooltip>
-            )}
-            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.2px' }}>
-              {resumeTitle || t('appliedResume.table.notUpdated')}
-            </Typography>
-          </Box>
               </>
             );
           })()}
@@ -145,21 +171,40 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
       cell: (info) => {
         const resumeType = info.row.original.type || info.row.original.resume?.type;
         const isOnline = resumeType === CV_TYPES.cvWebsite;
+        const cvFileUrl = info.row.original.resume?.fileUrl || '';
         return (
-          <Chip 
-              label={isOnline ? t('appliedResume.table.onlineResume') : t('appliedResume.table.attachedResume')} 
-              size="small" 
-              sx={{ 
-                fontWeight: 900, 
-                fontSize: '0.7rem',
-                borderRadius: 1.5,
-                bgcolor: isOnline ? alpha(theme.palette.primary.main, 0.08) : alpha(theme.palette.error.main, 0.08),
-                color: isOnline ? 'primary.main' : 'error.main',
-                border: '1px solid',
-                borderColor: isOnline ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.error.main, 0.1),
-                '& .MuiChip-label': { px: 1.5 }
-              }}
-          />
+          <Tooltip
+            title={!isOnline && cvFileUrl ? (
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <span>{t('appliedResume.table.clickToDownload', { defaultValue: 'Nhấp để tải xuống' })}</span>
+                <DownloadIcon sx={{ fontSize: 13 }} />
+              </Box>
+            ) : ''}
+            arrow
+            disableHoverListener={isOnline || !cvFileUrl}
+          >
+            <Chip 
+                label={isOnline ? t('appliedResume.table.onlineResume') : t('appliedResume.table.attachedResume')} 
+                size="small" 
+                sx={{ 
+                  fontWeight: 900, 
+                  fontSize: '0.7rem',
+                  borderRadius: 1.5,
+                  bgcolor: isOnline ? alpha(theme.palette.primary.main, 0.08) : alpha(theme.palette.error.main, 0.08),
+                  color: isOnline ? 'primary.main' : 'error.main',
+                  border: '1px solid',
+                  borderColor: isOnline ? alpha(theme.palette.primary.main, 0.1) : alpha(theme.palette.error.main, 0.1),
+                  '& .MuiChip-label': { px: 1.5 },
+                  cursor: !isOnline && cvFileUrl ? 'pointer' : 'default',
+                }}
+                {...(!isOnline && cvFileUrl ? {
+                  component: 'a' as const,
+                  href: cvFileUrl,
+                  download: true,
+                  onClick: (e: React.MouseEvent) => e.stopPropagation(),
+                } : {})}
+            />
+          </Tooltip>
         );
       },
     },

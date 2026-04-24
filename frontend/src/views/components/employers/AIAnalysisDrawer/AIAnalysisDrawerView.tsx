@@ -18,6 +18,7 @@ type Props = {
   isCompleted: boolean;
   isFailed: boolean;
   resumeFileUrl: string;
+  onlineProfileUrl: string;
   canEmbedResume: boolean;
   stats: { matchingSkills: number; missingSkills: number; totalSkills: number };
   onAnalyze: () => void;
@@ -38,6 +39,7 @@ const AIAnalysisDrawerView = ({
   isCompleted,
   isFailed,
   resumeFileUrl,
+  onlineProfileUrl,
   canEmbedResume,
   stats,
   onAnalyze,
@@ -80,6 +82,7 @@ const AIAnalysisDrawerView = ({
         <Box sx={{ p: 3, overflowY: 'auto', flex: 1 }}>
           <AIAnalysisDrawerResumeSection
             resumeFileUrl={resumeFileUrl}
+            onlineProfileUrl={onlineProfileUrl}
             canEmbedResume={canEmbedResume}
             isProcessing={isProcessing}
             scanLinePosition={scanLinePosition}

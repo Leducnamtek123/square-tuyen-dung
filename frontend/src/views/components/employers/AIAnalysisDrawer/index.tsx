@@ -16,6 +16,8 @@ export type AIAnalysisData = {
   aiAnalysisStatus?: 'processing' | 'completed' | 'failed' | 'idle' | string;
   aiAnalysisProgress?: number;
   resumeFileUrl?: string;
+  onlineProfileUrl?: string;
+  resumeType?: string;
   aiAnalysisMatchingSkills?: string | string[];
   aiAnalysisMissingSkills?: string | string[];
   aiAnalysisSkills?: string | string[];
@@ -89,6 +91,12 @@ const toAIAnalysisData = (activity: JobPostActivity): AIAnalysisData => {
   const raw = activity as ActivityRawFields;
   const jobPostDict = raw.jobPostDict || {};
   const aiAnalysisScoreRaw = raw.aiAnalysisScore;
+  const resumeSlug = activity.resume?.slug || activity.resumeSlug;
+  const resumeType = activity.type || activity.resume?.type;
+  // Build online profile URL from slug
+  const onlineProfileUrl = resumeSlug
+    ? `${typeof window !== 'undefined' ? window.location.origin : ''}/ho-so-truc-tuyen/${resumeSlug}`
+    : undefined;
 
   return {
     id: activity.id,
@@ -97,6 +105,8 @@ const toAIAnalysisData = (activity: JobPostActivity): AIAnalysisData => {
     aiAnalysisStatus: activity.aiAnalysisStatus,
     aiAnalysisProgress: activity.aiAnalysisProgress,
     resumeFileUrl: typeof raw.resumeFileUrl === 'string' ? raw.resumeFileUrl : undefined,
+    onlineProfileUrl,
+    resumeType,
     aiAnalysisMatchingSkills: toStringOrStringArray(raw.aiAnalysisMatchingSkills),
     aiAnalysisMissingSkills: toStringOrStringArray(raw.aiAnalysisMissingSkills),
     aiAnalysisSkills: toStringOrStringArray(raw.aiAnalysisSkills),
@@ -252,7 +262,12 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
         value: { ...(state.data || {}), aiAnalysisStatus: 'processing', aiAnalysisProgress: 5 },
       });
       onAnalysisStateChange?.({ aiAnalysisStatus: 'processing', aiAnalysisProgress: 5 });
-      await jobPostActivityService.analyzeResume(activityId);
+      // For online CVs, pass the online profile URL so backend can scrape it
+      const payload: { onlineProfileUrl?: string } = {};
+      if (state.data?.onlineProfileUrl && !state.data?.resumeFileUrl) {
+        payload.onlineProfileUrl = state.data.onlineProfileUrl;
+      }
+      await jobPostActivityService.analyzeResume(activityId, payload);
       toastMessages.success(t('appliedResume.ai.analysisStarted'));
     } catch (err: unknown) {
       errorHandling(err as AxiosError);
@@ -276,6 +291,7 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
   }, [state.data?.aiAnalysisProgress, isCompleted]);
 
   const resumeFileUrl = typeof state.data?.resumeFileUrl === 'string' ? state.data.resumeFileUrl : '';
+  const onlineProfileUrl = typeof state.data?.onlineProfileUrl === 'string' ? state.data.onlineProfileUrl : '';
   const canEmbedResume = React.useMemo(() => canEmbedUrl(resumeFileUrl), [resumeFileUrl]);
   const stats = React.useMemo(
     () => ({
@@ -299,6 +315,7 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
       isCompleted={isCompleted}
       isFailed={isFailed}
       resumeFileUrl={resumeFileUrl}
+      onlineProfileUrl={onlineProfileUrl}
       canEmbedResume={canEmbedResume}
       stats={stats}
       onAnalyze={handleAnalyze}

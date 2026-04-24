@@ -57,7 +57,13 @@ const InterviewObserverDialogContent: React.FC<InterviewObserverDialogProps> = (
     .toString()
     .padStart(2, '0')}:${(elapsed % 60).toString().padStart(2, '0')}`;
 
-  const content = (
+  /**
+   * Build the dialog body.
+   * `withVisualizer` must only be true when rendered inside <LiveKitRoom>,
+   * because InterviewObserverDialogVisualizer uses useTracks() which requires
+   * the LiveKit room context.
+   */
+  const buildContent = (withVisualizer: boolean) => (
     <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100vh' }}>
       <InterviewObserverDialogHeader
         candidateName={candidateName}
@@ -89,7 +95,8 @@ const InterviewObserverDialogContent: React.FC<InterviewObserverDialogProps> = (
             }}
           />
           <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
-            <InterviewObserverDialogVisualizer />
+            {/* useTracks() inside InterviewObserverDialogVisualizer requires LiveKitRoom context */}
+            {withVisualizer && <InterviewObserverDialogVisualizer />}
           </Box>
         </Box>
 
@@ -114,11 +121,19 @@ const InterviewObserverDialogContent: React.FC<InterviewObserverDialogProps> = (
       }}
     >
       {connectionDetails ? (
-        <LiveKitRoom token={connectionDetails.token} serverUrl={connectionDetails.serverUrl} connect={open} audio={false} video={false}>
-          {content}
+        <LiveKitRoom
+          token={connectionDetails.token}
+          serverUrl={connectionDetails.serverUrl}
+          connect={open}
+          audio={false}
+          video={false}
+        >
+          {/* Render visualizer only inside LiveKitRoom so useTracks has context */}
+          {buildContent(true)}
         </LiveKitRoom>
       ) : (
-        content
+        /* No LiveKit connection — render without visualizer to avoid missing context */
+        buildContent(false)
       )}
     </Dialog>
   );

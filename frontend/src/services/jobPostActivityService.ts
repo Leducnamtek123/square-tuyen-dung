@@ -97,9 +97,9 @@ const jobPostActivityService = {
     return withPresign(httpRequest.get(url)) as Promise<JobPostActivity>;
   },
 
-  analyzeResume: (id: IdType): Promise<ActionResponse> => {
+  analyzeResume: (id: IdType, payload?: { onlineProfileUrl?: string }): Promise<ActionResponse> => {
     const url = `job/web/employer-job-posts-activity/${id}/analyze-resume/`;
-    return httpRequest.post(url);
+    return httpRequest.post(url, payload || {});
   },
 };
 
