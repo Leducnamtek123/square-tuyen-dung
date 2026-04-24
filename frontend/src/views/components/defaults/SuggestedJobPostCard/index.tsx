@@ -32,13 +32,8 @@ const SuggestedJobPostCard: React.FC<SuggestedJobPostCardProps> = ({ pageSize = 
 
     const observer = new ResizeObserver((entries) => {
       const width = entries[0].contentRect.width;
-      if (width < 600) {
-        setCol(12);
-      } else if (width < 900) {
-        setCol(6);
-      } else {
-        setCol(fullWidth ? 6 : 4);
-      }
+      const nextCol = width < 600 ? 12 : width < 900 ? 6 : fullWidth ? 6 : 4;
+      setCol(nextCol);
     });
 
     observer.observe(element);

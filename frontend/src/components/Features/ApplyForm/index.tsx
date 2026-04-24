@@ -35,7 +35,7 @@ type ApplyFormState = {
 };
 
 const initialState: ApplyFormState = {
-  isLoadingResumes: false,
+  isLoadingResumes: true,
   resumes: [],
 };
 
@@ -78,7 +78,6 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
 
   React.useEffect(() => {
     const getOnlineProfile = async (jobSeekerProfileId: number | string | undefined) => {
-      setState((prev) => ({ ...prev, isLoadingResumes: true }));
       try {
         const resData = await jobSeekerProfileService.getResumes(jobSeekerProfileId);
         const parsedResumes = Array.isArray(resData) ? resData : (resData.results || []);

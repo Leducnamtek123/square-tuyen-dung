@@ -14,9 +14,9 @@ import {
 import InfoIcon from '@mui/icons-material/Info';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
 import dayjs from 'dayjs';
+import LineChartClient from '@/components/Common/Charts/LineChartClient';
 import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerCandidateStatistics } from '../../hooks/useEmployerQueries';
-import type { ChartOptions } from 'chart.js';
 
 interface CandidateChartProps {
   title: string;
@@ -62,44 +62,10 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
   const { t } = useTranslation('employer');
   const theme = useTheme();
   const [allowSubmit, setAllowSubmit] = React.useState(false);
-  const [LineChart, setLineChart] = React.useState<React.ComponentType<any> | null>(null);
   const [selectedDateRange, setSelectedDateRange] = React.useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([
     dayjs(new Date()).subtract(1, 'month'),
     dayjs(new Date()),
   ]);
-
-  React.useEffect(() => {
-    let alive = true;
-
-    const loadChart = async () => {
-      const chartJsModule = ['chart', '.js'].join('');
-      const reactChartModule = ['react-chartjs', '-2'].join('');
-      const [{ Chart: ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend }, reactChart] = await Promise.all([
-        import(chartJsModule),
-        import(reactChartModule),
-      ]);
-
-      ChartJS.register(
-        CategoryScale,
-        LinearScale,
-        PointElement,
-        LineElement,
-        Title,
-        Tooltip,
-        Legend
-      );
-
-      if (alive) {
-        setLineChart(() => reactChart.Line);
-      }
-    };
-
-    loadChart();
-
-    return () => {
-      alive = false;
-    };
-  }, []);
 
   const queryParams = React.useMemo(() => ({
     startDate: dayjs(selectedDateRange[0]).format('YYYY-MM-DD'),
@@ -205,14 +171,10 @@ const CandidateChart = ({ title }: CandidateChartProps) => {
                     {t('candidateChart.noData')}
                 </Typography>
               </Stack>
-            ) : LineChart ? (
-              <Box sx={{ height: 320 }}>
-                <LineChart data={dataOptions} options={options as ChartOptions<"line">} height={300} />
-              </Box>
             ) : (
-              <Stack alignItems="center" justifyContent="center" sx={{ height: 320 }}>
-                <CircularProgress size={40} thickness={4} sx={{ color: 'primary.main' }} />
-              </Stack>
+              <Box sx={{ height: 320 }}>
+                <LineChartClient data={dataOptions} options={options} height={300} />
+              </Box>
             )}
           </Box>
         </Box>

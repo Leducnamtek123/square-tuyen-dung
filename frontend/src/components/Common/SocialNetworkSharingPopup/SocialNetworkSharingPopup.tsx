@@ -147,7 +147,6 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
                 url={facebook?.url || ''}
                 quote={facebook?.quote || ''}
                 hashtag={facebook?.hashtag || ''}
-                style={{ outline: 'none' }}
               >
                 <Box sx={iconButtonStyles}>
                   <FacebookIcon />
@@ -172,7 +171,6 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
                 url={facebookMessenger?.url || ''}
                 appId=""
                 redirectUri={facebookMessenger?.url || ''}
-                style={{ outline: 'none' }}
               >
                 <Box sx={iconButtonStyles}>
                   <MessengerIcon />
@@ -198,7 +196,6 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
                 title={linkedin?.title || ''}
                 summary={linkedin?.summary || ''}
                 source={linkedin?.source || ''}
-                style={{ outline: 'none' }}
               >
                 <Box sx={iconButtonStyles}>
                   <LinkedinIcon />
@@ -225,7 +222,6 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
                 via={twitter?.via || ''}
                 hashtags={twitter?.hashtags || []}
                 related={twitter?.related || []}
-                style={{ outline: 'none' }}
               >
                 <Box sx={iconButtonStyles}>
                   <XIcon />
@@ -250,7 +246,6 @@ const SocialNetworkSharingPopup = (props: SocialNetworkSharingPopupProps) => {
                 url={email?.url || ""}
                 subject={email?.subject || ""}
                 body={email?.body || ""}
-                style={{ outline: 'none' }}
               >
                 <Box sx={iconButtonStyles}>
                   <EmailIcon />

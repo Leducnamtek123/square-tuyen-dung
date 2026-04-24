@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { Box, Button, Typography } from '@mui/material';
 import i18n from '@/i18n';
 
 export default function GlobalError({
@@ -17,39 +18,27 @@ export default function GlobalError({
   return (
     <html lang="vi">
       <body>
-        <div
-          style={{
+        <Box
+          sx={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: '100vh',
-            fontFamily: 'system-ui, sans-serif',
             textAlign: 'center',
-            padding: '24px',
+            px: 3,
           }}
         >
-          <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
+          <Typography component="h1" sx={{ fontSize: '2rem', mb: 1, fontWeight: 700 }}>
             {i18n.t('errors.system.title', { defaultValue: 'Hệ thống gặp sự cố / System Error' })}
-          </h1>
-          <p style={{ color: '#666', maxWidth: '480px', marginBottom: '2rem' }}>
+          </Typography>
+          <Typography component="p" sx={{ color: 'text.secondary', maxWidth: 480, mb: 4 }}>
             {i18n.t('errors.system.message', { defaultValue: 'Đã xảy ra lỗi nghiêm trọng. Vui lòng thử tải lại trang. / A critical error has occurred. Please try reloading the page.' })}
-          </p>
-          <button
-            onClick={reset}
-            style={{
-              padding: '12px 32px',
-              fontSize: '1rem',
-              backgroundColor: '#1a407d',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              cursor: 'pointer',
-            }}
-          >
+          </Typography>
+          <Button onClick={reset} variant="contained" sx={{ px: 4, py: 1.5, borderRadius: 2 }}>
             {i18n.t('common:actions.reload', { defaultValue: 'Tải lại trang / Reload Page' })}
-          </button>
-        </div>
+          </Button>
+        </Box>
       </body>
     </html>
   );

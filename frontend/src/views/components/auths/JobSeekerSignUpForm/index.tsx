@@ -71,7 +71,7 @@ const JobSeekerSignUpForm = ({
 
   const email = useWatch({ control, name: 'email' });
   const emailDebounce = useDebounce(email, 500);
-  const [emailExistsError, setEmailExistsError] = React.useState(false);
+  const emailExistsErrorRef = React.useRef(false);
 
   React.useEffect(() => {
     for (const err in serverErrors) {
@@ -82,9 +82,9 @@ const JobSeekerSignUpForm = ({
   React.useEffect(() => {
     const normalizedEmail = String(emailDebounce || '').trim();
     if (!normalizedEmail || !normalizedEmail.includes('@')) {
-      if (emailExistsError) {
+      if (emailExistsErrorRef.current) {
         clearErrors('email');
-        setEmailExistsError(false);
+        emailExistsErrorRef.current = false;
       }
       return;
     }
@@ -104,10 +104,10 @@ const JobSeekerSignUpForm = ({
             type: 'manual',
             message: t('validation.emailExists'),
           });
-          setEmailExistsError(true);
-        } else if (emailExistsError) {
+          emailExistsErrorRef.current = true;
+        } else if (emailExistsErrorRef.current) {
           clearErrors('email');
-          setEmailExistsError(false);
+          emailExistsErrorRef.current = false;
         }
       } catch {
         // ignore email existence errors
@@ -115,7 +115,7 @@ const JobSeekerSignUpForm = ({
     };
 
     checkEmail();
-  }, [emailDebounce, emailExistsError, clearErrors, setError, t, checkCreds]);
+  }, [emailDebounce, clearErrors, setError, t, checkCreds]);
 
   const googleRegister = useGoogleLogin({
     onSuccess: onGoogleRegister,

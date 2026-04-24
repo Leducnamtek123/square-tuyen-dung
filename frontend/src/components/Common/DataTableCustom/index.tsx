@@ -22,6 +22,9 @@ import { visuallyHidden } from '@mui/utils';
 
 import { Skeleton, Stack } from "@mui/material";
 
+const EMPTY_HEAD_CELLS: HeadCell[] = [];
+const EMPTY_ROWS: unknown[] = [];
+
 interface HeadCell {
   id: string;
   label: string;
@@ -39,7 +42,7 @@ interface EnhancedTableHeadProps {
 
 
 
-function EnhancedTableHead({ headCells = [], order, orderBy, onRequestSort }: EnhancedTableHeadProps) {
+function EnhancedTableHead({ headCells = EMPTY_HEAD_CELLS, order, orderBy, onRequestSort }: EnhancedTableHeadProps) {
 
   const createSortHandler = (property: string) => (event: React.MouseEvent<unknown>) => {
 
@@ -144,8 +147,8 @@ interface DataTableCustomProps {
 }
 
 const DataTableCustom = ({
-  headCells = [],
-  rows = [],
+  headCells = EMPTY_HEAD_CELLS,
+  rows = EMPTY_ROWS,
   order,
   orderBy,
   page = 0,
@@ -224,18 +227,28 @@ const DataTableCustom = ({
 };
 
 const Loading = () => {
+  const loadingKeys = [
+    'loading-row-1',
+    'loading-row-2',
+    'loading-row-3',
+    'loading-row-4',
+    'loading-row-5',
+    'loading-row-6',
+    'loading-row-7',
+    'loading-row-8',
+    'loading-row-9',
+    'loading-row-10',
+    'loading-row-11',
+    'loading-row-12',
+  ];
 
   return (
 
     <Stack>
 
-      {Array(12)
-        .fill(null)
-        .map((_, index) => (
-
-          <Skeleton key={index} height={50} />
-
-        ))}
+      {loadingKeys.map((key) => (
+        <Skeleton key={key} height={50} />
+      ))}
 
     </Stack>
 

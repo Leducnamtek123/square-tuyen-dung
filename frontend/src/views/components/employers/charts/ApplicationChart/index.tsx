@@ -13,21 +13,8 @@ import {
 } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
-import { Chart } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  ChartData,
-  ChartOptions,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
 import dayjs from 'dayjs';
+import BarChartClient from '@/components/Common/Charts/BarChartClient';
 import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerApplicationStatistics } from '../../hooks/useEmployerQueries';
 
@@ -35,18 +22,7 @@ interface ApplicationChartProps {
   title: string;
 }
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-const options: ChartOptions<'bar'> = {
+const options = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -98,7 +74,7 @@ const ApplicationChart = ({ title }: ApplicationChartProps) => {
 
   const { data, isLoading: queryLoading } = useEmployerApplicationStatistics(queryParams);
 
-  const dataOptions = React.useMemo<ChartData<'bar' | 'line'>>(() => {
+  const dataOptions = React.useMemo(() => {
     const title2 = String(data?.title2 ?? '');
     const title2Key = title2.toLowerCase().replace(/\s+/g, '');
     const title1 = String(data?.title1 ?? '');
@@ -193,7 +169,7 @@ const ApplicationChart = ({ title }: ApplicationChartProps) => {
               </Stack>
             ) : (
               <Box sx={{ height: 320 }}>
-                <Chart type="bar" options={options} data={dataOptions as ChartData<'bar'>} />
+                <BarChartClient options={options} data={dataOptions} />
               </Box>
             )}
           </Box>

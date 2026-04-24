@@ -18,8 +18,8 @@ const LanguageSkillCardLoading = () => (
       <Box sx={{ py: 2 }}>
         <Skeleton height={5} />
       </Box>
-      {Array.from({ length: 4 }, (_, index) => (
-        <Box sx={{ py: 0.5 }} key={`language-skill-skeleton-${index}`}>
+      {['language-skill-skeleton-1', 'language-skill-skeleton-2', 'language-skill-skeleton-3', 'language-skill-skeleton-4'].map((key) => (
+        <Box sx={{ py: 0.5 }} key={key}>
           <Skeleton height={30} />
         </Box>
       ))}

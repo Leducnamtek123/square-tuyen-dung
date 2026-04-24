@@ -1,11 +1,12 @@
 'use client';
 
-import { AnimatePresence, type HTMLMotionProps, motion } from 'motion/react';
+import { AnimatePresence, LazyMotion, domAnimation, m, type HTMLMotionProps } from 'motion/react';
 import { type ReceivedMessage } from '@livekit/components-react';
 import { ChatEntry } from '@/components/Features/VoiceAssistant/components/livekit/chat-entry';
 
-const MotionContainer = motion.create('div');
-const MotionChatEntry = motion.create(ChatEntry);
+const MotionContainer = m.div;
+const MotionChatEntry = m.create(ChatEntry);
+const EMPTY_MESSAGES: ReceivedMessage[] = [];
 
 const CONTAINER_MOTION_PROPS: HTMLMotionProps<"div"> = {
   variants: {
@@ -54,34 +55,36 @@ interface ChatTranscriptProps {
 
 export function ChatTranscript({
   hidden = false,
-  messages = [],
+  messages = EMPTY_MESSAGES,
   ...props
 }: ChatTranscriptProps & Omit<HTMLMotionProps<'div'>, 'ref'>) {
   return (
-    <AnimatePresence>
-      {!hidden && (
-        <MotionContainer {...CONTAINER_MOTION_PROPS} {...props}>
-          {messages.map((receivedMessage) => {
-            const { id, timestamp, from, message } = receivedMessage;
-            const locale = navigator?.language ?? 'en-US';
-            const messageOrigin = from?.isLocal ? 'local' : 'remote';
-            const hasBeenEdited =
-              receivedMessage.type === 'chatMessage' && !!receivedMessage.editTimestamp;
+    <LazyMotion features={domAnimation}>
+      <AnimatePresence>
+        {!hidden && (
+          <MotionContainer {...CONTAINER_MOTION_PROPS} {...props}>
+            {messages.map((receivedMessage) => {
+              const { id, timestamp, from, message } = receivedMessage;
+              const locale = navigator?.language ?? 'en-US';
+              const messageOrigin = from?.isLocal ? 'local' : 'remote';
+              const hasBeenEdited =
+                receivedMessage.type === 'chatMessage' && !!receivedMessage.editTimestamp;
 
-            return (
-              <MotionChatEntry
-                key={id}
-                locale={locale}
-                timestamp={timestamp}
-                message={message}
-                messageOrigin={messageOrigin}
-                hasBeenEdited={hasBeenEdited}
-                {...MESSAGE_MOTION_PROPS}
-              />
-            );
-          })}
-        </MotionContainer>
-      )}
-    </AnimatePresence>
+              return (
+                <MotionChatEntry
+                  key={id}
+                  locale={locale}
+                  timestamp={timestamp}
+                  message={message}
+                  messageOrigin={messageOrigin}
+                  hasBeenEdited={hasBeenEdited}
+                  {...MESSAGE_MOTION_PROPS}
+                />
+              );
+            })}
+          </MotionContainer>
+        )}
+      </AnimatePresence>
+    </LazyMotion>
   );
 }

@@ -3,12 +3,16 @@
 import React from 'react';
 import dynamic from 'next/dynamic';
 import { Control, Controller, FieldValues, Path, PathValue } from 'react-hook-form';
-import { AtomicBlockUtils, EditorState } from 'draft-js';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
 import commonService from '@/services/commonService';
 import type { EditorProps } from 'react-draft-wysiwyg';
+
+type DraftJsModule = typeof import('draft-js');
+type EditorState = import('draft-js').EditorState;
+
+const loadDraftJs = () => import('draft-js') as Promise<DraftJsModule>;
 
 const DraftEditor = dynamic(
   async () => {
@@ -34,7 +38,7 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
   title = '',
   showRequired = false,
 }: Props<T>) => {
-  const editorStateRef = React.useRef<EditorState>(EditorState.createEmpty());
+  const editorStateRef = React.useRef<EditorState>(createEditorStateFromHTMLString(''));
   const isMountedRef = React.useRef(true);
   const [uploadState, setUploadState] = React.useState<{
     active: boolean;
@@ -63,14 +67,15 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
     return uploadResult.url;
   };
 
-  const insertImageBlock = (editorState: EditorState, imageUrl: string, altText = ''): EditorState => {
+  const insertImageBlock = async (editorState: EditorState, imageUrl: string, altText = ''): Promise<EditorState> => {
+    const { AtomicBlockUtils, EditorState: DraftEditorState } = await loadDraftJs();
     const contentState = editorState.getCurrentContent();
     const contentStateWithEntity = contentState.createEntity('IMAGE', 'MUTABLE', {
       src: imageUrl,
       alt: altText,
     });
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-    const nextEditorState = EditorState.set(editorState, {
+    const nextEditorState = DraftEditorState.set(editorState, {
       currentContent: contentStateWithEntity,
     });
 
@@ -110,7 +115,7 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
         });
 
         const latestEditorState = getEditorState();
-        const nextEditorState = insertImageBlock(latestEditorState, imageUrl, file.name);
+        const nextEditorState = await insertImageBlock(latestEditorState, imageUrl, file.name);
         onChange(nextEditorState);
       }
 
@@ -140,13 +145,13 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
       <Controller
         control={control}
         name={name as Path<T>}
-        defaultValue={EditorState.createEmpty() as PathValue<T, Path<T>>}
+        defaultValue={createEditorStateFromHTMLString('') as PathValue<T, Path<T>>}
         render={({ field, fieldState }) => {
           const safeEditorState = field.value?.getCurrentContent
             ? field.value
             : typeof field.value === 'string'
             ? createEditorStateFromHTMLString(field.value)
-            : EditorState.createEmpty();
+            : createEditorStateFromHTMLString('');
           editorStateRef.current = safeEditorState;
 
           const handleImageUpload = async (file: File) => {
@@ -166,7 +171,7 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
                 });
               });
 
-              const nextEditorState = insertImageBlock(editorStateRef.current, imageUrl, file.name);
+              const nextEditorState = await insertImageBlock(editorStateRef.current, imageUrl, file.name);
               field.onChange(nextEditorState);
               return { data: { link: imageUrl } };
             } finally {

@@ -17,6 +17,7 @@ import type { Theme } from '@mui/material/styles';
 
 const LOADING_SLIDE_KEYS = ['loading-1', 'loading-2', 'loading-3', 'loading-4', 'loading-5', 'loading-6', 'loading-7', 'loading-8', 'loading-9', 'loading-10'];
 const STAR_KEYS = ['star-1', 'star-2', 'star-3', 'star-4', 'star-5'];
+const LOADING_STAR_KEYS = ['loading-star-1', 'loading-star-2', 'loading-star-3', 'loading-star-4', 'loading-star-5'];
 
 const styles = {
   ".swiper-pagination": {
@@ -68,8 +69,8 @@ const Loading = () => {
           
           <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mt: 'auto', width: '100%' }}>
             <Stack direction="row" spacing={0.5}>
-              {[1, 2, 3, 4, 5].map((i) => (
-                <Skeleton key={i} variant="circular" width={20} height={20} />
+              {LOADING_STAR_KEYS.map((key) => (
+                <Skeleton key={key} variant="circular" width={20} height={20} />
               ))}
             </Stack>
             <Skeleton variant="rounded" width={110} height={36} sx={{ borderRadius: 2 }} />

@@ -207,7 +207,7 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
   const emailDebounce = useDebounce(email, 500);
   const addressDebounce = useDebounce(address, 500);
 
-  const [emailExistsError, setEmailExistsError] = React.useState(false);
+  const emailExistsErrorRef = React.useRef(false);
 
   React.useEffect(() => {
     applyEmployerServerErrors(serverErrors, setError);
@@ -220,9 +220,9 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
   React.useEffect(() => {
     const normalizedEmail = String(emailDebounce || '').trim();
     if (!normalizedEmail || !normalizedEmail.includes('@')) {
-      if (emailExistsError) {
+      if (emailExistsErrorRef.current) {
         clearErrors('email');
-        setEmailExistsError(false);
+        emailExistsErrorRef.current = false;
       }
       return;
     }
@@ -231,17 +231,17 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
         const resData = (await authService.emailExists(normalizedEmail)) as { exists?: boolean };
         if (resData?.exists === true) {
           setError('email', { type: 'manual', message: t('validation.emailExists') });
-          setEmailExistsError(true);
-        } else if (emailExistsError) {
+          emailExistsErrorRef.current = true;
+        } else if (emailExistsErrorRef.current) {
           clearErrors('email');
-          setEmailExistsError(false);
+          emailExistsErrorRef.current = false;
         }
       } catch {
         /* ignore */
       }
     };
     checkEmail();
-  }, [emailDebounce, clearErrors, emailExistsError, setError, t]);
+  }, [emailDebounce, clearErrors, setError, t]);
 
   const handleSelectLocation = async (e: React.SyntheticEvent, value: string | SelectOption | null) => {
     if (!value || typeof value !== 'object' || !value.place_id) return;
@@ -258,12 +258,13 @@ const EmployerSignUpForm = ({ onSignUp, serverErrors = EMPTY_SERVER_ERRORS, chec
     const loadDistricts = async (cityId: number) => {
       try {
         const resData = await commonService.getDistrictsByCityId(cityId);
+        const nextDistrictOptions = resData.data?.map((d) => ({ id: d.id, name: d.name })) || [];
         // Only clear district if the cityId has actually changed (user interaction)
         // and it's not the initial load (prevCityIdRef.current is not null).
         if (prevCityIdRef.current !== null && prevCityIdRef.current !== cityId) {
           setValue('company.location.district', '');
         }
-        setDistrictOptions(resData.data?.map(d => ({ id: d.id, name: d.name })) || []);
+        setDistrictOptions(nextDistrictOptions);
         prevCityIdRef.current = cityId;
       } catch (error) {
         errorHandling(error);

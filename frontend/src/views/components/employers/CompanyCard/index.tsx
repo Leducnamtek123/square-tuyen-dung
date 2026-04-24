@@ -20,7 +20,6 @@ import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import ImageCropDialog from '@/components/Common/ImageCropDialog';
 import { useCompanyProfile, useCompanyMutations } from '../hooks/useEmployerQueries';
 import type { CompanyFormValues } from '../CompanyForm/types';
-import type { EditorState } from 'draft-js';
 import type { Company } from '@/types/models';
 
 const normalizeId = (value: number | string | { id: number; name: string } | undefined): number | string | undefined => {
@@ -126,7 +125,7 @@ const CompanyCard = () => {
     try {
       const payload = {
         ...formData,
-        description: convertEditorStateToHTMLString(formData.description as EditorState),
+        description: convertEditorStateToHTMLString(formData.description as ReturnType<typeof createEditorStateFromHTMLString>),
       };
       await updateCompany({ id: company.id, data: payload });
       toastMessages.success(t('companyProfile.success.update'));

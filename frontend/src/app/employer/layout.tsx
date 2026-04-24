@@ -65,7 +65,6 @@ export default function EmployerSectionLayout({
             try {
               user = await dispatch(getUserInfo()).unwrap();
             } catch {
-              setIsChecking(false);
               return;
             }
           }
@@ -82,8 +81,6 @@ export default function EmployerSectionLayout({
             return;
           }
         }
-
-        setIsChecking(false);
         return;
       }
 
@@ -107,11 +104,9 @@ export default function EmployerSectionLayout({
         window.location.replace('/');
         return;
       }
-
-      setIsChecking(false);
     };
 
-    checkAuth();
+    void checkAuth().finally(() => setIsChecking(false));
   }, [currentUser, dispatch, isPublicPage, pathname]);
 
   if (isChecking) {

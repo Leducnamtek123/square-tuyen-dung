@@ -1,6 +1,7 @@
 import { memo, useEffect, useMemo, useState } from "react";
 import type { HTMLAttributes, ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import HtmlContent from '@/components/Common/HtmlContent';
 
 const hasMermaid = (content: string) => /```mermaid[\s\S]*?```/i.test(content);
 const hasCode = (content: string) => /```[\s\S]*?```/.test(content) || /`[^`]+`/.test(content);
@@ -162,10 +163,9 @@ const MessageResponseInner = memo(({
   // Browser can't run streamdown - lightweight markdown fallback
   if (!canRunStreamdown) {
     return (
-      <div
+      <HtmlContent
         className={cn(wrapperCn, "streamdown-fallback")}
-        dangerouslySetInnerHTML={{ __html: simpleMdToHtml(content) }}
-        {...props}
+        html={simpleMdToHtml(content)}
       />
     );
   }

@@ -45,6 +45,7 @@ type Props = {
   onCancel: () => void;
   onOpenAddQuestion: () => void;
   onOpenEditQuestion: () => void;
+  onQuestionGroupChange: (value: string | number) => void;
 };
 
 const InterviewCreateCardQuestionSection = ({
@@ -62,6 +63,7 @@ const InterviewCreateCardQuestionSection = ({
   onCancel,
   onOpenAddQuestion,
   onOpenEditQuestion,
+  onQuestionGroupChange,
 }: Props) => {
   return (
     <>
@@ -94,6 +96,7 @@ const InterviewCreateCardQuestionSection = ({
               {...field}
               select
               fullWidth
+              onChange={(e) => onQuestionGroupChange(e.target.value)}
               label={t('interview:interviewCreateCard.label.selectquestiongroupoptional')}
               variant="outlined"
               helperText={t('interview:interviewCreateCard.helperText.selectaquestiongrouptoautomaticallyfillthequestions below')}

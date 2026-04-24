@@ -2,6 +2,7 @@ import toastMessages from '../../../../utils/toastMessages';
 import React, { useEffect, useReducer } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Chip, Autocomplete, CircularProgress, Alert } from "@mui/material";
 import { useTranslation, Trans } from 'react-i18next';
+import { useQuery } from '@tanstack/react-query';
 
 import VideocamOutlinedIcon from '@mui/icons-material/VideocamOutlined';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -19,21 +20,26 @@ interface ScheduleInterviewDialogProps {
 
 const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialogProps) => {
     const { t } = useTranslation('admin');
+    const { data: loadedQuestions = [], isFetching: loadingQuestions } = useQuery({
+        queryKey: ['schedule-interview-questions', open],
+        queryFn: async () => {
+            const res = await questionService.getQuestions({ pageSize: 100 });
+            return res?.results || [];
+        },
+        enabled: open,
+        staleTime: 0,
+    });
     const [state, dispatch] = useReducer(
         (
             current: {
                 scheduledAt: Dayjs | null;
                 notes: string;
                 selectedQuestions: Question[];
-                questions: Question[];
-                loadingQuestions: boolean;
             },
             action:
                 | { type: 'set_scheduled_at'; value: Dayjs | null }
                 | { type: 'set_notes'; value: string }
                 | { type: 'set_selected_questions'; value: Question[] }
-                | { type: 'set_questions'; value: Question[] }
-                | { type: 'set_loading_questions'; value: boolean }
                 | { type: 'reset_form' }
         ) => {
             switch (action.type) {
@@ -43,17 +49,11 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                     return { ...current, notes: action.value };
                 case 'set_selected_questions':
                     return { ...current, selectedQuestions: action.value };
-                case 'set_questions':
-                    return { ...current, questions: action.value };
-                case 'set_loading_questions':
-                    return { ...current, loadingQuestions: action.value };
                 case 'reset_form':
                     return {
                         scheduledAt: dayjs().add(1, 'day'),
                         notes: '',
                         selectedQuestions: [],
-                        questions: [],
-                        loadingQuestions: false,
                     };
                 default:
                     return current;
@@ -63,23 +63,8 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
             scheduledAt: dayjs().add(1, 'day'),
             notes: '',
             selectedQuestions: [],
-            questions: [],
-            loadingQuestions: false,
         }
     );
-
-    useEffect(() => {
-        if (open) {
-            dispatch({ type: 'set_loading_questions', value: true });
-            questionService.getQuestions({ pageSize: 100 })
-                .then((res) => {
-                    const items = res?.results || [];
-                    dispatch({ type: 'set_questions', value: items });
-                })
-                .catch(console.error)
-                .finally(() => dispatch({ type: 'set_loading_questions', value: false }));
-        }
-    }, [open]);
 
     useEffect(() => {
         if (!open) {
@@ -144,12 +129,12 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
 
                         <Autocomplete
                             multiple
-                        options={state.questions}
+                        options={loadedQuestions}
                             getOptionLabel={(opt) => opt.content || opt.text || `Question #${opt.id}`}
                         value={state.selectedQuestions}
                             isOptionEqualToValue={(option, value) => option.id === value.id}
                         onChange={(_, v) => dispatch({ type: 'set_selected_questions', value: v })}
-                        loading={state.loadingQuestions}
+                        loading={loadingQuestions}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
@@ -158,9 +143,9 @@ const ScheduleInterviewDialog = ({ open, onClose, user }: ScheduleInterviewDialo
                                 slotProps={{
                                     input: {
                                         ...params.InputProps,
-                                        endAdornment: (
-                                            <>
-                                                {state.loadingQuestions && <CircularProgress size={20} />}
+                                    endAdornment: (
+                                        <>
+                                                {loadingQuestions && <CircularProgress size={20} />}
                                                 {params.InputProps.endAdornment}
                                             </>
                                         ),

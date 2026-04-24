@@ -65,5 +65,3 @@ export const compressImageFiles = async (
 ): Promise<File[]> => {
   return Promise.all(files.map((f) => compressImageFile(f, options)));
 };
-
-export default compressImageFile;

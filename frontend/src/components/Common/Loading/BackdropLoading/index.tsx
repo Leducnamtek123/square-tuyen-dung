@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Backdrop from '@mui/material/Backdrop';
-import Fade from '@mui/material/Fade';
 import Image from 'next/image';
 import { LOADING_IMAGES } from '@/configs/constants';
 
@@ -16,20 +15,13 @@ const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: Backdr
     <Backdrop
 
       sx={{
-
         color: '#fff',
-
         backgroundColor: bgColor,
-
         position: 'fixed',
-
-      }}
-
-      style={{
-        zIndex: 9999,
+        zIndex: (theme) => theme.zIndex.modal + 1,
       }}
       open={open}
-      transitionDuration={100}
+      transitionDuration={300}
     >
 
       <Image
@@ -40,7 +32,7 @@ const BackdropLoading = ({ bgColor = 'rgba(0, 0, 0, 0.4)', open = true }: Backdr
         style={{
           width: '100px',
           height: 'auto',
-          animation: 'spin 2s linear infinite',
+          animation: 'spin 1s linear infinite',
         }}
       />
 

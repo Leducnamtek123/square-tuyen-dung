@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+import { useQuery } from '@tanstack/react-query';
+import { redirect, usePathname } from 'next/navigation';
 import AdminLayout from '@/layouts/AdminLayout';
 import AdminLoginLayout from '@/layouts/AdminLoginLayout';
 import tokenService from '@/services/tokenService';
 import { getUserInfo } from '@/redux/userSlice';
 import { ROLES_NAME } from '@/configs/constants';
-import { isAdminPortalPath, getPreferredLanguage, getPortalPrefix } from '@/configs/portalRouting';
+import { getPreferredLanguage, getPortalPrefix } from '@/configs/portalRouting';
+import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 
 /**
  * AdminSectionLayout - Handles authentication and role-based access control
@@ -21,82 +21,41 @@ export default function AdminSectionLayout({
 }) {
   const pathname = usePathname() || '';
   const dispatch = useAppDispatch();
-  const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
-  const [isChecking, setIsChecking] = useState(true);
+  const { currentUser } = useAppSelector((state) => state.user);
 
-  // Detect if current path is an auth-related page (login, forgot-password, etc.)
-  // We check for both English (/admin) and Vietnamese (/quan-tri) prefixes
   const authSubPaths = ['/login', '/forgot-password', '/reset-password'];
-  const isAuthPage = authSubPaths.some((subPath) => 
-    pathname.endsWith(subPath) || pathname.includes(`${subPath}/`)
-  );
+  const isAuthPage = authSubPaths.some((subPath) => pathname.endsWith(subPath) || pathname.includes(`${subPath}/`));
+  const isLoginPage = pathname.endsWith('/login') || pathname.endsWith('/quan-tri');
+  const token = tokenService.getAccessTokenFromCookie();
+  const lang = getPreferredLanguage();
+  const adminPrefix = getPortalPrefix('admin', lang);
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      const token = tokenService.getAccessTokenFromCookie();
-      const lang = getPreferredLanguage();
-      const adminPrefix = getPortalPrefix('admin', lang);
+  const { data: fetchedUser } = useQuery({
+    queryKey: ['admin-layout-user', token],
+    queryFn: async () => dispatch(getUserInfo()).unwrap(),
+    enabled: Boolean(token) && !currentUser,
+    retry: false,
+  });
 
-      // 1. If no token, redirect to login if not already on an auth page
-      if (!token) {
-        if (!isAuthPage) {
-          window.location.replace(`${adminPrefix}/login`);
-        } else {
-          setIsChecking(false);
-        }
-        return;
-      }
+  const user = currentUser ?? fetchedUser ?? null;
 
-      // 2. Token exists, ensure user info is loaded
-      if (!currentUser) {
-        try {
-          await dispatch(getUserInfo()).unwrap();
-        } catch (error) {
-          // If fetching user info fails, token might be invalid/expired
-          if (!isAuthPage) {
-            window.location.replace(`${adminPrefix}/login`);
-          } else {
-            setIsChecking(false);
-          }
-          return;
-        }
-      }
-
-      // 3. Re-check currentUser after dispatch
-    };
-
-    checkAuth();
-  }, [currentUser, dispatch, isAuthPage, pathname]);
-
-  // Second effect to handle role verification once currentUser is available
-  useEffect(() => {
-    if (currentUser) {
-      const lang = getPreferredLanguage();
-      const adminPrefix = getPortalPrefix('admin', lang);
-      const userRole = currentUser.roleName;
-
-      if (userRole !== ROLES_NAME.ADMIN) {
-        // Not an admin: if on an admin page, redirect away
-        if (!isAuthPage) {
-          // Redirect to a forbidden page or home if not authorized
-          window.location.replace('/');
-        } else {
-          setIsChecking(false);
-        }
-      } else {
-        // Is admin: if on login page, redirect to dashboard
-        if (isAuthPage && (pathname.endsWith('/login') || pathname.endsWith('/quan-tri'))) {
-           window.location.replace(`${adminPrefix}/dashboard`);
-        } else {
-          setIsChecking(false);
-        }
-      }
+  if (!token) {
+    if (!isAuthPage) {
+      redirect(`${adminPrefix}/login`);
     }
-  }, [currentUser, isAuthPage, pathname]);
+    return <AdminLoginLayout>{children}</AdminLoginLayout>;
+  }
 
-  if (isChecking) {
-    // Show nothing or a loading spinner while checking auth/roles
-    return null; 
+  if (!user && !isAuthPage) {
+    redirect(`${adminPrefix}/login`);
+  }
+
+  if (user?.roleName && user.roleName !== ROLES_NAME.ADMIN) {
+    if (!isAuthPage) {
+      redirect('/');
+    }
+  } else if (isAuthPage && isLoginPage) {
+    redirect(`${adminPrefix}/dashboard`);
   }
 
   if (isAuthPage) {

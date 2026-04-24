@@ -3,11 +3,10 @@ import { useForm } from 'react-hook-form';
 import { typedYupResolver } from '../../../../utils/formHelpers';
 import * as yup from 'yup';
 import { useTranslation } from 'react-i18next';
-import { Grid2 as Grid } from "@mui/material";
+import { Grid2 as Grid } from '@mui/material';
 import { DATE_OPTIONS } from '../../../../configs/constants';
 import TextFieldCustom from '../../../../components/Common/Controls/TextFieldCustom';
 import DatePickerCustom from '../../../../components/Common/Controls/DatePickerCustom';
-import type { Resolver as ReactHookFormResolver } from 'react-hook-form';
 
 export interface FormValues {
   name: string;
@@ -22,64 +21,48 @@ interface CertificateFormProps {
   serverErrors?: Record<string, string[]> | null;
 }
 
-const CertificateForm = ({
+const initialValues: FormValues = {
+  name: '',
+  trainingPlace: '',
+  startDate: null,
+  expirationDate: null,
+};
+
+const CertificateFormContent = ({
   handleAddOrUpdate,
-  editData,
-  serverErrors = null,
-}: CertificateFormProps) => {
+  serverErrors,
+  initialValues,
+}: {
+  handleAddOrUpdate: (data: FormValues) => void;
+  serverErrors: Record<string, string[]> | null;
+  initialValues: FormValues;
+}) => {
   const { t } = useTranslation(['jobSeeker', 'common']);
 
-  const schema = yup.object().shape({
-    name: yup
-      .string()
-      .required(t('jobSeeker:profile.validation.certificateNameRequired'))
-      .max(200, t('jobSeeker:profile.validation.certificateNameMax')),
-    trainingPlace: yup
-      .string()
-      .required(t('jobSeeker:profile.validation.trainingPlaceRequired'))
-      .max(255, t('jobSeeker:profile.validation.trainingPlaceMax')),
-    startDate: yup
-      .date()
-      .required(t('jobSeeker:profile.validation.startDateRequired'))
-      .typeError(t('jobSeeker:profile.validation.startDateRequired')),
-    expirationDate: yup.date().nullable(),
-  });
+  const schema = React.useMemo(
+    () =>
+      yup.object().shape({
+        name: yup.string().required(t('jobSeeker:profile.validation.certificateNameRequired')).max(200, t('jobSeeker:profile.validation.certificateNameMax')),
+        trainingPlace: yup.string().required(t('jobSeeker:profile.validation.trainingPlaceRequired')).max(255, t('jobSeeker:profile.validation.trainingPlaceMax')),
+        startDate: yup.date().required(t('jobSeeker:profile.validation.startDateRequired')).typeError(t('jobSeeker:profile.validation.startDateRequired')),
+        expirationDate: yup.date().nullable(),
+      }),
+    [t]
+  );
 
-  const { control, reset, setError, handleSubmit } = useForm<FormValues>({
-    defaultValues: {
-      name: '',
-      trainingPlace: '',
-      startDate: null,
-      expirationDate: null,
-    },
+  const { control, setError, handleSubmit } = useForm<FormValues>({
+    defaultValues: initialValues,
     resolver: typedYupResolver(schema),
   });
 
   React.useEffect(() => {
-    if (editData) {
-      reset((formValues) => ({
-        ...formValues,
-        ...editData,
-      }));
-    } else {
-      reset({
-        name: '',
-        trainingPlace: '',
-        startDate: null,
-        expirationDate: null,
-      });
-    }
-  }, [editData, reset]);
+    if (serverErrors === null) return;
 
-  // show server errors
-  React.useEffect(() => {
-    if (serverErrors !== null) {
-      for (let err in serverErrors) {
-        setError(err as keyof FormValues, {
-          type: 'server',
-          message: serverErrors[err]?.join(' '),
-        });
-      }
+    for (const err in serverErrors) {
+      setError(err as keyof FormValues, {
+        type: 'server',
+        message: serverErrors[err]?.join(' '),
+      });
     }
   }, [serverErrors, setError]);
 
@@ -123,6 +106,26 @@ const CertificateForm = ({
         </Grid>
       </Grid>
     </form>
+  );
+};
+
+const CertificateForm = ({ handleAddOrUpdate, editData, serverErrors = null }: CertificateFormProps) => {
+  const formKey = React.useMemo(() => JSON.stringify(editData ?? initialValues), [editData]);
+  const mergedValues = React.useMemo(
+    () => ({
+      ...initialValues,
+      ...editData,
+    }),
+    [editData]
+  );
+
+  return (
+    <CertificateFormContent
+      key={formKey}
+      handleAddOrUpdate={handleAddOrUpdate}
+      serverErrors={serverErrors}
+      initialValues={mergedValues}
+    />
   );
 };
 

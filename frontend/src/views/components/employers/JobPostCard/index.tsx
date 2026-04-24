@@ -24,7 +24,6 @@ import JobPostsTable from '../JobPostsTable';
 import { useDataTable } from '../../../../hooks';
 import { useEmployerJobPosts, useJobPostMutations } from '../hooks/useEmployerQueries';
 import type { ApiError } from '../../../../types/api';
-import type { EditorState } from 'draft-js';
 import type { JobPostInput } from '../../../../services/jobService';
 
 type JobPostEditData = Partial<JobPostFormValues> & { id?: string | number };
@@ -159,9 +158,9 @@ const JobPostCard = () => {
       interviewTemplate: formData.interviewTemplate ? Number(formData.interviewTemplate) : null,
       typeOfWorkplace: Number(formData.typeOfWorkplace),
       genderRequired: formData.genderRequired,
-      jobDescription: convertEditorStateToHTMLString(formData.jobDescription as EditorState),
-      jobRequirement: convertEditorStateToHTMLString(formData.jobRequirement as EditorState),
-      benefitsEnjoyed: convertEditorStateToHTMLString(formData.benefitsEnjoyed as EditorState),
+      jobDescription: convertEditorStateToHTMLString(formData.jobDescription as ReturnType<typeof createEditorStateFromHTMLString>),
+      jobRequirement: convertEditorStateToHTMLString(formData.jobRequirement as ReturnType<typeof createEditorStateFromHTMLString>),
+      benefitsEnjoyed: convertEditorStateToHTMLString(formData.benefitsEnjoyed as ReturnType<typeof createEditorStateFromHTMLString>),
       contactPersonName: formData.contactPersonName,
       contactPersonPhone: formData.contactPersonPhone,
       contactPersonEmail: formData.contactPersonEmail,

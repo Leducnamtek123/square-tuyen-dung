@@ -18,21 +18,8 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import TimerIcon from '@mui/icons-material/Timer';
-import { Bar } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  LineElement,
-  PointElement,
-  ChartData,
-  ChartOptions,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
 import dayjs, { Dayjs } from 'dayjs';
+import BarChartClient from '@/components/Common/Charts/BarChartClient';
 import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerInterviewStatistics } from '../../hooks/useEmployerQueries';
 
@@ -40,9 +27,7 @@ interface InterviewStatsChartProps {
   title: string;
 }
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend);
-
-const options: ChartOptions<'bar'> = {
+const options = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
@@ -99,7 +84,7 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
 
   const { data, isLoading } = useEmployerInterviewStatistics(queryParams);
 
-  const chartData = React.useMemo<ChartData<'bar'>>(() => {
+  const chartData = React.useMemo(() => {
     return {
       labels: data?.labels || [],
       datasets: [
@@ -258,7 +243,7 @@ const InterviewStatsChart = ({ title }: InterviewStatsChartProps) => {
               </Stack>
             ) : (
               <Box sx={{ height: 320 }}>
-                <Bar options={options} data={chartData} />
+                <BarChartClient options={options} data={chartData} />
               </Box>
             )}
           </Box>

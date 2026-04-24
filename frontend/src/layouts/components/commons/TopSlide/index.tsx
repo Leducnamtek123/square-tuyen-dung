@@ -48,7 +48,6 @@ const TopSlide = () => {
   React.useEffect(() => {
     const getBanners = async () => {
       try {
-        setIsLoading(true);
         const resData = await contentService.getBanners({ type: BANNER_TYPES.HOME });
         setBanners(resData);
       } catch (error) {

@@ -9,12 +9,9 @@ import WorkIcon from '@mui/icons-material/Work';
 import QuestionAnswerIcon from '@mui/icons-material/QuestionAnswer';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import VideocamIcon from '@mui/icons-material/Videocam';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, ChartOptions, TooltipItem } from 'chart.js';
-import { Pie } from 'react-chartjs-2';
+import PieChartClient from '@/components/Common/Charts/PieChartClient';
 import { useAdminStats } from './hooks/useAdminStats';
 import StatCard from './components/StatCard';
-
-ChartJS.register(ArcElement, Tooltip, Legend);
 
 const DashboardPage = () => {
     const { t } = useTranslation('admin');
@@ -49,7 +46,7 @@ const DashboardPage = () => {
         ],
     }), [userRoleData, BRAND_COLORS]);
 
-    const pieOptions: ChartOptions<'pie'> = useMemo(() => ({
+    const pieOptions = useMemo(() => ({
         plugins: {
             legend: {
                 position: 'bottom',
@@ -64,7 +61,7 @@ const DashboardPage = () => {
             },
             tooltip: {
                 callbacks: {
-                    label: (context: TooltipItem<'pie'>) => `${context.label}: ${context.parsed}`,
+                    label: (context: any) => `${context.label}: ${context.parsed}`,
                 },
             },
         },
@@ -123,8 +120,8 @@ const DashboardPage = () => {
                                 <Skeleton variant="rectangular" height="100%" sx={{ borderRadius: '12px' }} />
                             ) : (
                                 <Box sx={{ height: '100%', display: 'flex', justifyContent: 'center' }}>
-                                    <Pie data={pieData} options={pieOptions} />
-                                </Box>
+                <PieChartClient data={pieData} options={pieOptions} />
+            </Box>
                             )}
                         </CardContent>
                     </Card>

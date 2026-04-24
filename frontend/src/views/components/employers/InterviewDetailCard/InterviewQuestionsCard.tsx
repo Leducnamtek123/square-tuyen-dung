@@ -55,7 +55,7 @@ const InterviewQuestionsCard: React.FC<InterviewQuestionsCardProps> = ({ session
                 {questions.length > 0 ? (
                     questions.map((q, idx) => (
                         <Box 
-                            key={idx} 
+                            key={q.id} 
                             sx={{ 
                                 p: 3, 
                                 bgcolor: alpha(theme.palette.action.disabled, 0.03), 

@@ -42,10 +42,9 @@ export default function NextAppDirEmotionCacheProvider(props: { options: Omit<Op
       <style
         key={cache.key}
         data-emotion={`${cache.key} ${names.join(' ')}`}
-        dangerouslySetInnerHTML={{
-          __html: styles,
-        }}
-      />
+      >
+        {styles}
+      </style>
     );
   });
 

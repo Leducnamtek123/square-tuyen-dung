@@ -27,7 +27,9 @@ type TranscriptItem = {
   isLive: boolean;
 };
 
-const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n, liveTranscripts = [], isLive = false }) => {
+const EMPTY_LIVE_TRANSCRIPTS: SSETranscript[] = [];
+
+const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n, liveTranscripts = EMPTY_LIVE_TRANSCRIPTS, isLive = false }) => {
     const theme = useTheme();
     const transcriptEndRef = useRef<HTMLDivElement>(null);
 
@@ -147,12 +149,12 @@ const InterviewTranscriptPanel: React.FC<InterviewTranscriptPanelProps> = ({ ses
             }}>
                 {mergedTranscripts.length > 0 ? (
                     <Stack spacing={6}>
-                        {mergedTranscripts.map((item, idx) => {
+                        {mergedTranscripts.map((item) => {
                             const isInterviewer = item.speaker === 'interviewer';
                             const isNewLive = item.isLive;
                             return (
                                 <Stack
-                                    key={idx}
+                                    key={`${item.id}-${item.timestamp}-${item.speaker}`}
                                     direction="row"
                                     spacing={3}
                                     alignItems="flex-start"

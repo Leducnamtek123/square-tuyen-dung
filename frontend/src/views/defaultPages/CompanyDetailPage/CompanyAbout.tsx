@@ -2,6 +2,7 @@ import React from 'react';
 import { Box, Typography } from "@mui/material";
 import type { TFunction } from 'i18next';
 import type { CompanyDetailProps } from './types';
+import HtmlContent from '@/components/Common/HtmlContent';
 
 interface CompanyAboutProps {
   companyDetail: CompanyDetailProps;
@@ -22,7 +23,7 @@ const CompanyAbout: React.FC<CompanyAboutProps> = ({ companyDetail, safeDescript
       <Box sx={{ p: 2.5, borderRadius: 2, bgcolor: "grey.50" }}>
         <Typography sx={{ textAlign: "justify", color: "text.secondary", lineHeight: 1.8 }}>
           {companyDetail?.description ? (
-            <div dangerouslySetInnerHTML={{ __html: safeDescriptionHtml }}></div>
+            <HtmlContent html={safeDescriptionHtml} />
           ) : (
             <span style={{ color: "#e0e0e0", fontStyle: "italic", fontSize: 13 }}>
               {t("companyDetail.notUpdated")}

@@ -1,15 +1,13 @@
 'use client';
 
-import { AnimatePresence, motion } from 'motion/react';
+import { AnimatePresence, LazyMotion, domAnimation, m, type HTMLMotionProps } from 'motion/react';
 import { useSessionContext } from '@livekit/components-react';
 import type { AppConfig } from '@/components/Features/VoiceAssistant/app-config';
 import { SessionView } from '@/components/Features/VoiceAssistant/components/app/session-view';
 import { WelcomeView } from '@/components/Features/VoiceAssistant/components/app/welcome-view';
 
-const MotionWelcomeView = motion.create(WelcomeView);
-const MotionSessionView = motion.create(SessionView);
-
-import type { HTMLMotionProps } from 'motion/react';
+const MotionWelcomeView = m.create(WelcomeView);
+const MotionSessionView = m.create(SessionView);
 
 const VIEW_MOTION_PROPS: HTMLMotionProps<"div"> = {
   variants: {
@@ -37,20 +35,22 @@ export function ViewController({ appConfig }: ViewControllerProps) {
   const { isConnected, start } = useSessionContext();
 
   return (
-    <AnimatePresence mode="wait">
-      {/* Welcome view */}
-      {!isConnected && (
-        <MotionWelcomeView
-          key="welcome"
-          {...VIEW_MOTION_PROPS}
-          startButtonText={appConfig.startButtonText}
-          onStartCall={start}
-        />
-      )}
-      {/* Session view */}
-      {isConnected && (
-        <MotionSessionView key="session-view" {...VIEW_MOTION_PROPS} appConfig={appConfig} />
-      )}
-    </AnimatePresence>
+    <LazyMotion features={domAnimation}>
+      <AnimatePresence mode="wait">
+        {/* Welcome view */}
+        {!isConnected && (
+          <MotionWelcomeView
+            key="welcome"
+            {...VIEW_MOTION_PROPS}
+            startButtonText={appConfig.startButtonText}
+            onStartCall={start}
+          />
+        )}
+        {/* Session view */}
+        {isConnected && (
+          <MotionSessionView key="session-view" {...VIEW_MOTION_PROPS} appConfig={appConfig} />
+        )}
+      </AnimatePresence>
+    </LazyMotion>
   );
 }

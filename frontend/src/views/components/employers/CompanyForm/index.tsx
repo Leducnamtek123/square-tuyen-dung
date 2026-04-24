@@ -3,19 +3,17 @@ import { useTranslation } from 'react-i18next';
 import { useForm, useWatch, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Grid2 as Grid } from "@mui/material";
-import { EditorState } from 'draft-js';
+import { Alert, Grid2 as Grid, Stack } from "@mui/material";
 
 import errorHandling from '../../../../utils/errorHandling';
 import { REGEX_VALIDATE } from '../../../../configs/constants';
 import commonService from '../../../../services/commonService';
 import useDebounce from '../../../../hooks/useDebounce';
 import goongService from '../../../../services/goongService';
+import { createEditorStateFromHTMLString } from '@/utils/editorUtils';
 
 import CompanyFormFields from './CompanyFormFields';
 import { useConfig } from '@/hooks/useConfig';
-import type { AxiosError } from 'axios';
-import type { ApiError } from '../../../../types/api';
 import type { SelectOption } from '../../../../types/models';
 import type { PlacePrediction } from '../../../../services/goongService';
 import type { CompanyFormValues } from './types';
@@ -26,13 +24,48 @@ interface CompanyFormProps {
   serverErrors?: Record<string, string[]> | null;
 }
 
-const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFormProps) => {
-  const { t } = useTranslation('employer');
-  const { allConfig } = useConfig();
-  const [districtOptions, setDistrictOptions] = useState<SelectOption[]>([]);
-  const [locationOptions, setLocationOptions] = useState<SelectOption[]>([]);
-  type PlaceOption = SelectOption & { place_id: string };
+type PlaceOption = SelectOption & { place_id: string };
 
+type CompanyFormContentProps = {
+  handleUpdate: (data: CompanyFormValues) => void;
+  t: ReturnType<typeof useTranslation>['t'];
+  allConfig: ReturnType<typeof useConfig>['allConfig'];
+  initialValues: CompanyFormValues;
+  serverErrors: Record<string, string[]> | null;
+  districtOptions: SelectOption[];
+  locationOptions: SelectOption[];
+};
+
+const buildInitialValues = (editData: Partial<CompanyFormValues> | null): CompanyFormValues => {
+  const baseValues: CompanyFormValues = {
+    description: createEditorStateFromHTMLString(''),
+    since: null,
+    websiteUrl: '',
+    facebookUrl: '',
+    youtubeUrl: '',
+    linkedinUrl: '',
+    location: { city: '', district: '', address: '', lat: '', lng: '' },
+  } as CompanyFormValues;
+
+  return {
+    ...baseValues,
+    ...editData,
+    location: {
+      ...baseValues.location,
+      ...editData?.location,
+    },
+  } as CompanyFormValues;
+};
+
+const CompanyFormContent = ({
+  handleUpdate,
+  t,
+  allConfig,
+  initialValues,
+  serverErrors,
+  districtOptions,
+  locationOptions,
+}: CompanyFormContentProps) => {
   const schema = yup.object().shape({
     companyName: yup.string().required(t('companyForm.validation.companyNameRequired', 'Company name is required.')).max(255, t('common:validation.max255')),
     taxCode: yup.string().required(t('companyForm.placeholder.entercompanytaxcode', 'Tax code is required.')).max(30, t('common:validation.max30')),
@@ -48,93 +81,65 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
     since: yup.date().nullable(),
     companyEmail: yup.string().required(t('jobPostForm.validation.contactpersonemailisrequired')).email(t('jobPostForm.validation.invalidemail')).max(100),
     companyPhone: yup.string().required(t('jobPostForm.validation.contactpersonphoneisrequired')).matches(REGEX_VALIDATE.phoneRegExp, t('jobPostForm.validation.invalidphonenumber')).max(15),
-    websiteUrl: yup
-      .string()
-      .transform((value, originalValue) => {
-        if (typeof originalValue === 'string' && originalValue.trim() === '') return null;
-        return value?.trim() || value;
-      })
-      .nullable()
-      .notRequired()
-      .url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
-    facebookUrl: yup
-      .string()
-      .transform((value, originalValue) => {
-        if (typeof originalValue === 'string' && originalValue.trim() === '') return null;
-        return value?.trim() || value;
-      })
-      .nullable()
-      .notRequired()
-      .url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
-    youtubeUrl: yup
-      .string()
-      .transform((value, originalValue) => {
-        if (typeof originalValue === 'string' && originalValue.trim() === '') return null;
-        return value?.trim() || value;
-      })
-      .nullable()
-      .notRequired()
-      .url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
-    linkedinUrl: yup
-      .string()
-      .transform((value, originalValue) => {
-        if (typeof originalValue === 'string' && originalValue.trim() === '') return null;
-        return value?.trim() || value;
-      })
-      .nullable()
-      .notRequired()
-      .url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
+    websiteUrl: yup.string().transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value)).nullable().notRequired().url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
+    facebookUrl: yup.string().transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value)).nullable().notRequired().url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
+    youtubeUrl: yup.string().transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value)).nullable().notRequired().url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
+    linkedinUrl: yup.string().transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? null : value?.trim() || value)).nullable().notRequired().url(t('common:validation.invalidUrl', 'Please enter a valid URL.')),
     description: yup.mixed().notRequired(),
   });
 
-  const { control, reset, setValue, setError, clearErrors, handleSubmit } = useForm<CompanyFormValues>({
+  const { control, setValue, handleSubmit } = useForm<CompanyFormValues>({
     resolver: yupResolver(schema) as Resolver<CompanyFormValues>,
-    defaultValues: {
-      description: EditorState.createEmpty(),
-      since: null,
-      websiteUrl: '',
-      facebookUrl: '',
-      youtubeUrl: '',
-      linkedinUrl: '',
-      location: { city: '', district: '', address: '', lat: '', lng: '' },
-    },
+    defaultValues: initialValues,
   });
 
+  const [localDistrictOptions, setLocalDistrictOptions] = useState<SelectOption[]>([]);
+  const [localLocationOptions, setLocalLocationOptions] = useState<SelectOption[]>([]);
   const cityId = useWatch({ control, name: 'location.city' });
   const address = useWatch({ control, name: 'location.address' });
   const addressDebounce = useDebounce(address, 500);
-
   const prevCityIdRef = useRef<number | string | null>(null);
 
-  // Load districts when city changes
   useEffect(() => {
-    const loadDistricts = async (id: number | string) => {
-      try {
-        const resData = await commonService.getDistrictsByCityId(id);
-        const results = (Array.isArray(resData) ? resData : ((resData as { data?: SelectOption[] })?.data || [])) as SelectOption[];
-        
-        // Only clear district if the cityId has actually changed (user interaction)
-        if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
-          setValue('location.district', '');
+    let cancelled = false;
+
+    const loadDistricts = async (id: number | string | null) => {
+      const nextDistrictOptions: SelectOption[] = [];
+
+      if (id) {
+        try {
+          const resData = await commonService.getDistrictsByCityId(id);
+          const results = (Array.isArray(resData) ? resData : ((resData as { data?: SelectOption[] })?.data || [])) as SelectOption[];
+          nextDistrictOptions.push(...results);
+
+          if (prevCityIdRef.current !== null && prevCityIdRef.current !== id) {
+            setValue('location.district', '');
+          }
+          prevCityIdRef.current = id;
+        } catch (error) {
+          errorHandling(error);
+          return;
         }
-        setDistrictOptions(results);
-        prevCityIdRef.current = id;
-      } catch (error) {
-        errorHandling(error);
+      } else {
+        prevCityIdRef.current = null;
+      }
+
+      if (!cancelled) {
+        setLocalDistrictOptions(nextDistrictOptions);
       }
     };
-    if (cityId) loadDistricts(cityId);
-    else {
-        setDistrictOptions([]);
-        prevCityIdRef.current = null;
-    }
+
+    void loadDistricts(cityId);
+
+    return () => {
+      cancelled = true;
+    };
   }, [cityId, setValue]);
 
-  // Load Goong location predictions
   useEffect(() => {
     const loadLocation = async (input: string) => {
       if (!input || input.trim().length < 3) {
-        setLocationOptions([]);
+        setLocalLocationOptions([]);
         return;
       }
       try {
@@ -145,33 +150,15 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
           name: prediction.description,
           place_id: prediction.place_id,
         }));
-        setLocationOptions(mappedOptions);
-      } catch (error) {
-          // Silent fail for autocomplete
+        setLocalLocationOptions(mappedOptions);
+      } catch {
+        // Silent fail for autocomplete
       }
     };
-    loadLocation(addressDebounce);
+    void loadLocation(addressDebounce);
   }, [addressDebounce]);
 
-  // Load edit data
-  useEffect(() => {
-    if (editData) {
-      reset((formValues) => ({ ...formValues, ...(editData as Partial<CompanyFormValues>) }));
-    }
-  }, [editData, reset]);
-
-  // Handle server errors
-  useEffect(() => {
-    if (serverErrors) {
-      for (let err in serverErrors) {
-        setError(err as keyof CompanyFormValues, { type: 'manual', message: serverErrors[err]?.join(' ') });
-      }
-    } else {
-      clearErrors();
-    }
-  }, [serverErrors, setError, clearErrors]);
-
-  const handleSelectLocation = async (e: React.SyntheticEvent, value: string | SelectOption | null) => {
+  const handleSelectLocation = async (_e: React.SyntheticEvent, value: string | SelectOption | null) => {
     if (!value || typeof value !== 'object' || !('place_id' in value)) return;
     try {
       const placeId = value.place_id as string;
@@ -187,21 +174,45 @@ const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFor
     }
   };
 
+  const errorText = serverErrors ? Object.values(serverErrors).flat().join(' ') : '';
+
   return (
     <form id="company-form" onSubmit={handleSubmit(handleUpdate)}>
-      <Grid container justifyContent="center">
-        <Grid size={{ xs: 12, lg: 10 }}>
-          <CompanyFormFields
-            control={control}
-            t={t}
-            allConfig={allConfig}
-            districtOptions={districtOptions}
-            locationOptions={locationOptions}
-            handleSelectLocation={handleSelectLocation}
-          />
+      <Stack spacing={2}>
+        {errorText ? <Alert severity="error">{errorText}</Alert> : null}
+        <Grid container justifyContent="center">
+          <Grid size={{ xs: 12, lg: 10 }}>
+            <CompanyFormFields
+              control={control}
+              t={t}
+              allConfig={allConfig}
+              districtOptions={localDistrictOptions}
+              locationOptions={localLocationOptions}
+              handleSelectLocation={handleSelectLocation}
+            />
+          </Grid>
         </Grid>
-      </Grid>
+      </Stack>
     </form>
+  );
+};
+
+const CompanyForm = ({ handleUpdate, editData, serverErrors = null }: CompanyFormProps) => {
+  const { t } = useTranslation('employer');
+  const { allConfig } = useConfig();
+  const initialValues = React.useMemo(() => buildInitialValues(editData), [editData]);
+
+  return (
+    <CompanyFormContent
+      key={JSON.stringify({ editData, serverErrors })}
+      handleUpdate={handleUpdate}
+      t={t}
+      allConfig={allConfig}
+      initialValues={initialValues}
+      serverErrors={serverErrors}
+      districtOptions={[]}
+      locationOptions={[]}
+    />
   );
 };
 

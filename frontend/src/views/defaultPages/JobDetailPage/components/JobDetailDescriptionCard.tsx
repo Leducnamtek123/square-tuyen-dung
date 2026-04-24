@@ -1,6 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import sanitizeHtml from "../../../../utils/sanitizeHtml";
+import HtmlContent from '@/components/Common/HtmlContent';
 
 import JobDetailInfoItem from "./JobDetailInfoItem";
 
@@ -22,11 +23,9 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
             {t("jobDetail.description")}
           </h3>
           <div className="mt-1 h-1 w-12 rounded bg-purple-600" />
-          <div
+          <HtmlContent
             className="mt-6 text-sm leading-6"
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHtml(jobPostDetail?.jobDescription),
-            }}
+            html={sanitizeHtml(jobPostDetail?.jobDescription)}
           />
         </div>
 
@@ -36,11 +35,9 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
             {t("jobDetail.requirements")}
           </h3>
           <div className="mt-1 h-1 w-12 rounded bg-purple-600" />
-          <div
+          <HtmlContent
             className="mt-6 text-sm leading-6"
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHtml(jobPostDetail?.jobRequirement),
-            }}
+            html={sanitizeHtml(jobPostDetail?.jobRequirement)}
           />
         </div>
 
@@ -50,11 +47,9 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
             {t("jobDetail.benefits")}
           </h3>
           <div className="mt-1 h-1 w-12 rounded bg-purple-600" />
-          <div
+          <HtmlContent
             className="mt-6 text-sm leading-6"
-            dangerouslySetInnerHTML={{
-              __html: sanitizeHtml(jobPostDetail?.benefitsEnjoyed),
-            }}
+            html={sanitizeHtml(jobPostDetail?.benefitsEnjoyed)}
           />
         </div>
 

@@ -31,6 +31,7 @@ type Props = {
   selectedQuestionsCount: number;
   onCancel: () => void;
   onJobPostChange: (value: string | number) => void;
+  onQuestionGroupChange: (value: string | number) => void;
   onOpenAddQuestion: () => void;
   onOpenEditQuestion: () => void;
 };
@@ -56,6 +57,7 @@ const InterviewCreateCardForm = ({
   selectedQuestionsCount,
   onCancel,
   onJobPostChange,
+  onQuestionGroupChange,
   onOpenAddQuestion,
   onOpenEditQuestion,
 }: Props) => {
@@ -206,6 +208,7 @@ const InterviewCreateCardForm = ({
               onCancel={onCancel}
               onOpenAddQuestion={onOpenAddQuestion}
               onOpenEditQuestion={onOpenEditQuestion}
+              onQuestionGroupChange={onQuestionGroupChange}
             />
           </Grid>
         </form>

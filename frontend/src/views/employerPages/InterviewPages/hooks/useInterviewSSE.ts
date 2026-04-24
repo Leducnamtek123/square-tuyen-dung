@@ -157,5 +157,3 @@ export function useInterviewSSE({
     statusEvents,
   };
 }
-
-export default useInterviewSSE;

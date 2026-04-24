@@ -29,19 +29,8 @@ import {
 } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import InsertChartOutlinedIcon from "@mui/icons-material/InsertChartOutlined";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  ChartData,
-  ChartOptions,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
 import dayjs, { Dayjs } from "dayjs";
+import BarChartClient from '@/components/Common/Charts/BarChartClient';
 import RangePickerCustom from "../../../../../components/Common/Controls/RangePickerCustom";
 import { useEmployerRecruitmentStatistics } from '../../hooks/useEmployerQueries';
 
@@ -58,16 +47,7 @@ const colors = [
   "rgba(255, 99, 132, 0.9)",
 ];
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-export const options: ChartOptions<'bar'> = {
+export const options = {
   plugins: {
     legend: {
       position: "bottom" as const,
@@ -125,9 +105,17 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
 
   const { data, isLoading: queryLoading } = useEmployerRecruitmentStatistics(queryParams);
 
-  const dataOptions = React.useMemo<ChartData<'bar'>>(() => {
+  const dataOptions = React.useMemo(() => {
     const safeData = data || [];
-    const datasets = [];
+    const datasets: Array<{
+      label: string | undefined;
+      data: unknown[];
+      backgroundColor: string | undefined;
+      stack: string;
+      borderRadius: number;
+      barThickness: number;
+      maxBarThickness: number;
+    }> = [];
 
     for (let i = safeData.length - 1; i >= 0; i--) {
       const labelText = safeData[i]?.label;
@@ -148,7 +136,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
 
     return {
       labels: [""],
-      datasets: datasets as ChartData<'bar'>['datasets'],
+      datasets,
     };
   }, [data, t]);
 
@@ -211,7 +199,7 @@ const RecruitmentChart = ({ title }: RecruitmentChartProps) => {
               </Stack>
             ) : (
               <Box sx={{ height: 320 }}>
-                <Bar options={options} data={dataOptions} />
+                <BarChartClient options={options} data={dataOptions} />
               </Box>
             )}
           </Box>

@@ -58,27 +58,24 @@ const getStatusColor = (status: string): 'success' | 'primary' | 'info' | 'error
   }
 };
 
-const formatElapsed = (startTime: string | null | undefined) => {
+const formatElapsed = (startTime: string | null | undefined, now = Date.now()) => {
   if (!startTime) return '--:--';
-  const elapsed = Math.max(0, Math.floor((Date.now() - new Date(startTime).getTime()) / 1000));
+  const elapsed = Math.max(0, Math.floor((now - new Date(startTime).getTime()) / 1000));
   const m = Math.floor(elapsed / 60);
   const s = elapsed % 60;
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
 };
 
 export const ElapsedTimer: React.FC<{ startTime: string | null | undefined }> = ({ startTime }) => {
-  const [elapsed, setElapsed] = useState(() => formatElapsed(startTime));
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    if (!startTime) {
-      setElapsed('--:--');
-      return;
-    }
-    const update = () => setElapsed(formatElapsed(startTime));
-    update();
-    const interval = setInterval(update, 1000);
+    if (!startTime) return;
+    const interval = setInterval(() => setNow(Date.now()), 1000);
     return () => clearInterval(interval);
   }, [startTime]);
+
+  const elapsed = formatElapsed(startTime, now);
 
   return (
     <Typography
@@ -230,4 +227,3 @@ export const LiveObserverVisualizer: React.FC<LiveObserverVisualizerProps> = ({ 
 };
 
 export { ACTIVE_STATUSES, normalizeStatus, getSafeLiveKitUrl, getStatusColor };
-

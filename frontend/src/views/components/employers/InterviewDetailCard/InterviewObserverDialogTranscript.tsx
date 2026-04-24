@@ -44,10 +44,10 @@ const InterviewObserverDialogTranscript = ({ liveTranscripts, t }: Props) => (
     >
       {liveTranscripts.length > 0 ? (
         <Stack spacing={3}>
-          {liveTranscripts.map((item, idx) => {
+          {liveTranscripts.map((item) => {
             const isAI = item.speakerRole === 'ai_agent';
             return (
-              <Stack key={item.id || idx} direction="row" spacing={1.5} alignItems="flex-start">
+              <Stack key={`${item.id}-${item.createAt || item.content}`} direction="row" spacing={1.5} alignItems="flex-start">
                 <Avatar
                   sx={{
                     width: 32,
@@ -89,16 +89,16 @@ const InterviewObserverDialogTranscript = ({ liveTranscripts, t }: Props) => (
             {t('common:auto.InterviewObserverDialog_waiting_for_conversation_to_be_3e38', { defaultValue: 'Waiting for conversation to begin...' })}
           </Typography>
           <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 1 }}>
-            {[0, 1, 2].map((i) => (
+            {['dot-1', 'dot-2', 'dot-3'].map((key, index) => (
               <Box
-                key={i}
+                key={key}
                 sx={{
                   width: 8,
                   height: 8,
                   borderRadius: '50%',
                   bgcolor: alpha('#0ea5e9', 0.4),
                   animation: 'dotBounce 1.4s infinite ease-in-out both',
-                  animationDelay: `${i * 0.16}s`,
+                  animationDelay: `${index * 0.16}s`,
                   '@keyframes dotBounce': {
                     '0%, 80%, 100%': { transform: 'scale(0)' },
                     '40%': { transform: 'scale(1)' },

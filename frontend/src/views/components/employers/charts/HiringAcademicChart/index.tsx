@@ -13,18 +13,14 @@ import {
 } from "@mui/material";
 import InfoIcon from '@mui/icons-material/Info';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
-import { Pie } from 'react-chartjs-2';
 import dayjs from 'dayjs';
+import PieChartClient from '@/components/Common/Charts/PieChartClient';
 import RangePickerCustom from '../../../../../components/Common/Controls/RangePickerCustom';
 import { useEmployerRecruitmentByRank } from '../../hooks/useEmployerQueries';
-import type { ChartOptions } from 'chart.js';
 
 interface HiringAcademicChartProps {
   title: string;
 }
-
-ChartJS.register(ArcElement, Tooltip, Legend);
 
 const options = {
   responsive: true,
@@ -156,7 +152,7 @@ const HiringAcademicChart = ({ title }: HiringAcademicChartProps) => {
               </Stack>
             ) : (
               <Box sx={{ height: 320 }}>
-                <Pie data={dataOptions} options={options as ChartOptions<"pie">} height={300} />
+                <PieChartClient data={dataOptions} options={options} height={300} />
               </Box>
             )}
           </Box>

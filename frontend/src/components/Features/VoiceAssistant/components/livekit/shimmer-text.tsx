@@ -20,5 +20,3 @@ export function ShimmerText({
     </span>
   );
 }
-
-export default ShimmerText;

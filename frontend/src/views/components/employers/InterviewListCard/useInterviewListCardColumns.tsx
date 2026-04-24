@@ -224,6 +224,6 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
         },
       },
     ],
-    [count, onCancel, onDelete, t, theme]
+    [onCancel, onDelete, t, theme]
   );
 };

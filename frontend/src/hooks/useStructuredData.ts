@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 interface JobPostingSchema {
   type: 'JobPosting';
@@ -200,8 +200,9 @@ const SCRIPT_ID_PREFIX = 'ld-json-';
  * Supports JobPosting, Organization, WebSite, BreadcrumbList schemas.
  */
 const useStructuredData = (schemas: StructuredDataSchema | StructuredDataSchema[]) => {
+  const schemaList = useMemo(() => (Array.isArray(schemas) ? schemas : [schemas]), [schemas]);
+
   useEffect(() => {
-    const schemaList = Array.isArray(schemas) ? schemas : [schemas];
     const ids: string[] = [];
 
     schemaList.forEach((schema, index) => {
@@ -224,8 +225,7 @@ const useStructuredData = (schemas: StructuredDataSchema | StructuredDataSchema[
         if (el) el.remove();
       });
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(schemas)]);
+  }, [schemaList]);
 };
 
 export default useStructuredData;

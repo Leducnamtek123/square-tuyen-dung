@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'motion/react';
+import { LazyMotion, domAnimation, m } from 'motion/react';
 import { useSessionContext, useSessionMessages } from '@livekit/components-react';
 import type { AppConfig } from '@/components/Features/VoiceAssistant/app-config';
 import { ChatTranscript } from '@/components/Features/VoiceAssistant/components/app/chat-transcript';
@@ -15,7 +15,7 @@ import { cn } from '@/lib/utils';
 import { ScrollArea } from '../livekit/scroll-area/scroll-area';
 import type { Transition } from 'motion/react';
 
-const MotionBottom = motion.create('div');
+const MotionBottom = m.div;
 
 const BOTTOM_VIEW_MOTION_PROPS = {
   variants: {
@@ -89,48 +89,50 @@ export const SessionView = ({
   }, [messages]);
 
   return (
-    <section className="bg-background relative z-10 h-full w-full overflow-hidden" {...props}>
-      {/* Chat Transcript */}
-      <div
-        className={cn(
-          'fixed inset-0 grid grid-cols-1 grid-rows-1',
-          !chatOpen && 'pointer-events-none'
-        )}
-      >
-        <Fade top className="absolute inset-x-4 top-0 h-40" />
-        <ScrollArea ref={scrollAreaRef} className="px-4 pt-40 pb-[150px] md:px-6 md:pb-[200px]">
-          <ChatTranscript
-            hidden={!chatOpen}
-            messages={messages}
-            className="mx-auto max-w-2xl space-y-3 transition-opacity duration-300 ease-out"
-          />
-        </ScrollArea>
-      </div>
-
-      {/* Tile Layout */}
-      <TileLayout chatOpen={chatOpen} />
-
-      {/* Bottom */}
-      <MotionBottom
-        {...BOTTOM_VIEW_MOTION_PROPS}
-        className="fixed inset-x-3 bottom-0 z-50 md:inset-x-12"
-      >
-        {appConfig.isPreConnectBufferEnabled && (
-          <PreConnectMessage messages={messages} className="pb-4" />
-        )}
-        <div className="bg-background relative mx-auto max-w-2xl pb-3 md:pb-12">
-          <Fade bottom className="absolute inset-x-0 top-0 h-4 -translate-y-full" />
-          <AgentControlBar
-            controls={controls}
-            isConnected={session.isConnected}
-            onDisconnect={() => {
-              session.end();
-              if (props.onDisconnect) props.onDisconnect();
-            }}
-            onChatOpenChange={setChatOpen}
-          />
+    <LazyMotion features={domAnimation}>
+      <section className="bg-background relative z-10 h-full w-full overflow-hidden" {...props}>
+        {/* Chat Transcript */}
+        <div
+          className={cn(
+            'fixed inset-0 grid grid-cols-1 grid-rows-1',
+            !chatOpen && 'pointer-events-none'
+          )}
+        >
+          <Fade top className="absolute inset-x-4 top-0 h-40" />
+          <ScrollArea ref={scrollAreaRef} className="px-4 pt-40 pb-[150px] md:px-6 md:pb-[200px]">
+            <ChatTranscript
+              hidden={!chatOpen}
+              messages={messages}
+              className="mx-auto max-w-2xl space-y-3 transition-opacity duration-300 ease-out"
+            />
+          </ScrollArea>
         </div>
-      </MotionBottom>
-    </section>
+
+        {/* Tile Layout */}
+        <TileLayout chatOpen={chatOpen} />
+
+        {/* Bottom */}
+        <MotionBottom
+          {...BOTTOM_VIEW_MOTION_PROPS}
+          className="fixed inset-x-3 bottom-0 z-50 md:inset-x-12"
+        >
+          {appConfig.isPreConnectBufferEnabled && (
+            <PreConnectMessage messages={messages} className="pb-4" />
+          )}
+          <div className="bg-background relative mx-auto max-w-2xl pb-3 md:pb-12">
+            <Fade bottom className="absolute inset-x-0 top-0 h-4 -translate-y-full" />
+            <AgentControlBar
+              controls={controls}
+              isConnected={session.isConnected}
+              onDisconnect={() => {
+                session.end();
+                if (props.onDisconnect) props.onDisconnect();
+              }}
+              onChatOpenChange={setChatOpen}
+            />
+          </div>
+        </MotionBottom>
+      </section>
+    </LazyMotion>
   );
 };
