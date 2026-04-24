@@ -4,7 +4,22 @@ services:
       context: ./inference/vieneu-text-to-speech
       args:
         MIRROR_PREFIX: ${DOCKER_MIRROR:-nvidia}
-    gpus: all
+    # ── GPU: 16GB VRAM — TTS lấy 65% (~10.4GB) ──────────────────────────────
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["0"]
+              capabilities: [gpu]
+    environment:
+      - TTS_DEVICE=${TTS_DEVICE:-cuda}
+      # 65% = ~10.4GB/16GB — đủ cho VieNeu float16, nhường ~5.6GB cho Whisper + buffer
+      - TTS_GPU_MEM_FRACTION=${TTS_GPU_MEM_FRACTION:-0.65}
+      # Giảm memory fragmentation, cải thiện allocation speed
+      - PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:512,expandable_segments:True
+      # TF32 giữ nguyên (mặc định bật trên Ampere+) — nhanh hơn float32 ~8x
+      - TORCH_ALLOW_TF32=1
 
   whisper:
     build:
@@ -12,7 +27,17 @@ services:
       args:
         WHISPER_BASE: ${WHISPER_BASE:-${DOCKER_MIRROR:-nvidia}/cuda:12.4.1-cudnn-runtime-ubuntu22.04}
         MIRROR_PREFIX: ${DOCKER_MIRROR:-nvidia}
-    gpus: all
+    # ── GPU: 16GB VRAM — Whisper lấy ~3GB (float16) ─────────────────────────
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["0"]
+              capabilities: [gpu]
     environment:
-      - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cuda:0}
+      - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cuda}
+      # float16 thay vì int8 — 16GB đủ VRAM, chất lượng nhận dạng tốt hơn
+      - VOXBOX_COMPUTE_TYPE=${VOXBOX_COMPUTE_TYPE:-float16}
+
 

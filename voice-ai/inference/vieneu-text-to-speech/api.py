@@ -6,6 +6,7 @@ import sys
 if os.path.exists(os.path.join(os.path.dirname(__file__), "src")):
     sys.path.append(os.path.join(os.path.dirname(__file__), "src"))
 
+import asyncio
 import logging
 import time
 import numpy as np
@@ -59,6 +60,11 @@ async def health(response: Response):
 # Global TTS Instance
 tts = None
 
+# ── GPU Concurrency Control ──────────────────────────────────────────────────
+# Giới hạn chỉ 1 TTS inference chạy trên GPU tại một thời điểm.
+# Tránh trường hợp 2 request đồng thời tranh nhau VRAM → OOM hoặc slowdown.
+_gpu_semaphore = asyncio.Semaphore(1)
+
 def get_tts():
     global tts
     if tts is None:
@@ -74,14 +80,31 @@ def get_tts():
             codec_device = device if codec_device_setting in ("", "auto") else codec_device_setting
             mode = os.getenv("TTS_MODE", "standard")
             backbone_repo = os.getenv("TTS_BACKBONE_REPO", "pnnbao-ump/VieNeu-TTS")
-            
+
+            # ── GPU Memory Fraction ───────────────────────────────────────────
+            # 16GB VRAM layout (ước tính):
+            #   TTS  (VieNeu float16) : ~4-6 GB  → fraction 0.65 → max ~10.4 GB
+            #   STT  (Whisper float16): ~3 GB    → phần còn lại tự nhiên
+            #   Buffer an toàn        : ~2-3 GB
+            # Nếu muốn giới hạn cứng thì set TTS_GPU_MEM_FRACTION=0.65 trong .env.
+            # Để tắt giới hạn (dùng toàn bộ) thì set TTS_GPU_MEM_FRACTION=1.0
+            if device.startswith("cuda") and torch.cuda.is_available():
+                mem_fraction = float(os.getenv("TTS_GPU_MEM_FRACTION", "0.65"))
+                if mem_fraction < 1.0:
+                    torch.cuda.set_per_process_memory_fraction(mem_fraction)
+                total_vram_gb = torch.cuda.get_device_properties(0).total_memory / 1e9
+                logger.info(
+                    f"🔧 GPU memory fraction set to {mem_fraction*100:.0f}% "
+                    f"(~{total_vram_gb * mem_fraction:.1f}GB / {total_vram_gb:.1f}GB total)"
+                )
+
             logger.info(
                 "🚀 Initializing VieNeu-TTS "
                 f"(Mode: {mode}, Device: {device}, Backbone: {backbone_repo})..."
             )
-            
-            # Initialize TTS 
-            # Switching to 'standard' mode for maximum stability 
+
+            # Initialize TTS
+            # Switching to 'standard' mode for maximum stability
             # as 'fast' mode (LMDeploy) is hitting a fatal buffer error on this system.
             tts = Vieneu(
                 mode=mode,
@@ -89,7 +112,7 @@ def get_tts():
                 backbone_device=device,
                 codec_device=codec_device,
             )
-            
+
             # DEBUG: List all available voices at startup
             try:
                 voices = tts.list_preset_voices()
@@ -98,7 +121,7 @@ def get_tts():
                     logger.info(f"  - {desc} [ID: {vid}]")
             except Exception as e:
                 logger.error(f"Failed to list voices: {e}")
-                
+
             logger.info("✅ VieNeu-TTS (Standard Mode) Initialized and Ready")
         except Exception as e:
             logger.critical(f"❌ FATAL ERROR during VieNeu-TTS initialization: {e}")
@@ -132,7 +155,7 @@ async def list_voices():
     return [v[0] for v in engine.list_preset_voices()]
 
 @app.post("/v1/audio/speech")
-async def tts_speech(req: OpenAITTSRequest):
+async def tts_speech(req: OpenAITTSRequest):  # noqa: C901
     # Basic input validation
     if not req.input or not req.input.strip():
         logger.warning("Received empty TTS input")
@@ -263,8 +286,24 @@ async def tts_speech(req: OpenAITTSRequest):
     media_type = "audio/mpeg" if req.response_format == "mp3" else "audio/wav"
     if req.response_format == "pcm":
         media_type = "audio/pcm;rate=24000"
-        
-    return StreamingResponse(generator(), media_type=media_type)
+
+    async def async_generator():
+        """Wrap blocking generator với GPU semaphore để serialize GPU access."""
+        async with _gpu_semaphore:
+            logger.debug("🔒 GPU semaphore acquired for TTS inference")
+            loop = asyncio.get_event_loop()
+            gen = generator()
+            try:
+                while True:
+                    # Chạy blocking read trong thread pool để không block event loop
+                    chunk = await loop.run_in_executor(None, next, gen, None)
+                    if chunk is None:
+                        break
+                    yield chunk
+            finally:
+                logger.debug("🔓 GPU semaphore released")
+
+    return StreamingResponse(async_generator(), media_type=media_type)
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8298))
