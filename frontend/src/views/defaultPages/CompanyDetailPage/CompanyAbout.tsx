@@ -21,7 +21,7 @@ const CompanyAbout: React.FC<CompanyAboutProps> = ({ companyDetail, safeDescript
         {t("companyDetail.about")}
       </Typography>
       <Box sx={{ p: 2.5, borderRadius: 2, bgcolor: "grey.50" }}>
-        <Typography sx={{ textAlign: "justify", color: "text.secondary", lineHeight: 1.8 }}>
+        <Box sx={{ textAlign: "justify", color: "text.secondary", lineHeight: 1.8 }}>
           {companyDetail?.description ? (
             <HtmlContent html={safeDescriptionHtml} />
           ) : (
@@ -29,7 +29,7 @@ const CompanyAbout: React.FC<CompanyAboutProps> = ({ companyDetail, safeDescript
               {t("companyDetail.notUpdated")}
             </span>
           )}
-        </Typography>
+        </Box>
       </Box>
     </Box>
   );

@@ -35,6 +35,20 @@ const renderNode = (node: Node, key: string): React.ReactNode => {
   switch (element.tagName.toLowerCase()) {
     case 'br':
       return <br key={key} />;
+    case 'img':
+      return (
+        <img
+          key={key}
+          src={element.getAttribute('src') || ''}
+          alt={element.getAttribute('alt') || ''}
+          className="my-4 block max-w-full rounded-md"
+          loading="lazy"
+        />
+      );
+    case 'figure':
+      return <figure key={key} className="my-4">
+        {children}
+      </figure>;
     case 'p':
       return (
         <p key={key} className="mb-4 last:mb-0">

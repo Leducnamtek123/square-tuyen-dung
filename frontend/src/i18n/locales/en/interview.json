@@ -240,20 +240,34 @@
     "noCandidates": "No candidates have applied for this position"
   },
   "interviewDetail": {
-    "messages": {
-      "evaluationSuccess": "Evaluation saved successfully",
-      "aiTriggerSuccess": "AI evaluation started",
-      "notFound": "Interview not found",
-      "notFoundDesc": "The interview you are looking for does not exist",
-      "recordingPending": "Video is being processed",
-      "recordingPendingDesc": "The recording will appear here once processing is complete"
-    },
-    "actions": {
-      "backToList": "Back to List"
-    },
     "title": "Interview Details",
+    "subtitle": {
+      "info": "Interview Information",
+      "aiEvaluation": "AI Evaluation Result",
+      "analysis": "AI Analysis",
+      "history": "Conversation History",
+      "recording": "Interview Recording",
+      "transcript": "Conversation Transcript",
+      "questions": "Question List"
+    },
     "label": {
       "roomCode": "Room Code",
+      "id": "ID",
+      "candidate": "CANDIDATE",
+      "position": "POSITION",
+      "type": "INTERVIEW TYPE",
+      "schedule": "SCHEDULE",
+      "liveMonitoring": "LIVE MONITORING",
+      "aiInterviewer": "AI Interviewer",
+      "interviewer": "Interviewer",
+      "candidateSmall": "Candidate",
+      "technicalScore": "Technical Score",
+      "communicationScore": "Communication Score",
+      "detailedAnalysis": "Detailed AI Analysis",
+      "detailedFeedback": "Detailed Feedback",
+      "strengths": "Strengths",
+      "weaknesses": "Weaknesses",
+      "feedback": "Detailed Feedback",
       "softSkills": "Soft skills",
       "confidence": "Confidence",
       "clarity": "Clarity",
@@ -265,6 +279,47 @@
     "tooltips": {
       "cannotJoin": "Cannot join at this time",
       "forceEndNow": "End this interview immediately"
+    },
+    "messages": {
+      "evaluationSuccess": "Evaluation saved successfully",
+      "aiTriggerSuccess": "AI evaluation started",
+      "notFound": "Interview not found",
+      "notFoundDesc": "The interview you are looking for does not exist",
+      "recordingPending": "Video is being processed",
+      "recordingPendingDesc": "The recording will appear here once processing is complete",
+      "confirmForceEnd": "Are you sure you want to end this interview session immediately?",
+      "forceEndSuccess": "Interview end requested",
+      "aiGenerating": "AI evaluation results are being generated",
+      "aiAnalyzing": "AI is analyzing the conversation...",
+      "aiAnalyzingDesc": "AI is analyzing the profile...",
+      "aiNeedsTrigger": "AI analysis needs to be triggered",
+      "notEnded": "Interview has not ended",
+      "noHistory": "No conversation data available",
+      "noData": "No data",
+      "noDetails": "No details available",
+      "noQuestions": "No interview questions",
+      "noTranscript": "No transcript",
+      "noTranscriptDesc": "No conversation has been recorded yet."
+    },
+    "actions": {
+      "triggerAi": "Trigger AI Evaluation",
+      "backToList": "Back to List",
+      "viewReport": "View detailed report",
+      "openRecording": "Open recording",
+      "retryAi": "Re-analyze with AI",
+      "questionList": "Interview Questions List",
+      "hrEvaluation": "HR Evaluation",
+      "attitudeScore": "Attitude Score",
+      "professionalScore": "Professional Score",
+      "overallScore": "Overall Score",
+      "resultLabel": "Final Result",
+      "comments": "Detailed Comments",
+      "proposedSalary": "Proposed Salary (VND)",
+      "submitEvaluation": "Submit Final Evaluation",
+      "evalSuccess": "Evaluation submitted successfully!",
+      "passed": "Accepted (Pass)",
+      "failed": "Rejected (Fail)",
+      "pending": "Pending Review"
     }
   }
 }

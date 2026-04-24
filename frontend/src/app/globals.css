@@ -211,6 +211,20 @@ h1, h2, h3, h4, h5, .display-text {
     radial-gradient(at 100% 100%, rgba(42, 169, 225, 0.08) 0px, transparent 50%);
 }
 
+/* Rich text editor images */
+.rdw-editor-main img,
+.rdw-editor-main .public-DraftStyleDefault-block img,
+.rdw-editor-main .public-DraftEditor-content img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 12px 0;
+}
+
+.rdw-editor-main .rdw-image-alignment {
+  display: block;
+}
+
 /* Removed SVG Noise Filter as it is extremely expensive for rendering */
 .bg-noise {
   display: none;
