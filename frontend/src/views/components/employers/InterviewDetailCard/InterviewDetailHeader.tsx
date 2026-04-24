@@ -59,6 +59,17 @@ const InterviewDetailHeader = ({
   const statusDefaultValue = effectiveStatus ? effectiveStatus.replaceAll('_', ' ').toUpperCase() : '';
   const statusTranslationKey = effectiveStatus ? `interview:interviewListCard.statuses.${effectiveStatus}` : undefined;
 
+  // Hardcoded rgba values — alpha(var(--mui-palette-X-main), n) crashes in MUI v6 (Error #9)
+  const STATUS_CHIP: Record<string, { bg: string; border: string }> = {
+    success: { bg: 'rgba(5, 150, 105, 0.08)',  border: 'rgba(5, 150, 105, 0.1)' },
+    primary: { bg: 'rgba(26, 64, 125, 0.08)',  border: 'rgba(26, 64, 125, 0.1)' },
+    error:   { bg: 'rgba(220, 38, 38, 0.08)',  border: 'rgba(220, 38, 38, 0.1)' },
+    info:    { bg: 'rgba(42, 169, 225, 0.08)', border: 'rgba(42, 169, 225, 0.1)' },
+    warning: { bg: 'rgba(245, 158, 11, 0.08)', border: 'rgba(245, 158, 11, 0.1)' },
+    default: { bg: 'rgba(100, 116, 139, 0.08)', border: 'rgba(100, 116, 139, 0.1)' },
+  };
+  const chipColors = STATUS_CHIP[themeStatus] ?? STATUS_CHIP.default;
+
   return (
     <>
       <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 5 }}>
@@ -101,16 +112,10 @@ const InterviewDetailHeader = ({
                 fontWeight: 900,
                 borderRadius: 1.5,
                 px: 1,
-                bgcolor:
-                  themeStatus === 'default'
-                    ? alpha('#64748b', 0.08)
-                    : alpha(`var(--mui-palette-${themeStatus}-main, #64748b)` as any, 0.08),
+                bgcolor: chipColors.bg,
                 color: themeStatus === 'default' ? 'text.secondary' : `${themeStatus}.main`,
                 border: '1px solid',
-                borderColor:
-                  themeStatus === 'default'
-                    ? alpha('#64748b', 0.1)
-                    : alpha(`var(--mui-palette-${themeStatus}-main, #64748b)` as any, 0.1),
+                borderColor: chipColors.border,
                 textTransform: 'uppercase',
                 fontSize: '0.75rem',
                 letterSpacing: '0.5px',
