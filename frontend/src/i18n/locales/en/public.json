@@ -169,5 +169,53 @@
   "jobPost": {
     "remaining": "{{days}} days remaining",
     "timeLeft": "Remaining"
+  },
+  "seo": {
+    "home": {
+      "title": "Fast job search, effective recruitment",
+      "description": "Square - Vietnam's leading recruitment platform. Search thousands of matching jobs, apply quickly, and connect with trusted employers.",
+      "keywords": "job search, recruitment, jobs, apply, employers, Square",
+      "appName": "Square Recruitment",
+      "appDescription": "A leading online recruitment platform in Vietnam"
+    },
+    "jobsByCareer": {
+      "description": "Explore jobs by industry at Square. Choose the industry you love and find a suitable job today.",
+      "keywords": "jobs by industry, IT jobs, accounting jobs, marketing jobs, recruitment"
+    },
+    "jobsByJobType": {
+      "description": "Search jobs by type: full-time, part-time, internship, contract. Many quality job opportunities at Square.",
+      "keywords": "full-time jobs, part-time jobs, internship, contract, remote"
+    },
+    "jobsByCity": {
+      "description": "Search jobs by city and province across the country at Square. Jobs in Hanoi, Ho Chi Minh City, and other provinces.",
+      "keywords": "jobs in Hanoi, jobs in Ho Chi Minh City, jobs by city, local recruitment"
+    },
+    "jobList": {
+      "description": "Search thousands of the latest jobs at Square. Filter by industry, salary, and location. Apply quickly and easily.",
+      "keywords": "job search, latest jobs, recruitment, online application, good jobs"
+    },
+    "jobDetail": {
+      "titlePrefix": "Recruiting",
+      "at": "at",
+      "reputableCompany": "trusted company",
+      "keywordsSuffix": "recruitment, jobs",
+      "breadcrumb": {
+        "home": "Home",
+        "jobs": "Jobs"
+      }
+    },
+    "companySearch": {
+      "description": "Discover hundreds of leading employers at Square. Learn about company culture, see open roles, and apply now.",
+      "keywords": "recruiting companies, reputable employers, hiring businesses, company profiles"
+    },
+    "companyDetail": {
+      "recruitingCompany": "Recruiting company",
+      "hiringLabel": "View open jobs.",
+      "keywordsSuffix": "recruitment, jobs",
+      "breadcrumb": {
+        "home": "Home",
+        "company": "Company"
+      }
+    }
   }
 }
