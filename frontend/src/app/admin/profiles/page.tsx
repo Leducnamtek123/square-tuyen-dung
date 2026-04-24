@@ -1,7 +1,7 @@
 ﻿import type { Metadata } from 'next';
-export const metadata: Metadata = { title: 'Hồ sơ ứng viên' };
-
 import ProfilesPage from '@/views/adminPages/ProfilesPage';
+
+export const metadata: Metadata = { title: 'Profiles' };
 
 export default function Page() {
   return <ProfilesPage />;

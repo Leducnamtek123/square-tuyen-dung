@@ -1,8 +1,8 @@
 ﻿import type { Metadata } from 'next';
-export const metadata: Metadata = { title: 'Tin nhắn' };
+import ChatPage from '@/views/adminPages/ChatPage';
 
-import AdminChatPage from '@/views/adminPages/ChatPage';
+export const metadata: Metadata = { title: 'Chat' };
 
 export default function Page() {
-  return <AdminChatPage />;
+  return <ChatPage />;
 }

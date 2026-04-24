@@ -1,9 +1,8 @@
-// Server Component — exports metadata, delegates redirect logic to client
-import type { Metadata } from 'next';
+﻿import type { Metadata } from 'next';
 import AdminIndexClient from './AdminIndexClient';
 
-export const metadata: Metadata = { title: 'Quản trị' };
+export const metadata: Metadata = { title: 'Admin' };
 
-export default function AdminPage() {
+export default function Page() {
   return <AdminIndexClient />;
 }

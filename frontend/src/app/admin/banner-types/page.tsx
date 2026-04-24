@@ -1,7 +1,7 @@
 ﻿import type { Metadata } from 'next';
-export const metadata: Metadata = { title: 'Loại banner' };
-
 import BannerTypesPage from '@/views/adminPages/BannerTypesPage';
+
+export const metadata: Metadata = { title: 'Banner Types' };
 
 export default function Page() {
   return <BannerTypesPage />;

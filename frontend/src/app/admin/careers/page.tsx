@@ -1,7 +1,7 @@
 ﻿import type { Metadata } from 'next';
-export const metadata: Metadata = { title: 'Ngành nghề' };
-
 import CareersPage from '@/views/adminPages/CareersPage';
+
+export const metadata: Metadata = { title: 'Careers' };
 
 export default function Page() {
   return <CareersPage />;

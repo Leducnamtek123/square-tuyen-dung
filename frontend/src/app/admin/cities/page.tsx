@@ -1,7 +1,7 @@
 ﻿import type { Metadata } from 'next';
-export const metadata: Metadata = { title: 'Tỉnh thành' };
-
 import CitiesPage from '@/views/adminPages/CitiesPage';
+
+export const metadata: Metadata = { title: 'Cities' };
 
 export default function Page() {
   return <CitiesPage />;
