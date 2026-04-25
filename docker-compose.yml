@@ -353,6 +353,8 @@ services:
       - BACKEND_API_URL=${BACKEND_API_URL:-http://backend:8000/api}
       - LIVEKIT_URL=${LIVEKIT_URL:-http://tuyendung-studio-livekit:7880}
       - LIVEKIT_AGENT_NAME=square-ai-interviewer
+      - STT_LANGUAGE=${STT_LANGUAGE:-vi}
+      - TTS_VOICE=${TTS_VOICE:-Bình (nam miền Bắc)}
 
     depends_on:
       backend:

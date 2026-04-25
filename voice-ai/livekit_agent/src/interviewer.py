@@ -48,8 +48,8 @@ class Interviewer(Agent):
         self._finalizing = False
         self._current_stage = InterviewStage.INTRODUCTION
 
-        candidate_name = _brief_text(self._context.get("candidateName", "ung vien"), 80)
-        job_title = _brief_text(self._context.get("jobTitle", "dang ung tuyen"), 120)
+        candidate_name = _brief_text(self._context.get("candidateName", "Ứng viên"), 80)
+        job_title = _brief_text(self._context.get("jobTitle", "đang ứng tuyển"), 120)
         interview_subject = _brief_text(self._context.get("interviewSubject", job_title), 180)
         job_desc = _brief_text(self._context.get("jobDescription", ""), 600)
         job_req = _brief_text(self._context.get("jobRequirement", ""), 400)
@@ -58,21 +58,21 @@ class Interviewer(Agent):
         notes = _brief_text(self._context.get("interviewNotes", ""), 240)
 
         instructions += (
-            "\n\nThong tin ngu canh:\n"
-            f"- Ung vien: {candidate_name}\n"
-            f"- Vi tri: {job_title}\n"
-            f"- Chu de phong van: {interview_subject}\n"
+            "\n\nThông tin ngữ cảnh:\n"
+            f"- Ứng viên: {candidate_name}\n"
+            f"- Vị trí: {job_title}\n"
+            f"- Chủ đề phỏng vấn: {interview_subject}\n"
         )
         if job_desc:
-            instructions += f"- Mo ta cong viec: {job_desc}\n"
+            instructions += f"- Mô tả công việc: {job_desc}\n"
         if job_req:
-            instructions += f"- Yeu cau cong viec: {job_req}\n"
+            instructions += f"- Yêu cầu công việc: {job_req}\n"
         if q_group_name:
-            instructions += f"- Nhom cau hoi: {q_group_name}\n"
+            instructions += f"- Nhóm câu hỏi: {q_group_name}\n"
         if q_group_desc:
-            instructions += f"- Mo ta nhom cau hoi: {q_group_desc}\n"
+            instructions += f"- Mô tả nhóm câu hỏi: {q_group_desc}\n"
         if notes:
-            instructions += f"- Ghi chu phong van: {notes}\n"
+            instructions += f"- Ghi chú phỏng vấn: {notes}\n"
 
         questions = self._context.get("questions", [])
         if questions:
@@ -85,13 +85,14 @@ class Interviewer(Agent):
                     question_text = str(q)
                 q_text += f"{i}. {_brief_text(question_text, 300)}\n"
             instructions += (
-                f"\nDANH SACH {total_q} CAU HOI BAT BUOC PHAI HOI THEO THU TU TU 1 DEN {total_q}:\n{q_text}"
-                "Hay hoi tung cau mot cach ngan gon, khong duoc hoi don nhieu cau."
+                f"\nDANH SÁCH {total_q} CÂU HỎI BẮT BUỘC PHẢI HỎI THEO THỨ TỰ TỪ 1 ĐẾN {total_q}:\n{q_text}"
+                "Hãy hỏi từng câu một cách ngắn gọn, không được hỏi dồn nhiều câu."
             )
 
         instructions += (
-            "\nQuy tac do dai: moi cau noi chi 1 den 2 cau, toi da khoang 40 tu."
-            "\nKhi da den buoc ket thuc va da noi loi cam on, phai goi finish_interview ngay."
+            "\nQuy tắc độ dài: mỗi câu nói chỉ 1 đến 2 câu, tối đa khoảng 40 từ."
+            "\nKhi đã đến bước kết thúc và đã nói lời cảm ơn, phải gọi finish_interview ngay."
+            "\nBắt buộc: mọi câu trả lời phải là tiếng Việt có dấu đầy đủ, tự nhiên, không được viết không dấu."
         )
 
         super().__init__(instructions=instructions)
@@ -103,12 +104,12 @@ class Interviewer(Agent):
     async def on_enter(self) -> None:
         """Called when the agent joins the session."""
         logger.info("Interviewer agent entered session. Generating initial greeting...")
-        candidate_name = _brief_text(self._context.get("candidateName", "ung vien"), 80)
+        candidate_name = _brief_text(self._context.get("candidateName", "Ứng viên"), 80)
 
         # Keep the bootstrap greeting short so CPU TTS can finish quickly in
         # local smoke tests and the agent can start the interview promptly.
         await self.session.say(
-            f"{DEFAULT_GREETING} Xin chao {candidate_name}, bat dau phong van nhe.",
+            f"{DEFAULT_GREETING} Xin chào {candidate_name}, bắt đầu phỏng vấn nhé.",
             allow_interruptions=False,
         )
 
@@ -126,23 +127,23 @@ class Interviewer(Agent):
             except Exception as exc:
                 logger.warning("Could not update room metadata: %s", exc)
 
-            msg = f"Interview stage updated to {stage_name}."
+            msg = f"Đã cập nhật giai đoạn phỏng vấn sang {stage_name}."
             if new_stage == InterviewStage.TECHNICAL:
-                msg += " Ask the listed questions strictly and in order."
+                msg += " Hãy hỏi các câu trong danh sách theo đúng thứ tự."
             return msg
         except KeyError:
-            return f"Invalid stage name: {stage_name}."
+            return f"Tên giai đoạn không hợp lệ: {stage_name}."
 
     @function_tool
     async def get_interview_progress(self, context: RunContext) -> str:
         """Get the current progress of the interview."""
-        return f"Currently in the {self._current_stage.name} stage."
+        return f"Hiện đang ở giai đoạn {self._current_stage.name}."
 
     @function_tool
     async def finish_interview(self, context: RunContext) -> str:
         """End the interview session after the farewell is spoken."""
         if self._completed:
-            return "The interview session is already ending."
+            return "Buổi phỏng vấn đang trong quá trình kết thúc."
 
         self._completed = True
         logger.info("Finishing interview for room: %s", self._room_name)
@@ -159,7 +160,7 @@ class Interviewer(Agent):
         else:
             asyncio.create_task(self._shutdown_session())
 
-        return "Cam on ban. Chung ta ket thuc buoi phong van o day."
+        return "Cảm ơn bạn. Chúng ta kết thúc buổi phỏng vấn ở đây."
 
     async def _shutdown_session(self) -> None:
         try:
