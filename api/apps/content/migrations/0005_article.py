@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('Project', '0004_bannertype_and_banner_type_field'),
         ('files', '0001_initial'),
-        ('accounts', '0001_initial'),
+        ('authentication', '0001_initial'),
     ]
 
     operations = [
@@ -44,7 +44,7 @@ class Migration(migrations.Migration):
                     blank=True, null=True,
                     on_delete=django.db.models.deletion.SET_NULL,
                     related_name='articles',
-                    to='accounts.user'
+                    to='authentication.user'
                 )),
             ],
             options={
