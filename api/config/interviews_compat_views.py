@@ -30,7 +30,7 @@ def interview_context(request: HttpRequest, room_name: str):
 
     try:
         session = (
-            InterviewSession.objects.select_related("candidate", "job_post")
+            InterviewSession.objects.select_related("candidate", "job_post", "question_group")
             .prefetch_related("questions")
             .get(room_name=room_name)
         )

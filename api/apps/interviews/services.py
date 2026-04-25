@@ -3,8 +3,10 @@ from __future__ import annotations
 import json
 import logging
 from typing import Dict, Iterable, Optional
+
 from django.conf import settings
 from django.utils import timezone
+from django.utils.html import strip_tags
 
 from .livekit_service import LiveKitService
 from .models import InterviewSession, InterviewTranscript, Question
@@ -14,7 +16,6 @@ logger = logging.getLogger(__name__)
 
 class SessionNotJoinableError(ValueError):
     """Exception raised when an interview session is not in a joinable state."""
-    pass
 
 
 def get_session_questions(session: InterviewSession) -> Iterable[Question]:
@@ -23,16 +24,78 @@ def get_session_questions(session: InterviewSession) -> Iterable[Question]:
         return questions
     if session.question_group_id:
         return session.question_group.questions.all()
+    if session.job_post_id and getattr(session.job_post, "interview_template_id", None):
+        return session.job_post.interview_template.questions.all()
     return questions
 
 
+def _clean_text(value: str | None) -> str:
+    if not value:
+        return ""
+    return " ".join(strip_tags(value).split())
+
+
+def _truncate_text(value: str, limit: int) -> str:
+    if len(value) <= limit:
+        return value
+    return value[: max(0, limit - 1)].rstrip() + "..."
+
+
+def _build_interview_subject(
+    session: InterviewSession,
+    job_description: str,
+    question_group_description: str,
+) -> str:
+    parts: list[str] = []
+
+    if session.job_post and session.job_post.job_name:
+        parts.append(session.job_post.job_name)
+    if session.question_group and session.question_group.name:
+        parts.append(session.question_group.name)
+    if session.job_post and getattr(session.job_post, "interview_template_id", None):
+        template_name = getattr(session.job_post.interview_template, "name", "")
+        if template_name:
+            parts.append(template_name)
+
+    if parts:
+        return " - ".join(parts)
+
+    fallback = job_description or question_group_description
+    return fallback[:120] if fallback else "Phong van tuyen dung"
+
+
 def build_interview_context(session: InterviewSession) -> Dict[str, object]:
-    questions = get_session_questions(session)
+    questions = list(get_session_questions(session).order_by("sort_order", "create_at", "id"))
+    template = getattr(getattr(session, "job_post", None), "interview_template", None)
+    question_group = session.question_group or template
+    job_description = _truncate_text(_clean_text(getattr(session.job_post, "job_description", "")), 1200)
+    job_requirement = _truncate_text(_clean_text(getattr(session.job_post, "job_requirement", "")), 900)
+    question_group_description = _truncate_text(_clean_text(getattr(question_group, "description", "")), 900)
+    notes = _truncate_text(_clean_text(session.notes), 500)
+
     return {
         "candidateName": session.candidate.full_name,
         "candidateEmail": session.candidate.email,
         "jobTitle": session.job_post.job_name if session.job_post else None,
-        "questions": [{"text": q.text} for q in questions],
+        "jobDescription": job_description or None,
+        "jobRequirement": job_requirement or None,
+        "questionGroupName": question_group.name if question_group else None,
+        "questionGroupDescription": question_group_description or None,
+        "interviewNotes": notes or None,
+        "interviewSubject": _build_interview_subject(
+            session,
+            job_description,
+            question_group_description,
+        ),
+        "questionCount": len(questions),
+        "questions": [
+            {
+                "text": q.text,
+                "category": q.category,
+                "difficulty": q.difficulty,
+            }
+            for q in questions
+        ],
         "interviewType": session.type,
     }
 
@@ -49,10 +112,12 @@ def _build_public_livekit_url(request) -> str:
 
 
 def create_livekit_participant_token(session: InterviewSession, request) -> Dict[str, str]:
-    # Security: Chỉ cấp token nếu status là 'scheduled', 'calibration' hoặc 'in_progress'
+    # Security: only allow when the session is joinable.
     allowed_statuses = ("scheduled", "calibration", "in_progress")
     if session.status not in allowed_statuses:
-        raise SessionNotJoinableError(f"Không thể tham gia buổi phỏng vấn này vì trạng thái hiện tại là: {session.get_status_display()}")
+        raise SessionNotJoinableError(
+            f"Khong the tham gia buoi phong van nay vi trang thai hien tai la: {session.get_status_display()}"
+        )
 
     participant_identity = f"candidate-{session.candidate_id}"
     participant_name = session.candidate.full_name or session.candidate.email or participant_identity
@@ -76,6 +141,7 @@ def broadcast_interview_event(session_id: int, event_type: str, data: dict) -> N
     """Publish an event to Redis Pub/Sub for SSE streaming to employer."""
     try:
         import redis as _redis
+
         r = _redis.Redis(
             host=settings.SERVICE_REDIS_HOST,
             port=settings.SERVICE_REDIS_PORT,
@@ -108,14 +174,18 @@ def update_interview_status(
         max_duration_seconds=max_duration_seconds,
     )
     # Broadcast status change to SSE subscribers
-    broadcast_interview_event(session.id, "status_changed", {
-        "sessionId": session.id,
-        "oldStatus": old_status,
-        "newStatus": new_status,
-        "startTime": session.start_time.isoformat() if session.start_time else None,
-        "endTime": session.end_time.isoformat() if session.end_time else None,
-        "duration": session.duration,
-    })
+    broadcast_interview_event(
+        session.id,
+        "status_changed",
+        {
+            "sessionId": session.id,
+            "oldStatus": old_status,
+            "newStatus": new_status,
+            "startTime": session.start_time.isoformat() if session.start_time else None,
+            "endTime": session.end_time.isoformat() if session.end_time else None,
+            "duration": session.duration,
+        },
+    )
     return new_status
 
 
@@ -136,6 +206,7 @@ def apply_status_transition(session: InterviewSession, new_status: str) -> None:
 
     session.save()
 
+
 def run_status_side_effects(
     session: InterviewSession,
     new_status: str,
@@ -151,8 +222,9 @@ def run_status_side_effects(
 
         timeout = int(max_duration_seconds or getattr(settings, "INTERVIEW_MAX_DURATION_SECONDS", 1800))
         end_interview_session.apply_async(args=[session.id, "max_duration"], countdown=timeout)
-        # Bắt đầu ghi hình egress ngay khi phỏng vấn bắt đầu "in_progress"
+        # Start recording as soon as the interview becomes active.
         import threading
+
         threading.Thread(target=LiveKitService.start_recording, args=(session.room_name,)).start()
 
 
@@ -162,16 +234,20 @@ def append_transcript(session: InterviewSession, payload: Dict[str, object]) -> 
         **payload,
     )
     # Broadcast new transcript to SSE subscribers
-    broadcast_interview_event(session.id, "transcript_added", {
-        "sessionId": session.id,
-        "transcript": {
-            "id": transcript.id,
-            "speakerRole": transcript.speaker_role,
-            "content": transcript.content,
-            "speechDurationMs": transcript.speech_duration_ms,
-            "createAt": transcript.create_at.isoformat() if transcript.create_at else None,
+    broadcast_interview_event(
+        session.id,
+        "transcript_added",
+        {
+            "sessionId": session.id,
+            "transcript": {
+                "id": transcript.id,
+                "speakerRole": transcript.speaker_role,
+                "content": transcript.content,
+                "speechDurationMs": transcript.speech_duration_ms,
+                "createAt": transcript.create_at.isoformat() if transcript.create_at else None,
+            },
         },
-    })
+    )
     return transcript
 
 
@@ -218,14 +294,18 @@ def queue_ai_evaluation(session: InterviewSession) -> None:
     session.status = "processing"
     session.save(update_fields=["status", "update_at"])
 
-    broadcast_interview_event(session.id, "status_changed", {
-        "sessionId": session.id,
-        "oldStatus": old_status,
-        "newStatus": "processing",
-        "startTime": session.start_time.isoformat() if session.start_time else None,
-        "endTime": session.end_time.isoformat() if session.end_time else None,
-        "duration": session.duration,
-    })
+    broadcast_interview_event(
+        session.id,
+        "status_changed",
+        {
+            "sessionId": session.id,
+            "oldStatus": old_status,
+            "newStatus": "processing",
+            "startTime": session.start_time.isoformat() if session.start_time else None,
+            "endTime": session.end_time.isoformat() if session.end_time else None,
+            "duration": session.duration,
+        },
+    )
 
     evaluate_interview_session.delay(session.id)
 
@@ -235,7 +315,7 @@ def create_observer_livekit_token(session: InterviewSession, request) -> Dict[st
     allowed_statuses = ("scheduled", "calibration", "in_progress")
     if session.status not in allowed_statuses:
         raise SessionNotJoinableError(
-            f"Không thể quan sát buổi phỏng vấn này vì trạng thái hiện tại là: {session.get_status_display()}"
+            f"Khong the quan sat buoi phong van nay vi trang thai hien tai la: {session.get_status_display()}"
         )
 
     user = request.user

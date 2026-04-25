@@ -135,7 +135,7 @@ const ProfileUploadCard = ({
 
               icon={<StarIcon sx={{ color: 'warning.main' }} />}
 
-              label="Cho phÃ©p tÃ¬m kiáº¿m"
+              label="Cho phép tìm kiếm"
 
               onClick={() => handleActive(slug)}
 
@@ -163,7 +163,7 @@ const ProfileUploadCard = ({
 
               icon={<StarOutlineIcon sx={{ color: 'warning.main' }} />}
 
-              label="Cho phÃ©p tÃ¬m kiáº¿m"
+              label="Cho phép tìm kiếm"
 
               onClick={() => handleActive(slug)}
 
@@ -173,7 +173,7 @@ const ProfileUploadCard = ({
 
           <Tooltip
 
-            title={`Báº­t "Cho phÃ©p tÃ¬m kiáº¿m" sáº½ giÃºp nhÃ  tuyá»ƒn dá»¥ng tÃ¬m tháº¥y há»“ sÆ¡ cá»§a báº¡n vÃ  há» cÃ³ thá»ƒ liÃªn há»‡ vá»›i báº¡n vá» cÃ´ng viá»‡c má»›i. Chá»‰ cÃ³ duy nháº¥t má»™t há»“ Ä‘Æ°á»£c báº­t tráº¡ng thÃ¡i "cho phÃ©p tÃ¬m kiáº¿m" trong táº¥t cáº£ há»“ sÆ¡ cá»§a báº¡n.`}
+            title={`Bật "Cho phép tìm kiếm" sẽ giúp nhà tuyển dụng tìm thấy hồ sơ của bạn và họ có thể liên hệ với bạn về công việc mới. Chỉ có duy nhất một hồ sơ được bật trạng thái "cho phép tìm kiếm" trong tất cả hồ sơ của bạn.`}
 
             arrow
 
@@ -251,7 +251,7 @@ const ProfileUploadCard = ({
 
             <Typography variant="caption" sx={{ opacity: 0.8 }}>
 
-              Cáº­p nháº­t láº§n cuá»‘i: {dayjs(updateAt).format('DD/MM/YYYY HH:mm:ss')}
+              Cập nhật lần cuối: {dayjs(updateAt).format('DD/MM/YYYY HH:mm:ss')}
 
             </Typography>
 
@@ -277,7 +277,7 @@ const ProfileUploadCard = ({
 
                 icon={<DownloadIcon sx={{ color: defaultTheme.palette.secondary.main }} />}
 
-                label="Táº£i xuá»‘ng"
+                label="Tải xuống"
 
                 onClick={() => downloadPdf(fileUrl, title)}
 

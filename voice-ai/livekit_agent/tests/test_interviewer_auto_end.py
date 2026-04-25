@@ -1,69 +1,78 @@
-import pytest
+import asyncio
+import importlib.util
+import sys
+from pathlib import Path
 
-from livekit_agent import interviewer as interviewer_module
+ROOT = Path(__file__).resolve().parents[1] / "src"
+if "livekit_agent" not in sys.modules:
+    spec = importlib.util.spec_from_file_location(
+        "livekit_agent",
+        ROOT / "__init__.py",
+        submodule_search_locations=[str(ROOT)],
+    )
+    module = importlib.util.module_from_spec(spec)
+    assert spec and spec.loader
+    sys.modules["livekit_agent"] = module
+    spec.loader.exec_module(module)
+
 from livekit_agent.interviewer import Interviewer
 
-class DummySession:
+
+class DummySpeechHandle:
     def __init__(self) -> None:
-        self.shutdown_calls: list[bool] = []
+        self._callbacks = []
 
-    def shutdown(self, drain: bool = True) -> None:
-        self.shutdown_calls.append(drain)
+    def add_done_callback(self, callback) -> None:
+        self._callbacks.append(callback)
 
-@pytest.mark.asyncio
-async def test_closing_does_not_auto_end_when_disabled(monkeypatch) -> None:
-    agent = Interviewer(context={"backendApiUrl": "http://test", "roomName": "room-1"})
-    agent.session = DummySession()
+    def resolve(self) -> None:
+        for callback in list(self._callbacks):
+            callback(self)
 
-    monkeypatch.setattr(interviewer_module.config, "AUTO_END_ON_COMPLETION", False)
 
-    async def fake_fetch_next_question(advance: bool = True):
-        return {"done": True, "question": None, "index": 1, "total": 1}
+def test_finish_interview_waits_for_playout_before_shutdown() -> None:
+    async def run() -> None:
+        agent = Interviewer(context={"backendApiUrl": "http://test", "roomName": "room-1"})
+        shutdown_calls = {"count": 0}
 
-    async def fake_say_and_wait(text: str, *, allow_interruptions: bool = True) -> None:
-        return None
+        async def fake_shutdown_session() -> None:
+            shutdown_calls["count"] += 1
 
-    status_updates = {"count": 0}
+        agent._shutdown_session = fake_shutdown_session  # type: ignore[assignment]
 
-    async def fake_update_backend_status(status: str) -> None:
-        status_updates["count"] += 1
+        speech_handle = DummySpeechHandle()
+        context = type("Ctx", (), {"speech_handle": speech_handle})()
 
-    monkeypatch.setattr(agent, "_fetch_next_question", fake_fetch_next_question)
-    monkeypatch.setattr(agent, "_say_and_wait", fake_say_and_wait)
-    monkeypatch.setattr(agent, "_update_backend_status", fake_update_backend_status)
+        result = await agent.finish_interview(context)
 
-    handled = await agent._ask_next_question()
+        assert "ket thuc" in result.lower()
+        assert shutdown_calls["count"] == 0
 
-    assert handled is True
-    assert status_updates["count"] == 0
-    assert agent.session.shutdown_calls == []
-    assert agent._completed is True
+        speech_handle.resolve()
+        await asyncio.sleep(0)
 
-@pytest.mark.asyncio
-async def test_closing_auto_ends_when_enabled(monkeypatch) -> None:
-    agent = Interviewer(context={"backendApiUrl": "http://test", "roomName": "room-2"})
-    agent.session = DummySession()
+        assert shutdown_calls["count"] == 1
 
-    monkeypatch.setattr(interviewer_module.config, "AUTO_END_ON_COMPLETION", True)
+    asyncio.run(run())
 
-    async def fake_fetch_next_question(advance: bool = True):
-        return {"done": True, "question": None, "index": 2, "total": 2}
 
-    async def fake_say_and_wait(text: str, *, allow_interruptions: bool = True) -> None:
-        return None
+def test_finish_interview_falls_back_when_no_speech_handle() -> None:
+    async def run() -> None:
+        agent = Interviewer(context={"backendApiUrl": "http://test", "roomName": "room-2"})
+        shutdown_calls = {"count": 0}
 
-    status_updates = {"count": 0}
+        async def fake_shutdown_session() -> None:
+            shutdown_calls["count"] += 1
 
-    async def fake_update_backend_status(status: str) -> None:
-        status_updates["count"] += 1
+        agent._shutdown_session = fake_shutdown_session  # type: ignore[assignment]
 
-    monkeypatch.setattr(agent, "_fetch_next_question", fake_fetch_next_question)
-    monkeypatch.setattr(agent, "_say_and_wait", fake_say_and_wait)
-    monkeypatch.setattr(agent, "_update_backend_status", fake_update_backend_status)
+        context = type("Ctx", (), {})()
 
-    handled = await agent._ask_next_question()
+        result = await agent.finish_interview(context)
+        assert "ket thuc" in result.lower()
 
-    assert handled is True
-    assert status_updates["count"] == 1
-    assert agent.session.shutdown_calls == [True]
-    assert agent._completed is True
+        await asyncio.sleep(0)
+
+        assert shutdown_calls["count"] == 1
+
+    asyncio.run(run())

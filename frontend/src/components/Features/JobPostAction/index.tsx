@@ -253,7 +253,7 @@ const JobPostAction = ({
 
                       }}>
 
-                        ChÆ°a cáº­p nháº­t
+                        Chưa cập nhật
 
                       </span>
 

@@ -53,6 +53,18 @@ class InterviewServiceTests(TestCase):
 
         self.assertEqual(context["candidateEmail"], self.candidate.email)
         self.assertEqual(len(context["questions"]), 2)
+        self.assertIn("interviewSubject", context)
+
+    def test_build_interview_context_includes_topic_details(self):
+        group = QuestionGroup.objects.create(name="Backend screening", description="<p>Test the backend stack</p>")
+        self.session.question_group = group
+        self.session.save(update_fields=["question_group", "update_at"])
+
+        context = build_interview_context(self.session)
+
+        self.assertEqual(context["questionGroupName"], "Backend screening")
+        self.assertEqual(context["questionGroupDescription"], "Test the backend stack")
+        self.assertEqual(context["interviewSubject"], "Backend screening")
 
     def test_get_next_question_payload_no_side_effect(self):
         q1 = Question.objects.create(text="Question 1")

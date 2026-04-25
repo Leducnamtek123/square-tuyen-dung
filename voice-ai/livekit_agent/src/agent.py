@@ -15,6 +15,7 @@ from livekit.agents import (
     cli,
     metrics,
 )
+from livekit.agents.job import get_job_context
 from livekit.agents.voice.events import CloseEvent
 from livekit.plugins import openai, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
@@ -124,8 +125,10 @@ async def entrypoint(ctx: JobContext) -> None:
         url = f"{config.BACKEND_API_URL}/v1/interview/compat/{ctx.room.name}/context"
         async with httpx.AsyncClient() as client:
             resp = await client.get(url, timeout=5.0)
-            if resp.status_code == 200:
-                data = resp.json()
+        if resp.status_code == 200:
+            data = resp.json()
+            if isinstance(data, dict):
+                agent_context.update(data)
                 agent_context["questions"] = data.get("questions", [])
     except Exception as e:
         logger.warning(f"Failed to fetch predefined questions: {e}")
@@ -164,6 +167,11 @@ async def entrypoint(ctx: JobContext) -> None:
                     asyncio.create_task(
                         interviewer._append_transcript(role, content.strip())
                     )
+
+        try:
+            get_job_context().shutdown(reason=ev.reason.value)
+        except Exception as exc:
+            logger.warning(f"Failed to shutdown job context: {exc}")
 
     # 6. Shutdown callback for final status sync
     async def on_shutdown() -> None:
