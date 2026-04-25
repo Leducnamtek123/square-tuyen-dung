@@ -264,7 +264,6 @@ const InterviewDetailCard = () => {
         <Grid size={{ xs: 12, lg: 4 }}>
           <Stack spacing={5}>
             <InterviewInfoCard session={session} t={t} i18n={i18n} />
-            <InterviewRecordingCard recordingUrl={recordingUrl} isCompleted={effectiveStatus === 'completed'} t={t} />
             <InterviewAiEvaluationCard session={session} effectiveStatus={effectiveStatus} t={t} onTriggerAi={handleTriggerAi} isTriggeringAi={state.isTriggeringAi} />
             <InterviewHrEvaluationForm
               evalForm={state.evalForm}
@@ -280,6 +279,7 @@ const InterviewDetailCard = () => {
 
         <Grid size={{ xs: 12, lg: 8 }}>
           <Stack spacing={5}>
+            <InterviewRecordingCard recordingUrl={recordingUrl} isCompleted={effectiveStatus === 'completed'} t={t} />
             <InterviewAnalysisPanel session={session} t={t} />
             <InterviewTranscriptPanel session={session} t={t} i18n={i18n} liveTranscripts={liveTranscripts} isLive={isSessionActive && sseConnected} />
           </Stack>

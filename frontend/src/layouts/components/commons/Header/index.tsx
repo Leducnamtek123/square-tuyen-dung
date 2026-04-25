@@ -51,7 +51,7 @@ const Header = (_props: HeaderProps) => {
       { id: '2', label: t('nav.services'), path: `/${ROUTES.EMPLOYER.SERVICE}` },
       { id: '3', label: t('nav.pricing'), path: `/${ROUTES.EMPLOYER.PRICING}` },
       { id: '4', label: t('nav.support'), path: `/${ROUTES.EMPLOYER.SUPPORT}` },
-      { id: '5', label: t('nav.blog'), path: `/${ROUTES.EMPLOYER.BLOG}` },
+      { id: '5', label: t('nav.blog'), path: localizeRoutePath(`/${ROUTES.JOB_SEEKER.NEWS}`, i18n.language) },
     ],
   }), [t, i18n.language]);
 
