@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 from typing import Dict, Iterable, Optional
 
 from django.conf import settings
@@ -39,6 +40,18 @@ def _truncate_text(value: str, limit: int) -> str:
     if len(value) <= limit:
         return value
     return value[: max(0, limit - 1)].rstrip() + "..."
+
+
+def _sanitize_transcript_text(value: str | None) -> str:
+    if not value:
+        return ""
+
+    text = strip_tags(value)
+    text = re.sub(r"<function=[^>]+>[\s\S]*?</function>", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"</?function[^>]*>", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"\{\s*\"stage_name\"\s*:\s*\"[^\"]+\"\s*\}", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"```[\s\S]*?```", " ", text)
+    return " ".join(text.split())
 
 
 def _build_interview_subject(
@@ -235,9 +248,12 @@ def run_status_side_effects(
 
 
 def append_transcript(session: InterviewSession, payload: Dict[str, object]) -> InterviewTranscript:
+    content = _sanitize_transcript_text(payload.get("content") if isinstance(payload, dict) else None)
     transcript = InterviewTranscript.objects.create(
         interview=session,
-        **payload,
+        speaker_role=str(payload.get("speaker_role", "")),
+        content=content,
+        speech_duration_ms=payload.get("speech_duration_ms"),
     )
     # Broadcast new transcript to SSE subscribers
     broadcast_interview_event(

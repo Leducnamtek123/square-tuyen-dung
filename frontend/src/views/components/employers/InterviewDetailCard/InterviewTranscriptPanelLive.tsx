@@ -11,7 +11,7 @@ import type { Participant } from 'livekit-client';
 import type { i18n, TFunction } from 'i18next';
 
 import { InterviewSession, InterviewTranscript } from '@/types/models';
-import { isLiveKitAgentParticipant } from '@/views/interviewPages/livekitParticipant';
+import { isLiveKitAgentParticipant, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
 import pc from '@/utils/muiColors';
 
 interface InterviewTranscriptPanelProps {
@@ -233,7 +233,7 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
                       }}
                     >
                       <Typography variant="body2" sx={{ lineHeight: 2, color: 'text.primary', fontWeight: 700, fontSize: '0.95rem' }}>
-                        {item.text}
+                        {sanitizeInterviewText(item.text)}
                       </Typography>
                     </Paper>
                   </Box>

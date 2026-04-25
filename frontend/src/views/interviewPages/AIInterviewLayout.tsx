@@ -10,12 +10,11 @@ import {
   useRoomContext,
   useLocalParticipant,
   useParticipants,
-  useChat,
   useTranscriptions,
 } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
-import { isLiveKitAgentIdentity, isLiveKitAgentParticipant } from './livekitParticipant';
+import { isLiveKitAgentIdentity, isLiveKitAgentParticipant, sanitizeInterviewText } from './livekitParticipant';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faMicrophone,
@@ -109,10 +108,10 @@ function isRoleMatch(participant: any, terms: string[]) {
 
 function AIParticipantTile({ trackRef, ...props }: { trackRef?: TrackReferenceOrPlaceholder; [key: string]: any }) {
   const participant = trackRef?.participant;
-  const isAgent = isLiveKitAgentParticipant(participant);
   const isSelf = participant?.isLocal;
   const isSpeaking = participant?.isSpeaking;
   const isEmployer = isRoleMatch(participant, ['employer', 'admin']);
+  const isAgent = !isSelf && !isEmployer ? true : isLiveKitAgentParticipant(participant);
 
   let displayName = participant?.name || participant?.identity || '';
   if (isAgent) displayName = 'AI Interviewer';
@@ -204,6 +203,7 @@ function TimelineMessage({
   live?: boolean;
 }) {
   const alignRight = entry.isLocal && !entry.isAgent;
+  const displayMessage = sanitizeInterviewText(entry.message);
 
   return (
     <Stack
@@ -297,7 +297,7 @@ function TimelineMessage({
         }}
       >
         <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.92)', fontWeight: 600, whiteSpace: 'pre-wrap' }}>
-          {entry.message}
+          {displayMessage}
         </Typography>
       </Paper>
     </Stack>
@@ -439,10 +439,12 @@ function ChatPanel({
 export function AIInterviewLayout() {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatDraft, setChatDraft] = useState('');
+  const [localChatEntries, setLocalChatEntries] = useState<TimelineEntry[]>([]);
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
   const timeFormatted = useLiveTimer();
   const participants = useParticipants();
   const { localParticipant } = useLocalParticipant();
-  const { chatMessages, send, isSending } = useChat();
+  const room = useRoomContext();
   const transcriptions = useTranscriptions();
 
   const rawTracks = useTracks(
@@ -517,25 +519,8 @@ export function AIInterviewLayout() {
   }, [localParticipant.identity, participants, transcriptions]);
 
   const roomChatEntries = React.useMemo<TimelineEntry[]>(() => {
-    return chatMessages.map((message) => {
-      const isLocal = message.from?.isLocal === true;
-      const isAgent = isLiveKitAgentParticipant(message.from);
-      const name = isAgent
-        ? 'AI Interviewer'
-        : isLocal
-          ? 'You'
-          : message.from?.name || message.from?.identity || 'Guest';
-
-      return {
-        id: message.id,
-        name,
-        message: message.message,
-        timestamp: message.timestamp,
-        isLocal,
-        isAgent,
-      };
-    });
-  }, [chatMessages]);
+    return localChatEntries;
+  }, [localChatEntries]);
 
   let showObservingBar = false;
   let observingMessage = '';
@@ -593,12 +578,29 @@ export function AIInterviewLayout() {
             onSend={async () => {
               const text = chatDraft.trim();
               if (!text) return;
-              await send(text);
-              setChatDraft('');
+              const now = Date.now();
+              setIsSendingMessage(true);
+              setLocalChatEntries((entries) => [
+                ...entries,
+                {
+                  id: `local-${now}`,
+                  name: 'You',
+                  message: text,
+                  timestamp: now,
+                  isLocal: true,
+                  isAgent: false,
+                },
+              ]);
+              try {
+                await room.localParticipant.sendText(text, { topic: 'lk.chat' });
+                setChatDraft('');
+              } finally {
+                setIsSendingMessage(false);
+              }
             }}
             chatDraft={chatDraft}
             setChatDraft={setChatDraft}
-            isSending={isSending}
+            isSending={isSendingMessage}
           />
         )}
       </div>

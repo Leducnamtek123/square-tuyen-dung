@@ -5,7 +5,7 @@ import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
 import type { TextStreamData } from '@livekit/components-core';
 import { type Participant } from 'livekit-client';
-import { isLiveKitAgentParticipant } from '@/views/interviewPages/livekitParticipant';
+import { isLiveKitAgentParticipant, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
 
 type Props = {
   t: (key: string, options?: Record<string, unknown>) => string;
@@ -107,7 +107,7 @@ const InterviewObserverDialogTranscript = ({ t }: Props) => {
                     }}
                   >
                     <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', fontWeight: 600, lineHeight: 1.8, fontSize: '0.85rem' }}>
-                      {item.content}
+                      {sanitizeInterviewText(item.content)}
                     </Typography>
                   </Paper>
                 </Box>

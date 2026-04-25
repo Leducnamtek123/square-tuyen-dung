@@ -40,3 +40,17 @@ export function isLiveKitAgentParticipant(participant?: Participant | null): boo
     return value === 'agent' || value === 'interviewer';
   });
 }
+
+export function sanitizeInterviewText(value: string): string {
+  if (!value) {
+    return '';
+  }
+
+  return value
+    .replace(/<function=[^>]+>[\s\S]*?<\/function>/gi, ' ')
+    .replace(/<\/?function[^>]*>/gi, ' ')
+    .replace(/\{\s*"stage_name"\s*:\s*"[^"]+"\s*\}/gi, ' ')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
