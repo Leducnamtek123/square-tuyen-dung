@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Box, Button, Chip, Paper, Stack, Typography, alpha } from '@mui/material';
 import {
   GridLayout,
   ParticipantTile,
@@ -9,7 +10,8 @@ import {
   useRoomContext,
   useLocalParticipant,
   useParticipants,
-  Chat,
+  useChat,
+  useTranscriptions,
 } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
@@ -26,81 +28,6 @@ import {
   faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
-
-const CHAT_STYLES = `
-  .lk-chat {
-    width: 100% !important;
-    height: 100% !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-  .lk-chat-header {
-    display: none !important;
-  }
-  .lk-chat-messages {
-    padding: 1rem !important;
-    background: transparent !important;
-  }
-  .lk-chat-entry {
-    margin-bottom: 1rem !important;
-  }
-  .lk-chat-entry .lk-participant-name {
-    font-size: 0.75rem !important;
-    color: #94a3b8 !important;
-    font-weight: 600 !important;
-    margin-bottom: 0.25rem !important;
-  }
-  .lk-chat-entry .lk-message-body {
-    font-size: 0.875rem !important;
-    color: #f1f5f9 !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    padding: 0.5rem 0.75rem !important;
-    border-radius: 0.75rem !important;
-    border-top-left-radius: 0.25rem !important;
-    display: inline-block !important;
-    word-break: break-word !important;
-  }
-  .lk-chat-form {
-    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-    padding: 1rem !important;
-    background: #0b1120 !important;
-    display: flex !important;
-    gap: 0.5rem !important;
-    margin: 0 !important;
-  }
-  .lk-chat-form-input {
-    background: rgba(255, 255, 255, 0.05) !important;
-    color: #f1f5f9 !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 0.5rem !important;
-    padding: 0.5rem 0.75rem !important;
-    font-size: 0.875rem !important;
-    flex: 1 !important;
-  }
-  .lk-chat-form-input:focus {
-    border-color: #38bdf8 !important;
-    outline: none !important;
-  }
-  .lk-button.lk-chat-form-button {
-    background: #0ea5e9 !important;
-    color: white !important;
-    border-radius: 0.5rem !important;
-    font-size: 0.875rem !important;
-    font-weight: 600 !important;
-    padding: 0.5rem 1rem !important;
-    border: none !important;
-    cursor: pointer !important;
-    transition: background 0.2s !important;
-  }
-  .lk-button.lk-chat-form-button:hover {
-    background: #38bdf8 !important;
-  }
-`;
 
 function useLiveTimer() {
   const [time, setTime] = useState(0);
@@ -186,9 +113,11 @@ function AIParticipantTile({ trackRef, ...props }: { trackRef?: TrackReferenceOr
   const isSpeaking = participant?.isSpeaking;
   const isEmployer = isRoleMatch(participant, ['employer', 'admin']);
 
-  let displayName = participant?.name || participant?.identity || 'Ứng viên';
-  if (isEmployer) displayName = 'Nhà tuyển dụng';
+  let displayName = participant?.name || participant?.identity || '';
   if (isAgent) displayName = 'AI Interviewer';
+  else if (isEmployer) displayName = 'Nhà tuyển dụng';
+  else if (isSelf) displayName = 'Bạn';
+  else if (!displayName) displayName = 'Ứng viên';
 
   if (isAgent) {
     return (
@@ -249,15 +178,303 @@ function AIParticipantTile({ trackRef, ...props }: { trackRef?: TrackReferenceOr
   );
 }
 
-function ChatPanel() {
+type TimelineEntry = {
+  id: string;
+  name: string;
+  message: string;
+  timestamp: number;
+  isLocal: boolean;
+  isAgent: boolean;
+};
+
+function formatTimelineTime(timestamp: number) {
+  return new Date(timestamp).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+function TimelineMessage({
+  entry,
+  live = false,
+}: {
+  entry: TimelineEntry;
+  live?: boolean;
+}) {
+  const alignRight = entry.isLocal && !entry.isAgent;
+
   return (
-    <div className="absolute right-0 top-0 bottom-0 z-30 flex h-full w-[312px] flex-col border-l border-white/8 bg-[#0b1120] shadow-[-10px_0_30px_rgba(0,0,0,0.5)] md:w-[320px]">
-      <div className="shrink-0 border-b border-white/8 bg-[#0b1120] px-4 py-3">
-        <p className="text-sm font-bold text-white">Chat</p>
+    <Stack
+      spacing={0.75}
+      alignItems={alignRight ? 'flex-end' : 'flex-start'}
+      sx={{ width: '100%' }}
+    >
+      <Stack
+        direction="row"
+        spacing={1}
+        alignItems="center"
+        sx={{
+          alignSelf: alignRight ? 'flex-end' : 'flex-start',
+          flexWrap: 'wrap',
+          justifyContent: alignRight ? 'flex-end' : 'flex-start',
+        }}
+      >
+        <Chip
+          label={entry.isAgent ? 'AI' : entry.isLocal ? 'You' : 'Guest'}
+          size="small"
+          sx={{
+            height: 20,
+            fontSize: '0.58rem',
+            fontWeight: 900,
+            letterSpacing: 1.1,
+            bgcolor: entry.isAgent
+              ? alpha('#8b5cf6', 0.18)
+              : entry.isLocal
+                ? alpha('#0ea5e9', 0.18)
+                : alpha('#94a3b8', 0.12),
+            color: entry.isAgent
+              ? '#c4b5fd'
+              : entry.isLocal
+                ? '#7dd3fc'
+                : '#cbd5e1',
+            border: '1px solid',
+            borderColor: entry.isAgent
+              ? alpha('#8b5cf6', 0.28)
+              : entry.isLocal
+                ? alpha('#0ea5e9', 0.24)
+                : alpha('#94a3b8', 0.16),
+          }}
+        />
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+          {entry.name}
+        </Typography>
+        <Typography variant="caption" sx={{ color: 'text.disabled', fontFamily: 'monospace' }}>
+          {formatTimelineTime(entry.timestamp)}
+        </Typography>
+        {live && (
+          <Chip
+            label="LIVE"
+            size="small"
+            sx={{
+              height: 18,
+              fontSize: '0.55rem',
+              fontWeight: 900,
+              bgcolor: alpha('#22c55e', 0.12),
+              color: '#22c55e',
+              border: '1px solid',
+              borderColor: alpha('#22c55e', 0.18),
+            }}
+          />
+        )}
+      </Stack>
+      <Paper
+        elevation={0}
+        sx={{
+          maxWidth: '100%',
+          width: 'fit-content',
+          px: 2,
+          py: 1.5,
+          borderRadius: 3,
+          border: '1px solid',
+          borderColor: entry.isAgent
+            ? alpha('#8b5cf6', 0.16)
+            : entry.isLocal
+              ? alpha('#0ea5e9', 0.16)
+              : alpha('#334155', 0.5),
+          bgcolor: entry.isAgent
+            ? alpha('#8b5cf6', 0.08)
+            : entry.isLocal
+              ? alpha('#0ea5e9', 0.08)
+              : alpha('#020617', 0.7),
+          color: '#fff',
+          boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
+          lineHeight: 1.75,
+          fontWeight: 600,
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+        }}
+      >
+        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.92)', fontWeight: 600, whiteSpace: 'pre-wrap' }}>
+          {entry.message}
+        </Typography>
+      </Paper>
+    </Stack>
+  );
+}
+
+function ChatPanel({
+  transcriptEntries,
+  chatEntries,
+  activeTab,
+  onTabChange,
+  onSend,
+  chatDraft,
+  setChatDraft,
+  isSending,
+}: {
+  transcriptEntries: TimelineEntry[];
+  chatEntries: TimelineEntry[];
+  activeTab: 'transcript' | 'chat';
+  onTabChange: (value: 'transcript' | 'chat') => void;
+  onSend: () => void;
+  chatDraft: string;
+  setChatDraft: React.Dispatch<React.SetStateAction<string>>;
+  isSending: boolean;
+}) {
+  const transcriptScrollRef = React.useRef<HTMLDivElement>(null);
+  const chatScrollRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const target = activeTab === 'transcript' ? transcriptScrollRef.current : chatScrollRef.current;
+    if (!target) return;
+    target.scrollTop = target.scrollHeight;
+  }, [activeTab, transcriptEntries.length, chatEntries.length]);
+
+  return (
+    <div className="absolute right-0 top-0 bottom-0 z-30 flex h-full w-[352px] flex-col overflow-hidden border-l border-white/8 bg-[#0b1120] shadow-[-10px_0_30px_rgba(0,0,0,0.5)] md:w-[380px]">
+      <div className="shrink-0 border-b border-white/8 bg-[#0b1120]/96 px-4 py-3 backdrop-blur-xl">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm font-bold text-white">Conversation</p>
+          <Stack direction="row" spacing={1}>
+            <Chip
+              label={`Transcript ${transcriptEntries.length}`}
+              size="small"
+              onClick={() => onTabChange('transcript')}
+              sx={{
+                cursor: 'pointer',
+                fontWeight: 900,
+                bgcolor: activeTab === 'transcript' ? alpha('#0ea5e9', 0.16) : alpha('#ffffff', 0.04),
+                color: activeTab === 'transcript' ? '#7dd3fc' : 'rgba(255,255,255,0.7)',
+                border: '1px solid',
+                borderColor: activeTab === 'transcript' ? alpha('#0ea5e9', 0.28) : alpha('#ffffff', 0.08),
+              }}
+            />
+            <Chip
+              label={`Chat ${chatEntries.length}`}
+              size="small"
+              onClick={() => onTabChange('chat')}
+              sx={{
+                cursor: 'pointer',
+                fontWeight: 900,
+                bgcolor: activeTab === 'chat' ? alpha('#8b5cf6', 0.16) : alpha('#ffffff', 0.04),
+                color: activeTab === 'chat' ? '#ddd6fe' : 'rgba(255,255,255,0.7)',
+                border: '1px solid',
+                borderColor: activeTab === 'chat' ? alpha('#8b5cf6', 0.28) : alpha('#ffffff', 0.08),
+              }}
+            />
+          </Stack>
+        </div>
       </div>
-      <div className="relative min-h-0 flex-1 overflow-hidden">
-        <style>{CHAT_STYLES}</style>
-        <Chat />
+
+      <div className="min-h-0 flex-1 overflow-hidden">
+        {activeTab === 'transcript' ? (
+          <Box
+            ref={transcriptScrollRef}
+            sx={{
+              height: '100%',
+              overflowY: 'auto',
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1.5,
+              '&::-webkit-scrollbar': { width: 6 },
+              '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.12)', borderRadius: 3 },
+            }}
+          >
+            {transcriptEntries.length > 0 ? transcriptEntries.map((entry) => (
+              <TimelineMessage key={entry.id} entry={entry} live />
+            )) : (
+              <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', textAlign: 'center', px: 2 }}>
+                <Stack spacing={1}>
+                  <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900 }}>
+                    Waiting for transcript
+                  </Typography>
+                  <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                    LiveKit text streams will appear here as soon as the agent speaks.
+                  </Typography>
+                </Stack>
+              </Box>
+            )}
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              minHeight: 0,
+            }}
+          >
+            <Box
+              ref={chatScrollRef}
+              sx={{
+                flex: 1,
+                minHeight: 0,
+                overflowY: 'auto',
+                p: 2,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 1.5,
+                '&::-webkit-scrollbar': { width: 6 },
+                '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.12)', borderRadius: 3 },
+              }}
+            >
+              {chatEntries.length > 0 ? chatEntries.map((entry) => (
+                <TimelineMessage key={entry.id} entry={entry} />
+              )) : (
+                <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', textAlign: 'center', px: 2 }}>
+                  <Stack spacing={1}>
+                    <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900 }}>
+                      No chat yet
+                    </Typography>
+                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                      Send a room chat message to everyone in the interview.
+                    </Typography>
+                  </Stack>
+                </Box>
+              )}
+            </Box>
+
+            <Box
+              component="form"
+              onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+                event.preventDefault();
+                onSend();
+              }}
+              sx={{
+                p: 1.5,
+                borderTop: '1px solid rgba(255,255,255,0.06)',
+                bgcolor: 'rgba(2, 6, 23, 0.9)',
+                backdropFilter: 'blur(12px)',
+              }}
+            >
+              <Stack direction="row" spacing={1}>
+                <input
+                  value={chatDraft}
+                  onChange={(event) => setChatDraft(event.target.value)}
+                  placeholder="Write a message..."
+                  className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-cyan-400/40 focus:bg-white/8"
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={!chatDraft.trim() || isSending}
+                  sx={{
+                    borderRadius: 2.5,
+                    minWidth: 76,
+                    fontWeight: 800,
+                    textTransform: 'none',
+                    bgcolor: '#38bdf8',
+                    '&:hover': { bgcolor: '#0ea5e9' },
+                    '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.35)' },
+                  }}
+                >
+                  Send
+                </Button>
+              </Stack>
+            </Box>
+          </Box>
+        )}
       </div>
     </div>
   );
@@ -265,9 +482,13 @@ function ChatPanel() {
 
 export function AIInterviewLayout() {
   const [chatOpen, setChatOpen] = useState(false);
+  const [panelTab, setPanelTab] = useState<'transcript' | 'chat'>('transcript');
+  const [chatDraft, setChatDraft] = useState('');
   const timeFormatted = useLiveTimer();
   const participants = useParticipants();
   const { localParticipant } = useLocalParticipant();
+  const { chatMessages, send, isSending } = useChat();
+  const transcriptions = useTranscriptions();
 
   const rawTracks = useTracks(
     [
@@ -315,6 +536,49 @@ export function AIInterviewLayout() {
   if (employerWithCamera) {
     finalTracks = finalTracks.filter((track) => !isRoleMatch(track.participant, ['agent', 'interviewer']));
   }
+
+  const transcriptEntries = React.useMemo<TimelineEntry[]>(() => {
+    return transcriptions.map((item) => {
+      const participant = participants.find((p) => p.identity === item.participantInfo.identity);
+      const isAgent = isRoleMatch(participant, ['agent', 'interviewer']) || isRoleMatch(item.participantInfo.identity, ['agent', 'interviewer']);
+      const isLocal = participant?.isLocal ?? item.participantInfo.identity === localParticipant.identity;
+      const name = isAgent
+        ? 'AI Interviewer'
+        : isLocal
+          ? 'You'
+          : participant?.name || participant?.identity || item.participantInfo.identity || 'Guest';
+
+      return {
+        id: `${item.streamInfo.id}`,
+        name,
+        message: item.text,
+        timestamp: item.streamInfo.timestamp,
+        isLocal,
+        isAgent,
+      };
+    });
+  }, [localParticipant.identity, participants, transcriptions]);
+
+  const roomChatEntries = React.useMemo<TimelineEntry[]>(() => {
+    return chatMessages.map((message) => {
+      const isLocal = message.from?.isLocal === true;
+      const isAgent = isRoleMatch(message.from, ['agent', 'interviewer']);
+      const name = isAgent
+        ? 'AI Interviewer'
+        : isLocal
+          ? 'You'
+          : message.from?.name || message.from?.identity || 'Guest';
+
+      return {
+        id: message.id,
+        name,
+        message: message.message,
+        timestamp: message.timestamp,
+        isLocal,
+        isAgent,
+      };
+    });
+  }, [chatMessages]);
 
   let showObservingBar = false;
   let observingMessage = '';
@@ -365,7 +629,24 @@ export function AIInterviewLayout() {
           <CustomControlBar chatOpen={chatOpen} setChatOpen={setChatOpen} />
         </div>
 
-        {chatOpen && <ChatPanel />}
+        {chatOpen && (
+          <ChatPanel
+            transcriptEntries={transcriptEntries}
+            chatEntries={roomChatEntries}
+            activeTab={panelTab}
+            onTabChange={setPanelTab}
+            onSend={async () => {
+              const text = chatDraft.trim();
+              if (!text) return;
+              await send(text);
+              setChatDraft('');
+              setPanelTab('chat');
+            }}
+            chatDraft={chatDraft}
+            setChatDraft={setChatDraft}
+            isSending={isSending}
+          />
+        )}
       </div>
     </LayoutContextProvider>
   );

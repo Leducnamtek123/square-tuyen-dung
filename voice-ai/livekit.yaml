@@ -2,8 +2,8 @@ port: 7880
 bind_addresses:
   - "0.0.0.0"
 rtc:
-  use_external_ip: true
-  node_ip: 192.168.10.111
+  use_external_ip: false
+  node_ip: 127.0.0.1
   port_range_start: 50000
   port_range_end: 50010
 keys:

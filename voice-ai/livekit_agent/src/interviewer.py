@@ -104,17 +104,11 @@ class Interviewer(Agent):
         """Called when the agent joins the session."""
         logger.info("Interviewer agent entered session. Generating initial greeting...")
         candidate_name = _brief_text(self._context.get("candidateName", "ung vien"), 80)
-        job_title = _brief_text(self._context.get("jobTitle", "dang ung tuyen"), 120)
 
-        # Use a deterministic greeting here to avoid LLM/tool-call failures
-        # during session bootstrap. The conversation can still use the LLM
-        # normally after the room is active.
+        # Keep the bootstrap greeting short so CPU TTS can finish quickly in
+        # local smoke tests and the agent can start the interview promptly.
         await self.session.say(
-            (
-                f"{DEFAULT_GREETING} "
-                f"Xin chao {candidate_name}, "
-                f"chung ta bat dau buoi phong van cho vi tri {job_title} nhe."
-            ),
+            f"{DEFAULT_GREETING} Xin chao {candidate_name}, bat dau phong van nhe.",
             allow_interruptions=False,
         )
 

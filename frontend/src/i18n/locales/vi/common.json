@@ -107,7 +107,8 @@
     "viewAttachedResume": "Xem hồ sơ đính kèm",
     "email": "Email",
     "back": "Quay lại",
-    "messages": "Tin nhắn"
+    "messages": "Tin nhắn",
+    "attachedResume": "Hồ sơ đính kèm"
   },
   "placeholders": {
     "selectCity": "Chọn Tỉnh/Thành phố",

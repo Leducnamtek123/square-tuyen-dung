@@ -121,7 +121,8 @@
     "email": "Email",
     "back": "Back",
     "notUpdated": "Not updated",
-    "messages": "Messages"
+    "messages": "Messages",
+    "attachedResume": "Attached Resume"
   },
   "placeholders": {
     "selectCity": "Select City/Province",

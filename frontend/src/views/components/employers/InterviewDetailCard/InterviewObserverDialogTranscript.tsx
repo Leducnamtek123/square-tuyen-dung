@@ -1,16 +1,54 @@
 import React from 'react';
 import { alpha, Avatar, Box, Chip, Paper, Stack, Typography } from '@mui/material';
+import { useParticipants, useTranscriptions } from '@livekit/components-react';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
-import type { SSETranscript } from '../../../employerPages/InterviewPages/hooks/useInterviewSSE';
+import type { TextStreamData } from '@livekit/components-core';
+import { type Participant } from 'livekit-client';
 
 type Props = {
-  liveTranscripts: SSETranscript[];
   t: (key: string, options?: Record<string, unknown>) => string;
 };
 
-const InterviewObserverDialogTranscript = ({ liveTranscripts, t }: Props) => (
-  <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+type TranscriptItem = {
+  id: string;
+  name: string;
+  content: string;
+  timestamp: number;
+  isAI: boolean;
+  isLocal: boolean;
+};
+
+const isRoleMatch = (participant: Participant | undefined, terms: string[]) => {
+  const identity = participant?.identity?.toLowerCase() ?? '';
+  const name = participant?.name?.toLowerCase() ?? '';
+  return terms.some((term) => identity.includes(term) || name.includes(term));
+};
+
+const mapTranscriptions = (items: TextStreamData[], participants: Participant[]): TranscriptItem[] => {
+  return items.map((item) => {
+    const participant = participants.find((p) => p.identity === item.participantInfo.identity);
+    const isAI = isRoleMatch(participant, ['agent', 'interviewer']);
+    const isLocal = participant?.isLocal === true;
+
+    return {
+      id: `${item.streamInfo.id}`,
+      name: isAI ? 'AI Interviewer' : isLocal ? 'You' : participant?.name || participant?.identity || 'Guest',
+      content: item.text,
+      timestamp: item.streamInfo.timestamp,
+      isAI,
+      isLocal,
+    };
+  });
+};
+
+const InterviewObserverDialogTranscript = ({ t }: Props) => {
+  const participants = useParticipants();
+  const transcriptions = useTranscriptions();
+  const liveTranscripts = React.useMemo(() => mapTranscriptions(transcriptions, participants), [participants, transcriptions]);
+
+  return (
+    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
     <Box sx={{ px: 3, py: 2, borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
       <Stack direction="row" alignItems="center" spacing={1}>
         <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900 }}>
@@ -45,33 +83,32 @@ const InterviewObserverDialogTranscript = ({ liveTranscripts, t }: Props) => (
       {liveTranscripts.length > 0 ? (
         <Stack spacing={3}>
           {liveTranscripts.map((item) => {
-            const isAI = item.speakerRole === 'ai_agent';
             return (
-              <Stack key={`${item.id}-${item.createAt || item.content}`} direction="row" spacing={1.5} alignItems="flex-start">
+              <Stack key={`${item.id}-${item.timestamp}-${item.content}`} direction="row" spacing={1.5} alignItems="flex-start">
                 <Avatar
                   sx={{
                     width: 32,
                     height: 32,
-                    bgcolor: isAI ? alpha('#0ea5e9', 0.2) : alpha('#a855f7', 0.2),
+                    bgcolor: item.isAI ? alpha('#0ea5e9', 0.2) : alpha('#a855f7', 0.2),
                     border: '1.5px solid',
-                    borderColor: isAI ? alpha('#0ea5e9', 0.3) : alpha('#a855f7', 0.3),
+                    borderColor: item.isAI ? alpha('#0ea5e9', 0.3) : alpha('#a855f7', 0.3),
                   }}
                 >
-                  {isAI ? <SmartToyIcon sx={{ fontSize: 16, color: '#0ea5e9' }} /> : <PersonIcon sx={{ fontSize: 16, color: '#a855f7' }} />}
+                  {item.isAI ? <SmartToyIcon sx={{ fontSize: 16, color: '#0ea5e9' }} /> : <PersonIcon sx={{ fontSize: 16, color: '#a855f7' }} />}
                 </Avatar>
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="caption" sx={{ fontWeight: 900, color: isAI ? '#0ea5e9' : '#a855f7', textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: 1.5 }}>
-                    {isAI ? t('employer:interviewLive.candidateCard.aiInterviewer') : t('employer:interviewLive.candidateCard.candidate')}
+                  <Typography variant="caption" sx={{ fontWeight: 900, color: item.isAI ? '#0ea5e9' : '#a855f7', textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: 1.5 }}>
+                    {item.name}
                   </Typography>
                   <Paper
                     elevation={0}
                     sx={{
                       mt: 0.5,
                       p: 2,
-                      bgcolor: isAI ? alpha('#0ea5e9', 0.06) : alpha('#a855f7', 0.06),
-                      borderRadius: isAI ? '0 12px 12px 12px' : '12px 0 12px 12px',
+                      bgcolor: item.isAI ? alpha('#0ea5e9', 0.06) : alpha('#a855f7', 0.06),
+                      borderRadius: item.isAI ? '0 12px 12px 12px' : '12px 0 12px 12px',
                       border: '1px solid',
-                      borderColor: isAI ? alpha('#0ea5e9', 0.1) : alpha('#a855f7', 0.1),
+                      borderColor: item.isAI ? alpha('#0ea5e9', 0.1) : alpha('#a855f7', 0.1),
                     }}
                   >
                     <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', fontWeight: 600, lineHeight: 1.8, fontSize: '0.85rem' }}>
@@ -111,6 +148,7 @@ const InterviewObserverDialogTranscript = ({ liveTranscripts, t }: Props) => (
       )}
     </Box>
   </Box>
-);
+  );
+};
 
 export default InterviewObserverDialogTranscript;

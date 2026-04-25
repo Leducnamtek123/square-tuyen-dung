@@ -12,6 +12,22 @@ from apps.interviews.services import (
     update_interview_status,
 )
 
+
+def _get_context_session(room_name: str) -> InterviewSession:
+    return (
+        InterviewSession.objects.select_related("candidate", "job_post", "question_group")
+        .prefetch_related("questions")
+        .get(room_name=room_name)
+    )
+
+
+def _get_question_session(room_name: str) -> InterviewSession:
+    return InterviewSession.objects.prefetch_related("questions").get(room_name=room_name)
+
+
+def _get_session(room_name: str) -> InterviewSession:
+    return InterviewSession.objects.get(room_name=room_name)
+
 @csrf_exempt
 def interview_context(request: HttpRequest, room_name: str):
     """
@@ -24,11 +40,7 @@ def interview_context(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
     try:
-        session = (
-            InterviewSession.objects.select_related("candidate", "job_post", "question_group")
-            .prefetch_related("questions")
-            .get(room_name=room_name)
-        )
+        session = _get_context_session(room_name)
         context_data = build_interview_context(session)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
@@ -59,7 +71,7 @@ def interview_next_question(request: HttpRequest, room_name: str):
         advance = bool(body.get("advance", True))
 
     try:
-        session = InterviewSession.objects.prefetch_related("questions").get(room_name=room_name)
+        session = _get_question_session(room_name)
         payload = get_next_question_payload(session)
         if advance and not payload.get("done"):
             advance_question_cursor(session)
@@ -94,7 +106,7 @@ def interview_status(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Missing `status`."}, status=400)
 
     try:
-        session = InterviewSession.objects.get(room_name=room_name)
+        session = _get_session(room_name)
         updated_status = update_interview_status(session, new_status)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
@@ -129,7 +141,7 @@ def interview_append_transcription(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Missing `content`."}, status=400)
 
     try:
-        session = InterviewSession.objects.get(room_name=room_name)
+        session = _get_session(room_name)
         transcript = append_transcript(
             session,
             {

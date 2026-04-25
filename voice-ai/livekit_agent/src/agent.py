@@ -13,6 +13,7 @@ from livekit.agents import (
     MetricsCollectedEvent,
     cli,
     metrics,
+    room_io,
 )
 from livekit.agents.job import get_job_context
 from livekit.agents.voice.events import CloseEvent
@@ -191,6 +192,9 @@ async def entrypoint(ctx: JobContext) -> None:
         await session.start(
             agent=interviewer,
             room=ctx.room,
+            room_output_options=room_io.RoomOutputOptions(
+                sync_transcription=False,
+            ),
         )
     except Exception:
         session_started = False

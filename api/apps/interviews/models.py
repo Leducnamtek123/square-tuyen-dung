@@ -118,7 +118,7 @@ class InterviewSession(CommonBaseModel):
 
     VALID_TRANSITIONS = {
         'draft': {'scheduled', 'cancelled'},
-        'scheduled': {'calibration', 'in_progress', 'cancelled'},
+        'scheduled': {'calibration', 'in_progress', 'completed', 'cancelled'},
         'calibration': {'in_progress', 'cancelled'},
         'in_progress': {'completed', 'interrupted', 'processing'},
         'processing': {'completed', 'interrupted'},

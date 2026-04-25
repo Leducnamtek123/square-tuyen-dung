@@ -3,6 +3,7 @@
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Box, Grid2 as Grid, Paper, Skeleton, Stack, Typography } from '@mui/material';
+import { LiveKitRoom } from '@livekit/components-react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { ROUTES } from '../../../../configs/constants';
@@ -13,6 +14,7 @@ import InterviewInfoCard from './InterviewInfoCard';
 import InterviewQuestionsCard from './InterviewQuestionsCard';
 import InterviewRecordingCard from './InterviewRecordingCard';
 import InterviewTranscriptPanel from './InterviewTranscriptPanel';
+import InterviewTranscriptPanelLive from './InterviewTranscriptPanelLive';
 import InterviewObserverDialog from './InterviewObserverDialog';
 import InterviewDetailHeader from './InterviewDetailHeader';
 import { useInterviewDetail, useInterviewMutations } from '../hooks/useEmployerQueries';
@@ -81,23 +83,6 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
-const getStatusColor = (status: string | undefined): 'success' | 'primary' | 'error' | 'info' | 'warning' | 'default' => {
-  switch (status) {
-    case 'completed':
-      return 'success';
-    case 'in_progress':
-      return 'primary';
-    case 'cancelled':
-      return 'error';
-    case 'processing':
-      return 'info';
-    case 'scheduled':
-      return 'warning';
-    default:
-      return 'default';
-  }
-};
-
 const InterviewDetailCard = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useRouter();
@@ -108,7 +93,7 @@ const InterviewDetailCard = () => {
   const { data: session, isLoading: loading } = useInterviewDetail(id);
   const { submitEvaluation, isMutating: isInterviewMutating } = useInterviewMutations();
   const isSessionActive = session ? ACTIVE_STATUSES.includes(session.status) : false;
-  const { liveTranscripts, liveStatus, connected: sseConnected } = useInterviewSSE({
+  const { liveStatus, connected: sseConnected } = useInterviewSSE({
     sessionId: session?.id,
     enabled: isSessionActive,
   });
@@ -134,6 +119,46 @@ const InterviewDetailCard = () => {
       },
     });
   }, [session]);
+
+  React.useEffect(() => {
+    if (isSessionActive || !state.connectionDetails) return;
+    dispatch({ type: 'set_connection_details', payload: null });
+    dispatch({ type: 'set_observer_open', payload: false });
+  }, [isSessionActive, state.connectionDetails]);
+
+  const ensureObserverConnection = React.useCallback(
+    async (openAfterConnect: boolean) => {
+      if (!session?.id) return false;
+      if (state.connectionDetails) {
+        if (openAfterConnect) {
+          dispatch({ type: 'set_observer_open', payload: true });
+        }
+        return true;
+      }
+
+      dispatch({ type: 'set_observer_loading', payload: true });
+      try {
+        const details = await interviewService.getObserverToken(session.id);
+        const serverUrl = details.serverUrl || details.server_url || process.env.NEXT_PUBLIC_LIVEKIT_URL || '';
+        dispatch({ type: 'set_connection_details', payload: { token: details.token, serverUrl } });
+        if (openAfterConnect) {
+          dispatch({ type: 'set_observer_open', payload: true });
+        }
+        return true;
+      } catch (e) {
+        errorHandling(e as AxiosError<{ errors?: ApiError }>);
+        return false;
+      } finally {
+        dispatch({ type: 'set_observer_loading', payload: false });
+      }
+    },
+    [session?.id, state.connectionDetails]
+  );
+
+  React.useEffect(() => {
+    if (!isSessionActive || state.connectionDetails || state.observerLoading) return;
+    void ensureObserverConnection(false);
+  }, [ensureObserverConnection, isSessionActive, state.connectionDetails, state.observerLoading]);
 
   const handleEvalChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -174,18 +199,7 @@ const InterviewDetailCard = () => {
   };
 
   const handleObserverMode = async () => {
-    if (!session?.id) return;
-    dispatch({ type: 'set_observer_loading', payload: true });
-    try {
-      const details = await interviewService.getObserverToken(session.id);
-      const serverUrl = details.serverUrl || details.server_url || process.env.NEXT_PUBLIC_LIVEKIT_URL || '';
-      dispatch({ type: 'set_connection_details', payload: { token: details.token, serverUrl } });
-      dispatch({ type: 'set_observer_open', payload: true });
-    } catch (e) {
-      errorHandling(e as AxiosError<{ errors?: ApiError }>);
-    } finally {
-      dispatch({ type: 'set_observer_loading', payload: false });
-    }
+    await ensureObserverConnection(true);
   };
 
   const handleForceEndInterview = async () => {
@@ -241,10 +255,9 @@ const InterviewDetailCard = () => {
   const canJoinLiveRoom = effectiveStatus !== 'cancelled' && effectiveStatus !== 'completed';
   const canObserve = effectiveStatus === 'in_progress';
   const recordingUrl = session.recordingUrl || session.recording_url || null;
-  const statusColor = getStatusColor(effectiveStatus);
-
-  return (
-    <Paper elevation={0} sx={{ p: { xs: 3, sm: 6 }, backgroundColor: 'background.paper', borderRadius: 4, boxShadow: (theme) => theme.customShadows?.z1, border: '1px solid', borderColor: 'divider' }}>
+  const liveKitReady = Boolean(isSessionActive && state.connectionDetails);
+  const detailContent = (
+    <>
       <InterviewDetailHeader
         session={session}
         effectiveStatus={effectiveStatus}
@@ -254,11 +267,11 @@ const InterviewDetailCard = () => {
         sseConnected={sseConnected}
         observerLoading={state.observerLoading}
         onBack={() => navigate.back()}
-      onTriggerObserver={handleObserverMode}
-      onForceEndInterview={handleForceEndInterview}
-      onJoinRoom={() => navigate.push(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id.toString())}`)}
-      t={t}
-    />
+        onTriggerObserver={handleObserverMode}
+        onForceEndInterview={handleForceEndInterview}
+        onJoinRoom={() => navigate.push(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id.toString())}`)}
+        t={t}
+      />
 
       <Grid container spacing={5}>
         <Grid size={{ xs: 12, lg: 4 }}>
@@ -281,23 +294,46 @@ const InterviewDetailCard = () => {
           <Stack spacing={5}>
             <InterviewRecordingCard recordingUrl={recordingUrl} isCompleted={effectiveStatus === 'completed'} t={t} />
             <InterviewAnalysisPanel session={session} t={t} />
-            <InterviewTranscriptPanel session={session} t={t} i18n={i18n} liveTranscripts={liveTranscripts} isLive={isSessionActive && sseConnected} />
+            {liveKitReady ? (
+              <InterviewTranscriptPanelLive session={session} t={t} i18n={i18n} />
+            ) : (
+              <InterviewTranscriptPanel session={session} t={t} i18n={i18n} />
+            )}
           </Stack>
         </Grid>
       </Grid>
 
       {(isInterviewMutating || state.isTriggeringAi) && <BackdropLoading />}
-      <InterviewObserverDialog
-        open={state.observerOpen}
-        onClose={() => dispatch({ type: 'set_observer_open', payload: false })}
-        sessionId={session.id}
-        candidateName={session.candidateName}
-        jobName={session.jobName}
-        liveTranscripts={liveTranscripts}
-        liveStatus={liveStatus}
-        sseConnected={sseConnected}
-        connectionDetails={state.connectionDetails}
-      />
+      {liveKitReady && (
+        <InterviewObserverDialog
+          open={state.observerOpen}
+          onClose={() => dispatch({ type: 'set_observer_open', payload: false })}
+          sessionId={session.id}
+          candidateName={session.candidateName}
+          jobName={session.jobName}
+          liveStatus={liveStatus}
+          sseConnected={sseConnected}
+        />
+      )}
+    </>
+  );
+
+  return (
+    <Paper elevation={0} sx={{ p: { xs: 3, sm: 6 }, backgroundColor: 'background.paper', borderRadius: 4, boxShadow: (theme) => theme.customShadows?.z1, border: '1px solid', borderColor: 'divider' }}>
+      {liveKitReady ? (
+        <LiveKitRoom
+          token={state.connectionDetails!.token}
+          serverUrl={state.connectionDetails!.serverUrl}
+          connect={true}
+          audio={false}
+          video={false}
+          options={{ adaptiveStream: true }}
+        >
+          {detailContent}
+        </LiveKitRoom>
+      ) : (
+        detailContent
+      )}
     </Paper>
   );
 };
