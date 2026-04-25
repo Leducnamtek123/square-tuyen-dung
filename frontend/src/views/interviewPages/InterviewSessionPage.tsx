@@ -17,6 +17,7 @@ import tokenService from '../../services/tokenService';
 import { transformInterviewSession } from '../../utils/transformers';
 import type { InterviewSession } from '../../types/models';
 import { PreflightRoom } from './PreflightRoom';
+import { AIInterviewLayout } from './AIInterviewLayout';
 import { cn } from '@/lib/utils';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -328,7 +329,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
             onDisconnected={terminateInterviewSession}
             style={{ height: '100%' }}
           >
-            <VideoConference />
+            <AIInterviewLayout />
             <RoomAudioRenderer />
           </LiveKitRoom>
         </div>
