@@ -685,11 +685,18 @@
       "form": {
         "title": "Title",
         "imageUrl": "Image URL",
-        "content": "Content"
+        "content": "Content",
+        "salary": "Expected Salary",
+        "frequency": "Notification Frequency (days)",
+        "position": "Position / Job Title",
+        "experience": "Experience (years)",
+        "careerId": "Field / Career",
+        "cityId": "City",
+        "isActive": "Active"
       },
       "cancel": "Cancel",
       "deleteTitle": "Delete Notification",
-      "deleteConfirm": "Are you sure you want to delete?"
+      "deleteConfirm": "Are you sure you want to delete this notification?"
     },
     "interviews": {
       "bulkSelect": {

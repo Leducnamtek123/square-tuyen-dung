@@ -29,6 +29,8 @@ const STEPS: { key: Step; label: string; desc: string }[] = [
   { key: 'connected', label: '3. Trong phòng PV',    desc: 'Giao diện phỏng vấn live' },
 ];
 
+import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
+
 // ─── Mock Participant Tile ────────────────────────────────────────────────────
 function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
   name: string; isAI?: boolean; isSelf?: boolean; speaking?: boolean;
@@ -37,11 +39,21 @@ function MockTile({ name, isAI = false, isSelf = false, speaking = false }: {
     <div className={`relative flex flex-col items-center justify-center rounded-2xl border bg-[#0f172a] overflow-hidden aspect-video
       ${speaking ? 'border-cyan-400/60 shadow-[0_0_0_2px_rgba(14,165,233,0.3)]' : 'border-white/8'}`}>
       {/* Fake video bg */}
-      <div className={`absolute inset-0 ${isAI ? 'bg-gradient-to-br from-violet-900/40 to-cyan-900/30' : isSelf ? 'bg-gradient-to-br from-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-950 to-slate-900'}`} />
-      {/* Avatar */}
-      <div className={`relative z-10 flex h-16 w-16 items-center justify-center rounded-full border text-2xl
-        ${isAI ? 'border-violet-400/40 bg-violet-500/20 text-violet-300' : 'border-cyan-400/30 bg-cyan-500/10 text-slate-200'}`}>
-        <FontAwesomeIcon icon={isAI ? faRobot : faUser} />
+      <div className={`absolute inset-0 ${isAI ? 'bg-slate-950' : isSelf ? 'bg-gradient-to-br from-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-950 to-slate-900'}`} />
+      {/* Avatar / Visualizer */}
+      <div className="relative z-10 flex h-full w-full items-center justify-center">
+        {isAI ? (
+           <AgentAudioVisualizerAura 
+             state={speaking ? 'speaking' : 'listening'} 
+             size="lg" 
+             color="#8b5cf6" 
+           />
+        ) : (
+          <div className={`flex h-16 w-16 items-center justify-center rounded-full border text-2xl
+            ${isSelf ? 'border-cyan-400/30 bg-cyan-500/10 text-slate-200' : 'border-slate-500/30 bg-slate-500/10 text-slate-200'}`}>
+            <FontAwesomeIcon icon={faUser} />
+          </div>
+        )}
       </div>
       {/* Speaking pulse */}
       {speaking && (

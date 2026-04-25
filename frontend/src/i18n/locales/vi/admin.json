@@ -685,11 +685,18 @@
       "form": {
         "title": "Tiêu đề",
         "imageUrl": "URL Ảnh",
-        "content": "Nội dung"
+        "content": "Nội dung",
+        "salary": "Mức lương kỳ vọng",
+        "frequency": "Tần suất thông báo (ngày)",
+        "position": "Vị trí / Tên công việc",
+        "experience": "Kinh nghiệm (năm)",
+        "careerId": "Lĩnh vực / Ngành nghề",
+        "cityId": "Tỉnh / Thành phố",
+        "isActive": "Đang hoạt động"
       },
       "cancel": "Hủy",
       "deleteTitle": "Xóa thông báo",
-      "deleteConfirm": "Bạn có chắc muốn xóa?"
+      "deleteConfirm": "Bạn có chắc muốn xóa thông báo này?"
     },
     "interviews": {
       "bulkSelect": {
