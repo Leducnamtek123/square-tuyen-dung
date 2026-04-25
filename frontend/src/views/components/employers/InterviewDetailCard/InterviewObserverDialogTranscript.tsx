@@ -1,6 +1,6 @@
 import React from 'react';
 import { alpha, Avatar, Box, Chip, Paper, Stack, Typography } from '@mui/material';
-import { useParticipants, useTranscriptions } from '@livekit/components-react';
+import { useChat, useParticipants, useTranscriptions } from '@livekit/components-react';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
 import type { TextStreamData } from '@livekit/components-core';
@@ -37,10 +37,32 @@ const mapTranscriptions = (items: TextStreamData[], participants: Participant[])
   });
 };
 
+const mapChatMessages = (items: ReturnType<typeof useChat>['chatMessages']): TranscriptItem[] => {
+  return items.map((item) => {
+    const participant = item.from;
+    const isAI = isLiveKitAgentParticipant(participant);
+    const isLocal = participant?.isLocal === true;
+
+    return {
+      id: item.id,
+      name: isAI ? 'AI Interviewer' : isLocal ? 'You' : participant?.name || participant?.identity || 'Guest',
+      content: item.message,
+      timestamp: item.timestamp,
+      isAI,
+      isLocal,
+    };
+  });
+};
+
 const InterviewObserverDialogTranscript = ({ t }: Props) => {
   const participants = useParticipants();
   const transcriptions = useTranscriptions();
-  const liveTranscripts = React.useMemo(() => mapTranscriptions(transcriptions, participants), [participants, transcriptions]);
+  const chatOptions = React.useMemo(() => ({ channelTopic: 'lk.chat' }), []);
+  const chat = useChat(chatOptions);
+  const liveTranscripts = React.useMemo(
+    () => [...mapTranscriptions(transcriptions, participants), ...mapChatMessages(chat.chatMessages)],
+    [chat.chatMessages, participants, transcriptions],
+  );
 
   return (
     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

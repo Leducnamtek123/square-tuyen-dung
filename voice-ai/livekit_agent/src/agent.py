@@ -18,6 +18,7 @@ from livekit.agents import (
 )
 from livekit.agents.job import get_job_context
 from livekit.agents.voice.events import CloseEvent
+from livekit.agents.llm import ChatMessage
 from livekit.plugins import openai, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 import openai as openai_lib
@@ -137,6 +138,31 @@ async def entrypoint(ctx: JobContext) -> None:
     # 3. Create Interviewer Agent (greeting is handled in on_enter)
     interviewer = Interviewer(context=agent_context)
 
+    async def _on_text_input(sess, ev) -> None:
+        text = (ev.text or "").strip()
+        if not text:
+            return
+
+        logger.info(
+            "Received text interview input for room %s from %s: %s",
+            ctx.room.name,
+            getattr(ev.participant, "identity", "unknown"),
+            text,
+        )
+        await interviewer.record_transcript("candidate", text)
+        try:
+            await sess.interrupt(force=True)
+        except Exception as exc:
+            logger.info(
+                "Skipping interrupt before text reply for room %s: %s",
+                ctx.room.name,
+                exc,
+            )
+        # Text-chat turns should stay on the conversational path only.
+        # Disabling tool selection here avoids function-call failures from the
+        # LLM when a candidate sends a plain text answer.
+        sess.generate_reply(user_input=text, tools=[], tool_choice="none")
+
     # 4. Setup Session (Standard 1.5.x Pattern)
     session = AgentSession(
         stt=stt_model,
@@ -153,6 +179,20 @@ async def entrypoint(ctx: JobContext) -> None:
     def _on_metrics_collected(ev: MetricsCollectedEvent) -> None:
         metrics.log_metrics(ev.metrics)
 
+    @session.on("conversation_item_added")
+    def _on_conversation_item_added(ev) -> None:
+        item = getattr(ev, "item", None)
+        if not isinstance(item, ChatMessage):
+            return
+
+        content = item.text_content or ""
+        content = content.strip()
+        if not content:
+            return
+
+        role = "candidate" if item.role == "user" else "ai_agent"
+        asyncio.create_task(interviewer.record_transcript(role, content))
+
     @session.on("close")
     def _on_close(ev: CloseEvent) -> None:
         close_reason = getattr(ev.reason, "value", ev.reason)
@@ -166,7 +206,7 @@ async def entrypoint(ctx: JobContext) -> None:
                 content = item.text_content
                 if content and content.strip():
                     asyncio.create_task(
-                        interviewer._append_transcript(role, content.strip())
+                        interviewer.record_transcript(role, content.strip())
                     )
 
         try:
@@ -192,12 +232,14 @@ async def entrypoint(ctx: JobContext) -> None:
         session_started = True
         # Mark interview as active only after the agent has a live room connection.
         await _update_backend_status(ctx.room.name, "in_progress")
+        room_options = room_io.RoomOptions(
+            text_input=room_io.TextInputOptions(text_input_cb=_on_text_input),
+            text_output=room_io.TextOutputOptions(sync_transcription=False),
+        )
         await session.start(
             agent=interviewer,
             room=ctx.room,
-            room_output_options=room_io.RoomOutputOptions(
-                sync_transcription=False,
-            ),
+            room_options=room_options,
         )
     except Exception:
         session_started = False

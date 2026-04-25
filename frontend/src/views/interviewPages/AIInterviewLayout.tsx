@@ -10,6 +10,7 @@ import {
   useRoomContext,
   useLocalParticipant,
   useParticipants,
+  useChat,
   useTranscriptions,
 } from '@livekit/components-react';
 import { Track } from 'livekit-client';
@@ -454,12 +455,12 @@ type AIInterviewLayoutProps = {
 export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatDraft, setChatDraft] = useState('');
-  const [localChatEntries, setLocalChatEntries] = useState<TimelineEntry[]>([]);
-  const [isSendingMessage, setIsSendingMessage] = useState(false);
   const timeFormatted = useLiveTimer();
   const participants = useParticipants();
   const { localParticipant } = useLocalParticipant();
   const room = useRoomContext();
+  const chatOptions = React.useMemo(() => ({ room, channelTopic: 'lk.chat' }), [room]);
+  const chat = useChat(chatOptions);
   const transcriptions = useTranscriptions();
 
   const rawTracks = useTracks(
@@ -534,8 +535,27 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   }, [localParticipant.identity, participants, transcriptions]);
 
   const roomChatEntries = React.useMemo<TimelineEntry[]>(() => {
-    return localChatEntries;
-  }, [localChatEntries]);
+    return chat.chatMessages.map((message) => {
+      const participant = message.from;
+      const isAgent = isLiveKitAgentParticipant(participant);
+      const isLocal = participant?.isLocal === true;
+      const name = isAgent
+        ? 'AI Interviewer'
+        : isLocal
+          ? 'You'
+          : participant?.name || participant?.identity || 'Guest';
+
+      return {
+        id: message.id,
+        name,
+        message: message.message,
+        timestamp: message.timestamp,
+        isLocal,
+        isAgent,
+        type: 'chat',
+      };
+    });
+  }, [chat.chatMessages]);
 
   let showObservingBar = false;
   let observingMessage = '';
@@ -593,29 +613,16 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
             onSend={async () => {
               const text = chatDraft.trim();
               if (!text) return;
-              const now = Date.now();
-              setIsSendingMessage(true);
-              setLocalChatEntries((entries) => [
-                ...entries,
-                {
-                  id: `local-${now}`,
-                  name: 'You',
-                  message: text,
-                  timestamp: now,
-                  isLocal: true,
-                  isAgent: false,
-                },
-              ]);
               try {
-                await room.localParticipant.sendText(text, { topic: 'lk.chat' });
+                await chat.send(text, { topic: 'lk.chat' });
                 setChatDraft('');
               } finally {
-                setIsSendingMessage(false);
+                // useChat handles sending state internally
               }
             }}
             chatDraft={chatDraft}
             setChatDraft={setChatDraft}
-            isSending={isSendingMessage}
+            isSending={chat.isSending}
           />
         )}
       </div>

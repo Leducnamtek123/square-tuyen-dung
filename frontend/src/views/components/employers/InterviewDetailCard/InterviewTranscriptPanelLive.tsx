@@ -5,7 +5,7 @@ import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { useParticipants, useTranscriptions } from '@livekit/components-react';
+import { useChat, useParticipants, useTranscriptions } from '@livekit/components-react';
 import type { TextStreamData } from '@livekit/components-core';
 import type { Participant } from 'livekit-client';
 import type { i18n, TFunction } from 'i18next';
@@ -43,15 +43,35 @@ const mapLiveTranscripts = (items: TextStreamData[], participants: Participant[]
   });
 };
 
+const mapChatMessages = (items: ReturnType<typeof useChat>['chatMessages']): TranscriptItem[] => {
+  return items.map((item) => {
+    const participant = item.from;
+    const isInterviewer = isLiveKitAgentParticipant(participant);
+
+    return {
+      speaker: isInterviewer ? 'interviewer' : 'candidate',
+      text: item.message,
+      timestamp: new Date(item.timestamp).toLocaleTimeString(),
+      id: item.id,
+      isLive: true,
+    };
+  });
+};
+
 const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n }) => {
   const transcriptEndRef = useRef<HTMLDivElement>(null);
   const participants = useParticipants();
   const transcriptions = useTranscriptions();
+  const chatOptions = React.useMemo(() => ({ channelTopic: 'lk.chat' }), []);
+  const chat = useChat(chatOptions);
 
   const mergedTranscripts = React.useMemo(() => {
     const existingTranscripts = Array.isArray(session.transcripts) ? session.transcripts : [];
     const existingIds = new Set(existingTranscripts.map((transcript: InterviewTranscript) => transcript.id));
-    const liveOnly = mapLiveTranscripts(transcriptions, participants).filter((item) => !existingIds.has(item.id));
+    const liveOnly = [
+      ...mapLiveTranscripts(transcriptions, participants),
+      ...mapChatMessages(chat.chatMessages),
+    ].filter((item) => !existingIds.has(item.id));
 
     const mapped: TranscriptItem[] = existingTranscripts.map((transcript: InterviewTranscript) => ({
       speaker: transcript.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
@@ -62,13 +82,13 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
     }));
 
     return [...mapped, ...liveOnly];
-  }, [i18n.language, participants, session.transcripts, transcriptions]);
+  }, [chat.chatMessages, i18n.language, participants, session.transcripts, transcriptions]);
 
   useEffect(() => {
-    if (transcriptions.length > 0 && transcriptEndRef.current) {
+    if ((transcriptions.length > 0 || chat.chatMessages.length > 0) && transcriptEndRef.current) {
       transcriptEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [transcriptions.length]);
+  }, [chat.chatMessages.length, transcriptions.length]);
 
   return (
     <Paper

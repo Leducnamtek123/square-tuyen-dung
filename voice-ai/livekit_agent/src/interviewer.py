@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from enum import Enum, auto
 from typing import Any
 
@@ -38,6 +39,22 @@ def _brief_text(value: Any, limit: int = 240) -> str:
     return text[: max(0, limit - 3)].rstrip() + "..."
 
 
+def _sanitize_output_text(value: Any) -> str:
+    text = _normalize_text(value)
+    if not text:
+        return ""
+
+    text = (
+        text.replace("\u200b", " ")
+        .replace("\ufeff", " ")
+    )
+    text = re.sub(r"<function=[^>]+>[\s\S]*?</function>", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"</?function[^>]*>", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"```[\s\S]*?```", " ", text)
+    text = re.sub(r"\{\s*\"stage_name\"\s*:\s*\"[^\"]+\"\s*\}", " ", text)
+    return " ".join(text.split()).strip()
+
+
 class Interviewer(Agent):
     def __init__(self, context: dict[str, Any] | None = None) -> None:
         instructions = INTERVIEWER_INSTRUCTIONS
@@ -47,6 +64,7 @@ class Interviewer(Agent):
         self._completed = False
         self._finalizing = False
         self._current_stage = InterviewStage.INTRODUCTION
+        self._recorded_transcripts: set[tuple[str, str]] = set()
 
         candidate_name = _brief_text(self._context.get("candidateName", "Ứng viên"), 80)
         job_title = _brief_text(self._context.get("jobTitle", "đang ứng tuyển"), 120)
@@ -162,6 +180,15 @@ class Interviewer(Agent):
 
         return "Cảm ơn bạn. Chúng ta kết thúc buổi phỏng vấn ở đây."
 
+    async def transcription_node(self, text, model_settings):
+        async for delta in super().transcription_node(text, model_settings):
+            if isinstance(delta, str):
+                sanitized = _sanitize_output_text(delta)
+                if sanitized:
+                    yield sanitized
+            else:
+                yield delta
+
     async def _shutdown_session(self) -> None:
         try:
             if self.session:
@@ -190,9 +217,16 @@ class Interviewer(Agent):
         if not content or not content.strip():
             return
         try:
+            cleaned_content = _sanitize_output_text(content)
+            if not cleaned_content:
+                return
+            fingerprint = (speaker_role, cleaned_content)
+            if fingerprint in self._recorded_transcripts:
+                return
+            self._recorded_transcripts.add(fingerprint)
             payload: dict[str, Any] = {
                 "speaker_role": speaker_role,
-                "content": content.strip(),
+                "content": cleaned_content,
             }
             if speech_duration_ms is not None:
                 payload["speech_duration_ms"] = int(speech_duration_ms)
@@ -203,3 +237,15 @@ class Interviewer(Agent):
                     logger.debug("append_transcript returned %d", resp.status_code)
         except Exception as exc:
             logger.warning("append_transcript failed: %s", exc)
+
+    async def record_transcript(
+        self,
+        speaker_role: str,
+        content: str,
+        speech_duration_ms: int | None = None,
+    ) -> None:
+        await self._append_transcript(
+            speaker_role=speaker_role,
+            content=content,
+            speech_duration_ms=speech_duration_ms,
+        )
