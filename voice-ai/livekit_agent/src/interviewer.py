@@ -106,13 +106,16 @@ class Interviewer(Agent):
         candidate_name = _brief_text(self._context.get("candidateName", "ung vien"), 80)
         job_title = _brief_text(self._context.get("jobTitle", "dang ung tuyen"), 120)
 
-        self.session.generate_reply(
-            instructions=(
+        # Use a deterministic greeting here to avoid LLM/tool-call failures
+        # during session bootstrap. The conversation can still use the LLM
+        # normally after the room is active.
+        await self.session.say(
+            (
                 f"{DEFAULT_GREETING} "
-                f"Hay chao don ung vien {candidate_name} ngan gon, "
-                f"tu nhien va gioi thieu buoi phong van vi tri {job_title}. "
-                "Khong noi dai, chi 1-2 cau."
-            )
+                f"Xin chao {candidate_name}, "
+                f"chung ta bat dau buoi phong van cho vi tri {job_title} nhe."
+            ),
+            allow_interruptions=False,
         )
 
     @function_tool

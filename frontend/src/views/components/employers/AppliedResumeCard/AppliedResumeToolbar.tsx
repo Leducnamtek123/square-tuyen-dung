@@ -99,13 +99,64 @@ const AppliedResumeToolbar: React.FC<Props> = ({
               if (newValue) onViewModeChange(newValue);
             }}
             size="small"
-            sx={{ bgcolor: 'background.neutral', '& .MuiToggleButton-root': { borderRadius: 3 } }}
+            sx={{
+              p: 0.5,
+              bgcolor: alpha(theme.palette.primary.main, 0.08),
+              borderRadius: 2,
+              '& .MuiToggleButtonGroup-grouped': {
+                border: 0,
+                borderRadius: 1.5,
+                '&.Mui-disabled': {
+                  border: 0,
+                },
+                '&:not(:first-of-type)': {
+                  borderRadius: 1.5,
+                },
+                '&:first-of-type': {
+                  borderRadius: 1.5,
+                },
+              },
+            }}
           >
-            <ToggleButton value="table" sx={{ fontWeight: 800, px: 2, textTransform: 'none' }}>
-              <ViewListIcon sx={{ mr: 1, fontSize: 18 }} /> {t('employer:appliedResume.tableView')}
+            <ToggleButton 
+              value="table" 
+              sx={{ 
+                fontWeight: 800, 
+                px: 3, 
+                py: 1,
+                textTransform: 'none',
+                color: 'primary.main',
+                '&.Mui-selected, &.Mui-selected:hover': {
+                  bgcolor: 'primary.main',
+                  color: 'primary.contrastText',
+                  boxShadow: theme.customShadows?.z1,
+                },
+                '&:hover': {
+                  bgcolor: alpha(theme.palette.primary.main, 0.12),
+                }
+              }}
+            >
+              <ViewListIcon sx={{ mr: 1, fontSize: 20 }} /> {t('employer:appliedResume.tableView')}
             </ToggleButton>
-            <ToggleButton value="board" sx={{ fontWeight: 800, px: 2, textTransform: 'none' }}>
-              <ViewKanbanIcon sx={{ mr: 1, fontSize: 18 }} /> {t('employer:appliedResume.boardView')}
+            <ToggleButton 
+              value="board" 
+              sx={{ 
+                fontWeight: 800, 
+                px: 3, 
+                py: 1,
+                textTransform: 'none',
+                color: 'primary.main',
+                '&.Mui-selected, &.Mui-selected:hover': {
+                  bgcolor: 'primary.main',
+                  color: 'primary.contrastText',
+                  boxShadow: theme.customShadows?.z1,
+                },
+                '&:hover': {
+                  bgcolor: alpha(theme.palette.primary.main, 0.12),
+                }
+              }}
+            >
+              <ViewKanbanIcon sx={{ mr: 1, fontSize: 20 }} /> {t('employer:appliedResume.boardView')}
             </ToggleButton>
           </ToggleButtonGroup>
 
