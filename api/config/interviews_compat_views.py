@@ -1,4 +1,5 @@
 import json
+from concurrent.futures import ThreadPoolExecutor
 
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -12,10 +13,14 @@ from apps.interviews.services import (
     update_interview_status,
 )
 
-# NOTE: All views here are SYNC (not async) because the backend runs on
-# Gunicorn + WSGI (config.wsgi:application), which does NOT support async views.
-# Django async views require an ASGI server (e.g. uvicorn/daphne).
-# Using async def under WSGI causes: "view returned an unawaited coroutine".
+# NOTE: These views stay sync, but ORM/service work is pushed into a worker
+# thread so the endpoints remain safe if Django serves them from an async-capable
+# stack. That avoids SynchronousOnlyOperation without requiring async views.
+
+
+def _run_in_thread(func):
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        return executor.submit(func).result()
 
 @csrf_exempt
 def interview_context(request: HttpRequest, room_name: str):
@@ -28,16 +33,19 @@ def interview_context(request: HttpRequest, room_name: str):
     if request.method != "GET":
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
-    try:
+    def _work():
         session = (
             InterviewSession.objects.select_related("candidate", "job_post", "question_group")
             .prefetch_related("questions")
             .get(room_name=room_name)
         )
+        return build_interview_context(session)
+
+    try:
+        context_data = _run_in_thread(_work)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
-    context_data = build_interview_context(session)
     return JsonResponse(context_data, status=200)
 
 
@@ -53,11 +61,6 @@ def interview_next_question(request: HttpRequest, room_name: str):
     if request.method not in ("POST", "GET"):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
-    try:
-        session = InterviewSession.objects.prefetch_related("questions").get(room_name=room_name)
-    except InterviewSession.DoesNotExist:
-        return JsonResponse({"detail": "Interview session not found."}, status=404)
-
     advance = True
     if request.method == "GET":
         advance = request.GET.get("advance", "1").lower() in ("1", "true", "yes")
@@ -68,12 +71,21 @@ def interview_next_question(request: HttpRequest, room_name: str):
             body = {}
         advance = bool(body.get("advance", True))
 
-    payload = get_next_question_payload(session)
-    if advance and not payload.get("done"):
-        advance_question_cursor(session)
-        payload["advance"] = True
-    else:
-        payload["advance"] = False
+    def _work():
+        session = InterviewSession.objects.prefetch_related("questions").get(room_name=room_name)
+        payload = get_next_question_payload(session)
+        if advance and not payload.get("done"):
+            advance_question_cursor(session)
+            payload["advance"] = True
+        else:
+            payload["advance"] = False
+        return payload
+
+    try:
+        payload = _run_in_thread(_work)
+    except InterviewSession.DoesNotExist:
+        return JsonResponse({"detail": "Interview session not found."}, status=404)
+
     return JsonResponse(payload, status=200)
 
 
@@ -90,11 +102,6 @@ def interview_status(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
     try:
-        session = InterviewSession.objects.get(room_name=room_name)
-    except InterviewSession.DoesNotExist:
-        return JsonResponse({"detail": "Interview session not found."}, status=404)
-
-    try:
         payload = json.loads(request.body.decode("utf-8") or "{}")
     except Exception:
         payload = {}
@@ -103,7 +110,15 @@ def interview_status(request: HttpRequest, room_name: str):
     if not new_status:
         return JsonResponse({"detail": "Missing `status`."}, status=400)
 
-    updated_status = update_interview_status(session, new_status)
+    def _work():
+        session = InterviewSession.objects.get(room_name=room_name)
+        return update_interview_status(session, new_status)
+
+    try:
+        updated_status = _run_in_thread(_work)
+    except InterviewSession.DoesNotExist:
+        return JsonResponse({"detail": "Interview session not found."}, status=404)
+
     return JsonResponse({"status": updated_status}, status=200)
 
 
@@ -120,11 +135,6 @@ def interview_append_transcription(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
     try:
-        session = InterviewSession.objects.get(room_name=room_name)
-    except InterviewSession.DoesNotExist:
-        return JsonResponse({"detail": "Interview session not found."}, status=404)
-
-    try:
         payload = json.loads(request.body.decode("utf-8") or "{}")
     except Exception:
         payload = {}
@@ -138,14 +148,22 @@ def interview_append_transcription(request: HttpRequest, room_name: str):
     if not isinstance(content, str) or not content.strip():
         return JsonResponse({"detail": "Missing `content`."}, status=400)
 
-    transcript = append_transcript(
-        session,
-        {
-            "speaker_role": speaker_role,
-            "content": content.strip(),
-            "speech_duration_ms": speech_duration_ms if speech_duration_ms is not None else None,
-        },
-    )
+    def _work():
+        session = InterviewSession.objects.get(room_name=room_name)
+        return append_transcript(
+            session,
+            {
+                "speaker_role": speaker_role,
+                "content": content.strip(),
+                "speech_duration_ms": speech_duration_ms if speech_duration_ms is not None else None,
+            },
+        )
+
+    try:
+        transcript = _run_in_thread(_work)
+    except InterviewSession.DoesNotExist:
+        return JsonResponse({"detail": "Interview session not found."}, status=404)
+
     return JsonResponse(
         {
             "id": transcript.id,

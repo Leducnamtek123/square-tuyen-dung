@@ -306,15 +306,6 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
             <span className={cn('inline-flex items-center rounded-md border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest', statusClass)}>
               {statusText}
             </span>
-            <Button
-              variant="contained"
-              color="error"
-              size="small"
-              onClick={terminateInterviewSession}
-              sx={{ borderRadius: '10px', fontWeight: 900, fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}
-            >
-              {t('controls.end')}
-            </Button>
           </div>
         </header>
 

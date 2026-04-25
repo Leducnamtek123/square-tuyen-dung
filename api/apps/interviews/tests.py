@@ -11,7 +11,7 @@ Tests cover:
 from unittest.mock import patch
 from decimal import Decimal
 
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
 from rest_framework.test import APIClient
 from rest_framework import status as drf_status
@@ -100,7 +100,7 @@ class InterviewServiceTests(TestCase):
         self.assertIsNotNone(self.session.start_time)
 
 
-class InterviewCompatEndpointTests(TestCase):
+class InterviewCompatEndpointTests(TransactionTestCase):
     def setUp(self):
         self.client = APIClient()
         self.candidate = User.objects.create_user(
@@ -126,6 +126,17 @@ class InterviewCompatEndpointTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertIn("question", response.json())
+
+    def test_status_endpoint_updates_session(self):
+        response = self.client.patch(
+            f"/api/v1/interview/compat/{self.session.room_name}/status",
+            data={"status": "scheduled"},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.session.refresh_from_db()
+        self.assertEqual(self.session.status, "scheduled")
+        self.assertEqual(response.json()["status"], "scheduled")
 
 
 # ─── NEW: Session CRUD API Tests ───────────────────────────────────────────
