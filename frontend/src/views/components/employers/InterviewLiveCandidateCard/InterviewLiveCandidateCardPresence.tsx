@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import interviewService from '../../../../services/interviewService';
 import { type InterviewSession } from '../../../../types/models';
 
-const ACTIVE_STATUSES = new Set(['in_progress', 'calibration', 'connecting', 'active']);
+const ACTIVE_STATUSES = new Set(['in_progress', 'calibration', 'connecting', 'active', 'interrupted']);
 const normalizeStatus = (status: string) => status.trim().toLowerCase();
 
 const getSafeLiveKitUrl = () => {

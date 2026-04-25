@@ -29,6 +29,8 @@ const getStatusColor = (status: string | undefined): 'success' | 'primary' | 'er
       return 'success';
     case 'in_progress':
       return 'primary';
+    case 'interrupted':
+      return 'warning';
     case 'cancelled':
       return 'error';
     case 'processing':
@@ -58,6 +60,7 @@ const InterviewDetailHeader = ({
   const themeStatus = getStatusColor(normalizedStatus);
   const statusDefaultValue = effectiveStatus ? effectiveStatus.replaceAll('_', ' ').toUpperCase() : '';
   const statusTranslationKey = effectiveStatus ? `interview:interviewListCard.statuses.${effectiveStatus}` : undefined;
+  const isInterrupted = normalizedStatus === 'interrupted';
 
   // Hardcoded rgba values — alpha(var(--mui-palette-X-main), n) crashes in MUI v6 (Error #9)
   const STATUS_CHIP: Record<string, { bg: string; border: string }> = {
@@ -121,6 +124,24 @@ const InterviewDetailHeader = ({
                 letterSpacing: '0.5px',
               }}
             />
+            {isInterrupted && (
+              <Chip
+                label={t('interview:interviewDetail.status.interruptedResume', { defaultValue: 'TẠM NGẮT, CÓ THỂ TIẾP TỤC' })}
+                size="small"
+                sx={{
+                  fontWeight: 900,
+                  borderRadius: 1.5,
+                  px: 1,
+                  bgcolor: 'rgba(245, 158, 11, 0.08)',
+                  color: 'warning.main',
+                  border: '1px solid',
+                  borderColor: 'rgba(245, 158, 11, 0.18)',
+                  textTransform: 'uppercase',
+                  fontSize: '0.72rem',
+                  letterSpacing: '0.5px',
+                }}
+              />
+            )}
             {isSessionActive && sseConnected && (
               <Chip
                 icon={
@@ -162,6 +183,13 @@ const InterviewDetailHeader = ({
               ID: <Box component="span" sx={{ color: 'text.secondary', fontWeight: 800 }}>{session.id}</Box>
             </Typography>
           </Stack>
+          {isInterrupted && (
+            <Typography variant="body2" sx={{ mt: 2, color: 'warning.main', fontWeight: 700 }}>
+              {t('interview:interviewDetail.messages.interruptedResumeHint', {
+                defaultValue: 'Phiên phỏng vấn đang tạm ngắt. Ứng viên vẫn có thể quay lại trong một khoảng thời gian ngắn để tiếp tục.',
+              })}
+            </Typography>
+          )}
         </Box>
 
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ width: { xs: '100%', md: 'auto' } }}>

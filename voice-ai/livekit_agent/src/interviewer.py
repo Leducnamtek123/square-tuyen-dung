@@ -159,6 +159,8 @@ class Interviewer(Agent):
         else:
             asyncio.create_task(self._shutdown_session())
 
+        asyncio.create_task(self._update_backend_status("completed"))
+
         return "Cam on ban. Chung ta ket thuc buoi phong van o day."
 
     async def _shutdown_session(self) -> None:

@@ -113,7 +113,7 @@ def _build_public_livekit_url(request) -> str:
 
 def create_livekit_participant_token(session: InterviewSession, request) -> Dict[str, str]:
     # Security: only allow when the session is joinable.
-    allowed_statuses = ("scheduled", "calibration", "in_progress")
+    allowed_statuses = ("scheduled", "calibration", "in_progress", "interrupted")
     if session.status not in allowed_statuses:
         raise SessionNotJoinableError(
             f"Khong the tham gia buoi phong van nay vi trang thai hien tai la: {session.get_status_display()}"
@@ -226,6 +226,12 @@ def run_status_side_effects(
         import threading
 
         threading.Thread(target=LiveKitService.start_recording, args=(session.room_name,)).start()
+
+    if new_status == "interrupted":
+        from .tasks import finalize_disconnected_session
+
+        grace_seconds = int(getattr(settings, "INTERVIEW_DISCONNECT_GRACE_SECONDS", 300))
+        finalize_disconnected_session.apply_async(args=[session.id], countdown=grace_seconds)
 
 
 def append_transcript(session: InterviewSession, payload: Dict[str, object]) -> InterviewTranscript:

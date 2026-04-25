@@ -11,6 +11,7 @@ import type { Participant } from 'livekit-client';
 import type { i18n, TFunction } from 'i18next';
 
 import { InterviewSession, InterviewTranscript } from '@/types/models';
+import { isLiveKitAgentParticipant } from '@/views/interviewPages/livekitParticipant';
 import pc from '@/utils/muiColors';
 
 interface InterviewTranscriptPanelProps {
@@ -27,16 +28,10 @@ type TranscriptItem = {
   isLive: boolean;
 };
 
-const isRoleMatch = (participant: Participant | undefined, terms: string[]) => {
-  const identity = participant?.identity?.toLowerCase() ?? '';
-  const name = participant?.name?.toLowerCase() ?? '';
-  return terms.some((term) => identity.includes(term) || name.includes(term));
-};
-
 const mapLiveTranscripts = (items: TextStreamData[], participants: Participant[]): TranscriptItem[] => {
   return items.map((item) => {
     const participant = participants.find((p) => p.identity === item.participantInfo.identity);
-    const isInterviewer = isRoleMatch(participant, ['agent', 'interviewer']);
+    const isInterviewer = isLiveKitAgentParticipant(participant);
 
     return {
       speaker: isInterviewer ? 'interviewer' : 'candidate',

@@ -5,6 +5,7 @@ import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
 import type { TextStreamData } from '@livekit/components-core';
 import { type Participant } from 'livekit-client';
+import { isLiveKitAgentParticipant } from '@/views/interviewPages/livekitParticipant';
 
 type Props = {
   t: (key: string, options?: Record<string, unknown>) => string;
@@ -19,16 +20,10 @@ type TranscriptItem = {
   isLocal: boolean;
 };
 
-const isRoleMatch = (participant: Participant | undefined, terms: string[]) => {
-  const identity = participant?.identity?.toLowerCase() ?? '';
-  const name = participant?.name?.toLowerCase() ?? '';
-  return terms.some((term) => identity.includes(term) || name.includes(term));
-};
-
 const mapTranscriptions = (items: TextStreamData[], participants: Participant[]): TranscriptItem[] => {
   return items.map((item) => {
     const participant = participants.find((p) => p.identity === item.participantInfo.identity);
-    const isAI = isRoleMatch(participant, ['agent', 'interviewer']);
+    const isAI = isLiveKitAgentParticipant(participant);
     const isLocal = participant?.isLocal === true;
 
     return {

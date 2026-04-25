@@ -15,6 +15,7 @@ import {
 } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
+import { isLiveKitAgentIdentity, isLiveKitAgentParticipant } from './livekitParticipant';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faMicrophone,
@@ -108,7 +109,7 @@ function isRoleMatch(participant: any, terms: string[]) {
 
 function AIParticipantTile({ trackRef, ...props }: { trackRef?: TrackReferenceOrPlaceholder; [key: string]: any }) {
   const participant = trackRef?.participant;
-  const isAgent = isRoleMatch(participant, ['agent', 'interviewer']);
+  const isAgent = isLiveKitAgentParticipant(participant);
   const isSelf = participant?.isLocal;
   const isSpeaking = participant?.isSpeaking;
   const isEmployer = isRoleMatch(participant, ['employer', 'admin']);
@@ -185,6 +186,7 @@ type TimelineEntry = {
   timestamp: number;
   isLocal: boolean;
   isAgent: boolean;
+  type?: 'transcript' | 'chat';
 };
 
 function formatTimelineTime(timestamp: number) {
@@ -305,8 +307,6 @@ function TimelineMessage({
 function ChatPanel({
   transcriptEntries,
   chatEntries,
-  activeTab,
-  onTabChange,
   onSend,
   chatDraft,
   setChatDraft,
@@ -314,64 +314,57 @@ function ChatPanel({
 }: {
   transcriptEntries: TimelineEntry[];
   chatEntries: TimelineEntry[];
-  activeTab: 'transcript' | 'chat';
-  onTabChange: (value: 'transcript' | 'chat') => void;
   onSend: () => void;
   chatDraft: string;
   setChatDraft: React.Dispatch<React.SetStateAction<string>>;
   isSending: boolean;
 }) {
-  const transcriptScrollRef = React.useRef<HTMLDivElement>(null);
-  const chatScrollRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  const combinedEntries = React.useMemo(() => {
+    const transcripts = transcriptEntries.map(e => ({ ...e, type: 'transcript' as const }));
+    const chats = chatEntries.map(e => ({ ...e, type: 'chat' as const }));
+    return [...transcripts, ...chats].sort((a, b) => a.timestamp - b.timestamp);
+  }, [transcriptEntries, chatEntries]);
 
   useEffect(() => {
-    const target = activeTab === 'transcript' ? transcriptScrollRef.current : chatScrollRef.current;
-    if (!target) return;
-    target.scrollTop = target.scrollHeight;
-  }, [activeTab, transcriptEntries.length, chatEntries.length]);
+    if (!scrollRef.current) return;
+    scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [combinedEntries.length]);
 
   return (
     <div className="absolute right-0 top-0 bottom-0 z-30 flex h-full w-[352px] flex-col overflow-hidden border-l border-white/8 bg-[#0b1120] shadow-[-10px_0_30px_rgba(0,0,0,0.5)] md:w-[380px]">
       <div className="shrink-0 border-b border-white/8 bg-[#0b1120]/96 px-4 py-3 backdrop-blur-xl">
         <div className="flex items-center justify-between gap-3">
           <p className="text-sm font-bold text-white">Conversation</p>
-          <Stack direction="row" spacing={1}>
-            <Chip
-              label={`Transcript ${transcriptEntries.length}`}
-              size="small"
-              onClick={() => onTabChange('transcript')}
-              sx={{
-                cursor: 'pointer',
-                fontWeight: 900,
-                bgcolor: activeTab === 'transcript' ? alpha('#0ea5e9', 0.16) : alpha('#ffffff', 0.04),
-                color: activeTab === 'transcript' ? '#7dd3fc' : 'rgba(255,255,255,0.7)',
-                border: '1px solid',
-                borderColor: activeTab === 'transcript' ? alpha('#0ea5e9', 0.28) : alpha('#ffffff', 0.08),
-              }}
-            />
-            <Chip
-              label={`Chat ${chatEntries.length}`}
-              size="small"
-              onClick={() => onTabChange('chat')}
-              sx={{
-                cursor: 'pointer',
-                fontWeight: 900,
-                bgcolor: activeTab === 'chat' ? alpha('#8b5cf6', 0.16) : alpha('#ffffff', 0.04),
-                color: activeTab === 'chat' ? '#ddd6fe' : 'rgba(255,255,255,0.7)',
-                border: '1px solid',
-                borderColor: activeTab === 'chat' ? alpha('#8b5cf6', 0.28) : alpha('#ffffff', 0.08),
-              }}
-            />
-          </Stack>
+          <Chip
+            label={`${combinedEntries.length} messages`}
+            size="small"
+            sx={{
+              fontWeight: 900,
+              bgcolor: alpha('#0ea5e9', 0.16),
+              color: '#7dd3fc',
+              border: '1px solid',
+              borderColor: alpha('#0ea5e9', 0.28),
+            }}
+          />
         </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-hidden">
-        {activeTab === 'transcript' ? (
+        <Box
+          sx={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+          }}
+        >
           <Box
-            ref={transcriptScrollRef}
+            ref={scrollRef}
             sx={{
-              height: '100%',
+              flex: 1,
+              minHeight: 0,
               overflowY: 'auto',
               p: 2,
               display: 'flex',
@@ -381,100 +374,63 @@ function ChatPanel({
               '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.12)', borderRadius: 3 },
             }}
           >
-            {transcriptEntries.length > 0 ? transcriptEntries.map((entry) => (
-              <TimelineMessage key={entry.id} entry={entry} live />
-            )) : (
+            {combinedEntries.length > 0 ? (
+              combinedEntries.map((entry) => (
+                <TimelineMessage key={`${entry.type}-${entry.id}`} entry={entry} live={entry.type === 'transcript'} />
+              ))
+            ) : (
               <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', textAlign: 'center', px: 2 }}>
                 <Stack spacing={1}>
                   <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900 }}>
-                    Waiting for transcript
+                    No messages yet
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    LiveKit text streams will appear here as soon as the agent speaks.
+                    Conversation will appear here when someone speaks or types.
                   </Typography>
                 </Stack>
               </Box>
             )}
           </Box>
-        ) : (
+
           <Box
+            component="form"
+            onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+              event.preventDefault();
+              onSend();
+            }}
             sx={{
-              height: '100%',
-              display: 'flex',
-              flexDirection: 'column',
-              minHeight: 0,
+              p: 1.5,
+              borderTop: '1px solid rgba(255,255,255,0.06)',
+              bgcolor: 'rgba(2, 6, 23, 0.9)',
+              backdropFilter: 'blur(12px)',
             }}
           >
-            <Box
-              ref={chatScrollRef}
-              sx={{
-                flex: 1,
-                minHeight: 0,
-                overflowY: 'auto',
-                p: 2,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 1.5,
-                '&::-webkit-scrollbar': { width: 6 },
-                '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.12)', borderRadius: 3 },
-              }}
-            >
-              {chatEntries.length > 0 ? chatEntries.map((entry) => (
-                <TimelineMessage key={entry.id} entry={entry} />
-              )) : (
-                <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', textAlign: 'center', px: 2 }}>
-                  <Stack spacing={1}>
-                    <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900 }}>
-                      No chat yet
-                    </Typography>
-                    <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                      Send a room chat message to everyone in the interview.
-                    </Typography>
-                  </Stack>
-                </Box>
-              )}
-            </Box>
-
-            <Box
-              component="form"
-              onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
-                event.preventDefault();
-                onSend();
-              }}
-              sx={{
-                p: 1.5,
-                borderTop: '1px solid rgba(255,255,255,0.06)',
-                bgcolor: 'rgba(2, 6, 23, 0.9)',
-                backdropFilter: 'blur(12px)',
-              }}
-            >
-              <Stack direction="row" spacing={1}>
-                <input
-                  value={chatDraft}
-                  onChange={(event) => setChatDraft(event.target.value)}
-                  placeholder="Write a message..."
-                  className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-cyan-400/40 focus:bg-white/8"
-                />
-                <Button
-                  type="submit"
-                  variant="contained"
-                  disabled={!chatDraft.trim() || isSending}
-                  sx={{
-                    borderRadius: 2.5,
-                    minWidth: 76,
-                    fontWeight: 800,
-                    textTransform: 'none',
-                    bgcolor: '#38bdf8',
-                    '&:hover': { bgcolor: '#0ea5e9' },
-                    '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.35)' },
-                  }}
-                >
-                  Send
-                </Button>
-              </Stack>
-            </Box>
+            <Stack direction="row" spacing={1}>
+              <input
+                value={chatDraft}
+                onChange={(event) => setChatDraft(event.target.value)}
+                placeholder="Write a message..."
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-cyan-400/40 focus:bg-white/8"
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                disabled={!chatDraft.trim() || isSending}
+                sx={{
+                  borderRadius: 2.5,
+                  minWidth: 76,
+                  fontWeight: 800,
+                  textTransform: 'none',
+                  bgcolor: '#38bdf8',
+                  '&:hover': { bgcolor: '#0ea5e9' },
+                  '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.35)' },
+                }}
+              >
+                Send
+              </Button>
+            </Stack>
           </Box>
-        )}
+        </Box>
       </div>
     </div>
   );
@@ -482,7 +438,6 @@ function ChatPanel({
 
 export function AIInterviewLayout() {
   const [chatOpen, setChatOpen] = useState(false);
-  const [panelTab, setPanelTab] = useState<'transcript' | 'chat'>('transcript');
   const [chatDraft, setChatDraft] = useState('');
   const timeFormatted = useLiveTimer();
   const participants = useParticipants();
@@ -508,7 +463,9 @@ export function AIInterviewLayout() {
 
   const isLocalEmployer = isRoleMatch(localParticipant, ['employer', 'admin']);
   const otherEmployerCount = participants.filter((participant) => !participant.isLocal && isRoleMatch(participant, ['employer', 'admin'])).length;
-  const candidatePresent = participants.some((participant) => !isRoleMatch(participant, ['employer', 'admin', 'agent', 'interviewer']));
+  const candidatePresent = participants.some(
+    (participant) => !isRoleMatch(participant, ['employer', 'admin']) && !isLiveKitAgentParticipant(participant),
+  );
 
   let finalTracks = rawTracks.filter((track) => {
     const participant = track.participant;
@@ -521,7 +478,7 @@ export function AIInterviewLayout() {
     return true;
   });
 
-  const agentParticipant = participants.find((participant) => isRoleMatch(participant, ['agent', 'interviewer']));
+  const agentParticipant = participants.find((participant) => isLiveKitAgentParticipant(participant));
   if (agentParticipant) {
     const hasAgentTrack = finalTracks.some((track) => track.participant.sid === agentParticipant.sid);
     if (!hasAgentTrack) {
@@ -534,13 +491,13 @@ export function AIInterviewLayout() {
 
   const employerWithCamera = finalTracks.find((track) => isRoleMatch(track.participant, ['employer', 'admin']) && track.publication);
   if (employerWithCamera) {
-    finalTracks = finalTracks.filter((track) => !isRoleMatch(track.participant, ['agent', 'interviewer']));
+    finalTracks = finalTracks.filter((track) => !isLiveKitAgentParticipant(track.participant));
   }
 
   const transcriptEntries = React.useMemo<TimelineEntry[]>(() => {
     return transcriptions.map((item) => {
       const participant = participants.find((p) => p.identity === item.participantInfo.identity);
-      const isAgent = isRoleMatch(participant, ['agent', 'interviewer']) || isRoleMatch(item.participantInfo.identity, ['agent', 'interviewer']);
+      const isAgent = isLiveKitAgentParticipant(participant) || isLiveKitAgentIdentity(item.participantInfo.identity);
       const isLocal = participant?.isLocal ?? item.participantInfo.identity === localParticipant.identity;
       const name = isAgent
         ? 'AI Interviewer'
@@ -562,7 +519,7 @@ export function AIInterviewLayout() {
   const roomChatEntries = React.useMemo<TimelineEntry[]>(() => {
     return chatMessages.map((message) => {
       const isLocal = message.from?.isLocal === true;
-      const isAgent = isRoleMatch(message.from, ['agent', 'interviewer']);
+      const isAgent = isLiveKitAgentParticipant(message.from);
       const name = isAgent
         ? 'AI Interviewer'
         : isLocal
@@ -633,14 +590,11 @@ export function AIInterviewLayout() {
           <ChatPanel
             transcriptEntries={transcriptEntries}
             chatEntries={roomChatEntries}
-            activeTab={panelTab}
-            onTabChange={setPanelTab}
             onSend={async () => {
               const text = chatDraft.trim();
               if (!text) return;
               await send(text);
               setChatDraft('');
-              setPanelTab('chat');
             }}
             chatDraft={chatDraft}
             setChatDraft={setChatDraft}
