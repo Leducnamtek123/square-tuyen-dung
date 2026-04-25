@@ -142,6 +142,7 @@ async def entrypoint(ctx: JobContext) -> None:
         llm=llm_model,
         tts=tts_model,
         vad=ctx.proc.userdata["vad"],
+        fnc_ctx=interviewer,
         turn_handling=TurnHandlingOptions(
             turn_detection=MultilingualModel(),
         ),
