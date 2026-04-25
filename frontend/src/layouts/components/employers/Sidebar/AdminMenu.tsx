@@ -77,6 +77,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
           <MenuItem text={t('admin:sidebar.activityLogs')} to={`/${ROUTES.ADMIN.JOB_ACTIVITY}`} isSelected={location.pathname === `/${ROUTES.ADMIN.JOB_ACTIVITY}`} isChild />
           <MenuItem text={t('admin:sidebar.interviewSchedule')} to={`/${ROUTES.ADMIN.INTERVIEWS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.INTERVIEWS}`} isChild />
           <MenuItem text={t('admin:sidebar.jobNotifications')} to={`/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`} isChild />
+          <MenuItem text="🎬 Interview UI Preview" to="/admin/interview-preview" isSelected={location.pathname === '/admin/interview-preview'} isChild />
         </List>
       </Collapse>
     </>
