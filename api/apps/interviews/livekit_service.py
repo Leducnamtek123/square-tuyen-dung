@@ -97,6 +97,27 @@ class LiveKitService:
         return token_builder.to_jwt()
 
     @staticmethod
+    def list_participants(room_name: str) -> list[dict]:
+        """Return the current LiveKit participants for a room."""
+        async def _list_participants():
+            lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+            try:
+                resp = await lkapi.room.list_participants(api.ListParticipantsRequest(room=room_name))
+                return list(getattr(resp, "participants", []) or [])
+            finally:
+                await lkapi.aclose()
+
+        try:
+            return asyncio.run(_list_participants())
+        except Exception as exc:
+            logger.warning("LiveKit list_participants failed for room %s: %s", room_name, exc)
+            return []
+
+    @staticmethod
+    def has_active_participants(room_name: str) -> bool:
+        return len(LiveKitService.list_participants(room_name)) > 0
+
+    @staticmethod
     def delete_room(room_name: str) -> None:
         """Delete a LiveKit room by name."""
         async def _delete_room():

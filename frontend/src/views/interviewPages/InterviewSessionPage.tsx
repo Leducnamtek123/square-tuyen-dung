@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import Button from '@mui/material/Button';
 import CircularProgress from '@mui/material/CircularProgress';
+import Alert from '@mui/material/Alert';
 
 import {
   LiveKitRoom,
@@ -63,9 +64,10 @@ const statusClassMap: Record<string, string> = {
   processing:  'border-amber-400/30 bg-amber-500/15 text-amber-200',
   completed:   'border-emerald-400/30 bg-emerald-500/15 text-emerald-200',
   cancelled:   'border-rose-400/30 bg-rose-500/15 text-rose-200',
+  interrupted: 'border-amber-400/30 bg-amber-500/15 text-amber-200',
 };
 
-const JOINABLE_STATUSES = ['scheduled', 'calibration', 'in_progress'];
+const JOINABLE_STATUSES = ['scheduled', 'calibration', 'in_progress', 'interrupted'];
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -130,6 +132,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
   const roomName   = state.session?.roomName;
   const isJoinable = !!state.session && JOINABLE_STATUSES.includes(state.session.status);
+  const isInterrupted = state.session?.status === 'interrupted';
 
   // ── Fetch session ────────────────────────────────────────────────────────
 
@@ -339,6 +342,14 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
   return (
     <main className="dark min-h-screen bg-[#020617] px-4 py-4 text-slate-100 md:px-8 md:py-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+
+        {isInterrupted && (
+          <Alert severity="warning" sx={{ borderRadius: 3, bgcolor: 'rgba(245, 158, 11, 0.08)', color: '#fbbf24' }}>
+            {t('interview:interviewDetail.messages.interruptedResumeHint', {
+              defaultValue: 'Kết nối vừa bị ngắt tạm thời. Bạn có thể bấm join lại để tiếp tục buổi phỏng vấn.',
+            })}
+          </Alert>
+        )}
 
         {/* Session header card */}
         <header className="relative overflow-hidden rounded-3xl border border-white/5 bg-slate-900/40 p-4 shadow-2xl shadow-black/50 backdrop-blur-2xl md:p-5">

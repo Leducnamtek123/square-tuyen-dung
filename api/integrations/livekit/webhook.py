@@ -76,14 +76,14 @@ def _handle_livekit_event(payload: dict[str, Any]) -> None:
         return
 
     if event in {"room_started", "room_start"}:
-        if session.status in {"draft", "scheduled", "calibration", "processing"}:
+        if session.status in {"draft", "scheduled", "calibration", "processing", "interrupted"}:
             update_interview_status(session, "in_progress")
             logger.info("LiveKit webhook: session %s marked in_progress", session.id)
             LiveKitService.start_recording(session.room_name)
     elif event in {"room_finished", "room_ended", "room_stopped", "room_disconnected"}:
         if session.status not in {"completed", "cancelled"}:
-            update_interview_status(session, "completed")
-            logger.info("LiveKit webhook: session %s marked completed", session.id)
+            update_interview_status(session, "interrupted")
+            logger.info("LiveKit webhook: session %s marked interrupted", session.id)
 
     recording_url = _extract_recording_url(payload)
     if recording_url and recording_url != session.recording_url:

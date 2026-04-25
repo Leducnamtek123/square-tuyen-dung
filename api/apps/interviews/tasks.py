@@ -121,6 +121,61 @@ def end_interview_session(session_id, reason="max_duration"):
 
 
 @shared_task
+def finalize_disconnected_session(session_id):
+    """Cancel a session if the room has stayed disconnected past the grace period."""
+    try:
+        session = InterviewSession.objects.get(id=session_id)
+    except InterviewSession.DoesNotExist:
+        logger.warning("Interview session %s not found when finalizing disconnect.", session_id)
+        return
+
+    if session.status != "interrupted":
+        logger.info(
+            "Skip finalizing disconnect for session %s because status is %s.",
+            session_id,
+            session.status,
+        )
+        return
+
+    try:
+        if LiveKitService.has_active_participants(session.room_name):
+            update_status = "in_progress"
+            session.status = update_status
+            session.save(update_fields=["status", "update_at"])
+            broadcast_interview_event(session.id, "status_changed", {
+                "sessionId": session.id,
+                "oldStatus": "interrupted",
+                "newStatus": update_status,
+                "startTime": session.start_time.isoformat() if session.start_time else None,
+                "endTime": session.end_time.isoformat() if session.end_time else None,
+                "duration": session.duration,
+            })
+            logger.info("Session %s resumed before grace timeout.", session_id)
+            return
+    except Exception as exc:
+        logger.warning("Could not verify LiveKit participants for session %s: %s", session_id, exc)
+        return
+
+    try:
+        session.status = "cancelled"
+        if session.start_time and not session.end_time:
+            session.end_time = tz.now()
+            session.duration = int((session.end_time - session.start_time).total_seconds())
+        session.save()
+        broadcast_interview_event(session.id, "status_changed", {
+            "sessionId": session.id,
+            "oldStatus": "interrupted",
+            "newStatus": "cancelled",
+            "startTime": session.start_time.isoformat() if session.start_time else None,
+            "endTime": session.end_time.isoformat() if session.end_time else None,
+            "duration": session.duration,
+        })
+        logger.info("Session %s cancelled after disconnect grace elapsed.", session_id)
+    except Exception as exc:
+        logger.error("Failed to finalize disconnected session %s: %s", session_id, exc)
+
+
+@shared_task
 def send_interview_invitation(session_id):
     """Send interview invitation email to candidate."""
     try:

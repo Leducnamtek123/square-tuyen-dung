@@ -177,7 +177,6 @@ async def entrypoint(ctx: JobContext) -> None:
     async def on_shutdown() -> None:
         if not session_started:
             return
-        await _update_backend_status(ctx.room.name, "completed")
         logger.info(f"Session finished for room: {ctx.room.name}")
         logger.info(f"Usage: {session.usage}")
 

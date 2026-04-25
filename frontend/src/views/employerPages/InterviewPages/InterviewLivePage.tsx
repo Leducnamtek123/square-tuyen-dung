@@ -25,7 +25,7 @@ import { type InterviewSession } from '../../../types/models';
 import InterviewLiveCandidateCard from '../../../views/components/employers/InterviewLiveCandidateCard';
 import pc from '@/utils/muiColors';
 
-const ACTIVE_STATUSES = new Set(['in_progress', 'calibration', 'connecting', 'active']);
+const ACTIVE_STATUSES = new Set(['in_progress', 'calibration', 'connecting', 'active', 'interrupted']);
 
 const normalizeStatus = (status: string) => status.trim().toLowerCase();
 
