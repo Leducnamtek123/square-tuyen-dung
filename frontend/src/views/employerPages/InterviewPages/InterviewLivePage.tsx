@@ -170,7 +170,7 @@ const InterviewLivePage = () => {
             {t('interviewLive.title')}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary', mt: 0.5 }}>
-            {t('employer:interviewLive.subtitle')}
+            {t('interviewLive.subtitle')}
           </Typography>
         </Box>
 
@@ -181,7 +181,7 @@ const InterviewLivePage = () => {
             onClick={() => dispatch({ type: 'toggle-auto-refresh' })}
             sx={{ borderRadius: 2, px: 2, textTransform: 'none' }}
           >
-            {state.autoRefresh ? t('employer:interviewLive.autoRefresh.on') : t('employer:interviewLive.autoRefresh.off')}
+            {state.autoRefresh ? t('interviewLive.autoRefresh.on') : t('interviewLive.autoRefresh.off')}
           </Button>
           <Button
             variant="outlined"
@@ -190,7 +190,7 @@ const InterviewLivePage = () => {
             startIcon={<RefreshIcon />}
             sx={{ borderRadius: 2, px: 2, textTransform: 'none' }}
           >
-            {state.refreshing ? t('employer:interviewLive.updating') : t('common:actions.refresh')}
+            {state.refreshing ? t('interviewLive.updating') : t('common:actions.refresh')}
           </Button>
         </Stack>
       </Stack>
@@ -216,7 +216,7 @@ const InterviewLivePage = () => {
               <TrendingUpIcon sx={{ fontSize: 20 }} />
             </Avatar>
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
-              {t('employer:interviewLive.stats.inProgressLabel')}
+              {t('interviewLive.stats.inProgressLabel')}
             </Typography>
           </Stack>
           <Typography variant="h3" sx={{ fontWeight: 900, color: theme.palette.primary.main }}>
@@ -230,7 +230,7 @@ const InterviewLivePage = () => {
               <ScheduleIcon sx={{ fontSize: 20 }} />
             </Avatar>
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
-              {t('employer:interviewLive.stats.scheduledLabel')}
+              {t('interviewLive.stats.scheduledLabel')}
             </Typography>
           </Stack>
           <Typography variant="h3" sx={{ fontWeight: 900, color: theme.palette.info.main }}>
@@ -244,7 +244,7 @@ const InterviewLivePage = () => {
               <CheckCircleIcon sx={{ fontSize: 20 }} />
             </Avatar>
             <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.secondary', textTransform: 'uppercase' }}>
-              {t('employer:interviewLive.stats.completedLabel')}
+              {t('interviewLive.stats.completedLabel')}
             </Typography>
           </Stack>
           <Typography variant="h3" sx={{ fontWeight: 900, color: theme.palette.success.main }}>
@@ -262,7 +262,7 @@ const InterviewLivePage = () => {
       <Stack direction="row" alignItems="center" spacing={1.5} sx={{ mb: 2 }}>
         <FiberManualRecordIcon sx={{ fontSize: 12, color: theme.palette.primary.main, animation: 'liveDot 2s infinite', '@keyframes liveDot': { '0%, 100%': { opacity: 1 }, '50%': { opacity: 0.35 } } }} />
         <Typography variant="subtitle1" sx={{ fontWeight: 900, color: 'text.primary' }}>
-          {t('employer:interviewLive.activeNow')}
+          {t('interviewLive.activeNow')}
         </Typography>
       </Stack>
 
@@ -279,10 +279,10 @@ const InterviewLivePage = () => {
           }}
         >
           <Typography variant="h6" sx={{ fontWeight: 800, mb: 1 }}>
-            {t('employer:interviewLive.noData.title')}
+            {t('interviewLive.noData.title')}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-            {t('employer:interviewLive.noData.subtitle')}
+            {t('interviewLive.noData.subtitle')}
           </Typography>
         </Paper>
       ) : (

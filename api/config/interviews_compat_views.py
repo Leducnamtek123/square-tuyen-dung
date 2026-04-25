@@ -1,8 +1,8 @@
 import json
-from concurrent.futures import ThreadPoolExecutor
 
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from asgiref.sync import sync_to_async
 
 from apps.interviews.models import InterviewSession
 from apps.interviews.services import (
@@ -13,17 +13,8 @@ from apps.interviews.services import (
     update_interview_status,
 )
 
-# NOTE: These views stay sync, but ORM/service work is pushed into a worker
-# thread so the endpoints remain safe if Django serves them from an async-capable
-# stack. That avoids SynchronousOnlyOperation without requiring async views.
-
-
-def _run_in_thread(func):
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        return executor.submit(func).result()
-
 @csrf_exempt
-def interview_context(request: HttpRequest, room_name: str):
+async def interview_context(request: HttpRequest, room_name: str):
     """
     GET /api/v1/interview/compat/{room_name}/context
 
@@ -42,7 +33,7 @@ def interview_context(request: HttpRequest, room_name: str):
         return build_interview_context(session)
 
     try:
-        context_data = _run_in_thread(_work)
+        context_data = await sync_to_async(_work, thread_sensitive=True)()
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
@@ -50,7 +41,7 @@ def interview_context(request: HttpRequest, room_name: str):
 
 
 @csrf_exempt
-def interview_next_question(request: HttpRequest, room_name: str):
+async def interview_next_question(request: HttpRequest, room_name: str):
     """
     POST /api/v1/interview/compat/{room_name}/next-question
     Body: { "advance": true|false }
@@ -82,7 +73,7 @@ def interview_next_question(request: HttpRequest, room_name: str):
         return payload
 
     try:
-        payload = _run_in_thread(_work)
+        payload = await sync_to_async(_work, thread_sensitive=True)()
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
@@ -90,7 +81,7 @@ def interview_next_question(request: HttpRequest, room_name: str):
 
 
 @csrf_exempt
-def interview_status(request: HttpRequest, room_name: str):
+async def interview_status(request: HttpRequest, room_name: str):
     """
     PATCH /api/v1/interview/compat/{room_name}/status
     Body: { "status": "in_progress"|"completed"|... }
@@ -115,7 +106,7 @@ def interview_status(request: HttpRequest, room_name: str):
         return update_interview_status(session, new_status)
 
     try:
-        updated_status = _run_in_thread(_work)
+        updated_status = await sync_to_async(_work, thread_sensitive=True)()
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
@@ -123,7 +114,7 @@ def interview_status(request: HttpRequest, room_name: str):
 
 
 @csrf_exempt
-def interview_append_transcription(request: HttpRequest, room_name: str):
+async def interview_append_transcription(request: HttpRequest, room_name: str):
     """
     POST /api/v1/interview/compat/{room_name}/append-transcription
     Body: { "speaker_role": "ai_agent"|"candidate", "content": "...", "speech_duration_ms": 123 }
@@ -160,7 +151,7 @@ def interview_append_transcription(request: HttpRequest, room_name: str):
         )
 
     try:
-        transcript = _run_in_thread(_work)
+        transcript = await sync_to_async(_work, thread_sensitive=True)()
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
