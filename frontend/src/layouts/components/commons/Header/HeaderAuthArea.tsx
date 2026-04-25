@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Avatar, Box, Button, Card, Stack, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
 import UserMenu from "../UserMenu";
 
 type HeaderAuthAreaProps = {
@@ -25,6 +26,7 @@ const HeaderAuthArea = ({
   onLogin,
   onSignUp,
 }: HeaderAuthAreaProps) => {
+  const { t } = useTranslation('common');
   return isAuthenticated ? (
     <Box sx={{ flexGrow: 0, ml: 1 }}>
       <Card
@@ -111,7 +113,7 @@ const HeaderAuthArea = ({
           }}
           onClick={onLogin}
         >
-          Login
+          {t('nav.login')}
         </Button>
 
         <Button
@@ -135,7 +137,7 @@ const HeaderAuthArea = ({
           }}
           onClick={onSignUp}
         >
-          Register
+          {t('nav.register')}
         </Button>
       </Stack>
     </Box>

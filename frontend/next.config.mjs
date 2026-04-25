@@ -71,6 +71,8 @@ const nextConfig = {
       { source: '/thong-bao', destination: '/notifications' },
       { source: '/tai-khoan', destination: '/account' },
       { source: '/ket-noi-voi-nha-tuyen-dung', destination: '/chat' },
+      { source: '/tin-tuc', destination: '/blog' },
+      { source: '/tin-tuc/:slug', destination: '/blog/:slug' },
       { source: '/lien-he', destination: '/contact' },
       { source: '/cau-hoi-thuong-gap', destination: '/faq' },
       { source: '/dieu-khoan-dich-vu', destination: '/terms-of-service' },
