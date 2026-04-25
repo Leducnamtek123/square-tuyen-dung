@@ -161,7 +161,9 @@ export function AIInterviewLayout() {
   );
 
   const layoutContext = useCreateLayoutContext();
-  layoutContext.widget.state.showChat = chatOpen;
+  if (layoutContext?.widget?.state) {
+    layoutContext.widget.state.showChat = chatOpen;
+  }
 
   return (
     <LayoutContextProvider value={layoutContext}>
