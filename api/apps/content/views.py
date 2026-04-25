@@ -10,6 +10,7 @@ from shared import renderers
 from shared import pagination as paginations
 from shared.configs import variable_response as var_res, variable_system as var_sys, app_setting as app_set
 from shared.configs.messages import NOTIFICATION_MESSAGES, ERROR_MESSAGES
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 
 from rest_framework.decorators import api_view, permission_classes
 
@@ -43,13 +44,23 @@ def get_banner_type_value_map():
     type_map = {
         str(item[1]).upper(): int(item[0]) for item in var_sys.BANNER_TYPE
     }
-    db_types = BannerType.objects.all().values("code", "value")
+    db_types = list(BannerType.objects.all().values("code", "value"))
     for row in db_types:
         code = str(row.get("code", "")).upper()
         value = row.get("value")
         if code and value is not None:
             type_map[code] = int(value)
     return type_map
+
+
+def _run_blocking(func, timeout: int = 5):
+    # Keep ORM work out of the ASGI event loop.
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(func)
+        try:
+            return future.result(timeout=timeout)
+        except (FuturesTimeoutError, Exception):
+            raise
 
 
 class FeedbackViewSet(viewsets.ViewSet,
@@ -120,55 +131,61 @@ def send_sms_download_app(request):
 @api_view(http_method_names=['get'])
 @permission_classes([perms_sys.AllowAny])
 def get_web_banner(request):
+    banner_type_param = str(request.GET.get("type", "")).upper()
 
-    query_params = request.GET
+    def _build():
+        banner_type_options = get_banner_type_value_map()
+        banner_type = banner_type_options.get(banner_type_param, None)
 
-    banner_type_options = get_banner_type_value_map()
-    banner_type_param = str(query_params.get("type", "")).upper()
-    banner_type = banner_type_options.get(banner_type_param, None)
+        banner_queryset = Banner.objects.filter(is_active=True, platform="WEB")
 
-    banner_queryset = Banner.objects.filter(is_active=True, platform="WEB")
+        if banner_type:
+            banner_queryset = banner_queryset.filter(type=banner_type)
 
-    if banner_type:
+        serializer = BannerSerializer(banner_queryset, many=True, fields=[
+            "id", "imageUrl", "buttonText", "description",
+            "buttonLink", "isShowButton", "descriptionLocation"
+        ])
+        return serializer.data
 
-        banner_queryset = banner_queryset.filter(type=banner_type)
-
-    serializer = BannerSerializer(banner_queryset, many=True, fields=[
-
-        "id", "imageUrl", "buttonText", "description",
-
-        "buttonLink", "isShowButton", "descriptionLocation"
-
-    ])
-
-    return var_res.response_data(data=serializer.data)
+    try:
+        return var_res.response_data(data=_run_blocking(_build))
+    except Exception as ex:
+        helper.print_log_error("get_web_banner", ex)
+        return var_res.response_data(data=[])
 
 
 @api_view(http_method_names=['get'])
 @permission_classes([perms_sys.AllowAny])
 def get_mobile_banner(request):
-
     banner_type_param = str(request.GET.get("type", "HOME")).upper()
-    banner_type_options = get_banner_type_value_map()
-    banner_type = banner_type_options.get(banner_type_param, None)
-    if banner_type is None:
-        return var_res.response_data(
-            status=status.HTTP_400_BAD_REQUEST,
-            errors={"type": ["Invalid banner type."]},
-        )
 
-    banner_queryset = Banner.objects.filter(is_active=True, platform="APP")
-    banner_queryset = banner_queryset.filter(type=banner_type)
+    def _build():
+        banner_type_options = get_banner_type_value_map()
+        banner_type = banner_type_options.get(banner_type_param, None)
+        if banner_type is None:
+            return None
 
-    serializer = BannerSerializer(banner_queryset, many=True, fields=[
+        banner_queryset = Banner.objects.filter(is_active=True, platform="APP")
+        banner_queryset = banner_queryset.filter(type=banner_type)
 
-        "id", "imageMobileUrl", "buttonText", "description",
+        serializer = BannerSerializer(banner_queryset, many=True, fields=[
+            "id", "imageMobileUrl", "buttonText", "description",
+            "buttonLink", "isShowButton", "descriptionLocation"
+        ])
+        return serializer.data
 
-        "buttonLink", "isShowButton", "descriptionLocation"
-
-    ])
-
-    return var_res.response_data(data=serializer.data)
+    try:
+        data = _run_blocking(_build)
+        if data is None:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"type": ["Invalid banner type."]},
+            )
+        return var_res.response_data(data=data)
+    except Exception as ex:
+        helper.print_log_error("get_mobile_banner", ex)
+        return var_res.response_data(data=[])
 
 
 @api_view(http_method_names=['post'])

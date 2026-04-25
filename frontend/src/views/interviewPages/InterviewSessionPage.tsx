@@ -23,8 +23,13 @@ import { cn } from '@/lib/utils';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-const getSafeLiveKitUrl = () => {
+const getSafeLiveKitUrl = (preferLocal = false) => {
   if (typeof window === 'undefined') return '';
+  if (preferLocal) {
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const host = window.location.host;
+    return `${protocol}//${host}/livekit`.replace(/\/$/, '');
+  }
   const envUrl = (process.env.NEXT_PUBLIC_LIVEKIT_URL || '').trim();
   if (envUrl.startsWith('wss://')) return envUrl.replace(/\/$/, '');
 
@@ -129,6 +134,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
   const navigate = useRouter();
   const { t, i18n } = useTranslation(['interview', 'common']);
   const [state, dispatch] = React.useReducer(reducer, initialState);
+  const finalizeOnDisconnectRef = React.useRef(false);
 
   const roomName   = state.session?.roomName;
   const isJoinable = !!state.session && JOINABLE_STATUSES.includes(state.session.status);
@@ -212,9 +218,12 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
       const tokenData = await interviewService.getLiveKitToken(state.sessionInviteToken);
       if (!tokenData?.token) throw new Error(t('errors.tokenMissing'));
 
-      let urlToUse = getSafeLiveKitUrl();
+      const isLocalOrigin =
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1';
+      let urlToUse = getSafeLiveKitUrl(isLocalOrigin);
       const returnedUrl = tokenData.serverUrl || tokenData.server_url || tokenData.url;
-      if (returnedUrl) {
+      if (!isLocalOrigin && returnedUrl) {
         const isInternal =
           returnedUrl.includes('localhost') ||
           returnedUrl.includes('127.0.0.1') ||
@@ -241,12 +250,20 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
     }
   }, [normalizedRole, roomName, routeId, state.sessionInviteToken, t]);
 
-  const terminateInterviewSession = React.useCallback(async () => {
+  const handleDisconnected = React.useCallback(() => {
     dispatch({ type: 'set-connect-room', value: false });
     dispatch({ type: 'set-connection-details', value: undefined });
+    finalizeOnDisconnectRef.current = false;
+  }, []);
+
+  const finalizeInterviewSession = React.useCallback(async () => {
+    if (!roomName) return;
+    finalizeOnDisconnectRef.current = true;
     try {
-      if (roomName) await interviewService.updateSessionStatus(roomName, 'completed');
-    } catch {}
+      await interviewService.updateSessionStatus(roomName, 'completed');
+    } catch {
+      finalizeOnDisconnectRef.current = false;
+    }
   }, [roomName]);
 
   // ── Loading state ─────────────────────────────────────────────────────────
@@ -320,10 +337,10 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
             connect={true}
             video={normalizedRole === 'jobseeker'}
             audio={true}
-            onDisconnected={terminateInterviewSession}
+            onDisconnected={handleDisconnected}
             style={{ height: '100%' }}
           >
-            <AIInterviewLayout />
+            <AIInterviewLayout onEndSession={finalizeInterviewSession} />
             <RoomAudioRenderer />
           </LiveKitRoom>
         </div>

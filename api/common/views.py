@@ -103,6 +103,15 @@ class AdminWardViewSet(viewsets.ModelViewSet):
 
     filterset_fields = ['district']
 
+def _run_blocking(func, timeout: int = 5):
+    # Keep ORM/cache work out of the ASGI event loop.
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        future = executor.submit(func)
+        try:
+            return future.result(timeout=timeout)
+        except (FuturesTimeoutError, Exception):
+            raise
+
 @api_view(http_method_names=["GET"])
 @authentication_classes([])
 @permission_classes([AllowAny])
@@ -133,8 +142,8 @@ def get_all_config(request):
     job_post_status_tuple = utils.convert_tuple_or_list_to_options(var_sys.JOB_POST_STATUS)
 
     # database
-    cities = City.objects.exclude(name__icontains=exclude_city_name).values_list("id", "name")
-    careers = Career.objects.values_list("id", "name")
+    cities = _run_blocking(lambda: list(City.objects.exclude(name__icontains=exclude_city_name).values_list("id", "name")))
+    careers = _run_blocking(lambda: list(Career.objects.values_list("id", "name")))
     city_tuple = utils.convert_tuple_or_list_to_options(cities)
     career_tuple = utils.convert_tuple_or_list_to_options(careers)
 
@@ -183,19 +192,24 @@ def get_districts(request):
 
     city_id_raw = params.get('cityId', None)
 
-    district_queryset = District.objects.all()
-
     try:
-        if city_id_raw not in (None, ""):
-            city_id = int(str(city_id_raw).strip())
-            district_queryset = district_queryset.filter(city_id=city_id)
+        def _build_districts():
+            queryset = District.objects.all()
+            if city_id_raw not in (None, ""):
+                city_id = int(str(city_id_raw).strip())
+                queryset = queryset.filter(city_id=city_id)
+            districts = list(queryset.values_list("id", "name"))
+            return utils.convert_tuple_or_list_to_options(districts)[0]
+
+        district_options = _run_blocking(_build_districts)
     except (TypeError, ValueError):
 
         # Invalid cityId should not break dependent forms.
         return var_res.response_data(data=[])
+    except Exception as ex:
+        helper.print_log_error("get_districts", ex)
+        return var_res.response_data(data=[])
 
-    districts = district_queryset.values_list("id", "name")
-    district_options = utils.convert_tuple_or_list_to_options(districts)[0]
     return var_res.response_data(data=district_options)
 
 @api_view(http_method_names=["GET"])
@@ -207,18 +221,23 @@ def get_wards(request):
 
     district_id_raw = params.get('districtId', None)
 
-    ward_queryset = Ward.objects.all()
-
     try:
-        if district_id_raw not in (None, ""):
-            district_id = int(str(district_id_raw).strip())
-            ward_queryset = ward_queryset.filter(district_id=district_id)
+        def _build_wards():
+            queryset = Ward.objects.all()
+            if district_id_raw not in (None, ""):
+                district_id = int(str(district_id_raw).strip())
+                queryset = queryset.filter(district_id=district_id)
+            wards = list(queryset.values_list("id", "name"))
+            return utils.convert_tuple_or_list_to_options(wards)[0]
+
+        ward_options = _run_blocking(_build_wards)
     except (TypeError, ValueError):
 
         return var_res.response_data(data=[])
+    except Exception as ex:
+        helper.print_log_error("get_wards", ex)
+        return var_res.response_data(data=[])
 
-    wards = ward_queryset.values_list("id", "name")
-    ward_options = utils.convert_tuple_or_list_to_options(wards)[0]
     return var_res.response_data(data=ward_options)
 
 @api_view(http_method_names=["GET"])
@@ -226,21 +245,25 @@ def get_wards(request):
 @permission_classes([AllowAny])
 def get_top_10_careers(request):
     try:
-        hot_qs = Career.objects.filter(is_hot=True).annotate(
-            num_job_posts=Count('job_posts')
-        ).order_by('-num_job_posts', 'id')
-        hot_ids = list(hot_qs.values_list('id', flat=True))
+        hot_qs = _run_blocking(lambda: list(
+            Career.objects.filter(is_hot=True).annotate(
+                num_job_posts=Count('job_posts')
+            ).order_by('-num_job_posts', 'id')
+        ))
+        hot_ids = [item.id for item in hot_qs]
 
         remaining = max(0, 10 - len(hot_ids))
-        normal_qs = Career.objects.exclude(id__in=hot_ids).annotate(
-            num_job_posts=Count('job_posts')
-        ).order_by('-num_job_posts', 'id')[:remaining]
+        normal_qs = _run_blocking(lambda: list(
+            Career.objects.exclude(id__in=hot_ids).annotate(
+                num_job_posts=Count('job_posts')
+            ).order_by('-num_job_posts', 'id')[:remaining]
+        ))
 
-        queryset = list(hot_qs[:10]) + list(normal_qs)
+        queryset = hot_qs[:10] + normal_qs
     except Exception as ex:
         helper.print_log_error("get_top_careers_fallback", ex)
         # Fallback path to keep homepage usable when aggregate query fails.
-        queryset = list(Career.objects.all().order_by('id')[:10])
+        queryset = _run_blocking(lambda: list(Career.objects.all().order_by('id')[:10]))
 
     serializer = CareerSerializer(
         queryset,
@@ -255,13 +278,16 @@ def get_top_10_careers(request):
 @permission_classes([AllowAny])
 def get_all_careers(request):
     paginator = paginations.CustomPagination()
-    queryset = Career.objects
 
     kw = request.query_params.get("kw", None)
-    if kw:
-        queryset = queryset.filter(name__icontains=kw)
 
-    queryset = queryset.all().order_by('id')
+    def _build_queryset():
+        queryset = Career.objects.all()
+        if kw:
+            queryset = queryset.filter(name__icontains=kw)
+        return list(queryset.order_by('id'))
+
+    queryset = _run_blocking(_build_queryset)
     page = paginator.paginate_queryset(queryset, request)
 
     if page is not None:

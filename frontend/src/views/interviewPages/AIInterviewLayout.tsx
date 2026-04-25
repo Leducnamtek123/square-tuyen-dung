@@ -45,9 +45,11 @@ function useLiveTimer() {
 function CustomControlBar({
   chatOpen,
   setChatOpen,
+  onEndSession,
 }: {
   chatOpen: boolean;
   setChatOpen: (value: boolean) => void;
+  onEndSession?: () => Promise<void> | void;
 }) {
   const room = useRoomContext();
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled, isScreenShareEnabled } = useLocalParticipant();
@@ -56,7 +58,16 @@ function CustomControlBar({
   const toggleMic = () => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
   const toggleCam = () => localParticipant.setCameraEnabled(!isCameraEnabled);
   const toggleScreen = () => localParticipant.setScreenShareEnabled(!isScreenShareEnabled);
-  const onEnd = () => room.disconnect();
+  const onEnd = async () => {
+    if (onEndSession) {
+      try {
+        await onEndSession();
+      } catch {
+        // If finalization fails, fall through and still disconnect gracefully.
+      }
+    }
+    room.disconnect();
+  };
 
   return (
     <div className="flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl">
@@ -436,7 +447,11 @@ function ChatPanel({
   );
 }
 
-export function AIInterviewLayout() {
+type AIInterviewLayoutProps = {
+  onEndSession?: () => Promise<void> | void;
+};
+
+export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   const [chatOpen, setChatOpen] = useState(false);
   const [chatDraft, setChatDraft] = useState('');
   const [localChatEntries, setLocalChatEntries] = useState<TimelineEntry[]>([]);
@@ -568,7 +583,7 @@ export function AIInterviewLayout() {
             )}
           </div>
 
-          <CustomControlBar chatOpen={chatOpen} setChatOpen={setChatOpen} />
+          <CustomControlBar chatOpen={chatOpen} setChatOpen={setChatOpen} onEndSession={onEndSession} />
         </div>
 
         {chatOpen && (

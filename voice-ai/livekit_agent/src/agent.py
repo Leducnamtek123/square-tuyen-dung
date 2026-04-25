@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from livekit.agents import (
     AgentServer,
     AgentSession,
+    AutoSubscribe,
     JobContext,
     JobProcess,
     MetricsCollectedEvent,
@@ -182,12 +183,15 @@ async def entrypoint(ctx: JobContext) -> None:
 
     ctx.add_shutdown_callback(on_shutdown)
 
-    # Mark interview as active before the session blocks until shutdown.
-    await _update_backend_status(ctx.room.name, "in_progress")
+    # Establish the room connection up front so the greeting and first audio turn
+    # don't race the agent connection handshake.
+    await ctx.connect(auto_subscribe=AutoSubscribe.SUBSCRIBE_ALL)
 
     # 7. Start the Session (no ctx.connect() needed - handled by session.start)
     try:
         session_started = True
+        # Mark interview as active only after the agent has a live room connection.
+        await _update_backend_status(ctx.room.name, "in_progress")
         await session.start(
             agent=interviewer,
             room=ctx.room,
