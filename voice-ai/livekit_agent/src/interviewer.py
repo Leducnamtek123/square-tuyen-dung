@@ -79,7 +79,11 @@ class Interviewer(Agent):
             q_text = ""
             total_q = len(questions)
             for i, q in enumerate(questions, 1):
-                q_text += f"{i}. {_brief_text(q.get('text', ''), 300)}\n"
+                if isinstance(q, dict):
+                    question_text = q.get("text", "")
+                else:
+                    question_text = str(q)
+                q_text += f"{i}. {_brief_text(question_text, 300)}\n"
             instructions += (
                 f"\nDANH SACH {total_q} CAU HOI BAT BUOC PHAI HOI THEO THU TU TU 1 DEN {total_q}:\n{q_text}"
                 "Hay hoi tung cau mot cach ngan gon, khong duoc hoi don nhieu cau."
@@ -121,7 +125,7 @@ class Interviewer(Agent):
 
             try:
                 job_ctx = get_job_context()
-                await job_ctx.room.local_participant.set_metadata(f"STAGE:{new_stage.name}")
+                job_ctx.room.local_participant.set_metadata(f"STAGE:{new_stage.name}")
             except Exception as exc:
                 logger.warning("Could not update room metadata: %s", exc)
 

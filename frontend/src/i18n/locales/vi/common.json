@@ -590,6 +590,9 @@
       "generalInfo": "Thông tin chung",
       "languages": "Ngôn ngữ",
       "personalInfo": "Thông tin cá nhân"
+    },
+    "messages": {
+      "noAttachedFile": "Không có tệp đính kèm."
     }
   },
   "content": "Nội dung",

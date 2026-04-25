@@ -72,13 +72,24 @@ const AppliedResumeToolbar: React.FC<Props> = ({
         spacing={3}
         mb={5}
       >
-        <Box>
-          <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px', mb: 0.5 }}>
-            {title}
-          </Typography>
-          <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-            {t('employer:appliedResume.manageSubtitle')}
-          </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box sx={{ 
+            p: 1, 
+            borderRadius: 2, 
+            bgcolor: 'primary.extralight', 
+            color: 'primary.main',
+            display: 'flex'
+          }}>
+            <AssignmentTurnedInIcon sx={{ fontSize: 28 }} />
+          </Box>
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px', mb: 0.5 }}>
+              {title}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
+              {t('employer:appliedResume.manageSubtitle')}
+            </Typography>
+          </Box>
         </Box>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
           <ToggleButtonGroup

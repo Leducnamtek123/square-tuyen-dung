@@ -833,7 +833,8 @@
       "saveSuccess": "Lưu hồ sơ thành công.",
       "unsaveSuccess": "Bỏ lưu hồ sơ thành công.",
       "loadingPdf": "Đang tải PDF...",
-      "emailSentSuccess": "Gửi email thành công."
+      "emailSentSuccess": "Gửi email thành công.",
+      "noAttachedFile": "Không có tệp đính kèm."
     }
   },
   "common": {

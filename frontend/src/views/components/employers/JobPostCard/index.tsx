@@ -5,6 +5,7 @@ import { Box, Button, Divider, LinearProgress, Stack, Typography, Paper, Tooltip
 import AddIcon from '@mui/icons-material/Add';
 import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import {
   convertEditorStateToHTMLString,
   createEditorStateFromHTMLString,
@@ -255,13 +256,24 @@ const JobPostCard = () => {
           spacing={3} 
           mb={5}
         >
-          <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Box sx={{ 
+              p: 1, 
+              borderRadius: 2, 
+              bgcolor: 'primary.extralight', 
+              color: 'primary.main',
+              display: 'flex'
+            }}>
+              <WorkOutlineIcon sx={{ fontSize: 28 }} />
+            </Box>
+            <Box>
             <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px', mb: 0.5 }}>
               {t('jobPost.title')}
             </Typography>
             <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 600 }}>
               {t('jobPost.manageSubtitle', 'Manage and monitor all your job postings in one place.')}
             </Typography>
+          </Box>
           </Box>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} width={{ xs: '100%', sm: 'auto' }}>
             <Button 

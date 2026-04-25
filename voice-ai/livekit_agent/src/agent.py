@@ -11,7 +11,6 @@ from livekit.agents import (
     JobContext,
     JobProcess,
     MetricsCollectedEvent,
-    TurnHandlingOptions,
     cli,
     metrics,
 )
@@ -142,12 +141,10 @@ async def entrypoint(ctx: JobContext) -> None:
         llm=llm_model,
         tts=tts_model,
         vad=ctx.proc.userdata["vad"],
-        fnc_ctx=interviewer,
-        turn_handling=TurnHandlingOptions(
-            turn_detection=MultilingualModel(),
-        ),
+        turn_detection=MultilingualModel(),
         **build_session_kwargs(),
     )
+    session_started = False
 
     # 5. Event Handlers
     @session.on("metrics_collected")
@@ -156,8 +153,9 @@ async def entrypoint(ctx: JobContext) -> None:
 
     @session.on("close")
     def _on_close(ev: CloseEvent) -> None:
+        close_reason = getattr(ev.reason, "value", ev.reason)
         logger.info(
-            f"Session closed for room: {ctx.room.name}, reason: {ev.reason}"
+            f"Session closed for room: {ctx.room.name}, reason: {close_reason}"
         )
         # Sync remaining transcript from session history
         for item in session.history.items:
@@ -170,26 +168,35 @@ async def entrypoint(ctx: JobContext) -> None:
                     )
 
         try:
-            get_job_context().shutdown(reason=ev.reason.value)
+            get_job_context().shutdown(reason=close_reason)
         except Exception as exc:
             logger.warning(f"Failed to shutdown job context: {exc}")
 
     # 6. Shutdown callback for final status sync
     async def on_shutdown() -> None:
+        if not session_started:
+            return
         await _update_backend_status(ctx.room.name, "completed")
         logger.info(f"Session finished for room: {ctx.room.name}")
         logger.info(f"Usage: {session.usage}")
 
     ctx.add_shutdown_callback(on_shutdown)
 
-    # 7. Start the Session (no ctx.connect() needed - handled by session.start)
-    await session.start(
-        agent=interviewer,
-        room=ctx.room,
-    )
-
-    # Mark interview as active in backend
+    # Mark interview as active before the session blocks until shutdown.
     await _update_backend_status(ctx.room.name, "in_progress")
+
+    # 7. Start the Session (no ctx.connect() needed - handled by session.start)
+    try:
+        session_started = True
+        await session.start(
+            agent=interviewer,
+            room=ctx.room,
+        )
+    except Exception:
+        session_started = False
+        logger.exception("Failed to start LiveKit session for room %s", ctx.room.name)
+        await _update_backend_status(ctx.room.name, "interrupted")
+        raise
 
     # NO busy-wait loop needed - framework manages lifecycle automatically
 

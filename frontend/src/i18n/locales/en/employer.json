@@ -807,7 +807,8 @@
       "saveSuccess": "Saved successfully.",
       "unsaveSuccess": "Unsaved successfully.",
       "emailSentSuccess": "Email sent successfully.",
-      "loadingPdf": "Loading PDF..."
+      "loadingPdf": "Loading PDF...",
+      "noAttachedFile": "No attached file"
     }
   },
   "common": {

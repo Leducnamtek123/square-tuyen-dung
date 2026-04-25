@@ -4,6 +4,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { useTranslation } from 'react-i18next';
 import { Box, Card, Pagination, Stack, Typography, Grid2 as Grid, Paper, alpha, useTheme } from "@mui/material";
 import SearchOffIcon from '@mui/icons-material/SearchOff';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
 import NoDataCard from '../../../../components/Common/NoDataCard';
 import toastMessages from '../../../../utils/toastMessages';
 import ProfileSearch from '../ProfileSearch';
@@ -54,13 +55,24 @@ const ProfileCardContent: React.FC = () => {
             <Grid size={{ xs: 12, lg: 9 }}>
                 <Stack spacing={5}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
-                            <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px' }}>
-                                {t('profileCard.label.resultsFound')}
-                            </Typography>
-                            <Typography component="span" variant="h3" color="primary" sx={{ fontWeight: 1000, lineHeight: 1 }}>
-                                {t('profileCard.label.profiles', { count })}
-                            </Typography>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box sx={{ 
+                                p: 1, 
+                                borderRadius: 2, 
+                                bgcolor: 'primary.extralight', 
+                                color: 'primary.main',
+                                display: 'flex'
+                            }}>
+                                <AssignmentIndIcon sx={{ fontSize: 28 }} />
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1.5 }}>
+                                <Typography variant="h4" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-1px' }}>
+                                    {t('profileCard.label.resultsFound')}
+                                </Typography>
+                                <Typography component="span" variant="h3" color="primary" sx={{ fontWeight: 1000, lineHeight: 1 }}>
+                                    {t('profileCard.label.profiles', { count })}
+                                </Typography>
+                            </Box>
                         </Box>
                     </Box>
 

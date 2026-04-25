@@ -1,4 +1,4 @@
-{
+﻿{
   "appName": "Project",
   "city": "City/Province",
   "career": "Industry",
@@ -609,6 +609,9 @@
       "generalInfo": "General Information",
       "languages": "Languages",
       "personalInfo": "Personal Information"
+    },
+    "messages": {
+      "noAttachedFile": "No attached file"
     }
   },
   "content": "Content",
@@ -848,3 +851,4 @@
     "backToAdmin": "Back to Admin"
   }
 }
+

@@ -121,7 +121,7 @@ const ProfileSearch: React.FC = () => {
   };
 
   return (
-    <Grid container spacing={4} size={12}>
+    <>
       <Grid size={12}>
         <Paper
           elevation={0}
@@ -208,12 +208,20 @@ const ProfileSearch: React.FC = () => {
         >
           <Stack spacing={4}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                <FilterAltIcon color="primary" sx={{ fontSize: 28 }} />
-                <Typography variant="h5" sx={{ fontWeight: 900, letterSpacing: '-0.5px' }}>
-                  {t('employer:profileSearch.title.advancedFilters')}
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                <Box sx={{ 
+                  p: 0.75, 
+                  borderRadius: 1.5, 
+                  bgcolor: 'primary.extralight', 
+                  color: 'primary.main',
+                  display: 'flex'
+                }}>
+                  <FilterAltIcon sx={{ fontSize: 20 }} />
+                </Box>
+                <Typography variant="subtitle1" sx={{ color: 'text.primary', fontWeight: 900, letterSpacing: '0.5px' }}>
+                  {t('employer:profileSearch.title.advancedFilters').toUpperCase()}
                 </Typography>
-              </Box>
+              </Stack>
               <Tooltip title={t('employer:profileSearch.label.clearFilters')} arrow>
                 <Button
                   variant="text"
@@ -314,7 +322,7 @@ const ProfileSearch: React.FC = () => {
           </Stack>
         </Paper>
       </Grid>
-    </Grid>
+    </>
   );
 };
 
