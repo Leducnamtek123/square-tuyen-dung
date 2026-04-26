@@ -128,6 +128,11 @@ const interviewService = {
     return httpRequest.post(url) as Promise<LiveKitTokenResponse & { mode: string }>;
   },
 
+  getHrPresenceToken: (sessionId: IdType): Promise<LiveKitTokenResponse & { mode: string; participant_name: string }> => {
+    const url = `interview/web/sessions/${sessionId}/hr-token/`;
+    return httpRequest.post(url) as Promise<LiveKitTokenResponse & { mode: string; participant_name: string }>;
+  },
+
   getSessionMetrics: (sessionId: IdType): Promise<SessionMetrics> => {
     const url = `interview/web/sessions/${sessionId}/live-metrics/`;
     return httpRequest.get(url) as Promise<SessionMetrics>;

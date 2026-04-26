@@ -359,3 +359,41 @@ def create_observer_livekit_token(session: InterviewSession, request) -> Dict[st
         "server_url": server_url,
         "mode": "observer",
     }
+
+
+def create_hr_presence_livekit_token(session: InterviewSession, request) -> Dict[str, str]:
+    """
+    Tạo token cho HR tham gia hiện diện — ứng viên thấy HR trong phòng.
+
+    - identity = employer-{user.id}  → AIInterviewLayout nhận diện badge "Nhà tuyển dụng"
+    - hidden = False                 → ứng viên thấy participant này
+    - can_publish = False            → HR không publish audio/video (không làm rối AI)
+    - can_publish_data = True        → HR gửi được chat message
+    - can_subscribe = True           → HR nghe/xem được toàn bộ phòng
+    """
+    allowed_statuses = ("scheduled", "calibration", "in_progress", "interrupted")
+    if session.status not in allowed_statuses:
+        raise SessionNotJoinableError(
+            f"Khong the tham gia buoi phong van nay vi trang thai hien tai la: {session.get_status_display()}"
+        )
+
+    user = request.user
+    hr_identity = f"employer-{user.id}"
+    hr_name = user.full_name or user.email or hr_identity
+
+    token = LiveKitService.create_hr_presence_token(
+        room_name=session.room_name,
+        hr_identity=hr_identity,
+        hr_name=hr_name,
+    )
+
+    server_url = _build_public_livekit_url(request)
+
+    return {
+        "token": token,
+        "room_name": session.room_name,
+        "participant_identity": hr_identity,
+        "participant_name": hr_name,
+        "server_url": server_url,
+        "mode": "hr_presence",
+    }

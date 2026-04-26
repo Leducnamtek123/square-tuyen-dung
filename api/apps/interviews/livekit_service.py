@@ -24,7 +24,10 @@ class LiveKitService:
     def ensure_room_with_agent(room_name: str) -> None:
         """
         Ensure room exists and is configured to dispatch the interview agent.
-        If room already exists, ignore the error.
+        Room names are unique per interview session, so if the room already
+        exists we keep it intact instead of deleting/recreating it. Recreating
+        an empty room can race against LiveKit dispatch and abort in-flight
+        participant joins.
         """
         async def _create_room():
             lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
@@ -44,28 +47,9 @@ class LiveKitService:
             finally:
                 await lkapi.aclose()
 
-        async def _has_participants():
-            lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
-            try:
-                resp = await lkapi.room.list_participants(api.ListParticipantsRequest(room=room_name))
-                return len(getattr(resp, "participants", []) or []) > 0
-            finally:
-                await lkapi.aclose()
-
-        async def _delete_room():
-            lkapi = api.LiveKitAPI(LIVEKIT_URL, LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
-            try:
-                await lkapi.room.delete_room(api.DeleteRoomRequest(room=room_name))
-            finally:
-                await lkapi.aclose()
-
         try:
-            # If the room exists but is empty, delete it to ensure agent config is applied.
-            try:
-                if asyncio.run(_room_exists()) and not asyncio.run(_has_participants()):
-                    asyncio.run(_delete_room())
-            except Exception as cleanup_exc:
-                logger.warning("LiveKit pre-cleanup failed: %s", cleanup_exc)
+            if asyncio.run(_room_exists()):
+                return
             asyncio.run(_create_room())
         except Exception as exc:
             message = str(exc).lower()
@@ -156,6 +140,35 @@ class LiveKitService:
                 can_publish_data=False,
                 can_subscribe=True,
                 hidden=True,
+            ))
+        )
+        return token_builder.to_jwt()
+
+    @staticmethod
+    def create_hr_presence_token(
+        room_name: str,
+        hr_identity: str,
+        hr_name: str,
+    ) -> str:
+        """
+        Tạo JWT token cho HR tham gia hiện diện.
+        hidden=False: ứng viên thấy HR trong danh sách participant.
+        can_publish=False: HR không publish audio/video (không làm rối AI agent).
+        can_publish_data=True: HR gửi được chat message.
+        can_subscribe=True: HR nghe/xem được toàn bộ phòng.
+        """
+        token_builder = (
+            api.AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET)
+            .with_identity(hr_identity)
+            .with_name(hr_name)
+            .with_grants(api.VideoGrants(
+                room_join=True,
+                room=room_name,
+                room_admin=False,
+                can_publish=False,
+                can_publish_data=True,
+                can_subscribe=True,
+                hidden=False,
             ))
         )
         return token_builder.to_jwt()

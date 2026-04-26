@@ -30,11 +30,13 @@ from .services import (
     queue_invitation_email,
     queue_ai_evaluation,
     create_observer_livekit_token,
+    create_hr_presence_livekit_token,
     get_session_questions,
     SessionNotJoinableError,
 )
 from apps.accounts import permissions as perms_custom
 from shared.helpers import helper
+
 
 class InterviewStatisticViewSet(viewsets.ViewSet):
     permission_classes = [perms_custom.IsAdminUser]
@@ -61,6 +63,7 @@ class InterviewStatisticViewSet(viewsets.ViewSet):
         }
 
         return response_data(data=data)
+
 
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = Question.objects.select_related('career', 'career__icon', 'company', 'author').all()
@@ -96,6 +99,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
             serializer.save(author=user, company=company)
         else:
             serializer.save(author=user)
+
 
 class QuestionGroupViewSet(viewsets.ModelViewSet):
     queryset = QuestionGroup.objects.prefetch_related('questions', 'questions__career', 'questions__career__icon').select_related('company', 'author').all()
@@ -138,6 +142,7 @@ class QuestionGroupViewSet(viewsets.ModelViewSet):
             helper.print_log_error("QuestionGroupViewSet.list", ex)
             return response_data(data={"count": 0, "results": []})
 
+
 class InterviewSessionViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -167,7 +172,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
             from django.db.models import Q
             company = self._resolve_company(user)
             if company:
-                 return base_qs.filter(Q(job_post__company=company) | Q(created_by=user)).distinct()
+                return base_qs.filter(Q(job_post__company=company) | Q(created_by=user)).distinct()
             return base_qs.filter(created_by=user)
 
         # Admin or other roles can see all
@@ -319,6 +324,27 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
         except ValueError as exc:
             return response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": [str(exc)]})
 
+    # POST /sessions/{pk}/hr-token/
+    @action(detail=True, methods=['post'], url_path='hr-token',
+            permission_classes=[permissions.IsAuthenticated])
+    def hr_token(self, request, pk=None):
+        """
+        Tạo token cho HR tham gia hiện diện.
+        Ứng viên thấy HR trong phòng, HR có thể gửi chat message.
+        HR không publish audio/video để không làm rối AI agent.
+        """
+        session = self.get_object()
+        try:
+            data = create_hr_presence_livekit_token(session, request)
+            return response_data(data=data)
+        except SessionNotJoinableError as exc:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": [str(exc)], "code": "SESSION_NOT_JOINABLE"}
+            )
+        except ValueError as exc:
+            return response_data(status=status.HTTP_400_BAD_REQUEST, errors={"detail": [str(exc)]})
+
     # GET /sessions/{pk}/live-metrics/
     @action(detail=True, methods=['get'], url_path='live-metrics',
             permission_classes=[permissions.IsAuthenticated])
@@ -349,6 +375,7 @@ class InterviewSessionViewSet(viewsets.ModelViewSet):
             "jobName": session.job_post.job_name if session.job_post else None,
         })
 
+
 class InterviewEvaluationViewSet(viewsets.ModelViewSet):
     queryset = InterviewEvaluation.objects.select_related('interview', 'evaluator').all()
     serializer_class = InterviewEvaluationSerializer
@@ -374,6 +401,7 @@ class InterviewEvaluationViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(evaluator=self.request.user)
 
+
 class AdminInterviewSessionReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     """Admin-only read access to interview sessions for monitoring."""
     queryset = InterviewSession.objects.select_related(
@@ -384,7 +412,7 @@ class AdminInterviewSessionReadOnlyViewSet(viewsets.ReadOnlyModelViewSet):
     filterset_fields = ['status', 'type']
     search_fields = ['room_name', 'candidate__full_name', 'candidate__email', 'job_post__job_name']
     ordering_fields = ['create_at', 'status', 'start_time']
-    
+
     def get_serializer_class(self):
         if self.action == 'retrieve':
             return InterviewSessionDetailSerializer

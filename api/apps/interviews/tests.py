@@ -8,8 +8,9 @@ Tests cover:
 4. Status transitions (state machine guards)
 """
 
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 from decimal import Decimal
+from types import SimpleNamespace
 
 from django.test import TestCase, TransactionTestCase
 from django.test import RequestFactory, override_settings
@@ -34,6 +35,7 @@ from apps.interviews.services import (
     get_next_question_payload,
     update_interview_status,
 )
+from apps.interviews.livekit_service import LiveKitService
 from integrations.livekit.webhook import _handle_livekit_event, livekit_webhook
 
 
@@ -203,6 +205,24 @@ class LiveKitWebhookTests(TestCase):
             self.session.recording_url,
             "http://localhost:9000/square/interviews/demo/recording.mp4",
         )
+
+
+class LiveKitServiceTests(TestCase):
+    @patch("apps.interviews.livekit_service.api.LiveKitAPI")
+    def test_ensure_room_with_agent_keeps_existing_room_intact(self, mock_livekit_api_cls):
+        mock_api = mock_livekit_api_cls.return_value
+        mock_api.aclose = AsyncMock()
+        mock_api.room = SimpleNamespace(
+            list_rooms=AsyncMock(return_value=SimpleNamespace(rooms=[object()])),
+            create_room=AsyncMock(),
+            delete_room=AsyncMock(),
+            list_participants=AsyncMock(),
+        )
+
+        LiveKitService.ensure_room_with_agent("interview-existing-room")
+
+        mock_api.room.create_room.assert_not_called()
+        mock_api.room.delete_room.assert_not_called()
 
 
 # ─── NEW: Session CRUD API Tests ───────────────────────────────────────────

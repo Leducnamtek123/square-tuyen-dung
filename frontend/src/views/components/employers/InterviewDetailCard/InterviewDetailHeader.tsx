@@ -16,6 +16,7 @@ type Props = {
   isSessionActive: boolean;
   sseConnected: boolean;
   observerLoading: boolean;
+  joinLoading?: boolean;
   onBack: () => void;
   onTriggerObserver: () => void;
   onForceEndInterview: () => void;
@@ -50,6 +51,7 @@ const InterviewDetailHeader = ({
   isSessionActive,
   sseConnected,
   observerLoading,
+  joinLoading = false,
   onBack,
   onTriggerObserver,
   onForceEndInterview,
@@ -256,9 +258,9 @@ const InterviewDetailHeader = ({
             <Box sx={{ width: { xs: '100%', md: 'auto' } }}>
               <Button
                 variant="contained"
-                disabled={!canJoinLiveRoom}
+                disabled={!canJoinLiveRoom || joinLoading}
                 onClick={onJoinRoom}
-                startIcon={<PlayCircleOutlineIcon />}
+                startIcon={joinLoading ? undefined : <PlayCircleOutlineIcon />}
                 sx={{
                   borderRadius: 3,
                   minWidth: { xs: '100%', md: 280 },
@@ -279,7 +281,7 @@ const InterviewDetailHeader = ({
                   },
                 }}
               >
-                {t('common:actions.joinNow')}
+                {joinLoading ? 'Đang kết nối...' : t('common:actions.joinNow')}
               </Button>
             </Box>
           </Tooltip>

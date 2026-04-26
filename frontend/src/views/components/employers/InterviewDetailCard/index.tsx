@@ -6,7 +6,7 @@ import { Box, Grid2 as Grid, Paper, Skeleton, Stack, Typography } from '@mui/mat
 import { LiveKitRoom } from '@livekit/components-react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { ROUTES } from '../../../../configs/constants';
+import { AIInterviewLayout } from '../../../interviewPages/AIInterviewLayout';
 import InterviewAiEvaluationCard from './InterviewAiEvaluationCard';
 import InterviewAnalysisPanel from './InterviewAnalysisPanel';
 import InterviewHrEvaluationForm from './InterviewHrEvaluationForm';
@@ -43,6 +43,9 @@ type State = {
   observerOpen: boolean;
   connectionDetails: { token: string; serverUrl: string } | null;
   observerLoading: boolean;
+  hrConnectionDetails: { token: string; serverUrl: string } | null;
+  hrLoading: boolean;
+  hrConnected: boolean;
 };
 
 type Action =
@@ -50,7 +53,10 @@ type Action =
   | { type: 'set_triggering_ai'; payload: boolean }
   | { type: 'set_observer_open'; payload: boolean }
   | { type: 'set_connection_details'; payload: { token: string; serverUrl: string } | null }
-  | { type: 'set_observer_loading'; payload: boolean };
+  | { type: 'set_observer_loading'; payload: boolean }
+  | { type: 'set_hr_connection_details'; payload: { token: string; serverUrl: string } | null }
+  | { type: 'set_hr_loading'; payload: boolean }
+  | { type: 'set_hr_connected'; payload: boolean };
 
 const initialState: State = {
   evalForm: {
@@ -64,6 +70,9 @@ const initialState: State = {
   observerOpen: false,
   connectionDetails: null,
   observerLoading: false,
+  hrConnectionDetails: null,
+  hrLoading: false,
+  hrConnected: false,
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -78,6 +87,12 @@ const reducer = (state: State, action: Action): State => {
       return { ...state, connectionDetails: action.payload };
     case 'set_observer_loading':
       return { ...state, observerLoading: action.payload };
+    case 'set_hr_connection_details':
+      return { ...state, hrConnectionDetails: action.payload };
+    case 'set_hr_loading':
+      return { ...state, hrLoading: action.payload };
+    case 'set_hr_connected':
+      return { ...state, hrConnected: action.payload };
     default:
       return state;
   }
@@ -214,6 +229,21 @@ const InterviewDetailCard = () => {
     }
   };
 
+  const handleJoinAsHR = React.useCallback(async () => {
+    if (!session?.id) return;
+    dispatch({ type: 'set_hr_loading', payload: true });
+    try {
+      const details = await interviewService.getHrPresenceToken(session.id);
+      const serverUrl = details.serverUrl || details.server_url || process.env.NEXT_PUBLIC_LIVEKIT_URL || '';
+      dispatch({ type: 'set_hr_connection_details', payload: { token: details.token, serverUrl } });
+      dispatch({ type: 'set_hr_connected', payload: true });
+    } catch (e) {
+      errorHandling(e as AxiosError<{ errors?: ApiError }>);
+    } finally {
+      dispatch({ type: 'set_hr_loading', payload: false });
+    }
+  }, [session?.id]);
+
   if (loading) {
     return (
       <Box sx={{ p: 4 }}>
@@ -256,6 +286,34 @@ const InterviewDetailCard = () => {
   const canObserve = effectiveStatus === 'in_progress';
   const recordingUrl = session.recordingUrl || session.recording_url || null;
   const liveKitReady = Boolean(isSessionActive && state.connectionDetails);
+
+  // ── HR Presence fullscreen session ──────────────────────────────────────
+  if (state.hrConnected && state.hrConnectionDetails) {
+    return (
+      <Paper elevation={0} sx={{ position: 'fixed', inset: 0, zIndex: 1300, borderRadius: 0, bgcolor: '#020617' }}>
+        <LiveKitRoom
+          token={state.hrConnectionDetails.token}
+          serverUrl={state.hrConnectionDetails.serverUrl}
+          connect={true}
+          audio={false}
+          video={false}
+          onDisconnected={() => {
+            dispatch({ type: 'set_hr_connected', payload: false });
+            dispatch({ type: 'set_hr_connection_details', payload: null });
+          }}
+          style={{ height: '100%', width: '100%' }}
+        >
+          <AIInterviewLayout
+            onEndSession={async () => {
+              dispatch({ type: 'set_hr_connected', payload: false });
+              dispatch({ type: 'set_hr_connection_details', payload: null });
+            }}
+          />
+        </LiveKitRoom>
+      </Paper>
+    );
+  }
+
   const detailContent = (
     <>
       <InterviewDetailHeader
@@ -266,10 +324,11 @@ const InterviewDetailCard = () => {
         isSessionActive={isSessionActive}
         sseConnected={sseConnected}
         observerLoading={state.observerLoading}
+        joinLoading={state.hrLoading}
         onBack={() => navigate.back()}
         onTriggerObserver={handleObserverMode}
         onForceEndInterview={handleForceEndInterview}
-        onJoinRoom={() => navigate.push(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', session.id.toString())}`)}
+        onJoinRoom={() => handleJoinAsHR()}
         t={t}
       />
 
