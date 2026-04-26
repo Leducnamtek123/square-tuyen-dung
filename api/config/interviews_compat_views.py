@@ -1,6 +1,5 @@
 import json
 
-from asgiref.sync import sync_to_async
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -35,11 +34,11 @@ def _get_session(room_name: str) -> InterviewSession:
 
 
 # ---------------------------------------------------------------------------
-# Views (async – safe for ASGI)
+# Views (sync for compatibility with both WSGI and ASGI)
 # ---------------------------------------------------------------------------
 
 @csrf_exempt
-async def interview_context(request: HttpRequest, room_name: str):
+def interview_context(request: HttpRequest, room_name: str):
     """
     GET /api/v1/interview/compat/{room_name}/context
 
@@ -50,8 +49,8 @@ async def interview_context(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
     try:
-        session = await sync_to_async(_get_context_session)(room_name)
-        context_data = await sync_to_async(build_interview_context)(session)
+        session = _get_context_session(room_name)
+        context_data = build_interview_context(session)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
@@ -59,7 +58,7 @@ async def interview_context(request: HttpRequest, room_name: str):
 
 
 @csrf_exempt
-async def interview_next_question(request: HttpRequest, room_name: str):
+def interview_next_question(request: HttpRequest, room_name: str):
     """
     POST /api/v1/interview/compat/{room_name}/next-question
     Body: { "advance": true|false }
@@ -81,10 +80,10 @@ async def interview_next_question(request: HttpRequest, room_name: str):
         advance = bool(body.get("advance", True))
 
     try:
-        session = await sync_to_async(_get_question_session)(room_name)
-        payload = await sync_to_async(get_next_question_payload)(session)
+        session = _get_question_session(room_name)
+        payload = get_next_question_payload(session)
         if advance and not payload.get("done"):
-            await sync_to_async(advance_question_cursor)(session)
+            advance_question_cursor(session)
             payload["advance"] = True
         else:
             payload["advance"] = False
@@ -95,7 +94,7 @@ async def interview_next_question(request: HttpRequest, room_name: str):
 
 
 @csrf_exempt
-async def interview_status(request: HttpRequest, room_name: str):
+def interview_status(request: HttpRequest, room_name: str):
     """
     PATCH /api/v1/interview/compat/{room_name}/status
     Body: { "status": "in_progress"|"completed"|... }
@@ -116,8 +115,8 @@ async def interview_status(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Missing `status`."}, status=400)
 
     try:
-        session = await sync_to_async(_get_session)(room_name)
-        updated_status = await sync_to_async(update_interview_status)(session, new_status)
+        session = _get_session(room_name)
+        updated_status = update_interview_status(session, new_status)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
@@ -125,7 +124,7 @@ async def interview_status(request: HttpRequest, room_name: str):
 
 
 @csrf_exempt
-async def interview_append_transcription(request: HttpRequest, room_name: str):
+def interview_append_transcription(request: HttpRequest, room_name: str):
     """
     POST /api/v1/interview/compat/{room_name}/append-transcription
     Body: { "speaker_role": "ai_agent"|"candidate", "content": "...", "speech_duration_ms": 123 }
@@ -151,8 +150,8 @@ async def interview_append_transcription(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Missing `content`."}, status=400)
 
     try:
-        session = await sync_to_async(_get_session)(room_name)
-        transcript = await sync_to_async(append_transcript)(
+        session = _get_session(room_name)
+        transcript = append_transcript(
             session,
             {
                 "speaker_role": speaker_role,

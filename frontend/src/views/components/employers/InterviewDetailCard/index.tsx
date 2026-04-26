@@ -35,7 +35,7 @@ interface EvalFormType {
   proposed_salary: number | string;
 }
 
-const ACTIVE_STATUSES = ['in_progress', 'calibration', 'processing', 'connecting', 'active', 'interrupted'];
+const ACTIVE_STATUSES = ['scheduled', 'calibration', 'in_progress'];
 
 type State = {
   evalForm: EvalFormType;

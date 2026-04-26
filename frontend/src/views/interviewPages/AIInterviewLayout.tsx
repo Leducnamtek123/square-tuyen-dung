@@ -123,7 +123,7 @@ function AIParticipantTile({ trackRef, ...props }: { trackRef?: TrackReferenceOr
   const isSelf = participant?.isLocal;
   const isSpeaking = participant?.isSpeaking;
   const isEmployer = isRoleMatch(participant, ['employer', 'admin']);
-  const isAgent = !isSelf && !isEmployer ? true : isLiveKitAgentParticipant(participant);
+  const isAgent = isLiveKitAgentParticipant(participant);
   const { t } = useTranslation(['interview']);
 
   let displayName = participant?.name || participant?.identity || '';

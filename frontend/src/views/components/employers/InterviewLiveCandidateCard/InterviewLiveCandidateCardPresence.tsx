@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import interviewService from '../../../../services/interviewService';
 import { type InterviewSession } from '../../../../types/models';
 
-const ACTIVE_STATUSES = new Set(['in_progress', 'calibration', 'connecting', 'active', 'interrupted']);
+const ACTIVE_STATUSES = new Set(['scheduled', 'calibration', 'in_progress']);
 const normalizeStatus = (status: string) => status.trim().toLowerCase();
 
 const getSafeLiveKitUrl = () => {
@@ -42,13 +42,10 @@ const getStatusColor = (status: string): 'success' | 'primary' | 'info' | 'error
   switch (status) {
     case 'completed':
       return 'success';
-    case 'in_progress':
-    case 'calibration':
-    case 'connecting':
-    case 'active':
-      return 'primary';
     case 'scheduled':
-      return 'info';
+    case 'calibration':
+    case 'in_progress':
+      return 'primary';
     case 'processing':
       return 'warning';
     case 'cancelled':
