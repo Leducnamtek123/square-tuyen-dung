@@ -207,7 +207,7 @@ def livekit_webhook(request: HttpRequest):
             )
 
     try:
-        _run_in_thread(_handle_livekit_event, payload)
+        _handle_livekit_event(payload)
     except Exception as exc:
         logger.warning("LiveKit webhook handling error: %s", exc)
 

@@ -16,12 +16,18 @@ def build_session_kwargs() -> dict[str, Any]:
     """
 
     return {
-        "allow_interruptions": True,
-        "discard_audio_if_uninterruptible": True,
-        "min_interruption_duration": config.MIN_INTERRUPTION_DURATION,
-        "min_interruption_words": config.MIN_INTERRUPTION_WORDS,
-        "min_endpointing_delay": config.MIN_ENDPOINTING_DELAY,
-        "max_endpointing_delay": config.MAX_ENDPOINTING_DELAY,
+        "turn_handling": {
+            "endpointing": {
+                "min_delay": config.MIN_ENDPOINTING_DELAY,
+                "max_delay": config.MAX_ENDPOINTING_DELAY,
+            },
+            "interruption": {
+                "enabled": True,
+                "discard_audio_if_uninterruptible": True,
+                "min_duration": config.MIN_INTERRUPTION_DURATION,
+                "min_words": config.MIN_INTERRUPTION_WORDS,
+            },
+        },
         "min_consecutive_speech_delay": config.MIN_CONSECUTIVE_SPEECH_DELAY,
         "preemptive_generation": config.PREEMPTIVE_GENERATION,
     }

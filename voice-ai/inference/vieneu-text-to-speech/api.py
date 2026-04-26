@@ -15,6 +15,7 @@ import torch
 import uvicorn
 import subprocess
 import threading
+from contextlib import asynccontextmanager, suppress
 
 # Polyfill for missing torch bit-types if needed by dynamic imports (like torchao)
 if not hasattr(torch, "int1"):
@@ -28,8 +29,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from vieneu import Vieneu
 from loguru import logger
-
-from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -202,6 +201,7 @@ async def tts_speech(req: OpenAITTSRequest):  # noqa: C901
     def generator():
         input_sample_rate = 24000
         output_sample_rate = 24000
+        stop_event = threading.Event()
         
         ffmpeg_cmd = [
             "ffmpeg", "-loglevel", "error", "-f", "s16le", "-ar", str(input_sample_rate), "-ac", "1", "-i", "-",
@@ -233,6 +233,10 @@ async def tts_speech(req: OpenAITTSRequest):  # noqa: C901
                 chunk_count = 0
                 # Using temperature=1.2 for more energy and variance
                 for chunk in engine.infer_stream(req.input, voice=voice_data, temperature=1.2):
+                    if stop_event.is_set():
+                        logger.debug("TTS writer stopping early due to stream shutdown")
+                        break
+
                     chunk_count += 1
                     
                     # Log detailed stats before normalization
@@ -248,16 +252,29 @@ async def tts_speech(req: OpenAITTSRequest):  # noqa: C901
                         logger.warning(f"⚠️ SILENT CHUNK {chunk_count} (max={raw_max:.8f}) - Skipping normalization")
                     
                     pcm_data = float32_to_pcm16(chunk)
-                    process.stdin.write(pcm_data)
-                    process.stdin.flush()
+                    try:
+                        if process.stdin is None or process.stdin.closed:
+                            raise BrokenPipeError("FFmpeg stdin already closed")
+                        process.stdin.write(pcm_data)
+                        process.stdin.flush()
+                    except (BrokenPipeError, ValueError, OSError) as pipe_exc:
+                        if stop_event.is_set() or process.poll() is not None:
+                            logger.debug("TTS writer stopped after shutdown: %s", pipe_exc)
+                            break
+                        raise
                 
                 logger.info(f"Inference finished. Total chunks: {chunk_count}")
-                process.stdin.close()
-            except Exception as e:
-                logger.error(f"Inference error: {e}", exc_info=True)
-                ex_q.put(e)
-                if process.stdin:
+                if process.stdin and not process.stdin.closed:
                     process.stdin.close()
+            except Exception as e:
+                if stop_event.is_set() and isinstance(e, (BrokenPipeError, ValueError, OSError)):
+                    logger.debug("Inference ended after shutdown: %s", e)
+                else:
+                    logger.error(f"Inference error: {e}", exc_info=True)
+                    ex_q.put(e)
+                with suppress(Exception):
+                    if process.stdin and not process.stdin.closed:
+                        process.stdin.close()
 
         thread = threading.Thread(target=write_to_ffmpeg, daemon=True)
         thread.start()
@@ -279,9 +296,16 @@ async def tts_speech(req: OpenAITTSRequest):  # noqa: C901
                 total_bytes_out += len(data)
                 yield data
         finally:
-            process.terminate()
-            if process.stdin:
-                process.stdin.close()
+            stop_event.set()
+            with suppress(Exception):
+                if process.stdin and not process.stdin.closed:
+                    process.stdin.close()
+            with suppress(Exception):
+                process.terminate()
+            with suppress(Exception):
+                process.wait(timeout=2)
+            if thread.is_alive():
+                thread.join(timeout=2)
 
     media_type = "audio/mpeg" if req.response_format == "mp3" else "audio/wav"
     if req.response_format == "pcm":
