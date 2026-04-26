@@ -171,9 +171,9 @@ const InterviewDetailCard = () => {
   );
 
   React.useEffect(() => {
-    if (!isSessionActive || state.connectionDetails || state.observerLoading) return;
+    if (effectiveStatus !== 'in_progress' || state.connectionDetails || state.observerLoading) return;
     void ensureObserverConnection(false);
-  }, [ensureObserverConnection, isSessionActive, state.connectionDetails, state.observerLoading]);
+  }, [ensureObserverConnection, effectiveStatus, state.connectionDetails, state.observerLoading]);
 
   const handleEvalChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

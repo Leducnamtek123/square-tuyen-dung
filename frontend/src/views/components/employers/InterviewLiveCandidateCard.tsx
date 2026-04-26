@@ -88,12 +88,13 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
 
   const normalizedStatus = normalizeStatus(session.status);
   const isLive = ACTIVE_STATUSES.has(normalizedStatus);
+  const shouldLoadObserverToken = normalizedStatus === 'calibration' || normalizedStatus === 'in_progress';
 
   useEffect(() => {
     let alive = true;
 
     const loadToken = async () => {
-      if (!isLive || !session.id) {
+      if (!shouldLoadObserverToken || !session.id) {
         dispatch({ type: 'set_connection_details', value: null });
         dispatch({ type: 'set_token_error', value: null });
         dispatch({ type: 'set_loading_token', value: false });
@@ -123,7 +124,7 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
     return () => {
       alive = false;
     };
-  }, [isLive, session.id, t]);
+  }, [shouldLoadObserverToken, session.id, t]);
 
   useEffect(() => {
     if (!isLive) {
