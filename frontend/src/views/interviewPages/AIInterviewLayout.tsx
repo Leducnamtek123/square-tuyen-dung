@@ -115,10 +115,16 @@ function CustomControlBar({
 function AIParticipantTile({
   trackRef,
   agentState,
+  agentIdentity,
+  agentSid,
+  hasDetectedAgent,
   ...props
 }: {
   trackRef?: TrackReferenceOrPlaceholder;
   agentState?: AgentState;
+  agentIdentity?: string;
+  agentSid?: string;
+  hasDetectedAgent?: boolean;
   [key: string]: any;
 }) {
   const participant = trackRef?.participant;
@@ -126,9 +132,17 @@ function AIParticipantTile({
   const isSpeaking = participant?.isSpeaking;
   const role = getParticipantRole(participant);
   const isEmployer = role === 'employer';
-  const isAgent = role === 'agent';
+  const isAgentByVoiceAssistant =
+    Boolean(agentSid && participant?.sid === agentSid) ||
+    Boolean(agentIdentity && participant?.identity === agentIdentity);
+  const isAgent = role === 'agent' || isAgentByVoiceAssistant;
   const hasPublication = Boolean(trackRef?.publication);
-  const shouldRenderSyntheticAgent = !isAgent && !isEmployer && !isSelf && !hasPublication && props?.hasAgentTranscript;
+  const shouldRenderSyntheticAgent =
+    !isAgent &&
+    !isEmployer &&
+    !isSelf &&
+    !hasPublication &&
+    (props?.hasAgentTranscript || hasDetectedAgent);
   const { t } = useTranslation(['interview']);
 
   let displayName = participant?.name || participant?.identity || '';
@@ -541,6 +555,8 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   const { messages, send, isSending } = useInterviewMessages();
   const { t } = useTranslation(['interview']);
   const hasAgentTranscript = messages.some((message) => message.type === 'agentTranscript');
+  const agentIdentity = voiceAssistant.agent?.identity;
+  const agentSid = voiceAssistant.agent?.sid;
 
   const rawTracks = useTracks(
     [
@@ -573,7 +589,8 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
     return true;
   });
 
-  const agentParticipant = participants.find((participant) => getParticipantRole(participant) === 'agent');
+  const agentParticipant =
+    voiceAssistant.agent ?? participants.find((participant) => getParticipantRole(participant) === 'agent');
   if (agentParticipant) {
     const hasAgentTrack = finalTracks.some((track) => track.participant.sid === agentParticipant.sid);
     if (!hasAgentTrack) {
@@ -613,7 +630,13 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
           <div className="flex flex-1 flex-col gap-2 min-h-0 p-2">
             <div className="min-h-0 flex-1">
               <GridLayout tracks={finalTracks}>
-                <AIParticipantTile hasAgentTranscript={hasAgentTranscript} agentState={voiceAssistant.state} />
+                <AIParticipantTile
+                  hasAgentTranscript={hasAgentTranscript}
+                  hasDetectedAgent={Boolean(agentParticipant)}
+                  agentState={voiceAssistant.state}
+                  agentIdentity={agentIdentity}
+                  agentSid={agentSid}
+                />
               </GridLayout>
             </div>
 

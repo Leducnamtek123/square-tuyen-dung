@@ -24,7 +24,18 @@ describe('livekitParticipant helpers', () => {
     expect(getParticipantRole(participant)).toBe('employer');
   });
 
-  it('falls back to candidate role by default', () => {
+  it('detects agent from lk.agent.state attribute', () => {
+    const participant = {
+      kind: ParticipantKind.STANDARD,
+      identity: 'assistant-1',
+      name: 'Assistant',
+      attributes: { 'lk.agent.state': 'listening' },
+    } as any;
+
+    expect(getParticipantRole(participant)).toBe('agent');
+  });
+
+  it('falls back to guest role by default', () => {
     const participant = {
       kind: ParticipantKind.STANDARD,
       identity: 'user-9',
@@ -32,7 +43,7 @@ describe('livekitParticipant helpers', () => {
       attributes: {},
     } as any;
 
-    expect(getParticipantRole(participant)).toBe('candidate');
+    expect(getParticipantRole(participant)).toBe('guest');
   });
 
   it('sanitizes function payloads and code blocks from transcript text', () => {
@@ -40,4 +51,3 @@ describe('livekitParticipant helpers', () => {
     expect(sanitizeInterviewText(raw)).toBe('xin chao the end');
   });
 });
-
