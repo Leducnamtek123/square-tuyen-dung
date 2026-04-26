@@ -10,7 +10,7 @@ import {
   useRoomContext,
   useLocalParticipant,
   useParticipants,
-  useAgent,
+  useVoiceAssistant,
   type AgentState,
 } from '@livekit/components-react';
 import { Track } from 'livekit-client';
@@ -536,7 +536,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   const timeFormatted = useLiveTimer();
   const participants = useParticipants();
   const { localParticipant } = useLocalParticipant();
-  const agent = useAgent();
+  const voiceAssistant = useVoiceAssistant();
   const room = useRoomContext();
   const { messages, send, isSending } = useInterviewMessages();
   const { t } = useTranslation(['interview']);
@@ -613,7 +613,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
           <div className="flex flex-1 flex-col gap-2 min-h-0 p-2">
             <div className="min-h-0 flex-1">
               <GridLayout tracks={finalTracks}>
-                <AIParticipantTile hasAgentTranscript={hasAgentTranscript} agentState={agent.state} />
+                <AIParticipantTile hasAgentTranscript={hasAgentTranscript} agentState={voiceAssistant.state} />
               </GridLayout>
             </div>
 
