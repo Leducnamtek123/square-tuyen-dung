@@ -8,7 +8,7 @@ import type {
   TextStreamData,
 } from '@livekit/components-core';
 import type { SendTextOptions } from 'livekit-client';
-import { isLiveKitAgentParticipant } from './livekitParticipant';
+import { isLiveKitAgentIdentity, isLiveKitAgentParticipant } from './livekitParticipant';
 
 type InterviewMessagesResult = {
   messages: ReceivedMessage[];
@@ -26,9 +26,14 @@ function mapTranscriptions(
   const agentParticipant = participants.find((participant) => isLiveKitAgentParticipant(participant));
 
   return transcriptions.map((transcription) => {
-    const participant = participants.find((p) => p.identity === transcription.participantInfo.identity);
-    const isLocal = transcription.participantInfo.identity === localIdentity;
-    const isAgent = agentParticipant?.identity === transcription.participantInfo.identity;
+    const participantInfo = transcription.participantInfo;
+    const participant = participants.find((p) => p.identity === participantInfo.identity);
+    const identity = participantInfo.identity ?? '';
+    const isLocal = identity === localIdentity;
+    const isAgent =
+      isLiveKitAgentParticipant(participant) ||
+      isLiveKitAgentIdentity(identity) ||
+      Boolean(agentParticipant && agentParticipant.identity === identity);
 
     if (isLocal) {
       return {

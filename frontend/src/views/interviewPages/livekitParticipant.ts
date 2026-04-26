@@ -1,5 +1,7 @@
 import { Participant, ParticipantKind } from 'livekit-client';
 
+export type ParticipantRole = 'agent' | 'employer' | 'candidate' | 'observer' | 'guest';
+
 const ROLE_HINTS = ['agent', 'interviewer'];
 const ROLE_ATTRIBUTE_KEYS = ['role', 'participant_role', 'user_role', 'livekit_role'];
 
@@ -39,6 +41,35 @@ export function isLiveKitAgentParticipant(participant?: Participant | null): boo
     const value = participant.attributes?.[key]?.toLowerCase();
     return value === 'agent' || value === 'interviewer';
   });
+}
+
+export function getParticipantRole(participant?: Participant | null): ParticipantRole {
+  const identity = participant?.identity?.toLowerCase?.() ?? '';
+  const name = participant?.name?.toLowerCase?.() ?? '';
+  const metadata = participant?.metadata?.toLowerCase?.() ?? '';
+  const attributes = Object.values(participant?.attributes ?? {})
+    .filter(Boolean)
+    .map((value) => String(value).toLowerCase())
+    .join(' ');
+  const haystack = `${identity} ${name} ${metadata} ${attributes}`.trim();
+
+  if (participant?.isAgent || participant?.kind === ParticipantKind.AGENT || isLiveKitAgentParticipant(participant)) {
+    return 'agent';
+  }
+
+  if (identity.startsWith('employer-') || haystack.includes('employer') || haystack.includes('admin')) {
+    return 'employer';
+  }
+
+  if (identity.startsWith('observer-') || haystack.includes('observer')) {
+    return 'observer';
+  }
+
+  if (identity.startsWith('candidate-') || haystack.includes('candidate')) {
+    return 'candidate';
+  }
+
+  return 'candidate';
 }
 
 export function sanitizeInterviewText(value: string): string {

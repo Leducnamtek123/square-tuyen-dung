@@ -3,7 +3,7 @@ import { alpha, Avatar, Box, Chip, Paper, Stack, Typography } from '@mui/materia
 import { useInterviewMessages } from '@/views/interviewPages/useInterviewMessages';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
-import { isLiveKitAgentParticipant, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
+import { getParticipantRole, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
 
 type Props = {
   t: (key: string, options?: Record<string, unknown>) => string;
@@ -18,15 +18,22 @@ type TranscriptItem = {
   isLocal: boolean;
 };
 
-const mapLiveMessages = (items: ReturnType<typeof useInterviewMessages>['messages']): TranscriptItem[] => {
+const mapLiveMessages = (
+  items: ReturnType<typeof useInterviewMessages>['messages'],
+  t: Props['t'],
+): TranscriptItem[] => {
   return items.map((item) => {
     const participant = item.from;
-    const isAI = isLiveKitAgentParticipant(participant);
+    const isAI = getParticipantRole(participant) === 'agent';
     const isLocal = participant?.isLocal === true;
 
     return {
       id: item.id,
-      name: isAI ? 'AI Interviewer' : isLocal ? 'You' : participant?.name || participant?.identity || 'Guest',
+      name: isAI
+        ? t('interviewDetail.label.interviewer')
+        : isLocal
+          ? t('liveRoom.participants.you')
+          : participant?.name || participant?.identity || t('liveRoom.participants.guest'),
       content: item.message,
       timestamp: item.timestamp,
       isAI,
@@ -37,7 +44,7 @@ const mapLiveMessages = (items: ReturnType<typeof useInterviewMessages>['message
 
 const InterviewObserverDialogTranscript = ({ t }: Props) => {
   const { messages: liveMessages } = useInterviewMessages();
-  const liveTranscripts = React.useMemo(() => mapLiveMessages(liveMessages), [liveMessages]);
+  const liveTranscripts = React.useMemo(() => mapLiveMessages(liveMessages, t), [liveMessages, t]);
 
   return (
     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

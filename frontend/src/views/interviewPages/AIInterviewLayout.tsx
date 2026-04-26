@@ -11,9 +11,9 @@ import {
   useLocalParticipant,
   useParticipants,
 } from '@livekit/components-react';
-import { Track, ParticipantKind } from 'livekit-client';
+import { Track } from 'livekit-client';
 import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
-import { isLiveKitAgentParticipant, sanitizeInterviewText } from './livekitParticipant';
+import { getParticipantRole, isLiveKitAgentParticipant, sanitizeInterviewText } from './livekitParticipant';
 import { useInterviewMessages } from './useInterviewMessages';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -110,39 +110,6 @@ function CustomControlBar({
   );
 }
 
-type ParticipantRole = 'agent' | 'employer' | 'candidate' | 'observer' | 'guest';
-
-function getParticipantRole(participant: any): ParticipantRole {
-  const identity = participant?.identity?.toLowerCase?.() ?? '';
-  const name = participant?.name?.toLowerCase?.() ?? '';
-  const metadata = participant?.metadata?.toLowerCase?.() ?? '';
-  const attributes = Object.values(participant?.attributes ?? {})
-    .filter(Boolean)
-    .map((value) => String(value).toLowerCase())
-    .join(' ');
-  const haystack = `${identity} ${name} ${metadata} ${attributes}`.trim();
-
-  if (
-    participant?.isAgent ||
-    participant?.kind === ParticipantKind.AGENT ||
-    haystack.includes('agent') ||
-    haystack.includes('interviewer')
-  ) {
-    return 'agent';
-  }
-  if (identity.startsWith('employer-') || haystack.includes('employer') || haystack.includes('admin')) {
-    return 'employer';
-  }
-  if (identity.startsWith('observer-') || haystack.includes('observer')) {
-    return 'observer';
-  }
-  if (identity.startsWith('candidate-') || haystack.includes('candidate')) {
-    return 'candidate';
-  }
-
-  return participant?.isLocal ? 'candidate' : 'candidate';
-}
-
 function AIParticipantTile({ trackRef, ...props }: { trackRef?: TrackReferenceOrPlaceholder; [key: string]: any }) {
   const participant = trackRef?.participant;
   const isSelf = participant?.isLocal;
@@ -150,15 +117,18 @@ function AIParticipantTile({ trackRef, ...props }: { trackRef?: TrackReferenceOr
   const role = getParticipantRole(participant);
   const isEmployer = role === 'employer';
   const isAgent = role === 'agent';
+  const hasPublication = Boolean(trackRef?.publication);
+  const shouldRenderSyntheticAgent = !isAgent && !isEmployer && !isSelf && !hasPublication && props?.hasAgentTranscript;
   const { t } = useTranslation(['interview']);
 
   let displayName = participant?.name || participant?.identity || '';
   if (isAgent) displayName = t('liveRoom.participants.aiInterviewer');
   else if (isEmployer) displayName = t('liveRoom.participants.employer');
   else if (isSelf) displayName = t('liveRoom.participants.you');
+  else if (shouldRenderSyntheticAgent) displayName = t('liveRoom.participants.aiInterviewer');
   else if (!displayName) displayName = role === 'candidate' ? t('liveRoom.participants.candidate') : t('liveRoom.participants.guest');
 
-  if (isAgent) {
+  if (isAgent || shouldRenderSyntheticAgent) {
     return (
       <div
         className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-white/8 bg-[#0f172a] shadow-[0_0_0_2px_rgba(14,165,233,0)] transition-all data-[speaking=true]:border-cyan-400/60 data-[speaking=true]:shadow-[0_0_0_2px_rgba(14,165,233,0.3)]"
@@ -493,6 +463,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   const room = useRoomContext();
   const { messages, send, isSending } = useInterviewMessages();
   const { t } = useTranslation(['interview']);
+  const hasAgentTranscript = messages.some((message) => message.type === 'agentTranscript');
 
   const rawTracks = useTracks(
     [
@@ -565,7 +536,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
           <div className="flex flex-1 flex-col gap-2 min-h-0 p-2">
             <div className="min-h-0 flex-1">
               <GridLayout tracks={finalTracks}>
-                <AIParticipantTile />
+                <AIParticipantTile hasAgentTranscript={hasAgentTranscript} />
               </GridLayout>
             </div>
 

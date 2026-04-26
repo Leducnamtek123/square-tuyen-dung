@@ -8,7 +8,7 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import type { i18n, TFunction } from 'i18next';
 
 import { InterviewSession, InterviewTranscript } from '@/types/models';
-import { isLiveKitAgentParticipant, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
+import { getParticipantRole, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
 import { useInterviewMessages } from '@/views/interviewPages/useInterviewMessages';
 import pc from '@/utils/muiColors';
 
@@ -29,7 +29,7 @@ type TranscriptItem = {
 const mapLiveMessages = (items: ReturnType<typeof useInterviewMessages>['messages']): TranscriptItem[] => {
   return items.map((item) => {
     const participant = item.from;
-    const isInterviewer = isLiveKitAgentParticipant(participant);
+    const isInterviewer = getParticipantRole(participant) === 'agent';
 
     return {
       speaker: isInterviewer ? 'interviewer' : 'candidate',
