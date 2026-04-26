@@ -1,10 +1,8 @@
 import React from 'react';
 import { alpha, Avatar, Box, Chip, Paper, Stack, Typography } from '@mui/material';
-import { useChat, useParticipants, useTranscriptions } from '@livekit/components-react';
+import { useInterviewMessages } from '@/views/interviewPages/useInterviewMessages';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
-import type { TextStreamData } from '@livekit/components-core';
-import { type Participant } from 'livekit-client';
 import { isLiveKitAgentParticipant, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
 
 type Props = {
@@ -20,24 +18,7 @@ type TranscriptItem = {
   isLocal: boolean;
 };
 
-const mapTranscriptions = (items: TextStreamData[], participants: Participant[]): TranscriptItem[] => {
-  return items.map((item) => {
-    const participant = participants.find((p) => p.identity === item.participantInfo.identity);
-    const isAI = isLiveKitAgentParticipant(participant);
-    const isLocal = participant?.isLocal === true;
-
-    return {
-      id: `${item.streamInfo.id}`,
-      name: isAI ? 'AI Interviewer' : isLocal ? 'You' : participant?.name || participant?.identity || 'Guest',
-      content: item.text,
-      timestamp: item.streamInfo.timestamp,
-      isAI,
-      isLocal,
-    };
-  });
-};
-
-const mapChatMessages = (items: ReturnType<typeof useChat>['chatMessages']): TranscriptItem[] => {
+const mapLiveMessages = (items: ReturnType<typeof useInterviewMessages>['messages']): TranscriptItem[] => {
   return items.map((item) => {
     const participant = item.from;
     const isAI = isLiveKitAgentParticipant(participant);
@@ -55,14 +36,8 @@ const mapChatMessages = (items: ReturnType<typeof useChat>['chatMessages']): Tra
 };
 
 const InterviewObserverDialogTranscript = ({ t }: Props) => {
-  const participants = useParticipants();
-  const transcriptions = useTranscriptions();
-  const chatOptions = React.useMemo(() => ({ channelTopic: 'lk.chat' }), []);
-  const chat = useChat(chatOptions);
-  const liveTranscripts = React.useMemo(
-    () => [...mapTranscriptions(transcriptions, participants), ...mapChatMessages(chat.chatMessages)],
-    [chat.chatMessages, participants, transcriptions],
-  );
+  const { messages: liveMessages } = useInterviewMessages();
+  const liveTranscripts = React.useMemo(() => mapLiveMessages(liveMessages), [liveMessages]);
 
   return (
     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>

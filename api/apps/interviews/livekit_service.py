@@ -6,6 +6,7 @@ import os
 import uuid
 import asyncio
 import logging
+import json
 from decouple import config
 from livekit import api
 
@@ -20,6 +21,21 @@ LIVEKIT_AGENT_NAME = config('LIVEKIT_AGENT_NAME', default='square-ai-interviewer
 logger = logging.getLogger(__name__)
 
 class LiveKitService:
+    @staticmethod
+    def _apply_participant_identity(token_builder: api.AccessToken, role: str, *, participant_name: str) -> api.AccessToken:
+        """
+        Tag participant role in both metadata and attributes so the frontend can
+        classify participants without guessing from display names.
+        """
+        return (
+            token_builder
+            .with_metadata(json.dumps({"role": role, "name": participant_name}, ensure_ascii=False))
+            .with_attributes({
+                "role": role,
+                "participant_role": role,
+            })
+        )
+
     @staticmethod
     def ensure_room_with_agent(room_name: str) -> None:
         """
@@ -75,6 +91,12 @@ class LiveKitService:
                 can_subscribe=True,
                 hidden=is_agent
             )))
+        participant_role = "agent" if is_agent else "candidate"
+        token_builder = LiveKitService._apply_participant_identity(
+            token_builder,
+            participant_role,
+            participant_name=participant_name,
+        )
         # Room agent is already attached when the room is created via ensure_room_with_agent().
         # Avoid attaching room_config to participant tokens to prevent triggering participant-level
         # agent jobs when workers only handle room-level jobs.
@@ -142,6 +164,11 @@ class LiveKitService:
                 hidden=True,
             ))
         )
+        token_builder = LiveKitService._apply_participant_identity(
+            token_builder,
+            "observer",
+            participant_name=observer_name,
+        )
         return token_builder.to_jwt()
 
     @staticmethod
@@ -170,6 +197,11 @@ class LiveKitService:
                 can_subscribe=True,
                 hidden=False,
             ))
+        )
+        token_builder = LiveKitService._apply_participant_identity(
+            token_builder,
+            "employer",
+            participant_name=hr_name,
         )
         return token_builder.to_jwt()
 

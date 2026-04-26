@@ -5,13 +5,11 @@ import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
-import { useChat, useParticipants, useTranscriptions } from '@livekit/components-react';
-import type { TextStreamData } from '@livekit/components-core';
-import type { Participant } from 'livekit-client';
 import type { i18n, TFunction } from 'i18next';
 
 import { InterviewSession, InterviewTranscript } from '@/types/models';
 import { isLiveKitAgentParticipant, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
+import { useInterviewMessages } from '@/views/interviewPages/useInterviewMessages';
 import pc from '@/utils/muiColors';
 
 interface InterviewTranscriptPanelProps {
@@ -28,22 +26,7 @@ type TranscriptItem = {
   isLive: boolean;
 };
 
-const mapLiveTranscripts = (items: TextStreamData[], participants: Participant[]): TranscriptItem[] => {
-  return items.map((item) => {
-    const participant = participants.find((p) => p.identity === item.participantInfo.identity);
-    const isInterviewer = isLiveKitAgentParticipant(participant);
-
-    return {
-      speaker: isInterviewer ? 'interviewer' : 'candidate',
-      text: item.text,
-      timestamp: new Date(item.streamInfo.timestamp).toLocaleTimeString(),
-      id: item.streamInfo.id,
-      isLive: true,
-    };
-  });
-};
-
-const mapChatMessages = (items: ReturnType<typeof useChat>['chatMessages']): TranscriptItem[] => {
+const mapLiveMessages = (items: ReturnType<typeof useInterviewMessages>['messages']): TranscriptItem[] => {
   return items.map((item) => {
     const participant = item.from;
     const isInterviewer = isLiveKitAgentParticipant(participant);
@@ -60,17 +43,13 @@ const mapChatMessages = (items: ReturnType<typeof useChat>['chatMessages']): Tra
 
 const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n }) => {
   const transcriptEndRef = useRef<HTMLDivElement>(null);
-  const participants = useParticipants();
-  const transcriptions = useTranscriptions();
-  const chatOptions = React.useMemo(() => ({ channelTopic: 'lk.chat' }), []);
-  const chat = useChat(chatOptions);
+  const { messages: liveMessages } = useInterviewMessages();
 
   const mergedTranscripts = React.useMemo(() => {
     const existingTranscripts = Array.isArray(session.transcripts) ? session.transcripts : [];
     const existingIds = new Set(existingTranscripts.map((transcript: InterviewTranscript) => transcript.id));
     const liveOnly = [
-      ...mapLiveTranscripts(transcriptions, participants),
-      ...mapChatMessages(chat.chatMessages),
+      ...mapLiveMessages(liveMessages),
     ].filter((item) => !existingIds.has(item.id));
 
     const mapped: TranscriptItem[] = existingTranscripts.map((transcript: InterviewTranscript) => ({
@@ -82,13 +61,13 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
     }));
 
     return [...mapped, ...liveOnly];
-  }, [chat.chatMessages, i18n.language, participants, session.transcripts, transcriptions]);
+  }, [i18n.language, liveMessages, session.transcripts]);
 
   useEffect(() => {
-    if ((transcriptions.length > 0 || chat.chatMessages.length > 0) && transcriptEndRef.current) {
+    if (liveMessages.length > 0 && transcriptEndRef.current) {
       transcriptEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [chat.chatMessages.length, transcriptions.length]);
+  }, [liveMessages.length]);
 
   return (
     <Paper

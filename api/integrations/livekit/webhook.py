@@ -1,6 +1,7 @@
 import json
 import logging
 from collections.abc import Mapping, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 from django.conf import settings
@@ -12,6 +13,8 @@ from apps.interviews.services import update_interview_status
 from apps.interviews.livekit_service import LiveKitService
 
 logger = logging.getLogger("livekit.webhook")
+
+_THREAD_POOL = ThreadPoolExecutor(max_workers=4)
 
 
 _URL_KEYS = ("recording_url", "recordingUrl", "recordingURL", "file_url", "fileUrl", "url", "downloadUrl")
@@ -35,6 +38,10 @@ def _iter_nodes(value: Any) -> list[Any]:
     if isinstance(value, Sequence):
         return list(value)
     return [value]
+
+
+def _run_in_thread(func, *args, **kwargs):
+    return _THREAD_POOL.submit(func, *args, **kwargs).result()
 
 def _parse_json(raw: bytes) -> dict[str, Any]:
     if not raw:
@@ -200,7 +207,7 @@ def livekit_webhook(request: HttpRequest):
             )
 
     try:
-        _handle_livekit_event(payload)
+        _run_in_thread(_handle_livekit_event, payload)
     except Exception as exc:
         logger.warning("LiveKit webhook handling error: %s", exc)
 

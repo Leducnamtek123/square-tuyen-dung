@@ -1,4 +1,5 @@
 import json
+from concurrent.futures import ThreadPoolExecutor
 
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -17,6 +18,12 @@ from apps.interviews.services import (
 # Sync DB helpers – called via sync_to_async inside every view
 # ---------------------------------------------------------------------------
 
+_THREAD_POOL = ThreadPoolExecutor(max_workers=4)
+
+
+def _run_in_thread(func, *args, **kwargs):
+    return _THREAD_POOL.submit(func, *args, **kwargs).result()
+
 def _get_context_session(room_name: str) -> InterviewSession:
     return (
         InterviewSession.objects.select_related("candidate", "job_post", "question_group")
@@ -34,7 +41,7 @@ def _get_session(room_name: str) -> InterviewSession:
 
 
 # ---------------------------------------------------------------------------
-# Views (sync for compatibility with both WSGI and ASGI)
+# Views (sync for compatibility with the current WSGI worker)
 # ---------------------------------------------------------------------------
 
 @csrf_exempt
@@ -49,8 +56,8 @@ def interview_context(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
     try:
-        session = _get_context_session(room_name)
-        context_data = build_interview_context(session)
+        session = _run_in_thread(_get_context_session, room_name)
+        context_data = _run_in_thread(build_interview_context, session)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
@@ -80,10 +87,10 @@ def interview_next_question(request: HttpRequest, room_name: str):
         advance = bool(body.get("advance", True))
 
     try:
-        session = _get_question_session(room_name)
-        payload = get_next_question_payload(session)
+        session = _run_in_thread(_get_question_session, room_name)
+        payload = _run_in_thread(get_next_question_payload, session)
         if advance and not payload.get("done"):
-            advance_question_cursor(session)
+            _run_in_thread(advance_question_cursor, session)
             payload["advance"] = True
         else:
             payload["advance"] = False
@@ -115,8 +122,8 @@ def interview_status(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Missing `status`."}, status=400)
 
     try:
-        session = _get_session(room_name)
-        updated_status = update_interview_status(session, new_status)
+        session = _run_in_thread(_get_session, room_name)
+        updated_status = _run_in_thread(update_interview_status, session, new_status)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
@@ -150,8 +157,9 @@ def interview_append_transcription(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Missing `content`."}, status=400)
 
     try:
-        session = _get_session(room_name)
-        transcript = append_transcript(
+        session = _run_in_thread(_get_session, room_name)
+        transcript = _run_in_thread(
+            append_transcript,
             session,
             {
                 "speaker_role": speaker_role,
