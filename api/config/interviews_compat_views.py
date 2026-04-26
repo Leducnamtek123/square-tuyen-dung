@@ -1,5 +1,6 @@
 import json
 
+from asgiref.sync import sync_to_async
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -12,6 +13,10 @@ from apps.interviews.services import (
     update_interview_status,
 )
 
+
+# ---------------------------------------------------------------------------
+# Sync DB helpers – called via sync_to_async inside every view
+# ---------------------------------------------------------------------------
 
 def _get_context_session(room_name: str) -> InterviewSession:
     return (
@@ -28,8 +33,13 @@ def _get_question_session(room_name: str) -> InterviewSession:
 def _get_session(room_name: str) -> InterviewSession:
     return InterviewSession.objects.get(room_name=room_name)
 
+
+# ---------------------------------------------------------------------------
+# Views (async – safe for ASGI)
+# ---------------------------------------------------------------------------
+
 @csrf_exempt
-def interview_context(request: HttpRequest, room_name: str):
+async def interview_context(request: HttpRequest, room_name: str):
     """
     GET /api/v1/interview/compat/{room_name}/context
 
@@ -40,8 +50,8 @@ def interview_context(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Method not allowed."}, status=405)
 
     try:
-        session = _get_context_session(room_name)
-        context_data = build_interview_context(session)
+        session = await sync_to_async(_get_context_session)(room_name)
+        context_data = await sync_to_async(build_interview_context)(session)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
@@ -49,7 +59,7 @@ def interview_context(request: HttpRequest, room_name: str):
 
 
 @csrf_exempt
-def interview_next_question(request: HttpRequest, room_name: str):
+async def interview_next_question(request: HttpRequest, room_name: str):
     """
     POST /api/v1/interview/compat/{room_name}/next-question
     Body: { "advance": true|false }
@@ -71,10 +81,10 @@ def interview_next_question(request: HttpRequest, room_name: str):
         advance = bool(body.get("advance", True))
 
     try:
-        session = _get_question_session(room_name)
-        payload = get_next_question_payload(session)
+        session = await sync_to_async(_get_question_session)(room_name)
+        payload = await sync_to_async(get_next_question_payload)(session)
         if advance and not payload.get("done"):
-            advance_question_cursor(session)
+            await sync_to_async(advance_question_cursor)(session)
             payload["advance"] = True
         else:
             payload["advance"] = False
@@ -85,7 +95,7 @@ def interview_next_question(request: HttpRequest, room_name: str):
 
 
 @csrf_exempt
-def interview_status(request: HttpRequest, room_name: str):
+async def interview_status(request: HttpRequest, room_name: str):
     """
     PATCH /api/v1/interview/compat/{room_name}/status
     Body: { "status": "in_progress"|"completed"|... }
@@ -106,8 +116,8 @@ def interview_status(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Missing `status`."}, status=400)
 
     try:
-        session = _get_session(room_name)
-        updated_status = update_interview_status(session, new_status)
+        session = await sync_to_async(_get_session)(room_name)
+        updated_status = await sync_to_async(update_interview_status)(session, new_status)
     except InterviewSession.DoesNotExist:
         return JsonResponse({"detail": "Interview session not found."}, status=404)
 
@@ -115,7 +125,7 @@ def interview_status(request: HttpRequest, room_name: str):
 
 
 @csrf_exempt
-def interview_append_transcription(request: HttpRequest, room_name: str):
+async def interview_append_transcription(request: HttpRequest, room_name: str):
     """
     POST /api/v1/interview/compat/{room_name}/append-transcription
     Body: { "speaker_role": "ai_agent"|"candidate", "content": "...", "speech_duration_ms": 123 }
@@ -141,8 +151,8 @@ def interview_append_transcription(request: HttpRequest, room_name: str):
         return JsonResponse({"detail": "Missing `content`."}, status=400)
 
     try:
-        session = _get_session(room_name)
-        transcript = append_transcript(
+        session = await sync_to_async(_get_session)(room_name)
+        transcript = await sync_to_async(append_transcript)(
             session,
             {
                 "speaker_role": speaker_role,

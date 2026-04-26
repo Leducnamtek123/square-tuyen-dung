@@ -1,5 +1,6 @@
 import json
 import logging
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from django.conf import settings
@@ -12,6 +13,29 @@ from apps.interviews.livekit_service import LiveKitService
 
 logger = logging.getLogger("livekit.webhook")
 
+
+_URL_KEYS = ("recording_url", "recordingUrl", "recordingURL", "file_url", "fileUrl", "url", "downloadUrl")
+_ROOM_KEYS = ("roomName", "room_name", "room")
+_EGRESS_KEYS = ("egressInfo", "egress_info", "egress", "recording")
+_FILE_RESULT_KEYS = ("fileResults", "file_results")
+_FILE_URL_KEYS = ("location", "url", "fileUrl", "file_url", "downloadUrl", "filepath", "path")
+
+
+def _get_attr_or_item(node: Any, key: str, default: Any = None) -> Any:
+    if isinstance(node, Mapping):
+        return node.get(key, default)
+    return getattr(node, key, default)
+
+
+def _iter_nodes(value: Any) -> list[Any]:
+    if value is None:
+        return []
+    if isinstance(value, (str, bytes, bytearray)):
+        return [value]
+    if isinstance(value, Sequence):
+        return list(value)
+    return [value]
+
 def _parse_json(raw: bytes) -> dict[str, Any]:
     if not raw:
         return {}
@@ -20,42 +44,57 @@ def _parse_json(raw: bytes) -> dict[str, Any]:
     except Exception:
         return {}
 
-def _extract_room_name(payload: dict[str, Any]) -> str | None:
-    for key in ("roomName", "room_name", "room"):
-        value = payload.get(key)
+def _extract_room_name(payload: Any) -> str | None:
+    for key in _ROOM_KEYS:
+        value = _get_attr_or_item(payload, key)
         if isinstance(value, str) and value:
             return value
 
-    room = payload.get("room")
+    room = _get_attr_or_item(payload, "room")
     if isinstance(room, dict):
         for key in ("name", "roomName", "room_name"):
             value = room.get(key)
             if isinstance(value, str) and value:
                 return value
+    elif room is not None:
+        for key in ("name", "roomName", "room_name"):
+            value = _get_attr_or_item(room, key)
+            if isinstance(value, str) and value:
+                return value
 
     return None
 
-def _extract_recording_url(payload: dict[str, Any]) -> str | None:
+
+def _extract_recording_url(payload: Any) -> str | None:
     candidates = []
-    for key in ("recording_url", "recordingUrl", "recordingURL", "file_url", "fileUrl", "url", "downloadUrl"):
-        value = payload.get(key)
+    for key in _URL_KEYS:
+        value = _get_attr_or_item(payload, key)
         if isinstance(value, str):
             candidates.append(value)
 
-    for key in ("egressInfo", "egress", "recording"):
-        node = payload.get(key)
-        if isinstance(node, dict):
-            for sub_key in ("file", "output", "recording"):
-                sub = node.get(sub_key)
-                if isinstance(sub, dict):
-                    for url_key in ("location", "url", "fileUrl", "file_url", "downloadUrl"):
-                        value = sub.get(url_key)
+    for key in _EGRESS_KEYS:
+        node = _get_attr_or_item(payload, key)
+        if not node:
+            continue
+
+        for url_key in _FILE_URL_KEYS:
+            value = _get_attr_or_item(node, url_key)
+            if isinstance(value, str):
+                candidates.append(value)
+
+        for file_key in _FILE_RESULT_KEYS:
+            file_results = _get_attr_or_item(node, file_key)
+            for file_result in _iter_nodes(file_results):
+                for url_key in _FILE_URL_KEYS:
+                    value = _get_attr_or_item(file_result, url_key)
+                    if isinstance(value, str):
+                        candidates.append(value)
+                file_node = _get_attr_or_item(file_result, "file")
+                if file_node:
+                    for url_key in _FILE_URL_KEYS:
+                        value = _get_attr_or_item(file_node, url_key)
                         if isinstance(value, str):
                             candidates.append(value)
-            for url_key in ("location", "url", "fileUrl", "file_url", "downloadUrl"):
-                value = node.get(url_key)
-                if isinstance(value, str):
-                    candidates.append(value)
 
     for value in candidates:
         if value:
@@ -63,10 +102,15 @@ def _extract_recording_url(payload: dict[str, Any]) -> str | None:
 
     return None
 
-def _handle_livekit_event(payload: dict[str, Any]) -> None:
-    event_name = payload.get("event") or payload.get("eventName") or ""
+
+def _handle_livekit_event(payload: Any) -> None:
+    event_name = _get_attr_or_item(payload, "event") or _get_attr_or_item(payload, "eventName") or ""
     event = str(event_name).lower()
     room_name = _extract_room_name(payload)
+    if not room_name:
+        egress_info = _get_attr_or_item(payload, "egressInfo") or _get_attr_or_item(payload, "egress_info")
+        if egress_info is not None:
+            room_name = _get_attr_or_item(egress_info, "roomName") or _get_attr_or_item(egress_info, "room_name")
     if not room_name:
         return
 
@@ -155,10 +199,9 @@ def livekit_webhook(request: HttpRequest):
                 disconnect_reason,
             )
 
-    if isinstance(payload, dict):
-        try:
-            _handle_livekit_event(payload)
-        except Exception as exc:
-            logger.warning("LiveKit webhook handling error: %s", exc)
+    try:
+        _handle_livekit_event(payload)
+    except Exception as exc:
+        logger.warning("LiveKit webhook handling error: %s", exc)
 
     return JsonResponse({"ok": True}, status=200)

@@ -12,6 +12,7 @@ from unittest.mock import patch
 from decimal import Decimal
 
 from django.test import TestCase, TransactionTestCase
+from django.test import RequestFactory, override_settings
 from django.core.exceptions import ValidationError
 from rest_framework.test import APIClient
 from rest_framework import status as drf_status
@@ -33,6 +34,7 @@ from apps.interviews.services import (
     get_next_question_payload,
     update_interview_status,
 )
+from integrations.livekit.webhook import _handle_livekit_event, livekit_webhook
 
 
 class InterviewServiceTests(TestCase):
@@ -137,6 +139,70 @@ class InterviewCompatEndpointTests(TransactionTestCase):
         self.session.refresh_from_db()
         self.assertEqual(self.session.status, "scheduled")
         self.assertEqual(response.json()["status"], "scheduled")
+
+
+class _FakeFileResult:
+    def __init__(self, location: str):
+        self.location = location
+
+
+class _FakeEgressInfo:
+    def __init__(self, room_name: str, file_results: list[_FakeFileResult]):
+        self.roomName = room_name
+        self.fileResults = file_results
+
+
+class _FakeWebhookEvent:
+    def __init__(self, room_name: str, recording_url: str):
+        self.event = "egress_ended"
+        self.egressInfo = _FakeEgressInfo(room_name, [_FakeFileResult(recording_url)])
+
+
+class LiveKitWebhookTests(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.candidate = User.objects.create_user(
+            email="candidate-webhook@example.com",
+            full_name="Candidate Webhook",
+            password="password123",
+        )
+        self.session = InterviewSession.objects.create(
+            candidate=self.candidate,
+            status="completed",
+        )
+
+    def test_handle_livekit_event_updates_recording_url_from_egress_event_object(self):
+        _handle_livekit_event(_FakeWebhookEvent(self.session.room_name, "http://localhost:9000/square/interviews/demo/recording.mp4"))
+
+        self.session.refresh_from_db()
+        self.assertEqual(
+            self.session.recording_url,
+            "http://localhost:9000/square/interviews/demo/recording.mp4",
+        )
+
+    @override_settings(LIVEKIT_API_KEY="devkey", LIVEKIT_API_SECRET="secret", LIVEKIT_WEBHOOK_STRICT=True)
+    @patch("livekit.api.TokenVerifier")
+    @patch("livekit.api.WebhookReceiver")
+    def test_livekit_webhook_processes_verified_event_object(self, mock_receiver_cls, mock_verifier_cls):
+        fake_event = _FakeWebhookEvent(self.session.room_name, "http://localhost:9000/square/interviews/demo/recording.mp4")
+        mock_receiver = mock_receiver_cls.return_value
+        mock_receiver.receive.return_value = fake_event
+
+        request = self.factory.post(
+            "/api/v1/livekit/webhook",
+            data="{}",
+            content_type="application/webhook+json",
+            HTTP_AUTHORIZATION="Bearer signed-token",
+        )
+
+        response = livekit_webhook(request)
+
+        self.assertEqual(response.status_code, 200)
+        self.session.refresh_from_db()
+        self.assertEqual(
+            self.session.recording_url,
+            "http://localhost:9000/square/interviews/demo/recording.mp4",
+        )
 
 
 # ─── NEW: Session CRUD API Tests ───────────────────────────────────────────

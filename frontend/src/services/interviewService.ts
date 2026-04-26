@@ -1,4 +1,5 @@
 import httpRequest from '../utils/httpRequest';
+import { presignInObject } from '../utils/presignUrl';
 import type { InterviewSession, InterviewEvaluation } from '../types/models';
 import type { PaginatedResponse } from '../types/api';
 
@@ -66,17 +67,17 @@ interface SessionMetrics {
 const interviewService = {
   getSessions: (params: GetSessionsParams = {}): Promise<PaginatedResponse<InterviewSession>> => {
     const url = 'interview/web/sessions/';
-    return httpRequest.get(url, { params }) as Promise<PaginatedResponse<InterviewSession>>;
+    return httpRequest.get(url, { params }).then((res) => presignInObject(res)) as Promise<PaginatedResponse<InterviewSession>>;
   },
 
   getSessionDetail: (id: IdType): Promise<InterviewSession> => {
     const url = `interview/web/sessions/${id}/`;
-    return httpRequest.get(url) as Promise<InterviewSession>;
+    return httpRequest.get(url).then((res) => presignInObject(res)) as Promise<InterviewSession>;
   },
 
   getSessionDetailByInviteToken: (inviteToken: string): Promise<InterviewSession> => {
     const url = `interview/web/sessions/invite/${inviteToken}/`;
-    return httpRequest.get(url) as Promise<InterviewSession>;
+    return httpRequest.get(url).then((res) => presignInObject(res)) as Promise<InterviewSession>;
   },
 
   scheduleSession: (data: ScheduleSessionInput): Promise<InterviewSession> => {
@@ -86,7 +87,7 @@ const interviewService = {
 
   updateSession: (id: IdType, data: Partial<ScheduleSessionInput>): Promise<InterviewSession> => {
     const url = `interview/web/sessions/${id}/`;
-    return httpRequest.patch(url, data) as Promise<InterviewSession>;
+    return httpRequest.patch(url, data).then((res) => presignInObject(res)) as Promise<InterviewSession>;
   },
 
   deleteSession: (id: IdType): Promise<void> => {
@@ -99,7 +100,7 @@ const interviewService = {
       typeof roomName === 'object' && roomName ? roomName.roomName : roomName;
 
     const url = `interview/web/sessions/${target}/status/`;
-    return httpRequest.patch(url, { status }) as Promise<InterviewSession>;
+    return httpRequest.patch(url, { status }).then((res) => presignInObject(res)) as Promise<InterviewSession>;
   },
 
   getLiveKitToken: (inviteToken: string): Promise<LiveKitTokenResponse> => {
