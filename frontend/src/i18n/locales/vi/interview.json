@@ -319,7 +319,38 @@
       "evalSuccess": "Gửi đánh giá thành công!",
       "passed": "Chấp nhận (Đạt)",
       "failed": "Từ chối (Không đạt)",
-      "pending": "Chờ xem xét"
+      "pending": "Chờ xem xét",
+      "joinAsHrLoading": "Đang kết nối..."
+    }
+  },
+  "liveRoom": {
+    "participants": {
+      "aiInterviewer": "AI Phỏng vấn",
+      "employer": "Nhà tuyển dụng",
+      "you": "Bạn",
+      "candidate": "Ứng viên",
+      "guest": "Khách"
+    },
+    "chips": {
+      "ai": "AI",
+      "you": "BẠN",
+      "employer": "NTD",
+      "live": "TRỰC TIẾP"
+    },
+    "chat": {
+      "title": "Hội thoại",
+      "messagesCount": "{{count}} tin nhắn",
+      "noMessages": "Chưa có tin nhắn",
+      "noMessagesDesc": "Hội thoại sẽ xuất hiện tại đây khi ai đó nói hoặc nhắn tin.",
+      "placeholder": "Nhập tin nhắn...",
+      "send": "Gửi"
+    },
+    "observingBar": {
+      "hrObserving": "Bạn đang quan sát phiên phỏng vấn này",
+      "hrWaiting": "Đang chờ ứng viên tham gia phòng...",
+      "employerObserving": "Nhà tuyển dụng đang quan sát phiên phỏng vấn này",
+      "live": "TRỰC TIẾP",
+      "waiting": "CHỜ"
     }
   }
 }

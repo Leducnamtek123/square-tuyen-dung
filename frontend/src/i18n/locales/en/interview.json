@@ -319,7 +319,38 @@
       "evalSuccess": "Evaluation submitted successfully!",
       "passed": "Accepted (Pass)",
       "failed": "Rejected (Fail)",
-      "pending": "Pending Review"
+      "pending": "Pending Review",
+      "joinAsHrLoading": "Connecting..."
+    }
+  },
+  "liveRoom": {
+    "participants": {
+      "aiInterviewer": "AI Interviewer",
+      "employer": "Employer",
+      "you": "You",
+      "candidate": "Candidate",
+      "guest": "Guest"
+    },
+    "chips": {
+      "ai": "AI",
+      "you": "YOU",
+      "employer": "HR",
+      "live": "LIVE"
+    },
+    "chat": {
+      "title": "Conversation",
+      "messagesCount": "{{count}} messages",
+      "noMessages": "No messages yet",
+      "noMessagesDesc": "Conversation will appear here when someone speaks or types.",
+      "placeholder": "Write a message...",
+      "send": "Send"
+    },
+    "observingBar": {
+      "hrObserving": "You are observing this interview session",
+      "hrWaiting": "Waiting for candidate to join the room...",
+      "employerObserving": "Employer is observing this interview session",
+      "live": "LIVE",
+      "waiting": "WAITING"
     }
   }
 }

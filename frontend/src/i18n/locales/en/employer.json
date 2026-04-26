@@ -710,7 +710,13 @@
       "room": "Room",
       "time": "Time",
       "endSession": "End session",
-      "noConnectionDetails": "No connection details available for fullscreen."
+      "noConnectionDetails": "No connection details available for fullscreen.",
+      "joinPresence": "Join as Present",
+      "joinPresenceLoading": "Connecting...",
+      "joinPresenceTooltip": "Join the room as Employer — candidate will see you",
+      "presenceTitle": "Present in Room",
+      "presenceSubtitle": "You are joining as Employer. The candidate can see your presence.",
+      "presenceExit": "Leave room"
     }
   },
   "verification": {

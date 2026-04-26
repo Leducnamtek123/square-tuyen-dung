@@ -6,6 +6,7 @@ import GridViewIcon from '@mui/icons-material/GridView';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
 import { ROUTES } from '@/configs/constants';
 import MenuItem from './MenuItem';
 
@@ -77,7 +78,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
           <MenuItem text={t('admin:sidebar.activityLogs')} to={`/${ROUTES.ADMIN.JOB_ACTIVITY}`} isSelected={location.pathname === `/${ROUTES.ADMIN.JOB_ACTIVITY}`} isChild />
           <MenuItem text={t('admin:sidebar.interviewSchedule')} to={`/${ROUTES.ADMIN.INTERVIEWS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.INTERVIEWS}`} isChild />
           <MenuItem text={t('admin:sidebar.jobNotifications')} to={`/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`} isChild />
-          <MenuItem text="🎬 Interview UI Preview" to="/admin/interview-preview" isSelected={location.pathname === '/admin/interview-preview'} isChild />
+          <MenuItem icon={VideoLibraryIcon} text="Interview UI Preview" to="/admin/interview-preview" isSelected={location.pathname === '/admin/interview-preview'} isChild />
         </List>
       </Collapse>
     </>

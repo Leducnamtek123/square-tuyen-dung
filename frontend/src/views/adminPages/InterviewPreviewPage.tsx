@@ -211,8 +211,8 @@ function ConnectedStep({ onEnd }: { onEnd: () => void }) {
               <p className="text-sm font-bold text-white">Chat</p>
             </div>
             <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
-              {FAKE_MESSAGES.map((m, i) => (
-                <div key={i} className={`flex gap-2 ${m.from === 'Candidate' ? 'flex-row-reverse' : ''}`}>
+              {FAKE_MESSAGES.map((m) => (
+                <div key={`${m.from}-${m.text}`} className={`flex gap-2 ${m.from === 'Candidate' ? 'flex-row-reverse' : ''}`}>
                   <div className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-xs
                     ${m.from === 'AI' ? 'bg-violet-500/20 text-violet-300' : 'bg-cyan-500/20 text-cyan-300'}`}>
                     <FontAwesomeIcon icon={m.from === 'AI' ? faRobot : faUser} />

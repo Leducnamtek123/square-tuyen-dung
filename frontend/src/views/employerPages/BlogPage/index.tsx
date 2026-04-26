@@ -8,6 +8,7 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import SearchIcon from '@mui/icons-material/Search';
+import LightbulbIcon from '@mui/icons-material/Lightbulb';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
 import contentService, { Article, ArticleStatus } from '@/services/contentService';
@@ -157,8 +158,9 @@ const EmployerBlogListPage = () => {
       </Stack>
 
       {/* Info banner */}
-      <Box sx={{ bgcolor: 'info.main', color: 'white', p: 2, borderRadius: 2, mb: 3, fontSize: '0.85rem' }}>
-        💡 Bài viết sẽ được gửi cho Admin duyệt trước khi hiển thị trên website. Thời gian duyệt thường trong 24 giờ.
+      <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 1, bgcolor: 'info.main', color: 'white', p: 2, borderRadius: 2, mb: 3, fontSize: '0.85rem' }}>
+        <LightbulbIcon sx={{ fontSize: 18, mt: 0.1, flexShrink: 0 }} />
+        Bài viết sẽ được gửi cho Admin duyệt trước khi hiển thị trên website. Thời gian duyệt thường trong 24 giờ.
       </Box>
 
       {/* Filters */}

@@ -23,6 +23,8 @@ type InterviewLiveCandidateCardState = {
   loadingToken: boolean;
   tokenError: string | null;
   fullscreenOpen: boolean;
+  hrPresenceDetails: { token: string; serverUrl: string } | null;
+  hrPresenceLoading: boolean;
 };
 
 type InterviewLiveCandidateCardAction =
@@ -30,6 +32,8 @@ type InterviewLiveCandidateCardAction =
   | { type: 'set_loading_token'; value: boolean }
   | { type: 'set_token_error'; value: string | null }
   | { type: 'set_fullscreen_open'; value: boolean }
+  | { type: 'set_hr_presence_details'; value: { token: string; serverUrl: string } | null }
+  | { type: 'set_hr_presence_loading'; value: boolean }
   | { type: 'reset_when_hidden' };
 
 const initialState: InterviewLiveCandidateCardState = {
@@ -37,6 +41,8 @@ const initialState: InterviewLiveCandidateCardState = {
   loadingToken: false,
   tokenError: null,
   fullscreenOpen: false,
+  hrPresenceDetails: null,
+  hrPresenceLoading: false,
 };
 
 const reducer = (
@@ -52,6 +58,10 @@ const reducer = (
       return { ...state, tokenError: action.value };
     case 'set_fullscreen_open':
       return { ...state, fullscreenOpen: action.value };
+    case 'set_hr_presence_details':
+      return { ...state, hrPresenceDetails: action.value };
+    case 'set_hr_presence_loading':
+      return { ...state, hrPresenceLoading: action.value };
     case 'reset_when_hidden':
       return {
         ...state,
@@ -59,6 +69,8 @@ const reducer = (
         loadingToken: false,
         tokenError: null,
         fullscreenOpen: false,
+        hrPresenceDetails: null,
+        hrPresenceLoading: false,
       };
     default:
       return state;
@@ -119,6 +131,20 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
     }
   }, [isLive]);
 
+  const handleJoinAsHR = React.useCallback(async () => {
+    if (!session.id) return;
+    dispatch({ type: 'set_hr_presence_loading', value: true });
+    try {
+      const details = await interviewService.getHrPresenceToken(session.id);
+      const serverUrl = details.serverUrl || details.server_url || getSafeLiveKitUrl();
+      dispatch({ type: 'set_hr_presence_details', value: { token: details.token, serverUrl } });
+    } catch (err) {
+      console.error('HR presence token error', err);
+    } finally {
+      dispatch({ type: 'set_hr_presence_loading', value: false });
+    }
+  }, [session.id]);
+
   return (
     <Paper
       elevation={0}
@@ -178,9 +204,13 @@ const InterviewLiveCandidateCard: React.FC<InterviewLiveCandidateCardProps> = ({
         isForceEnding={isForceEnding}
         fullscreenOpen={state.fullscreenOpen}
         isLive={isLive}
+        hrPresenceDetails={state.hrPresenceDetails}
+        hrPresenceLoading={state.hrPresenceLoading}
         onForceEnd={onForceEnd}
         onOpenFullscreen={() => dispatch({ type: 'set_fullscreen_open', value: true })}
         onCloseFullscreen={() => dispatch({ type: 'set_fullscreen_open', value: false })}
+        onJoinAsHR={handleJoinAsHR}
+        onLeaveHR={() => dispatch({ type: 'set_hr_presence_details', value: null })}
       />
     </Paper>
   );

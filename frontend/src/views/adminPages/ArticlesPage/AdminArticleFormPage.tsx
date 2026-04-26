@@ -9,6 +9,8 @@ import SaveIcon from '@mui/icons-material/Save';
 import PublishIcon from '@mui/icons-material/Publish';
 import ImageIcon from '@mui/icons-material/Image';
 import CloseIcon from '@mui/icons-material/Close';
+import ArticleIcon from '@mui/icons-material/Article';
+import EditNoteIcon from '@mui/icons-material/EditNote';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import contentService, { ArticlePayload, ArticleCategory, ArticleStatus } from '@/services/contentService';
@@ -207,8 +209,12 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
               <InputLabel>Danh mục</InputLabel>
               <Select value={category} label="Danh mục" onChange={(e) => setCategory(e.target.value as ArticleCategory)}>
-                <MenuItem value="news">📰 Tin tức</MenuItem>
-                <MenuItem value="blog">✍️ Blog tuyển dụng</MenuItem>
+                <MenuItem value="news" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <ArticleIcon sx={{ fontSize: 16, color: 'text.secondary' }} /> Tin tức
+                </MenuItem>
+                <MenuItem value="blog" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <EditNoteIcon sx={{ fontSize: 16, color: 'text.secondary' }} /> Blog tuyển dụng
+                </MenuItem>
               </Select>
             </FormControl>
 

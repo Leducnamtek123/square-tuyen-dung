@@ -281,7 +281,7 @@ const InterviewDetailHeader = ({
                   },
                 }}
               >
-                {joinLoading ? 'Đang kết nối...' : t('common:actions.joinNow')}
+                {joinLoading ? t('interviewDetail.actions.joinAsHrLoading') : t('common:actions.joinNow')}
               </Button>
             </Box>
           </Tooltip>

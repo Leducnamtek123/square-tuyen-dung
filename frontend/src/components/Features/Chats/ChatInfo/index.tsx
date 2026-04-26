@@ -1,5 +1,6 @@
 import React from 'react';
 import { Box, Stack, Typography } from "@mui/material";
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import MuiImageCustom from '@/components/Common/MuiImageCustom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
@@ -39,8 +40,8 @@ const ChatInfo = ({ avatarUrl, title, subTitle, description }: ChatInfoProps) =>
         <Typography textAlign="center" variant="caption" color="green">
           <FontAwesomeIcon icon={faCheckCircle} /> {description}
         </Typography>
-        <Typography textAlign="center" variant="caption">
-          Hãy bắt đầu cuộc trò chuyện bằng một lời chào 😍
+        <Typography textAlign="center" variant="caption" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0.5 }}>
+          Hãy bắt đầu cuộc trò chuyện bằng một lời chào <FavoriteIcon sx={{ fontSize: 14, color: 'error.main' }} />
         </Typography>
       </Stack>
     </Stack>

@@ -736,7 +736,13 @@
       "room": "Phòng",
       "time": "Thời gian",
       "endSession": "Kết thúc phiên",
-      "noConnectionDetails": "Chưa có connection details để mở fullscreen."
+      "noConnectionDetails": "Chưa có connection details để mở fullscreen.",
+      "joinPresence": "Tham gia hiện diện",
+      "joinPresenceLoading": "Đang kết nối...",
+      "joinPresenceTooltip": "Vào phòng với tư cách Nhà tuyển dụng — ứng viên sẽ thấy bạn",
+      "presenceTitle": "Tham gia hiện diện",
+      "presenceSubtitle": "Bạn đang tham gia với tư cách Nhà tuyển dụng. Ứng viên có thể thấy sự hiện diện của bạn.",
+      "presenceExit": "Rời phòng"
     }
   },
   "verification": {

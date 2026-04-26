@@ -9,6 +9,7 @@ import {
   IconButton,
   Paper,
   Stack,
+  Tooltip,
   Typography,
   alpha,
   useTheme,
@@ -17,10 +18,12 @@ import CloseIcon from '@mui/icons-material/Close';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import StopCircleIcon from '@mui/icons-material/StopCircle';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import { LiveKitRoom } from '@livekit/components-react';
 import { useTranslation } from 'react-i18next';
 import { type InterviewSession } from '../../../../types/models';
 import { ElapsedTimer, LiveObserverVisualizer, normalizeStatus } from './InterviewLiveCandidateCardPresence';
+import { AIInterviewLayout } from '../../../interviewPages/AIInterviewLayout';
 import pc from '@/utils/muiColors';
 
 type Props = {
@@ -31,9 +34,13 @@ type Props = {
   isForceEnding: boolean;
   fullscreenOpen: boolean;
   isLive: boolean;
+  hrPresenceDetails: { token: string; serverUrl: string } | null;
+  hrPresenceLoading: boolean;
   onForceEnd: (session: InterviewSession) => void;
   onOpenFullscreen: () => void;
   onCloseFullscreen: () => void;
+  onJoinAsHR: () => void;
+  onLeaveHR: () => void;
 };
 
 const InterviewLiveCandidateCardPanel = ({
@@ -44,9 +51,13 @@ const InterviewLiveCandidateCardPanel = ({
   isForceEnding,
   fullscreenOpen,
   isLive,
+  hrPresenceDetails,
+  hrPresenceLoading,
   onForceEnd,
   onOpenFullscreen,
   onCloseFullscreen,
+  onJoinAsHR,
+  onLeaveHR,
 }: Props) => {
   const theme = useTheme();
   const { t } = useTranslation(['employer', 'interview', 'common']);
@@ -54,6 +65,71 @@ const InterviewLiveCandidateCardPanel = ({
   const statusLabel = t(`interview:interviewListCard.statuses.${session.status}`, {
     defaultValue: normalizedStatus?.replaceAll('_', ' ')?.toUpperCase(),
   });
+
+  // ── Fullscreen HR Presence dialog ──────────────────────────────────────────
+  if (hrPresenceDetails) {
+    return (
+      <Dialog
+        open={true}
+        onClose={onLeaveHR}
+        fullScreen
+        sx={{
+          '& .MuiDialog-paper': {
+            bgcolor: '#020617',
+            backgroundImage: 'radial-gradient(circle at top, rgba(56,189,248,0.08), transparent 60%)',
+          },
+        }}
+      >
+        <DialogContent sx={{ p: 0, display: 'flex', flexDirection: 'column', height: '100vh' }}>
+          <Box
+            sx={{
+              px: 3,
+              py: 2,
+              borderBottom: '1px solid rgba(255,255,255,0.06)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              bgcolor: 'rgba(10,14,26,0.86)',
+              backdropFilter: 'blur(8px)',
+            }}
+          >
+            <Box>
+              <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 900 }}>
+                {t('employer:interviewLive.candidateCard.presenceTitle')} — {session.candidateName || t('employer:interviewLive.candidateCard.unknownCandidate')}
+              </Typography>
+              <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)' }}>
+                {t('employer:interviewLive.candidateCard.presenceSubtitle')}
+              </Typography>
+            </Box>
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              startIcon={<CloseIcon />}
+              onClick={onLeaveHR}
+              sx={{ textTransform: 'none', fontWeight: 800, color: '#f87171', borderColor: 'rgba(248,113,113,0.4)' }}
+            >
+              {t('employer:interviewLive.candidateCard.presenceExit')}
+            </Button>
+          </Box>
+
+          <Box sx={{ flex: 1, minHeight: 0 }}>
+            <LiveKitRoom
+              token={hrPresenceDetails.token}
+              serverUrl={hrPresenceDetails.serverUrl}
+              connect={true}
+              audio={false}
+              video={false}
+              onDisconnected={onLeaveHR}
+              style={{ height: '100%', width: '100%' }}
+            >
+              <AIInterviewLayout onEndSession={onLeaveHR} />
+            </LiveKitRoom>
+          </Box>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <>
@@ -103,6 +179,23 @@ const InterviewLiveCandidateCardPanel = ({
                   }}
                 />
                 <Stack direction="row" spacing={1}>
+                  <Tooltip title={t('employer:interviewLive.candidateCard.joinPresenceTooltip')} arrow>
+                    <span>
+                      <Button
+                        size="small"
+                        variant="contained"
+                        color="warning"
+                        startIcon={<MeetingRoomIcon />}
+                        onClick={onJoinAsHR}
+                        disabled={hrPresenceLoading || !isLive}
+                        sx={{ fontWeight: 800, textTransform: 'none', bgcolor: '#f59e0b', '&:hover': { bgcolor: '#d97706' } }}
+                      >
+                        {hrPresenceLoading
+                          ? t('employer:interviewLive.candidateCard.joinPresenceLoading')
+                          : t('employer:interviewLive.candidateCard.joinPresence')}
+                      </Button>
+                    </span>
+                  </Tooltip>
                   <Button size="small" variant="outlined" startIcon={<FullscreenIcon />} onClick={onOpenFullscreen} sx={{ fontWeight: 800, textTransform: 'none' }}>
                     {t('employer:interviewLive.candidateCard.maximize')}
                   </Button>

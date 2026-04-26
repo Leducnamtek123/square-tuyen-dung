@@ -124,12 +124,13 @@ function AIParticipantTile({ trackRef, ...props }: { trackRef?: TrackReferenceOr
   const isSpeaking = participant?.isSpeaking;
   const isEmployer = isRoleMatch(participant, ['employer', 'admin']);
   const isAgent = !isSelf && !isEmployer ? true : isLiveKitAgentParticipant(participant);
+  const { t } = useTranslation(['interview']);
 
   let displayName = participant?.name || participant?.identity || '';
-  if (isAgent) displayName = 'AI Interviewer';
-  else if (isEmployer) displayName = 'Nhà tuyển dụng';
-  else if (isSelf) displayName = 'Bạn';
-  else if (!displayName) displayName = 'Ứng viên';
+  if (isAgent) displayName = t('liveRoom.participants.aiInterviewer');
+  else if (isEmployer) displayName = t('liveRoom.participants.employer');
+  else if (isSelf) displayName = t('liveRoom.participants.you');
+  else if (!displayName) displayName = t('liveRoom.participants.candidate');
 
   if (isAgent) {
     return (
@@ -174,12 +175,12 @@ function AIParticipantTile({ trackRef, ...props }: { trackRef?: TrackReferenceOr
         <div className="flex items-center gap-1.5">
           {isSelf && (
             <span className="rounded bg-cyan-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-cyan-300">
-              Bạn
+              {t('liveRoom.chips.you')}
             </span>
           )}
           {isEmployer && !isSelf && (
             <span className="rounded bg-amber-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-amber-300">
-              Nhà tuyển dụng
+              {t('liveRoom.chips.employer')}
             </span>
           )}
           <span className="text-xs font-semibold text-white">{displayName}</span>
@@ -216,6 +217,7 @@ function TimelineMessage({
 }) {
   const alignRight = entry.isLocal && !entry.isAgent;
   const displayMessage = sanitizeInterviewText(entry.message);
+  const { t } = useTranslation(['interview']);
 
   return (
     <Stack
@@ -234,7 +236,7 @@ function TimelineMessage({
         }}
       >
         <Chip
-          label={entry.isAgent ? 'AI' : entry.isLocal ? 'You' : 'Guest'}
+          label={entry.isAgent ? t('liveRoom.chips.ai') : entry.isLocal ? t('liveRoom.chips.you') : t('liveRoom.participants.guest')}
           size="small"
           sx={{
             height: 20,
@@ -267,7 +269,7 @@ function TimelineMessage({
         </Typography>
         {live && (
           <Chip
-            label="LIVE"
+            label={t('liveRoom.chips.live')}
             size="small"
             sx={{
               height: 18,
@@ -332,6 +334,7 @@ function ChatPanel({
   isSending: boolean;
 }) {
   const scrollRef = React.useRef<HTMLDivElement>(null);
+  const { t } = useTranslation(['interview']);
 
   const combinedEntries = React.useMemo(() => {
     const transcripts = transcriptEntries.map(e => ({ ...e, type: 'transcript' as const }));
@@ -348,9 +351,9 @@ function ChatPanel({
     <div className="absolute right-0 top-0 bottom-0 z-30 flex h-full w-[352px] flex-col overflow-hidden border-l border-white/8 bg-[#0b1120] shadow-[-10px_0_30px_rgba(0,0,0,0.5)] md:w-[380px]">
       <div className="shrink-0 border-b border-white/8 bg-[#0b1120]/96 px-4 py-3 backdrop-blur-xl">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm font-bold text-white">Conversation</p>
+          <p className="text-sm font-bold text-white">{t('liveRoom.chat.title')}</p>
           <Chip
-            label={`${combinedEntries.length} messages`}
+            label={t('liveRoom.chat.messagesCount', { count: combinedEntries.length })}
             size="small"
             sx={{
               fontWeight: 900,
@@ -394,10 +397,10 @@ function ChatPanel({
               <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', textAlign: 'center', px: 2 }}>
                 <Stack spacing={1}>
                   <Typography variant="subtitle2" sx={{ color: '#fff', fontWeight: 900 }}>
-                    No messages yet
+                    {t('liveRoom.chat.noMessages')}
                   </Typography>
                   <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                    Conversation will appear here when someone speaks or types.
+                    {t('liveRoom.chat.noMessagesDesc')}
                   </Typography>
                 </Stack>
               </Box>
@@ -421,7 +424,7 @@ function ChatPanel({
               <input
                 value={chatDraft}
                 onChange={(event) => setChatDraft(event.target.value)}
-                placeholder="Write a message..."
+                placeholder={t('liveRoom.chat.placeholder')}
                 className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition focus:border-cyan-400/40 focus:bg-white/8"
               />
               <Button
@@ -438,7 +441,7 @@ function ChatPanel({
                   '&.Mui-disabled': { bgcolor: 'rgba(255,255,255,0.12)', color: 'rgba(255,255,255,0.35)' },
                 }}
               >
-                Send
+                {t('liveRoom.chat.send')}
               </Button>
             </Stack>
           </Box>
@@ -462,6 +465,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   const chatOptions = React.useMemo(() => ({ room, channelTopic: 'lk.chat' }), [room]);
   const chat = useChat(chatOptions);
   const transcriptions = useTranscriptions();
+  const { t } = useTranslation(['interview']);
 
   const rawTracks = useTracks(
     [
@@ -512,16 +516,20 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
     finalTracks = finalTracks.filter((track) => !isLiveKitAgentParticipant(track.participant));
   }
 
+  const aiName = t('liveRoom.participants.aiInterviewer');
+  const youName = t('liveRoom.participants.you');
+  const guestName = t('liveRoom.participants.guest');
+
   const transcriptEntries = React.useMemo<TimelineEntry[]>(() => {
     return transcriptions.map((item) => {
       const participant = participants.find((p) => p.identity === item.participantInfo.identity);
       const isAgent = isLiveKitAgentParticipant(participant) || isLiveKitAgentIdentity(item.participantInfo.identity);
       const isLocal = participant?.isLocal ?? item.participantInfo.identity === localParticipant.identity;
       const name = isAgent
-        ? 'AI Interviewer'
+        ? aiName
         : isLocal
-          ? 'You'
-          : participant?.name || participant?.identity || item.participantInfo.identity || 'Guest';
+          ? youName
+          : participant?.name || participant?.identity || item.participantInfo.identity || guestName;
 
       return {
         id: `${item.streamInfo.id}`,
@@ -532,7 +540,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
         isAgent,
       };
     });
-  }, [localParticipant.identity, participants, transcriptions]);
+  }, [localParticipant.identity, participants, transcriptions, aiName, youName, guestName]);
 
   const roomChatEntries = React.useMemo<TimelineEntry[]>(() => {
     return chat.chatMessages.map((message) => {
@@ -540,10 +548,10 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
       const isAgent = isLiveKitAgentParticipant(participant);
       const isLocal = participant?.isLocal === true;
       const name = isAgent
-        ? 'AI Interviewer'
+        ? aiName
         : isLocal
-          ? 'You'
-          : participant?.name || participant?.identity || 'Guest';
+          ? youName
+          : participant?.name || participant?.identity || guestName;
 
       return {
         id: message.id,
@@ -555,7 +563,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
         type: 'chat',
       };
     });
-  }, [chat.chatMessages]);
+  }, [chat.chatMessages, aiName, youName, guestName]);
 
   let showObservingBar = false;
   let observingMessage = '';
@@ -564,14 +572,14 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   if (isLocalEmployer) {
     showObservingBar = true;
     if (candidatePresent) {
-      observingMessage = 'Bạn đang quan sát phiên phỏng vấn này';
+      observingMessage = t('liveRoom.observingBar.hrObserving');
     } else {
-      observingMessage = 'Đang chờ ứng viên tham gia phòng...';
+      observingMessage = t('liveRoom.observingBar.hrWaiting');
       observingIcon = faSpinner;
     }
   } else if (otherEmployerCount > 0 && !employerWithCamera) {
     showObservingBar = true;
-    observingMessage = 'Nhà tuyển dụng đang quan sát phiên phỏng vấn này';
+    observingMessage = t('liveRoom.observingBar.employerObserving');
   }
 
   return (
@@ -595,7 +603,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
                 <div className="ml-auto flex items-center gap-2">
                   {candidatePresent && <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />}
                   <span className="text-[10px] font-bold tracking-widest text-emerald-400">
-                    {candidatePresent ? 'LIVE' : 'WAITING'}
+                    {candidatePresent ? t('liveRoom.observingBar.live') : t('liveRoom.observingBar.waiting')}
                   </span>
                   <span className="ml-2 font-mono text-[11px] font-medium text-slate-400">{timeFormatted}</span>
                 </div>
