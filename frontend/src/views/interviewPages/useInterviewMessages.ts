@@ -18,7 +18,7 @@ type InterviewMessagesResult = {
 
 const CHAT_OPTIONS = { channelTopic: 'lk.chat' };
 
-function mapTranscriptions(
+export function mapTranscriptions(
   transcriptions: TextStreamData[],
   localIdentity: string,
   participants: ReturnType<typeof useParticipants>,
@@ -45,12 +45,22 @@ function mapTranscriptions(
       };
     }
 
+    if (isAgent) {
+      return {
+        type: 'agentTranscript',
+        message: transcription.text,
+        id: transcription.streamInfo.id,
+        timestamp: transcription.streamInfo.timestamp,
+        from: agentParticipant ?? participant,
+      };
+    }
+
     return {
-      type: 'agentTranscript',
+      type: 'userTranscript',
       message: transcription.text,
       id: transcription.streamInfo.id,
       timestamp: transcription.streamInfo.timestamp,
-      from: isAgent ? agentParticipant : participant,
+      from: participant,
     };
   });
 }

@@ -1,26 +1,97 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('Global UI Resiliency & Layouts', () => {
-  
-  test('Job Card Rendering should hold layout and wait for networkidle', async ({ page }) => {
-    // Navigate to a page with job cards (assuming /jobs or similar)
-    await page.goto('/');
+  test('Interview detail cards should render stably with mocked API', async ({ page }) => {
+    const recordingUrl = 'http://minio:9000/square/interviews/demo/recording.mp4';
+    const presignedUrl = 'http://localhost:9000/square/interviews/demo/recording.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Signature=visual-test';
 
-    // Best Practice from Claude Skills: ALWAYS wait for networkidle unconditionally before evaluating DOM!
-    await page.waitForLoadState('networkidle');
+    await page.context().addCookies([
+      {
+        name: 'access_token',
+        value: 'fake-access-token',
+        domain: 'localhost',
+        path: '/',
+      },
+    ]);
 
-    // Make sure the main job list container is visible
-    // Update the selector to what your actual container class is
-    const jobCards = page.locator('.MuiCard-root'); 
-    
-    // Check if job cards rendered correctly under asymmetric CSS layout
-    const count = await jobCards.count();
+    await page.route('**/api/common/configs**', async (route) => {
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({}) });
+    });
+
+    await page.route('**/api/common/all-careers**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ count: 0, results: [] }),
+      });
+    });
+
+    await page.route('**/api/auth/user-info-basic/', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 1,
+          email: 'employer@example.com',
+          full_name: 'Employer HR',
+          role_name: 'EMPLOYER',
+          workspaces: [{ type: 'company', company_id: 10, label: 'Company', is_default: true }],
+        }),
+      });
+    });
+
+    await page.route('**/api/auth/user-workspaces/', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          workspaces: [{ type: 'company', company_id: 10, label: 'Company', is_default: true }],
+        }),
+      });
+    });
+
+    await page.route('**/api/interview/web/sessions/42/', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 42,
+          room_name: 'room-42',
+          status: 'completed',
+          type: 'mixed',
+          candidate_name: 'Nguyen Van A',
+          candidate_email: 'candidate@example.com',
+          job_name: 'Backend Engineer',
+          company_name: 'Square',
+          scheduled_at: '2026-04-26T03:00:00Z',
+          start_time: '2026-04-26T03:00:00Z',
+          end_time: '2026-04-26T03:30:00Z',
+          duration: 1800,
+          recording_url: recordingUrl,
+          transcripts: [],
+          evaluations: [],
+          questions: [],
+        }),
+      });
+    });
+
+    await page.route('**/api/common/presign/**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ url: presignedUrl }),
+      });
+    });
+
+    await page.goto('/employer/interviews/42', { waitUntil: 'domcontentloaded' });
+
+    const cards = page.locator('.MuiCard-root');
+    await expect(cards.first()).toBeVisible({ timeout: 15000 });
+    const count = await cards.count();
     expect(count).toBeGreaterThan(0);
 
-    // E2E Visual Regression: Take a screenshot of the first job card to ensure the new border radii aren't broken
     if (count > 0) {
-      await jobCards.first().screenshot({ path: 'test-results/first-job-card-visual.png' });
+      await cards.first().screenshot({ path: 'test-results/interview-detail-first-card-visual.png' });
     }
   });
-
 });

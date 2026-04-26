@@ -215,7 +215,10 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
         );
       }
 
-      const tokenData = await interviewService.getLiveKitToken(state.sessionInviteToken);
+      const tokenData =
+        normalizedRole === 'jobseeker'
+          ? await interviewService.getLiveKitToken(state.sessionInviteToken)
+          : await interviewService.getHrPresenceToken(routeId as string);
       if (!tokenData?.token) throw new Error(t('errors.tokenMissing'));
 
       const isLocalOrigin =
