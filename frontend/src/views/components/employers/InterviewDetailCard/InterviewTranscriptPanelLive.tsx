@@ -19,7 +19,7 @@ interface InterviewTranscriptPanelProps {
 }
 
 type TranscriptItem = {
-  speaker: 'interviewer' | 'candidate';
+  speaker: 'interviewer' | 'candidate' | 'employer' | 'observer' | 'guest';
   text: string;
   timestamp: string;
   id: number | string;
@@ -29,10 +29,20 @@ type TranscriptItem = {
 const mapLiveMessages = (items: ReturnType<typeof useInterviewMessages>['messages']): TranscriptItem[] => {
   return items.map((item) => {
     const participant = item.from;
-    const isInterviewer = getParticipantRole(participant) === 'agent';
+    const role = getParticipantRole(participant);
+    const speaker: TranscriptItem['speaker'] =
+      role === 'agent'
+        ? 'interviewer'
+        : role === 'employer'
+          ? 'employer'
+          : role === 'observer'
+            ? 'observer'
+            : role === 'candidate'
+              ? 'candidate'
+              : 'guest';
 
     return {
-      speaker: isInterviewer ? 'interviewer' : 'candidate',
+      speaker,
       text: item.message,
       timestamp: new Date(item.timestamp).toLocaleTimeString(),
       id: item.id,
@@ -156,6 +166,8 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
           <Stack spacing={6}>
             {mergedTranscripts.map((item) => {
               const isInterviewer = item.speaker === 'interviewer';
+              const isEmployer = item.speaker === 'employer';
+              const isObserver = item.speaker === 'observer';
               const isNewLive = item.isLive;
               return (
                 <Stack
@@ -175,10 +187,17 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
                     sx={{
                       width: 44,
                       height: 44,
-                      bgcolor: isInterviewer ? 'primary.main' : 'secondary.main',
-                      boxShadow: (theme) => (isInterviewer ? theme.customShadows?.primary : theme.customShadows?.secondary),
+                      bgcolor: isInterviewer ? 'primary.main' : isEmployer ? 'warning.main' : isObserver ? 'grey.600' : 'secondary.main',
+                      boxShadow: (theme) =>
+                        isInterviewer ? theme.customShadows?.primary : isEmployer ? '0 8px 24px rgba(245, 158, 11, 0.14)' : theme.customShadows?.secondary,
                       border: '2.5px solid',
-                      borderColor: isInterviewer ? 'rgba(42, 169, 225, 0.5)' : 'rgba(16, 185, 129, 0.5)',
+                      borderColor: isInterviewer
+                        ? 'rgba(42, 169, 225, 0.5)'
+                        : isEmployer
+                          ? 'rgba(245, 158, 11, 0.5)'
+                          : isObserver
+                            ? 'rgba(148, 163, 184, 0.5)'
+                            : 'rgba(16, 185, 129, 0.5)',
                     }}
                   >
                     {isInterviewer ? <SmartToyIcon sx={{ fontSize: 24 }} /> : <PersonIcon sx={{ fontSize: 24 }} />}
@@ -195,7 +214,13 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
                           letterSpacing: 1.5,
                         }}
                       >
-                        {isInterviewer ? t('interviewDetail.label.interviewer') : t('interviewDetail.label.candidate')}
+                        {isInterviewer
+                          ? t('interviewDetail.label.interviewer')
+                          : isEmployer
+                            ? t('liveRoom.participants.employer')
+                            : isObserver
+                              ? t('liveRoom.participants.observer', 'Quan sát viên')
+                              : t('interviewDetail.label.candidate')}
                       </Typography>
                       {isNewLive && (
                         <Chip

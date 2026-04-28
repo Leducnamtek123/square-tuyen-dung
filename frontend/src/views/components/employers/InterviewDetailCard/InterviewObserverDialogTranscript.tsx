@@ -14,7 +14,7 @@ type TranscriptItem = {
   name: string;
   content: string;
   timestamp: number;
-  isAI: boolean;
+  role: 'agent' | 'employer' | 'observer' | 'candidate' | 'guest';
   isLocal: boolean;
 };
 
@@ -24,19 +24,25 @@ const mapLiveMessages = (
 ): TranscriptItem[] => {
   return items.map((item) => {
     const participant = item.from;
-    const isAI = getParticipantRole(participant) === 'agent';
+    const role = getParticipantRole(participant);
     const isLocal = participant?.isLocal === true;
+    const name =
+      role === 'agent'
+        ? t('interviewDetail.label.interviewer')
+        : role === 'employer'
+          ? t('liveRoom.participants.employer')
+          : role === 'observer'
+            ? t('liveRoom.participants.observer')
+            : role === 'candidate'
+              ? t('liveRoom.participants.candidate')
+              : participant?.name || participant?.identity || t('liveRoom.participants.guest');
 
     return {
       id: item.id,
-      name: isAI
-        ? t('interviewDetail.label.interviewer')
-        : isLocal
-          ? t('liveRoom.participants.you')
-          : participant?.name || participant?.identity || t('liveRoom.participants.guest'),
+      name: isLocal ? t('liveRoom.participants.you') : name,
       content: item.message,
       timestamp: item.timestamp,
-      isAI,
+      role,
       isLocal,
     };
   });
@@ -82,21 +88,24 @@ const InterviewObserverDialogTranscript = ({ t }: Props) => {
       {liveTranscripts.length > 0 ? (
         <Stack spacing={3}>
           {liveTranscripts.map((item) => {
+            const isAI = item.role === 'agent';
+            const isEmployer = item.role === 'employer';
+            const isObserver = item.role === 'observer';
             return (
               <Stack key={`${item.id}-${item.timestamp}-${item.content}`} direction="row" spacing={1.5} alignItems="flex-start">
                 <Avatar
                   sx={{
                     width: 32,
                     height: 32,
-                    bgcolor: item.isAI ? alpha('#0ea5e9', 0.2) : alpha('#a855f7', 0.2),
+                    bgcolor: isAI ? alpha('#0ea5e9', 0.2) : isEmployer ? alpha('#f59e0b', 0.2) : isObserver ? alpha('#64748b', 0.2) : alpha('#a855f7', 0.2),
                     border: '1.5px solid',
-                    borderColor: item.isAI ? alpha('#0ea5e9', 0.3) : alpha('#a855f7', 0.3),
+                    borderColor: isAI ? alpha('#0ea5e9', 0.3) : isEmployer ? alpha('#f59e0b', 0.3) : isObserver ? alpha('#64748b', 0.3) : alpha('#a855f7', 0.3),
                   }}
                 >
-                  {item.isAI ? <SmartToyIcon sx={{ fontSize: 16, color: '#0ea5e9' }} /> : <PersonIcon sx={{ fontSize: 16, color: '#a855f7' }} />}
+                  {isAI ? <SmartToyIcon sx={{ fontSize: 16, color: '#0ea5e9' }} /> : <PersonIcon sx={{ fontSize: 16, color: isEmployer ? '#f59e0b' : isObserver ? '#94a3b8' : '#a855f7' }} />}
                 </Avatar>
                 <Box sx={{ flex: 1 }}>
-                  <Typography variant="caption" sx={{ fontWeight: 900, color: item.isAI ? '#0ea5e9' : '#a855f7', textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: 1.5 }}>
+                  <Typography variant="caption" sx={{ fontWeight: 900, color: isAI ? '#0ea5e9' : isEmployer ? '#f59e0b' : isObserver ? '#94a3b8' : '#a855f7', textTransform: 'uppercase', fontSize: '0.65rem', letterSpacing: 1.5 }}>
                     {item.name}
                   </Typography>
                   <Paper
@@ -104,10 +113,10 @@ const InterviewObserverDialogTranscript = ({ t }: Props) => {
                     sx={{
                       mt: 0.5,
                       p: 2,
-                      bgcolor: item.isAI ? alpha('#0ea5e9', 0.06) : alpha('#a855f7', 0.06),
-                      borderRadius: item.isAI ? '0 12px 12px 12px' : '12px 0 12px 12px',
+                      bgcolor: isAI ? alpha('#0ea5e9', 0.06) : isEmployer ? alpha('#f59e0b', 0.06) : isObserver ? alpha('#64748b', 0.06) : alpha('#a855f7', 0.06),
+                      borderRadius: isAI ? '0 12px 12px 12px' : '12px 0 12px 12px',
                       border: '1px solid',
-                      borderColor: item.isAI ? alpha('#0ea5e9', 0.1) : alpha('#a855f7', 0.1),
+                      borderColor: isAI ? alpha('#0ea5e9', 0.1) : isEmployer ? alpha('#f59e0b', 0.1) : isObserver ? alpha('#64748b', 0.1) : alpha('#a855f7', 0.1),
                     }}
                   >
                     <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.85)', fontWeight: 600, lineHeight: 1.8, fontSize: '0.85rem' }}>

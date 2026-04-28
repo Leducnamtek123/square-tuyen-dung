@@ -11,16 +11,14 @@ from livekit.agents import (
     AutoSubscribe,
     JobContext,
     JobProcess,
-    MetricsCollectedEvent,
     cli,
-    metrics,
     room_io,
 )
 from livekit.agents.job import get_job_context
 from livekit.agents.voice.events import CloseEvent
+from livekit.agents.voice.events import SessionUsageUpdatedEvent
 from livekit.agents.llm import ChatMessage
 from livekit.plugins import openai, silero
-from livekit.plugins.turn_detector.multilingual import MultilingualModel
 import openai as openai_lib
 
 from .config import config
@@ -107,6 +105,7 @@ async def entrypoint(ctx: JobContext) -> None:
         "jobDescription": "",
         "backendApiUrl": config.BACKEND_API_URL,
         "roomName": ctx.room.name,
+        "participantIdentity": "",
     }
     try:
         metadata = ctx.room.metadata
@@ -138,20 +137,42 @@ async def entrypoint(ctx: JobContext) -> None:
     # 3. Create Interviewer Agent (greeting is handled in on_enter)
     interviewer = Interviewer(context=agent_context)
 
-    async def _on_text_input(sess, ev) -> None:
-        text = (ev.text or "").strip()
+    async def _wait_for_participant(participant_identity: str | None, timeout_seconds: float = 2.0):
+        if not participant_identity:
+            return None
+
+        deadline = asyncio.get_event_loop().time() + timeout_seconds
+        while True:
+            participant = ctx.room.remote_participants.get(participant_identity)
+            if participant is not None:
+                return participant
+            if asyncio.get_event_loop().time() >= deadline:
+                return None
+            await asyncio.sleep(0.1)
+
+    async def _handle_text_stream(reader, participant_identity: str) -> None:
+        text = (await reader.read_all()).strip()
         if not text:
+            return
+
+        participant = await _wait_for_participant(participant_identity)
+        if participant is None:
+            logger.warning(
+                "participant not found after retry, ignoring text input for room %s from %s",
+                ctx.room.name,
+                participant_identity,
+            )
             return
 
         logger.info(
             "Received text interview input for room %s from %s: %s",
             ctx.room.name,
-            getattr(ev.participant, "identity", "unknown"),
+            participant_identity,
             text,
         )
         await interviewer.record_transcript("candidate", text)
         try:
-            await sess.interrupt(force=True)
+            await session.interrupt(force=True)
         except Exception as exc:
             logger.info(
                 "Skipping interrupt before text reply for room %s: %s",
@@ -161,7 +182,7 @@ async def entrypoint(ctx: JobContext) -> None:
         # Text-chat turns should stay on the conversational path only.
         # Disabling tool selection here avoids function-call failures from the
         # LLM when a candidate sends a plain text answer.
-        sess.generate_reply(user_input=text, tools=[], tool_choice="none")
+        session.generate_reply(user_input=text, tools=[], tool_choice="none")
 
     # 4. Setup Session (Standard 1.5.x Pattern)
     session = AgentSession(
@@ -169,15 +190,14 @@ async def entrypoint(ctx: JobContext) -> None:
         llm=llm_model,
         tts=tts_model,
         vad=ctx.proc.userdata["vad"],
-        turn_detection=MultilingualModel(),
         **build_session_kwargs(),
     )
     session_started = False
 
     # 5. Event Handlers
-    @session.on("metrics_collected")
-    def _on_metrics_collected(ev: MetricsCollectedEvent) -> None:
-        metrics.log_metrics(ev.metrics)
+    @session.on("session_usage_updated")
+    def _on_session_usage_updated(ev: SessionUsageUpdatedEvent) -> None:
+        logger.info("Session usage updated for room %s: %s", ctx.room.name, ev.usage)
 
     @session.on("conversation_item_added")
     def _on_conversation_item_added(ev) -> None:
@@ -226,6 +246,7 @@ async def entrypoint(ctx: JobContext) -> None:
     # Establish the room connection up front so the greeting and first audio turn
     # don't race the agent connection handshake.
     await ctx.connect(auto_subscribe=AutoSubscribe.SUBSCRIBE_ALL)
+    ctx.room.register_text_stream_handler("lk.chat", lambda reader, participant_identity: asyncio.create_task(_handle_text_stream(reader, participant_identity)))
 
     # 7. Start the Session (no ctx.connect() needed - handled by session.start)
     try:
@@ -233,8 +254,10 @@ async def entrypoint(ctx: JobContext) -> None:
         # Mark interview as active only after the agent has a live room connection.
         await _update_backend_status(ctx.room.name, "in_progress")
         room_options = room_io.RoomOptions(
-            text_input=room_io.TextInputOptions(text_input_cb=_on_text_input),
+            text_input=False,
             text_output=room_io.TextOutputOptions(sync_transcription=False),
+            participant_identity=str(agent_context.get("participantIdentity") or "").strip() or None,
+            close_on_disconnect=False,
         )
         await session.start(
             agent=interviewer,

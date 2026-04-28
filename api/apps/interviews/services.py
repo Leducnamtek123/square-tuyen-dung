@@ -87,6 +87,7 @@ def build_interview_context(session: InterviewSession) -> Dict[str, object]:
     notes = _truncate_text(_clean_text(session.notes), 500)
 
     return {
+        "participantIdentity": f"candidate-{session.candidate_id}",
         "candidateName": session.candidate.full_name,
         "candidateEmail": session.candidate.email,
         "jobTitle": session.job_post.job_name if session.job_post else None,
