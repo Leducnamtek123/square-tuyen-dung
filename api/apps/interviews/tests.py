@@ -32,6 +32,7 @@ from apps.interviews.services import (
     append_transcript,
     advance_question_cursor,
     build_interview_context,
+    create_hr_presence_livekit_token,
     get_next_question_payload,
     update_interview_status,
 )
@@ -223,6 +224,29 @@ class LiveKitServiceTests(TestCase):
 
         mock_api.room.create_room.assert_not_called()
         mock_api.room.delete_room.assert_not_called()
+
+    @patch("apps.interviews.services.LiveKitService.create_hr_presence_token", return_value="fake-token")
+    def test_create_hr_presence_livekit_token_includes_company_name(self, mock_create_hr_presence_token):
+        session = SimpleNamespace(room_name="room-123", status="in_progress")
+        request = SimpleNamespace(
+            user=SimpleNamespace(
+                id=7,
+                full_name="HR User",
+                email="hr@example.com",
+                active_company=SimpleNamespace(company_name="Square Tech"),
+            )
+        )
+
+        data = create_hr_presence_livekit_token(session, request)
+
+        self.assertEqual(data["participant_name"], "HR User")
+        self.assertEqual(data["company_name"], "Square Tech")
+        mock_create_hr_presence_token.assert_called_once_with(
+            room_name="room-123",
+            hr_identity="employer-7",
+            hr_name="HR User",
+            company_name="Square Tech",
+        )
 
 
 # ─── NEW: Session CRUD API Tests ───────────────────────────────────────────

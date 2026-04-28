@@ -8,7 +8,7 @@ import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import type { i18n, TFunction } from 'i18next';
 
 import { InterviewSession, InterviewTranscript } from '@/types/models';
-import { getParticipantRole, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
+import { getParticipantCompanyName, getParticipantRole, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
 import { useInterviewMessages } from '@/views/interviewPages/useInterviewMessages';
 import pc from '@/utils/muiColors';
 
@@ -30,6 +30,7 @@ const mapLiveMessages = (items: ReturnType<typeof useInterviewMessages>['message
   return items.map((item) => {
     const participant = item.from;
     const role = getParticipantRole(participant);
+    const companyName = getParticipantCompanyName(participant);
     const speaker: TranscriptItem['speaker'] =
       role === 'agent'
         ? 'interviewer'
@@ -217,7 +218,7 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
                         {isInterviewer
                           ? t('interviewDetail.label.interviewer')
                           : isEmployer
-                            ? t('liveRoom.participants.employer')
+                            ? companyName || t('liveRoom.participants.employer')
                             : isObserver
                               ? t('liveRoom.participants.observer', 'Quan sát viên')
                               : t('interviewDetail.label.candidate')}

@@ -3,7 +3,7 @@ import { alpha, Avatar, Box, Chip, Paper, Stack, Typography } from '@mui/materia
 import { useInterviewMessages } from '@/views/interviewPages/useInterviewMessages';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import PersonIcon from '@mui/icons-material/Person';
-import { getParticipantRole, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
+import { getParticipantCompanyName, getParticipantRole, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
 
 type Props = {
   t: (key: string, options?: Record<string, unknown>) => string;
@@ -26,11 +26,12 @@ const mapLiveMessages = (
     const participant = item.from;
     const role = getParticipantRole(participant);
     const isLocal = participant?.isLocal === true;
+    const companyName = getParticipantCompanyName(participant);
     const name =
       role === 'agent'
         ? t('interviewDetail.label.interviewer')
         : role === 'employer'
-          ? t('liveRoom.participants.employer')
+          ? companyName || t('liveRoom.participants.employer')
           : role === 'observer'
             ? t('liveRoom.participants.observer')
             : role === 'candidate'

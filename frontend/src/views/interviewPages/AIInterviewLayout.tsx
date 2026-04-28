@@ -12,7 +12,7 @@ import {
 } from '@livekit/components-react';
 import { Track } from 'livekit-client';
 import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
-import { getParticipantRole, isLiveKitAgentParticipant, sanitizeInterviewText } from './livekitParticipant';
+import { getParticipantCompanyName, getParticipantRole, isLiveKitAgentParticipant, sanitizeInterviewText } from './livekitParticipant';
 import { useInterviewMessages } from './useInterviewMessages';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -133,6 +133,7 @@ function AIParticipantTile({
   const isSpeaking = participant?.isSpeaking;
   const role = participant ? getParticipantRole(participant) : (variant === 'candidate' ? 'candidate' : 'guest');
   const isEmployer = role === 'employer';
+  const employerCompanyName = getParticipantCompanyName(participant);
   const isAgentByVoiceAssistant =
     Boolean(agentSid && participant?.sid === agentSid) ||
     Boolean(agentIdentity && participant?.identity === agentIdentity);
@@ -148,7 +149,7 @@ function AIParticipantTile({
 
   let displayName = participant?.name || participant?.identity || '';
   if (isAgent) displayName = t('liveRoom.participants.aiInterviewer');
-  else if (isEmployer) displayName = t('liveRoom.participants.employer');
+  else if (isEmployer) displayName = employerCompanyName || participant?.name || t('liveRoom.participants.employer');
   else if (isSelf) displayName = t('liveRoom.participants.you');
   else if (shouldRenderSyntheticAgent) displayName = t('liveRoom.participants.aiInterviewer');
   else if (!displayName) {
@@ -227,19 +228,21 @@ function AIParticipantTile({
           </div>
         </div>
         <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
-          <div className="flex items-center gap-1.5">
-            {isSelf && (
-              <span className="rounded bg-cyan-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-cyan-300">
-                {t('liveRoom.chips.you')}
-              </span>
-            )}
-            {variant === 'candidate' && !isSelf && !isEmployer && (
-              <span className="rounded bg-slate-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-200">
-                {candidateLabel}
-              </span>
-            )}
-            <span className="text-xs font-semibold text-white">{displayName}</span>
-            {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-1.5">
+              {isSelf && (
+                <span className="rounded bg-cyan-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-cyan-300">
+                  {t('liveRoom.chips.you')}
+                </span>
+              )}
+              {variant === 'candidate' && !isSelf && !isEmployer && (
+                <span className="rounded bg-slate-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-200">
+                  {candidateLabel}
+                </span>
+              )}
+              <span className="text-xs font-semibold text-white">{displayName}</span>
+              {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
+            </div>
           </div>
         </div>
       </div>
@@ -261,24 +264,21 @@ function AIParticipantTile({
       </div>
 
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
-        <div className="flex items-center gap-1.5">
-          {isSelf && (
-            <span className="rounded bg-cyan-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-cyan-300">
-              {t('liveRoom.chips.you')}
-            </span>
-          )}
-          {isEmployer && !isSelf && (
-            <span className="rounded bg-amber-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-amber-300">
-              {t('liveRoom.chips.employer')}
-            </span>
-          )}
-          {variant === 'candidate' && !isSelf && !isEmployer && (
-            <span className="rounded bg-slate-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-200">
-              {candidateLabel}
-            </span>
-          )}
-          <span className="text-xs font-semibold text-white">{displayName}</span>
-          {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-1.5">
+            {isSelf && (
+              <span className="rounded bg-cyan-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-cyan-300">
+                {t('liveRoom.chips.you')}
+              </span>
+            )}
+            {variant === 'candidate' && !isSelf && !isEmployer && (
+              <span className="rounded bg-slate-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-200">
+                {candidateLabel}
+              </span>
+            )}
+            <span className="text-xs font-semibold text-white">{displayName}</span>
+            {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
+          </div>
         </div>
       </div>
     </div>
@@ -337,7 +337,8 @@ function TimelineMessage({ entry }: { entry: { id: string; timestamp: number; me
   const employerName = t('liveRoom.participants.employer');
   const candidateName = t('liveRoom.participants.candidate');
   const participantRole = entry.from ? getParticipantRole(entry.from as any) : 'guest';
-  const displayName = getMessageDisplayName(entry, fallbackName, youName, aiName, participantRole, employerName, candidateName);
+  const employerCompanyName = getParticipantCompanyName(entry.from as any) || employerName;
+  const displayName = getMessageDisplayName(entry, fallbackName, youName, aiName, participantRole, employerCompanyName, candidateName);
   const isEmployer = participantRole === 'employer';
   const isCandidate = participantRole === 'candidate';
   const alignRight = isLocal && !isAgent;
@@ -346,7 +347,7 @@ function TimelineMessage({ entry }: { entry: { id: string; timestamp: number; me
     : isLocal
     ? t('liveRoom.chips.you')
     : isEmployer
-    ? t('liveRoom.chips.employer')
+    ? employerCompanyName
     : isCandidate
     ? t('liveRoom.participants.candidate')
     : isTranscript
