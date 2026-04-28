@@ -24,13 +24,7 @@ const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
   const zoomPluginInstance = zoomPlugin();
 
   const getFilePluginInstance = getFilePlugin({
-
-    fileNameGenerator: (file) => {
-
-      return `project_CV-${toSlug(title)}`;
-
-    },
-
+    fileNameGenerator: () => `project_CV-${toSlug(title)}`,
   });
 
   const { Download } = getFilePluginInstance;
@@ -206,7 +200,14 @@ const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
 
         </Stack>
 
-        <Box sx={{ height: '100%', maxHeight: 800, overflowY: 'auto' }}>
+        <Box
+          sx={{
+            height: 'min(80vh, 900px)',
+            minHeight: 520,
+            overflow: 'auto',
+            bgcolor: '#fff',
+          }}
+        >
 
           <Viewer
 
@@ -214,7 +215,7 @@ const Pdf = ({ fileUrl, title = '' }: PdfProps) => {
 
             plugins={[zoomPluginInstance, getFilePluginInstance]}
 
-            defaultScale={1.2}
+            defaultScale={SpecialZoomLevel.PageFit}
 
           />
 
