@@ -8,8 +8,8 @@ import { Career } from '../../../../types/models';
 import { PaginatedResponse } from '../../../../types/api';
 
 type UseCareersResult = UseQueryResult<PaginatedResponse<Career>> & {
-    createCareer: (data: CareerPayload) => Promise<Career>;
-    updateCareer: (args: { id: string | number; data: Partial<CareerPayload> }) => Promise<Career>;
+    createCareer: (data: CareerPayload | FormData) => Promise<Career>;
+    updateCareer: (args: { id: string | number; data: Partial<CareerPayload> | FormData }) => Promise<Career>;
     deleteCareer: (id: string | number) => Promise<void>;
     isMutating: boolean;
 };
@@ -27,7 +27,7 @@ export const useCareers = (params?: AdminListParams): UseCareersResult => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (data: CareerPayload) => adminManagementService.createCareer(data),
+        mutationFn: (data: CareerPayload | FormData) => adminManagementService.createCareer(data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
             toastMessages.success('Career added successfully');
@@ -39,7 +39,7 @@ export const useCareers = (params?: AdminListParams): UseCareersResult => {
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, data }: { id: string | number; data: Partial<CareerPayload> }) => adminManagementService.updateCareer(id, data),
+        mutationFn: ({ id, data }: { id: string | number; data: Partial<CareerPayload> | FormData }) => adminManagementService.updateCareer(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-careers'] });
             toastMessages.success('Career updated successfully');

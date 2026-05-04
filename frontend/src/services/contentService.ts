@@ -64,6 +64,7 @@ export interface ArticleListParams {
   tag?: string;
   page?: number;
   page_size?: number;
+  pageSize?: number;
   [key: string]: string | number | undefined;
 }
 
@@ -88,6 +89,14 @@ export interface PaginatedArticles {
 // ─── Content Service ──────────────────────────────────────────────────────────
 
 const contentService = {
+  normalizeArticleListParams: (params: ArticleListParams = {}): Record<string, string | number | undefined> => {
+    const { page_size, pageSize, ...rest } = params;
+    return {
+      ...rest,
+      pageSize: pageSize ?? page_size,
+    };
+  },
+
   getFeedbacks: async (): Promise<Feedback[]> => {
     const url = 'content/web/feedbacks/';
     const response = await httpRequest.get(url);
@@ -118,7 +127,9 @@ const contentService = {
   // ─── Public Article API ──────────────────────────────────────────────────
 
   getPublicArticles: async (params: ArticleListParams = {}): Promise<PaginatedArticles> => {
-    const response = await httpRequest.get('content/web/articles/', { params: cleanParams(params) });
+    const response = await httpRequest.get('content/web/articles/', {
+      params: cleanParams(contentService.normalizeArticleListParams(params)),
+    });
     const raw = response as PaginatedArticles & { data?: PaginatedArticles };
     if (raw && typeof raw === 'object' && 'data' in raw) return (raw as { data: PaginatedArticles }).data;
     return raw as PaginatedArticles;
@@ -134,7 +145,9 @@ const contentService = {
   // ─── Admin Article API ───────────────────────────────────────────────────
 
   adminGetArticles: async (params: ArticleListParams = {}): Promise<PaginatedArticles> => {
-    const response = await httpRequest.get('content/web/admin/articles/', { params: cleanParams(params) });
+    const response = await httpRequest.get('content/web/admin/articles/', {
+      params: cleanParams(contentService.normalizeArticleListParams(params)),
+    });
     const raw = response as PaginatedArticles & { data?: PaginatedArticles };
     if (raw && typeof raw === 'object' && 'data' in raw) return (raw as { data: PaginatedArticles }).data;
     return raw as PaginatedArticles;
@@ -172,7 +185,9 @@ const contentService = {
   // ─── Employer Article (Blog) API ─────────────────────────────────────────
 
   employerGetBlogs: async (params: ArticleListParams = {}): Promise<PaginatedArticles> => {
-    const response = await httpRequest.get('content/web/employer/articles/', { params: cleanParams(params) });
+    const response = await httpRequest.get('content/web/employer/articles/', {
+      params: cleanParams(contentService.normalizeArticleListParams(params)),
+    });
     const raw = response as PaginatedArticles & { data?: PaginatedArticles };
     if (raw && typeof raw === 'object' && 'data' in raw) return (raw as { data: PaginatedArticles }).data;
     return raw as PaginatedArticles;

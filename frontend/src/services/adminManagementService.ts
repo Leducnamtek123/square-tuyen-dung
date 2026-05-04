@@ -34,7 +34,7 @@ export interface CareerPayload {
   name: string;
   appIconName?: string | null;
   isHot?: boolean;
-  iconFile?: File;
+  iconFile?: File | null;
 }
 
 export interface CityPayload {

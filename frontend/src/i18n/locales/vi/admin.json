@@ -72,6 +72,7 @@
       "keyCareerBadge": "Trọng điểm",
       "uploadIconBtn": "Tải ảnh đại diện",
       "noIconSelected": "Chưa chọn tệp",
+      "existingIconHint": "Ảnh hiện tại sẽ được giữ nguyên nếu bạn không chọn file mới.",
       "cancelBtn": "Hủy",
       "saveBtn": "Lưu",
       "savingBtn": "Đang lưu...",

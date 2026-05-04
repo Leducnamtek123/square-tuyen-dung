@@ -72,6 +72,7 @@
       "keyCareerBadge": "Key",
       "uploadIconBtn": "Upload Icon",
       "noIconSelected": "No file selected",
+      "existingIconHint": "The current image will be kept if you do not upload a new file.",
       "cancelBtn": "Cancel",
       "saveBtn": "Save",
       "savingBtn": "Saving...",
