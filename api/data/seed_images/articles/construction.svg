@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#07111f"/>
+      <stop offset="55%" stop-color="#123245"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#84cc16"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1320" cy="180" r="220" fill="#22c55e1f" />
+  <circle cx="250" cy="760" r="300" fill="#f59e0b18" />
+  <rect x="120" y="140" width="460" height="620" rx="34" fill="#0b2036" fill-opacity="0.9" stroke="#ffffff18"/>
+  <rect x="190" y="210" width="360" height="38" rx="10" fill="url(#accent)" opacity="0.92"/>
+  <rect x="190" y="276" width="220" height="220" rx="22" fill="#ffffff10"/>
+  <rect x="430" y="276" width="120" height="450" rx="20" fill="#ffffff12"/>
+  <path d="M200 570H550" stroke="#ffffff26" stroke-width="18" stroke-linecap="round"/>
+  <path d="M200 630H520" stroke="#ffffff18" stroke-width="18" stroke-linecap="round"/>
+  <path d="M250 276L250 740" stroke="#ffffff16" stroke-width="10"/>
+  <path d="M335 276L335 740" stroke="#ffffff16" stroke-width="10"/>
+  <text x="700" y="330" fill="#ffffff" font-size="78" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="4">CONSTRUCTION</text>
+  <text x="700" y="398" fill="#cbd5e1" font-size="34" font-family="Arial, Helvetica, sans-serif" letter-spacing="2">Site management, QA/QC and delivery</text>
+  <rect x="700" y="460" width="320" height="10" rx="5" fill="url(#accent)"/>
+  <text x="700" y="540" fill="#e2e8f0" font-size="56" font-family="Arial, Helvetica, sans-serif" font-weight="700">Square Insights</text>
+  <text x="700" y="610" fill="#94a3b8" font-size="30" font-family="Arial, Helvetica, sans-serif">Xây dựng</text>
+</svg>

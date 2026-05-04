@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#08111f"/>
+      <stop offset="55%" stop-color="#2a1b4f"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fb7185"/>
+      <stop offset="100%" stop-color="#f59e0b"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1300" cy="170" r="220" fill="#f472b61d" />
+  <circle cx="270" cy="740" r="280" fill="#f59e0b16" />
+  <rect x="120" y="150" width="460" height="610" rx="34" fill="#0b2036" fill-opacity="0.9" stroke="#ffffff18"/>
+  <rect x="185" y="230" width="220" height="180" rx="24" fill="#ffffff10"/>
+  <rect x="430" y="230" width="110" height="480" rx="20" fill="#ffffff12"/>
+  <rect x="185" y="450" width="355" height="110" rx="28" fill="url(#accent)" opacity="0.92"/>
+  <rect x="185" y="590" width="180" height="120" rx="24" fill="#ffffff12"/>
+  <rect x="385" y="590" width="155" height="120" rx="24" fill="#ffffff10"/>
+  <text x="700" y="330" fill="#ffffff" font-size="78" font-family="Arial, Helvetica, sans-serif" font-weight="700" letter-spacing="4">INTERIOR DESIGN</text>
+  <text x="700" y="398" fill="#cbd5e1" font-size="34" font-family="Arial, Helvetica, sans-serif" letter-spacing="2">Space planning, materials and styling</text>
+  <rect x="700" y="460" width="320" height="10" rx="5" fill="url(#accent)"/>
+  <text x="700" y="540" fill="#e2e8f0" font-size="56" font-family="Arial, Helvetica, sans-serif" font-weight="700">Square Insights</text>
+  <text x="700" y="610" fill="#94a3b8" font-size="30" font-family="Arial, Helvetica, sans-serif">Nội thất</text>
+</svg>

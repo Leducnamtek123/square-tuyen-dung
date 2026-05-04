@@ -6,6 +6,7 @@ from .seeders.location_seeder import seed_locations
 from .seeders.career_seeder import seed_careers
 from .seeders.account_seeder import seed_accounts
 from .seeders.job_seeder import seed_jobs
+from apps.content.management.commands.seed_articles import seed_articles
 from .seeders.interview_seeder import seed_interviews
 from .seeders.banner_seeder import seed_banners
 from .seeders.feedback_seeder import seed_feedbacks
@@ -18,7 +19,7 @@ class Command(BaseCommand):
             '--type',
             type=str,
             default='all',
-            help='Type of data to seed: locations, careers, accounts, jobs, interviews, banners, feedbacks, square, all',
+            help='Type of data to seed: locations, careers, accounts, jobs, interviews, banners, feedbacks, articles, square, all',
         )
 
     @transaction.atomic
@@ -50,6 +51,9 @@ class Command(BaseCommand):
             seed_jobs()
             self.stdout.write(self.style.SUCCESS('✅ Seed command finished for: square'))
             return
+
+        if seed_type in ['articles', 'all']:
+            seed_articles(stdout=self.stdout, stderr=self.stderr)
 
         if seed_type in ['locations', 'all']:
             seed_locations()
