@@ -7,6 +7,7 @@ import uuid
 import asyncio
 import logging
 import json
+from typing import Dict, Optional
 from decouple import config
 from livekit import api
 
@@ -22,18 +23,36 @@ logger = logging.getLogger(__name__)
 
 class LiveKitService:
     @staticmethod
-    def _apply_participant_identity(token_builder: api.AccessToken, role: str, *, participant_name: str) -> api.AccessToken:
+    def _apply_participant_identity(
+        token_builder: api.AccessToken,
+        role: str,
+        *,
+        participant_name: str,
+        extra_attributes: Optional[Dict[str, str]] = None,
+        extra_metadata: Optional[Dict[str, str]] = None,
+    ) -> api.AccessToken:
         """
         Tag participant role in both metadata and attributes so the frontend can
         classify participants without guessing from display names.
         """
+        attributes = {
+            "role": role,
+            "participant_role": role,
+        }
+        if extra_attributes:
+            attributes.update({key: value for key, value in extra_attributes.items() if value})
+
+        metadata = {
+            "role": role,
+            "name": participant_name,
+        }
+        if extra_metadata:
+            metadata.update({key: value for key, value in extra_metadata.items() if value})
+
         return (
             token_builder
-            .with_metadata(json.dumps({"role": role, "name": participant_name}, ensure_ascii=False))
-            .with_attributes({
-                "role": role,
-                "participant_role": role,
-            })
+            .with_metadata(json.dumps(metadata, ensure_ascii=False))
+            .with_attributes(attributes)
         )
 
     @staticmethod
@@ -176,6 +195,7 @@ class LiveKitService:
         room_name: str,
         hr_identity: str,
         hr_name: str,
+        company_name: Optional[str] = None,
     ) -> str:
         """
         Tạo JWT token cho HR tham gia hiện diện.
@@ -202,6 +222,8 @@ class LiveKitService:
             token_builder,
             "employer",
             participant_name=hr_name,
+            extra_attributes={"company_name": company_name} if company_name else None,
+            extra_metadata={"company_name": company_name} if company_name else None,
         )
         return token_builder.to_jwt()
 

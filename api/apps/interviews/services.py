@@ -362,7 +362,7 @@ def create_observer_livekit_token(session: InterviewSession, request) -> Dict[st
     }
 
 
-def create_hr_presence_livekit_token(session: InterviewSession, request) -> Dict[str, str]:
+def create_hr_presence_livekit_token(session: InterviewSession, request) -> Dict[str, object]:
     """
     Tạo token cho HR tham gia hiện diện — ứng viên thấy HR trong phòng.
 
@@ -381,11 +381,14 @@ def create_hr_presence_livekit_token(session: InterviewSession, request) -> Dict
     user = request.user
     hr_identity = f"employer-{user.id}"
     hr_name = user.full_name or user.email or hr_identity
+    company = getattr(user, "active_company", None)
+    company_name = getattr(company, "company_name", None) if company else None
 
     token = LiveKitService.create_hr_presence_token(
         room_name=session.room_name,
         hr_identity=hr_identity,
         hr_name=hr_name,
+        company_name=company_name,
     )
 
     server_url = _build_public_livekit_url(request)
@@ -395,6 +398,7 @@ def create_hr_presence_livekit_token(session: InterviewSession, request) -> Dict
         "room_name": session.room_name,
         "participant_identity": hr_identity,
         "participant_name": hr_name,
+        "company_name": company_name,
         "server_url": server_url,
         "mode": "hr_presence",
     }

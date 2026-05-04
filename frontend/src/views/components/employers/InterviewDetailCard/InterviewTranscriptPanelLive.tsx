@@ -1,13 +1,16 @@
 import React, { useEffect, useRef } from 'react';
-import { Box, Paper, Stack, Typography, Divider, Chip } from '@mui/material';
-import ForumIcon from '@mui/icons-material/Forum';
+import { alpha, Avatar, Box, Chip, Divider, Paper, Stack, Typography } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import ForumIcon from '@mui/icons-material/Forum';
+import PersonIcon from '@mui/icons-material/Person';
+import SmartToyIcon from '@mui/icons-material/SmartToy';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import type { i18n, TFunction } from 'i18next';
-import { ChatEntry, useSessionContext, useSessionMessages, type ReceivedMessage } from '@livekit/components-react';
+import { useSessionContext, useSessionMessages } from '@livekit/components-react';
 
 import { InterviewSession, InterviewTranscript } from '@/types/models';
-import { getParticipantRole } from '@/views/interviewPages/livekitParticipant';
+import { getParticipantCompanyName, getParticipantRole, sanitizeInterviewText } from '@/views/interviewPages/livekitParticipant';
+import { useInterviewMessages } from '@/views/interviewPages/useInterviewMessages';
 import pc from '@/utils/muiColors';
 
 interface InterviewTranscriptPanelProps {
@@ -16,75 +19,118 @@ interface InterviewTranscriptPanelProps {
   i18n: i18n;
 }
 
-type LiveEntry = ReceivedMessage;
-
-const mapLiveMessages = (
-  items: ReturnType<typeof useSessionMessages>['messages'],
-  t: TFunction,
-): LiveEntry[] => {
-  return items.map((item) => {
-    const role = getParticipantRole(item.from);
-    const speakerName =
-      role === 'agent'
-        ? t('interviewDetail.label.interviewer')
-        : role === 'employer'
-          ? t('liveRoom.participants.employer')
-          : role === 'observer'
-            ? t('liveRoom.participants.observer', 'Quan sát viên')
-            : role === 'candidate'
-              ? t('liveRoom.participants.candidate')
-              : item.from?.name || item.from?.identity || t('liveRoom.participants.guest');
-
-    return {
-      ...item,
-      from: {
-        ...item.from,
-        name: speakerName,
-      },
-    } as LiveEntry;
-  });
+type TimelineItem = {
+  id: string;
+  speaker: 'interviewer' | 'employer' | 'observer' | 'candidate' | 'guest';
+  speakerName: string;
+  content: string;
+  timestamp: number;
+  isLive: boolean;
 };
 
-const mapHistoryMessages = (session: InterviewSession, t: TFunction, i18n: i18n): LiveEntry[] => {
-  const existingTranscripts = Array.isArray(session.transcripts) ? session.transcripts : [];
-  return existingTranscripts.map((transcript: InterviewTranscript) => {
-    const isInterviewer = transcript.speakerRole === 'ai_agent';
-    const speakerName = isInterviewer
-      ? t('interviewDetail.label.interviewer')
-      : t('interviewDetail.label.candidate');
+const formatTime = (timestamp: number, language: string) =>
+  new Date(timestamp).toLocaleTimeString(language === 'vi' ? 'vi-VN' : 'en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+
+const mapLiveMessages = (items: ReturnType<typeof useInterviewMessages>['messages'], t: TFunction): TimelineItem[] =>
+  items.map((item) => {
+    const participant = item.from;
+    const role = getParticipantRole(participant);
+    const companyName = getParticipantCompanyName(participant);
 
     return {
-      id: String(transcript.id),
-      timestamp: transcript.createAt ? new Date(transcript.createAt).getTime() : Date.now(),
-      message: transcript.content || transcript.text || '',
-      type: 'chatMessage',
-      from: {
-        isLocal: false,
-        name: speakerName,
-        identity: String(transcript.id),
-      },
-      editTimestamp: undefined,
-    } as LiveEntry;
+      id: item.id,
+      speaker:
+        role === 'agent'
+          ? 'interviewer'
+          : role === 'employer'
+            ? 'employer'
+            : role === 'observer'
+              ? 'observer'
+              : role === 'candidate'
+                ? 'candidate'
+                : 'guest',
+      speakerName:
+        role === 'agent'
+          ? t('interviewDetail.label.interviewer')
+          : role === 'employer'
+            ? companyName || t('liveRoom.participants.employer')
+            : role === 'observer'
+              ? t('liveRoom.participants.observer', 'Quan sát viên')
+              : role === 'candidate'
+                ? t('liveRoom.participants.candidate')
+                : participant?.name || participant?.identity || t('liveRoom.participants.guest'),
+      content: sanitizeInterviewText(item.message),
+      timestamp: item.timestamp,
+      isLive: true,
+    };
   });
+
+const mapHistoryMessages = (session: InterviewSession, t: TFunction): TimelineItem[] => {
+  const existingTranscripts = Array.isArray(session.transcripts) ? session.transcripts : [];
+
+  return existingTranscripts.map((transcript: InterviewTranscript) => ({
+    id: String(transcript.id),
+    speaker: transcript.speakerRole === 'ai_agent' ? 'interviewer' : 'candidate',
+    speakerName:
+      transcript.speakerRole === 'ai_agent'
+        ? t('interviewDetail.label.interviewer')
+        : t('interviewDetail.label.candidate'),
+    content: sanitizeInterviewText(transcript.content || transcript.text || ''),
+    timestamp: transcript.createAt ? new Date(transcript.createAt).getTime() : Date.now(),
+    isLive: false,
+  }));
 };
 
 const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({ session, t, i18n }) => {
   const transcriptEndRef = useRef<HTMLDivElement>(null);
   const liveSession = useSessionContext();
-  const { messages: liveMessages } = useSessionMessages(liveSession);
+  const { messages: sessionMessages } = useSessionMessages(liveSession);
+  const { messages: liveMessages } = useInterviewMessages();
 
   const mergedTranscripts = React.useMemo(() => {
-    const existingMessages = mapHistoryMessages(session, t, i18n);
-    const existingIds = new Set(existingMessages.map((message) => message.id));
-    const liveOnly = mapLiveMessages(liveMessages, t).filter((item) => !existingIds.has(item.id));
-    return [...existingMessages, ...liveOnly];
-  }, [i18n, liveMessages, session, t]);
+    const history = mapHistoryMessages(session, t);
+    const historyIds = new Set(history.map((item) => item.id));
+    const live = mapLiveMessages(liveMessages, t).filter((item) => !historyIds.has(item.id));
+    const liveChat = sessionMessages
+      .filter((message) => !historyIds.has(message.id))
+      .map((message) => ({
+        id: message.id,
+        speaker:
+          getParticipantRole(message.from) === 'agent'
+            ? 'interviewer'
+            : getParticipantRole(message.from) === 'employer'
+              ? 'employer'
+              : getParticipantRole(message.from) === 'observer'
+                ? 'observer'
+                : getParticipantRole(message.from) === 'candidate'
+                  ? 'candidate'
+                  : 'guest',
+        speakerName:
+          getParticipantRole(message.from) === 'agent'
+            ? t('interviewDetail.label.interviewer')
+            : getParticipantRole(message.from) === 'employer'
+              ? getParticipantCompanyName(message.from) || t('liveRoom.participants.employer')
+              : getParticipantRole(message.from) === 'observer'
+                ? t('liveRoom.participants.observer', 'Quan sát viên')
+                : getParticipantRole(message.from) === 'candidate'
+                  ? t('liveRoom.participants.candidate')
+                  : message.from?.name || message.from?.identity || t('liveRoom.participants.guest'),
+        content: sanitizeInterviewText(message.message),
+        timestamp: message.timestamp,
+        isLive: true,
+      }) as TimelineItem);
+
+    return [...history, ...live, ...liveChat].sort((a, b) => a.timestamp - b.timestamp);
+  }, [liveMessages, session, sessionMessages, t]);
 
   useEffect(() => {
-    if (liveMessages.length > 0 && transcriptEndRef.current) {
+    if (mergedTranscripts.length > 0 && transcriptEndRef.current) {
       transcriptEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [liveMessages.length]);
+  }, [mergedTranscripts.length]);
 
   return (
     <Paper
@@ -170,46 +216,123 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
         }}
       >
         {mergedTranscripts.length > 0 ? (
-          <div className="space-y-4">
-            {mergedTranscripts.map((item) => (
-              <Box
-                key={`${item.id}-${item.timestamp}`}
-                sx={{
-                  borderRadius: 3,
-                  border: '1px solid',
-                  borderColor: 'rgba(255,255,255,0.08)',
-                  bgcolor: 'rgba(2, 6, 23, 0.2)',
-                  p: 1.5,
-                }}
-              >
-                <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                  <AccessTimeIcon sx={{ fontSize: 14, color: 'text.disabled' }} />
-                  <Typography variant="caption" sx={{ fontWeight: 800, color: 'text.disabled' }}>
-                    {new Date(item.timestamp).toLocaleTimeString(i18n.language === 'vi' ? 'vi-VN' : 'en-US')}
-                  </Typography>
-                  {item.type === 'chatMessage' && (
-                    <Chip
-                      label={t('employer:interviewLive.candidateCard.newBadge')}
-                      size="small"
+          <Stack spacing={3}>
+            {mergedTranscripts.map((item) => {
+              const isInterviewer = item.speaker === 'interviewer';
+              const isEmployer = item.speaker === 'employer';
+              const isObserver = item.speaker === 'observer';
+              const isCandidate = item.speaker === 'candidate';
+
+              return (
+                <Stack
+                  key={`${item.id}-${item.timestamp}-${item.isLive ? 'live' : 'history'}`}
+                  direction="row"
+                  spacing={2}
+                  alignItems="flex-start"
+                  sx={{
+                    animation: item.isLive ? 'fadeSlideIn 0.5s ease-out' : 'none',
+                    '@keyframes fadeSlideIn': {
+                      from: { opacity: 0, transform: 'translateY(12px)' },
+                      to: { opacity: 1, transform: 'translateY(0)' },
+                    },
+                  }}
+                >
+                  <Avatar
+                    sx={{
+                      width: 42,
+                      height: 42,
+                      bgcolor: isInterviewer
+                        ? 'primary.main'
+                        : isEmployer
+                          ? 'warning.main'
+                          : isObserver
+                            ? 'grey.600'
+                            : isCandidate
+                              ? 'success.main'
+                              : 'secondary.main',
+                      boxShadow: (theme) =>
+                        isInterviewer
+                          ? theme.customShadows?.primary
+                          : isEmployer
+                            ? '0 8px 24px rgba(245, 158, 11, 0.14)'
+                            : theme.customShadows?.secondary,
+                      border: '2.5px solid',
+                      borderColor: isInterviewer
+                        ? 'rgba(42, 169, 225, 0.5)'
+                        : isEmployer
+                          ? 'rgba(245, 158, 11, 0.5)'
+                          : isObserver
+                            ? 'rgba(148, 163, 184, 0.5)'
+                            : isCandidate
+                              ? 'rgba(34, 197, 94, 0.5)'
+                              : 'rgba(16, 185, 129, 0.5)',
+                    }}
+                  >
+                    {isInterviewer ? <SmartToyIcon sx={{ fontSize: 24 }} /> : <PersonIcon sx={{ fontSize: 24 }} />}
+                  </Avatar>
+
+                  <Box sx={{ flex: 1 }}>
+                    <Stack direction="row" spacing={1.5} alignItems="center" sx={{ mb: 2, flexWrap: 'wrap' }}>
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          fontWeight: 900,
+                          color: isInterviewer ? 'primary.main' : 'secondary.main',
+                          textTransform: 'uppercase',
+                          fontSize: '0.8rem',
+                          letterSpacing: 1.5,
+                        }}
+                      >
+                        {item.speakerName}
+                      </Typography>
+                      <Stack direction="row" alignItems="center" spacing={0.5} sx={{ color: 'text.disabled' }}>
+                        <AccessTimeIcon sx={{ fontSize: 14 }} />
+                        <Typography variant="caption" sx={{ fontWeight: 800 }}>
+                          {formatTime(item.timestamp, i18n.language)}
+                        </Typography>
+                      </Stack>
+                      {item.isLive && (
+                        <Chip
+                          label={t('employer:interviewLive.candidateCard.newBadge')}
+                          size="small"
+                          sx={{
+                            height: 18,
+                            fontSize: '0.55rem',
+                            fontWeight: 900,
+                            letterSpacing: 1,
+                            bgcolor: 'rgba(245, 158, 11, 0.1)',
+                            color: '#f59e0b',
+                            border: '1px solid',
+                            borderColor: 'rgba(245, 158, 11, 0.2)',
+                          }}
+                        />
+                      )}
+                    </Stack>
+
+                    <Paper
+                      elevation={0}
                       sx={{
-                        height: 18,
-                        fontSize: '0.55rem',
-                        fontWeight: 900,
-                        letterSpacing: 1,
-                        bgcolor: 'rgba(245, 158, 11, 0.1)',
-                        color: '#f59e0b',
+                        p: 3,
+                        bgcolor: isInterviewer ? pc.primary(0.03) : pc.actionDisabled(0.03),
+                        borderRadius: isInterviewer ? '0px 20px 20px 20px' : '20px 0px 20px 20px',
                         border: '1px solid',
-                        borderColor: 'rgba(245, 158, 11, 0.2)',
-                        ml: 'auto',
+                        borderColor: isInterviewer ? pc.primary(0.1) : pc.divider(0.5),
+                        boxShadow: (theme) => (isInterviewer ? 'none' : theme.customShadows?.z1),
                       }}
-                    />
-                  )}
+                    >
+                      <Typography
+                        variant="body2"
+                        sx={{ lineHeight: 2, color: 'text.primary', fontWeight: 700, fontSize: '0.95rem' }}
+                      >
+                        {item.content}
+                      </Typography>
+                    </Paper>
+                  </Box>
                 </Stack>
-                <ChatEntry entry={item as any} />
-              </Box>
-            ))}
+              );
+            })}
             <div ref={transcriptEndRef} />
-          </div>
+          </Stack>
         ) : (
           <Box sx={{ textAlign: 'center', py: 15, opacity: 0.6 }}>
             <ForumIcon sx={{ fontSize: 64, color: 'text.disabled', mb: 3, opacity: 0.2 }} />

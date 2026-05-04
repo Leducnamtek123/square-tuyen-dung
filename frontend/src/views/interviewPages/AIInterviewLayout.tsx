@@ -1,34 +1,40 @@
-import React, { useState, useEffect } from 'react';
-import { Box, Button, Chip, Stack, Typography, alpha } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Chip, Paper, Stack, Typography, alpha } from '@mui/material';
 import {
   BarVisualizer,
-  ChatEntry,
-  useTracks,
   TrackReferenceOrPlaceholder,
-  useRoomContext,
   useLocalParticipant,
   useParticipants,
+  useRoomContext,
+  useTracks,
   useVoiceAssistant,
   VideoTrack,
   type AgentState,
   type ReceivedMessage,
 } from '@livekit/components-react';
 import { Track } from 'livekit-client';
-import { getParticipantRole, isLiveKitAgentParticipant } from './livekitParticipant';
-import { useInterviewMessages } from './useInterviewMessages';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
+  faComment,
+  faDesktop,
+  faEye,
   faMicrophone,
   faMicrophoneSlash,
+  faPhoneSlash,
+  faSpinner,
   faVideo,
   faVideoSlash,
-  faPhoneSlash,
-  faDesktop,
-  faComment,
-  faEye,
-  faSpinner,
 } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
+
+import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
+import {
+  getParticipantCompanyName,
+  getParticipantRole,
+  isLiveKitAgentParticipant,
+  sanitizeInterviewText,
+} from './livekitParticipant';
+import { useInterviewMessages } from './useInterviewMessages';
 
 function useLiveTimer() {
   const [time, setTime] = useState(0);
@@ -55,38 +61,24 @@ function CustomControlBar({
   const { localParticipant, isMicrophoneEnabled, isCameraEnabled, isScreenShareEnabled } = useLocalParticipant();
   const { t } = useTranslation(['interview']);
 
-  const toggleMic = () => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled);
-  const toggleCam = () => localParticipant.setCameraEnabled(!isCameraEnabled);
-  const toggleScreen = () => localParticipant.setScreenShareEnabled(!isScreenShareEnabled);
-
-  const onEnd = async () => {
-    if (onEndSession) {
-      try {
-        await onEndSession();
-      } catch {
-        // Keep disconnect flow resilient if finalization fails.
-      }
-    }
-  };
-
   return (
     <div className="flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl">
       <button
-        onClick={toggleMic}
+        onClick={() => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)}
         className={`flex h-11 w-11 items-center justify-center rounded-full border transition-all
           ${isMicrophoneEnabled ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}
       >
         <FontAwesomeIcon icon={isMicrophoneEnabled ? faMicrophone : faMicrophoneSlash} />
       </button>
       <button
-        onClick={toggleCam}
+        onClick={() => localParticipant.setCameraEnabled(!isCameraEnabled)}
         className={`flex h-11 w-11 items-center justify-center rounded-full border transition-all
           ${isCameraEnabled ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}
       >
         <FontAwesomeIcon icon={isCameraEnabled ? faVideo : faVideoSlash} />
       </button>
       <button
-        onClick={toggleScreen}
+        onClick={() => localParticipant.setScreenShareEnabled(!isScreenShareEnabled)}
         className={`flex h-11 w-11 items-center justify-center rounded-full border transition-all
           ${isScreenShareEnabled ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}
       >
@@ -101,7 +93,13 @@ function CustomControlBar({
       </button>
       <div className="mx-2 h-6 w-px bg-white/10" />
       <button
-        onClick={onEnd}
+        onClick={async () => {
+          try {
+            await onEndSession?.();
+          } catch {
+            // keep disconnect flow resilient
+          }
+        }}
         className="flex h-11 items-center gap-2 rounded-full border border-rose-400/40 bg-rose-500/20 px-5 text-sm font-bold text-rose-300 transition-all hover:bg-rose-500/30"
       >
         <FontAwesomeIcon icon={faPhoneSlash} />
@@ -137,24 +135,19 @@ function AIParticipantTile({
   const isSpeaking = participant?.isSpeaking;
   const role = participant ? getParticipantRole(participant) : (variant === 'candidate' ? 'candidate' : 'guest');
   const isEmployer = role === 'employer';
+  const employerCompanyName = getParticipantCompanyName(participant);
   const isAgentByVoiceAssistant =
     Boolean(agentSid && participant?.sid === agentSid) ||
     Boolean(agentIdentity && participant?.identity === agentIdentity);
   const isAgent = variant === 'agent' || role === 'agent' || isAgentByVoiceAssistant;
   const hasPublication = Boolean(trackRef?.publication);
-  const shouldRenderSyntheticAgent =
-    !isAgent &&
-    !isEmployer &&
-    !isSelf &&
-    !hasPublication &&
-    (props?.hasAgentTranscript || hasDetectedAgent);
+  const shouldRenderSyntheticAgent = !isAgent && !isEmployer && !isSelf && !hasPublication && (props?.hasAgentTranscript || hasDetectedAgent);
   const { t } = useTranslation(['interview']);
 
   let displayName = participant?.name || participant?.identity || '';
-  if (isAgent) displayName = t('liveRoom.participants.aiInterviewer');
-  else if (isEmployer) displayName = t('liveRoom.participants.employer');
+  if (isAgent || shouldRenderSyntheticAgent) displayName = t('liveRoom.participants.aiInterviewer');
+  else if (isEmployer) displayName = employerCompanyName || t('liveRoom.participants.employer');
   else if (isSelf) displayName = t('liveRoom.participants.you');
-  else if (shouldRenderSyntheticAgent) displayName = t('liveRoom.participants.aiInterviewer');
   else if (!displayName) {
     if (variant === 'candidate') displayName = candidateLabel;
     else if (role === 'observer') displayName = t('liveRoom.participants.observer', 'Quan sát viên');
@@ -162,6 +155,7 @@ function AIParticipantTile({
   }
 
   const visualizerState: AgentState = agentState ?? (isSpeaking ? 'speaking' : 'listening');
+
   if (isAgent || shouldRenderSyntheticAgent) {
     return (
       <div
@@ -170,22 +164,26 @@ function AIParticipantTile({
       >
         <div className="absolute inset-0 bg-slate-950" />
         <div className="relative z-10 flex h-full w-full items-center justify-center">
-          <BarVisualizer
-            track={audioTrack}
+          <AgentAudioVisualizerAura
+            audioTrack={audioTrack ?? trackRef}
             state={visualizerState}
-            barCount={5}
-            options={{ minHeight: 18, maxHeight: 100 }}
-            style={{ height: 72, width: 144, gap: 8 }}
-            className="lk-audio-bar-visualizer rounded-full border border-white/10 bg-slate-950/40 px-5 py-4"
+            size="lg"
+            color="#1FD5F9"
+            className="h-[224px] w-[224px]"
           />
         </div>
         <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
-          <div className="flex items-center gap-1.5">
-            <span className="rounded bg-violet-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-violet-300">
-              AI
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-1.5">
+              <span className="rounded bg-violet-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-violet-300">
+                AI
+              </span>
+              <span className="text-xs font-semibold text-white">{displayName}</span>
+              {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
+            </div>
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-300/90">
+              {t(visualizerState === 'speaking' ? 'aiSpeaking' : visualizerState === 'listening' ? 'aiListening' : 'agentView.ready')}
             </span>
-            <span className="text-xs font-semibold text-white">{displayName}</span>
-            {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
           </div>
         </div>
       </div>
@@ -230,24 +228,14 @@ function AIParticipantTile({
       data-speaking={isSpeaking}
     >
       <div className={`absolute inset-0 ${isSelf ? 'bg-gradient-to-br from-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-950 to-slate-900'} z-0`} />
-
       <div className="relative z-10 h-full w-full overflow-hidden rounded-2xl">
-        <VideoTrack
-          trackRef={trackRef as any}
-          className={`h-full w-full object-cover ${isSelf ? 'scale-x-[-1]' : ''}`}
-        />
+        <VideoTrack trackRef={trackRef as any} className={`h-full w-full object-cover ${isSelf ? 'scale-x-[-1]' : ''}`} />
       </div>
-
       <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
         <div className="flex items-center gap-1.5">
           {isSelf && (
             <span className="rounded bg-cyan-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-cyan-300">
               {t('liveRoom.chips.you')}
-            </span>
-          )}
-          {isEmployer && !isSelf && (
-            <span className="rounded bg-amber-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-amber-300">
-              {t('liveRoom.chips.employer')}
             </span>
           )}
           {variant === 'candidate' && !isSelf && !isEmployer && (
@@ -260,6 +248,154 @@ function AIParticipantTile({
         </div>
       </div>
     </div>
+  );
+}
+
+function formatTimelineTime(timestamp: number) {
+  return new Date(timestamp).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+type TimelineMessageType = 'userTranscript' | 'agentTranscript' | 'chatMessage';
+
+function isTranscriptMessage(message: { type?: TimelineMessageType }) {
+  return message.type === 'userTranscript' || message.type === 'agentTranscript';
+}
+
+function TimelineMessage({
+  entry,
+}: {
+  entry: { id: string; timestamp: number; message: string; from?: { isLocal?: boolean; name?: string; identity?: string } | null; type?: TimelineMessageType };
+}) {
+  const { t } = useTranslation(['interview']);
+  const isTranscript = isTranscriptMessage(entry);
+  const isAgent = entry.type === 'agentTranscript';
+  const isLocal = entry.from?.isLocal === true;
+  const participantRole = entry.from ? getParticipantRole(entry.from as any) : 'guest';
+  const employerCompanyName = getParticipantCompanyName(entry.from as any) || t('liveRoom.participants.employer');
+  const displayName =
+    isAgent
+      ? t('liveRoom.participants.aiInterviewer')
+      : isLocal
+        ? t('liveRoom.participants.you')
+        : participantRole === 'employer'
+          ? employerCompanyName
+          : participantRole === 'candidate'
+            ? t('liveRoom.participants.candidate')
+            : participantRole === 'observer'
+              ? t('liveRoom.participants.observer', 'Quan sát viên')
+              : entry.from?.name || entry.from?.identity || t('liveRoom.participants.guest');
+  const isEmployer = participantRole === 'employer';
+  const isCandidate = participantRole === 'candidate';
+  const alignRight = isLocal && !isAgent;
+  const chipLabel = isAgent
+    ? t('liveRoom.chips.ai')
+    : isLocal
+      ? t('liveRoom.chips.you')
+      : isEmployer
+        ? t('liveRoom.chips.employer')
+        : isCandidate
+          ? t('liveRoom.participants.candidate')
+          : isTranscript
+            ? t('liveRoom.chips.live')
+            : t('liveRoom.participants.guest');
+
+  return (
+    <Stack spacing={0.75} alignItems={alignRight ? 'flex-end' : 'flex-start'} sx={{ width: '100%' }}>
+      <Stack
+        direction="row"
+        spacing={1}
+        alignItems="center"
+        sx={{
+          alignSelf: alignRight ? 'flex-end' : 'flex-start',
+          flexWrap: 'wrap',
+          justifyContent: alignRight ? 'flex-end' : 'flex-start',
+        }}
+      >
+        <Chip
+          label={chipLabel}
+          size="small"
+          sx={{
+            height: 20,
+            fontSize: '0.58rem',
+            fontWeight: 900,
+            letterSpacing: 1.1,
+            bgcolor: isAgent
+              ? alpha('#8b5cf6', 0.18)
+              : isLocal
+                ? alpha('#0ea5e9', 0.18)
+                : isEmployer
+                  ? alpha('#f59e0b', 0.16)
+                  : isCandidate || isTranscript
+                    ? alpha('#22c55e', 0.12)
+                    : alpha('#94a3b8', 0.12),
+            color: isAgent
+              ? '#c4b5fd'
+              : isLocal
+                ? '#7dd3fc'
+                : isEmployer
+                  ? '#fbbf24'
+                  : isCandidate || isTranscript
+                    ? '#86efac'
+                    : '#cbd5e1',
+            border: '1px solid',
+            borderColor: isAgent
+              ? alpha('#8b5cf6', 0.28)
+              : isLocal
+                ? alpha('#0ea5e9', 0.24)
+                : isEmployer
+                  ? alpha('#f59e0b', 0.26)
+                  : isCandidate || isTranscript
+                    ? alpha('#22c55e', 0.18)
+                    : alpha('#94a3b8', 0.16),
+          }}
+        />
+        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+          {displayName}
+        </Typography>
+        <Typography variant="caption" sx={{ color: 'text.disabled', fontFamily: 'monospace' }}>
+          {formatTimelineTime(entry.timestamp)}
+        </Typography>
+      </Stack>
+
+      <Paper
+        elevation={0}
+        sx={{
+          maxWidth: '100%',
+          width: 'fit-content',
+          px: 2,
+          py: 1.5,
+          borderRadius: 3,
+          border: '1px solid',
+          borderColor: isTranscript
+            ? alpha('#22c55e', 0.16)
+            : isAgent
+              ? alpha('#8b5cf6', 0.16)
+              : isLocal
+                ? alpha('#0ea5e9', 0.16)
+                : alpha('#334155', 0.5),
+          bgcolor: isTranscript
+            ? alpha('#0f172a', 0.82)
+            : isAgent
+              ? alpha('#8b5cf6', 0.08)
+              : isLocal
+                ? alpha('#0ea5e9', 0.08)
+                : alpha('#020617', 0.7),
+          color: '#fff',
+          boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
+          lineHeight: 1.8,
+          fontWeight: 600,
+          whiteSpace: 'pre-wrap',
+          wordBreak: 'break-word',
+        }}
+      >
+        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.92)', fontWeight: 600, whiteSpace: 'pre-wrap' }}>
+          {sanitizeInterviewText(entry.message)}
+        </Typography>
+      </Paper>
+    </Stack>
   );
 }
 
@@ -296,12 +432,7 @@ function ChatPanel({
           </div>
           <Stack direction="row" spacing={1} alignItems="center">
             {agentState && ['thinking', 'connecting', 'initializing', 'pre-connect-buffering'].includes(agentState) && (
-              <BarVisualizer
-                state={agentState}
-                barCount={4}
-                style={{ height: 24, width: 64 }}
-                options={{ minHeight: 30, maxHeight: 100 }}
-              />
+              <BarVisualizer state={agentState} barCount={4} style={{ height: 24, width: 64 }} options={{ minHeight: 30, maxHeight: 100 }} />
             )}
             <Chip
               label={t('liveRoom.chat.messagesCount', { count: messages.length })}
@@ -319,14 +450,7 @@ function ChatPanel({
       </div>
 
       <div className="min-h-0 flex-1 overflow-hidden">
-        <Box
-          sx={{
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            minHeight: 0,
-          }}
-        >
+        <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
           <Box
             ref={scrollRef}
             sx={{
@@ -339,11 +463,11 @@ function ChatPanel({
             }}
           >
             {messages.length > 0 ? (
-              <ul className="lk-list flex flex-col gap-3 px-1">
+              <Stack spacing={2}>
                 {messages.map((entry) => (
-                  <ChatEntry key={entry.id} entry={entry as any} />
+                  <TimelineMessage key={`${entry.type}-${entry.id}`} entry={entry as any} />
                 ))}
-              </ul>
+              </Stack>
             ) : (
               <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', textAlign: 'center', px: 2 }}>
                 <Stack spacing={1}>
@@ -436,31 +560,16 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
   let finalTracks = rawTracks.filter((track) => {
     const participant = track.participant;
     const isEmployer = getParticipantRole(participant) === 'employer';
-
-    if (isEmployer && track.source === Track.Source.Camera && !track.publication) {
-      return false;
-    }
-
-    return true;
+    return !(isEmployer && track.source === Track.Source.Camera && !track.publication);
   });
 
-  const agentParticipant =
-    voiceAssistant.agent ?? participants.find((participant) => getParticipantRole(participant) === 'agent');
-  if (agentParticipant) {
-    const hasAgentTrack = finalTracks.some((track) => track.participant.sid === agentParticipant.sid);
-    if (!hasAgentTrack) {
-      finalTracks.push({
-        participant: agentParticipant,
-        source: Track.Source.Camera,
-      } as any);
-    }
+  const agentParticipant = voiceAssistant.agent ?? participants.find((participant) => getParticipantRole(participant) === 'agent');
+  if (agentParticipant && !finalTracks.some((track) => track.participant.sid === agentParticipant.sid)) {
+    finalTracks.push({ participant: agentParticipant, source: Track.Source.Camera } as any);
   }
 
   const candidateTrack =
-    finalTracks.find((track) => {
-      const role = getParticipantRole(track.participant);
-      return track.participant?.isLocal || role === 'candidate';
-    }) ?? undefined;
+    finalTracks.find((track) => track.participant?.isLocal || getParticipantRole(track.participant) === 'candidate') ?? undefined;
   const agentTrack =
     finalTracks.find((track) => {
       const role = getParticipantRole(track.participant);
@@ -479,12 +588,8 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
 
   if (isLocalEmployer) {
     showObservingBar = true;
-    if (candidatePresent) {
-      observingMessage = t('liveRoom.observingBar.hrObserving');
-    } else {
-      observingMessage = t('liveRoom.observingBar.hrWaiting');
-      observingIcon = faSpinner;
-    }
+    observingMessage = candidatePresent ? t('liveRoom.observingBar.hrObserving') : t('liveRoom.observingBar.hrWaiting');
+    observingIcon = candidatePresent ? faEye : faSpinner;
   } else if (otherEmployerCount > 0 && !employerWithCamera) {
     showObservingBar = true;
     observingMessage = t('liveRoom.observingBar.employerObserving');
@@ -522,10 +627,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
 
           {showObservingBar && (
             <div className="mx-2 mb-2 flex shrink-0 items-center gap-3 rounded-2xl border border-white/5 bg-[#0b1221] p-4">
-              <FontAwesomeIcon
-                icon={observingIcon}
-                className={observingIcon === faSpinner ? 'animate-spin text-cyan-400' : 'text-slate-500'}
-              />
+              <FontAwesomeIcon icon={observingIcon} className={observingIcon === faSpinner ? 'animate-spin text-cyan-400' : 'text-slate-500'} />
               <span className="text-xs font-medium text-slate-500">{observingMessage}</span>
               <div className="ml-auto flex items-center gap-2">
                 {candidatePresent && <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />}
