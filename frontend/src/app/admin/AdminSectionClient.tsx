@@ -1,7 +1,8 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
-import { redirect, usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { Box, CircularProgress } from '@mui/material';
 import AdminLayout from '@/layouts/AdminLayout';
 import AdminLoginLayout from '@/layouts/AdminLoginLayout';
 import tokenService from '@/services/tokenService';
@@ -15,6 +16,25 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
  * for all routes under /admin and /quan-tri.
  * Extracted to Client Component so admin/layout.tsx can be a Server Component.
  */
+
+function AuthLoadingScreen() {
+  return (
+    <Box
+      sx={{
+        position: 'fixed',
+        inset: 0,
+        zIndex: 9999,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        bgcolor: 'background.default',
+      }}
+    >
+      <CircularProgress size={40} thickness={4} />
+    </Box>
+  );
+}
+
 export default function AdminSectionClient({
   children,
 }: {
@@ -30,33 +50,67 @@ export default function AdminSectionClient({
   const token = tokenService.getAccessTokenFromCookie();
   const lang = getPreferredLanguage();
   const adminPrefix = getPortalPrefix('admin', lang);
+  const loginPath = `${adminPrefix}/login`;
+  const dashboardPath = `${adminPrefix}/dashboard`;
 
-  const { data: fetchedUser } = useQuery({
-    queryKey: ['admin-layout-user', token],
-    queryFn: async () => dispatch(getUserInfo()).unwrap(),
-    enabled: Boolean(token) && !currentUser,
-    retry: false,
+  const [isChecking, setIsChecking] = useState(() => {
+    if (isAuthPage) return false;
+    if (typeof window === 'undefined') return true;
+    return Boolean(tokenService.getAccessTokenFromCookie());
   });
 
-  const user = currentUser ?? fetchedUser ?? null;
+  const [shouldRedirectToLogin, setShouldRedirectToLogin] = useState(() => {
+    if (isAuthPage || typeof window === 'undefined') return false;
+    return !tokenService.getAccessTokenFromCookie();
+  });
+
+  useEffect(() => {
+    if (shouldRedirectToLogin) {
+      window.location.replace(loginPath);
+      return;
+    }
+
+    const checkAuth = async () => {
+      const currentToken = tokenService.getAccessTokenFromCookie();
+
+      if (!currentToken) {
+        if (!isAuthPage) {
+          setShouldRedirectToLogin(true);
+        }
+        return;
+      }
+
+      let nextUser = currentUser;
+      if (!nextUser) {
+        try {
+          nextUser = await dispatch(getUserInfo()).unwrap();
+        } catch {
+          setShouldRedirectToLogin(true);
+          return;
+        }
+      }
+
+      if (nextUser?.roleName && nextUser.roleName !== ROLES_NAME.ADMIN) {
+        window.location.replace('/');
+        return;
+      }
+
+      if (isAuthPage && isLoginPage && nextUser?.roleName === ROLES_NAME.ADMIN) {
+        window.location.replace(dashboardPath);
+      }
+    };
+
+    void checkAuth().finally(() => {
+      setIsChecking(false);
+    });
+  }, [adminPrefix, currentUser, dashboardPath, dispatch, isAuthPage, isLoginPage, loginPath, shouldRedirectToLogin]);
+
+  if (isChecking || shouldRedirectToLogin) {
+    return <AuthLoadingScreen />;
+  }
 
   if (!token) {
-    if (!isAuthPage) {
-      redirect(`${adminPrefix}/login`);
-    }
     return <AdminLoginLayout>{children}</AdminLoginLayout>;
-  }
-
-  if (!user && !isAuthPage) {
-    redirect(`${adminPrefix}/login`);
-  }
-
-  if (user?.roleName && user.roleName !== ROLES_NAME.ADMIN) {
-    if (!isAuthPage) {
-      redirect('/');
-    }
-  } else if (isAuthPage && isLoginPage) {
-    redirect(`${adminPrefix}/dashboard`);
   }
 
   if (isAuthPage) {
