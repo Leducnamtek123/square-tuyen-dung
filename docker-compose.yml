@@ -265,6 +265,8 @@ services:
     container_name: tuyendung-studio-livekit-egress
     image: livekit/egress:latest
     restart: always
+    cap_add:
+      - SYS_ADMIN
     environment:
       - EGRESS_CONFIG_FILE=/etc/egress.yaml
     volumes:

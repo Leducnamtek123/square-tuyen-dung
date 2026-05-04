@@ -2,9 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { LazyMotion, domAnimation, m } from 'motion/react';
-import { useSessionContext, useSessionMessages } from '@livekit/components-react';
+import { ChatEntry, useSessionContext, useSessionMessages } from '@livekit/components-react';
 import type { AppConfig } from '@/components/Features/VoiceAssistant/app-config';
-import { ChatTranscript } from '@/components/Features/VoiceAssistant/components/app/chat-transcript';
 import { PreConnectMessage } from '@/components/Features/VoiceAssistant/components/app/preconnect-message';
 import { TileLayout } from '@/components/Features/VoiceAssistant/components/app/tile-layout';
 import {
@@ -103,11 +102,13 @@ export const SessionView = ({
             ref={scrollAreaRef}
             className="mx-auto w-full max-w-3xl px-4 pt-40 pb-[150px] md:px-6 md:pb-[200px]"
           >
-            <ChatTranscript
-              hidden={!chatOpen}
-              messages={messages}
-              className="space-y-3 rounded-[28px] border border-white/8 bg-slate-950/30 p-4 backdrop-blur-xl transition-opacity duration-300 ease-out md:p-6"
-            />
+            {chatOpen && (
+              <ul className="lk-list space-y-3 rounded-[28px] border border-white/8 bg-slate-950/30 p-4 backdrop-blur-xl transition-opacity duration-300 ease-out md:p-6">
+                {messages.map((entry) => (
+                  <ChatEntry key={entry.id} entry={entry as any} />
+                ))}
+              </ul>
+            )}
           </ScrollArea>
         </div>
 

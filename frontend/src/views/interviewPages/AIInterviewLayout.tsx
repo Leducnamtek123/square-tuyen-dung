@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Chip, Paper, Stack, Typography, alpha } from '@mui/material';
+import { Box, Button, Chip, Stack, Typography, alpha } from '@mui/material';
 import {
+  BarVisualizer,
+  ChatEntry,
   useTracks,
   TrackReferenceOrPlaceholder,
   useRoomContext,
@@ -9,10 +11,10 @@ import {
   useVoiceAssistant,
   VideoTrack,
   type AgentState,
+  type ReceivedMessage,
 } from '@livekit/components-react';
 import { Track } from 'livekit-client';
-import { AgentAudioVisualizerAura } from '@/components/agents-ui/agent-audio-visualizer-aura';
-import { getParticipantRole, isLiveKitAgentParticipant, sanitizeInterviewText } from './livekitParticipant';
+import { getParticipantRole, isLiveKitAgentParticipant } from './livekitParticipant';
 import { useInterviewMessages } from './useInterviewMessages';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -111,6 +113,7 @@ function CustomControlBar({
 
 function AIParticipantTile({
   trackRef,
+  audioTrack,
   agentState,
   agentIdentity,
   agentSid,
@@ -120,6 +123,7 @@ function AIParticipantTile({
   ...props
 }: {
   trackRef?: TrackReferenceOrPlaceholder;
+  audioTrack?: any;
   agentState?: AgentState;
   agentIdentity?: string;
   agentSid?: string;
@@ -158,29 +162,6 @@ function AIParticipantTile({
   }
 
   const visualizerState: AgentState = agentState ?? (isSpeaking ? 'speaking' : 'listening');
-  const getAgentStateLabel = (state: AgentState) => {
-    switch (state) {
-      case 'speaking':
-        return t('aiSpeaking');
-      case 'listening':
-        return t('aiListening');
-      case 'thinking':
-        return t('agentView.agentThinking');
-      case 'connecting':
-      case 'pre-connect-buffering':
-      case 'initializing':
-        return t('liveRoom.agentStates.connecting', 'Dang ket noi');
-      case 'idle':
-        return t('agentView.ready');
-      case 'failed':
-        return t('liveRoom.agentStates.failed', 'Loi ket noi');
-      case 'disconnected':
-        return t('liveRoom.agentStates.disconnected', 'Da ngat ket noi');
-      default:
-        return state;
-    }
-  };
-
   if (isAgent || shouldRenderSyntheticAgent) {
     return (
       <div
@@ -189,25 +170,22 @@ function AIParticipantTile({
       >
         <div className="absolute inset-0 bg-slate-950" />
         <div className="relative z-10 flex h-full w-full items-center justify-center">
-          <AgentAudioVisualizerAura
-            audioTrack={trackRef?.publication ? (trackRef as any) : undefined}
+          <BarVisualizer
+            track={audioTrack}
             state={visualizerState}
-            size="lg"
-            color="#8b5cf6"
+            barCount={5}
+            options={{ minHeight: 18, maxHeight: 100 }}
+            style={{ height: 72, width: 144, gap: 8 }}
+            className="lk-audio-bar-visualizer rounded-full border border-white/10 bg-slate-950/40 px-5 py-4"
           />
         </div>
         <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
-          <div className="flex flex-col gap-0.5">
-            <div className="flex items-center gap-1.5">
-              <span className="rounded bg-violet-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-violet-300">
-                AI
-              </span>
-              <span className="text-xs font-semibold text-white">{displayName}</span>
-              {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
-            </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-300/90">
-              {getAgentStateLabel(visualizerState)}
+          <div className="flex items-center gap-1.5">
+            <span className="rounded bg-violet-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-violet-300">
+              AI
             </span>
+            <span className="text-xs font-semibold text-white">{displayName}</span>
+            {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
           </div>
         </div>
       </div>
@@ -285,183 +263,20 @@ function AIParticipantTile({
   );
 }
 
-function formatTimelineTime(timestamp: number) {
-  return new Date(timestamp).toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
-type TimelineMessageType = 'userTranscript' | 'agentTranscript' | 'chatMessage';
-
-function isTranscriptMessage(message: { type?: TimelineMessageType }) {
-  return message.type === 'userTranscript' || message.type === 'agentTranscript';
-}
-
-function getMessageDisplayName(
-  message: { from?: { isLocal?: boolean; name?: string; identity?: string } | null; type?: TimelineMessageType },
-  fallback: string,
-  youName: string,
-  aiName: string,
-  participantRole: string,
-  employerName: string,
-  candidateName: string,
-) {
-  if (message.type === 'agentTranscript') {
-    return aiName;
-  }
-  if (message.from?.isLocal) {
-    return youName;
-  }
-  if (message.from?.name || message.from?.identity) {
-    return message.from?.name || message.from?.identity || fallback;
-  }
-  if (participantRole === 'employer') {
-    return employerName;
-  }
-  if (participantRole === 'candidate') {
-    return candidateName;
-  }
-  return fallback;
-}
-
-function TimelineMessage({ entry }: { entry: { id: string; timestamp: number; message: string; from?: { isLocal?: boolean; name?: string; identity?: string } | null; type?: TimelineMessageType } }) {
-  const { t } = useTranslation(['interview']);
-  const isTranscript = isTranscriptMessage(entry);
-  const isAgent = entry.type === 'agentTranscript';
-  const isLocal = entry.from?.isLocal === true;
-  const displayMessage = sanitizeInterviewText(entry.message);
-  const fallbackName = t('liveRoom.participants.guest');
-  const aiName = t('liveRoom.participants.aiInterviewer');
-  const youName = t('liveRoom.participants.you');
-  const employerName = t('liveRoom.participants.employer');
-  const candidateName = t('liveRoom.participants.candidate');
-  const participantRole = entry.from ? getParticipantRole(entry.from as any) : 'guest';
-  const displayName = getMessageDisplayName(entry, fallbackName, youName, aiName, participantRole, employerName, candidateName);
-  const isEmployer = participantRole === 'employer';
-  const isCandidate = participantRole === 'candidate';
-  const alignRight = isLocal && !isAgent;
-  const chipLabel = isAgent
-    ? t('liveRoom.chips.ai')
-    : isLocal
-    ? t('liveRoom.chips.you')
-    : isEmployer
-    ? t('liveRoom.chips.employer')
-    : isCandidate
-    ? t('liveRoom.participants.candidate')
-    : isTranscript
-    ? t('liveRoom.chips.live')
-    : t('liveRoom.participants.guest');
-
-  return (
-    <Stack spacing={0.75} alignItems={alignRight ? 'flex-end' : 'flex-start'} sx={{ width: '100%' }}>
-      <Stack
-        direction="row"
-        spacing={1}
-        alignItems="center"
-        sx={{
-          alignSelf: alignRight ? 'flex-end' : 'flex-start',
-          flexWrap: 'wrap',
-          justifyContent: alignRight ? 'flex-end' : 'flex-start',
-        }}
-      >
-        <Chip
-          label={chipLabel}
-          size="small"
-          sx={{
-            height: 20,
-            fontSize: '0.58rem',
-            fontWeight: 900,
-            letterSpacing: 1.1,
-            bgcolor: isAgent
-              ? alpha('#8b5cf6', 0.18)
-              : isLocal
-              ? alpha('#0ea5e9', 0.18)
-              : isEmployer
-              ? alpha('#f59e0b', 0.16)
-              : isCandidate || isTranscript
-              ? alpha('#22c55e', 0.12)
-              : alpha('#94a3b8', 0.12),
-            color: isAgent
-              ? '#c4b5fd'
-              : isLocal
-              ? '#7dd3fc'
-              : isEmployer
-              ? '#fbbf24'
-              : isCandidate || isTranscript
-              ? '#86efac'
-              : '#cbd5e1',
-            border: '1px solid',
-            borderColor: isAgent
-              ? alpha('#8b5cf6', 0.28)
-              : isLocal
-              ? alpha('#0ea5e9', 0.24)
-              : isEmployer
-              ? alpha('#f59e0b', 0.26)
-              : isCandidate || isTranscript
-              ? alpha('#22c55e', 0.18)
-              : alpha('#94a3b8', 0.16),
-          }}
-        />
-        <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700 }}>
-          {displayName}
-        </Typography>
-        <Typography variant="caption" sx={{ color: 'text.disabled', fontFamily: 'monospace' }}>
-          {formatTimelineTime(entry.timestamp)}
-        </Typography>
-      </Stack>
-
-      <Paper
-        elevation={0}
-        sx={{
-          maxWidth: '100%',
-          width: 'fit-content',
-          px: 2,
-          py: 1.5,
-          borderRadius: 3,
-          border: '1px solid',
-          borderColor: isTranscript
-            ? alpha('#22c55e', 0.16)
-            : isAgent
-            ? alpha('#8b5cf6', 0.16)
-            : isLocal
-            ? alpha('#0ea5e9', 0.16)
-            : alpha('#334155', 0.5),
-          bgcolor: isTranscript
-            ? alpha('#0f172a', 0.82)
-            : isAgent
-            ? alpha('#8b5cf6', 0.08)
-            : isLocal
-            ? alpha('#0ea5e9', 0.08)
-            : alpha('#020617', 0.7),
-          color: '#fff',
-          boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
-          lineHeight: 1.8,
-          fontWeight: 600,
-          whiteSpace: 'pre-wrap',
-          wordBreak: 'break-word',
-        }}
-      >
-        <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.92)', fontWeight: 600, whiteSpace: 'pre-wrap' }}>
-          {displayMessage}
-        </Typography>
-      </Paper>
-    </Stack>
-  );
-}
-
 function ChatPanel({
   messages,
   onSend,
   chatDraft,
   setChatDraft,
   isSending,
+  agentState,
 }: {
-  messages: Array<{ id: string; timestamp: number; message: string; from?: { isLocal?: boolean; name?: string; identity?: string } | null; type?: TimelineMessageType }>;
+  messages: ReceivedMessage[];
   onSend: () => void;
   chatDraft: string;
   setChatDraft: React.Dispatch<React.SetStateAction<string>>;
   isSending: boolean;
+  agentState?: AgentState;
 }) {
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const { t } = useTranslation(['interview']);
@@ -477,19 +292,29 @@ function ChatPanel({
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-sm font-bold text-white">{t('liveRoom.chat.title')}</p>
-            <p className="text-[11px] text-slate-500">{t('liveRoom.chat.subtitle', 'Voice and messages share the same timeline.')}</p>
+            <p className="mt-0.5 text-xs text-slate-500">{t('liveRoom.chat.subtitle', 'Voice and messages share the same timeline.')}</p>
           </div>
-          <Chip
-            label={t('liveRoom.chat.messagesCount', { count: messages.length })}
-            size="small"
-            sx={{
-              fontWeight: 900,
-              bgcolor: alpha('#0ea5e9', 0.16),
-              color: '#7dd3fc',
-              border: '1px solid',
-              borderColor: alpha('#0ea5e9', 0.28),
-            }}
-          />
+          <Stack direction="row" spacing={1} alignItems="center">
+            {agentState && ['thinking', 'connecting', 'initializing', 'pre-connect-buffering'].includes(agentState) && (
+              <BarVisualizer
+                state={agentState}
+                barCount={4}
+                style={{ height: 24, width: 64 }}
+                options={{ minHeight: 30, maxHeight: 100 }}
+              />
+            )}
+            <Chip
+              label={t('liveRoom.chat.messagesCount', { count: messages.length })}
+              size="small"
+              sx={{
+                fontWeight: 900,
+                bgcolor: alpha('#0ea5e9', 0.16),
+                color: '#7dd3fc',
+                border: '1px solid',
+                borderColor: alpha('#0ea5e9', 0.28),
+              }}
+            />
+          </Stack>
         </div>
       </div>
 
@@ -509,19 +334,16 @@ function ChatPanel({
               minHeight: 0,
               overflowY: 'auto',
               p: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 1.5,
               '&::-webkit-scrollbar': { width: 6 },
               '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(255,255,255,0.12)', borderRadius: 3 },
             }}
           >
             {messages.length > 0 ? (
-              <Stack spacing={2}>
+              <ul className="lk-list flex flex-col gap-3 px-1">
                 {messages.map((entry) => (
-                  <TimelineMessage key={`${entry.type}-${entry.id}`} entry={entry} />
+                  <ChatEntry key={entry.id} entry={entry as any} />
                 ))}
-              </Stack>
+              </ul>
             ) : (
               <Box sx={{ height: '100%', display: 'grid', placeItems: 'center', textAlign: 'center', px: 2 }}>
                 <Stack spacing={1}>
@@ -688,6 +510,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
                 variant="agent"
                 candidateLabel={candidateLabel}
                 trackRef={agentTrack}
+                audioTrack={voiceAssistant.audioTrack}
                 hasAgentTranscript={hasAgentTranscript}
                 hasDetectedAgent={Boolean(agentParticipant)}
                 agentState={voiceAssistant.state}
@@ -731,6 +554,7 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
       {chatOpen && (
         <ChatPanel
           messages={messages}
+          agentState={voiceAssistant.state}
           onSend={async () => {
             const text = chatDraft.trim();
             if (!text) return;

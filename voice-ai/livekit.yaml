@@ -11,6 +11,8 @@ logging:
   level: info
 room:
   empty_timeout: 3600
+redis:
+  address: redis:6379
 
 webhook:
   api_key: devkey

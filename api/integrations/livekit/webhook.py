@@ -130,7 +130,7 @@ def _handle_livekit_event(payload: Any) -> None:
         if session.status in {"draft", "scheduled", "calibration", "processing", "interrupted"}:
             update_interview_status(session, "in_progress")
             logger.info("LiveKit webhook: session %s marked in_progress", session.id)
-            LiveKitService.start_recording(session.room_name)
+            _run_in_thread(LiveKitService.start_recording, session.room_name)
     elif event in {"room_finished", "room_ended", "room_stopped", "room_disconnected"}:
         if session.status not in {"completed", "cancelled"}:
             update_interview_status(session, "interrupted")

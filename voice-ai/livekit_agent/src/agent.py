@@ -205,12 +205,21 @@ async def entrypoint(ctx: JobContext) -> None:
         if not isinstance(item, ChatMessage):
             return
 
+        role = str(getattr(item, "role", "") or "").strip().lower()
+        if role not in {"user", "assistant"}:
+            return
+
         content = item.text_content or ""
         content = content.strip()
         if not content:
             return
 
-        role = "candidate" if item.role == "user" else "ai_agent"
+        if role == "assistant":
+            lowered = content.lower()
+            if "finish_interview" in lowered or "set_interview_stage" in lowered or "get_interview_progress" in lowered:
+                return
+
+        role = "candidate" if role == "user" else "ai_agent"
         asyncio.create_task(interviewer.record_transcript(role, content))
 
     @session.on("close")
@@ -255,7 +264,6 @@ async def entrypoint(ctx: JobContext) -> None:
         await _update_backend_status(ctx.room.name, "in_progress")
         room_options = room_io.RoomOptions(
             text_input=False,
-            text_output=room_io.TextOutputOptions(sync_transcription=False),
             participant_identity=str(agent_context.get("participantIdentity") or "").strip() or None,
             close_on_disconnect=False,
         )

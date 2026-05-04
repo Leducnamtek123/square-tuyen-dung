@@ -9,9 +9,12 @@ import Alert from '@mui/material/Alert';
 
 import {
   LiveKitRoom,
+  SessionProvider,
+  useSession,
   VideoConference,
   RoomAudioRenderer,
 } from '@livekit/components-react';
+import { TokenSource } from 'livekit-client';
 
 import interviewService from '../../services/interviewService';
 import tokenService from '../../services/tokenService';
@@ -122,9 +125,28 @@ const reducer = (state: SessionPageState, action: SessionPageAction): SessionPag
     case 'set-connection-details': return { ...state, connectionDetails: action.value };
     case 'set-session':            return { ...state, session: action.value };
     case 'set-session-invite-token': return { ...state, sessionInviteToken: action.value };
-    default:                       return state;
+  default:                       return state;
   }
 };
+
+function InterviewSessionBridge({
+  connectionDetails,
+  children,
+}: {
+  connectionDetails: { token: string; serverUrl: string };
+  children: React.ReactNode;
+}) {
+  const tokenSource = React.useMemo(() => {
+    return TokenSource.custom(async () => ({
+      participantToken: connectionDetails.token,
+      serverUrl: connectionDetails.serverUrl,
+    }));
+  }, [connectionDetails.serverUrl, connectionDetails.token]);
+
+  const session = useSession(tokenSource);
+
+  return <SessionProvider session={session}>{children}</SessionProvider>;
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -343,8 +365,10 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
             onDisconnected={handleDisconnected}
             style={{ height: '100%' }}
           >
-            <AIInterviewLayout onEndSession={finalizeInterviewSession} />
-            <RoomAudioRenderer />
+            <InterviewSessionBridge connectionDetails={state.connectionDetails}>
+              <AIInterviewLayout onEndSession={finalizeInterviewSession} />
+              <RoomAudioRenderer />
+            </InterviewSessionBridge>
           </LiveKitRoom>
         </div>
 

@@ -48,6 +48,9 @@ def _sanitize_output_text(value: Any) -> str:
         text.replace("\u200b", " ")
         .replace("\ufeff", " ")
     )
+    text = re.sub(r"\bfinish_interview\b", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bset_interview_stage\b", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"\bget_interview_progress\b", " ", text, flags=re.IGNORECASE)
     text = re.sub(r"<function=[^>]+>[\s\S]*?</function>", " ", text, flags=re.IGNORECASE)
     text = re.sub(r"</?function[^>]*>", " ", text, flags=re.IGNORECASE)
     text = re.sub(r"```[\s\S]*?```", " ", text)
@@ -109,7 +112,8 @@ class Interviewer(Agent):
 
         instructions += (
             "\nQuy tắc độ dài: mỗi câu nói chỉ 1 đến 2 câu, tối đa khoảng 40 từ."
-            "\nKhi đã đến bước kết thúc và đã nói lời cảm ơn, phải gọi finish_interview ngay."
+            "\nKhi đã đến bước kết thúc và đã nói lời cảm ơn, hãy kết thúc buổi phỏng vấn ngay."
+            "\nKhông bao giờ nhắc tới tên hàm nội bộ, tên công cụ, JSON, hoặc bất kỳ chuỗi kiểu `finish_interview`, `set_interview_stage`, `get_interview_progress` trong câu nói của bạn."
             "\nBắt buộc: mọi câu trả lời phải là tiếng Việt có dấu đầy đủ, tự nhiên, không được viết không dấu."
         )
 

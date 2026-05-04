@@ -3,7 +3,8 @@
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Box, Grid2 as Grid, Paper, Skeleton, Stack, Typography } from '@mui/material';
-import { LiveKitRoom } from '@livekit/components-react';
+import { LiveKitRoom, SessionProvider, useSession } from '@livekit/components-react';
+import { TokenSource } from 'livekit-client';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { AIInterviewLayout } from '../../../interviewPages/AIInterviewLayout';
@@ -36,6 +37,25 @@ interface EvalFormType {
 }
 
 const ACTIVE_STATUSES = ['scheduled', 'calibration', 'in_progress'];
+
+function InterviewSessionBridge({
+  connectionDetails,
+  children,
+}: {
+  connectionDetails: { token: string; serverUrl: string };
+  children: React.ReactNode;
+}) {
+  const tokenSource = React.useMemo(() => {
+    return TokenSource.custom(async () => ({
+      participantToken: connectionDetails.token,
+      serverUrl: connectionDetails.serverUrl,
+    }));
+  }, [connectionDetails.serverUrl, connectionDetails.token]);
+
+  const session = useSession(tokenSource);
+
+  return <SessionProvider session={session}>{children}</SessionProvider>;
+}
 
 type State = {
   evalForm: EvalFormType;
@@ -303,12 +323,14 @@ const InterviewDetailCard = () => {
           }}
           style={{ height: '100%', width: '100%' }}
         >
-          <AIInterviewLayout
-            onEndSession={async () => {
-              dispatch({ type: 'set_hr_connected', payload: false });
-              dispatch({ type: 'set_hr_connection_details', payload: null });
-            }}
-          />
+          <InterviewSessionBridge connectionDetails={state.hrConnectionDetails}>
+            <AIInterviewLayout
+              onEndSession={async () => {
+                dispatch({ type: 'set_hr_connected', payload: false });
+                dispatch({ type: 'set_hr_connection_details', payload: null });
+              }}
+            />
+          </InterviewSessionBridge>
         </LiveKitRoom>
       </Paper>
     );
@@ -388,7 +410,9 @@ const InterviewDetailCard = () => {
           video={false}
           options={{ adaptiveStream: true }}
         >
-          {detailContent}
+          <InterviewSessionBridge connectionDetails={state.connectionDetails!}>
+            {detailContent}
+          </InterviewSessionBridge>
         </LiveKitRoom>
       ) : (
         detailContent
