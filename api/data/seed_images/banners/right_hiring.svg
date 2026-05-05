@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1000" viewBox="0 0 1000 1000">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#07111f"/>
+      <stop offset="55%" stop-color="#12324c"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#22c55e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1000" height="1000" fill="url(#bg)"/>
+  <circle cx="790" cy="180" r="180" fill="#ffffff10"/>
+  <circle cx="180" cy="790" r="220" fill="#22d3ee18"/>
+  <rect x="80" y="80" width="840" height="840" rx="42" fill="#07111fcc" stroke="#ffffff14"/>
+  <circle cx="500" cy="320" r="140" fill="url(#accent)"/>
+  <path d="M500 236c-58 0-106 48-106 106 0 63 106 178 106 178s106-115 106-178c0-58-48-106-106-106zm0 158a52 52 0 1 1 0-104 52 52 0 0 1 0 104z" fill="#0b1220"/>
+  <text x="500" y="610" text-anchor="middle" fill="#f8fafc" font-size="56" font-family="Arial, Helvetica, sans-serif" font-weight="700">SQUARE TUYỂN DỤNG</text>
+  <text x="500" y="670" text-anchor="middle" fill="#dbeafe" font-size="30" font-family="Arial, Helvetica, sans-serif">4 ngành trọng điểm</text>
+  <text x="500" y="728" text-anchor="middle" fill="#cbd5e1" font-size="24" font-family="Arial, Helvetica, sans-serif">Bất động sản · Xây dựng · Nội thất · Kiến trúc</text>
+  <rect x="285" y="780" width="430" height="14" rx="7" fill="url(#accent)"/>
+  <text x="500" y="862" text-anchor="middle" fill="#ffffff" font-size="32" font-family="Arial, Helvetica, sans-serif" font-weight="700">Đăng tin tuyển dụng ngay</text>
+</svg>
