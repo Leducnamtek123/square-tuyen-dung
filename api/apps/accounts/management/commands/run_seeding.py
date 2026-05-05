@@ -49,6 +49,7 @@ class Command(BaseCommand):
             seed_accounts()
             seed_careers()
             seed_jobs()
+            seed_banners()
             self.stdout.write(self.style.SUCCESS('✅ Seed command finished for: square'))
             return
 
