@@ -22,7 +22,7 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
           <h3 className="text-lg font-bold">
             {t("jobDetail.description")}
           </h3>
-          <div className="mt-1 h-1 w-12 rounded bg-purple-600" />
+          <div className="mt-1 h-1 w-12 rounded bg-primary" />
           <HtmlContent
             className="mt-6 text-sm leading-6"
             html={sanitizeHtml(jobPostDetail?.jobDescription)}
@@ -34,7 +34,7 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
           <h3 className="text-lg font-bold">
             {t("jobDetail.requirements")}
           </h3>
-          <div className="mt-1 h-1 w-12 rounded bg-purple-600" />
+          <div className="mt-1 h-1 w-12 rounded bg-primary" />
           <HtmlContent
             className="mt-6 text-sm leading-6"
             html={sanitizeHtml(jobPostDetail?.jobRequirement)}
@@ -46,7 +46,7 @@ const JobDetailDescriptionCard: React.FC<JobDetailDescriptionCardProps> = ({ job
           <h3 className="text-lg font-bold">
             {t("jobDetail.benefits")}
           </h3>
-          <div className="mt-1 h-1 w-12 rounded bg-purple-600" />
+          <div className="mt-1 h-1 w-12 rounded bg-primary" />
           <HtmlContent
             className="mt-6 text-sm leading-6"
             html={sanitizeHtml(jobPostDetail?.benefitsEnjoyed)}

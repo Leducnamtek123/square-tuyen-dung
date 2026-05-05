@@ -42,15 +42,15 @@ const HeaderAuthArea = ({
         }}
         sx={{
           p: 0.5,
-          borderRadius: 50,
-          backgroundColor: "rgba(255, 255, 255, 0.1)",
-          borderColor: "rgba(255, 255, 255, 0.4)",
+          borderRadius: 999,
+          backgroundColor: "rgba(255, 255, 255, 0.10)",
+          borderColor: "rgba(255, 255, 255, 0.30)",
           cursor: "pointer",
           transition: "all 0.3s ease",
           backdropFilter: "blur(8px)",
           "&:hover": {
-            backgroundColor: "rgba(255, 255, 255, 0.2)",
-            borderColor: "rgba(255, 255, 255, 0.6)",
+            backgroundColor: "rgba(255, 255, 255, 0.16)",
+            borderColor: "rgba(255, 255, 255, 0.55)",
             transform: "translateY(-1px)",
           },
         }}
@@ -94,21 +94,17 @@ const HeaderAuthArea = ({
         <Button
           variant="outlined"
           color="inherit"
+          size="small"
           sx={{
             color: "white",
-            borderColor: "rgba(255, 255, 255, 0.5)",
-            borderRadius: "24px",
+            borderColor: "rgba(255, 255, 255, 0.35)",
             px: { xs: 1.5, sm: 2.5 },
             py: 0.75,
             fontSize: { xs: "0.75rem", sm: "0.85rem" },
-            fontWeight: 600,
-            textTransform: "none",
             backdropFilter: "blur(4px)",
-            transition: "all 0.3s ease",
             "&:hover": {
-              borderColor: "white",
-              backgroundColor: "rgba(255, 255, 255, 0.15)",
-              transform: "translateY(-1px)",
+              borderColor: "rgba(255, 255, 255, 0.65)",
+              backgroundColor: "rgba(255, 255, 255, 0.12)",
             },
           }}
           onClick={onLogin}
@@ -118,15 +114,13 @@ const HeaderAuthArea = ({
 
         <Button
           variant="contained"
+          size="small"
           sx={{
             color: "primary.main",
             backgroundColor: "white",
-            borderRadius: "24px",
             px: { xs: 1.5, sm: 2.5 },
             py: 0.75,
             fontSize: { xs: "0.72rem", sm: "0.85rem" },
-            fontWeight: 600,
-            textTransform: "none",
             boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
             transition: "all 0.3s ease",
             "&:hover": {

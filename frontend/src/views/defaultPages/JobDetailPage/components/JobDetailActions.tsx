@@ -52,7 +52,7 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
           <Button
             variant="default"
             size="lg"
-            className="bg-amber-500 font-semibold text-white hover:bg-amber-600"
+            className="bg-primary font-semibold text-white"
             disabled={isApplied}
             onClick={handleApplyClick}
           >
@@ -66,8 +66,8 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
               disabled={isLoadingSave}
               className={
                 isSaved
-                  ? "bg-purple-600 text-white hover:bg-purple-700"
-                  : "border-purple-600 text-purple-600 hover:bg-purple-50"
+                  ? "bg-secondary text-white"
+                  : "border-primary/25 text-primary hover:bg-primary/5"
               }
             >
               {isLoadingSave ? (
@@ -86,7 +86,7 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
         variant="outline"
         size="lg"
         onClick={() => setOpenSharePopup(true)}
-        className="border-purple-600 text-purple-600 hover:bg-purple-50"
+        className="border-primary/25 text-primary hover:bg-primary/5"
       >
         <ShareIcon fontSize="small" className="mr-2" />
         {t("jobDetail.actions.share")}

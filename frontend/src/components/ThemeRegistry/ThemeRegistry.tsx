@@ -17,6 +17,79 @@ const baseTheme = createTheme(defaultTheme as ThemeOptions);
  */
 const theme = createTheme(baseTheme, {
   components: {
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          boxShadow: '0 8px 24px rgba(26, 64, 125, 0.12)',
+          backdropFilter: 'blur(14px)',
+        },
+      },
+    },
+    MuiCard: {
+      styleOverrides: {
+        root: {
+          borderRadius: 20,
+          border: '1px solid',
+          borderColor: 'rgba(26, 64, 125, 0.10)',
+          boxShadow: '0 10px 30px rgba(26, 64, 125, 0.06)',
+        },
+      },
+    },
+    MuiButton: {
+      defaultProps: {
+        disableElevation: true,
+      },
+      styleOverrides: {
+        root: {
+          borderRadius: 999,
+          textTransform: 'none',
+          fontWeight: 700,
+          transition: 'transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease',
+        },
+        contained: {
+          boxShadow: '0 10px 24px rgba(26, 64, 125, 0.18)',
+          '&:hover': {
+            boxShadow: '0 14px 30px rgba(26, 64, 125, 0.22)',
+            transform: 'translateY(-1px)',
+          },
+        },
+        outlined: {
+          borderWidth: 1.5,
+          '&:hover': {
+            transform: 'translateY(-1px)',
+          },
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 999,
+          fontWeight: 600,
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          backgroundImage: 'none',
+        },
+      },
+    },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+          backgroundColor: 'rgba(255, 255, 255, 0.92)',
+        },
+      },
+    },
+    MuiTextField: {
+      defaultProps: {
+        variant: 'outlined',
+        size: 'small',
+      },
+    },
     MuiAlert: {
       styleOverrides: {
         root: ({ ownerState }: { ownerState: { severity?: string } }) => ({

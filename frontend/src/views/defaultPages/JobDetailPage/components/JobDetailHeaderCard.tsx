@@ -90,19 +90,19 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
 
           <div className="mt-4 flex flex-wrap gap-8 text-sm text-muted-foreground">
             <div className="flex items-center gap-3">
-              <FontAwesomeIcon icon={faCalendarDay} className="text-purple-600" />
+              <FontAwesomeIcon icon={faCalendarDay} className="text-primary" />
               <span>
                 {t("jobDetail.deadline")}: {dayjs(jobPostDetail?.deadline).format("DD/MM/YYYY")}
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <FontAwesomeIcon icon={faEye} className="text-purple-600" />
+              <FontAwesomeIcon icon={faEye} className="text-primary" />
               <span>
                 {jobPostDetail?.views} {t("jobDetail.views")}
               </span>
             </div>
             <div className="flex items-center gap-3">
-              <FontAwesomeIcon icon={faClockFour} className="text-purple-600" />
+              <FontAwesomeIcon icon={faClockFour} className="text-primary" />
               <span>
                 {t("jobDetail.postedDate")}: {dayjs(jobPostDetail?.createAt).format("DD/MM/YYYY")}
               </span>

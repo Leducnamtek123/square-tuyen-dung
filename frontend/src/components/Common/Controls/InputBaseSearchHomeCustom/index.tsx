@@ -154,13 +154,19 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
       <div ref={inputSearchRef}>
         <Box
           sx={{
-            boxShadow: 0,
-            borderRadius: 1,
-            p: '3.5px 4px',
+            boxShadow: 'none',
+            borderRadius: 999,
+            p: '3px 4px',
             display: 'flex',
             alignItems: 'center',
             width: '100%',
             backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212',
+            border: '1px solid',
+            borderColor: 'rgba(26, 64, 125, 0.16)',
+            '&:focus-within': {
+              borderColor: theme.palette.primary.main,
+              boxShadow: '0 0 0 4px rgba(26, 64, 125, 0.08)',
+            },
           }}
         >
           <SearchIcon color="disabled" />

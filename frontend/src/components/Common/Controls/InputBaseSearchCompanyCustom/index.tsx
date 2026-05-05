@@ -37,15 +37,15 @@ const InputBaseSearchCompanyCustom = <T extends FieldValues = FieldValues>({
 
     <>
 
-      <Box
+        <Box
 
-        sx={{
+          sx={{
 
-          boxShadow: 0,
+          boxShadow: 'none',
 
-          borderRadius: 1,
+          borderRadius: 999,
 
-          p: '3.5px 4px',
+          p: '3px 4px',
 
           display: 'flex',
 
@@ -54,6 +54,12 @@ const InputBaseSearchCompanyCustom = <T extends FieldValues = FieldValues>({
           width: '100%',
 
           backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212',
+          border: '1px solid',
+          borderColor: 'rgba(26, 64, 125, 0.16)',
+          '&:focus-within': {
+            borderColor: theme.palette.primary.main,
+            boxShadow: '0 0 0 4px rgba(26, 64, 125, 0.08)',
+          },
 
         }}
 

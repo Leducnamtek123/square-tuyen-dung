@@ -270,7 +270,7 @@ const JobDetailPage = () => {
       {!state.isLoading && state.jobPostDetail && canApply && (
         <div className="fixed inset-x-0 bottom-0 z-50 block border-t border-border bg-background p-4 md:hidden">
           <Button
-            className="w-full bg-amber-500 text-white hover:bg-amber-600"
+            className="w-full bg-primary text-white hover:bg-primary/90"
             size="lg"
             disabled={state.jobPostDetail?.isApplied}
             onClick={handleMobileApplyClick}

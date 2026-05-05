@@ -60,7 +60,7 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
           onChange={(e, value) => field.onChange(value?.id || '')}
 
-          renderInput={(params) => (
+        renderInput={(params) => (
 
             <TextField
 
@@ -70,7 +70,27 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
 
               placeholder={placeholder}
 
-              sx={{ backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212', borderRadius: 1 }}
+              sx={{
+                backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212',
+                borderRadius: 999,
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: 999,
+                  backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212',
+                  '& fieldset': {
+                    borderColor: 'rgba(26, 64, 125, 0.18)',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: 'rgba(26, 64, 125, 0.35)',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: theme.palette.primary.main,
+                    borderWidth: 1,
+                  },
+                },
+                '& .MuiInputBase-input': {
+                  px: 1.5,
+                },
+              }}
 
             />
 

@@ -1,33 +1,18 @@
 'use client';
+
 import * as React from 'react';
 import { useAppSelector } from '@/redux/hooks';
-
 import { useDispatch } from 'react-redux';
-
 import { useRouter } from 'next/navigation';
-
-import { Container, Stack, useMediaQuery } from "@mui/material";
-
-import AppBar from '@mui/material/AppBar';
-
-import Box from '@mui/material/Box';
-
-import Toolbar from '@mui/material/Toolbar';
-
-import Typography from '@mui/material/Typography';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
-import { faListUl } from '@fortawesome/free-solid-svg-icons';
-
-import SubHeaderDialog from '../SubHeaderDialog';
-
-import commonService from '../../../../services/commonService';
-
+import { AppBar, Box, Chip, Container, IconButton, Stack, Toolbar, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
-
+import { useTranslation } from 'react-i18next';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faListUl } from '@fortawesome/free-solid-svg-icons';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import commonService from '../../../../services/commonService';
+import SubHeaderDialog from '../SubHeaderDialog';
 import { searchJobPost } from '../../../../redux/filterSlice';
-
 import { ROUTES } from '../../../../configs/constants';
 
 interface CareerItem {
@@ -36,263 +21,171 @@ interface CareerItem {
   metadata?: object;
 }
 
-
-
-const listItems = (items: CareerItem[], handleFilter: (id: string | number) => void) => (
-
-  <Stack
-
-    direction="row"
-
-    spacing={2}
-
-    alignContent="center"
-
-    sx={{
-      overflowX: 'auto',
-      scrollbarWidth: 'none',
-      msOverflowStyle: 'none',
-      '&::-webkit-scrollbar': {
-        display: 'none',
-      },
-
-      '& .MuiTypography-root:hover': {
-
-        transform: 'translateY(-2px)',
-
-        transition: 'transform 0.2s ease-in-out'
-
-      }
-
-    }}
-
-  >
-
-    {items.map((item) => (
-
-      <Typography
-
-        variant="body2"
-
-        key={item.id}
-
-        sx={{
-
-          fontWeight: 600,
-
-          cursor: 'pointer',
-
-          whiteSpace: 'nowrap',
-
-          padding: '6px 12px',
-
-          borderRadius: '16px',
-
-          transition: 'all 0.2s ease-in-out',
-
-          '&:hover': {
-
-            backgroundColor: (theme) => theme.palette.primary.background,
-
-            color: (theme) => theme.palette.primary.main,
-
-          }
-
-        }}
-
-        onClick={() => handleFilter(item.id)}
-
-      >
-
-        {item?.name}
-
-      </Typography>
-
-    ))}
-
-  </Stack>
-
-);
-
 const SubHeader = () => {
-
+  const { t } = useTranslation('common');
   const dispatch = useDispatch();
-
   const nav = useRouter();
-
   const { jobPostFilter } = useAppSelector((state) => state.filter);
-
   const [open, setOpen] = React.useState(false);
-
   const [topCareers, setTopCareers] = React.useState<CareerItem[]>([]);
+  const careerScrollRef = React.useRef<HTMLDivElement | null>(null);
 
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down('md'));
 
   React.useEffect(() => {
-
     const getTopCarreers = async () => {
-
       try {
-
         const resData = await commonService.getTop10Careers();
-
-        setTopCareers(resData.map((item: { name: string; metadata?: object; id?: number | string }) => ({
-          ...item,
-          id: String(item.id)
-        })));
-
-      } catch (error) {
-
-      } finally {
-
+        setTopCareers(
+          resData.map((item: { name: string; metadata?: object; id?: number | string }) => ({
+            ...item,
+            id: String(item.id),
+          }))
+        );
+      } catch {
+        // Silent fallback
       }
-
     };
 
     getTopCarreers();
-
   }, []);
 
   const handleFilter = (id: string | number) => {
-
     dispatch(searchJobPost({ ...jobPostFilter, careerId: String(id) }));
-
     nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
+  };
 
+  const handleScrollNext = () => {
+    careerScrollRef.current?.scrollBy({ left: 280, behavior: 'smooth' });
   };
 
   return (
-
     <>
-
-      {/* SubHeader áº©n trÃªn xs vÃ¬ HomeSearch Ä‘Ã£ náº±m dÆ°á»›i TopSlide; hiá»‡n tá»« sm+ */}
       <Box sx={{ flexGrow: 1, display: { xs: 'none', sm: 'block' } }}>
-
         <AppBar
-
           position="static"
-
           sx={{
-
-            bgcolor: (theme) =>
-
-              theme.palette.mode === 'light' ? 'white' : 'black',
-
+            bgcolor: (theme) => (theme.palette.mode === 'light' ? 'white' : 'black'),
             boxShadow: 0,
-
             borderBottom: 1,
-
             borderColor: (theme) =>
-
               theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.primary.dark,
-
           }}
-
         >
-
           <Container maxWidth="xl">
-
             <Toolbar
-
               variant="dense"
-
               sx={{
-
-                color: (theme) =>
-
-                  theme.palette.mode === 'light' ? 'black' : 'white',
-
-                py: 0.5,
-
-                gap: 1
-
+                color: (theme) => (theme.palette.mode === 'light' ? 'black' : 'white'),
+                py: 0.75,
+                gap: 1.25,
               }}
-
             >
-
               <Box
-
                 sx={{
-
                   cursor: 'pointer',
-
-                  width: 40,
-
-                  height: 40,
-
+                  width: 42,
+                  height: 42,
                   display: 'flex',
-
                   alignItems: 'center',
-
                   justifyContent: 'center',
-
-                  borderRadius: '12px',
-
+                  borderRadius: '14px',
                   transition: 'all 0.2s ease-in-out',
-
                   '&:hover': {
-
                     backgroundColor: theme.palette.primary.background,
-
-                    transform: 'scale(1.05)'
-
-                  }
-
+                    transform: 'scale(1.05)',
+                  },
                 }}
-
                 onClick={() => setOpen(true)}
-
               >
-
                 <FontAwesomeIcon
-
                   icon={faListUl}
-
                   fontSize={20}
-
-                  style={{
-
-                    color: theme.palette.primary.main
-
-                  }}
-
+                  style={{ color: theme.palette.primary.main }}
                 />
-
               </Box>
 
-              {!isSmall && listItems(topCareers, handleFilter)}
+              {!isSmall && (
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    flex: 1,
+                    minWidth: 0,
+                    gap: 1,
+                  }}
+                >
+                  <Stack
+                    ref={careerScrollRef}
+                    direction="row"
+                    spacing={1}
+                    sx={{
+                      overflowX: 'auto',
+                      scrollbarWidth: 'none',
+                      flex: 1,
+                      minWidth: 0,
+                      '&::-webkit-scrollbar': {
+                        display: 'none',
+                      },
+                    }}
+                  >
+                    {topCareers.map((item) => (
+                      <Chip
+                        key={item.id}
+                        label={item.name}
+                        clickable
+                        onClick={() => handleFilter(item.id)}
+                        variant="outlined"
+                        sx={{
+                          fontWeight: 600,
+                          borderColor: 'rgba(26, 64, 125, 0.14)',
+                          backgroundColor: 'rgba(255,255,255,0.80)',
+                          flexShrink: 0,
+                          '&:hover': {
+                            backgroundColor: theme.palette.primary.background,
+                            color: theme.palette.primary.main,
+                          },
+                        }}
+                      />
+                    ))}
+                  </Stack>
 
+                  <IconButton
+                    aria-label={t('common.next', { defaultValue: 'Next' })}
+                    onClick={handleScrollNext}
+                    size="small"
+                    sx={{
+                      flexShrink: 0,
+                      width: 34,
+                      height: 34,
+                      border: '1px solid rgba(26, 64, 125, 0.14)',
+                      bgcolor: 'rgba(255,255,255,0.9)',
+                      color: theme.palette.primary.main,
+                      boxShadow: '0 1px 6px rgba(15, 57, 127, 0.08)',
+                      '&:hover': {
+                        bgcolor: theme.palette.primary.background,
+                        borderColor: theme.palette.primary.main,
+                      },
+                    }}
+                  >
+                    <ChevronRightIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              )}
             </Toolbar>
-
           </Container>
-
         </AppBar>
-
       </Box>
 
-      {/* Start: Subheader Dialog */}
-
       <SubHeaderDialog
-
         open={open}
-
         setOpen={setOpen}
-
         topCareers={topCareers}
-
         handleFilter={handleFilter}
-
       />
-
-      {/* End: Subheader Dialog */}
-
     </>
-
   );
-
 };
 
 export default SubHeader;
-
-
