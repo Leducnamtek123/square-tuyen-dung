@@ -1,13 +1,17 @@
 'use client';
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Avatar, Box, Card, CardContent, CardHeader, Stack, Typography, Button } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import ApartmentIcon from "@mui/icons-material/Apartment";
+import ArchitectureIcon from "@mui/icons-material/Architecture";
+import EngineeringIcon from "@mui/icons-material/Engineering";
 import TipsAndUpdatesIcon from "@mui/icons-material/TipsAndUpdates";
 import SearchIcon from "@mui/icons-material/Search";
+import WeekendIcon from "@mui/icons-material/Weekend";
 import {
-  HOME_FILTER_CAREER,
   ROLES_NAME,
   ROUTES,
 } from "../../../configs/constants";
@@ -19,33 +23,42 @@ import FeedbackCarousel from "../../../components/Features/FeedbackCarousel";
 import JobByCategory from "../../components/defaults/JobByCategory";
 import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
 import SuggestedJobPostCard from "../../components/defaults/SuggestedJobPostCard";
+import commonService from '../../../services/commonService';
 import bannerExploreImport from '../../../assets/images/banner-explore.webp';
 import bannerExplorePcImport from '../../../assets/images/banner-explore-pc.webp';
 import { useAppSelector } from "../../../hooks/useAppStore";
 import type { SvgIconComponent } from "@mui/icons-material";
 import LazyLoadSection from "../../../components/Common/LazyLoadSection";
 import type { TFunction } from "i18next";
+import type { Career } from "@/types/models";
 
 // Next.js image imports return objects; extract string src
 const toSrc = (img: string | { src?: string; default?: { src?: string } } | null | undefined): string => typeof img === 'string' ? img : img?.src || img?.default?.src || '';
 const bannerExplore = toSrc(bannerExploreImport);
 const bannerExplorePc = toSrc(bannerExplorePcImport);
 
+const CAREER_ICON_MAP: Record<string, SvgIconComponent> = {
+  apartment: ApartmentIcon,
+  engineering: EngineeringIcon,
+  weekend: WeekendIcon,
+  architecture: ArchitectureIcon,
+};
+
 /** Reusable section for career-filtered job listings */
 const CareerJobSection = ({
   career,
   t,
 }: {
-  career: (typeof HOME_FILTER_CAREER)[number];
+  career: Career;
   t: TFunction<'public'>;
 }) => {
-  const Icon = career.titleIcon;
+  const Icon = career.appIconName ? CAREER_ICON_MAP[career.appIconName.toLowerCase()] : undefined;
   return (
     <Card variant="outlined" sx={{ boxShadow: 0 }}>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: "white" }} aria-label={career.name}>
-            <Icon color="secondary" />
+            {Icon ? <Icon color="secondary" /> : career.name.slice(0, 1)}
           </Avatar>
         }
         title={
@@ -99,6 +112,14 @@ export default function HomePage() {
 
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
   const router = useRouter();
+  const { data: careerSections = [] } = useQuery({
+    queryKey: ['home-top-careers'],
+    queryFn: async () => {
+      const data = await commonService.getTop10Careers();
+      return data.slice(0, 4);
+    },
+    staleTime: 5 * 60_000,
+  });
 
   return (
     <>
@@ -215,7 +236,7 @@ export default function HomePage() {
       </Box>
 
       {/* Career Job Sections — deduplicated via map */}
-      {HOME_FILTER_CAREER.map((career, index) => (
+      {careerSections.map((career, index) => (
         <Box sx={{ mt: index === 0 ? 6 : 10 }} key={career.id}>
           <LazyLoadSection minHeight="400px" rootMargin="300px">
             <CareerJobSection career={career} t={t} />

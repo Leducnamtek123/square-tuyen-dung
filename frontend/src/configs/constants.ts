@@ -1,13 +1,11 @@
 /**
- * Application constants — lightweight, no heavy asset imports.
+ * Application constants - lightweight, no heavy asset imports.
  *
  * Image/icon assets have been moved to '@/configs/images' to avoid
  * polluting the bundle when only config values are needed.
  */
 
 import dayjs from './dayjs-config';
-import DeveloperBoardIcon from '@mui/icons-material/DeveloperBoard';
-import DevicesIcon from '@mui/icons-material/Devices';
 
 // Re-export image constants for backward compatibility.
 // New code should import directly from '@/configs/images'.
@@ -21,7 +19,7 @@ export {
   SVG_IMAGES,
 } from './images';
 
-// ROUTES — centralized in routeConfig.ts
+// ROUTES - centralized in routeConfig.ts
 export { ROUTES } from './routeConfig';
 
 const ENV = process.env.NEXT_PUBLIC_NODE_ENV || 'development';
@@ -58,7 +56,6 @@ const AUTH_PROVIDER = {
 } as const;
 
 const AUTH_CONFIG = {
-  // BACKEND
   CLIENT_ID: process.env.NEXT_PUBLIC_PROJECT_SERVER_CLIENT_ID,
   CLIENT_SECRET: process.env.NEXT_PUBLIC_PROJECT_SERVER_CLIENT_SECRET,
   BACKEND_KEY: 'backend',
@@ -67,14 +64,11 @@ const AUTH_CONFIG = {
   REFRESH_TOKEN_GRANT: 'refresh_token',
   PASSWORD_KEY: 'password',
   CONVERT_TOKEN_KEY: 'convert_token',
-  // FACEBOOK AUTH
   FACEBOOK_CLIENT_ID: process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_ID,
   FACEBOOK_CLIENT_SECRET: process.env.NEXT_PUBLIC_FACEBOOK_CLIENT_SECRET,
-  // GOOGLE AUTH
   GOOGLE_CLIENT_ID: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || 'dummy-google-client-id',
   GOOGLE_CLIENT_SECRET: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET,
   GOONGAPI_KEY: process.env.NEXT_PUBLIC_GOONGAPI_KEY,
-  // Dialogflow chatbot — icons now use lazy import from '@/configs/images'
   JOB_SEEKER_BOT: {
     AGENT_ID: process.env.NEXT_PUBLIC_JOB_SEEKER_BOT_AGENT_ID || '',
     CHAT_TITLE: 'Square AI',
@@ -96,19 +90,6 @@ const PAGINATION = {
   ADMIN_MAX_PAGE_SIZE: 10000,
 } as const;
 
-const HOME_FILTER_CAREER = [
-  {
-    id: 34,
-    name: 'IT - Software',
-    titleIcon: DevicesIcon,
-  },
-  {
-    id: 33,
-    name: 'IT - Hardware/Networking',
-    titleIcon: DeveloperBoardIcon,
-  },
-] as const;
-
 const REGEX_VALIDATE = {
   phoneRegExp:
     /^((\+[1-9]{1,4}[ \-]*)|(\([0-9]{2,3}\)[ \-]*)|([0-9]{2,4})[ \-]*)*?[0-9]{3,4}?[ \-]*[0-9]{3,4}?$/,
@@ -122,7 +103,7 @@ const CV_TYPES = {
 } as const;
 
 /**
- * DATE_OPTIONS — computed lazily to avoid stale dates when app is open past midnight.
+ * DATE_OPTIONS - computed lazily to avoid stale dates when app is open past midnight.
  * Use: DATE_OPTIONS.today() instead of DATE_OPTIONS.today
  */
 const DATE_OPTIONS = {
@@ -157,6 +138,7 @@ const JOB_POST_STATUS_BG_COLOR = {
 } as const;
 
 export {
+  ENV,
   PLATFORM,
   APP_NAME,
   HOST_NAME,
@@ -164,7 +146,6 @@ export {
   AUTH_CONFIG,
   ROLES_NAME,
   PAGINATION,
-  HOME_FILTER_CAREER,
   REGEX_VALIDATE,
   CV_TYPES,
   BANNER_TYPES,
