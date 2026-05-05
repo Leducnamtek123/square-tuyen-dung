@@ -7,7 +7,7 @@ FROM ${MIRROR_PREFIX}/cuda:12.4.1-runtime-ubuntu22.04
 ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1 \
     HF_HOME=/root/.cache/huggingface \
-    UV_HTTP_TIMEOUT=1000 \
+    UV_HTTP_TIMEOUT=3600 \
     VIRTUAL_ENV=/opt/venv \
     PATH="/opt/venv/bin:$PATH"
 
@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     software-properties-common \
     build-essential git curl ca-certificates ffmpeg espeak-ng libgomp1 \
     python3.10 python3.10-dev python3.10-venv \
+    rustc cargo \
     && rm -rf /var/lib/apt/lists/*
 
 # Install UV
