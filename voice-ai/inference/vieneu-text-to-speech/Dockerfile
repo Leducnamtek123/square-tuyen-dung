@@ -16,7 +16,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     software-properties-common \
     build-essential git curl ca-certificates ffmpeg espeak-ng libgomp1 \
     python3.10 python3.10-dev python3.10-venv \
-    rustc cargo \
     && rm -rf /var/lib/apt/lists/*
 
 # Install UV
@@ -32,7 +31,8 @@ WORKDIR /workspace
 RUN uv venv /opt/venv && \
     uv pip install --no-cache \
     "torch==2.5.1" "torchaudio==2.5.1" --index-url https://download.pytorch.org/whl/cu124 && \
-    uv pip install --no-cache "accelerate>=0.30.0" "vieneu[gpu]>=1.2.6" "loguru" "fastapi" "uvicorn" "pydantic" "numpy" && \
+    # Pin to 1.2.6 because vieneu 2.x pulls sea-g2p, which requires a Rust source build.
+    uv pip install --no-cache "accelerate>=0.30.0" "vieneu[gpu]==1.2.6" "loguru" "fastapi" "uvicorn" "pydantic" "numpy" && \
     uv pip install --no-cache "transformers>=4.45.0" "torchao==0.6.1"
 
 # Ensure PyTorch's bundled NCCL takes priority over the system one
