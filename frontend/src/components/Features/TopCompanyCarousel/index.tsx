@@ -83,7 +83,7 @@ const Loading = () => {
 };
 
 const TopCompanyCarousel = () => {
-  const nav = useRouter();
+  const { push } = useRouter();
   const { i18n, t } = useTranslation('common');
   const [parentWidth, setParentWidth] = React.useState(0);
   const col = parentWidth < 600 ? 2 : parentWidth < 900 ? 3 : parentWidth < 1200 ? 4 : 5;
@@ -160,7 +160,7 @@ const TopCompanyCarousel = () => {
                         }
                       },
                     }}
-                    onClick={() => nav.push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, value.slug as string)}`, i18n.language))}
+                    onClick={() => push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, value.slug as string)}`, i18n.language))}
                   >
                     <Box
                       sx={{

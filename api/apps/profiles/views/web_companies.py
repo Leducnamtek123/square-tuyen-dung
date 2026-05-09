@@ -42,6 +42,7 @@ from ..serializers import (
     CompanyImageSerializer,
     CompanyRoleSerializer,
     CompanyMemberSerializer,
+    TrustReportSerializer,
 )
 
 from apps.jobs.models import JobPost
@@ -89,6 +90,7 @@ class CompanyView(viewsets.ViewSet):
             fields=[
                 "id",
                 "jobName",
+                "slug",
                 "academicLevel",
                 "deadline",
                 "quantity",
@@ -104,10 +106,16 @@ class CompanyView(viewsets.ViewSet):
                 "salaryMin",
                 "salaryMax",
                 "isUrgent",
+                "isHot",
                 "contactPersonName",
                 "contactPersonPhone",
                 "contactPersonEmail",
                 "location",
+                "createAt",
+                "views",
+                "isSaved",
+                "isApplied",
+                "companyDict",
             ],
         )
         return var_res.response_data(data=job_post_serializer.data)
@@ -397,6 +405,49 @@ class CompanyFollowedAPIView(views.APIView):
         serializer = CompanyFollowedSerializer(queryset, many=True)
 
         return var_res.response_data(data=serializer.data)
+
+
+class TrustReportViewSet(
+    viewsets.ViewSet,
+    generics.CreateAPIView,
+    generics.ListAPIView,
+):
+    serializer_class = TrustReportSerializer
+    renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
+    permission_classes = [perms_sys.IsAuthenticated]
+
+    def get_queryset(self):
+        return self.request.user.trust_reports.select_related("company", "job_post", "reporter").order_by("-create_at")
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(
+                page,
+                many=True,
+                fields=[
+                    "id",
+                    "targetType",
+                    "reason",
+                    "message",
+                    "status",
+                    "company",
+                    "jobPost",
+                    "createAt",
+                ],
+            )
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        return var_res.response_data(data=serializer.data)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        report = serializer.save()
+        return var_res.response_data(status=status.HTTP_201_CREATED, data=self.get_serializer(report).data)
 
 
 class CompanyImageViewSet(viewsets.ViewSet,

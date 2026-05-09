@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import { usePathname } from 'next/navigation';
 import { Box, CircularProgress } from '@mui/material';
 import AdminLayout from '@/layouts/AdminLayout';
@@ -10,6 +10,54 @@ import { getUserInfo } from '@/redux/userSlice';
 import { ROLES_NAME } from '@/configs/constants';
 import { getPreferredLanguage, getPortalPrefix } from '@/configs/portalRouting';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
+
+type AuthGateState = {
+  isChecking: boolean;
+  shouldRedirectToLogin: boolean;
+};
+
+type AuthGateAction = { type: 'redirectToLogin' } | { type: 'checked' };
+
+const authGateReducer = (state: AuthGateState, action: AuthGateAction): AuthGateState => {
+  switch (action.type) {
+    case 'redirectToLogin':
+      return {
+        ...state,
+        isChecking: false,
+        shouldRedirectToLogin: true,
+      };
+    case 'checked':
+      return {
+        ...state,
+        isChecking: false,
+      };
+    default:
+      return state;
+  }
+};
+
+const getInitialAuthGateState = (isAuthPage: boolean): AuthGateState => {
+  if (isAuthPage) {
+    return {
+      isChecking: false,
+      shouldRedirectToLogin: false,
+    };
+  }
+
+  if (typeof window === 'undefined') {
+    return {
+      isChecking: true,
+      shouldRedirectToLogin: false,
+    };
+  }
+
+  const hasToken = Boolean(tokenService.getAccessTokenFromCookie());
+
+  return {
+    isChecking: hasToken,
+    shouldRedirectToLogin: !hasToken,
+  };
+};
 
 /**
  * AdminSectionClient - Handles authentication and role-based access control
@@ -52,20 +100,14 @@ export default function AdminSectionClient({
   const adminPrefix = getPortalPrefix('admin', lang);
   const loginPath = `${adminPrefix}/login`;
   const dashboardPath = `${adminPrefix}/dashboard`;
-
-  const [isChecking, setIsChecking] = useState(() => {
-    if (isAuthPage) return false;
-    if (typeof window === 'undefined') return true;
-    return Boolean(tokenService.getAccessTokenFromCookie());
-  });
-
-  const [shouldRedirectToLogin, setShouldRedirectToLogin] = useState(() => {
-    if (isAuthPage || typeof window === 'undefined') return false;
-    return !tokenService.getAccessTokenFromCookie();
-  });
+  const [authGate, dispatchAuthGate] = useReducer(
+    authGateReducer,
+    isAuthPage,
+    getInitialAuthGateState
+  );
 
   useEffect(() => {
-    if (shouldRedirectToLogin) {
+    if (authGate.shouldRedirectToLogin) {
       window.location.replace(loginPath);
       return;
     }
@@ -75,7 +117,7 @@ export default function AdminSectionClient({
 
       if (!currentToken) {
         if (!isAuthPage) {
-          setShouldRedirectToLogin(true);
+          dispatchAuthGate({ type: 'redirectToLogin' });
         }
         return;
       }
@@ -85,7 +127,7 @@ export default function AdminSectionClient({
         try {
           nextUser = await dispatch(getUserInfo()).unwrap();
         } catch {
-          setShouldRedirectToLogin(true);
+          dispatchAuthGate({ type: 'redirectToLogin' });
           return;
         }
       }
@@ -101,11 +143,11 @@ export default function AdminSectionClient({
     };
 
     void checkAuth().finally(() => {
-      setIsChecking(false);
+      dispatchAuthGate({ type: 'checked' });
     });
-  }, [adminPrefix, currentUser, dashboardPath, dispatch, isAuthPage, isLoginPage, loginPath, shouldRedirectToLogin]);
+  }, [authGate.shouldRedirectToLogin, adminPrefix, currentUser, dashboardPath, dispatch, isAuthPage, isLoginPage, loginPath]);
 
-  if (isChecking || shouldRedirectToLogin) {
+  if (authGate.isChecking || authGate.shouldRedirectToLogin) {
     return <AuthLoadingScreen />;
   }
 

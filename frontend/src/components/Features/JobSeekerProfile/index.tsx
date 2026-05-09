@@ -71,12 +71,12 @@ const JobSeekerProfile = ({
   handleSave,
 }: JobSeekerProfileProps) => {
     const { t } = useTranslation(['employer', 'common']);
-    const nav = useRouter();
+    const { push } = useRouter();
     const theme = useTheme();
     const { allConfig } = useConfig();
 
     const handleNavigate = () => {
-        nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, slug)}`);
+        push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, slug)}`);
     };
 
     return (

@@ -1,8 +1,9 @@
 import * as yup from 'yup';
-import { EditorState } from 'draft-js';
 import dayjs from 'dayjs';
 import { REGEX_VALIDATE } from '../../../../configs/constants';
 import type { TFunction } from 'i18next';
+
+type EditorState = import('draft-js').EditorState;
 
 export interface JobPostFormValues {
   jobName?: string;

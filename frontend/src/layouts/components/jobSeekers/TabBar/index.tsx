@@ -16,7 +16,7 @@ import { ROUTES, APP_NAME } from "../../../../configs/constants";
 
 const TabBar = () => {
   const pathname = usePathname();
-  const nav = useRouter();
+  const { push } = useRouter();
   const { t } = useTranslation(['jobSeeker', 'common']);
 
   const tabItems = [
@@ -71,7 +71,7 @@ const TabBar = () => {
     }
   }, [activeTabIndex]);
 
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+  const selectTab = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
 
@@ -86,7 +86,7 @@ const TabBar = () => {
     >
       <Tabs
         value={value}
-        onChange={handleChange}
+        onChange={selectTab}
         variant="scrollable"
         scrollButtons
         allowScrollButtonsMobile
@@ -110,7 +110,7 @@ const TabBar = () => {
       >
         {tabItems.map((tab) => (
           <Tab
-            onClick={() => nav.push(tab.path)}
+            onClick={() => push(tab.path)}
             key={tab.id}
             icon={tab.icon}
             iconPosition="start"

@@ -14,39 +14,37 @@ type MuiImageCustomProps = Omit<MuiImageBaseProps, 'src' | 'onError'> & {
   onError?: MuiImageBaseProps['onError'];
 };
 
+type ImageWithFallbackProps = Omit<MuiImageCustomProps, 'fallbackSrc' | 'src'> & {
+  fallbackSrc: string;
+  src: string;
+};
+
 const resolveSrc = (src: string | StaticImageData | null | undefined): string => {
   if (!src) return '';
   if (typeof src === 'string') return src;
   return src.src; // StaticImageData
 };
 
-const MuiImageCustom = (props: MuiImageCustomProps) => {
-
-  const {
-    loading = 'lazy',
-    src,
-    fallbackSrc,
-    onError,
-    ...rest
-  } = props;
-
-  const resolvedFallback = resolveSrc(fallbackSrc);
-  const [imageSrc, setImageSrc] = React.useState(resolveSrc(src) || resolvedFallback || '');
-
-  React.useEffect(() => {
-    setImageSrc(resolveSrc(src) || resolvedFallback || '');
-  }, [src, resolvedFallback]);
+const ImageWithFallback = ({
+  loading,
+  src,
+  fallbackSrc,
+  onError,
+  ...rest
+}: ImageWithFallbackProps) => {
+  const [hasError, setHasError] = React.useState(false);
+  const imageSrc = hasError && fallbackSrc ? fallbackSrc : src;
 
   const handleError = React.useCallback(
     (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
-      if (resolvedFallback && imageSrc !== resolvedFallback) {
-        setImageSrc(resolvedFallback);
+      if (fallbackSrc && !hasError) {
+        setHasError(true);
       }
       if (onError) {
         onError(event);
       }
     },
-    [imageSrc, onError, resolvedFallback]
+    [fallbackSrc, hasError, onError]
   );
 
   return (
@@ -66,7 +64,30 @@ const MuiImageCustom = (props: MuiImageCustomProps) => {
       {...rest}
     />
   );
+};
 
+const MuiImageCustom = (props: MuiImageCustomProps) => {
+  const {
+    loading = 'lazy',
+    src,
+    fallbackSrc,
+    onError,
+    ...rest
+  } = props;
+
+  const resolvedFallback = resolveSrc(fallbackSrc);
+  const resolvedSrc = resolveSrc(src) || resolvedFallback || '';
+
+  return (
+    <ImageWithFallback
+      key={resolvedSrc || 'empty-src'}
+      loading={loading}
+      fallbackSrc={resolvedFallback}
+      src={resolvedSrc}
+      onError={onError}
+      {...rest}
+    />
+  );
 };
 
 export default React.memo(MuiImageCustom);

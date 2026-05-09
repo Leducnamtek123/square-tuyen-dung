@@ -102,7 +102,7 @@ const JobByCategory = () => {
   const { t } = useTranslation('public');
   const { allConfig } = useConfig();
   const dispatch = useAppDispatch();
-  const nav = useRouter();
+  const { push } = useRouter();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
 
   const careerOptions = (allConfig?.careerOptions || []) as Option[];
@@ -122,7 +122,7 @@ const JobByCategory = () => {
         break;
     }
 
-    nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
+    push(`/${ROUTES.JOB_SEEKER.JOBS}`);
   };
 
   return (

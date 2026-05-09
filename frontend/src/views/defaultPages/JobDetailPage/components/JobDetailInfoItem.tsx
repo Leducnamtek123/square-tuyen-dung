@@ -19,7 +19,7 @@ const JobDetailInfoItem: React.FC<JobDetailInfoItemProps> = ({ title, value }) =
             {typeof value === "string" ? t([`choices.${value}`, value]) : value}
           </span>
         ) : (
-          <span className="text-xs italic text-gray-300">
+          <span className="text-xs italic text-zinc-300">
             {t("jobDetail.notUpdated")}
           </span>
         )}

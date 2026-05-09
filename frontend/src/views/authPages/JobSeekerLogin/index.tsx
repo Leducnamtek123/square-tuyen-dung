@@ -31,7 +31,7 @@ const JobSeekerLogin = () => {
   TabTitle(t('login.jobSeekerTitle'));
 
   const dispatch = useAppDispatch();
-  const nav = useRouter();
+  const { push } = useRouter();
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
@@ -50,7 +50,7 @@ const JobSeekerLogin = () => {
 
   const navigateHome = async () => {
     await dispatch(getUserInfo()).unwrap();
-    nav.push('/');
+    push('/');
   };
 
   const handleLogin = (data: { email: string; password?: string }) => {
@@ -68,7 +68,7 @@ const JobSeekerLogin = () => {
               roleName: ROLES_NAME.JOB_SEEKER as RoleName,
             }),
           );
-          nav.push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
+          push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
           return;
         }
 

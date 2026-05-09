@@ -4,11 +4,92 @@ import { useTrackVolume } from '@livekit/components-react';
 
 
 type AnimatedValue = number | number[];
+type AnimationTransition = NonNullable<Parameters<typeof animate>[2]>;
+type WaveAnimationConfig = {
+  speed: number;
+  amplitude: AnimatedValue;
+  amplitudeTransition: AnimationTransition;
+  frequency: AnimatedValue;
+  frequencyTransition: AnimationTransition;
+  opacity: AnimatedValue;
+  opacityTransition: AnimationTransition;
+};
 
 const DEFAULT_SPEED = 5;
 const DEFAULT_AMPLITUDE = 0.025;
 const DEFAULT_FREQUENCY = 10;
 const DEFAULT_TRANSITION = { duration: 0.2, ease: 'easeOut' } as const;
+const LISTENING_OPACITY_TRANSITION = {
+  duration: 0.75,
+  repeat: Infinity,
+  repeatType: 'mirror',
+} as const;
+const THINKING_OPACITY_TRANSITION = {
+  duration: 0.4,
+  repeat: Infinity,
+  repeatType: 'mirror',
+} as const;
+
+const getWaveAnimationConfig = (state?: string): WaveAnimationConfig => {
+  switch (state) {
+    case 'disconnected':
+      return {
+        speed: DEFAULT_SPEED,
+        amplitude: 0,
+        amplitudeTransition: DEFAULT_TRANSITION,
+        frequency: 0,
+        frequencyTransition: DEFAULT_TRANSITION,
+        opacity: 1.0,
+        opacityTransition: DEFAULT_TRANSITION,
+      };
+    case 'listening':
+      return {
+        speed: DEFAULT_SPEED,
+        amplitude: DEFAULT_AMPLITUDE,
+        amplitudeTransition: DEFAULT_TRANSITION,
+        frequency: DEFAULT_FREQUENCY,
+        frequencyTransition: DEFAULT_TRANSITION,
+        opacity: [1.0, 0.3],
+        opacityTransition: LISTENING_OPACITY_TRANSITION,
+      };
+    case 'thinking':
+    case 'connecting':
+    case 'initializing':
+      return {
+        speed: DEFAULT_SPEED * 4,
+        amplitude: DEFAULT_AMPLITUDE / 4,
+        amplitudeTransition: DEFAULT_TRANSITION,
+        frequency: DEFAULT_FREQUENCY * 4,
+        frequencyTransition: DEFAULT_TRANSITION,
+        opacity: [1.0, 0.3],
+        opacityTransition: THINKING_OPACITY_TRANSITION,
+      };
+    case 'speaking':
+    default:
+      return {
+        speed: DEFAULT_SPEED * 2,
+        amplitude: DEFAULT_AMPLITUDE,
+        amplitudeTransition: DEFAULT_TRANSITION,
+        frequency: DEFAULT_FREQUENCY,
+        frequencyTransition: DEFAULT_TRANSITION,
+        opacity: 1.0,
+        opacityTransition: DEFAULT_TRANSITION,
+      };
+  }
+};
+
+const applyWaveAnimation = (
+  config: WaveAnimationConfig,
+  controls: {
+    animateAmplitude: (targetValue: AnimatedValue, transition: AnimationTransition) => void;
+    animateFrequency: (targetValue: AnimatedValue, transition: AnimationTransition) => void;
+    animateOpacity: (targetValue: AnimatedValue, transition: AnimationTransition) => void;
+  },
+) => {
+  controls.animateAmplitude(config.amplitude, config.amplitudeTransition);
+  controls.animateFrequency(config.frequency, config.frequencyTransition);
+  controls.animateOpacity(config.opacity, config.opacityTransition);
+};
 
 function useAnimatedValue(initialValue: AnimatedValue) {
   const [value, setValue] = useState(initialValue);
@@ -37,7 +118,7 @@ export function useAgentAudioVisualizerWave({
   state?: string;
   audioTrack?: unknown;
 }) {
-  const [speed, setSpeed] = useState(DEFAULT_SPEED);
+  const speed = getWaveAnimationConfig(state).speed;
   const { value: amplitude, animate: animateAmplitude } = useAnimatedValue(DEFAULT_AMPLITUDE);
   const { value: frequency, animate: animateFrequency } = useAnimatedValue(DEFAULT_FREQUENCY);
   const { value: opacity, animate: animateOpacity } = useAnimatedValue(1.0);
@@ -48,44 +129,12 @@ export function useAgentAudioVisualizerWave({
   });
 
   useEffect(() => {
-    switch (state) {
-      case 'disconnected':
-        setSpeed(DEFAULT_SPEED);
-        animateAmplitude(0, DEFAULT_TRANSITION);
-        animateFrequency(0, DEFAULT_TRANSITION);
-        animateOpacity(1.0, DEFAULT_TRANSITION);
-        return;
-      case 'listening':
-        setSpeed(DEFAULT_SPEED);
-        animateAmplitude(DEFAULT_AMPLITUDE, DEFAULT_TRANSITION);
-        animateFrequency(DEFAULT_FREQUENCY, DEFAULT_TRANSITION);
-        animateOpacity([1.0, 0.3], {
-          duration: 0.75,
-          repeat: Infinity,
-          repeatType: 'mirror',
-        });
-        return;
-      case 'thinking':
-      case 'connecting':
-      case 'initializing':
-        setSpeed(DEFAULT_SPEED * 4);
-        animateAmplitude(DEFAULT_AMPLITUDE / 4, DEFAULT_TRANSITION);
-        animateFrequency(DEFAULT_FREQUENCY * 4, DEFAULT_TRANSITION);
-        animateOpacity([1.0, 0.3], {
-          duration: 0.4,
-          repeat: Infinity,
-          repeatType: 'mirror',
-        });
-        return;
-      case 'speaking':
-      default:
-        setSpeed(DEFAULT_SPEED * 2);
-        animateAmplitude(DEFAULT_AMPLITUDE, DEFAULT_TRANSITION);
-        animateFrequency(DEFAULT_FREQUENCY, DEFAULT_TRANSITION);
-        animateOpacity(1.0, DEFAULT_TRANSITION);
-        return;
-    }
-  }, [state, setSpeed, animateAmplitude, animateFrequency, animateOpacity]);
+    applyWaveAnimation(getWaveAnimationConfig(state), {
+      animateAmplitude,
+      animateFrequency,
+      animateOpacity,
+    });
+  }, [state, animateAmplitude, animateFrequency, animateOpacity]);
 
   useEffect(() => {
     if (state === 'speaking') {

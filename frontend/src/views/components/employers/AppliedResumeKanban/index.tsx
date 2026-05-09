@@ -53,7 +53,7 @@ interface AppliedResumeKanbanProps {
 const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoading, handleChangeApplicationStatus, handleDelete, onAnalysisStateChange }) => {
     const { t } = useTranslation(['employer', 'common']);
     const { allConfig } = useConfig();
-    const nav = useRouter();
+    const { push } = useRouter();
     const theme = useTheme();
 
     const [openDrawerId, setOpenDrawerId] = useState<string | number | null>(null);
@@ -217,12 +217,12 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                          </Box>
                                                                          <Stack direction="row" spacing={0.5}>
                                                                              <Tooltip title={t('appliedResume.table.tooltips.view')} arrow>
-                                                                                <IconButton size="small" onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, item.resumeSlug || item.resume?.slug || '')}`)}>
+                                                                                <IconButton size="small" onClick={() => push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, item.resumeSlug || item.resume?.slug || '')}`)}>
                                                                                     <RemoveRedEyeIcon fontSize="small" />
                                                                                 </IconButton>
                                                                              </Tooltip>
                                                                              <Tooltip title={t('appliedResume.table.tooltips.scheduleInterview', 'Schedule Interview')} arrow>
-                                                                                 <IconButton size="small" onClick={() => nav.push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}/create?candidate=${item.userId ?? ''}&jobPost=${item.jobPost?.id ?? ''}`)}>
+                                                                                 <IconButton size="small" onClick={() => push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}/create?candidate=${item.userId ?? ''}&jobPost=${item.jobPost?.id ?? ''}`)}>
                                                                                      <EventIcon fontSize="small" sx={{ color: 'info.main' }} />
                                                                                  </IconButton>
                                                                              </Tooltip>

@@ -1,5 +1,7 @@
 ﻿import { useEffect, useState } from 'react';
 
+import { useMemo } from 'react';
+
 type Point = { x: number; y: number };
 
 export function generateConnectingSequence(rows: number, columns: number, radius: number): Point[] {
@@ -67,29 +69,25 @@ export function useAgentAudioVisualizerGridAnimator(
   radius?: number
 ): Point {
   const [index, setIndex] = useState(0);
-  const [sequence, setSequence] = useState<Point[]>(() => [
-    {
-      x: Math.floor(columns / 2),
-      y: Math.floor(rows / 2),
-    },
-  ]);
 
-  useEffect(() => {
+  const sequence = useMemo(() => {
     const clampedRadius = radius
       ? Math.min(radius, Math.floor(Math.max(rows, columns) / 2))
       : Math.floor(Math.max(rows, columns) / 2);
 
     if (state === 'thinking') {
-      setSequence(generateThinkingSequence(rows, columns));
-    } else if (state === 'connecting' || state === 'initializing') {
-      const nextSequence = [...generateConnectingSequence(rows, columns, clampedRadius)];
-      setSequence(nextSequence);
-    } else if (state === 'listening') {
-      setSequence(generateListeningSequence(rows, columns));
-    } else {
-      setSequence([{ x: Math.floor(columns / 2), y: Math.floor(rows / 2) }]);
+      return generateThinkingSequence(rows, columns);
     }
-    setIndex(0);
+
+    if (state === 'connecting' || state === 'initializing') {
+      return [...generateConnectingSequence(rows, columns, clampedRadius)];
+    }
+
+    if (state === 'listening') {
+      return generateListeningSequence(rows, columns);
+    }
+
+    return [{ x: Math.floor(columns / 2), y: Math.floor(rows / 2) }];
   }, [state, rows, columns, radius]);
 
   useEffect(() => {

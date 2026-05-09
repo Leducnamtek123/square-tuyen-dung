@@ -77,7 +77,7 @@ const Header = (_props: HeaderProps) => {
       ? HOST_NAME.EMPLOYER_PROJECT
       : HOST_NAME.PROJECT;
 
-  const nav = useRouter();
+  const { push } = useRouter();
 
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
 
@@ -109,14 +109,14 @@ const Header = (_props: HeaderProps) => {
 
   const handleLogin = () => {
     if (isAdminPortal) {
-      nav.push(`/${ROUTES.ADMIN_AUTH.LOGIN}`);
+      push(`/${ROUTES.ADMIN_AUTH.LOGIN}`);
       return;
     }
     if (isEmployerPortal) {
-      nav.push(`/${ROUTES.EMPLOYER_AUTH.LOGIN}`);
+      push(`/${ROUTES.EMPLOYER_AUTH.LOGIN}`);
       return;
     }
-    nav.push(`/${ROUTES.AUTH.LOGIN}`);
+    push(`/${ROUTES.AUTH.LOGIN}`);
 
   };
 
@@ -124,10 +124,10 @@ const Header = (_props: HeaderProps) => {
 
     if (isAdminPortal) return;
     if (isEmployerPortal) {
-      nav.push(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`);
+      push(`/${ROUTES.EMPLOYER_AUTH.REGISTER}`);
       return;
     }
-    nav.push(`/${ROUTES.AUTH.REGISTER}`);
+    push(`/${ROUTES.AUTH.REGISTER}`);
 
   };
 

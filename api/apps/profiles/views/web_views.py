@@ -98,6 +98,7 @@ from .web_companies import (
     PrivateCompanyViewSet,
     CompanyViewSet,
     CompanyFollowedAPIView,
+    TrustReportViewSet,
     CompanyImageViewSet,
     CompanyRoleViewSet,
     CompanyMemberViewSet,

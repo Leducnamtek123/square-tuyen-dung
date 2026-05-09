@@ -66,7 +66,7 @@ const RenderItem = ({ item }: { item: Banner }) => {
 
 const TopSlide = () => {
   const { t, i18n } = useTranslation('public');
-  const router = useRouter();
+  const { push } = useRouter();
   const [banners, setBanners] = React.useState<Banner[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
 
@@ -201,7 +201,7 @@ const TopSlide = () => {
                       variant="contained"
                       size="large"
                       startIcon={<SearchIcon />}
-                      onClick={() => router.push(localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language))}
+                      onClick={() => push(localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language))}
                     >
                       {t('home.heroPrimaryCta', 'Khám phá việc làm')}
                     </Button>
@@ -209,7 +209,7 @@ const TopSlide = () => {
                       variant="outlined"
                       size="large"
                       startIcon={<ApartmentIcon />}
-                      onClick={() => router.push(`/${ROUTES.EMPLOYER.INTRODUCE}`)}
+                      onClick={() => push(`/${ROUTES.EMPLOYER.INTRODUCE}`)}
                     >
                       {t('home.heroSecondaryCta', 'Dành cho nhà tuyển dụng')}
                     </Button>

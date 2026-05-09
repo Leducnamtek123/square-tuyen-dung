@@ -34,7 +34,7 @@ const ShimmerComponent = ({
   const MotionComponent = getMotionComponent(Component);
 
   const dynamicSpread = useMemo(() => {
-    const textLength = typeof children === "string" ? children.length : 0;
+    const textLength = String(children ?? "").length;
     return textLength * spread;
   }, [children, spread]);
 

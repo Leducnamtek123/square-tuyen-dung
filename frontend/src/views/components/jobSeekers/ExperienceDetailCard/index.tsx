@@ -68,6 +68,21 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
   const [uiState, dispatch] = React.useReducer(reducer, initialUiState);
   const [experiencesDetail, setExperiencesDetail] = React.useState<ExperienceDetail[]>([]);
   const [editData, setEditData] = React.useState<ExperienceDetail | null>(null);
+  const editFormData = React.useMemo(
+    () =>
+      editData
+        ? {
+            jobName: editData.jobName || '',
+            companyName: editData.companyName || '',
+            startDate: editData.startDate ? new Date(editData.startDate) : null,
+            endDate: editData.endDate ? new Date(editData.endDate) : null,
+            description: editData.description || null,
+            lastSalary: null,
+            leaveReason: null,
+          }
+        : null,
+    [editData]
+  );
 
   React.useEffect(() => {
     const loadExperiencesDetail = async (slug: string | undefined) => {
@@ -242,19 +257,7 @@ const ExperienceDetailCard = ({ title }: ExperienceDetailCardProps) => {
       >
         <ExperienceDetaiForm
           handleAddOrUpdate={handleAddOrUpdate as (data: FormValues) => void}
-          editData={
-            editData
-              ? {
-                  jobName: editData.jobName || '',
-                  companyName: editData.companyName || '',
-                  startDate: editData.startDate ? new Date(editData.startDate) : null,
-                  endDate: editData.endDate ? new Date(editData.endDate) : null,
-                  description: editData.description || null,
-                  lastSalary: null,
-                  leaveReason: null,
-                }
-              : null
-          }
+          editData={editFormData}
         />
       </FormPopup>
 

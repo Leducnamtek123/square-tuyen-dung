@@ -57,7 +57,7 @@ export interface Article {
   update_at?: string;
 }
 
-export interface ArticleListParams {
+interface ArticleListParams {
   category?: ArticleCategory;
   status?: ArticleStatus;
   search?: string;
@@ -79,7 +79,7 @@ export interface ArticlePayload {
   slug?: string;
 }
 
-export interface PaginatedArticles {
+interface PaginatedArticles {
   results: Article[];
   count: number;
   next: string | null;

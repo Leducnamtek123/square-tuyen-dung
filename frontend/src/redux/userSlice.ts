@@ -2,6 +2,11 @@ import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/tool
 import type { NormalizedWorkspace, User, Workspace } from '../types/models';
 import authService from '../services/authService';
 import tokenService from '../services/tokenService';
+import {
+  ACTIVE_WORKSPACE_STORAGE_KEY,
+  LEGACY_ACTIVE_WORKSPACE_STORAGE_KEY,
+  readVersionedJson,
+} from '@/utils/storageKeys';
 
 interface UserState {
   isAuthenticated: boolean;
@@ -69,18 +74,12 @@ const deleteAvatar = createAsyncThunk<User, void>(
   }
 );
 
-const ACTIVE_WORKSPACE_STORAGE_KEY = 'active_workspace';
-
 type AnyWorkspace = Workspace | NormalizedWorkspace | null | undefined;
 
 const loadActiveWorkspace = (): NormalizedWorkspace | null => {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = localStorage.getItem(ACTIVE_WORKSPACE_STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as NormalizedWorkspace) : null;
-  } catch {
-    return null;
-  }
+  return readVersionedJson<NormalizedWorkspace>(ACTIVE_WORKSPACE_STORAGE_KEY, [
+    LEGACY_ACTIVE_WORKSPACE_STORAGE_KEY,
+  ]);
 };
 
 const normalizeWorkspace = (workspace: AnyWorkspace): NormalizedWorkspace | null => {

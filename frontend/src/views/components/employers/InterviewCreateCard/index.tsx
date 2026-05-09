@@ -72,7 +72,7 @@ const InterviewCreateCardInner = ({
   questionGroups,
   isLoadingJobs,
 }: InterviewCreateCardInnerProps) => {
-  const navigate = useRouter();
+  const { push, back } = useRouter();
   const { t } = useTranslation(['employer', 'interview', 'common']);
   const theme = useTheme();
   const { scheduleSession, updateSession, isMutating: isInterviewMutating } = useInterviewMutations();
@@ -155,13 +155,13 @@ const InterviewCreateCardInner = ({
         await scheduleSession(payload);
         toastMessages.success(t('interview:interviewCreateCard.messages.scheduleSuccess'));
       }
-      navigate.push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`);
+      push(`/${ROUTES.EMPLOYER.INTERVIEW_LIST}`);
     } catch {
       // Error handled by mutation hook
     } finally {
       setIsLoadingSessionSave(false);
     }
-  }, [sessionId, updateSession, scheduleSession, t, navigate]);
+  }, [sessionId, updateSession, scheduleSession, t, push]);
 
   const handleOpenAddQuestion = useCallback(() => {
     setEditingQuestionId(null);
@@ -207,7 +207,7 @@ const InterviewCreateCardInner = ({
         isInterviewMutating={isInterviewMutating || isLoadingSessionSave}
         selectedJobPostId={selectedJobPostId}
         selectedQuestionsCount={(watch('selected_questions') ?? []).length}
-        onCancel={() => navigate.back()}
+        onCancel={() => back()}
         onJobPostChange={handleJobPostChange}
         onQuestionGroupChange={handleQuestionGroupChange}
         onOpenAddQuestion={handleOpenAddQuestion}
@@ -284,7 +284,6 @@ const InterviewCreateCardInner = ({
 };
 
 const InterviewCreateCard: React.FC<InterviewCreateCardProps> = ({ title, sessionId }) => {
-  const navigate = useRouter();
   const searchParams = useMemo(() => {
     if (typeof window === 'undefined') {
       return new URLSearchParams('');

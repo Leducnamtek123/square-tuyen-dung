@@ -48,7 +48,7 @@ const JobPostAction = ({
   children,
 }: JobPostActionProps) => {
 
-  const nav = useRouter();
+  const { push } = useRouter();
 
   const { allConfig } = useConfig();
 
@@ -157,7 +157,7 @@ const JobPostAction = ({
 
                       }}
 
-                      onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`)}
+                      onClick={() => push(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`)}
 
                       noWrap
 

@@ -43,8 +43,7 @@ interface SavedResumeTableProps {
 
 const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
   const { t } = useTranslation(['employer', 'common']);
-  const theme = useTheme();
-  const nav = useRouter();
+  const { push } = useRouter();
   const { 
     rows, 
     isLoading, 
@@ -173,7 +172,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
             <IconButton
               size="small"
               color="primary"
-              onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`)}
+              onClick={() => push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`)}
               sx={{ 
                 bgcolor: pc.primary( 0.06), 
                 borderRadius: 1.5,
@@ -205,7 +204,7 @@ const SavedResumeTable: React.FC<SavedResumeTableProps> = (props) => {
         </Stack>
       ),
     },
-  ], [allConfig, handleUnsave, nav, t, theme]);
+  ], [allConfig, handleUnsave, push, t]);
 
   return (
     <DataTable

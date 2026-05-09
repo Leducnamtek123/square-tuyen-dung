@@ -14,7 +14,7 @@ export default function Loading() {
     >
       <CircularProgress size={48} />
       <Typography variant="body2" color="text.secondary">
-        Đang tải...
+        Đang tải…
       </Typography>
     </Box>
   );

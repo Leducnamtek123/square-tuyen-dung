@@ -88,7 +88,7 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
                                                      fields=['id', 'slug', 'employeeSize',
 
-                                                             'companyImageUrl', 'companyName', 'mobileUserDict'],
+                                                             'companyImageUrl', 'companyName', 'mobileUserDict', 'isVerified'],
 
                                                      read_only=True)
 
@@ -104,7 +104,7 @@ class JobPostSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
                                                                    'linkedinUrl', 'description',
 
-                                                                   'companyImageUrl', 'companyImages'],
+                                                                   'companyImageUrl', 'companyImages', 'isVerified'],
 
                                                            read_only=True)
 

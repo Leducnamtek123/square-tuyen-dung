@@ -167,20 +167,91 @@ const ArticleSkeleton = () => (
   </Card>
 );
 
+type NewsState = {
+  category: NewsCategory;
+  inputValue: string;
+  searchValue: string;
+  page: number;
+  articles: Article[];
+  total: number;
+  isLoading: boolean;
+};
+
+type NewsAction =
+  | { type: 'categoryChanged'; category: NewsCategory }
+  | { type: 'inputChanged'; inputValue: string }
+  | { type: 'searchCommitted'; searchValue: string }
+  | { type: 'pageChanged'; page: number }
+  | { type: 'loading' }
+  | { type: 'loaded'; articles: Article[]; total: number }
+  | { type: 'failed' };
+
+const initialNewsState: NewsState = {
+  category: 'blog',
+  inputValue: '',
+  searchValue: '',
+  page: 1,
+  articles: [],
+  total: 0,
+  isLoading: true,
+};
+
+const newsReducer = (state: NewsState, action: NewsAction): NewsState => {
+  switch (action.type) {
+    case 'categoryChanged':
+      return {
+        ...state,
+        category: action.category,
+        page: 1,
+      };
+    case 'inputChanged':
+      return {
+        ...state,
+        inputValue: action.inputValue,
+      };
+    case 'searchCommitted':
+      return {
+        ...state,
+        searchValue: action.searchValue,
+        page: 1,
+      };
+    case 'pageChanged':
+      return {
+        ...state,
+        page: action.page,
+      };
+    case 'loading':
+      return {
+        ...state,
+        isLoading: true,
+      };
+    case 'loaded':
+      return {
+        ...state,
+        articles: action.articles,
+        total: action.total,
+        isLoading: false,
+      };
+    case 'failed':
+      return {
+        ...state,
+        articles: [],
+        total: 0,
+        isLoading: false,
+      };
+    default:
+      return state;
+  }
+};
+
 const NewsPage = () => {
   const { t } = useTranslation(['common', 'public']);
-  const [category, setCategory] = React.useState<NewsCategory>('blog');
-  const [inputValue, setInputValue] = React.useState('');
-  const [searchValue, setSearchValue] = React.useState('');
-  const [page, setPage] = React.useState(1);
-  const [articles, setArticles] = React.useState<Article[]>([]);
-  const [total, setTotal] = React.useState(0);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [state, dispatch] = React.useReducer(newsReducer, initialNewsState);
+  const { category, inputValue, searchValue, page, articles, total, isLoading } = state;
 
   React.useEffect(() => {
     const timer = window.setTimeout(() => {
-      setSearchValue(inputValue.trim());
-      setPage(1);
+      dispatch({ type: 'searchCommitted', searchValue: inputValue.trim() });
     }, 350);
 
     return () => window.clearTimeout(timer);
@@ -190,7 +261,7 @@ const NewsPage = () => {
     let active = true;
 
     const loadArticles = async () => {
-      setIsLoading(true);
+      dispatch({ type: 'loading' });
       try {
         const response = await contentService.getPublicArticles({
           category: 'blog',
@@ -201,16 +272,16 @@ const NewsPage = () => {
 
         if (!active) return;
 
-        setArticles(response.results || []);
-        setTotal(response.count || 0);
+        dispatch({
+          type: 'loaded',
+          articles: response.results || [],
+          total: response.count || 0,
+        });
       } catch (error) {
         if (active) {
           errorHandling(error);
-          setArticles([]);
-          setTotal(0);
+          dispatch({ type: 'failed' });
         }
-      } finally {
-        if (active) setIsLoading(false);
       }
     };
 
@@ -296,8 +367,7 @@ const NewsPage = () => {
         <Tabs
           value={category}
           onChange={(_, value) => {
-            setCategory(value as NewsCategory);
-            setPage(1);
+            dispatch({ type: 'categoryChanged', category: value as NewsCategory });
           }}
           variant="scrollable"
           scrollButtons="auto"
@@ -330,7 +400,7 @@ const NewsPage = () => {
         >
           <TextField
             value={inputValue}
-            onChange={(event) => setInputValue(event.target.value)}
+            onChange={(event) => dispatch({ type: 'inputChanged', inputValue: event.target.value })}
             placeholder="Tìm bài viết, chủ đề hoặc từ khóa"
             fullWidth
             size="small"
@@ -339,8 +409,7 @@ const NewsPage = () => {
             variant="contained"
             startIcon={<SearchIcon />}
             onClick={() => {
-              setSearchValue(inputValue.trim());
-              setPage(1);
+              dispatch({ type: 'searchCommitted', searchValue: inputValue.trim() });
             }}
           >
             Tìm
@@ -383,7 +452,7 @@ const NewsPage = () => {
                   <Pagination
                     count={pageCount}
                     page={page}
-                    onChange={(_, nextPage) => setPage(nextPage)}
+                    onChange={(_, nextPage) => dispatch({ type: 'pageChanged', page: nextPage })}
                     color="primary"
                   />
                 </Stack>

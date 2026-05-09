@@ -18,15 +18,16 @@ const MyInterviewsPage = () => {
     const { t } = useTranslation(['jobSeeker', 'common', 'errors', 'interview']);
     const theme = useTheme();
     TabTitle(t('jobSeeker:myInterviewsTitle'));
-    const navigate = useRouter();
+    const { push } = useRouter();
     const { data: interviewsData, isLoading, isError } = useMyInterviews({ pageSize: 50 });
 
-    const interviews = (interviewsData?.results || [])
-        .map((session) => transformInterviewSession(session))
-        .filter((s): s is InterviewSession => s !== null);
+    const interviews = (interviewsData?.results || []).flatMap((session) => {
+        const interview = transformInterviewSession(session);
+        return interview ? [interview] : [];
+    });
 
     const handleJoin = (inviteToken: string) => {
-        navigate.push(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM.replace(':id', inviteToken)}`);
+        push(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM.replace(':id', inviteToken)}`);
     };
 
     const getStatusChip = (status: string) => {

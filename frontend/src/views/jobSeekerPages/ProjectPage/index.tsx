@@ -20,7 +20,7 @@ const ProjectPage = () => {
         return new URLSearchParams(window.location.search).get("tab") || "1";
     });
 
-    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    const selectJobManagementTab = (event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
     };
 
@@ -56,7 +56,7 @@ const ProjectPage = () => {
 
                                     <TabList
 
-                                        onChange={handleChange}
+                                        onChange={selectJobManagementTab}
 
                                         aria-label={t("jobManagement.aria.tabs")}
 

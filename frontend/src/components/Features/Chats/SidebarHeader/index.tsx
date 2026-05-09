@@ -16,7 +16,7 @@ interface SidebarHeaderProps {
 
 const SidebarHeader = (_props: SidebarHeaderProps) => {
   const { activeWorkspace } = useAppSelector((state) => state.user);
-  const nav = useRouter();
+  const { push } = useRouter();
   const { t } = useTranslation('common');
 
   const isEmployer = React.useMemo(() => {
@@ -25,9 +25,9 @@ const SidebarHeader = (_props: SidebarHeaderProps) => {
 
   const handleRedirect = () => {
     if (isEmployer) {
-      nav.push(`/${ROUTES.EMPLOYER.DASHBOARD}`);
+      push(`/${ROUTES.EMPLOYER.DASHBOARD}`);
     } else {
-      nav.push(`/${ROUTES.JOB_SEEKER.HOME}`);
+      push(`/${ROUTES.JOB_SEEKER.HOME}`);
     }
   };
 

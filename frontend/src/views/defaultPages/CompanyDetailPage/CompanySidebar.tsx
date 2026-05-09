@@ -5,6 +5,7 @@ import { faGlobe, faEnvelope, faPhoneVolume, faHashtag, faLocationDot } from "@f
 import { FacebookIcon, YoutubeIcon, LinkedinIcon } from "../../../components/Common/SocialIcons";
 import Map from "../../../components/Common/Map";
 import ImageGalleryCustom from "../../../components/Common/ImageGalleryCustom";
+import VerifiedIcon from "@mui/icons-material/Verified";
 
 import type { Theme as StylesTheme } from '@mui/material/styles';
 import type { Company } from '@/types/models';
@@ -21,6 +22,17 @@ const CompanySidebar: React.FC<CompanySidebarProps> = ({ companyDetail, imageLis
   return (
     <Card sx={{ p: 3, boxShadow: (theme: StylesTheme) => theme.customShadows?.small || 1 }}>
       <Stack spacing={3}>
+        {companyDetail.isVerified && (
+          <Box sx={{ p: 2, borderRadius: 2, bgcolor: 'success.50', border: '1px solid', borderColor: 'success.100' }}>
+            <Typography variant="subtitle2" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'success.main', fontWeight: 700 }}>
+              <VerifiedIcon fontSize="small" />
+              {t("companyDetail.verified", "Verified company")}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+              {t("companyDetail.verifiedDescription", "This company has been manually reviewed and marked as trusted.")}
+            </Typography>
+          </Box>
+        )}
         {/* Website */}
         <Box>
           <Typography variant="h6" sx={{ color: "primary.main", mb: 2 }}>

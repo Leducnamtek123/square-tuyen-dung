@@ -67,7 +67,7 @@ const Loading = (
 const CareerCarousel = () => {
   const { t } = useTranslation('public');
   const dispatch = useDispatch();
-  const nav = useRouter();
+  const { push } = useRouter();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [parentWidth, setParentWidth] = React.useState(0);
   const col = parentWidth < 600 ? 2 : parentWidth < 900 ? 3 : parentWidth < 1200 ? 4 : 5;
@@ -95,7 +95,7 @@ const CareerCarousel = () => {
 
   const handleFilter = (id: string | number) => {
     dispatch(searchJobPost({ ...jobPostFilter, careerId: String(id) }));
-    nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
+    push(`/${ROUTES.JOB_SEEKER.JOBS}`);
   };
 
   return (

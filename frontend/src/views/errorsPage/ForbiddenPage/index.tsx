@@ -7,7 +7,7 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 
 const ForbiddenPage = () => {
   const { t } = useTranslation('errors');
-  const navigate = useRouter();
+  const { push } = useRouter();
 
   return (
     <Box
@@ -74,7 +74,7 @@ const ForbiddenPage = () => {
         <Button
           variant="contained"
           startIcon={<HomeIcon />}
-          onClick={() => navigate.push('/')}
+          onClick={() => push('/')}
           sx={{
             borderRadius: '12px',
             px: 3,

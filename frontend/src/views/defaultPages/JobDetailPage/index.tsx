@@ -19,6 +19,8 @@ import NoDataCard from "../../../components/Common/NoDataCard";
 import jobService from "../../../services/jobService";
 import companyService from "../../../services/companyService";
 import ApplyCard from "../../../components/Features/ApplyCard";
+import JobSalaryInsightCard from "../../../components/Features/JobSalaryInsightCard";
+import TrustReportDialog from "../../../components/Features/TrustReportDialog";
 import SocialNetworkSharingPopup from "../../../components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
 import { ROLES_NAME, ROUTES } from "../../../configs/constants";
 import { useAppSelector } from "../../../hooks/useAppStore";
@@ -30,10 +32,11 @@ import type { Company } from '@/types/models';
 
 const JobDetailPage = () => {
   const { slug } = useParams();
-  const nav = useRouter();
+  const { push } = useRouter();
   const { t } = useTranslation(["public"]);
   const { allConfig } = useConfig();
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
+  const [openReportPopup, setOpenReportPopup] = React.useState(false);
 
   type ExtendedJobPost = JobPost & {
     companyName?: string;
@@ -228,7 +231,7 @@ const JobDetailPage = () => {
 
   const handleMobileApplyClick = () => {
     if (!isAuthenticated) {
-      nav.push(`/${ROUTES.AUTH.LOGIN}`);
+      push(`/${ROUTES.AUTH.LOGIN}`);
       return;
     }
     handleShowApplyForm();
@@ -253,7 +256,9 @@ const JobDetailPage = () => {
                 onSave={handleSave}
                 onShowApplyForm={handleShowApplyForm}
                 onOpenSharePopup={(open) => dispatch({ type: 'open-share-popup', value: open })}
+                onOpenReport={() => setOpenReportPopup(true)}
               />
+              <JobSalaryInsightCard slug={slug as string} />
               <JobDetailDescriptionCard
                 jobPostDetail={state.jobPostDetail}
                 allConfig={allConfig}
@@ -320,6 +325,14 @@ const JobDetailPage = () => {
             body: state.jobPostDetail?.jobDescription,
           },
         } as React.ComponentProps<typeof SocialNetworkSharingPopup>)}
+      />
+
+      <TrustReportDialog
+        openPopup={openReportPopup}
+        setOpenPopup={setOpenReportPopup}
+        targetType="job"
+        jobPostId={state.jobPostDetail?.id ?? null}
+        targetName={state.jobPostDetail?.jobName}
       />
     </>
   );

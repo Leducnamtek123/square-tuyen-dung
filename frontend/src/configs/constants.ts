@@ -22,7 +22,6 @@ export {
 // ROUTES - centralized in routeConfig.ts
 export { ROUTES } from './routeConfig';
 
-const ENV = process.env.NEXT_PUBLIC_NODE_ENV || 'development';
 const PLATFORM = 'WEB';
 const APP_NAME = 'Square';
 
@@ -138,7 +137,6 @@ const JOB_POST_STATUS_BG_COLOR = {
 } as const;
 
 export {
-  ENV,
   PLATFORM,
   APP_NAME,
   HOST_NAME,

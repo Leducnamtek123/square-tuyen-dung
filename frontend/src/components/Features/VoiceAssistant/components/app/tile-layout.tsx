@@ -219,7 +219,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                   >
                   <VideoTrack
                     trackRef={cameraTrack || screenShareTrack}
-                    className="bg-slate-800/55 backdrop-blur-xl aspect-square !w-[90px] !h-[90px] rounded-[28px] border border-white/10 object-cover shadow-2xl shadow-black/50 overflow-hidden"
+                    className="bg-zinc-800/55 backdrop-blur-xl aspect-square !w-[90px] !h-[90px] rounded-[28px] border border-white/10 object-cover shadow-2xl shadow-black/50 overflow-hidden"
                   />
                 </MotionContainer>
               )}

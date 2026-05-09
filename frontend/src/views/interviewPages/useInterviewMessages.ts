@@ -90,7 +90,7 @@ export function useInterviewMessages(): InterviewMessagesResult {
       messageFirstReceivedTimeMapRef.current.set(message.id, now);
     }
 
-    return [...receivedMessages].sort((a, b) => {
+    return receivedMessages.toSorted((a, b) => {
       const aFirstReceivedAt = messageFirstReceivedTimeMapRef.current.get(a.id);
       const bFirstReceivedAt = messageFirstReceivedTimeMapRef.current.get(b.id);
       if (typeof aFirstReceivedAt === 'undefined' || typeof bFirstReceivedAt === 'undefined') {

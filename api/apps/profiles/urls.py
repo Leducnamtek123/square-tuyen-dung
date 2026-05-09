@@ -91,6 +91,8 @@ urlpatterns = [
 
         path("", include(web_router.urls)),
 
+        path("trust-reports/", web_views.TrustReportViewSet.as_view({'get': 'list', 'post': 'create'})),
+
         path("resume-views/", web_views.ResumeViewedAPIView.as_view()),
 
         path("companies-follow/", web_views.CompanyFollowedAPIView.as_view()),

@@ -9,7 +9,7 @@ interface Props {
 }
 
 const VerificationIntroCard = ({ t }: Props) => {
-  const navigate = useRouter();
+  const { push } = useRouter();
 
   return (
     <Card sx={{ p: 3, mb: 3 }}>
@@ -20,7 +20,7 @@ const VerificationIntroCard = ({ t }: Props) => {
         {t('verification.step1.description')}
       </Typography>
       <Box sx={{ mt: 2, display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-        <Button variant="contained" onClick={() => navigate.push(`/${ROUTES.EMPLOYER.COMPANY}`)}>
+        <Button variant="contained" onClick={() => push(`/${ROUTES.EMPLOYER.COMPANY}`)}>
           {t('verification.step1.openBtn')}
         </Button>
         <Chip label={t('verification.step1.statusRequired')} color="warning" />

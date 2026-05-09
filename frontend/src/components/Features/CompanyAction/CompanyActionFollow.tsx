@@ -17,7 +17,7 @@ interface CompanyActionFollowProps {
 }
 
 const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) => {
-  const nav = useRouter();
+  const { push } = useRouter();
   const { t } = useTranslation('common');
   const followRef = React.useRef<HTMLDivElement>(null);
   const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>('column');
@@ -77,7 +77,7 @@ const CompanyActionFollow = ({ company, children }: CompanyActionFollowProps) =>
                         transition: 'color 0.2s ease',
                         '&:hover': { color: theme.palette.primary.dark }
                       }}
-                      onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug || '')}`)}
+                      onClick={() => push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug || '')}`)}
                     >
                       {company?.companyName}
                     </Typography>

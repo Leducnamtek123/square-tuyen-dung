@@ -18,7 +18,7 @@ interface NotificationCardProps {
 }
 
 const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
-  const nav = useRouter();
+  const { push } = useRouter();
   const { t } = useTranslation('common');
   const {
     isLoading,
@@ -35,28 +35,28 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ title }) => {
     switch (item.type) {
       case "SYSTEM":
         handleRead(item.key);
-        nav.push("/");
+        push("/");
         break;
       case "EMPLOYER_VIEWED_RESUME":
       case "EMPLOYER_SAVED_RESUME":
         handleRead(item.key);
-        nav.push(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`);
+        push(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`);
         break;
       case "APPLY_STATUS":
         handleRead(item.key);
-        nav.push(`/${ROUTES.JOB_SEEKER.MY_JOB}`);
+        push(`/${ROUTES.JOB_SEEKER.MY_JOB}`);
         break;
       case "COMPANY_FOLLOWED":
         handleRead(item.key);
-        nav.push(`/${ROUTES.EMPLOYER.PROFILE}`);
+        push(`/${ROUTES.EMPLOYER.PROFILE}`);
         break;
       case "POST_VERIFY_RESULT":
         handleRead(item.key);
-        nav.push(`/${ROUTES.EMPLOYER.JOB_POST}`);
+        push(`/${ROUTES.EMPLOYER.JOB_POST}`);
         break;
       case "APPLY_JOB":
         handleRead(item.key);
-        nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, (item["APPLY_JOB"] as Record<string, string>)?.resume_slug)}`);
+        push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, (item["APPLY_JOB"] as Record<string, string>)?.resume_slug)}`);
         break;
       default:
         break;

@@ -26,7 +26,6 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
   const dispatch = useAppDispatch();
   const { allConfig, isLoadingConfig } = useConfig();
   const hasCachedConfig = !!allConfig;
-  const [isInitializing, setIsInitializing] = React.useState(true);
   const { isAuthenticated, currentUser, activeWorkspace } = useAppSelector((state) => state.user);
 
   const isAdminAccount = currentUser?.roleName === ROLES_NAME.ADMIN;
@@ -52,17 +51,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     pathname.startsWith(`/${ROUTES.ADMIN.INTERVIEW_SESSION.replace(':id', '')}`);
   
   const canShowChatBot = !isAdminPortal && !isChatPage && !isInterviewPage;
-
-  React.useEffect(() => {
-    if (!hasMounted) return;
-    if (isJobSeekerInterviewRoute) {
-      setIsInitializing(false);
-      return;
-    }
-    if (hasCachedConfig || !isLoadingConfig) {
-      setIsInitializing(false);
-    }
-  }, [hasMounted, hasCachedConfig, isLoadingConfig, isJobSeekerInterviewRoute]);
+  const isInitializing = !isJobSeekerInterviewRoute && !hasCachedConfig && isLoadingConfig;
 
   React.useEffect(() => {
     if (!hasMounted || isJobSeekerInterviewRoute) return;

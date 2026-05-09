@@ -306,17 +306,17 @@ const AIAnalysisDrawer = ({ open, onClose, activityId, initialData, onAnalysisSt
     <AIAnalysisDrawerView
       open={open}
       onClose={onClose}
-      loading={state.loading}
       data={state.data}
-      analyzing={state.analyzing}
       scanLinePosition={state.scanLinePosition}
       scanProgress={scanProgress}
-      isProcessing={isProcessing}
-      isCompleted={isCompleted}
-      isFailed={isFailed}
       resumeFileUrl={resumeFileUrl}
       onlineProfileUrl={onlineProfileUrl}
-      canEmbedResume={canEmbedResume}
+      analysisState={{
+        loading: state.loading,
+        analyzing: state.analyzing,
+        phase: isProcessing ? 'processing' : isCompleted ? 'completed' : isFailed ? 'failed' : 'idle',
+        canEmbedResume,
+      }}
       stats={stats}
       onAnalyze={handleAnalyze}
       t={t}

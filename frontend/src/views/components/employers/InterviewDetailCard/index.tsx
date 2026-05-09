@@ -120,7 +120,7 @@ const reducer = (state: State, action: Action): State => {
 
 const InterviewDetailCard = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useRouter();
+  const { back } = useRouter();
   const { t, i18n } = useTranslation(['employer', 'interview', 'common']);
   const queryClient = useQueryClient();
   const [state, dispatch] = React.useReducer(reducer, initialState);
@@ -295,7 +295,7 @@ const InterviewDetailCard = () => {
         <Typography color="text.disabled" variant="body2" sx={{ fontWeight: 600, mb: 4 }}>
           {t('interview:interviewDetail.messages.notFoundDesc')}
         </Typography>
-        <Box component="button" onClick={() => navigate.back()} sx={{ borderRadius: 2.5, fontWeight: 800, px: 4, py: 1.25, textTransform: 'none' }}>
+        <Box component="button" onClick={() => back()} sx={{ borderRadius: 2.5, fontWeight: 800, px: 4, py: 1.25, textTransform: 'none' }}>
           {t('interview:interviewDetail.actions.backToList')}
         </Box>
       </Paper>
@@ -347,7 +347,7 @@ const InterviewDetailCard = () => {
         sseConnected={sseConnected}
         observerLoading={state.observerLoading}
         joinLoading={state.hrLoading}
-        onBack={() => navigate.back()}
+        onBack={() => back()}
         onTriggerObserver={handleObserverMode}
         onForceEndInterview={handleForceEndInterview}
         onJoinRoom={() => handleJoinAsHR()}

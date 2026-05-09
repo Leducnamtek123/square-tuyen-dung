@@ -1,5 +1,5 @@
-export type ParamsPrimitive = string | number | boolean | null | undefined;
-export type ParamsValue = ParamsPrimitive | ParamsPrimitive[] | object;
+type ParamsPrimitive = string | number | boolean | null | undefined;
+type ParamsValue = ParamsPrimitive | ParamsPrimitive[] | object;
 export type ParamsRecord = { [key: string]: ParamsValue };
 
 /**

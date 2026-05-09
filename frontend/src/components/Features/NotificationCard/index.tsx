@@ -67,7 +67,7 @@ function reducer(state: NotificationState, action: NotificationAction): Notifica
 }
 
 const NotificationCard: React.FC = () => {
-  const nav = useRouter();
+  const { push } = useRouter();
   const { currentUser } = useAppSelector((state) => state.user);
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -79,7 +79,7 @@ const NotificationCard: React.FC = () => {
     return collection(db, 'users', `${currentUser.id}`, 'notifications');
   }, [currentUser?.id]);
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
+  const openNotificationsMenu = (event: React.MouseEvent<HTMLElement>) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
 
   React.useEffect(() => {
@@ -184,28 +184,28 @@ const NotificationCard: React.FC = () => {
     switch (item.type) {
       case 'SYSTEM':
         handleRead(item.key);
-        nav.push('/');
+        push('/');
         break;
       case 'EMPLOYER_VIEWED_RESUME':
       case 'EMPLOYER_SAVED_RESUME':
         handleRead(item.key);
-        nav.push(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`);
+        push(`/${ROUTES.JOB_SEEKER.MY_COMPANY}`);
         break;
       case 'APPLY_STATUS':
         handleRead(item.key);
-        nav.push(`/${ROUTES.JOB_SEEKER.MY_JOB}`);
+        push(`/${ROUTES.JOB_SEEKER.MY_JOB}`);
         break;
       case 'COMPANY_FOLLOWED':
         handleRead(item.key);
-        nav.push(`/${ROUTES.EMPLOYER.PROFILE}`);
+        push(`/${ROUTES.EMPLOYER.PROFILE}`);
         break;
       case 'POST_VERIFY_RESULT':
         handleRead(item.key);
-        nav.push(`/${ROUTES.EMPLOYER.JOB_POST}`);
+        push(`/${ROUTES.EMPLOYER.JOB_POST}`);
         break;
       case 'APPLY_JOB':
         handleRead(item.key);
-        nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, (item.APPLY_JOB as Record<string, string>)?.resume_slug)}`);
+        push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, (item.APPLY_JOB as Record<string, string>)?.resume_slug)}`);
         break;
       case 'NEW_MESSAGE':
         handleRead(item.key);
@@ -220,7 +220,7 @@ const NotificationCard: React.FC = () => {
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
-        <IconButton size="large" aria-label="show new notifications" color="inherit" onClick={handleClick}>
+        <IconButton size="large" aria-label="show new notifications" color="inherit" onClick={openNotificationsMenu}>
           <Badge badgeContent={state.badgeCount} color="error">
             <NotificationsIcon />
           </Badge>

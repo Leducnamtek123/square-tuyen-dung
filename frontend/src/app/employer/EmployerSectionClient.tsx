@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useReducer } from 'react';
 import { usePathname } from 'next/navigation';
 import { Box, CircularProgress } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '@/redux/hooks';
@@ -12,7 +12,54 @@ import { getUserInfo } from '@/redux/userSlice';
 import { ROLES_NAME } from '@/configs/constants';
 import { getPreferredLanguage, getPortalPrefix } from '@/configs/portalRouting';
 
-// Pages that use DefaultLayout instead of EmployerLayout
+type AuthGateState = {
+  isChecking: boolean;
+  shouldRedirectToLogin: boolean;
+};
+
+type AuthGateAction = { type: 'redirectToLogin' } | { type: 'checked' };
+
+const authGateReducer = (state: AuthGateState, action: AuthGateAction): AuthGateState => {
+  switch (action.type) {
+    case 'redirectToLogin':
+      return {
+        ...state,
+        isChecking: false,
+        shouldRedirectToLogin: true,
+      };
+    case 'checked':
+      return {
+        ...state,
+        isChecking: false,
+      };
+    default:
+      return state;
+  }
+};
+
+const getInitialAuthGateState = (isPublicPage: boolean): AuthGateState => {
+  if (isPublicPage) {
+    return {
+      isChecking: false,
+      shouldRedirectToLogin: false,
+    };
+  }
+
+  if (typeof window === 'undefined') {
+    return {
+      isChecking: true,
+      shouldRedirectToLogin: false,
+    };
+  }
+
+  const hasToken = Boolean(tokenService.getAccessTokenFromCookie());
+
+  return {
+    isChecking: hasToken,
+    shouldRedirectToLogin: !hasToken,
+  };
+};
+
 const DEFAULT_LAYOUT_PATHS = [
   '/employer/login',
   '/nha-tuyen-dung/login',
@@ -33,13 +80,11 @@ const DEFAULT_LAYOUT_PATHS = [
   '/nha-tuyen-dung/bao-gia',
   '/employer/support',
   '/nha-tuyen-dung/ho-tro',
-  // NOTE: /employer/blog is a protected employer management page.
-  // Public readers should use /blog (localized as /tin-tuc on the VI route set).
+  // /employer/blog is protected; public readers use /blog or /tin-tuc.
 ];
 
 const CHAT_LAYOUT_PATHS = ['/employer/chat', '/nha-tuyen-dung/ket-noi-voi-ung-vien', '/nha-tuyen-dung/chat'];
 
-/** Full-screen loading overlay — shown while auth check is in progress */
 function AuthLoadingScreen() {
   return (
     <Box
@@ -67,33 +112,15 @@ export default function EmployerSectionClient({
   const dispatch = useAppDispatch();
   const { currentUser } = useAppSelector((state) => state.user);
 
-  const isPublicPage = DEFAULT_LAYOUT_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'));
-
-  /**
-   * Synchronous early-exit: if this is a protected page and there is no
-   * access-token cookie at all, we know immediately (before any async work)
-   * that the user must be redirected to login.  Setting the initial state to
-   * `true` (= "still checking") keeps the loading screen visible while
-   * window.location.replace() fires, which prevents the protected page from
-   * ever rendering.
-   */
-  const [isChecking, setIsChecking] = useState(() => {
-    if (isPublicPage) return false; // public pages never need a guard
-    if (typeof window === 'undefined') return true; // SSR – stay loading
-    const hasToken = Boolean(tokenService.getAccessTokenFromCookie());
-    return hasToken; // no token → skip async check (useEffect will redirect)
-  });
-
-  // Track whether we should redirect to login without flashing protected content.
-  // If the user has no token at all and is on a protected page, redirect immediately.
-  const [shouldRedirectToLogin, setShouldRedirectToLogin] = useState(() => {
-    if (isPublicPage || typeof window === 'undefined') return false;
-    return !tokenService.getAccessTokenFromCookie();
-  });
+  const isPublicPage = DEFAULT_LAYOUT_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  const [authGate, dispatchAuthGate] = useReducer(
+    authGateReducer,
+    isPublicPage,
+    getInitialAuthGateState
+  );
 
   useEffect(() => {
-    // Redirect immediately without waiting for the async check
-    if (shouldRedirectToLogin) {
+    if (authGate.shouldRedirectToLogin) {
       const lang = getPreferredLanguage();
       const employerPrefix = getPortalPrefix('employer', lang);
       window.location.replace(`${employerPrefix}/login`);
@@ -127,13 +154,11 @@ export default function EmployerSectionClient({
 
           if (role === ROLES_NAME.EMPLOYER && isAuthPage) {
             window.location.replace(dashboardPath);
-            return;
           }
         }
         return;
       }
 
-      // Token exists — verify role
       let user = currentUser;
       if (!user) {
         try {
@@ -144,23 +169,19 @@ export default function EmployerSectionClient({
         }
       }
 
-      const role = user?.roleName;
-      if (role !== ROLES_NAME.EMPLOYER) {
+      if (user?.roleName !== ROLES_NAME.EMPLOYER) {
         window.location.replace('/');
-        return;
       }
     };
 
-    void checkAuth().finally(() => setIsChecking(false));
-  }, [currentUser, dispatch, isPublicPage, pathname, shouldRedirectToLogin]);
+    void checkAuth().finally(() => dispatchAuthGate({ type: 'checked' }));
+  }, [authGate.shouldRedirectToLogin, currentUser, dispatch, isPublicPage, pathname]);
 
-  // Show a full-screen loading screen while auth is being verified.
-  // This completely hides children so protected pages never flash.
-  if (isChecking || shouldRedirectToLogin) {
+  if (authGate.isChecking || authGate.shouldRedirectToLogin) {
     return <AuthLoadingScreen />;
   }
 
-  if (CHAT_LAYOUT_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+  if (CHAT_LAYOUT_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
     return <ChatLayout>{children}</ChatLayout>;
   }
 

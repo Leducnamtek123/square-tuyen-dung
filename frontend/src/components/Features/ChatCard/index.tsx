@@ -23,7 +23,7 @@ const chatRoomCollectionRef = collection(db, 'chatRooms');
 
 const ChatCard = (_props: ChatCardProps) => {
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
-  const nav = useRouter();
+  const { push } = useRouter();
   const [count, setCount] = React.useState(0);
 
   const isEmployer = React.useMemo(() => {
@@ -57,9 +57,9 @@ const ChatCard = (_props: ChatCardProps) => {
 
   const handleRedirect = () => {
     if (isEmployer) {
-      nav.push(`/${ROUTES.EMPLOYER.CHAT}`);
+      push(`/${ROUTES.EMPLOYER.CHAT}`);
     } else {
-      nav.push(`/${ROUTES.JOB_SEEKER.CHAT}`);
+      push(`/${ROUTES.JOB_SEEKER.CHAT}`);
     }
   };
 

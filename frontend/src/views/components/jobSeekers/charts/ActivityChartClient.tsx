@@ -3,17 +3,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Box, Stack, CircularProgress, Typography } from '@mui/material';
 import InsertChartOutlinedIcon from '@mui/icons-material/InsertChartOutlined';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js';
-import { Line } from 'react-chartjs-2';
 import { useJobSeekerActivityStatistics } from '../hooks/useJobSeekerQueries';
 import defaultTheme from '../../../../themeConfigs/defaultTheme';
 
@@ -54,13 +43,54 @@ const options = {
   },
 };
 
+type ActivityChartData = {
+  labels: string[];
+  datasets: Array<Record<string, unknown>>;
+};
+
+type LineChartComponent = React.ComponentType<{
+  options: typeof options;
+  data: ActivityChartData;
+  height: number;
+}>;
+
 const ActivityChartClient = () => {
   const { t } = useTranslation('jobSeeker');
   const { data, isLoading } = useJobSeekerActivityStatistics();
+  const [LineChart, setLineChart] = React.useState<LineChartComponent | null>(null);
 
   React.useEffect(() => {
-    ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+    let isActive = true;
 
+    const loadChart = async () => {
+      const [
+        {
+          Chart: ChartJS,
+          CategoryScale,
+          LinearScale,
+          PointElement,
+          LineElement,
+          Title,
+          Tooltip,
+          Legend,
+        },
+        { Line },
+      ] = await Promise.all([
+        import('chart.js'),
+        import('react-chartjs-2'),
+      ]);
+
+      ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+      if (isActive) {
+        setLineChart(() => Line as unknown as LineChartComponent);
+      }
+    };
+
+    loadChart().catch(console.error);
+
+    return () => {
+      isActive = false;
+    };
   }, []);
 
   const dataOptions = React.useMemo(() => {
@@ -116,8 +146,10 @@ const ActivityChartClient = () => {
               {t('noDataForStatistics')}
             </Typography>
           </Stack>
+        ) : !LineChart ? (
+          <CircularProgress sx={{ color: 'primary.main' }} />
         ) : (
-          <Line options={options} data={dataOptions} height={320} />
+          <LineChart options={options} data={dataOptions} height={320} />
         )}
       </Stack>
     </Box>

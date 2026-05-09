@@ -1,5 +1,9 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import type { RoleName } from '../types/auth';
+import {
+  LEGACY_VERIFY_EMAIL_STORAGE_KEY,
+  VERIFY_EMAIL_STORAGE_KEY,
+} from '@/utils/storageKeys';
 
 interface AuthState {
   isAllowVerifyEmail: boolean;
@@ -13,12 +17,12 @@ interface VerifyEmailPayload {
   roleName?: RoleName | '';
 }
 
-const VERIFY_STORAGE_KEY = 'verifyEmail';
-
 const loadVerifyState = (): Partial<AuthState> | null => {
   if (typeof window === 'undefined') return null;
   try {
-    const raw = sessionStorage.getItem(VERIFY_STORAGE_KEY);
+    const raw =
+      sessionStorage.getItem(VERIFY_EMAIL_STORAGE_KEY) ??
+      sessionStorage.getItem(LEGACY_VERIFY_EMAIL_STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<AuthState>;
     if (!parsed?.email) return null;

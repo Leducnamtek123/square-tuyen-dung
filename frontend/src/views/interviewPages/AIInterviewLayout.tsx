@@ -65,28 +65,28 @@ function CustomControlBar({
     <div className="flex items-center justify-center gap-3 border-t border-white/8 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl">
       <button
         onClick={() => localParticipant.setMicrophoneEnabled(!isMicrophoneEnabled)}
-        className={`flex h-11 w-11 items-center justify-center rounded-full border transition-all
+        className={`flex size-11 items-center justify-center rounded-full border transition-all
           ${isMicrophoneEnabled ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}
       >
         <FontAwesomeIcon icon={isMicrophoneEnabled ? faMicrophone : faMicrophoneSlash} />
       </button>
       <button
         onClick={() => localParticipant.setCameraEnabled(!isCameraEnabled)}
-        className={`flex h-11 w-11 items-center justify-center rounded-full border transition-all
+        className={`flex size-11 items-center justify-center rounded-full border transition-all
           ${isCameraEnabled ? 'border-white/15 bg-white/8 text-white hover:bg-white/15' : 'border-rose-400/40 bg-rose-500/20 text-rose-300'}`}
       >
         <FontAwesomeIcon icon={isCameraEnabled ? faVideo : faVideoSlash} />
       </button>
       <button
         onClick={() => localParticipant.setScreenShareEnabled(!isScreenShareEnabled)}
-        className={`flex h-11 w-11 items-center justify-center rounded-full border transition-all
+        className={`flex size-11 items-center justify-center rounded-full border transition-all
           ${isScreenShareEnabled ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}
       >
         <FontAwesomeIcon icon={faDesktop} />
       </button>
       <button
         onClick={() => setChatOpen(!chatOpen)}
-        className={`flex h-11 w-11 items-center justify-center rounded-full border transition-all
+        className={`flex size-11 items-center justify-center rounded-full border transition-all
           ${chatOpen ? 'border-cyan-400/40 bg-cyan-500/20 text-cyan-300' : 'border-white/15 bg-white/8 text-white hover:bg-white/15'}`}
       >
         <FontAwesomeIcon icon={faComment} />
@@ -162,14 +162,14 @@ function AIParticipantTile({
         className="relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border border-white/8 bg-[#0f172a] shadow-[0_0_0_2px_rgba(14,165,233,0)] transition-all data-[speaking=true]:border-cyan-400/60 data-[speaking=true]:shadow-[0_0_0_2px_rgba(14,165,233,0.3)]"
         data-speaking={isSpeaking}
       >
-        <div className="absolute inset-0 bg-slate-950" />
+        <div className="absolute inset-0 bg-zinc-950" />
         <div className="relative z-10 flex h-full w-full items-center justify-center">
           <AgentAudioVisualizerAura
             audioTrack={audioTrack ?? trackRef}
             state={visualizerState}
             size="lg"
             color="#1FD5F9"
-            className="h-[224px] w-[224px]"
+            className="size-[224px]"
           />
         </div>
         <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-black/80 to-transparent px-3 py-2">
@@ -181,7 +181,7 @@ function AIParticipantTile({
               <span className="text-xs font-semibold text-white">{displayName}</span>
               {isSpeaking && <FontAwesomeIcon icon={faMicrophone} className="ml-auto text-[10px] text-cyan-400" />}
             </div>
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-300/90">
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-300/90">
               {t(visualizerState === 'speaking' ? 'aiSpeaking' : visualizerState === 'listening' ? 'aiListening' : 'agentView.ready')}
             </span>
           </div>
@@ -196,9 +196,9 @@ function AIParticipantTile({
         className={`relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border bg-[#0f172a] transition-all ${isSpeaking ? 'border-cyan-400/60 shadow-[0_0_0_2px_rgba(14,165,233,0.3)]' : 'border-white/8'}`}
         data-speaking={isSpeaking}
       >
-        <div className={`absolute inset-0 ${isSelf ? 'bg-gradient-to-br from-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-950 to-slate-900'} z-0`} />
+        <div className={`absolute inset-0 ${isSelf ? 'bg-gradient-to-br from-zinc-800 to-zinc-900' : 'bg-gradient-to-br from-cyan-950 to-zinc-900'} z-0`} />
         <div className="relative z-10 flex h-full w-full items-center justify-center">
-          <div className="flex h-28 w-28 items-center justify-center rounded-full border border-white/10 bg-white/10 text-5xl text-white/45 shadow-2xl shadow-black/30">
+          <div className="flex size-28 items-center justify-center rounded-full border border-white/10 bg-white/10 text-5xl text-white/45 shadow-2xl shadow-black/30">
             {isAgent ? 'AI' : '👤'}
           </div>
         </div>
@@ -210,7 +210,7 @@ function AIParticipantTile({
               </span>
             )}
             {variant === 'candidate' && !isSelf && !isEmployer && (
-              <span className="rounded bg-slate-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-200">
+              <span className="rounded bg-zinc-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-zinc-200">
                 {candidateLabel}
               </span>
             )}
@@ -227,7 +227,7 @@ function AIParticipantTile({
       className={`relative flex h-full w-full items-center justify-center overflow-hidden rounded-2xl border bg-[#0f172a] transition-all ${isSpeaking ? 'border-cyan-400/60 shadow-[0_0_0_2px_rgba(14,165,233,0.3)]' : 'border-white/8'}`}
       data-speaking={isSpeaking}
     >
-      <div className={`absolute inset-0 ${isSelf ? 'bg-gradient-to-br from-slate-800 to-slate-900' : 'bg-gradient-to-br from-blue-950 to-slate-900'} z-0`} />
+      <div className={`absolute inset-0 ${isSelf ? 'bg-gradient-to-br from-zinc-800 to-zinc-900' : 'bg-gradient-to-br from-cyan-950 to-zinc-900'} z-0`} />
       <div className="relative z-10 h-full w-full overflow-hidden rounded-2xl">
         <VideoTrack trackRef={trackRef as any} className={`h-full w-full object-cover ${isSelf ? 'scale-x-[-1]' : ''}`} />
       </div>
@@ -239,7 +239,7 @@ function AIParticipantTile({
             </span>
           )}
           {variant === 'candidate' && !isSelf && !isEmployer && (
-            <span className="rounded bg-slate-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-slate-200">
+            <span className="rounded bg-zinc-500/30 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-widest text-zinc-200">
               {candidateLabel}
             </span>
           )}
@@ -428,7 +428,7 @@ function ChatPanel({
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-sm font-bold text-white">{t('liveRoom.chat.title')}</p>
-            <p className="mt-0.5 text-xs text-slate-500">{t('liveRoom.chat.subtitle', 'Voice and messages share the same timeline.')}</p>
+            <p className="mt-0.5 text-xs text-zinc-500">{t('liveRoom.chat.subtitle', 'Voice and messages share the same timeline.')}</p>
           </div>
           <Stack direction="row" spacing={1} alignItems="center">
             {agentState && ['thinking', 'connecting', 'initializing', 'pre-connect-buffering'].includes(agentState) && (
@@ -500,7 +500,7 @@ function ChatPanel({
                 value={chatDraft}
                 onChange={(event) => setChatDraft(event.target.value)}
                 placeholder={t('liveRoom.chat.placeholder')}
-                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400/40 focus:bg-white/8"
+                className="flex-1 rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-cyan-400/40 focus:bg-white/8"
               />
               <Button
                 type="submit"
@@ -627,14 +627,14 @@ export function AIInterviewLayout({ onEndSession }: AIInterviewLayoutProps) {
 
           {showObservingBar && (
             <div className="mx-2 mb-2 flex shrink-0 items-center gap-3 rounded-2xl border border-white/5 bg-[#0b1221] p-4">
-              <FontAwesomeIcon icon={observingIcon} className={observingIcon === faSpinner ? 'animate-spin text-cyan-400' : 'text-slate-500'} />
-              <span className="text-xs font-medium text-slate-500">{observingMessage}</span>
+              <FontAwesomeIcon icon={observingIcon} className={observingIcon === faSpinner ? 'animate-spin text-cyan-400' : 'text-zinc-500'} />
+              <span className="text-xs font-medium text-zinc-500">{observingMessage}</span>
               <div className="ml-auto flex items-center gap-2">
-                {candidatePresent && <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />}
+                {candidatePresent && <div className="size-2 animate-pulse rounded-full bg-emerald-400" />}
                 <span className="text-[10px] font-bold tracking-widest text-emerald-400">
                   {candidatePresent ? t('liveRoom.observingBar.live') : t('liveRoom.observingBar.waiting')}
                 </span>
-                <span className="ml-2 font-mono text-[11px] font-medium text-slate-400">{timeFormatted}</span>
+                <span className="ml-2 font-mono text-[11px] font-medium text-zinc-400">{timeFormatted}</span>
               </div>
             </div>
           )}

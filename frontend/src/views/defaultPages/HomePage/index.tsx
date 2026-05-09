@@ -33,6 +33,7 @@ import FeedbackCarousel from '../../../components/Features/FeedbackCarousel';
 import JobByCategory from '../../components/defaults/JobByCategory';
 import FilterJobPostCard from '../../components/defaults/FilterJobPostCard';
 import SuggestedJobPostCard from '../../components/defaults/SuggestedJobPostCard';
+import HomeSearch from '../../components/defaults/HomeSearch';
 import commonService from '../../../services/commonService';
 import bannerExploreImport from '../../../assets/images/banner-explore.webp';
 import bannerExplorePcImport from '../../../assets/images/banner-explore-pc.webp';
@@ -178,7 +179,7 @@ const EntryPointCard = ({
 
 export default function HomePage() {
   const { t, i18n } = useTranslation('public');
-  const router = useRouter();
+  const { push } = useRouter();
 
   useSEO({
     title: t('seo.home.title'),
@@ -219,6 +220,30 @@ export default function HomePage() {
 
   return (
     <>
+      <Box
+        sx={{
+          mt: 6,
+          mb: 4,
+          borderRadius: 4,
+          overflow: 'hidden',
+          background: 'linear-gradient(135deg, rgba(15,57,127,0.98) 0%, rgba(26,64,125,0.92) 55%, rgba(42,169,225,0.92) 100%)',
+          p: { xs: 2.5, sm: 3, md: 4 },
+          color: 'white',
+        }}
+      >
+        <Stack spacing={2.5}>
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: 900, color: 'white' }}>
+              {t('home.searchHeadline', 'Search jobs faster, apply smarter')}
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.84)', maxWidth: 760, mt: 1 }}>
+              {t('home.searchSubheadline', 'Start with one search box, then save alerts, follow companies, and track roles that match your profile.')}
+            </Typography>
+          </Box>
+          <HomeSearch />
+        </Stack>
+      </Box>
+
       <Box sx={{ mt: 6 }}>
         <Stack spacing={1} sx={{ mb: 3 }}>
           <Typography variant="h5" sx={{ fontWeight: 800 }} gutterBottom>
@@ -262,7 +287,7 @@ export default function HomePage() {
                 t('home.candidateBenefit3', 'Gợi ý phù hợp'),
               ]}
               ctaLabel={t('home.candidateCta', 'Khám phá việc làm')}
-              onClick={() => router.push(localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language))}
+              onClick={() => push(localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language))}
               accent="#1e6bb8"
             />
           </Grid>
@@ -280,7 +305,7 @@ export default function HomePage() {
                 t('home.employerBenefit3', 'Phỏng vấn hiệu quả'),
               ]}
               ctaLabel={t('home.employerCta', 'Xem giải pháp')}
-              onClick={() => router.push(`/${ROUTES.EMPLOYER.INTRODUCE}`)}
+              onClick={() => push(`/${ROUTES.EMPLOYER.INTRODUCE}`)}
               accent="#2aa9e1"
             />
           </Grid>
@@ -322,7 +347,7 @@ export default function HomePage() {
                 color="primary"
                 size="large"
                 startIcon={<SearchIcon />}
-                onClick={() => router.push(localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language))}
+                onClick={() => push(localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language))}
                 sx={{
                   bgcolor: 'white',
                   color: 'primary.main',

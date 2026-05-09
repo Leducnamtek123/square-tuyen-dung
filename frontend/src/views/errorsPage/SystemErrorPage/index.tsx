@@ -8,7 +8,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 
 const SystemErrorPage = () => {
   const { t } = useTranslation('errors');
-  const navigate = useRouter();
+  const { push } = useRouter();
 
   return (
     <Box
@@ -89,7 +89,7 @@ const SystemErrorPage = () => {
         <Button
           variant="contained"
           startIcon={<HomeIcon />}
-          onClick={() => navigate.push('/')}
+          onClick={() => push('/')}
           sx={{
             borderRadius: '12px',
             px: 3,

@@ -1,18 +1,17 @@
 'use client';
 
-import { forwardRef, useCallback, useRef } from 'react';
+import { useCallback, useRef } from 'react';
+import type { MutableRefObject, ReactNode, Ref } from 'react';
 import { useAutoScroll } from '@/components/Features/VoiceAssistant/components/livekit/scroll-area/hooks/useAutoScroll';
 import { cn } from '@/lib/utils';
 
 interface ScrollAreaProps {
-  children?: React.ReactNode;
+  children?: ReactNode;
   className?: string;
+  ref?: Ref<HTMLDivElement>;
 }
 
-export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function ScrollArea(
-  { className, children },
-  ref
-) {
+export function ScrollArea({ className, children, ref }: ScrollAreaProps) {
   const scrollContentRef = useRef<HTMLDivElement | null>(null);
 
   useAutoScroll(scrollContentRef.current);
@@ -24,7 +23,7 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function S
       if (typeof ref === 'function') {
         ref(node);
       } else if (ref) {
-        ref.current = node;
+        (ref as MutableRefObject<HTMLDivElement | null>).current = node;
       }
     },
     [ref]
@@ -35,4 +34,4 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function S
       <div>{children}</div>
     </div>
   );
-});
+}

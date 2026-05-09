@@ -1,4 +1,4 @@
-import type { EditorState } from 'draft-js';
+type EditorState = import('draft-js').EditorState;
 
 export interface CompanyFormValues {
   companyName: string;

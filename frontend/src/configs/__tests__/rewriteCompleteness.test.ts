@@ -32,6 +32,8 @@ const normalizePatternForMatch = (pattern: string): string => {
 };
 
 // Check if a localized URL is covered by ANY rewrite rule
+const catchAllRoutePattern = /:path\*/;
+
 const isRouteCoveredByRewrite = (
   localizedPath: string,
   rewrites: Array<{ source: string; destination: string }>
@@ -43,7 +45,7 @@ const isRouteCoveredByRewrite = (
     if (normalizedSource === normalized) return true;
     
     // Check catch-all (:path*)
-    if (rule.source.includes(':path*')) {
+    if (catchAllRoutePattern.test(rule.source)) {
       const prefix = rule.source.split(':path*')[0].replace(/\/+$/, '');
       if (normalized.startsWith(prefix)) return true;
     }

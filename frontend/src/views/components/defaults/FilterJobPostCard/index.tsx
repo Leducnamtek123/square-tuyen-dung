@@ -82,7 +82,7 @@ const FilterJobPostCardContent: React.FC<FilterJobPostCardProps> = ({ params = E
         ) : (
           <>
             <Grid container spacing={2}>
-              {jobPosts.map((value: ModelsJobPost & { companyDict?: { companyImageUrl?: string; companyName?: string }; locationDict?: { city?: number | string } }) => (
+              {jobPosts.map((value: ModelsJobPost & { companyDict?: { companyImageUrl?: string | null; companyName?: string | null }; locationDict?: { city?: number | string } }) => (
                 <Grid key={value.id} size={col}>
                   <JobPost
                     id={value.id}

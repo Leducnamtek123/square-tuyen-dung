@@ -5,27 +5,45 @@ import { Box, Button, Card, Stack } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'next/navigation';
 import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
 import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
+import FormPopup from '../../../../components/Common/Controls/FormPopup';
 import {
   resetSearchJobPostFilter,
   searchJobPost,
   JobPostFilter,
 } from '../../../../redux/filterSlice';
 import { useAppDispatch, useAppSelector } from '../../../../hooks/useAppStore';
+import { ROLES_NAME, ROUTES } from '../../../../configs/constants';
 import { useConfig } from '@/hooks/useConfig';
 import { SelectOption } from '../../../../types/models';
 import type { JobPostSearchFormValues } from './types';
 import { useJobPostSearchLocationOptions } from './useJobPostSearchLocationOptions';
 import JobPostSearchAdvancedFilters from './JobPostSearchAdvancedFilters';
+import JobPostNotificationForm, { type JobPostNotificationFormValues } from '../../jobSeekers/JobPostNotificationForm';
+import jobPostNotificationService from '@/services/jobPostNotificationService';
+import errorHandling from '@/utils/errorHandling';
+import toastMessages from '@/utils/toastMessages';
+import {
+  PROJECT_SEARCH_HISTORY_STORAGE_KEY,
+  LEGACY_PROJECT_SEARCH_HISTORY_STORAGE_KEY,
+  readVersionedJson,
+  writeVersionedJson,
+} from '@/utils/storageKeys';
 
 const JobPostSearch = () => {
   const { t } = useTranslation(['public', 'common']);
   const dispatch = useAppDispatch();
+  const { push } = useRouter();
   const { allConfig } = useConfig();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
+  const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
   const [showAdvanceFilter, setShowAdvanceFilter] = React.useState(false);
+  const [openSaveAlert, setOpenSaveAlert] = React.useState(false);
+  const [saveAlertValues, setSaveAlertValues] = React.useState<Partial<JobPostNotificationFormValues> | null>(null);
   const { control, handleSubmit, reset, getValues } = useForm<JobPostSearchFormValues>({
     defaultValues: {
       kw: '',
@@ -110,31 +128,16 @@ const JobPostSearch = () => {
   const handleSaveKeywordLocalStorage = (kw: string | null | undefined) => {
     try {
       if (kw) {
-        const keywordListStr = localStorage.getItem('project_search_history');
-        if (
-          keywordListStr !== null &&
-          keywordListStr !== undefined &&
-          keywordListStr !== ''
-        ) {
-          const keywordList = JSON.parse(keywordListStr);
-          if (!keywordList.includes(kw)) {
-            if (keywordList.length >= 5) {
-              localStorage.setItem(
-                'project_search_history',
-                JSON.stringify([
-                  kw,
-                  ...keywordList.slice(0, keywordList.length - 1),
-                ])
-              );
-            } else {
-              localStorage.setItem(
-                'project_search_history',
-                JSON.stringify([kw, ...keywordList])
-              );
-            }
-          }
-        } else {
-          localStorage.setItem('project_search_history', JSON.stringify([kw]));
+        const keywordList =
+          readVersionedJson<string[]>(PROJECT_SEARCH_HISTORY_STORAGE_KEY, [
+            LEGACY_PROJECT_SEARCH_HISTORY_STORAGE_KEY,
+          ]) ?? [];
+        if (!keywordList.includes(kw)) {
+          const nextKeywords =
+            keywordList.length >= 5
+              ? [kw, ...keywordList.slice(0, keywordList.length - 1)]
+              : [kw, ...keywordList];
+          writeVersionedJson(PROJECT_SEARCH_HISTORY_STORAGE_KEY, nextKeywords);
         }
       }
     } catch {
@@ -148,6 +151,42 @@ const JobPostSearch = () => {
 
       dispatch(searchJobPost(data as JobPostFilter));
 
+  };
+
+  const handleOpenSaveAlert = () => {
+    if (!isAuthenticated || currentUser?.roleName !== ROLES_NAME.JOB_SEEKER) {
+      push(`/${ROUTES.AUTH.LOGIN}`);
+      return;
+    }
+    const values = getValues();
+    setSaveAlertValues({
+      jobName: values.kw || t('jobSearch.savedAlert.defaultName', 'Saved search'),
+      career: Number(values.careerId) || 0,
+      city: Number(values.cityId) || 0,
+      position: values.positionId ? Number(values.positionId) : null,
+      experience: values.experienceId ? Number(values.experienceId) : null,
+      salary: null,
+      frequency: (allConfig?.frequencyNotificationOptions?.[0]?.id as number | undefined) ?? 7,
+    });
+    setOpenSaveAlert(true);
+  };
+
+  const handleSaveAlert = async (data: JobPostNotificationFormValues) => {
+    try {
+      await jobPostNotificationService.addJobPostNotification({
+        jobName: data.jobName,
+        frequency: Number(data.frequency || 7),
+        career: Number(data.career),
+        city: Number(data.city),
+        position: data.position ?? null,
+        experience: data.experience ?? null,
+        salary: data.salary ?? null,
+      });
+      toastMessages.success(t('jobSearch.savedAlert.success', 'Search alert saved.'));
+      setOpenSaveAlert(false);
+    } catch (error) {
+      errorHandling(error);
+    }
   };
 
   const handleReset = () => {
@@ -230,6 +269,15 @@ const JobPostSearch = () => {
                 {t('jobSearch.searchButton')}
               </Button>
               <Button
+                variant="outlined"
+                color="secondary"
+                sx={{ py: 1, whiteSpace: 'nowrap' }}
+                startIcon={<BookmarkAddIcon />}
+                onClick={handleOpenSaveAlert}
+              >
+                {t('jobSearch.saveSearch', 'Save search')}
+              </Button>
+              <Button
                 variant="contained"
                 sx={{ py: 1, color: 'white', whiteSpace: 'nowrap' }}
                 startIcon={
@@ -261,6 +309,20 @@ const JobPostSearch = () => {
           onToggleAdvancedFilter={handleChangeShowFilter}
         />
       ) : null}
+
+      <FormPopup
+        title={t('jobSearch.saveSearch', 'Save search')}
+        openPopup={openSaveAlert}
+        setOpenPopup={setOpenSaveAlert}
+        buttonText={t('jobSearch.saveSearch', 'Save search')}
+        buttonIcon={null}
+      >
+        <JobPostNotificationForm
+          handleAddOrUpdate={handleSaveAlert}
+          editData={null}
+          initialValues={saveAlertValues}
+        />
+      </FormPopup>
     </Box>
   );
 };

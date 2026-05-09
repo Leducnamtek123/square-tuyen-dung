@@ -391,6 +391,10 @@ type TextureParams = {
   flipY?: number;
 };
 
+const EMPTY_TEXTURES: TextureParams[] = [];
+const DEFAULT_CLEAR_COLOR: Vector4 = [0, 0, 0, 1];
+const DEFAULT_CONTEXT_ATTRIBUTES: Record<string, unknown> = {};
+
 export interface ReactShaderToyProps {
   /** Fragment shader GLSL code. */
   fs: string;
@@ -476,12 +480,12 @@ export interface ReactShaderToyProps {
 export function ReactShaderToy({
   fs,
   vs = BASIC_VS,
-  textures = [],
+  textures = EMPTY_TEXTURES,
   uniforms: propUniforms,
-  clearColor = [0, 0, 0, 1],
+  clearColor = DEFAULT_CLEAR_COLOR,
   precision = 'highp',
   style,
-  contextAttributes = {},
+  contextAttributes = DEFAULT_CONTEXT_ATTRIBUTES,
   lerp = 1,
   devicePixelRatio = 1,
   onDoneLoadingTextures,
@@ -741,7 +745,7 @@ export function ReactShaderToy({
       .concat(`#define DPR ${devicePixelRatio.toFixed(1)}\n`)
       .concat(fragment.replace(/texture\(/g, 'texture2D('));
     for (const uniform of Object.keys(uniformsRef.current)) {
-      if (fragment.includes(uniform)) {
+      if (fragment.split(uniform).length > 1) {
         const u = uniformsRef.current[uniform];
         if (!u) continue;
         fragmentShader = insertStringAtIndex(

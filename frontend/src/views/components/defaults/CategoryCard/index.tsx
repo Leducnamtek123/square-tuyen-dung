@@ -18,7 +18,7 @@ interface CategoryCardProps {
 const CategoryCard = ({ options, type }: CategoryCardProps) => {
   const { t } = useTranslation('common');
   const dispatch = useDispatch();
-  const nav = useRouter();
+  const { push } = useRouter();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [searchTerm, setSearchTerm] = React.useState('');
   const items = React.useMemo(() => {
@@ -47,7 +47,7 @@ const CategoryCard = ({ options, type }: CategoryCardProps) => {
       default:
         break;
     }
-    nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
+    push(`/${ROUTES.JOB_SEEKER.JOBS}`);
   };
 
   return (

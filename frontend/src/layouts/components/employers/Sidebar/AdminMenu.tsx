@@ -21,64 +21,64 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
   return (
     <>
       <ListItem disablePadding>
-        <MenuItem icon={GridViewIcon} text={t('admin:sidebar.systemOverview')} to={`/${ROUTES.ADMIN.DASHBOARD}`} isSelected={location.pathname === `/${ROUTES.ADMIN.DASHBOARD}`} />
+        <MenuItem icon={GridViewIcon} text={t('admin:sidebar.systemOverview')} to={`/${ROUTES.ADMIN.DASHBOARD}`} state={{ selected: location.pathname === `/${ROUTES.ADMIN.DASHBOARD}` }} />
       </ListItem>
       <ListItem disablePadding>
-        <MenuItem icon={AccountCircleOutlinedIcon} text={t('admin:sidebar.systemAndUsers')} hasChildren isExpanded={expandedItems.system} onClick={() => handleExpand('system')} />
+        <MenuItem icon={AccountCircleOutlinedIcon} text={t('admin:sidebar.systemAndUsers')} kind="group" state={{ expanded: expandedItems.system }} onClick={() => handleExpand('system')} />
       </ListItem>
       <Collapse in={expandedItems.system} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <MenuItem text={t('admin:sidebar.usersAndPermissions')} to={`/${ROUTES.ADMIN.USERS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.USERS}`} isChild />
-          <MenuItem text={t('admin:sidebar.systemConfiguration')} to={`/${ROUTES.ADMIN.SETTINGS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.SETTINGS}`} isChild />
+          <MenuItem text={t('admin:sidebar.usersAndPermissions')} to={`/${ROUTES.ADMIN.USERS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.USERS}` }} />
+          <MenuItem text={t('admin:sidebar.systemConfiguration')} to={`/${ROUTES.ADMIN.SETTINGS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.SETTINGS}` }} />
         </List>
       </Collapse>
       
       <ListItem disablePadding>
-        <MenuItem icon={BusinessOutlinedIcon} text={t('admin:sidebar.generalCategories')} hasChildren isExpanded={expandedItems.categories} onClick={() => handleExpand('categories')} />
+        <MenuItem icon={BusinessOutlinedIcon} text={t('admin:sidebar.generalCategories')} kind="group" state={{ expanded: expandedItems.categories }} onClick={() => handleExpand('categories')} />
       </ListItem>
       <Collapse in={expandedItems.categories} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <MenuItem text={t('admin:sidebar.careersManagement')} to={`/${ROUTES.ADMIN.CAREERS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.CAREERS}`} isChild />
-          <MenuItem text={t('admin:sidebar.citiesManagement')} to={`/${ROUTES.ADMIN.CITIES}`} isSelected={location.pathname === `/${ROUTES.ADMIN.CITIES}`} isChild />
-          <MenuItem text={t('admin:sidebar.districtsManagement')} to={`/${ROUTES.ADMIN.DISTRICTS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.DISTRICTS}`} isChild />
-          <MenuItem text={t('admin:sidebar.wardsManagement')} to={`/${ROUTES.ADMIN.WARDS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.WARDS}`} isChild />
+          <MenuItem text={t('admin:sidebar.careersManagement')} to={`/${ROUTES.ADMIN.CAREERS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.CAREERS}` }} />
+          <MenuItem text={t('admin:sidebar.citiesManagement')} to={`/${ROUTES.ADMIN.CITIES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.CITIES}` }} />
+          <MenuItem text={t('admin:sidebar.districtsManagement')} to={`/${ROUTES.ADMIN.DISTRICTS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.DISTRICTS}` }} />
+          <MenuItem text={t('admin:sidebar.wardsManagement')} to={`/${ROUTES.ADMIN.WARDS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.WARDS}` }} />
         </List>
       </Collapse>
 
       <ListItem disablePadding>
-        <MenuItem icon={BusinessOutlinedIcon} text={t('admin:sidebar.contentManagement')} hasChildren isExpanded={expandedItems.content} onClick={() => handleExpand('content')} />
+        <MenuItem icon={BusinessOutlinedIcon} text={t('admin:sidebar.contentManagement')} kind="group" state={{ expanded: expandedItems.content }} onClick={() => handleExpand('content')} />
       </ListItem>
       <Collapse in={expandedItems.content} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <MenuItem text={t('admin:sidebar.bannersManagement')} to={`/${ROUTES.ADMIN.BANNERS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.BANNERS}`} isChild />
-          <MenuItem text="Banner Types" to={`/${ROUTES.ADMIN.BANNER_TYPES}`} isSelected={location.pathname === `/${ROUTES.ADMIN.BANNER_TYPES}`} isChild />
-          <MenuItem text={t('admin:sidebar.feedbacksManagement')} to={`/${ROUTES.ADMIN.FEEDBACKS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.FEEDBACKS}`} isChild />
-          <MenuItem text={t('admin:sidebar.articlesManagement')} to={`/${ROUTES.ADMIN.ARTICLES}`} isSelected={location.pathname?.startsWith(`/${ROUTES.ADMIN.ARTICLES}`) ?? false} isChild />
-          <MenuItem text={t('admin:sidebar.chatWithEmployers')} to={`/${ROUTES.ADMIN.CHAT}`} isSelected={location.pathname === `/${ROUTES.ADMIN.CHAT}`} isChild />
+          <MenuItem text={t('admin:sidebar.bannersManagement')} to={`/${ROUTES.ADMIN.BANNERS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.BANNERS}` }} />
+          <MenuItem text="Banner Types" to={`/${ROUTES.ADMIN.BANNER_TYPES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.BANNER_TYPES}` }} />
+          <MenuItem text={t('admin:sidebar.feedbacksManagement')} to={`/${ROUTES.ADMIN.FEEDBACKS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.FEEDBACKS}` }} />
+          <MenuItem text={t('admin:sidebar.articlesManagement')} to={`/${ROUTES.ADMIN.ARTICLES}`} kind="child" state={{ selected: location.pathname?.startsWith(`/${ROUTES.ADMIN.ARTICLES}`) ?? false }} />
+          <MenuItem text={t('admin:sidebar.chatWithEmployers')} to={`/${ROUTES.ADMIN.CHAT}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.CHAT}` }} />
         </List>
       </Collapse>
 
       <ListItem disablePadding>
-        <MenuItem icon={BusinessOutlinedIcon} text={t('admin:sidebar.infoAndProfiles')} hasChildren isExpanded={expandedItems.profiles} onClick={() => handleExpand('profiles')} />
+        <MenuItem icon={BusinessOutlinedIcon} text={t('admin:sidebar.infoAndProfiles')} kind="group" state={{ expanded: expandedItems.profiles }} onClick={() => handleExpand('profiles')} />
       </ListItem>
       <Collapse in={expandedItems.profiles} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <MenuItem text={t('admin:sidebar.companyManagement')} to={`/${ROUTES.ADMIN.COMPANIES}`} isSelected={location.pathname === `/${ROUTES.ADMIN.COMPANIES}`} isChild />
-          <MenuItem text={t('admin:sidebar.candidateProfiles')} to={`/${ROUTES.ADMIN.PROFILES}`} isSelected={location.pathname === `/${ROUTES.ADMIN.PROFILES}`} isChild />
-          <MenuItem text={t('admin:sidebar.resumeManagement')} to={`/${ROUTES.ADMIN.RESUMES}`} isSelected={location.pathname === `/${ROUTES.ADMIN.RESUMES}`} isChild />
+          <MenuItem text={t('admin:sidebar.companyManagement')} to={`/${ROUTES.ADMIN.COMPANIES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.COMPANIES}` }} />
+          <MenuItem text={t('admin:sidebar.candidateProfiles')} to={`/${ROUTES.ADMIN.PROFILES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.PROFILES}` }} />
+          <MenuItem text={t('admin:sidebar.resumeManagement')} to={`/${ROUTES.ADMIN.RESUMES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.RESUMES}` }} />
         </List>
       </Collapse>
 
       <ListItem disablePadding>
-        <MenuItem icon={FactCheckOutlinedIcon} text={t('admin:sidebar.recruitmentAndInterviews')} hasChildren isExpanded={expandedItems.recruitment} onClick={() => handleExpand('recruitment')} />
+        <MenuItem icon={FactCheckOutlinedIcon} text={t('admin:sidebar.recruitmentAndInterviews')} kind="group" state={{ expanded: expandedItems.recruitment }} onClick={() => handleExpand('recruitment')} />
       </ListItem>
       <Collapse in={expandedItems.recruitment} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
-          <MenuItem text={t('admin:sidebar.jobPosts')} to={`/${ROUTES.ADMIN.JOBS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.JOBS}`} isChild />
-          <MenuItem text={t('admin:sidebar.activityLogs')} to={`/${ROUTES.ADMIN.JOB_ACTIVITY}`} isSelected={location.pathname === `/${ROUTES.ADMIN.JOB_ACTIVITY}`} isChild />
-          <MenuItem text={t('admin:sidebar.interviewSchedule')} to={`/${ROUTES.ADMIN.INTERVIEWS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.INTERVIEWS}`} isChild />
-          <MenuItem text={t('admin:sidebar.jobNotifications')} to={`/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`} isSelected={location.pathname === `/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`} isChild />
-          <MenuItem icon={VideoLibraryIcon} text="Interview UI Preview" to="/admin/interview-preview" isSelected={location.pathname === '/admin/interview-preview'} isChild />
+          <MenuItem text={t('admin:sidebar.jobPosts')} to={`/${ROUTES.ADMIN.JOBS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.JOBS}` }} />
+          <MenuItem text={t('admin:sidebar.activityLogs')} to={`/${ROUTES.ADMIN.JOB_ACTIVITY}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.JOB_ACTIVITY}` }} />
+          <MenuItem text={t('admin:sidebar.interviewSchedule')} to={`/${ROUTES.ADMIN.INTERVIEWS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.INTERVIEWS}` }} />
+          <MenuItem text={t('admin:sidebar.jobNotifications')} to={`/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.JOB_NOTIFICATIONS}` }} />
+          <MenuItem icon={VideoLibraryIcon} text="Interview UI Preview" to="/admin/interview-preview" kind="child" state={{ selected: location.pathname === '/admin/interview-preview' }} />
         </List>
       </Collapse>
     </>

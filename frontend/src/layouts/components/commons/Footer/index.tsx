@@ -18,14 +18,22 @@ import { LINKS, ROUTES, APP_NAME, IMAGES } from '../../../../configs/constants';
 import { FacebookIcon, WebsiteIcon } from '../../../../components/Common/SocialIcons';
 import MuiImageCustom from '../../../../components/Common/MuiImageCustom';
 
+const subscribeToStaticYear = () => () => {};
+const getCurrentYearSnapshot = () => new Date().getFullYear();
+
 const Footer = () => {
   const { t, i18n } = useTranslation('common');
-  const nav = useRouter();
+  const { push } = useRouter();
   const lang = i18n.language;
 
   const brandNavy = '#1a407d';
   const brandSky = '#2aa9e1';
   const brandLight = '#e1effe';
+  const currentYear = React.useSyncExternalStore(
+    subscribeToStaticYear,
+    getCurrentYearSnapshot,
+    getCurrentYearSnapshot
+  );
 
   const navButtonSx = {
     justifyContent: 'flex-start',
@@ -58,7 +66,7 @@ const Footer = () => {
                 width={150}
                 src={IMAGES.getTextLogo('dark')}
                 sx={{ display: 'block', cursor: 'pointer' }}
-                onClick={() => nav.push('/')}
+                onClick={() => push('/')}
               />
               {[
                 { label: t('footer.aboutApp', { appName: APP_NAME }), route: localizeRoutePath(`/${ROUTES.JOB_SEEKER.ABOUT_US}`, lang) },
@@ -67,7 +75,7 @@ const Footer = () => {
               ].map((item) => (
                 <Button
                   key={item.label}
-                  onClick={() => nav.push(item.route)}
+                  onClick={() => push(item.route)}
                   variant="text"
                   sx={navButtonSx}
                 >
@@ -89,7 +97,7 @@ const Footer = () => {
               ].map((item) => (
                 <Button
                   key={item.label}
-                  onClick={() => nav.push(item.route)}
+                  onClick={() => push(item.route)}
                   variant="text"
                   sx={navButtonSx}
                 >
@@ -111,7 +119,7 @@ const Footer = () => {
               ].map((item) => (
                 <Button
                   key={item.label}
-                  onClick={() => nav.push(item.route)}
+                  onClick={() => push(item.route)}
                   variant="text"
                   sx={navButtonSx}
                 >
@@ -172,7 +180,7 @@ const Footer = () => {
           }}
         >
           <Typography variant="body2" sx={{ color: brandNavy, opacity: 0.7 }} align="center">
-            {t('footer.rightsReserved', { year: new Date().getFullYear(), appName: APP_NAME })}
+            {t('footer.rightsReserved', { year: currentYear, appName: APP_NAME })}
           </Typography>
         </Box>
       </Container>

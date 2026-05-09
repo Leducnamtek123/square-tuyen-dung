@@ -18,7 +18,7 @@ from console.jobs import queue_auth
 
 from ..models import (
     Company, CompanyFollowed, CompanyImage,
-    CompanyRole, CompanyMember
+    CompanyRole, CompanyMember, TrustReport
 )
 from apps.files.models import File
 from apps.locations.models import Location
@@ -113,6 +113,8 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                                                                     message=ERROR_MESSAGES["COMPANY_NAME_EXISTS"])])
 
     employeeSize = serializers.IntegerField(source="employee_size", required=True)
+
+    isVerified = serializers.BooleanField(source="is_verified", read_only=True)
 
     fieldOperation = serializers.CharField(source="field_operation", required=True, max_length=255)
 
@@ -220,7 +222,7 @@ class CompanySerializer(DynamicFieldsMixin, serializers.ModelSerializer):
                   'since', 'companyEmail', 'companyPhone',
                   'websiteUrl', 'facebookUrl', 'youtubeUrl', 'linkedinUrl',
                   'description',
-                  'companyImageUrl', 'companyCoverImageUrl', 'locationDict',
+                  'companyImageUrl', 'companyCoverImageUrl', 'locationDict', 'isVerified',
                   'followNumber', 'jobPostNumber', 'isFollowed',
                   'companyImages', 'mobileUserDict')
 
@@ -275,6 +277,81 @@ class CompanyFollowedSerializer(DynamicFieldsMixin, serializers.ModelSerializer)
     class Meta:
         model = CompanyFollowed
         fields = ('id', 'company',)
+
+
+class TrustReportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    targetType = serializers.CharField(source="target_type", required=True)
+    reason = serializers.CharField(required=True)
+    message = serializers.CharField(required=False, allow_blank=True, allow_null=True)
+    company = serializers.IntegerField(required=False, allow_null=True, source="company_id")
+    jobPost = serializers.IntegerField(required=False, allow_null=True, source="job_post_id")
+    reporterDict = auth_serializers.UserSerializer(source='reporter', read_only=True, fields=['id', 'fullName', 'email', 'avatarUrl'])
+    createAt = serializers.DateTimeField(source='create_at', read_only=True)
+
+    def validate(self, attrs):
+        errors = {}
+        target_type = attrs.get("target_type")
+        company_id = attrs.get("company_id")
+        job_post_id = attrs.get("job_post_id")
+
+        if target_type not in {TrustReport.TARGET_JOB, TrustReport.TARGET_COMPANY}:
+            errors["targetType"] = "Invalid target type."
+
+        if target_type == TrustReport.TARGET_JOB:
+            if not job_post_id:
+                errors["jobPost"] = "Job post is required."
+            if company_id:
+                errors["company"] = "Company must be empty for job reports."
+        elif target_type == TrustReport.TARGET_COMPANY:
+            if not company_id:
+                errors["company"] = "Company is required."
+            if job_post_id:
+                errors["jobPost"] = "Job post must be empty for company reports."
+
+        if attrs.get("reason") not in dict(TrustReport.REASON_CHOICES):
+            errors["reason"] = "Invalid report reason."
+
+        if errors:
+            raise serializers.ValidationError(errors)
+        return attrs
+
+    def create(self, validated_data):
+        from apps.jobs.models import JobPost
+
+        request = self.context["request"]
+        user = request.user
+        company_id = validated_data.pop("company_id", None)
+        job_post_id = validated_data.pop("job_post_id", None)
+
+        if job_post_id:
+            job_post = JobPost.objects.filter(pk=job_post_id).first()
+            if not job_post:
+                raise serializers.ValidationError({"jobPost": "Job post not found."})
+            validated_data["job_post"] = job_post
+
+        if company_id:
+            company = Company.objects.filter(pk=company_id).first()
+            if not company:
+                raise serializers.ValidationError({"company": "Company not found."})
+            validated_data["company"] = company
+
+        validated_data["reporter"] = user
+        report = TrustReport.objects.create(**validated_data)
+        return report
+
+    class Meta:
+        model = TrustReport
+        fields = (
+            "id",
+            "targetType",
+            "reason",
+            "message",
+            "status",
+            "company",
+            "jobPost",
+            "reporterDict",
+            "createAt",
+        )
 
 
 class CompanyRoleSerializer(DynamicFieldsMixin, serializers.ModelSerializer):

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
+import Image from 'next/image';
 
 type Props = {
   html: string;
@@ -35,16 +36,24 @@ const renderNode = (node: Node, key: string): React.ReactNode => {
   switch (element.tagName.toLowerCase()) {
     case 'br':
       return <br key={key} />;
-    case 'img':
+    case 'img': {
+      const src = element.getAttribute('src') || '';
+      if (!src) return null;
+
       return (
-        <img
+        <Image
           key={key}
-          src={element.getAttribute('src') || ''}
+          src={src}
           alt={element.getAttribute('alt') || ''}
+          width={Number(element.getAttribute('width')) || 1200}
+          height={Number(element.getAttribute('height')) || 675}
           className="my-4 block max-w-full rounded-md"
-          loading="lazy"
+          sizes="100vw"
+          style={{ width: '100%', height: 'auto' }}
+          unoptimized
         />
       );
+    }
     case 'figure':
       return <figure key={key} className="my-4">
         {children}

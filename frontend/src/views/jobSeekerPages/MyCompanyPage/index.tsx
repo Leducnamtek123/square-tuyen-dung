@@ -14,7 +14,7 @@ const MyCompanyPage = () => {
     TabTitle(t("myCompany.title"))
     const [value, setValue] = React.useState('1');
 
-    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    const selectCompanyTab = (event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
     };
 
@@ -34,7 +34,7 @@ const MyCompanyPage = () => {
                             <TabContext value={value}>
                                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                     <TabList
-                                        onChange={handleChange}
+                                        onChange={selectCompanyTab}
                                         aria-label={t("myCompany.aria.tabs")}
                                         variant="scrollable"
                                         allowScrollButtonsMobile

@@ -1,5 +1,7 @@
 ﻿import { useEffect, useRef, useState } from 'react';
 
+import { useMemo } from 'react';
+
 function findGcdLessThan(columns: number, max = columns): number {
   function gcd(a: number, b: number): number {
     while (b !== 0) {
@@ -44,21 +46,25 @@ export const useAgentAudioVisualizerRadialAnimator = (
   interval: number
 ): number[] => {
   const [index, setIndex] = useState(0);
-  const [sequence, setSequence] = useState<number[][]>([[]]);
 
-  useEffect(() => {
+  const sequence = useMemo(() => {
     if (state === 'thinking') {
-      setSequence(generateListeningSequenceBar(barCount));
-    } else if (state === 'connecting' || state === 'initializing') {
-      setSequence(generateConnectingSequenceBar(barCount));
-    } else if (state === 'listening') {
-      setSequence(generateListeningSequenceBar(barCount));
-    } else if (state === undefined || state === 'speaking') {
-      setSequence([new Array(barCount).fill(0).map((_, idx) => idx)]);
-    } else {
-      setSequence([[]]);
+      return generateListeningSequenceBar(barCount);
     }
-    setIndex(0);
+
+    if (state === 'connecting' || state === 'initializing') {
+      return generateConnectingSequenceBar(barCount);
+    }
+
+    if (state === 'listening') {
+      return generateListeningSequenceBar(barCount);
+    }
+
+    if (state === undefined || state === 'speaking') {
+      return [new Array(barCount).fill(0).map((_, idx) => idx)];
+    }
+
+    return [[]];
   }, [state, barCount]);
 
   const animationFrameId = useRef<number | null>(null);

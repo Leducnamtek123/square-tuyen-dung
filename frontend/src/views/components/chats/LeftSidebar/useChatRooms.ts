@@ -5,6 +5,7 @@ import { useChatContext } from '../../../../context/ChatProvider';
 import { getUserAccount } from '../../../../services/firebaseService';
 import type { Timestamp } from 'firebase/firestore';
 import type { DocumentSnapshot } from 'firebase/firestore';
+import type { QueryDocumentSnapshot } from 'firebase/firestore';
 import type { FieldValue } from 'firebase/firestore';
 
 export interface UserAccount {
@@ -30,114 +31,166 @@ export interface ChatRoomData {
 const LIMIT = 20;
 const chatRoomCollectionRef = collection(db, 'chatRooms');
 
+const resolveChatRoomData = async (
+  docSnap: QueryDocumentSnapshot,
+  currentUserId: string
+): Promise<ChatRoomData | null> => {
+  try {
+    const chatRoomData = docSnap.data();
+    const partnerId = chatRoomData?.members[0] === currentUserId
+      ? chatRoomData?.members[1]
+      : chatRoomData?.members[0];
+    const userAccount = await getUserAccount('accounts', `${partnerId}`) as UserAccount | null;
+    return {
+      ...(chatRoomData as Omit<ChatRoomData, "id" | "user">),
+      id: docSnap.id,
+      user: userAccount || undefined,
+    };
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+};
+
+const noopUnsubscribe = () => {};
+
+const subscribeToChatRoomCount = (
+  currentUserId: string | undefined,
+  onCountChanged: (count: number) => void,
+) => {
+  if (!currentUserId) return noopUnsubscribe;
+
+  const q = query(
+    chatRoomCollectionRef,
+    where('members', 'array-contains', currentUserId)
+  );
+
+  return onSnapshot(q, (querySnapshot) => {
+    onCountChanged(querySnapshot?.size || 0);
+  });
+};
+
+const subscribeToInitialChatRooms = (
+  currentUserId: string | undefined,
+  onLoading: () => void,
+  onLoaded: (chatRooms: ChatRoomData[], lastDocument: DocumentSnapshot | null) => void,
+) => {
+  if (!currentUserId) return noopUnsubscribe;
+
+  onLoading();
+  const q = query(
+    chatRoomCollectionRef,
+    where('members', 'array-contains', currentUserId),
+    orderBy('updatedAt', 'desc'),
+    limit(LIMIT)
+  );
+
+  return onSnapshot(q, async (querySnapshot) => {
+    const lastDocument = querySnapshot.docs[querySnapshot.docs.length - 1] || null;
+    const chatRoomsData = (await Promise.all(
+      querySnapshot.docs.map((docSnap) => resolveChatRoomData(docSnap, currentUserId))
+    )).filter((chatRoom): chatRoom is ChatRoomData => !!chatRoom);
+    onLoaded(chatRoomsData, lastDocument);
+  });
+};
+
+type ChatRoomsState = {
+  isLoading: boolean;
+  hasMore: boolean;
+  lastDocument: DocumentSnapshot | null;
+  chatRooms: ChatRoomData[];
+  page: number;
+  count: number;
+};
+
+type ChatRoomsAction =
+  | { type: 'countChanged'; count: number }
+  | { type: 'loading' }
+  | { type: 'initialLoaded'; chatRooms: ChatRoomData[]; lastDocument: DocumentSnapshot | null }
+  | { type: 'loadedMore'; chatRooms: ChatRoomData[]; lastDocument: DocumentSnapshot | null }
+  | { type: 'noMore' };
+
+const initialChatRoomsState: ChatRoomsState = {
+  isLoading: true,
+  hasMore: true,
+  lastDocument: null,
+  chatRooms: [],
+  page: 0,
+  count: 0,
+};
+
+const chatRoomsReducer = (state: ChatRoomsState, action: ChatRoomsAction): ChatRoomsState => {
+  switch (action.type) {
+    case 'countChanged':
+      return { ...state, count: action.count };
+    case 'loading':
+      return { ...state, isLoading: true };
+    case 'initialLoaded':
+      return {
+        ...state,
+        isLoading: false,
+        hasMore: true,
+        page: 1,
+        chatRooms: action.chatRooms,
+        lastDocument: action.lastDocument,
+      };
+    case 'loadedMore':
+      return {
+        ...state,
+        page: state.page + 1,
+        chatRooms: [...state.chatRooms, ...action.chatRooms],
+        lastDocument: action.lastDocument,
+      };
+    case 'noMore':
+      return { ...state, hasMore: false };
+    default:
+      return state;
+  }
+};
+
 export const useChatRooms = () => {
   const { currentUserChat, setSelectedRoomId } = useChatContext();
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [hasMore, setHasMore] = React.useState(true);
-  const [lastDocument, setLastDocument] = React.useState<DocumentSnapshot | null>(null);
-  const [chatRooms, setChatRooms] = React.useState<ChatRoomData[]>([]);
-  const [page, setPage] = React.useState(0);
-  const [count, setCount] = React.useState(0);
+  const [state, dispatch] = React.useReducer(chatRoomsReducer, initialChatRoomsState);
+  const currentUserId = currentUserChat?.userId ? `${currentUserChat.userId}` : undefined;
 
   React.useEffect(() => {
-    if (currentUserChat) {
-      const q = query(
-        chatRoomCollectionRef,
-        where('members', 'array-contains', `${currentUserChat.userId}`)
-      );
-      const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-        setCount(querySnapshot?.size || 0);
-      });
-      return () => unsubscribe();
-    }
-  }, [currentUserChat]);
+    return subscribeToChatRoomCount(currentUserId, (count) => {
+      dispatch({ type: 'countChanged', count });
+    });
+  }, [currentUserId]);
 
   React.useEffect(() => {
-    if (currentUserChat) {
-      setIsLoading(true);
-      let q = query(
-        chatRoomCollectionRef,
-        where('members', 'array-contains', `${currentUserChat.userId}`),
-        orderBy('updatedAt', 'desc'),
-        limit(LIMIT)
-      );
-      const unsubscribe = onSnapshot(q, async (querySnapshot) => {
-        let chatRoomsData: ChatRoomData[] = [];
-        const promises = querySnapshot.docs.map(async (doc) => {
-          try {
-            let partnerId = '';
-            const chatRoomData = doc.data();
-            if (chatRoomData?.members[0] === `${currentUserChat.userId}`) {
-              partnerId = chatRoomData?.members[1];
-            } else {
-              partnerId = chatRoomData?.members[0];
-            }
-            const userAccount = await getUserAccount('accounts', `${partnerId}`) as UserAccount | null;
-            chatRoomsData.push({
-              ...(chatRoomData as Omit<ChatRoomData, "id" | "user">),
-              id: doc.id,
-              user: userAccount || undefined,
-            });
-          } catch (error) {
-            console.error(error);
-          }
-        });
-        if (querySnapshot.docs.length > 0) {
-          setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
-        }
-        await Promise.all(promises);
-        setChatRooms(chatRoomsData);
-        setHasMore(true);
-        setPage(1);
-        setIsLoading(false);
-      });
-      return () => unsubscribe();
-    }
-  }, [currentUserChat]);
+    return subscribeToInitialChatRooms(
+      currentUserId,
+      () => dispatch({ type: 'loading' }),
+      (chatRooms, lastDocument) => {
+        dispatch({ type: 'initialLoaded', chatRooms, lastDocument });
+      },
+    );
+  }, [currentUserId]);
 
   const handleLoadMore = () => {
     const getMoreData = async () => {
-      if (lastDocument !== null && currentUserChat) {
+      if (state.lastDocument !== null && currentUserId) {
         const q = query(
           chatRoomCollectionRef,
-          where('members', 'array-contains', `${currentUserChat.userId}`),
+          where('members', 'array-contains', currentUserId),
           orderBy('updatedAt', 'desc'),
-          startAfter(lastDocument),
+          startAfter(state.lastDocument),
           limit(LIMIT)
         );
         const querySnapshot = await getDocs(q);
-        let chatRoomsData: ChatRoomData[] = [];
-        if (querySnapshot.docs.length > 0) {
-          setLastDocument(querySnapshot.docs[querySnapshot.docs.length - 1]);
-        }
-        const promises = querySnapshot.docs.map(async (doc) => {
-          try {
-            let partnerId = '';
-            const chatRoomData = doc.data();
-            if (chatRoomData?.members[0] === `${currentUserChat.userId}`) {
-              partnerId = chatRoomData?.members[1];
-            } else {
-              partnerId = chatRoomData?.members[0];
-            }
-            const userAccount = await getUserAccount('accounts', `${partnerId}`) as UserAccount | null;
-            chatRoomsData.push({
-              ...(chatRoomData as Omit<ChatRoomData, "id" | "user">),
-              id: doc.id,
-              user: userAccount || undefined,
-            });
-          } catch (error) {
-            console.error(error);
-          }
-        });
-        await Promise.all(promises);
-        setChatRooms(prev => [...prev, ...chatRoomsData]);
+        const lastDocument = querySnapshot.docs[querySnapshot.docs.length - 1] || state.lastDocument;
+        const chatRoomsData = (await Promise.all(
+          querySnapshot.docs.map((docSnap) => resolveChatRoomData(docSnap, currentUserId))
+        )).filter((chatRoom): chatRoom is ChatRoomData => !!chatRoom);
+        dispatch({ type: 'loadedMore', chatRooms: chatRoomsData, lastDocument });
       }
     };
-    if (Math.ceil(count / LIMIT) > page) {
-      setPage(page + 1);
+    if (Math.ceil(state.count / LIMIT) > state.page) {
       getMoreData();
     } else {
-      setHasMore(false);
+      dispatch({ type: 'noMore' });
     }
   };
 
@@ -146,9 +199,9 @@ export const useChatRooms = () => {
   };
 
   return {
-    isLoading,
-    hasMore,
-    chatRooms,
+    isLoading: state.isLoading,
+    hasMore: state.hasMore,
+    chatRooms: state.chatRooms,
     handleLoadMore,
     handleSelectRoom,
     currentUserChat

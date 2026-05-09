@@ -65,10 +65,10 @@ export function getParticipantRole(participant?: Participant | null): Participan
   const identity = participant?.identity?.toLowerCase?.() ?? '';
   const name = participant?.name?.toLowerCase?.() ?? '';
   const metadata = participant?.metadata?.toLowerCase?.() ?? '';
-  const attributes = Object.values(participant?.attributes ?? {})
-    .filter(Boolean)
-    .map((value) => String(value).toLowerCase())
-    .join(' ');
+  const attributes = Object.values(participant?.attributes ?? {}).reduce<string[]>((values, value) => {
+    if (value) values.push(String(value).toLowerCase());
+    return values;
+  }, []).join(' ');
   const haystack = `${identity} ${name} ${metadata} ${attributes}`.trim();
 
   if (participant?.isAgent || participant?.kind === ParticipantKind.AGENT || isLiveKitAgentParticipant(participant)) {

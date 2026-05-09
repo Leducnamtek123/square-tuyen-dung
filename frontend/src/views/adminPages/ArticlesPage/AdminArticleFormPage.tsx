@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useReducer, useRef } from 'react';
 import {
   Box, Button, TextField, Stack, Typography, MenuItem, Select,
   FormControl, InputLabel, Chip, Paper, CircularProgress, IconButton,
@@ -23,73 +23,173 @@ interface Props {
   articleId?: number;
 }
 
+type AdminArticleFormState = {
+  loading: boolean;
+  saving: boolean;
+  title: string;
+  excerpt: string;
+  content: string;
+  category: ArticleCategory;
+  articleStatus: ArticleStatus;
+  tags: string;
+  tagInput: string;
+  tagList: string[];
+  thumbnailFile: File | null;
+  thumbnailPreview: string | null;
+  existingThumbnailUrl: string | null;
+};
+
+type AdminArticleFormAction =
+  | { type: 'patch'; patch: Partial<AdminArticleFormState> }
+  | {
+      type: 'loaded';
+      article: {
+        title: string;
+        excerpt: string;
+        content?: string | null;
+        category: ArticleCategory;
+        status: ArticleStatus;
+        tags?: string | null;
+        tagList?: string[];
+        thumbnailUrl?: string | null;
+      };
+    }
+  | { type: 'loadFailed' }
+  | { type: 'addTag'; tag: string }
+  | { type: 'removeTag'; tag: string }
+  | { type: 'clearThumbnail' };
+
+const initialAdminArticleFormState: AdminArticleFormState = {
+  loading: false,
+  saving: false,
+  title: '',
+  excerpt: '',
+  content: '',
+  category: 'news',
+  articleStatus: 'draft',
+  tags: '',
+  tagInput: '',
+  tagList: [],
+  thumbnailFile: null,
+  thumbnailPreview: null,
+  existingThumbnailUrl: null,
+};
+
+const adminArticleFormReducer = (
+  state: AdminArticleFormState,
+  action: AdminArticleFormAction
+): AdminArticleFormState => {
+  switch (action.type) {
+    case 'patch':
+      return {
+        ...state,
+        ...action.patch,
+      };
+    case 'loaded':
+      return {
+        ...state,
+        loading: false,
+        title: action.article.title,
+        excerpt: action.article.excerpt,
+        content: action.article.content || '',
+        category: action.article.category,
+        articleStatus: action.article.status,
+        tags: action.article.tags || '',
+        tagList: action.article.tagList || [],
+        existingThumbnailUrl: action.article.thumbnailUrl || null,
+      };
+    case 'loadFailed':
+      return {
+        ...state,
+        loading: false,
+      };
+    case 'addTag': {
+      const tag = action.tag.trim();
+      const tagList = tag && !state.tagList.includes(tag) ? [...state.tagList, tag] : state.tagList;
+
+      return {
+        ...state,
+        tagInput: '',
+        tagList,
+        tags: tagList.join(','),
+      };
+    }
+    case 'removeTag': {
+      const tagList = state.tagList.filter((tag) => tag !== action.tag);
+
+      return {
+        ...state,
+        tagList,
+        tags: tagList.join(','),
+      };
+    }
+    case 'clearThumbnail':
+      return {
+        ...state,
+        thumbnailFile: null,
+        thumbnailPreview: null,
+        existingThumbnailUrl: null,
+      };
+    default:
+      return state;
+  }
+};
+
 const AdminArticleFormPage = ({ mode, articleId }: Props) => {
-  const router = useRouter();
+  const { push } = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [title, setTitle] = useState('');
-  const [excerpt, setExcerpt] = useState('');
-  const [content, setContent] = useState('');
-  const [category, setCategory] = useState<ArticleCategory>('news');
-  const [articleStatus, setArticleStatus] = useState<ArticleStatus>('draft');
-  const [tags, setTags] = useState('');
-  const [tagInput, setTagInput] = useState('');
-  const [tagList, setTagList] = useState<string[]>([]);
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
-  const [existingThumbnailUrl, setExistingThumbnailUrl] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(adminArticleFormReducer, initialAdminArticleFormState);
+  const {
+    loading,
+    saving,
+    title,
+    excerpt,
+    content,
+    category,
+    articleStatus,
+    tags,
+    tagInput,
+    tagList,
+    thumbnailFile,
+    thumbnailPreview,
+    existingThumbnailUrl,
+  } = state;
 
   useEffect(() => {
     if (mode === 'edit' && articleId) {
-      setLoading(true);
+      dispatch({ type: 'patch', patch: { loading: true } });
       contentService.adminGetArticle(articleId)
         .then((article) => {
-          setTitle(article.title);
-          setExcerpt(article.excerpt);
-          setContent(article.content || '');
-          setCategory(article.category);
-          setArticleStatus(article.status);
-          setTags(article.tags || '');
-          setTagList(article.tagList || []);
-          setExistingThumbnailUrl(article.thumbnailUrl || null);
+          dispatch({ type: 'loaded', article });
         })
         .catch(() => toastMessages.error('Không thể tải bài viết'))
-        .finally(() => setLoading(false));
+        .finally(() => dispatch({ type: 'loadFailed' }));
     }
   }, [mode, articleId]);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setThumbnailFile(file);
+    dispatch({ type: 'patch', patch: { thumbnailFile: file } });
     const reader = new FileReader();
-    reader.onload = (ev) => setThumbnailPreview(ev.target?.result as string);
+    reader.onload = (ev) => dispatch({ type: 'patch', patch: { thumbnailPreview: ev.target?.result as string } });
     reader.readAsDataURL(file);
   };
 
   const addTag = () => {
-    const t = tagInput.trim();
-    if (t && !tagList.includes(t)) {
-      const newList = [...tagList, t];
-      setTagList(newList);
-      setTags(newList.join(','));
-    }
-    setTagInput('');
+    dispatch({ type: 'addTag', tag: tagInput });
   };
 
   const removeTag = (tag: string) => {
-    const newList = tagList.filter(t => t !== tag);
-    setTagList(newList);
-    setTags(newList.join(','));
+    dispatch({ type: 'removeTag', tag });
   };
 
   const handleSave = async (targetStatus?: ArticleStatus) => {
     if (!title.trim()) { toastMessages.error('Vui lòng nhập tiêu đề'); return; }
     if (!content.trim()) { toastMessages.error('Vui lòng nhập nội dung'); return; }
 
-    setSaving(true);
+    dispatch({ type: 'patch', patch: { saving: true } });
     const payload: ArticlePayload = {
       title: title.trim(),
       excerpt: excerpt.trim(),
@@ -103,16 +203,16 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
       if (mode === 'create') {
         const created = await contentService.adminCreateArticle(payload, thumbnailFile || undefined);
         toastMessages.success('Tạo bài viết thành công!');
-        router.push(`/admin/articles/${created.id}`);
+        push(`/admin/articles/${created.id}`);
       } else if (articleId) {
         await contentService.adminUpdateArticle(articleId, payload, thumbnailFile || undefined);
         toastMessages.success('Lưu bài viết thành công!');
-        if (targetStatus) setArticleStatus(targetStatus);
+        if (targetStatus) dispatch({ type: 'patch', patch: { articleStatus: targetStatus } });
       }
     } catch {
       toastMessages.error('Không thể lưu bài viết');
     } finally {
-      setSaving(false);
+      dispatch({ type: 'patch', patch: { saving: false } });
     }
   };
 
@@ -128,7 +228,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
     <Box sx={{ p: 3, maxWidth: 1200, mx: 'auto' }}>
       {/* Header */}
       <Stack direction="row" alignItems="center" spacing={2} mb={4}>
-        <IconButton onClick={() => router.push('/admin/articles')} sx={{ bgcolor: 'action.hover', borderRadius: 1.5 }}>
+        <IconButton onClick={() => push('/admin/articles')} sx={{ bgcolor: 'action.hover', borderRadius: 1.5 }}>
           <ArrowBackIcon />
         </IconButton>
         <Box flex={1}>
@@ -167,7 +267,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
               fullWidth
               label="Tiêu đề bài viết"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => dispatch({ type: 'patch', patch: { title: e.target.value } })}
               placeholder="Nhập tiêu đề hấp dẫn..."
               sx={{ mb: 2 }}
               inputProps={{ style: { fontSize: '1.1rem', fontWeight: 700 } }}
@@ -176,7 +276,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
               fullWidth
               label="Mô tả ngắn (excerpt)"
               value={excerpt}
-              onChange={(e) => setExcerpt(e.target.value)}
+              onChange={(e) => dispatch({ type: 'patch', patch: { excerpt: e.target.value } })}
               placeholder="Tóm tắt nội dung bài viết (hiển thị trong danh sách)..."
               multiline
               rows={2}
@@ -192,7 +292,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
             </Typography>
             <SimpleRichEditor
               value={content}
-              onChange={setContent}
+              onChange={(nextContent) => dispatch({ type: 'patch', patch: { content: nextContent } })}
               minHeight={400}
             />
           </Paper>
@@ -208,7 +308,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
 
             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
               <InputLabel>Danh mục</InputLabel>
-              <Select value={category} label="Danh mục" onChange={(e) => setCategory(e.target.value as ArticleCategory)}>
+              <Select value={category} label="Danh mục" onChange={(e) => dispatch({ type: 'patch', patch: { category: e.target.value as ArticleCategory } })}>
                 <MenuItem value="news" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <ArticleIcon sx={{ fontSize: 16, color: 'text.secondary' }} /> Tin tức
                 </MenuItem>
@@ -220,7 +320,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
 
             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
               <InputLabel>Trạng thái</InputLabel>
-              <Select value={articleStatus} label="Trạng thái" onChange={(e) => setArticleStatus(e.target.value as ArticleStatus)}>
+              <Select value={articleStatus} label="Trạng thái" onChange={(e) => dispatch({ type: 'patch', patch: { articleStatus: e.target.value as ArticleStatus } })}>
                 <MenuItem value="draft">Bản nháp</MenuItem>
                 <MenuItem value="pending">Chờ duyệt</MenuItem>
                 <MenuItem value="published">Đã đăng</MenuItem>
@@ -252,7 +352,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
                 <IconButton
                   size="small"
                   sx={{ position: 'absolute', top: 4, right: 4, bgcolor: 'rgba(0,0,0,0.5)', color: 'white' }}
-                  onClick={() => { setThumbnailFile(null); setThumbnailPreview(null); setExistingThumbnailUrl(null); }}
+                  onClick={() => dispatch({ type: 'clearThumbnail' })}
                 >
                   <CloseIcon fontSize="small" />
                 </IconButton>
@@ -283,7 +383,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
                 size="small"
                 placeholder="Nhập tag..."
                 value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
+                onChange={(e) => dispatch({ type: 'patch', patch: { tagInput: e.target.value } })}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
                 fullWidth
               />

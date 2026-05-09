@@ -1,7 +1,7 @@
 import datetime
 
 from django.db import DatabaseError
-from django.db.models import Count, F, Prefetch
+from django.db.models import Count, F, Prefetch, Avg, Min, Max
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions as perms_sys, status, viewsets
 from rest_framework.decorators import action
@@ -475,6 +475,46 @@ class JobPostViewSet(PermissionActionMapMixin, viewsets.GenericViewSet, generics
             return var_res.response_data(data={"isSaved": is_saved})
         except JobsDomainError as e:
             return var_res.response_data(status=status.HTTP_400_BAD_REQUEST, errors={"errorMessage": [str(e)]})
+
+    @action(methods=["get"], detail=True, url_path="salary-insight", url_name="salary-insight")
+    def salary_insight(self, request, slug):
+        job_post = self.get_object()
+        career_id = job_post.career_id
+        city_id = job_post.location.city_id if job_post.location and job_post.location.city_id else None
+
+        queryset = self.get_queryset().filter(status=var_sys.JobPostStatus.APPROVED)
+        if career_id:
+            queryset = queryset.filter(career_id=career_id)
+        if city_id:
+            queryset = queryset.filter(location__city_id=city_id)
+
+        queryset = queryset.filter(salary_min__gt=0, salary_max__gt=0)
+        aggregate = queryset.aggregate(
+            count=Count('id'),
+            minSalary=Min('salary_min'),
+            maxSalary=Max('salary_max'),
+            avgMinSalary=Avg('salary_min'),
+            avgMaxSalary=Avg('salary_max'),
+        )
+
+        related_jobs = queryset.select_related('company', 'company__logo')[:5]
+        related_serializer = JobPostSerializer(
+            related_jobs,
+            many=True,
+            fields=['id', 'slug', 'jobName', 'salaryMin', 'salaryMax', 'companyDict', 'city'],
+        )
+
+        return var_res.response_data(data={
+            "careerId": career_id,
+            "cityId": city_id,
+            "jobPostId": job_post.id,
+            "count": aggregate.get("count") or 0,
+            "minSalary": aggregate.get("minSalary"),
+            "maxSalary": aggregate.get("maxSalary"),
+            "avgMinSalary": aggregate.get("avgMinSalary"),
+            "avgMaxSalary": aggregate.get("avgMaxSalary"),
+            "relatedJobs": related_serializer.data,
+        })
 
 
 class AdminJobPostViewSet(viewsets.ModelViewSet):

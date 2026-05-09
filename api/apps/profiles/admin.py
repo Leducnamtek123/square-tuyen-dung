@@ -45,6 +45,7 @@ from .models import (
     CompanyImage,
     CompanyRole,
     CompanyMember,
+    TrustReport,
 
     ResumeSaved,
 
@@ -360,7 +361,7 @@ class CompanyAdmin(admin.ModelAdmin):
 
     list_display = ("id", "show_company_image", "company_name", "field_operation", "company_email",
 
-                    "company_phone", "employee_size", "tax_code", "user",)
+                    "company_phone", "employee_size", "is_verified", "tax_code", "user",)
 
     list_display_links = ("id", "company_name",)
 
@@ -369,6 +370,7 @@ class CompanyAdmin(admin.ModelAdmin):
     list_filter = [
 
         ("employee_size", ChoiceDropdownFilter),
+        ("is_verified", DropdownFilter),
 
     ]
 
@@ -386,7 +388,7 @@ class CompanyAdmin(admin.ModelAdmin):
 
             'fields': ("company_name", 'field_operation', 'company_phone',
 
-                       'employee_size', 'tax_code', 'since', 'description',
+                       'employee_size', 'is_verified', 'tax_code', 'since', 'description',
 
                        'website_url', 'user', 'location')
 
@@ -660,6 +662,15 @@ class CompanyMemberAdmin(admin.ModelAdmin):
     raw_id_fields = ("company", "user", "role", "invited_by")
     list_select_related = ("company", "user", "role", "invited_by")
 
+
+class TrustReportAdmin(admin.ModelAdmin):
+    list_display = ("id", "target_type", "reason", "status", "reporter", "company", "job_post", "create_at")
+    list_display_links = ("id",)
+    search_fields = ("id", "message", "reporter__email", "company__company_name", "job_post__job_name")
+    list_filter = ("target_type", "reason", "status")
+    raw_id_fields = ("reporter", "company", "job_post")
+    list_select_related = ("reporter", "company", "job_post")
+
 custom_admin_site.register(JobSeekerProfile, JobSeekerProfileAdmin)
 
 custom_admin_site.register(Resume, ResumeAdmin)
@@ -675,3 +686,5 @@ custom_admin_site.register(CompanyFollowed, CompanyFollowedAdmin)
 custom_admin_site.register(CompanyRole, CompanyRoleAdmin)
 
 custom_admin_site.register(CompanyMember, CompanyMemberAdmin)
+
+custom_admin_site.register(TrustReport, TrustReportAdmin)

@@ -173,23 +173,28 @@ export const useJobPostNotifications = (params: JobPostNotificationListParams = 
 
 export const useJobPostNotificationMutations = () => {
     const queryClient = useQueryClient();
-    const invalidate = () => queryClient.invalidateQueries({ queryKey: ['jobPostNotifications'] });
 
     const addMutation = useMutation({
         mutationFn: (data: JobPostNotificationPayload) => jobPostNotificationService.addJobPostNotification(data),
-        onSuccess: () => invalidate(),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['jobPostNotifications'] });
+        },
 
     });
 
     const updateMutation = useMutation({
         mutationFn: ({ id, data }: { id: string | number; data: Partial<JobPostNotificationPayload> }) => jobPostNotificationService.updateJobPostNotificationById(id, data),
-        onSuccess: () => invalidate(),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['jobPostNotifications'] });
+        },
 
     });
 
     const deleteMutation = useMutation({
         mutationFn: (id: number) => jobPostNotificationService.deleteJobPostNotificationDetailById(id),
-        onSuccess: () => invalidate(),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['jobPostNotifications'] });
+        },
 
     });
 

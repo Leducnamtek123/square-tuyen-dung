@@ -118,10 +118,11 @@ export const ConversationScrollButton = ({
   ));
 };
 
-const getMessageText = (message: ConversationMessage) => (message?.parts || [])
-  .filter((part: ConversationMessagePart) => part.type === "text")
-  .map((part: ConversationMessagePart) => part.text || "")
-  .join("");
+const getMessageText = (message: ConversationMessage) =>
+  (message?.parts || []).reduce((text, part: ConversationMessagePart) => {
+    if (part.type !== "text") return text;
+    return `${text}${part.text || ""}`;
+  }, "");
 
 const defaultFormatMessage = (message: ConversationMessage) => {
   const roleLabel =

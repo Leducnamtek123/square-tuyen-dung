@@ -10,7 +10,7 @@ import type { Theme as MaterialTheme } from '@mui/material';
 
 const SidebarViewTotal = () => {
   const { t } = useTranslation('jobSeeker');
-  const nav = useRouter();
+  const { push } = useRouter();
   const { data, isLoading } = useJobSeekerTotalView();
 
   return (
@@ -72,7 +72,7 @@ const SidebarViewTotal = () => {
         <Button
           variant="contained"
           size="medium"
-          onClick={() => nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`)}
+          onClick={() => push(`/${ROUTES.JOB_SEEKER.JOBS}`)}
           sx={{
             background: (theme: MaterialTheme) => theme.palette.primary.main,
             px: 3,

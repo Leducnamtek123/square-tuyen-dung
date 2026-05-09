@@ -20,7 +20,7 @@ const ResetPasswordPage = () => {
 
   const { token } = useParams();
 
-  const navigate = useRouter();
+  const { push } = useRouter();
 
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
@@ -32,7 +32,7 @@ const ResetPasswordPage = () => {
         confirmPassword: data.confirmPassword,
         platform: 'WEB'
       });
-      navigate.push(`/${ROUTES.AUTH.LOGIN}?successMessage=Password updated successfully`);
+      push(`/${ROUTES.AUTH.LOGIN}?successMessage=Password updated successfully`);
     } catch (error) {
       setErrorMessage(t('messages.tryAgain') as string);
     }

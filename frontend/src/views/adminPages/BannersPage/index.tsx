@@ -160,13 +160,14 @@ const BannersPageContent = () => {
   );
 
   const TYPE_OPTIONS = useMemo(() => {
-    const apiTypes = (bannerTypesData?.results || [])
-      .filter((item) => item.is_active !== false)
-      .map((item) => ({
+    const apiTypes = (bannerTypesData?.results || []).flatMap((item) => {
+      if (item.is_active === false) return [];
+      return [{
         value: item.value,
         label: item.name || item.code,
         webAspectRatio: item.web_aspect_ratio || '',
-      }));
+      }];
+    });
 
     return apiTypes.length > 0
       ? apiTypes

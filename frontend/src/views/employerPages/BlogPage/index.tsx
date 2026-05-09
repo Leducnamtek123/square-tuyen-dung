@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useReducer } from 'react';
 import {
   Box, Button, Chip, IconButton, Stack, Tooltip, Typography,
   TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel,
@@ -30,19 +30,83 @@ const STATUS_LABEL: Record<ArticleStatus, string> = {
   archived: 'Lưu trữ',
 };
 
+type BlogListPagination = {
+  pageIndex: number;
+  pageSize: number;
+};
+
+type EmployerBlogListState = {
+  statusFilter: ArticleStatus | 'all';
+  searchInput: string;
+  search: string;
+  articles: Article[];
+  total: number;
+  isLoading: boolean;
+  pagination: BlogListPagination;
+};
+
+type EmployerBlogListAction =
+  | { type: 'patch'; patch: Partial<EmployerBlogListState> }
+  | { type: 'loading' }
+  | { type: 'loaded'; articles: Article[]; total: number }
+  | { type: 'failed' }
+  | { type: 'paginationChanged'; pagination: BlogListPagination };
+
+const initialEmployerBlogListState: EmployerBlogListState = {
+  statusFilter: 'all',
+  searchInput: '',
+  search: '',
+  articles: [],
+  total: 0,
+  isLoading: false,
+  pagination: { pageIndex: 0, pageSize: 10 },
+};
+
+const employerBlogListReducer = (
+  state: EmployerBlogListState,
+  action: EmployerBlogListAction
+): EmployerBlogListState => {
+  switch (action.type) {
+    case 'patch':
+      return {
+        ...state,
+        ...action.patch,
+      };
+    case 'loading':
+      return {
+        ...state,
+        isLoading: true,
+      };
+    case 'loaded':
+      return {
+        ...state,
+        articles: action.articles,
+        total: action.total,
+        isLoading: false,
+      };
+    case 'failed':
+      return {
+        ...state,
+        isLoading: false,
+      };
+    case 'paginationChanged':
+      return {
+        ...state,
+        pagination: action.pagination,
+      };
+    default:
+      return state;
+  }
+};
+
 const EmployerBlogListPage = () => {
   const { t } = useTranslation('employer');
-  const router = useRouter();
-  const [statusFilter, setStatusFilter] = useState<ArticleStatus | 'all'>('all');
-  const [searchInput, setSearchInput] = useState('');
-  const [search, setSearch] = useState('');
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [total, setTotal] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const { push } = useRouter();
+  const [state, dispatch] = useReducer(employerBlogListReducer, initialEmployerBlogListState);
+  const { statusFilter, searchInput, search, articles, total, isLoading, pagination } = state;
 
   const fetchArticles = useCallback(async () => {
-    setIsLoading(true);
+    dispatch({ type: 'loading' });
     try {
       const res = await contentService.employerGetBlogs({
         status: statusFilter === 'all' ? undefined : statusFilter,
@@ -50,12 +114,10 @@ const EmployerBlogListPage = () => {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
       });
-      setArticles(res.results || []);
-      setTotal(res.count || 0);
+      dispatch({ type: 'loaded', articles: res.results || [], total: res.count || 0 });
     } catch {
       toastMessages.error('Không thể tải danh sách blog');
-    } finally {
-      setIsLoading(false);
+      dispatch({ type: 'failed' });
     }
   }, [statusFilter, search, pagination]);
 
@@ -121,7 +183,7 @@ const EmployerBlogListPage = () => {
       cell: ({ row }: { row: { original: Article } }) => (
         <Stack direction="row" spacing={0.5}>
           <Tooltip title="Chỉnh sửa">
-            <IconButton size="small" onClick={() => router.push(`/employer/blog/${row.original.id}`)}>
+            <IconButton size="small" onClick={() => push(`/employer/blog/${row.original.id}`)}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -150,7 +212,7 @@ const EmployerBlogListPage = () => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => router.push('/employer/blog/create')}
+          onClick={() => push('/employer/blog/create')}
           sx={{ borderRadius: 2, fontWeight: 700, px: 3 }}
         >
           Viết bài mới
@@ -170,7 +232,7 @@ const EmployerBlogListPage = () => {
           <Select
             value={statusFilter}
             label="Trạng thái"
-            onChange={(e) => setStatusFilter(e.target.value as ArticleStatus | 'all')}
+            onChange={(e) => dispatch({ type: 'patch', patch: { statusFilter: e.target.value as ArticleStatus | 'all' } })}
           >
             <MenuItem value="all">Tất cả</MenuItem>
             <MenuItem value="draft">Bản nháp</MenuItem>
@@ -183,8 +245,8 @@ const EmployerBlogListPage = () => {
           size="small"
           placeholder="Tìm kiếm bài viết..."
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput)}
+          onChange={(e) => dispatch({ type: 'patch', patch: { searchInput: e.target.value } })}
+          onKeyDown={(e) => e.key === 'Enter' && dispatch({ type: 'patch', patch: { search: searchInput } })}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -203,7 +265,7 @@ const EmployerBlogListPage = () => {
         isLoading={isLoading}
         pagination={pagination}
         rowCount={total}
-        onPaginationChange={setPagination}
+        onPaginationChange={(nextPagination) => dispatch({ type: 'paginationChanged', pagination: nextPagination })}
       />
     </Box>
   );

@@ -7,7 +7,7 @@ import SearchOffIcon from '@mui/icons-material/SearchOff';
 
 const NotFoundPage = () => {
   const { t } = useTranslation('errors');
-  const navigate = useRouter();
+  const { push } = useRouter();
 
   return (
     <Box
@@ -72,7 +72,7 @@ const NotFoundPage = () => {
         <Button
           variant="contained"
           startIcon={<HomeIcon />}
-          onClick={() => navigate.push('/')}
+          onClick={() => push('/')}
           sx={{
             borderRadius: '12px',
             px: 3,

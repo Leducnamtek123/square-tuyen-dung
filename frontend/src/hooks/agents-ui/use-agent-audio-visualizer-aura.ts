@@ -26,6 +26,99 @@ const DEFAULT_PULSE_TRANSITION: ValueAnimationTransition = {
   repeat: Infinity,
   repeatType: 'mirror',
 };
+const LISTENING_SCALE_TRANSITION: ValueAnimationTransition = {
+  type: 'spring',
+  duration: 1.0,
+  bounce: 0.35,
+};
+
+type AnimatedNumber = number | number[];
+type AuraAnimationConfig = {
+  speed: number;
+  scale: AnimatedNumber;
+  scaleTransition: ValueAnimationTransition;
+  amplitude: AnimatedNumber;
+  amplitudeTransition: ValueAnimationTransition;
+  frequency: AnimatedNumber;
+  frequencyTransition: ValueAnimationTransition;
+  brightness: AnimatedNumber;
+  brightnessTransition: ValueAnimationTransition;
+};
+
+const getAuraAnimationConfig = (state: AgentState | undefined): AuraAnimationConfig | null => {
+  switch (state) {
+    case 'idle':
+    case 'failed':
+    case 'disconnected':
+      return {
+        speed: 10,
+        scale: 0.2,
+        scaleTransition: DEFAULT_TRANSITION,
+        amplitude: 1.2,
+        amplitudeTransition: DEFAULT_TRANSITION,
+        frequency: 0.4,
+        frequencyTransition: DEFAULT_TRANSITION,
+        brightness: 1.0,
+        brightnessTransition: DEFAULT_TRANSITION,
+      };
+    case 'listening':
+    case 'pre-connect-buffering':
+      return {
+        speed: 20,
+        scale: 0.3,
+        scaleTransition: LISTENING_SCALE_TRANSITION,
+        amplitude: 1.0,
+        amplitudeTransition: DEFAULT_TRANSITION,
+        frequency: 0.7,
+        frequencyTransition: DEFAULT_TRANSITION,
+        brightness: [1.5, 2.0],
+        brightnessTransition: DEFAULT_PULSE_TRANSITION,
+      };
+    case 'thinking':
+    case 'connecting':
+    case 'initializing':
+      return {
+        speed: 30,
+        scale: 0.3,
+        scaleTransition: DEFAULT_TRANSITION,
+        amplitude: 0.5,
+        amplitudeTransition: DEFAULT_TRANSITION,
+        frequency: 1,
+        frequencyTransition: DEFAULT_TRANSITION,
+        brightness: [0.5, 2.5],
+        brightnessTransition: DEFAULT_PULSE_TRANSITION,
+      };
+    case 'speaking':
+      return {
+        speed: 70,
+        scale: 0.3,
+        scaleTransition: DEFAULT_TRANSITION,
+        amplitude: 0.75,
+        amplitudeTransition: DEFAULT_TRANSITION,
+        frequency: 1.25,
+        frequencyTransition: DEFAULT_TRANSITION,
+        brightness: 1.5,
+        brightnessTransition: DEFAULT_TRANSITION,
+      };
+    default:
+      return null;
+  }
+};
+
+const applyAuraAnimation = (
+  config: AuraAnimationConfig,
+  controls: {
+    animateScale: (targetValue: AnimatedNumber, transition: ValueAnimationTransition) => void;
+    animateAmplitude: (targetValue: AnimatedNumber, transition: ValueAnimationTransition) => void;
+    animateFrequency: (targetValue: AnimatedNumber, transition: ValueAnimationTransition) => void;
+    animateBrightness: (targetValue: AnimatedNumber, transition: ValueAnimationTransition) => void;
+  },
+) => {
+  controls.animateScale(config.scale, config.scaleTransition);
+  controls.animateAmplitude(config.amplitude, config.amplitudeTransition);
+  controls.animateFrequency(config.frequency, config.frequencyTransition);
+  controls.animateBrightness(config.brightness, config.brightnessTransition);
+};
 
 function useAnimatedValue<T>(initialValue: T) {
   const [value, setValue] = useState(initialValue);
@@ -47,7 +140,7 @@ export function useAgentAudioVisualizerAura(
   state: AgentState | undefined,
   audioTrack?: LocalAudioTrack | RemoteAudioTrack | TrackReferenceOrPlaceholder,
 ) {
-  const [speed, setSpeed] = useState(DEFAULT_SPEED);
+  const speed = getAuraAnimationConfig(state)?.speed ?? DEFAULT_SPEED;
   const {
     value: scale,
     animate: animateScale,
@@ -63,40 +156,14 @@ export function useAgentAudioVisualizerAura(
   });
 
   useEffect(() => {
-    switch (state) {
-      case 'idle':
-      case 'failed':
-      case 'disconnected':
-        setSpeed(10);
-        animateScale(0.2, DEFAULT_TRANSITION);
-        animateAmplitude(1.2, DEFAULT_TRANSITION);
-        animateFrequency(0.4, DEFAULT_TRANSITION);
-        animateBrightness(1.0, DEFAULT_TRANSITION);
-        return;
-      case 'listening':
-      case 'pre-connect-buffering':
-        setSpeed(20);
-        animateScale(0.3, { type: 'spring', duration: 1.0, bounce: 0.35 });
-        animateAmplitude(1.0, DEFAULT_TRANSITION);
-        animateFrequency(0.7, DEFAULT_TRANSITION);
-        animateBrightness([1.5, 2.0], DEFAULT_PULSE_TRANSITION);
-        return;
-      case 'thinking':
-      case 'connecting':
-      case 'initializing':
-        setSpeed(30);
-        animateScale(0.3, DEFAULT_TRANSITION);
-        animateAmplitude(0.5, DEFAULT_TRANSITION);
-        animateFrequency(1, DEFAULT_TRANSITION);
-        animateBrightness([0.5, 2.5], DEFAULT_PULSE_TRANSITION);
-        return;
-      case 'speaking':
-        setSpeed(70);
-        animateScale(0.3, DEFAULT_TRANSITION);
-        animateAmplitude(0.75, DEFAULT_TRANSITION);
-        animateFrequency(1.25, DEFAULT_TRANSITION);
-        animateBrightness(1.5, DEFAULT_TRANSITION);
-        return;
+    const animationConfig = getAuraAnimationConfig(state);
+    if (animationConfig) {
+      applyAuraAnimation(animationConfig, {
+        animateScale,
+        animateAmplitude,
+        animateFrequency,
+        animateBrightness,
+      });
     }
   }, [state, animateScale, animateAmplitude, animateFrequency, animateBrightness]);
 

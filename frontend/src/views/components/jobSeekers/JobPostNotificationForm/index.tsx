@@ -25,6 +25,7 @@ export interface JobPostNotificationFormValues {
 interface JobPostNotificationFormProps {
   handleAddOrUpdate: (data: JobPostNotificationFormValues) => void;
   editData: Partial<JobPostNotificationFormValues> | null;
+  initialValues?: Partial<JobPostNotificationFormValues> | null;
 }
 
 const getDefaultFrequency = (options?: SelectOption[]) => {
@@ -32,7 +33,7 @@ const getDefaultFrequency = (options?: SelectOption[]) => {
   return (options[0]?.id as number | null) ?? null;
 };
 
-const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotificationFormProps) => {
+const JobPostNotificationForm = ({ handleAddOrUpdate, editData, initialValues }: JobPostNotificationFormProps) => {
   const { t } = useTranslation(['jobSeeker', 'common']);
   const { allConfig } = useConfig();
 
@@ -46,11 +47,13 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
         career: yup
           .number()
           .required(t('jobSeeker:jobManagement.notifications.form.validation.careerRequired'))
-          .typeError(t('jobSeeker:jobManagement.notifications.form.validation.careerRequired')),
+          .typeError(t('jobSeeker:jobManagement.notifications.form.validation.careerRequired'))
+          .moreThan(0, t('jobSeeker:jobManagement.notifications.form.validation.careerRequired')),
         city: yup
           .number()
           .required(t('jobSeeker:jobManagement.notifications.form.validation.cityRequired'))
-          .typeError(t('jobSeeker:jobManagement.notifications.form.validation.cityRequired')),
+          .typeError(t('jobSeeker:jobManagement.notifications.form.validation.cityRequired'))
+          .moreThan(0, t('jobSeeker:jobManagement.notifications.form.validation.cityRequired')),
         position: yup.number().notRequired().nullable(),
         experience: yup.number().notRequired().nullable(),
         salary: yup
@@ -64,15 +67,15 @@ const JobPostNotificationForm = ({ handleAddOrUpdate, editData }: JobPostNotific
 
   const defaultValues = React.useMemo<JobPostNotificationFormValues>(
     () => ({
-      frequency: editData?.frequency ?? getDefaultFrequency(allConfig?.frequencyNotificationOptions),
-      jobName: editData?.jobName ?? '',
-      career: editData?.career ?? 0,
-      city: editData?.city ?? 0,
-      position: editData?.position ?? null,
-      experience: editData?.experience ?? null,
-      salary: editData?.salary ?? null,
+      frequency: editData?.frequency ?? initialValues?.frequency ?? getDefaultFrequency(allConfig?.frequencyNotificationOptions),
+      jobName: editData?.jobName ?? initialValues?.jobName ?? '',
+      career: editData?.career ?? initialValues?.career ?? 0,
+      city: editData?.city ?? initialValues?.city ?? 0,
+      position: editData?.position ?? initialValues?.position ?? null,
+      experience: editData?.experience ?? initialValues?.experience ?? null,
+      salary: editData?.salary ?? initialValues?.salary ?? null,
     }),
-    [editData, allConfig?.frequencyNotificationOptions],
+    [editData, initialValues, allConfig?.frequencyNotificationOptions],
   );
 
   const { control, handleSubmit } = useForm<JobPostNotificationFormValues>({

@@ -49,7 +49,7 @@ const JobSeekerSignUp = () => {
 
   const dispatch = useAppDispatch();
 
-  const nav = useRouter();
+  const { push } = useRouter();
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
 
@@ -79,7 +79,7 @@ const JobSeekerSignUp = () => {
 
         );
 
-        nav.push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
+        push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
 
       } catch (error) {
 
@@ -98,7 +98,7 @@ const JobSeekerSignUp = () => {
                   roleName: ROLES_NAME.JOB_SEEKER as RoleName,
                 })
               );
-              nav.push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
+              push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
               return;
             }
           } catch {
@@ -172,7 +172,7 @@ const JobSeekerSignUp = () => {
 
           .then(() => {
 
-            nav.push('/');
+            push('/');
 
           })
 
@@ -254,7 +254,7 @@ const JobSeekerSignUp = () => {
             roleName: roleName,
           })
         );
-        nav.push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
+        push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
         return false;
       }
 

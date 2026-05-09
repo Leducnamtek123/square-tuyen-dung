@@ -3,6 +3,12 @@ import userReducer, { setActiveWorkspace } from './userSlice';
 import authReducer, { updateVerifyEmail } from './authSlice';
 import filterReducer from './filterSlice';
 import profileReducer from './profileSlice';
+import {
+  ACTIVE_WORKSPACE_STORAGE_KEY,
+  LEGACY_ACTIVE_WORKSPACE_STORAGE_KEY,
+  LEGACY_VERIFY_EMAIL_STORAGE_KEY,
+  VERIFY_EMAIL_STORAGE_KEY,
+} from '@/utils/storageKeys';
 
 // ---------------------------------------------------------------------------
 // Persistence middleware — keeps side effects OUT of reducers
@@ -19,11 +25,13 @@ persistenceMiddleware.startListening({
       const { isAllowVerifyEmail, email, roleName } = action.payload;
       if (isAllowVerifyEmail && email) {
         sessionStorage.setItem(
-          'verifyEmail',
+          VERIFY_EMAIL_STORAGE_KEY,
           JSON.stringify({ email, roleName: roleName || '' }),
         );
+        sessionStorage.removeItem(LEGACY_VERIFY_EMAIL_STORAGE_KEY);
       } else {
-        sessionStorage.removeItem('verifyEmail');
+        sessionStorage.removeItem(VERIFY_EMAIL_STORAGE_KEY);
+        sessionStorage.removeItem(LEGACY_VERIFY_EMAIL_STORAGE_KEY);
       }
     } catch {
       // Ignore storage errors
@@ -38,9 +46,11 @@ persistenceMiddleware.startListening({
     if (typeof window === 'undefined') return;
     try {
       if (action.payload) {
-        localStorage.setItem('active_workspace', JSON.stringify(action.payload));
+        localStorage.setItem(ACTIVE_WORKSPACE_STORAGE_KEY, JSON.stringify(action.payload));
+        localStorage.removeItem(LEGACY_ACTIVE_WORKSPACE_STORAGE_KEY);
       } else {
-        localStorage.removeItem('active_workspace');
+        localStorage.removeItem(ACTIVE_WORKSPACE_STORAGE_KEY);
+        localStorage.removeItem(LEGACY_ACTIVE_WORKSPACE_STORAGE_KEY);
       }
     } catch {
       // Ignore storage errors

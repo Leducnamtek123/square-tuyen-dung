@@ -35,10 +35,11 @@ const toStringArray = (value: unknown): string[] => {
     }
 
     if (typeof value === 'string') {
-        return value
-            .split('\n')
-            .map((item) => item.trim())
-            .filter((item): item is string => Boolean(item));
+        return value.split('\n').reduce<string[]>((items, item) => {
+            const trimmedItem = item.trim();
+            if (trimmedItem) items.push(trimmedItem);
+            return items;
+        }, []);
     }
 
     return [];

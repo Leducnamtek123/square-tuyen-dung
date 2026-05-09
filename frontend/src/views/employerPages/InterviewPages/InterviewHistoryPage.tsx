@@ -2,7 +2,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import {
   Box, Typography, Chip, Stack, Divider, Button, IconButton,
-  Paper, Avatar, alpha, useTheme, type Theme, TextField, InputAdornment,
+  Paper, Avatar, useTheme, TextField, InputAdornment,
   FormControl, InputLabel, Select, MenuItem, Tooltip,
   Grid2 as Grid,
 } from "@mui/material";
@@ -24,6 +24,7 @@ import BackdropLoading from '../../../components/Common/Loading/BackdropLoading'
 import type { CellContext as ReactTableCellContext } from '@tanstack/react-table';
 import useDebounce from '../../../hooks/useDebounce';
 import pc from '@/utils/muiColors';
+import dayjs from '@/configs/dayjs-config';
 
 interface VideoCardProps {
   session: InterviewSession;
@@ -106,7 +107,7 @@ const VideoCard = ({ session }: VideoCardProps) => {
 
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <Typography variant="caption" color="text.disabled" sx={{ fontWeight: 600 }}>
-          {session.endTime ? new Date(session.endTime).toLocaleDateString('vi-VN') : '---'}
+          {session.endTime ? dayjs(session.endTime).format('DD/MM/YYYY') : '---'}
         </Typography>
         {recordingUrl && (
           <Button
@@ -181,7 +182,6 @@ const reducer = (
 
 const InterviewHistoryPage = () => {
   const { t } = useTranslation(['employer', 'interview', 'common']);
-  const theme = useTheme();
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const debouncedSearch = useDebounce(state.searchTerm, 500);
 
@@ -237,7 +237,7 @@ const InterviewHistoryPage = () => {
         accessorKey: 'endTime',
         cell: ({ getValue }: ReactTableCellContext<InterviewSession, unknown>) => (
           <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 600 }}>
-            {(getValue() as string) ? new Date(getValue() as string).toLocaleString('vi-VN') : '---'}
+            {(getValue() as string) ? dayjs(getValue() as string).format('DD/MM/YYYY HH:mm') : '---'}
           </Typography>
         ),
       },
@@ -280,7 +280,7 @@ const InterviewHistoryPage = () => {
         ),
       },
     ],
-    [t, theme.palette.primary.main]
+    [t]
   );
 
   return (

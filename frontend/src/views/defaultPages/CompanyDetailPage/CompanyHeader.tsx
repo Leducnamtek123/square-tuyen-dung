@@ -6,6 +6,9 @@ import { faBriefcase, faUsers, faCalendarDays } from "@fortawesome/free-solid-sv
 import BookmarkIcon from "@mui/icons-material/Bookmark";
 import BookmarkBorderIcon from "@mui/icons-material/BookmarkBorder";
 import ShareIcon from "@mui/icons-material/Share";
+import FlagIcon from "@mui/icons-material/Flag";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import { Chip } from "@mui/material";
 import dayjs from "dayjs";
 
 import { IMAGES, ROLES_NAME } from "../../../configs/constants";
@@ -25,6 +28,7 @@ interface CompanyHeaderProps {
   isLoadingFollow: boolean;
   handleFollow: () => void;
   setOpenSharePopup: (val: boolean) => void;
+  setOpenReportPopup: (val: boolean) => void;
   t: TFunction;
 }
 
@@ -36,6 +40,7 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
   isLoadingFollow,
   handleFollow,
   setOpenSharePopup,
+  setOpenReportPopup,
   t
 }) => {
   return (
@@ -84,6 +89,16 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
               >
                 {companyDetail.companyName}
               </Typography>
+              {companyDetail.isVerified && (
+                <Chip
+                  icon={<VerifiedIcon sx={{ fontSize: 16 }} />}
+                  label={t("companyDetail.verified", "Verified company")}
+                  size="small"
+                  color="success"
+                  variant="outlined"
+                  sx={{ ml: { xs: 0, md: 1 }, mb: 1 }}
+                />
+              )}
             </Box>
             <Stack
               direction={{ xs: "column", sm: "row" }}
@@ -145,6 +160,17 @@ const CompanyHeader: React.FC<CompanyHeaderProps> = ({
             >
               {t("companyDetail.share")}
             </Button>
+            {isAuthenticated && currentUser?.roleName === ROLES_NAME.JOB_SEEKER && (
+              <Button
+                variant="outlined"
+                color="warning"
+                startIcon={<FlagIcon />}
+                onClick={() => setOpenReportPopup(true)}
+                sx={{ minWidth: 160, borderRadius: 2, boxShadow: "none" }}
+              >
+                {t("companyDetail.report", "Report")}
+              </Button>
+            )}
           </Stack>
         </Stack>
       </Box>

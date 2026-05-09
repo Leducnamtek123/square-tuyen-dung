@@ -8,8 +8,8 @@ import {
   lazy,
   memo,
   Suspense,
+  use,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useState,
@@ -148,7 +148,7 @@ type MessageBranchContextValue = {
 const MessageBranchContext = createContext<MessageBranchContextValue | null>(null);
 
 const useMessageBranch = () => {
-  const context = useContext(MessageBranchContext);
+  const context = use(MessageBranchContext);
 
   if (!context) {
     throw new Error("MessageBranch components must be used within MessageBranch");

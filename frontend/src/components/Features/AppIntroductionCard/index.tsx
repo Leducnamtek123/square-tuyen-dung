@@ -15,7 +15,7 @@ interface AppIntroductionCardProps {
 
 const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
   const { t } = useTranslation('common');
-  const nav = useRouter();
+  const { push } = useRouter();
 
   return (
     <Card sx={{ p: 4, position: 'relative', overflow: 'hidden' }}>
@@ -36,7 +36,7 @@ const AppIntroductionCard = (_props: AppIntroductionCardProps) => {
             variant="contained"
             color="primary"
             size="large"
-            onClick={() => nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`)}
+            onClick={() => push(`/${ROUTES.JOB_SEEKER.JOBS}`)}
             sx={{ borderRadius: 2, px: 4 }}
           >
             Tìm việc ngay

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect, useReducer, useRef } from 'react';
 import {
   Box, Button, TextField, Stack, Typography, Chip, Paper,
   CircularProgress, IconButton,
@@ -19,69 +19,160 @@ interface Props {
   articleId?: number;
 }
 
+type BlogFormState = {
+  loading: boolean;
+  saving: boolean;
+  title: string;
+  excerpt: string;
+  content: string;
+  tags: string;
+  tagInput: string;
+  tagList: string[];
+  thumbnailFile: File | null;
+  thumbnailPreview: string | null;
+  existingThumbnailUrl: string | null;
+};
+
+type BlogFormAction =
+  | { type: 'patch'; patch: Partial<BlogFormState> }
+  | {
+      type: 'loaded';
+      article: {
+        title: string;
+        excerpt: string;
+        content?: string | null;
+        tags?: string | null;
+        tagList?: string[];
+        thumbnailUrl?: string | null;
+      };
+    }
+  | { type: 'loadFailed' }
+  | { type: 'addTag'; tag: string }
+  | { type: 'removeTag'; tag: string }
+  | { type: 'clearThumbnail' };
+
+const initialBlogFormState: BlogFormState = {
+  loading: false,
+  saving: false,
+  title: '',
+  excerpt: '',
+  content: '',
+  tags: '',
+  tagInput: '',
+  tagList: [],
+  thumbnailFile: null,
+  thumbnailPreview: null,
+  existingThumbnailUrl: null,
+};
+
+const blogFormReducer = (state: BlogFormState, action: BlogFormAction): BlogFormState => {
+  switch (action.type) {
+    case 'patch':
+      return {
+        ...state,
+        ...action.patch,
+      };
+    case 'loaded':
+      return {
+        ...state,
+        loading: false,
+        title: action.article.title,
+        excerpt: action.article.excerpt,
+        content: action.article.content || '',
+        tags: action.article.tags || '',
+        tagList: action.article.tagList || [],
+        existingThumbnailUrl: action.article.thumbnailUrl || null,
+      };
+    case 'loadFailed':
+      return {
+        ...state,
+        loading: false,
+      };
+    case 'addTag': {
+      const tag = action.tag.trim();
+      const tagList = tag && !state.tagList.includes(tag) ? [...state.tagList, tag] : state.tagList;
+
+      return {
+        ...state,
+        tagInput: '',
+        tagList,
+        tags: tagList.join(','),
+      };
+    }
+    case 'removeTag': {
+      const tagList = state.tagList.filter((tag) => tag !== action.tag);
+
+      return {
+        ...state,
+        tagList,
+        tags: tagList.join(','),
+      };
+    }
+    case 'clearThumbnail':
+      return {
+        ...state,
+        thumbnailFile: null,
+        thumbnailPreview: null,
+        existingThumbnailUrl: null,
+      };
+    default:
+      return state;
+  }
+};
+
 const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
-  const router = useRouter();
+  const { push } = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [loading, setLoading] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const [title, setTitle] = useState('');
-  const [excerpt, setExcerpt] = useState('');
-  const [content, setContent] = useState('');
-  const [tags, setTags] = useState('');
-  const [tagInput, setTagInput] = useState('');
-  const [tagList, setTagList] = useState<string[]>([]);
-  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
-  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
-  const [existingThumbnailUrl, setExistingThumbnailUrl] = useState<string | null>(null);
+  const [state, dispatch] = useReducer(blogFormReducer, initialBlogFormState);
+  const {
+    loading,
+    saving,
+    title,
+    excerpt,
+    content,
+    tags,
+    tagInput,
+    tagList,
+    thumbnailFile,
+    thumbnailPreview,
+    existingThumbnailUrl,
+  } = state;
 
   useEffect(() => {
     if (mode === 'edit' && articleId) {
-      setLoading(true);
+      dispatch({ type: 'patch', patch: { loading: true } });
       contentService.employerGetBlog(articleId)
         .then((article) => {
-          setTitle(article.title);
-          setExcerpt(article.excerpt);
-          setContent(article.content || '');
-          setTags(article.tags || '');
-          setTagList(article.tagList || []);
-          setExistingThumbnailUrl(article.thumbnailUrl || null);
+          dispatch({ type: 'loaded', article });
         })
         .catch(() => toastMessages.error('Không thể tải bài viết'))
-        .finally(() => setLoading(false));
+        .finally(() => dispatch({ type: 'loadFailed' }));
     }
   }, [mode, articleId]);
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    setThumbnailFile(file);
+    dispatch({ type: 'patch', patch: { thumbnailFile: file } });
     const reader = new FileReader();
-    reader.onload = (ev) => setThumbnailPreview(ev.target?.result as string);
+    reader.onload = (ev) => dispatch({ type: 'patch', patch: { thumbnailPreview: ev.target?.result as string } });
     reader.readAsDataURL(file);
   };
 
   const addTag = () => {
-    const t = tagInput.trim();
-    if (t && !tagList.includes(t)) {
-      const newList = [...tagList, t];
-      setTagList(newList);
-      setTags(newList.join(','));
-    }
-    setTagInput('');
+    dispatch({ type: 'addTag', tag: tagInput });
   };
 
   const removeTag = (tag: string) => {
-    const newList = tagList.filter(t => t !== tag);
-    setTagList(newList);
-    setTags(newList.join(','));
+    dispatch({ type: 'removeTag', tag });
   };
 
   const handleSave = async (submitForReview = false) => {
     if (!title.trim()) { toastMessages.error('Vui lòng nhập tiêu đề'); return; }
     if (!content.trim()) { toastMessages.error('Vui lòng nhập nội dung'); return; }
 
-    setSaving(true);
+    dispatch({ type: 'patch', patch: { saving: true } });
     const payload: ArticlePayload = {
       title: title.trim(),
       excerpt: excerpt.trim(),
@@ -93,7 +184,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
       if (mode === 'create') {
         await contentService.employerCreateBlog(payload, thumbnailFile || undefined);
         toastMessages.success(submitForReview ? 'Đã gửi bài viết chờ duyệt!' : 'Đã lưu bản nháp!');
-        router.push('/employer/blog');
+        push('/employer/blog');
       } else if (articleId) {
         await contentService.employerUpdateBlog(articleId, payload, thumbnailFile || undefined);
         toastMessages.success(submitForReview ? 'Đã gửi bài viết chờ duyệt!' : 'Đã lưu thay đổi!');
@@ -101,7 +192,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
     } catch {
       toastMessages.error('Không thể lưu bài viết');
     } finally {
-      setSaving(false);
+      dispatch({ type: 'patch', patch: { saving: false } });
     }
   };
 
@@ -117,7 +208,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
     <Box sx={{ p: 3, maxWidth: 1100, mx: 'auto' }}>
       {/* Header */}
       <Stack direction="row" alignItems="center" spacing={2} mb={4}>
-        <IconButton onClick={() => router.push('/employer/blog')} sx={{ bgcolor: 'action.hover', borderRadius: 1.5 }}>
+        <IconButton onClick={() => push('/employer/blog')} sx={{ bgcolor: 'action.hover', borderRadius: 1.5 }}>
           <ArrowBackIcon />
         </IconButton>
         <Box flex={1}>
@@ -158,7 +249,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
               fullWidth
               label="Tiêu đề bài viết"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => dispatch({ type: 'patch', patch: { title: e.target.value } })}
               placeholder="Chia sẻ kinh nghiệm tuyển dụng của bạn..."
               sx={{ mb: 2 }}
               inputProps={{ style: { fontSize: '1.1rem', fontWeight: 700 } }}
@@ -167,7 +258,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
               fullWidth
               label="Mô tả ngắn"
               value={excerpt}
-              onChange={(e) => setExcerpt(e.target.value)}
+              onChange={(e) => dispatch({ type: 'patch', patch: { excerpt: e.target.value } })}
               placeholder="Tóm tắt ngắn gọn nội dung bài viết..."
               multiline
               rows={2}
@@ -180,7 +271,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
             <Typography variant="subtitle2" fontWeight={700} mb={2} color="text.secondary">
               NỘI DUNG BÀI VIẾT
             </Typography>
-            <SimpleRichEditor value={content} onChange={setContent} minHeight={350} />
+            <SimpleRichEditor value={content} onChange={(nextContent) => dispatch({ type: 'patch', patch: { content: nextContent } })} minHeight={350} />
           </Paper>
         </Box>
 
@@ -202,7 +293,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
                   sx={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: 1.5 }} />
                 <IconButton size="small"
                   sx={{ position: 'absolute', top: 4, right: 4, bgcolor: 'rgba(0,0,0,0.5)', color: 'white' }}
-                  onClick={() => { setThumbnailFile(null); setThumbnailPreview(null); setExistingThumbnailUrl(null); }}>
+                  onClick={() => dispatch({ type: 'clearThumbnail' })}>
                   <CloseIcon fontSize="small" />
                 </IconButton>
                 <Button size="small" fullWidth startIcon={<ImageIcon />} onClick={() => fileInputRef.current?.click()} sx={{ mt: 1 }}>
@@ -224,7 +315,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
             <Stack direction="row" spacing={1} mb={1.5}>
               <TextField
                 size="small" placeholder="Nhập tag..." value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
+                onChange={(e) => dispatch({ type: 'patch', patch: { tagInput: e.target.value } })}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
                 fullWidth
               />

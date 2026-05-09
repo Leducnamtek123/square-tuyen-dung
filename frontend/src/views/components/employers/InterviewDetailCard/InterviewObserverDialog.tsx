@@ -18,12 +18,12 @@ interface InterviewObserverDialogProps {
   sseConnected: boolean;
 }
 
-const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & { children: React.ReactElement },
-  ref: React.Ref<unknown>,
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
+const Transition = ({
+  ref,
+  ...props
+}: TransitionProps & { children: React.ReactElement; ref?: React.Ref<unknown> }) => (
+  <Slide direction="up" ref={ref} {...props} />
+);
 
 const InterviewObserverDialogContent: React.FC<InterviewObserverDialogProps> = ({
   open,

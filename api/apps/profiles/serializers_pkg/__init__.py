@@ -6,6 +6,7 @@ from .company_serializers import (  # noqa: F401
     CompanyImageSerializer,
     CompanySerializer,
     CompanyFollowedSerializer,
+    TrustReportSerializer,
     CompanyRoleSerializer,
     CompanyMemberSerializer,
     LogoCompanySerializer,

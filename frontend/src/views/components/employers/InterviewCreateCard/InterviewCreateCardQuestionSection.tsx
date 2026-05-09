@@ -31,6 +31,10 @@ import type { Question, QuestionGroup } from '../../../../types/models';
 import type { TFunction } from 'i18next';
 import pc from '@/utils/muiColors';
 
+const subscribeToStaticDateTime = () => () => {};
+const getClientMinDateTime = (): string | null => new Date().toISOString();
+const getServerMinDateTime = (): string | null => null;
+
 type Props = {
   t: TFunction;
   theme: Theme;
@@ -66,6 +70,12 @@ const InterviewCreateCardQuestionSection = ({
   onOpenEditQuestion,
   onQuestionGroupChange,
 }: Props) => {
+  const minDateTime = React.useSyncExternalStore(
+    subscribeToStaticDateTime,
+    getClientMinDateTime,
+    getServerMinDateTime
+  );
+
   return (
     <>
       <Grid size={{ xs: 12, md: 6 }}>
@@ -74,7 +84,7 @@ const InterviewCreateCardQuestionSection = ({
           control={control}
           title={t('interview:interviewCreateCard.title.scheduledtime')}
           showRequired
-          minDateTime={new Date().toISOString()}
+          minDateTime={minDateTime}
         />
       </Grid>
 

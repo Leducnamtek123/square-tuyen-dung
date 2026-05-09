@@ -7,6 +7,7 @@ import { Grid2 as Grid } from "@mui/material";
 import errorHandling from "../../../utils/errorHandling";
 import toastMessages from "../../../utils/toastMessages";
 import SocialNetworkSharingPopup from "../../../components/Common/SocialNetworkSharingPopup/SocialNetworkSharingPopup";
+import TrustReportDialog from "../../../components/Features/TrustReportDialog";
 import NoDataCard from "../../../components/Common/NoDataCard";
 import companyService from "../../../services/companyService";
 import FilterJobPostCard from "../../components/defaults/FilterJobPostCard";
@@ -32,6 +33,7 @@ const CompanyDetailPage = () => {
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
 
   const [openSharePopup, setOpenSharePopup] = React.useState(false);
+  const [openReportPopup, setOpenReportPopup] = React.useState(false);
   const queryClient = useQueryClient();
 
   const { data: fetchRes, isLoading } = useQuery({
@@ -116,7 +118,7 @@ const CompanyDetailPage = () => {
     <>
       <Box sx={{ mt: 2 }}>
         <Stack spacing={2}>
-          <CompanyHeader companyDetail={companyDetail} allConfig={allConfig} isAuthenticated={isAuthenticated} currentUser={currentUser} isLoadingFollow={followMutation.isPending} handleFollow={handleFollow} setOpenSharePopup={setOpenSharePopup} t={t} />
+          <CompanyHeader companyDetail={companyDetail} allConfig={allConfig} isAuthenticated={isAuthenticated} currentUser={currentUser} isLoadingFollow={followMutation.isPending} handleFollow={handleFollow} setOpenSharePopup={setOpenSharePopup} setOpenReportPopup={setOpenReportPopup} t={t} />
           <Box>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, md: 8 }}>
@@ -150,6 +152,14 @@ const CompanyDetailPage = () => {
           twitter: { url: (typeof window !== 'undefined' ? window.location.href : ''), title: companyDetail?.companyName },
           email: { url: (typeof window !== 'undefined' ? window.location.href : ''), subject: companyDetail?.companyName, body: companyDetail?.description },
         } as React.ComponentProps<typeof SocialNetworkSharingPopup>)}
+      />
+
+      <TrustReportDialog
+        openPopup={openReportPopup}
+        setOpenPopup={setOpenReportPopup}
+        targetType="company"
+        companyId={companyDetail.id}
+        targetName={companyDetail.companyName}
       />
     </>
   );

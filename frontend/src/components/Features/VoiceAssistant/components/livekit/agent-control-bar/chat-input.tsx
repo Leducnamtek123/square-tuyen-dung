@@ -73,7 +73,7 @@ export function ChatInput({
       >
         <form
           onSubmit={handleSubmit}
-          className="mb-3 flex grow items-end gap-2 rounded-[24px] border border-white/8 bg-slate-950/50 p-2 text-sm shadow-inner shadow-black/20"
+          className="mb-3 flex grow items-end gap-2 rounded-[24px] border border-white/8 bg-zinc-950/50 p-2 text-sm shadow-inner shadow-black/20"
         >
           <input
             ref={inputRef}
@@ -83,7 +83,7 @@ export function ChatInput({
             placeholder="Type a message..."
             onChange={(e) => setMessage(e.target.value)}
             className={cn(
-              'h-11 flex-1 bg-transparent px-3 text-slate-100 placeholder:text-slate-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+              'h-11 flex-1 bg-transparent px-3 text-zinc-100 placeholder:text-zinc-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50'
             )}
           />
           <Button

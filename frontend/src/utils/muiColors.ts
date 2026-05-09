@@ -62,7 +62,7 @@ function rgba(hex: string, opacity: number): string {
  *   bgcolor: pc.primary(0.08)       // 'rgba(26, 64, 125, 0.08)'
  *   borderColor: pc.info(0.15)      // 'rgba(42, 169, 225, 0.15)'
  */
-export const pc = {
+const pc = {
   primary:        (opacity: number) => rgba(HEX.primary, opacity),
   primaryLight:   (opacity: number) => rgba(HEX.primaryLight, opacity),
   secondary:      (opacity: number) => rgba(HEX.secondary, opacity),

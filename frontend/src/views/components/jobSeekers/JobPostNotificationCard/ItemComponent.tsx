@@ -37,28 +37,19 @@ const ItemComponent = ({
 }: ItemComponentProps) => {
   const { t } = useTranslation(["jobSeeker", "common"]);
   const { allConfig } = useConfig();
-  const [parentWidth, setParentWidth] = React.useState(0);
   const [stackDirection, setStackDirection] = React.useState<'row' | 'column'>("column");
 
   React.useEffect(() => {
     const handleResize = () => {
       const element = document.getElementById("job-post-notification");
       if (element) {
-        setParentWidth(element.offsetWidth);
+        setStackDirection(element.offsetWidth < 600 ? "column" : "row");
       }
     };
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-  React.useEffect(() => {
-    if (parentWidth < 600) {
-      setStackDirection("column");
-    } else {
-      setStackDirection("row");
-    }
-  }, [parentWidth]);
 
   return (
     <div id="job-post-notification">

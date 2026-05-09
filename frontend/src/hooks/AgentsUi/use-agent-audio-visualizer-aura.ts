@@ -4,6 +4,18 @@ import { useTrackVolume } from '@livekit/components-react';
 
 
 type AnimatedValue = number | number[];
+type AnimationTransition = NonNullable<Parameters<typeof animate>[2]>;
+type AuraAnimationConfig = {
+  speed: number;
+  scale: AnimatedValue;
+  scaleTransition: AnimationTransition;
+  amplitude: AnimatedValue;
+  amplitudeTransition: AnimationTransition;
+  frequency: AnimatedValue;
+  frequencyTransition: AnimationTransition;
+  brightness: AnimatedValue;
+  brightnessTransition: AnimationTransition;
+};
 
 const DEFAULT_SPEED = 10;
 const DEFAULT_AMPLITUDE = 2;
@@ -17,6 +29,82 @@ const DEFAULT_PULSE_TRANSITION = {
   repeat: Infinity,
   repeatType: 'mirror',
 } as const;
+const LISTENING_SCALE_TRANSITION = { type: 'spring', duration: 1.0, bounce: 0.35 } as const;
+
+const getAuraAnimationConfig = (state?: string): AuraAnimationConfig | null => {
+  switch (state) {
+    case 'idle':
+    case 'failed':
+    case 'disconnected':
+      return {
+        speed: 10,
+        scale: 0.2,
+        scaleTransition: DEFAULT_TRANSITION,
+        amplitude: 1.2,
+        amplitudeTransition: DEFAULT_TRANSITION,
+        frequency: 0.4,
+        frequencyTransition: DEFAULT_TRANSITION,
+        brightness: 1.0,
+        brightnessTransition: DEFAULT_TRANSITION,
+      };
+    case 'listening':
+    case 'pre-connect-buffering':
+      return {
+        speed: 20,
+        scale: 0.3,
+        scaleTransition: LISTENING_SCALE_TRANSITION,
+        amplitude: 1.0,
+        amplitudeTransition: DEFAULT_TRANSITION,
+        frequency: 0.7,
+        frequencyTransition: DEFAULT_TRANSITION,
+        brightness: [1.5, 2.0],
+        brightnessTransition: DEFAULT_PULSE_TRANSITION,
+      };
+    case 'thinking':
+    case 'connecting':
+    case 'initializing':
+      return {
+        speed: 30,
+        scale: 0.3,
+        scaleTransition: DEFAULT_TRANSITION,
+        amplitude: 0.5,
+        amplitudeTransition: DEFAULT_TRANSITION,
+        frequency: 1,
+        frequencyTransition: DEFAULT_TRANSITION,
+        brightness: [0.5, 2.5],
+        brightnessTransition: DEFAULT_PULSE_TRANSITION,
+      };
+    case 'speaking':
+      return {
+        speed: 70,
+        scale: 0.3,
+        scaleTransition: DEFAULT_TRANSITION,
+        amplitude: 0.75,
+        amplitudeTransition: DEFAULT_TRANSITION,
+        frequency: 1.25,
+        frequencyTransition: DEFAULT_TRANSITION,
+        brightness: 1.5,
+        brightnessTransition: DEFAULT_TRANSITION,
+      };
+    default:
+      return null;
+  }
+};
+
+const applyAuraAnimation = (
+  config: AuraAnimationConfig,
+  controls: {
+    animateScale: (targetValue: AnimatedValue, transition: AnimationTransition) => void;
+    animateAmplitude: (targetValue: AnimatedValue, transition: AnimationTransition) => void;
+    animateFrequency: (targetValue: AnimatedValue, transition: AnimationTransition) => void;
+    animateBrightness: (targetValue: AnimatedValue, transition: AnimationTransition) => void;
+  },
+) => {
+  controls.animateScale(config.scale, config.scaleTransition);
+  controls.animateAmplitude(config.amplitude, config.amplitudeTransition);
+  controls.animateFrequency(config.frequency, config.frequencyTransition);
+  controls.animateBrightness(config.brightness, config.brightnessTransition);
+};
 
 function useAnimatedValue(initialValue: AnimatedValue) {
   const [value, setValue] = useState(initialValue);
@@ -42,7 +130,7 @@ export function useAgentAudioVisualizerAura(
   state: string | undefined,
   audioTrack: unknown
 ) {
-  const [speed, setSpeed] = useState(DEFAULT_SPEED);
+  const speed = getAuraAnimationConfig(state)?.speed ?? DEFAULT_SPEED;
   const {
     value: scale,
     animate: animateScale,
@@ -52,8 +140,6 @@ export function useAgentAudioVisualizerAura(
   const { value: frequency, animate: animateFrequency } = useAnimatedValue(DEFAULT_FREQUENCY);
   const { value: brightness, animate: animateBrightness } = useAnimatedValue(DEFAULT_BRIGHTNESS);
 
-  const [volume, setVolume] = useState(0);
-  
   // Note: We can't call hooks conditionally, so we expect the caller 
   // to ensure context or handle the error if this hook is used outside of Room.
   // However, we'll try to be safe by checking if audioTrack exists.
@@ -61,50 +147,17 @@ export function useAgentAudioVisualizerAura(
     fftSize: 512,
     smoothingTimeConstant: 0.55,
   });
+  const volume = audioTrack ? trackVolume : 0;
 
   useEffect(() => {
-    if (audioTrack) {
-      setVolume(trackVolume);
-    } else {
-      setVolume(0);
-    }
-  }, [audioTrack, trackVolume]);
-
-  useEffect(() => {
-    switch (state) {
-      case 'idle':
-      case 'failed':
-      case 'disconnected':
-        setSpeed(10);
-        animateScale(0.2, DEFAULT_TRANSITION);
-        animateAmplitude(1.2, DEFAULT_TRANSITION);
-        animateFrequency(0.4, DEFAULT_TRANSITION);
-        animateBrightness(1.0, DEFAULT_TRANSITION);
-        return;
-      case 'listening':
-      case 'pre-connect-buffering':
-        setSpeed(20);
-        animateScale(0.3, { type: 'spring', duration: 1.0, bounce: 0.35 });
-        animateAmplitude(1.0, DEFAULT_TRANSITION);
-        animateFrequency(0.7, DEFAULT_TRANSITION);
-        animateBrightness([1.5, 2.0], DEFAULT_PULSE_TRANSITION);
-        return;
-      case 'thinking':
-      case 'connecting':
-      case 'initializing':
-        setSpeed(30);
-        animateScale(0.3, DEFAULT_TRANSITION);
-        animateAmplitude(0.5, DEFAULT_TRANSITION);
-        animateFrequency(1, DEFAULT_TRANSITION);
-        animateBrightness([0.5, 2.5], DEFAULT_PULSE_TRANSITION);
-        return;
-      case 'speaking':
-        setSpeed(70);
-        animateScale(0.3, DEFAULT_TRANSITION);
-        animateAmplitude(0.75, DEFAULT_TRANSITION);
-        animateFrequency(1.25, DEFAULT_TRANSITION);
-        animateBrightness(1.5, DEFAULT_TRANSITION);
-        return;
+    const animationConfig = getAuraAnimationConfig(state);
+    if (animationConfig) {
+      applyAuraAnimation(animationConfig, {
+        animateScale,
+        animateAmplitude,
+        animateFrequency,
+        animateBrightness,
+      });
     }
   }, [state, animateScale, animateAmplitude, animateFrequency, animateBrightness]);
 

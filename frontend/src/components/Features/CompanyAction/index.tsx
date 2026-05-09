@@ -29,7 +29,7 @@ interface CompanyActionProps {
 
 const CompanyAction = ({ id, views, createAt, resume, company, children }: CompanyActionProps) => {
 
-  const nav = useRouter();
+  const { push } = useRouter();
 
   const parentRef = React.useRef<HTMLDivElement>(null);
 
@@ -147,7 +147,7 @@ const CompanyAction = ({ id, views, createAt, resume, company, children }: Compa
 
                   noWrap
 
-                  onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug as string)}`)}
+                  onClick={() => push(`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, company?.slug as string)}`)}
 
                 >
 

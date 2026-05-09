@@ -9,6 +9,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../../../configs/constants';
 import { formatRoute } from '../../../../utils/funcUtils';
+import dayjs from '@/configs/dayjs-config';
 import type { InterviewSession } from '@/types/models';
 
 type StatusColor = 'success' | 'primary' | 'info' | 'error' | 'warning' | 'default';
@@ -87,13 +88,7 @@ export const useInterviewListCardColumns = ({ count, onDelete, onCancel }: UseIn
         cell: ({ getValue }) => (
           <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.secondary' }}>
             {getValue()
-              ? new Date(getValue() as string).toLocaleString('vi-VN', {
-                  year: 'numeric',
-                  month: '2-digit',
-                  day: '2-digit',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })
+              ? dayjs(getValue() as string).format('DD/MM/YYYY HH:mm')
               : '---'}
           </Typography>
         ),

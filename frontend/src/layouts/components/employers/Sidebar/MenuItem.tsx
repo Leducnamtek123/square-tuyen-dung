@@ -13,10 +13,11 @@ interface MenuItemProps {
   text: string;
   to?: string;
   onClick?: () => void;
-  isSelected?: boolean;
-  isExpanded?: boolean;
-  hasChildren?: boolean;
-  isChild?: boolean;
+  kind?: 'item' | 'group' | 'child';
+  state?: {
+    selected?: boolean;
+    expanded?: boolean;
+  };
 }
 
 const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementType; href?: string }>(({ theme }) => ({
@@ -56,8 +57,11 @@ const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementT
   },
 }));
 
-const MenuItem = ({ icon: Icon, text, to, onClick, isSelected, isExpanded, hasChildren, isChild }: MenuItemProps) => {
+const MenuItem = ({ icon: Icon, text, to, onClick, kind = 'item', state }: MenuItemProps) => {
   const pathname = usePathname();
+  const isChild = kind === 'child';
+  const hasChildren = kind === 'group';
+  const isExpanded = state?.expanded ?? false;
   const isActive = to ? pathname === to || pathname.startsWith(to + '/') : false;
 
   return (
@@ -65,7 +69,7 @@ const MenuItem = ({ icon: Icon, text, to, onClick, isSelected, isExpanded, hasCh
       component={to ? Link : 'div'}
       href={to}
       onClick={onClick}
-      selected={isSelected || isActive}
+      selected={state?.selected || isActive}
       sx={{
         pl: isChild ? 3 : 2,
         ...(hasChildren ? {} : { '& .MuiListItemIcon-root': { ml: 0 } })

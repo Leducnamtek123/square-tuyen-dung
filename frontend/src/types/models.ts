@@ -1,7 +1,7 @@
 import type { RoleName } from './auth';
 
 /* Job Post Status */
-export type JobPostStatus = 'draft' | 'active' | 'expired';
+type JobPostStatus = 'draft' | 'active' | 'expired';
 
 /** Maps legacy numeric status to semantic status */
 const JOB_POST_STATUS_MAP: Record<number, JobPostStatus> = {
@@ -59,6 +59,7 @@ export interface Company {
   logoUrl?: string | null;
   coverImageUrl?: string | null;
   companyCoverImageUrl?: string | null;
+  isVerified?: boolean;
   location?: Location | null;
   fieldOperation?: string | null;
   followersCount?: number;
@@ -118,7 +119,7 @@ export interface JobPost {
   views?: number;
   position?: number;
   experience?: number;
-  companyDict?: { id?: number; companyName?: string; logoUrl?: string | null };
+  companyDict?: { id?: number; companyName?: string; logoUrl?: string | null; companyImageUrl?: string | null; slug?: string; employeeSize?: number | null; isVerified?: boolean };
   academicLevel?: number;
   jobType?: number;
   typeOfWorkplace?: number;
@@ -406,7 +407,7 @@ export interface InterviewTranscript {
   createAt?: string | null;
 }
 
-export interface InterviewAiDetailedFeedback {
+interface InterviewAiDetailedFeedback {
   technical?: string;
   communication?: string;
   attitude?: string;

@@ -253,6 +253,8 @@ class Company(CommonBaseModel):
 
     employee_size = models.SmallIntegerField(choices=var_sys.EMPLOYEE_SIZE_CHOICES, null=True)
 
+    is_verified = models.BooleanField(default=False, db_index=True)
+
     user = models.OneToOneField(User, on_delete=models.CASCADE,
 
                                 related_name="company")
@@ -280,6 +282,70 @@ class Company(CommonBaseModel):
     def __str__(self):
 
         return f"{self.company_name if self.company_name is not None else '-'}"
+
+
+class TrustReport(CommonBaseModel):
+    TARGET_JOB = "job"
+    TARGET_COMPANY = "company"
+    TARGET_CHOICES = (
+        (TARGET_JOB, "Job post"),
+        (TARGET_COMPANY, "Company"),
+    )
+
+    REASON_SCAM = "scam"
+    REASON_WRONG_INFO = "wrong_info"
+    REASON_SPAM = "spam"
+    REASON_DUPLICATE = "duplicate"
+    REASON_OTHER = "other"
+    REASON_CHOICES = (
+        (REASON_SCAM, "Scam or fraud"),
+        (REASON_WRONG_INFO, "Wrong or misleading information"),
+        (REASON_SPAM, "Spam"),
+        (REASON_DUPLICATE, "Duplicate listing"),
+        (REASON_OTHER, "Other"),
+    )
+
+    STATUS_OPEN = "open"
+    STATUS_REVIEWING = "reviewing"
+    STATUS_RESOLVED = "resolved"
+    STATUS_REJECTED = "rejected"
+    STATUS_CHOICES = (
+        (STATUS_OPEN, "Open"),
+        (STATUS_REVIEWING, "Reviewing"),
+        (STATUS_RESOLVED, "Resolved"),
+        (STATUS_REJECTED, "Rejected"),
+    )
+
+    target_type = models.CharField(max_length=20, choices=TARGET_CHOICES)
+    reason = models.CharField(max_length=30, choices=REASON_CHOICES)
+    message = models.TextField(blank=True, default="")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_OPEN, db_index=True)
+    company = models.ForeignKey(
+        Company,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="trust_reports",
+    )
+    job_post = models.ForeignKey(
+        "jobs.JobPost",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="trust_reports",
+    )
+    reporter = models.ForeignKey(User, on_delete=models.CASCADE, related_name="trust_reports")
+
+    class Meta:
+        db_table = "project_info_trust_report"
+        indexes = [
+            models.Index(fields=["target_type", "status"], name="idx_trust_report_target_status"),
+            models.Index(fields=["reporter", "status"], name="idx_trust_report_reporter_status"),
+        ]
+
+    def __str__(self):
+        target = self.company.company_name if self.company_id else (self.job_post.job_name if self.job_post_id else self.target_type)
+        return f"{self.get_reason_display()} - {target}"
 
 class CompanyMember(CommonBaseModel):
     STATUS_INVITED = "INVITED"

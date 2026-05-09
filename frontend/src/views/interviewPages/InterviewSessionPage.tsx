@@ -153,7 +153,7 @@ function InterviewSessionBridge({
 const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps) => {
   const normalizedRole = normalizeRole(role);
   const { id: routeId } = useParams<{ id?: string }>();
-  const navigate = useRouter();
+  const { push, back } = useRouter();
   const { t, i18n } = useTranslation(['interview', 'common']);
   const [state, dispatch] = React.useReducer(reducer, initialState);
   const finalizeOnDisconnectRef = React.useRef(false);
@@ -295,10 +295,10 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
   if (state.loading) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#020617] text-slate-100">
+      <main className="grid min-h-screen place-items-center bg-[#020617] text-zinc-100">
         <div className="flex flex-col items-center gap-3 text-center">
           <CircularProgress size={36} sx={{ color: '#38bdf8' }} />
-          <p className="text-sm text-slate-400">{t('loading')}</p>
+          <p className="text-sm text-zinc-400">{t('loading')}</p>
         </div>
       </main>
     );
@@ -311,7 +311,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
       <main className="grid min-h-screen place-items-center bg-[#020617] px-6">
         <section className="w-full max-w-lg rounded-2xl border border-rose-400/30 bg-rose-500/10 p-8 text-center text-rose-100">
           <p className="mb-6 text-lg font-medium">{state.error}</p>
-          <Button variant="contained" sx={{ bgcolor: '#e11d48', '&:hover': { bgcolor: '#be123c' } }} onClick={() => navigate.push('/')}>
+          <Button variant="contained" sx={{ bgcolor: '#e11d48', '&:hover': { bgcolor: '#be123c' } }} onClick={() => push('/')}>
             {t('common:actions.backHome')}
           </Button>
         </section>
@@ -323,7 +323,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
   const statusKey   = (state.session?.status || 'scheduled').toLowerCase();
   const statusText  = t(`interviewListCard.statuses.${statusKey}`, { defaultValue: statusKey.replaceAll('_', ' ') });
-  const statusClass = statusClassMap[statusKey] || 'border-white/15 bg-white/10 text-slate-200';
+  const statusClass = statusClassMap[statusKey] || 'border-white/15 bg-white/10 text-zinc-200';
   const formattedSchedule =
     state.session?.scheduledAt &&
     new Date(state.session.scheduledAt).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US');
@@ -340,12 +340,12 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
   if (state.connectRoom && state.connectionDetails) {
     return (
-      <main className="flex min-h-screen flex-col bg-[#020617] text-slate-100">
+      <main className="flex min-h-screen flex-col bg-[#020617] text-zinc-100">
         {/* Header */}
         <header className="relative z-10 flex items-center justify-between border-b border-white/5 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl md:px-6">
           <div>
-            <h1 className="text-sm font-bold text-white md:text-base">{sessionTitle}</h1>
-            <p className="mt-0.5 text-xs text-slate-400">{jobLabel} | {candidateLabel}</p>
+            <h1 className="text-sm font-semibold text-white md:text-base">{sessionTitle}</h1>
+            <p className="mt-0.5 text-xs text-zinc-400">{jobLabel} | {candidateLabel}</p>
           </div>
           <div className="flex items-center gap-3">
             <span className={cn('inline-flex items-center rounded-md border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest', statusClass)}>
@@ -373,7 +373,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
         </div>
 
         {formattedSchedule && (
-          <p className="px-4 py-2 text-xs text-slate-500">
+          <p className="px-4 py-2 text-xs text-zinc-500">
             {t('common:labels.time')} &bull; {formattedSchedule}
           </p>
         )}
@@ -384,7 +384,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
   // ─── Preflight / waiting room ─────────────────────────────────────────────
 
   return (
-    <main className="dark min-h-screen bg-[#020617] px-4 py-4 text-slate-100 md:px-8 md:py-6">
+    <main className="dark min-h-screen bg-[#020617] px-4 py-4 text-zinc-100 md:px-8 md:py-6">
       <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
 
         {isInterrupted && (
@@ -396,12 +396,12 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
         )}
 
         {/* Session header card */}
-        <header className="relative overflow-hidden rounded-3xl border border-white/5 bg-slate-900/40 p-4 shadow-2xl shadow-black/50 backdrop-blur-2xl md:p-5">
+        <header className="relative overflow-hidden rounded-3xl border border-white/5 bg-zinc-900/40 p-4 shadow-2xl shadow-black/50 backdrop-blur-2xl md:p-5">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.1),transparent_60%)]" />
           <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-white md:text-2xl">{sessionTitle}</h1>
-              <p className="mt-1 text-sm font-medium text-slate-400">{jobLabel} | {candidateLabel}</p>
+              <h1 className="text-xl font-semibold tracking-tight text-white md:text-2xl">{sessionTitle}</h1>
+              <p className="mt-1 text-sm font-medium text-zinc-400">{jobLabel} | {candidateLabel}</p>
             </div>
             <div className="flex items-center gap-4">
               <span className={cn('inline-flex items-center rounded-lg border px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.15em] shadow-sm', statusClass)}>
@@ -446,13 +446,13 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
                 {/* Title & error */}
                 <div className="space-y-4">
-                  <h2 className="text-3xl font-black tracking-tight text-white md:text-4xl">
+                  <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
                     {isJoinable ? t('readyTitle') : t('sessionNotJoinable')}
                   </h2>
                   {state.error && (
                     <p className="text-sm font-bold uppercase tracking-widest text-rose-400">{state.error}</p>
                   )}
-                  <p className="mx-auto max-w-md text-sm leading-relaxed text-slate-400">
+                  <p className="mx-auto max-w-md text-sm leading-relaxed text-zinc-400">
                     {isJoinable ? t('readyBody') : t('sessionNotJoinableBody')}
                   </p>
                 </div>
@@ -483,7 +483,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
                       </Button>
                       <Button
                         variant="text"
-                        onClick={() => navigate.back()}
+                        onClick={() => back()}
                         sx={{ fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', '&:hover': { color: 'white' } }}
                       >
                         {t('common:actions.back')}
@@ -492,7 +492,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
                   ) : (
                     <Button
                       variant="contained"
-                      onClick={() => navigate.push('/')}
+                      onClick={() => push('/')}
                       sx={{ height: 48, borderRadius: '1rem', background: '#1e293b', px: 5, fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', '&:hover': { background: '#334155' } }}
                     >
                       {t('common:actions.backHome')}
@@ -505,7 +505,7 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
         </section>
 
         {formattedSchedule && (
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-zinc-500">
             {t('common:labels.time')} &bull; {formattedSchedule}
           </p>
         )}

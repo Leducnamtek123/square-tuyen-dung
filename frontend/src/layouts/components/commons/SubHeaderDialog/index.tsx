@@ -69,9 +69,7 @@ const DesktopContent = (
                 <Typography variant="h6">{t('nav.careers.topCareers')}</Typography>
                 <Divider sx={{ my: 2 }} />
                 <Grid container spacing={2}>
-                  {careers
-                    .filter((value) => value.isHot === true)
-                    .map((career) => (
+                  {careers.map((career) => career.isHot === true ? (
                       <Grid key={career.id} size={12}>
                         <Typography
                           sx={{
@@ -86,7 +84,7 @@ const DesktopContent = (
                           {career?.name}
                         </Typography>
                       </Grid>
-                    ))}
+                    ) : null)}
                 </Grid>
               </Stack>
             </Alert>
@@ -100,9 +98,7 @@ const DesktopContent = (
               <Typography variant="h6">{t('nav.careers.otherCareers')}</Typography>
               <Divider sx={{ my: 2 }} />
               <Grid container spacing={2}>
-                {careers
-                  .filter((value) => value.isHot !== true)
-                  .map((career) => (
+                {careers.map((career) => career.isHot !== true ? (
                     <Grid
                       key={career.id}
                       size={{
@@ -122,10 +118,10 @@ const DesktopContent = (
                         }}
                         onClick={() => handleFilter(career.id)}
                       >
-                        {career?.name}
-                      </Typography>
-                    </Grid>
-                  ))}
+                      {career?.name}
+                    </Typography>
+                  </Grid>
+                ) : null)}
               </Grid>
             </Stack>
           </Grid>
@@ -197,11 +193,11 @@ const SubHeaderDialog = ({ open, setOpen, topCareers, handleFilter }: SubHeaderD
   const fullScreen = useMediaQuery(theme.breakpoints.down('md'));
 
   const customCareers = React.useCallback((allCareers: CareerOption[], topCareers: CareerOption[]) => {
-    const topCarrersId = topCareers.map((value: CareerOption) => value.id);
-    var careerResult = [];
+    const topCareerIds = new Set(topCareers.map((value: CareerOption) => value.id));
+    const careerResult: CareerOption[] = [];
 
     for (let i = 0; i < allCareers.length; i++) {
-      if (topCarrersId.includes(allCareers[i].id)) {
+      if (topCareerIds.has(allCareers[i].id)) {
         careerResult.push({ ...allCareers[i], isHot: true });
       } else {
         careerResult.push({ ...allCareers[i], isHot: false });

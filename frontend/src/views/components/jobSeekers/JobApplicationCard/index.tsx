@@ -22,7 +22,7 @@ interface JobApplicationExt extends Omit<Resume, 'type'> {
 
 const JobApplicationCard = () => {
   const { t } = useTranslation(['jobSeeker', 'common']);
-  const nav = useRouter();
+  const { push } = useRouter();
   const { currentUser } = useAppSelector((state) => state.user);
   
   const profileId = currentUser?.jobSeekerProfile?.id || currentUser?.jobSeekerProfileId;
@@ -49,7 +49,7 @@ const JobApplicationCard = () => {
           aria-label={t('jobSeeker:jobApplication.aria.navigateToProfile')}
           size="medium"
           onClick={() =>
-            nav.push(`/${ROUTES.JOB_SEEKER.PROFILE}`)
+            push(`/${ROUTES.JOB_SEEKER.PROFILE}`)
           }
           sx={{
             "&:hover": {

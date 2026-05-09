@@ -95,9 +95,10 @@ const transformQuestionGroup = (group: unknown): QuestionGroup | null => {
     id: typeof map.id === 'number' ? map.id : 0,
     name: typeof map.name === 'string' ? map.name : '',
     description: typeof map.description === 'string' ? map.description : '',
-    questions: (Array.isArray(map.questions) ? map.questions : [])
-      .map((item) => transformQuestion(item))
-      .filter((item): item is Question => !!item),
+    questions: (Array.isArray(map.questions) ? map.questions : []).flatMap((item) => {
+      const question = transformQuestion(item);
+      return question ? [question] : [];
+    }),
   };
 };
 
@@ -160,9 +161,10 @@ export const transformInterviewSession = (session: unknown): InterviewSession | 
       (typeof s.recordingUrl === 'string' && s.recordingUrl) ||
       (typeof s.recording_url === 'string' && s.recording_url) ||
       null,
-    questions: (Array.isArray(s.questions) ? s.questions : [])
-      .map((item) => transformQuestion(item))
-      .filter((item): item is Question => !!item),
+    questions: (Array.isArray(s.questions) ? s.questions : []).flatMap((item) => {
+      const question = transformQuestion(item);
+      return question ? [question] : [];
+    }),
   };
 };
 

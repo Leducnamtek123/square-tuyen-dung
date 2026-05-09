@@ -37,17 +37,36 @@ type ApplyFormState = {
   resumes: Resume[];
 };
 
+type ApplyFormAction =
+  | { type: "resumesLoading" }
+  | { type: "resumesLoaded"; resumes: Resume[] }
+  | { type: "resumesLoadFailed" };
+
 const initialState: ApplyFormState = {
   isLoadingResumes: true,
   resumes: [],
 };
 
+const applyFormReducer = (state: ApplyFormState, action: ApplyFormAction): ApplyFormState => {
+  switch (action.type) {
+    case "resumesLoading":
+      return { ...state, isLoadingResumes: true };
+    case "resumesLoaded":
+      return { resumes: action.resumes, isLoadingResumes: false };
+    case "resumesLoadFailed":
+      return { ...state, isLoadingResumes: false };
+    default:
+      return state;
+  }
+};
+
 const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) => {
   const { t } = useTranslation("public");
   const theme = useTheme();
-  const nav = useRouter();
+  const { push } = useRouter();
   const { currentUser } = useAppSelector((state) => state.user);
-  const [state, setState] = React.useState<ApplyFormState>(initialState);
+  const [state, dispatch] = React.useReducer(applyFormReducer, initialState);
+  const jobSeekerProfileId = (currentUser as { jobSeekerProfileId?: number | string })?.jobSeekerProfileId;
 
   const schema = yup.object().shape({
     fullName: yup
@@ -80,19 +99,29 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
   });
 
   React.useEffect(() => {
+    let isActive = true;
+
     const getOnlineProfile = async (jobSeekerProfileId?: number | string) => {
+      dispatch({ type: "resumesLoading" });
       try {
-        setState((prev) => ({ ...prev, isLoadingResumes: true }));
         const resData = await jobSeekerProfileService.getResumes(jobSeekerProfileId);
-        setState((prev) => ({ ...prev, resumes: resData.results || [], isLoadingResumes: false }));
+        if (isActive) {
+          dispatch({ type: "resumesLoaded", resumes: resData.results || [] });
+        }
       } catch (error) {
-        errorHandling(error);
-        setState((prev) => ({ ...prev, isLoadingResumes: false }));
+        if (isActive) {
+          errorHandling(error);
+          dispatch({ type: "resumesLoadFailed" });
+        }
       }
     };
 
-    getOnlineProfile((currentUser as { jobSeekerProfileId?: number | string })?.jobSeekerProfileId);
-  }, [currentUser]);
+    getOnlineProfile(jobSeekerProfileId);
+
+    return () => {
+      isActive = false;
+    };
+  }, [jobSeekerProfileId]);
 
   const selectedResumeId = watch("resume");
 
@@ -136,7 +165,7 @@ const ApplyForm = ({ handleApplyJob, formId = 'modal-form' }: ApplyFormProps) =>
                     variant="contained"
                     color="primary"
                     size="small"
-                    onClick={() => nav.push(`/${ROUTES.JOB_SEEKER.PROFILE}`)}
+                    onClick={() => push(`/${ROUTES.JOB_SEEKER.PROFILE}`)}
                     sx={{ textTransform: "none" }}
                   >
                     {t("applyForm.resume.createNow", { defaultValue: "Tao ho so ngay" })}

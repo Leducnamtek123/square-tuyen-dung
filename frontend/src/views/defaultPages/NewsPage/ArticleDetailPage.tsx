@@ -54,29 +54,67 @@ const ArticleDetailSkeleton = () => (
   </Stack>
 );
 
+type ArticleDetailState = {
+  article: Article | null;
+  isLoading: boolean;
+};
+
+type ArticleDetailAction =
+  | { type: 'loading' }
+  | { type: 'loaded'; article: Article }
+  | { type: 'failed' };
+
+const articleDetailReducer = (
+  state: ArticleDetailState,
+  action: ArticleDetailAction
+): ArticleDetailState => {
+  switch (action.type) {
+    case 'loading':
+      return {
+        ...state,
+        isLoading: true,
+      };
+    case 'loaded':
+      return {
+        article: action.article,
+        isLoading: false,
+      };
+    case 'failed':
+      return {
+        article: null,
+        isLoading: false,
+      };
+    default:
+      return state;
+  }
+};
+
+const initialArticleDetailState: ArticleDetailState = {
+  article: null,
+  isLoading: true,
+};
+
 const ArticleDetailPage = () => {
-  const router = useRouter();
+  const { push } = useRouter();
   const { slug } = useParams<{ slug: string }>();
   const { t } = useTranslation(['common', 'public']);
-  const [article, setArticle] = React.useState<Article | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [state, dispatch] = React.useReducer(articleDetailReducer, initialArticleDetailState);
+  const { article, isLoading } = state;
 
   React.useEffect(() => {
     let active = true;
 
     const loadArticle = async () => {
-      setIsLoading(true);
+      dispatch({ type: 'loading' });
       try {
         const response = await contentService.getPublicArticleBySlug(slug);
         if (!active) return;
-        setArticle(response);
+        dispatch({ type: 'loaded', article: response });
       } catch (error) {
         if (active) {
           errorHandling(error);
-          setArticle(null);
+          dispatch({ type: 'failed' });
         }
-      } finally {
-        if (active) setIsLoading(false);
       }
     };
 
@@ -128,7 +166,7 @@ const ArticleDetailPage = () => {
           title="Không tìm thấy bài viết"
           content="Bài viết có thể đã bị xoá hoặc đường dẫn đã thay đổi."
           buttonText="Quay lại tin tức"
-          onClick={() => router.push(`/${ROUTES.JOB_SEEKER.NEWS}`)}
+          onClick={() => push(`/${ROUTES.JOB_SEEKER.NEWS}`)}
         />
       </Box>
     );

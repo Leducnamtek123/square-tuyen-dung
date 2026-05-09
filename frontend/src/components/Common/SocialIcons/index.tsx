@@ -49,20 +49,21 @@ export const LinkedinIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
 );
 
 export const XIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (
-  <span
-    style={{
+  <Box
+    component="span"
+    sx={{
       width: size,
       height: size,
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
       borderRadius: '999px',
-      background: '#000000',
+      backgroundColor: '#0a0a0f',
       color: '#ffffff',
     }}
   >
     <XIconMui sx={{ fontSize: Math.round(size * 0.52) }} />
-  </span>
+  </Box>
 );
 
 export const EmailIcon: React.FC<SocialIconProps> = ({ size = 44 }) => (

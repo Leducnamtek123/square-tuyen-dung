@@ -29,12 +29,12 @@ const JobPostLarge = ({
   salaryMax,
 }: JobPostLargeProps) => {
   const theme = useTheme();
-  const nav = useRouter();
+  const { push } = useRouter();
   const { allConfig } = useConfig();
   const { i18n } = useTranslation('public');
 
   const goToDetail = () => {
-    nav.push(
+    push(
       localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language),
     );
   };

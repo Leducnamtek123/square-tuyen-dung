@@ -64,13 +64,13 @@ const JobPost = ({
   salaryMin,
   salaryMax,
 }: JobPostProps) => {
-  const nav = useRouter();
+  const { push } = useRouter();
   const theme = useTheme();
   const { allConfig } = useConfig();
   const { t, i18n } = useTranslation('public');
 
   const goToDetail = () => {
-    nav.push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language));
+    push(localizeRoutePath(`/${formatRoute(ROUTES.JOB_SEEKER.JOB_DETAIL, slug)}`, i18n.language));
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {

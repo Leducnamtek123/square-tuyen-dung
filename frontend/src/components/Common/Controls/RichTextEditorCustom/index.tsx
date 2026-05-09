@@ -102,9 +102,7 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
     });
 
     try {
-      for (const file of imageFiles) {
-        if (!isMountedRef.current) return true;
-
+      const uploadResults = await Promise.all(imageFiles.map(async (file) => {
         const imageUrl = await uploadImageToMinio(file, (progress) => {
           if (!isMountedRef.current) return;
           setUploadState({
@@ -113,9 +111,26 @@ const RichTextEditorCustom = <T extends FieldValues = FieldValues>({
             fileName: file.name,
           });
         });
+        return { file, imageUrl };
+      }));
 
-        const latestEditorState = getEditorState();
-        const nextEditorState = await insertImageBlock(latestEditorState, imageUrl, file.name);
+      if (!isMountedRef.current) return true;
+
+      const { AtomicBlockUtils, EditorState: DraftEditorState } = await loadDraftJs();
+      let nextEditorState = getEditorState();
+
+      for (const { file, imageUrl } of uploadResults) {
+        const contentState = nextEditorState.getCurrentContent();
+        const contentStateWithEntity = contentState.createEntity('IMAGE', 'MUTABLE', {
+          src: imageUrl,
+          alt: file.name,
+        });
+        const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+        nextEditorState = AtomicBlockUtils.insertAtomicBlock(
+          DraftEditorState.set(nextEditorState, { currentContent: contentStateWithEntity }),
+          entityKey,
+          ' '
+        );
         onChange(nextEditorState);
       }
 

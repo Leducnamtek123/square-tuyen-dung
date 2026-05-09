@@ -154,7 +154,7 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const openLanguageMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
@@ -207,7 +207,7 @@ const LanguageSwitcher = ({ color = 'white' }: LanguageSwitcherProps) => {
         aria-controls={open ? 'language-menu' : undefined}
         aria-haspopup="true"
         aria-expanded={open ? 'true' : undefined}
-        onClick={handleClick}
+        onClick={openLanguageMenu}
         color="inherit"
         sx={{
           textTransform: 'none',

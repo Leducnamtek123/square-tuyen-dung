@@ -6,7 +6,7 @@ import SearchOffIcon from '@mui/icons-material/SearchOff';
 import { useTranslation } from 'react-i18next';
 
 export default function NotFound() {
-  const router = useRouter();
+  const { push } = useRouter();
   const { t } = useTranslation('common');
 
   return (
@@ -34,7 +34,7 @@ export default function NotFound() {
       <Button
         variant="contained"
         size="large"
-        onClick={() => router.push('/')}
+        onClick={() => push('/')}
         sx={{ textTransform: 'none', borderRadius: 2 }}
       >
         {t('notFound.backHome')}

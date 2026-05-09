@@ -10,7 +10,7 @@ import pc from '@/utils/muiColors';
 
 const ProfileDetailPage = () => {
   const { t } = useTranslation('employer');
-  const router = useRouter();
+  const { back } = useRouter();
   const theme = useTheme();
   TabTitle(t('profileDetailCard.title.profileDetail'));
 
@@ -19,7 +19,7 @@ const ProfileDetailPage = () => {
       <Box>
         <Button
           startIcon={<ArrowBackIcon />}
-          onClick={() => router.back()}
+          onClick={() => back()}
           sx={{
             fontWeight: 800,
             color: 'text.secondary',

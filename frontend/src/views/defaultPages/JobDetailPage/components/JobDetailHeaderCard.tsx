@@ -9,6 +9,8 @@ import {
   faEye,
   faClockFour,
 } from "@fortawesome/free-solid-svg-icons";
+import VerifiedIcon from "@mui/icons-material/Verified";
+import { Chip } from "@mui/material";
 
 import QRCodeBox from "../../../../components/Common/QRCodeBox";
 import MuiImageCustom from "../../../../components/Common/MuiImageCustom";
@@ -33,6 +35,7 @@ interface JobDetailHeaderCardProps {
   onSave: () => void;
   onShowApplyForm: () => void;
   onOpenSharePopup: (open: boolean) => void;
+  onOpenReport: () => void;
 }
 
 const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
@@ -44,6 +47,7 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
   onSave,
   onShowApplyForm,
   onOpenSharePopup,
+  onOpenReport,
 }) => {
   const { t } = useTranslation(["public"]);
   return (
@@ -62,15 +66,26 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
             }}
           />
           <div className="min-w-0 flex-1">
-            <Link
-              href={`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, jobPostDetail?.companyDict?.slug || '')}`}
-              className="text-lg font-semibold text-foreground hover:underline"
-            >
-              {jobPostDetail?.companyDict?.companyName}
-            </Link>
+            <div className="flex flex-wrap items-center gap-2">
+              <Link
+                href={`/${formatRoute(ROUTES.JOB_SEEKER.COMPANY_DETAIL, jobPostDetail?.companyDict?.slug || '')}`}
+                className="text-lg font-semibold text-foreground hover:underline"
+              >
+                {jobPostDetail?.companyDict?.companyName}
+              </Link>
+              {jobPostDetail?.companyDict?.isVerified && (
+                <Chip
+                  icon={<VerifiedIcon sx={{ fontSize: 16 }} />}
+                  label={t("companyDetail.verified", "Verified")}
+                  size="small"
+                  color="success"
+                  variant="outlined"
+                />
+              )}
+            </div>
             <p className="text-sm text-muted-foreground">
               {allConfig?.employeeSizeDict?.[String(jobPostDetail?.companyDict?.employeeSize)] || (
-                <span className="text-xs italic text-gray-300">
+                <span className="text-xs italic text-zinc-300">
                   {t("jobDetail.notUpdated")}
                 </span>
               )}
@@ -111,14 +126,13 @@ const JobDetailHeaderCard: React.FC<JobDetailHeaderCardProps> = ({
 
           <div className="mt-8">
             <JobDetailActions
-            isApplied={jobPostDetail?.isApplied || false}
-            isSaved={jobPostDetail?.isSaved || false}
-            isLoadingSave={isLoadingSave}
-            handleSave={onSave}
-            handleShowApplyForm={onShowApplyForm}
-            setOpenSharePopup={onOpenSharePopup}
-            isAuthenticated={isAuthenticated}
-            currentUser={currentUser}
+              applicationState={jobPostDetail?.isApplied ? "applied" : "available"}
+              saveState={isLoadingSave ? "saving" : jobPostDetail?.isSaved ? "saved" : "idle"}
+              handleSave={onSave}
+              handleShowApplyForm={onShowApplyForm}
+              setOpenSharePopup={onOpenSharePopup}
+              onOpenReport={onOpenReport}
+              viewer={{ isAuthenticated, currentUser }}
             />
           </div>
         </div>

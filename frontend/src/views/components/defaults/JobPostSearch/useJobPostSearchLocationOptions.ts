@@ -11,18 +11,52 @@ type UseJobPostSearchLocationOptionsParams = {
   reset: UseFormReset<JobPostSearchFormValues>;
 };
 
+type LocationOptionsState = {
+  districtOptions: SelectOption[];
+  wardOptions: SelectOption[];
+};
+
+type LocationOptionsAction =
+  | { type: 'districtsLoaded'; options: SelectOption[] }
+  | { type: 'wardsLoaded'; options: SelectOption[] };
+
+const locationOptionsReducer = (
+  state: LocationOptionsState,
+  action: LocationOptionsAction
+): LocationOptionsState => {
+  switch (action.type) {
+    case 'districtsLoaded':
+      return {
+        ...state,
+        districtOptions: action.options,
+      };
+    case 'wardsLoaded':
+      return {
+        ...state,
+        wardOptions: action.options,
+      };
+    default:
+      return state;
+  }
+};
+
+const initialLocationOptionsState: LocationOptionsState = {
+  districtOptions: [],
+  wardOptions: [],
+};
+
 export const useJobPostSearchLocationOptions = ({
   cityId,
   districtId,
   getValues,
   reset,
 }: UseJobPostSearchLocationOptionsParams) => {
-  const [districtOptions, setDistrictOptions] = React.useState<SelectOption[]>([]);
-  const [wardOptions, setWardOptions] = React.useState<SelectOption[]>([]);
-  const [previousCityId, setPreviousCityId] = React.useState<JobPostSearchFormValues['cityId'] | null>(null);
-  const [previousDistrictId, setPreviousDistrictId] = React.useState<JobPostSearchFormValues['districtId'] | null>(null);
+  const [state, dispatch] = React.useReducer(locationOptionsReducer, initialLocationOptionsState);
+  const previousCityIdRef = React.useRef<JobPostSearchFormValues['cityId'] | null>(null);
+  const previousDistrictIdRef = React.useRef<JobPostSearchFormValues['districtId'] | null>(null);
 
   React.useEffect(() => {
+    const previousCityId = previousCityIdRef.current;
     const hasCityChanged = previousCityId !== null && previousCityId !== cityId;
 
     if (hasCityChanged) {
@@ -35,8 +69,8 @@ export const useJobPostSearchLocationOptions = ({
       reset(currentValues, { keepDefaultValues: true });
     }
 
-    setPreviousCityId(cityId || null);
-  }, [cityId, getValues, reset, previousCityId]);
+    previousCityIdRef.current = cityId || null;
+  }, [cityId, getValues, reset]);
 
   React.useEffect(() => {
     let isActive = true;
@@ -48,10 +82,13 @@ export const useJobPostSearchLocationOptions = ({
           return;
         }
 
-        setDistrictOptions(resData.data?.map((district) => ({ id: district.id, name: district.name })) || []);
+        dispatch({
+          type: 'districtsLoaded',
+          options: resData.data?.map((district) => ({ id: district.id, name: district.name })) || [],
+        });
       } catch {
         if (isActive) {
-          setDistrictOptions([]);
+          dispatch({ type: 'districtsLoaded', options: [] });
         }
       }
     };
@@ -59,7 +96,7 @@ export const useJobPostSearchLocationOptions = ({
     if (cityId) {
       loadDistricts();
     } else {
-      setDistrictOptions([]);
+      dispatch({ type: 'districtsLoaded', options: [] });
     }
 
     return () => {
@@ -68,6 +105,7 @@ export const useJobPostSearchLocationOptions = ({
   }, [cityId]);
 
   React.useEffect(() => {
+    const previousDistrictId = previousDistrictIdRef.current;
     const hasDistrictChanged = previousDistrictId !== null && previousDistrictId !== districtId;
 
     if (hasDistrictChanged) {
@@ -79,8 +117,8 @@ export const useJobPostSearchLocationOptions = ({
       reset(currentValues, { keepDefaultValues: true });
     }
 
-    setPreviousDistrictId(districtId || null);
-  }, [districtId, getValues, reset, previousDistrictId]);
+    previousDistrictIdRef.current = districtId || null;
+  }, [districtId, getValues, reset]);
 
   React.useEffect(() => {
     let isActive = true;
@@ -92,10 +130,13 @@ export const useJobPostSearchLocationOptions = ({
           return;
         }
 
-        setWardOptions(resData.data?.map((ward) => ({ id: ward.id, name: ward.name })) || []);
+        dispatch({
+          type: 'wardsLoaded',
+          options: resData.data?.map((ward) => ({ id: ward.id, name: ward.name })) || [],
+        });
       } catch {
         if (isActive) {
-          setWardOptions([]);
+          dispatch({ type: 'wardsLoaded', options: [] });
         }
       }
     };
@@ -103,7 +144,7 @@ export const useJobPostSearchLocationOptions = ({
     if (districtId) {
       loadWards();
     } else {
-      setWardOptions([]);
+      dispatch({ type: 'wardsLoaded', options: [] });
     }
 
     return () => {
@@ -112,7 +153,7 @@ export const useJobPostSearchLocationOptions = ({
   }, [districtId]);
 
   return {
-    districtOptions,
-    wardOptions,
+    districtOptions: state.districtOptions,
+    wardOptions: state.wardOptions,
   };
 };

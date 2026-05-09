@@ -32,7 +32,7 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
 
   const dispatch = useAppDispatch();
 
-  const nav = useRouter();
+  const { push } = useRouter();
 
   const [openPopup, setOpenPopup] = React.useState(false);
 
@@ -68,7 +68,7 @@ const AccountCard = ({ title, sx }: AccountCardProps) => {
         dispatch(removeUserInfo({ accessToken, backend }))
           .unwrap()
           .then(() => {
-            nav.push(path);
+            push(path);
           })
           .catch((err: unknown) => {
             toastMessages.error(t('messages.genericError'));

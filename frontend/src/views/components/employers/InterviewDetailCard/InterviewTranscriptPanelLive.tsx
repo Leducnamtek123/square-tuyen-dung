@@ -94,34 +94,36 @@ const InterviewTranscriptPanelLive: React.FC<InterviewTranscriptPanelProps> = ({
     const history = mapHistoryMessages(session, t);
     const historyIds = new Set(history.map((item) => item.id));
     const live = mapLiveMessages(liveMessages, t).filter((item) => !historyIds.has(item.id));
-    const liveChat = sessionMessages
-      .filter((message) => !historyIds.has(message.id))
-      .map((message) => ({
+    const liveChat = sessionMessages.flatMap((message) => {
+      if (historyIds.has(message.id)) return [];
+      const role = getParticipantRole(message.from);
+      return [{
         id: message.id,
         speaker:
-          getParticipantRole(message.from) === 'agent'
+          role === 'agent'
             ? 'interviewer'
-            : getParticipantRole(message.from) === 'employer'
+            : role === 'employer'
               ? 'employer'
-              : getParticipantRole(message.from) === 'observer'
+              : role === 'observer'
                 ? 'observer'
-                : getParticipantRole(message.from) === 'candidate'
+                : role === 'candidate'
                   ? 'candidate'
                   : 'guest',
         speakerName:
-          getParticipantRole(message.from) === 'agent'
+          role === 'agent'
             ? t('interviewDetail.label.interviewer')
-            : getParticipantRole(message.from) === 'employer'
+            : role === 'employer'
               ? getParticipantCompanyName(message.from) || t('liveRoom.participants.employer')
-              : getParticipantRole(message.from) === 'observer'
+              : role === 'observer'
                 ? t('liveRoom.participants.observer', 'Quan sát viên')
-                : getParticipantRole(message.from) === 'candidate'
+                : role === 'candidate'
                   ? t('liveRoom.participants.candidate')
                   : message.from?.name || message.from?.identity || t('liveRoom.participants.guest'),
         content: sanitizeInterviewText(message.message),
         timestamp: message.timestamp,
         isLive: true,
-      }) as TimelineItem);
+      } as TimelineItem];
+    });
 
     return [...history, ...live, ...liveChat].sort((a, b) => a.timestamp - b.timestamp);
   }, [liveMessages, session, sessionMessages, t]);

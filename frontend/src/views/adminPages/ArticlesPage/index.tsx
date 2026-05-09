@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useReducer } from 'react';
 import {
   Box, Button, Chip, IconButton, Stack, Tooltip, Typography,
   TextField, InputAdornment, MenuItem, Select, FormControl, InputLabel,
@@ -32,19 +32,84 @@ const STATUS_LABEL: Record<ArticleStatus, string> = {
   archived: 'Lưu trữ',
 };
 
+type ArticleListPagination = {
+  pageIndex: number;
+  pageSize: number;
+};
+
+type AdminArticlesState = {
+  category: ArticleCategory | 'all';
+  statusFilter: ArticleStatus | 'all';
+  search: string;
+  searchInput: string;
+  articles: Article[];
+  total: number;
+  isLoading: boolean;
+  pagination: ArticleListPagination;
+};
+
+type AdminArticlesAction =
+  | { type: 'patch'; patch: Partial<AdminArticlesState> }
+  | { type: 'loading' }
+  | { type: 'loaded'; articles: Article[]; total: number }
+  | { type: 'failed' }
+  | { type: 'paginationChanged'; pagination: ArticleListPagination };
+
+const initialAdminArticlesState: AdminArticlesState = {
+  category: 'all',
+  statusFilter: 'all',
+  search: '',
+  searchInput: '',
+  articles: [],
+  total: 0,
+  isLoading: false,
+  pagination: { pageIndex: 0, pageSize: 10 },
+};
+
+const adminArticlesReducer = (
+  state: AdminArticlesState,
+  action: AdminArticlesAction
+): AdminArticlesState => {
+  switch (action.type) {
+    case 'patch':
+      return {
+        ...state,
+        ...action.patch,
+      };
+    case 'loading':
+      return {
+        ...state,
+        isLoading: true,
+      };
+    case 'loaded':
+      return {
+        ...state,
+        articles: action.articles,
+        total: action.total,
+        isLoading: false,
+      };
+    case 'failed':
+      return {
+        ...state,
+        isLoading: false,
+      };
+    case 'paginationChanged':
+      return {
+        ...state,
+        pagination: action.pagination,
+      };
+    default:
+      return state;
+  }
+};
+
 const AdminArticlesPage = () => {
-  const router = useRouter();
-  const [category, setCategory] = useState<ArticleCategory | 'all'>('all');
-  const [statusFilter, setStatusFilter] = useState<ArticleStatus | 'all'>('all');
-  const [search, setSearch] = useState('');
-  const [searchInput, setSearchInput] = useState('');
-  const [articles, setArticles] = useState<Article[]>([]);
-  const [total, setTotal] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
+  const { push } = useRouter();
+  const [state, dispatch] = useReducer(adminArticlesReducer, initialAdminArticlesState);
+  const { category, statusFilter, search, searchInput, articles, total, isLoading, pagination } = state;
 
   const fetchArticles = useCallback(async () => {
-    setIsLoading(true);
+    dispatch({ type: 'loading' });
     try {
       const res = await contentService.adminGetArticles({
         category: category === 'all' ? undefined : category,
@@ -53,12 +118,10 @@ const AdminArticlesPage = () => {
         page: pagination.pageIndex + 1,
         page_size: pagination.pageSize,
       });
-      setArticles(res.results || []);
-      setTotal(res.count || 0);
+      dispatch({ type: 'loaded', articles: res.results || [], total: res.count || 0 });
     } catch {
       toastMessages.error('Không thể tải danh sách bài viết');
-    } finally {
-      setIsLoading(false);
+      dispatch({ type: 'failed' });
     }
   }, [category, statusFilter, search, pagination]);
 
@@ -139,7 +202,7 @@ const AdminArticlesPage = () => {
       cell: ({ row }) => (
         <Stack direction="row" spacing={0.5}>
           <Tooltip title="Chỉnh sửa">
-            <IconButton size="small" onClick={() => router.push(`/admin/articles/${row.original.id}`)}>
+            <IconButton size="small" onClick={() => push(`/admin/articles/${row.original.id}`)}>
               <EditIcon fontSize="small" />
             </IconButton>
           </Tooltip>
@@ -168,7 +231,7 @@ const AdminArticlesPage = () => {
         <Button
           variant="contained"
           startIcon={<AddIcon />}
-          onClick={() => router.push('/admin/articles/create')}
+          onClick={() => push('/admin/articles/create')}
           sx={{ borderRadius: 2, fontWeight: 700, px: 3 }}
         >
           Viết bài mới
@@ -180,7 +243,9 @@ const AdminArticlesPage = () => {
         <ToggleButtonGroup
           value={category}
           exclusive
-          onChange={(_, v) => { if (v) setCategory(v); }}
+          onChange={(_, v) => {
+            if (v) dispatch({ type: 'patch', patch: { category: v } });
+          }}
           size="small"
           sx={{ height: 40 }}
         >
@@ -194,7 +259,7 @@ const AdminArticlesPage = () => {
           <Select
             value={statusFilter}
             label="Trạng thái"
-            onChange={(e) => setStatusFilter(e.target.value as ArticleStatus | 'all')}
+            onChange={(e) => dispatch({ type: 'patch', patch: { statusFilter: e.target.value as ArticleStatus | 'all' } })}
           >
             <MenuItem value="all">Tất cả</MenuItem>
             <MenuItem value="draft">Bản nháp</MenuItem>
@@ -208,8 +273,8 @@ const AdminArticlesPage = () => {
           size="small"
           placeholder="Tìm kiếm bài viết..."
           value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && setSearch(searchInput)}
+          onChange={(e) => dispatch({ type: 'patch', patch: { searchInput: e.target.value } })}
+          onKeyDown={(e) => e.key === 'Enter' && dispatch({ type: 'patch', patch: { search: searchInput } })}
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
@@ -219,7 +284,7 @@ const AdminArticlesPage = () => {
           }}
           sx={{ flex: 1, maxWidth: 400 }}
         />
-        <Button variant="outlined" onClick={() => setSearch(searchInput)} sx={{ height: 40 }}>
+        <Button variant="outlined" onClick={() => dispatch({ type: 'patch', patch: { search: searchInput } })} sx={{ height: 40 }}>
           Tìm kiếm
         </Button>
       </Stack>
@@ -231,7 +296,7 @@ const AdminArticlesPage = () => {
         isLoading={isLoading}
         pagination={pagination}
         rowCount={total}
-        onPaginationChange={setPagination}
+        onPaginationChange={(nextPagination) => dispatch({ type: 'paginationChanged', pagination: nextPagination })}
       />
     </Box>
   );

@@ -47,8 +47,7 @@ interface AppliedResumeTableProps {
 
 const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
   const { t } = useTranslation(['employer', 'common']);
-  const nav = useRouter();
-  const theme = useTheme();
+  const { push } = useRouter();
   const { 
     rows, 
     isLoading, 
@@ -238,7 +237,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             <IconButton
               color="primary"
               size="small"
-              onClick={() => nav.push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`)}
+              onClick={() => push(`/${formatRoute(ROUTES.EMPLOYER.PROFILE_DETAIL, info.row.original.resumeSlug || info.row.original.resume?.slug || '')}`)}
               sx={{ 
                 bgcolor: pc.primary( 0.06),
                 borderRadius: 1.5,
@@ -273,7 +272,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         </Stack>
       ),
     },
-  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, nav, theme.palette]);
+  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, push]);
 
   return (
     <>

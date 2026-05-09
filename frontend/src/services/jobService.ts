@@ -71,6 +71,18 @@ type JobPostOptionsResponse = {
   statusOptions?: { id: number; name: string }[];
 };
 
+type JobSalaryInsightResponse = {
+  careerId?: number | null;
+  cityId?: number | null;
+  jobPostId?: number | null;
+  count?: number;
+  minSalary?: number | null;
+  maxSalary?: number | null;
+  avgMinSalary?: number | null;
+  avgMaxSalary?: number | null;
+  relatedJobs?: JobPost[];
+};
+
 /* ── Service ──────────────────────────────────────────────────────────── */
 
 const jobService = {
@@ -137,6 +149,11 @@ const jobService = {
   saveJobPost: (slug: IdType): Promise<{ isSaved: boolean }> => {
     const url = `job/web/job-posts/${slug}/save/`;
     return httpRequest.post(url) as Promise<{ isSaved: boolean }>;
+  },
+
+  getJobSalaryInsightBySlug: (slug: IdType): Promise<JobSalaryInsightResponse> => {
+    const url = `job/web/job-posts/${slug}/salary-insight/`;
+    return httpRequest.get(url) as Promise<JobSalaryInsightResponse>;
   },
 };
 

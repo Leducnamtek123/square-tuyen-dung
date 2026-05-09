@@ -9,17 +9,17 @@ import type { AIAnalysisData } from './types';
 type Props = {
   open: boolean;
   onClose: () => void;
-  loading: boolean;
   data: AIAnalysisData | null;
-  analyzing: boolean;
   scanLinePosition: number;
   scanProgress: number;
-  isProcessing: boolean;
-  isCompleted: boolean;
-  isFailed: boolean;
   resumeFileUrl: string;
   onlineProfileUrl: string;
-  canEmbedResume: boolean;
+  analysisState: {
+    loading: boolean;
+    analyzing: boolean;
+    phase: 'idle' | 'processing' | 'completed' | 'failed';
+    canEmbedResume: boolean;
+  };
   stats: { matchingSkills: number; missingSkills: number; totalSkills: number };
   onAnalyze: () => void;
   t: TFunction;
@@ -30,21 +30,21 @@ const DRAWER_WIDTH = 520;
 const AIAnalysisDrawerView = ({
   open,
   onClose,
-  loading,
   data,
-  analyzing,
   scanLinePosition,
   scanProgress,
-  isProcessing,
-  isCompleted,
-  isFailed,
   resumeFileUrl,
   onlineProfileUrl,
-  canEmbedResume,
+  analysisState,
   stats,
   onAnalyze,
   t,
 }: Props) => {
+  const { loading, analyzing, canEmbedResume } = analysisState;
+  const isProcessing = analysisState.phase === 'processing';
+  const isCompleted = analysisState.phase === 'completed';
+  const isFailed = analysisState.phase === 'failed';
+
   return (
     <Drawer
       anchor="right"

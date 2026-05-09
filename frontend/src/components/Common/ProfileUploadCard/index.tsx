@@ -58,7 +58,7 @@ const ProfileUploadCard = ({
   handleActive,
 }: ProfileUploadCardProps) => {
 
-  const nav = useRouter();
+  const { push } = useRouter();
 
   return (
 
@@ -239,7 +239,7 @@ const ProfileUploadCard = ({
 
                 size="small"
 
-                onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.ATTACHED_PROFILE, slug)}`)}
+                onClick={() => push(`/${formatRoute(ROUTES.JOB_SEEKER.ATTACHED_PROFILE, slug)}`)}
 
               >
 

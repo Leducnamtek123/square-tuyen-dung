@@ -42,7 +42,7 @@ const DRAWER_WIDTH_XS = '80vw';
 const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicActions = true }: LeftDrawerProps) => {
   const { t } = useTranslation('common');
   const dispatch = useDispatch();
-  const nav = useRouter();
+  const { push } = useRouter();
   const { isAuthenticated } = useAppSelector((state) => state.user);
 
   const container = window !== undefined ? () => window().document.body : undefined;
@@ -61,7 +61,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
         dispatch(resetSearchJobPostFilter());
         dispatch(resetSearchCompany());
         dispatch(resetSearchResume());
-        nav.push(`/${ROUTES.AUTH.LOGIN}`);
+        push(`/${ROUTES.AUTH.LOGIN}`);
       })
       .catch((error: AxiosError<{ errors?: ApiError }>) => {
         errorHandling(error);
@@ -201,7 +201,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
                   fontSize: '0.85rem',
                 }}
                 onClick={() => {
-                  nav.push(`/${loginRoute}`);
+                  push(`/${loginRoute}`);
                   handleDrawerToggle();
                 }}
               >
@@ -219,7 +219,7 @@ const LeftDrawer = ({ window, pages, mobileOpen, handleDrawerToggle, showPublicA
                   fontWeight: 600,
                 }}
                 onClick={() => {
-                  nav.push(`/${registerRoute}`);
+                  push(`/${registerRoute}`);
                   handleDrawerToggle();
                 }}
               >

@@ -103,7 +103,7 @@ export const SessionView = ({
             className="mx-auto w-full max-w-3xl px-4 pt-40 pb-[150px] md:px-6 md:pb-[200px]"
           >
             {chatOpen && (
-              <ul className="lk-list space-y-3 rounded-[28px] border border-white/8 bg-slate-950/30 p-4 backdrop-blur-xl transition-opacity duration-300 ease-out md:p-6">
+              <ul className="lk-list space-y-3 rounded-[28px] border border-white/8 bg-zinc-950/30 p-4 backdrop-blur-xl transition-opacity duration-300 ease-out md:p-6">
                 {messages.map((entry) => (
                   <ChatEntry key={entry.id} entry={entry as any} />
                 ))}

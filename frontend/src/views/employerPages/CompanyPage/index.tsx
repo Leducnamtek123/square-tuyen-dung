@@ -12,7 +12,7 @@ const CompanyPage = () => {
     TabTitle(t("company.title"));
     const [value, setValue] = React.useState('0');
 
-    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+    const selectCompanyTab = (event: React.SyntheticEvent, newValue: string) => {
         setValue(newValue);
     };
 
@@ -20,7 +20,7 @@ const CompanyPage = () => {
         <Card sx={{ p: 2 }}>
             <TabContext value={value}>
                 <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                    <TabList onChange={handleChange} aria-label="company tabs">
+                    <TabList onChange={selectCompanyTab} aria-label="company tabs">
                         <Tab label={t("company.tabs.info")} value="0" />
                         <Tab label={t("company.tabs.multimedia")} value="1" />
                     </TabList>

@@ -7,6 +7,8 @@ import { SEGMENT_MAP, EN_TO_VI_MAP, VI_TO_EN_MAP, ROUTES } from '../routeConfig'
 import { localizeRoutePath } from '../routeLocalization';
 
 describe('SEGMENT_MAP integrity', () => {
+  const compoundSegmentPattern = /\//;
+
   it('has VI_TO_EN_MAP for every segment', () => {
     for (const [vi, en] of Object.entries(SEGMENT_MAP)) {
       expect(VI_TO_EN_MAP[vi]).toBe(en);
@@ -17,7 +19,7 @@ describe('SEGMENT_MAP integrity', () => {
     const uniqueEnglishSegments = new Set(Object.values(SEGMENT_MAP));
     for (const en of uniqueEnglishSegments) {
       // Skip compound segments like 'interviews/live'
-      if (en.includes('/')) continue;
+      if (compoundSegmentPattern.test(en)) continue;
       expect(EN_TO_VI_MAP[en]).toBeDefined();
     }
   });

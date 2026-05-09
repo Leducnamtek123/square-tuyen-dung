@@ -48,7 +48,7 @@ interface MenuItem {
 
 const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) => {
   const { t } = useTranslation('common');
-  const nav = useRouter();
+  const { push } = useRouter();
   const dispatch = useDispatch();
   const { currentUser, activeWorkspace } = useAppSelector((state) => state.user);
 
@@ -108,7 +108,7 @@ const UserMenu = ({ anchorElUser, open, handleCloseUserMenu }: UserMenuProps) =>
         dispatch(resetSearchCompany());
         dispatch(resetSearchResume());
 
-        nav.push(`/${ROUTES.AUTH.LOGIN}`);
+        push(`/${ROUTES.AUTH.LOGIN}`);
       })
       .catch((error: AxiosError<{ errors?: ApiError }>) => {
         errorHandling(error);

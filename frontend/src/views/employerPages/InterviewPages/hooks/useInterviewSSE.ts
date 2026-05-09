@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useReducer, useRef } from 'react';
 import tokenService from '../../../../services/tokenService';
 
 /**
@@ -41,6 +41,56 @@ interface UseInterviewSSEReturn {
   statusEvents: SSEStatusEvent[];
 }
 
+type InterviewSSEState = UseInterviewSSEReturn;
+
+type InterviewSSEAction =
+  | { type: 'reset' }
+  | { type: 'connected' }
+  | { type: 'disconnected' }
+  | { type: 'connectionLost'; error: string }
+  | { type: 'transcriptAdded'; transcript: SSETranscript }
+  | { type: 'statusChanged'; event: SSEStatusEvent };
+
+const initialInterviewSSEState: InterviewSSEState = {
+  liveTranscripts: [],
+  liveStatus: null,
+  connected: false,
+  error: null,
+  statusEvents: [],
+};
+
+const interviewSSEReducer = (
+  state: InterviewSSEState,
+  action: InterviewSSEAction,
+): InterviewSSEState => {
+  switch (action.type) {
+    case 'reset':
+      return initialInterviewSSEState;
+    case 'connected':
+      return { ...state, connected: true, error: null };
+    case 'disconnected':
+      return { ...state, connected: false };
+    case 'connectionLost':
+      return { ...state, connected: false, error: action.error };
+    case 'transcriptAdded':
+      if (state.liveTranscripts.some((transcript) => transcript.id === action.transcript.id)) {
+        return state;
+      }
+      return {
+        ...state,
+        liveTranscripts: [...state.liveTranscripts, action.transcript],
+      };
+    case 'statusChanged':
+      return {
+        ...state,
+        liveStatus: action.event.newStatus,
+        statusEvents: [...state.statusEvents, action.event],
+      };
+    default:
+      return state;
+  }
+};
+
 /**
  * Custom hook for SSE (Server-Sent Events) connection to receive
  * realtime interview events (transcripts, status changes).
@@ -49,11 +99,7 @@ export function useInterviewSSE({
   sessionId,
   enabled = true,
 }: UseInterviewSSEOptions): UseInterviewSSEReturn {
-  const [liveTranscripts, setLiveTranscripts] = useState<SSETranscript[]>([]);
-  const [liveStatus, setLiveStatus] = useState<string | null>(null);
-  const [connected, setConnected] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [statusEvents, setStatusEvents] = useState<SSEStatusEvent[]>([]);
+  const [state, dispatch] = useReducer(interviewSSEReducer, initialInterviewSSEState);
   const eventSourceRef = useRef<EventSource | null>(null);
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reconnectAttempts = useRef(0);
@@ -69,10 +115,14 @@ export function useInterviewSSE({
     }
   }, []);
 
-  const connect = useCallback(() => {
-    if (!sessionId || !enabled) return;
-
+  const connect = useCallback((shouldResetState = false) => {
     cleanup();
+    if (shouldResetState) {
+      dispatch({ type: 'reset' });
+      reconnectAttempts.current = 0;
+    }
+
+    if (!sessionId || !enabled) return;
 
     const base = (process.env.NEXT_PUBLIC_API_BASE || '/api').replace(/\/$/, '');
     const token = tokenService.getAccessTokenFromCookie?.() || '';
@@ -83,19 +133,14 @@ export function useInterviewSSE({
     eventSourceRef.current = es;
 
     es.addEventListener('connected', () => {
-      setConnected(true);
-      setError(null);
+      dispatch({ type: 'connected' });
       reconnectAttempts.current = 0;
     });
 
     es.addEventListener('transcript_added', (e: MessageEvent) => {
       try {
         const data: SSETranscriptEvent = JSON.parse(e.data);
-        setLiveTranscripts((prev) => {
-          // Deduplicate by id
-          if (prev.some((t) => t.id === data.transcript.id)) return prev;
-          return [...prev, data.transcript];
-        });
+        dispatch({ type: 'transcriptAdded', transcript: data.transcript });
       } catch {
         // ignore parse errors
       }
@@ -104,8 +149,7 @@ export function useInterviewSSE({
     es.addEventListener('status_changed', (e: MessageEvent) => {
       try {
         const data: SSEStatusEvent = JSON.parse(e.data);
-        setLiveStatus(data.newStatus);
-        setStatusEvents((prev) => [...prev, data]);
+        dispatch({ type: 'statusChanged', event: data });
       } catch {
         // ignore
       }
@@ -120,7 +164,7 @@ export function useInterviewSSE({
     });
 
     es.onerror = () => {
-      setConnected(false);
+      dispatch({ type: 'disconnected' });
       es.close();
       eventSourceRef.current = null;
 
@@ -133,29 +177,21 @@ export function useInterviewSSE({
           connect();
         }, delay);
       } else {
-        setError('SSE connection lost. Please refresh the page.');
+        dispatch({ type: 'connectionLost', error: 'SSE connection lost. Please refresh the page.' });
       }
     };
   }, [sessionId, enabled, cleanup]);
 
   useEffect(() => {
-    connect();
+    connect(true);
     return cleanup;
   }, [connect, cleanup]);
 
-  // Reset state when sessionId changes
-  useEffect(() => {
-    setLiveTranscripts([]);
-    setLiveStatus(null);
-    setStatusEvents([]);
-    setError(null);
-  }, [sessionId]);
-
   return {
-    liveTranscripts,
-    liveStatus,
-    connected,
-    error,
-    statusEvents,
+    liveTranscripts: state.liveTranscripts,
+    liveStatus: state.liveStatus,
+    connected: state.connected,
+    error: state.error,
+    statusEvents: state.statusEvents,
   };
 }

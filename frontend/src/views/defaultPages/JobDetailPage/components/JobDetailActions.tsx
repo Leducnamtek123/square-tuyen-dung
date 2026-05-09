@@ -6,40 +6,45 @@ import { useRouter } from 'next/navigation';
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShareIcon from "@mui/icons-material/Share";
+import FlagIcon from "@mui/icons-material/Flag";
 
 import { ROLES_NAME, ROUTES } from "../../../../configs/constants";
 import type { User } from '@/types/models';
 
 interface JobDetailActionsProps {
-  isApplied: boolean;
-  isSaved: boolean;
-  isLoadingSave: boolean;
+  applicationState: "applied" | "available";
+  saveState: "idle" | "saved" | "saving";
   handleSave: () => void;
   handleShowApplyForm: () => void;
   setOpenSharePopup: (open: boolean) => void;
-  isAuthenticated: boolean;
-  currentUser: User | null;
+  onOpenReport: () => void;
+  viewer: {
+    isAuthenticated: boolean;
+    currentUser: User | null;
+  };
 }
 
 const JobDetailActions: React.FC<JobDetailActionsProps> = ({
-  isApplied,
-  isSaved,
-  isLoadingSave,
+  applicationState,
+  saveState,
   handleSave,
   handleShowApplyForm,
   setOpenSharePopup,
-  isAuthenticated,
-  currentUser,
+  onOpenReport,
+  viewer,
 }) => {
   const { t } = useTranslation(["public"]);
-  const nav = useRouter();
+  const { push } = useRouter();
+  const isApplied = applicationState === "applied";
+  const isSaved = saveState === "saved";
+  const isLoadingSave = saveState === "saving";
   const canApply =
-    !isAuthenticated ||
-    currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
+    !viewer.isAuthenticated ||
+    viewer.currentUser?.roleName === ROLES_NAME.JOB_SEEKER;
 
   const handleApplyClick = () => {
-    if (!isAuthenticated) {
-      nav.push(`/${ROUTES.AUTH.LOGIN}`);
+    if (!viewer.isAuthenticated) {
+      push(`/${ROUTES.AUTH.LOGIN}`);
       return;
     }
     handleShowApplyForm();
@@ -58,7 +63,7 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
           >
             {isApplied ? t("jobDetail.actions.applied") : t("jobDetail.actions.apply")}
           </Button>
-          {isAuthenticated && (
+          {viewer.isAuthenticated && (
             <Button
               onClick={handleSave}
               variant={isSaved ? "default" : "outline"}
@@ -91,6 +96,17 @@ const JobDetailActions: React.FC<JobDetailActionsProps> = ({
         <ShareIcon fontSize="small" className="mr-2" />
         {t("jobDetail.actions.share")}
       </Button>
+      {viewer.isAuthenticated && (
+        <Button
+          variant="outline"
+          size="lg"
+          onClick={onOpenReport}
+          className="border-amber-300 text-amber-700 hover:bg-amber-50"
+        >
+          <FlagIcon fontSize="small" className="mr-2" />
+          {t("jobDetail.actions.report", "Report")}
+        </Button>
+      )}
     </div>
   );
 };

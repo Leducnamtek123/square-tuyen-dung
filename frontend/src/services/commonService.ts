@@ -96,28 +96,41 @@ const commonService = {
     const url = 'common/all-careers/';
     const pageSize = Number(params.pageSize || 1000);
     const kw = params.kw;
-    let page = Number(params.page || 1);
-    let results: Career[] = [];
-    let total = 0;
-
-    while (true) {
-      const res = await httpRequest.get(url, {
+    const startPage = Number(params.page || 1);
+    const fetchPage = async (page: number): Promise<PaginatedLike<Career>> => {
+      return (await httpRequest.get(url, {
         params: { page, pageSize, kw },
-      }) as PaginatedLike<Career>;
+      })) as PaginatedLike<Career>;
+    };
 
+    const fetchUntilShortPage = async (page: number, collected: Career[]): Promise<Career[]> => {
+      const res = await fetchPage(page);
       const pageResults = extractResults<Career>(res);
+      const nextResults = collected.concat(pageResults);
 
-      const count = typeof res?.count === 'number' ? res.count : null;
+      if (!pageResults.length || pageResults.length < pageSize) {
+        return nextResults;
+      }
+      return fetchUntilShortPage(page + 1, nextResults);
+    };
 
-      if (typeof count === 'number') total = count;
+    const firstPage = await fetchPage(startPage);
+    const firstPageResults = extractResults<Career>(firstPage);
+    const total = typeof firstPage?.count === 'number' ? firstPage.count : null;
 
-      results = results.concat(pageResults);
-
-      if (!pageResults.length) break;
-      if (total && results.length >= total) break;
-      if (pageResults.length < pageSize) break;
-
-      page += 1;
+    let results: Career[];
+    if (total) {
+      const totalPages = Math.ceil(total / pageSize);
+      const remainingPages = Array.from(
+        { length: Math.max(0, totalPages - startPage) },
+        (_, index) => startPage + index + 1
+      );
+      const remainingResults = await Promise.all(remainingPages.map(fetchPage));
+      results = firstPageResults.concat(remainingResults.flatMap((res) => extractResults<Career>(res)));
+    } else {
+      results = firstPageResults.length < pageSize
+        ? firstPageResults
+        : await fetchUntilShortPage(startPage + 1, firstPageResults);
     }
 
     return (await presignInObject(results)) as Career[];

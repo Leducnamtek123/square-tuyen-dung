@@ -227,7 +227,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                             rows={5}
                             variant="outlined"
                             value={currentQuestion.text || ''}
-                            onChange={(e) => setCurrentQuestion({ ...currentQuestion, text: e.target.value })}
+                            onChange={(e) => setCurrentQuestion((prev) => ({ ...prev, text: e.target.value }))}
                             sx={inputSx}
                         />
                         <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1.5, px: 1, fontWeight: 500 }}>

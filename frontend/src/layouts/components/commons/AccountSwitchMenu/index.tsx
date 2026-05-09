@@ -53,7 +53,7 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
     window.location.href = targetUrl;
   };
 
-  const handleClick = () => {
+  const switchWorkspacePortal = () => {
     openPortal(!isEmployerPortal);
   };
 
@@ -211,7 +211,7 @@ const AccountSwitchMenu = ({ isShowButton = false }: AccountSwitchMenuProps) => 
         <Button
           variant="contained"
           size="small"
-          onClick={handleClick}
+          onClick={switchWorkspacePortal}
           startIcon={
             <FontAwesomeIcon
               icon={!isEmployerPortal ? faBriefcase : faUsers}

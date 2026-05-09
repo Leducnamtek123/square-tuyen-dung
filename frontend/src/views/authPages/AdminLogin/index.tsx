@@ -96,9 +96,9 @@ const AdminLogin: React.FC = () => {
   const { t } = useTranslation(['auth', 'admin']);
   TabTitle(t('auth:login.adminTitle'));
   const dispatch = useDispatch<AppDispatch>();
-  const nav = useRouter();
+  const { push } = useRouter();
 
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isAuthenticating, setIsAuthenticating] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   /* ── slider data ── */
@@ -146,7 +146,6 @@ const AdminLogin: React.FC = () => {
   /* ── auth logic ── */
   const handleLogin: React.ComponentProps<typeof AdminLoginForm>['onLogin'] = (data) => {
     const getAccessToken = async (email: string, password: string, roleName: string) => {
-      setIsLoading(true);
       try {
         const resData = await authService.getToken(email, password, roleName as RoleName);
         const { accessToken, refreshToken, backend } = resData;
@@ -163,7 +162,7 @@ const AdminLogin: React.FC = () => {
             .then(() => {
               const lang = getPreferredLanguage();
               const dashboardPath = buildPortalPath('admin', '/dashboard', lang);
-              nav.push(dashboardPath);
+              push(dashboardPath);
             })
             .catch(() => toastMessages.error(t('auth:messages.loginError')));
         } else {
@@ -180,13 +179,12 @@ const AdminLogin: React.FC = () => {
             toastMessages.error(t('auth:messages.tryAgain'));
           }
         }
-      } finally {
-        setIsLoading(false);
       }
     };
 
     const checkCreds = async (email: string, password: string, roleName: string) => {
-      setIsLoading(true);
+      setErrorMessage(null);
+      setIsAuthenticating(true);
       try {
         const resData = await authService.checkCreds(email, roleName as RoleName);
         const { exists, email: resEmail, emailVerified } = resData;
@@ -199,17 +197,17 @@ const AdminLogin: React.FC = () => {
               roleName: roleName as RoleName,
             }),
           );
-          nav.push(`/${ROUTES.AUTH.LOGIN}`);
+          push(`/${ROUTES.AUTH.LOGIN}`);
           return;
         } else if (exists === false) {
           setErrorMessage(t('auth:messages.noAdminAccount'));
           return;
         }
-        getAccessToken(resEmail, password, roleName);
+        await getAccessToken(resEmail, password, roleName);
       } catch (error) {
         toastMessages.error(t('auth:messages.loginError'));
       } finally {
-        setIsLoading(false);
+        setIsAuthenticating(false);
       }
     };
 
@@ -324,7 +322,7 @@ const AdminLogin: React.FC = () => {
         </RightPanel>
       </Card>
 
-      {isLoading && <BackdropLoading />}
+      {isAuthenticating && <BackdropLoading />}
     </>
   );
 };

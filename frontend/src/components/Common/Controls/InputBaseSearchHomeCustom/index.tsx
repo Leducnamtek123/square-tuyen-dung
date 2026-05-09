@@ -16,6 +16,12 @@ import { searchJobPostWithKeyword } from '@/redux/filterSlice';
 import jobService from '@/services/jobService';
 import { ROUTES } from '@/configs/constants';
 import { useTranslation } from 'react-i18next';
+import {
+  RECENT_SEARCH_STORAGE_KEY,
+  LEGACY_RECENT_SEARCH_STORAGE_KEY,
+  readVersionedJson,
+  writeVersionedJson,
+} from '@/utils/storageKeys';
 
 interface Props<T extends FieldValues = FieldValues> {
   name: string;
@@ -76,16 +82,18 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
   const { t } = useTranslation('common');
   const inputRef = React.useRef<HTMLInputElement | null>(null);
   const inputSearchRef = React.useRef<HTMLDivElement | null>(null);
-  const nav = useRouter();
+  const { push } = useRouter();
   const dispatch = useDispatch();
   const [state, dispatchSearch] = React.useReducer(reducer, initialState);
   const debounced = useDebounce(state.searchValue, 300);
 
   React.useEffect(() => {
     try {
-      const stored = localStorage.getItem('recentSearch');
-      if (!stored) return;
-      const parsed = JSON.parse(stored) as unknown;
+      const parsed = readVersionedJson<unknown[]>(
+        RECENT_SEARCH_STORAGE_KEY,
+        [LEGACY_RECENT_SEARCH_STORAGE_KEY]
+      );
+      if (!parsed) return;
       dispatchSearch({
         type: 'set_recent_search',
         value: Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [],
@@ -139,13 +147,13 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
     dispatchSearch({ type: 'set_recent_search', value: nextRecent });
     dispatchSearch({ type: 'show_result', value: false });
     try {
-      localStorage.setItem('recentSearch', JSON.stringify(nextRecent));
+      writeVersionedJson(RECENT_SEARCH_STORAGE_KEY, nextRecent);
     } catch {
       // ignore storage errors
     }
 
     if (location === 'HOME') {
-      nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
+      push(`/${ROUTES.JOB_SEEKER.JOBS}`);
     }
   };
 

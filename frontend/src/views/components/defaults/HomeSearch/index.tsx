@@ -16,11 +16,17 @@ import {
 import { ROUTES } from '../../../../configs/constants';
 import { useConfig } from '@/hooks/useConfig';
 import type { JobPostFilter } from '../../../../redux/filterSlice';
+import {
+  PROJECT_SEARCH_HISTORY_STORAGE_KEY,
+  LEGACY_PROJECT_SEARCH_HISTORY_STORAGE_KEY,
+  readVersionedJson,
+  writeVersionedJson,
+} from '@/utils/storageKeys';
 
 const HomeSearch = () => {
   const { t } = useTranslation(['common']);
   const dispatch = useDispatch();
-  const nav = useRouter();
+  const { push } = useRouter();
   const { allConfig } = useConfig();
 
   const { jobPostFilter } = useAppSelector((state) => state.filter);
@@ -40,31 +46,16 @@ const HomeSearch = () => {
   const handleSaveKeyworLocalStorage = (kw: string) => {
     try {
       if (kw) {
-        const keywordListStr = localStorage.getItem('project_search_history');
-        if (
-          keywordListStr !== null &&
-          keywordListStr !== undefined &&
-          keywordListStr !== ''
-        ) {
-          const keywordList = JSON.parse(keywordListStr);
-          if (!keywordList.includes(kw)) {
-            if (keywordList.length >= 5) {
-              localStorage.setItem(
-                'project_search_history',
-                JSON.stringify([
-                  kw,
-                  ...keywordList.slice(0, keywordList.length - 1),
-                ])
-              );
-            } else {
-              localStorage.setItem(
-                'project_search_history',
-                JSON.stringify([kw, ...keywordList])
-              );
-            }
-          }
-        } else {
-          localStorage.setItem('project_search_history', JSON.stringify([kw]));
+        const keywordList = readVersionedJson<string[]>(
+          PROJECT_SEARCH_HISTORY_STORAGE_KEY,
+          [LEGACY_PROJECT_SEARCH_HISTORY_STORAGE_KEY]
+        ) ?? [];
+        if (!keywordList.includes(kw)) {
+          const nextKeywords =
+            keywordList.length >= 5
+              ? [kw, ...keywordList.slice(0, keywordList.length - 1)]
+              : [kw, ...keywordList];
+          writeVersionedJson(PROJECT_SEARCH_HISTORY_STORAGE_KEY, nextKeywords);
         }
       }
     } catch {
@@ -75,7 +66,7 @@ const HomeSearch = () => {
   const handleFilter = (data: { kw: string; cityId: string; careerId: string }) => {
     handleSaveKeyworLocalStorage(data?.kw);
     dispatch(searchJobPost({ ...jobPostFilter, ...data } as JobPostFilter));
-    nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
+    push(`/${ROUTES.JOB_SEEKER.JOBS}`);
   };
 
   return (

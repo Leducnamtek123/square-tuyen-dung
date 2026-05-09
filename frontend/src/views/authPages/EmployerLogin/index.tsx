@@ -54,7 +54,7 @@ const EmployerLogin = () => {
   TabTitle(t('login.employerTitle'));
 
   const dispatch = useAppDispatch();
-  const nav = useRouter();
+  const { push } = useRouter();
 
   const [isFullScreenLoading, setIsFullScreenLoading] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
@@ -91,7 +91,7 @@ const EmployerLogin = () => {
           dispatch(getUserInfo())
             .unwrap()
             .then(() => {
-              nav.push('/');
+              push('/');
             })
             .catch(() => {
               toastMessages.error(t('messages.loginError'));
@@ -134,7 +134,7 @@ const EmployerLogin = () => {
             })
           );
 
-          nav.push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
+          push(`/${ROUTES.AUTH.EMAIL_VERIFICATION}`);
           return;
         }
 
@@ -172,7 +172,7 @@ const EmployerLogin = () => {
         dispatch(getUserInfo())
           .unwrap()
           .then(() => {
-            nav.push('/');
+            push('/');
           })
           .catch(() => {
             toastMessages.error(t('messages.loginError'));

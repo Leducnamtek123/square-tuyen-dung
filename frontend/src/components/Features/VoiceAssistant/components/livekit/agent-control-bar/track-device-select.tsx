@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { cva } from 'class-variance-authority';
 import { LocalAudioTrack, LocalVideoTrack } from 'livekit-client';
 import { useMaybeRoomContext, useMediaDeviceSelect } from '@livekit/components-react';
@@ -19,7 +19,6 @@ type DeviceSelectProps = React.ComponentProps<typeof SelectTrigger> & {
   track?: LocalAudioTrack | LocalVideoTrack | undefined;
   requestPermissions?: boolean;
   onMediaDeviceError?: (error: Error) => void;
-  onDeviceListChange?: (devices: MediaDeviceInfo[]) => void;
   onActiveDeviceChange?: (deviceId: string) => void;
 };
 
@@ -44,7 +43,6 @@ export function TrackDeviceSelect({
   size = 'default',
   requestPermissions = false,
   onMediaDeviceError,
-  onDeviceListChange,
   onActiveDeviceChange,
   ...props
 }: DeviceSelectProps) {
@@ -58,10 +56,6 @@ export function TrackDeviceSelect({
     requestPermissions: requestPermissionsState,
     onError: onMediaDeviceError,
   });
-
-  useEffect(() => {
-    onDeviceListChange?.(devices);
-  }, [devices, onDeviceListChange]);
 
   const handleActiveDeviceChange = (deviceId: string) => {
     setActiveMediaDevice(deviceId);

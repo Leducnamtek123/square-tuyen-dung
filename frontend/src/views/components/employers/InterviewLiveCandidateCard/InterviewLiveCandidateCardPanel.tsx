@@ -95,7 +95,7 @@ const InterviewLiveCandidateCardPanel = ({
           >
             <Box>
               <Typography variant="subtitle1" sx={{ color: '#fff', fontWeight: 900 }}>
-                {t('employer:interviewLive.candidateCard.presenceTitle')} — {session.candidateName || t('employer:interviewLive.candidateCard.unknownCandidate')}
+                {t('employer:interviewLive.candidateCard.presenceTitle')}: {session.candidateName || t('employer:interviewLive.candidateCard.unknownCandidate')}
               </Typography>
               <Typography variant="caption" sx={{ color: 'rgba(255,255,255,0.55)' }}>
                 {t('employer:interviewLive.candidateCard.presenceSubtitle')}

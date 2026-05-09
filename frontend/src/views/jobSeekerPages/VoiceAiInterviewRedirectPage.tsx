@@ -9,7 +9,7 @@ import { ROUTES } from '../../configs/constants';
 
 const VoiceAiInterviewRedirectPage = () => {
   const { id } = useParams();
-  const navigate = useRouter();
+  const { push } = useRouter();
   const { t } = useTranslation('interview');
 
   const targetUrl = React.useMemo(() => {
@@ -20,7 +20,7 @@ const VoiceAiInterviewRedirectPage = () => {
   React.useEffect(() => {
     if (!id) return;
     window.location.replace(targetUrl);
-  }, [id, targetUrl, navigate]);
+  }, [id, targetUrl]);
 
   return (
     <Box
@@ -53,7 +53,7 @@ const VoiceAiInterviewRedirectPage = () => {
           <Typography sx={{ color: '#cbd5e1' }}>
             {t('redirectBody')}
           </Typography>
-          <Button variant="contained" onClick={() => navigate.push(targetUrl)}>
+          <Button variant="contained" onClick={() => push(targetUrl)}>
             {t('redirectCta')}
           </Button>
           <Typography variant="caption" sx={{ color: '#94a3b8' }}>

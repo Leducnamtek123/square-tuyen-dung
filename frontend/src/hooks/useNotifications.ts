@@ -20,8 +20,6 @@ import { useAppSelector } from './useAppStore';
 const PAGE_SIZE = 10;
 const MAX_NOTIFICATIONS = 50;
 
-/* ── Types ────────────────────────────────────────────────────────────── */
-
 interface AppNotification {
   key: string;
   title?: string;
@@ -48,14 +46,86 @@ interface UseNotificationsReturn {
   handleRemoveAll: () => Promise<void>;
 }
 
-/* ── Hook ─────────────────────────────────────────────────────────────── */
+type NotificationsState = {
+  count: number;
+  isLoading: boolean;
+  notifications: AppNotification[];
+  lastKey: DocumentSnapshot | null;
+};
+
+type NotificationsAction =
+  | { type: 'loading' }
+  | { type: 'countLoaded'; count: number }
+  | { type: 'initialLoaded'; notifications: AppNotification[]; lastKey: DocumentSnapshot | null }
+  | { type: 'loadMoreLoaded'; notifications: AppNotification[]; lastKey: DocumentSnapshot | null }
+  | { type: 'notificationRemoved'; key: string }
+  | { type: 'allRemoved' }
+  | { type: 'finishedLoading' };
+
+const initialNotificationsState: NotificationsState = {
+  count: 0,
+  isLoading: false,
+  notifications: [],
+  lastKey: null,
+};
+
+const notificationsReducer = (
+  state: NotificationsState,
+  action: NotificationsAction
+): NotificationsState => {
+  switch (action.type) {
+    case 'loading':
+      return {
+        ...state,
+        isLoading: true,
+      };
+    case 'countLoaded':
+      return {
+        ...state,
+        count: action.count,
+      };
+    case 'initialLoaded':
+      return {
+        ...state,
+        isLoading: false,
+        notifications: action.notifications,
+        lastKey: action.lastKey,
+      };
+    case 'loadMoreLoaded': {
+      const combined = [...state.notifications, ...action.notifications];
+
+      return {
+        ...state,
+        notifications: combined.slice(0, MAX_NOTIFICATIONS),
+        lastKey: action.lastKey,
+      };
+    }
+    case 'notificationRemoved':
+      return {
+        ...state,
+        notifications: state.notifications.filter((notification) => notification.key !== action.key),
+        count: Math.max(0, state.count - 1),
+      };
+    case 'allRemoved':
+      return {
+        ...state,
+        notifications: [],
+        count: 0,
+        lastKey: null,
+      };
+    case 'finishedLoading':
+      return {
+        ...state,
+        isLoading: false,
+      };
+    default:
+      return state;
+  }
+};
 
 export const useNotifications = (): UseNotificationsReturn => {
   const { currentUser } = useAppSelector((state) => state.user);
-  const [count, setCount] = React.useState(0);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [notifications, setNotifications] = React.useState<AppNotification[]>([]);
-  const [lastKey, setLastKey] = React.useState<DocumentSnapshot | null>(null);
+  const [state, dispatch] = React.useReducer(notificationsReducer, initialNotificationsState);
 
   const getCollectionRef = React.useCallback(() => {
     if (!currentUser?.id) return null;
@@ -66,15 +136,13 @@ export const useNotifications = (): UseNotificationsReturn => {
     const notificationsRef = getCollectionRef();
     if (!notificationsRef) return;
 
-    setIsLoading(true);
+    dispatch({ type: 'loading' });
 
-    // Initial count
     const allQuery = query(notificationsRef, where('is_deleted', '==', false));
     getDocs(allQuery)
-      .then((snap) => setCount(snap.size))
+      .then((snap) => dispatch({ type: 'countLoaded', count: snap.size }))
       .catch(() => {});
 
-    // Initial list limit
     const first = query(
       notificationsRef,
       where('is_deleted', '==', false),
@@ -84,17 +152,21 @@ export const useNotifications = (): UseNotificationsReturn => {
 
     const unsubscribe = onSnapshot(first, (querySnapshot) => {
       const notificationList: AppNotification[] = [];
+
       querySnapshot.forEach((docSnap: QueryDocumentSnapshot) => {
         notificationList.push({
           ...(docSnap.data() as Omit<AppNotification, 'key'>),
           key: docSnap.id,
         });
       });
-      setNotifications(notificationList);
-      setLastKey(querySnapshot.docs[querySnapshot.docs.length - 1] || null);
-      setIsLoading(false);
+
+      dispatch({
+        type: 'initialLoaded',
+        notifications: notificationList,
+        lastKey: querySnapshot.docs[querySnapshot.docs.length - 1] || null,
+      });
     }, () => {
-      setIsLoading(false);
+      dispatch({ type: 'finishedLoading' });
     });
 
     return () => unsubscribe();
@@ -102,13 +174,13 @@ export const useNotifications = (): UseNotificationsReturn => {
 
   const loadMore = async () => {
     const notificationsRef = getCollectionRef();
-    if (!notificationsRef || !lastKey) return;
+    if (!notificationsRef || !state.lastKey) return;
 
     const nextQuery = query(
       notificationsRef,
       where('is_deleted', '==', false),
       orderBy('time', 'desc'),
-      startAfter(lastKey),
+      startAfter(state.lastKey),
       limit(PAGE_SIZE)
     );
 
@@ -123,9 +195,11 @@ export const useNotifications = (): UseNotificationsReturn => {
       });
     });
 
-    const combined = [...notifications, ...nextNotificationList];
-    setNotifications(combined.slice(0, MAX_NOTIFICATIONS));
-    setLastKey(lastVisible);
+    dispatch({
+      type: 'loadMoreLoaded',
+      notifications: nextNotificationList,
+      lastKey: lastVisible || null,
+    });
   };
 
   const handleRead = async (key: string) => {
@@ -145,7 +219,7 @@ export const useNotifications = (): UseNotificationsReturn => {
       await updateDoc(doc(db, 'users', `${currentUser.id}`, 'notifications', key), {
         is_deleted: true,
       });
-      setNotifications((prev) => prev.filter((val) => val.key !== key));
+      dispatch({ type: 'notificationRemoved', key });
     } catch {
       // Ignored
     }
@@ -157,7 +231,7 @@ export const useNotifications = (): UseNotificationsReturn => {
 
     const readQuery = query(notificationsRef, where('is_read', '==', false));
     const querySnapshot = await getDocs(readQuery);
-    
+
     const batch = writeBatch(db);
     querySnapshot.forEach((docSnap) => {
       batch.update(docSnap.ref, { is_read: true });
@@ -171,24 +245,27 @@ export const useNotifications = (): UseNotificationsReturn => {
 
     const deleteQuery = query(notificationsRef, where('is_deleted', '==', false));
     const querySnapshot = await getDocs(deleteQuery);
-    
+
     const batch = writeBatch(db);
     querySnapshot.forEach((docSnap) => {
       batch.update(docSnap.ref, { is_deleted: true });
     });
     await batch.commit();
-    setNotifications([]);
+    dispatch({ type: 'allRemoved' });
   };
 
   return {
-    count,
-    isLoading,
-    notifications,
+    count: state.count,
+    isLoading: state.isLoading,
+    notifications: state.notifications,
     loadMore,
-    hasMore: Math.ceil(count / PAGE_SIZE) > 1 && notifications.length < count && notifications.length < MAX_NOTIFICATIONS,
+    hasMore:
+      Math.ceil(state.count / PAGE_SIZE) > 1 &&
+      state.notifications.length < state.count &&
+      state.notifications.length < MAX_NOTIFICATIONS,
     handleRead,
     handleRemove,
     handleMakeAllRead,
-    handleRemoveAll
+    handleRemoveAll,
   };
 };

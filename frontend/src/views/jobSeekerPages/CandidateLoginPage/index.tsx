@@ -9,13 +9,13 @@ import LanguageSwitcher from '../../../layouts/components/commons/LanguageSwitch
 
 const JobSeekerInterviewLoginPage = () => {
     const [sessionId, setSessionId] = useState('');
-    const navigate = useRouter();
+    const { push } = useRouter();
     const { t } = useTranslation(['candidate', 'common']);
 
     const handleJoin = () => {
         if (sessionId.trim()) {
             const targetRoute = ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM;
-            navigate.push(`/${targetRoute.replace(':id', sessionId.trim())}`);
+            push(`/${targetRoute.replace(':id', sessionId.trim())}`);
         }
     };
 

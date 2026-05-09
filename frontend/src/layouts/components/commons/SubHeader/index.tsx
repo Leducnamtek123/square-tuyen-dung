@@ -24,7 +24,7 @@ interface CareerItem {
 const SubHeader = () => {
   const { t } = useTranslation('common');
   const dispatch = useDispatch();
-  const nav = useRouter();
+  const { push } = useRouter();
   const { jobPostFilter } = useAppSelector((state) => state.filter);
   const [open, setOpen] = React.useState(false);
   const [topCareers, setTopCareers] = React.useState<CareerItem[]>([]);
@@ -53,7 +53,7 @@ const SubHeader = () => {
 
   const handleFilter = (id: string | number) => {
     dispatch(searchJobPost({ ...jobPostFilter, careerId: String(id) }));
-    nav.push(`/${ROUTES.JOB_SEEKER.JOBS}`);
+    push(`/${ROUTES.JOB_SEEKER.JOBS}`);
   };
 
   const handleScrollNext = () => {

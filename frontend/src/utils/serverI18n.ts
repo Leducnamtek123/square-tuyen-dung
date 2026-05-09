@@ -22,7 +22,7 @@ function normalizeLocale(lang?: string | null): SupportedLocale {
  *   2. `Accept-Language` header (fallback for first-time visitors)
  *   3. Default: 'vi'
  */
-export async function getServerLocale(): Promise<SupportedLocale> {
+async function getServerLocale(): Promise<SupportedLocale> {
   const cookieStore = await cookies();
   const fromCookie = cookieStore.get('i18nextLng')?.value;
   if (fromCookie) return normalizeLocale(fromCookie);
@@ -101,7 +101,7 @@ const PAGE_TITLES: Record<string, Record<SupportedLocale, string>> = {
  * Get a localized page title.
  * Falls back to Vietnamese if key or locale not found.
  */
-export async function getPageTitle(key: string): Promise<string> {
+async function getPageTitle(key: string): Promise<string> {
   const locale = await getServerLocale();
   return PAGE_TITLES[key]?.[locale] ?? PAGE_TITLES[key]?.['vi'] ?? key;
 }

@@ -40,7 +40,7 @@ export const ChatContext = React.createContext<ChatContextValue | undefined>(und
 
 /** Type-safe hook to consume ChatContext */
 export const useChatContext = (): ChatContextValue => {
-  const ctx = React.useContext(ChatContext);
+  const ctx = React.use(ChatContext);
   if (!ctx) {
     throw new Error('useChatContext must be used within a ChatProvider');
   }

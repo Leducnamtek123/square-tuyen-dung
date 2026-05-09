@@ -85,7 +85,7 @@ interface BoxProfileProps {
 const BoxProfile = ({ title }: BoxProfileProps) => {
   const { t } = useTranslation(["jobSeeker", "common"]);
   const dispatch = useDispatch();
-  const nav = useRouter();
+  const { push } = useRouter();
 
   const {
     resume: { reloadCounter },
@@ -332,7 +332,7 @@ const BoxProfile = ({ title }: BoxProfileProps) => {
                   <Button
                     variant="contained"
                     startIcon={<EditIcon />}
-                    onClick={() => nav.push(`/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, resume.slug)}`)}
+                    onClick={() => push(`/${formatRoute(ROUTES.JOB_SEEKER.STEP_PROFILE, resume.slug)}`)}
                     sx={{
                       px: 4, py: 1, fontSize: "1rem",
                       background: (theme) => theme.palette.primary.main,

@@ -7,30 +7,63 @@ import type { ChatAccountData, ChatRoomDocument } from '../../../../services/fir
 
 export type UserDataPayload = ChatAccountData;
 
+type RightSidebarState<T> = {
+  isLoading: boolean;
+  dataList: T[];
+  count: number;
+};
+
+type RightSidebarAction<T> =
+  | { type: 'loading' }
+  | { type: 'loaded'; count: number; results: T[] }
+  | { type: 'finished' };
+
+const createInitialState = <T,>(): RightSidebarState<T> => ({
+  isLoading: true,
+  dataList: [],
+  count: 0,
+});
+
+const rightSidebarReducer = <T,>(
+  state: RightSidebarState<T>,
+  action: RightSidebarAction<T>
+): RightSidebarState<T> => {
+  switch (action.type) {
+    case 'loading':
+      return { ...state, isLoading: true };
+    case 'loaded':
+      return { isLoading: false, dataList: action.results, count: action.count };
+    case 'finished':
+      return { ...state, isLoading: false };
+    default:
+      return state;
+  }
+};
+
 export const useRightSidebarData = <T,>(fetchData: (params: { page: number; pageSize: number }) => Promise<{ count: number; results: T[] }>, pageSize: number = 12) => {
-  const context = React.useContext(ChatContext);
+  const context = React.use(ChatContext);
   const { currentUser } = useSelector((state: RootState) => state.user);
   const userId = currentUser?.id;
 
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [dataList, setDataList] = React.useState<T[]>([]);
+  const [state, dispatch] = React.useReducer(rightSidebarReducer<T>, undefined, createInitialState<T>);
   const [page, setPage] = React.useState(1);
-  const [count, setCount] = React.useState(0);
 
   const { setSelectedRoomId } = context || {};
 
   React.useEffect(() => {
     const loadData = async () => {
-      setIsLoading(true);
+      dispatch({ type: 'loading' });
       try {
         const resData = await fetchData({ page, pageSize });
         const data = resData || { count: 0, results: [] };
-        setCount(typeof data.count === 'number' ? data.count : 0);
-        setDataList(Array.isArray(data.results) ? data.results : []);
+        dispatch({
+          type: 'loaded',
+          count: typeof data.count === 'number' ? data.count : 0,
+          results: Array.isArray(data.results) ? data.results : [],
+        });
       } catch (error) {
         // Error handled silently
-      } finally {
-        setIsLoading(false);
+        dispatch({ type: 'finished' });
       }
     };
     loadData();
@@ -67,11 +100,11 @@ export const useRightSidebarData = <T,>(fetchData: (params: { page: number; page
   };
 
   return {
-    isLoading,
-    dataList,
+    isLoading: state.isLoading,
+    dataList: state.dataList,
     page,
     setPage,
-    count,
+    count: state.count,
     handleAddRoom,
     pageSize,
     isContextReady: !!context && !!setSelectedRoomId
