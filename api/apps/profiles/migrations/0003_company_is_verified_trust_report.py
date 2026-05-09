@@ -99,6 +99,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name="trustreport",
-            index=models.Index(fields=["reporter", "status"], name="idx_trust_report_reporter_status"),
+            index=models.Index(fields=["reporter", "status"], name="idx_trust_rpt_rep_status"),
         ),
     ]

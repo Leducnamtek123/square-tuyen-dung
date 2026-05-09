@@ -284,7 +284,7 @@ services:
       - data-net
 
   # ---------------------------------------------------------------------------
-  # AI Services (GPU enabled by default)
+  # AI Services (GPU-capable, CPU-safe defaults)
   # ---------------------------------------------------------------------------
   whisper:
     container_name: tuyendung-studio-whisper
@@ -292,16 +292,9 @@ services:
       context: ./voice-ai/inference/whisper
     profiles: ["gpu"]
     init: true
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     environment:
       - VOXBOX_HF_REPO_ID=${VOXBOX_HF_REPO_ID:-Systran/faster-whisper-large-v3}
-      - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cuda:0}
+      - VOXBOX_DEVICE=${VOXBOX_DEVICE:-cpu}
       - DATA_DIR=${WHISPER_DATA_DIR:-/data}
     volumes:
       - whisper-data:/data
@@ -321,18 +314,11 @@ services:
       context: ./voice-ai/inference/vieneu-text-to-speech
     profiles: ["gpu"]
     init: true
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     env_file:
       - .env
     environment:
       - PORT=${VIENEU_TTS_PORT:-8298}
-      - TTS_DEVICE=${TTS_DEVICE:-cuda}
+      - TTS_DEVICE=${TTS_DEVICE:-auto}
     volumes:
       - huggingface-cache:/root/.cache/huggingface
     healthcheck:

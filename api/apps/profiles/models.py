@@ -328,7 +328,7 @@ class TrustReport(CommonBaseModel):
         related_name="trust_reports",
     )
     job_post = models.ForeignKey(
-        "jobs.JobPost",
+        "job.JobPost",
         on_delete=models.CASCADE,
         null=True,
         blank=True,
@@ -340,7 +340,7 @@ class TrustReport(CommonBaseModel):
         db_table = "project_info_trust_report"
         indexes = [
             models.Index(fields=["target_type", "status"], name="idx_trust_report_target_status"),
-            models.Index(fields=["reporter", "status"], name="idx_trust_report_reporter_status"),
+            models.Index(fields=["reporter", "status"], name="idx_trust_rpt_rep_status"),
         ]
 
     def __str__(self):
