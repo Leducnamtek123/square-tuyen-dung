@@ -83,13 +83,18 @@ type InterviewSessionPageProps = {
   role?: 'jobseeker' | 'employer' | 'admin' | string;
 };
 
+type LiveKitConnectionDetails = {
+  token: string;
+  serverUrl: string;
+};
+
 type SessionPageState = {
   loading: boolean;
   starting: boolean;
   error: string;
   showPreflight: boolean;
   connectRoom: boolean;
-  connectionDetails?: { token: string; serverUrl: string };
+  connectionDetails?: LiveKitConnectionDetails;
   session: InterviewSession | null;
   sessionInviteToken: string;
 };
@@ -100,7 +105,7 @@ type SessionPageAction =
   | { type: 'set-error'; value: string }
   | { type: 'set-show-preflight'; value: boolean }
   | { type: 'set-connect-room'; value: boolean }
-  | { type: 'set-connection-details'; value?: { token: string; serverUrl: string } }
+  | { type: 'set-connection-details'; value?: LiveKitConnectionDetails }
   | { type: 'set-session'; value: InterviewSession | null }
   | { type: 'set-session-invite-token'; value: string };
 
@@ -133,7 +138,7 @@ function InterviewSessionBridge({
   connectionDetails,
   children,
 }: {
-  connectionDetails: { token: string; serverUrl: string };
+  connectionDetails: LiveKitConnectionDetails;
   children: React.ReactNode;
 }) {
   const tokenSource = React.useMemo(() => {
@@ -149,6 +154,268 @@ function InterviewSessionBridge({
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
+
+function InterviewSessionLoading({ label }: { label: string }) {
+  return (
+    <main className="grid min-h-screen place-items-center bg-[#020617] text-zinc-100">
+      <div className="flex flex-col items-center gap-3 text-center">
+        <CircularProgress size={36} sx={{ color: '#38bdf8' }} />
+        <p className="text-sm text-zinc-400">{label}</p>
+      </div>
+    </main>
+  );
+}
+
+function InterviewSessionError({
+  message,
+  actionLabel,
+  onBackHome,
+}: {
+  message: string;
+  actionLabel: string;
+  onBackHome: () => void;
+}) {
+  return (
+    <main className="grid min-h-screen place-items-center bg-[#020617] px-6">
+      <section className="w-full max-w-lg rounded-2xl border border-rose-400/30 bg-rose-500/10 p-8 text-center text-rose-100">
+        <p className="mb-6 text-lg font-medium">{message}</p>
+        <Button variant="contained" sx={{ bgcolor: '#e11d48', '&:hover': { bgcolor: '#be123c' } }} onClick={onBackHome}>
+          {actionLabel}
+        </Button>
+      </section>
+    </main>
+  );
+}
+
+function ActiveInterviewRoom({
+  connectionDetails,
+  sessionTitle,
+  jobLabel,
+  candidateLabel,
+  statusClass,
+  statusText,
+  role,
+  formattedSchedule,
+  timeLabel,
+  onDisconnected,
+  onEndSession,
+}: {
+  connectionDetails: LiveKitConnectionDetails;
+  sessionTitle: string;
+  jobLabel: string;
+  candidateLabel: string;
+  statusClass: string;
+  statusText: string;
+  role: string;
+  formattedSchedule?: string | false;
+  timeLabel: string;
+  onDisconnected: () => void;
+  onEndSession: () => Promise<void>;
+}) {
+  return (
+    <main className="flex min-h-screen flex-col bg-[#020617] text-zinc-100">
+      <header className="relative z-10 flex items-center justify-between border-b border-white/5 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl md:px-6">
+        <div>
+          <h1 className="text-sm font-semibold text-white md:text-base">{sessionTitle}</h1>
+          <p className="mt-0.5 text-xs text-zinc-400">{jobLabel} | {candidateLabel}</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className={cn('inline-flex items-center rounded-md border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest', statusClass)}>
+            {statusText}
+          </span>
+        </div>
+      </header>
+
+      <div className="flex-1" style={{ height: 'calc(100vh - 57px)' }}>
+        <LiveKitRoom
+          token={connectionDetails.token}
+          serverUrl={connectionDetails.serverUrl}
+          connect={true}
+          video={role === 'jobseeker'}
+          audio={true}
+          onDisconnected={onDisconnected}
+          style={{ height: '100%' }}
+        >
+          <InterviewSessionBridge connectionDetails={connectionDetails}>
+            <AIInterviewLayout onEndSession={onEndSession} />
+            <RoomAudioRenderer />
+          </InterviewSessionBridge>
+        </LiveKitRoom>
+      </div>
+
+      {formattedSchedule && (
+        <p className="px-4 py-2 text-xs text-zinc-500">
+          {timeLabel} &bull; {formattedSchedule}
+        </p>
+      )}
+    </main>
+  );
+}
+
+type WaitingRoomViewState = {
+  isInterrupted: boolean;
+  showPreflight: boolean;
+  starting: boolean;
+  isJoinable: boolean;
+};
+
+type WaitingRoomLabels = {
+  interruptedResumeHint: string;
+  sessionTitle: string;
+  jobLabel: string;
+  candidateLabel: string;
+  statusText: string;
+  readyTitle: string;
+  unavailableTitle: string;
+  readyBody: string;
+  unavailableBody: string;
+  startInterview: string;
+  back: string;
+  backHome: string;
+  time: string;
+};
+
+type WaitingRoomActions = {
+  onJoin: () => Promise<void>;
+  onCancelPreflight: () => void;
+  onShowPreflight: () => void;
+  onBack: () => void;
+  onBackHome: () => void;
+};
+
+function InterviewWaitingRoom({
+  viewState,
+  labels,
+  statusClass,
+  error,
+  formattedSchedule,
+  actions,
+}: {
+  viewState: WaitingRoomViewState;
+  labels: WaitingRoomLabels;
+  statusClass: string;
+  error: string;
+  formattedSchedule?: string | false;
+  actions: WaitingRoomActions;
+}) {
+  return (
+    <main className="dark min-h-screen bg-[#020617] px-4 py-4 text-zinc-100 md:px-8 md:py-6">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+        {viewState.isInterrupted && (
+          <Alert severity="warning" sx={{ borderRadius: 3, bgcolor: 'rgba(245, 158, 11, 0.08)', color: '#fbbf24' }}>
+            {labels.interruptedResumeHint}
+          </Alert>
+        )}
+
+        <header className="relative overflow-hidden rounded-3xl border border-white/5 bg-zinc-900/40 p-4 shadow-2xl shadow-black/50 backdrop-blur-2xl md:p-5">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.1),transparent_60%)]" />
+          <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 className="text-xl font-semibold tracking-tight text-white md:text-2xl">{labels.sessionTitle}</h1>
+              <p className="mt-1 text-sm font-medium text-zinc-400">{labels.jobLabel} | {labels.candidateLabel}</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className={cn('inline-flex items-center rounded-lg border px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.15em] shadow-sm', statusClass)}>
+                {labels.statusText}
+              </span>
+            </div>
+          </div>
+        </header>
+
+        <section className="relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/10 bg-[#020617] shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+          {viewState.showPreflight ? (
+            <div className="relative flex h-full min-h-[520px] items-center justify-center px-6 py-10">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.15),transparent_52%)]" />
+              <PreflightRoom
+                onJoin={actions.onJoin}
+                onCancel={actions.onCancelPreflight}
+                starting={viewState.starting}
+              />
+            </div>
+          ) : (
+            <div className="relative flex h-full min-h-[520px] items-center justify-center px-6 py-10">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.22),transparent_52%)]" />
+              <div className="relative flex w-full max-w-2xl flex-col items-center gap-10 text-center">
+                <div className="relative group">
+                  <div className="absolute inset-0 rounded-full bg-cyan-500/10 blur-[80px] transition-all duration-1000 group-hover:bg-cyan-500/20" />
+                  <div className="relative z-10 flex h-[180px] w-[180px] items-center justify-center opacity-70 transition-all duration-1000 group-hover:opacity-100 md:h-[260px] md:w-[260px]">
+                    <Image
+                      src="/square-icons/logo.svg"
+                      alt="Square"
+                      width={180}
+                      height={180}
+                      style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
+                    {viewState.isJoinable ? labels.readyTitle : labels.unavailableTitle}
+                  </h2>
+                  {error && (
+                    <p className="text-sm font-bold uppercase tracking-widest text-rose-400">{error}</p>
+                  )}
+                  <p className="mx-auto max-w-md text-sm leading-relaxed text-zinc-400">
+                    {viewState.isJoinable ? labels.readyBody : labels.unavailableBody}
+                  </p>
+                </div>
+
+                <div className="flex flex-col items-center gap-3">
+                  {viewState.isJoinable ? (
+                    <>
+                      <Button
+                        variant="contained"
+                        onClick={actions.onShowPreflight}
+                        disabled={viewState.starting}
+                        sx={{
+                          height: 56,
+                          borderRadius: '1rem',
+                          background: '#0ea5e9',
+                          px: 6,
+                          fontSize: '0.8rem',
+                          fontWeight: 900,
+                          letterSpacing: '0.2em',
+                          textTransform: 'uppercase',
+                          boxShadow: '0 0 30px rgba(14,165,233,0.3)',
+                          '&:hover': { background: '#38bdf8' },
+                          '&:disabled': { opacity: 0.5 },
+                        }}
+                      >
+                        {viewState.starting ? <CircularProgress size={22} color="inherit" /> : labels.startInterview}
+                      </Button>
+                      <Button
+                        variant="text"
+                        onClick={actions.onBack}
+                        sx={{ fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', '&:hover': { color: 'white' } }}
+                      >
+                        {labels.back}
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      onClick={actions.onBackHome}
+                      sx={{ height: 48, borderRadius: '1rem', background: '#1e293b', px: 5, fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', '&:hover': { background: '#334155' } }}
+                    >
+                      {labels.backHome}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
+
+        {formattedSchedule && (
+          <p className="text-xs text-zinc-500">
+            {labels.time} &bull; {formattedSchedule}
+          </p>
+        )}
+      </div>
+    </main>
+  );
+}
 
 const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps) => {
   const normalizedRole = normalizeRole(role);
@@ -294,28 +561,18 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
   // ── Loading state ─────────────────────────────────────────────────────────
 
   if (state.loading) {
-    return (
-      <main className="grid min-h-screen place-items-center bg-[#020617] text-zinc-100">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <CircularProgress size={36} sx={{ color: '#38bdf8' }} />
-          <p className="text-sm text-zinc-400">{t('loading')}</p>
-        </div>
-      </main>
-    );
+    return <InterviewSessionLoading label={t('loading')} />;
   }
 
   // ── Error (no session) ────────────────────────────────────────────────────
 
   if (state.error && !state.session) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#020617] px-6">
-        <section className="w-full max-w-lg rounded-2xl border border-rose-400/30 bg-rose-500/10 p-8 text-center text-rose-100">
-          <p className="mb-6 text-lg font-medium">{state.error}</p>
-          <Button variant="contained" sx={{ bgcolor: '#e11d48', '&:hover': { bgcolor: '#be123c' } }} onClick={() => push('/')}>
-            {t('common:actions.backHome')}
-          </Button>
-        </section>
-      </main>
+      <InterviewSessionError
+        message={state.error}
+        actionLabel={t('common:actions.backHome')}
+        onBackHome={() => push('/')}
+      />
     );
   }
 
@@ -324,9 +581,9 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
   const statusKey   = (state.session?.status || 'scheduled').toLowerCase();
   const statusText  = t(`interviewListCard.statuses.${statusKey}`, { defaultValue: statusKey.replaceAll('_', ' ') });
   const statusClass = statusClassMap[statusKey] || 'border-white/15 bg-white/10 text-zinc-200';
-  const formattedSchedule =
-    state.session?.scheduledAt &&
-    new Date(state.session.scheduledAt).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US');
+  const formattedSchedule = state.session?.scheduledAt
+    ? new Date(state.session.scheduledAt).toLocaleString(i18n.language === 'vi' ? 'vi-VN' : 'en-US')
+    : undefined;
 
   const jobLabel       = state.session?.jobName       || t('common:labels.job');
   const candidateLabel = state.session?.candidateName || t('interviewListCard.candidate');
@@ -340,177 +597,60 @@ const InterviewSessionPage = ({ role = 'jobseeker' }: InterviewSessionPageProps)
 
   if (state.connectRoom && state.connectionDetails) {
     return (
-      <main className="flex min-h-screen flex-col bg-[#020617] text-zinc-100">
-        {/* Header */}
-        <header className="relative z-10 flex items-center justify-between border-b border-white/5 bg-[#020617]/90 px-4 py-3 backdrop-blur-xl md:px-6">
-          <div>
-            <h1 className="text-sm font-semibold text-white md:text-base">{sessionTitle}</h1>
-            <p className="mt-0.5 text-xs text-zinc-400">{jobLabel} | {candidateLabel}</p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className={cn('inline-flex items-center rounded-md border px-2 py-0.5 text-[9px] font-black uppercase tracking-widest', statusClass)}>
-              {statusText}
-            </span>
-          </div>
-        </header>
-
-        {/* LiveKit room — uses VideoConference which handles layout, tiles, controls */}
-        <div className="flex-1" style={{ height: 'calc(100vh - 57px)' }}>
-          <LiveKitRoom
-            token={state.connectionDetails.token}
-            serverUrl={state.connectionDetails.serverUrl}
-            connect={true}
-            video={normalizedRole === 'jobseeker'}
-            audio={true}
-            onDisconnected={handleDisconnected}
-            style={{ height: '100%' }}
-          >
-            <InterviewSessionBridge connectionDetails={state.connectionDetails}>
-              <AIInterviewLayout onEndSession={finalizeInterviewSession} />
-              <RoomAudioRenderer />
-            </InterviewSessionBridge>
-          </LiveKitRoom>
-        </div>
-
-        {formattedSchedule && (
-          <p className="px-4 py-2 text-xs text-zinc-500">
-            {t('common:labels.time')} &bull; {formattedSchedule}
-          </p>
-        )}
-      </main>
+      <ActiveInterviewRoom
+        connectionDetails={state.connectionDetails}
+        sessionTitle={sessionTitle}
+        jobLabel={jobLabel}
+        candidateLabel={candidateLabel}
+        statusClass={statusClass}
+        statusText={statusText}
+        role={normalizedRole}
+        formattedSchedule={formattedSchedule}
+        timeLabel={t('common:labels.time')}
+        onDisconnected={handleDisconnected}
+        onEndSession={finalizeInterviewSession}
+      />
     );
   }
 
   // ─── Preflight / waiting room ─────────────────────────────────────────────
 
   return (
-    <main className="dark min-h-screen bg-[#020617] px-4 py-4 text-zinc-100 md:px-8 md:py-6">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
-
-        {isInterrupted && (
-          <Alert severity="warning" sx={{ borderRadius: 3, bgcolor: 'rgba(245, 158, 11, 0.08)', color: '#fbbf24' }}>
-            {t('interview:interviewDetail.messages.interruptedResumeHint', {
-              defaultValue: 'Kết nối vừa bị ngắt tạm thời. Bạn có thể bấm join lại để tiếp tục buổi phỏng vấn.',
-            })}
-          </Alert>
-        )}
-
-        {/* Session header card */}
-        <header className="relative overflow-hidden rounded-3xl border border-white/5 bg-zinc-900/40 p-4 shadow-2xl shadow-black/50 backdrop-blur-2xl md:p-5">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(56,189,248,0.1),transparent_60%)]" />
-          <div className="relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-xl font-semibold tracking-tight text-white md:text-2xl">{sessionTitle}</h1>
-              <p className="mt-1 text-sm font-medium text-zinc-400">{jobLabel} | {candidateLabel}</p>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className={cn('inline-flex items-center rounded-lg border px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.15em] shadow-sm', statusClass)}>
-                {statusText}
-              </span>
-            </div>
-          </div>
-        </header>
-
-        {/* Content area */}
-        <section className="relative min-h-[520px] overflow-hidden rounded-[2rem] border border-white/10 bg-[#020617] shadow-[0_0_100px_rgba(0,0,0,0.5)]">
-
-          {state.showPreflight ? (
-            /* ── Preflight device check ── */
-            <div className="relative flex h-full min-h-[520px] items-center justify-center px-6 py-10">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(14,165,233,0.15),transparent_52%)]" />
-              <PreflightRoom
-                onJoin={initiateInterviewSession}
-                onCancel={() => dispatch({ type: 'set-show-preflight', value: false })}
-                starting={state.starting}
-              />
-            </div>
-          ) : (
-            /* ── Waiting / not-yet-joinable ── */
-            <div className="relative flex h-full min-h-[520px] items-center justify-center px-6 py-10">
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(56,189,248,0.22),transparent_52%)]" />
-              <div className="relative flex w-full max-w-2xl flex-col items-center gap-10 text-center">
-
-                {/* Logo */}
-                <div className="relative group">
-                  <div className="absolute inset-0 rounded-full bg-cyan-500/10 blur-[80px] transition-all duration-1000 group-hover:bg-cyan-500/20" />
-                  <div className="relative z-10 flex h-[180px] w-[180px] items-center justify-center opacity-70 transition-all duration-1000 group-hover:opacity-100 md:h-[260px] md:w-[260px]">
-                    <Image
-                      src="/square-icons/logo.svg"
-                      alt="Square"
-                      width={180}
-                      height={180}
-                      style={{ objectFit: 'contain', filter: 'brightness(0) invert(1)' }}
-                    />
-                  </div>
-                </div>
-
-                {/* Title & error */}
-                <div className="space-y-4">
-                  <h2 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
-                    {isJoinable ? t('readyTitle') : t('sessionNotJoinable')}
-                  </h2>
-                  {state.error && (
-                    <p className="text-sm font-bold uppercase tracking-widest text-rose-400">{state.error}</p>
-                  )}
-                  <p className="mx-auto max-w-md text-sm leading-relaxed text-zinc-400">
-                    {isJoinable ? t('readyBody') : t('sessionNotJoinableBody')}
-                  </p>
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-col items-center gap-3">
-                  {isJoinable ? (
-                    <>
-                      <Button
-                        variant="contained"
-                        onClick={() => dispatch({ type: 'set-show-preflight', value: true })}
-                        disabled={state.starting}
-                        sx={{
-                          height: 56,
-                          borderRadius: '1rem',
-                          background: '#0ea5e9',
-                          px: 6,
-                          fontSize: '0.8rem',
-                          fontWeight: 900,
-                          letterSpacing: '0.2em',
-                          textTransform: 'uppercase',
-                          boxShadow: '0 0 30px rgba(14,165,233,0.3)',
-                          '&:hover': { background: '#38bdf8' },
-                          '&:disabled': { opacity: 0.5 },
-                        }}
-                      >
-                        {state.starting ? <CircularProgress size={22} color="inherit" /> : t('startInterview')}
-                      </Button>
-                      <Button
-                        variant="text"
-                        onClick={() => back()}
-                        sx={{ fontSize: '0.7rem', fontWeight: 900, letterSpacing: '0.2em', color: 'rgba(255,255,255,0.3)', textTransform: 'uppercase', '&:hover': { color: 'white' } }}
-                      >
-                        {t('common:actions.back')}
-                      </Button>
-                    </>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      onClick={() => push('/')}
-                      sx={{ height: 48, borderRadius: '1rem', background: '#1e293b', px: 5, fontSize: '0.75rem', fontWeight: 900, letterSpacing: '0.1em', textTransform: 'uppercase', '&:hover': { background: '#334155' } }}
-                    >
-                      {t('common:actions.backHome')}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </section>
-
-        {formattedSchedule && (
-          <p className="text-xs text-zinc-500">
-            {t('common:labels.time')} &bull; {formattedSchedule}
-          </p>
-        )}
-      </div>
-    </main>
+    <InterviewWaitingRoom
+      viewState={{
+        isInterrupted,
+        showPreflight: state.showPreflight,
+        starting: state.starting,
+        isJoinable,
+      }}
+      labels={{
+        interruptedResumeHint: t('interview:interviewDetail.messages.interruptedResumeHint', {
+          defaultValue: 'Kết nối vừa bị ngắt tạm thời. Bạn có thể bấm join lại để tiếp tục buổi phỏng vấn.',
+        }),
+        sessionTitle,
+        jobLabel,
+        candidateLabel,
+        statusText,
+        readyTitle: t('readyTitle'),
+        unavailableTitle: t('sessionNotJoinable'),
+        readyBody: t('readyBody'),
+        unavailableBody: t('sessionNotJoinableBody'),
+        startInterview: t('startInterview'),
+        back: t('common:actions.back'),
+        backHome: t('common:actions.backHome'),
+        time: t('common:labels.time'),
+      }}
+      statusClass={statusClass}
+      error={state.error}
+      formattedSchedule={formattedSchedule}
+      actions={{
+        onJoin: initiateInterviewSession,
+        onCancelPreflight: () => dispatch({ type: 'set-show-preflight', value: false }),
+        onShowPreflight: () => dispatch({ type: 'set-show-preflight', value: true }),
+        onBack: () => back(),
+        onBackHome: () => push('/'),
+      }}
+    />
   );
 };
 

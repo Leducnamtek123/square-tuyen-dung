@@ -28,6 +28,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import EditIcon from '@mui/icons-material/Edit';
 import { ColumnDef } from '@tanstack/react-table';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import DataTable from '../../../components/Common/DataTable';
 import { useDataTable, useDebounce } from '../../../hooks';
 import { Career } from '../../../types/models';
@@ -133,6 +134,182 @@ const reducer = (state: CareersPageState, action: CareersPageAction): CareersPag
       return state;
   }
 };
+
+type CareerFormDialogProps = {
+  open: boolean;
+  mode: 'add' | 'edit';
+  formData: CareerPayload;
+  iconFile: File | null;
+  iconPreview: string | null;
+  existingIconUrl: string | null;
+  iconInputRef: React.RefObject<HTMLInputElement | null>;
+  isMutating: boolean;
+  onClose: () => void;
+  onNameChange: (value: string) => void;
+  onIconChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onClearIcon: () => void;
+  onSave: () => void;
+  t: TFunction<'admin'>;
+};
+
+const CareerFormDialog = ({
+  open,
+  mode,
+  formData,
+  iconFile,
+  iconPreview,
+  existingIconUrl,
+  iconInputRef,
+  isMutating,
+  onClose,
+  onNameChange,
+  onIconChange,
+  onClearIcon,
+  onSave,
+  t,
+}: CareerFormDialogProps) => (
+  <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
+    <DialogTitle>
+      {mode === 'add' ? t('pages.careers.add') : t('pages.careers.edit')}
+    </DialogTitle>
+    <DialogContent>
+      <Stack spacing={2.5} sx={{ pt: 1 }}>
+        <TextField
+          label={t('pages.careers.form.name')}
+          fullWidth
+          value={formData.name}
+          onChange={(event) => onNameChange(event.target.value)}
+          required
+        />
+
+        <Box>
+          <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>
+            {t('pages.careers.iconLabel')}
+          </Typography>
+
+          <input
+            ref={iconInputRef as React.RefObject<HTMLInputElement>}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={onIconChange}
+          />
+
+          {iconPreview ? (
+            <Paper variant="outlined" sx={{ p: 2 }}>
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Avatar
+                  src={iconPreview}
+                  alt={formData.name}
+                  variant="rounded"
+                  sx={{ width: 72, height: 72, bgcolor: 'grey.100' }}
+                >
+                  <ImageIcon />
+                </Avatar>
+                <Box sx={{ minWidth: 0, flex: 1 }}>
+                  <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
+                    {t('pages.careers.uploadIconBtn')}
+                  </Typography>
+                  <FormHelperText sx={{ m: 0 }}>
+                    {iconFile
+                      ? iconFile.name
+                      : existingIconUrl
+                        ? t('pages.careers.existingIconHint')
+                        : t('pages.careers.noIconSelected')}
+                  </FormHelperText>
+                  <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                    <Button variant="outlined" startIcon={<ImageIcon />} onClick={() => iconInputRef.current?.click()}>
+                      {t('pages.careers.uploadIconBtn')}
+                    </Button>
+                    {iconFile && (
+                      <Button color="inherit" onClick={onClearIcon}>
+                        {t('pages.careers.cancelBtn')}
+                      </Button>
+                    )}
+                  </Stack>
+                </Box>
+              </Stack>
+            </Paper>
+          ) : (
+            <Paper
+              variant="outlined"
+              sx={{
+                p: 2,
+                borderStyle: 'dashed',
+                borderRadius: 2,
+                textAlign: 'center',
+              }}
+            >
+              <Stack spacing={1} alignItems="center">
+                <Avatar sx={{ bgcolor: 'primary.background', color: 'primary.main' }}>
+                  <ImageIcon />
+                </Avatar>
+                <Typography variant="body2" color="text.secondary">
+                  {t('pages.careers.noIconSelected')}
+                </Typography>
+                <Button variant="outlined" startIcon={<ImageIcon />} onClick={() => iconInputRef.current?.click()}>
+                  {t('pages.careers.uploadIconBtn')}
+                </Button>
+              </Stack>
+            </Paper>
+          )}
+        </Box>
+      </Stack>
+    </DialogContent>
+    <DialogActions sx={{ px: 3, pb: 2 }}>
+      <Button onClick={onClose} color="inherit">
+        {t('pages.careers.cancelBtn')}
+      </Button>
+      <Button
+        onClick={onSave}
+        variant="contained"
+        disabled={isMutating || !formData.name.trim()}
+      >
+        {isMutating ? t('pages.careers.savingBtn') : t('pages.careers.saveBtn')}
+      </Button>
+    </DialogActions>
+  </Dialog>
+);
+
+type DeleteCareerDialogProps = {
+  open: boolean;
+  career: Career | null;
+  isMutating: boolean;
+  onClose: () => void;
+  onDelete: () => void;
+  t: TFunction<'admin'>;
+};
+
+const DeleteCareerDialog = ({
+  open,
+  career,
+  isMutating,
+  onClose,
+  onDelete,
+  t,
+}: DeleteCareerDialogProps) => (
+  <Dialog open={open} onClose={onClose}>
+    <DialogTitle>{t('pages.careers.deleteTitle')}</DialogTitle>
+    <DialogContent>
+      <Typography>
+        {t('pages.careers.deleteConfirm', { name: career?.name })}
+      </Typography>
+    </DialogContent>
+    <DialogActions sx={{ px: 3, pb: 2 }}>
+      <Button onClick={onClose} color="inherit">
+        {t('pages.careers.cancelBtn')}
+      </Button>
+      <Button
+        onClick={onDelete}
+        color="error"
+        variant="contained"
+        disabled={isMutating}
+      >
+        {isMutating ? t('pages.careers.deletingBtn') : t('pages.careers.deleteBtn')}
+      </Button>
+    </DialogActions>
+  </Dialog>
+);
 
 const CareersPage = () => {
   const { t } = useTranslation('admin');
@@ -376,129 +553,31 @@ const CareersPage = () => {
         />
       </Paper>
 
-      <Dialog open={state.openDialog} onClose={handleCloseDialog} fullWidth maxWidth="sm">
-        <DialogTitle>
-          {state.dialogMode === 'add' ? t('pages.careers.add') : t('pages.careers.edit')}
-        </DialogTitle>
-        <DialogContent>
-          <Stack spacing={2.5} sx={{ pt: 1 }}>
-            <TextField
-              label={t('pages.careers.form.name')}
-              fullWidth
-              value={state.formData.name}
-              onChange={(e) => dispatch({ type: 'set_form_name', value: e.target.value })}
-              required
-            />
+      <CareerFormDialog
+        open={state.openDialog}
+        mode={state.dialogMode}
+        formData={state.formData}
+        iconFile={state.iconFile}
+        iconPreview={state.iconPreview}
+        existingIconUrl={state.existingIconUrl}
+        iconInputRef={iconInputRef}
+        isMutating={isMutating}
+        onClose={handleCloseDialog}
+        onNameChange={(value) => dispatch({ type: 'set_form_name', value })}
+        onIconChange={handleIconChange}
+        onClearIcon={handleClearIcon}
+        onSave={handleSave}
+        t={t}
+      />
 
-            <Box>
-              <Typography variant="subtitle2" sx={{ mb: 1, fontWeight: 700 }}>
-                {t('pages.careers.iconLabel')}
-              </Typography>
-
-              <input
-                ref={iconInputRef}
-                type="file"
-                accept="image/*"
-                style={{ display: 'none' }}
-                onChange={handleIconChange}
-              />
-
-              {state.iconPreview ? (
-                <Paper variant="outlined" sx={{ p: 2 }}>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Avatar
-                      src={state.iconPreview}
-                      alt={state.formData.name}
-                      variant="rounded"
-                      sx={{ width: 72, height: 72, bgcolor: 'grey.100' }}
-                    >
-                      <ImageIcon />
-                    </Avatar>
-                    <Box sx={{ minWidth: 0, flex: 1 }}>
-                      <Typography variant="body2" sx={{ fontWeight: 600 }} noWrap>
-                        {t('pages.careers.uploadIconBtn')}
-                      </Typography>
-                      <FormHelperText sx={{ m: 0 }}>
-                        {state.iconFile
-                          ? state.iconFile.name
-                          : state.existingIconUrl
-                            ? t('pages.careers.existingIconHint')
-                            : t('pages.careers.noIconSelected')}
-                      </FormHelperText>
-                      <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                        <Button variant="outlined" startIcon={<ImageIcon />} onClick={() => iconInputRef.current?.click()}>
-                          {t('pages.careers.uploadIconBtn')}
-                        </Button>
-                        {state.iconFile && (
-                          <Button color="inherit" onClick={handleClearIcon}>
-                            {t('pages.careers.cancelBtn')}
-                          </Button>
-                        )}
-                      </Stack>
-                    </Box>
-                  </Stack>
-                </Paper>
-              ) : (
-                <Paper
-                  variant="outlined"
-                  sx={{
-                    p: 2,
-                    borderStyle: 'dashed',
-                    borderRadius: 2,
-                    textAlign: 'center',
-                  }}
-                >
-                  <Stack spacing={1} alignItems="center">
-                    <Avatar sx={{ bgcolor: 'primary.background', color: 'primary.main' }}>
-                      <ImageIcon />
-                    </Avatar>
-                    <Typography variant="body2" color="text.secondary">
-                      {t('pages.careers.noIconSelected')}
-                    </Typography>
-                    <Button variant="outlined" startIcon={<ImageIcon />} onClick={() => iconInputRef.current?.click()}>
-                      {t('pages.careers.uploadIconBtn')}
-                    </Button>
-                  </Stack>
-                </Paper>
-              )}
-            </Box>
-          </Stack>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleCloseDialog} color="inherit">
-            {t('pages.careers.cancelBtn')}
-          </Button>
-          <Button
-            onClick={handleSave}
-            variant="contained"
-            disabled={isMutating || !state.formData.name.trim()}
-          >
-            {isMutating ? t('pages.careers.savingBtn') : t('pages.careers.saveBtn')}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={state.openDeleteDialog} onClose={handleCloseDialog}>
-        <DialogTitle>{t('pages.careers.deleteTitle')}</DialogTitle>
-        <DialogContent>
-          <Typography>
-            {t('pages.careers.deleteConfirm', { name: state.currentCareer?.name })}
-          </Typography>
-        </DialogContent>
-        <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleCloseDialog} color="inherit">
-            {t('pages.careers.cancelBtn')}
-          </Button>
-          <Button
-            onClick={handleDelete}
-            color="error"
-            variant="contained"
-            disabled={isMutating}
-          >
-            {isMutating ? t('pages.careers.deletingBtn') : t('pages.careers.deleteBtn')}
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <DeleteCareerDialog
+        open={state.openDeleteDialog}
+        career={state.currentCareer}
+        isMutating={isMutating}
+        onClose={handleCloseDialog}
+        onDelete={handleDelete}
+        t={t}
+      />
     </Box>
   );
 };

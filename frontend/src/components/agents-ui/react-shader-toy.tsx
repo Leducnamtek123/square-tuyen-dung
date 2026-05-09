@@ -477,23 +477,37 @@ export interface ReactShaderToyProps {
   animateWhenNotVisible?: boolean;
 }
 
-export function ReactShaderToy({
+type ReactShaderToyRuntimeConfig = {
+  fs: string;
+  vs: string;
+  textures: TextureParams[];
+  propUniforms?: Uniforms;
+  clearColor: Vector4;
+  precision: 'highp' | 'lowp' | 'mediump';
+  contextAttributes: Record<string, unknown>;
+  lerp: number;
+  devicePixelRatio: number;
+  onDoneLoadingTextures?: () => void;
+  onError: (error: string) => void;
+  onWarning: (warning: string) => void;
+  animateWhenNotVisible: boolean;
+};
+
+function useReactShaderToyRuntime({
   fs,
-  vs = BASIC_VS,
-  textures = EMPTY_TEXTURES,
-  uniforms: propUniforms,
-  clearColor = DEFAULT_CLEAR_COLOR,
-  precision = 'highp',
-  style,
-  contextAttributes = DEFAULT_CONTEXT_ATTRIBUTES,
-  lerp = 1,
-  devicePixelRatio = 1,
+  vs,
+  textures,
+  propUniforms,
+  clearColor,
+  precision,
+  contextAttributes,
+  lerp,
+  devicePixelRatio,
   onDoneLoadingTextures,
-  onError = console.error,
-  onWarning = console.warn,
-  animateWhenNotVisible = false,
-  ...canvasProps
-}: ReactShaderToyProps & ComponentPropsWithoutRef<'canvas'>) {
+  onError,
+  onWarning,
+  animateWhenNotVisible,
+}: ReactShaderToyRuntimeConfig) {
   // Refs for WebGL state
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const glRef = useRef<WebGLRenderingContext | null>(null);
@@ -560,11 +574,12 @@ export function ReactShaderToy({
   };
 
   const onDeviceOrientationChange = ({ alpha, beta, gamma }: DeviceOrientationEvent) => {
+    const orientationAngle = window.screen.orientation?.angle ?? 0;
     uniformsRef.current.iDeviceOrientation!.value = [
       alpha ?? 0,
       beta ?? 0,
       gamma ?? 0,
-      window.orientation ?? 0,
+      orientationAngle,
     ];
   };
 
@@ -987,6 +1002,42 @@ export function ReactShaderToy({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Empty dependency array to run only once on mount
+
+  return canvasRef;
+}
+
+export function ReactShaderToy({
+  fs,
+  vs = BASIC_VS,
+  textures = EMPTY_TEXTURES,
+  uniforms: propUniforms,
+  clearColor = DEFAULT_CLEAR_COLOR,
+  precision = 'highp',
+  style,
+  contextAttributes = DEFAULT_CONTEXT_ATTRIBUTES,
+  lerp = 1,
+  devicePixelRatio = 1,
+  onDoneLoadingTextures,
+  onError = console.error,
+  onWarning = console.warn,
+  animateWhenNotVisible = false,
+  ...canvasProps
+}: ReactShaderToyProps & ComponentPropsWithoutRef<'canvas'>) {
+  const canvasRef = useReactShaderToyRuntime({
+    fs,
+    vs,
+    textures,
+    propUniforms,
+    clearColor,
+    precision,
+    contextAttributes,
+    lerp,
+    devicePixelRatio,
+    onDoneLoadingTextures,
+    onError,
+    onWarning,
+    animateWhenNotVisible,
+  });
 
   return (
     <canvas ref={canvasRef} style={{ height: '100%', width: '100%', ...style }} {...canvasProps} />

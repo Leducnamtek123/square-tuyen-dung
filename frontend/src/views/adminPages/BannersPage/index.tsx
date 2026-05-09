@@ -286,7 +286,7 @@ const BannersPageContent = () => {
         columns={columns}
         data={banners}
         isLoading={isLoading}
-        hidePagination
+        paginationMode="hidden"
         enableSorting
         sorting={sorting}
         onSortingChange={onSortingChange}

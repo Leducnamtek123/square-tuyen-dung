@@ -83,7 +83,7 @@ const QuestionGroupTable = ({ data, loading, onEdit, onDelete }: QuestionGroupTa
             columns={columns}
             data={data || []}
             isLoading={loading}
-            hidePagination
+            paginationMode="hidden"
             emptyMessage={t('questionGroupsCard.table.noData')}
         />
     );

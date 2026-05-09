@@ -184,7 +184,7 @@ const InterviewCreateCardInner = ({
       '&:hover': { bgcolor: pc.actionDisabled( 0.06) },
       '& fieldset': { borderColor: pc.divider( 0.8) },
     },
-  }), [theme]);
+  }), []);
 
   return (
     <Box sx={{ p: { xs: 2, md: 4 } }}>

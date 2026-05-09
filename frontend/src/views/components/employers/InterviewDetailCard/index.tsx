@@ -118,6 +118,50 @@ const reducer = (state: State, action: Action): State => {
   }
 };
 
+const InterviewDetailSkeleton = () => (
+  <Box sx={{ p: 4 }}>
+    <Skeleton variant="text" width={200} height={40} sx={{ mb: 3 }} />
+    <Grid container spacing={4}>
+      <Grid size={{ xs: 12, lg: 4 }}>
+        <Stack spacing={4}>
+          <Skeleton variant="rectangular" height={350} sx={{ borderRadius: 4 }} />
+          <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 4 }} />
+        </Stack>
+      </Grid>
+      <Grid size={{ xs: 12, lg: 8 }}>
+        <Stack spacing={4}>
+          <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 4 }} />
+          <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 4 }} />
+        </Stack>
+      </Grid>
+    </Grid>
+  </Box>
+);
+
+const InterviewDetailNotFound = ({
+  title,
+  description,
+  actionLabel,
+  onBack,
+}: {
+  title: string;
+  description: string;
+  actionLabel: string;
+  onBack: () => void;
+}) => (
+  <Paper elevation={0} sx={{ textAlign: 'center', py: 12, borderRadius: 4, bgcolor: 'background.neutral', border: '1px dashed', borderColor: 'divider' }}>
+    <Typography color="text.secondary" variant="h5" sx={{ fontWeight: 800, mb: 1 }}>
+      {title}
+    </Typography>
+    <Typography color="text.disabled" variant="body2" sx={{ fontWeight: 600, mb: 4 }}>
+      {description}
+    </Typography>
+    <Box component="button" onClick={onBack} sx={{ borderRadius: 2.5, fontWeight: 800, px: 4, py: 1.25, textTransform: 'none' }}>
+      {actionLabel}
+    </Box>
+  </Paper>
+);
+
 const InterviewDetailCard = () => {
   const { id } = useParams<{ id: string }>();
   const { back } = useRouter();
@@ -265,40 +309,17 @@ const InterviewDetailCard = () => {
   }, [session?.id]);
 
   if (loading) {
-    return (
-      <Box sx={{ p: 4 }}>
-        <Skeleton variant="text" width={200} height={40} sx={{ mb: 3 }} />
-        <Grid container spacing={4}>
-          <Grid size={{ xs: 12, lg: 4 }}>
-            <Stack spacing={4}>
-              <Skeleton variant="rectangular" height={350} sx={{ borderRadius: 4 }} />
-              <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 4 }} />
-            </Stack>
-          </Grid>
-          <Grid size={{ xs: 12, lg: 8 }}>
-            <Stack spacing={4}>
-              <Skeleton variant="rectangular" height={400} sx={{ borderRadius: 4 }} />
-              <Skeleton variant="rectangular" height={500} sx={{ borderRadius: 4 }} />
-            </Stack>
-          </Grid>
-        </Grid>
-      </Box>
-    );
+    return <InterviewDetailSkeleton />;
   }
 
   if (!session) {
     return (
-      <Paper elevation={0} sx={{ textAlign: 'center', py: 12, borderRadius: 4, bgcolor: 'background.neutral', border: '1px dashed', borderColor: 'divider' }}>
-        <Typography color="text.secondary" variant="h5" sx={{ fontWeight: 800, mb: 1 }}>
-          {t('interview:interviewDetail.messages.notFound')}
-        </Typography>
-        <Typography color="text.disabled" variant="body2" sx={{ fontWeight: 600, mb: 4 }}>
-          {t('interview:interviewDetail.messages.notFoundDesc')}
-        </Typography>
-        <Box component="button" onClick={() => back()} sx={{ borderRadius: 2.5, fontWeight: 800, px: 4, py: 1.25, textTransform: 'none' }}>
-          {t('interview:interviewDetail.actions.backToList')}
-        </Box>
-      </Paper>
+      <InterviewDetailNotFound
+        title={t('interview:interviewDetail.messages.notFound')}
+        description={t('interview:interviewDetail.messages.notFoundDesc')}
+        actionLabel={t('interview:interviewDetail.actions.backToList')}
+        onBack={() => back()}
+      />
     );
   }
 

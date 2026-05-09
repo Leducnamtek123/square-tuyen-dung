@@ -202,13 +202,13 @@ const EmployeesPage = () => {
 
         {state.tab === 'roles' && (
           <Box sx={{ mt: 2 }}>
-            <DataTable columns={roleColumns} data={roles} isLoading={rolesLoading} hidePagination enableSorting sorting={roleSorting} onSortingChange={onRoleSortingChange} />
+            <DataTable columns={roleColumns} data={roles} isLoading={rolesLoading} paginationMode="hidden" enableSorting sorting={roleSorting} onSortingChange={onRoleSortingChange} />
           </Box>
         )}
 
         {state.tab === 'members' && (
           <Box sx={{ mt: 2 }}>
-            <DataTable columns={memberColumns} data={members} isLoading={membersLoading} hidePagination enableSorting sorting={memberSorting} onSortingChange={onMemberSortingChange} />
+            <DataTable columns={memberColumns} data={members} isLoading={membersLoading} paginationMode="hidden" enableSorting sorting={memberSorting} onSortingChange={onMemberSortingChange} />
           </Box>
         )}
       </Paper>

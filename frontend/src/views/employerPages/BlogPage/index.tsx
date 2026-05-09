@@ -247,12 +247,14 @@ const EmployerBlogListPage = () => {
           value={searchInput}
           onChange={(e) => dispatch({ type: 'patch', patch: { searchInput: e.target.value } })}
           onKeyDown={(e) => e.key === 'Enter' && dispatch({ type: 'patch', patch: { search: searchInput } })}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon fontSize="small" />
-              </InputAdornment>
-            ),
+          slotProps={{
+            input: {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            },
           }}
           sx={{ flex: 1, maxWidth: 400 }}
         />

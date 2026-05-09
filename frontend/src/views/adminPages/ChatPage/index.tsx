@@ -243,7 +243,7 @@ const AdminChatPage = () => {
           columns={columns}
           data={conversations}
           isLoading={isLoading}
-          hidePagination
+          paginationMode="hidden"
           emptyMessage={conversations.length === 0 ? t('chat.empty.noConversations') : t('chat.empty.noResults')}
         />
       </Paper>

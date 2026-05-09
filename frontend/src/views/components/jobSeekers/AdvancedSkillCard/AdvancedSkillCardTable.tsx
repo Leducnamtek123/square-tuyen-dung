@@ -66,7 +66,7 @@ const AdvancedSkillCardTable = ({ data, onEdit, onDelete, t }: Props) => (
     ]}
     data={data}
     isLoading={false}
-    hidePagination
+    paginationMode="hidden"
     emptyMessage={t('jobSeeker:profile.messages.noSkillData')}
   />
 );

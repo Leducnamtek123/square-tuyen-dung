@@ -232,7 +232,7 @@ const LanguageSkillCard = ({ title }: LanguageSkillCardProps) => {
                 columns={columns}
                 data={state.languageSkills}
                 isLoading={state.isLoadingLanguageSkills}
-                hidePagination
+                paginationMode="hidden"
                 emptyMessage={t('jobSeeker:profile.messages.noLanguageData')}
               />
             </Box>

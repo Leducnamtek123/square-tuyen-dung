@@ -15,7 +15,6 @@ import {
   Tooltip,
   Paper,
   alpha,
-  useTheme,
   Theme
 } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
@@ -40,7 +39,6 @@ interface QuestionBankCardProps {
 
 const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
     const { t } = useTranslation(['interview', 'common']);
-    const theme = useTheme();
     const resolvedTitle = title || t('interview:employer.questionBank.title');
 
     const inputSx = {
@@ -172,7 +170,7 @@ const QuestionBankCard: React.FC<QuestionBankCardProps> = ({ title }) => {
                 </Stack>
             ),
         },
-    ], [t, handleOpen, handleDelete, theme]);
+    ], [t, handleOpen, handleDelete]);
 
     return (
         <Paper elevation={0} sx={{ p: { xs: 2.5, sm: 4 }, borderRadius: 4, boxShadow: (theme: Theme) => theme.customShadows?.z1, border: '1px solid', borderColor: 'divider' }}>

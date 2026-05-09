@@ -30,6 +30,80 @@ import { useConfig } from '@/hooks/useConfig';
 import type { Location } from '@/types/models';
 import type { Company } from '@/types/models';
 
+type ExtendedJobPost = JobPost & {
+  companyName?: string;
+  companyImageUrl?: string;
+  companySlug?: string;
+  locationName?: string;
+  jobTypeName?: string;
+  createdAt?: string;
+  isSaved?: boolean;
+  isApplied?: boolean;
+  companyDict?: Company;
+};
+
+type JobDetailState = {
+  openSharePopup: boolean;
+  openPopup: boolean;
+  isLoading: boolean;
+  isLoadingSave: boolean;
+  jobPostDetail: ExtendedJobPost | null;
+};
+
+type JobDetailAction =
+  | { type: 'set-loading'; value: boolean }
+  | { type: 'set-loading-save'; value: boolean }
+  | { type: 'set-job-post-detail'; value: ExtendedJobPost | null }
+  | { type: 'open-popup' }
+  | { type: 'close-popup' }
+  | { type: 'open-share-popup'; value: boolean }
+  | { type: 'mark-applied' }
+  | { type: 'mark-saved'; value: boolean };
+
+const initialJobDetailState: JobDetailState = {
+  openSharePopup: false,
+  openPopup: false,
+  isLoading: true,
+  isLoadingSave: false,
+  jobPostDetail: null,
+};
+
+const jobDetailReducer = (
+  current: JobDetailState,
+  action: JobDetailAction,
+): JobDetailState => {
+  switch (action.type) {
+    case 'set-loading':
+      return { ...current, isLoading: action.value };
+    case 'set-loading-save':
+      return { ...current, isLoadingSave: action.value };
+    case 'set-job-post-detail':
+      return { ...current, jobPostDetail: action.value };
+    case 'open-popup':
+      return { ...current, openPopup: true };
+    case 'close-popup':
+      return { ...current, openPopup: false };
+    case 'open-share-popup':
+      return { ...current, openSharePopup: action.value };
+    case 'mark-applied':
+      return {
+        ...current,
+        jobPostDetail: current.jobPostDetail
+          ? ({ ...current.jobPostDetail, isApplied: true } as ExtendedJobPost)
+          : current.jobPostDetail,
+      };
+    case 'mark-saved':
+      return {
+        ...current,
+        jobPostDetail: current.jobPostDetail
+          ? ({ ...current.jobPostDetail, isSaved: action.value } as ExtendedJobPost)
+          : current.jobPostDetail,
+      };
+    default:
+      return current;
+  }
+};
+
 const JobDetailPage = () => {
   const { slug } = useParams();
   const { push } = useRouter();
@@ -38,77 +112,7 @@ const JobDetailPage = () => {
   const { isAuthenticated, currentUser } = useAppSelector((state) => state.user);
   const [openReportPopup, setOpenReportPopup] = React.useState(false);
 
-  type ExtendedJobPost = JobPost & {
-    companyName?: string;
-    companyImageUrl?: string;
-    companySlug?: string;
-    locationName?: string;
-    jobTypeName?: string;
-    createdAt?: string;
-    isSaved?: boolean;
-    isApplied?: boolean;
-    companyDict?: Company;
-  };
-
-  type JobDetailState = {
-    openSharePopup: boolean;
-    openPopup: boolean;
-    isLoading: boolean;
-    isLoadingSave: boolean;
-    jobPostDetail: ExtendedJobPost | null;
-  };
-
-  type JobDetailAction =
-    | { type: 'set-loading'; value: boolean }
-    | { type: 'set-loading-save'; value: boolean }
-    | { type: 'set-job-post-detail'; value: ExtendedJobPost | null }
-    | { type: 'open-popup' }
-    | { type: 'close-popup' }
-    | { type: 'open-share-popup'; value: boolean }
-    | { type: 'mark-applied' }
-    | { type: 'mark-saved'; value: boolean };
-
-  const [state, dispatch] = React.useReducer(
-    (current: JobDetailState, action: JobDetailAction): JobDetailState => {
-      switch (action.type) {
-        case 'set-loading':
-          return { ...current, isLoading: action.value };
-        case 'set-loading-save':
-          return { ...current, isLoadingSave: action.value };
-        case 'set-job-post-detail':
-          return { ...current, jobPostDetail: action.value };
-        case 'open-popup':
-          return { ...current, openPopup: true };
-        case 'close-popup':
-          return { ...current, openPopup: false };
-        case 'open-share-popup':
-          return { ...current, openSharePopup: action.value };
-        case 'mark-applied':
-          return {
-            ...current,
-            jobPostDetail: current.jobPostDetail
-              ? ({ ...current.jobPostDetail, isApplied: true } as ExtendedJobPost)
-              : current.jobPostDetail,
-          };
-        case 'mark-saved':
-          return {
-            ...current,
-            jobPostDetail: current.jobPostDetail
-              ? ({ ...current.jobPostDetail, isSaved: action.value } as ExtendedJobPost)
-              : current.jobPostDetail,
-          };
-        default:
-          return current;
-      }
-    },
-    {
-      openSharePopup: false,
-      openPopup: false,
-      isLoading: true,
-      isLoadingSave: false,
-      jobPostDetail: null,
-    }
-  );
+  const [state, dispatch] = React.useReducer(jobDetailReducer, initialJobDetailState);
   const canApply =
     !isAuthenticated ||
     currentUser?.roleName === ROLES_NAME.JOB_SEEKER;

@@ -1,14 +1,19 @@
-import draftToHtml from 'draftjs-to-html';
-import {
-  ContentState,
-  EditorState,
-  convertFromHTML,
-  convertToRaw,
-} from 'draft-js';
 import {
   convertEditorStateToHTMLString,
   createEditorStateFromHTMLString,
 } from '../editorUtils';
+
+type DraftJsMock = {
+  ContentState: {
+    createFromBlockArray: jest.Mock;
+  };
+  EditorState: {
+    createEmpty: jest.Mock;
+    createWithContent: jest.Mock;
+  };
+  convertFromHTML: jest.Mock;
+  convertToRaw: jest.Mock;
+};
 
 jest.mock('draft-js', () => ({
   convertFromHTML: jest.fn(),
@@ -25,6 +30,10 @@ jest.mock('draft-js', () => ({
 jest.mock('draftjs-to-html', () => jest.fn());
 
 describe('editorUtils', () => {
+  const draftJs = jest.requireMock('draft-js') as DraftJsMock;
+  const draftToHtml = jest.requireMock('draftjs-to-html') as jest.Mock;
+  const { ContentState, EditorState, convertFromHTML, convertToRaw } = draftJs;
+
   beforeEach(() => {
     jest.clearAllMocks();
   });

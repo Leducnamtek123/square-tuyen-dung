@@ -270,7 +270,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
               onChange={(e) => dispatch({ type: 'patch', patch: { title: e.target.value } })}
               placeholder="Nhập tiêu đề hấp dẫn..."
               sx={{ mb: 2 }}
-              inputProps={{ style: { fontSize: '1.1rem', fontWeight: 700 } }}
+              slotProps={{ htmlInput: { style: { fontSize: '1.1rem', fontWeight: 700 } } }}
             />
             <TextField
               fullWidth
@@ -280,7 +280,7 @@ const AdminArticleFormPage = ({ mode, articleId }: Props) => {
               placeholder="Tóm tắt nội dung bài viết (hiển thị trong danh sách)..."
               multiline
               rows={2}
-              inputProps={{ maxLength: 500 }}
+              slotProps={{ htmlInput: { maxLength: 500 } }}
               helperText={`${excerpt.length}/500`}
             />
           </Paper>

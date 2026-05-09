@@ -252,7 +252,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
               onChange={(e) => dispatch({ type: 'patch', patch: { title: e.target.value } })}
               placeholder="Chia sẻ kinh nghiệm tuyển dụng của bạn..."
               sx={{ mb: 2 }}
-              inputProps={{ style: { fontSize: '1.1rem', fontWeight: 700 } }}
+              slotProps={{ htmlInput: { style: { fontSize: '1.1rem', fontWeight: 700 } } }}
             />
             <TextField
               fullWidth
@@ -262,7 +262,7 @@ const EmployerBlogFormPage = ({ mode, articleId }: Props) => {
               placeholder="Tóm tắt ngắn gọn nội dung bài viết..."
               multiline
               rows={2}
-              inputProps={{ maxLength: 500 }}
+              slotProps={{ htmlInput: { maxLength: 500 } }}
               helperText={`${excerpt.length}/500`}
             />
           </Paper>

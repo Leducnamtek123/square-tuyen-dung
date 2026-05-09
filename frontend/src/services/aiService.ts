@@ -1,25 +1,25 @@
 import httpRequest from '../utils/httpRequest';
 
-export interface TTSPayload {
+interface TTSPayload {
   text: string;
   voice?: string;
   speed?: number;
   format?: 'mp3' | 'wav';
 }
 
-export interface TranscribeParams {
+interface TranscribeParams {
   model?: string;
   language?: string;
 }
 
-export type TranscribeResponse = {
+type TranscribeResponse = {
   transcription?: string;
   text?: string;
   language?: string;
   duration?: number;
 };
 
-export type ScreeningResult = {
+type ScreeningResult = {
   id?: number | string;
   status?: string;
   score?: number;

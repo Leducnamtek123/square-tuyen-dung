@@ -146,7 +146,7 @@ const FeedbacksPage = () => {
             columns={columns}
             data={feedbacks}
             isLoading={isLoading}
-            hidePagination
+            paginationMode="hidden"
             enableSorting
             sorting={sorting}
             onSortingChange={onSortingChange}

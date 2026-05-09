@@ -57,7 +57,7 @@ interface Props<TData> {
   onPageChange?: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
   onRowsPerPageChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   emptyMessage?: string;
-  hidePagination?: boolean;
+  paginationMode?: 'visible' | 'hidden';
 }
 
 type CellAlign = 'left' | 'center' | 'right' | 'justify' | 'inherit';
@@ -82,7 +82,7 @@ const DataTable = <TData,>({
     onPageChange,
     onRowsPerPageChange,
     emptyMessage,
-    hidePagination = false,
+    paginationMode = 'visible',
 }: Props<TData>) => {
     const { t } = useTranslation('admin');
     
@@ -235,7 +235,7 @@ const DataTable = <TData,>({
                 </Table>
             </TableContainer>
 
-            {!hidePagination && (
+            {paginationMode === 'visible' && (
                 <TablePagination
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"

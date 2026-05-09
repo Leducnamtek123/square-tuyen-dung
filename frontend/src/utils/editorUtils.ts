@@ -1,3 +1,4 @@
+// react-doctor-disable-next-line react-doctor/prefer-dynamic-import
 import {
   ContentState,
   convertFromHTML,
