@@ -1,0 +1,48 @@
+{
+ "aggregate_function_based_on": "hours",
+ "based_on": "",
+ "chart_name": "Timesheet Activity Breakup",
+ "chart_type": "Group By",
+ "creation": "2025-07-15 13:15:12.817847",
+ "docstatus": 0,
+ "doctype": "Dashboard Chart",
+ "document_type": "Timesheet Detail",
+ "dynamic_filters_json": "[]",
+ "filters_json": "[]",
+ "group_by_based_on": "activity_type",
+ "group_by_type": "Sum",
+ "idx": 0,
+ "is_public": 1,
+ "is_standard": 1,
+ "last_synced_on": "2026-04-16 17:14:16.020107",
+ "modified": "2026-04-16 17:18:58.677457",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Timesheet Activity Breakup",
+ "number_of_groups": 0,
+ "owner": "Administrator",
+ "parent_document_type": "Timesheet",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "HR Manager"
+  },
+  {
+   "role": "HR User"
+  },
+  {
+   "role": "Employee"
+  }
+ ],
+ "show_values_over_chart": 0,
+ "source": "",
+ "time_interval": "Yearly",
+ "timeseries": 0,
+ "timespan": "Last Year",
+ "type": "Percentage",
+ "use_report_chart": 0,
+ "value_based_on": "",
+ "y_axis": []
+}

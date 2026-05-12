@@ -1,0 +1,139 @@
+@import "frappe-ui/src/style.css";
+
+ion-modal {
+	--height: auto;
+}
+
+input:disabled {
+	--webkit-text-fill-color: var(--tw-text-color);
+	opacity: 0.9; /* required on iOS */
+	color: var(--tw-text-color);
+}
+
+/* For Webkit-based browsers (Chrome, Safari and Opera) */
+input::-webkit-date-and-time-value {
+	text-align: left;
+}
+
+body {
+	-webkit-tap-highlight-color: transparent;
+	background: #f0f7ff;
+	color: #0f397f;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+	display: none;
+}
+
+/* For IE, Edge and Firefox */
+.hide-scrollbar {
+	-ms-overflow-style: none; /* IE and Edge */
+	scrollbar-width: none; /* Firefox */
+}
+
+:root {
+	--square-navy: #1a407d;
+	--square-navy-deep: #0f397f;
+	--square-cyan: #2aa9e1;
+	--square-bg: #f0f7ff;
+	--square-cyan-soft: #e1effe;
+	--square-muted: #3f6fc6;
+	--square-border: rgba(26, 64, 125, 0.1);
+	--square-shadow: 0 12px 32px rgba(26, 64, 125, 0.06);
+}
+
+.bg-gray-900,
+.hover\:bg-gray-800:hover,
+.active\:bg-gray-700:active {
+	background-color: var(--square-navy) !important;
+}
+
+.bg-gray-100,
+.hover\:bg-gray-200:hover,
+.active\:bg-gray-300:active,
+.bg-blue-100 {
+	background-color: var(--square-cyan-soft) !important;
+}
+
+.bg-white {
+	background-color: #ffffff !important;
+}
+
+.text-gray-900,
+.text-gray-800,
+.text-gray-700,
+.text-blue-600,
+.border-gray-900 {
+	color: var(--square-navy-deep) !important;
+	border-color: var(--square-navy) !important;
+}
+
+.text-gray-600,
+.text-gray-500 {
+	color: var(--square-muted) !important;
+}
+
+.border-gray-200,
+.border-gray-300 {
+	border-color: var(--square-border) !important;
+}
+
+.focus-visible\:ring-gray-400:focus-visible,
+.focus-visible\:ring:focus-visible {
+	--tw-ring-color: rgba(42, 169, 225, 0.24) !important;
+}
+
+.before\:bg-blue-500::before {
+	background-color: var(--square-cyan) !important;
+}
+
+.drop-shadow,
+.drop-shadow-xl,
+.shadow-sm {
+	filter: none !important;
+	box-shadow: var(--square-shadow) !important;
+}
+
+.square-hrm-app-language-switcher {
+	position: fixed;
+	top: max(12px, env(safe-area-inset-top));
+	right: max(12px, env(safe-area-inset-right));
+	z-index: 10000;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 4px;
+	border: 1px solid rgba(26, 64, 125, 0.18);
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.92);
+	box-shadow: 0 8px 24px rgba(26, 64, 125, 0.1);
+	backdrop-filter: blur(10px);
+}
+
+.square-hrm-app-language-switcher__button {
+	min-width: 38px;
+	height: 28px;
+	padding: 0 10px;
+	border: 0;
+	border-radius: 999px;
+	background: transparent;
+	color: var(--square-muted);
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 28px;
+	letter-spacing: 0;
+	cursor: pointer;
+}
+
+.square-hrm-app-language-switcher__button:hover,
+.square-hrm-app-language-switcher__button:focus-visible {
+	color: var(--square-navy-deep);
+	background: rgba(42, 169, 225, 0.12);
+	outline: none;
+}
+
+.square-hrm-app-language-switcher__button.is-active {
+	color: #ffffff;
+	background: linear-gradient(135deg, var(--square-navy) 0%, var(--square-cyan) 100%);
+	box-shadow: 0 6px 14px rgba(26, 64, 125, 0.16);
+}

@@ -1,0 +1,58 @@
+{
+ "actions": [],
+ "allow_import": 1,
+ "autoname": "field:offer_term",
+ "creation": "2015-03-05 13:00:30.900471",
+ "doctype": "DocType",
+ "document_type": "Setup",
+ "engine": "InnoDB",
+ "field_order": [
+  "offer_term"
+ ],
+ "fields": [
+  {
+   "fieldname": "offer_term",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Offer Term",
+   "reqd": 1,
+   "unique": 1
+  }
+ ],
+ "links": [],
+ "modified": "2026-04-09 18:33:35.969104",
+ "modified_by": "Administrator",
+ "module": "HR",
+ "name": "Offer Term",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "import": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "HR Manager",
+   "write": 1
+  },
+  {
+   "role": "HR User",
+   "select": 1
+  }
+ ],
+ "quick_entry": 1,
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

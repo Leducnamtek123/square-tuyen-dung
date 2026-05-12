@@ -1,0 +1,18 @@
+[project]
+name = "square_hrm_branding"
+version = "0.0.1"
+description = "Square HRM interface branding for Frappe HRMS"
+requires-python = ">=3.10"
+readme = "README.md"
+authors = [
+    { name = "Square" }
+]
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+[tool.bench.frappe-dependencies]
+frappe = ">=16.0.0,<17.0.0"
+erpnext = ">=16.0.0,<17.0.0"
+hrms = ">=16.0.0,<17.0.0"
