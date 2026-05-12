@@ -651,7 +651,12 @@
     "employerVerification": "Xác thực danh tính",
     "account": "Tài khoản",
     "settings": "Cài đặt",
-    "employeeRoles": "Nhân viên & Vai trò"
+    "employeeRoles": "Nhân viên & Vai trò",
+    "hrm": "Quản trị nhân sự",
+    "hrmEmployees": "Hồ sơ nhân sự",
+    "hrmRoles": "Vai trò & quyền",
+    "hrmMembers": "Thành viên công ty",
+    "squareHrmAdmin": "Mở Square HRM"
   },
   "interviewHistory": {
     "title": "Thư viện Video",
@@ -771,10 +776,18 @@
       "description": "Admin sẽ xác nhận lịch phỏng vấn và gửi thông tin tham gia phòng.",
       "timeLabel": "Thời gian mong muốn",
       "contactPerson": "Người liên hệ",
+      "contactName": "Người liên hệ",
       "contactPhone": "Số điện thoại liên hệ",
       "notes": "Ghi chú",
       "sendRequestBtn": "Gửi yêu cầu phỏng vấn",
+      "requestBtn": "Gửi yêu cầu phỏng vấn",
       "statusLabel": "Trạng thái: {{status}}"
+    },
+    "status": {
+      "pending": "Chờ duyệt",
+      "reviewing": "Đang xem xét",
+      "approved": "Đã duyệt",
+      "rejected": "Từ chối"
     },
     "submittedSchedules": {
       "title": "Lịch phỏng vấn đã gửi",
@@ -786,7 +799,9 @@
     "messages": {
       "infoRecorded": "Thông tin đã được ghi lại.",
       "noScheduleYet": "Chưa có lịch",
-      "waitingConfirmation": "Chờ xác nhận"
+      "waitingConfirmation": "Chờ xác nhận",
+      "profileSaved": "Đã lưu hồ sơ pháp lý.",
+      "requestSubmitted": "Đã gửi yêu cầu lịch xác minh."
     }
   },
   "profileDetailCard": {
@@ -1033,56 +1048,277 @@
       "trends_desc": "Nội dung đang được cập nhật để mang lại thông tin hữu ích."
     }
   },
+  "employeePortal": {
+    "sidebar": {
+      "dashboard": "Bảng điều khiển",
+      "profile": "Hồ sơ của tôi",
+      "onboarding": "Onboarding",
+      "contracts": "Hợp đồng",
+      "reviews": "Đánh giá",
+      "timeline": "Timeline"
+    },
+    "common": {
+      "progress": "tiến độ",
+      "activeContract": "Hợp đồng hiệu lực",
+      "latestReview": "Đánh giá mới nhất"
+    },
+    "metrics": {
+      "openTasks": "Task đang mở",
+      "completedTasks": "Task đã xong",
+      "contracts": "Hợp đồng",
+      "reviews": "Đánh giá"
+    },
+    "dashboard": {
+      "nextTasks": "Việc cần làm",
+      "status": "Trạng thái nhân sự"
+    },
+    "profile": {
+      "title": "Hồ sơ của tôi",
+      "save": "Lưu hồ sơ"
+    },
+    "onboarding": {
+      "title": "Onboarding và đào tạo",
+      "evidence": "Minh chứng hoặc ghi chú",
+      "start": "Bắt đầu",
+      "done": "Đánh dấu xong"
+    },
+    "contracts": {
+      "title": "Hợp đồng của tôi"
+    },
+    "reviews": {
+      "title": "Đánh giá của tôi"
+    },
+    "timeline": {
+      "title": "Timeline của tôi"
+    },
+    "taskStatuses": {
+      "TODO": "Cần làm",
+      "IN_PROGRESS": "Đang làm",
+      "DONE": "Hoàn thành",
+      "WAIVED": "Bỏ qua"
+    },
+    "empty": {
+      "noProfile": "Tài khoản này chưa được liên kết với hồ sơ nhân sự.",
+      "noTasks": "Chưa có task được giao.",
+      "noContracts": "Chưa có hợp đồng.",
+      "noReviews": "Chưa có đánh giá.",
+      "noTimeline": "Chưa có sự kiện timeline."
+    },
+    "toast": {
+      "profileUpdated": "Đã cập nhật hồ sơ",
+      "profileUpdateError": "Không thể cập nhật hồ sơ",
+      "taskUpdated": "Đã cập nhật task",
+      "taskUpdateError": "Không thể cập nhật task"
+    }
+  },
   "employees": {
-    "pageTitle": "Quản lý nhân sự công ty",
-    "pageDescription": "Quản lý role, thêm nhân viên và gán role trực tiếp.",
-    "addRole": "Thêm role",
+    "pageTitle": "Quản trị nhân sự",
+    "pageDescription": "Quản lý hồ sơ nhân sự, vai trò, thành viên công ty và quyền truy cập HRM.",
+    "sections": {
+      "employees": {
+        "title": "Hồ sơ nhân sự",
+        "description": "Theo dõi nhân sự, trạng thái làm việc, quyền vào portal và tiến độ onboarding."
+      },
+      "roles": {
+        "title": "Vai trò & quyền",
+        "description": "Thiết lập quyền cho nhà tuyển dụng, nhân sự và quản trị viên công ty."
+      },
+      "members": {
+        "title": "Thành viên công ty",
+        "description": "Quản lý các tài khoản người dùng có quyền truy cập workspace công ty."
+      }
+    },
+    "hrm": {
+      "addEmployee": "Thêm nhân sự",
+      "kpi": {
+        "total": "Tổng nhân sự",
+        "onboarding": "Onboarding / thử việc",
+        "active": "Đang làm việc",
+        "overdue": "Task đào tạo quá hạn"
+      },
+      "filters": {
+        "search": "Tìm nhân sự",
+        "status": "Trạng thái",
+        "allStatuses": "Tất cả trạng thái"
+      },
+      "fields": {
+        "fullName": "Họ và tên",
+        "email": "Email",
+        "phone": "Điện thoại",
+        "jobTitle": "Chức danh",
+        "department": "Phòng ban",
+        "employmentType": "Loại nhân sự",
+        "status": "Trạng thái",
+        "startDate": "Ngày bắt đầu",
+        "probationEndDate": "Ngày kết thúc thử việc",
+        "notes": "Ghi chú"
+      },
+      "statuses": {
+        "PREBOARDING": "Chuẩn bị nhận việc",
+        "ONBOARDING": "Onboarding",
+        "PROBATION": "Thử việc",
+        "ACTIVE": "Đang làm việc",
+        "OFFBOARDING": "Offboarding",
+        "EXITED": "Đã nghỉ việc"
+      },
+      "employmentTypes": {
+        "full_time": "Toàn thời gian",
+        "part_time": "Bán thời gian",
+        "contractor": "Cộng tác viên",
+        "intern": "Thực tập",
+        "probation": "Thử việc"
+      },
+      "reviewResults": {
+        "pass": "Đạt",
+        "needs_training": "Cần đào tạo thêm",
+        "fail": "Không đạt"
+      },
+      "portalStatuses": {
+        "NO_ACCOUNT": "Chưa có tài khoản",
+        "LINKED": "Đã liên kết",
+        "ACTIVE": "Portal đã kích hoạt"
+      },
+      "table": {
+        "code": "Mã NV",
+        "employee": "Nhân sự",
+        "jobTitle": "Chức danh",
+        "department": "Phòng ban",
+        "status": "Trạng thái",
+        "portal": "Portal",
+        "training": "Đào tạo",
+        "trainingProgress": "{{progress}}% xong • {{overdue}} quá hạn",
+        "viewDetail": "Xem chi tiết nhân sự",
+        "enablePortal": "Kích hoạt portal nhân sự",
+        "empty": "Chưa có nhân sự"
+      },
+      "dialog": {
+        "addTitle": "Thêm nhân sự",
+        "create": "Tạo nhân sự"
+      },
+      "toast": {
+        "createEmployeeSuccess": "Đã tạo nhân sự",
+        "createEmployeeError": "Không thể tạo nhân sự",
+        "portalAccessSuccess": "Đã kích hoạt portal nhân sự",
+        "portalAccessError": "Không thể kích hoạt portal nhân sự"
+      },
+      "convert": {
+        "action": "Đưa sang Frappe HR",
+        "openEmployee": "Mở hồ sơ Frappe HR",
+        "title": "Đưa ứng viên sang Frappe HR",
+        "submit": "Đưa sang Frappe HR",
+        "createFrappeAccount": "Tạo tài khoản Frappe HR",
+        "sendWelcomeEmail": "Gửi email mời từ Frappe",
+        "roles": "Vai trò Frappe",
+        "success": "Đã đưa ứng viên sang Frappe HR",
+        "error": "Không thể đưa hồ sơ này sang Frappe HR"
+      },
+      "detail": {
+        "back": "Về danh sách nhân sự",
+        "training": "đào tạo",
+        "notFound": "Không tìm thấy nhân sự",
+        "tabs": {
+          "overview": "Tổng quan",
+          "training": "Onboarding & Đào tạo",
+          "reviews": "Đánh giá",
+          "contracts": "Hợp đồng",
+          "offboarding": "Nghỉ việc",
+          "timeline": "Timeline"
+        },
+        "overviewTitle": "Tổng quan nhân sự",
+        "transitionTitle": "Chuyển trạng thái lifecycle",
+        "transitionNote": "Ghi chú chuyển trạng thái",
+        "applyTransition": "Áp dụng",
+        "transitionSuccess": "Đã cập nhật trạng thái nhân sự",
+        "transitionError": "Chuyển trạng thái không hợp lệ",
+        "enablePortal": "Kích hoạt portal",
+        "portalAccessSuccess": "Đã kích hoạt portal nhân sự",
+        "portalAccessError": "Không thể kích hoạt portal nhân sự",
+        "taskUpdateSuccess": "Đã cập nhật task",
+        "taskUpdateError": "Không thể cập nhật task",
+        "done": "Hoàn thành",
+        "waive": "Bỏ qua",
+        "newReview": "Đánh giá mới",
+        "reviewType": "Loại đánh giá",
+        "result": "Kết quả",
+        "strengths": "Điểm mạnh",
+        "improvements": "Cần cải thiện",
+        "nextTrainingActions": "Hướng đào tạo tiếp theo",
+        "createReview": "Tạo đánh giá",
+        "reviewCreateSuccess": "Đã tạo đánh giá",
+        "reviewCreateError": "Không thể tạo đánh giá",
+        "newContract": "Hợp đồng mới",
+        "contractType": "Loại hợp đồng",
+        "endDate": "Ngày kết thúc",
+        "baseSalary": "Lương cơ bản",
+        "workingTime": "Thời gian làm việc",
+        "createContract": "Tạo hợp đồng",
+        "contractCreateSuccess": "Đã tạo hợp đồng",
+        "contractCreateError": "Không thể tạo hợp đồng",
+        "offboardingTitle": "Offboarding",
+        "offboardingDesc": "Chuyển nhân sự sang quy trình nghỉ việc và đánh dấu đã nghỉ khi bàn giao xong.",
+        "startOffboarding": "Bắt đầu offboarding",
+        "markExited": "Đánh dấu đã nghỉ",
+        "offboardingNote": "Bắt đầu offboarding.",
+        "exitedNote": "Nhân sự đã nghỉ việc.",
+        "timelineNote": "Ghi chú timeline",
+        "addTimelineNote": "Thêm ghi chú",
+        "timelineNoteSuccess": "Đã thêm ghi chú timeline",
+        "timelineNoteError": "Không thể thêm ghi chú timeline"
+      }
+    },
+    "addRole": "Thêm vai trò",
     "addMember": "Thêm nhân viên",
     "tabs": {
-      "roles": "Roles",
-      "members": "Members"
+      "employees": "Nhân sự",
+      "roles": "Vai trò",
+      "members": "Thành viên"
     },
     "table": {
       "id": "ID",
-      "code": "Code",
-      "roleName": "Tên role",
+      "code": "Mã",
+      "roleName": "Tên vai trò",
       "permissions": "Quyền",
-      "system": "System",
+      "system": "Hệ thống",
       "actions": "Thao tác",
-      "user": "User",
+      "user": "Người dùng",
       "email": "Email",
-      "role": "Role",
+      "role": "Vai trò",
       "status": "Trạng thái",
       "noPermissions": "Không có quyền",
-      "yes": "Yes",
-      "no": "No",
+      "yes": "Có",
+      "no": "Không",
       "delete": "Xóa"
     },
     "dialog": {
-      "addRoleTitle": "Thêm role mới",
-      "roleNameLabel": "Tên role",
-      "codeLabel": "Code (slug)",
-      "codeHelperText": "Để trống sẽ tự sinh từ tên role.",
+      "addRoleTitle": "Thêm vai trò mới",
+      "roleNameLabel": "Tên vai trò",
+      "codeLabel": "Mã (slug)",
+      "codeHelperText": "Để trống sẽ tự sinh từ tên vai trò.",
       "descriptionLabel": "Mô tả",
-      "permissionsLabel": "Permissions",
+      "permissionsLabel": "Quyền",
       "cancel": "Hủy",
-      "createRole": "Tạo role",
+      "createRole": "Tạo vai trò",
       "addMemberTitle": "Thêm nhân viên",
-      "userIdLabel": "User ID",
-      "userIdHelperText": "Nhập ID tài khoản user cần thêm vào công ty.",
-      "roleLabel": "Role",
-      "statusLabel": "Status",
-      "invitedEmailLabel": "Invited email (optional)",
+      "userIdLabel": "ID người dùng",
+      "userIdHelperText": "Nhập ID tài khoản người dùng cần thêm vào công ty.",
+      "roleLabel": "Vai trò",
+      "statusLabel": "Trạng thái",
+      "invitedEmailLabel": "Email được mời (không bắt buộc)",
       "createMember": "Thêm nhân viên"
     },
+    "memberStatus": {
+      "active": "Hoạt động",
+      "invited": "Đã mời",
+      "disabled": "Đã tắt"
+    },
     "toast": {
-      "createRoleSuccess": "Tạo role thành công",
-      "createRoleError": "Không thể tạo role",
-      "deleteRoleSuccess": "Đã xóa role",
-      "deleteRoleError": "Không thể xóa role",
+      "createRoleSuccess": "Tạo vai trò thành công",
+      "createRoleError": "Không thể tạo vai trò",
+      "deleteRoleSuccess": "Đã xóa vai trò",
+      "deleteRoleError": "Không thể xóa vai trò",
       "createMemberSuccess": "Đã thêm nhân viên vào công ty",
       "createMemberError": "Không thể thêm nhân viên",
-      "updateMemberSuccess": "Đã cập nhật role nhân viên",
+      "updateMemberSuccess": "Đã cập nhật vai trò nhân viên",
       "updateMemberError": "Không thể cập nhật nhân viên",
       "deleteMemberSuccess": "Đã xóa nhân viên khỏi công ty",
       "deleteMemberError": "Không thể xóa nhân viên"

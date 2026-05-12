@@ -2,6 +2,7 @@
 import React, { useMemo, useCallback, useReducer } from 'react';
 import { Box, Paper } from "@mui/material";
 import { useTranslation } from 'react-i18next';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import errorHandling from '../../../../utils/errorHandling';
 import BackdropLoading from '../../../../components/Common/Loading/BackdropLoading';
 import xlsxUtils from '../../../../utils/xlsxUtils';
@@ -12,6 +13,7 @@ import AppliedResumeFilterForm from '../AppliedResumeFilterForm';
 import AppliedResumeTable from '../AppliedResumeTable';
 import AppliedResumeKanban from '../AppliedResumeKanban';
 import jobPostActivityService from '../../../../services/jobPostActivityService';
+import hrmService, { type EmployeeFromApplicationPayload } from '../../../../services/hrmService';
 import { useAppliedResumes, useJobPostOptions, useDeleteJobPostActivity, useUpdateApplicationStatus } from '../hooks/useEmployerQueries';
 import { useDataTable } from '../../../../hooks';
 import { useConfig } from '@/hooks/useConfig';
@@ -20,6 +22,7 @@ import type { OnChangeFn, PaginationState, SortingState } from '@tanstack/react-
 
 import { AppliedResumeFilterData } from '../AppliedResumeFilterForm';
 import AppliedResumeToolbar from './AppliedResumeToolbar';
+import EmployeeFromApplicationDialog from '../EmployeeFromApplicationDialog';
 
 interface AppliedResumeCardProps {
   title: string;
@@ -96,7 +99,9 @@ const reducer = (state: AppliedResumeState, action: AppliedResumeAction): Applie
 const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle }) => {
   const { t } = useTranslation(['employer', 'common']);
   const { allConfig } = useConfig();
+  const queryClient = useQueryClient();
   const [state, dispatch] = useReducer(reducer, initialState);
+  const [employeeSourceActivity, setEmployeeSourceActivity] = React.useState<JobPostActivity | null>(null);
 
   const {
     page,
@@ -127,6 +132,15 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
   const { data: queryData, isLoading } = useAppliedResumes(queryParams);
   const { deleteJobPostActivity, isMutating: isDeleting } = useDeleteJobPostActivity();
   const { updateStatus, isMutating: isUpdatingStatus } = useUpdateApplicationStatus();
+  const createEmployeeMutation = useMutation({
+    mutationFn: (payload: EmployeeFromApplicationPayload) => hrmService.createEmployeeFromApplication(payload),
+    onSuccess: () => {
+      toastMessages.success(t('employer:employees.hrm.convert.success'));
+      setEmployeeSourceActivity(null);
+      queryClient.invalidateQueries({ queryKey: ['appliedResumes'] });
+    },
+    onError: () => toastMessages.error(t('employer:employees.hrm.convert.error')),
+  });
 
   const resumes = useMemo(() => {
     const sourceRows = queryData?.results || [];
@@ -264,6 +278,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               onSortingChange={onSortingChange as OnChangeFn<SortingState>}
               handleChangeApplicationStatus={handleChangeApplicationStatus}
               handleDelete={handleDelete}
+              onCreateEmployee={setEmployeeSourceActivity}
               onAnalysisStateChange={handleAnalysisStateChange}
             />
         ) : (
@@ -272,6 +287,7 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
               isLoading={isLoading}
               handleChangeApplicationStatus={handleChangeApplicationStatus}
               handleDelete={handleDelete}
+              onCreateEmployee={setEmployeeSourceActivity}
               onAnalysisStateChange={handleAnalysisStateChange}
             />
         )}
@@ -282,6 +298,14 @@ const AppliedResumeCard: React.FC<AppliedResumeCardProps> = ({ title: cardTitle 
 
         {(state.isProcessing || isDeleting || isUpdatingStatus) && <BackdropLoading />}
       </Paper>
+      <EmployeeFromApplicationDialog
+        open={Boolean(employeeSourceActivity)}
+        activity={employeeSourceActivity}
+        loading={createEmployeeMutation.isPending}
+        onClose={() => setEmployeeSourceActivity(null)}
+        onSubmit={(payload) => createEmployeeMutation.mutate(payload)}
+        t={t}
+      />
     </Box>
   );
 };

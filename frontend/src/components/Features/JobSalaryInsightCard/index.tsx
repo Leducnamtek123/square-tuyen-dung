@@ -34,7 +34,7 @@ const formatMoney = (value?: number | null) => {
 };
 
 const JobSalaryInsightCard = ({ slug }: Props) => {
-  const { t } = useTranslation(['public']);
+  const { t } = useTranslation('public');
   const { data } = useQuery({
     queryKey: ['job-salary-insight', slug],
     queryFn: async () => {

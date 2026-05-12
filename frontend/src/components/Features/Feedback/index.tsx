@@ -82,16 +82,16 @@ const Feedback = (_props: FeedbackProps) => {
         onClick={handleOpen}
         sx={{
           position: 'fixed',
-          bottom: { xs: 16, md: 24 },
-          left: { xs: 16, md: 24 },
-          padding: '8px 16px',
+          right: { xs: 16, md: 96 },
+          bottom: { xs: 88, md: 24 },
+          padding: { xs: '9px 14px', md: '8px 16px' },
           textTransform: 'none',
           color: 'white',
           zIndex: 1250,
           boxShadow: (theme) => theme.customShadows.feedback,
           backdropFilter: 'blur(8px)',
           backgroundColor: (theme) => theme.palette.feedback.button.background,
-          borderRadius: '20px 20px 20px 4px',
+          borderRadius: '999px',
           fontSize: '0.95rem',
           fontWeight: 600,
           letterSpacing: '0.2px',
@@ -104,23 +104,13 @@ const Feedback = (_props: FeedbackProps) => {
           animation: 'feedbackIn 0.6s cubic-bezier(0.4, 0, 0.2, 1)',
           '@keyframes feedbackIn': {
             '0%': {
-              transform: 'translateX(-100%)',
+              transform: 'translateY(24px)',
               opacity: 0,
             },
             '100%': {
-              transform: 'translateX(0)',
+              transform: 'translateY(0)',
               opacity: 1,
             }
-          },
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            bottom: -8,
-            left: 0,
-            width: 16,
-            height: 16,
-            backgroundColor: 'inherit',
-            clipPath: 'polygon(0 0, 100% 0, 0 100%)',
           },
         }}
         startIcon={

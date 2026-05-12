@@ -4,7 +4,7 @@ import { useAppSelector } from '@/redux/hooks';
 import { useDispatch } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
-import { Card } from "@mui/material";
+import { Box } from "@mui/material";
 import { Grid2 as Grid } from "@mui/material";
 import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
 import SingleSelectSearchCustom from '../../../../components/Common/Controls/SingleSelectSearchCustom';
@@ -70,44 +70,46 @@ const HomeSearch = () => {
   };
 
   return (
-    <Card
+    <Box
+      component="form"
+      onSubmit={handleSubmit(handleFilter)}
       sx={{
-        backgroundColor: 'rgba(0,0,0,.35)',
         borderRadius: 3.5,
-        p: { xs: 2, sm: 3, md: 4 },
-        pt: { xs: 2.5, sm: 3.5, md: 5 },
+        p: { xs: 1.25, sm: 1.5, md: 2 },
+        backgroundColor: 'rgba(255,255,255,0.72)',
+        border: '1px solid rgba(26, 64, 125, 0.1)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8)',
+        backdropFilter: 'blur(14px)',
       }}
     >
-      <form onSubmit={handleSubmit(handleFilter)}>
-        <Grid container spacing={2}>
-          <Grid size={{ xs: 12 }}>
-            <InputBaseSearchHomeCustom
-              name="kw"
-              control={control}
-              placeholder={t("common:search.button")}
-              showSubmitButton={true}
-              location='HOME'
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <SingleSelectSearchCustom
-              name="careerId"
-              placeholder={t("common:placeholders.fieldOperation.all")}
-              control={control}
-              options={allConfig?.careerOptions || []}
-            />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <SingleSelectSearchCustom
-              name="cityId"
-              placeholder={t("common:placeholders.selectCity")}
-              control={control}
-              options={allConfig?.cityOptions || []}
-            />
-          </Grid>
+      <Grid container spacing={1.5}>
+        <Grid size={{ xs: 12 }}>
+          <InputBaseSearchHomeCustom
+            name="kw"
+            control={control}
+            placeholder={t("common:search.button")}
+            showSubmitButton={true}
+            location='HOME'
+          />
         </Grid>
-      </form>
-    </Card>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <SingleSelectSearchCustom
+            name="careerId"
+            placeholder={t("common:placeholders.fieldOperation.all")}
+            control={control}
+            options={allConfig?.careerOptions || []}
+          />
+        </Grid>
+        <Grid size={{ xs: 12, md: 6 }}>
+          <SingleSelectSearchCustom
+            name="cityId"
+            placeholder={t("common:placeholders.selectCity")}
+            control={control}
+            options={allConfig?.cityOptions || []}
+          />
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

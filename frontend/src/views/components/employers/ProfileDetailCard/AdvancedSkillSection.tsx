@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Stack, Paper, Divider, LinearProgress, alpha, useTheme } from '@mui/material';
+import { Box, Typography, Stack, Paper, Divider, LinearProgress } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 
@@ -12,25 +12,26 @@ interface AdvancedSkillSectionProps {
 
 const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDetail }) => {
     const { t } = useTranslation(['employer', 'common']);
-    const theme = useTheme();
 
     if (!(profileDetail?.skillDetails && profileDetail.skillDetails.length > 0)) return null;
 
     return (
         <Box>
-            <Stack direction="row" alignItems="center" spacing={2} mb={4}>
+            <Stack direction="row" alignItems="center" spacing={1.5} mb={2.5}>
                 <Box 
                     sx={{ 
-                        p: 1.25, 
+                        width: 40,
+                        height: 40,
                         borderRadius: 2, 
                         bgcolor: pc.primary( 0.1),
                         color: 'primary.main',
-                        display: 'flex'
+                        display: 'grid',
+                        placeItems: 'center',
                     }}
                 >
-                    <PsychologyIcon sx={{ fontSize: 28 }} />
+                    <PsychologyIcon sx={{ fontSize: 22 }} />
                 </Box>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+                <Typography variant="h6" sx={{ fontWeight: 1000, color: 'text.primary' }}>
                     {t('profileDetailCard.title.advancedSkills')}
                 </Typography>
             </Stack>
@@ -38,12 +39,12 @@ const AdvancedSkillSection: React.FC<AdvancedSkillSectionProps> = ({ profileDeta
             <Paper
                 elevation={0}
                 sx={{
-                    p: { xs: 3, md: 5 },
-                    borderRadius: 4,
+                    p: { xs: 2.5, md: 4 },
+                    borderRadius: 3,
                     border: '1px solid',
-                    borderColor: 'divider',
+                    borderColor: pc.divider(0.7),
                     bgcolor: 'background.paper',
-                    boxShadow: (theme) => theme.customShadows?.z1
+                    boxShadow: '0 14px 34px rgba(15, 23, 42, 0.06)',
                 }}
             >
                 <Stack spacing={4}>

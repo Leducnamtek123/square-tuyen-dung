@@ -7,6 +7,7 @@ import uuid
 import asyncio
 import logging
 import json
+import threading
 from typing import Dict, Optional
 from decouple import config
 from livekit import api
@@ -255,6 +256,18 @@ class LiveKitService:
                 await lkapi.aclose()
         
         try:
-            asyncio.run(_start_egress())
-        except Exception as exc:
-            logger.warning("LiveKit start_recording failed: %s", exc)
+            asyncio.get_running_loop()
+        except RuntimeError:
+            try:
+                asyncio.run(_start_egress())
+            except Exception as exc:
+                logger.warning("LiveKit start_recording failed: %s", exc)
+            return
+
+        def _run_in_thread() -> None:
+            try:
+                asyncio.run(_start_egress())
+            except Exception as exc:
+                logger.warning("LiveKit start_recording failed: %s", exc)
+
+        threading.Thread(target=_run_in_thread, daemon=True).start()

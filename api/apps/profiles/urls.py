@@ -59,6 +59,10 @@ web_router.register(r'admin/job-seeker-profiles', web_views.AdminJobSeekerProfil
 
 web_router.register(r'admin/resumes', web_views.AdminResumeViewSet, basename='admin-resumes')
 
+web_router.register(r'admin/company-verifications', web_views.AdminCompanyVerificationViewSet, basename='admin-company-verifications')
+
+web_router.register(r'admin/trust-reports', web_views.AdminTrustReportViewSet, basename='admin-trust-reports')
+
 urlpatterns = [
 
     path('', include([
@@ -88,6 +92,8 @@ urlpatterns = [
         path("company/", web_views.CompanyView.as_view({'get': 'get_company_info'})),
 
         path("company/job-posts/<int:pk>/", web_views.CompanyView.as_view({'get': 'get_job_post_detail'})),
+
+        path("company-verification/", web_views.CompanyVerificationView.as_view()),
 
         path("", include(web_router.urls)),
 

@@ -129,12 +129,23 @@ class SavedJobPost(CommonBaseModel):
         db_table = "project_job_saved_job_post"
 
         verbose_name_plural = "Saved job posts"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["user", "job_post"],
+                name="uq_savedjobpost_user_jobpost",
+            ),
+        ]
 
     def __str__(self):
 
         return f"{self.user} saved {self.job_post}"
 
 class JobPostActivity(CommonBaseModel):
+    class FrappeSyncStatus(models.TextChoices):
+        NOT_SYNCED = "NOT_SYNCED", "Not synced"
+        SYNCING = "SYNCING", "Syncing"
+        SYNCED = "SYNCED", "Synced"
+        FAILED = "FAILED", "Failed"
 
     full_name = models.CharField(max_length=100, null=True)
 
@@ -186,6 +197,21 @@ class JobPostActivity(CommonBaseModel):
 
     ], default='pending')
     ai_analysis_progress = models.PositiveSmallIntegerField(default=0)
+
+    frappe_employee_id = models.CharField(max_length=140, blank=True, default="", db_index=True)
+
+    frappe_user_id = models.CharField(max_length=140, blank=True, default="")
+
+    frappe_sync_status = models.CharField(
+        max_length=20,
+        choices=FrappeSyncStatus.choices,
+        default=FrappeSyncStatus.NOT_SYNCED,
+        db_index=True,
+    )
+
+    frappe_sync_error = models.TextField(blank=True, default="")
+
+    frappe_synced_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
 

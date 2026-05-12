@@ -84,11 +84,15 @@ const loadActiveWorkspace = (): NormalizedWorkspace | null => {
 
 const normalizeWorkspace = (workspace: AnyWorkspace): NormalizedWorkspace | null => {
   if (!workspace) return null;
-  return {
+  const normalized: NormalizedWorkspace = {
     type: workspace.type,
     companyId: workspace.companyId || null,
     label: workspace.label || '',
   };
+  if (workspace.roleCode) {
+    normalized.roleCode = workspace.roleCode;
+  }
+  return normalized;
 };
 
 const resolveActiveWorkspace = (

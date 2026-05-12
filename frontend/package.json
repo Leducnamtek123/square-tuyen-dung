@@ -93,7 +93,7 @@
     "yup": "^1.0.2"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --webpack",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src --ext .ts,.tsx",

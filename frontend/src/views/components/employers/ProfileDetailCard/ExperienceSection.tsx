@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Stack, Paper, Divider, alpha, useTheme } from '@mui/material';
+import { Box, Typography, Stack, Paper, Divider } from '@mui/material';
 import { Grid2 as Grid } from "@mui/material";
 import { useTranslation } from 'react-i18next';
 import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
@@ -16,25 +16,26 @@ interface ExperienceSectionProps {
 
 const ExperienceSection: React.FC<ExperienceSectionProps> = ({ profileDetail }) => {
     const { t } = useTranslation(['employer', 'common']);
-    const theme = useTheme();
 
     if (!(profileDetail?.experiencesDetails && profileDetail.experiencesDetails.length > 0)) return null;
 
     return (
         <Box>
-            <Stack direction="row" alignItems="center" spacing={2} mb={4}>
+            <Stack direction="row" alignItems="center" spacing={1.5} mb={2.5}>
                 <Box 
                     sx={{ 
-                        p: 1.25, 
+                        width: 40,
+                        height: 40,
                         borderRadius: 2, 
                         bgcolor: pc.primary( 0.1),
                         color: 'primary.main',
-                        display: 'flex'
+                        display: 'grid',
+                        placeItems: 'center',
                     }}
                 >
-                    <WorkHistoryIcon sx={{ fontSize: 28 }} />
+                    <WorkHistoryIcon sx={{ fontSize: 22 }} />
                 </Box>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+                <Typography variant="h6" sx={{ fontWeight: 1000, color: 'text.primary' }}>
                     {t('profileDetailCard.title.workExperience')}
                 </Typography>
             </Stack>
@@ -42,15 +43,15 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ profileDetail }) 
             <Paper
                 elevation={0}
                 sx={{
-                    p: { xs: 3, md: 5 },
-                    borderRadius: 4,
+                    p: { xs: 2.5, md: 4 },
+                    borderRadius: 3,
                     border: '1px solid',
-                    borderColor: 'divider',
+                    borderColor: pc.divider(0.7),
                     bgcolor: 'background.paper',
-                    boxShadow: (theme) => theme.customShadows?.z1
+                    boxShadow: '0 14px 34px rgba(15, 23, 42, 0.06)',
                 }}
             >
-                <Stack spacing={5}>
+                <Stack spacing={4}>
                     {(profileDetail.experiencesDetails || []).map((value, index: number) => (
                         <Box key={value.id || index}>
                             <Grid container spacing={4}>
@@ -93,7 +94,7 @@ const ExperienceSection: React.FC<ExperienceSectionProps> = ({ profileDetail }) 
                                 </Grid>
                             </Grid>
                             {index < (profileDetail.experiencesDetails?.length || 0) - 1 && (
-                                <Divider sx={{ mt: 5, borderStyle: 'dashed', borderColor: pc.divider( 0.8) }} />
+                                <Divider sx={{ mt: 4, borderStyle: 'dashed', borderColor: pc.divider( 0.8) }} />
                             )}
                         </Box>
                     ))}

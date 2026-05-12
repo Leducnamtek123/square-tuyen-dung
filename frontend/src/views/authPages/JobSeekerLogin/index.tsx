@@ -111,7 +111,14 @@ const JobSeekerLogin = () => {
     setIsFullScreenLoading(true);
 
     try {
-      const resData = await authService.convertToken(clientId, clientSecrect, provider, token, redirectUri);
+      const resData = await authService.convertToken(
+        clientId,
+        clientSecrect,
+        provider,
+        token,
+        redirectUri,
+        ROLES_NAME.JOB_SEEKER as RoleName,
+      );
       const { accessToken, refreshToken, backend } = resData;
       const saved = tokenService.saveAccessTokenAndRefreshTokenToCookie(accessToken, refreshToken, backend);
       if (saved) {

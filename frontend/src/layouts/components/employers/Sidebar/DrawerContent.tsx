@@ -19,6 +19,7 @@ const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
     candidates: true,
     interviews: true,
     account: true,
+    hrm: true,
     system: true,
     categories: true,
     profiles: true,

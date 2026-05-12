@@ -2,17 +2,44 @@
   "home": {
     "tabTitle": "Fast job search, effective recruitment at {{appName}}",
     "topCompanies": "Top Companies",
+    "topCompaniesSubtitle": "Discover employers that are actively hiring and get closer to the most relevant opportunities.",
     "urgentJobs": "Urgent Jobs",
     "keyCareers": "Key Careers",
+    "keyCareersSubtitle": "Explore high-demand career groups to narrow your search faster.",
     "suggestedJobs": "Suggested Jobs",
     "exploreHeading": "Need to find the right job for you?",
+    "exploreDescription": "Start from one place to search jobs, view companies, filter by industry, and move quickly to your next step.",
     "startExploring": "Start exploring",
     "userFeedback": "User Feedback",
     "noFeedbacks": "No user reviews yet",
     "noCompaniesFound": "No companies match your criteria",
     "jobsCount": "{{count}} Jobs",
     "companiesCount": "{{count}} companies",
-    "jobsIn": "{{careerName}} Jobs"
+    "jobsIn": "{{careerName}} Jobs",
+    "heroEyebrow": "Smart recruitment platform",
+    "heroTitle": "Find the right job, hire the right people faster",
+    "heroDescription": "Explore jobs by industry, city, and company. Employers can reach the right candidates faster with Square's search, profile, and interview tools.",
+    "heroPrimaryCta": "Explore jobs",
+    "heroSecondaryCta": "For employers",
+    "heroBenefit1": "Filter by career, city, and company",
+    "heroBenefit2": "Featured companies and clear job posts",
+    "heroBenefit3": "AI-assisted recommendations and workflow optimization",
+    "searchHeading": "Start searching now",
+    "searchDescription": "Enter a keyword, choose a career, or pick a city to find more relevant opportunities.",
+    "choosePathTitle": "What are you looking for?",
+    "choosePathDescription": "Choose the right path early to shorten the time it takes to find a job or recruit.",
+    "candidateTitle": "For candidates",
+    "candidateDescription": "Find relevant jobs by career, city, and company in just a few steps.",
+    "candidateBenefit1": "Filter by industry",
+    "candidateBenefit2": "Save and follow jobs",
+    "candidateBenefit3": "Relevant suggestions",
+    "candidateCta": "Explore jobs",
+    "employerTitle": "For employers",
+    "employerDescription": "Post jobs, search resumes, and shorten the hiring cycle with tools built for businesses.",
+    "employerBenefit1": "Post jobs fast",
+    "employerBenefit2": "Find matching resumes",
+    "employerBenefit3": "Run interviews efficiently",
+    "employerCta": "View solutions"
   },
   "jobDetail": {
     "deadline": "Deadline",
@@ -40,6 +67,26 @@
     "map": "Map",
     "similarJobs": "Similar Jobs",
     "notUpdated": "Not updated",
+    "salaryInsightTitle": "Salary insight",
+    "salaryInsightSubtitle": "Quick market snapshot from similar active jobs.",
+    "salaryInsightListings": "Listings",
+    "salaryInsightMin": "Min",
+    "salaryInsightMax": "Max",
+    "salaryInsightRange": "Typical range",
+    "salaryInsightRelated": "Related jobs",
+    "reportCaption": "Trust & Safety",
+    "reportJobTitle": "Report job post",
+    "reportReasonLabel": "Reason",
+    "reportMessageLabel": "Additional details",
+    "reportMessagePlaceholder": "Tell us what looks wrong or misleading.",
+    "reportSuccess": "Report sent successfully.",
+    "reportReasons": {
+      "scam": "Scam or fraud",
+      "wrongInfo": "Wrong or misleading information",
+      "spam": "Spam",
+      "duplicate": "Duplicate post",
+      "other": "Other"
+    },
     "savedSuccess": "Saved successfully.",
     "unsavedSuccess": "Unsaved successfully.",
     "noData": "No data available.",
@@ -71,6 +118,11 @@
     "searchResults": "Search Results",
     "posts": "posts",
     "noJobsFound": "No jobs found matching your criteria",
+    "saveSearch": "Save search",
+    "savedAlert": {
+      "defaultName": "Saved search",
+      "success": "Search alert saved."
+    },
     "jobTypeOptions": {
       "1": "Full-time Permanent",
       "2": "Full-time Temporary",
@@ -107,7 +159,16 @@
     "cityTitle": "Jobs by City",
     "jobTypeTitle": "Jobs by Job Type"
   },
+  "jobPostForm": {
+    "label": {
+      "isUrgent": "Is urgent"
+    }
+  },
   "companyDetail": {
+    "verified": "Verified company",
+    "verifiedDescription": "This company has been manually reviewed and marked as trusted.",
+    "report": "Report",
+    "reportCompanyTitle": "Report company",
     "since": "Since {{year}}",
     "employeeSize": "{{size}} employees",
     "notUpdated": "Not updated",
@@ -155,7 +216,8 @@
       "emailMax": "Email exceeds allowed length.",
       "phoneRequired": "Phone number is required.",
       "phoneInvalid": "Invalid phone number.",
-      "phoneMax": "Phone number exceeds allowed length."
+      "phoneMax": "Phone number exceeds allowed length.",
+      "resumeRequired": "Please select a resume."
     },
     "note": "Please provide accurate full name, email, and phone number so employers can contact you."
   },
@@ -227,6 +289,76 @@
       "breadcrumb": {
         "home": "Home"
       }
+    }
+  },
+  "static": {
+    "contact": {
+      "title": "Contact",
+      "subtitle": "Reach the Square recruitment support team.",
+      "sections": [
+        {
+          "title": "Support email",
+          "body": "For account, job post, verification, or interview issues, contact support@square.vn."
+        },
+        {
+          "title": "Business hours",
+          "body": "Support is available Monday to Friday during business hours."
+        }
+      ]
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Answers to common questions from candidates and employers.",
+      "sections": [
+        {
+          "title": "How do candidates apply?",
+          "body": "Candidates can create a profile, upload a CV, and apply directly from a job detail page."
+        },
+        {
+          "title": "How do employers verify a company?",
+          "body": "Employers submit legal profile information and request a verification appointment from the employer portal."
+        },
+        {
+          "title": "How are reports handled?",
+          "body": "Trust reports are reviewed by admins and moved through open, reviewing, resolved, or rejected statuses."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "subtitle": "Baseline terms for using Square recruitment services.",
+      "sections": [
+        {
+          "title": "Account responsibility",
+          "body": "Users are responsible for keeping account information accurate and protecting login credentials."
+        },
+        {
+          "title": "Recruitment content",
+          "body": "Job posts, company profiles, resumes, and interview content must be accurate, lawful, and respectful."
+        },
+        {
+          "title": "Platform operations",
+          "body": "Square may moderate content, suspend abusive activity, and adjust service availability to protect users."
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "subtitle": "How Square handles recruitment data.",
+      "sections": [
+        {
+          "title": "Data collected",
+          "body": "Square stores account data, profile data, company data, applications, saved profiles, and interview records needed to operate recruitment workflows."
+        },
+        {
+          "title": "Data use",
+          "body": "Data is used to provide job search, recruiting, matching, interview, notification, and support features."
+        },
+        {
+          "title": "Data control",
+          "body": "Users can update account and profile information from their dashboard and contact support for privacy requests."
+        }
+      ]
     }
   }
 }

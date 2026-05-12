@@ -23,11 +23,24 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
   const { allConfig } = useConfig();
   const theme = useTheme();
   const applyStatus = defaultStatus;
+  const allowedTransitions: Record<number, number[]> = {
+    1: [2, 6],
+    2: [3, 6],
+    3: [4, 6],
+    4: [5, 6],
+    5: [],
+    6: [],
+  };
+
+  const canChooseStatus = (statusId: number) => {
+    if (statusId === applyStatus) return true;
+    return (allowedTransitions[applyStatus] || []).includes(statusId);
+  };
 
   const handleChangeValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     const chooseValue = parseInt(e.target.value, 10);
     
-    if (chooseValue < applyStatus) {
+    if (!canChooseStatus(chooseValue)) {
       errorModal(
         t('appliedResume.status.errorTitle'),
         t('appliedResume.status.errorMsg', {
@@ -68,6 +81,7 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
             select
             value={applyStatus}
             onChange={handleChangeValue}
+            disabled={(allowedTransitions[applyStatus] || []).length === 0}
             sx={{
                 '& .MuiOutlinedInput-root': {
                     borderRadius: 2,
@@ -96,13 +110,16 @@ const AppliedStatusComponent: React.FC<AppliedStatusComponentProps> = ({
                 }
             }}
         >
-            {options.map((option) => (
-                <MenuItem key={option.id as string | number} value={option.id as string | number}>
+            {options.map((option) => {
+              const optionId = Number(option.id);
+              return (
+                <MenuItem key={option.id as string | number} value={option.id as string | number} disabled={!canChooseStatus(optionId)}>
                     <Typography variant="body2" sx={{ fontWeight: 800, fontSize: '0.8125rem' }}>
                         {tConfig(option.name as string)}
                     </Typography>
                 </MenuItem>
-            ))}
+              );
+            })}
         </TextField>
     </Box>
   );

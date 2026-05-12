@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Button, Card, Chip, Grid2 as Grid, TextField, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
-  t: (key: string) => string;
   legalProfile: {
     companyName: string;
     taxCode: string;
@@ -14,9 +14,13 @@ interface Props {
   };
   onChange: (field: keyof Props['legalProfile']) => (event: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (event: React.FormEvent) => void;
+  statusLabel: string;
+  loading?: boolean;
 }
 
-const VerificationLegalProfileForm = ({ t, legalProfile, onChange, onSubmit }: Props) => {
+const VerificationLegalProfileForm = ({ legalProfile, onChange, onSubmit, statusLabel, loading }: Props) => {
+  const { t } = useTranslation('employer');
+
   return (
     <Card sx={{ p: 3, mb: 3 }}>
       <Typography variant="h6" sx={{ fontWeight: 600 }}>
@@ -42,8 +46,8 @@ const VerificationLegalProfileForm = ({ t, legalProfile, onChange, onSubmit }: P
           ))}
         </Grid>
         <Box sx={{ mt: 2, display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-          <Button type="submit" variant="contained">{t('verification.step2.saveBtn')}</Button>
-          <Chip label={t('verification.step2.statusPending')} color="info" />
+          <Button type="submit" variant="contained" disabled={loading}>{t('verification.step2.saveBtn')}</Button>
+          <Chip label={statusLabel} color="info" />
         </Box>
       </Box>
     </Card>

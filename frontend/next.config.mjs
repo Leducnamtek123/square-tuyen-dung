@@ -1,3 +1,7 @@
+import { existsSync } from 'node:fs';
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 /** @type {import('next').NextConfig} */
 // ────────────────────────────────────────────────────────────────────────────
 // Rewrite & redirect rules are generated from the canonical route definitions
@@ -9,9 +13,24 @@
 // When routeConfig.ts changes, update these rules accordingly.
 // TODO: Generate these automatically via a build script from routeConfig.ts.
 
+const stripApiSuffix = (url = '') => url.replace(/\/api\/?$/, '').replace(/\/$/, '');
+const frontendRoot = dirname(fileURLToPath(import.meta.url));
+const isDockerRuntime = existsSync('/.dockerenv');
+const explicitApiProxyOrigin = stripApiSuffix(process.env.API_PROXY_ORIGIN || '');
+const backendApiOrigin = stripApiSuffix(process.env.BACKEND_API_URL || '');
+const backendApiUsesDockerHost = /^https?:\/\/backend(?::|\/|$)/.test(backendApiOrigin);
+const apiProxyOrigin =
+  explicitApiProxyOrigin ||
+  (backendApiOrigin && (!backendApiUsesDockerHost || isDockerRuntime) ? backendApiOrigin : '') ||
+  `http://localhost:${process.env.NGINX_PORT || '8080'}`;
+
 const nextConfig = {
   reactStrictMode: true,
+  skipTrailingSlashRedirect: true,
   output: 'standalone',
+  turbopack: {
+    root: frontendRoot,
+  },
   typescript: {
     ignoreBuildErrors: false,
   },
@@ -47,6 +66,8 @@ const nextConfig = {
   },
   async rewrites() {
     return [
+      { source: '/api/:path*', destination: `${apiProxyOrigin}/api/:path*/` },
+
       // ── Job Seeker (root level) ──
       { source: '/dang-nhap', destination: '/login' },
       { source: '/dang-ky', destination: '/register' },
@@ -94,10 +115,12 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/ho-so-ung-tuyen', destination: '/employer/applied-profiles' },
       { source: '/nha-tuyen-dung/ho-so-da-luu', destination: '/employer/saved-profiles' },
       { source: '/nha-tuyen-dung/danh-sach-ung-vien', destination: '/employer/candidates' },
+      { source: '/nha-tuyen-dung/danh-sach-ung-vien/:slug', destination: '/employer/candidates/:slug' },
       { source: '/nha-tuyen-dung/chi-tiet-ung-vien/:slug', destination: '/employer/candidates/:slug' },
       { source: '/employer/candidate-detail/:slug', destination: '/employer/candidates/:slug' },
       { source: '/nha-tuyen-dung/cong-ty', destination: '/employer/company' },
       { source: '/nha-tuyen-dung/nhan-su-va-vai-tro', destination: '/employer/employees' },
+      { source: '/nha-tuyen-dung/nhan-su-va-vai-tro/:id', destination: '/employer/employees/:id' },
       { source: '/nha-tuyen-dung/thong-bao', destination: '/employer/notifications' },
       { source: '/nha-tuyen-dung/tai-khoan', destination: '/employer/account' },
       { source: '/nha-tuyen-dung/cai-dat', destination: '/employer/settings' },
@@ -112,6 +135,11 @@ const nextConfig = {
       { source: '/nha-tuyen-dung/phong-van-truc-tiep/:id', destination: '/employer/interviews/:id' },
       { source: '/nha-tuyen-dung/len-lich-phong-van', destination: '/employer/interviews/create' },
       { source: '/nha-tuyen-dung/chi-tiet-phong-van/:id', destination: '/employer/interviews/:id' },
+      { source: '/nha-tuyen-dung/sua-lich-phong-van/:id', destination: '/employer/interviews/:id/edit' },
+      { source: '/nha-tuyen-dung/lien-he', destination: '/employer/contact' },
+      { source: '/nha-tuyen-dung/cau-hoi-thuong-gap', destination: '/employer/faq' },
+      { source: '/nha-tuyen-dung/dieu-khoan-dich-vu', destination: '/employer/terms-of-service' },
+      { source: '/nha-tuyen-dung/chinh-sach-bao-mat', destination: '/employer/privacy-policy' },
       { source: '/nha-tuyen-dung/:path*', destination: '/employer/:path*' },
 
       // ── Admin (/quan-tri → /admin) ──
@@ -119,8 +147,6 @@ const nextConfig = {
       { source: '/quan-tri/bang-dieu-khien', destination: '/admin/dashboard' },
       { source: '/quan-tri/quan-ly-nguoi-dung', destination: '/admin/users' },
       { source: '/quan-tri/quan-ly-tin-tuyen-dung', destination: '/admin/jobs' },
-      { source: '/quan-tri/kho-cau-hoi', destination: '/admin/questions' },
-      { source: '/quan-tri/quan-ly-bo-cau-hoi', destination: '/admin/question-groups' },
       { source: '/quan-tri/quan-ly-phong-van', destination: '/admin/interviews' },
       { source: '/quan-tri/cai-dat-he-thong', destination: '/admin/settings' },
       { source: '/quan-tri/quan-ly-nganh-nghe', destination: '/admin/careers' },
@@ -132,7 +158,8 @@ const nextConfig = {
       { source: '/quan-tri/quan-ly-cv-resume', destination: '/admin/resumes' },
       { source: '/quan-tri/nhat-ky-tin-tuyen-dung', destination: '/admin/job-activity' },
       { source: '/quan-tri/thong-bao-viec-lam', destination: '/admin/job-notifications' },
-      { source: '/quan-tri/phong-van-cong-ty-truc-tiep', destination: '/admin/interviews/live' },
+      { source: '/quan-tri/xac-thuc-cong-ty', destination: '/admin/company-verifications' },
+      { source: '/quan-tri/bao-cao-tin-cay', destination: '/admin/trust-reports' },
       { source: '/quan-tri', destination: '/admin/dashboard' },
       { source: '/quan-tri/:path*', destination: '/admin/:path*' },
 

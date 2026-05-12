@@ -40,10 +40,12 @@
     "wardsManagement": "Wards Management",
     "infoAndProfiles": "Info & Profiles",
     "companyManagement": "Company Management",
+    "companyVerifications": "Company Verifications",
     "candidateProfiles": "Candidate Profiles",
     "resumeManagement": "CV/Resume Management",
     "recruitmentAndInterviews": "Recruitment & Interviews",
     "jobPosts": "Job Posts",
+    "trustReports": "Trust Reports",
     "activityLogs": "Activity Logs",
     "questionBank": "Question Bank",
     "interviewQuestionSets": "Interview Question Sets",
@@ -54,7 +56,11 @@
     "bannersManagement": "Banners Management",
     "feedbacksManagement": "Feedbacks Management",
     "articlesManagement": "News & Blog",
-    "chatWithEmployers": "Chat with Employers"
+      "chatWithEmployers": "Chat with Employers",
+      "squareHrmAdmin": "Open Square HRM"
+  },
+  "aiHealth": {
+    "title": "AI services"
   },
   "pages": {
     "careers": {
@@ -526,7 +532,9 @@
       "bulkSelect": {
         "selectedCount": "{{count}} user(s) selected",
         "deleteConfirm": "Are you sure you want to delete the selected users? This action cannot be undone.",
-        "deleteBtn": "Delete Selected"
+        "deleteBtn": "Delete Selected",
+        "disableConfirm": "Block all selected users? Your own account will be skipped.",
+        "disableBtn": "Block Selected"
       },
       "table": {
         "id": "ID",
@@ -571,6 +579,7 @@
         "blockSuccess": "Account blocked.",
         "unblockSuccess": "Account unblocked.",
         "deleteSuccess": "User deleted successfully.",
+        "bulkDisableSuccess": "Blocked {{count}} user(s).",
         "actionFailed": "Operation failed.",
         "roleUpdated": "Role updated.",
         "roleUpdateFailed": "Role update failed."
@@ -583,6 +592,57 @@
       "title": "User Management",
       "breadcrumbAdmin": "Admin",
       "breadcrumbList": "List"
+    },
+    "companyVerifications": {
+      "title": "Company Verifications",
+      "subtitle": "Review legal profiles and verification appointment requests.",
+      "empty": "No verification requests.",
+      "reviewNotePlaceholder": "Review note",
+      "table": {
+        "company": "Company",
+        "legalProfile": "Legal profile",
+        "appointment": "Appointment",
+        "adminNote": "Admin note",
+        "status": "Status"
+      },
+      "legal": {
+        "tax": "Tax: {{value}}",
+        "license": "License: {{value}}",
+        "representative": "Representative: {{value}}"
+      },
+      "status": {
+        "pending": "Pending",
+        "reviewing": "Reviewing",
+        "approved": "Approved",
+        "rejected": "Rejected"
+      },
+      "toast": {
+        "updateSuccess": "Verification status updated.",
+        "updateError": "Could not update verification status."
+      }
+    },
+    "trustReports": {
+      "title": "Trust Reports",
+      "subtitle": "Review reports for job posts and company profiles.",
+      "empty": "No trust reports.",
+      "table": {
+        "id": "ID",
+        "target": "Target",
+        "reason": "Reason",
+        "reporter": "Reporter",
+        "message": "Message",
+        "status": "Status"
+      },
+      "status": {
+        "open": "Open",
+        "reviewing": "Reviewing",
+        "resolved": "Resolved",
+        "rejected": "Rejected"
+      },
+      "toast": {
+        "updateSuccess": "Report status updated.",
+        "updateError": "Could not update report status."
+      }
     },
     "questions": {
       "title": "Interview Question Bank",

@@ -1,6 +1,7 @@
 import asyncio
 import importlib.util
 import sys
+import unicodedata
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / "src"
@@ -16,6 +17,11 @@ if "livekit_agent" not in sys.modules:
     spec.loader.exec_module(module)
 
 from livekit_agent.interviewer import Interviewer
+
+
+def _strip_accents(value: str) -> str:
+    normalized = unicodedata.normalize("NFD", value)
+    return "".join(char for char in normalized if unicodedata.category(char) != "Mn")
 
 
 class DummySpeechHandle:
@@ -45,7 +51,7 @@ def test_finish_interview_waits_for_playout_before_shutdown() -> None:
 
         result = await agent.finish_interview(context)
 
-        assert "ket thuc" in result.lower()
+        assert "ket thuc" in _strip_accents(result).lower()
         assert shutdown_calls["count"] == 0
 
         speech_handle.resolve()
@@ -69,7 +75,7 @@ def test_finish_interview_falls_back_when_no_speech_handle() -> None:
         context = type("Ctx", (), {})()
 
         result = await agent.finish_interview(context)
-        assert "ket thuc" in result.lower()
+        assert "ket thuc" in _strip_accents(result).lower()
 
         await asyncio.sleep(0)
 

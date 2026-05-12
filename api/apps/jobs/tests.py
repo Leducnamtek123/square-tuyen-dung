@@ -9,6 +9,7 @@ from django.utils import timezone
 from django.test import TestCase
 
 from apps.jobs.models import JobPost, JobPostActivity
+from apps.jobs.serializers import JobSeekerJobPostActivitySerializer
 from apps.jobs.services import JobPostService, JobActivityService
 from apps.jobs.ai_scoring_service import _fallback_scoring, build_scoring_prompt
 from shared.configs import variable_system as var_sys
@@ -94,18 +95,55 @@ class TestJobService:
         assert activity.user == job_seeker_user
         assert activity.job_post == job_post
 
-    def test_apply_to_job_duplicate_rejected(self, job_seeker_user, job_post, resume):
-        """Should reject duplicate applications."""
+    def test_apply_serializer_accepts_camel_case_job_post(self, job_post, resume):
+        serializer = JobSeekerJobPostActivitySerializer(data={
+            'jobPost': job_post.id,
+            'resume': resume.id,
+            'fullName': 'Test Name',
+            'email': 'test@test.com',
+            'phone': '0901234567',
+        })
+
+        assert serializer.is_valid(), serializer.errors
+        assert serializer.validated_data['job_post'] == job_post
+
+    def test_apply_to_job_duplicate_reuses_existing_application(self, job_seeker_user, job_post, resume):
+        """Should not create duplicate applications on double submit."""
         validated_data = {
             'job_post': job_post,
             'resume': resume,
             'fullName': 'Test Name',
             'email': 'test@test.com'
         }
-        JobActivityService.apply_to_job(job_seeker_user, validated_data)
+        first = JobActivityService.apply_to_job(job_seeker_user, validated_data)
+        second = JobActivityService.apply_to_job(job_seeker_user, validated_data)
+
+        assert first.id == second.id
+        assert JobPostActivity.objects.filter(user=job_seeker_user, job_post=job_post, is_deleted=False).count() == 1
+        return
         
         with pytest.raises(ValueError, match="đã ứng tuyển"):
             JobActivityService.apply_to_job(job_seeker_user, validated_data)
+
+    def test_application_status_state_machine_blocks_skip_and_terminal_changes(self, job_seeker_user, job_post, resume):
+        activity = JobPostActivity.objects.create(
+            user=job_seeker_user,
+            job_post=job_post,
+            resume=resume,
+            status=var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+        )
+
+        with pytest.raises(ValueError):
+            JobActivityService.change_application_status(activity, var_sys.ApplicationStatus.HIRED)
+
+        activity = JobActivityService.change_application_status(activity, var_sys.ApplicationStatus.CONTACTED)
+        assert activity.status == var_sys.ApplicationStatus.CONTACTED
+
+        activity = JobActivityService.change_application_status(activity, var_sys.ApplicationStatus.NOT_SELECTED)
+        assert activity.status == var_sys.ApplicationStatus.NOT_SELECTED
+
+        with pytest.raises(ValueError):
+            JobActivityService.change_application_status(activity, var_sys.ApplicationStatus.CONTACTED)
 
     def test_apply_to_job_expired_rejected(self, job_seeker_user, job_post, resume):
         """Should reject applications to expired jobs."""

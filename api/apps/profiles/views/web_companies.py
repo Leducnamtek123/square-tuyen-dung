@@ -26,10 +26,12 @@ from apps.accounts import permissions as perms_custom
 
 from ..models import (
     Company,
+    CompanyVerification,
     CompanyFollowed,
     CompanyImage,
     CompanyRole,
     CompanyMember,
+    TrustReport,
 )
 
 from ..filters import CompanyFilter
@@ -43,6 +45,9 @@ from ..serializers import (
     CompanyRoleSerializer,
     CompanyMemberSerializer,
     TrustReportSerializer,
+    AdminTrustReportSerializer,
+    CompanyVerificationSerializer,
+    AdminCompanyVerificationSerializer,
 )
 
 from apps.jobs.models import JobPost
@@ -448,6 +453,108 @@ class TrustReportViewSet(
         serializer.is_valid(raise_exception=True)
         report = serializer.save()
         return var_res.response_data(status=status.HTTP_201_CREATED, data=self.get_serializer(report).data)
+
+
+class AdminTrustReportViewSet(viewsets.ModelViewSet):
+    queryset = TrustReport.objects.select_related("company", "job_post", "reporter")
+    serializer_class = AdminTrustReportSerializer
+    renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
+    permission_classes = [perms_custom.IsAdminUser]
+    http_method_names = ["get", "patch", "put", "head", "options"]
+
+    def get_queryset(self):
+        queryset = self.queryset.order_by("-create_at")
+        status_filter = self.request.query_params.get("status")
+        target_type = self.request.query_params.get("targetType")
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        if target_type:
+            queryset = queryset.filter(target_type=target_type)
+        return queryset
+
+
+class CompanyVerificationView(views.APIView):
+    permission_classes = [perms_custom.IsEmployerUser]
+    renderer_classes = [renderers.MyJSONRenderer]
+
+    def get_company(self, request):
+        return _get_user_company(request.user)
+
+    def get(self, request):
+        company = self.get_company(request)
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["User is not associated with any company."]},
+            )
+
+        verification = CompanyVerification.objects.filter(company=company).first()
+        if not verification:
+            data = {
+                "companyId": company.id,
+                "status": CompanyVerification.STATUS_PENDING if not company.is_verified else CompanyVerification.STATUS_APPROVED,
+                "companyName": company.company_name,
+                "taxCode": company.tax_code,
+                "phone": company.company_phone,
+                "email": company.company_email,
+                "website": company.website_url or "",
+            }
+            return var_res.response_data(data=data)
+
+        serializer = CompanyVerificationSerializer(verification)
+        return var_res.response_data(data=serializer.data)
+
+    def put(self, request):
+        company = self.get_company(request)
+        if not company:
+            return var_res.response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"errorMessage": ["User is not associated with any company."]},
+            )
+
+        verification, _created = CompanyVerification.objects.get_or_create(
+            company=company,
+            defaults={
+                "submitted_by": request.user,
+                "legal_company_name": company.company_name,
+                "tax_code": company.tax_code,
+                "contact_phone": company.company_phone,
+                "contact_email": company.company_email,
+                "website": company.website_url or "",
+            },
+        )
+
+        serializer = CompanyVerificationSerializer(
+            verification,
+            data=request.data,
+            partial=True,
+            context={"request": request},
+        )
+        serializer.is_valid(raise_exception=True)
+        verification = serializer.save(
+            submitted_by=request.user,
+            status=CompanyVerification.STATUS_PENDING,
+        )
+        return var_res.response_data(status=status.HTTP_200_OK, data=CompanyVerificationSerializer(verification).data)
+
+    patch = put
+
+
+class AdminCompanyVerificationViewSet(viewsets.ModelViewSet):
+    queryset = CompanyVerification.objects.select_related("company", "submitted_by", "reviewed_by")
+    serializer_class = AdminCompanyVerificationSerializer
+    renderer_classes = [renderers.MyJSONRenderer]
+    pagination_class = paginations.CustomPagination
+    permission_classes = [perms_custom.IsAdminUser]
+    http_method_names = ["get", "patch", "put", "head", "options"]
+
+    def get_queryset(self):
+        queryset = self.queryset.order_by("-create_at")
+        status_filter = self.request.query_params.get("status")
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+        return queryset
 
 
 class CompanyImageViewSet(viewsets.ViewSet,

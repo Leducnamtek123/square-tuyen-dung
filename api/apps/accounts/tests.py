@@ -2,8 +2,11 @@
 Unit tests for the Accounts app — User model, authentication, permissions.
 """
 import pytest
+from rest_framework.test import APIClient
 
 from apps.accounts.models import User, ForgotPasswordToken
+from apps.accounts.serializers import UserSerializer
+from apps.profiles.models import CompanyMember, CompanyRole
 from shared.configs import variable_system as var_sys
 from shared.permissions import (
     IsOwnerOrReadOnly, IsResumeOwner, IsEmployer, IsJobSeeker,
@@ -99,6 +102,65 @@ class TestUserModel:
         assert job_seeker_user.password != 'testpass123'
         assert job_seeker_user.check_password('testpass123')
 
+    def test_job_seeker_company_member_keeps_member_workspace_role(self, job_seeker_user, company):
+        role = CompanyRole.objects.create(
+            company=company,
+            code="employee",
+            name="Employee",
+            permissions=[],
+            is_system=True,
+        )
+        CompanyMember.objects.create(
+            company=company,
+            user=job_seeker_user,
+            role=role,
+            status=CompanyMember.STATUS_ACTIVE,
+            is_active=True,
+        )
+
+        data = UserSerializer(job_seeker_user).data
+
+        assert data["canAccessEmployerPortal"] is True
+        assert data["employerRoleCode"] == "employee"
+        assert data["workspaces"] == [
+            {"type": "job_seeker", "label": "Candidate", "isDefault": True},
+            {
+                "type": "company",
+                "label": company.company_name,
+                "companyId": company.id,
+                "companySlug": company.slug,
+                "companyImageUrl": var_sys.AVATAR_DEFAULT["COMPANY_LOGO"],
+                "roleCode": "employee",
+                "isDefault": False,
+            },
+        ]
+
+
+@pytest.mark.django_db
+class TestSocialAuthPipeline:
+    def test_existing_employer_email_can_link_social_login(self, employer_user):
+        from apps.accounts.pipeline import custom_social_user
+
+        result = custom_social_user(strategy=None, details={"email": "EMPLOYER@test.com"})
+
+        assert result["is_new"] is False
+        assert result["user"] == employer_user
+
+    def test_existing_job_seeker_email_can_link_social_login(self, job_seeker_user):
+        from apps.accounts.pipeline import custom_social_user
+
+        result = custom_social_user(strategy=None, details={"email": "jobseeker@test.com"})
+
+        assert result["is_new"] is False
+        assert result["user"] == job_seeker_user
+
+    def test_unknown_social_email_is_marked_new(self, db):
+        from apps.accounts.pipeline import custom_social_user
+
+        result = custom_social_user(strategy=None, details={"email": "new@test.com"})
+
+        assert result == {"is_new": True, "user": None}
+
 
 # ==================== Permission Tests ====================
 
@@ -158,3 +220,49 @@ class TestPermissions:
         perm = IsOwnerOrReadOnly()
         request = self._make_request(job_seeker_user, method='PUT')
         assert perm.has_object_permission(request, None, resume) is True
+
+
+@pytest.mark.django_db
+class TestUserAdminAPI:
+    def test_bulk_status_disables_selected_users(self, admin_user, employer_user, job_seeker_user):
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        response = client.post(
+            "/api/v1/auth/users/bulk-status/",
+            {"ids": [employer_user.id, job_seeker_user.id], "isActive": False},
+            format="json",
+        )
+
+        assert response.status_code == 200
+        assert response.data["data"]["updated"] == 2
+
+        employer_user.refresh_from_db()
+        job_seeker_user.refresh_from_db()
+        assert employer_user.is_active is False
+        assert job_seeker_user.is_active is False
+
+    def test_bulk_status_blocks_current_user_change(self, admin_user, employer_user):
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        response = client.post(
+            "/api/v1/auth/users/bulk-status/",
+            {"ids": [admin_user.id, employer_user.id], "isActive": False},
+            format="json",
+        )
+
+        assert response.status_code == 400
+        admin_user.refresh_from_db()
+        employer_user.refresh_from_db()
+        assert admin_user.is_active is True
+        assert employer_user.is_active is True
+
+    def test_destroy_blocks_current_user_delete(self, admin_user):
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        response = client.delete(f"/api/v1/auth/users/{admin_user.id}/")
+
+        assert response.status_code == 400
+        assert User.objects.filter(id=admin_user.id).exists()

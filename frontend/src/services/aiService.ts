@@ -26,6 +26,19 @@ type ScreeningResult = {
   summary?: string;
 };
 
+export type AIServiceStatus = 'online' | 'offline' | 'not_configured';
+
+export type AIHealthResponse = {
+  status: 'ready' | 'degraded';
+  checks: Record<string, {
+    status: AIServiceStatus;
+    latencyMs?: number | null;
+    statusCode?: number;
+    workers?: number;
+    error?: string;
+  }>;
+};
+
 const aiService = {
   tts: async (payload: TTSPayload): Promise<Blob> => {
     const url = 'ai/tts/';
@@ -59,6 +72,10 @@ const aiService = {
 
   getScreeningResult: async (id: string | number): Promise<ScreeningResult> => {
     return httpRequest.get<ScreeningResult>(`interview/web/screening-results/${id}/`);
+  },
+
+  getHealth: async (): Promise<AIHealthResponse> => {
+    return httpRequest.get<AIHealthResponse>('ai/health/');
   },
 };
 

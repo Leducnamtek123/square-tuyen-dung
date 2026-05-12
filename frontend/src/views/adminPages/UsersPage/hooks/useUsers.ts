@@ -13,10 +13,11 @@ import type { AxiosError } from 'axios';
 import type { AdminListParams } from '../../../../services/adminManagementService';
 import type { TOptions } from 'i18next';
 
-const t = (key: string, options?: TOptions) => i18n.t(key, { ns: 'admin', ...options });
+const translateAdmin = (key: string, options?: TOptions) => i18n.t(key, { ns: 'admin', ...options });
 
 type UseUsersResult = UseQueryResult<PaginatedResponse<UserModel>> & {
     toggleUserStatus: (user: UserModel) => Promise<UserModel>;
+    bulkDisableUsers: (ids: Array<string | number>) => Promise<{ updated: number; isActive: boolean }>;
     updateUserRole: (args: { userId: string | number; roleName: RoleName }) => Promise<UserModel>;
     deleteUser: (id: string | number) => Promise<void>;
     isMutating: boolean;
@@ -39,15 +40,15 @@ export const useUsers = (params: AdminListParams): UseUsersResult => {
         onSuccess: (_data, user: UserModel) => {
             toastMessages.success(
                 user.isActive
-                    ? t('pages.users.toast.blockSuccess')
-                    : t('pages.users.toast.unblockSuccess')
+                    ? translateAdmin('pages.users.toast.blockSuccess')
+                    : translateAdmin('pages.users.toast.unblockSuccess')
             );
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
         onError: (error: unknown) => {
             const err = error as AxiosError<{ errors?: { detail?: string } }>;
             toastMessages.error(
-                err.response?.data?.errors?.detail || t('pages.users.toast.actionFailed')
+                err.response?.data?.errors?.detail || translateAdmin('pages.users.toast.actionFailed')
             );
         }
     });
@@ -55,13 +56,27 @@ export const useUsers = (params: AdminListParams): UseUsersResult => {
     const updateRoleMutation = useMutation({
         mutationFn: ({ userId, roleName }: { userId: string | number; roleName: RoleName }) => userService.updateUser(userId, { roleName }),
         onSuccess: () => {
-            toastMessages.success(t('pages.users.toast.roleUpdated'));
+            toastMessages.success(translateAdmin('pages.users.toast.roleUpdated'));
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
         onError: (error: unknown) => {
             const err = error as AxiosError<{ errors?: { detail?: string } }>;
             toastMessages.error(
-                err.response?.data?.errors?.detail || t('pages.users.toast.roleUpdateFailed')
+                err.response?.data?.errors?.detail || translateAdmin('pages.users.toast.roleUpdateFailed')
+            );
+        }
+    });
+
+    const bulkDisableMutation = useMutation({
+        mutationFn: (ids: Array<string | number>) => userService.bulkStatus(ids, false),
+        onSuccess: (result) => {
+            toastMessages.success(translateAdmin('pages.users.toast.bulkDisableSuccess', { count: result.updated }));
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+        },
+        onError: (error: unknown) => {
+            const err = error as AxiosError<{ errors?: { detail?: string } }>;
+            toastMessages.error(
+                err.response?.data?.errors?.detail || translateAdmin('pages.users.toast.actionFailed')
             );
         }
     });
@@ -69,13 +84,13 @@ export const useUsers = (params: AdminListParams): UseUsersResult => {
     const deleteMutation = useMutation({
         mutationFn: (id: string | number) => userService.deleteUser(id),
         onSuccess: () => {
-            toastMessages.success(t('pages.users.toast.deleteSuccess'));
+            toastMessages.success(translateAdmin('pages.users.toast.deleteSuccess'));
             queryClient.invalidateQueries({ queryKey: ['users'] });
         },
         onError: (error: unknown) => {
             const err = error as AxiosError<{ errors?: { detail?: string } }>;
             toastMessages.error(
-                err.response?.data?.errors?.detail || t('pages.users.toast.actionFailed')
+                err.response?.data?.errors?.detail || translateAdmin('pages.users.toast.actionFailed')
             );
         }
     });
@@ -83,9 +98,10 @@ export const useUsers = (params: AdminListParams): UseUsersResult => {
     return {
         ...query,
         toggleUserStatus: toggleStatusMutation.mutateAsync,
+        bulkDisableUsers: bulkDisableMutation.mutateAsync,
         updateUserRole: updateRoleMutation.mutateAsync,
         deleteUser: deleteMutation.mutateAsync,
-        isMutating: toggleStatusMutation.isPending || updateRoleMutation.isPending || deleteMutation.isPending
+        isMutating: toggleStatusMutation.isPending || updateRoleMutation.isPending || bulkDisableMutation.isPending || deleteMutation.isPending
     } as UseUsersResult;
 };
 

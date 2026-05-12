@@ -38,6 +38,7 @@ const UsersPage = () => {
         data: usersData, 
         isLoading, 
         toggleUserStatus, 
+        bulkDisableUsers,
         updateUserRole,
         isMutating 
     } = useUsers({
@@ -74,6 +75,21 @@ const UsersPage = () => {
         }
     };
 
+    const selectedUserIds = Object.keys(rowSelection)
+        .map((rowIndex) => users[Number(rowIndex)]?.id)
+        .filter((id): id is number => typeof id === 'number' && id !== currentUserId);
+
+    const handleBulkDisable = async () => {
+        if (selectedUserIds.length === 0) return;
+        if (!window.confirm(t('pages.users.bulkSelect.disableConfirm'))) return;
+        try {
+            await bulkDisableUsers(selectedUserIds);
+            onRowSelectionChange({});
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
     return (
         <Box>
             <Box sx={{ mb: 3 }}>
@@ -103,13 +119,10 @@ const UsersPage = () => {
                             variant="contained" 
                             color="error" 
                             size="small"
-                            onClick={() => {
-                                if (window.confirm(t('pages.users.bulkSelect.deleteConfirm'))) {
-                                    // TODO: implement bulk delete API call
-                                }
-                            }}
+                            disabled={isMutating || selectedUserIds.length === 0}
+                            onClick={handleBulkDisable}
                         >
-                            {t('pages.users.bulkSelect.deleteBtn')}
+                            {t('pages.users.bulkSelect.disableBtn')}
                         </Button>
                     </Box>
                 )}

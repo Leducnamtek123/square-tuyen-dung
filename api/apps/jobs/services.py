@@ -112,6 +112,27 @@ class JobPostService:
 class JobActivityService:
     """Business logic for Job Applications and Saves."""
 
+    APPLICATION_STATUS_TRANSITIONS = {
+        var_sys.ApplicationStatus.PENDING_CONFIRMATION: {
+            var_sys.ApplicationStatus.CONTACTED,
+            var_sys.ApplicationStatus.NOT_SELECTED,
+        },
+        var_sys.ApplicationStatus.CONTACTED: {
+            var_sys.ApplicationStatus.TESTED,
+            var_sys.ApplicationStatus.NOT_SELECTED,
+        },
+        var_sys.ApplicationStatus.TESTED: {
+            var_sys.ApplicationStatus.INTERVIEWED,
+            var_sys.ApplicationStatus.NOT_SELECTED,
+        },
+        var_sys.ApplicationStatus.INTERVIEWED: {
+            var_sys.ApplicationStatus.HIRED,
+            var_sys.ApplicationStatus.NOT_SELECTED,
+        },
+        var_sys.ApplicationStatus.HIRED: set(),
+        var_sys.ApplicationStatus.NOT_SELECTED: set(),
+    }
+
     @staticmethod
     def apply_to_job(user: Any, validated_data: Dict[str, Any]) -> JobPostActivity:
         """
@@ -149,10 +170,10 @@ class JobActivityService:
 
         existing = JobPostActivity.objects.filter(
             user=user, job_post=job_post, is_deleted=False
-        ).exists()
+        ).first()
         if existing:
-            logger.info("Application rejected: User %s already applied to job %s", user.email, job_post.id)
-            raise DuplicateApplicationError("Bạn đã ứng tuyển vào vị trí này rồi.")
+            logger.info("Application reused: User %s already applied to job %s", user.email, job_post.id)
+            return existing
 
         # Create the activity in its own atomic block
         activity_payload = {
@@ -163,10 +184,14 @@ class JobActivityService:
             "phone": validated_data.get("phone", ""),
         }
         with transaction.atomic():
-            activity = JobPostActivity.objects.create(
+            activity, _ = JobPostActivity.objects.get_or_create(
                 user=user,
-                **activity_payload,
-                status=var_sys.ApplicationStatus.PENDING_CONFIRMATION
+                job_post=job_post,
+                is_deleted=False,
+                defaults={
+                    **activity_payload,
+                    "status": var_sys.ApplicationStatus.PENDING_CONFIRMATION,
+                },
             )
 
         logger.info(
@@ -247,13 +272,31 @@ class JobActivityService:
         from shared.configs.messages import APPLICATION_STATUS_MESSAGES
         from shared.helpers import helper
 
-        if activity.status > new_status:
+        try:
+            new_status = var_sys.ApplicationStatus(new_status)
+        except ValueError as exc:
+            raise InvalidApplicationStatusTransitionError("Unknown application status.") from exc
+
+        if activity.pk:
+            activity = (
+                JobPostActivity.objects
+                .select_related("job_post", "job_post__company", "job_post__company__logo")
+                .select_for_update()
+                .get(pk=activity.pk)
+            )
+
+        if activity.status == new_status:
+            return activity
+
+        current_status = var_sys.ApplicationStatus(activity.status)
+        allowed_statuses = JobActivityService.APPLICATION_STATUS_TRANSITIONS.get(current_status, set())
+        if new_status not in allowed_statuses:
             raise InvalidApplicationStatusTransitionError(
-                "Cannot revert application status backwards arbitrarily."
+                f"Cannot transition application from {current_status.label} to {new_status.label}."
             )
 
         activity.status = new_status
-        activity.save()
+        activity.save(update_fields=["status", "update_at"])
 
         notification_title = activity.job_post.company.company_name
         status_label = ""

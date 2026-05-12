@@ -1,5 +1,7 @@
 import json
+import time
 from typing import Optional, List, Dict, Any
+from urllib.parse import urlsplit, urlunsplit
 
 import requests
 from django.conf import settings
@@ -193,6 +195,82 @@ class TranscribeAPIView(APIView):
 
 # Backward-compat alias—urls.py uses ai_views.transcribe
 transcribe = TranscribeAPIView.as_view()
+
+
+def _http_probe_url(base_url: str) -> str:
+    if not base_url:
+        return ""
+
+    try:
+        parsed = urlsplit(base_url)
+    except ValueError:
+        return base_url
+
+    scheme = parsed.scheme.lower()
+    if scheme == "wss":
+        return urlunsplit(("https", parsed.netloc, parsed.path, parsed.query, parsed.fragment))
+    if scheme == "ws":
+        return urlunsplit(("http", parsed.netloc, parsed.path, parsed.query, parsed.fragment))
+    return base_url
+
+
+def _probe_http_service(name: str, base_url: str, path: str = "/models", headers: Optional[Dict[str, str]] = None) -> Dict[str, Any]:
+    if not base_url:
+        return {"status": "not_configured", "latencyMs": None}
+
+    probe_url = _http_probe_url(base_url)
+    started_at = time.time()
+    try:
+        response = requests.get(f"{probe_url.rstrip('/')}{path}", headers=headers or {}, timeout=(2, 4))
+        latency_ms = int((time.time() - started_at) * 1000)
+        return {
+            "status": "online" if response.status_code < 500 else "offline",
+            "latencyMs": latency_ms,
+            "statusCode": response.status_code,
+        }
+    except requests.RequestException as exc:
+        return {"status": "offline", "latencyMs": None, "error": str(exc)}
+
+
+def _probe_celery() -> Dict[str, Any]:
+    try:
+        from config.celery import app as celery_app
+
+        replies = celery_app.control.ping(timeout=1.0)
+        return {"status": "online" if replies else "offline", "workers": len(replies)}
+    except Exception as exc:
+        return {"status": "offline", "workers": 0, "error": str(exc)}
+
+
+class AIHealthAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request: DRFRequest):
+        llm_api_key = getattr(settings, "AI_LLM_API_KEY", "") or getattr(settings, "LLM_API_KEY", "") or getattr(settings, "GROQ_API_KEY", "")
+        headers = {"Authorization": f"Bearer {llm_api_key}"} if llm_api_key else {}
+        livekit_url = getattr(settings, "LIVEKIT_URL", "") or getattr(settings, "LIVEKIT_PUBLIC_URL", "")
+
+        checks = {
+            "llm": _probe_http_service("llm", getattr(settings, "AI_LLM_BASE_URL", ""), headers=headers),
+            "stt": _probe_http_service("stt", getattr(settings, "AI_STT_BASE_URL", "")),
+            "tts": _probe_http_service("tts", getattr(settings, "AI_TTS_BASE_URL", ""), path="/voices"),
+            "livekit": _probe_http_service("livekit", livekit_url, path="/"),
+            "celery": _probe_celery(),
+        }
+        all_ready = all(item.get("status") == "online" for item in checks.values())
+        return Response(
+            data_response(
+                errors={},
+                data={
+                    "status": "ready" if all_ready else "degraded",
+                    "checks": checks,
+                },
+            ),
+            status=200,
+        )
+
+
+health = AIHealthAPIView.as_view()
 
 
 # ---------------------------------------------------------------------------

@@ -52,7 +52,7 @@ const UserTable = ({
             case ROLES_NAME.JOB_SEEKER:
                 return t('pages.users.roles.jobSeeker');
             default:
-                return t('common.na');
+        return t('common:na');
         }
     }, [t]);
 

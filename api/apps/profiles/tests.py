@@ -2,11 +2,15 @@
 Unit tests for the Profiles app — models, services, and serializers.
 """
 import pytest
+from datetime import timedelta
+from django.utils import timezone
+from rest_framework.test import APIClient
 
 from apps.profiles.models import (
     Resume, Company, CompanyFollowed,
     JobSeekerProfile, ResumeViewed, ResumeSaved,
-    EducationDetail, ExperienceDetail
+    EducationDetail, ExperienceDetail,
+    CompanyVerification, TrustReport
 )
 from apps.profiles.services import ResumeService, CompanyService
 
@@ -75,6 +79,25 @@ class TestCompanyFollowed:
             user=job_seeker_user, company=company
         )
         assert str(follow) is not None
+
+
+@pytest.mark.django_db
+class TestSocialProfilePipeline:
+    def test_save_profile_creates_job_seeker_profile(self, job_seeker_user):
+        from apps.profiles.pipeline import save_profile
+
+        save_profile(backend=None, user=job_seeker_user, response={})
+
+        assert JobSeekerProfile.objects.filter(user=job_seeker_user).exists()
+        assert Resume.objects.filter(user=job_seeker_user).exists()
+
+    def test_save_profile_skips_employer_user(self, employer_user):
+        from apps.profiles.pipeline import save_profile
+
+        save_profile(backend=None, user=employer_user, response={})
+
+        assert not JobSeekerProfile.objects.filter(user=employer_user).exists()
+        assert not Resume.objects.filter(user=employer_user).exists()
 
 
 # ==================== Service Tests ====================
@@ -155,3 +178,83 @@ class TestCompanyService:
         assert stats['total_jobs'] >= 0
         assert 'resumes_saved' in stats
         assert 'resumes_viewed' in stats
+
+
+@pytest.mark.django_db
+class TestCompanyVerificationAPI:
+    def test_employer_can_submit_verification(self, employer_user, company):
+        client = APIClient()
+        client.force_authenticate(user=employer_user)
+
+        scheduled_at = timezone.now() + timedelta(days=2)
+        response = client.put(
+            "/api/v1/info/web/company-verification/",
+            {
+                "companyName": "Verified Test Company",
+                "taxCode": "1234567890",
+                "businessLicense": "BL-001",
+                "representative": "HR Lead",
+                "phone": "0901000000",
+                "email": "verify@test.com",
+                "website": "https://example.com",
+                "scheduledAt": scheduled_at.isoformat(),
+                "contactName": "HR Lead",
+                "contactPhone": "0901000000",
+                "notes": "Please review.",
+            },
+            format="json",
+        )
+
+        assert response.status_code == 200
+        data = response.data["data"]
+        assert data["status"] == CompanyVerification.STATUS_PENDING
+        assert data["businessLicense"] == "BL-001"
+        assert CompanyVerification.objects.filter(company=company).exists()
+
+    def test_admin_approval_marks_company_verified(self, admin_user, company):
+        verification = CompanyVerification.objects.create(
+            company=company,
+            legal_company_name=company.company_name,
+            tax_code=company.tax_code,
+            status=CompanyVerification.STATUS_PENDING,
+        )
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        response = client.patch(
+            f"/api/v1/info/web/admin/company-verifications/{verification.id}/",
+            {"status": CompanyVerification.STATUS_APPROVED, "adminNote": "Approved"},
+            format="json",
+        )
+
+        assert response.status_code == 200
+        verification.refresh_from_db()
+        company.refresh_from_db()
+        assert verification.status == CompanyVerification.STATUS_APPROVED
+        assert verification.admin_note == "Approved"
+        assert company.is_verified is True
+
+
+@pytest.mark.django_db
+class TestAdminTrustReportAPI:
+    def test_admin_can_update_trust_report_status(self, admin_user, job_seeker_user, company):
+        report = TrustReport.objects.create(
+            target_type=TrustReport.TARGET_COMPANY,
+            reason=TrustReport.REASON_SCAM,
+            message="Suspicious company profile",
+            status=TrustReport.STATUS_OPEN,
+            company=company,
+            reporter=job_seeker_user,
+        )
+        client = APIClient()
+        client.force_authenticate(user=admin_user)
+
+        response = client.patch(
+            f"/api/v1/info/web/admin/trust-reports/{report.id}/",
+            {"status": TrustReport.STATUS_REVIEWING},
+            format="json",
+        )
+
+        assert response.status_code == 200
+        report.refresh_from_db()
+        assert report.status == TrustReport.STATUS_REVIEWING

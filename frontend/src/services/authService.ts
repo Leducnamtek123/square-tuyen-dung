@@ -18,6 +18,7 @@ interface ConvertTokenPayload {
   backend: AuthProvider;
   token: string;
   redirect_uri?: string;
+  role_name?: RoleName;
 }
 interface ActionResponse {
   success?: boolean;
@@ -49,6 +50,7 @@ const authService = {
     provider: AuthProvider,
     token: string,
     redirectUri?: string,
+    roleName?: RoleName,
   ): Promise<TokenResponse> => {
     const url = 'auth/convert-token/';
     const data: ConvertTokenPayload = {
@@ -60,6 +62,9 @@ const authService = {
     };
     if (redirectUri) {
       data.redirect_uri = redirectUri;
+    }
+    if (roleName) {
+      data.role_name = roleName;
     }
     return httpRequest.post(url, data);
   },

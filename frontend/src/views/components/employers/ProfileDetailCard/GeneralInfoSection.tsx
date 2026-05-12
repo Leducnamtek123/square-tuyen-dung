@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Stack, Grid2 as Grid, alpha, useTheme } from '@mui/material';
+import { Box, Typography, Stack, Grid2 as Grid } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import InfoIcon from '@mui/icons-material/Info';
 import PositionIcon from '@mui/icons-material/Badge';
@@ -20,6 +20,7 @@ import type { City } from '../../../../types/models';
 import pc from '@/utils/muiColors';
 
 type ConfigDict = Record<string, string>;
+type ConfigValue = string | number | null | undefined | { id?: string | number; name?: string | null };
 
 interface GeneralInfoProfileExt extends Partial<JobSeekerProfile> {
   title?: string;
@@ -38,31 +39,40 @@ interface GeneralInfoSectionProps {
   profileDetail: GeneralInfoProfileExt;
 }
 
+const resolveConfigText = (dict: ConfigDict | undefined, value: ConfigValue): string => {
+    if (value === undefined || value === null || value === '') return '';
+    if (typeof value === 'object') {
+        return value.name || tConfig(dict?.[String(value.id ?? '')]);
+    }
+    return tConfig(dict?.[String(value)]);
+};
+
 const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }) => {
     const { t } = useTranslation(['employer', 'common']);
-    const theme = useTheme();
     const { allConfig } = useConfig();
 
     return (
         <Box>
-            <Stack direction="row" alignItems="center" spacing={2} mb={4}>
+            <Stack direction="row" alignItems="center" spacing={1.5} mb={2.5}>
                 <Box 
                     sx={{ 
-                        p: 1.25, 
+                        width: 40,
+                        height: 40,
                         borderRadius: 2, 
                         bgcolor: pc.primary( 0.1),
                         color: 'primary.main',
-                        display: 'flex'
+                        display: 'grid',
+                        placeItems: 'center',
                     }}
                 >
-                    <InfoIcon sx={{ fontSize: 28 }} />
+                    <InfoIcon sx={{ fontSize: 22 }} />
                 </Box>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+                <Typography variant="h6" sx={{ fontWeight: 1000, color: 'text.primary' }}>
                     {t('profileDetailCard.title.generalInfo')}
                 </Typography>
             </Stack>
 
-            <Grid container spacing={4}>
+            <Grid container spacing={1.5}>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('profileDetailCard.label.desiredPosition')} 
@@ -73,35 +83,35 @@ const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.desiredLevel')}
-                        value={tConfig(allConfig?.positionDict?.[profileDetail?.position as string])}
+                        value={resolveConfigText(allConfig?.positionDict, profileDetail?.position)}
                         icon={<PositionIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.educationLevel')}
-                        value={tConfig(allConfig?.academicLevelDict?.[profileDetail?.academicLevel as string])} 
+                        value={resolveConfigText(allConfig?.academicLevelDict, profileDetail?.academicLevel)}
                         icon={<SchoolIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.experience')}
-                        value={tConfig(allConfig?.experienceDict?.[profileDetail?.experience as string])}
+                        value={resolveConfigText(allConfig?.experienceDict, profileDetail?.experience)}
                         icon={<HistoryIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.career')}
-                        value={tConfig(allConfig?.careerDict?.[profileDetail?.career as string])}
+                        value={resolveConfigText(allConfig?.careerDict, profileDetail?.career as ConfigValue)}
                         icon={<CareerIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.workLocation')}
-                        value={tConfig(allConfig?.cityDict?.[profileDetail?.city as string])}
+                        value={resolveConfigText(allConfig?.cityDict, profileDetail?.city as ConfigValue)}
                         icon={<LocationIcon />}
                     />
                 </Grid>
@@ -115,14 +125,14 @@ const GeneralInfoSection: React.FC<GeneralInfoSectionProps> = ({ profileDetail }
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.workplaceType')}
-                        value={tConfig(allConfig?.typeOfWorkplaceDict?.[profileDetail?.typeOfWorkplace as string])}
+                        value={resolveConfigText(allConfig?.typeOfWorkplaceDict, profileDetail?.typeOfWorkplace)}
                         icon={<BuildingIcon />}
                     />
                 </Grid>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem
                         label={t('profileDetailCard.label.jobType')}
-                        value={tConfig(allConfig?.jobTypeDict?.[profileDetail?.jobType as string])}
+                        value={resolveConfigText(allConfig?.jobTypeDict, profileDetail?.jobType)}
                         icon={<WorkerIcon />}
                     />
                 </Grid>

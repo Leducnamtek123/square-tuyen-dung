@@ -6,6 +6,7 @@ import datetime
 
 from django.conf import settings
 from django.db import transaction
+from django.utils import timezone
 from rest_framework import serializers
 from shared.serializers import DynamicFieldsMixin
 from rest_framework.validators import UniqueValidator
@@ -18,7 +19,7 @@ from console.jobs import queue_auth
 
 from ..models import (
     Company, CompanyFollowed, CompanyImage,
-    CompanyRole, CompanyMember, TrustReport
+    CompanyRole, CompanyMember, TrustReport, CompanyVerification
 )
 from apps.files.models import File
 from apps.locations.models import Location
@@ -286,7 +287,15 @@ class TrustReportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
     company = serializers.IntegerField(required=False, allow_null=True, source="company_id")
     jobPost = serializers.IntegerField(required=False, allow_null=True, source="job_post_id")
     reporterDict = auth_serializers.UserSerializer(source='reporter', read_only=True, fields=['id', 'fullName', 'email', 'avatarUrl'])
+    targetTitle = serializers.SerializerMethodField()
     createAt = serializers.DateTimeField(source='create_at', read_only=True)
+
+    def get_targetTitle(self, report):
+        if report.company_id and report.company:
+            return report.company.company_name
+        if report.job_post_id and report.job_post:
+            return report.job_post.job_name
+        return ""
 
     def validate(self, attrs):
         errors = {}
@@ -350,7 +359,130 @@ class TrustReportSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
             "company",
             "jobPost",
             "reporterDict",
+            "targetTitle",
             "createAt",
+        )
+
+
+class AdminTrustReportSerializer(TrustReportSerializer):
+    targetType = serializers.CharField(source="target_type", read_only=True)
+    reason = serializers.CharField(read_only=True)
+    message = serializers.CharField(read_only=True)
+    company = serializers.IntegerField(read_only=True, source="company_id")
+    jobPost = serializers.IntegerField(read_only=True, source="job_post_id")
+
+    def validate_status(self, value):
+        if value not in dict(TrustReport.STATUS_CHOICES):
+            raise serializers.ValidationError("Invalid report status.")
+        return value
+
+    def validate(self, attrs):
+        return attrs
+
+    class Meta(TrustReportSerializer.Meta):
+        read_only_fields = (
+            "id",
+            "targetType",
+            "reason",
+            "message",
+            "company",
+            "jobPost",
+            "reporterDict",
+            "targetTitle",
+            "createAt",
+        )
+
+
+class CompanyVerificationSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
+    companyId = serializers.IntegerField(source="company_id", read_only=True)
+    companyDict = CompanySerializer(source="company", read_only=True, fields=["id", "slug", "companyName", "taxCode", "isVerified"])
+    companyName = serializers.CharField(source="legal_company_name", required=False, allow_blank=True)
+    taxCode = serializers.CharField(source="tax_code", required=False, allow_blank=True)
+    businessLicense = serializers.CharField(source="business_license", required=False, allow_blank=True)
+    representative = serializers.CharField(source="representative_name", required=False, allow_blank=True)
+    phone = serializers.CharField(source="contact_phone", required=False, allow_blank=True)
+    email = serializers.EmailField(source="contact_email", required=False, allow_blank=True)
+    website = serializers.URLField(required=False, allow_blank=True)
+    scheduledAt = serializers.DateTimeField(source="verification_scheduled_at", required=False, allow_null=True)
+    contactName = serializers.CharField(source="verification_contact_name", required=False, allow_blank=True)
+    contactPhone = serializers.CharField(source="verification_contact_phone", required=False, allow_blank=True)
+    notes = serializers.CharField(source="verification_notes", required=False, allow_blank=True)
+    adminNote = serializers.CharField(source="admin_note", read_only=True)
+    reviewedById = serializers.IntegerField(source="reviewed_by_id", read_only=True)
+    reviewedAt = serializers.DateTimeField(source="reviewed_at", read_only=True)
+    createAt = serializers.DateTimeField(source="create_at", read_only=True)
+    updateAt = serializers.DateTimeField(source="update_at", read_only=True)
+
+    class Meta:
+        model = CompanyVerification
+        fields = (
+            "id",
+            "companyId",
+            "companyDict",
+            "status",
+            "companyName",
+            "taxCode",
+            "businessLicense",
+            "representative",
+            "phone",
+            "email",
+            "website",
+            "scheduledAt",
+            "contactName",
+            "contactPhone",
+            "notes",
+            "adminNote",
+            "reviewedById",
+            "reviewedAt",
+            "createAt",
+            "updateAt",
+        )
+        read_only_fields = (
+            "id",
+            "companyId",
+            "companyDict",
+            "status",
+            "adminNote",
+            "reviewedById",
+            "reviewedAt",
+            "createAt",
+            "updateAt",
+        )
+
+
+class AdminCompanyVerificationSerializer(CompanyVerificationSerializer):
+    adminNote = serializers.CharField(source="admin_note", required=False, allow_blank=True)
+
+    def validate_status(self, value):
+        if value not in dict(CompanyVerification.STATUS_CHOICES):
+            raise serializers.ValidationError("Invalid verification status.")
+        return value
+
+    def update(self, instance, validated_data):
+        request = self.context.get("request")
+        status_value = validated_data.get("status")
+        instance = super().update(instance, validated_data)
+        if status_value:
+            instance.reviewed_by = request.user if request and request.user.is_authenticated else None
+            instance.reviewed_at = timezone.now()
+            instance.save(update_fields=["reviewed_by", "reviewed_at", "update_at"])
+            if status_value == CompanyVerification.STATUS_APPROVED and not instance.company.is_verified:
+                instance.company.is_verified = True
+                instance.company.save(update_fields=["is_verified", "update_at"])
+            elif status_value == CompanyVerification.STATUS_REJECTED and instance.company.is_verified:
+                instance.company.is_verified = False
+                instance.company.save(update_fields=["is_verified", "update_at"])
+        return instance
+
+    class Meta(CompanyVerificationSerializer.Meta):
+        read_only_fields = (
+            "id",
+            "companyId",
+            "companyDict",
+            "reviewedById",
+            "reviewedAt",
+            "createAt",
+            "updateAt",
         )
 
 

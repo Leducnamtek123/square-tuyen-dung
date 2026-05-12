@@ -7,7 +7,7 @@ import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import VideoLibraryIcon from '@mui/icons-material/VideoLibrary';
-import { ROUTES } from '@/configs/constants';
+import { ROUTES, LINKS } from '@/configs/constants';
 import MenuItem from './MenuItem';
 
 interface AdminMenuProps {
@@ -30,6 +30,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
         <List component="div" disablePadding>
           <MenuItem text={t('admin:sidebar.usersAndPermissions')} to={`/${ROUTES.ADMIN.USERS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.USERS}` }} />
           <MenuItem text={t('admin:sidebar.systemConfiguration')} to={`/${ROUTES.ADMIN.SETTINGS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.SETTINGS}` }} />
+          <MenuItem text={t('admin:sidebar.squareHrmAdmin')} to={LINKS.SQUARE_HRM_ADMIN_LINK} kind="child" external />
         </List>
       </Collapse>
       
@@ -64,6 +65,7 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
       <Collapse in={expandedItems.profiles} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           <MenuItem text={t('admin:sidebar.companyManagement')} to={`/${ROUTES.ADMIN.COMPANIES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.COMPANIES}` }} />
+          <MenuItem text={t('admin:sidebar.companyVerifications')} to={`/${ROUTES.ADMIN.COMPANY_VERIFICATIONS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.COMPANY_VERIFICATIONS}` }} />
           <MenuItem text={t('admin:sidebar.candidateProfiles')} to={`/${ROUTES.ADMIN.PROFILES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.PROFILES}` }} />
           <MenuItem text={t('admin:sidebar.resumeManagement')} to={`/${ROUTES.ADMIN.RESUMES}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.RESUMES}` }} />
         </List>
@@ -75,12 +77,14 @@ const AdminMenu = ({ t, location, expandedItems, handleExpand }: AdminMenuProps)
       <Collapse in={expandedItems.recruitment} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           <MenuItem text={t('admin:sidebar.jobPosts')} to={`/${ROUTES.ADMIN.JOBS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.JOBS}` }} />
+          <MenuItem text={t('admin:sidebar.trustReports')} to={`/${ROUTES.ADMIN.TRUST_REPORTS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.TRUST_REPORTS}` }} />
           <MenuItem text={t('admin:sidebar.activityLogs')} to={`/${ROUTES.ADMIN.JOB_ACTIVITY}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.JOB_ACTIVITY}` }} />
           <MenuItem text={t('admin:sidebar.interviewSchedule')} to={`/${ROUTES.ADMIN.INTERVIEWS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.INTERVIEWS}` }} />
           <MenuItem text={t('admin:sidebar.jobNotifications')} to={`/${ROUTES.ADMIN.JOB_NOTIFICATIONS}`} kind="child" state={{ selected: location.pathname === `/${ROUTES.ADMIN.JOB_NOTIFICATIONS}` }} />
           <MenuItem icon={VideoLibraryIcon} text="Interview UI Preview" to="/admin/interview-preview" kind="child" state={{ selected: location.pathname === '/admin/interview-preview' }} />
         </List>
       </Collapse>
+
     </>
   );
 };

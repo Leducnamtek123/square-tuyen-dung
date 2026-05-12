@@ -8,9 +8,10 @@ import EmployerLayout from '@/layouts/EmployerLayout';
 import DefaultLayout from '@/layouts/DefaultLayout';
 import ChatLayout from '@/layouts/ChatLayout';
 import tokenService from '@/services/tokenService';
-import { getUserInfo } from '@/redux/userSlice';
+import { getUserInfo, setActiveWorkspace } from '@/redux/userSlice';
 import { ROLES_NAME } from '@/configs/constants';
 import { getPreferredLanguage, getPortalPrefix } from '@/configs/portalRouting';
+import type { User, Workspace } from '@/types/models';
 
 type AuthGateState = {
   isChecking: boolean;
@@ -85,6 +86,13 @@ const DEFAULT_LAYOUT_PATHS = [
 
 const CHAT_LAYOUT_PATHS = ['/employer/chat', '/nha-tuyen-dung/ket-noi-voi-ung-vien', '/nha-tuyen-dung/chat'];
 
+const getCompanyPortalPath = (fallback = '/employer/dashboard') => {
+  return fallback;
+};
+
+const getCompanyWorkspace = (user?: User | null) =>
+  ((user?.workspaces || []) as Workspace[]).find((workspace) => workspace.type === 'company');
+
 function AuthLoadingScreen() {
   return (
     <Box
@@ -145,15 +153,19 @@ export default function EmployerSectionClient({
             }
           }
 
-          const role = user?.roleName;
+          const canAccessEmployerPortal = user?.roleName === ROLES_NAME.EMPLOYER || user?.canAccessEmployerPortal;
           const isAuthPage =
             pathname.endsWith('/login') ||
             pathname.endsWith('/register') ||
             pathname.endsWith('/forgot-password') ||
             pathname.includes('/reset-password/');
 
-          if (role === ROLES_NAME.EMPLOYER && isAuthPage) {
-            window.location.replace(dashboardPath);
+          if (canAccessEmployerPortal && isAuthPage) {
+            const companyWorkspace = getCompanyWorkspace(user);
+            if (companyWorkspace) {
+              dispatch(setActiveWorkspace(companyWorkspace));
+            }
+            window.location.replace(getCompanyPortalPath(dashboardPath));
           }
         }
         return;
@@ -169,8 +181,9 @@ export default function EmployerSectionClient({
         }
       }
 
-      if (user?.roleName !== ROLES_NAME.EMPLOYER) {
+      if (user?.roleName !== ROLES_NAME.EMPLOYER && !user?.canAccessEmployerPortal) {
         window.location.replace('/');
+        return;
       }
     };
 

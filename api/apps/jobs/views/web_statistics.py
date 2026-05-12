@@ -11,7 +11,7 @@ from rest_framework import status, viewsets
 from apps.accounts import permissions as perms_custom
 from apps.accounts.models import User
 from apps.interviews.models import InterviewEvaluation, InterviewSession
-from apps.profiles.models import CompanyFollowed, ResumeViewed
+from apps.profiles.models import CompanyFollowed, ResumeSaved, ResumeViewed
 from shared.configs import variable_response as var_res
 from shared.configs import variable_system as var_sys
 
@@ -206,7 +206,7 @@ class EmployerStatisticViewSet(viewsets.ViewSet):
             company=company
         ).count()
         # Saved profiles — placeholder for future ResumeSaved model
-        total_saved_profiles = 0
+        total_saved_profiles = ResumeSaved.objects.filter(company=company).count()
 
         # Interview stats
         interview_qs = InterviewSession.objects.filter(

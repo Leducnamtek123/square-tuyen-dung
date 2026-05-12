@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Paper, Stack, alpha, useTheme } from '@mui/material';
+import { Box, Typography, Stack } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import TrackChangesIcon from '@mui/icons-material/TrackChanges';
 
@@ -12,36 +12,35 @@ interface CareerGoalsSectionProps {
 
 const CareerGoalsSection: React.FC<CareerGoalsSectionProps> = ({ profileDetail }) => {
     const { t } = useTranslation(['employer', 'common']);
-    const theme = useTheme();
 
     return (
         <Box>
-            <Stack direction="row" alignItems="center" spacing={2} mb={4}>
+            <Stack direction="row" alignItems="center" spacing={1.5} mb={2.5}>
                 <Box 
                     sx={{ 
-                        p: 1.25, 
+                        width: 40,
+                        height: 40,
                         borderRadius: 2, 
                         bgcolor: pc.primary( 0.1),
                         color: 'primary.main',
-                        display: 'flex'
+                        display: 'grid',
+                        placeItems: 'center',
                     }}
                 >
-                    <TrackChangesIcon sx={{ fontSize: 28 }} />
+                    <TrackChangesIcon sx={{ fontSize: 22 }} />
                 </Box>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+                <Typography variant="h6" sx={{ fontWeight: 1000, color: 'text.primary' }}>
                     {t('profileDetailCard.title.careerGoals')}
                 </Typography>
             </Stack>
             
-            <Paper
-                variant="outlined"
+            <Box
                 sx={{
-                    p: 4,
-                    bgcolor: pc.actionDisabled( 0.04),
+                    p: { xs: 2, md: 2.5 },
+                    bgcolor: pc.bgDefault(0.35),
                     border: '1px solid',
-                    borderColor: 'divider',
-                    borderRadius: 3,
-                    boxShadow: 'none',
+                    borderColor: pc.divider(0.65),
+                    borderRadius: 2,
                 }}
             >
                 <Typography
@@ -57,7 +56,7 @@ const CareerGoalsSection: React.FC<CareerGoalsSectionProps> = ({ profileDetail }
                 >
                     {profileDetail?.description || t('common:labels.notUpdated')}
                 </Typography>
-            </Paper>
+            </Box>
         </Box>
     );
 };

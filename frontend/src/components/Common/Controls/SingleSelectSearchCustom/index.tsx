@@ -73,11 +73,14 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
               sx={{
                 backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212',
                 borderRadius: 999,
+                boxShadow: '0 10px 26px rgba(26, 64, 125, 0.08)',
                 '& .MuiOutlinedInput-root': {
+                  minHeight: 48,
                   borderRadius: 999,
                   backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212',
+                  transition: 'box-shadow 180ms ease, border-color 180ms ease',
                   '& fieldset': {
-                    borderColor: 'rgba(26, 64, 125, 0.18)',
+                    borderColor: 'rgba(26, 64, 125, 0.14)',
                   },
                   '&:hover fieldset': {
                     borderColor: 'rgba(26, 64, 125, 0.35)',
@@ -86,9 +89,18 @@ const SingleSelectSearchCustom = <T extends FieldValues = FieldValues>({
                     borderColor: theme.palette.primary.main,
                     borderWidth: 1,
                   },
+                  '&.Mui-focused': {
+                    boxShadow: '0 0 0 4px rgba(42, 169, 225, 0.16), 0 16px 34px rgba(26, 64, 125, 0.12)',
+                  },
                 },
                 '& .MuiInputBase-input': {
                   px: 1.5,
+                  fontWeight: 600,
+                  color: 'text.primary',
+                  '&::placeholder': {
+                    color: 'text.secondary',
+                    opacity: 0.78,
+                  },
                 },
               }}
 

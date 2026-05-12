@@ -68,11 +68,11 @@ DOMAIN_CLIENT = {
 }
 
 # Local AI (Voice) services
-AI_TTS_BASE_URL = config("AI_TTS_BASE_URL", default="http://localhost:8298/v1")
-AI_TTS_DEFAULT_VOICE = config("AI_TTS_DEFAULT_VOICE", default="Ly (nữ miền Bắc)")
-AI_STT_BASE_URL = config("AI_STT_BASE_URL", default="http://localhost:11437/v1")
-AI_STT_MODEL = config("AI_STT_MODEL", default="openai/whisper-large-v3")
-AI_STT_LANGUAGE = config("AI_STT_LANGUAGE", default="vi")
+AI_TTS_BASE_URL = config("AI_TTS_BASE_URL", default=config("TTS_BASE_URL", default="http://localhost:8298/v1"))
+AI_TTS_DEFAULT_VOICE = config("AI_TTS_DEFAULT_VOICE", default=config("TTS_VOICE", default="Ly (nữ miền Bắc)"))
+AI_STT_BASE_URL = config("AI_STT_BASE_URL", default=config("STT_BASE_URL", default="http://localhost:11437/v1"))
+AI_STT_MODEL = config("AI_STT_MODEL", default=config("STT_MODEL", default="openai/whisper-large-v3"))
+AI_STT_LANGUAGE = config("AI_STT_LANGUAGE", default=config("STT_LANGUAGE", default="vi"))
 AI_LLM_BASE_URL = config(
     "AI_LLM_BASE_URL",
     default=config("LLM_BASE_URL", default=config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")),
@@ -81,6 +81,7 @@ AI_LLM_MODEL = config("AI_LLM_MODEL", default=config("LLM_MODEL", default=config
 AI_LLM_API_KEY = config("AI_LLM_API_KEY", default=config("LLM_API_KEY", default=config("GROQ_API_KEY", default="")))
 AI_RESUME_AUTO_ANALYZE = config("AI_RESUME_AUTO_ANALYZE", default=True, cast=bool)
 LIVEKIT_PUBLIC_URL = config("LIVEKIT_PUBLIC_URL", default="")
+LIVEKIT_URL = config("LIVEKIT_URL", default="http://livekit:7880")
 LIVEKIT_API_KEY = config("LIVEKIT_API_KEY", default="")
 LIVEKIT_API_SECRET = config("LIVEKIT_API_SECRET", default="")
 API_VERSION = config("API_VERSION", default="v1")
@@ -91,6 +92,34 @@ INTERVIEW_DISCONNECT_GRACE_SECONDS = config("INTERVIEW_DISCONNECT_GRACE_SECONDS"
 APP_ENVIRONMENT = config("APP_ENVIRONMENT", default="development")
 STRICT_ENV_VALIDATION = config("STRICT_ENV_VALIDATION", default=False, cast=_to_bool)
 API_RESPONSE_ENVELOPE_V2 = config("API_RESPONSE_ENVELOPE_V2", default=True, cast=_to_bool)
+FRAPPE_HR_BASE_URL = config("FRAPPE_HR_BASE_URL", default="")
+FRAPPE_HR_PUBLIC_URL = config("FRAPPE_HR_PUBLIC_URL", default=FRAPPE_HR_BASE_URL)
+FRAPPE_HR_SITE_NAME = config("FRAPPE_HR_SITE_NAME", default="")
+FRAPPE_HR_API_KEY = config("FRAPPE_HR_API_KEY", default="")
+FRAPPE_HR_API_SECRET = config("FRAPPE_HR_API_SECRET", default="")
+FRAPPE_HR_TIMEOUT_SECONDS = config("FRAPPE_HR_TIMEOUT_SECONDS", default=20, cast=int)
+FRAPPE_HR_DEFAULT_COMPANY = config("FRAPPE_HR_DEFAULT_COMPANY", default="")
+FRAPPE_HR_DEFAULT_DEPARTMENT = config("FRAPPE_HR_DEFAULT_DEPARTMENT", default="")
+FRAPPE_HR_DEFAULT_CURRENCY = config("FRAPPE_HR_DEFAULT_CURRENCY", default="VND")
+FRAPPE_HR_DEFAULT_COUNTRY = config("FRAPPE_HR_DEFAULT_COUNTRY", default="Vietnam")
+FRAPPE_HR_DEFAULT_GENDER = config("FRAPPE_HR_DEFAULT_GENDER", default="Other")
+FRAPPE_HR_DEFAULT_DATE_OF_BIRTH = config("FRAPPE_HR_DEFAULT_DATE_OF_BIRTH", default="1990-01-01")
+FRAPPE_HR_EMPLOYEE_ROLES = config(
+    "FRAPPE_HR_EMPLOYEE_ROLES",
+    default="Employee",
+    cast=lambda v: [s.strip() for s in v.split(",") if s.strip()],
+)
+FRAPPE_HR_RECRUITER_ROLES = config(
+    "FRAPPE_HR_RECRUITER_ROLES",
+    default="HR Manager,HR User",
+    cast=lambda v: [s.strip() for s in v.split(",") if s.strip()],
+)
+FRAPPE_HR_RECRUITER_READONLY_ROLES = config(
+    "FRAPPE_HR_RECRUITER_READONLY_ROLES",
+    default="HR User",
+    cast=lambda v: [s.strip() for s in v.split(",") if s.strip()],
+)
+FRAPPE_HR_SYNC_RECRUITER_ACCOUNTS = config("FRAPPE_HR_SYNC_RECRUITER_ACCOUNTS", default=True, cast=_to_bool)
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-square-tuyen-dung-local-only")

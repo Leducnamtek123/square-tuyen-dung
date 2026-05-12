@@ -1,8 +1,40 @@
+import asyncio
+
 from livekit_agent.interview_flow import (
     decide_next_action,
     parse_question_payload,
     strip_punctuation_for_tts,
 )
+from livekit_agent.interviewer import Interviewer
+
+
+def test_scripted_llm_node_asks_configured_questions() -> None:
+    async def run() -> None:
+        agent = Interviewer(
+            context={
+                "questions": [
+                    {"text": "Cau hoi 1"},
+                    {"text": "Cau hoi 2"},
+                ]
+            }
+        )
+        recorded = []
+
+        async def fake_record_transcript(speaker_role, content, speech_duration_ms=None):
+            recorded.append((speaker_role, content, speech_duration_ms))
+
+        agent.record_transcript = fake_record_transcript
+
+        first = await agent.llm_node(None, [], None)
+        second = await agent.llm_node(None, [], None)
+        closing = await agent.llm_node(None, [], None)
+
+        assert "Cau hoi 1" in first
+        assert "Cau hoi 2" in second
+        assert "kết thúc" in closing.lower()
+        assert [item[0] for item in recorded] == ["ai_agent", "ai_agent", "ai_agent"]
+
+    asyncio.run(run())
 
 def test_parse_question_payload_done() -> None:
     payload = {

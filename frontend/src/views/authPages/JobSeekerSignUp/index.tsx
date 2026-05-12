@@ -146,7 +146,8 @@ const JobSeekerSignUp = () => {
         provider,
 
         token,
-        redirectUri
+        redirectUri,
+        ROLES_NAME.JOB_SEEKER as RoleName
 
       ));
 

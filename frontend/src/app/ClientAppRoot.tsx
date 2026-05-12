@@ -46,9 +46,7 @@ export default function ClientAppRoot({ children }: { children: React.ReactNode 
     pathname.startsWith(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW}`) ||
     pathname.startsWith(`/${ROUTES.JOBSEEKER_INTERVIEW.INTERVIEW_ROOM}`) ||
     pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_LIVE}`) ||
-    pathname.startsWith(`/${ROUTES.ADMIN.INTERVIEW_LIVE}`) ||
-    pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', '')}`) ||
-    pathname.startsWith(`/${ROUTES.ADMIN.INTERVIEW_SESSION.replace(':id', '')}`);
+    pathname.startsWith(`/${ROUTES.EMPLOYER.INTERVIEW_SESSION.replace(':id', '')}`);
   
   const canShowChatBot = !isAdminPortal && !isChatPage && !isInterviewPage;
   const isInitializing = !isJobSeekerInterviewRoute && !hasCachedConfig && isLoadingConfig;

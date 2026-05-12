@@ -33,12 +33,14 @@ export interface Workspace {
   companyId?: number | null;
   label?: string;
   isDefault?: boolean;
+  roleCode?: string | null;
 }
 
 export interface NormalizedWorkspace {
   type: 'company' | 'job_seeker';
   companyId: number | null;
   label: string;
+  roleCode?: string | null;
 }
 
 /* Company */
@@ -103,6 +105,42 @@ export interface CompanyMember {
   status?: string;
 }
 
+export interface CompanyVerification {
+  id?: number;
+  companyId?: number;
+  companyDict?: Company;
+  status?: 'pending' | 'reviewing' | 'approved' | 'rejected';
+  companyName?: string;
+  taxCode?: string;
+  businessLicense?: string;
+  representative?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  scheduledAt?: string | null;
+  contactName?: string;
+  contactPhone?: string;
+  notes?: string;
+  adminNote?: string;
+  reviewedById?: number | null;
+  reviewedAt?: string | null;
+  createAt?: string;
+  updateAt?: string;
+}
+
+export interface TrustReport {
+  id: number;
+  targetType: 'job' | 'company';
+  reason: string;
+  message?: string;
+  status: 'open' | 'reviewing' | 'resolved' | 'rejected';
+  company?: number | null;
+  jobPost?: number | null;
+  targetTitle?: string;
+  reporterDict?: User;
+  createAt?: string;
+}
+
 /* Job */
 
 export interface JobPost {
@@ -148,6 +186,13 @@ export interface JobPostActivity {
   title?: string;
   type?: string;
   status: number;
+  statusName?: string;
+  hrmEmployeeId?: string;
+  hrmUserId?: string;
+  hrmSyncStatus?: 'NOT_SYNCED' | 'SYNCING' | 'SYNCED' | 'FAILED' | string;
+  hrmSyncError?: string;
+  hrmSyncedAt?: string | null;
+  hrmEmployeeUrl?: string;
   isSentEmail?: boolean;
   isDeleted?: boolean;
   jobPost?: JobPost;

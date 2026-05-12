@@ -30,10 +30,12 @@ api_v1_patterns = [
     path("content/", include("apps.content.urls")),
     path("chatbot/", include("apps.chatbot.urls")),
     path("interview/", include("apps.interviews.urls")),
+    path("hrm/", include("integrations.frappe_hr.urls")),
     path("admin/web/system-settings/", views.SystemSettingsAPIView.as_view()),
     path("ai/tts/", ai_views.tts),
     path("ai/transcribe/", ai_views.transcribe),
     path("ai/chat/", ai_views.chat),
+    path("ai/health/", ai_views.health),
     path("livekit/webhook", livekit_webhook.livekit_webhook),
     # Compatibility endpoints for voice-agent integration.
     path("interview/compat/<str:room_name>/context", interviews_compat_views.interview_context),

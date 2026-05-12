@@ -11,12 +11,13 @@ import { AUTH_CONFIG, AUTH_PROVIDER, ROLES_NAME, ROUTES } from '../../../configs
 import toastMessages from '../../../utils/toastMessages';
 import BackdropLoading from '../../../components/Common/Loading/BackdropLoading';
 import { updateVerifyEmail } from '../../../redux/authSlice';
-import { getUserInfo } from '../../../redux/userSlice';
+import { getUserInfo, setActiveWorkspace } from '../../../redux/userSlice';
 import EmployerLoginForm, { EmployerLoginFormData } from '../../components/auths/EmployerLoginForm';
 import authService from '../../../services/authService';
 import tokenService from '../../../services/tokenService';
 import { useAppDispatch } from '../../../hooks/useAppStore';
 import type { RoleName, AuthProvider } from '../../../types/auth';
+import type { User, Workspace } from '../../../types/models';
 import type { AxiosError } from 'axios';
 import type { CodeResponse } from '@react-oauth/google';
 
@@ -48,6 +49,13 @@ const StyledLink = styled(Link)(({ theme }) => ({
     textDecoration: 'underline',
   },
 }));
+
+const getCompanyPortalPath = () => {
+  return `/${ROUTES.EMPLOYER.DASHBOARD}`;
+};
+
+const getCompanyWorkspace = (user?: User | null) =>
+  ((user?.workspaces || []) as Workspace[]).find((workspace) => workspace.type === 'company');
 
 const EmployerLogin = () => {
   const { t } = useTranslation('auth');
@@ -90,8 +98,12 @@ const EmployerLogin = () => {
         if (isSaveTokenToCookie) {
           dispatch(getUserInfo())
             .unwrap()
-            .then(() => {
-              push('/');
+            .then((user) => {
+              const companyWorkspace = getCompanyWorkspace(user);
+              if (companyWorkspace) {
+                dispatch(setActiveWorkspace(companyWorkspace));
+              }
+              push(getCompanyPortalPath());
             })
             .catch(() => {
               toastMessages.error(t('messages.loginError'));
@@ -159,7 +171,14 @@ const EmployerLogin = () => {
     setIsFullScreenLoading(true);
 
     try {
-      const resData = await authService.convertToken(clientId, clientSecrect, provider, token, redirectUri);
+      const resData = await authService.convertToken(
+        clientId,
+        clientSecrect,
+        provider,
+        token,
+        redirectUri,
+        ROLES_NAME.EMPLOYER as RoleName
+      );
       const { accessToken, refreshToken, backend } = resData;
 
       const isSaveTokenToCookie = tokenService.saveAccessTokenAndRefreshTokenToCookie(
@@ -171,8 +190,12 @@ const EmployerLogin = () => {
       if (isSaveTokenToCookie) {
         dispatch(getUserInfo())
           .unwrap()
-          .then(() => {
-            push('/');
+          .then((user) => {
+            const companyWorkspace = getCompanyWorkspace(user);
+            if (companyWorkspace) {
+              dispatch(setActiveWorkspace(companyWorkspace));
+            }
+            push(getCompanyPortalPath());
           })
           .catch(() => {
             toastMessages.error(t('messages.loginError'));

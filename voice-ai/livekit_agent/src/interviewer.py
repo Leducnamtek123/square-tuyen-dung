@@ -11,6 +11,7 @@ from livekit.agents import Agent, RunContext
 from livekit.agents.job import get_job_context
 from livekit.agents.llm import function_tool
 
+from .interview_flow import decide_next_action, parse_question_payload
 from .prompts import DEFAULT_GREETING, INTERVIEWER_INSTRUCTIONS
 
 logger = logging.getLogger("interviewer")
@@ -58,6 +59,12 @@ def _sanitize_output_text(value: Any) -> str:
     return " ".join(text.split()).strip()
 
 
+def _question_text(value: Any) -> str:
+    if isinstance(value, dict):
+        return _normalize_text(value.get("text"))
+    return _normalize_text(value)
+
+
 class Interviewer(Agent):
     def __init__(self, context: dict[str, Any] | None = None) -> None:
         instructions = INTERVIEWER_INSTRUCTIONS
@@ -68,6 +75,10 @@ class Interviewer(Agent):
         self._finalizing = False
         self._current_stage = InterviewStage.INTRODUCTION
         self._recorded_transcripts: set[tuple[str, str]] = set()
+        self._scripted_questions = [
+            text for text in (_question_text(q) for q in self._context.get("questions", [])) if text
+        ]
+        self._scripted_question_index = 0
 
         candidate_name = _brief_text(self._context.get("candidateName", "Ứng viên"), 80)
         job_title = _brief_text(self._context.get("jobTitle", "đang ứng tuyển"), 120)
@@ -134,6 +145,57 @@ class Interviewer(Agent):
             f"{DEFAULT_GREETING} Xin chào {candidate_name}, bắt đầu phỏng vấn nhé.",
             allow_interruptions=False,
         )
+
+    def llm_node(self, chat_ctx, tools, model_settings):
+        if self._backend_api_url and self._room_name:
+            return self._scripted_llm_response()
+        if self._scripted_questions:
+            return self._scripted_llm_response()
+        return super().llm_node(chat_ctx, tools, model_settings)
+
+    async def _scripted_llm_response(self) -> str:
+        response = await self._build_scripted_response()
+        await self.record_transcript("ai_agent", response)
+        return response
+
+    async def _build_scripted_response(self) -> str:
+        backend_payload = await self._fetch_next_question_payload()
+        if backend_payload is not None:
+            action = decide_next_action(parse_question_payload(backend_payload))
+            if action.kind == "ask_question" and action.text:
+                index = backend_payload.get("index")
+                total = backend_payload.get("total")
+                if isinstance(index, int) and isinstance(total, int) and total > 0:
+                    return f"Cảm ơn bạn. Câu hỏi {index + 1}/{total}: {action.text}"
+                return f"Cảm ơn bạn. Câu hỏi tiếp theo: {action.text}"
+            if action.kind == "closing":
+                self._completed = True
+                return "Cảm ơn bạn. Tôi đã ghi nhận phần trả lời, buổi phỏng vấn kết thúc tại đây."
+
+        if self._scripted_question_index < len(self._scripted_questions):
+            question = self._scripted_questions[self._scripted_question_index]
+            self._scripted_question_index += 1
+            total = len(self._scripted_questions)
+            return f"Cảm ơn bạn. Câu hỏi {self._scripted_question_index}/{total}: {question}"
+
+        self._completed = True
+        return "Cảm ơn bạn. Tôi đã ghi nhận phần trả lời, buổi phỏng vấn kết thúc tại đây."
+
+    async def _fetch_next_question_payload(self) -> dict[str, Any] | None:
+        if not self._backend_api_url or not self._room_name:
+            return None
+        try:
+            url = f"{self._backend_api_url}/v1/interview/compat/{self._room_name}/next-question"
+            async with httpx.AsyncClient() as client:
+                resp = await client.post(url, json={"advance": True}, timeout=5.0)
+            if resp.status_code == 200:
+                payload = resp.json()
+                if isinstance(payload, dict):
+                    return payload
+            logger.debug("next-question returned %d for room %s", resp.status_code, self._room_name)
+        except Exception as exc:
+            logger.warning("next-question failed for room %s: %s", self._room_name, exc)
+        return None
 
     @function_tool
     async def set_interview_stage(self, context: RunContext, stage_name: str) -> str:

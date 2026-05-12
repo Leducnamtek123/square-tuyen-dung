@@ -284,6 +284,62 @@ class Company(CommonBaseModel):
         return f"{self.company_name if self.company_name is not None else '-'}"
 
 
+class CompanyVerification(CommonBaseModel):
+    STATUS_PENDING = "pending"
+    STATUS_REVIEWING = "reviewing"
+    STATUS_APPROVED = "approved"
+    STATUS_REJECTED = "rejected"
+    STATUS_CHOICES = (
+        (STATUS_PENDING, "Pending"),
+        (STATUS_REVIEWING, "Reviewing"),
+        (STATUS_APPROVED, "Approved"),
+        (STATUS_REJECTED, "Rejected"),
+    )
+
+    company = models.OneToOneField(
+        Company,
+        on_delete=models.CASCADE,
+        related_name="verification_request",
+    )
+    submitted_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="company_verification_submissions",
+    )
+    reviewed_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="company_verification_reviews",
+    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING, db_index=True)
+    legal_company_name = models.CharField(max_length=255, blank=True, default="")
+    tax_code = models.CharField(max_length=30, blank=True, default="")
+    business_license = models.CharField(max_length=255, blank=True, default="")
+    representative_name = models.CharField(max_length=100, blank=True, default="")
+    contact_phone = models.CharField(max_length=30, blank=True, default="")
+    contact_email = models.EmailField(max_length=100, blank=True, default="")
+    website = models.URLField(max_length=300, blank=True, default="")
+    verification_scheduled_at = models.DateTimeField(null=True, blank=True)
+    verification_contact_name = models.CharField(max_length=100, blank=True, default="")
+    verification_contact_phone = models.CharField(max_length=30, blank=True, default="")
+    verification_notes = models.TextField(blank=True, default="")
+    admin_note = models.TextField(blank=True, default="")
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = "project_info_company_verification"
+        indexes = [
+            models.Index(fields=["status", "-create_at"], name="idx_company_verif_status"),
+        ]
+
+    def __str__(self):
+        return f"{self.company.company_name} - {self.status}"
+
+
 class TrustReport(CommonBaseModel):
     TARGET_JOB = "job"
     TARGET_COMPANY = "company"
@@ -407,6 +463,12 @@ class ResumeSaved(CommonBaseModel):
         db_table = "project_info_resume_saved"
 
         verbose_name_plural = "Resumes saved"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["company", "resume"],
+                name="uq_resume_saved_company_resume",
+            ),
+        ]
 
     def __str__(self):
 
@@ -425,6 +487,12 @@ class ResumeViewed(CommonBaseModel):
         db_table = "project_info_resume_viewed"
 
         verbose_name_plural = "Resumes viewed"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["company", "resume"],
+                name="uq_resume_viewed_company_resume",
+            ),
+        ]
 
     def __str__(self):
 
@@ -441,6 +509,12 @@ class ContactProfile(CommonBaseModel):
         db_table = "project_info_contact_profile"
 
         verbose_name_plural = "Contact profiles"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["company", "resume"],
+                name="uq_contact_profile_company_resume",
+            ),
+        ]
 
     def __str__(self):
 

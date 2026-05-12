@@ -251,6 +251,13 @@ class EmployerJobPostActivityViewSet(
                 "type",
                 "jobName",
                 "status",
+                "statusName",
+                "hrmEmployeeId",
+                "hrmUserId",
+                "hrmSyncStatus",
+                "hrmSyncError",
+                "hrmSyncedAt",
+                "hrmEmployeeUrl",
                 "createAt",
                 "isSentEmail",
                 "resumeFileUrl",
@@ -363,10 +370,25 @@ class EmployerJobPostActivityViewSet(
 
             from ..services import JobActivityService
             try:
-                JobActivityService.change_application_status(job_post_activity, stt)
-                return var_res.response_data(status=status.HTTP_200_OK)
-            except InvalidApplicationStatusTransitionError:
-                return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
+                job_post_activity = JobActivityService.change_application_status(job_post_activity, stt)
+                serializer = self.get_serializer(
+                    job_post_activity,
+                    fields=[
+                        "id",
+                        "status",
+                        "statusName",
+                        "hrmEmployeeId",
+                        "hrmUserId",
+                        "hrmSyncStatus",
+                        "hrmEmployeeUrl",
+                    ],
+                )
+                return var_res.response_data(status=status.HTTP_200_OK, data=serializer.data)
+            except InvalidApplicationStatusTransitionError as exc:
+                return var_res.response_data(
+                    status=status.HTTP_400_BAD_REQUEST,
+                    errors={"errorMessage": [str(exc)]},
+                )
 
         return var_res.response_data(status=status.HTTP_400_BAD_REQUEST)
 

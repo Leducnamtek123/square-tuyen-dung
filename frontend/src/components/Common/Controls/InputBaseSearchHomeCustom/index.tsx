@@ -162,22 +162,37 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
       <div ref={inputSearchRef}>
         <Box
           sx={{
-            boxShadow: 'none',
+            minHeight: showSubmitButton ? 54 : 48,
+            boxShadow: '0 10px 26px rgba(26, 64, 125, 0.08)',
             borderRadius: 999,
-            p: '3px 4px',
+            p: '4px',
             display: 'flex',
             alignItems: 'center',
             width: '100%',
             backgroundColor: theme.palette.mode === 'light' ? 'white' : '#121212',
             border: '1px solid',
-            borderColor: 'rgba(26, 64, 125, 0.16)',
+            borderColor: 'rgba(26, 64, 125, 0.14)',
+            transition: 'border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease',
             '&:focus-within': {
               borderColor: theme.palette.primary.main,
-              boxShadow: '0 0 0 4px rgba(26, 64, 125, 0.08)',
+              boxShadow: '0 0 0 4px rgba(42, 169, 225, 0.16), 0 16px 34px rgba(26, 64, 125, 0.12)',
             },
           }}
         >
-          <SearchIcon color="disabled" />
+          <Box
+            sx={{
+              width: 38,
+              height: 38,
+              display: 'grid',
+              placeItems: 'center',
+              borderRadius: '50%',
+              color: 'primary.main',
+              bgcolor: 'rgba(42, 169, 225, 0.09)',
+              flexShrink: 0,
+            }}
+          >
+            <SearchIcon fontSize="small" />
+          </Box>
           <Controller
             name={name as Path<T>}
             control={control}
@@ -185,7 +200,19 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
               <InputBase
                 inputRef={inputRef}
                 id={field.name}
-                sx={{ ml: 1, flex: 1 }}
+                sx={{
+                  ml: 1.25,
+                  flex: 1,
+                  minWidth: 0,
+                  '& .MuiInputBase-input': {
+                    fontWeight: 600,
+                    color: 'text.primary',
+                    '&::placeholder': {
+                      color: 'text.secondary',
+                      opacity: 0.78,
+                    },
+                  },
+                }}
                 placeholder={placeholder}
                 slotProps={{ input: { 'aria-label': 'search' } }}
                 value={field.value ?? ''}
@@ -221,7 +248,21 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
             )}
           />
           {showSubmitButton && (
-            <Button variant="contained" type="submit" color="primary">
+            <Button
+              variant="contained"
+              type="submit"
+              color="primary"
+              startIcon={<SearchIcon />}
+              sx={{
+                flexShrink: 0,
+                minHeight: 44,
+                minWidth: { xs: 44, sm: 112 },
+                px: { xs: 1.5, sm: 2.5 },
+                '& .MuiButton-startIcon': {
+                  display: { xs: 'none', sm: 'inherit' },
+                },
+              }}
+            >
               {t('search.button')}
             </Button>
           )}
@@ -238,15 +279,16 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
               backgroundColor: 'white',
               py: 2,
               px: 2,
-              boxShadow: 4,
-              borderRadius: 1,
+              boxShadow: '0 22px 50px rgba(15, 57, 127, 0.18)',
+              border: '1px solid rgba(26, 64, 125, 0.1)',
+              borderRadius: 3,
               maxHeight: '60vh',
               overflowY: 'auto',
             }}
           >
             <Stack>
               <Box>
-                <Typography fontWeight="bold" fontSize={17} color="#2C95FF">
+                <Typography fontWeight={800} fontSize={15} color="primary.main">
                   {t('search.suggestions')}
                 </Typography>
                 <Stack>
@@ -265,11 +307,11 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                           key={value}
                           sx={{
                             '&:hover': {
-                              backgroundColor: '#E9F4FF',
+                              backgroundColor: 'rgba(42, 169, 225, 0.08)',
                             },
                             cursor: 'pointer',
-                            borderRadius: 1,
-                            px: 0.5,
+                            borderRadius: 2,
+                            px: 1,
                           }}
                           onClick={() => handleClickItem(value)}
                         >
@@ -286,7 +328,7 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
 
               {state.recentSearch.length > 0 && (
                 <Box>
-                  <Typography fontWeight="bold" fontSize={17} color="#2C95FF">
+                  <Typography fontWeight={800} fontSize={15} color="primary.main">
                     {t('search.recent')}
                   </Typography>
                   <Stack>
@@ -296,11 +338,11 @@ const InputBaseSearchHomeCustom = <T extends FieldValues = FieldValues>({
                           key={value}
                           sx={{
                             '&:hover': {
-                              backgroundColor: '#E9F4FF',
+                              backgroundColor: 'rgba(42, 169, 225, 0.08)',
                             },
                             cursor: 'pointer',
-                            borderRadius: 1,
-                            px: 0.5,
+                            borderRadius: 2,
+                            px: 1,
                           }}
                           onClick={() => handleClickItem(value)}
                         >

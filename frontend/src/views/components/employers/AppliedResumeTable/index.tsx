@@ -18,6 +18,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import DescriptionIcon from '@mui/icons-material/Description';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import DownloadIcon from '@mui/icons-material/Download';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import type { ColumnDef, PaginationState, SortingState, OnChangeFn } from '@tanstack/react-table';
 
 import AIAnalysisDrawer, { AIAnalysisData } from '../AIAnalysisDrawer';
@@ -37,6 +38,7 @@ interface AppliedResumeTableProps {
   isLoading: boolean;
   handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;
   handleDelete: (id: string | number) => void;
+  onCreateEmployee?: (activity: JobPostActivity) => void;
   onAnalysisStateChange?: (id: string | number, nextState: Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>) => void;
   rowCount: number;
   pagination: PaginationState;
@@ -53,6 +55,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
     isLoading, 
     handleChangeApplicationStatus, 
     handleDelete,
+    onCreateEmployee,
     onAnalysisStateChange,
     rowCount,
     pagination,
@@ -255,6 +258,42 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
             fullName={info.row.original.fullName || ''}
           />
 
+          {info.row.original.hrmEmployeeId ? (
+            <Tooltip title={t('employees.hrm.convert.openEmployee', { defaultValue: 'Open Frappe HR employee profile' })} arrow>
+              <IconButton
+                size="small"
+                color="primary"
+                onClick={() => {
+                  if (info.row.original.hrmEmployeeUrl) {
+                    window.open(info.row.original.hrmEmployeeUrl, '_blank', 'noopener,noreferrer');
+                  }
+                }}
+                sx={{
+                  bgcolor: pc.primary(0.06),
+                  borderRadius: 1.5,
+                  '&:hover': { bgcolor: pc.primary(0.12) }
+                }}
+              >
+                <PersonAddAltIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          ) : ([4, 5].includes(Number(info.row.original.status)) && onCreateEmployee && (
+            <Tooltip title={t('employees.hrm.convert.action')} arrow>
+              <IconButton
+                size="small"
+                color="success"
+                onClick={() => onCreateEmployee(info.row.original)}
+                sx={{
+                  bgcolor: pc.success(0.06),
+                  borderRadius: 1.5,
+                  '&:hover': { bgcolor: pc.success(0.12) }
+                }}
+              >
+                <PersonAddAltIcon fontSize="small" />
+              </IconButton>
+            </Tooltip>
+          ))}
+
           <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
             <IconButton
               size="small"
@@ -272,7 +311,7 @@ const AppliedResumeTable: React.FC<AppliedResumeTableProps> = (props) => {
         </Stack>
       ),
     },
-  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, push]);
+  ], [t, allConfig, handleChangeApplicationStatus, handleDelete, onCreateEmployee, push]);
 
   return (
     <>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid2 as Grid, Box, Stack, Button, Typography, Divider } from '@mui/material';
+import { Grid2 as Grid, Box, Stack, Button, Typography, Chip } from '@mui/material';
 import PublishIcon from '@mui/icons-material/Publish';
 import NoDataCard from '../../../../components/Common/NoDataCard';
 import ProfileUploadCard from '../../../../components/Common/ProfileUploadCard';
@@ -30,15 +30,49 @@ const LOADING_KEYS = ['loading-1', 'loading-2', 'loading-3'];
 const ProfileUploadResumeGrid = ({ resumes, isLoadingResumes, title, t, onOpenPopup, onDelete, onActive }: Props) => {
   return (
     <>
-      <Box>
-        <Typography variant="h5">
-          {title} (<span style={{ color: 'red' }}>{resumes.length}</span>)
-        </Typography>
+      <Box
+        sx={{
+          mb: 3,
+          p: { xs: 2, sm: 2.5 },
+          borderRadius: 4,
+          border: '1px solid rgba(26, 64, 125, 0.1)',
+          backgroundColor: 'background.paper',
+          boxShadow: '0 10px 28px rgba(15, 57, 127, 0.07)',
+        }}
+      >
+        <Stack
+          direction={{ xs: 'column', sm: 'row' }}
+          spacing={2}
+          justifyContent="space-between"
+          alignItems={{ xs: 'stretch', sm: 'center' }}
+        >
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0 }}>
+            <Typography variant="h5" sx={{ fontWeight: 800, color: 'text.primary' }}>
+              {title}
+            </Typography>
+            <Chip
+              label={resumes.length}
+              color="primary"
+              size="small"
+              sx={{ fontWeight: 800, minWidth: 34 }}
+            />
+          </Stack>
+          <Button
+            variant="contained"
+            startIcon={<PublishIcon />}
+            onClick={onOpenPopup}
+            sx={{
+              width: { xs: '100%', sm: 'auto' },
+              justifyContent: 'center',
+              px: 3,
+            }}
+          >
+            {t('jobSeeker:attachedProfile.sidebar.cv')}
+          </Button>
+        </Stack>
       </Box>
 
-      <Divider sx={{ mt: 2, mb: 3, borderColor: 'grey.500' }} />
-
-      <Box sx={{ px: 1 }}>
+      <Box>
         {isLoadingResumes ? (
           <Grid container spacing={2}>
             {LOADING_KEYS.map((loadingKey) => (
@@ -75,25 +109,6 @@ const ProfileUploadResumeGrid = ({ resumes, isLoadingResumes, title, t, onOpenPo
           </Grid>
         )}
       </Box>
-
-      <Stack sx={{ pt: 5 }} direction="row" justifyContent="center">
-        <Button
-          variant="contained"
-          startIcon={<PublishIcon />}
-          onClick={onOpenPopup}
-          sx={{
-            px: 4,
-            py: 1.5,
-            background: (theme) => theme.palette.primary.main,
-            '&:hover': {
-              background: (theme) => theme.palette.primary.main,
-              opacity: 0.9,
-            },
-          }}
-        >
-          {t('jobSeeker:attachedProfile.sidebar.cv')}
-        </Button>
-      </Stack>
     </>
   );
 };

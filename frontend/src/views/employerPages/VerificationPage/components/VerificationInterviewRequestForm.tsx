@@ -4,6 +4,7 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { type Dayjs } from 'dayjs';
+import { useTranslation } from 'react-i18next';
 
 interface RequestedInterview {
   id: string;
@@ -14,7 +15,6 @@ interface RequestedInterview {
 }
 
 interface Props {
-  t: (key: string) => string;
   interviewRequest: {
     scheduledAt: Dayjs | null;
     contactName: string;
@@ -25,9 +25,12 @@ interface Props {
   onDateChange: (value: Dayjs | null) => void;
   onSubmit: (event: React.FormEvent) => void;
   statusText: string;
+  loading?: boolean;
 }
 
-const VerificationInterviewRequestForm = ({ t, interviewRequest, onTextChange, onDateChange, onSubmit, statusText }: Props) => {
+const VerificationInterviewRequestForm = ({ interviewRequest, onTextChange, onDateChange, onSubmit, statusText, loading }: Props) => {
+  const { t } = useTranslation('employer');
+
   return (
     <Card sx={{ p: 3, mb: 3 }}>
       <Typography variant="h6" sx={{ fontWeight: 600 }}>
@@ -60,7 +63,7 @@ const VerificationInterviewRequestForm = ({ t, interviewRequest, onTextChange, o
           ))}
         </Grid>
         <Box sx={{ mt: 2, display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-          <Button type="submit" variant="contained">{t('verification.step3.requestBtn')}</Button>
+          <Button type="submit" variant="contained" disabled={loading}>{t('verification.step3.requestBtn')}</Button>
           <Chip label={statusText} color="success" />
         </Box>
       </Box>

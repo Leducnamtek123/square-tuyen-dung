@@ -3,13 +3,11 @@ import React from 'react';
 import { Box, Button, Card, Chip, Typography } from '@mui/material';
 import { ROUTES } from '../../../../configs/constants';
 import { useRouter } from 'next/navigation';
+import { useTranslation } from 'react-i18next';
 
-interface Props {
-  t: (key: string) => string;
-}
-
-const VerificationIntroCard = ({ t }: Props) => {
+const VerificationIntroCard = () => {
   const { push } = useRouter();
+  const { t } = useTranslation('employer');
 
   return (
     <Card sx={{ p: 3, mb: 3 }}>

@@ -1,8 +1,3 @@
-
-from django.core.exceptions import BadRequest
-
-from shared.configs import variable_system as var_sys
-
 from shared.configs.messages import ERROR_MESSAGES, SYSTEM_MESSAGES
 
 from shared.helpers import helper
@@ -17,22 +12,16 @@ def custom_social_user(strategy, details, user=None, *args, **kwargs):
 
         return {'is_new': False}
 
-    # Check if the user exists in your local database based on their email address
+    # Check if the user exists in your local database based on their email address.
+    # Existing accounts are allowed to link a social provider during login.
 
     email = details.get('email')
 
     if email:
 
-        try:
+        user = User.objects.filter(email__iexact=email).first()
 
-            user = User.objects.get(email=email)
-
-            # check if the current user is an employer or not
-
-            if user.role_name == var_sys.EMPLOYER:
-
-                raise BadRequest(ERROR_MESSAGES['SOCIAL_EMAIL_EXISTS'])
-
+        if user:
             return {
 
                 'is_new': False,
@@ -40,10 +29,6 @@ def custom_social_user(strategy, details, user=None, *args, **kwargs):
                 'user': user
 
             }
-
-        except User.DoesNotExist:
-
-            pass
 
     return {
 

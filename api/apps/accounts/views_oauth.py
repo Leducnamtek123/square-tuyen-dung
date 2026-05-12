@@ -51,6 +51,28 @@ def _build_oauth_request(request, payload):
     return oauth_request
 
 
+def _can_login_as_role(user, role_name_input):
+    if not role_name_input:
+        return True
+
+    if user.role_name == role_name_input:
+        return True
+
+    if role_name_input == var_sys.EMPLOYER:
+        try:
+            from apps.profiles.models import CompanyMember
+
+            return CompanyMember.objects.filter(
+                user=user,
+                is_active=True,
+                status=CompanyMember.STATUS_ACTIVE,
+            ).exists()
+        except Exception:
+            return False
+
+    return False
+
+
 class CustomTokenView(TokenView):
     def post(self, request, *args, **kwargs):
         mutable_data = request.data.copy()
@@ -73,20 +95,7 @@ class CustomTokenView(TokenView):
                 if access_token is not None:
                     token = get_access_token_model().objects.get(token=access_token)
 
-                    role_name = token.user.role_name
-                    allow_login = role_name == role_name_input
-                    
-                    if role_name_input == var_sys.EMPLOYER and not allow_login:
-                        try:
-                            from apps.profiles.models import CompanyMember
-
-                            allow_login = CompanyMember.objects.filter(
-                                user=token.user,
-                                is_active=True,
-                                status=CompanyMember.STATUS_ACTIVE,
-                            ).exists()
-                        except Exception:
-                            allow_login = False
+                    allow_login = _can_login_as_role(token.user, role_name_input)
                             
                     # C5 Fix: If a non-admin tries to login as ADMIN, log it and block explicitly
                     if role_name_input == var_sys.ADMIN and not allow_login:
@@ -204,6 +213,10 @@ class CustomConvertTokenView(ConvertTokenView):
             mutable_data = request.data.copy()
             request_data = mutable_data.copy()
             redirect_uri = request_data.pop("redirect_uri", None)
+            role_name_input = request_data.pop(
+                "role_name",
+                request_data.pop("roleName", None),
+            )
 
             # If backend is google-oauth2, get access token from code
             # If Facebook doesn't need to get access token, because it's using access token
@@ -236,7 +249,38 @@ class CustomConvertTokenView(ConvertTokenView):
                         },
                     )
 
+                return response_data(
+                    status=stt,
+                    errors={
+                        "errorMessage": [
+                            error_description or ERROR_MESSAGES["LOGIN_ERROR"]
+                        ]
+                    },
+                )
+
             res_data = json.loads(body)
+
+            if stt == status.HTTP_200_OK and role_name_input:
+                access_token = res_data.get("access_token")
+                if access_token:
+                    token = get_access_token_model().objects.get(token=access_token)
+                    allow_login = _can_login_as_role(token.user, role_name_input)
+
+                    if role_name_input == var_sys.ADMIN and not allow_login:
+                        logger.warning(
+                            "Suspicious ADMIN social login attempt from non-admin user ID: %s",
+                            token.user.id,
+                        )
+
+                    if not allow_login:
+                        return response_data(
+                            status=status.HTTP_400_BAD_REQUEST,
+                            errors={
+                                "errorMessage": [
+                                    ERROR_MESSAGES["LOGIN_ERROR"]
+                                ]
+                            },
+                        )
 
             res_data["backend"] = mutable_data["backend"]
 

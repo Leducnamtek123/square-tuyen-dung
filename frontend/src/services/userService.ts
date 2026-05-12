@@ -25,6 +25,10 @@ const userService = {
     const url = `auth/users/${id}/toggle-active/`;
     return httpRequest.post(url) as Promise<UserModel>;
   },
+  bulkStatus: (ids: IdType[], isActive: boolean): Promise<{ updated: number; isActive: boolean }> => {
+    const url = 'auth/users/bulk-status/';
+    return httpRequest.post(url, { ids, isActive }) as Promise<{ updated: number; isActive: boolean }>;
+  },
   deleteUser: (id: IdType): Promise<void> => {
     const url = `auth/users/${id}/`;
     return httpRequest.delete(url);

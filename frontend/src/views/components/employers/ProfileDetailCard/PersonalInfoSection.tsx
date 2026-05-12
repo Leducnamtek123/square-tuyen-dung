@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Grid2 as Grid, Stack, alpha, useTheme } from '@mui/material';
+import { Box, Typography, Grid2 as Grid, Stack } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import PersonIcon from '@mui/icons-material/Person';
 import PhoneIcon from '@mui/icons-material/Phone';
@@ -23,29 +23,30 @@ interface PersonalInfoSectionProps {
 
 const PersonalInfoSection: React.FC<PersonalInfoSectionProps> = ({ profileDetail }) => {
     const { t } = useTranslation(['employer', 'common']);
-    const theme = useTheme();
     const { allConfig } = useConfig();
 
     return (
         <Box>
-            <Stack direction="row" alignItems="center" spacing={2} mb={4}>
+            <Stack direction="row" alignItems="center" spacing={1.5} mb={2.5}>
                 <Box 
                     sx={{ 
-                        p: 1.25, 
+                        width: 40,
+                        height: 40,
                         borderRadius: 2, 
                         bgcolor: pc.primary( 0.1),
                         color: 'primary.main',
-                        display: 'flex'
+                        display: 'grid',
+                        placeItems: 'center',
                     }}
                 >
-                    <PersonIcon sx={{ fontSize: 28 }} />
+                    <PersonIcon sx={{ fontSize: 22 }} />
                 </Box>
-                <Typography variant="h5" sx={{ fontWeight: 900, color: 'text.primary', letterSpacing: '-0.5px' }}>
+                <Typography variant="h6" sx={{ fontWeight: 1000, color: 'text.primary' }}>
                     {t('profileDetailCard.title.personalInfo')}
                 </Typography>
             </Stack>
 
-            <Grid container spacing={4}>
+            <Grid container spacing={1.5}>
                 <Grid size={{ xs: 12, sm: 6, md: 4 }}>
                     <InfoItem 
                         label={t('common:labels.email')} 

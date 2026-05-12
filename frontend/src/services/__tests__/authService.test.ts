@@ -108,15 +108,16 @@ describe('authService', () => {
       expect(httpRequest.get).toHaveBeenCalledWith('auth/settings/');
     });
 
-    it('convertToken calls post with optional redirectUri', async () => {
-      await authService.convertToken('client', 'secret', 'google', 'token', 'uri');
+    it('convertToken calls post with optional redirectUri and roleName', async () => {
+      await authService.convertToken('client', 'secret', 'google-oauth2', 'token', 'uri', 'EMPLOYER');
       expect(httpRequest.post).toHaveBeenCalledWith('auth/convert-token/', {
         grant_type: 'convert_token',
         client_id: 'client',
         client_secret: 'secret',
-        backend: 'google',
+        backend: 'google-oauth2',
         token: 'token',
-        redirect_uri: 'uri'
+        redirect_uri: 'uri',
+        role_name: 'EMPLOYER'
       });
     });
 

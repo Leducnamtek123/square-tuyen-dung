@@ -45,9 +45,15 @@ const withPresign = async <T>(promise: Promise<T>): Promise<T> => {
 
 const jobPostActivityService = {
   // job seeker
-  applyJob: (data: ApplyJobPayload): Promise<ActionResponse> => {
+  applyJob: ({ jobPost, resume, fullName, email, phone }: ApplyJobPayload): Promise<ActionResponse> => {
     const url = 'job/web/job-seeker-job-posts-activity/';
-    return httpRequest.post(url, data);
+    return httpRequest.post(url, {
+      job_post: jobPost,
+      resume,
+      fullName,
+      email,
+      phone,
+    });
   },
 
   getJobPostActivity: (params: JobPostActivityListParams = {}): Promise<PaginatedResponse<JobPostActivity>> => {

@@ -49,6 +49,26 @@ const HOST_NAME = {
     : `admin.${BASE_HOSTNAME}`,
 } as const;
 
+const getSquareHrmPublicUrl = (): string => {
+  const configured = process.env.NEXT_PUBLIC_FRAPPE_HR_PUBLIC_URL?.trim().replace(/\/$/, '');
+  if (configured) return configured;
+
+  if (BASE_HOSTNAME === 'localhost' || BASE_HOSTNAME === '127.0.0.1') {
+    return 'http://localhost:8081';
+  }
+
+  if (BASE_HOSTNAME === 'tuyendung.square.vn') {
+    return 'https://hrm.square.vn';
+  }
+
+  return `https://hrm.${BASE_HOSTNAME}`;
+};
+
+const SQUARE_HRM = {
+  PUBLIC_URL: getSquareHrmPublicUrl(),
+  ADMIN_URL: `${getSquareHrmPublicUrl()}/app`,
+} as const;
+
 const AUTH_PROVIDER = {
   FACEBOOK: 'facebook',
   GOOGLE: 'google-oauth2',
@@ -123,6 +143,7 @@ const LINKS = {
   TWITTER_LINK: 'https://twitter.com/HuyBuiKhanh',
   YOUTUBE_LINK: 'https://www.youtube.com/channel/UCn49BvcP1w1mamaOSGTKVZw',
   WEBSITE_LINK: 'https://sqstudio.vn/',
+  SQUARE_HRM_ADMIN_LINK: SQUARE_HRM.ADMIN_URL,
 } as const;
 
 const BANNER_TYPES = {
@@ -140,6 +161,7 @@ export {
   PLATFORM,
   APP_NAME,
   HOST_NAME,
+  SQUARE_HRM,
   AUTH_PROVIDER,
   AUTH_CONFIG,
   ROLES_NAME,

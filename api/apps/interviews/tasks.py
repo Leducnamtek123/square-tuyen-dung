@@ -67,6 +67,23 @@ def _extract_json_object(raw_content: str) -> str:
     return content[start : end + 1]
 
 
+def _mark_evaluation_unavailable(session: InterviewSession, reason: str):
+    old_status = session.status
+    session.status = "completed"
+    session.ai_summary = reason
+    session.save(update_fields=["status", "ai_summary", "update_at"])
+
+    if old_status == "processing":
+        broadcast_interview_event(session.id, "status_changed", {
+            "sessionId": session.id,
+            "oldStatus": "processing",
+            "newStatus": "completed",
+            "startTime": session.start_time.isoformat() if session.start_time else None,
+            "endTime": session.end_time.isoformat() if session.end_time else None,
+            "duration": session.duration,
+        })
+
+
 @shared_task
 def end_interview_session(session_id, reason="max_duration"):
     """Force-end an interview session and delete the LiveKit room."""
@@ -88,14 +105,15 @@ def end_interview_session(session_id, reason="max_duration"):
         # Update Candidate Pipeline to INTERVIEWED if applicable
         try:
             from apps.jobs.models import JobPostActivity
+            from shared.configs.variable_system import ApplicationStatus
             activity = JobPostActivity.objects.filter(
                 user=session.candidate, 
                 job_post=session.job_post, 
                 is_deleted=False
             ).first()
-            if activity:
-                activity.status = 4  # INTERVIEWED
-                activity.save(update_fields=['status'])
+            if activity and activity.status not in (ApplicationStatus.HIRED, ApplicationStatus.NOT_SELECTED):
+                activity.status = ApplicationStatus.INTERVIEWED
+                activity.save(update_fields=['status', 'update_at'])
         except Exception as err:
             logger.error("Could not update JobPostActivity pipeline for session %s: %s", session_id, err)
 
@@ -222,7 +240,7 @@ def send_evaluation_report(session_id):
             return
 
         web_url = config("WEB_CLIENT_URL", default="http://localhost:3002")
-        report_url = f"{web_url}/employer/interview-list/{session.id}"
+        report_url = f"{web_url}/employer/interviews/{session.id}"
 
         context = {
             "candidate_name": session.candidate.full_name,
@@ -258,6 +276,10 @@ def evaluate_interview_session(self, session_id):
 
         if not transcripts:
             logger.warning("Session %s has no transcripts to evaluate.", session_id)
+            _mark_evaluation_unavailable(
+                session,
+                "AI evaluation could not run because this interview has no transcript.",
+            )
             return None
 
         history_text = ""
@@ -286,8 +308,8 @@ Hãy trả về kết quả DƯỚI DẠNG JSON với các trường:
 Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
 """
 
-        llm_base_url = config("LLM_BASE_URL", default=config("OLLAMA_BASE_URL", default="http://ollama:11434/v1"))
-        model_alias = config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b"))
+        llm_base_url = config("AI_LLM_BASE_URL", default=config("LLM_BASE_URL", default=config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")))
+        model_alias = config("AI_LLM_MODEL", default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b")))
 
         payload = {
             "model": model_alias,
@@ -314,6 +336,10 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
 
         if resp.status_code != 200:
             logger.error("LLM API call failed with status %s: %s", resp.status_code, resp.text)
+            _mark_evaluation_unavailable(
+                session,
+                "AI evaluation service returned an error. Please check AI readiness and try again.",
+            )
             return None
 
         content = resp.json()["choices"][0]["message"]["content"]
@@ -362,16 +388,10 @@ Lưu ý: chỉ trả về 1 JSON object hợp lệ, không thêm giải thích.
     try:
         session = InterviewSession.objects.get(id=session_id)
         if session.status == "processing":
-            session.status = "completed"
-            session.save(update_fields=["status", "update_at"])
-            broadcast_interview_event(session.id, "status_changed", {
-                "sessionId": session.id,
-                "oldStatus": "processing",
-                "newStatus": "completed",
-                "startTime": session.start_time.isoformat() if session.start_time else None,
-                "endTime": session.end_time.isoformat() if session.end_time else None,
-                "duration": session.duration,
-            })
+            _mark_evaluation_unavailable(
+                session,
+                "AI evaluation failed before producing a valid report. Please check AI service logs.",
+            )
     except Exception as e2:
         logger.error("Failed to revert session %s status to completed: %s", session_id, e2)
 
@@ -414,8 +434,10 @@ def auto_schedule_screening_interview(activity_id: int):
         
         # Move pipeline to "Tested" to indicate an assessment was sent? Or leave in Pending
         # Let's move it to "Contacted" (2) since we contacted them with an assessment
-        activity.status = 2 # CONTACTED
-        activity.save(update_fields=['status'])
+        from shared.configs.variable_system import ApplicationStatus
+        if activity.status == ApplicationStatus.PENDING_CONFIRMATION:
+            activity.status = ApplicationStatus.CONTACTED
+            activity.save(update_fields=['status', 'update_at'])
         
         # Send Email
         send_interview_invitation.delay(session.id)

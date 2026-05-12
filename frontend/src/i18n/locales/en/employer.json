@@ -639,7 +639,12 @@
     "employerVerification": "Employer Verification",
     "account": "Account",
     "settings": "Settings",
-    "employeeRoles": "Employees & Roles"
+    "employeeRoles": "Employees & Roles",
+    "hrm": "HRM",
+    "hrmEmployees": "Employee records",
+    "hrmRoles": "Roles & permissions",
+      "hrmMembers": "Company members",
+      "squareHrmAdmin": "Open Square HRM"
   },
   "interviewHistory": {
     "title": "Video Library",
@@ -745,10 +750,18 @@
       "description": "Admin will confirm the interview schedule and send room participation information.",
       "timeLabel": "Desired Time",
       "contactPerson": "Contact Person",
+      "contactName": "Contact Person",
       "contactPhone": "Contact Phone Number",
       "notes": "Notes",
       "sendRequestBtn": "Send Interview Request",
+      "requestBtn": "Send Interview Request",
       "statusLabel": "Status: {{status}}"
+    },
+    "status": {
+      "pending": "Pending review",
+      "reviewing": "Reviewing",
+      "approved": "Approved",
+      "rejected": "Rejected"
     },
     "submittedSchedules": {
       "title": "Submitted Interview Schedules",
@@ -760,7 +773,9 @@
     "messages": {
       "infoRecorded": "Information recorded.",
       "noScheduleYet": "No schedule yet",
-      "waitingConfirmation": "Waiting for confirmation"
+      "waitingConfirmation": "Waiting for confirmation",
+      "profileSaved": "Legal profile saved.",
+      "requestSubmitted": "Verification interview request submitted."
     }
   },
   "profileDetailCard": {
@@ -993,12 +1008,228 @@
       "trends_desc": "Content is being updated to bring useful information."
     }
   },
+  "employeePortal": {
+    "sidebar": {
+      "dashboard": "My dashboard",
+      "profile": "My profile",
+      "onboarding": "Onboarding",
+      "contracts": "Contracts",
+      "reviews": "Reviews",
+      "timeline": "Timeline"
+    },
+    "common": {
+      "progress": "progress",
+      "activeContract": "Active contract",
+      "latestReview": "Latest review"
+    },
+    "metrics": {
+      "openTasks": "Open tasks",
+      "completedTasks": "Completed tasks",
+      "contracts": "Contracts",
+      "reviews": "Reviews"
+    },
+    "dashboard": {
+      "nextTasks": "Next tasks",
+      "status": "Employment status"
+    },
+    "profile": {
+      "title": "My profile",
+      "save": "Save profile"
+    },
+    "onboarding": {
+      "title": "Onboarding and training",
+      "evidence": "Evidence or note",
+      "start": "Start",
+      "done": "Mark done"
+    },
+    "contracts": {
+      "title": "My contracts"
+    },
+    "reviews": {
+      "title": "My reviews"
+    },
+    "timeline": {
+      "title": "My timeline"
+    },
+    "taskStatuses": {
+      "TODO": "To do",
+      "IN_PROGRESS": "In progress",
+      "DONE": "Done",
+      "WAIVED": "Waived"
+    },
+    "empty": {
+      "noProfile": "No employee profile is linked to this account.",
+      "noTasks": "No tasks assigned.",
+      "noContracts": "No contracts yet.",
+      "noReviews": "No reviews yet.",
+      "noTimeline": "No timeline events yet."
+    },
+    "toast": {
+      "profileUpdated": "Profile updated",
+      "profileUpdateError": "Failed to update profile",
+      "taskUpdated": "Task updated",
+      "taskUpdateError": "Failed to update task"
+    }
+  },
   "employees": {
-    "pageTitle": "Company Personnel Management",
-    "pageDescription": "Manage roles, add employees, and assign roles directly.",
+    "pageTitle": "HRM",
+    "pageDescription": "Manage employee records, roles, company members, and HRM access.",
+    "sections": {
+      "employees": {
+        "title": "Employee records",
+        "description": "Track employees, employment status, portal access, and onboarding progress."
+      },
+      "roles": {
+        "title": "Roles & permissions",
+        "description": "Define permissions for recruiters, HR staff, and company administrators."
+      },
+      "members": {
+        "title": "Company members",
+        "description": "Manage user accounts that can access this company workspace."
+      }
+    },
+    "hrm": {
+      "addEmployee": "Add Employee",
+      "kpi": {
+        "total": "Total employees",
+        "onboarding": "Onboarding / probation",
+        "active": "Active",
+        "overdue": "Overdue training tasks"
+      },
+      "filters": {
+        "search": "Search employees",
+        "status": "Status",
+        "allStatuses": "All statuses"
+      },
+      "fields": {
+        "fullName": "Full name",
+        "email": "Email",
+        "phone": "Phone",
+        "jobTitle": "Job title",
+        "department": "Department",
+        "employmentType": "Employment type",
+        "status": "Status",
+        "startDate": "Start date",
+        "probationEndDate": "Probation end date",
+        "notes": "Notes"
+      },
+      "statuses": {
+        "PREBOARDING": "Preboarding",
+        "ONBOARDING": "Onboarding",
+        "PROBATION": "Probation",
+        "ACTIVE": "Active",
+        "OFFBOARDING": "Offboarding",
+        "EXITED": "Exited"
+      },
+      "employmentTypes": {
+        "full_time": "Full time",
+        "part_time": "Part time",
+        "contractor": "Contractor",
+        "intern": "Intern",
+        "probation": "Probation"
+      },
+      "reviewResults": {
+        "pass": "Pass",
+        "needs_training": "Needs training",
+        "fail": "Fail"
+      },
+      "portalStatuses": {
+        "NO_ACCOUNT": "No account",
+        "LINKED": "Linked",
+        "ACTIVE": "Portal active"
+      },
+      "table": {
+        "code": "Code",
+        "employee": "Employee",
+        "jobTitle": "Job title",
+        "department": "Department",
+        "status": "Status",
+        "portal": "Portal",
+        "training": "Training",
+        "trainingProgress": "{{progress}}% done • {{overdue}} overdue",
+        "viewDetail": "View employee detail",
+        "enablePortal": "Enable employee portal",
+        "empty": "No employees yet"
+      },
+      "dialog": {
+        "addTitle": "Add Employee",
+        "create": "Create employee"
+      },
+      "toast": {
+        "createEmployeeSuccess": "Employee created",
+        "createEmployeeError": "Failed to create employee",
+        "portalAccessSuccess": "Employee portal access enabled",
+        "portalAccessError": "Failed to enable employee portal access"
+      },
+      "convert": {
+        "action": "Send to Frappe HR",
+        "openEmployee": "Open Frappe HR profile",
+        "title": "Send candidate to Frappe HR",
+        "submit": "Send to Frappe HR",
+        "createFrappeAccount": "Create Frappe HR account",
+        "sendWelcomeEmail": "Send Frappe welcome email",
+        "roles": "Frappe roles",
+        "success": "Candidate sent to Frappe HR",
+        "error": "Failed to send this application to Frappe HR"
+      },
+      "detail": {
+        "back": "Back to employees",
+        "training": "training",
+        "notFound": "Employee not found",
+        "tabs": {
+          "overview": "Overview",
+          "training": "Onboarding & Training",
+          "reviews": "Reviews",
+          "contracts": "Contracts",
+          "offboarding": "Offboarding",
+          "timeline": "Timeline"
+        },
+        "overviewTitle": "Employee Overview",
+        "transitionTitle": "Lifecycle transition",
+        "transitionNote": "Transition note",
+        "applyTransition": "Apply",
+        "transitionSuccess": "Employee status updated",
+        "transitionError": "Invalid employee status transition",
+        "enablePortal": "Enable portal",
+        "portalAccessSuccess": "Employee portal access enabled",
+        "portalAccessError": "Failed to enable employee portal access",
+        "taskUpdateSuccess": "Task updated",
+        "taskUpdateError": "Failed to update task",
+        "done": "Done",
+        "waive": "Waive",
+        "newReview": "New Review",
+        "reviewType": "Review type",
+        "result": "Result",
+        "strengths": "Strengths",
+        "improvements": "Improvements",
+        "nextTrainingActions": "Next training actions",
+        "createReview": "Create review",
+        "reviewCreateSuccess": "Review created",
+        "reviewCreateError": "Failed to create review",
+        "newContract": "New Contract",
+        "contractType": "Contract type",
+        "endDate": "End date",
+        "baseSalary": "Base salary",
+        "workingTime": "Working time",
+        "createContract": "Create contract",
+        "contractCreateSuccess": "Contract created",
+        "contractCreateError": "Failed to create contract",
+        "offboardingTitle": "Offboarding",
+        "offboardingDesc": "Move the employee through offboarding and mark exited when final handover is complete.",
+        "startOffboarding": "Start offboarding",
+        "markExited": "Mark exited",
+        "offboardingNote": "Offboarding started.",
+        "exitedNote": "Employee exited.",
+        "timelineNote": "Timeline note",
+        "addTimelineNote": "Add note",
+        "timelineNoteSuccess": "Timeline note added",
+        "timelineNoteError": "Failed to add timeline note"
+      }
+    },
     "addRole": "Add Role",
     "addMember": "Add Member",
     "tabs": {
+      "employees": "Employees",
       "roles": "Roles",
       "members": "Members"
     },
@@ -1034,6 +1265,11 @@
       "statusLabel": "Status",
       "invitedEmailLabel": "Invited email (optional)",
       "createMember": "Add Member"
+    },
+    "memberStatus": {
+      "active": "Active",
+      "invited": "Invited",
+      "disabled": "Disabled"
     },
     "toast": {
       "createRoleSuccess": "Role created successfully",

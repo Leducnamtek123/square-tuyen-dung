@@ -23,6 +23,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import interviewService from '../../../services/interviewService';
 import { type InterviewSession } from '../../../types/models';
 import InterviewLiveCandidateCard from '../../../views/components/employers/InterviewLiveCandidateCard';
+import AIServiceHealthBanner from '../../../components/Features/AIServiceHealthBanner';
 import pc from '@/utils/muiColors';
 
 const ACTIVE_STATUSES = new Set(['in_progress', 'calibration', 'connecting', 'active', 'interrupted']);
@@ -194,6 +195,8 @@ const InterviewLivePage = () => {
           </Button>
         </Stack>
       </Stack>
+
+      <AIServiceHealthBanner />
 
       {state.error && (
         <Alert

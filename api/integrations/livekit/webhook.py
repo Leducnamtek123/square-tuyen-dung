@@ -1,7 +1,6 @@
 import json
 import logging
 from collections.abc import Mapping, Sequence
-from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
 from django.conf import settings
@@ -10,18 +9,19 @@ from django.views.decorators.csrf import csrf_exempt
 
 from apps.interviews.models import InterviewSession
 from apps.interviews.services import update_interview_status
-from apps.interviews.livekit_service import LiveKitService
+from config.django_threading import run_django_sync_in_thread
 
 logger = logging.getLogger("livekit.webhook")
-
-_THREAD_POOL = ThreadPoolExecutor(max_workers=4)
-
 
 _URL_KEYS = ("recording_url", "recordingUrl", "recordingURL", "file_url", "fileUrl", "url", "downloadUrl")
 _ROOM_KEYS = ("roomName", "room_name", "room")
 _EGRESS_KEYS = ("egressInfo", "egress_info", "egress", "recording")
 _FILE_RESULT_KEYS = ("fileResults", "file_results")
 _FILE_URL_KEYS = ("location", "url", "fileUrl", "file_url", "downloadUrl", "filepath", "path")
+
+
+def _run_in_thread(func, *args, **kwargs):
+    return run_django_sync_in_thread(func, *args, **kwargs)
 
 
 def _get_attr_or_item(node: Any, key: str, default: Any = None) -> Any:
@@ -39,9 +39,6 @@ def _iter_nodes(value: Any) -> list[Any]:
         return list(value)
     return [value]
 
-
-def _run_in_thread(func, *args, **kwargs):
-    return _THREAD_POOL.submit(func, *args, **kwargs).result()
 
 def _parse_json(raw: bytes) -> dict[str, Any]:
     if not raw:
@@ -130,7 +127,6 @@ def _handle_livekit_event(payload: Any) -> None:
         if session.status in {"draft", "scheduled", "calibration", "processing", "interrupted"}:
             update_interview_status(session, "in_progress")
             logger.info("LiveKit webhook: session %s marked in_progress", session.id)
-            _run_in_thread(LiveKitService.start_recording, session.room_name)
     elif event in {"room_finished", "room_ended", "room_stopped", "room_disconnected"}:
         if session.status not in {"completed", "cancelled"}:
             update_interview_status(session, "interrupted")
@@ -207,7 +203,7 @@ def livekit_webhook(request: HttpRequest):
             )
 
     try:
-        _handle_livekit_event(payload)
+        _run_in_thread(_handle_livekit_event, payload)
     except Exception as exc:
         logger.warning("LiveKit webhook handling error: %s", exc)
 

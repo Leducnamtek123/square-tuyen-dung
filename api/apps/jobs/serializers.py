@@ -406,6 +406,16 @@ class JobSeekerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSe
 
     ], read_only=True)
 
+    def to_internal_value(self, data):
+        if hasattr(data, "copy"):
+            data = data.copy()
+        else:
+            data = dict(data)
+
+        if "jobPost" in data and "job_post" not in data:
+            data["job_post"] = data.get("jobPost")
+
+        return super().to_internal_value(data)
 
     def validate(self, attrs):
         job_post = attrs.get('job_post')
@@ -452,6 +462,13 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
     resumeSlug = serializers.ReadOnlyField(source="resume.slug")
 
     jobName = serializers.ReadOnlyField(source="job_post.job_name")
+    statusName = serializers.SerializerMethodField()
+    hrmEmployeeId = serializers.CharField(source="frappe_employee_id", read_only=True)
+    hrmUserId = serializers.CharField(source="frappe_user_id", read_only=True)
+    hrmSyncStatus = serializers.CharField(source="frappe_sync_status", read_only=True)
+    hrmSyncError = serializers.CharField(source="frappe_sync_error", read_only=True)
+    hrmSyncedAt = serializers.DateTimeField(source="frappe_synced_at", read_only=True)
+    hrmEmployeeUrl = serializers.SerializerMethodField()
 
     createAt = serializers.DateTimeField(source='create_at', read_only=True)
 
@@ -480,6 +497,20 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
         if activity.resume and activity.resume.file:
             return activity.resume.file.get_full_url()
         return None
+
+    def get_statusName(self, activity):
+        try:
+            return var_sys.ApplicationStatus(activity.status).label
+        except ValueError:
+            return ""
+
+    def get_hrmEmployeeUrl(self, activity):
+        if not activity.frappe_employee_id:
+            return ""
+        from django.conf import settings
+
+        base_url = (settings.FRAPPE_HR_PUBLIC_URL or settings.FRAPPE_HR_BASE_URL or "").rstrip("/")
+        return f"{base_url}/app/employee/{activity.frappe_employee_id}" if base_url else ""
 
     userDict = serializers.SerializerMethodField(method_name="get_user_dict", read_only=True)
 
@@ -519,7 +550,8 @@ class EmployerJobPostActivitySerializer(DynamicFieldsMixin, serializers.ModelSer
 
         fields = ("id", "userId", "fullName", "email", "phone", "title", "type",
 
-                  "resumeSlug", "jobName", "status", "createAt", "isSentEmail",
+                  "resumeSlug", "jobName", "status", "statusName", "hrmEmployeeId", "hrmUserId",
+                  "hrmSyncStatus", "hrmSyncError", "hrmSyncedAt", "hrmEmployeeUrl", "createAt", "isSentEmail",
 
                   "aiAnalysisScore", "aiAnalysisSummary", "aiAnalysisSkills", "aiAnalysisStatus", "aiAnalysisProgress", "aiAnalysisPros", "aiAnalysisCons", "aiAnalysisMatchingSkills", "aiAnalysisMissingSkills",
                   "resumeFileUrl", "userDict", "jobPostDict", "companyDict")

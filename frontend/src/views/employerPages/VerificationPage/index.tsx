@@ -3,7 +3,9 @@ import React, { useMemo, useState } from 'react';
 import { Box, Snackbar, Alert, Typography } from '@mui/material';
 import dayjs, { type Dayjs } from 'dayjs';
 import { useTranslation } from 'react-i18next';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { TabTitle } from '../../../utils/generalFunction';
+import companyVerificationService, { type CompanyVerificationPayload } from '../../../services/companyVerificationService';
 import VerificationIntroCard from './components/VerificationIntroCard';
 import VerificationLegalProfileForm from './components/VerificationLegalProfileForm';
 import VerificationInterviewRequestForm from './components/VerificationInterviewRequestForm';
@@ -25,20 +27,27 @@ type InterviewRequest = {
   notes: string;
 };
 
-type RequestedInterview = InterviewRequest & { id: string };
-
-const makeId = () => {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return crypto.randomUUID();
+const getStatusLabelKey = (status?: string) => {
+  switch (status) {
+    case 'reviewing':
+      return 'verification.status.reviewing';
+    case 'approved':
+      return 'verification.status.approved';
+    case 'rejected':
+      return 'verification.status.rejected';
+    case 'pending':
+    default:
+      return 'verification.status.pending';
   }
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 };
 
 const VerificationPage = () => {
   const { t } = useTranslation('employer');
+  const queryClient = useQueryClient();
   TabTitle(t('verification.title'));
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   const [legalProfile, setLegalProfile] = useState<LegalProfile>({
     companyName: '',
     taxCode: '',
@@ -54,12 +63,46 @@ const VerificationPage = () => {
     contactPhone: '',
     notes: '',
   });
-  const [requestedInterviews, setRequestedInterviews] = useState<RequestedInterview[]>([]);
+
+  const { data: verification, isLoading } = useQuery({
+    queryKey: ['company-verification'],
+    queryFn: companyVerificationService.getVerification,
+  });
+
+  React.useEffect(() => {
+    if (!verification) return;
+    setLegalProfile({
+      companyName: verification.companyName || '',
+      taxCode: verification.taxCode || '',
+      businessLicense: verification.businessLicense || '',
+      representative: verification.representative || '',
+      phone: verification.phone || '',
+      email: verification.email || '',
+      website: verification.website || '',
+    });
+    setInterviewRequest({
+      scheduledAt: verification.scheduledAt ? dayjs(verification.scheduledAt) : dayjs().add(2, 'day'),
+      contactName: verification.contactName || '',
+      contactPhone: verification.contactPhone || '',
+      notes: verification.notes || '',
+    });
+  }, [verification]);
+
+  const updateMutation = useMutation({
+    mutationFn: (payload: CompanyVerificationPayload) => companyVerificationService.updateVerification(payload),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['company-verification'] });
+    },
+  });
+
+  const statusLabel = useMemo(() => {
+    return t(getStatusLabelKey(verification?.status));
+  }, [t, verification?.status]);
 
   const interviewStatus = useMemo(() => {
-    if (requestedInterviews.length === 0) return t('verification.messages.noScheduleYet');
+    if (!verification?.scheduledAt) return t('verification.messages.noScheduleYet');
     return t('verification.messages.waitingConfirmation');
-  }, [requestedInterviews.length, t]);
+  }, [verification?.scheduledAt, t]);
 
   const handleLegalProfileChange =
     (field: keyof LegalProfile) => (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -71,25 +114,24 @@ const VerificationPage = () => {
       setInterviewRequest((prev) => ({ ...prev, [field]: event.target.value }));
     };
 
-  const handleSaveLegalProfile = (event: React.FormEvent) => {
+  const handleSaveLegalProfile = async (event: React.FormEvent) => {
     event.preventDefault();
+    await updateMutation.mutateAsync(legalProfile);
+    setSnackbarMessage(t('verification.messages.profileSaved'));
     setSnackbarOpen(true);
   };
 
-  const handleRequestInterview = (event: React.FormEvent) => {
+  const handleRequestInterview = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!interviewRequest.scheduledAt || !interviewRequest.contactName) return;
-    setRequestedInterviews((prev) => [
-      {
-        id: makeId(),
-        scheduledAt: interviewRequest.scheduledAt,
-        contactName: interviewRequest.contactName,
-        contactPhone: interviewRequest.contactPhone,
-        notes: interviewRequest.notes,
-      },
-      ...prev,
-    ]);
-    setInterviewRequest((prev) => ({ ...prev, contactName: '', contactPhone: '', notes: '' }));
+    await updateMutation.mutateAsync({
+      ...legalProfile,
+      scheduledAt: interviewRequest.scheduledAt.toISOString(),
+      contactName: interviewRequest.contactName,
+      contactPhone: interviewRequest.contactPhone,
+      notes: interviewRequest.notes,
+    });
+    setSnackbarMessage(t('verification.messages.requestSubmitted'));
     setSnackbarOpen(true);
   };
 
@@ -98,20 +140,21 @@ const VerificationPage = () => {
       <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
         {t('verification.title')}
       </Typography>
-      <VerificationIntroCard t={t} />
+      <VerificationIntroCard />
       <VerificationLegalProfileForm
-        t={t}
         legalProfile={legalProfile}
         onChange={handleLegalProfileChange}
         onSubmit={handleSaveLegalProfile}
+        statusLabel={statusLabel}
+        loading={isLoading || updateMutation.isPending}
       />
       <VerificationInterviewRequestForm
-        t={t}
         interviewRequest={interviewRequest}
         onTextChange={handleInterviewChange}
         onDateChange={(value) => setInterviewRequest((prev) => ({ ...prev, scheduledAt: value }))}
         onSubmit={handleRequestInterview}
         statusText={interviewStatus}
+        loading={isLoading || updateMutation.isPending}
       />
       <Snackbar
         open={snackbarOpen}
@@ -120,7 +163,7 @@ const VerificationPage = () => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       >
         <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
-          {requestedInterviews.length > 0 ? t('verification.messages.requestSubmitted') : t('verification.messages.profileSaved')}
+          {snackbarMessage}
         </Alert>
       </Snackbar>
     </Box>

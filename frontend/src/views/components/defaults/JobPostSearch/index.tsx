@@ -6,6 +6,7 @@ import { Grid2 as Grid } from "@mui/material";
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
 import BookmarkAddIcon from '@mui/icons-material/BookmarkAdd';
+import SearchIcon from '@mui/icons-material/Search';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'next/navigation';
 import InputBaseSearchHomeCustom from '../../../../components/Common/Controls/InputBaseSearchHomeCustom';
@@ -195,8 +196,16 @@ const JobPostSearch = () => {
 
   return (
     <Box component="form" onSubmit={handleSubmit(handleFilter)}>
-      <Card sx={{ p: 3, boxShadow: 0, backgroundColor: 'primary.main' }}>
-        <Grid container spacing={2}>
+      <Card
+        sx={{
+          p: { xs: 1.5, sm: 2, md: 2.5 },
+          boxShadow: '0 10px 28px rgba(15, 57, 127, 0.08)',
+          backgroundColor: 'background.paper',
+          border: '1px solid rgba(26, 64, 125, 0.1)',
+          borderRadius: 4,
+        }}
+      >
+        <Grid container spacing={1.5} alignItems="center">
           <Grid
             size={{
               xs: 12,
@@ -262,16 +271,25 @@ const JobPostSearch = () => {
             >
               <Button
                 variant="contained"
-                color="info"
-                sx={{ py: 1, whiteSpace: 'nowrap' }}
+                color="primary"
+                startIcon={<SearchIcon />}
+                sx={{
+                  whiteSpace: 'nowrap',
+                  width: { xs: '100%', sm: 'auto' },
+                  justifyContent: 'center',
+                }}
                 type="submit"
               >
                 {t('jobSearch.searchButton')}
               </Button>
               <Button
                 variant="outlined"
-                color="secondary"
-                sx={{ py: 1, whiteSpace: 'nowrap' }}
+                color="primary"
+                sx={{
+                  whiteSpace: 'nowrap',
+                  width: { xs: '100%', sm: 'auto' },
+                  justifyContent: 'center',
+                }}
                 startIcon={<BookmarkAddIcon />}
                 onClick={handleOpenSaveAlert}
               >
@@ -279,7 +297,12 @@ const JobPostSearch = () => {
               </Button>
               <Button
                 variant="contained"
-                sx={{ py: 1, color: 'white', whiteSpace: 'nowrap' }}
+                sx={{
+                  color: 'white',
+                  whiteSpace: 'nowrap',
+                  width: { xs: '100%', sm: 'auto' },
+                  justifyContent: 'center',
+                }}
                 startIcon={
                   showAdvanceFilter ? <FilterAltOffIcon /> : <FilterAltIcon />
                 }

@@ -12,6 +12,7 @@ interface MenuItemProps {
   icon?: React.ElementType;
   text: string;
   to?: string;
+  external?: boolean;
   onClick?: () => void;
   kind?: 'item' | 'group' | 'child';
   state?: {
@@ -20,7 +21,7 @@ interface MenuItemProps {
   };
 }
 
-const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementType; href?: string }>(({ theme }) => ({
+const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementType; href?: string; target?: string; rel?: string }>(({ theme }) => ({
   borderRadius: '8px',
   marginBottom: '2px',
   color: theme.palette.text.secondary,
@@ -57,17 +58,19 @@ const StyledListItemButton = styled(ListItemButton)<{ component?: React.ElementT
   },
 }));
 
-const MenuItem = ({ icon: Icon, text, to, onClick, kind = 'item', state }: MenuItemProps) => {
+const MenuItem = ({ icon: Icon, text, to, external = false, onClick, kind = 'item', state }: MenuItemProps) => {
   const pathname = usePathname();
   const isChild = kind === 'child';
   const hasChildren = kind === 'group';
   const isExpanded = state?.expanded ?? false;
-  const isActive = to ? pathname === to || pathname.startsWith(to + '/') : false;
+  const isActive = to && !external ? pathname === to || pathname.startsWith(to + '/') : false;
 
   return (
     <StyledListItemButton
-      component={to ? Link : 'div'}
+      component={to ? (external ? 'a' : Link) : 'div'}
       href={to}
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noopener noreferrer' : undefined}
       onClick={onClick}
       selected={state?.selected || isActive}
       sx={{

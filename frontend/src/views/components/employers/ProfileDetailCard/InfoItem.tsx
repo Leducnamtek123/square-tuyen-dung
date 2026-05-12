@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Stack, alpha, useTheme } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import pc from '@/utils/muiColors';
 
@@ -11,52 +11,63 @@ interface InfoItemProps {
 
 const InfoItem: React.FC<InfoItemProps> = ({ label, value, icon }) => {
   const { t } = useTranslation('common');
-  const theme = useTheme();
-  
+
   return (
-    <Box sx={{ mb: 2 }}>
-      <Stack direction="row" alignItems="center" spacing={1} mb={0.75}>
+    <Box
+      sx={{
+        height: '100%',
+        p: 1.75,
+        borderRadius: 2,
+        border: '1px solid',
+        borderColor: pc.divider(0.6),
+        bgcolor: pc.bgDefault(0.28),
+      }}
+    >
+      <Stack direction="row" alignItems="flex-start" spacing={1.25}>
         {icon && (
-          <Box 
-            sx={{ 
-              color: 'primary.main', 
-              display: 'flex',
-              bgcolor: pc.primary( 0.08),
-              p: 0.5,
-              borderRadius: 1,
-              fontSize: 18
+          <Box
+            sx={{
+              width: 34,
+              height: 34,
+              borderRadius: 1.5,
+              color: 'primary.main',
+              display: 'grid',
+              placeItems: 'center',
+              flexShrink: 0,
+              bgcolor: pc.primary(0.08),
+              '& svg': { fontSize: 18 },
             }}
           >
             {React.cloneElement(icon as React.ReactElement, { sx: { fontSize: 18 } })}
           </Box>
         )}
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          sx={{
-            fontWeight: 900,
-            textTransform: 'uppercase',
-            letterSpacing: 1.2,
-            display: 'block',
-            fontSize: '0.65rem',
-            opacity: 0.8
-          }}
-        >
-          {label}
-        </Typography>
+        <Box sx={{ minWidth: 0 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              display: 'block',
+              color: 'text.secondary',
+              fontWeight: 900,
+              textTransform: 'uppercase',
+              lineHeight: 1.25,
+            }}
+          >
+            {label}
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 0.5,
+              color: 'text.primary',
+              fontWeight: 800,
+              lineHeight: 1.45,
+              overflowWrap: 'anywhere',
+            }}
+          >
+            {value || t('labels.notUpdated')}
+          </Typography>
+        </Box>
       </Stack>
-      <Typography 
-        variant="body2" 
-        sx={{ 
-            fontWeight: 700, 
-            color: 'text.primary', 
-            pl: icon ? 4.25 : 0,
-            fontSize: '0.9rem',
-            lineHeight: 1.4
-        }}
-      >
-        {value || t('common:labels.notUpdated')}
-      </Typography>
     </Box>
   );
 };

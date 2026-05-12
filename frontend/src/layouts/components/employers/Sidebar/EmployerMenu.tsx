@@ -7,8 +7,8 @@ import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import FactCheckOutlinedIcon from '@mui/icons-material/FactCheckOutlined';
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
-import GroupsOutlinedIcon from '@mui/icons-material/GroupsOutlined';
-import { ROUTES, APP_NAME } from '@/configs/constants';
+import AdminPanelSettingsOutlinedIcon from '@mui/icons-material/AdminPanelSettingsOutlined';
+import { ROUTES, APP_NAME, LINKS } from '@/configs/constants';
 import MenuItem from './MenuItem';
 
 interface EmployerMenuProps {
@@ -69,8 +69,9 @@ const EmployerMenu = ({ t, location, expandedItems, handleExpand }: EmployerMenu
       </Collapse>
 
       <ListItem disablePadding>
-        <MenuItem icon={GroupsOutlinedIcon} text={t('employer:sidebar.employeeRoles')} to={`/${ROUTES.EMPLOYER.EMPLOYEES}`} state={{ selected: location.pathname === `/${ROUTES.EMPLOYER.EMPLOYEES}` }} />
+        <MenuItem icon={AdminPanelSettingsOutlinedIcon} text={t('employer:sidebar.squareHrmAdmin')} to={LINKS.SQUARE_HRM_ADMIN_LINK} external />
       </ListItem>
+
     </>
   );
 };

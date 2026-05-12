@@ -54,9 +54,9 @@ const Popup = ({
           paper: {
             elevation: 0,
             sx: {
-              borderRadius: '16px',
-              boxShadow: theme.customShadows.card,
-              border: `1px solid ${theme.palette.grey[100]}`,
+              borderRadius: '24px',
+              boxShadow: '0 28px 70px rgba(15, 57, 127, 0.18)',
+              border: '1px solid rgba(26, 64, 125, 0.1)',
               overflow: 'hidden',
             },
           },
@@ -65,7 +65,7 @@ const Popup = ({
         <DialogTitle
           sx={{
             p: 2.5,
-            background: theme.palette.grey[50],
+            backgroundColor: theme.palette.grey[50],
           }}
         >
           <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -114,12 +114,8 @@ const Popup = ({
               sx={{
                 margin: '0 auto',
                 minWidth: 120,
-                background: theme.palette.primary.main,
-                '&:hover': {
-                  background: theme.palette.primary.main,
-                  opacity: 0.9,
-                  boxShadow: theme.customShadows.medium,
-                },
+                minHeight: 44,
+                px: 3,
               }}
               type="submit"
               form={formId}

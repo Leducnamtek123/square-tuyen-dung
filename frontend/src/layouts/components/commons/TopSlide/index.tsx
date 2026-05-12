@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import ApartmentIcon from '@mui/icons-material/Apartment';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import TipsAndUpdatesIcon from '@mui/icons-material/TipsAndUpdates';
 import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import HomeSearch from '../../../../views/components/defaults/HomeSearch';
@@ -33,12 +34,14 @@ const styles = {
     width: 10,
     height: 10,
     opacity: 0.5,
-    backgroundColor: '#8b6bd4',
+    backgroundColor: '#2aa9e1',
   },
   '.swiper-pagination-bullet-active': {
-    width: 10,
+    width: 22,
     height: 10,
     opacity: 1,
+    borderRadius: 999,
+    backgroundColor: '#1a407d',
   },
 };
 
@@ -201,7 +204,12 @@ const TopSlide = () => {
                       variant="contained"
                       size="large"
                       startIcon={<SearchIcon />}
+                      endIcon={<ArrowForwardIcon />}
                       onClick={() => push(localizeRoutePath(`/${ROUTES.JOB_SEEKER.JOBS}`, i18n.language))}
+                      sx={{
+                        width: { xs: '100%', sm: 'auto' },
+                        justifyContent: 'center',
+                      }}
                     >
                       {t('home.heroPrimaryCta', 'Khám phá việc làm')}
                     </Button>
@@ -210,6 +218,12 @@ const TopSlide = () => {
                       size="large"
                       startIcon={<ApartmentIcon />}
                       onClick={() => push(`/${ROUTES.EMPLOYER.INTRODUCE}`)}
+                      sx={{
+                        width: { xs: '100%', sm: 'auto' },
+                        justifyContent: 'center',
+                        bgcolor: 'rgba(255,255,255,0.74)',
+                        backdropFilter: 'blur(10px)',
+                      }}
                     >
                       {t('home.heroSecondaryCta', 'Dành cho nhà tuyển dụng')}
                     </Button>
@@ -261,11 +275,13 @@ const TopSlide = () => {
               <Grid size={{ xs: 12, md: 6 }}>
                 <Box
                   sx={{
-                    borderRadius: 3,
+                    borderRadius: 3.5,
                     p: { xs: 1.5, sm: 2, md: 2.5 },
-                    backgroundColor: 'rgba(15, 57, 127, 0.06)',
+                    backgroundColor: 'rgba(255,255,255,0.62)',
                     border: '1px solid',
-                    borderColor: 'rgba(15, 57, 127, 0.08)',
+                    borderColor: 'rgba(26, 64, 125, 0.1)',
+                    boxShadow: '0 18px 40px rgba(15, 57, 127, 0.08)',
+                    backdropFilter: 'blur(14px)',
                   }}
                 >
                   <Stack spacing={1.5} sx={{ mb: 2 }}>

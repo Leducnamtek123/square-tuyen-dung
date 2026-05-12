@@ -10,6 +10,8 @@ from .models import (
 )
 
 def save_profile(backend, user, response, *args, **kwargs):
+    if not user or user.role_name != var_sys.JOB_SEEKER:
+        return
 
     job_seeker_profile = JobSeekerProfile.objects.filter(user=user)
 

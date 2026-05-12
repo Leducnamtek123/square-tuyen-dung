@@ -52,6 +52,7 @@ services:
         NEXT_PUBLIC_GOONGAPI_ACCESS_TOKEN: ${NEXT_PUBLIC_GOONGAPI_ACCESS_TOKEN:-}
         NEXT_PUBLIC_MINIO_PUBLIC_URL: ${NEXT_PUBLIC_MINIO_PUBLIC_URL:-https://s3.tuyendung.square.vn:4433}
         NEXT_PUBLIC_LIVEKIT_URL: ${NEXT_PUBLIC_LIVEKIT_URL:-wss://tuyendung.square.vn/livekit}
+        NEXT_PUBLIC_FRAPPE_HR_PUBLIC_URL: ${NEXT_PUBLIC_FRAPPE_HR_PUBLIC_URL:-https://hrm.square.vn}
         NEXT_PUBLIC_FIREBASE_API_KEY: ${NEXT_PUBLIC_FIREBASE_API_KEY}
         NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN}
         NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${NEXT_PUBLIC_FIREBASE_PROJECT_ID}
@@ -221,6 +222,270 @@ services:
       - data-net
 
   # ---------------------------------------------------------------------------
+  # Frappe HRMS (external HRM system, enabled with --profile frappe-hrm)
+  # ---------------------------------------------------------------------------
+  frappe-hrms-backend:
+    container_name: tuyendung-studio-frappe-hrms-backend
+    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
+    build:
+      context: .
+      dockerfile: infra/frappe-hrms/Containerfile
+      args:
+        FRAPPE_BRANCH: ${FRAPPE_HR_FRAPPE_BRANCH:-version-16}
+        FRAPPE_IMAGE_PREFIX: ${FRAPPE_HR_IMAGE_PREFIX:-frappe}
+        CACHE_BUST: ${FRAPPE_HR_BUILD_CACHE_BUST:-}
+    profiles: ["frappe-hrm"]
+    environment:
+      DB_HOST: frappe-hrms-db
+      DB_PORT: "3306"
+      MYSQL_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:-admin}
+      MARIADB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:-admin}
+    volumes:
+      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
+      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
+    restart: unless-stopped
+    networks:
+      - frappe-hrms-net
+
+  frappe-hrms-configurator:
+    container_name: tuyendung-studio-frappe-hrms-configurator
+    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
+    profiles: ["frappe-hrm"]
+    entrypoint:
+      - bash
+      - -c
+    command:
+      - |
+        ls -1 apps > sites/apps.txt;
+        bench set-config -g db_host $$DB_HOST;
+        bench set-config -gp db_port $$DB_PORT;
+        bench set-config -g redis_cache "redis://$$REDIS_CACHE";
+        bench set-config -g redis_queue "redis://$$REDIS_QUEUE";
+        bench set-config -g redis_socketio "redis://$$REDIS_QUEUE";
+        bench set-config -gp socketio_port $$SOCKETIO_PORT;
+    environment:
+      DB_HOST: frappe-hrms-db
+      DB_PORT: "3306"
+      REDIS_CACHE: frappe-hrms-redis-cache:6379
+      REDIS_QUEUE: frappe-hrms-redis-queue:6379
+      SOCKETIO_PORT: "9000"
+    volumes:
+      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
+      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
+    depends_on:
+      frappe-hrms-db:
+        condition: service_healthy
+      frappe-hrms-redis-cache:
+        condition: service_started
+      frappe-hrms-redis-queue:
+        condition: service_started
+    restart: "no"
+    networks:
+      - frappe-hrms-net
+
+  frappe-hrms-create-site:
+    container_name: tuyendung-studio-frappe-hrms-create-site
+    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
+    profiles: ["frappe-hrm"]
+    entrypoint:
+      - bash
+      - -c
+    command:
+      - |
+        wait-for-it frappe-hrms-db:3306 -t 180;
+        wait-for-it frappe-hrms-redis-cache:6379 -t 180;
+        wait-for-it frappe-hrms-redis-queue:6379 -t 180;
+        export start=`date +%s`;
+        until [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".db_host // empty"` ]] &&
+          [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".redis_cache // empty"` ]] &&
+          [[ -n `grep -hs ^ sites/common_site_config.json | jq -r ".redis_queue // empty"` ]];
+        do
+          echo "Waiting for sites/common_site_config.json to be created";
+          sleep 5;
+          if (( `date +%s`-start > 180 )); then
+            echo "could not find sites/common_site_config.json with required keys";
+            exit 1;
+          fi
+        done;
+        if [ ! -d "sites/$${FRAPPE_SITE_NAME}" ]; then
+          bench new-site --mariadb-user-host-login-scope='%' --admin-password="$${ADMIN_PASSWORD}" --db-root-username=root --db-root-password="$${DB_ROOT_PASSWORD}" --install-app erpnext --install-app hrms --install-app square_hrm_branding --set-default "$${FRAPPE_SITE_NAME}";
+        else
+          echo "Frappe HR site already exists: $${FRAPPE_SITE_NAME}";
+          bench --site "$${FRAPPE_SITE_NAME}" migrate;
+          if ! bench --site "$${FRAPPE_SITE_NAME}" list-apps | grep -qx erpnext; then
+            bench --site "$${FRAPPE_SITE_NAME}" install-app erpnext;
+          fi
+          if ! bench --site "$${FRAPPE_SITE_NAME}" list-apps | grep -qx hrms; then
+            bench --site "$${FRAPPE_SITE_NAME}" install-app hrms;
+          fi
+          if ! bench --site "$${FRAPPE_SITE_NAME}" list-apps | grep -qx square_hrm_branding; then
+            bench --site "$${FRAPPE_SITE_NAME}" install-app square_hrm_branding;
+          fi
+          bench --site "$${FRAPPE_SITE_NAME}" migrate;
+        fi
+        bench --site "$${FRAPPE_SITE_NAME}" execute frappe.db.set_default --args "['desktop:home_page','workspace']";
+        bench --site "$${FRAPPE_SITE_NAME}" clear-cache;
+    environment:
+      FRAPPE_SITE_NAME: ${FRAPPE_HR_SITE_NAME:-hrm.tuyendung.square.vn}
+      ADMIN_PASSWORD: ${FRAPPE_HR_ADMIN_PASSWORD:-admin}
+      DB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:-admin}
+    volumes:
+      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
+      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
+    depends_on:
+      frappe-hrms-configurator:
+        condition: service_completed_successfully
+    restart: "no"
+    networks:
+      - frappe-hrms-net
+
+  frappe-hrms-db:
+    container_name: tuyendung-studio-frappe-hrms-db
+    image: mariadb:11.8
+    profiles: ["frappe-hrm"]
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --skip-character-set-client-handshake
+    environment:
+      MYSQL_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:-admin}
+      MARIADB_ROOT_PASSWORD: ${FRAPPE_HR_DB_ROOT_PASSWORD:-admin}
+    volumes:
+      - frappe-hrms-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - frappe-hrms-net
+
+  frappe-hrms-frontend:
+    container_name: tuyendung-studio-frappe-hrms-frontend
+    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
+    profiles: ["frappe-hrm"]
+    command:
+      - nginx-entrypoint.sh
+    environment:
+      BACKEND: frappe-hrms-backend:8000
+      FRAPPE_SITE_NAME_HEADER: ${FRAPPE_HR_SITE_NAME:-hrm.tuyendung.square.vn}
+      SOCKETIO: frappe-hrms-websocket:9000
+      UPSTREAM_REAL_IP_ADDRESS: 127.0.0.1
+      UPSTREAM_REAL_IP_HEADER: X-Forwarded-For
+      UPSTREAM_REAL_IP_RECURSIVE: "off"
+      PROXY_READ_TIMEOUT: 120
+      CLIENT_MAX_BODY_SIZE: 100m
+    ports:
+      - "${FRAPPE_HR_PORT:-8081}:8080"
+    volumes:
+      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
+      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
+    depends_on:
+      frappe-hrms-websocket:
+        condition: service_started
+      frappe-hrms-create-site:
+        condition: service_completed_successfully
+    restart: unless-stopped
+    networks:
+      proxy-net:
+        aliases:
+          - frappe-hrms
+          - hrm.tuyendung.square.vn
+      app-net:
+        aliases:
+          - frappe-hrms-frontend
+      frappe-hrms-net: {}
+
+  frappe-hrms-queue-long:
+    container_name: tuyendung-studio-frappe-hrms-queue-long
+    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
+    profiles: ["frappe-hrm"]
+    command:
+      - bench
+      - worker
+      - --queue
+      - long,default,short
+    environment:
+      FRAPPE_REDIS_CACHE: redis://frappe-hrms-redis-cache:6379
+      FRAPPE_REDIS_QUEUE: redis://frappe-hrms-redis-queue:6379
+    volumes:
+      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
+      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
+    restart: unless-stopped
+    networks:
+      - frappe-hrms-net
+
+  frappe-hrms-queue-short:
+    container_name: tuyendung-studio-frappe-hrms-queue-short
+    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
+    profiles: ["frappe-hrm"]
+    command:
+      - bench
+      - worker
+      - --queue
+      - short,default
+    environment:
+      FRAPPE_REDIS_CACHE: redis://frappe-hrms-redis-cache:6379
+      FRAPPE_REDIS_QUEUE: redis://frappe-hrms-redis-queue:6379
+    volumes:
+      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
+      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
+    restart: unless-stopped
+    networks:
+      - frappe-hrms-net
+
+  frappe-hrms-redis-cache:
+    container_name: tuyendung-studio-frappe-hrms-redis-cache
+    image: redis:6.2-alpine
+    profiles: ["frappe-hrm"]
+    restart: unless-stopped
+    networks:
+      - frappe-hrms-net
+
+  frappe-hrms-redis-queue:
+    container_name: tuyendung-studio-frappe-hrms-redis-queue
+    image: redis:6.2-alpine
+    profiles: ["frappe-hrm"]
+    volumes:
+      - frappe-hrms-redis-queue-data:/data
+    restart: unless-stopped
+    networks:
+      - frappe-hrms-net
+
+  frappe-hrms-scheduler:
+    container_name: tuyendung-studio-frappe-hrms-scheduler
+    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
+    profiles: ["frappe-hrm"]
+    command:
+      - bench
+      - schedule
+    volumes:
+      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
+      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
+    restart: unless-stopped
+    networks:
+      - frappe-hrms-net
+
+  frappe-hrms-websocket:
+    container_name: tuyendung-studio-frappe-hrms-websocket
+    image: ${FRAPPE_HR_IMAGE:-square/frappe-hrms:custom}
+    profiles: ["frappe-hrm"]
+    command:
+      - node
+      - /home/frappe/frappe-bench/apps/frappe/socketio.js
+    environment:
+      FRAPPE_REDIS_CACHE: redis://frappe-hrms-redis-cache:6379
+      FRAPPE_REDIS_QUEUE: redis://frappe-hrms-redis-queue:6379
+    volumes:
+      - frappe-hrms-sites:/home/frappe/frappe-bench/sites
+      - frappe-hrms-logs:/home/frappe/frappe-bench/logs
+    restart: unless-stopped
+    networks:
+      - frappe-hrms-net
+
+  # ---------------------------------------------------------------------------
   # LiveKit Server
   # ---------------------------------------------------------------------------
   livekit:
@@ -322,11 +587,11 @@ services:
     volumes:
       - huggingface-cache:/root/.cache/huggingface
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://localhost:8298/health > /dev/null"]
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:$${PORT:-8298}/health > /dev/null"]
       interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      timeout: 10s
+      retries: 120
+      start_period: 20m
     restart: always
     networks:
       - app-net
@@ -449,6 +714,8 @@ networks:
     driver: bridge
   data-net:
     driver: bridge
+  frappe-hrms-net:
+    driver: bridge
 
 volumes:
   db_data:
@@ -456,3 +723,7 @@ volumes:
   whisper-data:
   minio-data:
   elasticsearch-data:
+  frappe-hrms-db-data:
+  frappe-hrms-redis-queue-data:
+  frappe-hrms-sites:
+  frappe-hrms-logs:

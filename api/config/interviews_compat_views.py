@@ -1,5 +1,4 @@
 import json
-from concurrent.futures import ThreadPoolExecutor
 
 from django.http import HttpRequest, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -12,17 +11,15 @@ from apps.interviews.services import (
     get_next_question_payload,
     update_interview_status,
 )
+from config.django_threading import run_django_sync_in_thread
 
 
 # ---------------------------------------------------------------------------
 # Sync DB helpers – called via sync_to_async inside every view
 # ---------------------------------------------------------------------------
 
-_THREAD_POOL = ThreadPoolExecutor(max_workers=4)
-
-
 def _run_in_thread(func, *args, **kwargs):
-    return _THREAD_POOL.submit(func, *args, **kwargs).result()
+    return run_django_sync_in_thread(func, *args, **kwargs)
 
 def _get_context_session(room_name: str) -> InterviewSession:
     return (

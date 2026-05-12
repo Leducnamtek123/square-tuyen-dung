@@ -1,119 +1,73 @@
 'use client';
 
-/**
- * AIServiceHealthBanner
- *
- * Shows the live connectivity status of three core AI services:
- *  - LLM (Chat / llama-cpp)
- *  - STT (Whisper)
- *  - TTS (VieNeu TTS)
- *
- * Each badge auto-probes its service endpoint periodically and turns
- *   🟢 Online  / 🟡 Checking  / 🔴 Offline
- *
- * Used on the InterviewLivePage so admins know before starting an AI interview
- * whether all AI services are available.
- */
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Box, Chip, CircularProgress, Tooltip, Typography } from '@mui/material';
 import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
 import { useTranslation } from 'react-i18next';
-import chatbotService from '@/services/chatbotService';
-import httpRequest from '@/utils/httpRequest';
+import aiService, { type AIHealthResponse, type AIServiceStatus } from '@/services/aiService';
 
-type ServiceStatus = 'checking' | 'online' | 'offline';
+type ServiceStatus = 'checking' | AIServiceStatus;
 
 interface ServiceState {
   status: ServiceStatus;
   latencyMs?: number;
+  detail?: string;
 }
 
-const PROBE_INTERVAL_MS = 30_000; // re-probe every 30 s
+type ServiceItem = { label: string; state: ServiceState };
 
-// ---------------------------------------------------------------------------
-// Individual probes
-// ---------------------------------------------------------------------------
+const PROBE_INTERVAL_MS = 30_000;
 
-async function probeLLM(): Promise<ServiceState> {
-  const t0 = Date.now();
-  try {
-    await chatbotService.chat({
-      messages: [{ role: 'user', content: 'ping' }],
-    });
-    return { status: 'online', latencyMs: Date.now() - t0 };
-  } catch {
-    return { status: 'offline' };
-  }
-}
-
-async function probeSTT(): Promise<ServiceState> {
-  // STT needs a file — we just check if the endpoint responds at all.
-  // Use POST with empty body; a 400 (missing audio) still means the service is up.
-  const t0 = Date.now();
-  try {
-    await httpRequest.post('ai/transcribe/', {}, { timeout: 5000 });
-    return { status: 'online', latencyMs: Date.now() - t0 };
-  } catch (err: unknown) {
-    const status = (err as { response?: { status?: number } })?.response?.status;
-    // 400 (bad request) or 405 means the server IS responding — just invalid input
-    if (status && status < 500) {
-      return { status: 'online', latencyMs: Date.now() - t0 };
-    }
-    return { status: 'offline' };
-  }
-}
-
-async function probeTTS(): Promise<ServiceState> {
-  // Use POST with empty body; a 400 (missing text) still means the service is up.
-  const t0 = Date.now();
-  try {
-    await httpRequest.post('ai/tts/', {}, { timeout: 5000 });
-    return { status: 'online', latencyMs: Date.now() - t0 };
-  } catch (err: unknown) {
-    const status = (err as { response?: { status?: number } })?.response?.status;
-    if (status && status < 500) {
-      return { status: 'online', latencyMs: Date.now() - t0 };
-    }
-    return { status: 'offline' };
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Util
-// ---------------------------------------------------------------------------
-
-const statusColor = (s: ServiceStatus): 'success' | 'error' | 'default' => {
-  if (s === 'online') return 'success';
-  if (s === 'offline') return 'error';
+const statusColor = (status: ServiceStatus): 'success' | 'error' | 'default' => {
+  if (status === 'online') return 'success';
+  if (status === 'offline') return 'error';
   return 'default';
 };
 
-const statusDotColor = (s: ServiceStatus) => {
-  if (s === 'online') return '#22c55e';
-  if (s === 'offline') return '#ef4444';
+const statusDotColor = (status: ServiceStatus) => {
+  if (status === 'online') return '#22c55e';
+  if (status === 'offline') return '#ef4444';
   return '#f59e0b';
 };
 
-// ---------------------------------------------------------------------------
-// Component
-// ---------------------------------------------------------------------------
+const serviceLabels: Record<string, string> = {
+  llm: 'LLM',
+  stt: 'STT',
+  tts: 'TTS',
+  livekit: 'LiveKit',
+  celery: 'Celery',
+};
+
+const initialServices: ServiceItem[] = ['LLM', 'STT', 'TTS', 'LiveKit', 'Celery'].map((label) => ({
+  label,
+  state: { status: 'checking' },
+}));
+
+const mapHealthToServices = (health: AIHealthResponse): ServiceItem[] =>
+  Object.entries(health.checks).map(([key, value]) => ({
+    label: serviceLabels[key] || key,
+    state: {
+      status: value.status,
+      latencyMs: value.latencyMs ?? undefined,
+      detail: value.error,
+    },
+  }));
 
 const AIServiceHealthBanner: React.FC = () => {
   const { t } = useTranslation('admin');
-
-  const [llm, setLlm] = useState<ServiceState>({ status: 'checking' });
-  const [stt, setStt] = useState<ServiceState>({ status: 'checking' });
-  const [tts, setTts] = useState<ServiceState>({ status: 'checking' });
+  const [services, setServices] = useState<ServiceItem[]>(initialServices);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const probe = useCallback(async () => {
-    setLlm((s) => ({ ...s, status: 'checking' }));
-    setStt((s) => ({ ...s, status: 'checking' }));
-    setTts((s) => ({ ...s, status: 'checking' }));
-    const [llmRes, sttRes, ttsRes] = await Promise.all([probeLLM(), probeSTT(), probeTTS()]);
-    setLlm(llmRes);
-    setStt(sttRes);
-    setTts(ttsRes);
+    setServices((items) =>
+      items.map((item) => ({ ...item, state: { ...item.state, status: 'checking' } })),
+    );
+    try {
+      const health = await aiService.getHealth();
+      setServices(mapHealthToServices(health));
+    } catch {
+      setServices((items) => items.map((item) => ({ ...item, state: { status: 'offline' } })));
+    }
   }, []);
 
   useEffect(() => {
@@ -123,12 +77,6 @@ const AIServiceHealthBanner: React.FC = () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [probe]);
-
-  const services: { label: string; state: ServiceState }[] = [
-    { label: 'LLM (Chat AI)', state: llm },
-    { label: 'STT (Whisper)', state: stt },
-    { label: 'TTS (VieNeu)', state: tts },
-  ];
 
   return (
     <Box
@@ -153,7 +101,7 @@ const AIServiceHealthBanner: React.FC = () => {
         fontWeight={600}
         sx={{ color: 'text.secondary', mr: 0.5, whiteSpace: 'nowrap' }}
       >
-        AI Services:
+        {t('aiHealth.title', 'AI services')}
       </Typography>
 
       {services.map(({ label, state }) => (
@@ -162,9 +110,11 @@ const AIServiceHealthBanner: React.FC = () => {
           title={
             state.status === 'online'
               ? `${label}: Online${state.latencyMs != null ? ` (${state.latencyMs}ms)` : ''}`
-              : state.status === 'offline'
-              ? `${label}: Offline — Hệ thống AI này hiện không phản hồi.`
-              : `${label}: Đang kiểm tra...`
+              : state.status === 'not_configured'
+                ? `${label}: Not configured`
+                : state.status === 'offline'
+                  ? `${label}: Offline${state.detail ? ` - ${state.detail}` : ''}`
+                  : `${label}: Checking...`
           }
           placement="bottom"
         >

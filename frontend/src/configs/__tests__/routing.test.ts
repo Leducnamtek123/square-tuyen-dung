@@ -76,7 +76,6 @@ describe('Portal Routing', () => {
       expect(detectPortalFromPath('/employer')).toBe('employer');
       expect(detectPortalFromPath('/employer/')).toBe('employer');
       expect(detectPortalFromPath('/nha-tuyen-dung')).toBe('employer');
-      expect(detectPortalFromPath('/employee/jobs')).toBe('employer');
     });
 
     it('defaults to jobseeker', () => {

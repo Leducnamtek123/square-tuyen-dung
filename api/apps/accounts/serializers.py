@@ -262,7 +262,7 @@ class UserSerializer(DynamicFieldsMixin, serializers.ModelSerializer):
 
         company_ids = set()
         try:
-            owned_company = user.get_active_company()
+            owned_company = getattr(user, "company", None)
             if owned_company:
                 company_ids.add(owned_company.id)
                 logo = owned_company.logo.get_full_url() if owned_company.logo else var_sys.AVATAR_DEFAULT["COMPANY_LOGO"]

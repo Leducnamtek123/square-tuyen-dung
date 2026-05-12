@@ -21,6 +21,7 @@ export { default as jobPostNotificationService } from './jobPostNotificationServ
 export { default as companyService } from './companyService';
 export { default as companyImageService } from './companyImageService';
 export { default as companyTeamService } from './companyTeamService';
+export { default as hrmService } from './hrmService';
 export { default as companyFollowed } from './companyFollowed';
 export { default as jobSeekerProfileService } from './jobSeekerProfileService';
 export { default as resumeService } from './resumeService';

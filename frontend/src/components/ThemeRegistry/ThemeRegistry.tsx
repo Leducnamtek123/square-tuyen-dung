@@ -43,20 +43,127 @@ const theme = createTheme(baseTheme, {
         root: {
           borderRadius: 999,
           textTransform: 'none',
-          fontWeight: 700,
-          transition: 'transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease',
+          minHeight: 42,
+          paddingInline: 18,
+          fontWeight: 800,
+          letterSpacing: 0,
+          transition:
+            'transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease, border-color 180ms ease, filter 180ms ease',
+          '&:focus-visible': {
+            outline: '3px solid rgba(42, 169, 225, 0.2)',
+            outlineOffset: 2,
+          },
+          '&:active': {
+            transform: 'translateY(0)',
+          },
+          '& .MuiButton-startIcon': {
+            marginRight: 8,
+            marginLeft: -2,
+          },
+        },
+        sizeSmall: {
+          minHeight: 34,
+          paddingInline: 14,
+          fontSize: '0.8125rem',
+        },
+        sizeLarge: {
+          minHeight: 48,
+          paddingInline: 24,
+          fontSize: '0.95rem',
         },
         contained: {
-          boxShadow: '0 10px 24px rgba(26, 64, 125, 0.18)',
+          color: '#ffffff',
+          boxShadow: '0 8px 18px rgba(26, 64, 125, 0.16)',
           '&:hover': {
-            boxShadow: '0 14px 30px rgba(26, 64, 125, 0.22)',
+            boxShadow: '0 10px 22px rgba(26, 64, 125, 0.2)',
             transform: 'translateY(-1px)',
+          },
+          '&.Mui-disabled': {
+            boxShadow: 'none',
           },
         },
         outlined: {
-          borderWidth: 1.5,
+          borderWidth: 1,
+          backgroundColor: 'rgba(255, 255, 255, 0.78)',
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8)',
           '&:hover': {
             transform: 'translateY(-1px)',
+            borderWidth: 1,
+            backgroundColor: 'rgba(255, 255, 255, 0.92)',
+            boxShadow: '0 8px 18px rgba(26, 64, 125, 0.1)',
+          },
+        },
+        text: {
+          '&:hover': {
+            backgroundColor: 'rgba(42, 169, 225, 0.08)',
+          },
+        },
+      },
+      variants: [
+        {
+          props: { variant: 'contained', color: 'primary' },
+          style: {
+            backgroundColor: '#1a407d',
+            '&:hover': {
+              backgroundColor: '#0f397f',
+            },
+          },
+        },
+        {
+          props: { variant: 'contained', color: 'secondary' },
+          style: {
+            backgroundColor: '#10b981',
+            boxShadow: '0 8px 18px rgba(16, 185, 129, 0.16)',
+            '&:hover': {
+              backgroundColor: '#059669',
+              boxShadow: '0 10px 22px rgba(16, 185, 129, 0.2)',
+            },
+          },
+        },
+        {
+          props: { variant: 'contained', color: 'info' },
+          style: {
+            backgroundColor: '#2aa9e1',
+            boxShadow: '0 8px 18px rgba(42, 169, 225, 0.16)',
+            '&:hover': {
+              backgroundColor: '#1a407d',
+              boxShadow: '0 10px 22px rgba(42, 169, 225, 0.2)',
+            },
+          },
+        },
+        {
+          props: { variant: 'outlined', color: 'primary' },
+          style: {
+            borderColor: 'rgba(26, 64, 125, 0.22)',
+            color: '#0f397f',
+            '&:hover': {
+              borderColor: 'rgba(26, 64, 125, 0.36)',
+            },
+          },
+        },
+        {
+          props: { variant: 'outlined', color: 'secondary' },
+          style: {
+            borderColor: 'rgba(16, 185, 129, 0.28)',
+            color: '#047857',
+            '&:hover': {
+              borderColor: 'rgba(16, 185, 129, 0.42)',
+              backgroundColor: 'rgba(236, 253, 245, 0.88)',
+            },
+          },
+        },
+      ],
+    },
+    MuiIconButton: {
+      styleOverrides: {
+        root: {
+          transition: 'transform 160ms ease, background-color 160ms ease, box-shadow 160ms ease',
+          '&:hover': {
+            transform: 'translateY(-1px)',
+          },
+          '&:focus-visible': {
+            outline: '3px solid rgba(42, 169, 225, 0.24)',
+            outlineOffset: 2,
           },
         },
       },

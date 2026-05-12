@@ -40,10 +40,12 @@
     "wardsManagement": "Phường/Xã",
     "infoAndProfiles": "Hồ sơ & Thông tin",
     "companyManagement": "Công ty",
+    "companyVerifications": "Xác thực công ty",
     "candidateProfiles": "Hồ sơ ứng viên",
     "resumeManagement": "Hồ sơ đính kèm",
     "recruitmentAndInterviews": "Tuyển dụng",
     "jobPosts": "Tin tuyển dụng",
+    "trustReports": "Báo cáo tin cậy",
     "activityLogs": "Lịch sử hoạt động",
     "questionBank": "Ngân hàng câu hỏi",
     "interviewQuestionSets": "Bộ câu hỏi",
@@ -54,7 +56,11 @@
     "bannersManagement": "Quản lý Banner",
     "feedbacksManagement": "Quản lý Đánh giá",
     "articlesManagement": "Tin tức & Blog",
-    "chatWithEmployers": "Kết nối với nhà tuyển dụng"
+    "chatWithEmployers": "Kết nối với nhà tuyển dụng",
+    "squareHrmAdmin": "Mở Square HRM"
+  },
+  "aiHealth": {
+    "title": "Dịch vụ AI"
   },
   "pages": {
     "careers": {
@@ -526,7 +532,9 @@
       "bulkSelect": {
         "selectedCount": "Đã chọn {{count}} người dùng",
         "deleteConfirm": "Bạn có chắc chắn muốn xóa các người dùng đã chọn không? Hành động này không thể hoàn tác.",
-        "deleteBtn": "Xóa mục đã chọn"
+        "deleteBtn": "Xóa mục đã chọn",
+        "disableConfirm": "Khóa tất cả người dùng đã chọn? Tài khoản của bạn sẽ được bỏ qua.",
+        "disableBtn": "Khóa mục đã chọn"
       },
       "table": {
         "id": "ID",
@@ -571,6 +579,7 @@
         "blockSuccess": "Đã khóa tài khoản.",
         "unblockSuccess": "Đã mở khóa tài khoản.",
         "deleteSuccess": "Xóa người dùng thành công.",
+        "bulkDisableSuccess": "Đã khóa {{count}} người dùng.",
         "actionFailed": "Thao tác thất bại.",
         "roleUpdated": "Đã cập nhật vai trò.",
         "roleUpdateFailed": "Cập nhật vai trò thất bại."
@@ -583,6 +592,57 @@
       "title": "Quản lý người dùng",
       "breadcrumbAdmin": "Admin",
       "breadcrumbList": "Danh sách"
+    },
+    "companyVerifications": {
+      "title": "Xác thực công ty",
+      "subtitle": "Rà soát hồ sơ pháp lý và yêu cầu lịch xác minh.",
+      "empty": "Chưa có yêu cầu xác minh.",
+      "reviewNotePlaceholder": "Ghi chú rà soát",
+      "table": {
+        "company": "Công ty",
+        "legalProfile": "Hồ sơ pháp lý",
+        "appointment": "Lịch hẹn",
+        "adminNote": "Ghi chú admin",
+        "status": "Trạng thái"
+      },
+      "legal": {
+        "tax": "Mã số thuế: {{value}}",
+        "license": "Giấy phép: {{value}}",
+        "representative": "Đại diện: {{value}}"
+      },
+      "status": {
+        "pending": "Chờ duyệt",
+        "reviewing": "Đang xem xét",
+        "approved": "Đã duyệt",
+        "rejected": "Từ chối"
+      },
+      "toast": {
+        "updateSuccess": "Đã cập nhật trạng thái xác minh.",
+        "updateError": "Không thể cập nhật trạng thái xác minh."
+      }
+    },
+    "trustReports": {
+      "title": "Báo cáo tin cậy",
+      "subtitle": "Rà soát báo cáo về tin tuyển dụng và hồ sơ công ty.",
+      "empty": "Chưa có báo cáo.",
+      "table": {
+        "id": "ID",
+        "target": "Đối tượng",
+        "reason": "Lý do",
+        "reporter": "Người báo cáo",
+        "message": "Nội dung",
+        "status": "Trạng thái"
+      },
+      "status": {
+        "open": "Mới",
+        "reviewing": "Đang xem xét",
+        "resolved": "Đã xử lý",
+        "rejected": "Từ chối"
+      },
+      "toast": {
+        "updateSuccess": "Đã cập nhật trạng thái báo cáo.",
+        "updateError": "Không thể cập nhật trạng thái báo cáo."
+      }
     },
     "questions": {
       "title": "Ngân hàng Câu hỏi Phỏng vấn",

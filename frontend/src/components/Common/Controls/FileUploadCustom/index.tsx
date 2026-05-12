@@ -51,16 +51,18 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
         <Box
           sx={{
             border: '2px dashed',
-            borderColor: 'grey.200',
-            borderRadius: 2,
+            borderColor: 'rgba(42, 169, 225, 0.34)',
+            borderRadius: 4,
             p: 3,
             textAlign: 'center',
-            bgcolor: 'grey.50',
+            bgcolor: 'background.paper',
             cursor: 'pointer',
             transition: 'all 0.2s ease-in-out',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.86)',
             '&:hover': {
               borderColor: 'primary.main',
-              bgcolor: 'rgba(42, 169, 225, 0.04)'
+              bgcolor: 'rgba(42, 169, 225, 0.04)',
+              boxShadow: '0 10px 24px rgba(26, 64, 125, 0.08)',
             }
           }}
           onClick={handleInputClick}
@@ -74,7 +76,8 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
               <Button
                 variant="contained"
                 color="primary"
-                sx={{ px: 3, py: 1, borderRadius: 2, textTransform: 'none', boxShadow: 'none' }}
+                startIcon={<FileUploadIcon fontSize="small" />}
+                sx={{ px: 3 }}
               >
                 {t('fileUpload.selectFile')}
               </Button>
@@ -94,6 +97,7 @@ const FileUploadCustom = <T extends FieldValues = FieldValues>({
                 borderRadius: 2,
                 bgcolor: 'rgba(5, 150, 105, 0.06)',
                 border: '1px solid rgba(5, 150, 105, 0.3)',
+                boxShadow: '0 12px 28px rgba(5, 150, 105, 0.1)',
               }}
             >
               <FilePresentIcon sx={{ color: '#059669', fontSize: 22 }} />

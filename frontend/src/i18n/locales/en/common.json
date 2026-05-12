@@ -18,8 +18,13 @@
   "loading": "Loading...",
   "noData": "No data",
   "viewDetails": "View details",
+  "id": "ID",
+  "na": "N/A",
   "company": {
-    "defaultDescription": "A dynamic, creative workplace with many opportunities for advancement and career growth."
+    "defaultDescription": "A dynamic, creative workplace with many opportunities for advancement and career growth.",
+    "notUpdated": "Not updated",
+    "jobCount": "{{count}} jobs",
+    "followers": "{{count}} followers"
   },
   "nav": {
     "jobs": "Jobs",
@@ -72,10 +77,12 @@
     "rightsReserved": "© {{year}} {{appName}}. All Rights Reserved.",
     "forJobSeekers": "For Job Seekers"
   },
+  "next": "Next",
   "actionsLabel": "Actions",
   "actions": {
     "start": "Start",
     "close": "Close",
+    "submit": "Submit",
     "backHome": "Back to home",
     "joinNow": "Join now",
     "openNewTab": "Open in new tab",

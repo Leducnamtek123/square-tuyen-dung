@@ -32,6 +32,7 @@ import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import EventIcon from '@mui/icons-material/Event';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 
 import type { JobPostActivity } from '@/types/models';
 import { useConfig } from '@/hooks/useConfig';
@@ -47,10 +48,11 @@ interface AppliedResumeKanbanProps {
     isLoading: boolean;
     handleChangeApplicationStatus: (id: string | number, value: string | number, callback: (result: boolean) => void) => void;
     handleDelete: (id: string | number) => void;
+    onCreateEmployee?: (activity: JobPostActivity) => void;
     onAnalysisStateChange?: (id: string | number, nextState: Pick<JobPostActivity, 'aiAnalysisStatus' | 'aiAnalysisProgress'>) => void;
 }
 
-const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoading, handleChangeApplicationStatus, handleDelete, onAnalysisStateChange }) => {
+const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoading, handleChangeApplicationStatus, handleDelete, onCreateEmployee, onAnalysisStateChange }) => {
     const { t } = useTranslation(['employer', 'common']);
     const { allConfig } = useConfig();
     const { push } = useRouter();
@@ -227,6 +229,23 @@ const AppliedResumeKanban: React.FC<AppliedResumeKanbanProps> = ({ rows, isLoadi
                                                                                  </IconButton>
                                                                              </Tooltip>
                                                                              <SendEmailComponent jobPostActivityId={String(item.id)} isSentEmail={item.isSentEmail || false} email={item.email || ''} fullName={item.fullName || ''} />
+                                                                             {item.hrmEmployeeId ? (
+                                                                                <Tooltip title={t('employees.hrm.convert.openEmployee', { defaultValue: 'Open Frappe HR employee profile' })} arrow>
+                                                                                   <IconButton size="small" color="primary" onClick={() => {
+                                                                                       if (item.hrmEmployeeUrl) {
+                                                                                           window.open(item.hrmEmployeeUrl, '_blank', 'noopener,noreferrer');
+                                                                                       }
+                                                                                   }}>
+                                                                                       <PersonAddAltIcon fontSize="small" />
+                                                                                   </IconButton>
+                                                                                </Tooltip>
+                                                                             ) : ([4, 5].includes(Number(item.status)) && onCreateEmployee && (
+                                                                                <Tooltip title={t('employees.hrm.convert.action')} arrow>
+                                                                                   <IconButton size="small" color="success" onClick={() => onCreateEmployee(item)}>
+                                                                                       <PersonAddAltIcon fontSize="small" />
+                                                                                   </IconButton>
+                                                                                </Tooltip>
+                                                                             ))}
                                                                              <Tooltip title={t('appliedResume.table.tooltips.delete')} arrow>
                                                                                 <IconButton size="small" color="error" onClick={() => handleDelete(item.id)}>
                                                                                     <DeleteIcon fontSize="small" />

@@ -550,6 +550,14 @@ class UserViewSet(
             )
         return super().update(request, *args, **kwargs)
 
+    def destroy(self, request, *args, **kwargs):
+        if str(request.user.pk) == str(kwargs.get("pk")):
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": "Cannot delete your own account."},
+            )
+        return super().destroy(request, *args, **kwargs)
+
     @action(methods=["post"], detail=True, url_path="toggle-active", url_name="toggle-active")
     def toggle_active(self, request, pk=None):
         try:
@@ -566,3 +574,34 @@ class UserViewSet(
                 status=status.HTTP_404_NOT_FOUND,
                 errors={"detail": str(e)},
             )
+
+    @action(methods=["post"], detail=False, url_path="bulk-status", url_name="bulk-status")
+    def bulk_status(self, request):
+        ids = request.data.get("ids") or request.data.get("userIds") or []
+        if not isinstance(ids, list) or not ids:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"ids": ["At least one user id is required."]},
+            )
+
+        if "isActive" not in request.data:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"isActive": ["This field is required."]},
+            )
+
+        normalized_ids = {str(item) for item in ids}
+        if str(request.user.pk) in normalized_ids:
+            return response_data(
+                status=status.HTTP_400_BAD_REQUEST,
+                errors={"detail": "Cannot change the status of your own account."},
+            )
+
+        is_active = request.data.get("isActive")
+        if isinstance(is_active, str):
+            is_active = is_active.strip().lower() in {"1", "true", "yes", "on"}
+        else:
+            is_active = bool(is_active)
+
+        updated = User.objects.filter(pk__in=ids).update(is_active=is_active)
+        return response_data(data={"updated": updated, "isActive": is_active})

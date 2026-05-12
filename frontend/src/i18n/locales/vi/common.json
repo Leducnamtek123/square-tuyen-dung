@@ -24,6 +24,7 @@
   "actions": {
     "start": "Bắt đầu",
     "close": "Đóng",
+    "submit": "Gửi",
     "backHome": "Quay lại trang chủ",
     "joinNow": "Tham gia ngay",
     "openNewTab": "Mở tab mới",
@@ -53,7 +54,10 @@
   "noData": "Không có dữ liệu",
   "viewDetails": "Xem chi tiết",
   "company": {
-    "defaultDescription": "Môi trường làm việc năng động, sáng tạo với nhiều cơ hội thăng tiến và phát triển sự nghiệp."
+    "defaultDescription": "Môi trường làm việc năng động, sáng tạo với nhiều cơ hội thăng tiến và phát triển sự nghiệp.",
+    "notUpdated": "Chưa cập nhật",
+    "jobCount": "{{count}} việc làm",
+    "followers": "{{count}} người theo dõi"
   },
   "nav": {
     "jobs": "Việc làm",
@@ -869,5 +873,8 @@
   "sidebarHeader": {
     "backToHome": "Về trang chủ",
     "backToAdmin": "Về trang quản trị"
-  }
+  },
+  "next": "Tiếp",
+  "id": "ID",
+  "na": "N/A"
 }

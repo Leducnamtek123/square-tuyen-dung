@@ -74,9 +74,10 @@ const ProfileUploadCard = ({
 
         overflow: 'hidden',
 
-        borderRadius: 2,
+        borderRadius: 4,
 
         boxShadow: (theme: Theme) => theme.customShadows.card,
+        border: '1px solid rgba(26, 64, 125, 0.1)',
         transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
         '&:hover': {
           transform: 'translateY(-4px)',
@@ -105,7 +106,7 @@ const ProfileUploadCard = ({
 
           position: 'absolute',
 
-          background: 'linear-gradient(180deg, rgba(33, 47, 63, 0) 0%, rgba(33, 47, 63, 0.8) 50%, rgba(33, 47, 63, 0.95) 100%)',
+          background: 'linear-gradient(180deg, rgba(15, 32, 64, 0.04) 0%, rgba(15, 32, 64, 0.72) 54%, rgba(10, 22, 40, 0.96) 100%)',
 
         }}
 
@@ -119,9 +120,11 @@ const ProfileUploadCard = ({
 
               sx={{
 
-                backdropFilter: 'blur(8px)',
+                backdropFilter: 'blur(12px)',
 
-                backgroundColor: 'rgba(46, 125, 50, 0.85)',
+                backgroundColor: 'rgba(16, 185, 129, 0.92)',
+                border: '1px solid rgba(255,255,255,0.22)',
+                boxShadow: '0 10px 22px rgba(16,185,129,0.22)',
 
                 '& .MuiChip-label': {
 
@@ -147,9 +150,10 @@ const ProfileUploadCard = ({
 
               sx={{
 
-                backdropFilter: 'blur(8px)',
+                backdropFilter: 'blur(12px)',
 
-                backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                border: '1px solid rgba(255,255,255,0.22)',
 
                 '& .MuiChip-label': {
 
@@ -219,19 +223,38 @@ const ProfileUploadCard = ({
 
             >
 
-              <Typography variant="h6" sx={{ fontWeight: 600 }}>{title}</Typography>
+              <Typography
+                variant="h6"
+                sx={{
+                  minWidth: 0,
+                  pr: 1,
+                  overflow: 'hidden',
+                  display: '-webkit-box',
+                  WebkitBoxOrient: 'vertical',
+                  WebkitLineClamp: 2,
+                  fontWeight: 800,
+                  lineHeight: 1.25,
+                }}
+              >
+                {title}
+              </Typography>
 
               <IconButton
 
+                aria-label="edit resume"
                 sx={{
 
-                  bgcolor: 'rgba(255, 255, 255, 0.1)',
+                  width: 38,
+                  height: 38,
+                  bgcolor: 'rgba(255, 255, 255, 0.14)',
 
-                  backdropFilter: 'blur(8px)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255,255,255,0.18)',
+                  boxShadow: '0 10px 24px rgba(0,0,0,0.18)',
 
                   '&:hover': {
 
-                    bgcolor: 'rgba(255, 255, 255, 0.2)',
+                    bgcolor: 'rgba(255, 255, 255, 0.24)',
 
                   }
 
@@ -261,9 +284,11 @@ const ProfileUploadCard = ({
 
                 sx={{
 
-                  backdropFilter: 'blur(8px)',
+                  backdropFilter: 'blur(12px)',
 
-                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.16)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  fontWeight: 800,
 
                   '& .MuiChip-label': {
 
@@ -285,15 +310,19 @@ const ProfileUploadCard = ({
 
               <IconButton
 
+                aria-label="delete resume"
                 sx={{
 
-                  bgcolor: 'rgba(211, 47, 47, 0.1)',
+                  width: 38,
+                  height: 38,
+                  bgcolor: 'rgba(220, 38, 38, 0.16)',
 
-                  backdropFilter: 'blur(8px)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid rgba(255,255,255,0.16)',
 
                   '&:hover': {
 
-                    bgcolor: 'rgba(211, 47, 47, 0.2)',
+                    bgcolor: 'rgba(220, 38, 38, 0.26)',
 
                   }
 

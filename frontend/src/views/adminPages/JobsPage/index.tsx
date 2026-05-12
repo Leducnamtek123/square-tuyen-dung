@@ -104,7 +104,7 @@ const JobsPage = () => {
     const columns = useMemo<ColumnDef<JobPost>[]>(() => [
         {
             accessorKey: 'id',
-            header: 'ID',
+            header: t('common:id') as string,
             enableSorting: true,
         },
         {

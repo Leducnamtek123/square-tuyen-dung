@@ -131,7 +131,7 @@ class ResumeService:
             subject=validated_data.get("title"),
             data=email_data,
         )
-        ContactProfile.objects.create(company=company, resume=resume)
+        ContactProfile.objects.get_or_create(company=company, resume=resume)
 
 
 class CompanyService:

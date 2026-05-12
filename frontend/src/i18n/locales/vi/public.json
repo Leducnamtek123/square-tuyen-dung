@@ -2,17 +2,44 @@
   "home": {
     "tabTitle": "Tìm việc nhanh, tuyển dụng hiệu quả tại {{appName}}",
     "topCompanies": "Công ty nổi bật",
+    "topCompaniesSubtitle": "Khám phá doanh nghiệp đang tuyển và đi thẳng đến những cơ hội đáng chú ý nhất.",
     "urgentJobs": "Việc làm tuyển gấp",
     "keyCareers": "Ngành nghề trọng điểm",
+    "keyCareersSubtitle": "Khám phá các nhóm nghề đang có nhu cầu cao để rút ngắn bước tìm kiếm.",
     "suggestedJobs": "Việc làm đề xuất",
     "exploreHeading": "Bạn cần tìm công việc phù hợp với mình?",
+    "exploreDescription": "Bắt đầu từ một nơi duy nhất để tìm việc, xem công ty, lọc theo ngành và đi nhanh đến hành động tiếp theo.",
     "startExploring": "Bắt đầu khám phá",
     "userFeedback": "Đánh giá từ người dùng",
     "noFeedbacks": "Chưa có người dùng nào đánh giá",
     "noCompaniesFound": "Hiện chưa tìm công ty phù hợp với tiêu chí của bạn",
     "jobsCount": "{{count}} Việc Làm",
     "companiesCount": "{{count}} công ty",
-    "jobsIn": "Việc làm {{careerName}}"
+    "jobsIn": "Việc làm {{careerName}}",
+    "heroEyebrow": "Nền tảng tuyển dụng thông minh",
+    "heroTitle": "Tìm việc phù hợp, tuyển đúng người nhanh hơn",
+    "heroDescription": "Khám phá việc làm theo ngành, thành phố và công ty. Nhà tuyển dụng có thể tiếp cận ứng viên phù hợp nhanh hơn với bộ công cụ tìm kiếm, hồ sơ và phỏng vấn của Square.",
+    "heroPrimaryCta": "Khám phá việc làm",
+    "heroSecondaryCta": "Dành cho nhà tuyển dụng",
+    "heroBenefit1": "Lọc theo nghề, thành phố, công ty",
+    "heroBenefit2": "Công ty nổi bật và tin tuyển dụng rõ ràng",
+    "heroBenefit3": "AI hỗ trợ gợi ý và tối ưu quy trình",
+    "searchHeading": "Bắt đầu tìm kiếm ngay",
+    "searchDescription": "Nhập từ khóa, chọn nghề hoặc thành phố để tìm cơ hội phù hợp hơn.",
+    "choosePathTitle": "Bạn đang tìm gì?",
+    "choosePathDescription": "Chọn đúng lộ trình ngay từ đầu để rút ngắn thời gian tìm việc hoặc tuyển dụng.",
+    "candidateTitle": "Dành cho ứng viên",
+    "candidateDescription": "Tìm công việc phù hợp theo nghề, thành phố và công ty trong vài thao tác.",
+    "candidateBenefit1": "Lọc theo ngành",
+    "candidateBenefit2": "Lưu và theo dõi job",
+    "candidateBenefit3": "Gợi ý phù hợp",
+    "candidateCta": "Khám phá việc làm",
+    "employerTitle": "Dành cho nhà tuyển dụng",
+    "employerDescription": "Đăng tin, tìm hồ sơ và rút ngắn quy trình tuyển dụng với bộ công cụ dành cho doanh nghiệp.",
+    "employerBenefit1": "Đăng tin nhanh",
+    "employerBenefit2": "Tìm hồ sơ phù hợp",
+    "employerBenefit3": "Phỏng vấn hiệu quả",
+    "employerCta": "Xem giải pháp"
   },
   "jobDetail": {
     "deadline": "Hạn nộp",
@@ -40,6 +67,26 @@
     "map": "Bản đồ",
     "similarJobs": "Việc làm tương tự",
     "notUpdated": "Chưa cập nhật",
+    "salaryInsightTitle": "Phân tích lương",
+    "salaryInsightSubtitle": "Tổng quan thị trường nhanh từ các job đang hoạt động tương tự.",
+    "salaryInsightListings": "Số tin",
+    "salaryInsightMin": "Min",
+    "salaryInsightMax": "Max",
+    "salaryInsightRange": "Khoảng điển hình",
+    "salaryInsightRelated": "Việc làm liên quan",
+    "reportCaption": "Tin cậy & An toàn",
+    "reportJobTitle": "Báo cáo tin tuyển dụng",
+    "reportReasonLabel": "Lý do",
+    "reportMessageLabel": "Chi tiết bổ sung",
+    "reportMessagePlaceholder": "Hãy cho chúng tôi biết nội dung nào không đúng hoặc gây hiểu lầm.",
+    "reportSuccess": "Gửi báo cáo thành công.",
+    "reportReasons": {
+      "scam": "Lừa đảo hoặc gian lận",
+      "wrongInfo": "Thông tin sai hoặc gây hiểu lầm",
+      "spam": "Spam",
+      "duplicate": "Tin trùng lặp",
+      "other": "Khác"
+    },
     "savedSuccess": "Lưu thành công.",
     "unsavedSuccess": "Bỏ lưu thành công.",
     "noData": "Không có dữ liệu.",
@@ -84,6 +131,11 @@
       "1": "Tại văn phòng",
       "2": "Kết hợp",
       "3": "Từ xa"
+    },
+    "saveSearch": "Lưu tìm kiếm",
+    "savedAlert": {
+      "defaultName": "Tìm kiếm đã lưu",
+      "success": "Đã lưu cảnh báo tìm kiếm."
     }
   },
   "jobByCategory": {
@@ -107,7 +159,16 @@
     "cityTitle": "Việc làm theo tỉnh thành",
     "jobTypeTitle": "Việc làm theo hình thức làm việc"
   },
+  "jobPostForm": {
+    "label": {
+      "isUrgent": "Gấp"
+    }
+  },
   "companyDetail": {
+    "verified": "Công ty đã xác minh",
+    "verifiedDescription": "Công ty này đã được kiểm duyệt thủ công và được đánh dấu là đáng tin cậy.",
+    "report": "Báo cáo",
+    "reportCompanyTitle": "Báo cáo công ty",
     "since": "Thành lập năm {{year}}",
     "employeeSize": "{{size}} nhân viên",
     "notUpdated": "Chưa cập nhật",
@@ -155,7 +216,8 @@
       "emailMax": "Email vượt quá độ dài cho phép.",
       "phoneRequired": "Vui lòng nhập số điện thoại.",
       "phoneInvalid": "Số điện thoại không hợp lệ.",
-      "phoneMax": "Số điện thoại vượt quá độ dài cho phép."
+      "phoneMax": "Số điện thoại vượt quá độ dài cho phép.",
+      "resumeRequired": "Vui lòng chọn hồ sơ."
     },
     "note": "Vui lòng cung cấp chính xác họ tên, email và số điện thoại để nhà tuyển dụng có thể liên hệ với bạn."
   },
@@ -227,6 +289,76 @@
       "breadcrumb": {
         "home": "Trang chủ"
       }
+    }
+  },
+  "static": {
+    "contact": {
+      "title": "Liên hệ",
+      "subtitle": "Kết nối với đội ngũ hỗ trợ tuyển dụng Square.",
+      "sections": [
+        {
+          "title": "Email hỗ trợ",
+          "body": "Với vấn đề tài khoản, tin tuyển dụng, xác thực hoặc phỏng vấn, hãy liên hệ support@square.vn."
+        },
+        {
+          "title": "Giờ làm việc",
+          "body": "Hỗ trợ hoạt động từ thứ Hai đến thứ Sáu trong giờ hành chính."
+        }
+      ]
+    },
+    "faq": {
+      "title": "Câu hỏi thường gặp",
+      "subtitle": "Các câu trả lời phổ biến dành cho ứng viên và nhà tuyển dụng.",
+      "sections": [
+        {
+          "title": "Ứng viên ứng tuyển như thế nào?",
+          "body": "Ứng viên có thể tạo hồ sơ, tải CV và ứng tuyển trực tiếp từ trang chi tiết tin tuyển dụng."
+        },
+        {
+          "title": "Nhà tuyển dụng xác thực công ty như thế nào?",
+          "body": "Nhà tuyển dụng gửi thông tin hồ sơ pháp lý và yêu cầu lịch xác minh từ cổng nhà tuyển dụng."
+        },
+        {
+          "title": "Báo cáo được xử lý như thế nào?",
+          "body": "Báo cáo tin cậy được admin rà soát và chuyển qua các trạng thái mới, đang xem xét, đã xử lý hoặc từ chối."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Điều khoản dịch vụ",
+      "subtitle": "Điều khoản cơ bản khi sử dụng dịch vụ tuyển dụng Square.",
+      "sections": [
+        {
+          "title": "Trách nhiệm tài khoản",
+          "body": "Người dùng chịu trách nhiệm giữ thông tin tài khoản chính xác và bảo vệ thông tin đăng nhập."
+        },
+        {
+          "title": "Nội dung tuyển dụng",
+          "body": "Tin tuyển dụng, hồ sơ công ty, CV và nội dung phỏng vấn phải chính xác, hợp pháp và tôn trọng người dùng."
+        },
+        {
+          "title": "Vận hành nền tảng",
+          "body": "Square có thể kiểm duyệt nội dung, tạm dừng hành vi lạm dụng và điều chỉnh khả dụng dịch vụ để bảo vệ người dùng."
+        }
+      ]
+    },
+    "privacy": {
+      "title": "Chính sách bảo mật",
+      "subtitle": "Cách Square xử lý dữ liệu tuyển dụng.",
+      "sections": [
+        {
+          "title": "Dữ liệu thu thập",
+          "body": "Square lưu dữ liệu tài khoản, hồ sơ, công ty, ứng tuyển, hồ sơ đã lưu và bản ghi phỏng vấn cần thiết cho quy trình tuyển dụng."
+        },
+        {
+          "title": "Mục đích sử dụng",
+          "body": "Dữ liệu được dùng để cung cấp tìm việc, tuyển dụng, gợi ý phù hợp, phỏng vấn, thông báo và hỗ trợ."
+        },
+        {
+          "title": "Quyền kiểm soát",
+          "body": "Người dùng có thể cập nhật thông tin tài khoản và hồ sơ từ dashboard, đồng thời liên hệ hỗ trợ cho yêu cầu về quyền riêng tư."
+        }
+      ]
     }
   }
 }

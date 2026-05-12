@@ -22,7 +22,7 @@ const stripPrefix = (pathname: string, prefix: string): string => {
   return stripped.startsWith('/') ? stripped : `/${stripped}`;
 };
 
-const EMPLOYER_PREFIXES = ['/employee', '/employer', '/nha-tuyen-dung'] as const;
+const EMPLOYER_PREFIXES = ['/employer', '/nha-tuyen-dung'] as const;
 const ADMIN_PREFIXES = ['/admin', '/quan-tri'] as const;
 
 export const getPreferredLanguage = (): LanguageCode => {

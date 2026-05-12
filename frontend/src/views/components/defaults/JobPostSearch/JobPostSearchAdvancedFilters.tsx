@@ -42,12 +42,15 @@ const JobPostSearchAdvancedFilters = ({
   return (
     <Card
       sx={{
-        p: 2,
-        boxShadow: 3,
-        mt: -1,
+        p: { xs: 1.5, sm: 2 },
+        boxShadow: '0 10px 28px rgba(15, 57, 127, 0.07)',
+        mt: 1.5,
+        border: '1px solid rgba(26, 64, 125, 0.1)',
+        borderRadius: 4,
+        backgroundColor: 'background.paper',
       }}
     >
-      <Grid container spacing={2}>
+      <Grid container spacing={1.5} alignItems="center">
         <Grid
           size={{
             xs: 12,
@@ -57,7 +60,7 @@ const JobPostSearchAdvancedFilters = ({
             xl: 1,
           }}
         >
-          <Typography variant="subtitle2" sx={{ pt: 1, fontSize: 14 }} color="GrayText">
+          <Typography variant="subtitle2" sx={{ fontSize: 14, fontWeight: 800, color: 'text.primary' }}>
             {t('jobSearch.advancedFilter')}
           </Typography>
         </Grid>
@@ -185,10 +188,27 @@ const JobPostSearchAdvancedFilters = ({
           }}
         >
           <Stack direction="row" justifyContent={{ xs: 'flex-end', lg: 'center', xl: 'center' }}>
-            <IconButton color="primary" aria-label="reset" onClick={onReset}>
+            <IconButton
+              color="primary"
+              aria-label="reset"
+              onClick={onReset}
+              sx={{
+                bgcolor: 'rgba(16, 185, 129, 0.1)',
+                mr: 1,
+                '&:hover': { bgcolor: 'rgba(16, 185, 129, 0.16)' },
+              }}
+            >
               <DeleteForeverIcon color="secondary" />
             </IconButton>
-            <IconButton color="primary" aria-label="clear" onClick={onToggleAdvancedFilter}>
+            <IconButton
+              color="primary"
+              aria-label="clear"
+              onClick={onToggleAdvancedFilter}
+              sx={{
+                bgcolor: 'rgba(220, 38, 38, 0.08)',
+                '&:hover': { bgcolor: 'rgba(220, 38, 38, 0.14)' },
+              }}
+            >
               <ClearIcon color="error" />
             </IconButton>
           </Stack>

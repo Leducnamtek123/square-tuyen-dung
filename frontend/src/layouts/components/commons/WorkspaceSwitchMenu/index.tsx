@@ -13,6 +13,7 @@ type WorkspaceItem = {
   type: "company" | "job_seeker";
   companyId?: number | null;
   label?: string;
+  roleCode?: string | null;
 };
 
 const WorkspaceSwitchMenu = () => {

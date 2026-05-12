@@ -17,6 +17,8 @@ import {
   Feedback,
   Question,
   JobPostNotification,
+  TrustReport,
+  CompanyVerification,
 } from '../types/models';
 
 type IdType = string | number;
@@ -28,6 +30,8 @@ export type AdminListParams = {
   kw?: string;
   search?: string;
   roleName?: string;
+  status?: string;
+  targetType?: string;
 };
 
 export interface CareerPayload {
@@ -231,6 +235,26 @@ const adminManagementService = {
   deleteCompany: (id: IdType): Promise<void> => {
     const url = `info/web/admin/companies/${id}/`;
     return httpRequest.delete(url);
+  },
+
+  getCompanyVerifications: (params: AdminListParams = {}): Promise<PaginatedResponse<CompanyVerification>> => {
+    const url = 'info/web/admin/company-verifications/';
+    return httpRequest.get<PaginatedResponse<CompanyVerification>>(url, { params: cleanParams(params) });
+  },
+
+  updateCompanyVerification: (id: IdType, data: Pick<CompanyVerification, 'status'> & { adminNote?: string }): Promise<CompanyVerification> => {
+    const url = `info/web/admin/company-verifications/${id}/`;
+    return httpRequest.patch<CompanyVerification>(url, data);
+  },
+
+  getTrustReports: (params: AdminListParams = {}): Promise<PaginatedResponse<TrustReport>> => {
+    const url = 'info/web/admin/trust-reports/';
+    return httpRequest.get<PaginatedResponse<TrustReport>>(url, { params: cleanParams(params) });
+  },
+
+  updateTrustReport: (id: IdType, data: Pick<TrustReport, 'status'>): Promise<TrustReport> => {
+    const url = `info/web/admin/trust-reports/${id}/`;
+    return httpRequest.patch<TrustReport>(url, data);
   },
 
   getBanners: (params: AdminListParams = {}): Promise<PaginatedResponse<Banner>> => {
