@@ -1,0 +1,41 @@
+# FPT GPU Container import configuration for the interview LLM.
+# This uses the FPT built-in vLLM OpenAI-compatible template.
+name: square-vllm
+gpu_instance: "4xH100"
+
+image_setting:
+  template_name: vllm-openai-v0.10.1
+
+access_container:
+  tcp_ports: []
+  http_ports:
+    - 8000
+
+advanced_settings:
+  persistent_disk:
+    mount_capacity: 200
+    mount_path: /models
+  environment_variables:
+    - key: MODEL
+      value: meta-llama/Llama-3.3-70B-Instruct
+    - key: LLM_SERVED_MODEL_NAME
+      value: llama-3.3-70b-versatile
+    - key: API_TOKEN
+      value: "<token-tu-dat>"
+    - key: HUGGING_FACE_HUB_TOKEN
+      value: "<hf-token-co-quyen-llama-3-3>"
+    - key: HF_HOME
+      value: /models/huggingface
+    - key: TENSOR_PARALLEL_SIZE
+      value: "4"
+    - key: DTYPE
+      value: bfloat16
+    - key: GPU_MEMORY_UTILIZATION
+      value: "0.70"
+    - key: MAX_MODEL_LEN
+      value: "8192"
+    - key: MAX_NUM_SEQS
+      value: "16"
+  startup_commands:
+    cmd:
+    args:

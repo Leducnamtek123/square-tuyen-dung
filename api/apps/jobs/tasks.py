@@ -279,7 +279,10 @@ def analyze_resume_ai(self, activity_id):
         - no markdown, no extra text outside JSON.
         """
 
-        llm_base_url = config("LLM_BASE_URL", default=config("OLLAMA_BASE_URL", default="http://ollama:11434/v1"))
+        llm_base_url = config(
+            "AI_LLM_BASE_URL",
+            default=config("LLM_BASE_URL", default=config("OLLAMA_BASE_URL", default="http://ollama:11434/v1")),
+        )
         model_alias = config(
             "AI_RESUME_LLM_MODEL",
             default=config("AI_LLM_MODEL", default=config("LLM_MODEL", default=config("OLLAMA_MODEL", default="gemma4:e4b"))),

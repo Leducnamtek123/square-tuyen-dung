@@ -16,6 +16,22 @@ COPY --chown=frappe:frappe infra/frappe-hrms/apps.json /opt/frappe/apps.json
 
 USER frappe
 
+RUN for entry in \
+    "/opt/frappe/local/frappe version-16" \
+    "/opt/frappe/local/erpnext version-16" \
+    "/opt/frappe/local/hrms version-16" \
+    "/opt/frappe/local/square_hrm_branding main"; \
+  do \
+    set -- ${entry}; \
+    repo="$1"; \
+    branch="$2"; \
+    git -C "$repo" init -b "$branch"; \
+    git -C "$repo" config user.email "engineering@square.vn"; \
+    git -C "$repo" config user.name "Square Build"; \
+    git -C "$repo" add -A; \
+    git -C "$repo" commit -q -m "Initialize local source"; \
+  done
+
 RUN : "${CACHE_BUST}" && \
   bench init --apps_path=/opt/frappe/apps.json \
     --frappe-branch=${FRAPPE_BRANCH} \

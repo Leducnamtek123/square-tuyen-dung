@@ -36,6 +36,8 @@ api_v1_patterns = [
     path("ai/transcribe/", ai_views.transcribe),
     path("ai/chat/", ai_views.chat),
     path("ai/health/", ai_views.health),
+    path("ai/gpu-control/", ai_views.gpu_control_status),
+    path("ai/gpu-control/<str:action>/", ai_views.gpu_control_action),
     path("livekit/webhook", livekit_webhook.livekit_webhook),
     # Compatibility endpoints for voice-agent integration.
     path("interview/compat/<str:room_name>/context", interviews_compat_views.interview_context),

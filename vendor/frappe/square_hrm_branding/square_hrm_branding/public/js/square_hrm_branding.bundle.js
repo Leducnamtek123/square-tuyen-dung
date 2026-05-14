@@ -1,7 +1,7 @@
 (function () {
 	const BRAND_NAME = "Square HRM";
 	const BRAND_LOGO = "/assets/square_hrm_branding/images/square/text-logo-black.svg";
-	const FALLBACK_LANGUAGE = "en";
+	const FALLBACK_LANGUAGE = "vi";
 	const SUPPORTED_LANGUAGES = new Set(["en", "vi"]);
 	const replacements = [
 		[/Frappe HR/g, BRAND_NAME],
@@ -23,8 +23,16 @@
 
 	function patchBoot() {
 		if (!window.frappe?.boot) return;
-		window.frappe.boot.lang = normalizeLanguage(window.frappe.boot.lang || document.documentElement.lang);
+		const preferredLanguage = window.SquareHRMBranding?.getCurrentLanguage?.();
+		window.frappe.boot.lang = normalizeLanguage(preferredLanguage || window.frappe.boot.lang || document.documentElement.lang);
 		window.frappe.boot.app_logo_url = BRAND_LOGO;
+		window.frappe.boot.square_hrm_brand = {
+			...(window.frappe.boot.square_hrm_brand || {}),
+			name: BRAND_NAME,
+			logo: BRAND_LOGO,
+			default_language: FALLBACK_LANGUAGE,
+			supported_languages: ["en", "vi"],
+		};
 		for (const app of window.frappe.boot.app_data || []) {
 			if (["frappe", "hrms", "erpnext"].includes(app.app_name)) {
 				app.app_title = BRAND_NAME;

@@ -1,4 +1,5 @@
 import json
+import logging
 import time
 from typing import Optional, List, Dict, Any
 from urllib.parse import urlsplit, urlunsplit
@@ -20,7 +21,10 @@ from rest_framework.request import Request as DRFRequest
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.throttling import AnonRateThrottle
 
+from apps.accounts.permissions import IsAdminUser
 from shared.configs.variable_response import data_response
+
+logger = logging.getLogger(__name__)
 
 try:
     from config.throttles import (
@@ -242,21 +246,169 @@ def _probe_celery() -> Dict[str, Any]:
         return {"status": "offline", "workers": 0, "error": str(exc)}
 
 
+def _ai_service_checks() -> Dict[str, Any]:
+    llm_api_key = getattr(settings, "AI_LLM_API_KEY", "") or getattr(settings, "LLM_API_KEY", "") or getattr(settings, "GROQ_API_KEY", "")
+    headers = {"Authorization": f"Bearer {llm_api_key}"} if llm_api_key else {}
+    livekit_url = getattr(settings, "LIVEKIT_URL", "") or getattr(settings, "LIVEKIT_PUBLIC_URL", "")
+
+    return {
+        "llm": _probe_http_service("llm", getattr(settings, "AI_LLM_BASE_URL", ""), headers=headers),
+        "stt": _probe_http_service("stt", getattr(settings, "AI_STT_BASE_URL", "")),
+        "tts": _probe_http_service("tts", getattr(settings, "AI_TTS_BASE_URL", ""), path="/voices"),
+        "livekit": _probe_http_service("livekit", livekit_url, path="/"),
+        "celery": _probe_celery(),
+    }
+
+
+def _fpt_gpu_config() -> Dict[str, Any]:
+    return {
+        "tenantId": getattr(settings, "FPT_GPU_TENANT_ID", ""),
+        "region": getattr(settings, "FPT_GPU_REGION", "hanoi-2-vn"),
+        "containerId": getattr(settings, "FPT_GPU_CONTAINER_ID", ""),
+        "name": getattr(settings, "FPT_GPU_CONTAINER_NAME", ""),
+        "consoleUrl": getattr(settings, "FPT_GPU_CONSOLE_URL", ""),
+        "billing": {
+            "runningHourlyVnd": getattr(settings, "FPT_GPU_RUNNING_HOURLY_COST_VND", 0),
+            "stoppedHourlyVnd": getattr(settings, "FPT_GPU_STOPPED_HOURLY_COST_VND", 0),
+        },
+    }
+
+
+def _fpt_control_credentials_configured() -> bool:
+    return bool(
+        getattr(settings, "FPT_GPU_BSS_ACCESS_TOKEN", "")
+        or getattr(settings, "FPT_GPU_ACCESS_TOKEN", "")
+    )
+
+
+class FPTGPUControlError(Exception):
+    def __init__(self, message: str, status_code: int = 502):
+        super().__init__(message)
+        self.status_code = status_code
+
+
+class FPTGPUControlNotConfigured(FPTGPUControlError):
+    def __init__(self):
+        super().__init__(
+            "FPT GPU control token is not configured. Set FPT_GPU_BSS_ACCESS_TOKEN or FPT_GPU_ACCESS_TOKEN.",
+            status_code=503,
+        )
+
+
+def _get_fpt_bss_access_token() -> str:
+    token = getattr(settings, "FPT_GPU_BSS_ACCESS_TOKEN", "")
+    if token:
+        return token
+
+    access_token = getattr(settings, "FPT_GPU_ACCESS_TOKEN", "")
+    tenant_id = getattr(settings, "FPT_GPU_TENANT_ID", "")
+    if not access_token:
+        raise FPTGPUControlNotConfigured()
+    if not tenant_id:
+        raise FPTGPUControlError("FPT_GPU_TENANT_ID is required to exchange FPT access token.", status_code=503)
+
+    try:
+        response = requests.get(
+            getattr(settings, "FPT_GPU_BSS_TOKEN_EXCHANGE_URL", ""),
+            headers={
+                "Authorization": f"Bearer {access_token}",
+                "tenant-id": tenant_id,
+            },
+            timeout=(5, 20),
+        )
+    except requests.RequestException as exc:
+        raise FPTGPUControlError(f"Could not exchange FPT access token: {exc}") from exc
+
+    if response.status_code >= 400:
+        raise FPTGPUControlError(
+            f"FPT token exchange failed with status {response.status_code}.",
+            status_code=502,
+        )
+
+    try:
+        payload = response.json()
+    except ValueError as exc:
+        raise FPTGPUControlError("FPT token exchange returned invalid JSON.") from exc
+
+    cloud_token = (
+        (payload.get("data") or {}).get("cloud_access_token")
+        or payload.get("cloud_access_token")
+    )
+    if not cloud_token:
+        raise FPTGPUControlError("FPT token exchange did not return cloud_access_token.")
+    return cloud_token
+
+
+def _fpt_gpu_request(method: str, path: str, payload: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    token = _get_fpt_bss_access_token()
+    base_url = getattr(settings, "FPT_GPU_CONTROL_BASE_URL", "https://console-api.fptcloud.com").rstrip("/")
+    url = f"{base_url}{path}"
+
+    try:
+        response = requests.request(
+            method,
+            url,
+            json=payload,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "fpt-region": getattr(settings, "FPT_GPU_REGION", "hanoi-2-vn"),
+                "Content-Type": "application/json",
+            },
+            timeout=(5, 30),
+        )
+    except requests.RequestException as exc:
+        raise FPTGPUControlError(f"FPT GPU control request failed: {exc}") from exc
+
+    if response.status_code >= 400:
+        try:
+            error_payload = response.json()
+        except ValueError:
+            error_payload = response.text[:300]
+        raise FPTGPUControlError(
+            f"FPT GPU control returned {response.status_code}: {error_payload}",
+            status_code=502,
+        )
+
+    if not response.content:
+        return {}
+    try:
+        return response.json()
+    except ValueError:
+        return {"raw": response.text}
+
+
+def _fpt_gpu_path(suffix: str = "") -> str:
+    tenant_id = getattr(settings, "FPT_GPU_TENANT_ID", "")
+    container_id = getattr(settings, "FPT_GPU_CONTAINER_ID", "")
+    if not tenant_id or not container_id:
+        raise FPTGPUControlError("FPT_GPU_TENANT_ID and FPT_GPU_CONTAINER_ID are required.", status_code=503)
+    base = (
+        "/api/v1/xplat/gpu-container/common/tenants/"
+        f"{tenant_id}/gpu-containers/{container_id}"
+    )
+    return f"{base}{suffix}"
+
+
+def _get_fpt_container_detail() -> Optional[Dict[str, Any]]:
+    if not _fpt_control_credentials_configured():
+        return None
+    return _fpt_gpu_request("GET", _fpt_gpu_path())
+
+
+def _infer_container_status(checks: Dict[str, Any]) -> str:
+    ai_statuses = [checks.get(key, {}).get("status") for key in ("llm", "stt", "tts")]
+    if all(status == "online" for status in ai_statuses):
+        return "RUNNING"
+    if any(status == "online" for status in ai_statuses):
+        return "DEGRADED"
+    return "UNKNOWN"
+
+
 class AIHealthAPIView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request: DRFRequest):
-        llm_api_key = getattr(settings, "AI_LLM_API_KEY", "") or getattr(settings, "LLM_API_KEY", "") or getattr(settings, "GROQ_API_KEY", "")
-        headers = {"Authorization": f"Bearer {llm_api_key}"} if llm_api_key else {}
-        livekit_url = getattr(settings, "LIVEKIT_URL", "") or getattr(settings, "LIVEKIT_PUBLIC_URL", "")
-
-        checks = {
-            "llm": _probe_http_service("llm", getattr(settings, "AI_LLM_BASE_URL", ""), headers=headers),
-            "stt": _probe_http_service("stt", getattr(settings, "AI_STT_BASE_URL", "")),
-            "tts": _probe_http_service("tts", getattr(settings, "AI_TTS_BASE_URL", ""), path="/voices"),
-            "livekit": _probe_http_service("livekit", livekit_url, path="/"),
-            "celery": _probe_celery(),
-        }
+        checks = _ai_service_checks()
         all_ready = all(item.get("status") == "online" for item in checks.values())
         return Response(
             data_response(
@@ -271,6 +423,85 @@ class AIHealthAPIView(APIView):
 
 
 health = AIHealthAPIView.as_view()
+
+
+class FPTGPUControlStatusAPIView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def get(self, request: DRFRequest):
+        checks = _ai_service_checks()
+        container = _fpt_gpu_config()
+        control_error = ""
+        detail = None
+
+        if _fpt_control_credentials_configured():
+            try:
+                detail = _get_fpt_container_detail()
+            except FPTGPUControlError as exc:
+                control_error = str(exc)
+                logger.warning("FPT GPU detail check failed: %s", exc)
+
+        fpt_status = (detail or {}).get("status") if isinstance(detail, dict) else None
+        container.update(
+            {
+                "status": fpt_status or _infer_container_status(checks),
+                "statusSource": "fpt_api" if fpt_status else "service_probe",
+                "detail": detail if isinstance(detail, dict) else None,
+            }
+        )
+
+        all_ready = all(item.get("status") == "online" for item in checks.values())
+        return Response(
+            {
+                "container": container,
+                "control": {
+                    "available": _fpt_control_credentials_configured() and not control_error,
+                    "configured": _fpt_control_credentials_configured(),
+                    "error": control_error,
+                },
+                "ai": {
+                    "status": "ready" if all_ready else "degraded",
+                    "checks": checks,
+                },
+            },
+            status=200,
+        )
+
+
+class FPTGPUControlActionAPIView(APIView):
+    permission_classes = [IsAdminUser]
+
+    ACTIONS = {
+        "start": "START",
+        "stop": "STOP",
+        "restart": "RESTART",
+    }
+
+    def post(self, request: DRFRequest, action: str):
+        normalized_action = self.ACTIONS.get(action.lower())
+        if not normalized_action:
+            return Response({"detail": "Unsupported FPT GPU action."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            result = _fpt_gpu_request(
+                "POST",
+                _fpt_gpu_path("/actions"),
+                payload={"action": normalized_action},
+            )
+        except FPTGPUControlError as exc:
+            return Response({"detail": str(exc)}, status=exc.status_code)
+
+        return Response(
+            {
+                "action": normalized_action,
+                "result": result,
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+gpu_control_status = FPTGPUControlStatusAPIView.as_view()
+gpu_control_action = FPTGPUControlActionAPIView.as_view()
 
 
 # ---------------------------------------------------------------------------

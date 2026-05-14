@@ -15,6 +15,8 @@ interface HeaderProps {
   handleDrawerToggle: () => void;
 }
 
+const shellHeaderHeight = { xs: 56, sm: 64 };
+
 const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
   const { currentUser, isAuthenticated } = useAppSelector((state) => state.user);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -68,10 +70,11 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
       sx={{
         width: { xl: `calc(100% - ${drawerWidth}px)` },
         ml: { sm: `${drawerWidth}px` },
+        minHeight: shellHeaderHeight,
       }}
     >
-      <Stack direction="row" alignItems="center" justifyContent="space-between">
-        <Toolbar>
+      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ minHeight: shellHeaderHeight }}>
+        <Toolbar sx={{ minHeight: shellHeaderHeight }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -84,7 +87,7 @@ const Header = ({ drawerWidth, handleDrawerToggle }: HeaderProps) => {
           {/* <AccountSwitchMenu /> Remove or conditionally render this */}
           {!isAuthenticated && <AccountSwitchMenu />}
         </Toolbar>
-        <Toolbar>
+        <Toolbar sx={{ minHeight: shellHeaderHeight }}>
           <LanguageSwitcher />
           {isAuthenticated && (
             <React.Suspense fallback={<Box width={40} />}>

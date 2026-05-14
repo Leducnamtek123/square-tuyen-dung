@@ -3,11 +3,13 @@
 import React, { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from 'react-i18next';
-import { Avatar, Box, Divider, List, Toolbar, useTheme } from "@mui/material";
+import { Box, Divider, List, Toolbar, useTheme } from "@mui/material";
 import { IMAGES, ROUTES } from '@/configs/constants';
 import Link from 'next/link';
 import AdminMenu from './AdminMenu';
 import EmployerMenu from './EmployerMenu';
+
+const shellHeaderHeight = { xs: 56, sm: 64 };
 
 const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
   const { t } = useTranslation(['admin', 'employer']);
@@ -36,21 +38,22 @@ const DrawerContent = ({ isAdmin }: { isAdmin?: boolean }) => {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
-      <Toolbar sx={{ px: 2, py: 1.5, flexShrink: 0 }}>
+      <Toolbar disableGutters sx={{ px: 2, py: 0, minHeight: shellHeaderHeight, height: shellHeaderHeight, flexShrink: 0 }}>
         <Box
           component={Link}
           href={`/${isAdmin ? ROUTES.ADMIN.DASHBOARD : ROUTES.EMPLOYER.DASHBOARD}`}
           sx={{
             width: '100%',
             display: 'flex',
-            justifyContent: 'center'
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
         >
-          <Avatar
+          <Box
+            component="img"
             src={IMAGES.getTextLogo(theme.palette.mode === 'light' ? 'dark' : 'light')}
-            sx={{ height: 48, width: 'auto' }}
-            variant="rounded"
-            alt="LOGO"
+            sx={{ display: 'block', height: { xs: 36, sm: 40 }, width: 'auto', maxWidth: '100%', objectFit: 'contain' }}
+            alt="Square"
           />
         </Box>
       </Toolbar>

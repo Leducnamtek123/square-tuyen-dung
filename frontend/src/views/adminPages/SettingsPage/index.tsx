@@ -17,15 +17,189 @@ import {
   CardContent,
   Stack,
   CircularProgress,
+  Alert,
+  Chip,
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import SaveIcon from '@mui/icons-material/Save';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StopCircleIcon from '@mui/icons-material/StopCircle';
+import RefreshIcon from '@mui/icons-material/Refresh';
+import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { useSystemSettings, SystemSettings } from './hooks/useSystemSettings';
+import fptGpuService, { type FPTGpuControlStatus } from '../../../services/fptGpuService';
+import toastMessages from '../../../utils/toastMessages';
 
 const INITIAL_SETTINGS: SystemSettings = {
   maintenanceMode: false,
   autoApproveJobs: false,
   emailNotifications: true,
+};
+
+const serviceLabels: Record<string, string> = {
+  llm: 'LLM',
+  stt: 'STT',
+  tts: 'TTS',
+  livekit: 'LiveKit',
+  celery: 'Celery',
+};
+
+const normalizeStatus = (status?: string): string => (status || 'UNKNOWN').toUpperCase();
+
+const statusColor = (status?: string): 'success' | 'warning' | 'error' | 'default' => {
+  const normalized = normalizeStatus(status);
+  if (normalized === 'RUNNING' || normalized === 'READY') return 'success';
+  if (normalized === 'STOPPED' || normalized === 'UNKNOWN' || normalized === 'DEGRADED') return 'warning';
+  if (normalized === 'FAILED' || normalized === 'ERROR') return 'error';
+  return 'default';
+};
+
+const serviceColor = (status?: string): 'success' | 'error' | 'default' => {
+  if (status === 'online') return 'success';
+  if (status === 'offline') return 'error';
+  return 'default';
+};
+
+const formatVndPerHour = (value?: number): string => {
+  if (!value) return 'N/A';
+  return `${new Intl.NumberFormat('vi-VN').format(value)} VND/h`;
+};
+
+const FPTGpuControlCard = () => {
+  const queryClient = useQueryClient();
+  const { data, isLoading, isFetching, error } = useQuery<FPTGpuControlStatus>({
+    queryKey: ['fpt-gpu-control'],
+    queryFn: fptGpuService.getStatus,
+    refetchInterval: 30000,
+  });
+
+  const actionMutation = useMutation({
+    mutationFn: (action: 'start' | 'stop') =>
+      action === 'start' ? fptGpuService.start() : fptGpuService.stop(),
+    onSuccess: (_result, action) => {
+      toastMessages.success(action === 'start' ? 'FPT GPU start requested.' : 'FPT GPU stop requested.');
+      queryClient.invalidateQueries({ queryKey: ['fpt-gpu-control'] });
+    },
+    onError: (mutationError) => {
+      const message = mutationError instanceof Error ? mutationError.message : 'FPT GPU action failed.';
+      toastMessages.error(message);
+    },
+  });
+
+  const container = data?.container;
+  const control = data?.control;
+  const status = normalizeStatus(container?.status);
+  const isBusy = ['CREATING', 'PROCESSING', 'DELETING', 'INITIALIZING'].includes(status);
+  const canStart = !!control?.available && !isBusy && ['STOPPED', 'FAILED', 'ERROR', 'UNKNOWN'].includes(status);
+  const canStop = !!control?.available && !isBusy && status === 'RUNNING';
+  const checks = Object.entries(data?.ai.checks || {});
+  const queryError = error instanceof Error ? error.message : '';
+
+  return (
+    <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid', borderColor: 'divider' }}>
+      <CardContent sx={{ p: 3 }}>
+        <Stack direction={{ xs: 'column', sm: 'row' }} justifyContent="space-between" gap={2} sx={{ mb: 2 }}>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              FPT GPU Container
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {container?.name || 'square-ai-manual-1ivp1r2x'}
+            </Typography>
+          </Box>
+          <Stack direction="row" gap={1} flexWrap="wrap">
+            <Chip label={status} color={statusColor(status)} size="small" />
+            <Chip label={control?.available ? 'Control enabled' : 'Read only'} size="small" variant="outlined" />
+          </Stack>
+        </Stack>
+
+        <Divider sx={{ mb: 3 }} />
+
+        {queryError && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {queryError}
+          </Alert>
+        )}
+        {control?.configured && control?.error && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            {control.error}
+          </Alert>
+        )}
+        {!control?.configured && !isLoading && (
+          <Alert severity="info" sx={{ mb: 2 }}>
+            Add FPT_GPU_BSS_ACCESS_TOKEN or FPT_GPU_ACCESS_TOKEN on the backend to enable Start and Stop.
+          </Alert>
+        )}
+
+        <Grid container spacing={2} sx={{ mb: 3 }}>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Typography variant="caption" color="text.secondary">Tenant</Typography>
+            <Typography variant="body2" fontWeight={600}>{container?.tenantId || 'N/A'}</Typography>
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Typography variant="caption" color="text.secondary">Running cost</Typography>
+            <Typography variant="body2" fontWeight={600}>{formatVndPerHour(container?.billing?.runningHourlyVnd)}</Typography>
+          </Grid>
+          <Grid size={{ xs: 12, md: 4 }}>
+            <Typography variant="caption" color="text.secondary">Stopped disk cost</Typography>
+            <Typography variant="body2" fontWeight={600}>{formatVndPerHour(container?.billing?.stoppedHourlyVnd)}</Typography>
+          </Grid>
+        </Grid>
+
+        <Stack direction="row" gap={1} flexWrap="wrap" sx={{ mb: 3 }}>
+          {checks.map(([key, check]) => (
+            <Chip
+              key={key}
+              label={`${serviceLabels[key] || key}: ${check.status}`}
+              color={serviceColor(check.status)}
+              size="small"
+              variant="outlined"
+            />
+          ))}
+        </Stack>
+
+        <Stack direction={{ xs: 'column', sm: 'row' }} gap={1.5}>
+          <Button
+            variant="contained"
+            color="success"
+            startIcon={actionMutation.isPending ? <CircularProgress color="inherit" size={18} /> : <PlayArrowIcon />}
+            disabled={!canStart || actionMutation.isPending}
+            onClick={() => actionMutation.mutate('start')}
+          >
+            Start
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            startIcon={actionMutation.isPending ? <CircularProgress color="inherit" size={18} /> : <StopCircleIcon />}
+            disabled={!canStop || actionMutation.isPending}
+            onClick={() => actionMutation.mutate('stop')}
+          >
+            Stop
+          </Button>
+          <Button
+            variant="outlined"
+            startIcon={isFetching ? <CircularProgress size={18} /> : <RefreshIcon />}
+            onClick={() => queryClient.invalidateQueries({ queryKey: ['fpt-gpu-control'] })}
+          >
+            Refresh
+          </Button>
+          {container?.consoleUrl && (
+            <Button
+              variant="text"
+              endIcon={<OpenInNewIcon />}
+              href={container.consoleUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open FPT
+            </Button>
+          )}
+        </Stack>
+      </CardContent>
+    </Card>
+  );
 };
 
 type SettingsFormProps = {
@@ -123,6 +297,8 @@ const SettingsForm = ({ initialSettings, onSave, isMutating }: SettingsFormProps
                 </Stack>
               </CardContent>
             </Card>
+
+            <FPTGpuControlCard />
 
             <Card elevation={0} sx={{ borderRadius: '16px', border: '1px solid', borderColor: 'divider' }}>
               <CardContent sx={{ p: 3 }}>

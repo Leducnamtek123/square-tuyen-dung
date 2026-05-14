@@ -1,0 +1,36 @@
+# FPT GPU Container import configuration for Square VieNeu TTS.
+# Replace registry placeholders before importing into FPT Cloud.
+name: square-vieneu-tts
+gpu_instance: "1xH100"
+
+image_setting:
+  image_url: registry.fke.fptcloud.com/<registry-id>/square-vieneu-tts
+  image_tag: latest
+  image_user: "<registry-user>"
+  image_password: "<registry-token>"
+
+access_container:
+  tcp_ports: []
+  http_ports:
+    - 8298
+
+advanced_settings:
+  persistent_disk:
+    mount_capacity: 100
+    mount_path: /root/.cache/huggingface
+  environment_variables:
+    - key: PORT
+      value: "8298"
+    - key: TTS_DEVICE
+      value: cuda
+    - key: TTS_MODE
+      value: standard
+    - key: TTS_BACKBONE_REPO
+      value: pnnbao-ump/VieNeu-TTS-0.3B
+    - key: TTS_GPU_MEM_FRACTION
+      value: "0.65"
+    - key: HF_HOME
+      value: /root/.cache/huggingface
+  startup_commands:
+    cmd:
+    args:

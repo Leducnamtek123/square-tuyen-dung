@@ -549,7 +549,7 @@ services:
       - data-net
 
   # ---------------------------------------------------------------------------
-  # AI Services (GPU-capable, CPU-safe defaults)
+  # Optional local AI Services (GPU-capable, CPU-safe defaults)
   # ---------------------------------------------------------------------------
   whisper:
     container_name: tuyendung-studio-whisper
@@ -600,7 +600,6 @@ services:
     container_name: tuyendung-studio-livekit-agent
     build:
       context: ./voice-ai/livekit_agent
-    profiles: ["gpu"]
     env_file:
       - .env
     environment:
@@ -614,10 +613,6 @@ services:
       backend:
         condition: service_started
       livekit:
-        condition: service_healthy
-      vieneu-tts:
-        condition: service_healthy
-      whisper:
         condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"

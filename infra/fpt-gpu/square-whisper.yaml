@@ -1,0 +1,30 @@
+# FPT GPU Container import configuration for Square Whisper STT.
+# Replace registry placeholders before importing into FPT Cloud.
+name: square-whisper
+gpu_instance: "1xH100"
+
+image_setting:
+  image_url: registry.fke.fptcloud.com/<registry-id>/square-whisper
+  image_tag: latest
+  image_user: "<registry-user>"
+  image_password: "<registry-token>"
+
+access_container:
+  tcp_ports: []
+  http_ports:
+    - 8080
+
+advanced_settings:
+  persistent_disk:
+    mount_capacity: 100
+    mount_path: /data
+  environment_variables:
+    - key: VOXBOX_HF_REPO_ID
+      value: Systran/faster-whisper-large-v3
+    - key: VOXBOX_DEVICE
+      value: cuda
+    - key: DATA_DIR
+      value: /data
+  startup_commands:
+    cmd:
+    args:

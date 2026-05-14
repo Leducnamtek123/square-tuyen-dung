@@ -1,0 +1,70 @@
+name: square-ai-manual
+
+gpu_instance: "1xH100"
+
+image_setting:
+   template_name: "NVIDIA Pytorch 25.03"
+
+access_container:
+   tcp_ports:
+      - 22
+   http_ports:
+      - 8000
+      - 8080
+      - 8298
+   ssh_keys:
+      - name: "square-ai-fpt-gpu-rsa"
+        key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCvRDMXWrclz3iZIl3MgnLEU6BtXab/rsz/NLlbNQx6VvboYh13u+T9/2ejn9ErfFbQRGKL51ZGhrc5g6AeYQqiylfIPDf+rzpKi9QwV5W+trEvYkTCxZ/l4EvOx+mSisDLEVIvVcjmCgB1ZwYRrHAcMP33cmDxsoYRXyQABXp4ohjCsOkEr4DB64oqE+fZ3ZkxHAeqdvVTyTPz2uI0a44vaC+GW9csLsGnR7eyCowbRBauNcbUp7vYmZctLqawR3rq4w4X9NEcJ4IhMpK0dUV3AEsuNLdPFxald/8YZbjsHHOLH8m+ws4jRWoUnUdYzcHm5TxTTBeM8DD/N0hf6oZ5IpEU5oKoNFt2t4VXqV63bskKia3madSifJz7iXi2IdFS41i3OH6IsI837wyu6Nu8YdfRQd43rSHH+cKY3wpC1WX6fFUKQH+QJz1JqCGLUrHKG2OKY4fUm50jMa3hTD/DoukW4HGTzX+ETqlVqHu70rxsm5adU/dsFnfyDqdFAhdomPwztGGUfWRGmRkU+9IcMRWkObAtYzir+h2Jh2G+QgznehcPsN2XHeLhhs0tSsLMIh0fMCBo4bvcGOsP+XLYPZ+tYDdIYjuDG6A2WxnktgShenxXI7sO9x6Rh4T3oazqmvri4nIHHdMKB1RZreVo1X8b+MkJai8kVb3O9Cw2iw== square-ai-fpt-gpu-rsa"
+
+advanced_settings:
+   persistent_disk:
+      mount_capacity: 200
+      mount_path: "/models"
+
+   environment_variables:
+      - key: LLM_MODEL
+        value: "Qwen/Qwen3-14B"
+      - key: LLM_SERVED_MODEL_NAME
+        value: "qwen3-14b-interview"
+      - key: API_TOKEN
+        value: "36173238af56c9ee63badd82ac28ef9bb22ab5a47d8b02e29b8dc8a1f236b85b"
+      - key: HF_HOME
+        value: "/models/huggingface"
+      - key: VLLM_DOWNLOAD_DIR
+        value: "/models/huggingface"
+      - key: DTYPE
+        value: "bfloat16"
+      - key: GPU_MEMORY_UTILIZATION
+        value: "0.55"
+      - key: MAX_MODEL_LEN
+        value: "8192"
+      - key: MAX_NUM_SEQS
+        value: "8"
+      - key: REASONING_PARSER
+        value: "qwen3"
+      - key: VOXBOX_HF_REPO_ID
+        value: "Systran/faster-whisper-large-v3"
+      - key: VOXBOX_DEVICE
+        value: "cuda"
+      - key: DATA_DIR
+        value: "/models/whisper"
+      - key: TTS_DEVICE
+        value: "cuda"
+      - key: TTS_MODE
+        value: "standard"
+      - key: TTS_BACKBONE_REPO
+        value: "pnnbao-ump/VieNeu-TTS-0.3B"
+      - key: TTS_GPU_MEM_FRACTION
+        value: "0.15"
+      - key: STT_STARTUP_DELAY_SECONDS
+        value: "30"
+      - key: TTS_STARTUP_DELAY_SECONDS
+        value: "60"
+      - key: SQUARE_REPO_URL
+        value: "https://github.com/Leducnamtek123/square-tuyen-dung.git"
+      - key: SQUARE_REPO_REF
+        value: "main"
+
+   startup_commands:
+      cmd:
+      args:

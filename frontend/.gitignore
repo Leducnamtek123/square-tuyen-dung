@@ -19,3 +19,16 @@ build.log
 docker_build*.log
 ts_errors.log
 typecheck*.log
+
+# generated reports and temporary artifacts
+/coverage
+/playwright-report
+/test-results
+/package
+*.tgz
+audit_output.md
+fix_report.md
+TYPE_UNKNOWN_OBJECT_AUDIT.md
+implementation_plan.md
+walkthrough.md
+hrm-debug*.png

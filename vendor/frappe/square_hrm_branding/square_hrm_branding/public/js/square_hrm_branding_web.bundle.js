@@ -3,76 +3,102 @@
 	const BRAND_LOGO = "/assets/square_hrm_branding/images/square/text-logo-black.svg";
 	const BRAND_ICON = "/assets/square_hrm_branding/images/square/icon.svg";
 	const BRAND_FAVICON = BRAND_ICON;
-	const FALLBACK_LANGUAGE = "en";
-	const LANGUAGE_STORAGE_KEY = "square_hrm_language";
+	const FALLBACK_LANGUAGE = "vi";
+	const LANGUAGE_STORAGE_KEY = "square_hrm_language_v2";
 	const LANGUAGE_COOKIE = "preferred_language";
 	const SUPPORTED_LANGUAGES = new Set(["en", "vi"]);
 	const LANGUAGE_OPTIONS = {
 		en: "English",
-		vi: "Tiếng Việt",
+		vi: "Ti\u1ebfng Vi\u1ec7t",
 	};
 	const LANGUAGE_LABELS = {
 		en: "Language",
-		vi: "Ngôn ngữ",
+		vi: "Ng\u00f4n ng\u1eef",
 	};
 	const translations = {
 		"Login to Square HRM": {
 			en: "Login to Square HRM",
-			vi: "Đăng nhập Square HRM",
+			vi: "\u0110\u0103ng nh\u1eadp Square HRM",
+		},
+		"Create a Square HRM Account": {
+			en: "Create a Square HRM Account",
+			vi: "T\u1ea1o t\u00e0i kho\u1ea3n Square HRM",
+		},
+		"Signup Disabled": {
+			en: "Signup Disabled",
+			vi: "\u0110\u0103ng k\u00fd \u0111\u00e3 t\u1eaft",
+		},
+		"Signups have been disabled for this website.": {
+			en: "Signups have been disabled for this website.",
+			vi: "Website n\u00e0y \u0111\u00e3 t\u1eaft \u0111\u0103ng k\u00fd.",
 		},
 		"Login": {
 			en: "Login",
-			vi: "Đăng nhập",
+			vi: "\u0110\u0103ng nh\u1eadp",
+		},
+		"Forgot Password": {
+			en: "Forgot Password",
+			vi: "Qu\u00ean m\u1eadt kh\u1ea9u",
 		},
 		"Forgot Password?": {
 			en: "Forgot Password?",
-			vi: "Quên mật khẩu?",
+			vi: "Qu\u00ean m\u1eadt kh\u1ea9u?",
+		},
+		"Reset Password": {
+			en: "Reset Password",
+			vi: "\u0110\u1eb7t l\u1ea1i m\u1eadt kh\u1ea9u",
+		},
+		"Back to Login": {
+			en: "Back to Login",
+			vi: "Quay l\u1ea1i \u0111\u0103ng nh\u1eadp",
 		},
 		"Show": {
 			en: "Show",
-			vi: "Hiện",
+			vi: "Hi\u1ec7n",
 		},
 		"Login with Email Link": {
 			en: "Login with Email Link",
-			vi: "Đăng nhập bằng liên kết email",
+			vi: "\u0110\u0103ng nh\u1eadp b\u1eb1ng li\u00ean k\u1ebft email",
+		},
+		"Send login link": {
+			en: "Send login link",
+			vi: "G\u1eedi li\u00ean k\u1ebft \u0111\u0103ng nh\u1eadp",
 		},
 		"or": {
 			en: "or",
-			vi: "hoặc",
+			vi: "ho\u1eb7c",
 		},
 		"Email": {
 			en: "Email",
 			vi: "Email",
 		},
+		"Email Address": {
+			en: "Email Address",
+			vi: "\u0110\u1ecba ch\u1ec9 email",
+		},
 		"Password": {
 			en: "Password",
-			vi: "Mật khẩu",
+			vi: "M\u1eadt kh\u1ea9u",
 		},
 		"Search": {
 			en: "Search",
-			vi: "Tìm kiếm",
+			vi: "T\u00ecm ki\u1ebfm",
 		},
 		"Home": {
 			en: "Home",
-			vi: "Trang chủ",
+			vi: "Trang ch\u1ee7",
 		},
 		"Logout": {
 			en: "Logout",
-			vi: "Đăng xuất",
+			vi: "\u0110\u0103ng xu\u1ea5t",
 		},
 		"Language": {
 			en: "Language",
-			vi: "Ngôn ngữ",
+			vi: "Ng\u00f4n ng\u1eef",
 		},
 	};
 	const translationAliases = {
-		"Se connecter à Square HRM": "Login to Square HRM",
-		"Se connecter a Square HRM": "Login to Square HRM",
 		"Connexion": "Login",
-		"Mot de Passe Oublié ?": "Forgot Password?",
-		"Mot de Passe Oublié?": "Forgot Password?",
-		"Mot de passe oublié ?": "Forgot Password?",
-		"Mot de passe oublié?": "Forgot Password?",
 		"Afficher": "Show",
 		"Ou": "or",
 		"ou": "or",
@@ -81,19 +107,7 @@
 		"Mot de passe": "Password",
 		"Rechercher": "Search",
 		"Accueil": "Home",
-		"Déconnexion": "Logout",
 		"Langue": "Language",
-		"Đăng nhập Square HRM": "Login to Square HRM",
-		"Đăng nhập": "Login",
-		"Quên mật khẩu?": "Forgot Password?",
-		"Hiện": "Show",
-		"Đăng nhập bằng liên kết email": "Login with Email Link",
-		"hoặc": "or",
-		"Mật khẩu": "Password",
-		"Tìm kiếm": "Search",
-		"Trang chủ": "Home",
-		"Đăng xuất": "Logout",
-		"Ngôn ngữ": "Language",
 	};
 	const replacements = [
 		[/Frappe HR/g, BRAND_NAME],
@@ -139,14 +153,17 @@
 		}
 	}
 
+	function getBootLanguage() {
+		return window.frappe?.boot?.lang || "";
+	}
+
 	function getCurrentLanguage() {
 		return normalizeLanguage(
 			getQueryLanguage()
 				|| getStoredLanguage()
+				|| getBootLanguage()
 				|| getCookie(LANGUAGE_COOKIE)
-				|| window.frappe?.boot?.lang
-				|| document.documentElement.lang
-				|| navigator.language
+				|| FALLBACK_LANGUAGE
 		);
 	}
 
@@ -243,8 +260,7 @@
 			for (const attr of ["title", "aria-label", "alt", "placeholder"]) {
 				const value = element.getAttribute(attr);
 				if (value && /Frappe|ERPNext/.test(value)) {
-					const brandedValue = replaceText(value);
-					setAttributeIfChanged(element, attr, brandedValue);
+					setAttributeIfChanged(element, attr, replaceText(value));
 				}
 			}
 		}
@@ -306,14 +322,53 @@
 		document.title = translateValue(title, language) || title;
 	}
 
+	function isDeskShell() {
+		const path = window.location.pathname;
+		const user = window.frappe?.session?.user || window.frappe?.boot?.user?.name || "";
+		return (
+			user !== "Guest"
+			&& (
+				path.startsWith("/app")
+				|| path.startsWith("/desk")
+				|| !!document.querySelector(".body-sidebar, .page-container[data-page-route], .desktop-navbar, .navbar")
+			)
+		);
+	}
+
+	function getDeskHeaderActions() {
+		if (!isDeskShell()) return null;
+		const navbar = document.querySelector("header.desktop-navbar")
+			|| document.querySelector(".desktop-navbar")
+			|| document.querySelector("header .navbar")
+			|| document.querySelector(".navbar");
+		if (!navbar) return null;
+		let actions = navbar.querySelector(".square-hrm-desk-actions");
+		if (!actions) {
+			actions = document.createElement("div");
+			actions.className = "square-hrm-desk-actions";
+			const parent = navbar.querySelector(".navbar-right")
+				|| navbar.querySelector(".container")
+				|| navbar;
+			parent.appendChild(actions);
+		}
+		return actions;
+	}
+
 	function renderLanguageSwitcher() {
 		let switcher = document.querySelector(".square-hrm-language-switcher");
+		if (isDeskShell()) {
+			switcher?.remove();
+			return;
+		}
 		if (!switcher) {
 			switcher = document.createElement("div");
 			switcher.className = "square-hrm-language-switcher";
 			switcher.setAttribute("role", "group");
-			document.body.appendChild(switcher);
 		}
+
+		document.body.appendChild(switcher);
+		switcher.classList.remove("is-in-desk");
+		switcher.classList.add("is-floating");
 
 		const language = getCurrentLanguage();
 		switcher.setAttribute("aria-label", LANGUAGE_LABELS[language]);
@@ -335,6 +390,131 @@
 		}
 	}
 
+	function getVisibleSidebarMenu() {
+		const menus = [...document.querySelectorAll(".frappe-menu.context-menu")];
+		return menus.find((menu) => {
+			const style = getComputedStyle(menu);
+			if (style.display === "none" || style.visibility === "hidden" || !menu.getClientRects().length) return false;
+			const titles = [...menu.querySelectorAll(".menu-item-title")].map((title) => title.textContent.trim());
+			return titles.includes("Reload") && titles.includes("Toggle Theme");
+		});
+	}
+
+	function getMenuItemByTitle(menu, label) {
+		return [...menu.querySelectorAll(".dropdown-menu-item")].find((item) => {
+			return item.querySelector(".menu-item-title")?.textContent.trim() === label;
+		});
+	}
+
+	function renderDeskMenuLanguageSwitcher() {
+		if (!isDeskShell()) return;
+		const menu = getVisibleSidebarMenu();
+		if (!menu) return;
+		const language = getCurrentLanguage();
+		let item = menu.querySelector(".square-hrm-menu-language-item");
+		if (!item) {
+			item = document.createElement("div");
+			item.className = "dropdown-menu-item square-hrm-menu-language-item";
+			item.addEventListener("click", (event) => {
+				event.preventDefault();
+				event.stopPropagation();
+			});
+		}
+		item.innerHTML = `
+			<a>
+				<div class="menu-item-icon">${window.frappe?.utils?.icon?.("globe") || ""}</div>
+				<span class="menu-item-title">${LANGUAGE_LABELS[language]}</span>
+				<div class="square-hrm-menu-language-toggle" role="group" aria-label="${LANGUAGE_LABELS[language]}"></div>
+			</a>
+		`;
+		const toggle = item.querySelector(".square-hrm-menu-language-toggle");
+		for (const code of Object.keys(LANGUAGE_OPTIONS)) {
+			const button = document.createElement("button");
+			button.type = "button";
+			button.className = `square-hrm-menu-language-button${code === language ? " is-active" : ""}`;
+			button.textContent = code.toUpperCase();
+			button.setAttribute("aria-pressed", code === language ? "true" : "false");
+			button.setAttribute("title", LANGUAGE_OPTIONS[code]);
+			button.addEventListener("click", (event) => {
+				event.preventDefault();
+				event.stopPropagation();
+				if (code !== getCurrentLanguage()) {
+					setPreferredLanguage(code, true);
+				}
+			});
+			toggle.appendChild(button);
+		}
+		const themeItem = getMenuItemByTitle(menu, "Toggle Theme");
+		const helpItem = getMenuItemByTitle(menu, "Help");
+		const logoutItem = getMenuItemByTitle(menu, "Logout");
+		if (themeItem?.nextSibling) {
+			themeItem.after(item);
+		} else if (helpItem) {
+			menu.insertBefore(item, helpItem);
+		} else if (logoutItem) {
+			menu.insertBefore(item, logoutItem);
+		} else {
+			menu.appendChild(item);
+		}
+	}
+
+	function getUserDisplayName() {
+		const bootUser = window.frappe?.boot?.user;
+		if (bootUser && typeof bootUser === "object") {
+			return bootUser.full_name || bootUser.name || window.frappe?.session?.user || "User";
+		}
+		return window.frappe?.boot?.full_name || window.frappe?.session?.user || "User";
+	}
+
+	function getUserInitials(name) {
+		const cleanName = String(name || "A").replace(/@.*/, "").trim();
+		const parts = cleanName.split(/\s+/).filter(Boolean);
+		if (!parts.length) return "A";
+		return parts.slice(0, 2).map((part) => part[0]).join("").toUpperCase();
+	}
+
+	function logoutFromAvatar() {
+		const csrfToken = window.frappe?.csrf_token
+			|| document.querySelector("meta[name='csrf-token']")?.content
+			|| "";
+		window.fetch("/api/method/logout", {
+			method: "POST",
+			credentials: "same-origin",
+			headers: {
+				"Accept": "application/json",
+				"X-Frappe-CSRF-Token": csrfToken,
+			},
+		}).finally(() => {
+			window.location.assign("/login");
+		});
+	}
+
+	function renderDeskUserAvatar() {
+		let avatar = document.querySelector(".square-hrm-user-avatar");
+		if (!isDeskShell()) {
+			avatar?.remove();
+			return;
+		}
+		const headerActions = getDeskHeaderActions();
+		if (!headerActions) return;
+		if (!avatar) {
+			avatar = document.createElement("button");
+			avatar.type = "button";
+			avatar.className = "square-hrm-user-avatar";
+			avatar.addEventListener("click", logoutFromAvatar);
+		}
+		const language = getCurrentLanguage();
+		const name = getUserDisplayName();
+		const label = translations.Logout[language] || translations.Logout.en;
+		avatar.setAttribute("title", label);
+		avatar.setAttribute("aria-label", label);
+		avatar.innerHTML = `
+			<span class="square-hrm-user-avatar__initials">${getUserInitials(name)}</span>
+			<span class="square-hrm-user-avatar__name">${name}</span>
+		`;
+		headerActions.appendChild(avatar);
+	}
+
 	let observer;
 	let patching = false;
 	let scheduled = false;
@@ -353,6 +533,8 @@
 			patchFavicons();
 			patchTitle();
 			renderLanguageSwitcher();
+			renderDeskMenuLanguageSwitcher();
+			renderDeskUserAvatar();
 		} finally {
 			patching = false;
 			observer?.observe(document.documentElement, { childList: true, subtree: true });

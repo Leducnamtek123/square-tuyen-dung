@@ -8,6 +8,7 @@ if os.path.exists(os.path.join(os.path.dirname(__file__), "src")):
 
 import asyncio
 import logging
+import re
 import time
 import numpy as np
 import queue
@@ -112,7 +113,7 @@ def get_tts():
                 codec_device=codec_device,
             )
 
-            # DEBUG: List all available voices at startup
+            # Log available voices once so operators can verify voice IDs from container logs.
             try:
                 voices = tts.list_preset_voices()
                 logger.info(f"🎤 Available preset voices ({len(voices)}):")
@@ -144,6 +145,12 @@ class OpenAITTSRequest(BaseModel):
     response_format: str = "mp3"
     speed: float = 1.0
 
+def sanitize_tts_input(text: str) -> str:
+    text = re.sub(r"<think>[\s\S]*?</think>", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"<think>[\s\S]*", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"</think>", " ", text, flags=re.IGNORECASE)
+    return " ".join(text.split()).strip()
+
 def float32_to_pcm16(audio_float):
     return (audio_float * 32767).clip(-32768, 32767).astype(np.int16).tobytes()
 
@@ -155,6 +162,8 @@ async def list_voices():
 
 @app.post("/v1/audio/speech")
 async def tts_speech(req: OpenAITTSRequest):  # noqa: C901
+    req.input = sanitize_tts_input(req.input)
+
     # Basic input validation
     if not req.input or not req.input.strip():
         logger.warning("Received empty TTS input")

@@ -1,0 +1,63 @@
+# FPT GPU Container import configuration for one interview container running
+# LLM + STT + TTS. Values are mapped from the current project .env.
+# Replace registry/token placeholders before importing into FPT Cloud.
+name: square-ai-interview
+gpu_instance: "1xH100"
+
+image_setting:
+  image_url: registry.fke.fptcloud.com/<registry-id>/square-ai-all-in-one
+  image_tag: latest
+  image_user: "<registry-user>"
+  image_password: "<registry-token>"
+
+access_container:
+  tcp_ports: []
+  http_ports:
+    - 8000
+    - 8080
+    - 8298
+
+advanced_settings:
+  persistent_disk:
+    mount_capacity: 200
+    mount_path: /models
+  environment_variables:
+    - key: LLM_MODEL
+      value: Qwen/Qwen3-14B
+    - key: LLM_SERVED_MODEL_NAME
+      value: qwen3-14b-interview
+    - key: API_TOKEN
+      value: "<token-tu-dat>"
+    - key: HF_HOME
+      value: /models/huggingface
+    - key: VLLM_DOWNLOAD_DIR
+      value: /models/huggingface
+    - key: DTYPE
+      value: bfloat16
+    - key: GPU_MEMORY_UTILIZATION
+      value: "0.55"
+    - key: MAX_MODEL_LEN
+      value: "8192"
+    - key: MAX_NUM_SEQS
+      value: "8"
+    - key: VOXBOX_HF_REPO_ID
+      value: Systran/faster-whisper-large-v3
+    - key: VOXBOX_DEVICE
+      value: cuda
+    - key: DATA_DIR
+      value: /models/whisper
+    - key: TTS_DEVICE
+      value: cuda
+    - key: TTS_MODE
+      value: standard
+    - key: TTS_BACKBONE_REPO
+      value: pnnbao-ump/VieNeu-TTS-0.3B
+    - key: TTS_GPU_MEM_FRACTION
+      value: "0.15"
+    - key: STT_STARTUP_DELAY_SECONDS
+      value: "30"
+    - key: TTS_STARTUP_DELAY_SECONDS
+      value: "60"
+  startup_commands:
+    cmd:
+    args:
